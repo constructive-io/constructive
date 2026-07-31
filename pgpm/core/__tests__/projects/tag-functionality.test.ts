@@ -1,10 +1,11 @@
 process.env.CONSTRUCTIVE_DEBUG = 'true';
 
-import { TestDatabase } from '../../test-utils';
-import { teardownPgPools } from 'pg-cache';
 import { readFileSync } from 'fs';
-import { PgpmPackage } from '../../src/core/class/pgpm';
 import { join } from 'path';
+import { teardownPgPools } from 'pg-cache';
+
+import { PgpmPackage } from '../../src/core/class/pgpm';
+import { TestDatabase } from '../../test-utils';
 import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
 
 describe('Tag functionality with CoreDeployTestFixture', () => {

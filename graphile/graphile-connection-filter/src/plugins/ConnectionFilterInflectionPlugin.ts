@@ -1,4 +1,5 @@
 import '../augmentations';
+
 import type { GraphileConfig } from 'graphile-config';
 
 /**

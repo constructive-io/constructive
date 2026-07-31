@@ -1,11 +1,11 @@
-import type { ExecutionResult, GraphQLSchema, DocumentNode } from 'graphql';
-import { parse } from 'graphql';
-import type { GraphileConfig } from 'graphile-config';
+import { execute } from 'grafast';
 import { makeSchema } from 'graphile-build';
 import { defaultPreset as graphileBuildDefaultPreset } from 'graphile-build';
 import { defaultPreset as graphileBuildPgDefaultPreset, withPgClientFromPgService } from 'graphile-build-pg';
+import type { GraphileConfig } from 'graphile-config';
 import { makePgService } from 'graphile-settings';
-import { execute } from 'grafast';
+import type { DocumentNode,ExecutionResult, GraphQLSchema } from 'graphql';
+import { parse } from 'graphql';
 import type { Pool } from 'pg';
 
 /**

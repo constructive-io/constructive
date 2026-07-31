@@ -6,7 +6,8 @@
  */
 
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { presignPutUrl, presignGetUrl, headObject } from '../src/presigned';
+
+import { headObject,presignGetUrl, presignPutUrl } from '../src/presigned';
 
 // Mock the AWS SDK modules
 jest.mock('@aws-sdk/s3-request-presigner', () => ({

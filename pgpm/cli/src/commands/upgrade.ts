@@ -1,6 +1,7 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, PackageInfo, ParsedArgs, createSpinner, upgradePrompt } from 'inquirerer';
+import { CLIOptions, createSpinner, Inquirerer, PackageInfo, ParsedArgs, upgradePrompt } from 'inquirerer';
+
 import { fetchLatestVersion } from '../utils/npm-version';
 
 const log = new Logger('upgrade');

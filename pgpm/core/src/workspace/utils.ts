@@ -1,6 +1,6 @@
+import { errors } from '@pgpmjs/types';
 import { existsSync } from 'fs';
 import { dirname, resolve } from 'path';
-import { errors } from '@pgpmjs/types';
 
 /**
  * Recursively walks up directories to find a specific file (sync version).
@@ -31,6 +31,6 @@ export const sluggify = (text: string): string => {
   return text.toString().toLowerCase().trim()
     .replace(/\s+/g, '-')           // Replace spaces with -
     .replace(/&/g, '-and-')         // Replace & with 'and'
-    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-    .replace(/\-\-+/g, '-');        // Replace multiple - with single -
+    .replace(/[^\w-]+/g, '')       // Remove all non-word chars
+    .replace(/--+/g, '-');        // Replace multiple - with single -
 };

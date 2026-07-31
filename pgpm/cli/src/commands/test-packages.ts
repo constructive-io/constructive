@@ -1,10 +1,10 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import path from 'path';
 import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
-import { getPgEnvOptions } from 'pg-env';
+import path from 'path';
 import { getPgPool } from 'pg-cache';
+import { getPgEnvOptions } from 'pg-env';
 
 const log = new Logger('test-packages');
 

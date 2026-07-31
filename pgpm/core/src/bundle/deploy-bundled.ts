@@ -1,10 +1,10 @@
-import { Logger } from '@pgpmjs/logger';
 import { BundleChange, MigrationBundle, verifyBundle } from '@pgpmjs/bundle';
+import { Logger } from '@pgpmjs/logger';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
 
 import { PgpmMigrate } from '../migrate/client';
-import { bundleMatchesModule, buildExecutableBundle, readBundleArtifact } from './artifact';
+import { buildExecutableBundle, bundleMatchesModule, readBundleArtifact } from './artifact';
 
 const log = new Logger('deploy-fast');
 

@@ -164,12 +164,12 @@ function generateCustomMutationHookInternal(
 
   if (hasSelect) {
     statements.push(
-    createImportDeclaration(
-      '../../orm/select-types',
-      ['InferSelectResult', 'HookStrictSelect', 'StrictSelect'],
-      true,
-    ),
-  );
+      createImportDeclaration(
+        '../../orm/select-types',
+        ['InferSelectResult', 'HookStrictSelect', 'StrictSelect'],
+        true,
+      ),
+    );
   }
 
   // Re-exports
@@ -230,12 +230,12 @@ function generateCustomMutationHookInternal(
 
     const mutationKeyExpr = useCentralizedKeys
       ? callExpr(
-          t.memberExpression(
-            t.identifier('customMutationKeys'),
-            t.identifier(operation.name),
-          ),
-          [],
-        )
+        t.memberExpression(
+          t.identifier('customMutationKeys'),
+          t.identifier(operation.name),
+        ),
+        [],
+      )
       : undefined;
 
     // Cast to ORM's StrictSelect (not HookStrictSelect) since the ORM
@@ -340,12 +340,12 @@ function generateCustomMutationHookInternal(
 
     const mutationKeyExpr = useCentralizedKeys
       ? callExpr(
-          t.memberExpression(
-            t.identifier('customMutationKeys'),
-            t.identifier(operation.name),
-          ),
-          [],
-        )
+        t.memberExpression(
+          t.identifier('customMutationKeys'),
+          t.identifier(operation.name),
+        ),
+        [],
+      )
       : undefined;
 
     let mutationFnExpr: t.Expression;

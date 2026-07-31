@@ -3,14 +3,14 @@
  */
 export {
   buildTypeRegistry,
-  transformSchemaToOperations,
   filterOperations,
-  getTableOperationNames,
-  isTableOperation,
-  getCustomOperations,
   getBaseTypeName,
+  getCustomOperations,
+  getTableOperationNames,
   isNonNull,
-  unwrapType,
-  type TransformSchemaResult,
+  isTableOperation,
   type TableOperationNames,
+  type TransformSchemaResult,
+  transformSchemaToOperations,
+  unwrapType,
 } from '@constructive-io/graphql-query';

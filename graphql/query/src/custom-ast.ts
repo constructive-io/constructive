@@ -1,9 +1,9 @@
 import * as t from 'gql-ast';
-import { Kind } from 'graphql';
 import type { FieldNode, InlineFragmentNode } from 'graphql';
+import { Kind } from 'graphql';
 
-import type { Field } from './types/schema';
 import type { MetaField } from './types';
+import type { Field } from './types/schema';
 
 /**
  * Get custom AST for MetaField type - handles PostgreSQL types that need subfield selections

@@ -19,8 +19,9 @@
 
 import 'graphile-build';
 import 'graphile-build-pg';
-import { TYPES } from '@dataplan/pg';
+
 import type { PgCodecWithAttributes } from '@dataplan/pg';
+import { TYPES } from '@dataplan/pg';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 

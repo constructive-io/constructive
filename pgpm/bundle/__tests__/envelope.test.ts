@@ -32,14 +32,14 @@ const DEPLOY: Record<string, string> = {
 
 const DATA_PART = {
   name: 'source-plane-data',
-  deploy: "INSERT INTO auth.users (id) VALUES (1);\n",
+  deploy: 'INSERT INTO auth.users (id) VALUES (1);\n',
   revert: 'DELETE FROM auth.users WHERE id IN (1);\n',
   verify: 'SELECT 1/(count(*) = 1)::int FROM auth.users;\n'
 };
 
 const FIXTURE_PART = {
   name: 'seed-roles',
-  deploy: "INSERT INTO auth.users (id) VALUES (99);\n"
+  deploy: 'INSERT INTO auth.users (id) VALUES (99);\n'
 };
 
 function write(rel: string, content: string): void {

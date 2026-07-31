@@ -1,9 +1,4 @@
 import {
-  createScriptedProvider,
-  makeFakeAssistantMessage,
-  makeFakeModel,
-} from './helpers';
-import {
   type AssistantMessageEvent,
   type Context,
   createAssistantMessageEventStream,
@@ -12,6 +7,11 @@ import {
 } from '@agentic-kit/chat';
 
 import { Agent, type AgentEvent, type AgentTool, parseSSEStream } from '../src';
+import {
+  createScriptedProvider,
+  makeFakeAssistantMessage,
+  makeFakeModel,
+} from './helpers';
 
 describe('AgentRunHandle', () => {
   describe('events()', () => {

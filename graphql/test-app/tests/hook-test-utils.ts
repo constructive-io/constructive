@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 
 import {
+  notifyManager,
   QueryClient,
   QueryClientProvider,
-  notifyManager,
 } from '@tanstack/react-query';
 import React from 'react';
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';

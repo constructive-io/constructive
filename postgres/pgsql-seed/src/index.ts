@@ -1,21 +1,21 @@
 // Re-export everything from pg-seed (core seeding utilities)
 export {
-  // CSV utilities
-  exportCsv,
-  loadCsv,
-  loadCsvMap,
-  // JSON utilities
-  insertJson,
-  insertJsonMap,
-  // SQL utilities
-  execSql,
-  loadSql,
-  loadSqlFiles,
   // Types
   type ClientInput,
   type CopyableClient,
   type CsvSeedMap,
+  // SQL utilities
+  execSql,
+  // CSV utilities
+  exportCsv,
+  // JSON utilities
+  insertJson,
+  insertJsonMap,
   type JsonSeedMap,
+  loadCsv,
+  loadCsvMap,
+  loadSql,
+  loadSqlFiles,
   type QueryableClient,
   // Utility
   unwrapClient

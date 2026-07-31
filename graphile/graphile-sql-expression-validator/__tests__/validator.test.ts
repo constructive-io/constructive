@@ -1,9 +1,8 @@
-import {
-  parseAndValidateSqlExpression,
-  validateAst,
-  DEFAULT_ALLOWED_FUNCTIONS
-} from '../src/validator';
 import type { SqlExpressionValidatorOptions } from '../src/validator';
+import {
+  DEFAULT_ALLOWED_FUNCTIONS,
+  parseAndValidateSqlExpression,
+  validateAst} from '../src/validator';
 
 describe('DEFAULT_ALLOWED_FUNCTIONS', () => {
   it('should contain the expected set of safe PostgreSQL functions', () => {
@@ -500,7 +499,7 @@ describe('parseAndValidateSqlExpression', () => {
     });
 
     it('should allow normal cast to text', async () => {
-      const result = await parseAndValidateSqlExpression("42::text");
+      const result = await parseAndValidateSqlExpression('42::text');
       expect(result.valid).toBe(true);
     });
   });

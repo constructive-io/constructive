@@ -1,4 +1,5 @@
-import { GraphQLScalarType, GraphQLError } from 'graphql';
+import { GraphQLError,GraphQLScalarType } from 'graphql';
+
 import { createUploadPlugin } from '../src/plugin';
 
 /**

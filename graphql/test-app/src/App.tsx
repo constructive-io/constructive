@@ -7,57 +7,49 @@
  * Run `pnpm codegen` first to generate the hooks from the live API.
  */
 
-import { useState, FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { FormEvent,useState } from 'react';
 
 import {
   // Client configuration
   configure,
-
-  // Auth mutation hooks
-  useSignUpMutation,
-  useSignInMutation,
-  useSignOutMutation,
-
-  // Authenticated query hooks
-  useCurrentUserQuery,
-  useCurrentUserIdQuery,
-  useUsersQuery,
-  useDatabasesQuery,
-  useDatabaseQuery,
-  useSchemasQuery,
   useApisQuery,
-  useDomainsQuery,
-  useTablesQuery,
-  useFieldsQuery,
-
+  // Entity list queries
+  useAuditLogsQuery,
+  // Custom mutations
+  useCheckPasswordMutation,
+  useCreateApiMutation,
+  // Authenticated mutation hooks — Databases
+  useCreateDatabaseMutation,
+  useCreateDomainMutation,
+  // Authenticated mutation hooks — Schemas, APIs, Sites, Domains
+  useCreateSchemaMutation,
+  useCreateSiteMutation,
+  // Authenticated mutation hooks — Users
+  useCreateUserMutation,
   // Session & identity scalar queries
   useCurrentIpAddressQuery,
   useCurrentUserAgentQuery,
-
-  // Entity list queries
-  useAuditLogsQuery,
-  useEmailsQuery,
-  useRoleTypesQuery,
-
-  // Authenticated mutation hooks — Users
-  useCreateUserMutation,
-  useUpdateUserMutation,
-
-  // Authenticated mutation hooks — Databases
-  useCreateDatabaseMutation,
-  useUpdateDatabaseMutation,
+  useCurrentUserIdQuery,
+  // Authenticated query hooks
+  useCurrentUserQuery,
+  useDatabaseQuery,
+  useDatabasesQuery,
   useDeleteDatabaseMutation,
-
-  // Authenticated mutation hooks — Schemas, APIs, Sites, Domains
-  useCreateSchemaMutation,
-  useCreateApiMutation,
-  useCreateSiteMutation,
-  useCreateDomainMutation,
-
-  // Custom mutations
-  useCheckPasswordMutation,
+  useDomainsQuery,
+  useEmailsQuery,
   useExtendTokenExpiresMutation,
+  useFieldsQuery,
+  useRoleTypesQuery,
+  useSchemasQuery,
+  useSignInMutation,
+  useSignOutMutation,
+  // Auth mutation hooks
+  useSignUpMutation,
+  useTablesQuery,
+  useUpdateDatabaseMutation,
+  useUpdateUserMutation,
+  useUsersQuery,
   useVerifyPasswordMutation,
 } from './generated/hooks';
 

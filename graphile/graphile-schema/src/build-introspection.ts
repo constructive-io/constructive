@@ -1,8 +1,9 @@
-import type { TableMeta } from 'graphile-settings'
-import { buildSchemaArtifacts } from './build-schema'
-import type { BuildSchemaOptions } from './build-schema'
+import type { TableMeta } from 'graphile-settings';
 
-export type { BuildSchemaOptions as BuildIntrospectionOptions }
+import type { BuildSchemaOptions } from './build-schema';
+import { buildSchemaArtifacts } from './build-schema';
+
+export type { BuildSchemaOptions as BuildIntrospectionOptions };
 
 /**
  * Build introspection metadata for all tables visible in the given schemas.
@@ -31,5 +32,5 @@ export type { BuildSchemaOptions as BuildIntrospectionOptions }
 export async function buildIntrospectionJSON(
   opts: BuildSchemaOptions
 ): Promise<TableMeta[]> {
-  return (await buildSchemaArtifacts(opts)).tablesMeta
+  return (await buildSchemaArtifacts(opts)).tablesMeta;
 }

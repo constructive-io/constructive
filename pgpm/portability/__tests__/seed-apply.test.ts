@@ -1,7 +1,6 @@
 import { cpSync, mkdtempSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
-
 import { getConnections, PgTestClient, SeedAdapter } from 'pgsql-test';
 
 import { seed } from '../src';

@@ -7,14 +7,14 @@
  */
 
 import type {
-  StorageConnectionConfig,
-  StorageProvider,
   BucketAccessType,
   ProvisionResult,
+  StorageConnectionConfig,
+  StorageProvider,
 } from '@constructive-io/bucket-provisioner';
 
 // Re-export types that consumers will need
-export type { StorageConnectionConfig, StorageProvider, BucketAccessType, ProvisionResult };
+export type { BucketAccessType, ProvisionResult,StorageConnectionConfig, StorageProvider };
 
 /**
  * S3 connection configuration or a lazy getter that returns it on first use.

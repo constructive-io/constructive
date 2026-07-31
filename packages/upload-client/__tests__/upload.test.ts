@@ -1,7 +1,6 @@
-import { uploadFile } from '../src/upload';
-import { UploadError } from '../src/types';
 import { DEFAULT_BUCKET_QUERY_FIELD } from '../src/queries';
-import type { GraphQLExecutor, FileInput } from '../src/types';
+import type { FileInput,GraphQLExecutor } from '../src/types';
+import { uploadFile } from '../src/upload';
 
 /**
  * Create a mock FileInput from a string body.

@@ -139,18 +139,18 @@ function parseTypeString(typeStr: string): t.TSType {
 
   // Handle primitive types
   switch (typeStr) {
-    case 'string':
-      return t.tsStringKeyword();
-    case 'number':
-      return t.tsNumberKeyword();
-    case 'boolean':
-      return t.tsBooleanKeyword();
-    case 'null':
-      return t.tsNullKeyword();
-    case 'unknown':
-      return t.tsUnknownKeyword();
-    default:
-      return t.tsTypeReference(t.identifier(typeStr));
+  case 'string':
+    return t.tsStringKeyword();
+  case 'number':
+    return t.tsNumberKeyword();
+  case 'boolean':
+    return t.tsBooleanKeyword();
+  case 'null':
+    return t.tsNullKeyword();
+  case 'unknown':
+    return t.tsUnknownKeyword();
+  default:
+    return t.tsTypeReference(t.identifier(typeStr));
   }
 }
 

@@ -14,6 +14,9 @@ packageExtensionsChecksum: sha256-x8B4zkJ4KLRX+yspUWxuggXWlz6zrBLSIh72pNhpPiE=
 importers:
   .:
     devDependencies:
+      '@constructive-io/eslint-config':
+        specifier: ^0.2.0
+        version: 0.2.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
       '@jest/test-sequencer':
         specifier: ^30.4.1
         version: 30.4.1
@@ -4516,6 +4519,14 @@ packages:
       {
         integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==,
       }
+
+  '@constructive-io/eslint-config@0.2.0':
+    resolution:
+      {
+        integrity: sha512-BaIBn/3Oi+DcyzNqMyUQmelSD7z7MMnFQtlKr4vVrgAv8PXVkYXaY2IlfZH4MeqYactf3mDunS11+7ndOf9oVw==,
+      }
+    peerDependencies:
+      eslint: ^9
 
   '@constructive-io/fetch@1.1.1':
     resolution:
@@ -10588,6 +10599,13 @@ packages:
       }
     engines: { node: '>=18' }
 
+  globals@17.8.0:
+    resolution:
+      {
+        integrity: sha512-Zz/LMDZScFmkakeL2cTHzf+PbWKdpU3uclqkZT7TjDG58j5WPt0PpA+n9uPI24fZtlw07q0OtEi84K+umsRzqQ==,
+      }
+    engines: { node: '>=18' }
+
   google-auth-library@10.9.1:
     resolution:
       {
@@ -16206,6 +16224,20 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
+  '@constructive-io/eslint-config@0.2.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)':
+    dependencies:
+      '@eslint/js': 9.39.2
+      '@typescript-eslint/eslint-plugin': 8.59.4(@typescript-eslint/parser@8.59.4(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.59.4(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+      eslint: 9.39.2(jiti@2.7.0)
+      eslint-config-prettier: 10.1.8(eslint@9.39.2(jiti@2.7.0))
+      eslint-plugin-simple-import-sort: 12.1.1(eslint@9.39.2(jiti@2.7.0))
+      eslint-plugin-unused-imports: 4.4.1(@typescript-eslint/eslint-plugin@8.59.4(@typescript-eslint/parser@8.59.4(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))
+      globals: 17.8.0
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
   '@constructive-io/fetch@1.1.1': {}
 
   '@constructive-io/noble-hashes@0.2.1': {}
@@ -20276,6 +20308,8 @@ snapshots:
       path-scurry: 1.11.1
 
   globals@14.0.0: {}
+
+  globals@17.8.0: {}
 
   google-auth-library@10.9.1:
     dependencies:

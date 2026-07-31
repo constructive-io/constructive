@@ -6,11 +6,12 @@
  * continue to work without changes.
  */
 
-import { createS3Client as createS3ClientFromUtils, S3ConfigError } from '@constructive-io/s3-utils';
 import type { S3Client } from '@aws-sdk/client-s3';
+import { createS3Client as createS3ClientFromUtils, S3ConfigError } from '@constructive-io/s3-utils';
+
 import type { StorageConnectionConfig } from './types';
-import { ProvisionerError } from './types';
 import type { ProvisionerErrorCode } from './types';
+import { ProvisionerError } from './types';
 
 /**
  * Create an S3Client from a storage connection config.

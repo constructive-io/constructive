@@ -1,3 +1,4 @@
+import { getExtensionName } from '@pgpmjs/ast/files';
 import { Logger } from '@pgpmjs/logger';
 import { RawStmt } from '@pgsql/types';
 import { mkdirSync, readFileSync, rmSync,writeFileSync } from 'fs';
@@ -5,7 +6,6 @@ import { relative } from 'path';
 import { deparse } from 'pgsql-deparser';
 import { parse } from 'pgsql-parser';
 
-import { getExtensionName } from '@pgpmjs/ast/files';
 import { writeBundleArtifact } from '../bundle/artifact';
 import { resolve, resolveWithPlan } from '../resolution/resolve';
 import { transformProps } from './transform';
@@ -45,8 +45,10 @@ const filterStatements = (stmts: RawStmt[], stripTransactions: boolean): RawStmt
   if (!stripTransactions) return stmts;
   return stmts.filter(node => {
     const stmt = node.stmt;
-    return !stmt.hasOwnProperty('TransactionStmt') && 
-           !stmt.hasOwnProperty('CreateExtensionStmt');
+    return (
+      !Object.prototype.hasOwnProperty.call(stmt, 'TransactionStmt') &&
+      !Object.prototype.hasOwnProperty.call(stmt, 'CreateExtensionStmt')
+    );
   });
 };
 
@@ -163,7 +165,7 @@ export const writePackage = async ({
     writeFileSync(
       controlPath,
       control.replace(
-        /default_version = '[0-9\.]+'/,
+        /default_version = '[0-9.]+'/,
         `default_version = '${version}'`
       )
     );

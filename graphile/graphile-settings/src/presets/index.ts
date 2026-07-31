@@ -5,5 +5,5 @@
  * for common use cases.
  */
 
-export { ConstructivePreset, createConstructivePreset } from './constructive-preset';
 export type { ConstructivePresetOptions } from './constructive-preset';
+export { ConstructivePreset, createConstructivePreset } from './constructive-preset';

@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+
 import type { AuthSettings } from '../types';
 
 export const SESSION_COOKIE_NAME = 'constructive_session';

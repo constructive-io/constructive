@@ -27,8 +27,6 @@
  * ```
  */
 
-import { makePgService } from 'postgraphile/adaptors/pg';
-
 // Import modules for type augmentation
 // These add properties to the GraphileConfig.Preset interface:
 // - grafserv: adds 'grafserv' property
@@ -37,13 +35,15 @@ import { makePgService } from 'postgraphile/adaptors/pg';
 import 'postgraphile/grafserv';
 import 'graphile-build';
 
+import { makePgService } from 'postgraphile/adaptors/pg';
+
 // ============================================================================
 // Re-export all plugins and presets
 // ============================================================================
 
 // Main preset + factory
-export { ConstructivePreset, createConstructivePreset } from './presets/constructive-preset';
 export type { ConstructivePresetOptions } from './presets/constructive-preset';
+export { ConstructivePreset, createConstructivePreset } from './presets/constructive-preset';
 
 // Re-export all plugins for convenience
 export * from './plugins/index';

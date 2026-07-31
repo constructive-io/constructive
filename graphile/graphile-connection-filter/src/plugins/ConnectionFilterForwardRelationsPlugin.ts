@@ -1,8 +1,10 @@
 import '../augmentations';
+
+import type { PgCodecRelation, PgCodecWithAttributes, PgResource } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
-import type { PgCondition, PgCodecRelation, PgCodecWithAttributes, PgResource } from '@dataplan/pg';
-import type { SQL } from 'pg-sql2';
 import type { GraphQLInputObjectType } from 'graphql';
+import type { SQL } from 'pg-sql2';
+
 import { makeAssertAllowed } from '../utils';
 
 const version = '1.0.0';

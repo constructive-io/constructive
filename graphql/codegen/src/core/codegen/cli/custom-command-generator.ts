@@ -1,11 +1,11 @@
 import * as t from '@babel/types';
 import { toKebabCase } from 'inflekt';
 
+import type { Operation, TypeRef } from '../../../types/schema';
 import { generateCode } from '../babel-ast';
 import { getGeneratedFileHeader, ucFirst } from '../utils';
-import type { Operation, TypeRef } from '../../../types/schema';
-import type { GeneratedFile } from './executor-generator';
 import { buildQuestionsArray } from './arg-mapper';
+import type { GeneratedFile } from './executor-generator';
 
 function createImportDeclaration(
   moduleSpecifier: string,
@@ -365,14 +365,14 @@ export function generateCustomCommand(op: Operation, options?: CustomCommandOpti
   const argsExpr =
     op.args.length > 0
       ? t.tsAsExpression(
-          t.tsAsExpression(
-            hasInputObjectArg
-              ? t.identifier('parsedAnswers')
-              : t.identifier('answers'),
-            t.tsUnknownKeyword(),
-          ),
-          t.tsTypeReference(t.identifier(variablesTypeName)),
-        )
+        t.tsAsExpression(
+          hasInputObjectArg
+            ? t.identifier('parsedAnswers')
+            : t.identifier('answers'),
+          t.tsUnknownKeyword(),
+        ),
+        t.tsTypeReference(t.identifier(variablesTypeName)),
+      )
       : t.objectExpression([]);
 
   // For OBJECT return types, generate runtime select from --select flag

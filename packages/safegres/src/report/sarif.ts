@@ -16,7 +16,7 @@ import { readdirSync, readFileSync, statSync } from 'fs';
 import { join, relative, sep } from 'path';
 
 import { findingKey, subjectOf } from '../perf/baseline';
-import { RULES, dimensionOf } from '../rules/registry';
+import { dimensionOf,RULES } from '../rules/registry';
 import type { Finding, Report, Severity } from '../types';
 
 const SARIF_VERSION = '2.1.0';

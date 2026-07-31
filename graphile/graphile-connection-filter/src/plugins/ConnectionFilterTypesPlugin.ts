@@ -1,4 +1,5 @@
 import '../augmentations';
+
 import type { GraphileConfig } from 'graphile-config';
 
 const version = '1.0.0';
@@ -171,9 +172,9 @@ export const ConnectionFilterTypesPlugin: GraphileConfig.Plugin = {
           const domainBaseTypeName =
             codec.domainOfCodec && !codec.domainOfCodec.arrayOfCodec
               ? build.getGraphQLTypeNameByPgCodec(
-                  codec.domainOfCodec,
-                  'output'
-                )
+                codec.domainOfCodec,
+                'output'
+              )
               : null;
 
           return {

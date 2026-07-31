@@ -9,10 +9,10 @@
  * direction intact (`@pgpmjs/export` depends on core, which depends on this
  * package) while every byte remains digest-covered.
  */
+import { hashString } from '@pgpmjs/ast';
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 
-import { hashString } from '@pgpmjs/ast';
 import { readBundleFile, writeBundleFile } from './io';
 import { MigrationBundle } from './types';
 import { BundleIssue, verifyBundle } from './verify';

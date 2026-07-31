@@ -87,6 +87,6 @@ export const DEFAULT_ENGINE = 'pg';
  * named directly with `--driver <package>`.
  */
 export const BUILTIN_ENGINES: Record<string, PgpmEngineConfig> = {
-    [DEFAULT_ENGINE]: {},
-    pglite: { plugin: '@pgpmjs/pglite-adapter' }
+  [DEFAULT_ENGINE]: {},
+  pglite: { plugin: '@pgpmjs/pglite-adapter' }
 };

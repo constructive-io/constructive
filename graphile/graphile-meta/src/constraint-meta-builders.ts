@@ -1,5 +1,5 @@
+import { type BuildContext,buildFieldList } from './table-meta-context';
 import { buildFieldMeta } from './type-mappings';
-import { buildFieldList, type BuildContext } from './table-meta-context';
 import type {
   ForeignKeyConstraintMeta,
   PgAttribute,

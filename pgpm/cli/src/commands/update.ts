@@ -1,7 +1,8 @@
 import { suppressUpdateCheck } from '@inquirerer/utils';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, cliExitWithError, getPackageJson } from 'inquirerer';
 import { spawn } from 'child_process';
+import { cliExitWithError, CLIOptions, getPackageJson,Inquirerer } from 'inquirerer';
+
 import { fetchLatestVersion } from '../utils/npm-version';
 
 const log = new Logger('update');

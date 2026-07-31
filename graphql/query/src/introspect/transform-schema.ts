@@ -20,8 +20,8 @@ import type {
   Argument,
   ObjectField,
   Operation,
-  TypeRef,
   ResolvedType,
+  TypeRef,
   TypeRegistry,
 } from '../types/schema';
 
@@ -169,15 +169,15 @@ export function transformSchemaToOperations(
   // Transform queries
   const queries: Operation[] = queryTypeDef?.fields
     ? queryTypeDef.fields.map((field) =>
-        transformFieldToCleanOperation(field, 'query', types),
-      )
+      transformFieldToCleanOperation(field, 'query', types),
+    )
     : [];
 
   // Transform mutations
   const mutations: Operation[] = mutationTypeDef?.fields
     ? mutationTypeDef.fields.map((field) =>
-        transformFieldToCleanOperation(field, 'mutation', types),
-      )
+      transformFieldToCleanOperation(field, 'mutation', types),
+    )
     : [];
 
   return { queries, mutations, typeRegistry };

@@ -1,9 +1,10 @@
+import { classifyStatements, QualifiedName, StatementFacts } from '@pgsql/transform';
+
 import {
   CategoryProfile,
   ChangeCategory,
   TIER_PROFILE
 } from './categorize';
-import { classifyStatements, QualifiedName, StatementFacts } from '@pgsql/transform';
 
 /**
  * A change plus its deploy SQL. Optional plan `dependencies` (from `pgpm.plan`)

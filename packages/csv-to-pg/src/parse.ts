@@ -1,12 +1,13 @@
+import type { Node } from '@pgsql/types';
+import { ast, nodes } from '@pgsql/utils';
 import csv from 'csv-parser';
 import { createReadStream, readFileSync } from 'fs';
 import { load as parseYAML } from 'js-yaml';
-import { ast, nodes } from '@pgsql/utils';
-import type { Node } from '@pgsql/types';
+
 import {
+  getRelatedField,
   makeBoundingBox,
   makeLocation,
-  getRelatedField,
   wrapValue
 } from './utils';
 
@@ -244,282 +245,282 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
   const required = opts.required || false;
 
   switch (type) {
-    case 'int':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        const value = parseFn(rawValue);
-        if (isEmpty(value) || isNullToken(rawValue)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-        }
-        if (!isNumeric(value)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not numeric');
-        }
-        const val = nodes.aConst({
-          ival: ast.integer({ ival: Number(value) })
-        });
-        return wrapValue(val, opts);
-      };
-    case 'float':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        const value = parseFn(rawValue);
-        if (isEmpty(value) || isNullToken(rawValue)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-        }
-        if (!isNumeric(value)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not numeric');
-        }
+  case 'int':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      const value = parseFn(rawValue);
+      if (isEmpty(value) || isNullToken(rawValue)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      if (!isNumeric(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not numeric');
+      }
+      const val = nodes.aConst({
+        ival: ast.integer({ ival: Number(value) })
+      });
+      return wrapValue(val, opts);
+    };
+  case 'float':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      const value = parseFn(rawValue);
+      if (isEmpty(value) || isNullToken(rawValue)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      if (!isNumeric(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not numeric');
+      }
 
-        const val = nodes.aConst({
-          fval: ast.float({ fval: String(value) })
-        });
-        return wrapValue(val, opts);
-      };
-    case 'boolean':
-    case 'bool':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        const value = parseFn(parseBoolean(rawValue));
+      const val = nodes.aConst({
+        fval: ast.float({ fval: String(value) })
+      });
+      return wrapValue(val, opts);
+    };
+  case 'boolean':
+  case 'bool':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      const value = parseFn(parseBoolean(rawValue));
 
-        if (isEmpty(value)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not a valid boolean');
-        }
+      if (isEmpty(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not a valid boolean');
+      }
 
-        // Use proper boolean constant for PG17 AST
-        const val = nodes.aConst({
-          boolval: ast.boolean({ boolval: Boolean(value) })
-        });
-        return wrapValue(val, opts);
-      };
-    case 'bbox':
-      // do bbox magic with args from the fields
-      return (record: Record<string, unknown>): Node => {
-        const val = makeBoundingBox(String(parseFn(record[from[0]])));
-        return wrapValue(val, opts);
-      };
-    case 'location':
-      return (record: Record<string, unknown>): Node => {
-        const [lon, lat] = getValuesFromKeys(record, from);
-        if (lon === undefined || lon === null || isNullToken(lon)) {
-          return makeNullOrThrow(fieldName, { lon, lat }, type, required, 'longitude is missing or null');
-        }
-        if (lat === undefined || lat === null || isNullToken(lat)) {
-          return makeNullOrThrow(fieldName, { lon, lat }, type, required, 'latitude is missing or null');
-        }
-        if (!isNumeric(lon) || !isNumeric(lat)) {
-          return makeNullOrThrow(fieldName, { lon, lat }, type, required, 'longitude or latitude is not numeric');
-        }
+      // Use proper boolean constant for PG17 AST
+      const val = nodes.aConst({
+        boolval: ast.boolean({ boolval: Boolean(value) })
+      });
+      return wrapValue(val, opts);
+    };
+  case 'bbox':
+    // do bbox magic with args from the fields
+    return (record: Record<string, unknown>): Node => {
+      const val = makeBoundingBox(String(parseFn(record[from[0]])));
+      return wrapValue(val, opts);
+    };
+  case 'location':
+    return (record: Record<string, unknown>): Node => {
+      const [lon, lat] = getValuesFromKeys(record, from);
+      if (lon === undefined || lon === null || isNullToken(lon)) {
+        return makeNullOrThrow(fieldName, { lon, lat }, type, required, 'longitude is missing or null');
+      }
+      if (lat === undefined || lat === null || isNullToken(lat)) {
+        return makeNullOrThrow(fieldName, { lon, lat }, type, required, 'latitude is missing or null');
+      }
+      if (!isNumeric(lon) || !isNumeric(lat)) {
+        return makeNullOrThrow(fieldName, { lon, lat }, type, required, 'longitude or latitude is not numeric');
+      }
 
-        // NO parse here...
-        const val = makeLocation(lon as string | number, lat as string | number);
-        return wrapValue(val, opts);
-      };
-    case 'related':
-      return (record: Record<string, unknown>): Node => {
-        return getRelatedField({
-          schema: opts.schema,
-          table: opts.table!,
-          refType: opts.refType!,
-          refKey: opts.refKey!,
-          refField: opts.refField!,
-          wrap: opts.wrap,
-          wrapAst: opts.wrapAst,
-          cast: opts.cast,
-          record,
-          parse: parseFn,
-          from
-        });
-      };
-    case 'uuid':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        if (isNullToken(rawValue)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      // NO parse here...
+      const val = makeLocation(lon as string | number, lat as string | number);
+      return wrapValue(val, opts);
+    };
+  case 'related':
+    return (record: Record<string, unknown>): Node => {
+      return getRelatedField({
+        schema: opts.schema,
+        table: opts.table!,
+        refType: opts.refType!,
+        refKey: opts.refKey!,
+        refField: opts.refField!,
+        wrap: opts.wrap,
+        wrapAst: opts.wrapAst,
+        cast: opts.cast,
+        record,
+        parse: parseFn,
+        from
+      });
+    };
+  case 'uuid':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      if (isNullToken(rawValue)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      const value = parseFn(rawValue);
+      if (isEmpty(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty');
+      }
+      if (!/^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$/i.test(String(value))) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not a valid UUID');
+      }
+      const val = nodes.aConst({
+        sval: ast.string({ sval: String(value) })
+      });
+      return wrapValue(val, opts);
+    };
+  case 'uuid[]':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      if (isNullToken(rawValue)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      // Handle array values - validate each UUID
+      if (Array.isArray(rawValue)) {
+        if (rawValue.length === 0) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'array is empty');
         }
-        const value = parseFn(rawValue);
-        if (isEmpty(value)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty');
-        }
-        if (!/^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$/i.test(String(value))) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not a valid UUID');
-        }
-        const val = nodes.aConst({
-          sval: ast.string({ sval: String(value) })
-        });
-        return wrapValue(val, opts);
-      };
-    case 'uuid[]':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        if (isNullToken(rawValue)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-        }
-        // Handle array values - validate each UUID
-        if (Array.isArray(rawValue)) {
-          if (rawValue.length === 0) {
-            return makeNullOrThrow(fieldName, rawValue, type, required, 'array is empty');
+        const uuidRegex = /^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$/i;
+        for (const item of rawValue) {
+          if (!uuidRegex.test(String(item))) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, `array contains invalid UUID: ${item}`);
           }
-          const uuidRegex = /^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$/i;
-          for (const item of rawValue) {
-            if (!uuidRegex.test(String(item))) {
-              return makeNullOrThrow(fieldName, rawValue, type, required, `array contains invalid UUID: ${item}`);
-            }
-          }
-          const arrayLiteral = psqlArray(rawValue);
-          if (isEmpty(arrayLiteral)) {
-            return makeNullOrThrow(fieldName, rawValue, type, required, 'failed to format array');
-          }
-          const val = nodes.aConst({
-            sval: ast.string({ sval: String(arrayLiteral) })
-          });
-          return wrapValue(val, opts);
         }
-        // If not an array, treat as empty/null
-        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not an array');
-      };
-    case 'interval':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        if (isNullToken(rawValue)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-        }
-        const value = formatInterval(rawValue);
-        if (isEmpty(value)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or invalid interval');
+        const arrayLiteral = psqlArray(rawValue);
+        if (isEmpty(arrayLiteral)) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'failed to format array');
         }
         const val = nodes.aConst({
-          sval: ast.string({ sval: String(value) })
+          sval: ast.string({ sval: String(arrayLiteral) })
         });
         return wrapValue(val, opts);
-      };
-    case 'timestamp':
-    case 'timestamptz':
-    case 'date':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        if (isNullToken(rawValue)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-        }
-        const value = parseFn(rawValue);
-        if (isEmpty(value)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty');
-        }
+      }
+      // If not an array, treat as empty/null
+      return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not an array');
+    };
+  case 'interval':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      if (isNullToken(rawValue)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      const value = formatInterval(rawValue);
+      if (isEmpty(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or invalid interval');
+      }
+      const val = nodes.aConst({
+        sval: ast.string({ sval: String(value) })
+      });
+      return wrapValue(val, opts);
+    };
+  case 'timestamp':
+  case 'timestamptz':
+  case 'date':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      if (isNullToken(rawValue)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      const value = parseFn(rawValue);
+      if (isEmpty(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty');
+      }
         
-        // Try to parse as a date to validate
-        const strValue = String(value);
-        const dateObj = new Date(strValue);
+      // Try to parse as a date to validate
+      const strValue = String(value);
+      const dateObj = new Date(strValue);
         
-        // Check if the date is valid
-        if (isNaN(dateObj.getTime())) {
-          // Try parsing as epoch timestamp (seconds or milliseconds)
-          const numValue = Number(strValue);
-          if (!isNaN(numValue)) {
-            // Assume milliseconds if > 10 billion, otherwise seconds
-            const ms = numValue > 10000000000 ? numValue : numValue * 1000;
-            const epochDate = new Date(ms);
-            if (!isNaN(epochDate.getTime())) {
-              const val = nodes.aConst({
-                sval: ast.string({ sval: epochDate.toISOString() })
-              });
-              return wrapValue(val, opts);
-            }
+      // Check if the date is valid
+      if (isNaN(dateObj.getTime())) {
+        // Try parsing as epoch timestamp (seconds or milliseconds)
+        const numValue = Number(strValue);
+        if (!isNaN(numValue)) {
+          // Assume milliseconds if > 10 billion, otherwise seconds
+          const ms = numValue > 10000000000 ? numValue : numValue * 1000;
+          const epochDate = new Date(ms);
+          if (!isNaN(epochDate.getTime())) {
+            const val = nodes.aConst({
+              sval: ast.string({ sval: epochDate.toISOString() })
+            });
+            return wrapValue(val, opts);
           }
-          throw new Error(`Invalid ${type} value: "${strValue}" is not a valid date/timestamp`);
         }
+        throw new Error(`Invalid ${type} value: "${strValue}" is not a valid date/timestamp`);
+      }
         
-        // Use ISO format for consistency
-        const val = nodes.aConst({
-          sval: ast.string({ sval: type === 'date' ? dateObj.toISOString().split('T')[0] : dateObj.toISOString() })
-        });
-        return wrapValue(val, opts);
-      };
-    case 'text':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        const preserve = globalOpts?.preserveEmptyStrings !== false;
-        const cleansed = preserve ? rawValue : cleanseEmptyStrings(rawValue);
-        const value = parseFn(cleansed);
-        if (isEmpty(value)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-        }
-        const val = nodes.aConst({
-          sval: ast.string({ sval: String(value) })
-        });
-        return wrapValue(val, opts);
-      };
+      // Use ISO format for consistency
+      const val = nodes.aConst({
+        sval: ast.string({ sval: type === 'date' ? dateObj.toISOString().split('T')[0] : dateObj.toISOString() })
+      });
+      return wrapValue(val, opts);
+    };
+  case 'text':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      const preserve = globalOpts?.preserveEmptyStrings !== false;
+      const cleansed = preserve ? rawValue : cleanseEmptyStrings(rawValue);
+      const value = parseFn(cleansed);
+      if (isEmpty(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      const val = nodes.aConst({
+        sval: ast.string({ sval: String(value) })
+      });
+      return wrapValue(val, opts);
+    };
 
-    case 'text[]':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        const value = parseFn(psqlArray(cleanseEmptyStrings(rawValue)));
-        if (isEmpty(value)) {
+  case 'text[]':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      const value = parseFn(psqlArray(cleanseEmptyStrings(rawValue)));
+      if (isEmpty(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      const val = nodes.aConst({
+        sval: ast.string({ sval: String(value) })
+      });
+      return wrapValue(val, opts);
+    };
+  case 'image':
+  case 'attachment':
+  case 'json':
+  case 'jsonb':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      const value = parseFn(parseJson(cleanseEmptyStrings(rawValue)));
+      if (isEmpty(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      const val = nodes.aConst({
+        sval: ast.string({ sval: String(value) })
+      });
+      return wrapValue(val, opts);
+    };
+  case 'jsonb[]':
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      if (isNullToken(rawValue)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      if (Array.isArray(rawValue)) {
+        if (rawValue.length === 0) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'array is empty');
+        }
+        const elements = rawValue.map(el => JSON.stringify(el));
+        const arrayLiteral = psqlArray(elements);
+        if (isEmpty(arrayLiteral)) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'failed to format array');
+        }
+        const val = nodes.aConst({
+          sval: ast.string({ sval: String(arrayLiteral) })
+        });
+        return wrapValue(val, opts);
+      }
+      // If it's a string, try to parse as JSON array
+      if (typeof rawValue === 'string') {
+        const parsed = parseJson(cleanseEmptyStrings(rawValue));
+        if (isEmpty(parsed)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
         }
         const val = nodes.aConst({
-          sval: ast.string({ sval: String(value) })
+          sval: ast.string({ sval: String(parsed) })
         });
         return wrapValue(val, opts);
-      };
-    case 'image':
-    case 'attachment':
-    case 'json':
-    case 'jsonb':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        const value = parseFn(parseJson(cleanseEmptyStrings(rawValue)));
-        if (isEmpty(value)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-        }
-        const val = nodes.aConst({
-          sval: ast.string({ sval: String(value) })
-        });
-        return wrapValue(val, opts);
-      };
-    case 'jsonb[]':
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        if (isNullToken(rawValue)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-        }
-        if (Array.isArray(rawValue)) {
-          if (rawValue.length === 0) {
-            return makeNullOrThrow(fieldName, rawValue, type, required, 'array is empty');
-          }
-          const elements = rawValue.map(el => JSON.stringify(el));
-          const arrayLiteral = psqlArray(elements);
-          if (isEmpty(arrayLiteral)) {
-            return makeNullOrThrow(fieldName, rawValue, type, required, 'failed to format array');
-          }
-          const val = nodes.aConst({
-            sval: ast.string({ sval: String(arrayLiteral) })
-          });
-          return wrapValue(val, opts);
-        }
-        // If it's a string, try to parse as JSON array
-        if (typeof rawValue === 'string') {
-          const parsed = parseJson(cleanseEmptyStrings(rawValue));
-          if (isEmpty(parsed)) {
-            return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-          }
-          const val = nodes.aConst({
-            sval: ast.string({ sval: String(parsed) })
-          });
-          return wrapValue(val, opts);
-        }
-        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not an array');
-      };
-    default:
-      return (record: Record<string, unknown>): Node => {
-        const rawValue = record[from[0]];
-        const value = parseFn(cleanseEmptyStrings(rawValue));
-        if (isEmpty(value)) {
-          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
-        }
-        const val = nodes.aConst({
-          sval: ast.string({ sval: String(value) })
-        });
-        return wrapValue(val, opts);
-      };
+      }
+      return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not an array');
+    };
+  default:
+    return (record: Record<string, unknown>): Node => {
+      const rawValue = record[from[0]];
+      const value = parseFn(cleanseEmptyStrings(rawValue));
+      if (isEmpty(value)) {
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+      }
+      const val = nodes.aConst({
+        sval: ast.string({ sval: String(value) })
+      });
+      return wrapValue(val, opts);
+    };
   }
 };
 

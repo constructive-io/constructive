@@ -5,6 +5,6 @@
  */
 
 export * from './infer-tables';
+export * from './schema-query';
 export * from './transform';
 export * from './transform-schema';
-export * from './schema-query';

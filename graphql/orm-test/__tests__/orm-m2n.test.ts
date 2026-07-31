@@ -11,12 +11,13 @@
  * This validates that the codegen pipeline produces valid ORM code that
  * works against a real PostGraphile schema with ConstructivePreset enabled.
  */
-import path from 'path';
-import { getConnectionsObject, seed } from 'graphile-test';
-import type { GraphQLQueryFnObj } from 'graphile-test';
-import type { PgTestClient } from 'pgsql-test';
-import { ConstructivePreset } from 'graphile-settings';
 import { runCodegenAndLoad } from '@constructive-io/graphql-test';
+import { ConstructivePreset } from 'graphile-settings';
+import type { GraphQLQueryFnObj } from 'graphile-test';
+import { getConnectionsObject, seed } from 'graphile-test';
+import path from 'path';
+import type { PgTestClient } from 'pgsql-test';
+
 import { GraphileTestAdapter } from './helpers/graphile-adapter';
 
 jest.setTimeout(120000);

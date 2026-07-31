@@ -1,16 +1,17 @@
 import 'graphile-build';
 import 'graphile-build-pg';
+// Import types.ts for the Build/Inflection/Scope augmentation side effects
+import '../types';
+
 import type { PgCodec } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInterfaceType, GraphQLObjectType, GraphQLOutputType, ValueNode } from 'graphql';
-import sql from 'pg-sql2';
 import type { SQL } from 'pg-sql2';
-import { GisSubtype, CONCRETE_SUBTYPES } from '../constants';
+import sql from 'pg-sql2';
+
+import { CONCRETE_SUBTYPES,GisSubtype } from '../constants';
 import type { GisFieldValue, PostgisExtensionInfo } from '../types';
 import { getGISTypeDetails, getGISTypeModifier, getGISTypeName } from '../utils';
-
-// Import types.ts for the Build/Inflection/Scope augmentation side effects
-import '../types';
 
 /**
  * PostgisRegisterTypesPlugin
@@ -214,18 +215,18 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
                         [inflection.geojsonFieldName()]: {
                           type: geoJsonType,
                           description: 'Converts the object to GeoJSON',
-                        resolve(data: GisFieldValue) {
-                          return data.__geojson;
+                          resolve(data: GisFieldValue) {
+                            return data.__geojson;
+                          }
+                        },
+                        srid: {
+                          type: new GraphQLNonNull(GraphQLInt),
+                          description: 'Spatial reference identifier (SRID)',
+                          resolve(data: GisFieldValue) {
+                            return data.__srid;
+                          }
                         }
-                      },
-                      srid: {
-                        type: new GraphQLNonNull(GraphQLInt),
-                        description: 'Spatial reference identifier (SRID)',
-                        resolve(data: GisFieldValue) {
-                          return data.__srid;
-                        }
-                      }
-                    };
+                      };
                     }
                   }),
                   `PostgisRegisterTypesPlugin registering ${concreteTypeName} type`
@@ -363,28 +364,28 @@ function parseLiteralGeoJSON(
     throw new Error('GeoJSON input exceeds maximum nesting depth');
   }
   switch (ast.kind) {
-    case Kind.STRING:
-    case Kind.BOOLEAN:
-      return ast.value;
-    case Kind.INT:
-    case Kind.FLOAT:
-      return parseFloat(ast.value);
-    case Kind.OBJECT: {
-      const value = Object.create(null);
-      ast.fields.forEach((field) => {
-        value[field.name.value] = parseLiteralGeoJSON(field.value, variables, Kind, depth + 1);
-      });
-      return value;
-    }
-    case Kind.LIST:
-      return ast.values.map((n) => parseLiteralGeoJSON(n, variables, Kind, depth + 1));
-    case Kind.NULL:
-      return null;
-    case Kind.VARIABLE: {
-      const variableName = ast.name.value;
-      return variables ? variables[variableName] : undefined;
-    }
-    default:
-      return undefined;
+  case Kind.STRING:
+  case Kind.BOOLEAN:
+    return ast.value;
+  case Kind.INT:
+  case Kind.FLOAT:
+    return parseFloat(ast.value);
+  case Kind.OBJECT: {
+    const value = Object.create(null);
+    ast.fields.forEach((field) => {
+      value[field.name.value] = parseLiteralGeoJSON(field.value, variables, Kind, depth + 1);
+    });
+    return value;
+  }
+  case Kind.LIST:
+    return ast.values.map((n) => parseLiteralGeoJSON(n, variables, Kind, depth + 1));
+  case Kind.NULL:
+    return null;
+  case Kind.VARIABLE: {
+    const variableName = ast.name.value;
+    return variables ? variables[variableName] : undefined;
+  }
+  default:
+    return undefined;
   }
 }

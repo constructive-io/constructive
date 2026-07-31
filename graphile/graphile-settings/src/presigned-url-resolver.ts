@@ -11,11 +11,12 @@
  * Follows the same lazy-init pattern as upload-resolver.ts.
  */
 
-import { createS3Client } from '@constructive-io/s3-utils';
-import { getEnvOptions } from '@constructive-io/graphql-env';
-import { Logger } from '@pgpmjs/logger';
-import type { S3Config, BucketNameResolver, EnsureBucketProvisioned } from 'graphile-presigned-url-plugin';
 import { BucketProvisioner } from '@constructive-io/bucket-provisioner';
+import { getEnvOptions } from '@constructive-io/graphql-env';
+import { createS3Client } from '@constructive-io/s3-utils';
+import { Logger } from '@pgpmjs/logger';
+import type { BucketNameResolver, EnsureBucketProvisioned,S3Config } from 'graphile-presigned-url-plugin';
+
 import { getBucketProvisionerConnection } from './bucket-provisioner-resolver';
 
 const log = new Logger('presigned-url-resolver');

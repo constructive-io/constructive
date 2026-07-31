@@ -153,4 +153,4 @@ export class RealtimeManager {
   }
 }
 
-export { extractRowId, entryToNotifyPayload, entryToChannel };
+export { entryToChannel,entryToNotifyPayload, extractRowId };

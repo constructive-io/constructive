@@ -1,9 +1,10 @@
-import { join } from 'path';
-import { getConnectionsObject, seed } from 'graphile-test';
-import type { GraphQLQueryFnObj } from 'graphile-test';
 import type { GraphileConfig } from 'graphile-config';
-import { ConnectionFilterPreset } from '../src';
+import type { GraphQLQueryFnObj } from 'graphile-test';
+import { getConnectionsObject, seed } from 'graphile-test';
+import { join } from 'path';
+
 import type { ConnectionFilterOperatorFactory } from '../src';
+import { ConnectionFilterPreset } from '../src';
 
 const SCHEMA = 'filter_test';
 const sqlFile = (f: string) => join(__dirname, '../sql', f);

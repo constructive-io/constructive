@@ -1,7 +1,7 @@
+import { Logger } from '@pgpmjs/logger';
 import { parseEnvNumber } from '12factor-env';
 import pg from 'pg';
 import { getPgEnvOptions, PgConfig, PgPoolConfig } from 'pg-env';
-import { Logger } from '@pgpmjs/logger';
 
 import { getActivePgPoolFactory, PgPoolFactory } from './driver';
 import { pgCache } from './lru';

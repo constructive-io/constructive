@@ -1,23 +1,23 @@
 import { generateCli, generateMultiTargetCli, resolveBuiltinNames } from '../../core/codegen/cli';
+import type { MultiTargetDocsInput } from '../../core/codegen/cli/docs-generator';
 import {
-  generateReadme as generateCliReadme,
-  generateSkills as generateCliSkills,
   generateMultiTargetReadme,
   generateMultiTargetSkills,
+  generateReadme as generateCliReadme,
+  generateSkills as generateCliSkills,
 } from '../../core/codegen/cli/docs-generator';
-import type { MultiTargetDocsInput } from '../../core/codegen/cli/docs-generator';
 import { resolveDocsConfig } from '../../core/codegen/docs-utils';
-import {
-  generateOrmReadme,
-  generateOrmSkills,
-} from '../../core/codegen/orm/docs-generator';
 import {
   generateHooksReadme,
   generateHooksSkills,
 } from '../../core/codegen/hooks-docs-generator';
 import {
-  generateTargetReadme,
+  generateOrmReadme,
+  generateOrmSkills,
+} from '../../core/codegen/orm/docs-generator';
+import {
   generateRootRootReadme,
+  generateTargetReadme,
 } from '../../core/codegen/target-docs-generator';
 import type {
   FieldType,

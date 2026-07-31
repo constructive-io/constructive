@@ -1,16 +1,15 @@
 import {
-  createScriptedProvider,
-  makeFakeAssistantMessage,
-  makeFakeModel,
-} from './helpers';
-
-import {
   AgentKit,
   type AssistantMessage,
   getMessageText,
   type ModelDescriptor,
   transformMessages,
 } from '../src';
+import {
+  createScriptedProvider,
+  makeFakeAssistantMessage,
+  makeFakeModel,
+} from './helpers';
 
 function createFakeModel(): ModelDescriptor {
   return makeFakeModel({ name: 'Demo' });

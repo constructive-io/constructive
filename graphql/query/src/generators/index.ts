@@ -6,9 +6,9 @@
 
 // SELECT, FindOne, Count query generators
 export {
-  buildSelect,
-  buildFindOne,
   buildCount,
+  buildFindOne,
+  buildSelect,
   cleanTableToMetaObject,
   createASTQueryBuilder,
   generateIntrospectionSchema,
@@ -17,15 +17,15 @@ export {
 // Mutation generators (CREATE, UPDATE, DELETE)
 export {
   buildPostGraphileCreate,
-  buildPostGraphileUpdate,
   buildPostGraphileDelete,
+  buildPostGraphileUpdate,
 } from './mutations';
 
 // Field selection utilities
 export {
   convertToSelectionOptions,
-  isRelationalField,
   getAvailableRelations,
+  isRelationalField,
   validateFieldSelection,
 } from './field-selector';
 
@@ -34,14 +34,14 @@ export {
   normalizeInflectionValue,
   toCamelCasePlural,
   toCamelCaseSingular,
-  toCreateMutationName,
-  toUpdateMutationName,
-  toDeleteMutationName,
   toCreateInputTypeName,
-  toUpdateInputTypeName,
+  toCreateMutationName,
   toDeleteInputTypeName,
+  toDeleteMutationName,
   toFilterTypeName,
+  toOrderByEnumValue,
   toOrderByTypeName,
   toPatchFieldName,
-  toOrderByEnumValue,
+  toUpdateInputTypeName,
+  toUpdateMutationName,
 } from './naming-helpers';

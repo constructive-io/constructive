@@ -1,30 +1,30 @@
 import * as t from '@babel/types';
 import { toKebabCase } from 'inflekt';
 
+import type { Table, TypeRegistry } from '../../../types/schema';
 import { generateCode } from '../babel-ast';
+import type { SpecialFieldGroup } from '../docs-utils';
+import { categorizeSpecialFields } from '../docs-utils';
 import {
+  getCreateInputTypeName,
+  getDeleteInputTypeName,
+  getExtraInputKeys,
+  getFilterTypeName,
   getGeneratedFileHeader,
+  getOrderByTypeName,
+  getPatchTypeName,
   getPrimaryKeyInfo,
   getScalarFields,
   getSelectableScalarFields,
   getTableNames,
-  getWritableFieldNames,
-  resolveInnerInputType,
-  ucFirst,
-  lcFirst,
-  toPascalCase,
-  getCreateInputTypeName,
-  getPatchTypeName,
-  getFilterTypeName,
-  getOrderByTypeName,
-  getExtraInputKeys,
   getUpdateInputTypeName,
-  getDeleteInputTypeName,
+  getWritableFieldNames,
+  lcFirst,
+  resolveInnerInputType,
+  toPascalCase,
+  ucFirst,
 } from '../utils';
-import type { Table, TypeRegistry } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
-import { categorizeSpecialFields } from '../docs-utils';
-import type { SpecialFieldGroup } from '../docs-utils';
 
 function createImportDeclaration(
   moduleSpecifier: string,
@@ -84,28 +84,28 @@ function getTsTypeForField(field: { type: { gqlType: string; isArray: boolean } 
   // (e.g., _uuid[] in PG -> string in the ORM input), so we do NOT wrap
   // in tsArrayType here.
   switch (gqlType) {
-    case 'Boolean':
-      return t.tsBooleanKeyword();
-    case 'Int':
-    case 'BigInt':
-    case 'Float':
-    case 'BigFloat':
-      return t.tsNumberKeyword();
-    case 'JSON':
-    case 'GeoJSON':
-      return t.tsTypeReference(
-        t.identifier('Record'),
-        t.tsTypeParameterInstantiation([
-          t.tsStringKeyword(),
-          t.tsUnknownKeyword(),
-        ]),
-      );
-    case 'Interval':
-      // IntervalInput is a complex type, skip assertion
-      return null;
-    case 'UUID':
-    default:
-      return t.tsStringKeyword();
+  case 'Boolean':
+    return t.tsBooleanKeyword();
+  case 'Int':
+  case 'BigInt':
+  case 'Float':
+  case 'BigFloat':
+    return t.tsNumberKeyword();
+  case 'JSON':
+  case 'GeoJSON':
+    return t.tsTypeReference(
+      t.identifier('Record'),
+      t.tsTypeParameterInstantiation([
+        t.tsStringKeyword(),
+        t.tsUnknownKeyword(),
+      ]),
+    );
+  case 'Interval':
+    // IntervalInput is a complex type, skip assertion
+    return null;
+  case 'UUID':
+  default:
+    return t.tsStringKeyword();
   }
 }
 
@@ -116,13 +116,13 @@ function getTsTypeForField(field: { type: { gqlType: string; isArray: boolean } 
 function getQuestionTypeForField(field: { type: { gqlType: string } }): string {
   const gqlType = field.type.gqlType.replace(/!/g, '');
   switch (gqlType) {
-    case 'Boolean':
-      return 'boolean';
-    case 'JSON':
-    case 'GeoJSON':
-      return 'json';
-    default:
-      return 'text';
+  case 'Boolean':
+    return 'boolean';
+  case 'JSON':
+  case 'GeoJSON':
+    return 'json';
+  default:
+    return 'text';
   }
 }
 
@@ -133,25 +133,25 @@ function buildFieldSchemaObject(table: Table): t.ObjectExpression {
       const gqlType = f.type.gqlType.replace(/!/g, '');
       let schemaType: string;
       switch (gqlType) {
-        case 'Boolean':
-          schemaType = 'boolean';
-          break;
-        case 'Int':
-        case 'BigInt':
-          schemaType = 'int';
-          break;
-        case 'Float':
-          schemaType = 'float';
-          break;
-        case 'JSON':
-        case 'GeoJSON':
-          schemaType = 'json';
-          break;
-        case 'UUID':
-          schemaType = 'uuid';
-          break;
-        default:
-          schemaType = 'string';
+      case 'Boolean':
+        schemaType = 'boolean';
+        break;
+      case 'Int':
+      case 'BigInt':
+        schemaType = 'int';
+        break;
+      case 'Float':
+        schemaType = 'float';
+        break;
+      case 'JSON':
+      case 'GeoJSON':
+        schemaType = 'json';
+        break;
+      case 'UUID':
+        schemaType = 'uuid';
+        break;
+      default:
+        schemaType = 'string';
       }
       return t.objectProperty(
         t.identifier(f.name),
@@ -1180,10 +1180,10 @@ function buildMutationHandler(
   const selectObj =
     operation === 'delete'
       ? t.objectExpression(
-          pkFields.map((pkField) =>
-            t.objectProperty(t.identifier(pkField.name), t.booleanLiteral(true)),
-          ),
-        )
+        pkFields.map((pkField) =>
+          t.objectProperty(t.identifier(pkField.name), t.booleanLiteral(true)),
+        ),
+      )
       : buildSelectObject(table, typeRegistry);
 
   let ormArgs: t.ObjectExpression;
@@ -1377,10 +1377,10 @@ function buildBulkMutationHandler(
   // Map CLI op name to ORM method name
   const ormMethod = (() => {
     switch (operation) {
-      case 'bulk-create': return 'bulkCreate';
-      case 'bulk-upsert': return 'bulkUpsert';
-      case 'bulk-update': return 'bulkUpdate';
-      case 'bulk-delete': return 'bulkDelete';
+    case 'bulk-create': return 'bulkCreate';
+    case 'bulk-upsert': return 'bulkUpsert';
+    case 'bulk-update': return 'bulkUpdate';
+    case 'bulk-delete': return 'bulkDelete';
     }
   })();
 

@@ -1,8 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-
 import { Change, Tag } from '@pgpmjs/ast/files/types';
 import { generatePlanContent } from '@pgpmjs/slice';
+import fs from 'fs';
+import path from 'path';
 
 const SCRIPT_DIRS = ['deploy', 'revert', 'verify'] as const;
 export type MinimalScriptDir = (typeof SCRIPT_DIRS)[number];

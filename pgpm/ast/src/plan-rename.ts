@@ -18,7 +18,7 @@ export function renameInPlanContent(content: string, renames: Map<string, string
   if (renames.size === 0) return content;
 
   // One regex, compiled once per call (not per line or per rename).
-  const tokenRe = /(^|[\s\[])([^\s\[\]@]+)(?=$|[\s\]@])/g;
+  const tokenRe = /(^|[\s[])([^\s[\]@]+)(?=$|[\s\]@])/g;
 
   return content
     .split('\n')

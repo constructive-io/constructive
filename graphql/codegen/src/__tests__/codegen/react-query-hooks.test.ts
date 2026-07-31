@@ -33,9 +33,9 @@ import type {
   FieldType,
   Operation,
   Relations,
+  ResolvedType,
   Table,
   TypeRef,
-  ResolvedType,
   TypeRegistry,
 } from '../../types/schema';
 

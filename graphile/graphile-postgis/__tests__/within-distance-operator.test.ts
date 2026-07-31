@@ -1,4 +1,5 @@
 import sql from 'pg-sql2';
+
 import { CONCRETE_SUBTYPES } from '../src/constants';
 import { createWithinDistanceOperatorFactory } from '../src/plugins/within-distance-operator';
 import { GraphilePostgisPreset } from '../src/preset';
@@ -74,10 +75,10 @@ function runFactory(options: {
 
   const postgisInfo = hasPostgis
     ? {
-        schemaName,
-        geometryCodec: { name: 'geometry' },
-        geographyCodec: { name: 'geography' }
-      }
+      schemaName,
+      geometryCodec: { name: 'geometry' },
+      geographyCodec: { name: 'geography' }
+    }
     : undefined;
 
   const build = {

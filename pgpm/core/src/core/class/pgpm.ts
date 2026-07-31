@@ -1,21 +1,3 @@
-import { getExtensionsDir, loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
-import { Logger } from '@pgpmjs/logger';
-import { DEFAULT_EXTENSIONS_DIR,errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
-import { execSync } from 'child_process';
-import fs from 'fs';
-import * as glob from 'glob';
-import os from 'os';
-import { parse } from 'parse-package-name';
-import path, { dirname, resolve } from 'path';
-import { getPgPool } from 'pg-cache';
-import { PgConfig } from 'pg-env';
-import yanse from 'yanse';
-
-import { resolveEffectiveModulePath } from '../../apply/materialize';
-import { hasApplySpec, readApplySpec } from '../../apply/apply-spec';
-import { isReuseSpec, resolveSharedModuleName } from '../../apply/reuse';
-import { APPLY_SPEC_FILE, ResolvedApplySpec } from '../../apply/types';
-import { getAvailableExtensions } from '../../extensions/extensions';
 import { generatePlan, writePlan, writePlanFile } from '@pgpmjs/ast/files';
 import {
   ExtensionInfo,
@@ -31,6 +13,26 @@ import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { isValidChangeName, isValidTagName, parseReference } from '@pgpmjs/ast/files/plan/validators';
 import { Change, Tag } from '@pgpmjs/ast/files/types';
 import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '@pgpmjs/ast/files/types';
+import { getExtensionsDir, loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
+import { Logger } from '@pgpmjs/logger';
+import { DEFAULT_EXTENSIONS_DIR,errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
+import { execSync } from 'child_process';
+import fs from 'fs';
+import * as glob from 'glob';
+import os from 'os';
+import { parse } from 'parse-package-name';
+import path, { dirname, resolve } from 'path';
+import { getPgPool } from 'pg-cache';
+import { PgConfig } from 'pg-env';
+import yanse from 'yanse';
+
+import { hasApplySpec, readApplySpec } from '../../apply/apply-spec';
+import { resolveEffectiveModulePath } from '../../apply/materialize';
+import { isReuseSpec, resolveSharedModuleName } from '../../apply/reuse';
+import { APPLY_SPEC_FILE, ResolvedApplySpec } from '../../apply/types';
+import { deployModuleFast, isBundledDeployResult } from '../../bundle/deploy-bundled';
+import { getAvailableExtensions } from '../../extensions/extensions';
+import { findExtensionInstall, roleMapFromRoles } from '../../extensions/resolve-install';
 import { PgpmMigrate } from '../../migrate/client';
 import {
   getExtensionsAndModules,
@@ -39,9 +41,7 @@ import {
   latestChangeAndVersion,
   ModuleMap
 } from '../../modules/modules';
-import { deployModuleFast, isBundledDeployResult } from '../../bundle/deploy-bundled';
 import { syncModuleVersions, SyncVersionsOptions, SyncVersionsResult } from '../../packaging/sync-versions';
-import { findExtensionInstall, roleMapFromRoles } from '../../extensions/resolve-install';
 import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
 import { movePath } from '../../utils/fs';
 import { globPaths, globPattern, toPosixPath } from '../../utils/glob';
@@ -765,7 +765,9 @@ export class PgpmPackage {
                   }
                 }
               }
-            } catch {}
+            } catch {
+              // ignore
+            }
           }
 
           if (!hasTagDependency && !deps[firstKey].includes(depToken)) {

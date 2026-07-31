@@ -1,4 +1,4 @@
-import { formatQueryHistory, truncateErrorOutput, QueryHistoryEntry } from '../../src/migrate/utils/transaction';
+import { formatQueryHistory, QueryHistoryEntry,truncateErrorOutput } from '../../src/migrate/utils/transaction';
 
 describe('error output formatting', () => {
   describe('formatQueryHistory', () => {

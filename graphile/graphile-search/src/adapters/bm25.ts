@@ -13,10 +13,11 @@
  * LEAST(parent_score, chunk_score) (lower = better for BM25).
  */
 
-import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../types';
 import type { SQL } from 'pg-sql2';
+
 import { bm25IndexStore as moduleBm25IndexStore } from '../codecs/bm25-codec';
-import { getChunksInfo, type ChunksInfo } from './chunks';
+import type { FilterApplyResult,SearchableColumn, SearchAdapter } from '../types';
+import { type ChunksInfo,getChunksInfo } from './chunks';
 
 /**
  * BM25 index info discovered during gather phase.

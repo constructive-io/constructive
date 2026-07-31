@@ -1,9 +1,9 @@
-import { readFileSync } from 'fs';
-
 import { getChanges, getExtensionName } from '@pgpmjs/ast/files';
 import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
-import { resolveDependencies } from './deps';
 import { errors } from '@pgpmjs/types';
+import { readFileSync } from 'fs';
+
+import { resolveDependencies } from './deps';
 
 /**
  * Resolves SQL scripts for deployment or reversion.

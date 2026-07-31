@@ -8,9 +8,10 @@
  * - Fallback to base table values when no translation exists
  */
 
-import { join } from 'path';
-import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
+import { getConnections, seed } from 'graphile-test';
+import { join } from 'path';
+
 import { createI18nPlugin } from '../plugin';
 
 type QueryFn = <TResult = unknown>(

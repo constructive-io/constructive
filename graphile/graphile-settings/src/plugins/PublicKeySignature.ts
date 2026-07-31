@@ -1,9 +1,9 @@
 // import Networks from '@pyramation/crypto-networks';
 // import { verifyMessage } from '@pyramation/crypto-keys';
+import { QuoteUtils } from '@pgsql/quotes';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
-import { QuoteUtils } from '@pgsql/quotes';
 import pgQueryWithContext from 'pg-query-context';
 
 export interface PublicKeyChallengeConfig {

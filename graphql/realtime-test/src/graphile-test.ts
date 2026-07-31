@@ -1,4 +1,4 @@
-import type { RealtimeTestInput, RealtimeTestContext } from 'graphile-realtime-test';
+import type { RealtimeTestContext,RealtimeTestInput } from 'graphile-realtime-test';
 import { createRealtimeTestContext } from 'graphile-realtime-test';
 import { ConstructivePreset } from 'graphile-settings';
 import type { SeedAdapter } from 'pgsql-test/seed/types';

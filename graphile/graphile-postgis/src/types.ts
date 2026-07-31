@@ -2,6 +2,7 @@ import type { PgCodec } from '@dataplan/pg';
 import type { Geometry } from 'geojson';
 import type { GraphQLInterfaceType, GraphQLObjectType } from 'graphql';
 import type { SQL } from 'pg-sql2';
+
 import type { GisSubtype } from './constants';
 
 export interface GisTypeDetails {

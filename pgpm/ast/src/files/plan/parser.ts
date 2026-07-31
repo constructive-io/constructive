@@ -1,8 +1,8 @@
+import { errors } from '@pgpmjs/types';
 import { readFileSync } from 'fs';
 
 import { Change, ExtendedPlanFile, ParseError, ParseResult,PlanFile, Tag } from '../types';
 import { isValidChangeName, isValidDependency, isValidTagName, parseReference } from './validators';
-import { errors } from '@pgpmjs/types';
 
 /**
  * Parse a Sqitch plan file with full validation

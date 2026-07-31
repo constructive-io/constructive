@@ -79,23 +79,23 @@ export function buildScalarEncoding(
   }
 
   switch (kind) {
-    case 'geojson':
-      return {
-        kind,
-        geometrySubtype:
+  case 'geojson':
+    return {
+      kind,
+      geometrySubtype:
           typeof ext?.geometrySubtype === 'string' ? ext.geometrySubtype : null,
-        srid: typeof ext?.geometrySrid === 'number' ? ext.geometrySrid : null
-      };
-    case 'vector':
-      return {
-        kind,
-        elementType: 'float',
-        dimensions:
+      srid: typeof ext?.geometrySrid === 'number' ? ext.geometrySrid : null
+    };
+  case 'vector':
+    return {
+      kind,
+      elementType: 'float',
+      dimensions:
           typeof ext?.vectorDimensions === 'number' ? ext.vectorDimensions : null
-      };
-    case 'ltree':
-      return { kind, dotPath: true };
-    default:
-      return { kind };
+    };
+  case 'ltree':
+    return { kind, dotPath: true };
+  default:
+    return { kind };
   }
 }

@@ -92,9 +92,9 @@ function buildTableMeta(
         codecForLookup &&
         context.build.hasGraphQLTypeForPgCodec?.(codecForLookup, 'output')
           ? context.build.getGraphQLTypeNameByPgCodec?.(
-              codecForLookup,
-              'output'
-            )
+            codecForLookup,
+            'output'
+          )
           : null;
       if (registeredTypeName && registeredTypeName !== finalTypeName) {
         return [];

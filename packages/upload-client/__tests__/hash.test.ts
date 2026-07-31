@@ -1,6 +1,6 @@
 import { hashFile, hashFileChunked } from '../src/hash';
-import { UploadError } from '../src/types';
 import type { FileInput } from '../src/types';
+import { UploadError } from '../src/types';
 
 /**
  * Create a mock FileInput from a string body.
