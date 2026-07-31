@@ -1,7 +1,7 @@
 import './types'; // for Request type
 
 import crypto from 'node:crypto';
-import { classify, type ErrorContext, parse } from '@constructive-io/errors';
+import { classify, errors, type ErrorContext, parse } from '@constructive-io/errors';
 import type { ComputeConfig } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getNodeEnv } from '@pgpmjs/env';
@@ -17,11 +17,14 @@ import { getPgEnvOptions } from 'pg-env';
 
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
+import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import type { DatabaseSettings } from '../types';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
+
+const isDev = (): boolean => getNodeEnv() === 'development';
 
 /**
  * GraphQL framework protocol codes. These originate in the GraphQL/grafast
@@ -324,12 +327,17 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const api = req.api;
       if (!api) {
         log.error(`${label} Missing API info`);
-        return res.status(500).send('Missing API info');
+        respondWithGraphQLError(res, errors.INTERNAL_FAILURE({ details: 'Missing API info' }));
+        return;
       }
       const key = req.svc_key;
       if (!key) {
         log.error(`${label} Missing service cache key`);
-        return res.status(500).send('Missing service cache key');
+        respondWithGraphQLError(
+          res,
+          errors.INTERNAL_FAILURE({ details: 'Missing service cache key' })
+        );
+        return;
       }
       const { dbname, anonRole, roleName, schema } = api;
       const schemaLabel = schema?.join(',') || 'unknown';
@@ -431,9 +439,13 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
     } catch (e: any) {
       log.error(`${label} PostGraphile middleware error`, e);
       if (!res.headersSent) {
-        return res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' }
-        });
+        respondWithGraphQLError(
+          res,
+          errors.INTERNAL_FAILURE({
+            details: isDev() ? e?.message ?? String(e) : 'An unexpected error occurred'
+          })
+        );
+        return;
       }
       next(e);
     }
