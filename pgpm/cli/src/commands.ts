@@ -21,6 +21,7 @@ import materialize from './commands/materialize';
 import migrate from './commands/migrate';
 import _package from './commands/package';
 import plan from './commands/plan';
+import regen from './commands/regen';
 import remove from './commands/remove';
 import renameCmd from './commands/rename';
 import revert from './commands/revert';
@@ -60,6 +61,7 @@ const ENGINE_EXEMPT_COMMANDS = new Set([
   'package',
   'materialize',
   'plan',
+  'regen',
   'remove',
   'rename',
   'slice',
@@ -97,6 +99,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     init: pgt(init),
     extension: pgt(extension),
     plan: pgt(plan),
+    regen,
     export: pgt(_export),
     package: pgt(_package),
     tag: pgt(tag),

@@ -69,6 +69,15 @@ export type {
 } from './fixture-closure';
 export { resolveFixtureClosure } from './fixture-closure';
 export type {
+  GeneratedScript,
+  RegeneratedScripts,
+} from './regen';
+export {
+  classifyScript,
+  isStubScript,
+  regenerateScripts,
+} from './regen';
+export type {
   SqlProgram,
   SqlStatementAst,
   SqlStatementSpan,
