@@ -30,7 +30,6 @@ import {
   collectPredicateColumns,
   type PredicateColumn
 } from '../checks/policy-index';
-import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../checks/stats';
 import {
   checkGrantsWithoutRls,
   checkRlsEnabledNoPolicies,
@@ -42,13 +41,14 @@ import {
   checkUntrustedRoleWrites,
   type RoleTrustOptions
 } from '../checks/role-trust';
+import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../checks/stats';
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
+import { type ExplainReport, proveFindings } from '../perf/explain';
 import { resolveExposure } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
 import { introspectIndexes, type TableIndexSnapshot } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
-import { type ExplainReport, proveFindings } from '../perf/explain';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
 import { introspectStats, type StatsSnapshot } from '../pg/stats';

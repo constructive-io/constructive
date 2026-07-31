@@ -12,8 +12,9 @@
 
 import { sha256 } from '@constructive-io/noble-hashes/sha2';
 import { bytesToHex } from '@constructive-io/noble-hashes/utils';
-import { UploadError } from './types';
+
 import type { FileInput } from './types';
+import { UploadError } from './types';
 
 /** Default chunk size for chunked hashing: 2MB */
 const DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024;

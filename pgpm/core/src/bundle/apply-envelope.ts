@@ -1,6 +1,3 @@
-import { PgConfig } from 'pg-env';
-import { getPgPool } from 'pg-cache';
-
 import {
   BundleEnvelope,
   EnvelopeIssue,
@@ -8,6 +5,8 @@ import {
   EnvelopeScriptPart,
   verifyEnvelope
 } from '@pgpmjs/bundle';
+import { getPgPool } from 'pg-cache';
+import { PgConfig } from 'pg-env';
 
 import {
   applyBundle,

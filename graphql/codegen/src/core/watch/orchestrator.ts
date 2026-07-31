@@ -217,22 +217,22 @@ export class WatchOrchestrator {
       let outputDir: string | undefined;
 
       switch (this.options.generatorType) {
-        case 'react-query':
-          generateFn = this.options.generateReactQuery;
-          // React Query hooks go to {output}/hooks
-          outputDir =
+      case 'react-query':
+        generateFn = this.options.generateReactQuery;
+        // React Query hooks go to {output}/hooks
+        outputDir =
             this.options.outputDir ?? `${this.options.config.output}/hooks`;
-          break;
-        case 'orm':
-          generateFn = this.options.generateOrm;
-          // ORM client goes to {output}/orm
-          outputDir =
+        break;
+      case 'orm':
+        generateFn = this.options.generateOrm;
+        // ORM client goes to {output}/orm
+        outputDir =
             this.options.outputDir ?? `${this.options.config.output}/orm`;
-          break;
-        default:
-          throw new Error(
-            `Unknown generator type: ${this.options.generatorType}`,
-          );
+        break;
+      default:
+        throw new Error(
+          `Unknown generator type: ${this.options.generatorType}`,
+        );
       }
 
       const result = await generateFn({
@@ -291,16 +291,16 @@ export class WatchOrchestrator {
   private logHeader(): void {
     let generatorName: string;
     switch (this.options.generatorType) {
-      case 'react-query':
-        generatorName = 'React Query hooks';
-        break;
-      case 'orm':
-        generatorName = 'ORM client';
-        break;
-      default:
-        throw new Error(
-          `Unknown generator type: ${this.options.generatorType}`,
-        );
+    case 'react-query':
+      generatorName = 'React Query hooks';
+      break;
+    case 'orm':
+      generatorName = 'ORM client';
+      break;
+    default:
+      throw new Error(
+        `Unknown generator type: ${this.options.generatorType}`,
+      );
     }
     console.log(`\n${'─'.repeat(50)}`);
     console.log(`graphql-codegen watch mode (${generatorName})`);

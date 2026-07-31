@@ -17,7 +17,7 @@ export { GraphileFolderPreset, GraphileLtreePreset } from './preset';
 // Individual plugins
 export type { LtreeExtensionInfo } from './plugins/detect-ltree';
 export { LtreeExtensionDetectionPlugin } from './plugins/detect-ltree';
-export { ltreeToSlash, LTREE_SCALAR_NAME, LtreeCodecPlugin, slashToLtree } from './plugins/ltree-codec';
+export { LTREE_SCALAR_NAME, LtreeCodecPlugin, ltreeToSlash, slashToLtree } from './plugins/ltree-codec';
 
 // Connection filter operator factories
 export { createFolderOperatorFactory } from './plugins/folder-filter-operators';

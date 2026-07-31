@@ -61,6 +61,7 @@ export class MigrateTestFixture {
     const pool = getPgPool(pgConfig);
     this.pools.push(pool);
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const fixture = this;
     const db: TestDatabase = {
       name: dbName,

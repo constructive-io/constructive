@@ -22,20 +22,22 @@
  */
 
 import './augmentations';
+
 import type { GraphileConfig } from 'graphile-config';
-import type { ConnectionFilterOptions } from './types';
+
 import {
-  ConnectionFilterInflectionPlugin,
-  ConnectionFilterTypesPlugin,
   ConnectionFilterArgPlugin,
   ConnectionFilterAttributesPlugin,
-  ConnectionFilterOperatorsPlugin,
-  ConnectionFilterCustomOperatorsPlugin,
-  ConnectionFilterLogicalOperatorsPlugin,
-  ConnectionFilterComputedAttributesPlugin,
-  ConnectionFilterForwardRelationsPlugin,
   ConnectionFilterBackwardRelationsPlugin,
+  ConnectionFilterComputedAttributesPlugin,
+  ConnectionFilterCustomOperatorsPlugin,
+  ConnectionFilterForwardRelationsPlugin,
+  ConnectionFilterInflectionPlugin,
+  ConnectionFilterLogicalOperatorsPlugin,
+  ConnectionFilterOperatorsPlugin,
+  ConnectionFilterTypesPlugin,
 } from './plugins';
+import type { ConnectionFilterOptions } from './types';
 
 /**
  * Default schema options for the connection filter.

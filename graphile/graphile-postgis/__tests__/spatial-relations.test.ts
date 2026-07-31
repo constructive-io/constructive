@@ -1,10 +1,10 @@
 import sql from 'pg-sql2';
+
 import {
+  collectSpatialRelations,
   OPERATOR_REGISTRY,
   parseSpatialRelationTag,
-  collectSpatialRelations,
   PostgisSpatialRelationsPlugin,
-  type SpatialRelationInfo,
 } from '../src/plugins/spatial-relations';
 import { GraphilePostgisPreset } from '../src/preset';
 

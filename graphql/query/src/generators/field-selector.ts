@@ -2,6 +2,8 @@
  * Simplified field selection system
  * Converts user-friendly selection options to internal SelectionOptions format
  */
+import { fuzzyFindByName } from 'inflekt';
+
 import type { QuerySelectionOptions } from '../types';
 import type { Table } from '../types/schema';
 import type {
@@ -9,7 +11,6 @@ import type {
   FieldSelectionPreset,
   SimpleFieldSelection,
 } from '../types/selection';
-import { fuzzyFindByName } from 'inflekt';
 
 const relationalFieldSetCache = new WeakMap<Table, Set<string>>();
 
@@ -65,47 +66,47 @@ function convertPresetToSelection(
   const options: QuerySelectionOptions = {};
 
   switch (preset) {
-    case 'minimal': {
-      // Just id and first display field
-      const minimalFields = getMinimalFields(table);
-      minimalFields.forEach((field) => {
-        options[field] = true;
-      });
-      break;
-    }
+  case 'minimal': {
+    // Just id and first display field
+    const minimalFields = getMinimalFields(table);
+    minimalFields.forEach((field) => {
+      options[field] = true;
+    });
+    break;
+  }
 
-    case 'display': {
-      // Common display fields
-      const displayFields = getDisplayFields(table);
-      displayFields.forEach((field) => {
-        options[field] = true;
-      });
-      break;
-    }
+  case 'display': {
+    // Common display fields
+    const displayFields = getDisplayFields(table);
+    displayFields.forEach((field) => {
+      options[field] = true;
+    });
+    break;
+  }
 
-    case 'all': {
-      // All non-relational fields (includes complex fields like JSON, geometry, etc.)
-      const allFields = getNonRelationalFields(table);
-      allFields.forEach((field) => {
-        options[field] = true;
-      });
-      break;
-    }
+  case 'all': {
+    // All non-relational fields (includes complex fields like JSON, geometry, etc.)
+    const allFields = getNonRelationalFields(table);
+    allFields.forEach((field) => {
+      options[field] = true;
+    });
+    break;
+  }
 
-    case 'full':
-      // All fields including basic relations
-      table.fields.forEach((field) => {
-        options[field.name] = true;
-      });
-      break;
+  case 'full':
+    // All fields including basic relations
+    table.fields.forEach((field) => {
+      options[field.name] = true;
+    });
+    break;
 
-    default: {
-      // Default to display
-      const defaultFields = getDisplayFields(table);
-      defaultFields.forEach((field) => {
-        options[field] = true;
-      });
-    }
+  default: {
+    // Default to display
+    const defaultFields = getDisplayFields(table);
+    defaultFields.forEach((field) => {
+      options[field] = true;
+    });
+  }
   }
 
   return options;

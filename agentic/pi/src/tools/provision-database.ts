@@ -5,11 +5,9 @@ import path from 'node:path';
 import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
 import { z } from 'zod';
 
-import { getHost } from '../host';
-import { toolSchema } from '../tool-schema';
-
 import { prewarmAppWorkspace } from '../app-workspace';
 import { probeDatabase } from '../db-probe';
+import { getHost } from '../host';
 import { createDatabaseProvision } from '../provision-database/create-database-provision';
 import { selectProvisionCredential } from '../provision-database/credential';
 import {
@@ -21,6 +19,7 @@ import {
 import { loadProvisionManifest } from '../provision-database/manifest';
 import { applySqlFixups } from '../provision-database/pg-fixups';
 import { type ProvisionOverlay, resolveProvisionModules } from '../provision-database/resolve';
+import { toolSchema } from '../tool-schema';
 
 const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
 const DEFAULT_MODULES_ENDPOINT = 'http://modules.localhost:3000/graphql';

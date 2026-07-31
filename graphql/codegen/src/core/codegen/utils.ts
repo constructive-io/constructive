@@ -19,7 +19,7 @@ import type {
 import { scalarToFilterType, scalarToTsType } from './scalars';
 
 // Re-export string manipulation helpers from inflekt (single source of truth)
-export { lcFirst, toCamelCase, toPascalCase, toConstantCase, ucFirst };  
+export { lcFirst, toCamelCase, toConstantCase, toPascalCase, ucFirst };  
 
 // ============================================================================
 // Naming conventions for generated code

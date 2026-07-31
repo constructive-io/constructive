@@ -1,7 +1,6 @@
+import { DEFAULT_TEMPLATE_REPO, PgpmPackage, TEMPLATE_REPOS } from '@pgpmjs/core';
 import fs from 'fs';
 import path from 'path';
-
-import { DEFAULT_TEMPLATE_REPO, PgpmPackage, TEMPLATE_REPOS } from '@pgpmjs/core';
 
 /**
  * A template/boilerplate source, recorded on a workspace so that modules

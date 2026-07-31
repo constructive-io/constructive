@@ -6,9 +6,9 @@
  * toCamelCasePlural, and toOrderByTypeName now live in graphql-query.
  */
 export {
-  buildSelect,
-  buildFindOne,
   buildCount,
+  buildFindOne,
+  buildSelect,
   cleanTableToMetaObject,
   createASTQueryBuilder,
   generateIntrospectionSchema,

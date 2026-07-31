@@ -93,19 +93,19 @@ function routesFor(shape: VendorShape, provider: ProviderBinding, invert: boolea
     routes.push(
       invert
         ? {
-            fromSchema: provider.schema!,
-            kind: shape.users.kind,
-            name: provider.users,
-            toSchema: shape.users.schema,
-            ...(provider.users !== shape.users.name ? { toName: shape.users.name } : {})
-          }
+          fromSchema: provider.schema!,
+          kind: shape.users.kind,
+          name: provider.users,
+          toSchema: shape.users.schema,
+          ...(provider.users !== shape.users.name ? { toName: shape.users.name } : {})
+        }
         : {
-            fromSchema: shape.users.schema,
-            kind: shape.users.kind,
-            name: shape.users.name,
-            toSchema: provider.schema,
-            ...(provider.users !== shape.users.name ? { toName: provider.users } : {})
-          }
+          fromSchema: shape.users.schema,
+          kind: shape.users.kind,
+          name: shape.users.name,
+          toSchema: provider.schema,
+          ...(provider.users !== shape.users.name ? { toName: provider.users } : {})
+        }
     );
   }
 
@@ -115,19 +115,19 @@ function routesFor(shape: VendorShape, provider: ProviderBinding, invert: boolea
     routes.push(
       invert
         ? {
-            fromSchema: provider.schema!,
-            kind: accessor.kind,
-            name: target,
-            toSchema: accessor.schema,
-            ...(target !== accessor.name ? { toName: accessor.name } : {})
-          }
+          fromSchema: provider.schema!,
+          kind: accessor.kind,
+          name: target,
+          toSchema: accessor.schema,
+          ...(target !== accessor.name ? { toName: accessor.name } : {})
+        }
         : {
-            fromSchema: accessor.schema,
-            kind: accessor.kind,
-            name: accessor.name,
-            toSchema: provider.schema,
-            ...(target !== accessor.name ? { toName: target } : {})
-          }
+          fromSchema: accessor.schema,
+          kind: accessor.kind,
+          name: accessor.name,
+          toSchema: provider.schema,
+          ...(target !== accessor.name ? { toName: target } : {})
+        }
     );
   }
 

@@ -1,5 +1,6 @@
 import { hashString } from '@pgpmjs/ast';
 import { forEachScript } from '@pgpmjs/traverse';
+
 import { computeBundleDigest, computeChangeDigest } from './create';
 import { MigrationBundle } from './types';
 

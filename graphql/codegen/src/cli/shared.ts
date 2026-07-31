@@ -9,7 +9,7 @@ import { inflektTree } from 'inflekt/transform-keys';
 import type { Question } from 'inquirerer';
 
 import type { GenerateResult } from '../core/generate';
-import { mergeConfig, type GraphQLSDKConfigTarget } from '../types/config';
+import { type GraphQLSDKConfigTarget,mergeConfig } from '../types/config';
 
 export const splitCommas = (
   input: string | undefined,

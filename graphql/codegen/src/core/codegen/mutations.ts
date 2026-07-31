@@ -32,8 +32,8 @@ import {
   shorthandProp,
   spreadObj,
   sRef,
-  typeRef,
   typeLiteralWithProps,
+  typeRef,
   useMutationOptionsType,
   useMutationResultType,
   voidStatement,
@@ -252,12 +252,12 @@ export function generateCreateMutationHook(
 
   const mutationKeyExpr = useCentralizedKeys
     ? callExpr(
-        t.memberExpression(
-          t.identifier(mutationKeysName),
-          t.identifier('create'),
-        ),
-        [],
-      )
+      t.memberExpression(
+        t.identifier(mutationKeysName),
+        t.identifier('create'),
+      ),
+      [],
+    )
     : undefined;
 
   // mutationFn: (data: CreateInput['singular']) => getClient().singular.create({ data, select: ... }).unwrap()
@@ -280,13 +280,13 @@ export function generateCreateMutationHook(
   // onSuccess: invalidate lists
   const listKeyExpr = useCentralizedKeys
     ? callExpr(
-        t.memberExpression(t.identifier(keysName), t.identifier('lists')),
-        [],
-      )
+      t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+      [],
+    )
     : t.arrayExpression([
-        t.stringLiteral(typeName.toLowerCase()),
-        t.stringLiteral('list'),
-      ]);
+      t.stringLiteral(typeName.toLowerCase()),
+      t.stringLiteral('list'),
+    ]);
 
   const onSuccessFn = t.arrowFunctionExpression(
     [],
@@ -432,8 +432,8 @@ export function generateUpdateMutationHook(
         t.identifier(ek.name),
         t.tsTypeAnnotation(
           ek.tsType === 'number' ? t.tsNumberKeyword() :
-          ek.tsType === 'boolean' ? t.tsBooleanKeyword() :
-          t.tsStringKeyword()
+            ek.tsType === 'boolean' ? t.tsBooleanKeyword() :
+              t.tsStringKeyword()
         ),
       ),
     ),
@@ -533,31 +533,31 @@ export function generateUpdateMutationHook(
   // onSuccess: invalidate detail and lists
   const detailKeyExpr = useCentralizedKeys
     ? callExpr(
-        t.memberExpression(t.identifier(keysName), t.identifier('detail')),
-        [
-          t.memberExpression(
-            t.identifier('variables'),
-            t.identifier(pkField.name),
-          ),
-        ],
-      )
-    : t.arrayExpression([
-        t.stringLiteral(typeName.toLowerCase()),
-        t.stringLiteral('detail'),
+      t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+      [
         t.memberExpression(
           t.identifier('variables'),
           t.identifier(pkField.name),
         ),
-      ]);
+      ],
+    )
+    : t.arrayExpression([
+      t.stringLiteral(typeName.toLowerCase()),
+      t.stringLiteral('detail'),
+      t.memberExpression(
+        t.identifier('variables'),
+        t.identifier(pkField.name),
+      ),
+    ]);
   const listKeyExpr = useCentralizedKeys
     ? callExpr(
-        t.memberExpression(t.identifier(keysName), t.identifier('lists')),
-        [],
-      )
+      t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+      [],
+    )
     : t.arrayExpression([
-        t.stringLiteral(typeName.toLowerCase()),
-        t.stringLiteral('list'),
-      ]);
+      t.stringLiteral(typeName.toLowerCase()),
+      t.stringLiteral('list'),
+    ]);
 
   const onSuccessParam = t.identifier('_');
   const variablesParam = t.identifier('variables');
@@ -711,8 +711,8 @@ export function generateDeleteMutationHook(
         t.identifier(ek.name),
         t.tsTypeAnnotation(
           ek.tsType === 'number' ? t.tsNumberKeyword() :
-          ek.tsType === 'boolean' ? t.tsBooleanKeyword() :
-          t.tsStringKeyword()
+            ek.tsType === 'boolean' ? t.tsBooleanKeyword() :
+              t.tsStringKeyword()
         ),
       ),
     ),
@@ -806,31 +806,31 @@ export function generateDeleteMutationHook(
   // onSuccess: remove detail, invalidate lists
   const detailKeyExpr = useCentralizedKeys
     ? callExpr(
-        t.memberExpression(t.identifier(keysName), t.identifier('detail')),
-        [
-          t.memberExpression(
-            t.identifier('variables'),
-            t.identifier(pkField.name),
-          ),
-        ],
-      )
-    : t.arrayExpression([
-        t.stringLiteral(typeName.toLowerCase()),
-        t.stringLiteral('detail'),
+      t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+      [
         t.memberExpression(
           t.identifier('variables'),
           t.identifier(pkField.name),
         ),
-      ]);
+      ],
+    )
+    : t.arrayExpression([
+      t.stringLiteral(typeName.toLowerCase()),
+      t.stringLiteral('detail'),
+      t.memberExpression(
+        t.identifier('variables'),
+        t.identifier(pkField.name),
+      ),
+    ]);
   const listKeyExpr = useCentralizedKeys
     ? callExpr(
-        t.memberExpression(t.identifier(keysName), t.identifier('lists')),
-        [],
-      )
+      t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+      [],
+    )
     : t.arrayExpression([
-        t.stringLiteral(typeName.toLowerCase()),
-        t.stringLiteral('list'),
-      ]);
+      t.stringLiteral(typeName.toLowerCase()),
+      t.stringLiteral('list'),
+    ]);
 
   const onSuccessFn = t.arrowFunctionExpression(
     [t.identifier('_'), t.identifier('variables')],
@@ -901,10 +901,10 @@ function generateBulkMutationHook(
 
   const mutationFieldName = (() => {
     switch (op) {
-      case 'bulkCreate': return table.query?.bulkInsert;
-      case 'bulkUpsert': return table.query?.bulkUpsert;
-      case 'bulkUpdate': return table.query?.bulkUpdate;
-      case 'bulkDelete': return table.query?.bulkDelete;
+    case 'bulkCreate': return table.query?.bulkInsert;
+    case 'bulkUpsert': return table.query?.bulkUpsert;
+    case 'bulkUpdate': return table.query?.bulkUpdate;
+    case 'bulkDelete': return table.query?.bulkDelete;
     }
   })();
   if (!mutationFieldName) return null;
@@ -912,18 +912,18 @@ function generateBulkMutationHook(
   const { typeName, singularName } = getTableNames(table);
   const hookName = (() => {
     switch (op) {
-      case 'bulkCreate': return getBulkCreateMutationHookName(table);
-      case 'bulkUpsert': return getBulkUpsertMutationHookName(table);
-      case 'bulkUpdate': return getBulkUpdateMutationHookName(table);
-      case 'bulkDelete': return getBulkDeleteMutationHookName(table);
+    case 'bulkCreate': return getBulkCreateMutationHookName(table);
+    case 'bulkUpsert': return getBulkUpsertMutationHookName(table);
+    case 'bulkUpdate': return getBulkUpdateMutationHookName(table);
+    case 'bulkDelete': return getBulkDeleteMutationHookName(table);
     }
   })();
   const fileName = (() => {
     switch (op) {
-      case 'bulkCreate': return getBulkCreateMutationFileName(table);
-      case 'bulkUpsert': return getBulkUpsertMutationFileName(table);
-      case 'bulkUpdate': return getBulkUpdateMutationFileName(table);
-      case 'bulkDelete': return getBulkDeleteMutationFileName(table);
+    case 'bulkCreate': return getBulkCreateMutationFileName(table);
+    case 'bulkUpsert': return getBulkUpsertMutationFileName(table);
+    case 'bulkUpdate': return getBulkUpdateMutationFileName(table);
+    case 'bulkDelete': return getBulkDeleteMutationFileName(table);
     }
   })();
   const keysName = `${lcFirst(typeName)}Keys`;
@@ -994,64 +994,64 @@ function generateBulkMutationHook(
   // Build the variable type for the mutationFn parameter
   const varType = (() => {
     switch (op) {
-      case 'bulkCreate':
-        return t.tsTypeLiteral([
-          t.tsPropertySignature(
-            t.identifier('data'),
-            t.tsTypeAnnotation(
-              t.tsArrayType(
-                t.tsIndexedAccessType(
-                  typeRef(createInputTypeName),
-                  t.tsLiteralType(t.stringLiteral(singularName)),
-                ),
+    case 'bulkCreate':
+      return t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier('data'),
+          t.tsTypeAnnotation(
+            t.tsArrayType(
+              t.tsIndexedAccessType(
+                typeRef(createInputTypeName),
+                t.tsLiteralType(t.stringLiteral(singularName)),
               ),
             ),
           ),
-          (() => {
-            const p = t.tsPropertySignature(
-              t.identifier('onConflict'),
-              t.tsTypeAnnotation(t.tsUnknownKeyword()),
-            );
-            p.optional = true;
-            return p;
-          })(),
-        ]);
-      case 'bulkUpsert':
-        return t.tsTypeLiteral([
-          t.tsPropertySignature(
-            t.identifier('data'),
-            t.tsTypeAnnotation(
-              t.tsArrayType(
-                t.tsIndexedAccessType(
-                  typeRef(createInputTypeName),
-                  t.tsLiteralType(t.stringLiteral(singularName)),
-                ),
-              ),
-            ),
-          ),
-          t.tsPropertySignature(
+        ),
+        (() => {
+          const p = t.tsPropertySignature(
             t.identifier('onConflict'),
             t.tsTypeAnnotation(t.tsUnknownKeyword()),
+          );
+          p.optional = true;
+          return p;
+        })(),
+      ]);
+    case 'bulkUpsert':
+      return t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier('data'),
+          t.tsTypeAnnotation(
+            t.tsArrayType(
+              t.tsIndexedAccessType(
+                typeRef(createInputTypeName),
+                t.tsLiteralType(t.stringLiteral(singularName)),
+              ),
+            ),
           ),
-        ]);
-      case 'bulkUpdate':
-        return t.tsTypeLiteral([
-          t.tsPropertySignature(
-            t.identifier('where'),
-            t.tsTypeAnnotation(typeRef(filterTypeName)),
-          ),
-          t.tsPropertySignature(
-            t.identifier('data'),
-            t.tsTypeAnnotation(typeRef(patchTypeName)),
-          ),
-        ]);
-      case 'bulkDelete':
-        return t.tsTypeLiteral([
-          t.tsPropertySignature(
-            t.identifier('where'),
-            t.tsTypeAnnotation(typeRef(filterTypeName)),
-          ),
-        ]);
+        ),
+        t.tsPropertySignature(
+          t.identifier('onConflict'),
+          t.tsTypeAnnotation(t.tsUnknownKeyword()),
+        ),
+      ]);
+    case 'bulkUpdate':
+      return t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier('where'),
+          t.tsTypeAnnotation(typeRef(filterTypeName)),
+        ),
+        t.tsPropertySignature(
+          t.identifier('data'),
+          t.tsTypeAnnotation(typeRef(patchTypeName)),
+        ),
+      ]);
+    case 'bulkDelete':
+      return t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier('where'),
+          t.tsTypeAnnotation(typeRef(filterTypeName)),
+        ),
+      ]);
     }
   })();
 
@@ -1105,41 +1105,41 @@ function generateBulkMutationHook(
 
   const mutationKeyExpr = useCentralizedKeys
     ? callExpr(
-        t.memberExpression(
-          t.identifier(mutationKeysName),
-          t.identifier(op),
-        ),
-        [],
-      )
+      t.memberExpression(
+        t.identifier(mutationKeysName),
+        t.identifier(op),
+      ),
+      [],
+    )
     : undefined;
 
   // Build the ORM method call depending on the operation
   const ormMethodName = op;
   const mutationFnArgs = (() => {
     switch (op) {
-      case 'bulkCreate':
-        return t.objectExpression([
-          shorthandProp('data'),
-          objectProp('onConflict', t.memberExpression(t.identifier('vars'), t.identifier('onConflict'))),
-          objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select'))),
-        ]);
-      case 'bulkUpsert':
-        return t.objectExpression([
-          shorthandProp('data'),
-          objectProp('onConflict', t.memberExpression(t.identifier('vars'), t.identifier('onConflict'))),
-          objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select'))),
-        ]);
-      case 'bulkUpdate':
-        return t.objectExpression([
-          objectProp('where', t.memberExpression(t.identifier('vars'), t.identifier('where'))),
-          shorthandProp('data'),
-          objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select'))),
-        ]);
-      case 'bulkDelete':
-        return t.objectExpression([
-          objectProp('where', t.memberExpression(t.identifier('vars'), t.identifier('where'))),
-          objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select'))),
-        ]);
+    case 'bulkCreate':
+      return t.objectExpression([
+        shorthandProp('data'),
+        objectProp('onConflict', t.memberExpression(t.identifier('vars'), t.identifier('onConflict'))),
+        objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select'))),
+      ]);
+    case 'bulkUpsert':
+      return t.objectExpression([
+        shorthandProp('data'),
+        objectProp('onConflict', t.memberExpression(t.identifier('vars'), t.identifier('onConflict'))),
+        objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select'))),
+      ]);
+    case 'bulkUpdate':
+      return t.objectExpression([
+        objectProp('where', t.memberExpression(t.identifier('vars'), t.identifier('where'))),
+        shorthandProp('data'),
+        objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select'))),
+      ]);
+    case 'bulkDelete':
+      return t.objectExpression([
+        objectProp('where', t.memberExpression(t.identifier('vars'), t.identifier('where'))),
+        objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select'))),
+      ]);
     }
   })();
 
@@ -1152,13 +1152,13 @@ function generateBulkMutationHook(
   // onSuccess: invalidate lists
   const listKeyExpr = useCentralizedKeys
     ? callExpr(
-        t.memberExpression(t.identifier(keysName), t.identifier('lists')),
-        [],
-      )
+      t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+      [],
+    )
     : t.arrayExpression([
-        t.stringLiteral(typeName.toLowerCase()),
-        t.stringLiteral('list'),
-      ]);
+      t.stringLiteral(typeName.toLowerCase()),
+      t.stringLiteral('list'),
+    ]);
 
   const onSuccessFn = t.arrowFunctionExpression(
     [],

@@ -1,11 +1,11 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
+import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { createGraphileInstance, graphileCache, GraphileCacheEntry } from 'graphile-cache';
-import { makePgService } from 'graphile-settings';
 import type { GraphileConfig } from 'graphile-config';
+import { makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 

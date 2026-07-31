@@ -1,20 +1,19 @@
+import { ExtendedPlanFile } from '@pgpmjs/ast/files/types';
 import { mkdirSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 import {
+  assignChangesToPackages,
   buildDependencyGraph,
-  validateDAG,
+  buildPackageDependencies,
+  computeDeployOrder,
+  detectPackageCycle,
   extractPackageFromPath,
   findMatchingPattern,
-  assignChangesToPackages,
-  buildPackageDependencies,
-  detectPackageCycle,
-  computeDeployOrder,
-  topologicalSortWithinPackage,
+  PatternStrategy,
   slicePlan,
-  PatternStrategy
-} from '../src';
-import { ExtendedPlanFile } from '@pgpmjs/ast/files/types';
+  topologicalSortWithinPackage,
+  validateDAG} from '../src';
 
 describe('Slice Module', () => {
   const testDir = join(__dirname, 'test-slice');
@@ -190,9 +189,9 @@ describe('Slice Module', () => {
       const assignments = assignChangesToPackages(graph, {
         type: 'explicit',
         mapping: {
-          'change_a': 'pkg1',
-          'change_b': 'pkg1',
-          'change_c': 'pkg2'
+          change_a: 'pkg1',
+          change_b: 'pkg1',
+          change_c: 'pkg2'
         }
       });
 

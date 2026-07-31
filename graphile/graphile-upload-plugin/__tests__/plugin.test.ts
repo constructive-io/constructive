@@ -1,6 +1,7 @@
-import { GraphQLScalarType, GraphQLError } from 'graphql';
 import { EventEmitter } from 'events';
+import { GraphQLError,GraphQLScalarType } from 'graphql';
 import { Readable } from 'stream';
+
 import { createUploadPlugin } from '../src/plugin';
 import type { UploadFieldDefinition } from '../src/types';
 

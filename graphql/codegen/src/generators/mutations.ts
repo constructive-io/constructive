@@ -6,6 +6,6 @@
  */
 export {
   buildPostGraphileCreate,
-  buildPostGraphileUpdate,
   buildPostGraphileDelete,
+  buildPostGraphileUpdate,
 } from '@constructive-io/graphql-query';

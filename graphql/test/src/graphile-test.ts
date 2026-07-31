@@ -1,11 +1,11 @@
-import type { GraphQLQueryOptions, GraphQLTestContext, GetConnectionsInput, Variables } from 'graphile-test';
-import { ConstructivePreset } from 'graphile-settings';
-import type { GraphQLSchema } from 'graphql';
-import type { GraphileConfig } from 'graphile-config';
-import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { makeSchema } from 'graphile-build';
+import type { GraphileConfig } from 'graphile-config';
+import { ConstructivePreset } from 'graphile-settings';
 import { makePgService } from 'graphile-settings';
+import type { GetConnectionsInput, GraphQLQueryOptions, GraphQLTestContext, Variables } from 'graphile-test';
 import { runGraphQLInContext } from 'graphile-test/context';
+import type { GraphQLSchema } from 'graphql';
+import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 
 /**
  * Creates a GraphQL test context using PostGraphile v5 with ConstructivePreset.

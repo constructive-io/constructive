@@ -15,5 +15,5 @@ export * from './files';
 export * from './hash';
 export * from './module';
 export * from './plan-rename';
-export { parseAuthor } from './utils/author';
 export type { ParsedAuthor } from './utils/author';
+export { parseAuthor } from './utils/author';

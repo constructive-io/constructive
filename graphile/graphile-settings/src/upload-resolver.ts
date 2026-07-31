@@ -16,15 +16,15 @@
  *   CDN_ENDPOINT     - S3-compatible endpoint (default: 'http://localhost:9000')
  */
 
+import { getEnvOptions } from '@constructive-io/graphql-env';
 import Streamer from '@constructive-io/s3-streamer';
 import uploadNames from '@constructive-io/upload-names';
-import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { randomBytes } from 'crypto';
 import type {
-	FileUpload,
-	UploadFieldDefinition,
-	UploadPluginInfo,
+  FileUpload,
+  UploadFieldDefinition,
+  UploadPluginInfo,
 } from 'graphile-upload-plugin';
 
 const log = new Logger('upload-resolver');
@@ -34,38 +34,38 @@ let streamer: Streamer | null = null;
 let bucketName: string;
 
 function getStreamer(): Streamer {
-	if (streamer) return streamer;
+  if (streamer) return streamer;
 
-	const opts = getEnvOptions();
-	const cdn = opts.cdn || {};
+  const opts = getEnvOptions();
+  const cdn = opts.cdn || {};
 
-	const provider = cdn.provider || 'minio';
-	bucketName = cdn.bucketName || 'test-bucket';
-	const awsRegion = cdn.awsRegion || 'us-east-1';
-	const awsAccessKey = cdn.awsAccessKey || 'minioadmin';
-	const awsSecretKey = cdn.awsSecretKey || 'minioadmin';
-	const endpoint = cdn.endpoint || 'http://localhost:9000';
+  const provider = cdn.provider || 'minio';
+  bucketName = cdn.bucketName || 'test-bucket';
+  const awsRegion = cdn.awsRegion || 'us-east-1';
+  const awsAccessKey = cdn.awsAccessKey || 'minioadmin';
+  const awsSecretKey = cdn.awsSecretKey || 'minioadmin';
+  const endpoint = cdn.endpoint || 'http://localhost:9000';
 
-	if (process.env.NODE_ENV === 'production') {
-		if (!cdn.awsAccessKey || !cdn.awsSecretKey) {
-			log.warn('[upload-resolver] WARNING: Using default credentials in production.');
-		}
-	}
+  if (process.env.NODE_ENV === 'production') {
+    if (!cdn.awsAccessKey || !cdn.awsSecretKey) {
+      log.warn('[upload-resolver] WARNING: Using default credentials in production.');
+    }
+  }
 
-	log.info(
-		`[upload-resolver] Initializing: provider=${provider} bucket=${bucketName}`,
-	);
+  log.info(
+    `[upload-resolver] Initializing: provider=${provider} bucket=${bucketName}`,
+  );
 
-	streamer = new Streamer({
-		defaultBucket: bucketName,
-		awsRegion,
-		awsSecretKey,
-		awsAccessKey,
-		endpoint,
-		provider,
-	});
+  streamer = new Streamer({
+    defaultBucket: bucketName,
+    awsRegion,
+    awsSecretKey,
+    awsAccessKey,
+    endpoint,
+    provider,
+  });
 
-	return streamer;
+  return streamer;
 }
 
 /**
@@ -73,8 +73,8 @@ function getStreamer(): Streamer {
  * Format: {random10chars}-{sanitized-filename}
  */
 function generateKey(filename: string): string {
-	const rand = randomBytes(12).toString('hex');
-	return `${rand}-${uploadNames(filename)}`;
+  const rand = randomBytes(12).toString('hex');
+  return `${rand}-${uploadNames(filename)}`;
 }
 
 /**
@@ -88,59 +88,59 @@ function generateKey(filename: string): string {
  * stream bytes, validated against smart-tag/type rules, and only then uploaded.
  */
 async function uploadResolver(
-	upload: FileUpload,
-	_args: unknown,
-	_context: unknown,
-	info: { uploadPlugin: UploadPluginInfo },
+  upload: FileUpload,
+  _args: unknown,
+  _context: unknown,
+  info: { uploadPlugin: UploadPluginInfo },
 ): Promise<unknown> {
-	const { tags, type } = info.uploadPlugin;
-	const s3 = getStreamer();
-	const { filename } = upload;
-	const key = generateKey(filename);
+  const { tags, type } = info.uploadPlugin;
+  const s3 = getStreamer();
+  const { filename } = upload;
+  const key = generateKey(filename);
 
-	// MIME type validation from smart tags
-	const typ = type || tags?.type;
-	const VALID_MIME = /^[a-z]+\/[a-z0-9][a-z0-9!#$&\-.^_+]*$/i;
-	const mim: string[] = tags?.mime
-		? String(tags.mime)
-				.trim()
-				.split(',')
-				.map((a: string) => a.trim())
-				.filter((m: string) => VALID_MIME.test(m))
-		: typ === 'image'
-			? DEFAULT_IMAGE_MIME_TYPES
-			: [];
+  // MIME type validation from smart tags
+  const typ = type || tags?.type;
+  const VALID_MIME = /^[a-z]+\/[a-z0-9][a-z0-9!#$&\-.^_+]*$/i;
+  const mim: string[] = tags?.mime
+    ? String(tags.mime)
+      .trim()
+      .split(',')
+      .map((a: string) => a.trim())
+      .filter((m: string) => VALID_MIME.test(m))
+    : typ === 'image'
+      ? DEFAULT_IMAGE_MIME_TYPES
+      : [];
 
-	const detected = await s3.detectContentType({
-		readStream: upload.createReadStream(),
-		filename,
-	});
-	const detectedContentType = detected.contentType;
+  const detected = await s3.detectContentType({
+    readStream: upload.createReadStream(),
+    filename,
+  });
+  const detectedContentType = detected.contentType;
 
-	if (mim.length && !mim.includes(detectedContentType)) {
-		detected.stream.destroy();
-		throw new Error('UPLOAD_MIMETYPE');
-	}
+  if (mim.length && !mim.includes(detectedContentType)) {
+    detected.stream.destroy();
+    throw new Error('UPLOAD_MIMETYPE');
+  }
 
-	const result = await s3.uploadWithContentType({
-		readStream: detected.stream,
-		contentType: detectedContentType,
-		magic: detected.magic,
-		key,
-		bucket: bucketName,
-	});
+  const result = await s3.uploadWithContentType({
+    readStream: detected.stream,
+    contentType: detectedContentType,
+    magic: detected.magic,
+    key,
+    bucket: bucketName,
+  });
 
-	const url = result.upload.Location;
-	const { contentType } = result;
+  const url = result.upload.Location;
+  const { contentType } = result;
 
-	switch (typ) {
-		case 'image':
-		case 'upload':
-			return { filename, mime: contentType, url };
-		case 'attachment':
-		default:
-			return url;
-	}
+  switch (typ) {
+  case 'image':
+  case 'upload':
+    return { filename, mime: contentType, url };
+  case 'attachment':
+  default:
+    return url;
+  }
 }
 
 /**
@@ -157,22 +157,22 @@ async function uploadResolver(
  * to every application database. They rarely change, so this config is stable.
  */
 export const constructiveUploadFieldDefinitions: UploadFieldDefinition[] = [
-	{
-		name: 'image',
-		namespaceName: 'public',
-		type: 'image',
-		resolve: uploadResolver,
-	},
-	{
-		name: 'upload',
-		namespaceName: 'public',
-		type: 'upload',
-		resolve: uploadResolver,
-	},
-	{
-		name: 'attachment',
-		namespaceName: 'public',
-		type: 'attachment',
-		resolve: uploadResolver,
-	},
+  {
+    name: 'image',
+    namespaceName: 'public',
+    type: 'image',
+    resolve: uploadResolver,
+  },
+  {
+    name: 'upload',
+    namespaceName: 'public',
+    type: 'upload',
+    resolve: uploadResolver,
+  },
+  {
+    name: 'attachment',
+    namespaceName: 'public',
+    type: 'attachment',
+    resolve: uploadResolver,
+  },
 ];

@@ -1,6 +1,8 @@
 import '../augmentations';
+
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType } from 'graphql';
+
 import type { ConnectionFilterOperatorSpec } from '../types';
 import { $$filters } from '../types';
 import { makeApplyFromOperatorSpec } from './operatorApply';

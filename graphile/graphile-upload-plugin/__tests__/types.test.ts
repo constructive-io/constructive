@@ -1,10 +1,9 @@
 import type {
-  UploadFieldDefinition,
-  UploadResolver,
   FileUpload,
+  UploadFieldDefinition,
   UploadPluginInfo,
-  UploadPluginOptions
-} from '../src/types';
+  UploadPluginOptions,
+  UploadResolver} from '../src/types';
 
 /**
  * Tests for the UploadFieldDefinition type interface.

@@ -16,11 +16,12 @@
  *
  * Requires postgres-plus:18 image with postgis, vector, pg_textsearch, pg_trgm.
  */
-import { join } from 'path';
-import { getConnectionsObject, seed } from 'graphile-test';
-import type { GraphQLQueryFnObj, GraphQLResponse } from 'graphile-test';
-import { ConstructivePreset } from 'graphile-settings';
 import { runCodegenAndLoad } from '@constructive-io/graphql-test';
+import { ConstructivePreset } from 'graphile-settings';
+import type { GraphQLQueryFnObj, GraphQLResponse } from 'graphile-test';
+import { getConnectionsObject, seed } from 'graphile-test';
+import { join } from 'path';
+
 import { GraphileTestAdapter } from './helpers/graphile-adapter';
 
 jest.setTimeout(120000);

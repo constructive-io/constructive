@@ -5,17 +5,13 @@
  * search algorithm. They are plain objects — not Graphile plugins.
  */
 
-export { createTsvectorAdapter } from './tsvector';
-export type { TsvectorAdapterOptions } from './tsvector';
-
-export { createBm25Adapter } from './bm25';
 export type { Bm25AdapterOptions, Bm25IndexInfo } from './bm25';
-
-export { createTrgmAdapter } from './trgm';
-export type { TrgmAdapterOptions } from './trgm';
-
-export { createPgvectorAdapter } from './pgvector';
-export type { PgvectorAdapterOptions } from './pgvector';
-
-export { getChunksInfo } from './chunks';
+export { createBm25Adapter } from './bm25';
 export type { ChunksInfo } from './chunks';
+export { getChunksInfo } from './chunks';
+export type { PgvectorAdapterOptions } from './pgvector';
+export { createPgvectorAdapter } from './pgvector';
+export type { TrgmAdapterOptions } from './trgm';
+export { createTrgmAdapter } from './trgm';
+export type { TsvectorAdapterOptions } from './tsvector';
+export { createTsvectorAdapter } from './tsvector';

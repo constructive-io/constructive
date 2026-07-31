@@ -1,8 +1,8 @@
-import {
-  generateMulti,
-  expandSchemaDirToMultiTarget,
-} from '@constructive-io/graphql-codegen';
 import type { GraphQLSDKConfigTarget } from '@constructive-io/graphql-codegen';
+import {
+  expandSchemaDirToMultiTarget,
+  generateMulti,
+} from '@constructive-io/graphql-codegen';
 
 const SCHEMA_DIR = '../constructive-sdk/schemas';
 

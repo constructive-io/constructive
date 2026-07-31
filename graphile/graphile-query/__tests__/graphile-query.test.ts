@@ -2,13 +2,14 @@
  * Tests for graphile-query PostGraphile v5 integration
  */
 import { Pool } from 'pg';
-import { getConnections, GetConnectionResult } from 'pgsql-test';
+import { GetConnectionResult,getConnections } from 'pgsql-test';
+
 import {
+  createGraphileQuery,
+  createGraphileQuerySimple,
   getSchema,
   GraphileQuery,
   GraphileQuerySimple,
-  createGraphileQuery,
-  createGraphileQuerySimple,
 } from '../src';
 
 const TEST_SCHEMA = `

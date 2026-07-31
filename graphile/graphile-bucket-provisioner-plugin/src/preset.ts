@@ -6,8 +6,9 @@
  */
 
 import type { GraphileConfig } from 'graphile-config';
-import type { BucketProvisionerPluginOptions } from './types';
+
 import { createBucketProvisionerPlugin } from './plugin';
+import type { BucketProvisionerPluginOptions } from './types';
 
 /**
  * Creates a preset that includes the bucket provisioner plugin with the given options.

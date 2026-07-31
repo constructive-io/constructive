@@ -6,8 +6,8 @@
  * max entries.
  */
 
-import { LRUCache } from 'lru-cache';
 import { Logger } from '@pgpmjs/logger';
+import { LRUCache } from 'lru-cache';
 
 import type { LoaderContext, ModuleLoader } from './types';
 

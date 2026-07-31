@@ -1,4 +1,5 @@
-import { GraphQLNonNull, GraphQLString, GraphQLInt } from 'graphql';
+import { GraphQLInt,GraphQLNonNull, GraphQLString } from 'graphql';
+
 import { RequiredInputPlugin, RequiredInputPreset } from '../src/plugins/required-input-plugin';
 
 // ---------------------------------------------------------------------------

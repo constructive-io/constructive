@@ -1,4 +1,4 @@
-import { SESSION_COOKIE_NAME, DEVICE_TOKEN_COOKIE_NAME } from '../../middleware/cookie';
+import { DEVICE_TOKEN_COOKIE_NAME,SESSION_COOKIE_NAME } from '../../middleware/cookie';
 
 /**
  * Since the AuthCookiePlugin is a grafserv middleware plugin, we test

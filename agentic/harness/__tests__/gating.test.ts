@@ -1,4 +1,4 @@
-import { createConfirmGate, ConfirmGate, ConfirmGateDeps, GateHost } from '../src/gating/confirm-gate';
+import { ConfirmGate, ConfirmGateDeps, createConfirmGate, GateHost } from '../src/gating/confirm-gate';
 import { createDeclineGuard } from '../src/gating/decline-guard';
 import { buildConfirmPrompt } from '../src/gating/prompts';
 

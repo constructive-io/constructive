@@ -1,6 +1,6 @@
 import { GisSubtype } from '../src/constants';
-import { getGISTypeName } from '../src/utils';
 import { PostgisGeometryFieldsPlugin } from '../src/plugins/geometry-fields';
+import { getGISTypeName } from '../src/utils';
 
 describe('PostgisGeometryFieldsPlugin', () => {
   describe('plugin metadata', () => {

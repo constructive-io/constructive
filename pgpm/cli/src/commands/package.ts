@@ -134,7 +134,6 @@ export default async (
   project.ensureModule();
 
   const info = project.getModuleInfo();
-  info.version;
 
   await writePackage({
     version: info.version,

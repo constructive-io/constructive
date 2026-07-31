@@ -2,7 +2,7 @@ import '../augmentations';
 
 import { sideEffectWithPgClient } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
-import type { GraphQLOutputType, GraphQLInputType } from 'graphql';
+import type { GraphQLInputType,GraphQLOutputType } from 'graphql';
 
 const version = '0.1.0';
 

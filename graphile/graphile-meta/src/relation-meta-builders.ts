@@ -1,4 +1,3 @@
-import { safeInflection } from './inflection-utils';
 import {
   buildForeignKeyConstraint,
 } from './constraint-meta-builders';
@@ -6,8 +5,9 @@ import {
   findExecutableField,
   getFieldContainerType,
 } from './graphql-schema-utils';
+import { safeInflection } from './inflection-utils';
 import { resolveTableType } from './name-meta-builders';
-import { buildFieldList, type BuildContext } from './table-meta-context';
+import { type BuildContext,buildFieldList } from './table-meta-context';
 import {
   getRelation,
   getResourceCodec,
@@ -114,13 +114,13 @@ export function buildBelongsToRelations(
     if (context.schema && !remoteCodec) continue;
     const executable = remoteCodec
       ? resolveDirectRelationField(
-          relationName,
-          relation,
-          isUnique,
-          codec,
-          remoteCodec,
-          context,
-        )
+        relationName,
+        relation,
+        isUnique,
+        codec,
+        remoteCodec,
+        context,
+      )
       : null;
     if (context.schema && !executable) continue;
     const remoteTypeName = remoteCodec
@@ -162,13 +162,13 @@ export function buildReverseRelations(
     if (context.schema && !remoteCodec) continue;
     const executable = remoteCodec
       ? resolveDirectRelationField(
-          relationName,
-          relation,
-          isUnique,
-          codec,
-          remoteCodec,
-          context,
-        )
+        relationName,
+        relation,
+        isUnique,
+        codec,
+        remoteCodec,
+        context,
+      )
       : null;
     if (context.schema && !executable) continue;
     const remoteTypeName = remoteCodec
@@ -211,32 +211,32 @@ function buildManyToManyRelation(
   const rightTypeName = resolveTableType(context.build, rightCodec);
   const executable = context.schema
     ? findExecutableField(getFieldContainerType(context.schema, leftTypeName), [
-        {
-          name: safeInflection(
-            () =>
-              context.build.inflection.manyToManyRelationConnectionField?.(
-                details
-              ),
-            null,
-          ),
-          typeName: safeInflection(
-            () =>
-              context.build.inflection.manyToManyRelationConnectionType?.({
-                ...details,
-                leftTableTypeName: leftTypeName,
-              }),
-            null,
-          ),
-        },
-        {
-          name: safeInflection(
-            () =>
-              context.build.inflection.manyToManyRelationListField?.(details),
-            null,
-          ),
-          typeName: rightTypeName,
-        },
-      ])
+      {
+        name: safeInflection(
+          () =>
+            context.build.inflection.manyToManyRelationConnectionField?.(
+              details
+            ),
+          null,
+        ),
+        typeName: safeInflection(
+          () =>
+            context.build.inflection.manyToManyRelationConnectionType?.({
+              ...details,
+              leftTableTypeName: leftTypeName,
+            }),
+          null,
+        ),
+      },
+      {
+        name: safeInflection(
+          () =>
+            context.build.inflection.manyToManyRelationListField?.(details),
+          null,
+        ),
+        typeName: rightTypeName,
+      },
+    ])
     : null;
   if (context.schema && !executable) return null;
 

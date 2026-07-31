@@ -11,8 +11,8 @@
  * - clear() hook for future LISTEN/NOTIFY invalidation
  */
 
-import { LRUCache } from 'lru-cache';
 import { Logger } from '@pgpmjs/logger';
+import { LRUCache } from 'lru-cache';
 
 export interface ModuleConfigCacheOptions {
   /** Cache name (used in log prefix) */

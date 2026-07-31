@@ -1,5 +1,6 @@
 import * as http from 'node:http';
-import { getIntrospectionQuery, buildSchema, introspectionFromSchema } from 'graphql';
+
+import { buildSchema, introspectionFromSchema } from 'graphql';
 
 import { fetchEndpointSchemaSDL } from '../src/fetch-endpoint-schema';
 

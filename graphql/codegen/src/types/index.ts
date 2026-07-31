@@ -5,15 +5,15 @@
 // Schema types
 export type {
   BelongsToRelation,
+  ConstraintInfo,
   Field,
   FieldType,
+  ForeignKeyConstraint,
   HasManyRelation,
   HasOneRelation,
   ManyToManyRelation,
   Relations,
   Table,
-  ConstraintInfo,
-  ForeignKeyConstraint,
   TableConstraints,
   TableInflection,
   TableQueryNames,

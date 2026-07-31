@@ -1,8 +1,9 @@
-import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
-import { parsePgpmHeader, renameInHeader, writePgpmScript } from '@pgpmjs/ast/files/sql/header';
 import { hashString } from '@pgpmjs/ast';
 import { generatePlanFileContent, parsePlanContent, renameInPlanContent } from '@pgpmjs/ast';
+import { parsePgpmHeader, renameInHeader, writePgpmScript } from '@pgpmjs/ast/files/sql/header';
+import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
 import { mapScripts } from '@pgpmjs/traverse';
+
 import {
   computeBundleDigest,
   computeChangeDigest,

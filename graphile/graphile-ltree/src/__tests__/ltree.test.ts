@@ -4,8 +4,8 @@ import { getConnections, seed } from 'graphile-test';
 import { join } from 'path';
 import type { PgTestClient } from 'pgsql-test';
 
-import { createFolderOperatorFactory } from '../plugins/folder-filter-operators';
 import { LtreeExtensionDetectionPlugin } from '../plugins/detect-ltree';
+import { createFolderOperatorFactory } from '../plugins/folder-filter-operators';
 import { LtreeCodecPlugin } from '../plugins/ltree-codec';
 
 interface FileNode {

@@ -6,16 +6,16 @@
  */
 
 import { execute } from 'grafast';
-import { postgraphile, type PostGraphileInstance } from 'postgraphile';
-import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { withPgClientFromPgService } from 'graphile-build-pg';
+import type { GraphileConfig } from 'graphile-config';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
 import type {
   DocumentNode,
   ExecutionResult,
   GraphQLSchema,
 } from 'graphql';
-import type { GraphileConfig } from 'graphile-config';
 import { LRUCache } from 'lru-cache';
+import { postgraphile, type PostGraphileInstance } from 'postgraphile';
 
 /**
  * Configuration options for QueryExecutor

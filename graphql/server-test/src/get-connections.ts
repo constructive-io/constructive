@@ -1,10 +1,10 @@
+import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { getConnections as getPgConnections } from 'pgsql-test';
 import type { SeedAdapter } from 'pgsql-test/seed/types';
-import { getEnvOptions } from '@constructive-io/graphql-env';
 
 import { createDevTestServer, createTestServer } from './server';
-import { createSuperTestAgent, createQueryFn } from './supertest';
+import { createQueryFn,createSuperTestAgent } from './supertest';
 import type { GetConnectionsInput, GetConnectionsResult } from './types';
 
 /**

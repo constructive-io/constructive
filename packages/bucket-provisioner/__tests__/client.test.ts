@@ -3,8 +3,8 @@
  */
 
 import { createS3Client } from '../src/client';
-import { ProvisionerError } from '../src/types';
 import type { StorageConnectionConfig } from '../src/types';
+import { ProvisionerError } from '../src/types';
 
 describe('createS3Client', () => {
   const baseConfig: StorageConnectionConfig = {

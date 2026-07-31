@@ -1,8 +1,8 @@
+import { hashString } from '@pgpmjs/ast';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 
-import { hashString } from '@pgpmjs/ast';
 import {
   BUNDLE_ARCHIVE_ENTRY,
   bundleFromModule,

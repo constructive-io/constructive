@@ -1,4 +1,5 @@
-import type { Request, Response, NextFunction } from 'express';
+import type {Request } from 'express';
+
 import { DEVICE_TOKEN_COOKIE_NAME } from '../cookie';
 
 /**

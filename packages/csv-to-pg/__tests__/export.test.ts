@@ -1,10 +1,11 @@
 // @ts-nocheck
 
-import { parse, parseTypes } from '../src';
 import { resolve } from 'path';
 import { deparse } from 'pgsql-deparser';
-import { InsertOne, InsertMany } from '../src/utils';
+
+import { parse, parseTypes } from '../src';
 import { Parser } from '../src/parser';
+import { InsertMany } from '../src/utils';
 
 const testCase = resolve(__dirname + '/../__fixtures__/test-case.csv');
 
@@ -45,337 +46,337 @@ it('noop', () => {
   expect(true).toBe(true);
 });
 describe('test case', () => {
-it('test case', async () => {
-  const records = await parse(testCase, { headers: config.headers });
-  const types = parseTypes(config);
-  const stmt = InsertMany({
-    schema: config.schema,
-    table: config.table,
-    types,
-    records
+  it('test case', async () => {
+    const records = await parse(testCase, { headers: config.headers });
+    const types = parseTypes(config);
+    const stmt = InsertMany({
+      schema: config.schema,
+      table: config.table,
+      types,
+      records
+    });
+
+    expect(deparse([stmt])).toMatchSnapshot();
   });
 
-  expect(deparse([stmt])).toMatchSnapshot();
-});
+  it('test case parser', async () => {
+    const parser = new Parser(config);
 
-it('test case parser', async () => {
-  const parser = new Parser(config);
-
-  const sql = await parser.parse([
-    {
-      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      database_id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      table_id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      name: 'name here',
-      description: 'description'
-    }
-  ]);
-
-  expect(sql).toMatchSnapshot();
-});
-
-it('jsonb/json', async () => {
-  const parser = new Parser({
-    schema: 'metaschema_public',
-    singleStmts: true,
-    table: 'field',
-    fields: {
-      id: 'uuid',
-      name: 'text',
-      data: 'jsonb'
-    }
-  });
-
-  const sql = await parser.parse([
-    {
-      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      name: 'name here',
-      data: {
-        a: 1
+    const sql = await parser.parse([
+      {
+        id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        database_id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        table_id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        name: 'name here',
+        description: 'description'
       }
-    }
-  ]);
+    ]);
 
-  expect(sql).toMatchSnapshot();
-});
-
-it('image/attachment', async () => {
-  const parser = new Parser({
-    schema: 'metaschema_public',
-    singleStmts: true,
-    table: 'field',
-    fields: {
-      id: 'uuid',
-      name: 'text',
-      image: 'image',
-      upload: 'attachment'
-    }
+    expect(sql).toMatchSnapshot();
   });
 
-  const sql = await parser.parse([
-    {
-      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      name: 'name here',
-      image: {
-        url: 'http://path/to/image.jpg'
+  it('jsonb/json', async () => {
+    const parser = new Parser({
+      schema: 'metaschema_public',
+      singleStmts: true,
+      table: 'field',
+      fields: {
+        id: 'uuid',
+        name: 'text',
+        data: 'jsonb'
+      }
+    });
+
+    const sql = await parser.parse([
+      {
+        id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        name: 'name here',
+        data: {
+          a: 1
+        }
+      }
+    ]);
+
+    expect(sql).toMatchSnapshot();
+  });
+
+  it('image/attachment', async () => {
+    const parser = new Parser({
+      schema: 'metaschema_public',
+      singleStmts: true,
+      table: 'field',
+      fields: {
+        id: 'uuid',
+        name: 'text',
+        image: 'image',
+        upload: 'attachment'
+      }
+    });
+
+    const sql = await parser.parse([
+      {
+        id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        name: 'name here',
+        image: {
+          url: 'http://path/to/image.jpg'
+        },
+        upload: {
+          url: 'http://path/to/image.jpg'
+        }
+      }
+    ]);
+
+    expect(sql).toMatchSnapshot();
+  });
+
+  it('arrays', async () => {
+    const parser = new Parser({
+      schema: 'metaschema_public',
+      singleStmts: true,
+      table: 'field',
+      fields: {
+        id: 'uuid',
+        schemas: 'text[]'
+      }
+    });
+
+    const sql = await parser.parse([
+      {
+        id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        schemas: ['a', 'b']
+      }
+    ]);
+
+    expect(sql).toMatchSnapshot();
+  });
+
+  it('uuid[] arrays', async () => {
+    const parser = new Parser({
+      schema: 'metaschema_public',
+      singleStmts: true,
+      table: 'primary_key_constraint',
+      fields: {
+        id: 'uuid',
+        database_id: 'uuid',
+        table_id: 'uuid',
+        name: 'text',
+        field_ids: 'uuid[]'
+      }
+    });
+
+    const sql = await parser.parse([
+      {
+        id: 'cdc96a32-572c-4f69-8bce-4c7bd4024a4e',
+        database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+        table_id: '6616358d-8da8-45e4-834f-d735a0f02acc',
+        name: 'object_pkey',
+        field_ids: ['f853daae-f563-447d-ac09-901ddd68586e', 'a4257181-147d-4558-a51f-4b43246527a2']
       },
-      upload: {
-        url: 'http://path/to/image.jpg'
+      {
+        id: '03d7007c-5262-4250-9ce1-efcabc5bedea',
+        database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+        table_id: '535d5894-679a-4a7b-aa5a-bd07cce8a505',
+        name: 'ref_pkey',
+        field_ids: ['8cc2da93-a8e0-4565-9d14-f814c3a1432d', '40a34889-eb4c-4833-8daf-b99441962971']
       }
-    }
-  ]);
+    ]);
 
-  expect(sql).toMatchSnapshot();
-});
-
-it('arrays', async () => {
-  const parser = new Parser({
-    schema: 'metaschema_public',
-    singleStmts: true,
-    table: 'field',
-    fields: {
-      id: 'uuid',
-      schemas: 'text[]'
-    }
+    expect(sql).toMatchSnapshot();
   });
 
-  const sql = await parser.parse([
-    {
-      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      schemas: ['a', 'b']
-    }
-  ]);
+  it('interval type', async () => {
+    const parser = new Parser({
+      schema: 'metaschema_modules_public',
+      singleStmts: true,
+      table: 'tokens_module',
+      fields: {
+        id: 'uuid',
+        database_id: 'uuid',
+        tokens_default_expiration: 'interval',
+        tokens_table: 'text'
+      }
+    });
 
-  expect(sql).toMatchSnapshot();
+    const sql = await parser.parse([
+      {
+        id: '42aaba39-de20-4be0-95a1-4873d7d4b6d4',
+        database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+        tokens_default_expiration: { hours: 24 },
+        tokens_table: 'api_tokens'
+      },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+        tokens_default_expiration: { days: 7, hours: 12, minutes: 30 },
+        tokens_table: 'refresh_tokens'
+      },
+      {
+        id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+        tokens_default_expiration: { years: 1, months: 6 },
+        tokens_table: 'long_lived_tokens'
+      }
+    ]);
+
+    expect(sql).toMatchSnapshot();
   });
 
-it('uuid[] arrays', async () => {
-  const parser = new Parser({
-    schema: 'metaschema_public',
-    singleStmts: true,
-    table: 'primary_key_constraint',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      table_id: 'uuid',
-      name: 'text',
-      field_ids: 'uuid[]'
-    }
+  it('null array fields emit empty array literal instead of NULL', async () => {
+    const parser = new Parser({
+      schema: 'metaschema_modules_public',
+      singleStmts: true,
+      table: 'secure_table_provision',
+      fields: {
+        id: 'uuid',
+        node_type: 'text',
+        fields: 'jsonb[]',
+        out_fields: 'uuid[]'
+      }
+    });
+
+    const sql = await parser.parse([
+      {
+        id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        node_type: 'DataTimestamps',
+        fields: null,
+        out_fields: null
+      }
+    ]);
+
+    // Should emit '{}' for array columns instead of NULL
+    expect(sql).toContain("'{}'");
+    expect(sql).not.toContain('NULL');
+    expect(sql).toMatchSnapshot();
   });
 
-  const sql = await parser.parse([
-    {
-      id: 'cdc96a32-572c-4f69-8bce-4c7bd4024a4e',
-      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
-      table_id: '6616358d-8da8-45e4-834f-d735a0f02acc',
-      name: 'object_pkey',
-      field_ids: ['f853daae-f563-447d-ac09-901ddd68586e', 'a4257181-147d-4558-a51f-4b43246527a2']
-    },
-    {
-      id: '03d7007c-5262-4250-9ce1-efcabc5bedea',
-      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
-      table_id: '535d5894-679a-4a7b-aa5a-bd07cce8a505',
-      name: 'ref_pkey',
-      field_ids: ['8cc2da93-a8e0-4565-9d14-f814c3a1432d', '40a34889-eb4c-4833-8daf-b99441962971']
-    }
-  ]);
+  it('empty array fields emit empty array literal', async () => {
+    const parser = new Parser({
+      schema: 'metaschema_modules_public',
+      singleStmts: true,
+      table: 'secure_table_provision',
+      fields: {
+        id: 'uuid',
+        node_type: 'text',
+        fields: 'jsonb[]',
+        out_fields: 'uuid[]'
+      }
+    });
 
-  expect(sql).toMatchSnapshot();
-});
+    const sql = await parser.parse([
+      {
+        id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        node_type: 'DataTimestamps',
+        fields: [],
+        out_fields: []
+      }
+    ]);
 
-it('interval type', async () => {
-  const parser = new Parser({
-    schema: 'metaschema_modules_public',
-    singleStmts: true,
-    table: 'tokens_module',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      tokens_default_expiration: 'interval',
-      tokens_table: 'text'
-    }
+    // Empty arrays should also emit '{}' not NULL
+    expect(sql).toContain("'{}'");
+    expect(sql).not.toContain('NULL');
+    expect(sql).toMatchSnapshot();
   });
 
-  const sql = await parser.parse([
-    {
-      id: '42aaba39-de20-4be0-95a1-4873d7d4b6d4',
-      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
-      tokens_default_expiration: { hours: 24 },
-      tokens_table: 'api_tokens'
-    },
-    {
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
-      tokens_default_expiration: { days: 7, hours: 12, minutes: 30 },
-      tokens_table: 'refresh_tokens'
-    },
-    {
-      id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
-      tokens_default_expiration: { years: 1, months: 6 },
-      tokens_table: 'long_lived_tokens'
-    }
-  ]);
+  it('text fields preserve empty strings by default', async () => {
+    const parser = new Parser({
+      schema: 'app_public',
+      singleStmts: true,
+      table: 'webauthn_settings',
+      fields: {
+        id: 'uuid',
+        database_id: 'uuid',
+        rp_id: 'text',
+        rp_name: 'text'
+      }
+    });
 
-  expect(sql).toMatchSnapshot();
-});
+    const sql = await parser.parse([
+      {
+        id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        database_id: '550e8400-e29b-41d4-a716-446655440000',
+        rp_id: '',
+        rp_name: ''
+      }
+    ]);
 
-it('null array fields emit empty array literal instead of NULL', async () => {
-  const parser = new Parser({
-    schema: 'metaschema_modules_public',
-    singleStmts: true,
-    table: 'secure_table_provision',
-    fields: {
-      id: 'uuid',
-      node_type: 'text',
-      fields: 'jsonb[]',
-      out_fields: 'uuid[]'
-    }
+    // Default: empty strings are preserved as ''
+    expect(sql).not.toContain('NULL');
+    expect(sql).toMatchSnapshot();
   });
 
-  const sql = await parser.parse([
-    {
-      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      node_type: 'DataTimestamps',
-      fields: null,
-      out_fields: null
-    }
-  ]);
+  it('text fields convert empty strings to NULL when preserveEmptyStrings is false', async () => {
+    const parser = new Parser({
+      schema: 'app_public',
+      singleStmts: true,
+      table: 'webauthn_settings',
+      preserveEmptyStrings: false,
+      fields: {
+        id: 'uuid',
+        database_id: 'uuid',
+        rp_id: 'text',
+        rp_name: 'text'
+      }
+    });
 
-  // Should emit '{}' for array columns instead of NULL
-  expect(sql).toContain("'{}'");
-  expect(sql).not.toContain('NULL');
-  expect(sql).toMatchSnapshot();
-});
+    const sql = await parser.parse([
+      {
+        id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        database_id: '550e8400-e29b-41d4-a716-446655440000',
+        rp_id: '',
+        rp_name: ''
+      }
+    ]);
 
-it('empty array fields emit empty array literal', async () => {
-  const parser = new Parser({
-    schema: 'metaschema_modules_public',
-    singleStmts: true,
-    table: 'secure_table_provision',
-    fields: {
-      id: 'uuid',
-      node_type: 'text',
-      fields: 'jsonb[]',
-      out_fields: 'uuid[]'
-    }
+    // Opt-in: empty strings treated as NULL (CSV convention)
+    expect(sql).toContain('NULL');
+    expect(sql).toMatchSnapshot();
   });
 
-  const sql = await parser.parse([
-    {
-      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      node_type: 'DataTimestamps',
-      fields: [],
-      out_fields: []
-    }
-  ]);
+  it('text fields with null values produce NULL', async () => {
+    const parser = new Parser({
+      schema: 'app_public',
+      singleStmts: true,
+      table: 'webauthn_settings',
+      fields: {
+        id: 'uuid',
+        database_id: 'uuid',
+        rp_id: 'text',
+        rp_name: 'text'
+      }
+    });
 
-  // Empty arrays should also emit '{}' not NULL
-  expect(sql).toContain("'{}'");
-  expect(sql).not.toContain('NULL');
-  expect(sql).toMatchSnapshot();
-});
+    const sql = await parser.parse([
+      {
+        id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+        database_id: '550e8400-e29b-41d4-a716-446655440000',
+        rp_id: null,
+        rp_name: null
+      }
+    ]);
 
-it('text fields preserve empty strings by default', async () => {
-  const parser = new Parser({
-    schema: 'app_public',
-    singleStmts: true,
-    table: 'webauthn_settings',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      rp_id: 'text',
-      rp_name: 'text'
-    }
+    // Actual null values should still produce NULL
+    expect(sql).toContain('NULL');
+    expect(sql).toMatchSnapshot();
   });
 
-  const sql = await parser.parse([
-    {
-      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      database_id: '550e8400-e29b-41d4-a716-446655440000',
-      rp_id: '',
-      rp_name: ''
-    }
-  ]);
+  it('interval type with string value', async () => {
+    const parser = new Parser({
+      schema: 'metaschema_modules_public',
+      singleStmts: true,
+      table: 'tokens_module',
+      fields: {
+        id: 'uuid',
+        tokens_default_expiration: 'interval'
+      }
+    });
 
-  // Default: empty strings are preserved as ''
-  expect(sql).not.toContain('NULL');
-  expect(sql).toMatchSnapshot();
-});
+    const sql = await parser.parse([
+      {
+        id: '42aaba39-de20-4be0-95a1-4873d7d4b6d4',
+        tokens_default_expiration: '1 day 02:30:00'
+      }
+    ]);
 
-it('text fields convert empty strings to NULL when preserveEmptyStrings is false', async () => {
-  const parser = new Parser({
-    schema: 'app_public',
-    singleStmts: true,
-    table: 'webauthn_settings',
-    preserveEmptyStrings: false,
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      rp_id: 'text',
-      rp_name: 'text'
-    }
+    expect(sql).toMatchSnapshot();
   });
-
-  const sql = await parser.parse([
-    {
-      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      database_id: '550e8400-e29b-41d4-a716-446655440000',
-      rp_id: '',
-      rp_name: ''
-    }
-  ]);
-
-  // Opt-in: empty strings treated as NULL (CSV convention)
-  expect(sql).toContain('NULL');
-  expect(sql).toMatchSnapshot();
-});
-
-it('text fields with null values produce NULL', async () => {
-  const parser = new Parser({
-    schema: 'app_public',
-    singleStmts: true,
-    table: 'webauthn_settings',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      rp_id: 'text',
-      rp_name: 'text'
-    }
-  });
-
-  const sql = await parser.parse([
-    {
-      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
-      database_id: '550e8400-e29b-41d4-a716-446655440000',
-      rp_id: null,
-      rp_name: null
-    }
-  ]);
-
-  // Actual null values should still produce NULL
-  expect(sql).toContain('NULL');
-  expect(sql).toMatchSnapshot();
-});
-
-it('interval type with string value', async () => {
-  const parser = new Parser({
-    schema: 'metaschema_modules_public',
-    singleStmts: true,
-    table: 'tokens_module',
-    fields: {
-      id: 'uuid',
-      tokens_default_expiration: 'interval'
-    }
-  });
-
-  const sql = await parser.parse([
-    {
-      id: '42aaba39-de20-4be0-95a1-4873d7d4b6d4',
-      tokens_default_expiration: '1 day 02:30:00'
-    }
-  ]);
-
-  expect(sql).toMatchSnapshot();
-});
 });

@@ -7,15 +7,15 @@ import {
   loadModuleSource,
   parsePartitionConfig,
   PartitionConfig,
-  partitionExportRows,
   PartitionedPackageRows,
+  partitionExportRows,
   restructureExportRows,
   snapshotCatalog
 } from '@pgpmjs/export';
 import { Logger } from '@pgpmjs/logger';
 import { PartitionCycleError } from '@pgpmjs/transform';
 import * as fs from 'fs';
-import { CLIOptions, cliExitWithError, Inquirerer, ParsedArgs } from 'inquirerer';
+import { cliExitWithError, CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
 import { getPgPool } from 'pg-cache';
 import type { PgConfig } from 'pg-env';

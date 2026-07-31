@@ -146,49 +146,49 @@ export function createSchemaSource(
   const mode = detectSourceMode(options);
 
   switch (mode) {
-    case 'schemaFile':
-      return new FileSchemaSource({
-        schemaPath: options.schemaFile!,
-      });
+  case 'schemaFile':
+    return new FileSchemaSource({
+      schemaPath: options.schemaFile!,
+    });
 
-    case 'endpoint':
-      return new EndpointSchemaSource({
-        endpoint: options.endpoint!,
-        authorization: options.authorization,
-        headers: options.headers,
-        timeout: options.timeout,
-      });
+  case 'endpoint':
+    return new EndpointSchemaSource({
+      endpoint: options.endpoint!,
+      authorization: options.authorization,
+      headers: options.headers,
+      timeout: options.timeout,
+    });
 
-    case 'database':
-      // Database mode uses db.config for connection (falls back to env vars)
-      // and db.schemas or db.apiNames for schema selection
-      return new DatabaseSchemaSource({
-        database: options.db?.config?.database ?? '',
-        schemas: options.db?.schemas,
-        apiNames: options.db?.apiNames,
-      });
+  case 'database':
+    // Database mode uses db.config for connection (falls back to env vars)
+    // and db.schemas or db.apiNames for schema selection
+    return new DatabaseSchemaSource({
+      database: options.db?.config?.database ?? '',
+      schemas: options.db?.schemas,
+      apiNames: options.db?.apiNames,
+    });
 
-    case 'pgpm-module':
-      return new PgpmModuleSchemaSource({
-        pgpmModulePath: options.db!.pgpm!.modulePath!,
-        schemas: options.db?.schemas,
-        apiNames: options.db?.apiNames,
-        keepDb: options.db?.keepDb,
-      });
+  case 'pgpm-module':
+    return new PgpmModuleSchemaSource({
+      pgpmModulePath: options.db!.pgpm!.modulePath!,
+      schemas: options.db?.schemas,
+      apiNames: options.db?.apiNames,
+      keepDb: options.db?.keepDb,
+    });
 
-    case 'pgpm-workspace':
-      return new PgpmModuleSchemaSource({
-        pgpmWorkspacePath: options.db!.pgpm!.workspacePath!,
-        pgpmModuleName: options.db!.pgpm!.moduleName!,
-        schemas: options.db?.schemas,
-        apiNames: options.db?.apiNames,
-        keepDb: options.db?.keepDb,
-      });
+  case 'pgpm-workspace':
+    return new PgpmModuleSchemaSource({
+      pgpmWorkspacePath: options.db!.pgpm!.workspacePath!,
+      pgpmModuleName: options.db!.pgpm!.moduleName!,
+      schemas: options.db?.schemas,
+      apiNames: options.db?.apiNames,
+      keepDb: options.db?.keepDb,
+    });
 
-    default:
-      throw new Error(
-        'No source specified. Use one of: endpoint, schemaFile, or db (with optional pgpm for module deployment).',
-      );
+  default:
+    throw new Error(
+      'No source specified. Use one of: endpoint, schemaFile, or db (with optional pgpm for module deployment).',
+    );
   }
 }
 

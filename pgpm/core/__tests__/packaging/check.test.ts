@@ -1,6 +1,8 @@
 import { readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
+import { resolveBundleArtifactPath, writeBundleArtifact } from '../../src/bundle/artifact';
+import { PgpmPackage } from '../../src/core/class/pgpm';
 import {
   addDependents,
   checkModuleArtifact,
@@ -8,8 +10,6 @@ import {
   enumerateModules,
   mapFilesToModules,
 } from '../../src/packaging/check';
-import { resolveBundleArtifactPath, writeBundleArtifact } from '../../src/bundle/artifact';
-import { PgpmPackage } from '../../src/core/class/pgpm';
 import { TestFixture } from '../../test-utils';
 
 const MODULES = ['my-first', 'my-second', 'my-third'] as const;

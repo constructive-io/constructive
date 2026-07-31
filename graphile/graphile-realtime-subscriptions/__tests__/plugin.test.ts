@@ -55,10 +55,10 @@ jest.mock('graphile-utils', () => ({
 
 import {
   createRealtimeSubscriptionsPlugin,
-  RealtimeSubscriptionsPlugin,
-  parseNotifyPayload,
-  EventThrottle,
   DEFAULT_OVERFLOW_THRESHOLD,
+  EventThrottle,
+  parseNotifyPayload,
+  RealtimeSubscriptionsPlugin,
 } from '../src/plugin';
 
 // --- Test helpers ---

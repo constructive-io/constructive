@@ -1,7 +1,8 @@
 import { Logger } from '@pgpmjs/logger';
-import { LRUCache } from 'lru-cache';
 import { QuoteUtils } from '@pgsql/quotes';
-import type { StorageModuleConfig, BucketConfig } from './types';
+import { LRUCache } from 'lru-cache';
+
+import type { BucketConfig,StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:cache');
 

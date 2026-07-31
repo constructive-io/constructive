@@ -1,11 +1,12 @@
+import { createRequire } from 'node:module';
+import { resolve } from 'node:path';
+
 import {
   PGPM_DRIVER_EXPORT,
   PgpmDriverConfig,
   PgpmDriverFactory,
   PgpmDriverSession,
 } from '@pgpmjs/types';
-import { createRequire } from 'node:module';
-import { resolve } from 'node:path';
 
 /** Package name of the built-in PGlite driver plugin (the `--pglite` alias). */
 export const PGLITE_DRIVER_PLUGIN = '@pgpmjs/pglite-adapter';

@@ -2,11 +2,11 @@ import { createServer, type Server as HttpServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 
 import { subscribe as grafastSubscribe } from 'grafast';
-import type { ExecutionResult, GraphQLSchema } from 'graphql';
 import type { GraphileConfig } from 'graphile-config';
-import { createClient, type Client as GqlWsClient } from 'graphql-ws';
+import type { ExecutionResult, GraphQLSchema } from 'graphql';
+import { type Client as GqlWsClient,createClient } from 'graphql-ws';
 import { useServer } from 'graphql-ws/use/ws';
-import { WebSocketServer, WebSocket } from 'ws';
+import { WebSocket,WebSocketServer } from 'ws';
 
 export interface WsTestServerInput {
   schema: GraphQLSchema;

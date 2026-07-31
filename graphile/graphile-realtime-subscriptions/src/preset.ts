@@ -6,8 +6,9 @@
  */
 
 import type { GraphileConfig } from 'graphile-config';
-import type { RealtimeSubscriptionsPluginOptions } from './types';
+
 import { createRealtimeSubscriptionsPlugin } from './plugin';
+import type { RealtimeSubscriptionsPluginOptions } from './types';
 
 export function RealtimeSubscriptionsPreset(
   options: RealtimeSubscriptionsPluginOptions = {},

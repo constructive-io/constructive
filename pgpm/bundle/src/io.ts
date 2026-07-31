@@ -1,6 +1,3 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { dirname } from 'path';
-
 import { parseControlContent } from '@pgpmjs/ast/files/extension/reader';
 import { parsePlanContent } from '@pgpmjs/ast/files/plan/parser';
 import { parsePgpmHeader } from '@pgpmjs/ast/files/sql/header';
@@ -14,6 +11,9 @@ import {
 } from '@pgpmjs/ast/module/types';
 import { writeModule } from '@pgpmjs/ast/module/writer';
 import { mapScripts } from '@pgpmjs/traverse';
+import { mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { dirname } from 'path';
+
 import { createBundle, CreateBundleOptions } from './create';
 import { packSingleFileTarGz, unpackSingleFileTarGz } from './tar';
 import { BundleScript, MigrationBundle } from './types';

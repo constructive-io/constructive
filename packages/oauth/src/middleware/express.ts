@@ -1,7 +1,7 @@
 import { OAuthClient } from '../oauth-client';
-import { OAuthClientConfig, OAuthProfile, createOAuthError } from '../types';
-import { generateState, verifyState } from '../utils/state';
 import { getProviderIds } from '../providers';
+import { createOAuthError,OAuthClientConfig, OAuthProfile } from '../types';
+import { generateState, verifyState } from '../utils/state';
 
 export interface OAuthMiddlewareConfig extends OAuthClientConfig {
   onSuccess: (profile: OAuthProfile, context: OAuthCallbackContext) => Promise<unknown>;

@@ -1,12 +1,13 @@
 import 'graphile-build';
 import 'graphile-build-pg';
-import type { GraphileConfig } from 'graphile-config';
-import type { GraphQLFieldConfig } from 'graphql';
-import { GisSubtype } from '../constants';
-import type { GisFieldValue } from '../types';
-
 // Import types.ts for Build/Inflection/Scope augmentation side effects
 import '../types';
+
+import type { GraphileConfig } from 'graphile-config';
+import type { GraphQLFieldConfig } from 'graphql';
+
+import { GisSubtype } from '../constants';
+import type { GisFieldValue } from '../types';
 
 // ─── Client-side geodesic calculations ───────────────────────────────────
 //

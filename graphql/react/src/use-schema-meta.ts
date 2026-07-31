@@ -1,7 +1,8 @@
 // @ts-nocheck
-import { useEffect } from 'react';
 import { gql } from 'graphql-request';
+import { useEffect } from 'react';
 import { useQuery } from 'react-query';
+
 import { useGraphqlClient } from './use-graphql-client';
 
 const fieldFragment = `

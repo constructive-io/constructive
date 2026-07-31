@@ -1,5 +1,5 @@
-import type { SQL } from 'pg-sql2';
 import type { GraphQLInputType } from 'graphql';
+import type { SQL } from 'pg-sql2';
 
 /**
  * Symbol used to store the filter operator registry on the build object.

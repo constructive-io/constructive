@@ -1,9 +1,8 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, statSync, writeFileSync } from 'fs';
-import { dirname, join, relative, sep } from 'path';
-
 import { parsePlanFileSimple } from '@pgpmjs/ast/files/plan/parser';
 import { parsePgpmHeader, renameInHeader, writePgpmScript } from '@pgpmjs/ast/files/sql/header';
 import { renameInPlanContent } from '@pgpmjs/ast/plan-rename';
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, statSync, writeFileSync } from 'fs';
+import { dirname, join, relative, sep } from 'path';
 
 // Re-exported from @pgpmjs/ast so existing `@pgpmjs/core` consumers keep importing it here.
 export { renameInPlanContent };

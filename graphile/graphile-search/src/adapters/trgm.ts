@@ -10,9 +10,10 @@
  * GREATEST(parent_similarity, chunk_similarity).
  */
 
-import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../types';
 import type { SQL } from 'pg-sql2';
-import { getChunksInfo, type ChunksInfo } from './chunks';
+
+import type { FilterApplyResult,SearchableColumn, SearchAdapter } from '../types';
+import { type ChunksInfo,getChunksInfo } from './chunks';
 
 function isTextCodec(codec: any): boolean {
   const name = codec?.name;

@@ -48,11 +48,11 @@ import { generateMutationKeysFile } from './mutation-keys';
 import { generateAllMutationHooks } from './mutations';
 import { generateAllQueryHooks } from './queries';
 import { generateQueryKeysFile } from './query-keys';
+import { generateSelectionFile } from './selection';
 import {
   generateAllSubscriptionHooks,
   generateConnectionStateHook,
 } from './subscriptions';
-import { generateSelectionFile } from './selection';
 import { getTableNames } from './utils';
 
 // ============================================================================
@@ -239,9 +239,9 @@ export function generate(options: GenerateOptions): GenerateResult {
     content:
       customQueryHooks.length > 0
         ? generateCustomQueriesBarrel(
-            tables,
-            customQueryHooks.map((h) => h.operationName),
-          )
+          tables,
+          customQueryHooks.map((h) => h.operationName),
+        )
         : generateQueriesBarrel(tables),
   });
 
@@ -292,9 +292,9 @@ export function generate(options: GenerateOptions): GenerateResult {
       content:
         customMutationHooks.length > 0
           ? generateCustomMutationsBarrel(
-              tables,
-              customMutationHooks.map((h) => h.operationName),
-            )
+            tables,
+            customMutationHooks.map((h) => h.operationName),
+          )
           : generateMutationsBarrel(tables),
     });
   }

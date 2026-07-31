@@ -1,12 +1,12 @@
-import { EventEmitter } from 'events';
-import { parseEnvNumber } from '12factor-env';
 import { Logger } from '@pgpmjs/logger';
+import { parseEnvNumber } from '12factor-env';
+import { EventEmitter } from 'events';
+import type { Express } from 'express';
+import type { GrafservBase } from 'grafserv';
+import type { Server as HttpServer } from 'http';
 import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
-import type { Express } from 'express';
-import type { Server as HttpServer } from 'http';
 import type { PostGraphileInstance } from 'postgraphile';
-import type { GrafservBase } from 'grafserv';
 
 const log = new Logger('graphile-cache');
 

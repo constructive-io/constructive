@@ -30,6 +30,7 @@
  */
 
 import type { GraphileConfig } from 'graphile-config';
+
 import { createI18nPlugin } from './plugin';
 import type { I18nPluginOptions } from './types';
 

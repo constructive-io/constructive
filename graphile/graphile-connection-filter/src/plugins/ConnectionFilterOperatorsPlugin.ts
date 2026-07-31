@@ -1,5 +1,7 @@
 import '../augmentations';
+
 import type { GraphileConfig } from 'graphile-config';
+
 import { makeApplyFromOperatorSpec } from './operatorApply';
 
 const version = '1.0.0';
@@ -870,75 +872,75 @@ export const ConnectionFilterOperatorsPlugin: GraphileConfig.Plugin = {
           if (!isEnumCodec(underlyingType)) enumLike = false;
 
           switch (underlyingType) {
-            case TYPES.numeric:
-            case TYPES.money:
-            case TYPES.float:
-            case TYPES.float4:
-            case TYPES.bigint:
-            case TYPES.int:
-            case TYPES.int2:
-            case TYPES.boolean:
-            case TYPES.varbit:
-            case TYPES.bit:
-            case TYPES.date:
-            case TYPES.timestamp:
-            case TYPES.timestamptz:
-            case TYPES.time:
-            case TYPES.timetz:
-            case TYPES.interval:
-            case TYPES.json:
-            case TYPES.jsonb:
-            case TYPES.cidr:
-            case TYPES.inet:
-            case TYPES.macaddr:
-            case TYPES.macaddr8:
-            case TYPES.text:
-            case TYPES.name:
-            case TYPES.citext:
-            case TYPES.varchar:
-            case TYPES.char:
-            case TYPES.bpchar:
-            case TYPES.uuid:
-              break;
-            default:
-              sortable = false;
+          case TYPES.numeric:
+          case TYPES.money:
+          case TYPES.float:
+          case TYPES.float4:
+          case TYPES.bigint:
+          case TYPES.int:
+          case TYPES.int2:
+          case TYPES.boolean:
+          case TYPES.varbit:
+          case TYPES.bit:
+          case TYPES.date:
+          case TYPES.timestamp:
+          case TYPES.timestamptz:
+          case TYPES.time:
+          case TYPES.timetz:
+          case TYPES.interval:
+          case TYPES.json:
+          case TYPES.jsonb:
+          case TYPES.cidr:
+          case TYPES.inet:
+          case TYPES.macaddr:
+          case TYPES.macaddr8:
+          case TYPES.text:
+          case TYPES.name:
+          case TYPES.citext:
+          case TYPES.varchar:
+          case TYPES.char:
+          case TYPES.bpchar:
+          case TYPES.uuid:
+            break;
+          default:
+            sortable = false;
           }
 
           switch (underlyingType) {
-            case TYPES.cidr:
-            case TYPES.inet:
-            case TYPES.macaddr:
-            case TYPES.macaddr8:
-              break;
-            default:
-              inetLike = false;
+          case TYPES.cidr:
+          case TYPES.inet:
+          case TYPES.macaddr:
+          case TYPES.macaddr8:
+            break;
+          default:
+            inetLike = false;
           }
 
           switch (underlyingType) {
-            case TYPES.text:
-            case TYPES.name:
-            case TYPES.citext:
-            case TYPES.varchar:
-            case TYPES.char:
-            case TYPES.bpchar:
-              break;
-            default:
-              textLike = false;
+          case TYPES.text:
+          case TYPES.name:
+          case TYPES.citext:
+          case TYPES.varchar:
+          case TYPES.char:
+          case TYPES.bpchar:
+            break;
+          default:
+            textLike = false;
           }
 
           switch (underlyingType) {
-            case TYPES.json:
-            case TYPES.jsonb:
-              break;
-            default:
-              jsonLike = false;
+          case TYPES.json:
+          case TYPES.jsonb:
+            break;
+          default:
+            jsonLike = false;
           }
 
           switch (underlyingType) {
-            case TYPES.hstore:
-              break;
-            default:
-              hstoreLike = false;
+          case TYPES.hstore:
+            break;
+          default:
+            hstoreLike = false;
           }
         }
 
@@ -950,14 +952,14 @@ export const ConnectionFilterOperatorsPlugin: GraphileConfig.Plugin = {
             : enumLike
               ? connectionFilterEnumOperators
               : {
-                  ...standardOperators,
-                  ...(sortable ? sortOperators : null),
-                  ...(inetLike ? inetOperators : null),
-                  ...(jsonLike ? jsonbOperators : null),
-                  ...(hstoreLike ? hstoreOperators : null),
-                  ...(textLike ? patternMatchingOperators : null),
-                  ...(textLike ? insensitiveOperators : null),
-                };
+                ...standardOperators,
+                ...(sortable ? sortOperators : null),
+                ...(inetLike ? inetOperators : null),
+                ...(jsonLike ? jsonbOperators : null),
+                ...(hstoreLike ? hstoreOperators : null),
+                ...(textLike ? patternMatchingOperators : null),
+                ...(textLike ? insensitiveOperators : null),
+              };
 
         // Build the operator fields
         const operatorFields = Object.entries(operatorSpecs).reduce(

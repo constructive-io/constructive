@@ -1,11 +1,11 @@
-import deepmerge from 'deepmerge'
-import { graphql, lexicographicSortSchema, printSchema } from 'graphql'
-import { ConstructivePreset, getTablesMetaForSchema, makePgService } from 'graphile-settings'
-import { makeSchema } from 'graphile-build'
-import { getPgPool } from 'pg-cache'
-import { getPgEnvOptions } from 'pg-env'
-import type { GraphileConfig } from 'graphile-config'
-import type { TableMeta } from 'graphile-settings'
+import deepmerge from 'deepmerge';
+import { makeSchema } from 'graphile-build';
+import type { GraphileConfig } from 'graphile-config';
+import type { TableMeta } from 'graphile-settings';
+import { ConstructivePreset, getTablesMetaForSchema, makePgService } from 'graphile-settings';
+import { graphql, lexicographicSortSchema, printSchema } from 'graphql';
+import { getPgPool } from 'pg-cache';
+import { getPgEnvOptions } from 'pg-env';
 
 export type BuildSchemaOptions = {
   database?: string;
@@ -36,16 +36,16 @@ export type BuildSchemaArtifacts = {
  * concurrent builds in one process can never cross-contaminate results.
  */
 export async function buildSchemaArtifacts(opts: BuildSchemaOptions): Promise<BuildSchemaArtifacts> {
-  const database = opts.database ?? 'constructive'
-  const schemas = Array.isArray(opts.schemas) ? opts.schemas : []
+  const database = opts.database ?? 'constructive';
+  const schemas = Array.isArray(opts.schemas) ? opts.schemas : [];
 
-  const config = getPgEnvOptions({ database })
+  const config = getPgEnvOptions({ database });
 
   // Create the pool through pg-cache so it is tracked and can be cleaned up
   // by callers via pgCache.delete(database) before dropping ephemeral databases.
   // Without this, makePgService creates its own internal pool that isn't released,
   // causing "database has active sessions" errors during ephemeral DB teardown.
-  const pool = getPgPool(config)
+  const pool = getPgPool(config);
 
   // Hybrid preset composition: use deepmerge for safe scalar/object keys
   // (plugins, disablePlugins, schema, gather, etc.) but pluck out `extends`
@@ -53,9 +53,9 @@ export async function buildSchemaArtifacts(opts: BuildSchemaOptions): Promise<Bu
   // deepmerge cannot deep-clone `extends` (contains the entire PostGraphile
   // preset tree) or `pgServices` (contains pg Pool / EventEmitter internals)
   // without overflowing the call stack.
-  const { extends: callerExtends, pgServices: _pgServices, ...callerRest } = opts.graphile ?? {}
+  const { extends: callerExtends, pgServices: _pgServices, ...callerRest } = opts.graphile ?? {};
 
-  const baseRest: GraphileConfig.Preset = {}
+  const baseRest: GraphileConfig.Preset = {};
 
   const preset: GraphileConfig.Preset = {
     ...deepmerge(baseRest, callerRest),
@@ -69,35 +69,35 @@ export async function buildSchemaArtifacts(opts: BuildSchemaOptions): Promise<Bu
         schemas,
       }),
     ],
-  }
+  };
 
-  const { schema } = await makeSchema(preset)
+  const { schema } = await makeSchema(preset);
 
   // MetaSchemaPlugin validates executable names lazily against the schema that
   // will actually be executed. Trigger that resolver after every finalizer has
   // run, then read the metadata memoized for this exact GraphQLSchema instance.
-  let tablesMeta: TableMeta[] = []
+  let tablesMeta: TableMeta[] = [];
   if (schema.getQueryType()?.getFields()._meta) {
     const result = await graphql({
       schema,
       source: '{ _meta { tables { name } } }',
-    })
+    });
     if (result.errors?.length) {
-      throw new AggregateError(result.errors, 'Failed to build schema metadata')
+      throw new AggregateError(result.errors, 'Failed to build schema metadata');
     }
-    tablesMeta = getTablesMetaForSchema(schema) ?? []
+    tablesMeta = getTablesMetaForSchema(schema) ?? [];
   }
 
   if (opts._onMetaCollected) {
-    await opts._onMetaCollected()
+    await opts._onMetaCollected();
   }
 
   return {
     sdl: printSchema(lexicographicSortSchema(schema)),
     tablesMeta
-  }
+  };
 }
 
 export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> {
-  return (await buildSchemaArtifacts(opts)).sdl
+  return (await buildSchemaArtifacts(opts)).sdl;
 }

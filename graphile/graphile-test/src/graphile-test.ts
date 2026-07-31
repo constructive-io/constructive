@@ -1,14 +1,13 @@
-import type { GraphQLSchema } from 'graphql';
-import type { GraphileConfig } from 'graphile-config';
-import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
-
 import { makeSchema } from 'graphile-build';
 import { defaultPreset as graphileBuildDefaultPreset } from 'graphile-build';
 import { defaultPreset as graphileBuildPgDefaultPreset } from 'graphile-build-pg';
+import type { GraphileConfig } from 'graphile-config';
+import type { GraphQLSchema } from 'graphql';
+import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { makePgService } from 'postgraphile/adaptors/pg';
 
 import { runGraphQLInContext } from './context';
-import type { GraphQLQueryOptions, GraphQLTestContext, GetConnectionsInput, Variables } from './types';
+import type { GetConnectionsInput, GraphQLQueryOptions, GraphQLTestContext, Variables } from './types';
 
 /**
  * Minimal preset that provides core functionality without Node/Relay.

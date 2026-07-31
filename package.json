@@ -25,6 +25,7 @@
     "fixtures:install:force": "node pgpm/cli/dist/index.js install -W --force"
   },
   "devDependencies": {
+    "@constructive-io/eslint-config": "^0.2.0",
     "@jest/test-sequencer": "^30.4.1",
     "@types/jest": "^30.0.0",
     "@types/jest-in-case": "^1.0.9",

@@ -1,10 +1,9 @@
+import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
+import { BundleIssue, materializeBundle, MigrationBundle, verifyBundle } from '@pgpmjs/bundle';
 import { mkdtempSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { PgConfig } from 'pg-env';
-
-import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
-import { BundleIssue, materializeBundle, MigrationBundle, verifyBundle } from '@pgpmjs/bundle';
 
 import { PgpmMigrate, PgpmMigrateOptions } from '../migrate/client';
 import { DeployResult, VerifyResult } from '../migrate/types';

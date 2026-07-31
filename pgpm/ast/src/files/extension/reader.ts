@@ -36,13 +36,13 @@ export function parseControlContent(contents: string): { requires: string[]; ver
     .find((line) => /^requires/.test(line))
     ?.split('=')[1]
     .split(',')
-    .map((req) => req.replace(/[\'\s]*/g, '').trim()) || [];
+    .map((req) => req.replace(/['\s]*/g, '').trim()) || [];
 
   const version = contents
     .split('\n')
     .find((line) => /^default_version/.test(line))
     ?.split('=')[1]
-    .replace(/[\']*/g, '')
+    .replace(/[']*/g, '')
     .trim() || '';
 
   return { requires, version };

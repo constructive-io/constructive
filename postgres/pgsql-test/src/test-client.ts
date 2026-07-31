@@ -1,10 +1,11 @@
+import { QueryResult } from 'pg';
 import { PgConfig } from 'pg-env';
 import { PgClient, PgClientOpts } from 'pgsql-client';
 import { insertJsonMap, type JsonSeedMap } from 'pgsql-seed';
-import { loadCsvMap, type CsvSeedMap } from 'pgsql-seed';
+import { type CsvSeedMap,loadCsvMap } from 'pgsql-seed';
 import { loadSqlFiles } from 'pgsql-seed';
 import { deployPgpm } from 'pgsql-seed';
-import { QueryResult } from 'pg';
+
 import { formatPgError } from './utils';
 
 export type PgTestClientOpts = PgClientOpts & {

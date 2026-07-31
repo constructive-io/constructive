@@ -1,8 +1,9 @@
-import { join } from 'path';
-import { getConnectionsObject, seed } from 'graphile-test';
-import type { GraphQLQueryFnObj } from 'graphile-test';
 import type { GraphileConfig } from 'graphile-config';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
+import type { GraphQLQueryFnObj } from 'graphile-test';
+import { getConnectionsObject, seed } from 'graphile-test';
+import { join } from 'path';
+
 import { PgAggregatesPreset } from '../src';
 
 const SCHEMA = 'agg_test';

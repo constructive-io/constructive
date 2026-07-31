@@ -1,17 +1,18 @@
 import 'graphile-build';
 import 'graphile-build-pg';
+// Import types.ts for Build/Inflection/Scope augmentation side effects
+import '../types';
+
 import type { GraphileConfig } from 'graphile-config';
 import type {
   GraphQLFieldConfig,
   GraphQLList as GraphQLListType,
   GraphQLOutputType
 } from 'graphql';
-import { GisSubtype } from '../constants';
-import type { GisFieldValue, GisTypeDetails } from '../types';
-import { getGISTypeName } from '../utils';
 
-// Import types.ts for Build/Inflection/Scope augmentation side effects
-import '../types';
+import { GisSubtype } from '../constants';
+import type { GisFieldValue } from '../types';
+import { getGISTypeName } from '../utils';
 
 /**
  * PostgisGeometryFieldsPlugin
@@ -54,50 +55,50 @@ export const PostgisGeometryFieldsPlugin: GraphileConfig.Plugin = {
         const getType = build.getPostgisTypeByGeometryType;
 
         switch (subtype) {
-          case GisSubtype.Point:
-            return addPointFields(
-              fields, build, pgGISCodecName, hasZ,
-              GraphQLNonNull, GraphQLFloat, inflection
-            );
+        case GisSubtype.Point:
+          return addPointFields(
+            fields, build, pgGISCodecName, hasZ,
+            GraphQLNonNull, GraphQLFloat, inflection
+          );
 
-          case GisSubtype.LineString:
-            return addLineStringFields(
-              fields, build, pgGISCodecName, hasZ, hasM, srid,
-              GraphQLList, getType
-            );
+        case GisSubtype.LineString:
+          return addLineStringFields(
+            fields, build, pgGISCodecName, hasZ, hasM, srid,
+            GraphQLList, getType
+          );
 
-          case GisSubtype.Polygon:
-            return addPolygonFields(
-              fields, build, pgGISCodecName, hasZ, hasM, srid,
-              GraphQLList, getType
-            );
+        case GisSubtype.Polygon:
+          return addPolygonFields(
+            fields, build, pgGISCodecName, hasZ, hasM, srid,
+            GraphQLList, getType
+          );
 
-          case GisSubtype.MultiPoint:
-            return addMultiPointFields(
-              fields, build, pgGISCodecName, hasZ, hasM, srid,
-              GraphQLList, getType
-            );
+        case GisSubtype.MultiPoint:
+          return addMultiPointFields(
+            fields, build, pgGISCodecName, hasZ, hasM, srid,
+            GraphQLList, getType
+          );
 
-          case GisSubtype.MultiLineString:
-            return addMultiLineStringFields(
-              fields, build, pgGISCodecName, hasZ, hasM, srid,
-              GraphQLList, getType
-            );
+        case GisSubtype.MultiLineString:
+          return addMultiLineStringFields(
+            fields, build, pgGISCodecName, hasZ, hasM, srid,
+            GraphQLList, getType
+          );
 
-          case GisSubtype.MultiPolygon:
-            return addMultiPolygonFields(
-              fields, build, pgGISCodecName, hasZ, hasM, srid,
-              GraphQLList, getType
-            );
+        case GisSubtype.MultiPolygon:
+          return addMultiPolygonFields(
+            fields, build, pgGISCodecName, hasZ, hasM, srid,
+            GraphQLList, getType
+          );
 
-          case GisSubtype.GeometryCollection:
-            return addGeometryCollectionFields(
-              fields, build, pgGISCodecName, hasZ, hasM,
-              GraphQLList
-            );
+        case GisSubtype.GeometryCollection:
+          return addGeometryCollectionFields(
+            fields, build, pgGISCodecName, hasZ, hasM,
+            GraphQLList
+          );
 
-          default:
-            return fields;
+        default:
+          return fields;
         }
       }
     }

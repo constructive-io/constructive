@@ -1,6 +1,6 @@
-import type { GraphileConfig } from 'graphile-config';
 import { defaultPreset as graphileBuildPreset } from 'graphile-build';
 import { defaultPreset as graphileBuildPgPreset } from 'graphile-build-pg';
+import type { GraphileConfig } from 'graphile-config';
 
 /**
  * Minimal PostGraphile v5 preset without Node/Relay features.

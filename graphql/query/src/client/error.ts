@@ -19,13 +19,13 @@ import {
 } from '@constructive-io/errors';
 
 export {
-  ConstructiveError,
   classify,
+  ConstructiveError,
+  type ErrorClass,
+  type ErrorContext,
   format,
   isPublicCode,
   parse,
-  type ErrorClass,
-  type ErrorContext,
   type ParsedError,
   toError,
 } from '@constructive-io/errors';

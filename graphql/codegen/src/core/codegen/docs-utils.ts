@@ -1,6 +1,6 @@
 import type { DocsConfig } from '../../types/config';
 import type { Argument, Field, Operation, Table, TypeRef, TypeRegistry } from '../../types/schema';
-import { getScalarFields, getPrimaryKeyInfo, getWritableFieldNames } from './utils';
+import { getPrimaryKeyInfo, getScalarFields, getWritableFieldNames } from './utils';
 
 export interface GeneratedDocFile {
   fileName: string;
@@ -634,14 +634,14 @@ export function argPlaceholder(arg: Argument, registry?: TypeRegistry): string {
 
 export function gqlTypeToJsonSchemaType(gqlType: string): string {
   switch (gqlType) {
-    case 'Int':
-      return 'integer';
-    case 'Float':
-      return 'number';
-    case 'Boolean':
-      return 'boolean';
-    default:
-      return 'string';
+  case 'Int':
+    return 'integer';
+  case 'Float':
+    return 'number';
+  case 'Boolean':
+    return 'boolean';
+  default:
+    return 'string';
   }
 }
 

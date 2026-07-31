@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { SliceResult, PackageOutput } from './types';
+import { PackageOutput,SliceResult } from './types';
 
 /**
  * Options for writing sliced packages to disk

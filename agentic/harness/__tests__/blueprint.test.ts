@@ -1,6 +1,6 @@
 import { expandBlueprintDefaults } from '../src/blueprint/blueprint-defaults';
-import { fieldTypeToTypeName, toFieldDefault, toFieldType } from '../src/blueprint/field-type';
 import type { BlueprintDefinition } from '../src/blueprint/blueprint-schema';
+import { fieldTypeToTypeName, toFieldDefault, toFieldType } from '../src/blueprint/field-type';
 
 describe('field-type conversions', () => {
   it('round-trips array types', () => {

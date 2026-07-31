@@ -1,5 +1,5 @@
 import { checkForUpdates } from '@inquirerer/utils';
-import { CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
+import { cliExitWithError, CLIOptions, extractFirst, getPackageJson,Inquirerer, ParsedArgs } from 'inquirerer';
 
 import auth from './commands/auth';
 import codegen from './commands/codegen';

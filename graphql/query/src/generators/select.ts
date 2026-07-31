@@ -3,8 +3,9 @@
  * Uses AST-based approach for all query generation
  */
 import * as t from 'gql-ast';
-import { Kind, OperationTypeNode, print } from 'graphql';
 import type { ArgumentNode, FieldNode, TypeNode, VariableDefinitionNode } from 'graphql';
+import { Kind, OperationTypeNode, print } from 'graphql';
+import { fuzzyFindByName } from 'inflekt';
 
 import { TypedDocumentString } from '../client/typed-document';
 import {
@@ -25,7 +26,6 @@ import type { QueryOptions } from '../types/query';
 import type { Table, TypeRef } from '../types/schema';
 import type { FieldSelection } from '../types/selection';
 import { convertToSelectionOptions, isRelationalField } from './field-selector';
-import { fuzzyFindByName } from 'inflekt';
 import {
   normalizeInflectionValue,
   toCamelCasePlural,

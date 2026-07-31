@@ -6,12 +6,12 @@
  * models to execute queries against a real PostGraphile schema
  * running on a live PostgreSQL database.
  */
-import type { GraphQLQueryFnObj } from 'graphile-test';
 import type {
   GraphQLAdapter,
   GraphQLError,
   QueryResult,
 } from '@constructive-io/graphql-types';
+import type { GraphQLQueryFnObj } from 'graphile-test';
 
 export class GraphileTestAdapter implements GraphQLAdapter {
   constructor(private queryFn: GraphQLQueryFnObj) {}

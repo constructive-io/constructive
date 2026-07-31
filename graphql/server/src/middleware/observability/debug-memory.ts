@@ -1,5 +1,6 @@
 import { Logger } from '@pgpmjs/logger';
 import type { RequestHandler } from 'express';
+
 import { getDebugMemorySnapshot } from '../../diagnostics/debug-memory-snapshot';
 
 const log = new Logger('debug-memory');

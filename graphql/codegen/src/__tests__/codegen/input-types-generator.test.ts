@@ -16,9 +16,9 @@ import type {
   Argument,
   FieldType,
   Relations,
+  ResolvedType,
   Table,
   TypeRef,
-  ResolvedType,
   TypeRegistry,
 } from '../../types/schema';
 

@@ -8,12 +8,11 @@
  * 4. Cleaning up the ephemeral database (unless keepDb is true)
  */
 import { PgpmPackage } from '@pgpmjs/core';
+import { buildSchemaSDL } from 'graphile-schema';
 import { buildSchema, introspectionFromSchema } from 'graphql';
 import { getPgPool, pgCache } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
-
-import { buildSchemaSDL } from 'graphile-schema';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import { resolveApiSchemas, validateRoutingSchemas } from './api-schemas';

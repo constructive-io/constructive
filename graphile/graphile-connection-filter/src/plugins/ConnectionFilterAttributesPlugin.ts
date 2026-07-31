@@ -1,6 +1,8 @@
 import '../augmentations';
+
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType } from 'graphql';
+
 import { isEmpty } from '../utils';
 
 const version = '1.0.0';

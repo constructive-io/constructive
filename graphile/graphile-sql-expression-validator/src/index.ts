@@ -33,17 +33,15 @@
 
 // Standalone validation utilities
 export {
+  DEFAULT_ALLOWED_FUNCTIONS,
   parseAndValidateSqlExpression,
-  validateAst,
-  DEFAULT_ALLOWED_FUNCTIONS
-} from './validator';
+  validateAst} from './validator';
 
 // Types
 export type {
-  SqlExpressionValidatorOptions,
+  AstValidationResult,
   SqlExpressionValidationResult,
-  AstValidationResult
-} from './validator';
+  SqlExpressionValidatorOptions} from './validator';
 
 // PostGraphile v5 plugin and preset
 export {
@@ -53,22 +51,20 @@ export {
 
 // FieldType / FieldDefault structured models
 export {
-  validateFieldType,
-  validateFieldDefault,
-  fieldTypeToAst,
-  fieldTypeToSql,
   fieldDefaultToAst,
   fieldDefaultToSql,
-  FORBIDDEN_TYPES
-} from './field-types';
+  fieldTypeToAst,
+  fieldTypeToSql,
+  FORBIDDEN_TYPES,
+  validateFieldDefault,
+  validateFieldType} from './field-types';
 
 // FieldType / FieldDefault types
 export type {
-  FieldType,
   FieldDefault,
   FieldDefaultArg,
-  FieldTypeValidationOptions,
   FieldDefaultValidationOptions,
-  FieldTypeValidationResult,
-  FieldDefaultValidationResult
-} from './field-types';
+  FieldDefaultValidationResult,
+  FieldType,
+  FieldTypeValidationOptions,
+  FieldTypeValidationResult} from './field-types';

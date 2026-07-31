@@ -14,8 +14,6 @@
  */
 import { lcFirst, pluralize, singularize, ucFirst } from 'inflekt';
 
-import { parseSmartTags, stripSmartComments } from '../utils';
-
 import type {
   IntrospectionField,
   IntrospectionInputValue,
@@ -26,6 +24,7 @@ import type {
 import { getBaseTypeName, isList, isNonNull, unwrapType } from '../types/introspection';
 import type {
   BelongsToRelation,
+  ConstraintInfo,
   Field,
   FieldArgument,
   FieldType,
@@ -33,12 +32,12 @@ import type {
   ManyToManyRelation,
   Relations,
   Table,
-  ConstraintInfo,
   TableConstraints,
   TableInflection,
   TableQueryNames,
   TypeRef,
 } from '../types/schema';
+import { parseSmartTags, stripSmartComments } from '../utils';
 
 // ============================================================================
 // Pattern Matching Constants

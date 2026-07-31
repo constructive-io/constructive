@@ -4,7 +4,7 @@ import { deparse,parse } from 'pgsql-parser';
 const filterStatements = (stmts: RawStmt[]): { filteredStmts: RawStmt[], hasFiltered: boolean } => {
   const filteredStmts = stmts.filter(node => {
     const stmt = node.stmt;
-    return stmt && !stmt.hasOwnProperty('TransactionStmt');
+    return stmt && !Object.prototype.hasOwnProperty.call(stmt, 'TransactionStmt');
   });
   
   const hasFiltered = filteredStmts.length !== stmts.length;

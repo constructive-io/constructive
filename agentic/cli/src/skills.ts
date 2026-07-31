@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import {
   DirectorySkillSource,
   fetchSkillsFromGit,
@@ -9,6 +7,7 @@ import {
   resolveSkills,
   SkillSource
 } from '@agentic-kit/harness';
+import * as path from 'path';
 
 import { AgentCliConfig, BASE_LAYER, OVERLAY_LAYER } from './config';
 

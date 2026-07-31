@@ -1,6 +1,9 @@
 import 'graphile-build';
 import 'graphile-build-pg';
 import 'graphile-connection-filter';
+// Import types.ts for Build augmentation side effects
+import '../types';
+
 import type { PgCodec } from '@dataplan/pg';
 import type {
   ConnectionFilterOperatorFactory,
@@ -8,13 +11,11 @@ import type {
   ConnectionFilterOperatorSpec,
 } from 'graphile-connection-filter';
 import type { GraphQLInputObjectType as GraphQLInputObjectTypeType } from 'graphql';
-import sql from 'pg-sql2';
 import type { SQL } from 'pg-sql2';
+import sql from 'pg-sql2';
+
 import { CONCRETE_SUBTYPES } from '../constants';
 import type { PostgisExtensionInfo } from './detect-extension';
-
-// Import types.ts for Build augmentation side effects
-import '../types';
 
 /**
  * Creates the PostGIS ST_DWithin (withinDistance) operator factory.

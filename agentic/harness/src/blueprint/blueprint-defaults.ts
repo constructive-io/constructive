@@ -1,3 +1,4 @@
+import type { BlueprintDefinition } from './blueprint-schema';
 import { type FieldDefault, type FieldType, toFieldDefault, toFieldType } from './field-type';
 import {
   buildNodeData,
@@ -5,7 +6,6 @@ import {
   getPolicyFieldDefaults,
   getPolicyProvisioningConfig,
 } from './policy-provisioning';
-import type { BlueprintDefinition } from './blueprint-schema';
 
 const DEFAULT_GRANTS = [
   {

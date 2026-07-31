@@ -1,7 +1,7 @@
 import { subscribe as grafastSubscribe } from 'grafast';
-import { parse } from 'graphql';
-import type { GraphQLSchema, DocumentNode, ExecutionResult } from 'graphql';
 import type { GraphileConfig } from 'graphile-config';
+import type { DocumentNode, ExecutionResult,GraphQLSchema } from 'graphql';
+import { parse } from 'graphql';
 
 /**
  * A single event yielded by a subscription iterator.

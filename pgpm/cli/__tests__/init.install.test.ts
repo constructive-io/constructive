@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 
-import { TestFixture, normalizePackageJsonForSnapshot } from '../test-utils';
+import { normalizePackageJsonForSnapshot,TestFixture } from '../test-utils';
 
 describe('cmds:install - with initialized workspace and module', () => {
   let fixture: TestFixture;
@@ -119,8 +119,8 @@ describe('cmds:install - with initialized workspace and module', () => {
 
     
     const relativeFiles = installedFiles
-    .map((f: string) => path.relative(moduleDir, f))
-    .sort();
+      .map((f: string) => path.relative(moduleDir, f))
+      .sort();
     
     expect(relativeFiles).toMatchSnapshot();
 
