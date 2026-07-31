@@ -222,6 +222,7 @@ safegres audit --perf-baseline .safegres-perf.json --fail-on-new-perf   # ratche
 safegres audit --stats             # + runtime-statistics rules S1-S4 (implies --perf)
 safegres audit --explain           # + prove findings with EXPLAIN (implies --perf, PG16+)
 safegres audit --format json       # machine-readable
+safegres audit --format markdown >> "$GITHUB_STEP_SUMMARY"   # CI job summary / PR comment
 safegres audit --exposed-only      # hide internal advisories
 safegres doctor                    # config/parser/connection/catalog + exposure + stale public.read checks
 safegres print-config              # resolved effective config
