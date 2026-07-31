@@ -14,6 +14,7 @@ import { createClient } from '@pgpmjs/migrate-client';
 import { GraphQLClient } from './graphql-client';
 import { exportGraphQLMeta } from './export-graphql-meta';
 import { graphqlRowToPostgresRow } from './graphql-naming';
+import { PartitionConfig, partitionExportRows } from './partition';
 import { ExportGranularity, restructureExportRows } from './restructure';
 import {
   DB_REQUIRED_EXTENSIONS,
@@ -85,6 +86,13 @@ export interface ExportGraphQLOptions {
    * When omitted, sql_actions rows are written through unchanged.
    */
   granularity?: ExportGranularity;
+  /**
+   * Partition dial: split the exported database module into multiple pgpm
+   * packages per the config's rules (`partitionUnits` in `@pgpmjs/transform`).
+   * Cross-package dependencies become `<pkg>:<path>` requires. Throws
+   * `PartitionCycleError` on an unshippable partition.
+   */
+  partition?: PartitionConfig;
 }
 
 export const exportGraphQL = async ({
@@ -110,7 +118,8 @@ export const exportGraphQL = async ({
   username,
   serviceOutdir,
   skipSchemaRenaming = false,
-  granularity
+  granularity,
+  partition
 }: ExportGraphQLOptions): Promise<void> => {
   const normalizedOutdir = normalizeOutdir(outdir);
   const svcOutdir = normalizeOutdir(serviceOutdir || outdir);
@@ -204,22 +213,6 @@ export const exportGraphQL = async ({
   if (sqlActionRows.length > 0) {
     const dbMissingResult = await detectMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter, argv);
 
-    const dbModuleDir = await preparePackage({
-      project,
-      author,
-      outdir: normalizedOutdir,
-      name,
-      description: dbExtensionDesc,
-      extensions: [...DB_REQUIRED_EXTENSIONS],
-      prompter,
-      repoName,
-      username
-    });
-
-    if (dbMissingResult.shouldInstall) {
-      await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
-    }
-
     let dbRows = sqlActionRows as unknown as PgpmRow[];
     if (granularity) {
       const { rows, warnings } = await restructureExportRows(dbRows, granularity);
@@ -227,8 +220,49 @@ export const exportGraphQL = async ({
       warnings.forEach(warning => console.warn(`restructure (${granularity}): ${warning}`));
     }
 
-    writePgpmPlan(dbRows, opts);
-    writePgpmFiles(dbRows, opts);
+    if (partition) {
+      const { packages, warnings } = await partitionExportRows(dbRows, partition);
+      warnings.forEach(warning => console.warn(`partition: ${warning}`));
+
+      for (const pkg of packages) {
+        const pkgDir = await preparePackage({
+          project,
+          author,
+          outdir: normalizedOutdir,
+          name: pkg.name,
+          description: `${pkg.name} (partitioned from ${name})`,
+          extensions: [...DB_REQUIRED_EXTENSIONS, ...pkg.requires],
+          prompter,
+          repoName,
+          username
+        });
+        if (dbMissingResult.shouldInstall) {
+          await installMissingModules(pkgDir, dbMissingResult.missingModules);
+        }
+        const pkgOpts: SqlWriteOptions = { ...opts, name: pkg.name };
+        writePgpmPlan(pkg.rows, pkgOpts);
+        writePgpmFiles(pkg.rows, pkgOpts);
+      }
+    } else {
+      const dbModuleDir = await preparePackage({
+        project,
+        author,
+        outdir: normalizedOutdir,
+        name,
+        description: dbExtensionDesc,
+        extensions: [...DB_REQUIRED_EXTENSIONS],
+        prompter,
+        repoName,
+        username
+      });
+
+      if (dbMissingResult.shouldInstall) {
+        await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
+      }
+
+      writePgpmPlan(dbRows, opts);
+      writePgpmFiles(dbRows, opts);
+    }
   } else {
     console.log('No sql_actions found. Skipping database module export.');
   }
