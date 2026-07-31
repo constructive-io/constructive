@@ -120,6 +120,50 @@ describe('pgpm import e2e', () => {
     }
   );
 
+  it('--partition splits the import into multiple packages with cross-package requires', async () => {
+    fs.writeFileSync(
+      path.join(wsDir, 'partition.json'),
+      JSON.stringify({
+        defaultPackage: 'imp-core',
+        rules: [{ package: 'imp-audit-pkg', select: [{ schema: 'imp_audit' }] }]
+      })
+    );
+
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}
+      pgpm import dump.sql --pkg imp-part --partition partition.json
+      `,
+      {}
+    );
+
+    expect(fs.existsSync(path.join(wsDir, 'imp-core', 'pgpm.plan'))).toBe(true);
+    expect(fs.existsSync(path.join(wsDir, 'imp-audit-pkg', 'pgpm.plan'))).toBe(true);
+    const auditPlan = fs.readFileSync(path.join(wsDir, 'imp-audit-pkg', 'pgpm.plan'), 'utf-8');
+    expect(auditPlan).toContain('schemas/imp_audit');
+    const corePlan = fs.readFileSync(path.join(wsDir, 'imp-core', 'pgpm.plan'), 'utf-8');
+    expect(corePlan).not.toContain('schemas/imp_audit/');
+    // extension requires + cross-package requires land in the .control files
+    const coreControl = fs.readFileSync(path.join(wsDir, 'imp-core', 'imp-core.control'), 'utf-8');
+    expect(coreControl).toMatch(/requires = '.*pgcrypto.*'/);
+    const auditControl = fs.readFileSync(path.join(wsDir, 'imp-audit-pkg', 'imp-audit-pkg.control'), 'utf-8');
+    expect(auditControl).toMatch(/requires = '.*imp-core.*'/);
+
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/imp-core
+      pgpm deploy --database ${testDb.name} --package imp-core --yes
+      cd ../imp-audit-pkg
+      pgpm deploy --database ${testDb.name} --package imp-audit-pkg --yes
+      `,
+      { database: testDb.name }
+    );
+    const snapOriginal = await snapshotCatalog(originalDb);
+    const snapPartitioned = await snapshotCatalog(testDb);
+    expect(diffCatalogSnapshots(snapOriginal, snapPartitioned)).toEqual([]);
+  });
+
   it('--with-data deploys COPY/INSERT data as seed fixtures', async () => {
     await fixture.runTerminalCommands(
       `

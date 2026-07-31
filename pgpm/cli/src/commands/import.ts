@@ -3,9 +3,13 @@ import {
   ExportGranularity,
   importDumpRows,
   isExportGranularity,
-  loadDumpSource
+  loadDumpSource,
+  parsePartitionConfig,
+  PartitionConfig,
+  partitionExportRows
 } from '@pgpmjs/export';
 import { Logger } from '@pgpmjs/logger';
+import { PartitionCycleError } from '@pgpmjs/transform';
 import { CLIOptions, cliExitWithError, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
 
@@ -47,6 +51,9 @@ Options:
   --out <dir>             Output base directory (default: current directory);
                           the module is written to <out>/<pkg>
   --with-data             Import COPY/INSERT data as seed fixture changes
+  --partition <file>      Partition config (JSON: rules/defaultPackage/splitRiders)
+                          splitting the import into multiple pgpm packages with
+                          derived cross-package requires
   --write                 Allow overwriting an existing module directory
   --cwd <directory>       Working directory (default: current directory)
   --dry-run               Print the resulting plan/paths without writing
@@ -55,6 +62,7 @@ Examples:
   pgpm import dump.sql --pkg my-app
   pgpm import dump.sql --pkg my-app --granularity consolidated --naming flat
   pgpm import ./sql-files --pkg my-app --out ./packages --with-data
+  pgpm import dump.sql --pkg my-app --partition partition.json
 `;
 
 const NAMING_STYLES = ['directory', 'flat'] as const;
@@ -94,6 +102,15 @@ export default async (
   }
   const naming = namingRaw as NamingStyle;
 
+  let partition: PartitionConfig | undefined;
+  if (typeof argv.partition === 'string' && argv.partition) {
+    try {
+      partition = parsePartitionConfig(path.resolve(cwd, argv.partition));
+    } catch (err) {
+      await cliExitWithError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
   const outBase = typeof argv.out === 'string' && argv.out ? path.resolve(cwd, argv.out) : path.resolve(cwd);
   const withData = Boolean(argv['with-data'] ?? argv.withData);
   const write = Boolean(argv.write);
@@ -113,32 +130,53 @@ export default async (
 
   const result = await importDumpRows(source, { granularity, naming, withData });
 
+  let packages: { name: string; requires: string[]; rows: typeof result.rows }[];
+  if (partition) {
+    try {
+      const partitioned = await partitionExportRows(result.rows, partition);
+      result.warnings.push(...partitioned.warnings.map(w => `partition: ${w}`));
+      packages = partitioned.packages.map(pkg => ({
+        name: pkg.name,
+        requires: [...result.controlRequires, ...pkg.requires],
+        rows: pkg.rows
+      }));
+    } catch (err) {
+      if (err instanceof PartitionCycleError) {
+        await cliExitWithError(`Partition failed: ${err.message}`);
+        return;
+      }
+      throw err;
+    }
+  } else {
+    packages = [{ name: pkgName!, requires: result.controlRequires, rows: result.rows }];
+  }
+
   for (const warning of result.warnings) {
     console.warn(`import: ${warning}`);
   }
 
   if (dryRun) {
-    console.log(`package ${pkgName} -> ${path.join(outBase, pkgName!)}`);
-    if (result.controlRequires.length) {
-      console.log(`  requires: ${result.controlRequires.join(', ')}`);
-    }
-    for (const row of result.rows) {
-      const deps = row.deps?.length ? ` [${row.deps.join(' ')}]` : '';
-      console.log(`  ${row.deploy}${deps}`);
+    for (const pkg of packages) {
+      console.log(`package ${pkg.name} -> ${path.join(outBase, pkg.name)}`);
+      if (pkg.requires.length) {
+        console.log(`  requires: ${pkg.requires.join(', ')}`);
+      }
+      for (const row of pkg.rows) {
+        const deps = row.deps?.length ? ` [${row.deps.join(' ')}]` : '';
+        console.log(`  ${row.deploy}${deps}`);
+      }
     }
   } else {
-    const targetDir = path.join(outBase, pkgName!);
-    const guard = checkOverwrite(targetDir, source.files[0], write);
-    if (guard) {
-      await cliExitWithError(guard);
+    for (const pkg of packages) {
+      const guard = checkOverwrite(path.join(outBase, pkg.name), source.files[0], write);
+      if (guard) {
+        await cliExitWithError(guard);
+      }
     }
-
-    const dir = writePackage(outBase, {
-      name: pkgName!,
-      requires: result.controlRequires,
-      rows: result.rows
-    });
-    log.success(`wrote ${result.rows.length} changes to ${dir}`);
+    for (const pkg of packages) {
+      const dir = writePackage(outBase, pkg);
+      log.success(`wrote ${pkg.rows.length} changes to ${dir}`);
+    }
   }
 
   const { summary } = result;
