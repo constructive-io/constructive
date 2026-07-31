@@ -179,3 +179,43 @@ describe('perf baseline ratchet', () => {
     expect(toBaselineFinding(diff.added[0])).toEqual(full.findings[0]);
   });
 });
+
+describe('X7/X8: search and sort index coverage', () => {
+  beforeAll(async () => {
+    await applyFixture('x7-search-sort.sql');
+  });
+
+  it('X7: flags tsvector columns with no GIN/GiST index', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x7'], perf: true });
+    expect(tablesFor(report.perf!.findings, 'X7')).toEqual(['fx_x7.articles']);
+    const x7 = report.perf!.findings.find((f) => f.code === 'X7');
+    expect(x7?.severity).toBe('medium');
+    expect(x7?.context).toMatchObject({ column: 'search_doc', type: 'tsvector' });
+  });
+
+  it('X8: flags sort-shaped columns that lead no index', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x7'], perf: true });
+    const columns = report.perf!.findings
+      .filter((f) => f.code === 'X8')
+      .map((f) => `${f.table}.${(f.context as { column: string }).column}`)
+      .sort();
+    // articles.created_at leads an index; notes.created_at is only in trailing
+    // position, and notes.updated_at leads a *partial* index.
+    expect(columns).toEqual([
+      'articles.updated_at',
+      'notes.created_at',
+      'notes.updated_at'
+    ]);
+    expect(report.perf!.findings.find((f) => f.code === 'X8')?.severity).toBe('info');
+  });
+
+  it('X8 is advisory — info findings never move the perf score', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x7'], perf: true });
+    expect(report.perf!.score.deductions.some((d) => d.code === 'X8')).toBe(false);
+  });
+
+  it('X7/X8 stay off when perf is disabled', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x7'] });
+    expect(report.findings.filter((f) => ['X7', 'X8'].includes(f.code))).toHaveLength(0);
+  });
+});

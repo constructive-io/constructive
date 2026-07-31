@@ -72,7 +72,7 @@ The score only improves by being **explicit** (declaring exposure and intent) or
 | R3 | medium | fail-open | RLS table has grants **TO PUBLIC** |
 | W1 | medium | meta | No exposure surface configured — DB assumed reachable, score capped |
 
-Perf-dimension rules (only collected with `--perf`, scored on their own axis): **X1** FK with no covering index (medium), **X2** policy filters on a column that leads no index (medium), **X3** policy casts/wraps its own column with no matching expression index (medium), **X4** policy calls a non-LEAKPROOF function (low), **X5** redundant/duplicate index (low), **X6** no primary key and no usable replica identity (low), plus P1/P1b.
+Perf-dimension rules (only collected with `--perf`, scored on their own axis): **X1** FK with no covering index (medium), **X2** policy filters on a column that leads no index (medium), **X3** policy casts/wraps its own column with no matching expression index (medium), **X4** policy calls a non-LEAKPROOF function (low), **X5** redundant/duplicate index (low), **X6** no primary key and no usable replica identity (low), **X7** search column with no index the search can use — `tsvector` w/o GIN/GiST, `vector` w/o HNSW/IVFFlat (medium), **X8** sort-shaped `timestamptz`/`date` column leading no index (info, heuristic), plus P1/P1b.
 
 **Direction is the key idea:** `fail-open` = real exposure (untrusted side reaches more than intended). `fail-closed` = denied at runtime (hygiene/availability, not a leak) — contributes **0** to the score by default. R1/R2 are no-ops until you configure a role list; `safegres:constructive` sets them for `anonymous`.
 
@@ -103,7 +103,9 @@ Typed variant (`defineConfig` from `confstash`) works too — see the package RE
 
 ## Performance dimension (`--perf`, off by default)
 
-`safegres perf` / `safegres audit --perf` adds `report.perf` — its own findings, summary, and 0-100 score over index hygiene (X1/X5/X6), policy-aware index rules (X2/X3/X4) and policy cost (P1/P1b). Security and perf scores are never mixed: `report.score` sees only security findings, `report.perf.score` only perf ones. All checks are catalog + policy-AST analysis, so they're deterministic against an empty CI database.
+`safegres perf` / `safegres audit --perf` adds `report.perf` — its own findings, summary, and 0-100 score over index hygiene (X1/X5/X6/X7/X8), policy-aware index rules (X2/X3/X4) and policy cost (P1/P1b). Security and perf scores are never mixed: `report.score` sees only security findings, `report.perf.score` only perf ones. All checks are catalog + policy-AST analysis, so they're deterministic against an empty CI database.
+
+X7 is Constructive-specific: `graphile-search` exposes a full-text filter for every `tsvector` column and similarity search for every `vector` column *from the codec alone*, so an unindexed one is a live API field served by a seq scan. BM25/pg_trgm are intentionally not checked — those adapters are discovered from their indexes, so no index means the feature isn't exposed. X8 is the one heuristic (any column is orderable; timestamps are what feeds are actually sorted by), so it is `info`, scores 0, and is meant to be read rather than gated on.
 
 X2/X3/X4 read the policy predicate itself: RLS quals run before user quals on every candidate row, so an unindexed policy column (X2), a cast/function wrapping it (X3), or a non-LEAKPROOF call that blocks qual pushdown (X4) is a tax on every query against the table, not just one slow report.
 

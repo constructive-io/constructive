@@ -211,6 +211,24 @@ export const RULES: RuleMeta[] = [
     dimension: 'perf',
     title: 'Table has no primary key / no usable replica identity',
     scope: 'index'
+  },
+  {
+    code: 'X7',
+    category: 'index',
+    defaultSeverity: 'medium',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'Search column (tsvector/vector) with no index the search can use',
+    scope: 'index'
+  },
+  {
+    code: 'X8',
+    category: 'index',
+    defaultSeverity: 'info',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'Sort-shaped column (timestamp/date) leads no index — heuristic advisory',
+    scope: 'index'
   }
 ];
 

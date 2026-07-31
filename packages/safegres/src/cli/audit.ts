@@ -61,7 +61,7 @@ Exposure (what the score is computed against):
   --exposed-only           Hide internal (non-exposed) findings from output
 
 Performance dimension (optional; scored separately from security):
-  --perf                   Also audit index hygiene (X1/X5/X6), policy-aware
+  --perf                   Also audit index hygiene (X1/X5/X6/X7/X8), policy-aware
                            index coverage (X2/X3/X4) and policy cost (P1/P1b),
                            scored on its own 0-100 axis (report.perf)
   --fail-on-perf-score <n> Exit non-zero if the perf score is below n (0-100)

@@ -30,6 +30,16 @@ export interface IndexInfo {
   definition: string;
 }
 
+export interface ColumnInfo {
+  name: string;
+  /** `pg_attribute.attnum`. */
+  attnum: number;
+  /** `format_type()` output, e.g. `timestamptz`, `tsvector`, `vector(1536)`. */
+  type: string;
+  /** Base type name without modifiers, e.g. `timestamptz`, `vector`. */
+  baseType: string;
+}
+
 export interface ForeignKeyInfo {
   name: string;
   /** Referencing column attribute numbers, in constraint order. */
@@ -48,6 +58,8 @@ export interface TableIndexSnapshot {
   /** `pg_class.relreplident`: `d` default, `n` nothing, `f` full, `i` index. */
   replicaIdentity: string;
   hasPrimaryKey: boolean;
+  /** User columns (no system or dropped attributes), in attribute order. */
+  columns: ColumnInfo[];
   indexes: IndexInfo[];
   foreignKeys: ForeignKeyInfo[];
 }
@@ -141,7 +153,19 @@ export async function introspectIndexes(
           'references', f.references_table
         ) ORDER BY f.name) FROM fks f WHERE f.oid = r.oid),
         '[]'::jsonb
-      )                                                 AS foreign_keys
+      )                                                 AS foreign_keys,
+      COALESCE(
+        (SELECT jsonb_agg(jsonb_build_object(
+          'name', a.attname,
+          'attnum', a.attnum,
+          'type', format_type(a.atttypid, a.atttypmod),
+          'baseType', t.typname
+        ) ORDER BY a.attnum)
+         FROM pg_attribute a
+         JOIN pg_type t ON t.oid = a.atttypid
+         WHERE a.attrelid = r.oid AND a.attnum > 0 AND NOT a.attisdropped),
+        '[]'::jsonb
+      )                                                 AS columns
     FROM rels r
     ORDER BY r.schema_name, r.table_name
   `;
@@ -154,6 +178,7 @@ export async function introspectIndexes(
     replica_identity: string;
     indexes: IndexInfo[];
     foreign_keys: ForeignKeyInfo[];
+    columns: ColumnInfo[];
   }>(sql, [options.schemas ?? [], excludes]);
 
   return rows.map((r) => ({
@@ -163,6 +188,7 @@ export async function introspectIndexes(
     isPartition: r.is_partition,
     replicaIdentity: r.replica_identity,
     hasPrimaryKey: r.indexes.some((i) => i.primary),
+    columns: r.columns,
     indexes: r.indexes,
     foreignKeys: r.foreign_keys
   }));

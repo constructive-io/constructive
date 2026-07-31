@@ -116,6 +116,119 @@ export function checkMissingPrimaryKey(table: TableIndexSnapshot): Finding | nul
 }
 
 /**
+ * Search column types that only perform with a specialised index, mapped to
+ * the access methods that can serve them.
+ *
+ * The column type *is* the declaration: `graphile-search` detects searchable
+ * columns by codec (tsvector → full-text filter, vector → similarity search),
+ * so a bare `tsvector` column is already an API promise. BM25 and pg_trgm are
+ * absent on purpose — they are discovered *from* their indexes, so a missing
+ * index means the feature was never exposed rather than exposed and slow.
+ */
+const SEARCH_TYPES: Record<string, { methods: string[]; feature: string; example: string }> = {
+  tsvector: {
+    methods: ['gin', 'gist'],
+    feature: 'full-text search',
+    example: 'USING gin (%s)'
+  },
+  vector: {
+    methods: ['hnsw', 'ivfflat'],
+    feature: 'vector similarity search',
+    example: 'USING hnsw (%s vector_cosine_ops)'
+  },
+  halfvec: {
+    methods: ['hnsw', 'ivfflat'],
+    feature: 'vector similarity search',
+    example: 'USING hnsw (%s halfvec_cosine_ops)'
+  },
+  sparsevec: {
+    methods: ['hnsw'],
+    feature: 'vector similarity search',
+    example: 'USING hnsw (%s sparsevec_cosine_ops)'
+  }
+};
+
+/**
+ * X7: a search column with no index the search can use.
+ *
+ * A `tsvector` or `vector` column is exposed as a search field by
+ * `graphile-search` purely from its type — the schema promises a fast path.
+ * Without a GIN/GiST (full-text) or HNSW/IVFFlat (vector) index the promise
+ * is served by a sequential scan plus a per-row distance or match computation,
+ * which is the single worst plan the API can produce.
+ */
+export function checkUnindexedSearchColumns(table: TableIndexSnapshot): Finding[] {
+  if (table.isPartition) return [];
+
+  const findings: Finding[] = [];
+  for (const column of table.columns) {
+    const spec = SEARCH_TYPES[column.baseType];
+    if (!spec) continue;
+    const served = table.indexes.some(
+      (idx) => spec.methods.includes(idx.method) && idx.columns.includes(column.attnum)
+    );
+    if (served) continue;
+
+    findings.push({
+      code: 'X7',
+      severity: 'medium',
+      category: 'index',
+      schema: table.schema,
+      table: table.name,
+      message:
+        `${table.schema}.${table.name}.${column.name} is a ${column.type} column with no ${spec.methods.join('/')} index — ${spec.feature} scans the whole table`,
+      hint:
+        `CREATE INDEX ON ${table.schema}.${table.name} ${spec.example.replace('%s', column.name)};`,
+      context: { column: column.name, type: column.type, methods: spec.methods }
+    });
+  }
+  return findings;
+}
+
+/** Types whose columns are, in practice, what a connection is sorted by. */
+const SORT_TYPES = new Set(['timestamptz', 'timestamp', 'date']);
+
+/**
+ * X8: a sort-shaped column that leads no index.
+ *
+ * Every PostGraphile connection can be ordered by any column and paginated
+ * with a cursor over that order. Sorting on an unindexed column forces a full
+ * sort of the (RLS-filtered) result on every page, and keyset pagination
+ * degenerates into a scan-and-discard. Timestamp columns are singled out
+ * because they are what feeds are actually ordered by — a heuristic, hence
+ * `info` by default; turn it off with `perf.rules: { "X8": "off" }`.
+ */
+export function checkUnindexedSortColumns(table: TableIndexSnapshot): Finding[] {
+  if (table.isPartition) return [];
+
+  // A leading column can serve both ASC and DESC ordering; a trailing one
+  // cannot serve the sort on its own.
+  const leading = new Set(
+    table.indexes.filter((i) => !i.partial).map((i) => i.columns[0]).filter((c) => c !== undefined)
+  );
+
+  const findings: Finding[] = [];
+  for (const column of table.columns) {
+    if (!SORT_TYPES.has(column.baseType)) continue;
+    if (leading.has(column.attnum)) continue;
+
+    findings.push({
+      code: 'X8',
+      severity: 'info',
+      category: 'index',
+      schema: table.schema,
+      table: table.name,
+      message:
+        `${table.schema}.${table.name}.${column.name} (${column.type}) leads no index — ordering or paginating a connection by it sorts the whole table`,
+      hint:
+        `If the API orders by this column, CREATE INDEX ON ${table.schema}.${table.name} (${column.name} DESC); otherwise disable X8 or add the table to perf.ignore.`,
+      context: { column: column.name, type: column.type }
+    });
+  }
+  return findings;
+}
+
+/**
  * True when `index` can serve an equality lookup on exactly `columns`:
  * its leading columns are that same set, and it covers every row.
  */

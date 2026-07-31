@@ -19,7 +19,9 @@ import {
 import {
   checkMissingPrimaryKey,
   checkRedundantIndexes,
-  checkUnindexedForeignKeys
+  checkUnindexedForeignKeys,
+  checkUnindexedSearchColumns,
+  checkUnindexedSortColumns
 } from '../checks/indexes';
 import {
   checkNonLeakproofPolicyFunctions,
@@ -175,6 +177,8 @@ export async function audit(
     for (const table of indexSnapshot) {
       findings.push(...checkUnindexedForeignKeys(table));
       findings.push(...checkRedundantIndexes(table));
+      findings.push(...checkUnindexedSearchColumns(table));
+      findings.push(...checkUnindexedSortColumns(table));
       const x6 = checkMissingPrimaryKey(table);
       if (x6) findings.push(x6);
     }
