@@ -1,6 +1,6 @@
 {
   "name": "graphile-sql-expression-validator",
-  "version": "3.9.2",
+  "version": "3.9.3",
   "description": "SQL expression validation for PostGraphile v5",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -42,8 +42,8 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
-    "pgsql-deparser": "^18.1.1",
-    "pgsql-parser": "^18.1.1"
+    "pgsql-deparser": "^18.2.0",
+    "pgsql-parser": "^18.1.2"
   },
   "peerDependencies": {
     "grafast": "1.0.2",

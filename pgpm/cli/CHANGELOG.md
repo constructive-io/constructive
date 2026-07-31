@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.19.0](https://github.com/constructive-io/constructive/compare/pgpm@5.18.0...pgpm@5.19.0) (2026-07-31)
+
+### Features
+
+- **pgpm:** pgpm regen — generate revert/verify scripts from deploys ([81ed4e7](https://github.com/constructive-io/constructive/commit/81ed4e7d7a10401837b40481c0241d7a8e803b48))
+
 # [5.18.0](https://github.com/constructive-io/constructive/compare/pgpm@5.17.4...pgpm@5.18.0) (2026-07-31)
 
 ### Features

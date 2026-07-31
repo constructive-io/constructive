@@ -11,6 +11,7 @@ export const usageText = `
     init               Initialize workspace or module
     extension          Manage module dependencies
     plan               Generate module deployment plans
+    regen              Generate revert/verify scripts from deploy scripts
     package            Package module for distribution
     materialize        Transpile an apply proxy into a plain, committed module
     sync-versions      Sync .control/Makefile/sql metadata to package.json versions

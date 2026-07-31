@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.14.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.14.5...@constructive-io/graphql-server@5.14.6) (2026-07-31)
+
+### Bug Fixes
+
+- **server:** route graphile middleware GraphQL errors through the error registry ([0704c21](https://github.com/constructive-io/constructive/commit/0704c2184ae139c1f4eb9611676c3fbcfb2e2860))
+
 ## [5.14.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.14.4...@constructive-io/graphql-server@5.14.5) (2026-07-31)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

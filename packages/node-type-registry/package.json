@@ -1,6 +1,6 @@
 {
   "name": "node-type-registry",
-  "version": "1.13.2",
+  "version": "1.13.3",
   "description": "Node type definitions for the Constructive blueprint system. Single source of truth for all Authz*, Data*, Relation*, and View* node types.",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
@@ -34,8 +34,8 @@
     "@babel/generator": "^7.29.0",
     "@babel/types": "^7.29.0",
     "@pgsql/types": "^18.0.0",
-    "@pgsql/utils": "^18.1.1",
-    "pgsql-deparser": "^18.1.1",
+    "@pgsql/utils": "^18.1.2",
+    "pgsql-deparser": "^18.2.0",
     "schema-typescript": "^0.14.3"
   },
   "devDependencies": {

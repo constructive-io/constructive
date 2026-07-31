@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/transform",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Change-aware SQL transformation for PGPM — superset of @pgsql/transform plus change categorization, fixture closure, and bundle transpile/apply drivers",
   "main": "index.js",
@@ -46,6 +46,6 @@
     "@pgpmjs/naming-spec": "workspace:^",
     "@pgsql/scripts": "^18.1.0",
     "@pgsql/transform": "^18.11.0",
-    "plpgsql-parser": "^18.2.2"
+    "plpgsql-parser": "^18.2.3"
   }
 }
