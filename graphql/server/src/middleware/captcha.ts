@@ -1,5 +1,8 @@
+import { errors } from '@constructive-io/errors';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
+
+import { respondWithGraphQLError } from '../errors/graphql-response';
 import './types'; // for Request type
 
 const log = new Logger('captcha');
@@ -102,23 +105,13 @@ export const createCaptchaMiddleware = (): RequestHandler => {
 
     const captchaToken = req.get(CAPTCHA_HEADER);
     if (!captchaToken) {
-      res.status(200).json({
-        errors: [{
-          message: 'CAPTCHA verification required',
-          extensions: { code: 'CAPTCHA_REQUIRED' },
-        }],
-      });
+      respondWithGraphQLError(res, errors.CAPTCHA_REQUIRED());
       return;
     }
 
     const valid = await verifyToken(captchaToken, secretKey);
     if (!valid) {
-      res.status(200).json({
-        errors: [{
-          message: 'CAPTCHA verification failed',
-          extensions: { code: 'CAPTCHA_FAILED' },
-        }],
-      });
+      respondWithGraphQLError(res, errors.CAPTCHA_FAILED());
       return;
     }
 

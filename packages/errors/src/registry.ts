@@ -234,6 +234,18 @@ export const registry = {
     http: 401,
     message: 'You must be signed in to do that.'
   }),
+  CAPTCHA_REQUIRED: defineError({
+    code: 'CAPTCHA_REQUIRED',
+    class: 'public',
+    http: 400,
+    message: 'Please complete the CAPTCHA challenge.'
+  }),
+  CAPTCHA_FAILED: defineError({
+    code: 'CAPTCHA_FAILED',
+    class: 'public',
+    http: 403,
+    message: 'CAPTCHA verification failed. Please try again.'
+  }),
   FORBIDDEN: defineError({
     code: 'FORBIDDEN',
     class: 'public',
