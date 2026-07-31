@@ -49,6 +49,7 @@ export type { UniqueLookupOptions } from './primary-key-only';
 
 // Meta schema plugin for introspection (tables, fields, indexes, constraints)
 export {
+  getTablesMetaForSchema,
   MetaSchemaPlugin,
   MetaSchemaPreset,
 } from './meta-schema';

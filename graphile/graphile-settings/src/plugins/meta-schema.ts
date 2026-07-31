@@ -9,6 +9,7 @@ export {
   _buildScalarEncoding,
   _cachedTablesMeta,
   _pgTypeToGqlType,
+  getTablesMetaForSchema,
   MetaSchemaPlugin,
   MetaSchemaPreset,
 } from 'graphile-meta';

@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "makage": "^0.3.0",
+    "pgsql-test": "workspace:^",
     "ts-node": "^10.9.2"
   },
   "keywords": [

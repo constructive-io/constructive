@@ -24,6 +24,19 @@ function getRuntimeTablesMeta(
   return tables;
 }
 
+/**
+ * Returns the table metadata memoized for the given executable schema, or
+ * `undefined` if `_meta` has not been resolved against that schema (e.g. the
+ * meta plugin is disabled or `_meta` was never executed). Callers building
+ * schemas offline should use this schema-keyed accessor rather than the
+ * legacy process-global cache, which carries no association to any schema.
+ */
+export function getTablesMetaForSchema(
+  schema: GraphQLSchema
+): TableMeta[] | undefined {
+  return runtimeTablesBySchema.get(schema);
+}
+
 export const MetaSchemaPlugin: GraphileConfig.Plugin = {
   name: 'MetaSchemaPlugin',
   version: '1.0.0',

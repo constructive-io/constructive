@@ -3,11 +3,13 @@
  *
  * Loads GraphQL schema directly from a PostgreSQL database using PostGraphile
  * introspection and converts it to introspection format.
- * Also returns _meta table metadata when available (via MetaSchemaPlugin cache).
+ * Also returns _meta table metadata correlated to the same schema build
+ * (via buildSchemaArtifacts).
  */
 import { buildSchema, introspectionFromSchema } from 'graphql';
 
-import { buildSchemaSDL, _cachedTablesMeta } from 'graphile-schema';
+import { buildSchemaArtifacts } from 'graphile-schema';
+import type { TableMeta } from 'graphile-schema';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import {
@@ -38,6 +40,12 @@ export interface DatabaseSchemaSourceOptions {
    * Mutually exclusive with schemas
    */
   apiNames?: string[];
+
+  /**
+   * @internal Test-only. Forwarded to `buildSchemaArtifacts` so regression
+   * tests can deterministically interleave concurrent builds.
+   */
+  _onMetaCollected?: () => Promise<void>;
 }
 
 /**
@@ -79,13 +87,16 @@ export class DatabaseSchemaSource implements SchemaSource {
       schemas = this.options.schemas ?? ['public'];
     }
 
-    // Build SDL from database (MetaSchemaPlugin populates _cachedTablesMeta as a side-effect)
+    // Build SDL and _meta metadata from one correlated build boundary so the
+    // returned pair always describes the same GraphQLSchema.
     let sdl: string;
+    let tablesMeta: TableMeta[];
     try {
-      sdl = await buildSchemaSDL({
+      ({ sdl, tablesMeta } = await buildSchemaArtifacts({
         database,
         schemas,
-      });
+        _onMetaCollected: this.options._onMetaCollected,
+      }));
     } catch (err) {
       throw new SchemaSourceError(
         `Failed to introspect database: ${err instanceof Error ? err.message : 'Unknown error'}`,
@@ -133,7 +144,7 @@ export class DatabaseSchemaSource implements SchemaSource {
 
     return {
       introspection,
-      tablesMeta: [..._cachedTablesMeta] as MetaTableInfo[],
+      tablesMeta: tablesMeta as unknown as MetaTableInfo[],
     };
   }
 
