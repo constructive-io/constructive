@@ -100,6 +100,7 @@ export interface BuildFieldMetaOptions {
 
 export function buildFieldMeta(
   name: string,
+  columnName: string,
   attr: PgAttribute | null | undefined,
   build?: GqlTypeResolverBuild,
   options?: BuildFieldMetaOptions,
@@ -111,6 +112,7 @@ export function buildFieldMeta(
 
   return {
     name,
+    columnName,
     type: {
       pgType,
       gqlType: build ? resolveGqlTypeName(build, attr?.codec) : pgTypeToGqlType(pgType),

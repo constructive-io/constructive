@@ -33,6 +33,7 @@ export function buildForeignKeyConstraint(
     refFields: remoteAttributeNames.map((attrName) =>
       buildFieldMeta(
         remoteCodec ? context.inflectAttr(attrName, remoteCodec) : attrName,
+        attrName,
         remoteAttributes[attrName],
         context.build,
       ),

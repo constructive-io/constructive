@@ -1,3 +1,6 @@
+import type { GraphQLSchema } from 'graphql';
+
+import { findExecutableField } from './graphql-schema-utils';
 import { fallbackTableType, safeInflection } from './inflection-utils';
 import type {
   InflectionMeta,
@@ -19,20 +22,28 @@ export function buildInflectionMeta(
   resource: PgTableResource,
   tableType: string,
   build: MetaBuild,
+  query?: QueryMeta,
 ): InflectionMeta {
   const inflection = build.inflection;
+  const codec = resource.codec;
   return {
     tableType,
-    allRows: safeInflection(
-      () => inflection.allRows?.(resource),
-      `${tableType.toLowerCase()}s`,
-    ),
+    allRows:
+      query?.all ??
+      safeInflection(
+        () => inflection.allRows?.(resource),
+        `${tableType.toLowerCase()}s`,
+      ),
     connection: safeInflection(
-      () => inflection.connectionType?.(tableType),
+      () =>
+        (codec && inflection.tableConnectionType?.(codec)) ??
+        inflection.connectionType?.(tableType),
       `${tableType}Connection`,
     ),
     edge: safeInflection(
-      () => inflection.edgeType?.(tableType),
+      () =>
+        (codec && inflection.tableEdgeType?.(codec)) ??
+        inflection.edgeType?.(tableType),
       `${tableType}Edge`,
     ),
     filterType: safeInflection(
@@ -60,11 +71,11 @@ export function buildInflectionMeta(
       `Create${tableType}Payload`,
     ),
     updatePayloadType: safeInflection(
-      () => inflection.updatePayloadType?.(resource),
+      () => inflection.updatePayloadType?.({ resource }),
       `Update${tableType}Payload`,
     ),
     deletePayloadType: safeInflection(
-      () => inflection.deletePayloadType?.(resource),
+      () => inflection.deletePayloadType?.({ resource }),
       `Delete${tableType}Payload`,
     ),
   };
@@ -75,9 +86,95 @@ export function buildQueryMeta(
   uniques: PgUnique[],
   tableType: string,
   build: MetaBuild,
+  schema?: GraphQLSchema,
 ): QueryMeta {
   const inflection = build.inflection;
   const hasPrimaryKey = uniques.some((unique) => unique.isPrimary);
+
+  if (schema) {
+    const queryType = schema.getQueryType();
+    const mutationType = schema.getMutationType();
+    const codec = resource.codec;
+    const connectionType = codec
+      ? safeInflection(
+          () => inflection.tableConnectionType?.(codec),
+          `${tableType}Connection`,
+        )
+      : null;
+    const orderedUniques = [...uniques].sort(
+      (left, right) => Number(!!right.isPrimary) - Number(!!left.isPrimary),
+    );
+
+    const all = findExecutableField(queryType, [
+      {
+        name: safeInflection(
+          () => inflection.allRowsConnection?.(resource),
+          null,
+        ),
+        typeName: connectionType,
+      },
+      {
+        name: safeInflection(() => inflection.allRowsList?.(resource), null),
+        typeName: tableType,
+      },
+    ]);
+    const one = findExecutableField(
+      queryType,
+      orderedUniques.map((unique) => ({
+        name: safeInflection(
+          () => inflection.rowByUnique?.({ resource, unique }),
+          null,
+        ),
+        typeName: tableType,
+      })),
+    );
+    const createPayloadType = safeInflection(
+      () => inflection.createPayloadType?.(resource),
+      `Create${tableType}Payload`,
+    );
+    const create = findExecutableField(mutationType, [
+      {
+        name: safeInflection(() => inflection.createField?.(resource), null),
+        typeName: createPayloadType,
+      },
+    ]);
+    const updatePayloadType = safeInflection(
+      () => inflection.updatePayloadType?.({ resource }),
+      `Update${tableType}Payload`,
+    );
+    const update = findExecutableField(
+      mutationType,
+      orderedUniques.map((unique) => ({
+        name: safeInflection(
+          () => inflection.updateByKeysField?.({ resource, unique }),
+          null,
+        ),
+        typeName: updatePayloadType,
+      })),
+    );
+    const deletePayloadType = safeInflection(
+      () => inflection.deletePayloadType?.({ resource }),
+      `Delete${tableType}Payload`,
+    );
+    const deleteField = findExecutableField(
+      mutationType,
+      orderedUniques.map((unique) => ({
+        name: safeInflection(
+          () => inflection.deleteByKeysField?.({ resource, unique }),
+          null,
+        ),
+        typeName: deletePayloadType,
+      })),
+    );
+
+    return {
+      all: all?.name ?? null,
+      one: one?.name ?? null,
+      create: create?.name ?? null,
+      update: update?.name ?? null,
+      delete: deleteField?.name ?? null,
+    };
+  }
 
   return {
     all: safeInflection(

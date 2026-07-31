@@ -2,16 +2,26 @@
 import 'graphile-build';
 
 import type { GraphileConfig } from 'graphile-config';
+import type { GraphQLSchema } from 'graphql';
 
-import { getCachedTablesMeta, setCachedTablesMeta } from './cache';
+import { setCachedTablesMeta } from './cache';
 import { extendQueryWithMetaField } from './graphql-meta-field';
 import { collectTablesMeta } from './table-meta-builder';
-import type { MetaBuild } from './types';
+import type { MetaBuild, TableMeta } from './types';
 
-interface QueryTypeContext {
-  Self?: {
-    name?: string;
-  };
+const runtimeTablesBySchema = new WeakMap<GraphQLSchema, TableMeta[]>();
+
+function getRuntimeTablesMeta(
+  build: MetaBuild,
+  schema: GraphQLSchema
+): TableMeta[] {
+  let tables = runtimeTablesBySchema.get(schema);
+  if (!tables) {
+    tables = collectTablesMeta(build, schema);
+    runtimeTablesBySchema.set(schema, tables);
+    setCachedTablesMeta(tables);
+  }
+  return tables;
 }
 
 export const MetaSchemaPlugin: GraphileConfig.Plugin = {
@@ -20,19 +30,23 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
   description: 'Exposes _meta query for database schema introspection',
   schema: {
     hooks: {
-      init(input, rawBuild) {
+      GraphQLObjectType_fields(rawFields, rawBuild, rawContext) {
+        if (!rawContext.scope.isRootQuery) return rawFields;
         const build = rawBuild as unknown as MetaBuild;
-        setCachedTablesMeta(collectTablesMeta(build));
-        return input;
-      },
-
-      GraphQLObjectType_fields(rawFields, _rawBuild, rawContext) {
-        const context = rawContext as unknown as QueryTypeContext;
-        if (context.Self?.name !== 'Query') return rawFields;
         return extendQueryWithMetaField(
           rawFields as unknown as Record<string, unknown>,
-          getCachedTablesMeta(),
+          (schema) => getRuntimeTablesMeta(build, schema),
         ) as typeof rawFields;
+      },
+
+      finalize(schema, rawBuild) {
+        // Populate the legacy module-level cache for consumers that read
+        // `_cachedTablesMeta` without executing `_meta`. Deliberately does NOT
+        // pre-warm the per-schema memo: later finalizers may still mutate the
+        // schema, and the resolver must recompute from its final info.schema.
+        const build = rawBuild as unknown as MetaBuild;
+        setCachedTablesMeta(collectTablesMeta(build, schema));
+        return schema;
       },
     },
   },

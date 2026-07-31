@@ -7,6 +7,8 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
   type GraphQLOutputType,
+  type GraphQLResolveInfo,
+  type GraphQLSchema,
   GraphQLString
 } from 'graphql';
 
@@ -73,7 +75,14 @@ function createMetaSchemaType(): GraphQLObjectType {
     name: 'MetaField',
     description: 'Information about a table field/column',
     fields: () => ({
-      name: { type: nn(GraphQLString) },
+      name: {
+        type: nn(GraphQLString),
+        description: 'Final GraphQL field name'
+      },
+      columnName: {
+        type: nn(GraphQLString),
+        description: 'PostgreSQL column name'
+      },
       type: { type: nn(MetaTypeType) },
       isNotNull: { type: nn(GraphQLBoolean) },
       hasDefault: { type: nn(GraphQLBoolean) },
@@ -168,7 +177,7 @@ function createMetaSchemaType(): GraphQLObjectType {
     name: 'MetaQuery',
     description: 'Table query/mutation names',
     fields: () => ({
-      all: { type: nn(GraphQLString) },
+      all: { type: GraphQLString },
       one: { type: GraphQLString },
       create: { type: GraphQLString },
       update: { type: GraphQLString },
@@ -317,7 +326,14 @@ function createMetaSchemaType(): GraphQLObjectType {
     name: 'MetaTable',
     description: 'Information about a database table',
     fields: () => ({
-      name: { type: nn(GraphQLString) },
+      name: {
+        type: nn(GraphQLString),
+        description: 'Final GraphQL output type name'
+      },
+      tableName: {
+        type: nn(GraphQLString),
+        description: 'PostgreSQL table name'
+      },
       schemaName: { type: nn(GraphQLString) },
       fields: { type: nnList(MetaFieldType) },
       indexes: { type: nnList(MetaIndexType) },
@@ -347,15 +363,20 @@ function createMetaSchemaType(): GraphQLObjectType {
 
 export function extendQueryWithMetaField(
   fields: FieldMap,
-  tablesMeta: TableMeta[]
+  getTablesMeta: (schema: GraphQLSchema) => TableMeta[]
 ): FieldMap {
   const metaSchemaType = createMetaSchemaType();
   const metaField: GraphQLFieldConfig<unknown, unknown> = {
     type: metaSchemaType,
     description:
       'Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.',
-    resolve() {
-      return { tables: tablesMeta };
+    resolve(
+      _source: unknown,
+      _args: Record<string, never>,
+      _context: unknown,
+      info: GraphQLResolveInfo
+    ) {
+      return { tables: getTablesMeta(info.schema) };
     }
   };
 

@@ -52,8 +52,9 @@ query {
   _meta {
     tables {
       name
+      tableName
       schemaName
-      fields { name type { pgType gqlType isArray } isNotNull hasDefault isPrimaryKey isForeignKey }
+      fields { name columnName type { pgType gqlType isArray } isNotNull hasDefault isPrimaryKey isForeignKey }
       indexes { name isUnique isPrimary columns }
       constraints { primaryKey { name } unique { name } foreignKey { name referencedTable } }
       relations { belongsTo { fieldName references { name } } hasMany { fieldName referencedBy { name } } manyToMany { fieldName rightTable { name } } }
@@ -68,8 +69,8 @@ query {
 }
 ```
 
-The `_meta` resolver returns cached data — it is computed **once at schema build
-time**, not per request.
+The `_meta` resolver reconciles metadata against the final executable schema on
+its first execution for that schema, then returns the cached result.
 
 ## Architecture
 
@@ -77,17 +78,17 @@ Three files do the work; the flow is deliberately simple:
 
 ```
 MetaSchemaPlugin (plugin.ts)
-  ├─ schema.hooks.init                     → collectTablesMeta(build)  → setCachedTablesMeta(...)
-  └─ schema.hooks.GraphQLObjectType_fields → (only on the Query type) extendQueryWithMetaField(fields, getCachedTablesMeta())
+  ├─ schema.hooks.finalize                 → seed the legacy metadata cache
+  └─ schema.hooks.GraphQLObjectType_fields → add _meta to the root Query
+                                              └─ first resolution: collectTablesMeta(build, info.schema)
 ```
 
-1. **`init` hook** walks `build.input.pgRegistry.pgResources`, and for each table
-   resource in a configured schema builds a `TableMeta`
-   (`table-meta-builder.ts` → `collectTablesMeta` / `buildTableMeta`). The result
-   is memoized in a module-level cache (`cache.ts`).
-2. **`GraphQLObjectType_fields` hook** fires for every object type but early-returns
-   unless `context.Self.name === 'Query'`; then it appends the `_meta` field whose
-   resolver just returns the cached `{ tables }`.
+1. **`finalize` hook** seeds the module-level legacy cache used by existing
+   codegen paths. It is an eager compatibility path, not the runtime authority.
+2. **`GraphQLObjectType_fields` hook** appends `_meta` only when
+   `context.scope.isRootQuery` is true. Its resolver walks
+   `build.input.pgRegistry.pgResources`, validates every executable name against
+   `info.schema`, and caches the result by final `GraphQLSchema` identity.
 3. **`graphql-meta-field.ts`** constructs all the `Meta*` `GraphQLObjectType`s and
    the top-level `MetaSchema` type by hand (no PostGraphile codec plumbing — plain
    `graphql` types), so the shape is fully controlled here.
@@ -157,8 +158,8 @@ Worked pattern (this is exactly how the `scope` block was added — mirror the
 - Read tags defensively: `(codec as any).extensions?.tags` may be undefined.
 - Inflect column names before exposing them (`inflectAttr(attrName, codec)`), so
   `_meta` names match the GraphQL field names clients actually use.
-- Keep detection logic pure and synchronous — it runs at build time over
-  already-introspected resources.
+- Keep detection logic pure and synchronous — it runs over already-introspected
+  resources during schema finalization and first `_meta` execution.
 
 ## Why `_meta` matters for codegen
 
@@ -193,7 +194,7 @@ file, or direct introspection). Beyond raw structure it gives codegen the
 | `_meta` field missing | `MetaSchemaPreset`/`Plugin` not loaded | Add the preset (or use `ConstructivePreset`) |
 | Table missing from `_meta.tables` | Its schema isn't in the configured `pgSchemas`, or resource isn't a real table | Ensure the schema is in `makePgService({ schemas })`; virtual/function resources are skipped |
 | `storage`/`search`/`i18n`/`realtime`/`scope` is `null` | No corresponding smart tag emitted | Emit the smart tag in SQL (`append_table_smart_tags`) and re-introspect; verify `codec.extensions.tags` |
-| Stale metadata after schema change | `_meta` is cached at build time | Rebuild the schema (server uses LISTEN/NOTIFY cache invalidation) |
+| Stale metadata after schema change | `_meta` is cached by executable schema identity | Rebuild the schema (server uses LISTEN/NOTIFY cache invalidation) |
 | New field not appearing | Added to `types.ts`/builder but not to `graphql-meta-field.ts` | The GraphQL types are hand-declared — add the field to `MetaTableType` and its object type |
 
 ## Related Skills

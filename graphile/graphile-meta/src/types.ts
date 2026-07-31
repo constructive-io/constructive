@@ -1,5 +1,8 @@
 export interface TableMeta {
+  /** Final GraphQL output type name. */
   name: string;
+  /** PostgreSQL table name. */
+  tableName: string;
   schemaName: string;
   fields: FieldMeta[];
   indexes: IndexMeta[];
@@ -96,7 +99,10 @@ export interface EnumMeta {
 }
 
 export interface FieldMeta {
+  /** Final GraphQL field name. */
   name: string;
+  /** PostgreSQL column name. */
+  columnName: string;
   type: TypeMeta;
   isNotNull: boolean;
   hasDefault: boolean;
@@ -240,7 +246,7 @@ export interface InflectionMeta {
 }
 
 export interface QueryMeta {
-  all: string;
+  all: string | null;
   one: string | null;
   create: string | null;
   update: string | null;
@@ -256,6 +262,7 @@ export interface PgCodec {
   extensions?: {
     pg?: {
       schemaName?: string;
+      name?: string;
     };
   };
 }
@@ -284,9 +291,21 @@ export interface PgUnique {
 
 export interface PgRelation {
   isReferencee?: boolean;
+  isUnique?: boolean;
   localAttributes?: string[];
   remoteAttributes?: string[];
   remoteResource?: PgTableResource | null;
+}
+
+export interface PgUniqueInflectionDetails {
+  resource: PgTableResource;
+  unique: PgUnique;
+}
+
+export interface PgRelationInflectionDetails {
+  registry: MetaBuild['input']['pgRegistry'];
+  codec: PgCodec;
+  relationName: string;
 }
 
 export interface PgTableResource {
@@ -311,10 +330,24 @@ export interface PgManyToManyRelationDetails {
 
 export interface MetaInflection {
   tableType: (codec: PgCodec) => string;
+  tableConnectionType?: (codec: PgCodec) => string | null | undefined;
+  tableEdgeType?: (codec: PgCodec) => string | null | undefined;
+  attribute?: (input: { attributeName: string; codec: PgCodec }) => string | null | undefined;
   _attributeName?: (input: { attributeName: string; codec: PgCodec }) => string;
   camelCase?: (value: string) => string;
   _manyToManyRelation?: (details: PgManyToManyRelationDetails) => string | null | undefined;
+  manyToManyRelationConnectionField?: (
+    details: PgManyToManyRelationDetails,
+  ) => string | null | undefined;
+  manyToManyRelationListField?: (
+    details: PgManyToManyRelationDetails,
+  ) => string | null | undefined;
+  manyToManyRelationConnectionType?: (
+    details: PgManyToManyRelationDetails & { leftTableTypeName: string },
+  ) => string | null | undefined;
   allRows?: (resource: PgTableResource) => string | null | undefined;
+  allRowsConnection?: (resource: PgTableResource) => string | null | undefined;
+  allRowsList?: (resource: PgTableResource) => string | null | undefined;
   connectionType?: (tableType: string) => string | null | undefined;
   edgeType?: (tableType: string) => string | null | undefined;
   filterType?: (tableType: string) => string | null | undefined;
@@ -323,10 +356,27 @@ export interface MetaInflection {
   patchType?: (tableType: string) => string | null | undefined;
   createInputType?: (resource: PgTableResource) => string | null | undefined;
   createPayloadType?: (resource: PgTableResource) => string | null | undefined;
-  updatePayloadType?: (resource: PgTableResource) => string | null | undefined;
-  deletePayloadType?: (resource: PgTableResource) => string | null | undefined;
+  updatePayloadType?: (
+    details: { resource: PgTableResource },
+  ) => string | null | undefined;
+  deletePayloadType?: (
+    details: { resource: PgTableResource },
+  ) => string | null | undefined;
   tableFieldName?: (resource: PgTableResource) => string | null | undefined;
   createField?: (resource: PgTableResource) => string | null | undefined;
+  rowByUnique?: (details: PgUniqueInflectionDetails) => string | null | undefined;
+  updateByKeysField?: (details: PgUniqueInflectionDetails) => string | null | undefined;
+  deleteByKeysField?: (details: PgUniqueInflectionDetails) => string | null | undefined;
+  singleRelation?: (details: PgRelationInflectionDetails) => string | null | undefined;
+  singleRelationBackwards?: (
+    details: PgRelationInflectionDetails,
+  ) => string | null | undefined;
+  manyRelationConnection?: (
+    details: PgRelationInflectionDetails,
+  ) => string | null | undefined;
+  manyRelationList?: (
+    details: PgRelationInflectionDetails,
+  ) => string | null | undefined;
   updateByKeys?: (resource: PgTableResource) => string | null | undefined;
   deleteByKeys?: (resource: PgTableResource) => string | null | undefined;
 }
@@ -349,16 +399,18 @@ export interface MetaBuild extends GqlTypeResolverBuild {
     };
   };
   inflection: MetaInflection;
+  behavior?: {
+    pgCodecAttributeMatches?: (
+      entity: [PgCodec, string],
+      behavior: string,
+    ) => boolean;
+  };
   options?: {
     pgSchemas?: string[];
     [key: string]: unknown;
   };
-  pgManyToManyRealtionshipsByResource?: Map<unknown, unknown>;
-}
-
-export interface PgCodecExtensions {
-  pg?: {
-    schemaName?: string;
-  };
-  tags?: Record<string, unknown>;
+  pgManyToManyRealtionshipsByResource?: Map<
+    PgTableResource,
+    PgManyToManyRelationDetails[]
+  >;
 }

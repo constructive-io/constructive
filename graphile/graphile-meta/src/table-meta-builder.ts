@@ -1,9 +1,12 @@
+import { getNamedType, type GraphQLSchema } from 'graphql';
+
 import {
   buildForeignKeyConstraints,
   buildIndexes,
   buildPrimaryKey,
   buildUniqueConstraints
 } from './constraint-meta-builders';
+import { getFieldContainerType } from './graphql-schema-utils';
 import { buildInflectionMeta, buildQueryMeta, resolveTableType } from './name-meta-builders';
 import {
   buildBelongsToRelations,
@@ -37,11 +40,16 @@ function buildTableMeta(
   resource: TableResourceWithCodec,
   schemaName: string,
   context: BuildContext
-): TableMeta {
+): TableMeta | null {
   const codec = resource.codec;
   const attributes = codec.attributes;
   const uniques = getUniques(resource);
   const relations = getRelations(resource);
+  const tableType = resolveTableType(context.build, codec);
+  const finalTableType = context.schema
+    ? getFieldContainerType(context.schema, tableType)
+    : null;
+  if (context.schema && !finalTableType) return null;
 
   // Compute PK and FK attribute name sets for field metadata
   const pkAttrNames = new Set<string>();
@@ -56,12 +64,47 @@ function buildTableMeta(
     for (const attrName of relation.localAttributes || []) fkAttrNames.add(attrName);
   }
 
-  const fields = Object.entries(attributes).map(([attrName, attr]) =>
-    buildFieldMeta(context.inflectAttr(attrName, codec), attr, context.build, {
+  const fields = Object.entries(attributes).flatMap(([attrName, attr]) => {
+    if (
+      context.schema &&
+      context.build.behavior?.pgCodecAttributeMatches &&
+      !context.build.behavior.pgCodecAttributeMatches(
+        [codec, attrName],
+        'attribute:select'
+      )
+    ) {
+      return [];
+    }
+
+    const fieldName = context.inflectAttr(attrName, codec);
+    const fieldMeta = buildFieldMeta(fieldName, attrName, attr, context.build, {
       isPrimaryKey: pkAttrNames.has(attrName),
       isForeignKey: fkAttrNames.has(attrName)
-    })
-  );
+    });
+
+    if (finalTableType) {
+      const finalField = finalTableType.getFields()[fieldName];
+      if (!finalField) return [];
+
+      const finalTypeName = getNamedType(finalField.type).name;
+      const codecForLookup = attr.codec?.arrayOfCodec || attr.codec;
+      const registeredTypeName =
+        codecForLookup &&
+        context.build.hasGraphQLTypeForPgCodec?.(codecForLookup, 'output')
+          ? context.build.getGraphQLTypeNameByPgCodec?.(
+              codecForLookup,
+              'output'
+            )
+          : null;
+      if (registeredTypeName && registeredTypeName !== finalTypeName) {
+        return [];
+      }
+
+      fieldMeta.type.gqlType = finalTypeName;
+    }
+
+    return [fieldMeta];
+  });
   const indexes = buildIndexes(codec, attributes, uniques, context);
   const primaryKey = buildPrimaryKey(codec, attributes, uniques, context);
   const uniqueConstraints = buildUniqueConstraints(codec, attributes, uniques, context);
@@ -80,7 +123,7 @@ function buildTableMeta(
 
   const belongsTo = buildBelongsToRelations(codec, attributes, uniques, relations, context);
   const { hasOne, hasMany } = buildReverseRelations(codec, attributes, relations, context);
-  const manyToMany = buildManyToManyRelations(resource, codec, context);
+  const manyToMany = buildManyToManyRelations(resource, context);
 
   const relationsMeta: RelationsMeta = {
     belongsTo,
@@ -90,16 +133,23 @@ function buildTableMeta(
     manyToMany
   };
 
-  const tableType = resolveTableType(context.build, codec);
-
   const storage = buildStorageMeta(codec);
   const search = buildSearchMeta(codec, context.build, context.inflectAttr);
   const i18n = buildI18nMeta(codec, context.build, context.inflectAttr);
   const realtime = buildRealtimeMeta(codec, context.build);
   const scope = buildScopeMeta(codec, context.inflectAttr);
 
+  const query = buildQueryMeta(
+    resource,
+    uniques,
+    tableType,
+    context.build,
+    context.schema
+  );
+
   return {
     name: tableType,
+    tableName: codec.extensions?.pg?.name ?? codec.name,
     schemaName,
     fields,
     indexes,
@@ -108,8 +158,8 @@ function buildTableMeta(
     primaryKeyConstraints: primaryKey ? [primaryKey] : [],
     uniqueConstraints,
     relations: relationsMeta,
-    inflection: buildInflectionMeta(resource, tableType, context.build),
-    query: buildQueryMeta(resource, uniques, tableType, context.build),
+    inflection: buildInflectionMeta(resource, tableType, context.build, query),
+    query,
     storage,
     search,
     i18n,
@@ -118,9 +168,12 @@ function buildTableMeta(
   };
 }
 
-export function collectTablesMeta(build: MetaBuild): TableMeta[] {
+export function collectTablesMeta(
+  build: MetaBuild,
+  schema?: GraphQLSchema
+): TableMeta[] {
   const configuredSchemas = getConfiguredSchemas(build);
-  const context = createBuildContext(build);
+  const context = createBuildContext(build, schema);
   const seenCodecs = new Set<PgCodec>();
   const tablesMeta: TableMeta[] = [];
 
@@ -140,7 +193,8 @@ export function collectTablesMeta(build: MetaBuild): TableMeta[] {
       continue;
     }
 
-    tablesMeta.push(buildTableMeta(resource, schemaName, context));
+    const tableMeta = buildTableMeta(resource, schemaName, context);
+    if (tableMeta) tablesMeta.push(tableMeta);
   }
 
   return tablesMeta;
