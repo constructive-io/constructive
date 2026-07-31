@@ -1,9 +1,12 @@
+import { errors } from '@constructive-io/errors';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
+
+import { respondWithGraphQLError } from '../errors/graphql-response';
 import './types'; // for Request type
 
 const log = new Logger('auth');
@@ -112,9 +115,7 @@ export const createAuthenticateMiddleware = (
 
           if (result?.rowCount === 0) {
             log.info('[auth] No rows returned, returning UNAUTHENTICATED');
-            res.status(200).json({
-              errors: [{ extensions: { code: 'UNAUTHENTICATED' } }],
-            });
+            respondWithGraphQLError(res, errors.UNAUTHENTICATED());
             return;
           }
 
@@ -122,16 +123,12 @@ export const createAuthenticateMiddleware = (
           log.info(`[auth] Auth success: role=${token.role}, user_id=${token.user_id}`);
         } catch (e: any) {
           log.error('[auth] Auth error:', e.message);
-          res.status(200).json({
-            errors: [
-              {
-                extensions: {
-                  code: 'BAD_TOKEN_DEFINITION',
-                  message: e.message,
-                },
-              },
-            ],
-          });
+          respondWithGraphQLError(
+            res,
+            errors.INTERNAL_FAILURE({
+              details: isDev() ? e.message : 'authentication failed',
+            })
+          );
           return;
         }
       } else {

@@ -59,9 +59,9 @@ type FetchAdapterConstructor = new (
   ): Promise<{ ok: boolean; data: T | null; errors?: unknown[] }>;
 };
 
-function loadGeneratedFetchAdapter(
+function loadGeneratedClientExports(
   createFetch: () => typeof globalThis.fetch,
-): FetchAdapterConstructor {
+): Record<string, unknown> {
   const { content } = generateOrmClientFile();
   const { outputText } = ts.transpileModule(content, {
     compilerOptions: {
@@ -91,7 +91,14 @@ function loadGeneratedFetchAdapter(
     { filename: 'generated-orm-client.cjs' },
   );
 
-  return mod.exports.FetchAdapter as FetchAdapterConstructor;
+  return mod.exports;
+}
+
+function loadGeneratedFetchAdapter(
+  createFetch: () => typeof globalThis.fetch,
+): FetchAdapterConstructor {
+  return loadGeneratedClientExports(createFetch)
+    .FetchAdapter as FetchAdapterConstructor;
 }
 
 function createThisSensitiveFetch(payload: unknown) {
@@ -136,6 +143,18 @@ describe('client-generator', () => {
       expect(result.content).toContain('execute<T>');
       expect(result.content).toContain('QueryResult<T>');
       expect(result.content).toContain('GraphQLRequestError');
+    });
+
+    it('falls back to extensions.code when the server omits message', () => {
+      const GraphQLRequestError = loadGeneratedClientExports(
+        () => globalThis.fetch,
+      ).GraphQLRequestError as new (errors: unknown[]) => Error;
+
+      const error = new GraphQLRequestError([
+        { extensions: { code: 'UNAUTHENTICATED' } },
+      ]);
+
+      expect(error.message).toBe('GraphQL Error: UNAUTHENTICATED');
     });
 
     it('exposes an optional fetch injection in OrmClientConfig', () => {
