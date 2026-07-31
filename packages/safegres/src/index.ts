@@ -31,6 +31,13 @@ export {
   checkRedundantIndexes,
   checkUnindexedForeignKeys
 } from './checks/indexes';
+export type { PolicyClause, PredicateColumn } from './checks/policy-index';
+export {
+  checkNonLeakproofPolicyFunctions,
+  checkPolicyColumnCasts,
+  checkUnindexedPolicyColumns,
+  collectPredicateColumns
+} from './checks/policy-index';
 export type { RoleTrustOptions } from './checks/role-trust';
 export {
   checkPublicGrants,

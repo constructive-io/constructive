@@ -108,6 +108,48 @@ describe('perf dimension', () => {
   });
 });
 
+describe('policy-aware perf rules', () => {
+  beforeAll(async () => {
+    await applyFixture('x2-policy-index.sql');
+  });
+
+  it('X2: flags policy columns that lead no index', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x2'], perf: true });
+    expect(tablesFor(report.perf!.findings, 'X2')).toEqual([
+      'fx_x2.documents',
+      'fx_x2.receipts'
+    ]);
+    const documents = report.perf!.findings.find((f) => f.code === 'X2' && f.table === 'documents');
+    expect(documents?.policy).toBe('documents_tenant');
+    expect(documents?.context).toMatchObject({ column: 'tenant_id', clause: 'USING' });
+  });
+
+  it('X2: is not raised when the policy column leads an index', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x2'], perf: true });
+    expect(tablesFor(report.perf!.findings, 'X2')).not.toContain('fx_x2.invoices');
+  });
+
+  it('X3: flags casts/functions on policy columns without a matching expression index', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x2'], perf: true });
+    expect(tablesFor(report.perf!.findings, 'X3')).toEqual(['fx_x2.accounts']);
+    const accounts = report.perf!.findings.find((f) => f.code === 'X3');
+    expect(accounts?.context).toMatchObject({ column: 'tenant_id', expression: 'tenant_id::text' });
+  });
+
+  it('X4: flags non-LEAKPROOF policy functions, not LEAKPROOF ones', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x2'], perf: true });
+    const x4 = report.perf!.findings.filter((f) => f.code === 'X4');
+    const functions = x4.map((f) => (f.context as { function: string }).function).sort();
+    expect(functions).toContain('fx_x2.is_member');
+    expect(functions).not.toContain('fx_x2.is_admin');
+  });
+
+  it('X2/X3/X4 stay off when perf is disabled', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x2'] });
+    expect(report.findings.filter((f) => ['X2', 'X3', 'X4'].includes(f.code))).toHaveLength(0);
+  });
+});
+
 describe('P1/P1b re-homed to the perf dimension', () => {
   it('keeps P1 out of the security score', async () => {
     await applyFixture('p1-volatile-func.sql');

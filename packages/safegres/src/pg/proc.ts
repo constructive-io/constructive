@@ -8,6 +8,8 @@ export interface ProcVolatility {
   name: string;
   volatility: Volatility;
   isSecurityDefiner: boolean;
+  /** `pg_proc.proleakproof` — a leakproof function can be pushed below a security qual. */
+  isLeakproof: boolean;
   /** True if this is a built-in / system function (we usually allow-list these). */
   isSystem: boolean;
 }
@@ -44,13 +46,15 @@ export async function lookupVolatility(
     proname: string;
     volatility: Volatility;
     security_definer: boolean;
+    leakproof: boolean;
   }>(
     `
     SELECT
       n.nspname     AS schema,
       p.proname     AS proname,
       p.provolatile AS volatility,
-      p.prosecdef   AS security_definer
+      p.prosecdef   AS security_definer,
+      p.proleakproof AS leakproof
     FROM pg_proc p
     JOIN pg_namespace n ON n.oid = p.pronamespace
     WHERE (n.nspname, p.proname) IN (
@@ -69,6 +73,7 @@ export async function lookupVolatility(
       name: `${r.schema}.${r.proname}`,
       volatility: r.volatility,
       isSecurityDefiner: r.security_definer,
+      isLeakproof: r.leakproof,
       isSystem: SYSTEM_SCHEMAS.has(r.schema)
     };
     map.set(`${r.schema}.${r.proname}`, info);

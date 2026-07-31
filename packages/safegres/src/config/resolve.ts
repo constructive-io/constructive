@@ -201,9 +201,20 @@ export function applyRulesToFindings(resolved: ResolvedRules, findings: Finding[
   return out;
 }
 
-/** True when every AST-scoped rule is disabled (lets the audit skip parsing). */
-export function allAstRulesDisabled(resolved: ResolvedRules): boolean {
-  const astCodes = RULES.filter((r) => r.scope === 'policy-ast').map((r) => r.code);
+/**
+ * True when every AST-scoped rule is disabled (lets the audit skip parsing).
+ *
+ * The policy-aware index rules (X2–X4) are AST-scoped but only run when the
+ * perf dimension is on, so they hold parsing open only in that mode.
+ */
+export function allAstRulesDisabled(
+  resolved: ResolvedRules,
+  options: { perf?: boolean } = {}
+): boolean {
+  const astCodes = RULES
+    .filter((r) => r.scope === 'policy-ast')
+    .filter((r) => options.perf || r.category !== 'index')
+    .map((r) => r.code);
   const base = astCodes.every((code) => resolved.rules.get(code)?.enabled === false);
   if (!base) return false;
   // An override could re-enable an AST rule for some table.

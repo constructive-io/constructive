@@ -22,6 +22,13 @@ import {
   checkUnindexedForeignKeys
 } from '../checks/indexes';
 import {
+  checkNonLeakproofPolicyFunctions,
+  checkPolicyColumnCasts,
+  checkUnindexedPolicyColumns,
+  collectPredicateColumns,
+  type PredicateColumn
+} from '../checks/policy-index';
+import {
   checkGrantsWithoutRls,
   checkRlsEnabledNoPolicies,
   checkRlsNotForced
@@ -36,7 +43,7 @@ import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRu
 import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { resolveExposure } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
-import { introspectIndexes } from '../pg/indexes';
+import { introspectIndexes, type TableIndexSnapshot } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
@@ -89,7 +96,9 @@ export async function audit(
   const exec = asExecutor(client);
   const config = options.config ?? {};
   const resolved = resolveRules(config);
-  const skipAst = options.skipAstChecks || allAstRulesDisabled(resolved);
+  const perfEnabled = options.perf ?? config.perf?.enabled ?? false;
+  const skipAst =
+    options.skipAstChecks || allAstRulesDisabled(resolved, { perf: perfEnabled });
 
   // Resolve role set.
   const allRoles = await listAuditableRoles(exec);
@@ -113,6 +122,17 @@ export async function audit(
     : snapshot.length;
 
   let findings: Finding[] = [];
+
+  // --- Performance dimension (opt-in): index hygiene ---
+  const indexSnapshot = perfEnabled
+    ? await introspectIndexes(exec, {
+      schemas: options.schemas ?? config.schemas,
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+    })
+    : [];
+  const indexesByTable = new Map<string, TableIndexSnapshot>(
+    indexSnapshot.map((t) => [`${t.schema}.${t.name}`, t])
+  );
 
   for (const table of snapshot) {
     // --- RLS flags (structural) ---
@@ -139,19 +159,19 @@ export async function audit(
     );
     findings.push(...checkPublicGrants(table));
 
-    // --- AST-level anti-patterns ---
+    // --- AST-level anti-patterns (and, with perf on, policy-aware index rules) ---
     if (!skipAst) {
-      findings.push(...(await auditTableAst(exec, table)));
+      findings.push(
+        ...(await auditTableAst(
+          exec,
+          table,
+          perfEnabled ? indexesByTable.get(`${table.schema}.${table.name}`) : undefined
+        ))
+      );
     }
   }
 
-  // --- Performance dimension (opt-in): index hygiene ---
-  const perfEnabled = options.perf ?? config.perf?.enabled ?? false;
   if (perfEnabled) {
-    const indexSnapshot = await introspectIndexes(exec, {
-      schemas: options.schemas ?? config.schemas,
-      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
-    });
     for (const table of indexSnapshot) {
       findings.push(...checkUnindexedForeignKeys(table));
       findings.push(...checkRedundantIndexes(table));
@@ -269,7 +289,8 @@ export async function audit(
 
 async function auditTableAst(
   exec: QueryExecutor,
-  table: TableSnapshot
+  table: TableSnapshot,
+  indexes?: TableIndexSnapshot
 ): Promise<Finding[]> {
   if (table.policies.length === 0) return [];
 
@@ -298,6 +319,8 @@ async function auditTableAst(
   }
 
   const findings: Finding[] = [];
+  const predicateColumns = new Map<string, PredicateColumn[]>();
+
   for (const { policy, using, withCheck } of parsed) {
     const trivial = checkTriviallyPermissive(table, policy, using, withCheck);
     if (trivial) findings.push(trivial);
@@ -309,6 +332,25 @@ async function auditTableAst(
       findings.push(...checkVolatileFunctions(table, withCheck, volatility, policy.name));
       findings.push(...checkSessionUserGating(table, withCheck, policy.name));
     }
+
+    if (!indexes) continue;
+
+    // --- Policy-aware perf rules (X2/X3/X4) ---
+    const cols: PredicateColumn[] = [];
+    if (using) {
+      cols.push(...collectPredicateColumns(using, 'USING', table.name));
+      findings.push(...checkNonLeakproofPolicyFunctions(table, using, volatility, policy.name));
+    }
+    if (withCheck) {
+      cols.push(...collectPredicateColumns(withCheck, 'WITH CHECK', table.name));
+      findings.push(...checkNonLeakproofPolicyFunctions(table, withCheck, volatility, policy.name));
+    }
+    if (cols.length > 0) predicateColumns.set(policy.name, cols);
+  }
+
+  if (indexes && predicateColumns.size > 0) {
+    findings.push(...checkUnindexedPolicyColumns(table, indexes, predicateColumns));
+    findings.push(...checkPolicyColumnCasts(table, indexes, predicateColumns));
   }
 
   return dedupe(findings);
