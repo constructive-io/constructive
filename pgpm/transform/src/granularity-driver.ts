@@ -18,14 +18,13 @@
  * - `consolidated` — additionally inlines FKs proven safe by the graph.
  */
 import { pathFor } from '@pgpmjs/naming-spec';
+import { revertFor, verifyFor } from '@pgsql/scripts';
 import type { Granularity, StatementFacts } from '@pgsql/transform';
 import {
   buildStatementGraph,
   classifyStatements,
   identityOf,
-  restructureSql,
-  revertFor,
-  verifyFor
+  restructureSql
 } from '@pgsql/transform';
 
 export type { Granularity } from '@pgsql/transform';
