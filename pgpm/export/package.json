@@ -47,6 +47,8 @@
     "@constructive-io/query-builder": "workspace:^",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/migrate-client": "workspace:^",
+    "@pgpmjs/naming-spec": "workspace:^",
+    "@pgpmjs/transform": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "csv-to-pg": "workspace:^",
     "glob": "^13.0.6",

@@ -3001,6 +3001,12 @@ importers:
       '@pgpmjs/migrate-client':
         specifier: workspace:^
         version: link:../../sdk/migrate-client/dist
+      '@pgpmjs/naming-spec':
+        specifier: workspace:^
+        version: link:../naming-spec/dist
+      '@pgpmjs/transform':
+        specifier: workspace:^
+        version: link:../transform/dist
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
