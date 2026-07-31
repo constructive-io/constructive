@@ -19,11 +19,18 @@ import type {
   ConnectionState,
   ConnectionStateListener,
   RealtimeConfig,
+  SubscribeOptions,
   SubscriptionEvent,
   SubscriptionFieldMeta,
   Unsubscribe,
 } from './realtime';
 import { RealtimeManager } from './realtime';
+
+export type {
+  GraphQLAdapter,
+  GraphQLError,
+  QueryResult,
+} from '@constructive-io/graphql-query/runtime';
 
 export type {
   ConnectionState,
@@ -37,11 +44,6 @@ export type {
   WsClient,
 } from './realtime';
 export { RealtimeManager } from './realtime';
-export type {
-  GraphQLAdapter,
-  GraphQLError,
-  QueryResult,
-} from '@constructive-io/graphql-query/runtime';
 
 /**
  * Default adapter that uses fetch for HTTP requests.

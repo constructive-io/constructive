@@ -197,9 +197,9 @@ export function buildSelections(
         buildOptionalArg('first', nested.first),
         nested.filter
           ? t.argument({
-            name: 'filter',
-            value: buildValueAst(nested.filter),
-          })
+              name: 'filter',
+              value: buildValueAst(nested.filter),
+            })
           : null,
         buildEnumListArg('orderBy', nested.orderBy),
       ]);
@@ -255,7 +255,7 @@ export function buildFindManyDocument<TSelect, TWhere>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   const variableDefinitions: VariableDefinitionNode[] = [];
@@ -353,7 +353,7 @@ export function buildFindFirstDocument<TSelect, TWhere>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   const variableDefinitions: VariableDefinitionNode[] = [];
@@ -431,7 +431,7 @@ export function buildCreateDocument<TSelect, TData>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -474,7 +474,7 @@ export function buildUpdateDocument<
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -516,7 +516,7 @@ export function buildUpdateByPkDocument<TSelect, TData>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -555,7 +555,7 @@ export function buildFindOneDocument<TSelect>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   const variableDefinitions: VariableDefinitionNode[] = [
@@ -614,7 +614,7 @@ export function buildDeleteDocument<
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -653,7 +653,7 @@ export function buildDeleteByPkDocument<TSelect = undefined>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -716,7 +716,7 @@ export function buildCustomDocument<TSelect, TArgs>(
         actualSelect as Record<string, unknown>,
         connectionFieldsMap,
         entityType,
-    )
+      )
     : [];
 
   const variableDefs = variableDefinitions.map((definition) =>
@@ -994,7 +994,7 @@ export function buildBulkInsertDocument<TSelect, TData>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -1033,7 +1033,7 @@ export function buildBulkUpsertDocument<TSelect, TData>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -1072,7 +1072,7 @@ export function buildBulkUpdateDocument<TSelect, TWhere, TData>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -1110,7 +1110,7 @@ export function buildBulkDeleteDocument<TSelect, TWhere>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-    )
+      )
     : [t.field({ name: 'id' })];
 
   return {

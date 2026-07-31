@@ -49,56 +49,56 @@ export function coerceAnswers(
     }
 
     switch (fieldType) {
-    case 'boolean':
-      if (typeof value === 'boolean') break;
-      result[key] =
+      case 'boolean':
+        if (typeof value === 'boolean') break;
+        result[key] =
           strValue === 'true' || strValue === '1' || strValue === 'yes';
-      break;
-    case 'int':
-      if (typeof value === 'number') break;
-      {
-        const parsed = parseInt(strValue, 10);
-        result[key] = isNaN(parsed) ? undefined : parsed;
-      }
-      break;
-    case 'float':
-      if (typeof value === 'number') break;
-      {
-        const parsed = parseFloat(strValue);
-        result[key] = isNaN(parsed) ? undefined : parsed;
-      }
-      break;
-    case 'json':
-      if (typeof value === 'object') break;
-      if (strValue === '') {
-        result[key] = undefined;
-      } else {
-        try {
-          result[key] = JSON.parse(strValue);
-        } catch {
+        break;
+      case 'int':
+        if (typeof value === 'number') break;
+        {
+          const parsed = parseInt(strValue, 10);
+          result[key] = isNaN(parsed) ? undefined : parsed;
+        }
+        break;
+      case 'float':
+        if (typeof value === 'number') break;
+        {
+          const parsed = parseFloat(strValue);
+          result[key] = isNaN(parsed) ? undefined : parsed;
+        }
+        break;
+      case 'json':
+        if (typeof value === 'object') break;
+        if (strValue === '') {
+          result[key] = undefined;
+        } else {
+          try {
+            result[key] = JSON.parse(strValue);
+          } catch {
+            result[key] = undefined;
+          }
+        }
+        break;
+      case 'uuid':
+        // Empty UUIDs become undefined
+        if (strValue === '') {
           result[key] = undefined;
         }
-      }
-      break;
-    case 'uuid':
-      // Empty UUIDs become undefined
-      if (strValue === '') {
-        result[key] = undefined;
-      }
-      break;
-    case 'enum':
-      // Enums stay as strings but empty ones become undefined
-      if (strValue === '') {
-        result[key] = undefined;
-      }
-      break;
-    default:
-      // String type: empty strings also become undefined to avoid
-      // sending empty strings for optional fields
-      if (strValue === '') {
-        result[key] = undefined;
-      }
-      break;
+        break;
+      case 'enum':
+        // Enums stay as strings but empty ones become undefined
+        if (strValue === '') {
+          result[key] = undefined;
+        }
+        break;
+      default:
+        // String type: empty strings also become undefined to avoid
+        // sending empty strings for optional fields
+        if (strValue === '') {
+          result[key] = undefined;
+        }
+        break;
     }
   }
 

@@ -20,6 +20,8 @@ export default [
       '**/*.generated.ts',
       'postgres/pg-ast/src/asts.ts',
       'postgres/pg-ast/src/wrapped.ts',
+      // read verbatim at codegen time and written into generated clients
+      'graphql/codegen/src/core/codegen/templates/**',
       // legacy fixture build script
       '__fixtures__/kitchen-sink/**'
     ]
