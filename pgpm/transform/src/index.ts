@@ -24,6 +24,21 @@ export {
   restructureChanges,
 } from './granularity-driver';
 export type {
+  PartitionConfig,
+  PartitionedChange,
+  PartitionedPackage,
+  PartitionInputChange,
+  PartitionRule,
+  PartitionUnit,
+  PartitionUnitsResult,
+  UnitSelector,
+} from './partition-driver';
+export {
+  PartitionCycleError,
+  partitionUnits,
+  RESIDUAL_UNIT_PATH,
+} from './partition-driver';
+export type {
   CategoryProfile,
   ChangeCategory,
 } from './categorize';
