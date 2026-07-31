@@ -1,4 +1,4 @@
-import { classifyStatements } from '@pgpmjs/transform';
+import { buildStatementGraph, classifyStatements, QualifiedName } from '@pgpmjs/transform';
 
 /**
  * The parser runs on a WASM build of the real PostgreSQL parser; callers must
@@ -8,11 +8,10 @@ export { loadModule } from 'plpgsql-parser';
 
 /**
  * A (possibly schema-qualified) database object name extracted from SQL.
+ * Alias of `@pgsql/transform`'s `QualifiedName` — one name type across the
+ * facts substrate and the slice layer.
  */
-export interface SqlObjectRef {
-  schema: string | null;
-  name: string;
-}
+export type SqlObjectRef = QualifiedName;
 
 /**
  * AST-derived facts about a change's deploy SQL, used to discover
@@ -46,27 +45,27 @@ function pushUnique(list: SqlObjectRef[], r: SqlObjectRef): void {
  * including references reached inside PL/pgSQL function bodies (which are
  * opaque strings in `CREATE FUNCTION` and invisible to a plain SQL parse).
  *
- * Aggregates `@pgsql/transform`'s per-statement `classifyStatements` facts to
- * the change level: references satisfied by objects the same change creates
- * (in any statement) are dropped.
+ * A thin change-level adapter over `@pgsql/transform`: `classifyStatements`
+ * produces the per-statement facts and `buildStatementGraph`'s producer index
+ * decides which references are internal — a reference with an in-script
+ * producer is satisfied by the change itself, so only external references
+ * (the statement graph's non-edges) surface as change-level dependencies.
  */
 export function extractSqlFacts(sql: string): ChangeSqlFacts {
+  const statements = classifyStatements(sql);
+  const graph = buildStatementGraph(statements);
   const facts: ChangeSqlFacts = { creates: [], references: [], dynamicSql: false };
 
-  for (const stmt of classifyStatements(sql)) {
+  for (const stmt of statements) {
     for (const c of stmt.creates) {
       pushUnique(facts.creates, { schema: c.schema, name: c.name });
     }
     for (const r of stmt.references) {
+      if (graph.producers.has(`${r.schema ?? ''}.${r.name}`)) continue;
       pushUnique(facts.references, { schema: r.schema, name: r.name });
     }
     if (stmt.dynamicSql) facts.dynamicSql = true;
   }
-
-  // A change does not depend on objects it creates itself.
-  facts.references = facts.references.filter(
-    r => !facts.creates.some(c => c.schema === r.schema && c.name === r.name)
-  );
 
   return facts;
 }
