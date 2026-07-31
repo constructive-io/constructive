@@ -24,6 +24,18 @@ export {
   restructureChanges,
 } from './granularity-driver';
 export type {
+  DiffInputChange,
+  ObjectDelta,
+  SemanticDiffOptions,
+  SemanticDiffResult,
+  SemanticObjectDiff,
+} from './semantic-diff-driver';
+export {
+  diffChangeSets,
+  diffSchemas,
+  dropStatementFor,
+} from './semantic-diff-driver';
+export type {
   PartitionConfig,
   PartitionedChange,
   PartitionedPackage,
