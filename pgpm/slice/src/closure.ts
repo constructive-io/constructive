@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
+import { objectKey } from './object-graph';
 import { extractSqlFacts } from './refs';
 import {
   ClosureAutoInclude,
@@ -8,10 +9,6 @@ import {
   DependencyGraph,
   PatternStrategy
 } from './types';
-
-function objectKey(schema: string | null, name: string): string {
-  return `${schema ?? ''}\u0000${name}`;
-}
 
 function refLabel(schema: string | null, name: string): string {
   return schema ? `${schema}.${name}` : name;
@@ -51,7 +48,7 @@ export function buildAstEdges(graph: DependencyGraph, moduleDir: string): AstEdg
     const f = facts.get(change.name);
     if (!f) continue;
     for (const c of f.creates) {
-      const key = objectKey(c.schema, c.name);
+      const key = objectKey(c);
       if (!producerByObject.has(key)) producerByObject.set(key, change.name);
     }
   }
@@ -63,7 +60,7 @@ export function buildAstEdges(graph: DependencyGraph, moduleDir: string): AstEdg
   for (const [changeName, f] of facts) {
     if (f.dynamicSql) dynamicSqlChanges.push(changeName);
     for (const r of f.references) {
-      const producer = producerByObject.get(objectKey(r.schema, r.name));
+      const producer = producerByObject.get(objectKey(r));
       if (!producer) {
         unresolvedReferences.push({ change: changeName, ref: refLabel(r.schema, r.name) });
         continue;

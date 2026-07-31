@@ -2,10 +2,10 @@
  * Unified SQL object graph — the semantic IR over parsed programs.
  *
  * Nodes are database objects (keyed by qualified name) with the statements
- * that create them; edges are the references statements make to objects:
- * plain references, late-bound PL/pgSQL body references, and foreign-key
- * targets. Programs are named (typically one per pgpm change), so ownership
- * queries answer change-level questions directly:
+ * that create them; edges are the references statements make to objects,
+ * typed with `@pgsql/transform`'s edge taxonomy (`hard | fk | late`).
+ * Programs are named (typically one per pgpm change), so ownership queries
+ * answer change-level questions directly:
  *
  * - which objects live in a schema set (subsystem selection)
  * - which surviving statements still reach into a dropped object set
@@ -14,9 +14,15 @@
  * - which programs create nothing outside a dropped set (whole-change
  *   pruning by ownership, not survivor counting)
  *
+ * Each program's intra-program edges come straight from
+ * `buildStatementGraph`; references with no in-program producer (external
+ * dependencies, which the statement graph deliberately omits) are added with
+ * the same kind classification, so the object graph is a superset projection
+ * of the statement graph over the same facts.
+ *
  * Pure and I/O-free; built from `SqlProgram`s parsed once elsewhere.
  */
-import type { SqlProgram, StatementFacts } from '@pgpmjs/transform';
+import { buildStatementGraph, EdgeKind, SqlProgram, StatementFacts } from '@pgpmjs/transform';
 
 import { SqlObjectRef } from './refs';
 
@@ -26,7 +32,13 @@ export interface StatementId {
   statement: number;
 }
 
-export type ObjectEdgeKind = 'reference' | 'body' | 'fk';
+/**
+ * How an edge constrains ordering — `@pgsql/transform`'s taxonomy:
+ * `hard` (must exist at CREATE time), `fk` (a hard edge from a foreign-key
+ * target), `late` (reached only inside a PL/pgSQL body, resolved at call
+ * time).
+ */
+export type ObjectEdgeKind = EdgeKind;
 
 /** One reference from a statement to an object. */
 export interface ObjectEdge {
@@ -78,29 +90,60 @@ export function buildObjectGraph(
   const incoming = new Map<string, ObjectEdge[]>();
 
   const addEdge = (edge: ObjectEdge): void => {
-    edges.push(edge);
     const list = incoming.get(edge.to);
-    if (list) list.push(edge);
-    else incoming.set(edge.to, [edge]);
+    if (list) {
+      if (list.some(
+        e => e.kind === edge.kind &&
+          e.from.program === edge.from.program &&
+          e.from.statement === edge.from.statement
+      )) return;
+      list.push(edge);
+    } else {
+      incoming.set(edge.to, [edge]);
+    }
+    edges.push(edge);
   };
 
   for (const [name, program] of programMap) {
-    program.statements.forEach((stmt, i) => {
+    const facts = program.statements.map(s => s.facts);
+    const statementGraph = buildStatementGraph(facts);
+
+    facts.forEach((stmt, i) => {
       const id: StatementId = { program: name, statement: i };
-      for (const c of stmt.facts.creates) {
+      for (const c of stmt.creates) {
         const key = objectKey(c);
         const node = objects.get(key);
         if (node) node.createdBy.push(id);
         else objects.set(key, { ref: { schema: c.schema, name: c.name }, createdBy: [id] });
       }
-      for (const r of stmt.facts.references) {
-        addEdge({ from: id, to: objectKey(r), kind: 'reference' });
+    });
+
+    // Intra-program edges, exactly as the statement graph typed them.
+    for (const e of statementGraph.edges) {
+      addEdge({ from: { program: name, statement: e.from }, to: objectKey(e.via), kind: e.kind });
+    }
+
+    // References with no in-program producer are external dependencies: the
+    // statement graph induces no edge for them, but the object graph keeps
+    // them (that is what contract/cascade queries measure). Same kind
+    // classification: fk beats late beats hard.
+    facts.forEach((stmt, i) => {
+      const id: StatementId = { program: name, statement: i };
+      const bodyOnly = new Set(stmt.bodyReferences.map(objectKey));
+      const fkKeys = new Set(stmt.fkTargets.map(objectKey));
+      const seen = new Set<string>();
+      for (const r of stmt.references) {
+        const key = objectKey(r);
+        seen.add(key);
+        if (statementGraph.producers.has(`${r.schema ?? ''}.${r.name}`)) continue;
+        const kind: EdgeKind = fkKeys.has(key) ? 'fk' : bodyOnly.has(key) ? 'late' : 'hard';
+        addEdge({ from: id, to: key, kind });
       }
-      for (const r of stmt.facts.bodyReferences) {
-        addEdge({ from: id, to: objectKey(r), kind: 'body' });
-      }
-      for (const t of stmt.facts.fkTargets) {
-        addEdge({ from: id, to: objectKey(t), kind: 'fk' });
+      for (const t of stmt.fkTargets) {
+        const key = objectKey(t);
+        if (seen.has(key)) continue;
+        if (statementGraph.producers.has(`${t.schema ?? ''}.${t.name}`)) continue;
+        addEdge({ from: id, to: key, kind: 'fk' });
       }
     });
   }

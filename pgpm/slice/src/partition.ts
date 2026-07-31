@@ -4,6 +4,7 @@ import { join } from 'path';
 import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 
 import { AstEdges, buildAstEdges } from './closure';
+import { objectKey } from './object-graph';
 import { extractSqlFacts, SqlObjectRef } from './refs';
 import { buildDependencyGraph } from './slice';
 import { DependencyGraph } from './types';
@@ -150,10 +151,6 @@ export interface PartitionModuleResult extends PartitionResult {
   seedChanges: string[];
 }
 
-function objectKey(schema: string | null, name: string): string {
-  return `${schema ?? ''}\u0000${name}`;
-}
-
 /**
  * On-disk entry point: parse a module's plan + deploy SQL, resolve the given
  * per-tenant seed *objects* to the changes that create them, and partition the
@@ -178,7 +175,7 @@ export function partitionModule(options: PartitionModuleOptions): PartitionModul
     if (!existsSync(deployPath)) continue;
     const facts = extractSqlFacts(readFileSync(deployPath, 'utf-8'));
     for (const c of facts.creates) {
-      const key = objectKey(c.schema, c.name);
+      const key = objectKey(c);
       if (!producerByObject.has(key)) producerByObject.set(key, change.name);
     }
   }
@@ -186,7 +183,7 @@ export function partitionModule(options: PartitionModuleOptions): PartitionModul
   const seedChanges: string[] = [];
   const unresolvedSeeds: PartitionWarning[] = [];
   for (const obj of options.seedObjects) {
-    const producer = producerByObject.get(objectKey(obj.schema, obj.name));
+    const producer = producerByObject.get(objectKey(obj));
     if (!producer) {
       unresolvedSeeds.push({
         kind: 'unknown-seed',

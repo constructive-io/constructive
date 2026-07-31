@@ -33,7 +33,7 @@ describe('buildObjectGraph', () => {
     const intoUsers = graph.incoming.get(objectKey({ schema: 'auth', name: 'users' }))!;
     const kinds = intoUsers.map(e => `${e.from.program}:${e.kind}`).sort();
     expect(kinds).toContain('app/posts:fk');
-    expect(kinds).toContain('auth/uid:body');
+    expect(kinds).toContain('auth/uid:late');
   });
 });
 
@@ -58,7 +58,7 @@ describe('danglingEdges', () => {
     const summary = dangling.map(e => `${e.from.program}:${e.kind}`).sort();
     // auth/uid's body reference to auth.users originates inside the dropped
     // set, so it must NOT dangle; the FK and the policy accessor call must.
-    expect(summary).toEqual(['app/policy:reference', 'app/posts:fk', 'app/posts:reference']);
+    expect(summary).toEqual(['app/policy:hard', 'app/posts:fk']);
   });
 
   it('is empty when the referencing statements are dropped too', () => {
