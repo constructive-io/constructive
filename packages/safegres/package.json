@@ -45,7 +45,7 @@
   "dependencies": {
     "@inquirerer/utils": "^3.3.9",
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/traverse": "^18.1.0",
+    "@pgsql/traverse": "^18.4.0",
     "@pgsql/types": "^18.0.0",
     "confstash": "^0.1.0",
     "inquirerer": "^4.9.1",
