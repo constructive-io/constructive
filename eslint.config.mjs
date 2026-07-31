@@ -22,8 +22,9 @@ export default [
       'postgres/pg-ast/src/wrapped.ts',
       // read verbatim at codegen time and written into generated clients
       'graphql/codegen/src/core/codegen/templates/**',
-      // legacy fixture build script
-      '__fixtures__/kitchen-sink/**'
+      // codegen output snapshots and standalone sqitch/pgpm fixture projects
+      '__fixtures__/**',
+      '**/__fixtures__/**'
     ]
   },
   {

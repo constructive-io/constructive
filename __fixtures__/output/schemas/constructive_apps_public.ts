@@ -1,4 +1,4 @@
-import { Timestamp,UUID } from './_common';
+import { UUID, Timestamp } from "./_common";
 export interface AppComponents {
   id: UUID;
   created_at: Timestamp | null;

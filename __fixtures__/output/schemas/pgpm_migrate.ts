@@ -1,4 +1,4 @@
-import { Timestamp } from './_common';
+import { Timestamp } from "./_common";
 export interface Changes {
   change_id: string;
   change_name: string;

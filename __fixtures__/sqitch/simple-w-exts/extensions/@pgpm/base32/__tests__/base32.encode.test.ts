@@ -1,5 +1,5 @@
-import cases from 'jest-in-case';
 import { getConnections, PgTestClient } from 'pgsql-test';
+import cases from 'jest-in-case';
 
 let pg: PgTestClient;
 let teardown:  () => Promise<void>;
@@ -118,7 +118,7 @@ it('to_base32', async () => {
 cases(
   'base32.encode',
   async (opts: { name: string; result: string }) => {
-    const { encode } = await pg.one(
+      const { encode } = await pg.one(
       `SELECT base32.encode($1::text) AS encode`,
       [opts.name]
     );
