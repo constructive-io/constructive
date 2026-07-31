@@ -44,8 +44,8 @@
   },
   "dependencies": {
     "@pgpmjs/naming-spec": "workspace:^",
-    "@pgsql/scripts": "^18.0.0",
+    "@pgsql/scripts": "^18.1.0",
     "@pgsql/transform": "^18.11.0",
-    "plpgsql-parser": "^18.2.2"
+    "plpgsql-parser": "^18.2.3"
   }
 }
