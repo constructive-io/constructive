@@ -16,15 +16,18 @@
  * modified objects routed through the granularity pipeline
  * (`restructureChanges`), so names come from the naming spec and `requires`
  * from the statement graph — the same derivation every other projection uses.
- * Every emitted change carries a full deploy/revert/verify triple: drops are
- * `@pgsql/scripts`' `revertFor` inverses of the object's own deploy
- * statements (never hand-templated), reverts recreate what was dropped, and
- * verifies come from `verifyFor`.
+ * Every emitted change carries a full deploy/revert/verify triple: inverses
+ * and existence checks are composed at the AST level via `@pgsql/scripts`'
+ * node-level API (`invertStatement`/`existenceCheck`) — never hand-templated
+ * and never round-tripped through deparsed text — deparsing only once at the
+ * end. Statements the node layer cannot derive fall back to the text layer
+ * (`revertFor`/`verifyFor`) solely to surface its not-derivable comment and
+ * warning.
  *
  * Requires `loadModule()` from `plpgsql-parser` before use.
  */
 import { pathFor, PathStyle } from '@pgpmjs/naming-spec';
-import { revertFor, verifyFor } from '@pgsql/scripts';
+import { existenceCheck, invertStatement, revertFor, verifyFor } from '@pgsql/scripts';
 import type { ObjectIdentity, StatementFacts } from '@pgsql/transform';
 import {
   buildStatementGraph,
@@ -344,17 +347,45 @@ export function diffSchemas(
   const modifiedChanges: SemanticDeltaChange[] = [];
   const dropUnits: ObjectUnit[] = [];
 
-  /** `@pgsql/scripts` inverse of a deploy script (drops in reverse topo order). */
+  /**
+   * `@pgsql/scripts` inverse of a deploy script (drops in reverse topo
+   * order), composed at the AST level via `invertStatement` and deparsed
+   * once. Underivable statements fall back to `revertFor` on the single
+   * statement to surface its not-derivable comment and warning.
+   */
   const inverseOf = (deploy: string, context: string): string => {
-    const { sql, warnings: w } = revertFor(classifyStatements(deploy));
-    warnings.push(...w.map(x => `${context}: ${x}`));
-    return sql;
+    const facts = classifyStatements(deploy);
+    const graph = buildStatementGraph(facts);
+    const pieces: string[] = [];
+    for (const i of [...graph.order].reverse()) {
+      const nodes = invertStatement(facts[i]);
+      if (nodes === null) {
+        const { sql, warnings: w } = revertFor([facts[i]]);
+        warnings.push(...w.map(x => `${context}: ${x}`));
+        if (sql.trim()) pieces.push(sql);
+        continue;
+      }
+      pieces.push(...nodes.map(n => deparseStmt(n as Record<string, unknown>)));
+    }
+    return pieces.join('\n');
   };
-  /** `@pgsql/scripts` existence checks for a deploy script. */
+  /**
+   * `@pgsql/scripts` existence checks for a deploy script, composed from
+   * `existenceCheck`'s SelectStmt nodes and deparsed once. Underivable
+   * statements fall back to `verifyFor` to surface the warning.
+   */
   const verifyOf = (deploy: string, context: string): string => {
-    const { sql, warnings: w } = verifyFor(classifyStatements(deploy));
-    warnings.push(...w.map(x => `${context}: ${x}`));
-    return sql;
+    const pieces: string[] = [];
+    for (const fact of classifyStatements(deploy)) {
+      const nodes = existenceCheck(fact);
+      if (nodes === null) {
+        const { warnings: w } = verifyFor([fact]);
+        warnings.push(...w.map(x => `${context}: ${x}`));
+        continue;
+      }
+      pieces.push(...nodes.map(n => deparseStmt(n as Record<string, unknown>)));
+    }
+    return pieces.join('\n\n');
   };
 
   for (const key of b.order) {
