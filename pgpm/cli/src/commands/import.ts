@@ -3,6 +3,7 @@ import {
   ExportGranularity,
   importDumpRows,
   isExportGranularity,
+  linkTextualDeps,
   loadDumpSource,
   parsePartitionConfig,
   PartitionConfig,
@@ -138,7 +139,7 @@ export default async (
       packages = partitioned.packages.map(pkg => ({
         name: pkg.name,
         requires: [...result.controlRequires, ...pkg.requires],
-        rows: pkg.rows
+        rows: linkTextualDeps(pkg.rows)
       }));
     } catch (err) {
       if (err instanceof PartitionCycleError) {

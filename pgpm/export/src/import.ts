@@ -254,6 +254,70 @@ const sortRowsByDeps = (rows: PgpmRow[]): PgpmRow[] => {
   return sorted;
 };
 
+const CREATED_RELATION = /CREATE\s+(?:TABLE|SEQUENCE)\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w."]+)/gi;
+const RELATION_REFS = [
+  /OWNED\s+BY\s+([\w."]+)\.[\w"]+\s*;/gi,
+  /nextval\((?:CAST\()?'([^']+)'/g,
+  /ALTER\s+TABLE\s+(?:ONLY\s+)?(?:IF\s+EXISTS\s+)?([\w."]+)/gi,
+  /COMMENT\s+ON\s+TABLE\s+([\w."]+)/gi,
+  /GRANT\s+[^;]*?\s+ON\s+(?:TABLE\s+)?([\w."]+)\s+TO\s/gi
+];
+
+const normalizeQualname = (raw: string): string =>
+  raw.replace(/"/g, '').replace(/::regclass$/, '');
+
+/**
+ * Re-link intra-package deps that only exist in statement *text* — riders
+ * (`ALTER TABLE`, `GRANT`, `COMMENT ON`, `OWNED BY`) and serial
+ * `nextval('seq')` defaults referencing a relation created by another row —
+ * after a pass (like partitioning) that regrouped statements and rebuilt
+ * dependencies from the statement graph alone. Deps that would create a
+ * cycle are dropped so the emitted plan stays deployable. Mutates `deps`
+ * and returns the rows re-sorted so prerequisites deploy first.
+ */
+export const linkTextualDeps = (rows: PgpmRow[]): PgpmRow[] => {
+  const byQualname = new Map<string, PgpmRow>();
+  for (const row of rows) {
+    CREATED_RELATION.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = CREATED_RELATION.exec(row.content)) !== null) {
+      byQualname.set(normalizeQualname(match[1]), row);
+    }
+  }
+  for (const row of rows) {
+    for (const pattern of RELATION_REFS) {
+      pattern.lastIndex = 0;
+      let match: RegExpExecArray | null;
+      while ((match = pattern.exec(row.content)) !== null) {
+        const targetRow = byQualname.get(normalizeQualname(match[1]));
+        if (!targetRow || targetRow === row) continue;
+        row.deps = row.deps ?? [];
+        if (!row.deps.includes(targetRow.deploy)) row.deps.push(targetRow.deploy);
+      }
+    }
+  }
+
+  // Drop back-edges: a dep pointing at a row that transitively depends on
+  // this one would make the plan unsatisfiable.
+  const byName = new Map(rows.map(row => [row.deploy, row]));
+  const state = new Map<string, 'visiting' | 'done'>();
+  const prune = (row: PgpmRow): void => {
+    if (state.get(row.deploy)) return;
+    state.set(row.deploy, 'visiting');
+    row.deps = (row.deps ?? []).filter(dep => {
+      const depRow = byName.get(dep);
+      if (!depRow) return true;
+      if (state.get(depRow.deploy) === 'visiting') return false;
+      prune(depRow);
+      return true;
+    });
+    state.set(row.deploy, 'done');
+  };
+  for (const row of rows) prune(row);
+
+  return sortRowsByDeps(rows);
+};
+
 /**
  * Classify a preprocessed dump and restructure it into pgpm change rows at
  * the requested granularity. Requires nothing beyond the `DumpSource` —
