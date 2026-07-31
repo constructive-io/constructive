@@ -11,7 +11,7 @@ import {
 } from '@pgpmjs/export';
 import { Logger } from '@pgpmjs/logger';
 import { PartitionCycleError } from '@pgpmjs/transform';
-import { CLIOptions, cliExitWithError, Inquirerer, ParsedArgs } from 'inquirerer';
+import { cliExitWithError, CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
 
 import { checkOverwrite, writePackage } from '../utils/emit-package';

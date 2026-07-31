@@ -170,14 +170,14 @@ const decodeCopyField = (field: string): string => {
     }
     const next = field[++i];
     switch (next) {
-      case 'b': out += '\b'; break;
-      case 'f': out += '\f'; break;
-      case 'n': out += '\n'; break;
-      case 'r': out += '\r'; break;
-      case 't': out += '\t'; break;
-      case 'v': out += '\v'; break;
-      case undefined: out += '\\'; break;
-      default: out += next;
+    case 'b': out += '\b'; break;
+    case 'f': out += '\f'; break;
+    case 'n': out += '\n'; break;
+    case 'r': out += '\r'; break;
+    case 't': out += '\t'; break;
+    case 'v': out += '\v'; break;
+    case undefined: out += '\\'; break;
+    default: out += next;
     }
   }
   return out;

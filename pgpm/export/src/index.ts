@@ -1,5 +1,7 @@
 export type { CatalogQueryable, CatalogSnapshot } from './catalog-check';
 export { diffCatalogSnapshots, snapshotCatalog } from './catalog-check';
+export type { CopyBlock, CopyTarget, DumpSource } from './dump-source';
+export { copyBlockToInsert, copyTargetOf, loadDumpSource, preprocessDumpText } from './dump-source';
 export * from './export-data';
 export * from './export-graphql';
 export * from './export-graphql-meta';
@@ -28,8 +30,6 @@ export {
   normalizeOutdir,
   preparePackage,
   SERVICE_REQUIRED_EXTENSIONS} from './export-utils';
-export type { CopyBlock, CopyTarget, DumpSource } from './dump-source';
-export { copyBlockToInsert, copyTargetOf, loadDumpSource, preprocessDumpText } from './dump-source';
 export { GraphQLClient } from './graphql-client';
 export { buildFieldsFragment, getGraphQLQueryName, getGraphQLTypeName, graphqlRowToPostgresRow, GraphQLTypeInfo,mapGraphQLTypeToFieldType, unwrapGraphQLType } from './graphql-naming';
 export type { ImportDumpRowsOptions, ImportDumpRowsResult, ImportDumpSummary } from './import';
