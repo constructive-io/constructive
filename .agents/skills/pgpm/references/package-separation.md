@@ -1,10 +1,16 @@
-# Packaging: restructuring and separating pgpm packages
+# Package separation & restructuring
 
 How pgpm derives modular packages from one canonical substrate: statement
 facts and a typed dependency graph. Consult this when asked to split a
 database into multiple pgpm packages, cherry-pick objects into a package,
 restructure change granularity, or understand how change paths and
 `requires` are derived.
+
+> **Naming note:** this is *not* the `pgpm package` build command. `pgpm
+> package` compiles one module into its distributable artifacts (see
+> `references/publishing.md` to build+publish, `references/package-check.md`
+> to verify those artifacts). This file is about *separating* one deploy
+> surface into several packages.
 
 Everything here lives in `@pgpmjs/transform` (`pgpm/transform`), with paths
 rendered by `@pgpmjs/naming-spec` (`pgpm/naming-spec`). The underlying facts,

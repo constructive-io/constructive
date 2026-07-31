@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.5](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.8.4...@agentic-kit/pi@0.8.5) (2026-07-31)
+
+### Bug Fixes
+
+- **graphile-meta:** align metadata with final schema ([78b73eb](https://github.com/constructive-io/constructive/commit/78b73eb541ae0f4389bfb14619848dcebd9c78bf))
+
 ## [0.8.4](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.8.3...@agentic-kit/pi@0.8.4) (2026-07-31)
 
 **Note:** Version bump only for package @agentic-kit/pi

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.18.0](https://github.com/constructive-io/constructive/compare/pgpm@5.17.4...pgpm@5.18.0) (2026-07-31)
+
+### Features
+
+- **export:** granularity dial — route pgpm export through the dials pipeline ([5c71a7f](https://github.com/constructive-io/constructive/commit/5c71a7fddd6a40ee19f5b220a7ffae28e7fa88ff)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
+- **pgpm:** add `pgpm package --check` to verify committed bundle artifacts are in sync with deploy/ ([c0b3b0a](https://github.com/constructive-io/constructive/commit/c0b3b0a040004d42f9e779fbdbb343068613089f))
+
 ## [5.17.4](https://github.com/constructive-io/constructive/compare/pgpm@5.17.3...pgpm@5.17.4) (2026-07-31)
 
 **Note:** Version bump only for package pgpm

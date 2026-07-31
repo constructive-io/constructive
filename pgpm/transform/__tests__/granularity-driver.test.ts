@@ -77,6 +77,53 @@ describe('restructureChanges', () => {
     expect(users.deploy.match(/ALTER TABLE/g)!.length).toBeGreaterThanOrEqual(2);
   });
 
+  it('generates per-change revert scripts (drops in reverse topo order)', () => {
+    const result = restructureChanges(ATOMIC_CHANGES, { granularity: 'consolidated' });
+
+    const schema = result.changes.find(c => c.name === 'schemas/app/schema')!;
+    expect(schema.revert).toEqual('DROP SCHEMA app;');
+
+    const users = result.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
+    expect(users.revert).toEqual('DROP TABLE app.users;');
+    expect(users.revert).not.toContain('CASCADE');
+  });
+
+  it('generates per-change verify scripts (raise-on-failure existence checks)', () => {
+    const result = restructureChanges(ATOMIC_CHANGES, { granularity: 'consolidated' });
+
+    const schema = result.changes.find(c => c.name === 'schemas/app/schema')!;
+    expect(schema.verify).toEqual(
+      "SELECT 1/(CASE WHEN EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'app') THEN 1 ELSE 0 END);"
+    );
+
+    const users = result.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
+    expect(users.verify).toEqual(
+      "SELECT 1/(CASE WHEN to_regclass('app.users') IS NOT NULL THEN 1 ELSE 0 END);"
+    );
+  });
+
+  it('reverts the atomic shape per command, dependents first', () => {
+    const result = restructureChanges(ATOMIC_CHANGES, { granularity: 'atomic' });
+    const users = result.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
+    // Constraint dropped before its column, column before the table.
+    const drops = users.revert.split('\n\n');
+    expect(drops[0]).toContain('DROP CONSTRAINT users_pkey');
+    expect(drops[drops.length - 1]).toEqual('DROP TABLE app.users;');
+  });
+
+  it('prefixes revert/verify warnings with the owning change name', () => {
+    const result = restructureChanges([
+      {
+        name: 'schemas/app/tables/users/table',
+        dependencies: [],
+        deploy: 'CREATE TABLE app.users (id int);\nALTER TABLE app.users ADD CHECK (id > 0);'
+      }
+    ], { granularity: 'atomic' });
+    expect(result.warnings.some(w =>
+      w.startsWith('schemas/app/tables/users/table: revert not derivable:')
+    )).toBe(true);
+  });
+
   it('supports custom change naming', () => {
     const result = restructureChanges(ATOMIC_CHANGES, {
       granularity: 'consolidated',

@@ -421,6 +421,31 @@ steps:
     env: ${{ matrix.env }}
 ```
 
+## Bundle Drift Check
+
+Gate every PR so that no module's committed `sql/<name>--<version>.bundle.tar.gz`
+can drift from its `deploy/` SQL. `pgpm package --check` is read-only and
+touches no database, and by default only verifies the modules git says
+changed — so it is near-instant on a normal PR. See
+`references/package-check.md`.
+
+```yaml
+jobs:
+  bundle-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need the base ref for the diff
+      # ... pnpm + node + pgpm setup ...
+      - name: Verify pgpm bundles are in sync
+        run: pgpm package --check --since origin/${{ github.base_ref }}
+```
+
+Fail-fast is the default (stops at the first stale bundle); add
+`--no-fail-fast` to list every drifted module in one run. It needs no
+PostgreSQL service container.
+
 ## Best Practices
 
 1. **Always use health checks** — Ensure PostgreSQL is ready before tests run
@@ -431,6 +456,8 @@ steps:
 6. **Bootstrap users before tests** — `pgpm admin-users` creates required roles
 7. **Use fail-fast: false** — Let all tests complete even if some fail
 8. **Pin pgpm version** — Ensure consistent behavior across runs
+9. **Gate bundle drift** — Run `pgpm package --check` on PRs so stale
+   `sql/*.bundle.tar.gz` artifacts can't merge (fetch-depth: 0 for the diff)
 
 ## References
 

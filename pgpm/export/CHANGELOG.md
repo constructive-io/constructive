@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.13.4...@pgpmjs/export@1.14.0) (2026-07-31)
+
+### Features
+
+- **export:** granularity dial — route pgpm export through the dials pipeline ([5c71a7f](https://github.com/constructive-io/constructive/commit/5c71a7fddd6a40ee19f5b220a7ffae28e7fa88ff)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
+- **pgpm:** generate revert/verify scripts for restructured exports ([a604bcf](https://github.com/constructive-io/constructive/commit/a604bcfbdcdda0ab5018b53c64b4e66bd9250c07)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
+
 ## [1.13.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.13.3...@pgpmjs/export@1.13.4) (2026-07-31)
 
 **Note:** Version bump only for package @pgpmjs/export

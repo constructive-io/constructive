@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.16.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.15.3...@pgpmjs/transform@0.16.0) (2026-07-31)
+
+### Features
+
+- **pgpm:** generate revert/verify scripts for restructured exports ([a604bcf](https://github.com/constructive-io/constructive/commit/a604bcfbdcdda0ab5018b53c64b4e66bd9250c07)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
+- **transform:** derive change names from the naming spec — identityOf + pathFor ([7d0c9c6](https://github.com/constructive-io/constructive/commit/7d0c9c62eeb45897a316158b331426f097d7d642))
+- **transform:** partition dial — project one deploy surface into pgpm packages ([4dda559](https://github.com/constructive-io/constructive/commit/4dda559b94e3ccd3809007c279d69833c841582e))
+
 ## [0.15.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.15.2...@pgpmjs/transform@0.15.3) (2026-07-31)
 
 **Note:** Version bump only for package @pgpmjs/transform

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.13.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.13.4...@constructive-io/graphql-codegen@5.13.5) (2026-07-31)
+
+### Bug Fixes
+
+- **graphile-schema:** return SDL + tablesMeta from one correlated build boundary ([e69c59e](https://github.com/constructive-io/constructive/commit/e69c59e565e3065d24dbba2ecc0b4fb3959d3591)), closes [constructive-io/constructive-planning#1331](https://github.com/constructive-io/constructive-planning/issues/1331)
+
 ## [5.13.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.13.3...@constructive-io/graphql-codegen@5.13.4) (2026-07-31)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
