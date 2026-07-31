@@ -2,6 +2,7 @@ export * from './core/class/pgpm';
 export * from './rebundle';
 export * from './extensions';
 export * from './modules/modules';
+export * from './packaging/check';
 export * from './packaging/package';
 export * from './packaging/sync-versions';
 export * from './packaging/transform';
