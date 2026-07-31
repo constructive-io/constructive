@@ -14,6 +14,7 @@ import { createClient } from '@pgpmjs/migrate-client';
 import { GraphQLClient } from './graphql-client';
 import { exportGraphQLMeta } from './export-graphql-meta';
 import { graphqlRowToPostgresRow } from './graphql-naming';
+import { ExportGranularity, restructureExportRows } from './restructure';
 import {
   DB_REQUIRED_EXTENSIONS,
   SERVICE_REQUIRED_EXTENSIONS,
@@ -77,6 +78,13 @@ export interface ExportGraphQLOptions {
    * policy (export.exclude_categories), so this flag is not applied client-side.
    */
   excludeCategories?: string[];
+  /**
+   * Granularity dial for the exported database module. When set, exported SQL
+   * is routed through `restructureChanges` (`@pgpmjs/transform`): change paths
+   * are derived from the naming spec and `requires` from the statement graph.
+   * When omitted, sql_actions rows are written through unchanged.
+   */
+  granularity?: ExportGranularity;
 }
 
 export const exportGraphQL = async ({
@@ -101,7 +109,8 @@ export const exportGraphQL = async ({
   repoName,
   username,
   serviceOutdir,
-  skipSchemaRenaming = false
+  skipSchemaRenaming = false,
+  granularity
 }: ExportGraphQLOptions): Promise<void> => {
   const normalizedOutdir = normalizeOutdir(outdir);
   const svcOutdir = normalizeOutdir(serviceOutdir || outdir);
@@ -211,8 +220,15 @@ export const exportGraphQL = async ({
       await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
     }
 
-    writePgpmPlan(sqlActionRows as unknown as PgpmRow[], opts);
-    writePgpmFiles(sqlActionRows as unknown as PgpmRow[], opts);
+    let dbRows = sqlActionRows as unknown as PgpmRow[];
+    if (granularity) {
+      const { rows, warnings } = await restructureExportRows(dbRows, granularity);
+      dbRows = rows;
+      warnings.forEach(warning => console.warn(`restructure (${granularity}): ${warning}`));
+    }
+
+    writePgpmPlan(dbRows, opts);
+    writePgpmFiles(dbRows, opts);
   } else {
     console.log('No sql_actions found. Skipping database module export.');
   }

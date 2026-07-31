@@ -4,6 +4,7 @@ import { getPgPool } from 'pg-cache';
 
 import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { exportMeta } from './export-meta';
+import { ExportGranularity, restructureExportRows } from './restructure';
 import {
   DB_REQUIRED_EXTENSIONS,
   SERVICE_REQUIRED_EXTENSIONS,
@@ -50,6 +51,13 @@ interface ExportMigrationsToDiskOptions {
    * generated pgpm plan and SQL files. Rows with a NULL category are always kept.
    */
   excludeCategories?: string[];
+  /**
+   * Granularity dial for the exported database module. When set, exported SQL
+   * is routed through `restructureChanges` (`@pgpmjs/transform`): change paths
+   * are derived from the naming spec and `requires` from the statement graph.
+   * When omitted, sql_actions rows are written through unchanged.
+   */
+  granularity?: ExportGranularity;
 }
 
 interface ExportOptions {
@@ -87,6 +95,13 @@ interface ExportOptions {
    * generated pgpm plan and SQL files. Rows with a NULL category are always kept.
    */
   excludeCategories?: string[];
+  /**
+   * Granularity dial for the exported database module. When set, exported SQL
+   * is routed through `restructureChanges` (`@pgpmjs/transform`): change paths
+   * are derived from the naming spec and `requires` from the statement graph.
+   * When omitted, sql_actions rows are written through unchanged.
+   */
+  granularity?: ExportGranularity;
 }
 
 const exportMigrationsToDisk = async ({
@@ -108,7 +123,8 @@ const exportMigrationsToDisk = async ({
   username,
   serviceOutdir,
   skipSchemaRenaming = false,
-  excludeCategories
+  excludeCategories,
+  granularity
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   const normalizedOutdir = normalizeOutdir(outdir);
   // Use serviceOutdir for service module, defaulting to outdir if not provided
@@ -212,8 +228,15 @@ const exportMigrationsToDisk = async ({
       await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
     }
 
-    writePgpmPlan(appRows, opts);
-    writePgpmFiles(appRows, opts);
+    let dbRows = appRows;
+    if (granularity) {
+      const { rows, warnings } = await restructureExportRows(appRows, granularity);
+      dbRows = rows;
+      warnings.forEach(warning => console.warn(`restructure (${granularity}): ${warning}`));
+    }
+
+    writePgpmPlan(dbRows, opts);
+    writePgpmFiles(dbRows, opts);
   } else {
     console.log('No sql_actions found — skipping database module. Meta/service module will still be exported.');
   }
@@ -351,7 +374,8 @@ export const exportMigrations = async ({
   username,
   serviceOutdir,
   skipSchemaRenaming,
-  excludeCategories
+  excludeCategories,
+  granularity
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -374,7 +398,8 @@ export const exportMigrations = async ({
       username,
       serviceOutdir,
       skipSchemaRenaming,
-      excludeCategories
+      excludeCategories,
+      granularity
     });
   }
 };

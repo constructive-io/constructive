@@ -3,6 +3,8 @@ export * from './export-meta';
 export * from './export-migrations';
 export * from './export-graphql';
 export * from './export-graphql-meta';
+export { EXPORT_GRANULARITIES, isExportGranularity, restructureExportRows } from './restructure';
+export type { ExportGranularity, RestructureExportRowsResult } from './restructure';
 export { GraphQLClient } from './graphql-client';
 export { getGraphQLQueryName, getGraphQLTypeName, graphqlRowToPostgresRow, buildFieldsFragment, mapGraphQLTypeToFieldType, unwrapGraphQLType, GraphQLTypeInfo } from './graphql-naming';
 export {

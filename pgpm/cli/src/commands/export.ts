@@ -1,5 +1,5 @@
 import { PgpmPackage } from '@pgpmjs/core';
-import { exportMigrations, exportGraphQL, GraphQLClient, graphqlRowToPostgresRow } from '@pgpmjs/export';
+import { exportMigrations, exportGraphQL, GraphQLClient, graphqlRowToPostgresRow, isExportGranularity, EXPORT_GRANULARITIES } from '@pgpmjs/export';
 import { getEnvOptions } from '@pgpmjs/env';
 import { getGitConfigInfo } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer } from 'inquirerer';
@@ -25,11 +25,17 @@ Options:
   --metaExtensionName <name>  Meta extension name (default: svc)
   --exclude-categories <list>  Comma-separated sql_actions categories to omit
                           (e.g. security,permissions,auth,memberships). Works in SQL and GraphQL modes.
+  --granularity <level>   Restructure the exported database module through the
+                          dials pipeline: atomic | object | consolidated.
+                          Change paths are derived from the naming spec and
+                          requires from the statement graph. When omitted,
+                          sql_actions rows are exported unchanged.
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
   pgpm export              Export migrations from selected database (SQL mode)
   pgpm export --exclude-categories security,permissions,auth,memberships
+  pgpm export --granularity consolidated
   pgpm export --graphql-endpoint 'http://[::1]:3002/graphql' --migrate-endpoint 'http://[::1]:3000/graphql' --migrate-host db_migrate.localhost:3000
 `;
 
@@ -63,6 +69,14 @@ export default async (
       : Array.isArray(excludeCategoriesRaw)
         ? excludeCategoriesRaw
         : undefined;
+
+  const granularityRaw = argv.granularity;
+  if (granularityRaw !== undefined && !isExportGranularity(granularityRaw)) {
+    console.error(`Invalid --granularity "${granularityRaw}". Expected one of: ${EXPORT_GRANULARITIES.join(', ')}.`);
+    prompter.close();
+    return;
+  }
+  const granularity = granularityRaw;
 
   if (graphqlEndpoint) {
     // =========================================================================
@@ -180,7 +194,8 @@ export default async (
       prompter,
       argv,
       username,
-      excludeCategories
+      excludeCategories,
+      granularity
     });
   } else {
     // =========================================================================
@@ -318,7 +333,8 @@ export default async (
       prompter,
       argv,
       username,
-      excludeCategories
+      excludeCategories,
+      granularity
     });
   }
 
