@@ -119,6 +119,17 @@ X2/X3/X4 read the policy predicate itself: RLS quals run before user quals on ev
 }
 ```
 
+### Perf baseline (ratchet)
+
+An existing schema won't be perf-clean on day one, so gate on *new* debt instead of total debt:
+
+```bash
+safegres audit --write-perf-baseline .safegres-perf.json          # snapshot accepted debt (implies --perf)
+safegres audit --perf-baseline .safegres-perf.json --fail-on-new-perf   # exit 1 only on new findings
+```
+
+Entries are keyed by code + relation + policy + subject (constraint/index/expression/column/function), never by message text, so safegres upgrades don't invalidate a committed baseline. Fixed findings are reported so you can re-baseline and stop them regressing. Library: `toPerfBaseline(findings)` / `diffPerf(findings, baseline)` → `{ added, removed, accepted }`; also emitted as `report.perf.diff`. Prefer this over asserting a perf grade in a test — it fails on the change, not on inherited debt.
+
 ### Presets
 
 | Preset | Behavior |
@@ -197,6 +208,7 @@ score = 100 · exp(−k · riskPoints / exposedTables)
 safegres audit                     # audit the connected DB (default command)
 safegres perf                      # audit + index-hygiene dimension (= audit --perf)
 safegres audit --perf --fail-on-perf-grade B
+safegres audit --perf-baseline .safegres-perf.json --fail-on-new-perf   # ratchet: only new debt fails
 safegres audit --format json       # machine-readable
 safegres audit --exposed-only      # hide internal advisories
 safegres doctor                    # config/parser/connection/catalog + exposure + stale public.read checks
