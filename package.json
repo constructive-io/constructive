@@ -52,7 +52,6 @@
   "pnpm": {
     "overrides": {
       "@dataplan/json": "1.0.0",
-      "pgsql-deparser": "file:./.tarballs/pgsql-deparser-18.1.1.tgz",
       "graphql": "16.13.0",
       "@smithy/node-http-handler": "<4.5.0"
     },
