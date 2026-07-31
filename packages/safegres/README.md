@@ -107,12 +107,17 @@ A slow database is a different problem from an unsafe one, so safegres scores th
 | Code | Severity | Category | Check |
 | --- | --- | --- | --- |
 | X1 | medium | index | **Foreign key with no covering index** — joins and cascading deletes seq-scan the child table |
+| X2 | medium | index | **RLS policy filters on an unindexed column** — the security qual seq-scans on every query against the table |
+| X3 | medium | index | **Policy casts or wraps its own column** (`tenant_id::text = …`, `lower(email) = …`) with no matching expression index |
+| X4 | low | index | **Policy calls a non-LEAKPROOF function** — the qual can't be pushed below joins or subquery scans |
 | X5 | low | index | **Redundant index** — an exact duplicate of, or a leading-column prefix of, another index |
 | X6 | low | index | **No primary key** and no usable replica identity — rows cannot be addressed by updates, deletes, or logical replication |
 | P1 | high | anti-pattern | Policy body calls a **VOLATILE function** — re-evaluated per row |
 | P1b | medium | anti-pattern | Policy body calls a **STABLE function** in a per-row position |
 
-Every check is pure catalog analysis: deterministic, workload-free, and safe to run against an empty CI database. An index covers a foreign key only when its *leading* columns are the FK's columns and it covers every row — partial and expression indexes don't count, because the planner can't use them for the referential-integrity lookup. Constraint-backed, unique, partial, and expression indexes are never reported as redundant.
+Every check is pure catalog + AST analysis: deterministic, workload-free, and safe to run against an empty CI database. An index covers a foreign key only when its *leading* columns are the FK's columns and it covers every row — partial and expression indexes don't count, because the planner can't use them for the referential-integrity lookup. Constraint-backed, unique, partial, and expression indexes are never reported as redundant.
+
+X2–X4 are the checks a generic index linter can't make, because they read the policy predicate. RLS quals are evaluated *before* user quals, on every candidate row, for every caller — so an unindexed or cast-wrapped policy column is a whole-table tax rather than a slow query. X2 requires the policy column to be the *leading* column of some index (a trailing position can't serve the qual alone); X3 looks for an expression index matching the exact wrapped shape; X4 skips built-ins, whose leakproofness is a property of the server rather than a schema choice.
 
 ```bash
 safegres perf --database mydb

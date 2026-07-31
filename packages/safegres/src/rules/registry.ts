@@ -168,6 +168,33 @@ export const RULES: RuleMeta[] = [
     scope: 'index'
   },
   {
+    code: 'X2',
+    category: 'index',
+    defaultSeverity: 'medium',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'RLS policy filters on a column that is not the leading column of any index',
+    scope: 'policy-ast'
+  },
+  {
+    code: 'X3',
+    category: 'index',
+    defaultSeverity: 'medium',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'RLS policy casts or wraps its own column, defeating a plain index',
+    scope: 'policy-ast'
+  },
+  {
+    code: 'X4',
+    category: 'index',
+    defaultSeverity: 'low',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'RLS policy calls a non-LEAKPROOF function, blocking qual pushdown',
+    scope: 'policy-ast'
+  },
+  {
     code: 'X5',
     category: 'index',
     defaultSeverity: 'low',
