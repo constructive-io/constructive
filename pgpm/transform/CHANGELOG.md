@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.13.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.12.2...@pgpmjs/transform@0.13.0) (2026-07-31)
+
+### Features
+
+- **transform:** SqlProgram — statement-level program AST with facts, spans, and dirty-aware verbatim/deparse emission ([f549dea](https://github.com/constructive-io/constructive/commit/f549dea6cfbc5e9af92606f5660ff00ed50055c8))
+
 ## [0.12.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.12.1...@pgpmjs/transform@0.12.2) (2026-07-30)
 
 **Note:** Version bump only for package @pgpmjs/transform

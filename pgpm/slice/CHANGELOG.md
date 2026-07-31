@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.11.2...@pgpmjs/slice@0.12.0) (2026-07-31)
+
+### Features
+
+- **apply:** graph-based subsystem exclusion — one pass over per-change programs ([5637401](https://github.com/constructive-io/constructive/commit/56374010fd4d21bfcae6e88c9ac515a4ea71f27d))
+- **slice:** SqlObjectGraph — unified object-graph IR with cascade-safety and ownership-based change pruning ([2a4e637](https://github.com/constructive-io/constructive/commit/2a4e63751d4cf6c664594dc5124c118a6f12c546))
+
 ## [0.11.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.11.1...@pgpmjs/slice@0.11.2) (2026-07-30)
 
 **Note:** Version bump only for package @pgpmjs/slice

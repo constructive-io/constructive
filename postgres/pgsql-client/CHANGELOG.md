@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.8.7](https://github.com/constructive-io/constructive/compare/pgsql-client@4.8.6...pgsql-client@4.8.7) (2026-07-31)
+
+**Note:** Version bump only for package pgsql-client
+
 ## [4.8.6](https://github.com/constructive-io/constructive/compare/pgsql-client@4.8.5...pgsql-client@4.8.6) (2026-07-30)
 
 **Note:** Version bump only for package pgsql-client

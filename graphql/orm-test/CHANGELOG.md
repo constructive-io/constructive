@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.7](https://github.com/constructive-io/constructive/compare/graphql-orm-test@1.9.6...graphql-orm-test@1.9.7) (2026-07-31)
+
+**Note:** Version bump only for package graphql-orm-test
+
 ## [1.9.6](https://github.com/constructive-io/constructive/compare/graphql-orm-test@1.9.5...graphql-orm-test@1.9.6) (2026-07-30)
 
 **Note:** Version bump only for package graphql-orm-test

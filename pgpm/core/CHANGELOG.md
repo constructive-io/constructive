@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.18.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.17.2...@pgpmjs/core@7.18.0) (2026-07-31)
+
+### Bug Fixes
+
+- **pgpm-core:** reject a bundle artifact that no longer matches deploy/ ([c3f46b3](https://github.com/constructive-io/constructive/commit/c3f46b36562aa7f4b5fa8a5e0693e3c7e67f18f7))
+
+### Features
+
+- **apply:** graph-based subsystem exclusion — one pass over per-change programs ([5637401](https://github.com/constructive-io/constructive/commit/56374010fd4d21bfcae6e88c9ac515a4ea71f27d))
+
 ## [7.17.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.17.1...@pgpmjs/core@7.17.2) (2026-07-30)
 
 **Note:** Version bump only for package @pgpmjs/core
