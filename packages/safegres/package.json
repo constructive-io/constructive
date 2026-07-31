@@ -1,6 +1,6 @@
 {
   "name": "safegres",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Pure-Postgres Row-Level Security auditor: grants, RLS enforcement, policy coverage, and risky SQL policy patterns, plus an optional index-hygiene performance score. No app framework required.",
   "main": "index.js",
@@ -45,7 +45,7 @@
   "dependencies": {
     "@inquirerer/utils": "^3.3.9",
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/traverse": "^18.1.0",
+    "@pgsql/traverse": "^18.4.0",
     "@pgsql/types": "^18.0.0",
     "confstash": "^0.1.0",
     "inquirerer": "^4.9.1",

@@ -2646,8 +2646,8 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
       '@pgsql/traverse':
-        specifier: ^18.1.0
-        version: 18.1.0
+        specifier: ^18.4.0
+        version: 18.4.0
       '@pgsql/types':
         specifier: ^18.0.0
         version: 18.0.0
@@ -3239,8 +3239,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0
       pg-proto-parser:
-        specifier: ^1.30.6
-        version: 1.30.6
+        specifier: ^1.31.0
+        version: 1.31.0
       pgsql-deparser:
         specifier: ^18.1.1
         version: 18.1.1
@@ -5818,7 +5818,6 @@ packages:
     engines: { node: '>= 10' }
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@mariozechner/clipboard-linux-arm64-musl@0.3.9':
     resolution:
@@ -5828,7 +5827,6 @@ packages:
     engines: { node: '>= 10' }
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@mariozechner/clipboard-linux-riscv64-gnu@0.3.9':
     resolution:
@@ -5838,7 +5836,6 @@ packages:
     engines: { node: '>= 10' }
     cpu: [riscv64]
     os: [linux]
-    libc: [glibc]
 
   '@mariozechner/clipboard-linux-x64-gnu@0.3.9':
     resolution:
@@ -5848,7 +5845,6 @@ packages:
     engines: { node: '>= 10' }
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@mariozechner/clipboard-linux-x64-musl@0.3.9':
     resolution:
@@ -5858,7 +5854,6 @@ packages:
     engines: { node: '>= 10' }
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@mariozechner/clipboard-win32-arm64-msvc@0.3.9':
     resolution:
@@ -6104,7 +6099,6 @@ packages:
     engines: { node: '>= 10' }
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@nx/nx-linux-arm64-musl@20.8.3':
     resolution:
@@ -6114,7 +6108,6 @@ packages:
     engines: { node: '>= 10' }
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@nx/nx-linux-x64-gnu@20.8.3':
     resolution:
@@ -6124,7 +6117,6 @@ packages:
     engines: { node: '>= 10' }
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@nx/nx-linux-x64-musl@20.8.3':
     resolution:
@@ -6134,7 +6126,6 @@ packages:
     engines: { node: '>= 10' }
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@nx/nx-win32-arm64-msvc@20.8.3':
     resolution:
@@ -6333,7 +6324,6 @@ packages:
     engines: { node: ^20.19.0 || >=22.12.0 }
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@oxfmt/binding-linux-arm64-musl@0.51.0':
     resolution:
@@ -6343,7 +6333,6 @@ packages:
     engines: { node: ^20.19.0 || >=22.12.0 }
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@oxfmt/binding-linux-ppc64-gnu@0.51.0':
     resolution:
@@ -6353,7 +6342,6 @@ packages:
     engines: { node: ^20.19.0 || >=22.12.0 }
     cpu: [ppc64]
     os: [linux]
-    libc: [glibc]
 
   '@oxfmt/binding-linux-riscv64-gnu@0.51.0':
     resolution:
@@ -6363,7 +6351,6 @@ packages:
     engines: { node: ^20.19.0 || >=22.12.0 }
     cpu: [riscv64]
     os: [linux]
-    libc: [glibc]
 
   '@oxfmt/binding-linux-riscv64-musl@0.51.0':
     resolution:
@@ -6373,7 +6360,6 @@ packages:
     engines: { node: ^20.19.0 || >=22.12.0 }
     cpu: [riscv64]
     os: [linux]
-    libc: [musl]
 
   '@oxfmt/binding-linux-s390x-gnu@0.51.0':
     resolution:
@@ -6383,7 +6369,6 @@ packages:
     engines: { node: ^20.19.0 || >=22.12.0 }
     cpu: [s390x]
     os: [linux]
-    libc: [glibc]
 
   '@oxfmt/binding-linux-x64-gnu@0.51.0':
     resolution:
@@ -6393,7 +6378,6 @@ packages:
     engines: { node: ^20.19.0 || >=22.12.0 }
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@oxfmt/binding-linux-x64-musl@0.51.0':
     resolution:
@@ -6403,7 +6387,6 @@ packages:
     engines: { node: ^20.19.0 || >=22.12.0 }
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@oxfmt/binding-openharmony-arm64@0.51.0':
     resolution:
@@ -6457,18 +6440,6 @@ packages:
     resolution:
       {
         integrity: sha512-JhcB4i+IDKaQRsqKxXQfyc+LGWT7y/wot0u40XNmw8H1S7OrNUK1mMgMfcIqBsoIZ+gs5UpBgmJ3wL23nfaWpg==,
-      }
-
-  '@pgsql/transform@18.9.0':
-    resolution:
-      {
-        integrity: sha512-VqkupUcHLvvUcc0Sqhwq7tevmnLjAree2k215z2kJJtmeALfLx6gFBu8pQaI6HedBo5aqy2ORlGp/HAYLW2h/w==,
-      }
-
-  '@pgsql/traverse@18.1.0':
-    resolution:
-      {
-        integrity: sha512-B+jIX6BvWrHO6DKlJ7p6Wvhbu1s7IhksLwwC3tvV+epKiuU4v8gJLd/OVQ5xeRSwhhLWmrctRfuAKHecbCaNjw==,
       }
 
   '@pgsql/traverse@18.4.0':
@@ -7126,7 +7097,6 @@ packages:
       }
     cpu: [arm]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-arm-musleabihf@4.57.1':
     resolution:
@@ -7135,7 +7105,6 @@ packages:
       }
     cpu: [arm]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-arm64-gnu@4.57.1':
     resolution:
@@ -7144,7 +7113,6 @@ packages:
       }
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-arm64-musl@4.57.1':
     resolution:
@@ -7153,7 +7121,6 @@ packages:
       }
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-loong64-gnu@4.57.1':
     resolution:
@@ -7162,7 +7129,6 @@ packages:
       }
     cpu: [loong64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-loong64-musl@4.57.1':
     resolution:
@@ -7171,7 +7137,6 @@ packages:
       }
     cpu: [loong64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-ppc64-gnu@4.57.1':
     resolution:
@@ -7180,7 +7145,6 @@ packages:
       }
     cpu: [ppc64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-ppc64-musl@4.57.1':
     resolution:
@@ -7189,7 +7153,6 @@ packages:
       }
     cpu: [ppc64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-riscv64-gnu@4.57.1':
     resolution:
@@ -7198,7 +7161,6 @@ packages:
       }
     cpu: [riscv64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-musl@4.57.1':
     resolution:
@@ -7207,7 +7169,6 @@ packages:
       }
     cpu: [riscv64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-s390x-gnu@4.57.1':
     resolution:
@@ -7216,7 +7177,6 @@ packages:
       }
     cpu: [s390x]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-x64-gnu@4.57.1':
     resolution:
@@ -7225,7 +7185,6 @@ packages:
       }
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.57.1':
     resolution:
@@ -7234,7 +7193,6 @@ packages:
       }
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-openbsd-x64@4.57.1':
     resolution:
@@ -8166,7 +8124,6 @@ packages:
       }
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@unrs/resolver-binding-linux-arm64-musl@1.12.2':
     resolution:
@@ -8175,7 +8132,6 @@ packages:
       }
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@unrs/resolver-binding-linux-loong64-gnu@1.12.2':
     resolution:
@@ -8184,7 +8140,6 @@ packages:
       }
     cpu: [loong64]
     os: [linux]
-    libc: [glibc]
 
   '@unrs/resolver-binding-linux-loong64-musl@1.12.2':
     resolution:
@@ -8193,7 +8148,6 @@ packages:
       }
     cpu: [loong64]
     os: [linux]
-    libc: [musl]
 
   '@unrs/resolver-binding-linux-ppc64-gnu@1.12.2':
     resolution:
@@ -8202,7 +8156,6 @@ packages:
       }
     cpu: [ppc64]
     os: [linux]
-    libc: [glibc]
 
   '@unrs/resolver-binding-linux-riscv64-gnu@1.12.2':
     resolution:
@@ -8211,7 +8164,6 @@ packages:
       }
     cpu: [riscv64]
     os: [linux]
-    libc: [glibc]
 
   '@unrs/resolver-binding-linux-riscv64-musl@1.12.2':
     resolution:
@@ -8220,7 +8172,6 @@ packages:
       }
     cpu: [riscv64]
     os: [linux]
-    libc: [musl]
 
   '@unrs/resolver-binding-linux-s390x-gnu@1.12.2':
     resolution:
@@ -8229,7 +8180,6 @@ packages:
       }
     cpu: [s390x]
     os: [linux]
-    libc: [glibc]
 
   '@unrs/resolver-binding-linux-x64-gnu@1.12.2':
     resolution:
@@ -8238,7 +8188,6 @@ packages:
       }
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@unrs/resolver-binding-linux-x64-musl@1.12.2':
     resolution:
@@ -8247,7 +8196,6 @@ packages:
       }
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@unrs/resolver-binding-openharmony-arm64@1.12.2':
     resolution:
@@ -13212,12 +13160,6 @@ packages:
     peerDependencies:
       pg: '>=8.0'
 
-  pg-proto-parser@1.30.6:
-    resolution:
-      {
-        integrity: sha512-2XwPyl9oz5Pest4ebaovRTTJN8MXaa/XvqMQzKq127fFcl4I1POUgV/FtzHzg/p8FjtO5yHsipeW/kAumzNxxw==,
-      }
-
   pg-proto-parser@1.31.0:
     resolution:
       {
@@ -17758,21 +17700,6 @@ snapshots:
       '@pgsql/quotes': 18.1.0
       '@pgsql/traverse': 18.4.0
       plpgsql-parser: 18.2.2
-    transitivePeerDependencies:
-      - supports-color
-
-  '@pgsql/transform@18.9.0':
-    dependencies:
-      '@pgsql/quotes': 18.1.0
-      '@pgsql/traverse': 18.4.0
-      plpgsql-parser: 18.2.2
-    transitivePeerDependencies:
-      - supports-color
-
-  '@pgsql/traverse@18.1.0':
-    dependencies:
-      '@pgsql/types': 18.0.0
-      pg-proto-parser: 1.31.0
     transitivePeerDependencies:
       - supports-color
 
@@ -22402,20 +22329,6 @@ snapshots:
   pg-pool@3.14.0(pg@8.21.0):
     dependencies:
       pg: 8.21.0
-
-  pg-proto-parser@1.30.6:
-    dependencies:
-      '@babel/generator': 7.29.1
-      '@babel/parser': 7.29.3
-      '@babel/traverse': 7.28.5
-      '@babel/types': 7.28.5
-      '@launchql/protobufjs': 7.2.6
-      case: 1.6.3
-      deepmerge: 4.3.1
-      nested-obj: 0.2.2
-      strfy-js: 3.2.2
-    transitivePeerDependencies:
-      - supports-color
 
   pg-proto-parser@1.31.0:
     dependencies:

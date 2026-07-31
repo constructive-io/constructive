@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/constructive-io/constructive/compare/safegres@1.13.0...safegres@1.14.0) (2026-07-31)
+
+### Features
+
+- **safegres:** perf baseline ratchet (fail only on new performance debt) ([3075676](https://github.com/constructive-io/constructive/commit/3075676cf680a4a31b2274ee8144ef9f92cc0d4e))
+
 # [1.13.0](https://github.com/constructive-io/constructive/compare/safegres@1.12.0...safegres@1.13.0) (2026-07-31)
 
 ### Features
