@@ -79,3 +79,48 @@ describe('toVendorProfile (pgpm → vendor)', () => {
     );
   });
 });
+
+describe('insforge shape (second vendor — no extensions schema)', () => {
+  const provider: ProviderBinding = {
+    schema: 'app_auth',
+    users: 'users',
+    accessors: { uid: 'current_user_id' },
+    roles: { authenticated: 'app_authenticated' }
+  };
+
+  it('excludes auth, rebinds the users table and the uid accessor, translates roles', () => {
+    const profile = fromVendorProfile(insforge, provider);
+    expect(profile.exclude).toEqual({ schemas: ['auth'] });
+    expect(profile.route).toEqual([
+      { fromSchema: 'auth', kind: 'table', name: 'users', toSchema: 'app_auth' },
+      {
+        fromSchema: 'auth',
+        kind: 'function',
+        name: 'uid',
+        toSchema: 'app_auth',
+        toName: 'current_user_id'
+      }
+    ]);
+    expect(profile.roles).toEqual({ authenticated: 'app_authenticated' });
+  });
+
+  it('emits no extensions transform — InsForge has no extensions schema', () => {
+    expect(fromVendorProfile(insforge, provider).extensions).toBeUndefined();
+    expect(toVendorProfile(insforge, provider).extensions).toBeUndefined();
+  });
+
+  it('round-trips onto the native subsystem in reverse', () => {
+    const profile = toVendorProfile(insforge, provider);
+    expect(profile.route).toEqual([
+      { fromSchema: 'app_auth', kind: 'table', name: 'users', toSchema: 'auth' },
+      {
+        fromSchema: 'app_auth',
+        kind: 'function',
+        name: 'current_user_id',
+        toSchema: 'auth',
+        toName: 'uid'
+      }
+    ]);
+    expect(profile.roles).toEqual({ app_authenticated: 'authenticated' });
+  });
+});
