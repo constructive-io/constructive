@@ -3051,6 +3051,13 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
+  pgpm/naming-spec:
+    devDependencies:
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
   pgpm/portability:
     dependencies:
       '@pgpmjs/core':
