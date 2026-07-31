@@ -17,6 +17,14 @@ export type Severity = 'critical' | 'high' | 'medium' | 'low' | 'info';
  */
 export type Direction = 'fail-open' | 'fail-closed' | 'neutral';
 
+/**
+ * Which axis a finding is scored on. `security` findings drive `report.score`;
+ * `perf` findings drive `report.perf.score`. The two are never mixed — a
+ * database can be an A+ on security and a D on index hygiene, and both
+ * numbers stay meaningful.
+ */
+export type Dimension = 'security' | 'perf';
+
 export const SEVERITY_ORDER: Record<Severity, number> = {
   critical: 4,
   high: 3,
@@ -30,9 +38,11 @@ export interface Finding {
   code: string;
   severity: Severity;
   /** High-level bucket — helps renderers group findings. */
-  category: 'flags' | 'coverage' | 'anti-pattern' | 'sync' | 'match' | 'meta';
+  category: 'flags' | 'coverage' | 'anti-pattern' | 'index' | 'sync' | 'match' | 'meta';
   /** Leak vs deny vs directionless. Stamped from the rule registry. */
   direction?: Direction;
+  /** Scoring axis. Stamped from the rule registry; defaults to `security`. */
+  dimension?: Dimension;
   /**
    * Whether the finding's table is on the resolved exposure surface.
    * `undefined` when no exposure surface is known (everything is assumed
@@ -83,6 +93,19 @@ export interface ExposureReport {
   totalTables: number;
 }
 
+/**
+ * The optional performance dimension (`--perf`): index-hygiene and
+ * policy-cost findings, scored on their own 0-100 axis against the same
+ * exposure surface.
+ */
+export interface PerfReport {
+  /** Perf-dimension findings (also present in `report.findings`). */
+  findings: Finding[];
+  summary: Summary;
+  /** Perf score — computed only over perf-dimension findings. */
+  score: import('./score/score').Score;
+}
+
 export interface Report {
   version: string;
   generatedAt: string;
@@ -90,6 +113,8 @@ export interface Report {
   findings: Finding[];
   /** Config-driven audit score (weighted deductions, 0-100 + grade). */
   score?: import('./score/score').Score;
+  /** Performance dimension, present when the audit ran with `perf` enabled. */
+  perf?: PerfReport;
   /** The exposure surface the score was computed against. */
   exposure?: ExposureReport;
   /**

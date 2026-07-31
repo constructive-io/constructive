@@ -1,5 +1,5 @@
-import { expandRuleSelector, isKnownRule, RULES, RULES_BY_CODE } from '../rules/registry';
-import type { Finding, Severity } from '../types';
+import { dimensionOf, expandRuleSelector, isKnownRule, RULES, RULES_BY_CODE } from '../rules/registry';
+import type { Dimension, Finding, Severity } from '../types';
 import { SEVERITY_ORDER } from '../types';
 import type { OverrideEntry, RulesConfig, RuleSetting, SafegresConfig } from './types';
 
@@ -92,6 +92,10 @@ export function resolveRules(config: SafegresConfig): ResolvedRules {
   if (config.rules) {
     rules = applyRulesConfig(rules, config.rules);
   }
+  if (config.perf?.rules) {
+    assertPerfSelectors(config.perf.rules);
+    rules = applyRulesConfig(rules, config.perf.rules);
+  }
   const overrides = config.overrides ?? [];
   for (const o of overrides) {
     if (!Array.isArray(o.tables) || o.tables.length === 0) {
@@ -106,7 +110,44 @@ export function resolveRules(config: SafegresConfig): ResolvedRules {
       throw new ConfigValidationError('"public.read" must be an array of non-empty schema.table glob patterns.');
     }
   }
+  const perfIgnore = config.perf?.ignore;
+  if (perfIgnore !== undefined) {
+    if (!Array.isArray(perfIgnore) || perfIgnore.some((p) => typeof p !== 'string' || p.length === 0)) {
+      throw new ConfigValidationError('"perf.ignore" must be an array of non-empty schema.table glob patterns.');
+    }
+  }
   return { rules, overrides };
+}
+
+/**
+ * `perf.rules` may only retune perf-dimension codes — otherwise a security
+ * rule would silently change behind the perf flag.
+ */
+function assertPerfSelectors(rules: RulesConfig): void {
+  for (const selector of Object.keys(rules)) {
+    const codes = expandRuleSelector(selector);
+    if (codes.length === 0) {
+      throw new ConfigValidationError(
+        `Unknown rule code "${selector}" in "perf.rules". Perf rules: ${perfRuleCodes().join(', ')}.`
+      );
+    }
+    const security = codes.filter((code) => dimensionOf(RULES_BY_CODE.get(code)!) !== 'perf');
+    if (security.length > 0) {
+      throw new ConfigValidationError(
+        `"perf.rules" may only configure perf-dimension rules; "${selector}" matches security rule(s) `
+          + `${security.join(', ')}. Configure those under the top-level "rules".`
+      );
+    }
+  }
+}
+
+/** Rule codes belonging to a scoring dimension. */
+export function ruleCodesForDimension(dimension: Dimension): string[] {
+  return RULES.filter((r) => dimensionOf(r) === dimension).map((r) => r.code);
+}
+
+function perfRuleCodes(): string[] {
+  return ruleCodesForDimension('perf');
 }
 
 /** Simple `*` glob match against a qualified `schema.table` name. */

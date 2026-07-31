@@ -1,4 +1,4 @@
-import type { Direction, Finding, Severity } from '../types';
+import type { Dimension, Direction, Finding, Severity } from '../types';
 
 /**
  * Static metadata for every rule safegres can emit. Severity here is the
@@ -16,12 +16,23 @@ export interface RuleMeta {
    * to the score by default. `fail-open` findings are actual exposure.
    */
   direction: Direction;
+  /**
+   * Scoring axis. `security` rules drive the audit score; `perf` rules drive
+   * the optional performance score and are only collected when the perf
+   * dimension is enabled. Defaults to `security` when omitted.
+   */
+  dimension?: Dimension;
   title: string;
   /**
    * Rules with `scope: 'policy-ast'` require parsing policy expressions.
    * When every one of them is disabled the audit skips AST work entirely.
    */
-  scope: 'table' | 'policy-ast';
+  scope: 'table' | 'policy-ast' | 'index';
+}
+
+/** The scoring axis a rule belongs to (`security` unless declared otherwise). */
+export function dimensionOf(meta: RuleMeta): Dimension {
+  return meta.dimension ?? 'security';
 }
 
 export const RULES: RuleMeta[] = [
@@ -94,6 +105,7 @@ export const RULES: RuleMeta[] = [
     category: 'anti-pattern',
     defaultSeverity: 'high',
     direction: 'neutral',
+    dimension: 'perf',
     title: 'Policy body calls a VOLATILE function (per-row evaluation)',
     scope: 'policy-ast'
   },
@@ -102,6 +114,7 @@ export const RULES: RuleMeta[] = [
     category: 'anti-pattern',
     defaultSeverity: 'medium',
     direction: 'neutral',
+    dimension: 'perf',
     title: 'Policy body calls a SECURITY DEFINER wrapper (cannot be inlined)',
     scope: 'policy-ast'
   },
@@ -144,6 +157,33 @@ export const RULES: RuleMeta[] = [
     direction: 'neutral',
     title: 'No exposure surface configured — the whole database is assumed reachable and the score is capped',
     scope: 'table'
+  },
+  {
+    code: 'X1',
+    category: 'index',
+    defaultSeverity: 'medium',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'Foreign key with no covering index (slow joins and cascading deletes)',
+    scope: 'index'
+  },
+  {
+    code: 'X5',
+    category: 'index',
+    defaultSeverity: 'low',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'Redundant index — duplicated by, or a leading-column prefix of, another index',
+    scope: 'index'
+  },
+  {
+    code: 'X6',
+    category: 'index',
+    defaultSeverity: 'low',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'Table has no primary key / no usable replica identity',
+    scope: 'index'
   }
 ];
 

@@ -59,6 +59,12 @@ Exposure (what the score is computed against):
                            them become unscored internal advisories
   --exposed-only           Hide internal (non-exposed) findings from output
 
+Performance dimension (optional; scored separately from security):
+  --perf                   Also audit index hygiene (X1/X5/X6) and score it on
+                           its own 0-100 axis (report.perf)
+  --fail-on-perf-score <n> Exit non-zero if the perf score is below n (0-100)
+  --fail-on-perf-grade <g> Exit non-zero if the perf grade is below g (A+|A|B|C|D)
+
 Call graph (unscored; human review):
   --call-graph             Analyze the functions reachable from the exposed entry
                            points and list trust boundaries: SECURITY DEFINER hops,
@@ -110,6 +116,7 @@ export default async (
     includeRoles: csvList(argv.roles),
     excludeRoles: csvList(argv['exclude-roles']),
     skipAstChecks: argv['skip-ast'] === true,
+    perf: argv.perf === true ? true : undefined,
     callGraph:
       argv['call-graph'] === true
       || typeof argv.baseline === 'string'
@@ -201,6 +208,24 @@ export default async (
     typeof argv['fail-on-grade'] === 'string' ? (argv['fail-on-grade'] as Grade) : config.failOn?.grade;
   if (failOnGrade && report.score && !meetsGrade(report.score.grade, failOnGrade)) {
     log.error(`grade ${report.score.grade} is below --fail-on-grade ${failOnGrade}`);
+    process.exit(1);
+  }
+
+  const failOnPerfScore =
+    typeof argv['fail-on-perf-score'] === 'number'
+      ? argv['fail-on-perf-score']
+      : config.failOn?.perfScore;
+  if (failOnPerfScore != null && report.perf && report.perf.score.value < failOnPerfScore) {
+    log.error(`perf score ${report.perf.score.value} is below --fail-on-perf-score ${failOnPerfScore}`);
+    process.exit(1);
+  }
+
+  const failOnPerfGrade =
+    typeof argv['fail-on-perf-grade'] === 'string'
+      ? (argv['fail-on-perf-grade'] as Grade)
+      : config.failOn?.perfGrade;
+  if (failOnPerfGrade && report.perf && !meetsGrade(report.perf.score.grade, failOnPerfGrade)) {
+    log.error(`perf grade ${report.perf.score.grade} is below --fail-on-perf-grade ${failOnPerfGrade}`);
     process.exit(1);
   }
 

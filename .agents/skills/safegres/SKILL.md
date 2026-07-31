@@ -65,12 +65,14 @@ The score only improves by being **explicit** (declaring exposure and intent) or
 | A6 | info | fail-closed | UPDATE has `USING` but **no `WITH CHECK`** |
 | A7 | critical | fail-open | Trivially-permissive **WRITE** policy (`true`) |
 | A8 | low | fail-open | Trivially-permissive **SELECT** policy (`USING (true)`) |
-| P1 | high | neutral | Policy body calls a **VOLATILE** function |
+| P1 | high | neutral | Policy body calls a **VOLATILE** function (perf dimension) |
 | P5 | high | fail-open | Policy body references `session_user`/`current_user`/`pg_has_role` |
 | R1 | critical | fail-open | An **untrusted role** holds a write privilege |
 | R2 | high | fail-open | Permissive write policy applies to untrusted role or PUBLIC |
 | R3 | medium | fail-open | RLS table has grants **TO PUBLIC** |
 | W1 | medium | meta | No exposure surface configured — DB assumed reachable, score capped |
+
+Perf-dimension rules (only collected with `--perf`, scored on their own axis): **X1** FK with no covering index (medium), **X5** redundant/duplicate index (low), **X6** no primary key and no usable replica identity (low), plus P1/P1b.
 
 **Direction is the key idea:** `fail-open` = real exposure (untrusted side reaches more than intended). `fail-closed` = denied at runtime (hygiene/availability, not a leak) — contributes **0** to the score by default. R1/R2 are no-ops until you configure a role list; `safegres:constructive` sets them for `anonymous`.
 
@@ -98,6 +100,22 @@ Config is discovered by walking up from cwd: `safegres.config.{ts,js,mjs,cjs}`, 
 ```
 
 Typed variant (`defineConfig` from `confstash`) works too — see the package README.
+
+## Performance dimension (`--perf`, off by default)
+
+`safegres perf` / `safegres audit --perf` adds `report.perf` — its own findings, summary, and 0-100 score over index hygiene (X1/X5/X6) and policy cost (P1/P1b). Security and perf scores are never mixed: `report.score` sees only security findings, `report.perf.score` only perf ones. All checks are pure catalog analysis, so they're deterministic against an empty CI database.
+
+```jsonc
+{
+  "perf": {
+    "enabled": true,
+    "rules": { "X6": "off" },          // perf codes only — naming a security rule is a config error
+    "ignore": ["app_public.audit_*"],  // acknowledged: reported as info, off the perf score
+    "scoring": { "densityK": 0.17 }
+  },
+  "failOn": { "perfGrade": "B" }       // CLI: --fail-on-perf-score / --fail-on-perf-grade
+}
+```
 
 ### Presets
 
@@ -175,6 +193,8 @@ score = 100 · exp(−k · riskPoints / exposedTables)
 
 ```bash
 safegres audit                     # audit the connected DB (default command)
+safegres perf                      # audit + index-hygiene dimension (= audit --perf)
+safegres audit --perf --fail-on-perf-grade B
 safegres audit --format json       # machine-readable
 safegres audit --exposed-only      # hide internal advisories
 safegres doctor                    # config/parser/connection/catalog + exposure + stale public.read checks
@@ -194,6 +214,9 @@ await client.connect();
 const report = await audit(client, { config: { extends: 'safegres:constructive' } });
 console.log(renderPretty(report));
 console.log(report.score);   // { value, grade, model, deductions, ... }
+
+const perfReport = await audit(client, { perf: true });
+console.log(perfReport.perf?.score);   // separate 0-100 perf axis (undefined unless perf is on)
 ```
 
 ## CI integration

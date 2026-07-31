@@ -26,6 +26,11 @@ export type {
   ChecklistItem
 } from './callgraph/graph';
 export { buildCallGraph } from './callgraph/graph';
+export {
+  checkMissingPrimaryKey,
+  checkRedundantIndexes,
+  checkUnindexedForeignKeys
+} from './checks/indexes';
 export type { RoleTrustOptions } from './checks/role-trust';
 export {
   checkPublicGrants,
@@ -47,6 +52,7 @@ export {
   defaultRuleMap,
   matchTablePattern,
   resolveRules,
+  ruleCodesForDimension,
   rulesForTable
 } from './config/resolve';
 export type {
@@ -54,6 +60,7 @@ export type {
   FailOnConfig,
   Grade,
   OverrideEntry,
+  PerfConfig,
   RulesConfig,
   RuleSetting,
   SafegresConfig,
@@ -63,6 +70,8 @@ export type { ResolvedExposure } from './pg/exposure';
 export { resolveConstructiveExposure, resolveExposure, UNKNOWN_EXPOSURE } from './pg/exposure';
 export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from './pg/functions';
 export { introspectFunctions } from './pg/functions';
+export type { ForeignKeyInfo, IndexInfo, TableIndexSnapshot } from './pg/indexes';
+export { introspectIndexes } from './pg/indexes';
 export {
   type IntrospectOptions,
   introspectTables,
@@ -77,7 +86,7 @@ export { renderCallGraph, renderCallGraphDiff } from './report/callgraph';
 export { renderJson } from './report/json';
 export { renderPretty } from './report/pretty';
 export type { RuleMeta } from './rules/registry';
-export { expandRuleSelector, isKnownRule, RULES, RULES_BY_CODE } from './rules/registry';
+export { dimensionOf, expandRuleSelector, isKnownRule, RULES, RULES_BY_CODE } from './rules/registry';
 export type { Score, ScoreContext, ScoreDeduction } from './score/score';
 export { computeScore, DEFAULT_GRADE_BANDS, DEFAULT_WEIGHTS, meetsGrade } from './score/score';
 export * from './types';
