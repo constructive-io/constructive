@@ -72,7 +72,7 @@ The score only improves by being **explicit** (declaring exposure and intent) or
 | R3 | medium | fail-open | RLS table has grants **TO PUBLIC** |
 | W1 | medium | meta | No exposure surface configured — DB assumed reachable, score capped |
 
-Perf-dimension rules (only collected with `--perf`, scored on their own axis): **X1** FK with no covering index (medium), **X2** policy filters on a column that leads no index (medium), **X3** policy casts/wraps its own column with no matching expression index (medium), **X4** policy calls a non-LEAKPROOF function (low), **X5** redundant/duplicate index (low), **X6** no primary key and no usable replica identity (low), **X7** search column with no index the search can use — `tsvector` w/o GIN/GiST, `vector` w/o HNSW/IVFFlat (medium), **X8** sort-shaped `timestamptz`/`date` column leading no index (info, heuristic), plus P1/P1b.
+Perf-dimension rules (only collected with `--perf`, scored on their own axis; `S*` additionally need `--stats`): **X1** FK with no covering index (medium), **X2** policy filters on a column that leads no index (medium), **X3** policy casts/wraps its own column with no matching expression index (medium), **X4** policy calls a non-LEAKPROOF function (low), **X5** redundant/duplicate index (low), **X6** no primary key and no usable replica identity (low), **X7** search column with no index the search can use — `tsvector` w/o GIN/GiST, `vector` w/o HNSW/IVFFlat (medium), **X8** sort-shaped `timestamptz`/`date` column leading no index (info, heuristic), plus P1/P1b and the runtime-statistics rules **S1**-**S4**.
 
 **Direction is the key idea:** `fail-open` = real exposure (untrusted side reaches more than intended). `fail-closed` = denied at runtime (hygiene/availability, not a leak) — contributes **0** to the score by default. R1/R2 are no-ops until you configure a role list; `safegres:constructive` sets them for `anonymous`.
 
@@ -131,6 +131,14 @@ safegres audit --perf-baseline .safegres-perf.json --fail-on-new-perf   # exit 1
 ```
 
 Entries are keyed by code + relation + policy + subject (constraint/index/expression/column/function), never by message text, so safegres upgrades don't invalidate a committed baseline. Fixed findings are reported so you can re-baseline and stop them regressing. Library: `toPerfBaseline(findings)` / `diffPerf(findings, baseline)` → `{ added, removed, accepted }`; also emitted as `report.perf.diff`. Prefer this over asserting a perf grade in a test — it fails on the change, not on inherited debt.
+
+### Runtime statistics (`--stats`, implies `--perf`)
+
+The `S*` rules read what the workload did, from `pg_stat_user_tables` / `pg_stat_user_indexes` / optional `pg_stat_statements`: **S1** seq-scan-dominant table (medium), **S2** index the planner has never chosen (low), **S3** dead-tuple bloat (low), **S4** statement hotspot on a table in scope (info). Only meaningful against a database that has served real traffic — never in a fresh CI database. Every threshold is a floor and configurable under `perf.stats` (`minRows`, `seqScanRatio`, `minIndexBytes`, `deadTupleRatio`, `minTimeShare`, `topStatements`). `S*` findings **are scored** on the perf axis (asking for `--stats` is the opt-in); `perf.scoring.includeStats: false` demotes them to advisories. `report.perf.stats` carries provenance: tables read, `statsReset` (the window the counters describe), whether they were scored, and a note when `pg_stat_statements` isn't installed — a missing extension is never an error.
+
+### Planner proof (`--explain`, implies `--perf`)
+
+Turns catalog inference into evidence: each probeable finding's query shape is planned with `EXPLAIN (GENERIC_PLAN, FORMAT JSON)` (nothing executed, parameters stay parameters) and the plan is attached as `finding.evidence`. A finding the planner serves with an index is **refuted** — acknowledged, demoted to info, dropped from the perf score (e.g. a hash index on an FK column, which X1 doesn't credit). A seq scan only **confirms** above `perf.explain.minRows` (default 1000), because an empty table always seq-scans; below that the probe is `inconclusive` and the finding is untouched. Probes exist for X1/X2/X7/X8 only — the rules that name a query shape. Requires PostgreSQL 16+; otherwise `report.perf.explain.unavailable` explains why nothing was probed.
 
 ### Presets
 
@@ -211,6 +219,8 @@ safegres audit                     # audit the connected DB (default command)
 safegres perf                      # audit + index-hygiene dimension (= audit --perf)
 safegres audit --perf --fail-on-perf-grade B
 safegres audit --perf-baseline .safegres-perf.json --fail-on-new-perf   # ratchet: only new debt fails
+safegres audit --stats             # + runtime-statistics rules S1-S4 (implies --perf)
+safegres audit --explain           # + prove findings with EXPLAIN (implies --perf, PG16+)
 safegres audit --format json       # machine-readable
 safegres audit --exposed-only      # hide internal advisories
 safegres doctor                    # config/parser/connection/catalog + exposure + stale public.read checks

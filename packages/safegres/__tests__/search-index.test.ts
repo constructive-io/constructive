@@ -33,6 +33,7 @@ function table(over: Partial<TableIndexSnapshot> = {}): TableIndexSnapshot {
     isPartition: false,
     replicaIdentity: 'd',
     hasPrimaryKey: true,
+    estimatedRows: 0,
     columns: [],
     indexes: [],
     foreignKeys: [],

@@ -67,6 +67,26 @@ export interface Finding {
   hint?: string;
   /** Optional machine-readable extras (AST nodes, offending function name, …). */
   context?: Record<string, unknown>;
+  /**
+   * Proof attached by `--explain`: the plan the database produced for the
+   * query shape this finding is a claim about.
+   */
+  evidence?: FindingEvidence;
+}
+
+/**
+ * Planner evidence for a finding. `refuted` means the planner disagreed with
+ * the catalog inference — the finding is reported but no longer scored.
+ */
+export interface FindingEvidence {
+  source: 'explain';
+  status: 'confirmed' | 'refuted' | 'inconclusive';
+  /** The probe query, with parameters left unbound. */
+  probe: string;
+  /** Plan node types, outermost first. */
+  plan: string;
+  /** Why an inconclusive probe was inconclusive. */
+  note?: string;
 }
 
 export interface Summary {
@@ -109,6 +129,23 @@ export interface PerfReport {
    * are new debt, which were fixed, which are accepted.
    */
   diff?: import('./perf/baseline').PerfDiff;
+  /** Runtime-statistics provenance, present when the audit ran with `--stats`. */
+  stats?: PerfStatsReport;
+  /** Planner-proof summary, present when the audit ran with `--explain`. */
+  explain?: import('./perf/explain').ExplainReport;
+}
+
+/** Where the `S*` findings' numbers came from, and how much to trust them. */
+export interface PerfStatsReport {
+  source: 'live';
+  /** Tables whose cumulative statistics were read. */
+  tables: number;
+  /** When the counters were last reset — the window the numbers describe. */
+  statsReset: string | null;
+  /** Whether `S*` findings counted toward the perf score. */
+  scored: boolean;
+  /** Non-fatal gaps, e.g. `pg_stat_statements` not installed. */
+  notes?: string[];
 }
 
 export interface Report {

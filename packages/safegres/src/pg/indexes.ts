@@ -58,6 +58,8 @@ export interface TableIndexSnapshot {
   /** `pg_class.relreplident`: `d` default, `n` nothing, `f` full, `i` index. */
   replicaIdentity: string;
   hasPrimaryKey: boolean;
+  /** `pg_class.reltuples` — planner row estimate, `-1` when never analyzed. */
+  estimatedRows: number;
   /** User columns (no system or dropped attributes), in attribute order. */
   columns: ColumnInfo[];
   indexes: IndexInfo[];
@@ -90,7 +92,8 @@ export async function introspectIndexes(
         c.relname          AS table_name,
         c.oid              AS oid,
         c.relispartition   AS is_partition,
-        c.relreplident     AS replica_identity
+        c.relreplident     AS replica_identity,
+        c.reltuples        AS estimated_rows
       FROM pg_class c
       JOIN pg_namespace n ON n.oid = c.relnamespace
       WHERE c.relkind IN ('r', 'p')
@@ -130,6 +133,7 @@ export async function introspectIndexes(
       r.oid::int                                        AS oid,
       r.is_partition,
       r.replica_identity::text                          AS replica_identity,
+      r.estimated_rows::float8                          AS estimated_rows,
       COALESCE(
         (SELECT jsonb_agg(jsonb_build_object(
           'name', x.name,
@@ -176,6 +180,7 @@ export async function introspectIndexes(
     oid: number;
     is_partition: boolean;
     replica_identity: string;
+    estimated_rows: number;
     indexes: IndexInfo[];
     foreign_keys: ForeignKeyInfo[];
     columns: ColumnInfo[];
@@ -188,6 +193,7 @@ export async function introspectIndexes(
     isPartition: r.is_partition,
     replicaIdentity: r.replica_identity,
     hasPrimaryKey: r.indexes.some((i) => i.primary),
+    estimatedRows: Number(r.estimated_rows),
     columns: r.columns,
     indexes: r.indexes,
     foreignKeys: r.foreign_keys

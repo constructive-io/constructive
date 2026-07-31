@@ -162,6 +162,27 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
         lines.push(renderFinding(f, paint));
       }
     }
+
+    const { stats, explain } = report.perf;
+    if (stats) {
+      lines.push(
+        paint(
+          'info',
+          `  runtime statistics: ${stats.tables} tables, counters since ${stats.statsReset ?? 'server start'}`
+            + `${stats.scored ? '' : ' (S* findings advisory — perf.scoring.includeStats is false)'}`
+        )
+      );
+      for (const note of stats.notes ?? []) lines.push(paint('info', `  ${note}`));
+    }
+    if (explain) {
+      lines.push(
+        paint(
+          'info',
+          explain.unavailable
+            ?? `  planner proof: ${explain.confirmed} confirmed, ${explain.refuted} refuted, ${explain.inconclusive} inconclusive of ${explain.probed} probed`
+        )
+      );
+    }
   }
 
   if (report.callGraph) {
@@ -201,5 +222,8 @@ function renderFinding(f: Finding, paint: (sev: Severity, s: string) => string):
   const head = `[${label}] ${f.code}  ${loc}`;
   const body = `    ${f.message}`;
   const hint = f.hint ? `    hint: ${f.hint}` : '';
-  return [head, body, hint].filter(Boolean).join('\n');
+  const evidence = f.evidence
+    ? `    plan (${f.evidence.status}): ${f.evidence.plan}${f.evidence.note ? ` — ${f.evidence.note}` : ''}`
+    : '';
+  return [head, body, hint, evidence].filter(Boolean).join('\n');
 }
