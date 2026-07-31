@@ -16,6 +16,7 @@ export {
 } from './bundle-driver';
 export type {
   GranularityChange,
+  RestructuredChange,
   RestructureModuleOptions,
   RestructureModuleResult,
 } from './granularity-driver';

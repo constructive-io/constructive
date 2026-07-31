@@ -18,6 +18,7 @@
  * - `consolidated` — additionally inlines FKs proven safe by the graph.
  */
 import { pathFor } from '@pgpmjs/naming-spec';
+import { revertFor, verifyFor } from '@pgsql/scripts';
 import type { Granularity, StatementFacts } from '@pgsql/transform';
 import {
   buildStatementGraph,
@@ -38,6 +39,22 @@ export interface GranularityChange {
   deploy: string;
 }
 
+/** A restructured change: deploy plus generated revert/verify scripts. */
+export interface RestructuredChange extends GranularityChange {
+  /**
+   * Generated revert SQL (headerless): mechanical inverses of the change's
+   * statements in reverse topological order within the group, via
+   * `revertFor`. Non-invertible statements leave a `-- revert not
+   * derivable` comment and a warning.
+   */
+  revert: string;
+  /**
+   * Generated verify SQL (headerless): one raise-on-failure existence check
+   * per created object, via `verifyFor`.
+   */
+  verify: string;
+}
+
 export interface RestructureModuleOptions {
   granularity: Granularity;
   /**
@@ -50,7 +67,7 @@ export interface RestructureModuleOptions {
 
 export interface RestructureModuleResult {
   /** Restructured changes in deploy order, dependencies recomputed. */
-  changes: GranularityChange[];
+  changes: RestructuredChange[];
   /** Non-fatal notes (folds rejected to preserve ordering, etc.). */
   warnings: string[];
 }
@@ -145,14 +162,17 @@ export function restructureChanges(
     }
   });
 
-  // Slice statement text per group, in the emitted (topological) order.
+  // Slice statement text per group, in the emitted (topological) order,
+  // and collect each group's facts for revert/verify generation.
   const groupSql: string[][] = groupNames.map((): string[] => []);
+  const groupStatements: StatementFacts[][] = groupNames.map((): StatementFacts[] => []);
 
   facts.forEach((f, i) => {
     const text = sql.slice(f.span.start, f.span.start + f.span.len).trim();
     const g = groupOf[i];
     if (g !== -1 && text) {
       groupSql[g].push(text.endsWith(';') ? text : `${text};`);
+      groupStatements[g].push(f);
     }
   });
 
@@ -185,13 +205,25 @@ export function restructureChanges(
     return firstA - firstB;
   });
 
-  const result: GranularityChange[] = order
+  const result: RestructuredChange[] = order
     .filter(g => groupSql[g].length > 0)
-    .map(g => ({
-      name: groupNames[g],
-      dependencies: [...groupDeps[g]].map(d => groupNames[d]).sort(),
-      deploy: groupSql[g].join('\n\n')
-    }));
+    .map(g => {
+      const revert = revertFor(groupStatements[g]);
+      const verify = verifyFor(groupStatements[g]);
+      for (const warning of revert.warnings) {
+        warnings.push(`${groupNames[g]}: ${warning}`);
+      }
+      for (const warning of verify.warnings) {
+        warnings.push(`${groupNames[g]}: ${warning}`);
+      }
+      return {
+        name: groupNames[g],
+        dependencies: [...groupDeps[g]].map(d => groupNames[d]).sort(),
+        deploy: groupSql[g].join('\n\n'),
+        revert: revert.sql,
+        verify: verify.sql
+      };
+    });
 
   return { changes: result, warnings };
 }

@@ -31,8 +31,11 @@ export interface RestructureExportRowsResult {
  * alteration convention via `alterationPathFor` (monotonic per-parent
  * counter), with the parent added to their deps.
  *
- * Revert/verify scripts are not carried through: the restructured grouping no
- * longer matches the original rows one-to-one, so they are emitted empty.
+ * Revert/verify scripts are not carried through from the original rows (the
+ * restructured grouping no longer matches them one-to-one); instead each
+ * change gets scripts generated from its own statements via
+ * `revertFor`/`verifyFor` (drops in reverse topological order, one existence
+ * check per created object).
  */
 export const restructureExportRows = async (
   rows: PgpmRow[],
@@ -68,8 +71,8 @@ export const restructureExportRows = async (
       deploy,
       deps,
       content: change.deploy,
-      revert: '',
-      verify: ''
+      revert: change.revert,
+      verify: change.verify
     };
   });
 

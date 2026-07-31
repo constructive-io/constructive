@@ -248,6 +248,50 @@ relocatable = false
       `);
       expect(fk.rows).toHaveLength(1);
     });
+
+    it('generates populated revert/verify scripts for each change', () => {
+      const moduleDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME);
+
+      const ownersVerify = readFileSync(
+        join(moduleDir, 'verify', 'schemas', 'pets_consolidated_public', 'tables', 'owners', 'table.sql'),
+        'utf-8'
+      );
+      expect(ownersVerify).toContain("to_regclass('pets_consolidated_public.owners')");
+
+      const ownersRevert = readFileSync(
+        join(moduleDir, 'revert', 'schemas', 'pets_consolidated_public', 'tables', 'owners', 'table.sql'),
+        'utf-8'
+      );
+      expect(ownersRevert).toContain('DROP TABLE pets_consolidated_public.owners;');
+      expect(ownersRevert).not.toContain('CASCADE');
+
+      const schemaRevert = readFileSync(
+        join(moduleDir, 'revert', 'schemas', 'pets_consolidated_public', 'schema.sql'),
+        'utf-8'
+      );
+      expect(schemaRevert).toContain('DROP SCHEMA pets_consolidated_public;');
+    });
+
+    it('verifies the deployed module with the generated verify scripts', async () => {
+      const moduleDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME);
+      const migrate = new PgpmMigrate(dbConfig);
+      const result = await migrate.verify({ modulePath: moduleDir });
+      expect(result.failed).toEqual([]);
+      expect(result.verified.length).toBeGreaterThan(0);
+    });
+
+    it('reverts the module with the generated revert scripts, leaving the DB clean', async () => {
+      const moduleDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME);
+      const migrate = new PgpmMigrate(dbConfig);
+      const result = await migrate.revert({ modulePath: moduleDir });
+      expect(result.failed).toBeUndefined();
+
+      const schema = await pg.query(`
+        SELECT schema_name FROM information_schema.schemata
+        WHERE schema_name = 'pets_consolidated_public'
+      `);
+      expect(schema.rows).toHaveLength(0);
+    });
   });
 
   describe('atomic granularity', () => {
