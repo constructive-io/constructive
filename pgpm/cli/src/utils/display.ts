@@ -17,6 +17,7 @@ export const usageText = `
     materialize        Transpile an apply proxy into a plain, committed module
     sync-versions      Sync .control/Makefile/sql metadata to package.json versions
     export             Export database migrations from existing databases
+    import             pgpm-itize a SQL dump (pg_dump) into a pgpm module
     update             Update pgpm to the latest version
     cache              Manage cached templates (clean)
     upgrade            Upgrade installed pgpm modules to latest versions (alias: up)

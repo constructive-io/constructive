@@ -138,7 +138,7 @@ const writeControlFile = (dir: string, name: string, requires: string[]): void =
   fs.writeFileSync(path.join(dir, `${name}.control`), lines.join('\n') + '\n');
 };
 
-const writePackage = (
+export const writePackage = (
   outBase: string,
   pkg: PartitionedPackageRows,
   sourceRequires: string[]

@@ -14,6 +14,7 @@ import dump from './commands/dump';
 import env from './commands/env';
 import _export from './commands/export';
 import extension from './commands/extension';
+import importDump from './commands/import';
 import init from './commands/init';
 import install from './commands/install';
 import kill from './commands/kill';
@@ -113,6 +114,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     slice,
     'sync-versions': syncVersions,
     'test-packages': pgt(testPackages),
+    import: pgt(importDump),
     transform: pgt(transform),
     tune: pgt(tune),
     upgrade: pgt(upgrade),

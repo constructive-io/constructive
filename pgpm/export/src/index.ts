@@ -5,6 +5,8 @@ export * from './export-graphql';
 export * from './export-graphql-meta';
 export { EXPORT_GRANULARITIES, isExportGranularity, restructureExportRows } from './restructure';
 export type { ExportGranularity, RestructureExportRowsOptions, RestructureExportRowsResult } from './restructure';
+export { loadDumpSource, sanitizeDumpSql } from './dump-source';
+export type { DumpSource } from './dump-source';
 export { loadModuleSource, stripTransactionWrapper } from './module-source';
 export type { ModuleSource, ModuleSourceChange } from './module-source';
 export { parsePartitionConfig, partitionExportRows } from './partition';
