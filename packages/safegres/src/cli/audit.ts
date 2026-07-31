@@ -6,6 +6,7 @@ import { diffCallGraph, parseBaseline, serializeBaseline, toBaseline } from '../
 import { audit, type AuditOptions } from '../commands/audit';
 import { loadConfig } from '../config/loader';
 import type { Grade } from '../config/types';
+import { diffPerf, parsePerfBaseline, serializePerfBaseline, toPerfBaseline } from '../perf/baseline';
 import { renderJson } from '../report/json';
 import { renderPretty } from '../report/pretty';
 import { meetsGrade } from '../score/score';
@@ -60,10 +61,17 @@ Exposure (what the score is computed against):
   --exposed-only           Hide internal (non-exposed) findings from output
 
 Performance dimension (optional; scored separately from security):
-  --perf                   Also audit index hygiene (X1/X5/X6) and score it on
-                           its own 0-100 axis (report.perf)
+  --perf                   Also audit index hygiene (X1/X5/X6), policy-aware
+                           index coverage (X2/X3/X4) and policy cost (P1/P1b),
+                           scored on its own 0-100 axis (report.perf)
   --fail-on-perf-score <n> Exit non-zero if the perf score is below n (0-100)
   --fail-on-perf-grade <g> Exit non-zero if the perf grade is below g (A+|A|B|C|D)
+  --write-perf-baseline <file>
+                           Snapshot today's perf findings to <file> as accepted
+                           debt (implies --perf)
+  --perf-baseline <file>   Diff perf findings against a committed baseline and
+                           report only NEW debt (implies --perf)
+  --fail-on-new-perf       Exit non-zero when --perf-baseline finds new debt
 
 Call graph (unscored; human review):
   --call-graph             Analyze the functions reachable from the exposed entry
@@ -116,7 +124,12 @@ export default async (
     includeRoles: csvList(argv.roles),
     excludeRoles: csvList(argv['exclude-roles']),
     skipAstChecks: argv['skip-ast'] === true,
-    perf: argv.perf === true ? true : undefined,
+    perf:
+      argv.perf === true
+      || typeof argv['perf-baseline'] === 'string'
+      || typeof argv['write-perf-baseline'] === 'string'
+        ? true
+        : undefined,
     callGraph:
       argv['call-graph'] === true
       || typeof argv.baseline === 'string'
@@ -144,6 +157,27 @@ export default async (
   if (typeof argv['write-baseline'] === 'string' && report.callGraph) {
     fs.writeFileSync(argv['write-baseline'], serializeBaseline(toBaseline(report.callGraph)));
     log.info(`wrote call-graph baseline: ${argv['write-baseline']}`);
+  }
+
+  if (typeof argv['write-perf-baseline'] === 'string' && report.perf) {
+    fs.writeFileSync(
+      argv['write-perf-baseline'],
+      serializePerfBaseline(toPerfBaseline(report.perf.findings))
+    );
+    log.info(`wrote perf baseline: ${argv['write-perf-baseline']}`);
+  }
+
+  if (typeof argv['perf-baseline'] === 'string' && report.perf) {
+    let raw: string;
+    try {
+      raw = fs.readFileSync(argv['perf-baseline'], 'utf8');
+    } catch {
+      log.error(
+        `cannot read --perf-baseline file: ${argv['perf-baseline']} (create one with --write-perf-baseline)`
+      );
+      process.exit(2);
+    }
+    report.perf.diff = diffPerf(report.perf.findings, parsePerfBaseline(raw));
   }
 
   if (typeof argv.baseline === 'string' && report.callGraph) {
@@ -226,6 +260,14 @@ export default async (
       : config.failOn?.perfGrade;
   if (failOnPerfGrade && report.perf && !meetsGrade(report.perf.score.grade, failOnPerfGrade)) {
     log.error(`perf grade ${report.perf.score.grade} is below --fail-on-perf-grade ${failOnPerfGrade}`);
+    process.exit(1);
+  }
+
+  if (argv['fail-on-new-perf'] === true && report.perf?.diff && report.perf.diff.added.length > 0) {
+    const count = report.perf.diff.added.length;
+    log.error(
+      `${count} new performance finding${count === 1 ? '' : 's'} since the perf baseline — fix them, or re-baseline with --write-perf-baseline to accept`
+    );
     process.exit(1);
   }
 

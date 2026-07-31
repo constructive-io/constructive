@@ -89,6 +89,16 @@ export {
   type TableSnapshot
 } from './pg/introspect';
 export { listAuditableRoles, resolveRoles } from './pg/roles';
+export type { BaselineFinding, PerfBaseline, PerfDiff } from './perf/baseline';
+export {
+  diffPerf,
+  findingKey,
+  parsePerfBaseline,
+  serializePerfBaseline,
+  subjectOf,
+  toBaselineFinding,
+  toPerfBaseline
+} from './perf/baseline';
 export { renderCallGraph, renderCallGraphDiff } from './report/callgraph';
 export { renderJson } from './report/json';
 export { renderPretty } from './report/pretty';

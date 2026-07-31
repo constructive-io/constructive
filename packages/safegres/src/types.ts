@@ -104,6 +104,11 @@ export interface PerfReport {
   summary: Summary;
   /** Perf score — computed only over perf-dimension findings. */
   score: import('./score/score').Score;
+  /**
+   * Diff against a committed perf baseline (`--perf-baseline`): which findings
+   * are new debt, which were fixed, which are accepted.
+   */
+  diff?: import('./perf/baseline').PerfDiff;
 }
 
 export interface Report {

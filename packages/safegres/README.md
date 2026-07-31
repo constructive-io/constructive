@@ -138,6 +138,26 @@ safegres audit --database mydb --perf --fail-on-perf-grade B
 
 Tables matched by `perf.ignore` are acknowledged — reported as info, excluded from the perf score — the same way `public.read` works for open reads. Perf findings live in `report.findings` alongside the security ones (so `--fail-on <severity>` still sees them), but only they feed `report.perf.score`, and only security findings feed `report.score`.
 
+### Perf baseline (the ratchet)
+
+An established schema will not reach a clean perf report in one pass — but it can refuse to get worse. Commit today's findings as accepted debt, then gate CI on findings that are *not* in the baseline:
+
+```bash
+safegres audit --write-perf-baseline .safegres-perf.json          # snapshot (implies --perf)
+safegres audit --perf-baseline .safegres-perf.json                # diff: new vs accepted vs fixed
+safegres audit --perf-baseline .safegres-perf.json --fail-on-new-perf   # gate: exit 1 on new debt
+```
+
+```
+performance vs baseline:
+
+1 new perf finding since the baseline:
+  [medium] X1 app_public.comments — foreign key with no covering index
+  (14 accepted, 2 fixed)
+```
+
+Entries are identified by `code` + relation + policy + subject (the constraint, index, expression, column, or function the finding is about), so rewording a message or retuning a severity between safegres versions never invalidates a committed baseline, and two findings of the same code on the same table stay distinct. Findings that disappear are reported as fixed — re-run `--write-perf-baseline` to lock the win in and stop them regressing silently. The diff is also carried in JSON output as `perf.diff`, and available to library callers as `diffPerf(findings, baseline)`.
+
 ## Call graph (`--call-graph`)
 
 RLS findings tell you what the *tables* allow. The call graph tells you what the *functions* reach: starting from the exposed entry points (functions the API roles can `EXECUTE`), safegres statically walks each body and lists every **trust boundary** on the way — unscored, because a public `SECURITY DEFINER` calling private functions is the intended pattern (that's how `sign_in` works). The output is a deterministic checklist for human review:

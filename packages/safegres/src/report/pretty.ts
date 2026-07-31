@@ -125,6 +125,25 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     lines.push('no findings.');
   }
 
+  if (report.perf?.diff) {
+    const { added, removed, accepted } = report.perf.diff;
+    lines.push('', 'performance vs baseline:', '');
+    if (added.length === 0) {
+      lines.push(`no new perf debt (${accepted.length} accepted, ${removed.length} fixed).`);
+    } else {
+      lines.push(
+        paint('high', `${added.length} new perf finding${added.length === 1 ? '' : 's'} since the baseline:`)
+      );
+      for (const f of added) lines.push(renderFinding(f, paint));
+      lines.push(paint('info', `  (${accepted.length} accepted, ${removed.length} fixed)`));
+    }
+    if (removed.length > 0) {
+      lines.push(
+        paint('info', `  fixed since the baseline: ${removed.map((r) => `${r.code} ${r.schema}.${r.table}`).join(', ')} — re-baseline to lock the win in`)
+      );
+    }
+  }
+
   if (report.perf) {
     const perfExposed = report.perf.findings.filter((f) => f.exposed !== false);
     const perfInternal = report.perf.findings.length - perfExposed.length;

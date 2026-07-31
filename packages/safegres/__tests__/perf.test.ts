@@ -4,6 +4,7 @@ import { getConnections, PgTestClient } from 'pgsql-test';
 
 import { audit } from '../src/commands/audit';
 import { ConfigValidationError, resolveRules } from '../src/config/resolve';
+import { diffPerf, toBaselineFinding, toPerfBaseline } from '../src/perf/baseline';
 import type { Finding } from '../src/types';
 
 jest.setTimeout(120000);
@@ -158,5 +159,23 @@ describe('P1/P1b re-homed to the perf dimension', () => {
     expect(p1?.dimension).toBe('perf');
     expect(report.perf!.findings).toContain(p1);
     expect(report.score!.deductions.some((d) => d.code === 'P1')).toBe(false);
+  });
+});
+
+describe('perf baseline ratchet', () => {
+  it('accepts committed debt and flags only what is new', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x1'], perf: true });
+    const findings = report.perf!.findings;
+    expect(findings.length).toBeGreaterThan(1);
+
+    const full = toPerfBaseline(findings);
+    expect(diffPerf(findings, full).added).toHaveLength(0);
+    expect(diffPerf(findings, full).accepted).toHaveLength(findings.length);
+
+    // A baseline missing one entry is what "someone added new debt" looks like.
+    const partial = { ...full, findings: full.findings.slice(1) };
+    const diff = diffPerf(findings, partial);
+    expect(diff.added).toHaveLength(1);
+    expect(toBaselineFinding(diff.added[0])).toEqual(full.findings[0]);
   });
 });
