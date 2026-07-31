@@ -1,7 +1,3 @@
-import { mkdtempSync } from 'fs';
-import { tmpdir } from 'os';
-import { join, resolve } from 'path';
-
 import {
   bundleFromModule,
   materializeBundle,
@@ -9,14 +5,17 @@ import {
   transpileBundle,
   verifyBundle
 } from '@pgpmjs/bundle';
-import { buildSchemaRouter, loadModule, makeSchemaTranspiler, parseSqlProgram, SchemaTransformPass, SqlProgram } from '@pgpmjs/transform';
 import { excludeSubsystemPrograms, stripSubsystemSql } from '@pgpmjs/slice';
+import { buildSchemaRouter, loadModule, makeSchemaTranspiler, parseSqlProgram, SchemaTransformPass, SqlProgram } from '@pgpmjs/transform';
+import { mkdtempSync } from 'fs';
+import { tmpdir } from 'os';
+import { join, resolve } from 'path';
 
 import { ModuleMap } from '../modules/modules';
 import { hasApplySpec, readApplySpec } from './apply-spec';
 import { loadWorkspaceRoutingProfile, resolveEffectiveApplySpec } from './profile';
 import { isReuseSpec, materializeReuseModule, resolveSharedModuleName } from './reuse';
-import { ResolvedApplySpec } from './types';
+import { APPLY_SPEC_FILE, ResolvedApplySpec } from './types';
 
 export interface MaterializeApplyOptions {
   /** Directory of the source module being applied. */
@@ -277,4 +276,85 @@ export async function resolveEffectiveModulePath(
 /** Test seam: clear the per-process materialization cache. */
 export function clearApplyMaterializationCache(): void {
   materializedCache.clear();
+}
+
+export interface MaterializeWorkspaceTargetOptions {
+  /** Absolute workspace root path. */
+  workspacePath: string;
+  /** The workspace module map (proxies already synthesized in). */
+  moduleMap: ModuleMap;
+  /** Name of the apply-proxy module to materialize. */
+  target: string;
+  /** Directory to write the plain, deployable module into. */
+  outDir: string;
+}
+
+export interface MaterializeWorkspaceTargetResult {
+  /** The deployable module directory the bundle was written to. */
+  outDir: string;
+  /** The transpiled, content-addressed bundle that was materialized. */
+  bundle: MigrationBundle;
+  /** The resolved apply spec the materialization was driven by. */
+  spec: ResolvedApplySpec;
+}
+
+/**
+ * Resolve an apply-proxy module by name in a workspace and materialize it to a
+ * chosen directory as a plain, deployable module (transforms baked in — no
+ * `pgpm.apply.json`). Shared by the `pgpm materialize` command and tests; the
+ * counterpart to {@link resolveEffectiveModulePath}, but with an explicit,
+ * stable `outDir` and no per-process cache.
+ */
+export async function materializeWorkspaceTarget(
+  options: MaterializeWorkspaceTargetOptions
+): Promise<MaterializeWorkspaceTargetResult> {
+  const { workspacePath, moduleMap, target, outDir } = options;
+
+  const module = moduleMap[target];
+  if (!module) {
+    const proxies = Object.keys(moduleMap).sort();
+    throw new Error(
+      `Module "${target}" not found in the workspace.` +
+        (proxies.length ? ` Available modules: ${proxies.join(', ')}.` : '')
+    );
+  }
+
+  const modulePath = resolve(workspacePath, module.path);
+  if (!hasApplySpec(modulePath)) {
+    throw new Error(
+      `Module "${target}" is not an apply proxy (no ${APPLY_SPEC_FILE} in ${modulePath}). ` +
+        `Only apply-proxy modules can be materialized.`
+    );
+  }
+
+  const spec = resolveEffectiveApplySpec(
+    readApplySpec(modulePath),
+    loadWorkspaceRoutingProfile(workspacePath)
+  );
+
+  if (isReuseSpec(spec)) {
+    throw new Error(
+      `Apply proxy "${target}" is a reuse proxy (shared + per-tenant). ` +
+        `Reuse proxies are not yet supported by \`pgpm materialize\`.`
+    );
+  }
+
+  const sourceModule = moduleMap[spec.source.module];
+  if (!sourceModule) {
+    throw new Error(
+      `Apply spec in "${target}" references source module "${spec.source.module}", ` +
+        `which was not found in the workspace. Run \`pgpm install\` to install it` +
+        (spec.source.package ? ` (${spec.source.package})` : '') +
+        `.`
+    );
+  }
+
+  const sourceDir = resolve(workspacePath, sourceModule.path);
+  const { outDir: writtenDir, bundle } = await materializeApplyModule({
+    sourceDir,
+    spec,
+    outDir
+  });
+
+  return { outDir: writtenDir, bundle, spec };
 }

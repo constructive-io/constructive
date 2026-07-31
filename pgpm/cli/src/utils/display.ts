@@ -12,6 +12,7 @@ export const usageText = `
     extension          Manage module dependencies
     plan               Generate module deployment plans
     package            Package module for distribution
+    materialize        Transpile an apply proxy into a plain, committed module
     sync-versions      Sync .control/Makefile/sql metadata to package.json versions
     export             Export database migrations from existing databases
     update             Update pgpm to the latest version

@@ -17,6 +17,7 @@ import extension from './commands/extension';
 import init from './commands/init';
 import install from './commands/install';
 import kill from './commands/kill';
+import materialize from './commands/materialize';
 import migrate from './commands/migrate';
 import _package from './commands/package';
 import plan from './commands/plan';
@@ -57,6 +58,7 @@ const ENGINE_EXEMPT_COMMANDS = new Set([
   'init',
   'install',
   'package',
+  'materialize',
   'plan',
   'remove',
   'rename',
@@ -101,6 +103,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     kill: pgt(kill),
     install: pgt(install),
     migrate: pgt(migrate),
+    materialize,
     analyze: pgt(analyze),
     rename: pgt(renameCmd),
     slice,
