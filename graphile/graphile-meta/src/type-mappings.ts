@@ -94,13 +94,13 @@ function extractEnumMeta(
 }
 
 export interface BuildFieldMetaOptions {
-  columnName?: string;
   isPrimaryKey?: boolean;
   isForeignKey?: boolean;
 }
 
 export function buildFieldMeta(
   name: string,
+  columnName: string,
   attr: PgAttribute | null | undefined,
   build?: GqlTypeResolverBuild,
   options?: BuildFieldMetaOptions,
@@ -112,7 +112,7 @@ export function buildFieldMeta(
 
   return {
     name,
-    columnName: options?.columnName ?? name,
+    columnName,
     type: {
       pgType,
       gqlType: build ? resolveGqlTypeName(build, attr?.codec) : pgTypeToGqlType(pgType),

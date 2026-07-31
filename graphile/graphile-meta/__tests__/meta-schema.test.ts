@@ -852,9 +852,7 @@ describe('MetaSchemaPlugin', () => {
   describe('buildFieldMeta', () => {
     it('builds field meta with correct gqlType mapping', () => {
       const attr = createMockAttribute('timestamptz', { notNull: true, hasDefault: true });
-      const result = _buildFieldMeta('createdAt', attr, undefined, {
-        columnName: 'created_at'
-      });
+      const result = _buildFieldMeta('createdAt', 'created_at', attr);
 
       expect(result).toEqual({
         name: 'createdAt',
@@ -878,7 +876,7 @@ describe('MetaSchemaPlugin', () => {
     });
 
     it('handles null/undefined attributes gracefully', () => {
-      const result = _buildFieldMeta('broken', null);
+      const result = _buildFieldMeta('broken', 'broken', null);
       expect(result.name).toBe('broken');
       expect(result.type.pgType).toBe('unknown');
       expect(result.type.gqlType).toBe('unknown');
@@ -889,13 +887,13 @@ describe('MetaSchemaPlugin', () => {
       const attr = createMockAttribute('text', {
         codec: { name: 'text', arrayOfCodec: { name: '_text' } }
       });
-      const result = _buildFieldMeta('tags', attr);
+      const result = _buildFieldMeta('tags', 'tags', attr);
       expect(result.type.isArray).toBe(true);
     });
 
     it('detects non-array types', () => {
       const attr = createMockAttribute('text');
-      const result = _buildFieldMeta('name', attr);
+      const result = _buildFieldMeta('name', 'name', attr);
       expect(result.type.isArray).toBe(false);
     });
 
@@ -908,7 +906,7 @@ describe('MetaSchemaPlugin', () => {
         getGraphQLTypeNameByPgCodec: (): string | null => null
       };
 
-      const result = _buildFieldMeta('id', attr, build);
+      const result = _buildFieldMeta('id', 'id', attr, build);
       expect(result.type.gqlType).toBe('UUID');
     });
 
@@ -917,7 +915,7 @@ describe('MetaSchemaPlugin', () => {
         codec: { name: '_int4', arrayOfCodec: { name: 'int4' } }
       });
 
-      const result = _buildFieldMeta('ids', attr, {});
+      const result = _buildFieldMeta('ids', 'ids', attr, {});
       expect(result.type.gqlType).toBe('Int');
       expect(result.type.isArray).toBe(true);
     });
@@ -926,21 +924,21 @@ describe('MetaSchemaPlugin', () => {
       const attr = createMockAttribute('geometry', {
         extensions: { geometrySubtype: 'Polygon' }
       });
-      const result = _buildFieldMeta('zoneBoundary', attr);
+      const result = _buildFieldMeta('zoneBoundary', 'zoneBoundary', attr);
       expect(result.type.subtype).toBe('Polygon');
       expect(result.type.gqlType).toBe('GeoJSON');
     });
 
     it('returns null subtype when no geometrySubtype extension', () => {
       const attr = createMockAttribute('geometry');
-      const result = _buildFieldMeta('location', attr);
+      const result = _buildFieldMeta('location', 'location', attr);
       expect(result.type.subtype).toBeNull();
       expect(result.type.gqlType).toBe('GeoJSON');
     });
 
     it('returns null subtype for non-geometry types', () => {
       const attr = createMockAttribute('text');
-      const result = _buildFieldMeta('name', attr);
+      const result = _buildFieldMeta('name', 'name', attr);
       expect(result.type.subtype).toBeNull();
     });
   });
@@ -966,24 +964,24 @@ describe('MetaSchemaPlugin', () => {
       ['cidr', 'inet'],
       ['bytea', 'bytea']
     ])('maps %s → encoding.kind %s', (pg, kind) => {
-      const result = _buildFieldMeta('col', createMockAttribute(pg));
+      const result = _buildFieldMeta('col', 'col', createMockAttribute(pg));
       expect(result.type.encoding).toEqual({ kind });
     });
 
     it.each([['text'], ['varchar'], ['bool'], ['int4'], ['float8'], ['json'], ['jsonb']])(
       'returns null encoding for plain scalar %s',
       (pg) => {
-        const result = _buildFieldMeta('col', createMockAttribute(pg));
+        const result = _buildFieldMeta('col', 'col', createMockAttribute(pg));
         expect(result.type.encoding).toBeNull();
       }
     );
 
     it('returns null encoding when the attribute/codec is missing', () => {
-      expect(_buildFieldMeta('broken', null).type.encoding).toBeNull();
+      expect(_buildFieldMeta('broken', 'broken', null).type.encoding).toBeNull();
     });
 
     it('marks ltree with dotPath', () => {
-      const result = _buildFieldMeta('path', createMockAttribute('ltree'));
+      const result = _buildFieldMeta('path', 'path', createMockAttribute('ltree'));
       expect(result.type.encoding).toEqual({ kind: 'ltree', dotPath: true });
     });
 
@@ -991,7 +989,7 @@ describe('MetaSchemaPlugin', () => {
       const attr = createMockAttribute('geometry', {
         extensions: { geometrySubtype: 'Polygon', geometrySrid: 4326 }
       });
-      const result = _buildFieldMeta('zoneBoundary', attr);
+      const result = _buildFieldMeta('zoneBoundary', 'zoneBoundary', attr);
       expect(result.type.encoding).toEqual({
         kind: 'geojson',
         geometrySubtype: 'Polygon',
@@ -1000,7 +998,7 @@ describe('MetaSchemaPlugin', () => {
     });
 
     it('describes geometry with null subtype/srid when extensions absent', () => {
-      const result = _buildFieldMeta('location', createMockAttribute('geometry'));
+      const result = _buildFieldMeta('location', 'location', createMockAttribute('geometry'));
       expect(result.type.encoding).toEqual({
         kind: 'geojson',
         geometrySubtype: null,
@@ -1012,7 +1010,7 @@ describe('MetaSchemaPlugin', () => {
       const attr = createMockAttribute('vector', {
         extensions: { vectorDimensions: 1536 }
       });
-      const result = _buildFieldMeta('embedding', attr);
+      const result = _buildFieldMeta('embedding', 'embedding', attr);
       expect(result.type.encoding).toEqual({
         kind: 'vector',
         elementType: 'float',
@@ -1021,7 +1019,7 @@ describe('MetaSchemaPlugin', () => {
     });
 
     it('describes vector with null dimensions when unspecified', () => {
-      const result = _buildFieldMeta('embedding', createMockAttribute('vector'));
+      const result = _buildFieldMeta('embedding', 'embedding', createMockAttribute('vector'));
       expect(result.type.encoding).toEqual({
         kind: 'vector',
         elementType: 'float',
@@ -1033,7 +1031,7 @@ describe('MetaSchemaPlugin', () => {
       const attr = createMockAttribute('_uuid', {
         codec: { name: '_uuid', arrayOfCodec: { name: 'uuid' } }
       });
-      const result = _buildFieldMeta('ids', attr);
+      const result = _buildFieldMeta('ids', 'ids', attr);
       expect(result.type.isArray).toBe(true);
       expect(result.type.encoding).toEqual({ kind: 'uuid' });
     });
@@ -1042,7 +1040,7 @@ describe('MetaSchemaPlugin', () => {
       const attr = createMockAttribute('citext_domain', {
         codec: { name: 'citext_domain', arrayOfCodec: null, domainOfCodec: { name: 'int8' } }
       });
-      const result = _buildFieldMeta('big', attr);
+      const result = _buildFieldMeta('big', 'big', attr);
       expect(result.type.encoding).toEqual({ kind: 'bigint' });
     });
 
@@ -1054,7 +1052,7 @@ describe('MetaSchemaPlugin', () => {
           attributes: { street: { codec: { name: 'text' } } }
         }
       });
-      const result = _buildFieldMeta('addr', attr);
+      const result = _buildFieldMeta('addr', 'addr', attr);
       expect(result.type.encoding).toEqual({ kind: 'composite', fields: null });
     });
   });

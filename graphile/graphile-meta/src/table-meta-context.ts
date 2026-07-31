@@ -42,9 +42,9 @@ export function buildFieldList(
   return attrNames.map((attrName) =>
     buildFieldMeta(
       context.inflectAttr(attrName, codec),
+      attrName,
       attributes[attrName],
       context.build,
-      { columnName: attrName },
     ),
   );
 }

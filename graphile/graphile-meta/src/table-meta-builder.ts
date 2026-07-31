@@ -77,8 +77,7 @@ function buildTableMeta(
     }
 
     const fieldName = context.inflectAttr(attrName, codec);
-    const fieldMeta = buildFieldMeta(fieldName, attr, context.build, {
-      columnName: attrName,
+    const fieldMeta = buildFieldMeta(fieldName, attrName, attr, context.build, {
       isPrimaryKey: pkAttrNames.has(attrName),
       isForeignKey: fkAttrNames.has(attrName)
     });

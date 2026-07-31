@@ -40,10 +40,12 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
       },
 
       finalize(schema, rawBuild) {
-        // Compatibility only; the resolver recomputes from its final info.schema.
+        // Populate the legacy module-level cache for consumers that read
+        // `_cachedTablesMeta` without executing `_meta`. Deliberately does NOT
+        // pre-warm the per-schema memo: later finalizers may still mutate the
+        // schema, and the resolver must recompute from its final info.schema.
         const build = rawBuild as unknown as MetaBuild;
-        const tables = collectTablesMeta(build, schema);
-        setCachedTablesMeta(tables);
+        setCachedTablesMeta(collectTablesMeta(build, schema));
         return schema;
       },
     },
