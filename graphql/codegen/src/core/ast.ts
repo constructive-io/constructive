@@ -6,12 +6,12 @@
  * now live in graphql-query.
  */
 export {
+  createOne,
+  deleteOne,
   getAll,
   getCount,
   getMany,
   getOne,
-  createOne,
-  patchOne,
-  deleteOne,
   getSelections,
+  patchOne,
 } from '@constructive-io/graphql-query';

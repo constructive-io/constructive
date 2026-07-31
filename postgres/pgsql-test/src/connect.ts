@@ -2,12 +2,10 @@ import { getConnEnvOptions } from '@pgpmjs/env';
 import { PgTestConnectionOptions } from '@pgpmjs/types';
 import { randomUUID } from 'crypto';
 import { teardownPgPools } from 'pg-cache';
-
 import {
   getPgEnvOptions,
   PgConfig,
 } from 'pg-env';
-
 import { getDefaultRole } from 'pgsql-client';
 
 import { DbAdmin } from './admin';

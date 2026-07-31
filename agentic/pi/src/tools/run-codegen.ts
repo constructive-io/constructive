@@ -5,9 +5,6 @@ import path from 'node:path';
 import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
 import { z } from 'zod';
 
-import { getHost } from '../host';
-import { toolSchema } from '../tool-schema';
-
 import {
   ensureAppScaffold,
   ensureWorkspaceConfig,
@@ -16,8 +13,10 @@ import {
   prewarmAppWorkspace,
   run,
 } from '../app-workspace';
+import { getHost } from '../host';
 import { normalizeSdkBarrels } from '../run-codegen/barrels';
 import { codegenEndpointEnv, derivePlaneEndpoints, envLocalContent } from '../run-codegen/endpoints';
+import { toolSchema } from '../tool-schema';
 
 const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
 

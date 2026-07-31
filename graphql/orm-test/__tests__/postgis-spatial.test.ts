@@ -20,11 +20,12 @@
  *
  * Requires postgres-plus image with the `postgis` extension.
  */
-import { join } from 'path';
-import { getConnectionsObject, seed } from 'graphile-test';
-import type { GraphQLQueryFnObj } from 'graphile-test';
-import { ConstructivePreset } from 'graphile-settings';
 import { runCodegenAndLoad } from '@constructive-io/graphql-test';
+import { ConstructivePreset } from 'graphile-settings';
+import type { GraphQLQueryFnObj } from 'graphile-test';
+import { getConnectionsObject, seed } from 'graphile-test';
+import { join } from 'path';
+
 import { GraphileTestAdapter } from './helpers/graphile-adapter';
 
 jest.setTimeout(120000);

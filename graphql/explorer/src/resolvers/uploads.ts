@@ -1,8 +1,8 @@
 import Streamer from '@constructive-io/s3-streamer';
 import uploadNames from '@constructive-io/upload-names';
+import type { BucketProvider } from '@pgpmjs/types';
 import { ReadStream } from 'fs';
 import type { GraphQLResolveInfo } from 'graphql';
-import type { BucketProvider } from '@pgpmjs/types';
 
 interface UploaderOptions {
   bucketName: string;

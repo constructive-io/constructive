@@ -2,12 +2,11 @@ import assert from 'node:assert/strict';
 import { after, describe, test } from 'node:test';
 
 import { createClient } from '../src/generated/orm';
-
 import {
   assertLiveEnvConfigured,
+  type AuthSession,
   getLiveEnvHelpMessage,
   getLiveTestEnv,
-  type AuthSession,
   signIn,
   signOut,
 } from './live-test-utils';

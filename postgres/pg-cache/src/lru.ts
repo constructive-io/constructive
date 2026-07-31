@@ -1,5 +1,5 @@
-import { parseEnvNumber } from '12factor-env';
 import { Logger } from '@pgpmjs/logger';
+import { parseEnvNumber } from '12factor-env';
 import { LRUCache } from 'lru-cache';
 import pg from 'pg';
 

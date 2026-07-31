@@ -7,9 +7,8 @@
 import * as fs from 'node:fs';
 import path from 'node:path';
 
-import { buildClientSchema, printSchema } from 'graphql';
-
 import { PgpmPackage } from '@pgpmjs/core';
+import { buildClientSchema, printSchema } from 'graphql';
 import { pgCache } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
@@ -18,36 +17,36 @@ import type { CliConfig, DbConfig, GraphQLSDKConfigTarget, PgpmConfig, SchemaCon
 import { getConfigOptions } from '../types/config';
 import type { Operation, Table, TypeRegistry } from '../types/schema';
 import { generate as generateReactQueryFiles } from './codegen';
-import { generateRootBarrel, generateMultiTargetBarrel } from './codegen/barrel';
-import { generateCli as generateCliFiles, generateMultiTargetCli } from './codegen/cli';
+import { generateMultiTargetBarrel,generateRootBarrel } from './codegen/barrel';
 import type { MultiTargetCliTarget } from './codegen/cli';
-import {
-  generateReadme as generateCliReadme,
-  generateAgentsDocs as generateCliAgentsDocs,
-  generateSkills as generateCliSkills,
-  generateMultiTargetReadme,
-  generateMultiTargetAgentsDocs,
-  generateMultiTargetSkills,
-} from './codegen/cli/docs-generator';
+import { generateCli as generateCliFiles, generateMultiTargetCli } from './codegen/cli';
 import type { MultiTargetDocsInput } from './codegen/cli/docs-generator';
+import {
+  generateAgentsDocs as generateCliAgentsDocs,
+  generateMultiTargetAgentsDocs,
+  generateMultiTargetReadme,
+  generateMultiTargetSkills,
+  generateReadme as generateCliReadme,
+  generateSkills as generateCliSkills,
+} from './codegen/cli/docs-generator';
 import { resolveDocsConfig } from './codegen/docs-utils';
 import {
-  generateHooksReadme,
   generateHooksAgentsDocs,
+  generateHooksReadme,
   generateHooksSkills,
 } from './codegen/hooks-docs-generator';
 import { generateOrm as generateOrmFiles } from './codegen/orm';
 import {
-  generateOrmReadme,
   generateOrmAgentsDocs,
+  generateOrmReadme,
   generateOrmSkills,
 } from './codegen/orm/docs-generator';
 import { generateSharedTypes } from './codegen/shared';
-import {
-  generateTargetReadme,
-  generateRootRootReadme,
-} from './codegen/target-docs-generator';
 import type { RootRootReadmeTarget } from './codegen/target-docs-generator';
+import {
+  generateRootRootReadme,
+  generateTargetReadme,
+} from './codegen/target-docs-generator';
 import { createSchemaSource, validateSourceOptions } from './introspect';
 import { writeGeneratedFiles } from './output';
 import { runCodegenPipeline, validateTablesFound } from './pipeline';
@@ -694,170 +693,170 @@ export async function generateMulti(
   const sharedSources = await prepareSharedPgpmSources(configs, cliOverrides);
 
   try {
-  for (const name of names) {
-    const baseConfig: GraphQLSDKConfigTarget = {
-      ...configs[name],
-      ...(cliOverrides ?? {}),
-    };
-    const targetConfig = applySharedPgpmDb(baseConfig, sharedSources);
-    const result = await generate(
-      {
-        ...targetConfig,
-        verbose,
-        dryRun,
-        schema: schemaEnabled
-          ? { ...schema, filename: schema?.filename ?? `${name}.graphql` }
-          : targetConfig.schema,
-      },
-      useUnifiedCli ? { skipCli: true, targetName: name } : { targetName: name },
-    );
-    results.push({ name, result });
-    if (!result.success) {
-      hasError = true;
-    } else {
-      const resolvedConfig = getConfigOptions(targetConfig);
-      const gens: string[] = [];
-      if (resolvedConfig.reactQuery) gens.push('React Query');
-      if (resolvedConfig.orm || resolvedConfig.reactQuery || !!resolvedConfig.cli) gens.push('ORM');
-      if (resolvedConfig.cli) gens.push('CLI');
-      targetInfos.push({
-        name,
-        output: resolvedConfig.output,
-        endpoint: resolvedConfig.endpoint || undefined,
-        generators: gens,
-      });
-
-      if (useUnifiedCli && result.pipelineData) {
-        const isAuthTarget = name === 'auth';
-        cliTargets.push({
+    for (const name of names) {
+      const baseConfig: GraphQLSDKConfigTarget = {
+        ...configs[name],
+        ...(cliOverrides ?? {}),
+      };
+      const targetConfig = applySharedPgpmDb(baseConfig, sharedSources);
+      const result = await generate(
+        {
+          ...targetConfig,
+          verbose,
+          dryRun,
+          schema: schemaEnabled
+            ? { ...schema, filename: schema?.filename ?? `${name}.graphql` }
+            : targetConfig.schema,
+        },
+        useUnifiedCli ? { skipCli: true, targetName: name } : { targetName: name },
+      );
+      results.push({ name, result });
+      if (!result.success) {
+        hasError = true;
+      } else {
+        const resolvedConfig = getConfigOptions(targetConfig);
+        const gens: string[] = [];
+        if (resolvedConfig.reactQuery) gens.push('React Query');
+        if (resolvedConfig.orm || resolvedConfig.reactQuery || !!resolvedConfig.cli) gens.push('ORM');
+        if (resolvedConfig.cli) gens.push('CLI');
+        targetInfos.push({
           name,
-          endpoint: resolvedConfig.endpoint || '',
-          ormImportPath: `../${resolvedConfig.output.replace(/^\.\//, '')}/orm`,
-          tables: result.pipelineData.tables,
-          customOperations: result.pipelineData.customOperations,
-          isAuthTarget,
-          typeRegistry: result.pipelineData.customOperations.typeRegistry,
+          output: resolvedConfig.output,
+          endpoint: resolvedConfig.endpoint || undefined,
+          generators: gens,
         });
-      }
-    }
-  }
 
-  if (useUnifiedCli && cliTargets.length > 0 && !dryRun) {
-    const cliConfig = typeof unifiedCli === 'object' ? unifiedCli : {};
-    const toolName = cliConfig.toolName ?? 'app';
-    const firstTargetConfig = configs[names[0]];
-    const { files } = generateMultiTargetCli({
-      toolName,
-      builtinNames: cliConfig.builtinNames,
-      targets: cliTargets,
-      entryPoint: cliConfig.entryPoint,
-    });
-
-    const cliFilesToWrite = files.map((file) => ({
-      path: path.posix.join('cli', file.fileName),
-      content: file.content,
-    }));
-
-    const firstTargetDocsConfig = names.length > 0 && configs[names[0]]?.docs;
-    const docsConfig = resolveDocsConfig(firstTargetDocsConfig);
-    const { resolveBuiltinNames } = await import('./codegen/cli');
-    const builtinNames = resolveBuiltinNames(
-      cliTargets.map((t) => t.name),
-      cliConfig.builtinNames,
-    );
-
-    // Merge all target type registries into a combined registry for docs generation
-    const combinedRegistry = new Map<string, import('../types/schema').ResolvedType>();
-    for (const t of cliTargets) {
-      if (t.typeRegistry) {
-        for (const [key, value] of t.typeRegistry) {
-          combinedRegistry.set(key, value);
+        if (useUnifiedCli && result.pipelineData) {
+          const isAuthTarget = name === 'auth';
+          cliTargets.push({
+            name,
+            endpoint: resolvedConfig.endpoint || '',
+            ormImportPath: `../${resolvedConfig.output.replace(/^\.\//, '')}/orm`,
+            tables: result.pipelineData.tables,
+            customOperations: result.pipelineData.customOperations,
+            isAuthTarget,
+            typeRegistry: result.pipelineData.customOperations.typeRegistry,
+          });
         }
       }
     }
 
-    const docsInput: MultiTargetDocsInput = {
-      toolName,
-      builtinNames,
-      registry: combinedRegistry.size > 0 ? combinedRegistry : undefined,
-      targets: cliTargets.map((t) => ({
-        name: t.name,
-        endpoint: t.endpoint,
-        tables: t.tables,
-        customOperations: [
-          ...(t.customOperations?.queries ?? []),
-          ...(t.customOperations?.mutations ?? []),
-        ],
-        isAuthTarget: t.isAuthTarget,
-      })),
-    };
+    if (useUnifiedCli && cliTargets.length > 0 && !dryRun) {
+      const cliConfig = typeof unifiedCli === 'object' ? unifiedCli : {};
+      const toolName = cliConfig.toolName ?? 'app';
+      const firstTargetConfig = configs[names[0]];
+      const { files } = generateMultiTargetCli({
+        toolName,
+        builtinNames: cliConfig.builtinNames,
+        targets: cliTargets,
+        entryPoint: cliConfig.entryPoint,
+      });
 
-    if (docsConfig.readme) {
-      const readme = generateMultiTargetReadme(docsInput);
-      cliFilesToWrite.push({ path: path.posix.join('cli', readme.fileName), content: readme.content });
-    }
-    if (docsConfig.agents) {
-      const agents = generateMultiTargetAgentsDocs(docsInput);
-      cliFilesToWrite.push({ path: path.posix.join('cli', agents.fileName), content: agents.content });
-    }
-    const { writeGeneratedFiles: writeFiles } = await import('./output');
-    await writeFiles(cliFilesToWrite, '.', [], { pruneStaleFiles: false });
-
-    if (docsConfig.skills) {
-      const cliSkillsToWrite = generateMultiTargetSkills(docsInput).map((skill) => ({
-        path: skill.fileName,
-        content: skill.content,
+      const cliFilesToWrite = files.map((file) => ({
+        path: path.posix.join('cli', file.fileName),
+        content: file.content,
       }));
 
-      const firstTargetResolved = getConfigOptions({
-        ...(firstTargetConfig ?? {}),
-        ...(cliOverrides ?? {}),
-      });
-      const skillsOutputDir = resolveSkillsOutputDir(
-        firstTargetResolved,
-        firstTargetResolved.output,
+      const firstTargetDocsConfig = names.length > 0 && configs[names[0]]?.docs;
+      const docsConfig = resolveDocsConfig(firstTargetDocsConfig);
+      const { resolveBuiltinNames } = await import('./codegen/cli');
+      const builtinNames = resolveBuiltinNames(
+        cliTargets.map((t) => t.name),
+        cliConfig.builtinNames,
       );
-      await writeFiles(cliSkillsToWrite, skillsOutputDir, [], { pruneStaleFiles: false });
 
+      // Merge all target type registries into a combined registry for docs generation
+      const combinedRegistry = new Map<string, import('../types/schema').ResolvedType>();
+      for (const t of cliTargets) {
+        if (t.typeRegistry) {
+          for (const [key, value] of t.typeRegistry) {
+            combinedRegistry.set(key, value);
+          }
+        }
+      }
+
+      const docsInput: MultiTargetDocsInput = {
+        toolName,
+        builtinNames,
+        registry: combinedRegistry.size > 0 ? combinedRegistry : undefined,
+        targets: cliTargets.map((t) => ({
+          name: t.name,
+          endpoint: t.endpoint,
+          tables: t.tables,
+          customOperations: [
+            ...(t.customOperations?.queries ?? []),
+            ...(t.customOperations?.mutations ?? []),
+          ],
+          isAuthTarget: t.isAuthTarget,
+        })),
+      };
+
+      if (docsConfig.readme) {
+        const readme = generateMultiTargetReadme(docsInput);
+        cliFilesToWrite.push({ path: path.posix.join('cli', readme.fileName), content: readme.content });
+      }
+      if (docsConfig.agents) {
+        const agents = generateMultiTargetAgentsDocs(docsInput);
+        cliFilesToWrite.push({ path: path.posix.join('cli', agents.fileName), content: agents.content });
+      }
+      const { writeGeneratedFiles: writeFiles } = await import('./output');
+      await writeFiles(cliFilesToWrite, '.', [], { pruneStaleFiles: false });
+
+      if (docsConfig.skills) {
+        const cliSkillsToWrite = generateMultiTargetSkills(docsInput).map((skill) => ({
+          path: skill.fileName,
+          content: skill.content,
+        }));
+
+        const firstTargetResolved = getConfigOptions({
+          ...(firstTargetConfig ?? {}),
+          ...(cliOverrides ?? {}),
+        });
+        const skillsOutputDir = resolveSkillsOutputDir(
+          firstTargetResolved,
+          firstTargetResolved.output,
+        );
+        await writeFiles(cliSkillsToWrite, skillsOutputDir, [], { pruneStaleFiles: false });
+
+      }
     }
-  }
 
-  // Generate root-root README and barrel if multi-target
-  if (names.length > 1 && targetInfos.length > 0 && !dryRun) {
-    const { writeGeneratedFiles: writeFiles } = await import('./output');
+    // Generate root-root README and barrel if multi-target
+    if (names.length > 1 && targetInfos.length > 0 && !dryRun) {
+      const { writeGeneratedFiles: writeFiles } = await import('./output');
 
-    const rootReadme = generateRootRootReadme(targetInfos);
-    await writeFiles(
-      [{ path: rootReadme.fileName, content: rootReadme.content }],
-      '.',
-      [],
-      { pruneStaleFiles: false },
-    );
-
-    // Write a root barrel (index.ts) that re-exports each target as a
-    // namespace so the package has a single entry-point.  Derive the
-    // common output root from the first target's output path.
-    const successfulNames = results
-      .filter((r) => r.result.success)
-      .map((r) => r.name);
-    if (successfulNames.length > 0) {
-      const firstOutput = getConfigOptions(configs[successfulNames[0]]).output;
-      const outputRoot = path.dirname(firstOutput);
-      const barrelContent = generateMultiTargetBarrel(successfulNames);
+      const rootReadme = generateRootRootReadme(targetInfos);
       await writeFiles(
-        [{ path: 'index.ts', content: barrelContent }],
-        outputRoot,
+        [{ path: rootReadme.fileName, content: rootReadme.content }],
+        '.',
         [],
         { pruneStaleFiles: false },
       );
 
-      // Write manifest so removeStaleTargetDirs knows which dirs are generated
-      fs.writeFileSync(
-        path.join(outputRoot, TARGETS_MANIFEST),
-        JSON.stringify(successfulNames.sort()) + '\n',
-      );
+      // Write a root barrel (index.ts) that re-exports each target as a
+      // namespace so the package has a single entry-point.  Derive the
+      // common output root from the first target's output path.
+      const successfulNames = results
+        .filter((r) => r.result.success)
+        .map((r) => r.name);
+      if (successfulNames.length > 0) {
+        const firstOutput = getConfigOptions(configs[successfulNames[0]]).output;
+        const outputRoot = path.dirname(firstOutput);
+        const barrelContent = generateMultiTargetBarrel(successfulNames);
+        await writeFiles(
+          [{ path: 'index.ts', content: barrelContent }],
+          outputRoot,
+          [],
+          { pruneStaleFiles: false },
+        );
+
+        // Write manifest so removeStaleTargetDirs knows which dirs are generated
+        fs.writeFileSync(
+          path.join(outputRoot, TARGETS_MANIFEST),
+          JSON.stringify(successfulNames.sort()) + '\n',
+        );
+      }
     }
-  }
 
   } finally {
     for (const shared of sharedSources.values()) {

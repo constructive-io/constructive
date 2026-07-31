@@ -38,8 +38,8 @@ export { createI18nPlugin, I18nPlugin } from './plugin';
 export { I18nPreset } from './preset';
 
 // Middleware
-export { makeI18nContext, additionalGraphQLContextFromRequest } from './middleware';
+export { additionalGraphQLContextFromRequest,makeI18nContext } from './middleware';
 
 // Types
-export type { I18nPluginOptions, I18nTableInfo, TranslatableField } from './types';
 export type { I18nMiddlewareOptions } from './middleware';
+export type { I18nPluginOptions, I18nTableInfo, TranslatableField } from './types';

@@ -1,6 +1,7 @@
+import { PgpmOptions } from '@pgpmjs/types';
 import * as fs from 'fs';
 import * as path from 'path';
-import { PgpmOptions } from '@pgpmjs/types';
+
 import { walkUp } from './utils';
 
 /**
@@ -11,16 +12,16 @@ export const loadConfigFileSync = (configPath: string): PgpmOptions => {
   const ext = path.extname(configPath);
   
   switch (ext) {
-    case '.json':
-      return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  case '.json':
+    return JSON.parse(fs.readFileSync(configPath, 'utf8'));
     
-    case '.js':
-      // delete require.cache[require.resolve(configPath)];
-      const configModule = require(configPath);
-      return configModule.default || configModule;
+  case '.js':
+    // delete require.cache[require.resolve(configPath)];
+    const configModule = require(configPath);
+    return configModule.default || configModule;
     
-    default:
-      throw new Error(`Unsupported config file type: ${ext}`);
+  default:
+    throw new Error(`Unsupported config file type: ${ext}`);
   }
 };
 
@@ -56,6 +57,7 @@ export const loadConfigSync = (cwd: string = process.cwd()): PgpmOptions => {
       const configDir = walkUp(cwd, filename);
       return loadConfigSyncFromDir(configDir);
     } catch {
+      // ignore
     }
   }
   
@@ -73,6 +75,7 @@ export const resolvePgpmPath = (cwd: string = process.cwd()): string | undefined
     try {
       return walkUp(cwd, filename);
     } catch {
+      // ignore
     }
   }
   
@@ -135,15 +138,15 @@ export const resolveWorkspaceByType = (
   workspaceType: WorkspaceType
 ): string | undefined => {
   switch (workspaceType) {
-    case 'pgpm':
-      return resolvePgpmPath(cwd);
-    case 'pnpm':
-      return resolvePnpmWorkspace(cwd);
-    case 'lerna':
-      return resolveLernaWorkspace(cwd);
-    case 'npm':
-      return resolveNpmWorkspace(cwd);
-    default:
-      return undefined;
+  case 'pgpm':
+    return resolvePgpmPath(cwd);
+  case 'pnpm':
+    return resolvePnpmWorkspace(cwd);
+  case 'lerna':
+    return resolveLernaWorkspace(cwd);
+  case 'npm':
+    return resolveNpmWorkspace(cwd);
+  default:
+    return undefined;
   }
 };

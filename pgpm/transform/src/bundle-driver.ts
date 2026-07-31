@@ -13,11 +13,11 @@ import {
   createExtensionResult,
   createRoleResult,
   ExtensionDefinition,
-  ExtensionRouteSpec,
   ExtensionRouter,
+  ExtensionRouteSpec,
   ExtensionTransformResult,
-  RoleRouteSpec,
   RoleRouter,
+  RoleRouteSpec,
   RoleTransformResult,
   RouteSpec,
   SchemaRouter,
@@ -180,9 +180,9 @@ export function buildSchemaRouter(options: SchemaTranspilerOptions): SchemaRoute
       route.toName === undefined && typeof route.toSchema === 'string'
         ? route.toSchema
         : {
-            ...(route.toSchema !== undefined ? { schema: route.toSchema } : {}),
-            ...(route.toName !== undefined ? { name: route.toName } : {})
-          };
+          ...(route.toSchema !== undefined ? { schema: route.toSchema } : {}),
+          ...(route.toName !== undefined ? { name: route.toName } : {})
+        };
   }
   return new SchemaRouter(spec);
 }

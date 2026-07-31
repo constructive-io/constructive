@@ -1,7 +1,7 @@
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
+import { Pool, type PoolClient } from 'pg';
 import { buildConnectionString, getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
-import { Pool, type PoolClient } from 'pg';
 
 const ACTIVE_ACTIVITY_SQL = `
   select

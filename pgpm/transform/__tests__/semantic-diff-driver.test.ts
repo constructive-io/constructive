@@ -1,6 +1,6 @@
 import { loadModule } from 'plpgsql-parser';
 
-import { DiffInputChange, diffChangeSets, diffSchemas } from '../src/semantic-diff-driver';
+import { diffChangeSets, DiffInputChange, diffSchemas } from '../src/semantic-diff-driver';
 
 beforeAll(async () => {
   await loadModule();

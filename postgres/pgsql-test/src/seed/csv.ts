@@ -1,4 +1,4 @@
-import { loadCsv, type CsvSeedMap } from 'pgsql-seed';
+import { type CsvSeedMap,loadCsv } from 'pgsql-seed';
 
 import { SeedAdapter, SeedContext } from './types';
 

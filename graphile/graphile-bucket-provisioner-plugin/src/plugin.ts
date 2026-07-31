@@ -31,19 +31,18 @@
  *   COMMENT ON TABLE buckets IS E'@storageBuckets\nStorage buckets table';
  */
 
-import { context as grafastContext, lambda, object } from 'grafast';
-import type { GraphileConfig } from 'graphile-config';
-import { extendSchema, gql } from 'graphile-utils';
-import { Logger } from '@pgpmjs/logger';
-import { QuoteUtils } from '@pgsql/quotes';
+import type { ProvisionResult,StorageConnectionConfig } from '@constructive-io/bucket-provisioner';
 import {
   BucketProvisioner,
 } from '@constructive-io/bucket-provisioner';
-import type { StorageConnectionConfig, ProvisionResult } from '@constructive-io/bucket-provisioner';
+import { Logger } from '@pgpmjs/logger';
+import { QuoteUtils } from '@pgsql/quotes';
+import { context as grafastContext, lambda, object } from 'grafast';
+import type { GraphileConfig } from 'graphile-config';
+import { extendSchema, gql } from 'graphile-utils';
 
 import type {
   BucketProvisionerPluginOptions,
-  BucketNameResolver,
 } from './types';
 
 const log = new Logger('graphile-bucket-provisioner:plugin');

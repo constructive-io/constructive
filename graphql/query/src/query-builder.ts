@@ -1,5 +1,5 @@
 import { DocumentNode, print as gqlPrint } from 'graphql';
-import { toCamelCase, toPascalCase, toSnakeCase, pluralize } from 'inflekt';
+import { pluralize,toCamelCase, toPascalCase, toSnakeCase } from 'inflekt';
 
 import {
   createOne,
@@ -144,17 +144,17 @@ export class QueryBuilder {
     // We only need deleteAction from all of [deleteAction, deleteActionBySlug, deleteActionByName]
     const getInputName = (mutationType: string): string => {
       switch (mutationType) {
-        case 'delete': {
-          return `Delete${toPascalCase(this._model)}Input`;
-        }
-        case 'create': {
-          return `Create${toPascalCase(this._model)}Input`;
-        }
-        case 'patch': {
-          return `Update${toPascalCase(this._model)}Input`;
-        }
-        default:
-          throw new Error('Unhandled mutation type' + mutationType);
+      case 'delete': {
+        return `Delete${toPascalCase(this._model)}Input`;
+      }
+      case 'create': {
+        return `Create${toPascalCase(this._model)}Input`;
+      }
+      case 'patch': {
+        return `Update${toPascalCase(this._model)}Input`;
+      }
+      default:
+        throw new Error('Unhandled mutation type' + mutationType);
       }
     };
 

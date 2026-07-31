@@ -10,12 +10,12 @@
 import { hashFile } from './hash';
 import { putToPresignedUrl } from './put';
 import { buildRequestUploadUrlQuery, DEFAULT_BUCKET_QUERY_FIELD } from './queries';
-import { UploadError } from './types';
 import type {
+  RequestUploadUrlPayload,
   UploadFileOptions,
   UploadResult,
-  RequestUploadUrlPayload,
 } from './types';
+import { UploadError } from './types';
 
 /**
  * Upload a file using the presigned URL pipeline.

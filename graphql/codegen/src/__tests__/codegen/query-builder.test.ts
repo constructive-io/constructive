@@ -137,7 +137,7 @@ function buildFindManyDocument<TSelect, TWhere>(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
-      )
+    )
     : [t.field({ name: 'id' })];
   const variableDefinitions: VariableDefinitionNode[] = [];
   const queryArgs: ArgumentNode[] = [];
@@ -289,7 +289,7 @@ function buildCustomDocument<TSelect, TArgs>(
         actualSelect as Record<string, unknown>,
         connectionFieldsMap,
         entityType,
-      )
+    )
     : [];
 
   const variableDefs = variableDefinitions.map((definition) =>

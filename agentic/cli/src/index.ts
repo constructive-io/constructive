@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-import { loadConfig } from './config';
 import { init, skillsList, skillsUpdate, usage } from './commands';
+import { loadConfig } from './config';
 import { materializeDbTools } from './db-tools';
 import { assembleSkills } from './skills';
 
-export { assembleSkills } from './skills';
 export { AgentCliConfig, loadConfig } from './config';
 export { HOST_ENV_VARS, materializeDbTools } from './db-tools';
+export { assembleSkills } from './skills';
 
 async function run(args: string[]): Promise<void> {
   const config = loadConfig(process.env.AGENT_HOME);

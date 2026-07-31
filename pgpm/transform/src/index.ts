@@ -1,5 +1,3 @@
-export * from '@pgsql/transform';
-export { loadModule } from 'plpgsql-parser';
 export type {
   BundleScriptContext,
   ExtensionRoutingInput,
@@ -14,43 +12,6 @@ export {
   makeNamespaceValidator,
   makeSchemaTranspiler,
 } from './bundle-driver';
-export type {
-  GranularityChange,
-  RestructuredChange,
-  RestructureModuleOptions,
-  RestructureModuleResult,
-} from './granularity-driver';
-export {
-  defaultChangeName,
-  restructureChanges,
-} from './granularity-driver';
-export type {
-  DiffInputChange,
-  ObjectDelta,
-  SemanticDeltaChange,
-  SemanticDiffOptions,
-  SemanticDiffResult,
-  SemanticObjectDiff,
-} from './semantic-diff-driver';
-export {
-  diffChangeSets,
-  diffSchemas,
-} from './semantic-diff-driver';
-export type {
-  PartitionConfig,
-  PartitionedChange,
-  PartitionedPackage,
-  PartitionInputChange,
-  PartitionRule,
-  PartitionUnit,
-  PartitionUnitsResult,
-  UnitSelector,
-} from './partition-driver';
-export {
-  PartitionCycleError,
-  partitionUnits,
-  RESIDUAL_UNIT_PATH,
-} from './partition-driver';
 export type {
   CategoryProfile,
   ChangeCategory,
@@ -69,6 +30,37 @@ export type {
 } from './fixture-closure';
 export { resolveFixtureClosure } from './fixture-closure';
 export type {
+  GranularityChange,
+  RestructuredChange,
+  RestructureModuleOptions,
+  RestructureModuleResult,
+} from './granularity-driver';
+export {
+  defaultChangeName,
+  restructureChanges,
+} from './granularity-driver';
+export type {
+  PartitionConfig,
+  PartitionedChange,
+  PartitionedPackage,
+  PartitionInputChange,
+  PartitionRule,
+  PartitionUnit,
+  PartitionUnitsResult,
+  UnitSelector,
+} from './partition-driver';
+export {
+  PartitionCycleError,
+  partitionUnits,
+  RESIDUAL_UNIT_PATH,
+} from './partition-driver';
+export type {
+  SqlProgram,
+  SqlStatementAst,
+  SqlStatementSpan,
+} from './program';
+export { emitSqlProgram, parseSqlProgram } from './program';
+export type {
   GeneratedScript,
   RegeneratedScripts,
 } from './regen';
@@ -78,8 +70,16 @@ export {
   regenerateScripts,
 } from './regen';
 export type {
-  SqlProgram,
-  SqlStatementAst,
-  SqlStatementSpan,
-} from './program';
-export { emitSqlProgram, parseSqlProgram } from './program';
+  DiffInputChange,
+  ObjectDelta,
+  SemanticDeltaChange,
+  SemanticDiffOptions,
+  SemanticDiffResult,
+  SemanticObjectDiff,
+} from './semantic-diff-driver';
+export {
+  diffChangeSets,
+  diffSchemas,
+} from './semantic-diff-driver';
+export * from '@pgsql/transform';
+export { loadModule } from 'plpgsql-parser';

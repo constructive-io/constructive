@@ -1,6 +1,6 @@
 import type { GraphQLSDKConfigTarget } from '../../types/config';
-import { getReadmeHeader, getReadmeFooter } from './docs-utils';
 import type { GeneratedDocFile } from './docs-utils';
+import { getReadmeFooter,getReadmeHeader } from './docs-utils';
 
 export interface TargetReadmeOptions {
   hasOrm: boolean;

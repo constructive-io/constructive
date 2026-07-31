@@ -1,11 +1,9 @@
-export { CsrfConfig, CookieOptions, CsrfError, createCsrfError } from './types';
-
-export { generateToken, verifyToken } from './token';
-
 export {
   createCsrfMiddleware,
   csrfErrorHandler,
+  CsrfMiddlewareResult,
   CsrfRequest,
   CsrfResponse,
-  CsrfMiddlewareResult,
 } from './middleware';
+export { generateToken, verifyToken } from './token';
+export { CookieOptions, createCsrfError,CsrfConfig, CsrfError } from './types';

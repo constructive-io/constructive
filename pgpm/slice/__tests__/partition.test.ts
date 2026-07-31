@@ -1,3 +1,4 @@
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { mkdirSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
@@ -10,7 +11,6 @@ import {
   partitionChanges,
   partitionModule
 } from '../src';
-import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 
 beforeAll(async () => {
   await loadModule();

@@ -21,18 +21,17 @@
  *   const orm = codegen.createClient({ adapter });
  *   const rows = await orm.myTable.findMany({ select: { id: true } }).execute();
  */
-import fs from 'fs';
-import path from 'path';
-import ts from 'typescript';
-import type { GraphQLQueryFn, GraphQLQueryFnObj } from 'graphile-test';
+import { generateOrm } from '@constructive-io/graphql-codegen/core/codegen/orm';
+import type { Table } from '@constructive-io/graphql-query';
 import {
-  SCHEMA_INTROSPECTION_QUERY,
   inferTablesFromIntrospection,
+  SCHEMA_INTROSPECTION_QUERY,
   transformSchemaToOperations,
 } from '@constructive-io/graphql-query';
-import type { Table } from '@constructive-io/graphql-query';
-
-import { generateOrm } from '@constructive-io/graphql-codegen/core/codegen/orm';
+import fs from 'fs';
+import type { GraphQLQueryFn, GraphQLQueryFnObj } from 'graphile-test';
+import path from 'path';
+import ts from 'typescript';
 
 export interface CodegenResult {
   /** Factory function to create an ORM client from a GraphQLAdapter */

@@ -5,8 +5,8 @@ import * as path from 'path';
 import { getPgPool } from 'pg-cache';
 import {PgConfig } from 'pg-env';
 
-import { resolveEffectiveModulePath } from '../apply/materialize';
 import { hasApplySpec } from '../apply/apply-spec';
+import { resolveEffectiveModulePath } from '../apply/materialize';
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmMigrate } from '../migrate/client';
 import { resolveExtensionDependencies } from '../resolution/deps';

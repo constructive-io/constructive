@@ -5,15 +5,15 @@
  */
 
 import type {
+  BucketAccessType,
+  BucketNameResolver,
   BucketProvisionerPluginOptions,
   ConnectionConfigOrGetter,
-  BucketNameResolver,
   ProvisionBucketInput,
   ProvisionBucketPayload,
+  ProvisionResult,
   StorageConnectionConfig,
   StorageProvider,
-  BucketAccessType,
-  ProvisionResult,
 } from '../src/types';
 
 describe('BucketProvisionerPluginOptions', () => {

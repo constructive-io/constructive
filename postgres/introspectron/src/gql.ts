@@ -102,13 +102,13 @@ export const parseGraphQuery = (introQuery: IntrospectionQueryResult) => {
       return getInputForQueries(input.ofType!, context);
     }
 
-    if (input.kind === 'INPUT_OBJECT' && input.name && HASH.hasOwnProperty(input.name)) {
+    if (input.kind === 'INPUT_OBJECT' && input.name && Object.prototype.hasOwnProperty.call(HASH, input.name)) {
       const schema = HASH[input.name];
       context.properties = schema.inputFields!.map((field) => ({ name: field.name, type: field.type })).reduce((m3, v) => {
         m3[v.name] = v;
         return m3;
       }, {} as Record<string, any>);
-    } else if (input.kind === 'OBJECT' && input.name && HASH.hasOwnProperty(input.name)) {
+    } else if (input.kind === 'OBJECT' && input.name && Object.prototype.hasOwnProperty.call(HASH, input.name)) {
       const schema = HASH[input.name];
       context.properties = schema.fields!.map((field) => ({ name: field.name, type: field.type })).reduce((m3, v) => {
         m3[v.name] = v;
@@ -141,13 +141,13 @@ export const parseGraphQuery = (introQuery: IntrospectionQueryResult) => {
       return getInputForMutations(input.ofType!, context);
     }
 
-    if (input.kind === 'INPUT_OBJECT' && input.name && HASH.hasOwnProperty(input.name)) {
+    if (input.kind === 'INPUT_OBJECT' && input.name && Object.prototype.hasOwnProperty.call(HASH, input.name)) {
       const schema = HASH[input.name];
       context.properties = schema.inputFields!.map((field) => getInputForMutations(field.type, { name: field.name })).reduce((m3, v) => {
         m3[v.name!] = v;
         return m3;
       }, {} as Record<string, any>);
-    } else if (input.kind === 'OBJECT' && input.name && HASH.hasOwnProperty(input.name)) {
+    } else if (input.kind === 'OBJECT' && input.name && Object.prototype.hasOwnProperty.call(HASH, input.name)) {
       const schema = HASH[input.name];
       context.properties = schema.fields!.map((field) => ({ name: field.name, type: field.type })).reduce((m3, v) => {
         m3[v.name] = v;
@@ -169,7 +169,7 @@ export const parseGraphQuery = (introQuery: IntrospectionQueryResult) => {
     const props = mutation.args.reduce((m2, arg) => {
       const type = arg.type?.ofType?.name;
       const isNotNull = arg.type?.kind === 'NON_NULL';
-      if (type && HASH.hasOwnProperty(type)) {
+      if (type && Object.prototype.hasOwnProperty.call(HASH, type)) {
         const schema = HASH[type];
         const fields = schema.inputFields!.filter((a) => a.name !== 'clientMutationId');
         const properties = fields.map((a) => getInputForMutations(a.type, { name: a.name })).reduce((m3, v) => {

@@ -3,14 +3,15 @@
  * Uses appstash for directory resolution
  */
 
+import { appstash, resolve } from 'appstash';
 import * as fs from 'fs';
 import * as path from 'path';
-import { appstash, resolve } from 'appstash';
+
 import type {
   ContextConfig,
-  GlobalSettings,
-  Credentials,
   ContextCredentials,
+  Credentials,
+  GlobalSettings,
 } from './types';
 import { DEFAULT_SETTINGS } from './types';
 

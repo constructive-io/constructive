@@ -1,6 +1,6 @@
 import { getMissingInstallableModules, PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, ParsedArgs, createSpinner } from 'inquirerer';
+import { CLIOptions, createSpinner,Inquirerer, ParsedArgs } from 'inquirerer';
 
 const logger = new Logger('pgpm');
 

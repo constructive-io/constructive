@@ -1,7 +1,7 @@
 process.env.LOG_SCOPE = 'graphile-test';
 
-import gql from 'graphql-tag';
 import { GraphQLString } from 'graphql';
+import gql from 'graphql-tag';
 import { join } from 'path';
 import { seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';

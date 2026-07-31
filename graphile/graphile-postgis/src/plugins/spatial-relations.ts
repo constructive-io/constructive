@@ -1,9 +1,11 @@
 import 'graphile-build';
 import 'graphile-build-pg';
 import 'graphile-connection-filter';
+
 import type { GraphileConfig } from 'graphile-config';
 import type { SQL } from 'pg-sql2';
 import sql from 'pg-sql2';
+
 import type { PostgisExtensionInfo } from './detect-extension';
 
 /**

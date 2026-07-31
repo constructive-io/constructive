@@ -1,7 +1,7 @@
-import nodemailer, { SendMailOptions } from 'nodemailer';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { getEnvOptions } from '@pgpmjs/env';
 import { SmtpOptions } from '@pgpmjs/types';
+import nodemailer, { SendMailOptions } from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 type SendInput = {
   to: string | string[];
@@ -36,9 +36,9 @@ const buildTransportOptions = (smtpOpts: SmtpOptions): TransportConfig => {
 
   const auth = user
     ? {
-        user,
-        pass: pass ?? ''
-      }
+      user,
+      pass: pass ?? ''
+    }
     : undefined;
 
   const options: TransportConfig = {

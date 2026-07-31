@@ -1,23 +1,22 @@
-import type { GraphQLSchema } from 'graphql';
+import { makeSchema } from 'graphile-build';
+import { defaultPreset as graphileBuildDefaultPreset } from 'graphile-build';
+import { defaultPreset as graphileBuildPgDefaultPreset } from 'graphile-build-pg';
 import type { GraphileConfig } from 'graphile-config';
+import { createRealtimeSubscriptionsPlugin } from 'graphile-realtime-subscriptions';
+import type { GraphQLSchema } from 'graphql';
+import type { Client as GqlWsClient } from 'graphql-ws';
+import type { Pool } from 'pg';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { getConnections as getPgConnections } from 'pgsql-test';
 import type { SeedAdapter } from 'pgsql-test/seed/types';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import type { Pool } from 'pg';
-import type { Client as GqlWsClient } from 'graphql-ws';
-
-import { makeSchema } from 'graphile-build';
-import { defaultPreset as graphileBuildDefaultPreset } from 'graphile-build';
-import { defaultPreset as graphileBuildPgDefaultPreset } from 'graphile-build-pg';
 import { makePgService } from 'postgraphile/adaptors/pg';
 
-import { createRealtimeSubscriptionsPlugin } from 'graphile-realtime-subscriptions';
-import { makeRealtimeSmartTagsPlugin } from './smart-tags.js';
-import { createWsTestServer } from './ws-server.js';
-import type { WsTestServer } from './ws-server.js';
-import { nextEvent, collectWsEvents, delay } from './ws-helpers.js';
 import { notify, notifyChange, notifyInvalidate } from './notify.js';
+import { makeRealtimeSmartTagsPlugin } from './smart-tags.js';
+import { collectWsEvents, delay,nextEvent } from './ws-helpers.js';
+import type { WsTestServer } from './ws-server.js';
+import { createWsTestServer } from './ws-server.js';
 
 // --- Types ---
 

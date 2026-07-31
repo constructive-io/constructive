@@ -7,9 +7,10 @@
  */
 
 import type { GraphileConfig } from 'graphile-config';
-import type { PresignedUrlPluginOptions } from './types';
-import { createPresignedUrlPlugin } from './plugin';
+
 import { createDownloadUrlPlugin } from './download-url-field';
+import { createPresignedUrlPlugin } from './plugin';
+import type { PresignedUrlPluginOptions } from './types';
 
 /**
  * Creates a preset that includes the presigned URL plugins with the given options.

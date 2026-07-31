@@ -6,12 +6,12 @@
  * without needing an HTTP server.
  */
 
-import type { GraphQLQueryFn } from 'graphile-test';
 import type {
   GraphQLAdapter,
   GraphQLError,
   QueryResult,
 } from '@constructive-io/graphql-types';
+import type { GraphQLQueryFn } from 'graphile-test';
 
 /**
  * GraphQL adapter that wraps the graphile-test query function.

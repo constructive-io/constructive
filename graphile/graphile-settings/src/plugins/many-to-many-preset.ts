@@ -1,5 +1,5 @@
-import type { GraphileConfig } from 'graphile-config';
 import { PgManyToManyPreset } from '@graphile-contrib/pg-many-to-many';
+import type { GraphileConfig } from 'graphile-config';
 
 /**
  * Many-to-Many Preset with OPT-IN behavior (disabled by default).

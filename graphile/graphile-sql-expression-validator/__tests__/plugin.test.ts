@@ -8,11 +8,11 @@ jest.mock('grafast', () => ({
   sideEffect: (...args: unknown[]) => mockSideEffect(...args)
 }));
 
+import type { SqlExpressionValidatorOptions } from '../src';
 import {
   createSqlExpressionValidatorPlugin,
   SqlExpressionValidatorPreset
 } from '../src';
-import type { SqlExpressionValidatorOptions } from '../src';
 
 beforeEach(() => {
   mockSideEffect.mockClear();

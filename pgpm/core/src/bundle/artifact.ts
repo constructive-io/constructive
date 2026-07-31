@@ -1,6 +1,3 @@
-import { existsSync, readdirSync, readFileSync } from 'fs';
-import { join } from 'path';
-
 import { hashString } from '@pgpmjs/ast';
 import { getExtensionName, parseControlContent } from '@pgpmjs/ast/files';
 import {
@@ -13,6 +10,8 @@ import {
   withExecutableSql,
   writeBundleArchiveFile
 } from '@pgpmjs/bundle';
+import { existsSync, readdirSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 import { cleanSql } from '../migrate/clean';
 

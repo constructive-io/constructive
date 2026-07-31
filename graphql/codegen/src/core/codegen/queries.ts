@@ -17,8 +17,6 @@ import {
   buildListSelectionArgsCall,
   buildSelectionArgsCall,
   callExpr,
-  connectionResultType,
-  constDecl,
   createFunctionParam,
   createImportDeclaration,
   createSAndTDataTypeParams,
@@ -31,7 +29,6 @@ import {
   exportDeclareFunction,
   exportFunction,
   generateHookFileCode,
-  inferSelectResultType,
   listQueryResultType,
   listSelectionConfigType,
   objectProp,
@@ -43,8 +40,6 @@ import {
   spreadObj,
   sRef,
   typeRef,
-  typeLiteralWithProps,
-  useQueryOptionsType,
   useQueryOptionsImplType,
   voidStatement,
   withFieldsListSelectionType,
@@ -452,9 +447,9 @@ export function generateListQueryHook(
     const p1ParamType =
       hasRelationships && useCentralizedKeys
         ? t.tsIntersectionType([
-            p1BaseParamType,
-            scopeTypeLiteral(scopeTypeName),
-          ])
+          p1BaseParamType,
+          scopeTypeLiteral(scopeTypeName),
+        ])
         : p1BaseParamType;
     const p1Decl = exportAsyncDeclareFunction(
       prefetchFnName,
@@ -479,21 +474,7 @@ export function generateListQueryHook(
     const pImplParamType =
       hasRelationships && useCentralizedKeys
         ? t.tsIntersectionType([
-            t.tsTypeLiteral([
-              t.tsPropertySignature(
-                t.identifier('selection'),
-                t.tsTypeAnnotation(
-                  listSelectionConfigType(
-                    typeRef(selectTypeName),
-                    filterTypeName,
-                    orderByTypeName,
-                  ),
-                ),
-              ),
-            ]),
-            scopeTypeLiteral(scopeTypeName),
-          ])
-        : t.tsTypeLiteral([
+          t.tsTypeLiteral([
             t.tsPropertySignature(
               t.identifier('selection'),
               t.tsTypeAnnotation(
@@ -504,7 +485,21 @@ export function generateListQueryHook(
                 ),
               ),
             ),
-          ]);
+          ]),
+          scopeTypeLiteral(scopeTypeName),
+        ])
+        : t.tsTypeLiteral([
+          t.tsPropertySignature(
+            t.identifier('selection'),
+            t.tsTypeAnnotation(
+              listSelectionConfigType(
+                typeRef(selectTypeName),
+                filterTypeName,
+                orderByTypeName,
+              ),
+            ),
+          ),
+        ]);
     const pBody: t.Statement[] = [];
     pBody.push(
       buildListSelectionArgsCall(
@@ -517,14 +512,14 @@ export function generateListQueryHook(
     const queryKeyExpr =
       hasRelationships && useCentralizedKeys
         ? buildListQueryKey(
-            t.identifier('args'),
-            t.optionalMemberExpression(
-              t.identifier('params'),
-              t.identifier('scope'),
-              false,
-              true,
-            ),
-          )
+          t.identifier('args'),
+          t.optionalMemberExpression(
+            t.identifier('params'),
+            t.identifier('scope'),
+            false,
+            true,
+          ),
+        )
         : buildListQueryKey(t.identifier('args'));
 
     const prefetchCall = callExpr(
@@ -915,9 +910,9 @@ export function generateSingleQueryHook(
     const p1ParamType =
       hasRelationships && useCentralizedKeys
         ? t.tsIntersectionType([
-            p1BaseParamType,
-            scopeTypeLiteral(scopeTypeName),
-          ])
+          p1BaseParamType,
+          scopeTypeLiteral(scopeTypeName),
+        ])
         : p1BaseParamType;
     const p1Decl = exportAsyncDeclareFunction(
       prefetchFnName,
@@ -942,19 +937,7 @@ export function generateSingleQueryHook(
     const pImplParamType =
       hasRelationships && useCentralizedKeys
         ? t.tsIntersectionType([
-            t.tsTypeLiteral([
-              t.tsPropertySignature(
-                t.identifier(pkFieldName),
-                t.tsTypeAnnotation(pkTsType),
-              ),
-              t.tsPropertySignature(
-                t.identifier('selection'),
-                t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
-              ),
-            ]),
-            scopeTypeLiteral(scopeTypeName),
-          ])
-        : t.tsTypeLiteral([
+          t.tsTypeLiteral([
             t.tsPropertySignature(
               t.identifier(pkFieldName),
               t.tsTypeAnnotation(pkTsType),
@@ -963,30 +946,42 @@ export function generateSingleQueryHook(
               t.identifier('selection'),
               t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
             ),
-          ]);
+          ]),
+          scopeTypeLiteral(scopeTypeName),
+        ])
+        : t.tsTypeLiteral([
+          t.tsPropertySignature(
+            t.identifier(pkFieldName),
+            t.tsTypeAnnotation(pkTsType),
+          ),
+          t.tsPropertySignature(
+            t.identifier('selection'),
+            t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
+          ),
+        ]);
     const pBody: t.Statement[] = [];
     pBody.push(buildSelectionArgsCall(selectTypeName));
 
     const queryKeyExpr =
       hasRelationships && useCentralizedKeys
         ? buildDetailQueryKey(
-            t.memberExpression(
-              t.identifier('params'),
-              t.identifier(pkFieldName),
-            ),
-            t.optionalMemberExpression(
-              t.identifier('params'),
-              t.identifier('scope'),
-              false,
-              true,
-            ),
-          )
+          t.memberExpression(
+            t.identifier('params'),
+            t.identifier(pkFieldName),
+          ),
+          t.optionalMemberExpression(
+            t.identifier('params'),
+            t.identifier('scope'),
+            false,
+            true,
+          ),
+        )
         : buildDetailQueryKey(
-            t.memberExpression(
-              t.identifier('params'),
-              t.identifier(pkFieldName),
-            ),
-          );
+          t.memberExpression(
+            t.identifier('params'),
+            t.identifier(pkFieldName),
+          ),
+        );
 
     const prefetchCall = callExpr(
       t.memberExpression(

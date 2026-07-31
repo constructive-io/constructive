@@ -8,6 +8,7 @@
 // close() calls are idempotent. See pg-cache-close-leak.md for full details.
 
 import pg from 'pg';
+
 import { PgPoolCacheManager } from '../lru';
 
 // Minimal mock — we only need pool.end() and pool.ended

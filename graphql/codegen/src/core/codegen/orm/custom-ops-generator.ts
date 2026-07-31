@@ -8,7 +8,7 @@ import * as t from '@babel/types';
 
 import type { Argument, Operation } from '../../../types/schema';
 import { addJSDocComment, generateCode } from '../babel-ast';
-import { NON_SELECT_TYPES, getSelectTypeName } from '../select-helpers';
+import { getSelectTypeName,NON_SELECT_TYPES } from '../select-helpers';
 import {
   getTypeBaseName,
   isTypeRequired,
@@ -317,11 +317,11 @@ function buildOperationMethod(
   const selectExpr = selectTypeName
     ? t.memberExpression(t.identifier('options'), t.identifier('select'))
     : t.optionalMemberExpression(
-        t.identifier('options'),
-        t.identifier('select'),
-        false,
-        true,
-      );
+      t.identifier('options'),
+      t.identifier('select'),
+      false,
+      true,
+    );
   const entityTypeExpr =
     selectTypeName && payloadTypeName
       ? t.stringLiteral(payloadTypeName)

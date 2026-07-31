@@ -32,8 +32,8 @@
 
 import type { GraphileConfig } from 'graphile-config';
 
-import { llmConfigStore } from '../embedder';
 import type { LlmConfigOverrides } from '../embedder';
+import { llmConfigStore } from '../embedder';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
 

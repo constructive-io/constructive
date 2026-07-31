@@ -1,3 +1,4 @@
+import type { TableResourceWithCodec } from './table-meta-context';
 import type {
   MetaBuild,
   PgAttribute,
@@ -6,7 +7,6 @@ import type {
   PgTableResource,
   PgUnique,
 } from './types';
-import type { TableResourceWithCodec } from './table-meta-context';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;

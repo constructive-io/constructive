@@ -1,11 +1,12 @@
 import 'graphile-build';
 import 'graphile-build-pg';
-import type { GraphileConfig } from 'graphile-config';
-import type { GraphQLFieldConfig } from 'graphql';
-import type { GisFieldValue } from '../types';
-
 // Import types.ts for Build augmentation side effects
 import '../types';
+
+import type { GraphileConfig } from 'graphile-config';
+import type { GraphQLFieldConfig } from 'graphql';
+
+import type { GisFieldValue } from '../types';
 
 /**
  * PostgisTransformationFieldsPlugin
@@ -111,30 +112,30 @@ function extractAllCoordinates(geojson: unknown): number[][] {
   const type = geo.type as string;
 
   switch (type) {
-    case 'Point':
-      return [geo.coordinates as number[]];
+  case 'Point':
+    return [geo.coordinates as number[]];
 
-    case 'MultiPoint':
-    case 'LineString':
-      return geo.coordinates as number[][];
+  case 'MultiPoint':
+  case 'LineString':
+    return geo.coordinates as number[][];
 
-    case 'MultiLineString':
-    case 'Polygon':
-      return (geo.coordinates as number[][][]).flat();
+  case 'MultiLineString':
+  case 'Polygon':
+    return (geo.coordinates as number[][][]).flat();
 
-    case 'MultiPolygon':
-      return (geo.coordinates as number[][][][]).flat(2);
+  case 'MultiPolygon':
+    return (geo.coordinates as number[][][][]).flat(2);
 
-    case 'GeometryCollection': {
-      const geometries = geo.geometries as unknown[];
-      const all: number[][] = [];
-      for (const g of geometries) {
-        all.push(...extractAllCoordinates(g));
-      }
-      return all;
+  case 'GeometryCollection': {
+    const geometries = geo.geometries as unknown[];
+    const all: number[][] = [];
+    for (const g of geometries) {
+      all.push(...extractAllCoordinates(g));
     }
+    return all;
+  }
 
-    default:
-      return [];
+  default:
+    return [];
   }
 }

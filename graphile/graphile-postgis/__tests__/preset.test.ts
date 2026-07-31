@@ -1,13 +1,13 @@
-import { GraphilePostgisPreset } from '../src/preset';
-import { PostgisCodecPlugin } from '../src/plugins/codec';
-import { PostgisInflectionPlugin } from '../src/plugins/inflection';
-import { PostgisExtensionDetectionPlugin } from '../src/plugins/detect-extension';
-import { PostgisRegisterTypesPlugin } from '../src/plugins/register-types';
-import { PostgisGeometryFieldsPlugin } from '../src/plugins/geometry-fields';
-import { PostgisMeasurementFieldsPlugin } from '../src/plugins/measurement-fields';
-import { PostgisTransformationFieldsPlugin } from '../src/plugins/transformation-functions';
 import { PostgisAggregatePlugin } from '../src/plugins/aggregate-functions';
+import { PostgisCodecPlugin } from '../src/plugins/codec';
+import { PostgisExtensionDetectionPlugin } from '../src/plugins/detect-extension';
+import { PostgisGeometryFieldsPlugin } from '../src/plugins/geometry-fields';
+import { PostgisInflectionPlugin } from '../src/plugins/inflection';
+import { PostgisMeasurementFieldsPlugin } from '../src/plugins/measurement-fields';
+import { PostgisRegisterTypesPlugin } from '../src/plugins/register-types';
 import { PostgisSpatialRelationsPlugin } from '../src/plugins/spatial-relations';
+import { PostgisTransformationFieldsPlugin } from '../src/plugins/transformation-functions';
+import { GraphilePostgisPreset } from '../src/preset';
 
 describe('GraphilePostgisPreset', () => {
   it('should include all 9 plugins', () => {

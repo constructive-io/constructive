@@ -1,7 +1,9 @@
 import 'graphile-build';
 import 'graphile-build-pg';
+
 import type { PgCodec } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
+
 import type { PostgisExtensionInfo } from '../types';
 
 export type { PostgisExtensionInfo } from '../types';

@@ -15,7 +15,7 @@
  *   db_migrate.sql_actions -> sqlActions
  *   column database_id -> databaseId
  */
-import { toCamelCase, toPascalCase, toSnakeCase, distinctPluralize, singularizeLast } from 'inflekt';
+import { distinctPluralize, singularizeLast,toCamelCase, toPascalCase, toSnakeCase } from 'inflekt';
 
 import { FieldType } from './export-utils';
 import { lookupByGqlType } from './type-map';
@@ -122,10 +122,10 @@ export const mapGraphQLTypeToFieldType = (gqlTypeName: string, isList = false): 
     const inner = mapGraphQLTypeToFieldType(gqlTypeName, false);
     // Only these array types exist in FieldType: uuid[], text[], jsonb[]
     switch (inner) {
-      case 'uuid': return 'uuid[]';
-      case 'text': return 'text[]';
-      case 'jsonb': return 'jsonb[]';
-      default: return 'text'; // safe fallback for unsupported array types
+    case 'uuid': return 'uuid[]';
+    case 'text': return 'text[]';
+    case 'jsonb': return 'jsonb[]';
+    default: return 'text'; // safe fallback for unsupported array types
     }
   }
 

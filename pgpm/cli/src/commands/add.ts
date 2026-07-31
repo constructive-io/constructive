@@ -1,5 +1,5 @@
 import { PgpmPackage } from '@pgpmjs/core';
-import { CLIOptions, Inquirerer, ParsedArgs, extractFirst } from 'inquirerer';
+import { CLIOptions, extractFirst,Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
 
 const addUsageText = `

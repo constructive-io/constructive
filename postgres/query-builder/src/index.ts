@@ -1,3 +1,16 @@
+export type {
+  Expr,
+  FieldFilter,
+  Filter,
+  FnArg,
+  FnArgs,
+  Operand,
+  ParamAllocator,
+  QueryOutput,
+  SelectExpr,
+  SelectItem,
+  SqlValue,
+} from './query-builder';
 export {
   add,
   and,
@@ -20,17 +33,4 @@ export {
   param,
   QueryBuilder,
   sub
-} from './query-builder';
-export type {
-  Expr,
-  FieldFilter,
-  Filter,
-  FnArg,
-  FnArgs,
-  Operand,
-  ParamAllocator,
-  QueryOutput,
-  SelectExpr,
-  SelectItem,
-  SqlValue,
 } from './query-builder';

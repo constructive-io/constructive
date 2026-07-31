@@ -10,8 +10,8 @@ import {
   gqlTypeToTs,
   lcFirst,
   toCamelCase,
-  toPascalCase,
   toConstantCase,
+  toPascalCase,
   ucFirst,
 } from '../../core/codegen/utils';
 import type { Relations, Table } from '../../types/schema';

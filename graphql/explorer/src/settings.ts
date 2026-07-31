@@ -1,7 +1,7 @@
-import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getEnvOptions } from '@constructive-io/graphql-env';
-import { ConstructivePreset } from 'graphile-settings';
+import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import type { GraphileConfig } from 'graphile-config';
+import { ConstructivePreset } from 'graphile-settings';
 
 /**
  * Get a GraphileConfig.Preset for the explorer with grafast context configured.

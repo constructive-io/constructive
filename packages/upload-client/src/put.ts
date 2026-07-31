@@ -19,6 +19,7 @@
  */
 
 import { createFetch } from '@constructive-io/fetch';
+
 import { UploadError } from './types';
 
 const fetch = createFetch();

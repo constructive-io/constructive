@@ -3,19 +3,20 @@
  * Similar to kubectl contexts - manages named endpoint + credential configurations
  */
 
-import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
+import { CLIOptions, extractFirst,Inquirerer } from 'inquirerer';
 import chalk from 'yanse';
+
 import {
   createContext,
+  deleteContext,
+  getContextCredentials,
+  getCurrentContext,
+  hasValidCredentials,
   listContexts,
   loadContext,
-  deleteContext,
-  getCurrentContext,
-  setCurrentContext,
   loadSettings,
   saveSettings,
-  getContextCredentials,
-  hasValidCredentials,
+  setCurrentContext,
 } from '../config';
 
 const usage = `
@@ -76,20 +77,20 @@ async function handleSubcommand(
   prompter: Inquirerer
 ) {
   switch (subcommand) {
-    case 'create':
-      return handleCreate(argv, prompter);
-    case 'list':
-      return handleList();
-    case 'use':
-      return handleUse(argv, prompter);
-    case 'current':
-      return handleCurrent();
-    case 'delete':
-      return handleDelete(argv, prompter);
-    default:
-      console.log(usage);
-      console.error(chalk.red(`Unknown subcommand: ${subcommand}`));
-      process.exit(1);
+  case 'create':
+    return handleCreate(argv, prompter);
+  case 'list':
+    return handleList();
+  case 'use':
+    return handleUse(argv, prompter);
+  case 'current':
+    return handleCurrent();
+  case 'delete':
+    return handleDelete(argv, prompter);
+  default:
+    console.log(usage);
+    console.error(chalk.red(`Unknown subcommand: ${subcommand}`));
+    process.exit(1);
   }
 }
 

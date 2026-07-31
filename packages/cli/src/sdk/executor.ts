@@ -3,14 +3,14 @@
  * Executes raw GraphQL queries against configured endpoints
  */
 
-import { executeGraphQL, QueryResult } from './client';
-import {
-  getCurrentContext,
-  loadContext,
-  getContextCredentials,
-  hasValidCredentials,
-} from '../config';
 import type { ContextConfig } from '../config';
+import {
+  getContextCredentials,
+  getCurrentContext,
+  hasValidCredentials,
+  loadContext,
+} from '../config';
+import { executeGraphQL, QueryResult } from './client';
 
 /**
  * Execution context - bundles context config with credentials

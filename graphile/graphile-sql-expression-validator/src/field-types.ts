@@ -14,8 +14,9 @@
  */
 
 import { deparseSync } from 'pgsql-deparser';
+
+import type {SqlExpressionValidatorOptions } from './validator';
 import { validateAst } from './validator';
-import type { SqlExpressionValidatorOptions, AstValidationResult } from './validator';
 
 // ─── Types ────────────────────────────────────────────────────────
 

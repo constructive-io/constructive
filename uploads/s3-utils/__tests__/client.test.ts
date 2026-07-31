@@ -2,8 +2,8 @@
  * Tests for the unified S3 client factory.
  */
 
-import { createS3Client, S3ConfigError } from '../src/client';
 import type { StorageConnectionConfig } from '../src/client';
+import { createS3Client, S3ConfigError } from '../src/client';
 
 describe('createS3Client', () => {
   const baseConfig: StorageConnectionConfig = {

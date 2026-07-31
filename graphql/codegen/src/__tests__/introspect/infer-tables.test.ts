@@ -128,17 +128,17 @@ function createIntrospection(
     },
     ...(mutationFields.length > 0
       ? [
-          {
-            name: 'Mutation',
-            kind: 'OBJECT' as const,
-            fields: mutationFields.map(makeField),
-            inputFields: null,
-            enumValues: null,
-            interfaces: [],
-            possibleTypes: null,
-            description: null,
-          },
-        ]
+        {
+          name: 'Mutation',
+          kind: 'OBJECT' as const,
+          fields: mutationFields.map(makeField),
+          inputFields: null,
+          enumValues: null,
+          interfaces: [],
+          possibleTypes: null,
+          description: null,
+        },
+      ]
       : []),
     ...types.map(
       (t): IntrospectionType => ({
@@ -152,13 +152,13 @@ function createIntrospection(
         enumValues:
           t.kind === 'ENUM'
             ? (t.enumValues ?? []).map(
-                (v): IntrospectionEnumValue => ({
-                  name: v,
-                  deprecationReason: null,
-                  description: null,
-                  isDeprecated: false,
-                }),
-              )
+              (v): IntrospectionEnumValue => ({
+                name: v,
+                deprecationReason: null,
+                description: null,
+                isDeprecated: false,
+              }),
+            )
             : null,
         interfaces: [],
         possibleTypes: null,

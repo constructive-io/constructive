@@ -30,9 +30,9 @@
 import 'graphile-build';
 import 'graphile-build-pg';
 
+import { QueryBuilder, type SqlValue } from '@constructive-io/query-builder';
 import { withPgClientFromPgService } from '@dataplan/pg';
 import { Logger } from '@pgpmjs/logger';
-import { QueryBuilder, type SqlValue } from '@constructive-io/query-builder';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { isValidNameError } from 'graphql';

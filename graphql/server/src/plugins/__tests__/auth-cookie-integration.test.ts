@@ -6,7 +6,7 @@
  * grafserv uses Buffer-based responses, not JSON objects.
  */
 
-import { SESSION_COOKIE_NAME, DEVICE_TOKEN_COOKIE_NAME } from '../../middleware/cookie';
+import { DEVICE_TOKEN_COOKIE_NAME,SESSION_COOKIE_NAME } from '../../middleware/cookie';
 
 interface BufferResult {
   type: 'buffer';

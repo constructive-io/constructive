@@ -1,22 +1,21 @@
+import {
+  CDNOptions,
+  DeploymentOptions,
+  MigrationOptions,
+  pgpmDefaults,
+  PgpmOptions,
+  PgTestConnectionOptions,
+  ServerOptions} from '@pgpmjs/types';
 import deepmerge from 'deepmerge';
 import { PgConfig } from 'pg-env';
+
 import {
-  PgpmOptions,
-  pgpmDefaults,
-  PgTestConnectionOptions,
-  DeploymentOptions,
-  ServerOptions,
-  CDNOptions,
-  MigrationOptions
-} from '@pgpmjs/types';
-import {
-  GraphileOptions,
-  GraphileFeatureOptions,
+  apiDefaults,
   ApiOptions,
   graphileDefaults,
   graphileFeatureDefaults,
-  apiDefaults
-} from './graphile';
+  GraphileFeatureOptions,
+  GraphileOptions} from './graphile';
 import { LlmOptions } from './llm';
 import { SmsOptions } from './sms';
 

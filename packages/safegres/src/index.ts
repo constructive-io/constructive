@@ -34,15 +34,6 @@ export {
   checkUnindexedSortColumns
 } from './checks/indexes';
 export type { PolicyClause, PredicateColumn } from './checks/policy-index';
-export type { StatsThresholds } from './checks/stats';
-export {
-  checkDeadTuples,
-  checkSeqScanDominant,
-  checkStats,
-  checkTopStatements,
-  checkUnusedIndexes,
-  DEFAULT_STATS_THRESHOLDS
-} from './checks/stats';
 export {
   checkNonLeakproofPolicyFunctions,
   checkPolicyColumnCasts,
@@ -55,6 +46,15 @@ export {
   checkUntrustedRolePolicies,
   checkUntrustedRoleWrites
 } from './checks/role-trust';
+export type { StatsThresholds } from './checks/stats';
+export {
+  checkDeadTuples,
+  checkSeqScanDominant,
+  checkStats,
+  checkTopStatements,
+  checkUnusedIndexes,
+  DEFAULT_STATS_THRESHOLDS
+} from './checks/stats';
 export type { AuditOptions } from './commands/audit';
 export { audit } from './commands/audit';
 export type { DoctorCheck, DoctorOptions, DoctorReport, DoctorStatus } from './commands/doctor';
@@ -84,31 +84,6 @@ export type {
   SafegresConfig,
   ScoringConfig
 } from './config/types';
-export type { ResolvedExposure } from './pg/exposure';
-export { resolveConstructiveExposure, resolveExposure, UNKNOWN_EXPOSURE } from './pg/exposure';
-export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from './pg/functions';
-export { introspectFunctions } from './pg/functions';
-export type { ColumnInfo, ForeignKeyInfo, IndexInfo, TableIndexSnapshot } from './pg/indexes';
-export { introspectIndexes } from './pg/indexes';
-export type {
-  IndexUsage,
-  StatementUsage,
-  StatsSnapshot,
-  TableUsage
-} from './pg/stats';
-export { introspectStats } from './pg/stats';
-export type { ExplainOptions, ExplainReport } from './perf/explain';
-export { proveFindings } from './perf/explain';
-export {
-  type IntrospectOptions,
-  introspectTables,
-  type PgPrivilege,
-  type PolicyCmd,
-  type PolicyInfo,
-  type QueryExecutor,
-  type TableSnapshot
-} from './pg/introspect';
-export { listAuditableRoles, resolveRoles } from './pg/roles';
 export type { BaselineFinding, PerfBaseline, PerfDiff } from './perf/baseline';
 export {
   diffPerf,
@@ -119,6 +94,31 @@ export {
   toBaselineFinding,
   toPerfBaseline
 } from './perf/baseline';
+export type { ExplainOptions, ExplainReport } from './perf/explain';
+export { proveFindings } from './perf/explain';
+export type { ResolvedExposure } from './pg/exposure';
+export { resolveConstructiveExposure, resolveExposure, UNKNOWN_EXPOSURE } from './pg/exposure';
+export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from './pg/functions';
+export { introspectFunctions } from './pg/functions';
+export type { ColumnInfo, ForeignKeyInfo, IndexInfo, TableIndexSnapshot } from './pg/indexes';
+export { introspectIndexes } from './pg/indexes';
+export {
+  type IntrospectOptions,
+  introspectTables,
+  type PgPrivilege,
+  type PolicyCmd,
+  type PolicyInfo,
+  type QueryExecutor,
+  type TableSnapshot
+} from './pg/introspect';
+export { listAuditableRoles, resolveRoles } from './pg/roles';
+export type {
+  IndexUsage,
+  StatementUsage,
+  StatsSnapshot,
+  TableUsage
+} from './pg/stats';
+export { introspectStats } from './pg/stats';
 export { renderCallGraph, renderCallGraphDiff } from './report/callgraph';
 export { renderJson } from './report/json';
 export type { RenderMarkdownOptions } from './report/markdown';

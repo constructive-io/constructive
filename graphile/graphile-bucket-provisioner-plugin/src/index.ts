@@ -41,13 +41,13 @@
 export { BucketProvisionerPlugin, createBucketProvisionerPlugin } from './plugin';
 export { BucketProvisionerPreset } from './preset';
 export type {
+  BucketAccessType,
+  BucketNameResolver,
   BucketProvisionerPluginOptions,
   ConnectionConfigOrGetter,
-  BucketNameResolver,
   ProvisionBucketInput,
   ProvisionBucketPayload,
+  ProvisionResult,
   StorageConnectionConfig,
   StorageProvider,
-  BucketAccessType,
-  ProvisionResult,
 } from './types';

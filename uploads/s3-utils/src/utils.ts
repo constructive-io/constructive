@@ -36,6 +36,7 @@ export const download = async ({
   bucket,
   key,
 }: FileOperationArgs & { writeStream: NodeJS.WritableStream }): Promise<void> => {
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       const errors: Error[] = [];

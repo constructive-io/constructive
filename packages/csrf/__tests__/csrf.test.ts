@@ -1,4 +1,4 @@
-import { generateToken, verifyToken, createCsrfMiddleware } from '../src';
+import { createCsrfMiddleware,generateToken, verifyToken } from '../src';
 
 describe('token utilities', () => {
   describe('generateToken', () => {

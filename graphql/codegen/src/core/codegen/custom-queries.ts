@@ -45,9 +45,7 @@ import {
   typeRef,
   typeRefToTsTypeAST,
   useQueryOptionsImplType,
-  useQueryOptionsType,
   voidStatement,
-  wrapInferSelectResultType,
 } from './hooks-ast';
 import { getSelectTypeName } from './select-helpers';
 import {
@@ -167,12 +165,12 @@ export function generateCustomQueryHook(
 
   if (hasSelect) {
     statements.push(
-    createImportDeclaration(
-      '../../orm/select-types',
-      ['InferSelectResult', 'HookStrictSelect'],
-      true,
-    ),
-  );
+      createImportDeclaration(
+        '../../orm/select-types',
+        ['InferSelectResult', 'HookStrictSelect'],
+        true,
+      ),
+    );
   }
 
   // Re-exports
@@ -367,14 +365,14 @@ export function generateCustomQueryHook(
             'variables',
             hasRequiredArgs
               ? t.memberExpression(
-                  t.identifier('params'),
-                  t.identifier('variables'),
-                )
+                t.identifier('params'),
+                t.identifier('variables'),
+              )
               : t.logicalExpression(
-                  '??',
-                  t.memberExpression(t.identifier('params'), t.identifier('variables')),
-                  t.objectExpression([]),
-                ),
+                '??',
+                t.memberExpression(t.identifier('params'), t.identifier('variables')),
+                t.objectExpression([]),
+              ),
           ),
         );
       }
@@ -423,11 +421,11 @@ export function generateCustomQueryHook(
       ]);
       const queryFnArgs = hasArgs
         ? [
-            hasRequiredArgs
-              ? t.tsNonNullExpression(t.identifier('variables'))
-              : t.identifier('variables'),
-            selectArgExpr,
-          ]
+          hasRequiredArgs
+            ? t.tsNonNullExpression(t.identifier('variables'))
+            : t.identifier('variables'),
+          selectArgExpr,
+        ]
         : [selectArgExpr];
       const queryFnExpr = t.arrowFunctionExpression(
         [],
@@ -441,22 +439,22 @@ export function generateCustomQueryHook(
       const extraProps: (t.ObjectProperty | t.SpreadElement)[] = [];
       const enabledExpr = hasRequiredArgs
         ? t.logicalExpression(
-            '&&',
-            t.unaryExpression(
-              '!',
-              t.unaryExpression('!', t.identifier('variables')),
+          '&&',
+          t.unaryExpression(
+            '!',
+            t.unaryExpression('!', t.identifier('variables')),
+          ),
+          t.binaryExpression(
+            '!==',
+            t.optionalMemberExpression(
+              t.identifier('params'),
+              t.identifier('enabled'),
+              false,
+              true,
             ),
-            t.binaryExpression(
-              '!==',
-              t.optionalMemberExpression(
-                t.identifier('params'),
-                t.identifier('enabled'),
-                false,
-                true,
-              ),
-              t.booleanLiteral(false),
-            ),
-          )
+            t.booleanLiteral(false),
+          ),
+        )
         : undefined;
       extraProps.push(spreadObj(t.identifier('queryOptions')));
 
@@ -530,21 +528,21 @@ export function generateCustomQueryHook(
             'variables',
             hasRequiredArgs
               ? t.optionalMemberExpression(
+                t.identifier('params'),
+                t.identifier('variables'),
+                false,
+                true,
+              )
+              : t.logicalExpression(
+                '??',
+                t.optionalMemberExpression(
                   t.identifier('params'),
                   t.identifier('variables'),
                   false,
                   true,
-                )
-              : t.logicalExpression(
-                  '??',
-                  t.optionalMemberExpression(
-                    t.identifier('params'),
-                    t.identifier('variables'),
-                    false,
-                    true,
-                  ),
-                  t.objectExpression([]),
                 ),
+                t.objectExpression([]),
+              ),
           ),
         );
         const destructPattern = t.objectPattern([
@@ -584,10 +582,10 @@ export function generateCustomQueryHook(
 
       const queryFnArgs = hasArgs
         ? [
-            hasRequiredArgs
-              ? t.tsNonNullExpression(t.identifier('variables'))
-              : t.identifier('variables'),
-          ]
+          hasRequiredArgs
+            ? t.tsNonNullExpression(t.identifier('variables'))
+            : t.identifier('variables'),
+        ]
         : [];
       const queryFnExpr = t.arrowFunctionExpression(
         [],
@@ -600,22 +598,22 @@ export function generateCustomQueryHook(
 
       const enabledExpr = hasRequiredArgs
         ? t.logicalExpression(
-            '&&',
-            t.unaryExpression(
-              '!',
-              t.unaryExpression('!', t.identifier('variables')),
+          '&&',
+          t.unaryExpression(
+            '!',
+            t.unaryExpression('!', t.identifier('variables')),
+          ),
+          t.binaryExpression(
+            '!==',
+            t.optionalMemberExpression(
+              t.identifier('params'),
+              t.identifier('enabled'),
+              false,
+              true,
             ),
-            t.binaryExpression(
-              '!==',
-              t.optionalMemberExpression(
-                t.identifier('params'),
-                t.identifier('enabled'),
-                false,
-                true,
-              ),
-              t.booleanLiteral(false),
-            ),
-          )
+            t.booleanLiteral(false),
+          ),
+        )
         : undefined;
 
       body.push(
@@ -711,10 +709,10 @@ export function generateCustomQueryHook(
           hasRequiredArgs
             ? t.memberExpression(t.identifier('params'), t.identifier('variables'))
             : t.logicalExpression(
-                '??',
-                t.memberExpression(t.identifier('params'), t.identifier('variables')),
-                t.objectExpression([]),
-              ),
+              '??',
+              t.memberExpression(t.identifier('params'), t.identifier('variables')),
+              t.objectExpression([]),
+            ),
         ),
       );
     }
@@ -727,11 +725,11 @@ export function generateCustomQueryHook(
     ]);
     const fCallArgs = hasArgs
       ? [
-          hasRequiredArgs
-            ? t.tsNonNullExpression(t.identifier('variables'))
-            : t.identifier('variables'),
-          selectArgExpr,
-        ]
+        hasRequiredArgs
+          ? t.tsNonNullExpression(t.identifier('variables'))
+          : t.identifier('variables'),
+        selectArgExpr,
+      ]
       : [selectArgExpr];
     fBody.push(
       t.returnStatement(
@@ -771,21 +769,21 @@ export function generateCustomQueryHook(
           'variables',
           hasRequiredArgs
             ? t.optionalMemberExpression(
+              t.identifier('params'),
+              t.identifier('variables'),
+              false,
+              true,
+            )
+            : t.logicalExpression(
+              '??',
+              t.optionalMemberExpression(
                 t.identifier('params'),
                 t.identifier('variables'),
                 false,
                 true,
-              )
-            : t.logicalExpression(
-                '??',
-                t.optionalMemberExpression(
-                  t.identifier('params'),
-                  t.identifier('variables'),
-                  false,
-                  true,
-                ),
-                t.objectExpression([]),
               ),
+              t.objectExpression([]),
+            ),
         ),
       );
       const fCallArgs = hasRequiredArgs
@@ -913,14 +911,14 @@ export function generateCustomQueryHook(
             'variables',
             hasRequiredArgs
               ? t.memberExpression(
-                  t.identifier('params'),
-                  t.identifier('variables'),
-                )
+                t.identifier('params'),
+                t.identifier('variables'),
+              )
               : t.logicalExpression(
-                  '??',
-                  t.memberExpression(t.identifier('params'), t.identifier('variables')),
-                  t.objectExpression([]),
-                ),
+                '??',
+                t.memberExpression(t.identifier('params'), t.identifier('variables')),
+                t.objectExpression([]),
+              ),
           ),
         );
       }
@@ -933,11 +931,11 @@ export function generateCustomQueryHook(
       ]);
       const pCallArgs = hasArgs
         ? [
-            hasRequiredArgs
-              ? t.tsNonNullExpression(t.identifier('variables'))
-              : t.identifier('variables'),
-            selectArgExpr,
-          ]
+          hasRequiredArgs
+            ? t.tsNonNullExpression(t.identifier('variables'))
+            : t.identifier('variables'),
+          selectArgExpr,
+        ]
         : [selectArgExpr];
       const prefetchQueryCall = callExpr(
         t.memberExpression(
@@ -1005,21 +1003,21 @@ export function generateCustomQueryHook(
             'variables',
             hasRequiredArgs
               ? t.optionalMemberExpression(
+                t.identifier('params'),
+                t.identifier('variables'),
+                false,
+                true,
+              )
+              : t.logicalExpression(
+                '??',
+                t.optionalMemberExpression(
                   t.identifier('params'),
                   t.identifier('variables'),
                   false,
                   true,
-                )
-              : t.logicalExpression(
-                  '??',
-                  t.optionalMemberExpression(
-                    t.identifier('params'),
-                    t.identifier('variables'),
-                    false,
-                    true,
-                  ),
-                  t.objectExpression([]),
                 ),
+                t.objectExpression([]),
+              ),
           ),
         );
         const pCallArgs = hasRequiredArgs
