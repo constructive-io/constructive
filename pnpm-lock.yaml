@@ -3103,9 +3103,12 @@ importers:
 
   pgpm/transform:
     dependencies:
+      '@pgpmjs/naming-spec':
+        specifier: workspace:^
+        version: link:../naming-spec/dist
       '@pgsql/transform':
-        specifier: ^18.9.0
-        version: 18.9.0
+        specifier: ^18.10.0
+        version: 18.10.0
       plpgsql-parser:
         specifier: ^18.2.2
         version: 18.2.2
@@ -6448,6 +6451,12 @@ packages:
     resolution:
       {
         integrity: sha512-wZcMP1QHiQbWWKOw4nfvZ74xUSz/9jqeSUXVnoR1saI5M0D+iYbiuOlfNDyYmziLwgEkCuSJLZK1dZ+eQCwgAA==,
+      }
+
+  '@pgsql/transform@18.10.0':
+    resolution:
+      {
+        integrity: sha512-JhcB4i+IDKaQRsqKxXQfyc+LGWT7y/wot0u40XNmw8H1S7OrNUK1mMgMfcIqBsoIZ+gs5UpBgmJ3wL23nfaWpg==,
       }
 
   '@pgsql/transform@18.9.0':
@@ -17743,6 +17752,14 @@ snapshots:
       '@noble/hashes': 1.8.0
 
   '@pgsql/quotes@18.1.0': {}
+
+  '@pgsql/transform@18.10.0':
+    dependencies:
+      '@pgsql/quotes': 18.1.0
+      '@pgsql/traverse': 18.4.0
+      plpgsql-parser: 18.2.2
+    transitivePeerDependencies:
+      - supports-color
 
   '@pgsql/transform@18.9.0':
     dependencies:

@@ -8,13 +8,13 @@ beforeAll(async () => {
 
 const ATOMIC_CHANGES = [
   {
-    name: 'schemas/app',
+    name: 'schemas/app/schema',
     dependencies: [],
     deploy: 'CREATE SCHEMA app;'
   },
   {
-    name: 'schemas/app/tables/users',
-    dependencies: ['schemas/app'],
+    name: 'schemas/app/tables/users/table',
+    dependencies: ['schemas/app/schema'],
     deploy: [
       'CREATE TABLE app.users ();',
       'ALTER TABLE app.users ADD COLUMN id uuid;',
@@ -22,8 +22,8 @@ const ATOMIC_CHANGES = [
     ].join('\n')
   },
   {
-    name: 'schemas/app/tables/orders',
-    dependencies: ['schemas/app'],
+    name: 'schemas/app/tables/orders/table',
+    dependencies: ['schemas/app/schema'],
     deploy: [
       'CREATE TABLE app.orders ();',
       'ALTER TABLE app.orders ADD COLUMN id uuid;',
@@ -32,7 +32,7 @@ const ATOMIC_CHANGES = [
   },
   {
     name: 'schemas/app/tables/orders_fk',
-    dependencies: ['schemas/app/tables/orders', 'schemas/app/tables/users'],
+    dependencies: ['schemas/app/tables/orders/table', 'schemas/app/tables/users/table'],
     deploy: 'ALTER TABLE app.orders ADD CONSTRAINT orders_user_fk FOREIGN KEY (user_id) REFERENCES app.users (id);'
   }
 ];
@@ -44,19 +44,19 @@ describe('restructureChanges', () => {
 
     const names = result.changes.map(c => c.name);
     expect(names).toEqual([
-      'schemas/app',
-      'schemas/app/tables/users',
-      'schemas/app/tables/orders'
+      'schemas/app/schema',
+      'schemas/app/tables/users/table',
+      'schemas/app/tables/orders/table'
     ]);
 
-    const users = result.changes.find(c => c.name === 'schemas/app/tables/users')!;
+    const users = result.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
     expect(users.deploy).not.toContain('ALTER TABLE');
     expect(users.deploy).toContain('PRIMARY KEY');
-    expect(users.dependencies).toContain('schemas/app');
+    expect(users.dependencies).toContain('schemas/app/schema');
 
-    const orders = result.changes.find(c => c.name === 'schemas/app/tables/orders')!;
+    const orders = result.changes.find(c => c.name === 'schemas/app/tables/orders/table')!;
     expect(orders.deploy).toContain('FOREIGN KEY');
-    expect(orders.dependencies).toContain('schemas/app/tables/users');
+    expect(orders.dependencies).toContain('schemas/app/tables/users/table');
   });
 
   it('object granularity keeps cross-table FKs as separate statements', () => {
@@ -65,14 +65,14 @@ describe('restructureChanges', () => {
     expect(all).toContain('ALTER TABLE');
     expect(all).toContain('FOREIGN KEY');
     // Columns still folded into the creates.
-    const users = result.changes.find(c => c.name === 'schemas/app/tables/users')!;
+    const users = result.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
     expect(users.deploy).toContain('id uuid');
   });
 
   it('atomize explodes consolidated changes back to per-statement shape', () => {
     const consolidated = restructureChanges(ATOMIC_CHANGES, { granularity: 'consolidated' });
     const atomic = restructureChanges(consolidated.changes, { granularity: 'atomic' });
-    const users = atomic.changes.find(c => c.name === 'schemas/app/tables/users')!;
+    const users = atomic.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
     expect(users.deploy).toContain('ADD COLUMN');
     expect(users.deploy.match(/ALTER TABLE/g)!.length).toBeGreaterThanOrEqual(2);
   });

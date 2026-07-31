@@ -43,7 +43,8 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
-    "@pgsql/transform": "^18.9.0",
+    "@pgpmjs/naming-spec": "workspace:^",
+    "@pgsql/transform": "^18.10.0",
     "plpgsql-parser": "^18.2.2"
   }
 }
