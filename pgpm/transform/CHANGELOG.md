@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.14.0...@pgpmjs/transform@0.15.0) (2026-07-31)
+
+### Features
+
+- **transform:** granularity driver — restructure pgpm changes between atomic/object/consolidated ([6c39831](https://github.com/constructive-io/constructive/commit/6c398311f4540547d0e5f84f748b6d4dcbf727df))
+
 # [0.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.13.1...@pgpmjs/transform@0.14.0) (2026-07-31)
 
 **Note:** Version bump only for package @pgpmjs/transform

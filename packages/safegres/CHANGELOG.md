@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://github.com/constructive-io/constructive/compare/safegres@1.12.0...safegres@1.13.0) (2026-07-31)
+
+### Features
+
+- **safegres:** optional performance dimension with index-hygiene rules X1/X5/X6 ([d311a8c](https://github.com/constructive-io/constructive/commit/d311a8c4a11e40b6cc1058d17bef01688c6aa871))
+- **safegres:** policy-aware perf rules X2/X3/X4 (RLS predicate index coverage) ([dfcd459](https://github.com/constructive-io/constructive/commit/dfcd4591c6d7d7046026df1b3f4c79e9d457a093))
+
 # [1.12.0](https://github.com/constructive-io/constructive/compare/safegres@1.11.9...safegres@1.12.0) (2026-07-31)
 
 **Note:** Version bump only for package safegres
