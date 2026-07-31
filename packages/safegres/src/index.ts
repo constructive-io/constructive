@@ -29,7 +29,9 @@ export { buildCallGraph } from './callgraph/graph';
 export {
   checkMissingPrimaryKey,
   checkRedundantIndexes,
-  checkUnindexedForeignKeys
+  checkUnindexedForeignKeys,
+  checkUnindexedSearchColumns,
+  checkUnindexedSortColumns
 } from './checks/indexes';
 export type { PolicyClause, PredicateColumn } from './checks/policy-index';
 export {
@@ -77,7 +79,7 @@ export type { ResolvedExposure } from './pg/exposure';
 export { resolveConstructiveExposure, resolveExposure, UNKNOWN_EXPOSURE } from './pg/exposure';
 export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from './pg/functions';
 export { introspectFunctions } from './pg/functions';
-export type { ForeignKeyInfo, IndexInfo, TableIndexSnapshot } from './pg/indexes';
+export type { ColumnInfo, ForeignKeyInfo, IndexInfo, TableIndexSnapshot } from './pg/indexes';
 export { introspectIndexes } from './pg/indexes';
 export {
   type IntrospectOptions,
