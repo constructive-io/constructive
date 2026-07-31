@@ -124,6 +124,8 @@ export { renderJson } from './report/json';
 export type { RenderMarkdownOptions } from './report/markdown';
 export { renderMarkdown } from './report/markdown';
 export { renderPretty } from './report/pretty';
+export type { BuildSourceIndexOptions, RenderSarifOptions, SourceIndex, SourceLocation } from './report/sarif';
+export { buildSourceIndex, renderSarif } from './report/sarif';
 export type { RuleMeta } from './rules/registry';
 export { dimensionOf, expandRuleSelector, isKnownRule, RULES, RULES_BY_CODE } from './rules/registry';
 export type { Score, ScoreContext, ScoreDeduction } from './score/score';

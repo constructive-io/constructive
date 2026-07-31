@@ -10,6 +10,7 @@ import { diffPerf, parsePerfBaseline, serializePerfBaseline, toPerfBaseline } fr
 import { renderJson } from '../report/json';
 import { renderMarkdown } from '../report/markdown';
 import { renderPretty } from '../report/pretty';
+import { buildSourceIndex, renderSarif } from '../report/sarif';
 import { meetsGrade } from '../score/score';
 import type { Report, Severity } from '../types';
 import { meetsThreshold, SEVERITY_ORDER, summarize } from '../types';
@@ -99,8 +100,12 @@ Audit options:
   --exclude-schemas <csv>  Skip these schemas
   --roles <csv>            Audit grants only for these roles (default: all)
   --exclude-roles <csv>    Skip grants for these roles
-  --format <fmt>           "pretty" (default) | "json" | "json-pretty" | "markdown"
-                           (markdown is for CI: a GitHub job summary or PR comment)
+  --format <fmt>           "pretty" (default) | "json" | "json-pretty" | "markdown" | "sarif"
+                           (markdown is for CI: a GitHub job summary or PR comment;
+                           sarif uploads to GitHub code scanning)
+  --sarif-sources <dir>    With --format sarif: scan <dir> for the CREATE TABLE /
+                           CREATE POLICY that defines each object, so alerts point
+                           at the SQL that produced the finding
   --summary, -q            Print only exposure, score, and severity counts (no findings)
   --verbose                Expand internal (non-exposed) advisories (listed as a count otherwise)
   --fail-on <severity>     Exit non-zero if any finding >= severity
@@ -217,6 +222,13 @@ export default async (
     break;
   case 'json-pretty':
     output = renderJson(report, { pretty: true });
+    break;
+  case 'sarif':
+    output = renderSarif(report, {
+      sources: typeof argv['sarif-sources'] === 'string'
+        ? buildSourceIndex(argv['sarif-sources'])
+        : undefined
+    });
     break;
   case 'markdown':
   case 'md':
