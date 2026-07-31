@@ -185,6 +185,27 @@ describe('fast (bundle-backed) deployment', () => {
     expect((await ledger()).length).toBe(8);
   });
 
+  it('rebuilds from deploy/ when the artifact is valid but stale', async () => {
+    // A committed artifact plus a rebase: the archive verifies against itself,
+    // but `deploy/` has moved on. Using it would deploy yesterday's SQL and
+    // ledger it as today's.
+    await emitArtifacts();
+
+    const dir = modulePath('my-first');
+    const { name } = readBundleArchiveFile(resolveBundleArtifactPath(dir)!).changes[0];
+    const deployPath = join(dir, 'deploy', `${name}.sql`);
+    const updated = `${readFileSync(deployPath, 'utf-8')}\nCREATE SCHEMA rebased;\n`;
+    writeFileSync(deployPath, updated);
+
+    await fixture.deployModule('my-third', db.name, ['sqitch', 'simple-w-tags'], false, {
+      bundled: true
+    });
+
+    expect(await db.exists('schema', 'rebased')).toBe(true);
+    const row = (await ledger()).find((r: { change_name: string; script_hash: string }) => r.change_name === name);
+    expect(row!.script_hash).toBe(hashString(updated));
+  });
+
   it('rebuilds from deploy/ when the artifact archive is corrupt', async () => {
     await emitArtifacts();
     writeFileSync(resolveBundleArtifactPath(modulePath('my-second'))!, 'not-an-archive');

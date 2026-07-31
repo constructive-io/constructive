@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
+import { hashString } from '@pgpmjs/ast';
 import { getExtensionName, parseControlContent } from '@pgpmjs/ast/files';
 import {
   BUNDLE_ARCHIVE_EXTENSION,
@@ -92,6 +93,31 @@ export async function writeBundleArtifact(
   const outPath = join(moduleDir, 'sql', bundleArtifactFileName(bundle.manifest.name, version));
   writeBundleArchiveFile(bundle, outPath);
   return outPath;
+}
+
+/**
+ * Whether a stored bundle still describes what is on disk.
+ *
+ * `verifyBundle` only proves an artifact is internally consistent — it cannot
+ * tell that `deploy/` moved on since the artifact was written. A committed
+ * artifact plus a rebased branch is exactly that case, and using it would
+ * deploy the stale SQL while recording hashes for it, silently.
+ *
+ * The check is deliberately I/O-only (read + sha256, no parse), so it costs a
+ * fraction of the parse/deparse work the artifact exists to avoid.
+ */
+export function bundleMatchesModule(moduleDir: string, bundle: MigrationBundle): boolean {
+  const planPath = join(moduleDir, 'pgpm.plan');
+  if (!existsSync(planPath)) return false;
+  if (readFileSync(planPath, 'utf-8') !== bundle.plan) return false;
+
+  for (const change of bundle.changes) {
+    if (!change.deploy) continue;
+    const deployPath = join(moduleDir, 'deploy', `${change.name}.sql`);
+    if (!existsSync(deployPath)) return false;
+    if (hashString(readFileSync(deployPath, 'utf-8')) !== change.deploy.digest) return false;
+  }
+  return true;
 }
 
 /**

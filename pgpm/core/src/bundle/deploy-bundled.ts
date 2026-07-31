@@ -4,7 +4,7 @@ import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
 
 import { PgpmMigrate } from '../migrate/client';
-import { buildExecutableBundle, readBundleArtifact } from './artifact';
+import { bundleMatchesModule, buildExecutableBundle, readBundleArtifact } from './artifact';
 
 const log = new Logger('deploy-fast');
 
@@ -83,13 +83,19 @@ async function loadExecutableBundle(
   const stored = readBundleArtifact(moduleDir);
   if (stored) {
     const issues = verifyBundle(stored);
-    if (issues.length === 0) {
+    if (issues.length > 0) {
+      log.warn(
+        `⚠️ Bundle artifact for ${stored.manifest.name} failed verification ` +
+          `(${issues.map(i => i.kind).join(', ')}); rebuilding from deploy/.`
+      );
+    } else if (!bundleMatchesModule(moduleDir, stored)) {
+      log.warn(
+        `⚠️ Bundle artifact for ${stored.manifest.name} is stale (deploy/ has ` +
+          `changed since it was packaged); rebuilding from deploy/.`
+      );
+    } else {
       return { bundle: stored, source: 'artifact' };
     }
-    log.warn(
-      `⚠️ Bundle artifact for ${stored.manifest.name} failed verification ` +
-        `(${issues.map(i => i.kind).join(', ')}); rebuilding from deploy/.`
-    );
   }
   return { bundle: await buildExecutableBundle(moduleDir), source: 'packaged' };
 }
