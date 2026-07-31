@@ -217,9 +217,26 @@ pgpm plan
 
 **pgpm package** — Package module for distribution
 
+Emits two artifacts into `sql/`: the consolidated `sql/<name>--<version>.sql`
+and the content-addressed `sql/<name>--<version>.bundle.tar.gz` (consumed by
+`pgpm deploy --fast`/`--bundled`).
+
 ```bash
 pgpm package
 pgpm package --no-plan
+```
+
+**pgpm package --check** — Verify committed artifacts are in sync (no writes, no DB)
+
+Fails fast when a module's committed `sql/<name>--<version>.bundle.tar.gz` no
+longer matches its `deploy/`. By default only the modules that changed (via
+git) are checked. See `references/package-check.md`.
+
+```bash
+pgpm package --check                      # changed modules (auto base)
+pgpm package --check --since origin/main  # diff HEAD vs a branch/ref/tag
+pgpm package --check --all                # every workspace module
+pgpm package --check --no-fail-fast       # list all drift instead of stopping
 ```
 
 ### Testing
