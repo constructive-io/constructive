@@ -1,14 +1,15 @@
 import type { GraphileConfig } from 'graphile-config';
-import { PostgisCodecPlugin } from './plugins/codec';
-import { PostgisInflectionPlugin } from './plugins/inflection';
-import { PostgisExtensionDetectionPlugin } from './plugins/detect-extension';
-import { PostgisRegisterTypesPlugin } from './plugins/register-types';
-import { PostgisGeometryFieldsPlugin } from './plugins/geometry-fields';
-import { PostgisMeasurementFieldsPlugin } from './plugins/measurement-fields';
-import { PostgisTransformationFieldsPlugin } from './plugins/transformation-functions';
+
 import { PostgisAggregatePlugin } from './plugins/aggregate-functions';
-import { PostgisSpatialRelationsPlugin } from './plugins/spatial-relations';
+import { PostgisCodecPlugin } from './plugins/codec';
 import { createPostgisOperatorFactory } from './plugins/connection-filter-operators';
+import { PostgisExtensionDetectionPlugin } from './plugins/detect-extension';
+import { PostgisGeometryFieldsPlugin } from './plugins/geometry-fields';
+import { PostgisInflectionPlugin } from './plugins/inflection';
+import { PostgisMeasurementFieldsPlugin } from './plugins/measurement-fields';
+import { PostgisRegisterTypesPlugin } from './plugins/register-types';
+import { PostgisSpatialRelationsPlugin } from './plugins/spatial-relations';
+import { PostgisTransformationFieldsPlugin } from './plugins/transformation-functions';
 import { createWithinDistanceOperatorFactory } from './plugins/within-distance-operator';
 
 /**

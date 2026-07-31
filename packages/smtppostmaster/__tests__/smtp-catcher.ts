@@ -1,6 +1,6 @@
 import { AddressInfo } from 'net';
-import { SMTPServer } from 'smtp-server';
 import type { SMTPServerSession } from 'smtp-server';
+import { SMTPServer } from 'smtp-server';
 
 export type CapturedMessage = {
   envelope: SMTPServerSession['envelope'];

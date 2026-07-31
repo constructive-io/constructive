@@ -1,8 +1,7 @@
 import { 
-  getConnections as getPgConnections,
   type GetConnectionOpts,
-  type GetConnectionResult
-} from 'pgsql-test';
+  type GetConnectionResult,
+  getConnections as getPgConnections} from 'pgsql-test';
 
 /**
  * Get connections with Constructive platform behavior.

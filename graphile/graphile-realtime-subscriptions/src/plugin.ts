@@ -46,10 +46,10 @@
  *     preventing cross-tenant event leaks.
  */
 
-import { context as grafastContext, listen, object, constant, lambda } from 'grafast';
+import { Logger } from '@pgpmjs/logger';
+import { constant, context as grafastContext, lambda,listen, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema } from 'graphile-utils';
-import { Logger } from '@pgpmjs/logger';
 
 import type { RealtimeSubscriptionsPluginOptions } from './types';
 
@@ -341,7 +341,7 @@ export { createRealtimeSubscriptionsPlugin as RealtimeSubscriptionsPlugin };
 // Re-export CursorTracker and RealtimeManager for convenience
 export { CursorTracker } from './cursor-tracker';
 export { RealtimeManager } from './realtime-manager';
-export type { CursorTrackerOptions, ChangeLogEntry, Queryable, RealtimeManagerOptions } from './types';
+export type { ChangeLogEntry, CursorTrackerOptions, Queryable, RealtimeManagerOptions } from './types';
 
 // Exported for testing
-export { parseNotifyPayload, EventThrottle, DEFAULT_OVERFLOW_THRESHOLD };
+export { DEFAULT_OVERFLOW_THRESHOLD,EventThrottle, parseNotifyPayload };

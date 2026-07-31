@@ -10,9 +10,10 @@
  * GREATEST(parent_rank, chunk_rank).
  */
 
-import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../types';
 import type { SQL } from 'pg-sql2';
-import { getChunksInfo, type ChunksInfo } from './chunks';
+
+import type { FilterApplyResult,SearchableColumn, SearchAdapter } from '../types';
+import { type ChunksInfo,getChunksInfo } from './chunks';
 
 function isTsvectorCodec(codec: any): boolean {
   // In graphile-build-pg >= 5.0.0-rc.8, the built-in TYPES.tsvector codec

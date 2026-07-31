@@ -1,11 +1,12 @@
+import './types';
+
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 
-import { isApiError } from '../errors/api-errors';
-import errorPage404Message from '../errors/404-message';
 import errorPage50x from '../errors/50x';
-import './types';
+import errorPage404Message from '../errors/404-message';
+import { isApiError } from '../errors/api-errors';
 
 const log = new Logger('error-handler');
 

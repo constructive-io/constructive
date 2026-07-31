@@ -14,7 +14,7 @@
 export { QueryBuilder } from './query-builder';
 
 // QueryExecutor (server-side execution via PostGraphile)
-export { QueryExecutor, createExecutor } from './executor';
+export { createExecutor,QueryExecutor } from './executor';
 
 // AST builders (getAll, getMany, getOne, createOne, patchOne, deleteOne)
 export * from './ast';

@@ -6,7 +6,7 @@
  */
 export {
   convertToSelectionOptions,
-  isRelationalField,
   getAvailableRelations,
+  isRelationalField,
   validateFieldSelection,
 } from '@constructive-io/graphql-query';

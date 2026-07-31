@@ -6,13 +6,13 @@
 export {
   normalizeInflectionValue,
   toCamelCaseSingular,
-  toCreateMutationName,
-  toUpdateMutationName,
-  toDeleteMutationName,
   toCreateInputTypeName,
-  toUpdateInputTypeName,
+  toCreateMutationName,
   toDeleteInputTypeName,
+  toDeleteMutationName,
   toFilterTypeName,
-  toPatchFieldName,
   toOrderByEnumValue,
+  toPatchFieldName,
+  toUpdateInputTypeName,
+  toUpdateMutationName,
 } from '@constructive-io/graphql-query';

@@ -1,9 +1,9 @@
 import * as t from '@babel/types';
 import { toKebabCase } from 'inflekt';
 
+import type { Operation,Table } from '../../../types/schema';
 import { generateCode } from '../babel-ast';
 import { getGeneratedFileHeader, getTableNames } from '../utils';
-import type { Table, Operation } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
 
 function createImportDeclaration(

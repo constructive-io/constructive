@@ -1,7 +1,7 @@
 import {
   COMPARISON_FILTER_OPERATORS,
-  FILTER_OPERATORS,
   Filter,
+  FILTER_OPERATORS,
   isFilterOperator,
   isLogicalOperator,
   OrderByItem

@@ -1,4 +1,4 @@
-import { send, resetTransport } from '../src/index';
+import { resetTransport,send } from '../src/index';
 import { createSmtpCatcher } from './smtp-catcher';
 
 describe('send', () => {

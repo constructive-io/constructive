@@ -1,4 +1,4 @@
-import { GisSubtype, GIS_SUBTYPE_NAME } from './constants';
+import { GIS_SUBTYPE_NAME,GisSubtype } from './constants';
 import type { GisTypeDetails } from './types';
 
 /**

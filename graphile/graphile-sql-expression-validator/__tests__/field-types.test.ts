@@ -1,18 +1,14 @@
+import type {
+  FieldDefault,
+  FieldDefaultValidationOptions} from '../src/field-types';
 import {
-  validateFieldType,
-  validateFieldDefault,
-  fieldTypeToAst,
-  fieldTypeToSql,
   fieldDefaultToAst,
   fieldDefaultToSql,
-  FORBIDDEN_TYPES
-} from '../src/field-types';
-import type {
-  FieldType,
-  FieldDefault,
-  FieldTypeValidationOptions,
-  FieldDefaultValidationOptions
-} from '../src/field-types';
+  fieldTypeToAst,
+  fieldTypeToSql,
+  FORBIDDEN_TYPES,
+  validateFieldDefault,
+  validateFieldType} from '../src/field-types';
 import { DEFAULT_ALLOWED_FUNCTIONS } from '../src/validator';
 
 // ═══════════════════════════════════════════════════════════════════

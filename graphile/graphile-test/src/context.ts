@@ -1,19 +1,18 @@
+import { execute } from 'grafast';
+import type { GraphileConfig } from 'graphile-config';
 import type {
   DocumentNode,
   ExecutionResult,
-  GraphQLSchema,
-  GraphQLError,
   FieldNode,
+  GraphQLError,
+  GraphQLSchema,
   OperationDefinitionNode,
   SelectionNode,
 } from 'graphql';
-import { parse, print, Kind } from 'graphql';
-import type { GraphileConfig } from 'graphile-config';
-import { execute } from 'grafast';
-import { withPgClientFromPgService } from 'graphile-build-pg';
-import { makePgService } from 'postgraphile/adaptors/pg';
+import { Kind,parse, print } from 'graphql';
 import type { Client, Pool } from 'pg';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
+import { makePgService } from 'postgraphile/adaptors/pg';
 
 import type { GetConnectionsInput } from './types';
 

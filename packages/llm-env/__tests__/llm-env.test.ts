@@ -1,4 +1,4 @@
-import { getEnvVars, getEnvOptions, getLlmEnvOptions, llmDefaults } from '../src';
+import { getEnvOptions, getEnvVars, getLlmEnvOptions, llmDefaults } from '../src';
 
 describe('getEnvVars', () => {
   it('returns empty object when no env vars are set', () => {

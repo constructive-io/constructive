@@ -1,6 +1,7 @@
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { RequestHandler } from 'express';
+
 import { getDebugDatabaseSnapshot } from '../../diagnostics/debug-db-snapshot';
 
 const log = new Logger('debug-db');

@@ -311,7 +311,7 @@ const TYPE_NAME_ALIASES: Record<string, string> = {
   'time with time zone': 'timetz',
   'time without time zone': 'time',
   'character varying': 'varchar',
-  'character': 'bpchar',
+  character: 'bpchar',
   'double precision': 'float8',
   'bit varying': 'varbit'
 };

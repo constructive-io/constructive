@@ -1,3 +1,5 @@
+import './types'; // for Request type
+
 import { errors } from '@constructive-io/errors';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
@@ -7,7 +9,6 @@ import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
-import './types'; // for Request type
 
 const log = new Logger('auth');
 const isDev = () => getNodeEnv() === 'development';

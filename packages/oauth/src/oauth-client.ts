@@ -1,13 +1,12 @@
+import { extractPrimaryEmail,getProvider, GITHUB_EMAILS_URL } from './providers';
 import {
-  OAuthClientConfig,
-  OAuthCredentials,
-  OAuthProfile,
-  TokenResponse,
   AuthorizationUrlParams,
   CallbackParams,
   createOAuthError,
+  OAuthClientConfig,
+  OAuthProfile,
+  TokenResponse,
 } from './types';
-import { getProvider, GITHUB_EMAILS_URL, extractPrimaryEmail } from './providers';
 import { generateState } from './utils/state';
 
 export class OAuthClient {

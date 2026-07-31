@@ -18,8 +18,6 @@
  */
 
 export { parseType, print } from '@0no-co/graphql.web';
-
-export type { GraphQLAdapter, GraphQLError, QueryResult } from '@constructive-io/graphql-types';
-
-export { createFetch } from '@constructive-io/fetch';
 export type { FetchFunction } from '@constructive-io/fetch';
+export { createFetch } from '@constructive-io/fetch';
+export type { GraphQLAdapter, GraphQLError, QueryResult } from '@constructive-io/graphql-types';

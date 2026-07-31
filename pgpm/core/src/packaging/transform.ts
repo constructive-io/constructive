@@ -39,14 +39,14 @@ export const transformProps = (obj: any, props: TransformProps): any => {
     copy = {};
     for (const attr in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, attr)) {
-        if (props.hasOwnProperty(attr)) {
+        if (Object.prototype.hasOwnProperty.call(props, attr)) {
           const propRule = props[attr];
           if (typeof propRule === 'function') {
             // Apply function transformation
             copy[attr] = propRule(obj[attr]);
           } else if (typeof propRule === 'object' && propRule !== null) {
             // Apply value-based transformation
-            if (propRule.hasOwnProperty(obj[attr])) {
+            if (Object.prototype.hasOwnProperty.call(propRule, obj[attr])) {
               copy[attr] = propRule[obj[attr]];
             } else {
               copy[attr] = transformProps(obj[attr], props);

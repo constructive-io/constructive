@@ -97,9 +97,9 @@ export function buildQueryMeta(
     const codec = resource.codec;
     const connectionType = codec
       ? safeInflection(
-          () => inflection.tableConnectionType?.(codec),
-          `${tableType}Connection`,
-        )
+        () => inflection.tableConnectionType?.(codec),
+        `${tableType}Connection`,
+      )
       : null;
     const orderedUniques = [...uniques].sort(
       (left, right) => Number(!!right.isPrimary) - Number(!!left.isPrimary),
@@ -183,9 +183,9 @@ export function buildQueryMeta(
     ),
     one: hasPrimaryKey
       ? safeInflection(
-          () => inflection.tableFieldName?.(resource),
-          tableType.toLowerCase(),
-        )
+        () => inflection.tableFieldName?.(resource),
+        tableType.toLowerCase(),
+      )
       : null,
     create: safeInflection(
       () => inflection.createField?.(resource),
@@ -193,15 +193,15 @@ export function buildQueryMeta(
     ),
     update: hasPrimaryKey
       ? safeInflection(
-          () => inflection.updateByKeys?.(resource),
-          `update${tableType}`,
-        )
+        () => inflection.updateByKeys?.(resource),
+        `update${tableType}`,
+      )
       : null,
     delete: hasPrimaryKey
       ? safeInflection(
-          () => inflection.deleteByKeys?.(resource),
-          `delete${tableType}`,
-        )
+        () => inflection.deleteByKeys?.(resource),
+        `delete${tableType}`,
+      )
       : null,
   };
 }

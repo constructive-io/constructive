@@ -35,7 +35,9 @@ export class PgClient {
     if (this.connectPromise) {
       try {
         await this.connectPromise;
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
   }
 

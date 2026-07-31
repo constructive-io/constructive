@@ -1,8 +1,8 @@
+import { getExtensionInfo, parseControlContent } from '@pgpmjs/ast/files';
 import { Logger } from '@pgpmjs/logger';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-import { getExtensionInfo, parseControlContent } from '@pgpmjs/ast/files';
 import { writePackage } from './package';
 
 const log = new Logger('sync-versions');

@@ -2,17 +2,17 @@
  * Tests for types and error classes.
  */
 
-import { ProvisionerError } from '../src/types';
 import type {
-  StorageProvider,
-  StorageConnectionConfig,
   BucketAccessType,
-  CreateBucketOptions,
   CorsRule,
+  CreateBucketOptions,
   LifecycleRule,
-  ProvisionResult,
   ProvisionerErrorCode,
+  ProvisionResult,
+  StorageConnectionConfig,
+  StorageProvider,
 } from '../src/types';
+import { ProvisionerError } from '../src/types';
 
 describe('ProvisionerError', () => {
   it('creates error with code and message', () => {

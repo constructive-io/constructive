@@ -1,5 +1,6 @@
-import { CONCRETE_SUBTYPES, GisSubtype } from '../src/constants';
 import type { ConnectionFilterOperatorSpec as OperatorSpec } from 'graphile-connection-filter';
+
+import { CONCRETE_SUBTYPES } from '../src/constants';
 import { createPostgisOperatorFactory } from '../src/plugins/connection-filter-operators';
 
 /**

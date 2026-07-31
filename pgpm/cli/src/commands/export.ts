@@ -1,6 +1,6 @@
 import { PgpmPackage } from '@pgpmjs/core';
-import { exportMigrations, exportGraphQL, GraphQLClient, graphqlRowToPostgresRow, isExportGranularity, EXPORT_GRANULARITIES, parsePartitionConfig, PartitionConfig } from '@pgpmjs/export';
 import { getEnvOptions } from '@pgpmjs/env';
+import { EXPORT_GRANULARITIES, exportGraphQL, exportMigrations, GraphQLClient, graphqlRowToPostgresRow, isExportGranularity, parsePartitionConfig, PartitionConfig } from '@pgpmjs/export';
 import { getGitConfigInfo } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { resolve } from 'path';

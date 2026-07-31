@@ -35,7 +35,7 @@ function createMetaSchemaType(): GraphQLObjectType {
       kind: {
         type: nn(GraphQLString),
         description:
-          "Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite."
+          'Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite.'
       },
       elementType: { type: GraphQLString, description: "For 'vector': element scalar (e.g. 'float')." },
       dimensions: { type: GraphQLInt, description: "For 'vector': declared length, else null." },

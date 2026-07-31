@@ -8,7 +8,7 @@
  * Inspired by @pgpmjs/env walkUp / resolvePnpmWorkspace patterns.
  */
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, resolve, parse as parsePath } from 'node:path';
+import { dirname, parse as parsePath,resolve } from 'node:path';
 
 /**
  * Walk up directories from startDir looking for a file.

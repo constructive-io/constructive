@@ -207,7 +207,7 @@ export function getGraphileBuildStats(): {
   lastDatabaseId: string | null;
   recentEvents: GraphileBuildEvent[];
   byServiceKey: Record<string, GraphileBuildAggregate & { averageMs: number }>;
-} {
+  } {
   const completed = buildStats.succeeded + buildStats.failed;
   const withAverages = (map: Map<string, GraphileBuildAggregate>) =>
     Object.fromEntries(

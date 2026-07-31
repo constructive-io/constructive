@@ -1,7 +1,3 @@
-import { execSync } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-
 import {
   BoilerplateSkill,
   DEFAULT_TEMPLATE_REPO,
@@ -16,7 +12,10 @@ import {
 } from '@pgpmjs/core';
 import { resolveWorkspaceByType } from '@pgpmjs/env';
 import { errors } from '@pgpmjs/types';
+import { execSync } from 'child_process';
+import fs from 'fs';
 import { CLIOptions, Inquirerer, OptionValue, Question, registerDefaultResolver } from 'inquirerer';
+import path from 'path';
 
 import { isNoTtyRequested } from '../../utils';
 import {
@@ -704,8 +703,8 @@ async function handleModuleInit(
 
   const extensions = isPgpmTemplate && answers.extensions
     ? answers.extensions
-        .filter((opt: OptionValue) => opt.selected)
-        .map((opt: OptionValue) => opt.name)
+      .filter((opt: OptionValue) => opt.selected)
+      .map((opt: OptionValue) => opt.name)
     : [];
 
   const templateAnswers = {

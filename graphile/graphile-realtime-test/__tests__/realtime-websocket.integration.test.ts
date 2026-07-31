@@ -12,15 +12,15 @@
  *   4. Returns ws handle for creating clients, firing events, and teardown
  */
 
-import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { join } from 'node:path';
 
 import { subscribe as grafastSubscribe } from 'grafast';
 import { parse } from 'graphql';
 import { seed } from 'pgsql-test';
 
-import { getConnections } from '../src/get-connections';
 import type { GetConnectionsResult } from '../src/get-connections';
+import { getConnections } from '../src/get-connections';
 import { delay } from '../src/ws-helpers';
 
 // ─── Test Suite ─────────────────────────────────────────────────────────────

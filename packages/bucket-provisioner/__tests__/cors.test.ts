@@ -2,7 +2,7 @@
  * Tests for CORS configuration builders.
  */
 
-import { buildUploadCorsRules, buildPrivateCorsRules } from '../src/cors';
+import { buildPrivateCorsRules,buildUploadCorsRules } from '../src/cors';
 
 describe('buildUploadCorsRules', () => {
   it('builds rules with allowed origins', () => {

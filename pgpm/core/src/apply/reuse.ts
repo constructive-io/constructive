@@ -1,7 +1,3 @@
-import { mkdtempSync } from 'fs';
-import { tmpdir } from 'os';
-import { join } from 'path';
-
 import { hashString } from '@pgpmjs/ast';
 import {
   bundleFromModule,
@@ -19,6 +15,9 @@ import {
   SchemaObjectRoute,
   SchemaTransformPass
 } from '@pgpmjs/transform';
+import { mkdtempSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 import { ResolvedApplySpec } from './types';
 

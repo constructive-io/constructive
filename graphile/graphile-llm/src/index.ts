@@ -32,7 +32,7 @@
 
 // Environment configuration (re-exported from @constructive-io/llm-env)
 export type { LlmEnvOptions, LlmProviderConfig, ResolvedLlmEnvOptions } from './env';
-export { getEnvVars, getEnvOptions, getLlmEnvOptions, llmDefaults } from './env';
+export { getEnvOptions, getEnvVars, getLlmEnvOptions, llmDefaults } from './env';
 
 // Preset (recommended entry point)
 export { GraphileLlmPreset } from './preset';

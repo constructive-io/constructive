@@ -1,7 +1,7 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, Question, cliExitWithError } from 'inquirerer';
+import { cliExitWithError,CLIOptions, Inquirerer, Question } from 'inquirerer';
 import { getPgEnvOptions } from 'pg-env';
 
 import { getTargetDatabase } from '../utils';

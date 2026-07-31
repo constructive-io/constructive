@@ -1,8 +1,8 @@
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import fs from 'fs';
 import path from 'path';
-import { PgpmPackage } from '../../src/core/class/pgpm';
+
 import { TestFixture } from '../../test-utils/TestFixture';
-import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 
 describe('Clear Functionality', () => {
   let fixture: TestFixture;

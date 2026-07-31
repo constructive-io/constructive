@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 import { parsePlanFile } from '../plan/parser';
-import { parseReference, ParsedReference } from '../plan/validators';
+import { ParsedReference,parseReference } from '../plan/validators';
 
 /**
  * A parsed `-- requires:` line from a pgpm SQL script header.
@@ -241,7 +241,7 @@ export function scanDeployScript(
     }
 
     if (/:/.test(line)) {
-      const m2 = line.match(/^-- Deploy ([^:]*):([\w\/]+)(?:\s+to\s+pg)?/);
+      const m2 = line.match(/^-- Deploy ([^:]*):([\w/]+)(?:\s+to\s+pg)?/);
       if (m2) {
         const actualProject = m2[1];
         const keyToTest = m2[2];

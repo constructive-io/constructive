@@ -6,8 +6,8 @@
  * are sent with the right parameters.
  */
 
-import { BucketProvisioner } from '../src/provisioner';
 import type { BucketProvisionerOptions } from '../src/provisioner';
+import { BucketProvisioner } from '../src/provisioner';
 import { ProvisionerError } from '../src/types';
 
 // We mock the S3Client.send at the instance level

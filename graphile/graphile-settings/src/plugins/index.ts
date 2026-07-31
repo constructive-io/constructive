@@ -38,14 +38,14 @@ export {
 } from './many-to-many-preset';
 
 // Primary key only lookups (disable non-PK unique constraints)
+export type { UniqueLookupOptions } from './primary-key-only';
 export {
   createUniqueLookupPlugin,
-  PrimaryKeyOnlyPlugin,
   NoUniqueLookupPlugin,
-  PrimaryKeyOnlyPreset,
   NoUniqueLookupPreset,
+  PrimaryKeyOnlyPlugin,
+  PrimaryKeyOnlyPreset,
 } from './primary-key-only';
-export type { UniqueLookupOptions } from './primary-key-only';
 
 // Meta schema plugin for introspection (tables, fields, indexes, constraints)
 export {
@@ -54,35 +54,35 @@ export {
   MetaSchemaPreset,
 } from './meta-schema';
 export type {
-  TableMeta,
-  FieldMeta,
-  TypeMeta,
-  IndexMeta,
-  ConstraintsMeta,
-  PrimaryKeyConstraintMeta,
-  UniqueConstraintMeta,
-  ForeignKeyConstraintMeta,
-  RelationsMeta,
   BelongsToRelation,
+  ConstraintsMeta,
+  FieldMeta,
+  ForeignKeyConstraintMeta,
   HasRelation,
-  ManyToManyRelation,
+  IndexMeta,
   InflectionMeta,
+  ManyToManyRelation,
+  PrimaryKeyConstraintMeta,
   QueryMeta,
+  RelationsMeta,
+  TableMeta,
+  TypeMeta,
+  UniqueConstraintMeta,
 } from 'graphile-meta';
 
 // PG type mappings for custom PostgreSQL types (email, url, etc.)
+export type { TypeMapping } from './pg-type-mappings';
 export {
   PgTypeMappingsPlugin,
   PgTypeMappingsPreset,
 } from './pg-type-mappings';
-export type { TypeMapping } from './pg-type-mappings';
 
 // Public key signature plugin for crypto authentication
-export { PublicKeySignature } from './PublicKeySignature';
 export type { PublicKeyChallengeConfig } from './PublicKeySignature';
+export { PublicKeySignature } from './PublicKeySignature';
 
 // Internal exports for testing
-export { _pgTypeToGqlType, _buildFieldMeta } from './meta-schema';
+export { _buildFieldMeta,_pgTypeToGqlType } from './meta-schema';
 
 // Required input plugin - makes @requiredInput tagged fields non-nullable in mutation inputs
 export {
@@ -91,37 +91,37 @@ export {
 } from './required-input-plugin';
 
 // Unified search — tsvector + BM25 + pg_trgm + pgvector behind a single adapter architecture
+export type {
+  Bm25AdapterOptions,
+  Bm25IndexInfo,
+  PgvectorAdapterOptions,
+  SearchableColumn,
+  SearchAdapter,
+  TrgmAdapterOptions,
+  TsvectorAdapterOptions,
+  TsvectorCodecPluginOptions,
+  UnifiedSearchOptions,
+  UnifiedSearchPresetOptions,
+} from 'graphile-search';
 export {
-  // Core plugin + preset
-  createUnifiedSearchPlugin,
-  UnifiedSearchPreset,
-  // Codec plugins (tree-shakable)
-  TsvectorCodecPlugin,
-  TsvectorCodecPreset,
-  createTsvectorCodecPlugin,
   Bm25CodecPlugin,
   Bm25CodecPreset,
   bm25IndexStore,
-  VectorCodecPlugin,
-  VectorCodecPreset,
-  // Adapters
-  createTsvectorAdapter,
   createBm25Adapter,
-  createTrgmAdapter,
-  createPgvectorAdapter,
   // Operator factories for connection filter integration
   createMatchesOperatorFactory,
+  createPgvectorAdapter,
+  createTrgmAdapter,
   createTrgmOperatorFactories,
-} from 'graphile-search';
-export type {
-  SearchAdapter,
-  SearchableColumn,
-  UnifiedSearchOptions,
-  UnifiedSearchPresetOptions,
-  TsvectorCodecPluginOptions,
-  Bm25IndexInfo,
-  TsvectorAdapterOptions,
-  Bm25AdapterOptions,
-  TrgmAdapterOptions,
-  PgvectorAdapterOptions,
+  // Adapters
+  createTsvectorAdapter,
+  createTsvectorCodecPlugin,
+  // Core plugin + preset
+  createUnifiedSearchPlugin,
+  // Codec plugins (tree-shakable)
+  TsvectorCodecPlugin,
+  TsvectorCodecPreset,
+  UnifiedSearchPreset,
+  VectorCodecPlugin,
+  VectorCodecPreset,
 } from 'graphile-search';

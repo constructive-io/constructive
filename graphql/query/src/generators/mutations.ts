@@ -3,8 +3,8 @@
  * Uses AST-based approach for PostGraphile-compatible mutations
  */
 import * as t from 'gql-ast';
-import { OperationTypeNode, print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
+import { OperationTypeNode, print } from 'graphql';
 
 import { TypedDocumentString } from '../client/typed-document';
 import {

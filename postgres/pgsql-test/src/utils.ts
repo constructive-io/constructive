@@ -1,19 +1,17 @@
 import { 
   extractPgErrorFields, 
-  formatPgErrorFields, 
   formatPgError,
-  type PgErrorFields,
-  type PgErrorContext
-} from '@pgpmjs/types';
+  formatPgErrorFields, 
+  type PgErrorContext,
+  type PgErrorFields} from '@pgpmjs/types';
 
 // Re-export PostgreSQL error formatting utilities
 export { 
   extractPgErrorFields, 
-  formatPgErrorFields, 
   formatPgError,
-  type PgErrorFields,
-  type PgErrorContext
-};
+  formatPgErrorFields, 
+  type PgErrorContext,
+  type PgErrorFields};
 
 /**
  * Extract the error code from an error message.

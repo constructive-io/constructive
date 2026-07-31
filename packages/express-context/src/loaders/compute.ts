@@ -13,8 +13,8 @@
  */
 
 import type { ComputeConfig } from '../types';
-import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
+import type { LoaderContext, ModuleLoader } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 

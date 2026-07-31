@@ -8,7 +8,8 @@
 
 import 'graphile-build';
 import 'graphile-build-pg';
-import type { ConnectionFilterOperatorFactory, ConnectionFilterOperatorSpec, ConnectionFilterOperatorsDigest, PgConnectionFilterOperatorsScope } from './types';
+
+import type { ConnectionFilterOperatorFactory, ConnectionFilterOperatorsDigest, PgConnectionFilterOperatorsScope } from './types';
 
 declare global {
   namespace GraphileBuild {

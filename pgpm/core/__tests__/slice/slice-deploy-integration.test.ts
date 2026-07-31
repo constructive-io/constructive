@@ -1,9 +1,9 @@
-import { join } from 'path';
-import { mkdirSync, writeFileSync, rmSync } from 'fs';
+import { slicePlan, writeSliceResult } from '@pgpmjs/slice';
+import { mkdirSync, rmSync,writeFileSync } from 'fs';
 import { tmpdir } from 'os';
+import { join } from 'path';
 
 import { PgpmMigrate } from '../../src/migrate/client';
-import { slicePlan, writeSliceResult } from '@pgpmjs/slice';
 import { MigrateTestFixture, teardownAllPools, TestDatabase } from '../../test-utils';
 
 describe('Slice Deploy Integration', () => {

@@ -2,13 +2,13 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs
 import { tmpdir } from 'os';
 import { join } from 'path';
 
-import { modulePath, pgpmPath } from '../../src/workspace/paths';
 import {
   generateModuleControl,
   generateModuleMakefile,
   writeMinimalModule,
   writeMinimalWorkspace,
 } from '../../src/workspace/minimal';
+import { modulePath, pgpmPath } from '../../src/workspace/paths';
 
 let dir: string;
 

@@ -8,6 +8,7 @@
  */
 import { Parser } from 'csv-to-pg';
 import { toSnakeCase } from 'inflekt';
+
 import { FieldType, getTimestampDefaultColumnsForTable, META_TABLE_CONFIG, META_TABLE_ORDER, TableConfig } from './export-utils';
 import { GraphQLClient } from './graphql-client';
 import {

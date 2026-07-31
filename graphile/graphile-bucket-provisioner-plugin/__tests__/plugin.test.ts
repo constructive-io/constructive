@@ -111,7 +111,7 @@ function createMockPgClient(overrides: Record<string, any> = {}) {
         allowed_origins: null,
       }],
     },
-    'app_public': {
+    app_public: {
       rows: [{
         id: 'bucket-uuid-789',
         key: 'public',
@@ -218,7 +218,7 @@ describe('createBucketProvisionerPlugin', () => {
 
     it('provisions a private bucket', async () => {
       const privateBucketOverrides = {
-        'app_public': {
+        app_public: {
           rows: [{
             id: 'bucket-uuid-private',
             key: 'private',
@@ -388,7 +388,7 @@ describe('createBucketProvisionerPlugin', () => {
       createBucketProvisionerPlugin(createDefaultOptions());
 
       const pgClient = createMockPgClient({
-        'app_public': { rows: [] },
+        app_public: { rows: [] },
       });
       const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
         callback(pgClient),
@@ -911,7 +911,7 @@ describe('createBucketProvisionerPlugin', () => {
       const wrapped = hook(field, build, context);
 
       const pgClient = createMockPgClient({
-        'app_public': {
+        app_public: {
           rows: [{
             id: 'bucket-uuid-789',
             key: 'public',
@@ -964,7 +964,7 @@ describe('createBucketProvisionerPlugin', () => {
       const wrapped = hook(field, build, context);
 
       const pgClient = createMockPgClient({
-        'app_public': {
+        app_public: {
           rows: [{
             id: 'bucket-uuid-789',
             key: 'public',
@@ -1017,7 +1017,7 @@ describe('CORS resolution hierarchy', () => {
     createBucketProvisionerPlugin(createDefaultOptions());
 
     const pgClient = createMockPgClient({
-      'app_public': {
+      app_public: {
         rows: [{
           id: 'bucket-uuid-cdn',
           key: 'cdn-assets',
@@ -1074,7 +1074,7 @@ describe('CORS resolution hierarchy', () => {
     createBucketProvisionerPlugin(createDefaultOptions());
 
     const pgClient = createMockPgClient({
-      'app_public': {
+      app_public: {
         rows: [{
           id: 'bucket-uuid-uploads',
           key: 'uploads',
@@ -1133,7 +1133,7 @@ describe('CORS resolution hierarchy', () => {
     }));
 
     const pgClient = createMockPgClient({
-      'app_public': {
+      app_public: {
         rows: [{
           id: 'bucket-uuid-docs',
           key: 'docs',
@@ -1190,7 +1190,7 @@ describe('CORS resolution hierarchy', () => {
     createBucketProvisionerPlugin(createDefaultOptions());
 
     const pgClient = createMockPgClient({
-      'app_public': {
+      app_public: {
         rows: [{
           id: 'bucket-uuid-cdn',
           key: 'cdn-public',
@@ -1253,7 +1253,7 @@ describe('bucket name resolution', () => {
     });
 
     const pgClient = createMockPgClient({
-      'app_public': {
+      app_public: {
         rows: [{
           id: 'bucket-uuid',
           key: 'private',

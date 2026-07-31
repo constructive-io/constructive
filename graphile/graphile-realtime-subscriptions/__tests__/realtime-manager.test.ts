@@ -1,7 +1,8 @@
-import { RealtimeManager } from '../src/realtime-manager';
-import { extractRowId, entryToNotifyPayload, entryToChannel } from '../src/realtime-manager';
-import type { ChangeLogEntry, Queryable } from '../src/types';
 import { EventEmitter } from 'events';
+
+import { RealtimeManager } from '../src/realtime-manager';
+import { entryToChannel,entryToNotifyPayload, extractRowId } from '../src/realtime-manager';
+import type { ChangeLogEntry, Queryable } from '../src/types';
 
 // ---------------------------------------------------------------------------
 // Helpers

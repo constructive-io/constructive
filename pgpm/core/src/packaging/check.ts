@@ -1,7 +1,6 @@
+import { verifyBundle } from '@pgpmjs/bundle';
 import { execSync } from 'child_process';
 import { isAbsolute, relative, resolve as resolvePath } from 'path';
-
-import { verifyBundle } from '@pgpmjs/bundle';
 
 import {
   bundleMatchesModule,

@@ -1,5 +1,6 @@
 import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
 import { zipScripts } from '@pgpmjs/traverse';
+
 import { BundleChange, BundleScript, MigrationBundle } from './types';
 
 /** Per-script disposition between two revisions of the same change. */

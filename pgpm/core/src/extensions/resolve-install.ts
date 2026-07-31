@@ -1,6 +1,6 @@
+import { RoleMapping } from '@pgpmjs/types';
 import { resolve } from 'path';
 
-import { RoleMapping } from '@pgpmjs/types';
 import { CompiledExtensionInstall, compileExtensionInstall, CompileExtensionInstallOptions } from './compile';
 import { ExtensionProvide, readExtensionsManifest } from './manifest';
 

@@ -6,21 +6,19 @@
  * types and indexes before the schema build phase.
  */
 
-export {
-  TsvectorCodecPlugin,
-  TsvectorCodecPreset,
-  createTsvectorCodecPlugin,
-} from './tsvector-codec';
-export type { TsvectorCodecPluginOptions } from './tsvector-codec';
-
+export type { Bm25IndexInfo } from './bm25-codec';
 export {
   Bm25CodecPlugin,
   Bm25CodecPreset,
-  bm25IndexStore,
   bm25ExtensionDetected,
+  bm25IndexStore,
 } from './bm25-codec';
-export type { Bm25IndexInfo } from './bm25-codec';
-
+export type { TsvectorCodecPluginOptions } from './tsvector-codec';
+export {
+  createTsvectorCodecPlugin,
+  TsvectorCodecPlugin,
+  TsvectorCodecPreset,
+} from './tsvector-codec';
 export {
   VectorCodecPlugin,
   VectorCodecPreset,

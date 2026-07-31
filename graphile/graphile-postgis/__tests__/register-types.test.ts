@@ -1,6 +1,6 @@
-import { GisSubtype, CONCRETE_SUBTYPES } from '../src/constants';
-import { getGISTypeModifier, getGISTypeName } from '../src/utils';
+import { CONCRETE_SUBTYPES,GisSubtype } from '../src/constants';
 import { PostgisRegisterTypesPlugin } from '../src/plugins/register-types';
+import { getGISTypeModifier, getGISTypeName } from '../src/utils';
 
 describe('PostgisRegisterTypesPlugin', () => {
   describe('plugin metadata', () => {

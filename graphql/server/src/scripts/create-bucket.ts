@@ -1,8 +1,8 @@
 // Minimal script to create a bucket in MinIO/S3 using @constructive-io/s3-utils
 
-import { createS3Client, createS3Bucket } from '@constructive-io/s3-utils';
-import type { StorageProvider } from '@constructive-io/s3-utils';
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import type { StorageProvider } from '@constructive-io/s3-utils';
+import { createS3Bucket,createS3Client } from '@constructive-io/s3-utils';
 import { Logger } from '@pgpmjs/logger';
 
 const log = new Logger('create-bucket');

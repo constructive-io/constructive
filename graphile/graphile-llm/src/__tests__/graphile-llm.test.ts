@@ -1067,7 +1067,11 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
 
   afterAll(async () => {
     if (db) {
-      try { await db.client.query('ROLLBACK'); } catch {}
+      try {
+        await db.client.query('ROLLBACK');
+      } catch {
+        // ignore
+      }
     }
     if (teardown) await teardown();
   });

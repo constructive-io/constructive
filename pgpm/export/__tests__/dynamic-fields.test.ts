@@ -13,16 +13,14 @@
 import { toCamelCase, toSnakeCase } from 'inflekt';
 
 import {
-  META_TABLE_CONFIG,
+  FieldType,
   mapPgTypeToFieldType,
-  FieldType
-} from '../src/export-utils';
+  META_TABLE_CONFIG} from '../src/export-utils';
 import {
-  mapGraphQLTypeToFieldType,
-  unwrapGraphQLType,
+  getGraphQLQueryName,
   getGraphQLTypeName,
-  getGraphQLQueryName
-} from '../src/graphql-naming';
+  mapGraphQLTypeToFieldType,
+  unwrapGraphQLType} from '../src/graphql-naming';
 import { PG_TYPE_MAP } from '../src/type-map';
 
 // =============================================================================

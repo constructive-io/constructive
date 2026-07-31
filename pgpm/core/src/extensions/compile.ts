@@ -38,14 +38,14 @@ const routeRole = (role: string, roleMap?: Record<string, string>): string => {
 const grantObjectClause = (on: ExtensionGrantTarget, schema: string): string => {
   const s = quoteIdent(schema);
   switch (on) {
-    case 'schema':
-      return `SCHEMA ${s}`;
-    case 'all-tables':
-      return `ALL TABLES IN SCHEMA ${s}`;
-    case 'all-sequences':
-      return `ALL SEQUENCES IN SCHEMA ${s}`;
-    case 'all-functions':
-      return `ALL FUNCTIONS IN SCHEMA ${s}`;
+  case 'schema':
+    return `SCHEMA ${s}`;
+  case 'all-tables':
+    return `ALL TABLES IN SCHEMA ${s}`;
+  case 'all-sequences':
+    return `ALL SEQUENCES IN SCHEMA ${s}`;
+  case 'all-functions':
+    return `ALL FUNCTIONS IN SCHEMA ${s}`;
   }
 };
 

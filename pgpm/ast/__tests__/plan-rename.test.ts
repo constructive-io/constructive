@@ -78,7 +78,7 @@ describe('renameInPlanContent', () => {
     expect(out).toContain(`schemas/mod_${n - 1}/tables/t_${n - 1}`);
     expect(out).toContain('[schemas/mod_0/tables/t_0]');
     // No hyphenated change tokens should remain (metadata/comments still have them).
-    expect(out).not.toMatch(/(^|[\s\[])schemas\/mod-\d/m);
+    expect(out).not.toMatch(/(^|[\s[])schemas\/mod-\d/m);
     expect(elapsedMs).toBeLessThan(2000);
   });
 });

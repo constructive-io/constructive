@@ -69,9 +69,9 @@ describe('cmds:init', () => {
     const normalizedResult =
       result && typeof result === 'object'
         ? {
-            ...result,
-            cwd: typeof (result as any).cwd === 'string' ? '<CWD>' : (result as any).cwd
-          }
+          ...result,
+          cwd: typeof (result as any).cwd === 'string' ? '<CWD>' : (result as any).cwd
+        }
         : result;
 
     expect(snapshotArgs).toMatchSnapshot(`${label} - argv`);

@@ -12,15 +12,15 @@
  * - A running PostgreSQL instance accessible via standard PG* env vars
  */
 
-import { getConnections, seed } from 'pgsql-test';
-import type { PgTestClient } from 'pgsql-test';
-import type { PgConfig } from 'pg-env';
 import { toCamelCase } from 'inflekt';
+import type { PgConfig } from 'pg-env';
+import type { PgTestClient } from 'pgsql-test';
+import { getConnections, seed } from 'pgsql-test';
 
-import { exportMeta } from '../src/export-meta';
 import { exportGraphQLMeta } from '../src/export-graphql-meta';
-import { GraphQLClient } from '../src/graphql-client';
+import { exportMeta } from '../src/export-meta';
 import { META_TABLE_CONFIG } from '../src/export-utils';
+import { GraphQLClient } from '../src/graphql-client';
 import { getGraphQLQueryName, getGraphQLTypeName, GraphQLTypeInfo } from '../src/graphql-naming';
 import { lookupByPgUdt } from '../src/type-map';
 

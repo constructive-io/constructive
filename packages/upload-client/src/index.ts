@@ -37,23 +37,22 @@ export { hashFile, hashFileChunked } from './hash';
 export { hashContent } from './hash-content';
 
 // Presigned URL helpers
-export { putToPresignedUrl, fetchFromUrl } from './put';
+export { fetchFromUrl,putToPresignedUrl } from './put';
 
 // Orchestrator
 export { uploadFile } from './upload';
 
 // GraphQL query builders (for custom integrations)
-export { buildRequestUploadUrlQuery, REQUEST_UPLOAD_URL_QUERY, REQUEST_UPLOAD_URL_MUTATION, DEFAULT_BUCKET_QUERY_FIELD } from './queries';
+export { buildRequestUploadUrlQuery, DEFAULT_BUCKET_QUERY_FIELD,REQUEST_UPLOAD_URL_MUTATION, REQUEST_UPLOAD_URL_QUERY } from './queries';
 
 // Types
 export type {
   FileInput,
   GraphQLExecutor,
-  UploadFileOptions,
-  UploadResult,
   RequestUploadUrlInput,
   RequestUploadUrlPayload,
   UploadErrorCode,
+  UploadFileOptions,
+  UploadResult,
 } from './types';
-
 export { UploadError } from './types';

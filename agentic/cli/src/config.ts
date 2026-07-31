@@ -1,7 +1,6 @@
+import { HarnessDirs, harnessDirs, SkillsManifest } from '@agentic-kit/harness';
 import * as fs from 'fs';
 import * as path from 'path';
-
-import { harnessDirs, HarnessDirs, SkillsManifest } from '@agentic-kit/harness';
 
 export const DEFAULT_SKILLS_REPO = 'constructive-io/constructive-skills';
 export const DEFAULT_SKILLS_PIN = 'main';

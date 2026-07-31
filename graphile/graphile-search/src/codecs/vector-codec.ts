@@ -14,6 +14,7 @@
 
 import 'graphile-build-pg';
 import 'graphile-build';
+
 import type { GraphileConfig } from 'graphile-config';
 import sql from 'pg-sql2';
 

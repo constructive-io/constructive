@@ -1,5 +1,5 @@
-import { ast, nodes } from '@pgsql/utils';
 import type { Node } from '@pgsql/types';
+import { ast, nodes } from '@pgsql/utils';
 import { join, resolve } from 'path';
 
 export const normalizePath = (path: string, cwd?: string): string =>
@@ -309,20 +309,20 @@ export const getRelatedField = ({
   }
 
   switch (refType) {
-    case 'int':
-      val = nodes.aConst({ ival: ast.integer({ ival: value as number }) });
-      break;
-    case 'float':
-      val = nodes.aConst({ fval: ast.float({ fval: String(value) }) });
-      break;
-    case 'boolean':
-    case 'bool':
-      // Use proper boolean constant for PG17 AST
-      val = nodes.aConst({ boolval: ast.boolean({ boolval: Boolean(value) }) });
-      break;
-    case 'text':
-    default:
-      val = nodes.aConst({ sval: ast.string({ sval: String(value) }) });
+  case 'int':
+    val = nodes.aConst({ ival: ast.integer({ ival: value as number }) });
+    break;
+  case 'float':
+    val = nodes.aConst({ fval: ast.float({ fval: String(value) }) });
+    break;
+  case 'boolean':
+  case 'bool':
+    // Use proper boolean constant for PG17 AST
+    val = nodes.aConst({ boolval: ast.boolean({ boolval: Boolean(value) }) });
+    break;
+  case 'text':
+  default:
+    val = nodes.aConst({ sval: ast.string({ sval: String(value) }) });
   }
 
   val = wrapValue(val, { wrap, wrapAst });

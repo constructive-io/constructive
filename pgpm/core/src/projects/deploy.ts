@@ -6,8 +6,8 @@ import * as path from 'path';
 import { getPgPool } from 'pg-cache';
 import {PgConfig } from 'pg-env';
 
-import { resolveEffectiveModulePath } from '../apply/materialize';
 import { hasApplySpec } from '../apply/apply-spec';
+import { resolveEffectiveModulePath } from '../apply/materialize';
 import { deployModuleFast, isBundledDeployResult } from '../bundle/deploy-bundled';
 import { PgpmPackage } from '../core/class/pgpm';
 import { findExtensionInstall, roleMapFromRoles } from '../extensions';

@@ -2,6 +2,6 @@
  * Re-export TypedDocumentString from @constructive-io/graphql-query.
  */
 export {
-  TypedDocumentString,
   type DocumentTypeDecoration,
+  TypedDocumentString,
 } from '@constructive-io/graphql-query';

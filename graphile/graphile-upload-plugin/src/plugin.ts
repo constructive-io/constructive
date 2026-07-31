@@ -23,8 +23,10 @@
 
 import 'graphile-build';
 import 'graphile-build-pg';
+
 import type { GraphileConfig } from 'graphile-config';
 import { Readable, Transform } from 'stream';
+
 import type { UploadFieldDefinition, UploadPluginOptions } from './types';
 
 /**

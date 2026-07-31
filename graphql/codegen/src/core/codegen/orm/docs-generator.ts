@@ -1,27 +1,25 @@
 import { toKebabCase } from 'inflekt';
 
 import type { Operation, Table, TypeRegistry } from '../../../types/schema';
-import {
-  buildSkillFile,
-  buildSkillReference,
-  formatArgType,
-  fieldPlaceholder,
-  pkPlaceholder,
-  argPlaceholder,
-  getEditableFields,
-  categorizeSpecialFields,
-  buildSpecialFieldsMarkdown,
-  getReadmeHeader,
-  getReadmeFooter,
-  gqlTypeToJsonSchemaType,
-} from '../docs-utils';
 import type { GeneratedDocFile } from '../docs-utils';
 import {
+  argPlaceholder,
+  buildSkillFile,
+  buildSkillReference,
+  buildSpecialFieldsMarkdown,
+  categorizeSpecialFields,
+  fieldPlaceholder,
+  formatArgType,
+  getEditableFields,
+  getReadmeFooter,
+  getReadmeHeader,
+  pkPlaceholder,
+} from '../docs-utils';
+import {
+  getPrimaryKeyInfo,
   getScalarFields,
   getTableNames,
-  getPrimaryKeyInfo,
   lcFirst,
-  fieldTypeToTs,
 } from '../utils';
 
 export function generateOrmReadme(

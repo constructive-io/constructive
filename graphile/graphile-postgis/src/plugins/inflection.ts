@@ -1,8 +1,9 @@
-import type { GraphileConfig } from 'graphile-config';
-import { GisSubtype, SUBTYPE_STRING_BY_SUBTYPE } from '../constants';
-
 // Import types.ts for the Inflection augmentation side effects
 import '../types';
+
+import type { GraphileConfig } from 'graphile-config';
+
+import { GisSubtype, SUBTYPE_STRING_BY_SUBTYPE } from '../constants';
 
 /**
  * PostgisInflectionPlugin

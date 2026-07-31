@@ -3,10 +3,10 @@
  */
 
 import {
-  getPublicAccessBlock,
-  buildPublicReadPolicy,
   buildCloudFrontOacPolicy,
   buildPresignedUrlIamPolicy,
+  buildPublicReadPolicy,
+  getPublicAccessBlock,
 } from '../src/policies';
 
 describe('getPublicAccessBlock', () => {

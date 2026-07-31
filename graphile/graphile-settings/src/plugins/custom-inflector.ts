@@ -1,13 +1,11 @@
 import type { GraphileConfig } from 'graphile-config';
 import {
-  singularize,
-  pluralize,
-  singularizeLast,
-  pluralizeLast,
   distinctPluralize,
   fixCapitalisedPlural,
+  pluralizeLast,
+  singularize,
+  singularizeLast,
   toCamelCase,
-  toPascalCase,
 } from 'inflekt';
 
 /**

@@ -1,9 +1,10 @@
+import './types'; // for Request type
+
 import { errors } from '@constructive-io/errors';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
-import './types'; // for Request type
 
 const log = new Logger('captcha');
 

@@ -1,6 +1,5 @@
-import * as path from 'path';
-
 import { appstash, AppStashResult } from 'appstash';
+import * as path from 'path';
 
 export interface HarnessDirs {
   /** appstash root layout for the tool (config/cache/data/logs/tmp). */

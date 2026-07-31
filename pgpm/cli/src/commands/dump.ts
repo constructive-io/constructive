@@ -1,11 +1,11 @@
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
-import { getPgEnvOptions, getSpawnEnvWithPg } from 'pg-env';
-import { getPgPool } from 'pg-cache';
+import { QuoteUtils } from '@pgsql/quotes';
 import { spawn } from 'child_process';
 import fs from 'fs';
+import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import path from 'path';
-import { QuoteUtils } from '@pgsql/quotes';
+import { getPgPool } from 'pg-cache';
+import { getPgEnvOptions, getSpawnEnvWithPg } from 'pg-env';
 
 import { getTargetDatabase } from '../utils';
 

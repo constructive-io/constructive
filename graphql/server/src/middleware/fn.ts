@@ -18,9 +18,9 @@
  * transaction — RLS is fully enforced; no superuser or bypass path is used.
  */
 
+import { QueryBuilder, type SqlValue } from '@constructive-io/query-builder';
 import { Logger } from '@pgpmjs/logger';
 import { isUuid } from '@pgpmjs/server-utils';
-import { QueryBuilder, type SqlValue } from '@constructive-io/query-builder';
 import express, { Request, Response, Router } from 'express';
 
 const log = new Logger('fn');

@@ -13,10 +13,10 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { createS3Bucket } from '@constructive-io/s3-utils';
 
 import {
-  generatePresignedPutUrl,
-  generatePresignedGetUrl,
-  headObject,
   deleteS3Object,
+  generatePresignedGetUrl,
+  generatePresignedPutUrl,
+  headObject,
 } from '../src/s3-signer';
 import type { S3Config } from '../src/types';
 

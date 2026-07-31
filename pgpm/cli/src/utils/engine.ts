@@ -1,3 +1,5 @@
+import { resolve } from 'node:path';
+
 import { getEnvOptions } from '@pgpmjs/env';
 import {
   BUILTIN_ENGINES,
@@ -8,7 +10,6 @@ import {
   PgpmEngineConfig,
   PgpmOptions,
 } from '@pgpmjs/types';
-import { resolve } from 'node:path';
 
 import { activateDriver, driverOverrideFromArgv, PGLITE_DRIVER_PLUGIN } from './driver';
 

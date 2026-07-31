@@ -1,9 +1,9 @@
 import 'graphile-build';
 import 'graphile-build-pg';
-import type { GraphileConfig } from 'graphile-config';
-
 // Import types.ts for Build augmentation side effects
 import '../types';
+
+import type { GraphileConfig } from 'graphile-config';
 
 /**
  * PostgisAggregatePlugin

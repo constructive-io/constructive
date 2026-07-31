@@ -1,5 +1,5 @@
-import path from 'path';
 import { createTestFixture, TestFixture as BaseTestFixture, TestFixtureOptions } from '@inquirerer/test';
+import path from 'path';
 
 import { commands } from '../src/commands';
 

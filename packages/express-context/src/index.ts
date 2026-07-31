@@ -93,9 +93,9 @@ export {
   createModuleLoader,
   databaseSettingsLoader,
   inferenceLogLoader,
+  llmLoader,
   pubkeyLoader,
   rlsLoader,
-  llmLoader,
   webauthnLoader,
 } from './loaders';
 

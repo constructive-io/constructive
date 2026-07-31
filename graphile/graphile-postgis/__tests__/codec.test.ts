@@ -1,7 +1,8 @@
 import type { PgCodec } from '@dataplan/pg';
+
+import { GisSubtype } from '../src/constants';
 import { PostgisCodecPlugin } from '../src/plugins/codec';
 import type { GisFieldValue } from '../src/types';
-import { GisSubtype } from '../src/constants';
 import { getGISTypeModifier } from '../src/utils';
 
 // Test event shape matching the GatherHooks.pgCodecs_findPgCodec event

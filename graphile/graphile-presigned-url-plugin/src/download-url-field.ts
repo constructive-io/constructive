@@ -19,14 +19,15 @@
  * the plan() function is required for Grafast to execute the S3 signing.
  */
 
-import type { GraphileConfig } from 'graphile-config';
 import 'graphile-build';
-import { context as grafastContext, lambda, object } from 'grafast';
-import { Logger } from '@pgpmjs/logger';
 
-import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
+import { Logger } from '@pgpmjs/logger';
+import { context as grafastContext, lambda, object } from 'grafast';
+import type { GraphileConfig } from 'graphile-config';
+
 import { generatePresignedGetUrl } from './s3-signer';
 import { loadAllStorageModules, resolveStorageConfigFromCodec } from './storage-module-cache';
+import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:download-url');
 
@@ -159,26 +160,26 @@ export function createDownloadUrlPlugin(
                           // resolve it without the request role's pgSettings.
                           const config = databaseId
                             ? resolveStorageConfigFromCodec(
-                                capturedCodec,
-                                await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId)),
-                              )
+                              capturedCodec,
+                              await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId)),
+                            )
                             : null;
                           const resolved = config
                             ? await withPgClient(pgSettings, async (pgClient: any) => {
-                                // Look up the bucket key for scoped S3 resolution
-                                let bucketKey = 'public';
-                                if (bucketId) {
-                                  const bucketResult = await pgClient.query({
-                                    text: `SELECT key FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
-                                    values: [bucketId],
-                                  });
-                                  if (bucketResult.rows[0]?.key) {
-                                    bucketKey = bucketResult.rows[0].key;
-                                  }
+                              // Look up the bucket key for scoped S3 resolution
+                              let bucketKey = 'public';
+                              if (bucketId) {
+                                const bucketResult = await pgClient.query({
+                                  text: `SELECT key FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
+                                  values: [bucketId],
+                                });
+                                if (bucketResult.rows[0]?.key) {
+                                  bucketKey = bucketResult.rows[0].key;
                                 }
+                              }
 
-                                return { config, databaseId, bucketKey };
-                              })
+                              return { config, databaseId, bucketKey };
+                            })
                             : null;
                           if (resolved) {
                             downloadUrlExpirySeconds = resolved.config.downloadUrlExpirySeconds;

@@ -27,7 +27,7 @@
  * ```
  */
 
-export { UploadPlugin, createUploadPlugin } from './plugin';
+export { createUploadPlugin,UploadPlugin } from './plugin';
 export { UploadPreset } from './preset';
 export type {
   FileUpload,

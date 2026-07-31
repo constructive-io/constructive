@@ -116,7 +116,7 @@ describe('makeSchemaTranspiler', () => {
         extensions: { toSchema: 'extensions' }
       });
       const out = t.transformScript(
-        "CREATE TABLE auth.t (id uuid DEFAULT gen_random_bytes(16));",
+        'CREATE TABLE auth.t (id uuid DEFAULT gen_random_bytes(16));',
         CTX
       );
       expect(out).toContain('tenant_auth.t');
