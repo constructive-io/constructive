@@ -102,6 +102,18 @@ const commentHostOf = (stmt: Record<string, any>): string | null => {
   return null;
 };
 
+/** Resolve the host object an ALTER ... OWNER TO statement targets. */
+const ownerHostOf = (stmt: Record<string, any>): string | null => {
+  const alter = stmt.AlterOwnerStmt;
+  if (!alter?.object) return null;
+  const { object } = alter;
+  if (object.String) return hostKey(null, object.String.sval);
+  if (object.TypeName) return keyOfParts(namesOf(object.TypeName.names));
+  if (object.ObjectWithArgs) return keyOfParts(namesOf(object.ObjectWithArgs.objname));
+  if (object.List) return keyOfParts(namesOf(object.List.items));
+  return null;
+};
+
 /** Resolve the host object a GRANT/REVOKE statement targets. */
 const grantHostOf = (stmt: Record<string, any>): string | null => {
   const grant = stmt.GrantStmt;
@@ -115,6 +127,21 @@ const grantHostOf = (stmt: Record<string, any>): string | null => {
   return null;
 };
 
+/**
+ * `ALTER SEQUENCE ... OWNED BY table.column` must ride the *table* change:
+ * the serial table's default already depends on the sequence, so attaching
+ * OWNED BY to the sequence change would create a cycle.
+ */
+const sequenceOwnedByHostOf = (stmt: Record<string, any>): string | null => {
+  const options: any[] = stmt.AlterSeqStmt?.options ?? [];
+  for (const opt of options) {
+    if (opt?.DefElem?.defname !== 'owned_by') continue;
+    const parts = namesOf(opt.DefElem.arg?.List?.items);
+    if (parts.length >= 2) return keyOfParts(parts.slice(0, -1));
+  }
+  return null;
+};
+
 /** The host object a rider statement (no creates) attaches to, if resolvable. */
 const riderHostOf = (facts: StatementFacts): string | null => {
   if (facts.references.length > 0) {
@@ -124,10 +151,52 @@ const riderHostOf = (facts: StatementFacts): string | null => {
   if (!facts.stmt) return null;
   if (facts.nodeTag === 'CommentStmt') return commentHostOf(facts.stmt);
   if (facts.nodeTag === 'GrantStmt') return grantHostOf(facts.stmt);
+  if (facts.nodeTag === 'AlterOwnerStmt') return ownerHostOf(facts.stmt);
   return null;
 };
 
+/**
+ * Order a change's statements creates-first (stable): granularity folding
+ * can re-emit a folded CREATE after riders (grants, owners, comments) that
+ * were originally adjacent to the unfolded one.
+ */
+const reorderChangeStatements = (content: string): string => {
+  const facts = classifyStatements(content);
+  if (facts.length < 2) return content;
+  const isCreate = (f: StatementFacts): boolean =>
+    !f.nodeTag.startsWith('Alter') && f.nodeTag !== 'GrantStmt' && f.nodeTag !== 'CommentStmt';
+  const creates = facts.filter(isCreate);
+  const riders = facts.filter(f => !isCreate(f));
+  const ordered = [...creates, ...riders];
+  if (ordered.every((f, i) => f === facts[i])) return content;
+  return ordered.map(f => statementText(content, f)).join('\n\n') + '\n';
+};
+
+/**
+ * Order a revert's statements drops-last (stable), mirroring the deploy
+ * reorder: REVOKEs and other inverses must run before the host object is
+ * dropped. Non-statement note lines (e.g. "-- revert not derivable") are
+ * preserved at the end.
+ */
+const reorderRevertStatements = (content: string): string => {
+  const facts = classifyStatements(content);
+  if (facts.length < 2) return content;
+  const isDrop = (f: StatementFacts): boolean => f.nodeTag.startsWith('Drop');
+  const ordered = [...facts.filter(f => !isDrop(f)), ...facts.filter(isDrop)];
+  if (ordered.every((f, i) => f === facts[i])) return content;
+  let leftover = content;
+  for (const f of facts) {
+    leftover = leftover.replace(content.slice(f.span.start, f.span.start + f.span.len), '');
+  }
+  const notes = leftover
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.startsWith('--'));
+  return [...ordered.map(f => statementText(content, f)), ...notes].join('\n\n') + '\n';
+};
+
 const SET_CONFIG = /^SELECT\s+(pg_catalog\.)?set_config\s*\(/i;
+const SETVAL = /^SELECT\s+(pg_catalog\.)?setval\s*\(\s*'([^']+)'/i;
 
 const isPreamble = (facts: StatementFacts, text: string): boolean =>
   facts.nodeTag === 'VariableSetStmt' ||
@@ -158,6 +227,31 @@ const seedVerify = (schema: string | null, name: string): string => {
 const seedRevert = (schema: string | null, name: string): string => {
   const target = schema ? `${schema}.${name}` : name;
   return `DELETE FROM ${target};`;
+};
+
+/**
+ * Stable topological sort by intra-module deps: pg_dump orders objects
+ * alphabetically (orders before users), but pgpm deploys in plan order, so
+ * prerequisites must be written first.
+ */
+const sortRowsByDeps = (rows: PgpmRow[]): PgpmRow[] => {
+  const byName = new Map(rows.map(row => [row.deploy, row]));
+  const sorted: PgpmRow[] = [];
+  const state = new Map<string, 'visiting' | 'done'>();
+  const visit = (row: PgpmRow): void => {
+    const mark = state.get(row.deploy);
+    if (mark === 'done') return;
+    if (mark === 'visiting') return; // cycle: keep input order
+    state.set(row.deploy, 'visiting');
+    for (const dep of row.deps ?? []) {
+      const depRow = byName.get(dep);
+      if (depRow) visit(depRow);
+    }
+    state.set(row.deploy, 'done');
+    sorted.push(row);
+  };
+  for (const row of rows) visit(row);
+  return sorted;
 };
 
 /**
@@ -197,6 +291,7 @@ export const importDumpRows = async (
     nodeTag: string;
   }
   const pendingRiders: PendingRider[] = [];
+  const ownedSequences: { schema: string | null; name: string; tableKey: string; text: string }[] = [];
 
   for (const f of facts) {
     const text = statementText(source.sql, f);
@@ -210,6 +305,21 @@ export const importDumpRows = async (
       if (!controlRequires.includes(f.extension.name)) {
         controlRequires.push(f.extension.name);
       }
+      continue;
+    }
+
+    const setval = f.nodeTag === 'SelectStmt' ? SETVAL.exec(text) : null;
+    if (setval) {
+      if (!withData) {
+        skippedData++;
+        continue;
+      }
+      // setval is sequence state (data): ride the sequence's change.
+      const parts = setval[2].split('.');
+      const host = parts.length > 1
+        ? hostKey(parts[0], parts.slice(1).join('.'))
+        : hostKey(null, parts[0]);
+      pendingRiders.push({ text, host, nodeTag: 'SelectStmt (setval)' });
       continue;
     }
 
@@ -232,7 +342,35 @@ export const importDumpRows = async (
       continue;
     }
 
+    // `ALTER SEQUENCE ... OWNED BY table.column` is held out of the
+    // restructure (grouping would fold it into the sequence change, whose
+    // serial table depends on the sequence — a cycle) and appended to the
+    // table's change afterwards.
+    if (f.nodeTag === 'AlterSeqStmt' && f.stmt) {
+      const ownedBy = sequenceOwnedByHostOf(f.stmt);
+      if (ownedBy !== null) {
+        const seq = f.stmt.AlterSeqStmt?.sequence;
+        ownedSequences.push({
+          schema: seq?.schemaname ?? null,
+          name: seq?.relname ?? '',
+          tableKey: ownedBy,
+          text
+        });
+        continue;
+      }
+    }
+
     if (f.creates.length > 0) {
+      // pg_dump emits ALTERs (late FKs, owners, defaults) far from their
+      // CREATE; repositioning them right after it keeps each group's
+      // statements in a deployable order at every granularity.
+      const hostIndex = f.nodeTag.startsWith('Alter')
+        ? lastIndexOfKey.get(hostKey(f.creates[0].schema, f.creates[0].name))
+        : undefined;
+      if (hostIndex !== undefined) {
+        riderBuckets[hostIndex].push(text);
+        continue;
+      }
       const index = mainTexts.length;
       mainTexts.push(text);
       riderBuckets.push([]);
@@ -314,7 +452,13 @@ export const importDumpRows = async (
     });
   }
 
-  rows.push(...restructured.rows);
+  rows.push(
+    ...restructured.rows.map(row => ({
+      ...row,
+      content: reorderChangeStatements(row.content),
+      revert: reorderRevertStatements(row.revert)
+    }))
+  );
 
   // Seed fixture changes, one per table, after the schema changes.
   const seedsByTable = new Map<string, DataUnit[]>();
@@ -324,6 +468,7 @@ export const importDumpRows = async (
     else seedsByTable.set(unit.key, [unit]);
   }
   const taken = new Set(rows.map(row => row.deploy));
+  const seedPathByTablePath = new Map<string, string>();
   for (const units of seedsByTable.values()) {
     const { identity } = units[0];
     let deploy = pathFor(identity, { style });
@@ -333,6 +478,7 @@ export const importDumpRows = async (
       { kind: 'table', schema: identity.schema, name: identity.table! },
       { style }
     );
+    seedPathByTablePath.set(tablePath, deploy);
     rows.push({
       name: deploy,
       deploy,
@@ -343,13 +489,92 @@ export const importDumpRows = async (
     });
   }
 
+  // Seeds must respect FKs: if table B depends on table A and both have
+  // seeds, seed(B) also depends on seed(A).
+  for (const [tablePath, seedPath] of seedPathByTablePath) {
+    const tableRow = rows.find(row => row.deploy === tablePath);
+    const seedRow = rows.find(row => row.deploy === seedPath)!;
+    for (const dep of tableRow?.deps ?? []) {
+      const depSeed = seedPathByTablePath.get(dep);
+      if (depSeed && !seedRow.deps!.includes(depSeed)) {
+        seedRow.deps!.push(depSeed);
+      }
+    }
+  }
+
+  // Re-attach OWNED BY to the owning table's change; the sequence's own
+  // revert must then tolerate the sequence being dropped with the table.
+  for (const seq of ownedSequences) {
+    if (!seq.name) continue;
+    const [tableSchema, ...tableRest] = seq.tableKey.split('.');
+    const tablePath = pathFor(
+      { kind: 'table', schema: tableSchema || null, name: tableRest.join('.') },
+      { style }
+    );
+    const tableRow = rows.find(r => r.deploy === tablePath);
+    const seqPath = pathFor({ kind: 'sequence', schema: seq.schema, name: seq.name }, { style });
+    const seqRow = rows.find(r => r.deploy === seqPath);
+    if (tableRow) {
+      tableRow.content = `${tableRow.content.trimEnd()}\n\n${seq.text}`;
+      if (seqRow) {
+        tableRow.deps = tableRow.deps ?? [];
+        if (!tableRow.deps.includes(seqPath)) tableRow.deps.push(seqPath);
+      }
+    } else {
+      const miscRow = rows.find(r => r.deploy === MISC_CHANGE_PATH);
+      if (miscRow) {
+        miscRow.content = `${miscRow.content.trimEnd()}\n\n${seq.text}`;
+      } else {
+        rows.push({
+          name: MISC_CHANGE_PATH,
+          deploy: MISC_CHANGE_PATH,
+          deps: [],
+          content: seq.text,
+          revert: '',
+          verify: ''
+        });
+      }
+      warnings.push(`AlterSeqStmt OWNED BY targets a table not created in this dump — placed in ${MISC_CHANGE_PATH}: ${seq.text.split('\n')[0]}`);
+    }
+    if (seqRow && tableRow) {
+      const target = seq.schema ? `${seq.schema}.${seq.name}` : seq.name;
+      seqRow.revert = `DROP SEQUENCE IF EXISTS ${target};`;
+    }
+  }
+
+  // pg_dump wires serial columns via `SET DEFAULT nextval('...')` — a plain
+  // string the statement graph cannot see, so add the sequence dep here.
+  const NEXTVAL = /nextval\((?:CAST\()?'([^']+)'/g;
+  const rowsByPath = new Map(rows.map(row => [row.deploy, row]));
+  for (const row of rows) {
+    NEXTVAL.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = NEXTVAL.exec(row.content)) !== null) {
+      const parts = match[1].replace(/::regclass$/, '').split('.');
+      const seqPath = pathFor(
+        {
+          kind: 'sequence',
+          schema: parts.length > 1 ? parts[0] : null,
+          name: parts.length > 1 ? parts.slice(1).join('.') : parts[0]
+        },
+        { style }
+      );
+      if (seqPath !== row.deploy && rowsByPath.has(seqPath)) {
+        row.deps = row.deps ?? [];
+        if (!row.deps.includes(seqPath)) row.deps.push(seqPath);
+      }
+    }
+  }
+
+  const orderedRows = sortRowsByDeps(rows);
+
   return {
-    rows,
+    rows: orderedRows,
     controlRequires,
     warnings,
     summary: {
       statements: facts.length + source.copyBlocks.length + source.metaCommands.length,
-      changes: rows.length,
+      changes: orderedRows.length,
       skippedPreamble,
       skippedData: withData ? 0 : skippedData,
       misc: miscTexts.length
