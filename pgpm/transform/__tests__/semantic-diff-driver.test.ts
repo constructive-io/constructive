@@ -108,6 +108,36 @@ describe('diffSchemas', () => {
     expect(change.deploy).toContain('CREATE FUNCTION app.user_count');
   });
 
+  it('drops a changed named constraint before adding its replacement', () => {
+    const from = 'CREATE TABLE app.products (id int, price int, CONSTRAINT price_positive CHECK (price > 0));';
+    const to = 'CREATE TABLE app.products (id int, price int, CONSTRAINT price_positive CHECK (price >= 0));';
+    const result = diffSchemas(from, to);
+    const change = result.changes.find(c => c.name.startsWith('schemas/app/tables/products/table'))!;
+    const dropAt = change.deploy.indexOf('DROP CONSTRAINT price_positive');
+    const addAt = change.deploy.indexOf('ADD CONSTRAINT price_positive');
+    expect(dropAt).toBeGreaterThanOrEqual(0);
+    expect(addAt).toBeGreaterThan(dropAt);
+  });
+
+  it('inverts RLS enablement: revert of an added ENABLE ROW LEVEL SECURITY disables it', () => {
+    const from = 'CREATE TABLE app.products (id int);';
+    const to = [
+      'CREATE TABLE app.products (id int);',
+      'ALTER TABLE app.products ENABLE ROW LEVEL SECURITY;'
+    ].join('\n');
+    const result = diffSchemas(from, to);
+    const change = result.changes.find(c => c.name.startsWith('schemas/app/tables/products/table'))!;
+    expect(change.deploy).toContain('ENABLE ROW LEVEL SECURITY');
+    expect(change.revert).toContain('DISABLE ROW LEVEL SECURITY');
+  });
+
+  it('warns on non-derivable column alterations (constraints/defaults changed)', () => {
+    const from = 'CREATE TABLE app.products (id int, note text);';
+    const to = 'CREATE TABLE app.products (id int, note text NOT NULL);';
+    const result = diffSchemas(from, to);
+    expect(result.warnings.some(w => w.includes('column "note" changed beyond its type'))).toBe(true);
+  });
+
   it('drops removed objects in reverse topological order', () => {
     const result = diffSchemas(BASE, 'CREATE SCHEMA app;\nCREATE TABLE app.users (id uuid PRIMARY KEY, name text);');
 

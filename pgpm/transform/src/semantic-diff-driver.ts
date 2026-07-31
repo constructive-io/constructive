@@ -299,6 +299,31 @@ function diffTable(
     }
   }
 
+  // Self-inverse ALTER TABLE subtypes: a removed extra with one of these
+  // undoes with the paired subtype rather than a DROP CONSTRAINT.
+  const INVERSE_SUBTYPE: Record<string, string> = {
+    AT_EnableRowSecurity: 'AT_DisableRowSecurity',
+    AT_DisableRowSecurity: 'AT_EnableRowSecurity',
+    AT_ForceRowSecurity: 'AT_NoForceRowSecurity',
+    AT_NoForceRowSecurity: 'AT_ForceRowSecurity'
+  };
+
+  // Removed extras drop before added ones: a changed constraint that keeps
+  // its name must DROP CONSTRAINT before the replacement ADD CONSTRAINT.
+  for (const [print, extra] of from.extras) {
+    if (to.extras.has(print)) continue;
+    const conname = (extra as { Constraint?: { conname?: string } }).Constraint?.conname
+      ?? (extra as { AlterTableCmd?: { def?: { Constraint?: { conname?: string } } } })
+        .AlterTableCmd?.def?.Constraint?.conname;
+    const subtype = (extra as { AlterTableCmd?: { subtype?: string } }).AlterTableCmd?.subtype;
+    if (conname) {
+      stmts.push(alter({ subtype: 'AT_DropConstraint', name: conname }));
+    } else if (subtype && INVERSE_SUBTYPE[subtype]) {
+      stmts.push(alter({ subtype: INVERSE_SUBTYPE[subtype] }));
+    } else {
+      warnings.push(`${diff.path}: removed table element has no name to drop; emit a manual ALTER`);
+    }
+  }
   for (const [print, extra] of to.extras) {
     if (!from.extras.has(print)) {
       const at = (extra as Record<string, Record<string, unknown>>).AlterTableCmd;
@@ -308,17 +333,6 @@ function diffTable(
       } else {
         warnings.push(`${diff.path}: unrecognized added table element; emit a manual ALTER`);
       }
-    }
-  }
-  for (const [print, extra] of from.extras) {
-    if (to.extras.has(print)) continue;
-    const conname = (extra as { Constraint?: { conname?: string } }).Constraint?.conname
-      ?? (extra as { AlterTableCmd?: { def?: { Constraint?: { conname?: string } } } })
-        .AlterTableCmd?.def?.Constraint?.conname;
-    if (conname) {
-      stmts.push(alter({ subtype: 'AT_DropConstraint', name: conname }));
-    } else {
-      warnings.push(`${diff.path}: removed table element has no name to drop; emit a manual ALTER`);
     }
   }
   return stmts;
