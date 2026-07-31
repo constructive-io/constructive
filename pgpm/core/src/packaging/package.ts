@@ -45,8 +45,10 @@ const filterStatements = (stmts: RawStmt[], stripTransactions: boolean): RawStmt
   if (!stripTransactions) return stmts;
   return stmts.filter(node => {
     const stmt = node.stmt;
-    return !stmt.hasOwnProperty('TransactionStmt') && 
-           !stmt.hasOwnProperty('CreateExtensionStmt');
+    return (
+      !Object.prototype.hasOwnProperty.call(stmt, 'TransactionStmt') &&
+      !Object.prototype.hasOwnProperty.call(stmt, 'CreateExtensionStmt')
+    );
   });
 };
 
@@ -163,7 +165,7 @@ export const writePackage = async ({
     writeFileSync(
       controlPath,
       control.replace(
-        /default_version = '[0-9\.]+'/,
+        /default_version = '[0-9.]+'/,
         `default_version = '${version}'`
       )
     );

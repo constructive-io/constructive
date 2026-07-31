@@ -241,7 +241,7 @@ export function scanDeployScript(
     }
 
     if (/:/.test(line)) {
-      const m2 = line.match(/^-- Deploy ([^:]*):([\w\/]+)(?:\s+to\s+pg)?/);
+      const m2 = line.match(/^-- Deploy ([^:]*):([\w/]+)(?:\s+to\s+pg)?/);
       if (m2) {
         const actualProject = m2[1];
         const keyToTest = m2[2];

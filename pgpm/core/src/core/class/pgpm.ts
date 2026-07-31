@@ -765,7 +765,9 @@ export class PgpmPackage {
                   }
                 }
               }
-            } catch {}
+            } catch {
+              // ignore
+            }
           }
 
           if (!hasTagDependency && !deps[firstKey].includes(depToken)) {

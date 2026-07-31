@@ -57,6 +57,7 @@ export const loadConfigSync = (cwd: string = process.cwd()): PgpmOptions => {
       const configDir = walkUp(cwd, filename);
       return loadConfigSyncFromDir(configDir);
     } catch {
+      // ignore
     }
   }
   
@@ -74,6 +75,7 @@ export const resolvePgpmPath = (cwd: string = process.cwd()): string | undefined
     try {
       return walkUp(cwd, filename);
     } catch {
+      // ignore
     }
   }
   

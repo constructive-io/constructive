@@ -447,6 +447,7 @@ export class PgpmMigrate {
         }
       }
     } finally {
+      // no cleanup
     }
     
     if (failed.length > 0) {

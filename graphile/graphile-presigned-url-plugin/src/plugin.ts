@@ -35,7 +35,7 @@ const MAX_CONTENT_HASH_LENGTH = 128;
 const MAX_CONTENT_TYPE_LENGTH = 255;
 const MAX_CUSTOM_KEY_LENGTH = 1024;
 const SHA256_HEX_REGEX = /^[a-f0-9]{64}$/;
-const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9_.\-\/]*$/;
+const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9_.\-/]*$/;
 
 // --- Helpers ---
 

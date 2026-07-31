@@ -169,7 +169,11 @@ describe('RRF scoring — single adapter scenarios', () => {
 
   afterAll(async () => {
     if (db) {
-      try { await db.client.query('ROLLBACK'); } catch {}
+      try {
+        await db.client.query('ROLLBACK');
+      } catch {
+        // ignore
+      }
     }
     if (teardown) await teardown();
   });
@@ -362,7 +366,11 @@ describe('RRF scoring — multi-adapter combinations', () => {
 
   afterAll(async () => {
     if (db) {
-      try { await db.client.query('ROLLBACK'); } catch {}
+      try {
+        await db.client.query('ROLLBACK');
+      } catch {
+        // ignore
+      }
     }
     if (teardown) await teardown();
   });
@@ -605,7 +613,11 @@ describe('RRF scoring — unifiedSearch + pgvector fusion (simulating LLM path)'
 
   afterAll(async () => {
     if (db) {
-      try { await db.client.query('ROLLBACK'); } catch {}
+      try {
+        await db.client.query('ROLLBACK');
+      } catch {
+        // ignore
+      }
     }
     if (teardown) await teardown();
   });
@@ -793,7 +805,11 @@ describe('RRF scoring — chunk-aware tables', () => {
 
   afterAll(async () => {
     if (db) {
-      try { await db.client.query('ROLLBACK'); } catch {}
+      try {
+        await db.client.query('ROLLBACK');
+      } catch {
+        // ignore
+      }
     }
     if (teardown) await teardown();
   });
@@ -965,7 +981,11 @@ describe('RRF scoring — custom @searchConfig weights', () => {
 
   afterAll(async () => {
     if (db) {
-      try { await db.client.query('ROLLBACK'); } catch {}
+      try {
+        await db.client.query('ROLLBACK');
+      } catch {
+        // ignore
+      }
     }
     if (teardown) await teardown();
   });
@@ -1090,7 +1110,11 @@ describe('RRF scoring — recency boost', () => {
 
   afterAll(async () => {
     if (db) {
-      try { await db.client.query('ROLLBACK'); } catch {}
+      try {
+        await db.client.query('ROLLBACK');
+      } catch {
+        // ignore
+      }
     }
     if (teardown) await teardown();
   });
@@ -1209,7 +1233,11 @@ describe('RRF scoring — custom rrfK parameter', () => {
 
   afterAll(async () => {
     if (db) {
-      try { await db.client.query('ROLLBACK'); } catch {}
+      try {
+        await db.client.query('ROLLBACK');
+      } catch {
+        // ignore
+      }
     }
     if (teardown) await teardown();
   });
