@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.16.0...@pgpmjs/transform@0.17.0) (2026-07-31)
+
+### Features
+
+- **pgpm:** pgpm regen — generate revert/verify scripts from deploys ([81ed4e7](https://github.com/constructive-io/constructive/commit/81ed4e7d7a10401837b40481c0241d7a8e803b48))
+- **transform:** emit deploy/revert/verify triples via @pgsql/scripts in semantic diff ([0db84a2](https://github.com/constructive-io/constructive/commit/0db84a2ea4141b6f0fabdfa02c1a35dae5c3dafa))
+- **transform:** identity-keyed semantic diff — AST-level schema delta through the granularity pipeline ([ce88218](https://github.com/constructive-io/constructive/commit/ce88218147a044cf5debe7d5fcd3a64cb24178b2))
+
 # [0.16.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.15.3...@pgpmjs/transform@0.16.0) (2026-07-31)
 
 ### Features
