@@ -47,6 +47,29 @@ describe('diffSchemas', () => {
     expect(posts.deploy).toContain('CREATE TABLE app.posts');
   });
 
+  it('derives revert and verify for every emitted change via @pgsql/scripts', () => {
+    const to = `${BASE}\nCREATE TABLE app.posts (id uuid PRIMARY KEY);`;
+    const added = diffSchemas(BASE, to).changes.find(c => c.name === 'schemas/app/tables/posts/table')!;
+    expect(added.revert).toContain('DROP TABLE app.posts');
+    expect(added.verify).toContain('to_regclass');
+
+    const modified = diffSchemas(BASE, BASE.replace('count(*)', 'count(1)'))
+      .changes.find(c => c.name === 'schemas/app/procedures/user_count/procedure')!;
+    expect(modified.revert).toContain('DROP FUNCTION app.user_count');
+    expect(modified.revert).toContain('count(*)');
+    expect(modified.verify).toContain('to_regprocedure');
+
+    const alterUsers = diffSchemas(BASE, BASE.replace('name text', 'name text, email text'))
+      .changes.find(c => c.name === 'schemas/app/tables/users/table/alter')!;
+    expect(alterUsers.deploy).toContain('ADD COLUMN email text');
+    expect(alterUsers.revert).toContain('DROP COLUMN email');
+
+    const dropped = diffSchemas(BASE, BASE.replace('CREATE VIEW app.active_users AS SELECT * FROM app.users;', ''))
+      .changes.find(c => c.name === 'schemas/app/views/active_users/view/drop')!;
+    expect(dropped.deploy).toContain('DROP VIEW app.active_users');
+    expect(dropped.revert).toContain('CREATE VIEW app.active_users');
+  });
+
   it('diffs tables column-by-column', () => {
     const to = BASE
       .replace('name text', 'name text, email text')

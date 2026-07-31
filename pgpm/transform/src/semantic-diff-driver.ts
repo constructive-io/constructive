@@ -16,10 +16,15 @@
  * modified objects routed through the granularity pipeline
  * (`restructureChanges`), so names come from the naming spec and `requires`
  * from the statement graph — the same derivation every other projection uses.
+ * Every emitted change carries a full deploy/revert/verify triple: drops are
+ * `@pgsql/scripts`' `revertFor` inverses of the object's own deploy
+ * statements (never hand-templated), reverts recreate what was dropped, and
+ * verifies come from `verifyFor`.
  *
  * Requires `loadModule()` from `plpgsql-parser` before use.
  */
 import { pathFor, PathStyle } from '@pgpmjs/naming-spec';
+import { revertFor, verifyFor } from '@pgsql/scripts';
 import type { ObjectIdentity, StatementFacts } from '@pgsql/transform';
 import {
   buildStatementGraph,
@@ -53,6 +58,12 @@ export interface SemanticDiffOptions {
   style?: PathStyle;
 }
 
+/** One emitted delta change: a full deploy/revert/verify triple. */
+export interface SemanticDeltaChange extends GranularityChange {
+  revert: string;
+  verify: string;
+}
+
 export interface SemanticDiffResult {
   /** True when both sides describe the same objects with the same shapes. */
   identical: boolean;
@@ -63,7 +74,7 @@ export interface SemanticDiffResult {
    * topological order), then CREATE/ALTER changes named and ordered by the
    * granularity pipeline.
    */
-  changes: GranularityChange[];
+  changes: SemanticDeltaChange[];
   warnings: string[];
 }
 
@@ -229,53 +240,6 @@ function tableShape(unit: ObjectUnit): TableShape {
 const deparseStmt = (node: Record<string, unknown>): string =>
   `${Deparser.deparse(node, { pretty: false })};`;
 
-const nameList = (parts: string[]): unknown[] =>
-  parts.map(sval => ({ String: { sval } }));
-
-const DROP_REMOVE_TYPE: Partial<Record<ObjectIdentity['kind'], string>> = {
-  schema: 'OBJECT_SCHEMA',
-  table: 'OBJECT_TABLE',
-  view: 'OBJECT_VIEW',
-  sequence: 'OBJECT_SEQUENCE',
-  type: 'OBJECT_TYPE',
-  index: 'OBJECT_INDEX',
-  trigger: 'OBJECT_TRIGGER',
-  policy: 'OBJECT_POLICY'
-};
-
-/** Synthesize the DROP statement for an object identity, or null if unsupported. */
-export function dropStatementFor(identity: ObjectIdentity): string | null {
-  const { kind, schema, name, table } = identity;
-  if (kind === 'function') {
-    return deparseStmt({
-      DropStmt: {
-        objects: [{
-          ObjectWithArgs: {
-            objname: nameList(schema ? [schema, name] : [name]),
-            args_unspecified: true
-          }
-        }],
-        removeType: 'OBJECT_FUNCTION',
-        behavior: 'DROP_RESTRICT'
-      }
-    });
-  }
-  const removeType = DROP_REMOVE_TYPE[kind];
-  if (!removeType) return null;
-
-  const scoped = kind === 'trigger' || kind === 'policy';
-  const parts = scoped
-    ? [...(schema ? [schema] : []), table ?? '', name]
-    : [...(schema ? [schema] : []), name];
-  return deparseStmt({
-    DropStmt: {
-      objects: [{ List: { items: nameList(parts.filter(Boolean)) } }],
-      removeType,
-      behavior: 'DROP_RESTRICT'
-    }
-  });
-}
-
 /** Column-level ALTERs between two table shapes. */
 function diffTable(
   from: TableShape,
@@ -377,8 +341,21 @@ export function diffSchemas(
 
   const objects: SemanticObjectDiff[] = [];
   const forwardSql: string[] = [];
-  const modifiedChanges: GranularityChange[] = [];
+  const modifiedChanges: SemanticDeltaChange[] = [];
   const dropUnits: ObjectUnit[] = [];
+
+  /** `@pgsql/scripts` inverse of a deploy script (drops in reverse topo order). */
+  const inverseOf = (deploy: string, context: string): string => {
+    const { sql, warnings: w } = revertFor(classifyStatements(deploy));
+    warnings.push(...w.map(x => `${context}: ${x}`));
+    return sql;
+  };
+  /** `@pgsql/scripts` existence checks for a deploy script. */
+  const verifyOf = (deploy: string, context: string): string => {
+    const { sql, warnings: w } = verifyFor(classifyStatements(deploy));
+    warnings.push(...w.map(x => `${context}: ${x}`));
+    return sql;
+  };
 
   for (const key of b.order) {
     const unit = b.units.get(key)!;
@@ -399,10 +376,15 @@ export function diffSchemas(
       if (stmts.length > 0 || columnsTouched) {
         objects.push(diff);
         if (stmts.length > 0) {
+          // The inverse alteration is the same diff with the sides swapped.
+          const scratch: SemanticObjectDiff = { identity: unit.identity, path, delta: 'modified' };
+          const deploy = stmts.join('\n');
           modifiedChanges.push({
             name: `${path}/alter`,
             dependencies: [],
-            deploy: stmts.join('\n')
+            deploy,
+            revert: diffTable(shapeTo, shapeFrom, scratch, []).join('\n'),
+            verify: verifyOf(deploy, path)
           });
         }
       }
@@ -410,14 +392,14 @@ export function diffSchemas(
     }
     if (unitFingerprint(prior) !== unitFingerprint(unit)) {
       objects.push({ identity: unit.identity, path, delta: 'modified' });
-      const drop = dropStatementFor(unit.identity);
-      if (!drop) {
-        warnings.push(`${path}: no DROP synthesized for kind "${unit.identity.kind}"; recreate manually`);
-      }
+      const priorDeploy = prior.texts.join('\n');
+      const newDeploy = unit.texts.join('\n');
       modifiedChanges.push({
         name: path,
         dependencies: [],
-        deploy: [...(drop ? [drop] : []), ...unit.texts].join('\n')
+        deploy: [inverseOf(priorDeploy, path), newDeploy].filter(Boolean).join('\n'),
+        revert: [inverseOf(newDeploy, path), priorDeploy].filter(Boolean).join('\n'),
+        verify: verifyOf(newDeploy, path)
       });
     }
   }
@@ -433,28 +415,35 @@ export function diffSchemas(
   // (dependents before dependencies), one change per object.
   const position = new Map(dropUnits.map(u => [u, Math.min(...u.statements.map(s => a.graph.order.indexOf(s)))]));
   dropUnits.sort((x, y) => position.get(y)! - position.get(x)!);
-  const dropChanges: GranularityChange[] = [];
+  const dropChanges: SemanticDeltaChange[] = [];
   for (const unit of dropUnits) {
-    const drop = dropStatementFor(unit.identity);
     const path = pathFor(unit.identity, { style });
-    if (!drop) {
-      warnings.push(`${path}: no DROP synthesized for kind "${unit.identity.kind}"; drop manually`);
+    const recreate = unit.texts.join('\n');
+    const drop = inverseOf(recreate, path);
+    if (!drop.trim() || drop.trim().startsWith('--')) {
+      warnings.push(`${path}: no DROP derivable for kind "${unit.identity.kind}"; drop manually`);
       continue;
     }
     dropChanges.push({
       name: `${path}/drop`,
       dependencies: dropChanges.length > 0 ? [dropChanges[dropChanges.length - 1].name] : [],
-      deploy: drop
+      deploy: drop,
+      revert: recreate,
+      verify: ''
     });
   }
 
-  let forwardChanges: GranularityChange[] = [];
+  let forwardChanges: SemanticDeltaChange[] = [];
   if (forwardSql.length > 0) {
     const { changes, warnings: w } = restructureChanges(
       [{ name: 'delta', dependencies: [], deploy: forwardSql.join('\n\n') }],
       { granularity: options.granularity ?? 'object' }
     );
-    forwardChanges = changes;
+    forwardChanges = changes.map(c => ({
+      ...c,
+      revert: inverseOf(c.deploy, c.name),
+      verify: verifyOf(c.deploy, c.name)
+    }));
     warnings.push(...w);
   }
 

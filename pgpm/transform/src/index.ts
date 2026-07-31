@@ -26,6 +26,7 @@ export {
 export type {
   DiffInputChange,
   ObjectDelta,
+  SemanticDeltaChange,
   SemanticDiffOptions,
   SemanticDiffResult,
   SemanticObjectDiff,
@@ -33,7 +34,6 @@ export type {
 export {
   diffChangeSets,
   diffSchemas,
-  dropStatementFor,
 } from './semantic-diff-driver';
 export type {
   PartitionConfig,
