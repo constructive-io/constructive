@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.11.5](https://github.com/constructive-io/constructive/compare/graphile-settings@6.11.4...graphile-settings@6.11.5) (2026-07-31)
+
+### Bug Fixes
+
+- **graphile-meta:** align metadata with final schema ([78b73eb](https://github.com/constructive-io/constructive/commit/78b73eb541ae0f4389bfb14619848dcebd9c78bf))
+- **graphile-schema:** return SDL + tablesMeta from one correlated build boundary ([e69c59e](https://github.com/constructive-io/constructive/commit/e69c59e565e3065d24dbba2ecc0b4fb3959d3591)), closes [constructive-io/constructive-planning#1331](https://github.com/constructive-io/constructive-planning/issues/1331)
+
 ## [6.11.4](https://github.com/constructive-io/constructive/compare/graphile-settings@6.11.3...graphile-settings@6.11.4) (2026-07-31)
 
 **Note:** Version bump only for package graphile-settings

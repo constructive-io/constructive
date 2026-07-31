@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.21.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.20.4...@pgpmjs/core@7.21.0) (2026-07-31)
+
+### Features
+
+- **pgpm:** add `pgpm package --check` to verify committed bundle artifacts are in sync with deploy/ ([c0b3b0a](https://github.com/constructive-io/constructive/commit/c0b3b0a040004d42f9e779fbdbb343068613089f))
+
 ## [7.20.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.20.3...@pgpmjs/core@7.20.4) (2026-07-31)
 
 **Note:** Version bump only for package @pgpmjs/core

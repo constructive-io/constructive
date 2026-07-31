@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.5](https://github.com/constructive-io/constructive/compare/graphile-pg-aggregates@2.10.4...graphile-pg-aggregates@2.10.5) (2026-07-31)
+
+**Note:** Version bump only for package graphile-pg-aggregates
+
 ## [2.10.4](https://github.com/constructive-io/constructive/compare/graphile-pg-aggregates@2.10.3...graphile-pg-aggregates@2.10.4) (2026-07-31)
 
 **Note:** Version bump only for package graphile-pg-aggregates

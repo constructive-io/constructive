@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/constructive-io/constructive/compare/safegres@1.14.2...safegres@1.15.0) (2026-07-31)
+
+### Features
+
+- **safegres:** markdown report format for CI job summaries and PR comments ([7293eab](https://github.com/constructive-io/constructive/commit/7293eab3167a6b03335b89516a883107b88f8fc3))
+- **safegres:** perf rules X7/X8 (search and sort index coverage) ([ac11947](https://github.com/constructive-io/constructive/commit/ac1194717ba3ef75bcc219c4ec2567308fd5bef8))
+- **safegres:** runtime-statistics rules (S1-S4) and EXPLAIN planner proof ([5a36e85](https://github.com/constructive-io/constructive/commit/5a36e85d44c946cd82983c88b10c8469d6526be2))
+- **safegres:** SARIF output for GitHub code scanning ([7b3ec46](https://github.com/constructive-io/constructive/commit/7b3ec4690b36c4f6b42de2daf8a369bff8f8a658))
+
 ## [1.14.2](https://github.com/constructive-io/constructive/compare/safegres@1.14.1...safegres@1.14.2) (2026-07-31)
 
 **Note:** Version bump only for package safegres
