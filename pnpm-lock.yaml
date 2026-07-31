@@ -3103,6 +3103,9 @@ importers:
 
   pgpm/transform:
     dependencies:
+      '@pgpmjs/naming-spec':
+        specifier: workspace:^
+        version: link:../naming-spec/dist
       '@pgsql/transform':
         specifier: ^18.10.0
         version: 18.10.0

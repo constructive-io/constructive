@@ -17,10 +17,12 @@
  *                    (FKs, indexes, triggers, policies) stay separate.
  * - `consolidated` — additionally inlines FKs proven safe by the graph.
  */
+import { pathFor } from '@pgpmjs/naming-spec';
 import type { Granularity, StatementFacts } from '@pgsql/transform';
 import {
   buildStatementGraph,
   classifyStatements,
+  identityOf,
   restructureSql
 } from '@pgsql/transform';
 
@@ -28,7 +30,7 @@ export type { Granularity } from '@pgsql/transform';
 
 /** A change's deploy surface going into or out of the restructure. */
 export interface GranularityChange {
-  /** Change name (plan token, e.g. `schemas/app/tables/users`). */
+  /** Change name (plan token, e.g. `schemas/app/tables/users/table`). */
   name: string;
   /** Change names this change requires (within the same module). */
   dependencies: string[];
@@ -40,8 +42,8 @@ export interface RestructureModuleOptions {
   granularity: Granularity;
   /**
    * Derive a change name for a statement group from the facts of its primary
-   * (creating) statement. Defaults to {@link defaultChangeName}: pgpm-style
-   * `schemas/<schema>` / `schemas/<schema>/tables/<name>` paths.
+   * (creating) statement. Defaults to {@link defaultChangeName}: naming spec
+   * v1 paths (`identityOf` + `pathFor`).
    */
   changeName?: (facts: StatementFacts) => string;
 }
@@ -65,20 +67,14 @@ const KIND_DIRS: Partial<Record<StatementFacts['kind'], string>> = {
 };
 
 /**
- * Default pgpm-style change name for a statement group:
- * `schemas/<schema>` for schemas, `schemas/<schema>/<kind>/<name>` for
- * objects, `misc/<n>` when nothing better is known.
+ * Default change name for a statement group: the object's canonical naming
+ * spec v1 path — `identityOf(facts)` (Postgres-native identity, from
+ * `@pgsql/transform`) rendered through `pathFor` (`@pgpmjs/naming-spec`).
+ * Paths are pure projections of identity, never authored.
  */
 export function defaultChangeName(facts: StatementFacts): string {
-  const created = facts.creates[0];
-  if (facts.kind === 'schema' && created) return `schemas/${created.name}`;
-  if (created) {
-    const dir = KIND_DIRS[facts.kind] ?? 'objects';
-    const schema = created.schema ?? 'public';
-    // Trigger/policy names are table-qualified (`table.trigger`).
-    const name = created.name.replace(/\./g, '/');
-    return `schemas/${schema}/${dir}/${name}`;
-  }
+  const identity = identityOf(facts);
+  if (identity) return pathFor(identity);
   return 'misc/statements';
 }
 
