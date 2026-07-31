@@ -6,8 +6,8 @@
  * hand-chained deps recorded at action time.
  */
 import { PgpmRow } from '@pgpmjs/core';
-import { alterationPathFor } from '@pgpmjs/naming-spec';
-import { Granularity, loadModule, restructureChanges } from '@pgpmjs/transform';
+import { alterationPathFor, pathFor, PathStyle } from '@pgpmjs/naming-spec';
+import { Granularity, identityOf, loadModule, restructureChanges, StatementFacts } from '@pgpmjs/transform';
 
 export type ExportGranularity = Granularity;
 
@@ -19,6 +19,11 @@ export const isExportGranularity = (value: unknown): value is ExportGranularity 
 export interface RestructureExportRowsResult {
   rows: PgpmRow[];
   warnings: string[];
+}
+
+export interface RestructureExportRowsOptions {
+  /** Naming-spec rendering style for derived paths (default `directory`). */
+  naming?: PathStyle;
 }
 
 /**
@@ -39,9 +44,17 @@ export interface RestructureExportRowsResult {
  */
 export const restructureExportRows = async (
   rows: PgpmRow[],
-  granularity: ExportGranularity
+  granularity: ExportGranularity,
+  options: RestructureExportRowsOptions = {}
 ): Promise<RestructureExportRowsResult> => {
   await loadModule();
+
+  const style = options.naming ?? 'directory';
+  const changeName = (facts: StatementFacts): string => {
+    const identity = identityOf(facts);
+    if (identity) return pathFor(identity, { style });
+    return 'misc/statements';
+  };
 
   const { changes, warnings } = restructureChanges(
     rows.map(row => ({
@@ -49,7 +62,7 @@ export const restructureExportRows = async (
       dependencies: row.deps ?? [],
       deploy: row.content
     })),
-    { granularity }
+    { granularity, changeName }
   );
 
   const counters = new Map<string, number>();

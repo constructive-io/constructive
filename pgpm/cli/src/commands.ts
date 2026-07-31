@@ -29,6 +29,7 @@ import slice from './commands/slice';
 import syncVersions from './commands/sync-versions';
 import tag from './commands/tag';
 import testPackages from './commands/test-packages';
+import transform from './commands/transform';
 import tune from './commands/tune';
 import updateCmd from './commands/update';
 import upgrade from './commands/upgrade';
@@ -112,6 +113,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     slice,
     'sync-versions': syncVersions,
     'test-packages': pgt(testPackages),
+    transform: pgt(transform),
     tune: pgt(tune),
     upgrade: pgt(upgrade),
     up: pgt(upgrade),

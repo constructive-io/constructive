@@ -369,4 +369,96 @@ relocatable = false
       expect(plan).toContain('migrate/0002-owners');
     });
   });
+
+  describe('partition dial (--partition)', () => {
+    const EXTENSION_NAME = 'pets-part';
+    const PETS_PKG = 'pets-part-pets';
+
+    beforeAll(async () => {
+      scaffoldModule(EXTENSION_NAME, 'Exported pets database schema (partitioned)');
+      scaffoldModule(PETS_PKG, 'Exported pets tables (partitioned)');
+      scaffoldModule(`${EXTENSION_NAME}-svc`, 'Exported pets service metadata (partitioned)');
+
+      const project = new PgpmPackage(exportWorkspaceDir);
+
+      await exportMigrations({
+        project,
+        options: {
+          pg: dbConfig
+        },
+        dbInfo: {
+          dbname: dbConfig.database,
+          databaseName: 'pets',
+          database_ids: [DATABASE_ID]
+        },
+        author: 'test <test@test.local>',
+        outdir: join(exportWorkspaceDir, 'packages'),
+        schema_names: ['pets_public'],
+        extensionName: EXTENSION_NAME,
+        extensionDesc: 'Exported pets database schema (partitioned)',
+        metaExtensionName: `${EXTENSION_NAME}-svc`,
+        metaExtensionDesc: 'Exported pets service metadata (partitioned)',
+        granularity: 'object',
+        partition: {
+          defaultPackage: EXTENSION_NAME,
+          rules: [
+            {
+              package: PETS_PKG,
+              select: [{ name: 'pets' }, { table: 'pets' }]
+            }
+          ]
+        }
+      });
+    });
+
+    it('writes one complete module per partition package', () => {
+      for (const pkg of [EXTENSION_NAME, PETS_PKG]) {
+        expect(existsSync(join(exportWorkspaceDir, 'packages', pkg, 'pgpm.plan'))).toBe(true);
+      }
+      const defaultPlan = readFileSync(join(exportWorkspaceDir, 'packages', EXTENSION_NAME, 'pgpm.plan'), 'utf-8');
+      expect(defaultPlan).toContain('schemas/pets_part_public/schema');
+      expect(defaultPlan).toContain('tables/owners/table');
+      expect(defaultPlan).not.toContain('tables/pets/table');
+
+      const petsPlan = readFileSync(join(exportWorkspaceDir, 'packages', PETS_PKG, 'pgpm.plan'), 'utf-8');
+      const petsChanges = petsPlan
+        .split('\n')
+        .filter(line => line && !line.startsWith('%'))
+        .map(line => line.split(' ')[0]);
+      expect(petsChanges).toContain('schemas/pets_part_public/tables/pets/table');
+      // owners appears only as a cross-package dependency, never as a change
+      expect(petsChanges).not.toContain('schemas/pets_part_public/tables/owners/table');
+    });
+
+    it('derives cross-package requires (<pkg>:<path>) and control requires', () => {
+      const petsPlan = readFileSync(join(exportWorkspaceDir, 'packages', PETS_PKG, 'pgpm.plan'), 'utf-8');
+      expect(petsPlan).toContain(`${EXTENSION_NAME}:`);
+
+      const control = readFileSync(
+        join(exportWorkspaceDir, 'packages', PETS_PKG, `${PETS_PKG}.control`),
+        'utf-8'
+      );
+      expect(control).toContain(EXTENSION_NAME);
+    });
+
+    it('deploys the partitioned packages in dependency order (round-trip)', async () => {
+      const deployer = new PgpmMigrate(dbConfig);
+      await deployer.deploy({ modulePath: join(exportWorkspaceDir, 'packages', EXTENSION_NAME) });
+      await deployer.deploy({ modulePath: join(exportWorkspaceDir, 'packages', PETS_PKG) });
+
+      const tables = await pg.query(`
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'pets_part_public'
+        ORDER BY table_name
+      `);
+      expect(tables.rows.map((r: any) => r.table_name)).toEqual(['owners', 'pets']);
+
+      const fk = await pg.query(`
+        SELECT conname FROM pg_constraint
+        WHERE conname = 'pets_owner_fk'
+          AND connamespace = 'pets_part_public'::regnamespace
+      `);
+      expect(fk.rows).toHaveLength(1);
+    });
+  });
 });

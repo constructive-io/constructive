@@ -4,7 +4,13 @@ export * from './export-migrations';
 export * from './export-graphql';
 export * from './export-graphql-meta';
 export { EXPORT_GRANULARITIES, isExportGranularity, restructureExportRows } from './restructure';
-export type { ExportGranularity, RestructureExportRowsResult } from './restructure';
+export type { ExportGranularity, RestructureExportRowsOptions, RestructureExportRowsResult } from './restructure';
+export { loadModuleSource, stripTransactionWrapper } from './module-source';
+export type { ModuleSource, ModuleSourceChange } from './module-source';
+export { parsePartitionConfig, partitionExportRows } from './partition';
+export type { PartitionConfig, PartitionedPackageRows, PartitionExportRowsResult } from './partition';
+export { diffCatalogSnapshots, snapshotCatalog } from './catalog-check';
+export type { CatalogQueryable, CatalogSnapshot } from './catalog-check';
 export { GraphQLClient } from './graphql-client';
 export { getGraphQLQueryName, getGraphQLTypeName, graphqlRowToPostgresRow, buildFieldsFragment, mapGraphQLTypeToFieldType, unwrapGraphQLType, GraphQLTypeInfo } from './graphql-naming';
 export {
