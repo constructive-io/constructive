@@ -8,6 +8,7 @@ import { loadConfig } from '../config/loader';
 import type { Grade } from '../config/types';
 import { diffPerf, parsePerfBaseline, serializePerfBaseline, toPerfBaseline } from '../perf/baseline';
 import { renderJson } from '../report/json';
+import { renderMarkdown } from '../report/markdown';
 import { renderPretty } from '../report/pretty';
 import { meetsGrade } from '../score/score';
 import type { Report, Severity } from '../types';
@@ -98,7 +99,8 @@ Audit options:
   --exclude-schemas <csv>  Skip these schemas
   --roles <csv>            Audit grants only for these roles (default: all)
   --exclude-roles <csv>    Skip grants for these roles
-  --format <fmt>           "pretty" (default) | "json" | "json-pretty"
+  --format <fmt>           "pretty" (default) | "json" | "json-pretty" | "markdown"
+                           (markdown is for CI: a GitHub job summary or PR comment)
   --summary, -q            Print only exposure, score, and severity counts (no findings)
   --verbose                Expand internal (non-exposed) advisories (listed as a count otherwise)
   --fail-on <severity>     Exit non-zero if any finding >= severity
@@ -215,6 +217,13 @@ export default async (
     break;
   case 'json-pretty':
     output = renderJson(report, { pretty: true });
+    break;
+  case 'markdown':
+  case 'md':
+    output = renderMarkdown(report, {
+      summary: argv.summary === true,
+      verbose: argv.verbose === true
+    });
     break;
   case 'pretty':
     output = renderPretty(report, {

@@ -34,6 +34,24 @@ Pretty output prints the exposure line, score, and the exposed findings. Interna
 - `--verbose` — expand the internal advisories instead of collapsing them to a count.
 - `--exposed-only` — drop internal findings entirely.
 - `--format json` / `--format json-pretty` — machine-readable output (always carries every finding).
+- `--format markdown` — the same report as GitHub-flavoured markdown, for a job summary or a PR comment (see [CI](#ci)).
+
+### CI
+
+A plain audit is one command and one gate; `--format markdown` writes the report where a reviewer will actually see it:
+
+```yaml
+- name: Audit RLS
+  run: |
+    npx safegres audit --format markdown >> "$GITHUB_STEP_SUMMARY"
+    npx safegres audit --fail-on-grade B --summary
+  env:
+    PGHOST: localhost
+    PGUSER: postgres
+    PGPASSWORD: postgres
+```
+
+Scores lead, then the severity counts, then a table per dimension; internal (non-exposed) advisories and accepted baseline debt fold into `<details>` so the summary stays skimmable. To post it as a PR comment instead, pipe it to `gh pr comment --body-file -`. The same renderer is available to library callers as `renderMarkdown(report)`.
 
 ## What it checks
 
