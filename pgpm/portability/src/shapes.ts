@@ -50,14 +50,17 @@ export const supabase: VendorShape = {
   ]
 };
 
-/** InsForge: `auth` subsystem with `auth.users`, roles on the default search path. */
+/**
+ * InsForge: `auth` subsystem with `auth.users` and the `auth.uid()` claim
+ * accessor, extensions on the default search path (no extensions schema).
+ */
 export const insforge: VendorShape = {
   vendor: 'insforge',
   authSchemas: ['auth'],
   extensionsSchema: null,
   roles: ['anon', 'authenticated', 'project_admin'],
   users: { schema: 'auth', kind: 'table', name: 'users' },
-  accessors: []
+  accessors: [{ schema: 'auth', kind: 'function', name: 'uid' }]
 };
 
 /**
