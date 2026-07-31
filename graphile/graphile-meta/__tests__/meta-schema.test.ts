@@ -14,8 +14,8 @@ import {
 
 import {
   _buildFieldMeta,
-  _cachedTablesMeta,
   _pgTypeToGqlType,
+  getTablesMetaForSchema,
   MetaSchemaPlugin
 } from '../src';
 import { collectTablesMeta } from '../src/table-meta-builder';
@@ -134,14 +134,6 @@ function callGraphQLObjectTypeFieldsHook(
   return fieldsHook(fields, build, {
     scope: { isRootQuery: selfName === 'Query' }
   });
-}
-
-function callFinalizeHook(schema: GraphQLSchema, build: any): GraphQLSchema {
-  const finalizeHook = MetaSchemaPlugin.schema!.hooks!.finalize as (
-    schema: GraphQLSchema,
-    build: any,
-  ) => GraphQLSchema;
-  return finalizeHook(schema, build);
 }
 
 function deepClone<T>(value: T): T {
@@ -2024,9 +2016,6 @@ describe('MetaSchemaPlugin', () => {
         }),
         types: [userType]
       });
-      callFinalizeHook(schema, build);
-      const seededTables = _cachedTablesMeta as any[];
-
       const result = await graphql({
         schema,
         source: `
@@ -2047,6 +2036,7 @@ describe('MetaSchemaPlugin', () => {
 
       expect(result.errors).toBeUndefined();
       expect(result.data?.ping).toBe('pong');
+      const seededTables = getTablesMetaForSchema(schema) as any[];
       expect((result.data as any)?._meta?.tables).toHaveLength(seededTables.length);
       expect((result.data as any)?._meta?.tables?.[0]).toMatchObject({
         name: 'User',
@@ -2068,7 +2058,7 @@ describe('MetaSchemaPlugin', () => {
       ]);
     });
 
-    it('keeps resolver metadata scoped while replacing the legacy cache per build', async () => {
+    it('keeps resolver metadata scoped per executable schema', async () => {
       const buildSchema = (resourceName: string, typeName: string) => {
         const build = createMockBuild({
           [resourceName]: {
@@ -2096,15 +2086,11 @@ describe('MetaSchemaPlugin', () => {
             })
           ]
         });
-        callFinalizeHook(schema, build);
         return schema;
       };
 
       const userSchema = buildSchema('user', 'User');
-      expect(_cachedTablesMeta.map((table) => table.name)).toEqual(['User']);
-
       const projectSchema = buildSchema('project', 'Project');
-      expect(_cachedTablesMeta.map((table) => table.name)).toEqual(['Project']);
       const source = '{ _meta { tables { name } } }';
 
       const [userResult, projectResult] = await Promise.all([
@@ -2118,6 +2104,12 @@ describe('MetaSchemaPlugin', () => {
       expect((projectResult.data as any)._meta.tables).toEqual([
         { name: 'Project' }
       ]);
+      expect(
+        getTablesMetaForSchema(userSchema)!.map((table) => table.name)
+      ).toEqual(['User']);
+      expect(
+        getTablesMetaForSchema(projectSchema)!.map((table) => table.name)
+      ).toEqual(['Project']);
     });
 
     it('validates metadata against schema changes made by later finalizers', async () => {
@@ -2152,8 +2144,9 @@ describe('MetaSchemaPlugin', () => {
       });
       const schema = new GraphQLSchema({ query: queryType });
 
-      callFinalizeHook(schema, build);
-      expect(_cachedTablesMeta[0].query.all).toBe('users');
+      // Before later finalizers mutate the schema, the metadata resolves the
+      // list entry-point; the resolver must recompute from the final schema.
+      expect((collectTablesMeta(build, schema) as any[])[0].query.all).toBe('users');
 
       delete queryType.getFields().users;
       const result = await graphql({

@@ -49,6 +49,7 @@ export type { UniqueLookupOptions } from './primary-key-only';
 
 // Meta schema plugin for introspection (tables, fields, indexes, constraints)
 export {
+  getTablesMetaForSchema,
   MetaSchemaPlugin,
   MetaSchemaPreset,
 } from './meta-schema';
@@ -81,7 +82,7 @@ export { PublicKeySignature } from './PublicKeySignature';
 export type { PublicKeyChallengeConfig } from './PublicKeySignature';
 
 // Internal exports for testing
-export { _pgTypeToGqlType, _buildFieldMeta, _cachedTablesMeta } from './meta-schema';
+export { _pgTypeToGqlType, _buildFieldMeta } from './meta-schema';
 
 // Required input plugin - makes @requiredInput tagged fields non-nullable in mutation inputs
 export {

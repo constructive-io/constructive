@@ -4,7 +4,6 @@ import 'graphile-build';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLSchema } from 'graphql';
 
-import { setCachedTablesMeta } from './cache';
 import { extendQueryWithMetaField } from './graphql-meta-field';
 import { collectTablesMeta } from './table-meta-builder';
 import type { MetaBuild, TableMeta } from './types';
@@ -19,9 +18,19 @@ function getRuntimeTablesMeta(
   if (!tables) {
     tables = collectTablesMeta(build, schema);
     runtimeTablesBySchema.set(schema, tables);
-    setCachedTablesMeta(tables);
   }
   return tables;
+}
+
+/**
+ * Returns the table metadata memoized for the given executable schema, or
+ * `undefined` if `_meta` has not been resolved against that schema (e.g. the
+ * meta plugin is disabled or `_meta` was never executed).
+ */
+export function getTablesMetaForSchema(
+  schema: GraphQLSchema
+): TableMeta[] | undefined {
+  return runtimeTablesBySchema.get(schema);
 }
 
 export const MetaSchemaPlugin: GraphileConfig.Plugin = {
@@ -37,16 +46,6 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
           rawFields as unknown as Record<string, unknown>,
           (schema) => getRuntimeTablesMeta(build, schema),
         ) as typeof rawFields;
-      },
-
-      finalize(schema, rawBuild) {
-        // Populate the legacy module-level cache for consumers that read
-        // `_cachedTablesMeta` without executing `_meta`. Deliberately does NOT
-        // pre-warm the per-schema memo: later finalizers may still mutate the
-        // schema, and the resolver must recompute from its final info.schema.
-        const build = rawBuild as unknown as MetaBuild;
-        setCachedTablesMeta(collectTablesMeta(build, schema));
-        return schema;
       },
     },
   },

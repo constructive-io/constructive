@@ -1,6 +1,5 @@
 import type { TableMeta } from 'graphile-settings'
-import { _cachedTablesMeta } from 'graphile-settings'
-import { buildSchemaSDL } from './build-schema'
+import { buildSchemaArtifacts } from './build-schema'
 import type { BuildSchemaOptions } from './build-schema'
 
 export type { BuildSchemaOptions as BuildIntrospectionOptions }
@@ -8,9 +7,10 @@ export type { BuildSchemaOptions as BuildIntrospectionOptions }
 /**
  * Build introspection metadata for all tables visible in the given schemas.
  *
- * Internally calls `buildSchemaSDL()` which triggers the MetaSchemaPlugin
- * finalization hook, populating `_cachedTablesMeta` as a side-effect. The cached
- * metadata is then returned as a plain array of `TableMeta` objects.
+ * Internally calls `buildSchemaArtifacts()`, which returns SDL and `_meta`
+ * metadata from one correlated build boundary — both derived from the same
+ * final executable `GraphQLSchema` — so concurrent builds in one process
+ * cannot return each other's metadata.
  *
  * The result includes every table's fields, types, constraints, indexes,
  * relations, inflection names, and query entry-points — the same data
@@ -31,6 +31,5 @@ export type { BuildSchemaOptions as BuildIntrospectionOptions }
 export async function buildIntrospectionJSON(
   opts: BuildSchemaOptions
 ): Promise<TableMeta[]> {
-  await buildSchemaSDL(opts)
-  return [..._cachedTablesMeta]
+  return (await buildSchemaArtifacts(opts)).tablesMeta
 }

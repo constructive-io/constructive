@@ -2,7 +2,7 @@
  * M:N Relation Enrichment
  *
  * After table inference from introspection, enriches ManyToManyRelation objects
- * with junction key field metadata from _cachedTablesMeta (MetaSchemaPlugin).
+ * with junction key field metadata from the schema-correlated tablesMeta (MetaSchemaPlugin).
  */
 import type { Table } from '../../types/schema';
 import type { MetaTableInfo } from './source/types';

@@ -1,18 +1,41 @@
 import deepmerge from 'deepmerge'
 import { graphql, lexicographicSortSchema, printSchema } from 'graphql'
-import { ConstructivePreset, makePgService } from 'graphile-settings'
+import { ConstructivePreset, getTablesMetaForSchema, makePgService } from 'graphile-settings'
 import { makeSchema } from 'graphile-build'
 import { getPgPool } from 'pg-cache'
 import { getPgEnvOptions } from 'pg-env'
 import type { GraphileConfig } from 'graphile-config'
+import type { TableMeta } from 'graphile-settings'
 
 export type BuildSchemaOptions = {
   database?: string;
   schemas: string[];
   graphile?: Partial<GraphileConfig.Preset>;
+  /**
+   * @internal Test-only. Awaited after the schema's `_meta` metadata has been
+   * collected and before artifacts are returned, so regression tests can
+   * deterministically interleave concurrent builds.
+   */
+  _onMetaCollected?: () => Promise<void>;
 };
 
-export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> {
+export type BuildSchemaArtifacts = {
+  /** SDL printed from the final executable schema. */
+  sdl: string;
+  /**
+   * `_meta` table metadata belonging to the same `GraphQLSchema` the SDL was
+   * printed from. Empty when the meta plugin is disabled (no `_meta` field).
+   */
+  tablesMeta: TableMeta[];
+};
+
+/**
+ * Build the GraphQL schema for a database and return its SDL together with
+ * the `_meta` table metadata from one correlated build boundary. Both values
+ * are derived from the same final executable `GraphQLSchema` instance, so
+ * concurrent builds in one process can never cross-contaminate results.
+ */
+export async function buildSchemaArtifacts(opts: BuildSchemaOptions): Promise<BuildSchemaArtifacts> {
   const database = opts.database ?? 'constructive'
   const schemas = Array.isArray(opts.schemas) ? opts.schemas : []
 
@@ -52,7 +75,8 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
 
   // MetaSchemaPlugin validates executable names lazily against the schema that
   // will actually be executed. Trigger that resolver after every finalizer has
-  // run so legacy `_cachedTablesMeta` consumers receive the same final metadata.
+  // run, then read the metadata memoized for this exact GraphQLSchema instance.
+  let tablesMeta: TableMeta[] = []
   if (schema.getQueryType()?.getFields()._meta) {
     const result = await graphql({
       schema,
@@ -61,7 +85,19 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
     if (result.errors?.length) {
       throw new AggregateError(result.errors, 'Failed to build schema metadata')
     }
+    tablesMeta = getTablesMetaForSchema(schema) ?? []
   }
 
-  return printSchema(lexicographicSortSchema(schema))
+  if (opts._onMetaCollected) {
+    await opts._onMetaCollected()
+  }
+
+  return {
+    sdl: printSchema(lexicographicSortSchema(schema)),
+    tablesMeta
+  }
+}
+
+export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> {
+  return (await buildSchemaArtifacts(opts)).sdl
 }

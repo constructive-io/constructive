@@ -7,12 +7,11 @@
 
 import type { GraphileConfig } from 'graphile-config';
 
-import { cachedTablesMeta } from './cache';
 import { buildScalarEncoding } from './encoding-meta-builders';
-import { MetaSchemaPlugin } from './plugin';
+import { getTablesMetaForSchema, MetaSchemaPlugin } from './plugin';
 import { buildFieldMeta, pgTypeToGqlType } from './type-mappings';
 
-export { MetaSchemaPlugin };
+export { getTablesMetaForSchema, MetaSchemaPlugin };
 
 export const MetaSchemaPreset: GraphileConfig.Preset = {
   plugins: [MetaSchemaPlugin],
@@ -39,8 +38,6 @@ export type {
 export { pgTypeToGqlType as _pgTypeToGqlType };
 /** @internal Exported for testing only */
 export { buildFieldMeta as _buildFieldMeta };
-/** @internal Exported for testing only */
-export { cachedTablesMeta as _cachedTablesMeta };
 /** @internal Exported for testing only */
 export { buildScalarEncoding as _buildScalarEncoding };
 
