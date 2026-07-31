@@ -61,6 +61,30 @@ This guide helps AI agents quickly navigate the Constructive monorepo. Construct
 - Generate types/SDK: `cnc codegen`
 - Export schema SDL: `cnc get-graphql-schema`
 
+## Bundled Deploy (fast, ledger-preserving migrations)
+
+Every module can ship a content-addressed **bundle artifact** alongside its packaged SQL, and deploys can run from it in one shot — same speed as the old fast path, but it still writes the `pgpm_migrate` ledger. It's all driven by two CLI commands.
+
+**Emit the artifact (packaging):**
+
+```bash
+pgpm package            # writes sql/<name>--<version>.sql AND sql/<name>--<version>.bundle.tar.gz (default)
+pgpm package --no-bundle # skip the bundle artifact
+```
+
+The `.bundle.tar.gz` is a gzipped tarball of the module's JSON migration bundle (plan + per-change deploy/revert/verify SQL + a sha256 digest). **Commit it** beside the `.sql`.
+
+**Deploy from it (fast path):**
+
+```bash
+pgpm deploy --fast      # one-shot execute + bulk pgpm_migrate ledger
+pgpm deploy --bundled   # alias for --fast
+```
+
+`--fast` prefers each module's committed `sql/<name>--<version>.bundle.tar.gz`: it verifies the sha256 digest, checks the artifact still matches `deploy/`, executes the module in a single round-trip, and bulk-inserts one `pgpm_migrate` row (name + hash) per change. If the artifact is missing, stale, or fails verification it **falls back** to building the bundle from `deploy/` — no behavior change, never a hard failure. Re-deploys skip changes already recorded by hash.
+
+Programmatic API (only if you can't use the CLI): `writeBundleArtifact` / `readBundleArtifact` / `buildExecutableBundle` in `pgpm/core/src/bundle/artifact.ts`; see the `pgpm-migration-bundle` skill for the artifact/AST internals.
+
 ## Best Practices
 
 ### Environment Configuration
