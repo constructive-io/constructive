@@ -1,7 +1,7 @@
 {
   "name": "agentic-server",
   "version": "0.21.2",
-  "description": "Standalone Express LLM service — agent threads, chat streaming, billing metering, and inference logging via express-context",
+  "description": "Standalone OpenAI-compatible LLM gateway — multi-provider proxy with pluggable inference metering",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -29,32 +29,25 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@agentic-kit/ollama": "workspace:*",
-    "@constructive-io/express-context": "workspace:^",
-    "@constructive-io/llm-env": "workspace:^",
-    "@pgpmjs/logger": "workspace:^",
-    "pg": "^8.21.0",
-    "pg-cache": "workspace:^"
+    "@pgpmjs/logger": "workspace:^"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^22.19.11",
-    "@types/pg": "^8.20.0",
-    "@types/supertest": "^7.2.0",
     "express": "^5.2.1",
-    "makage": "^0.3.0",
-    "supertest": "^7.2.2"
+    "makage": "^0.3.0"
   },
   "peerDependencies": {
     "express": "^5.0.0"
   },
   "keywords": [
-    "agentic-kit",
     "express",
     "llm",
+    "gateway",
+    "openai",
     "ollama",
-    "streaming",
-    "billing",
+    "anthropic",
+    "proxy",
     "metering",
     "constructive"
   ]

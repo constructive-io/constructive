@@ -9,29 +9,27 @@
     <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/agentic-server"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=packages%2Fagentic-server%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/agentic-server"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=agentic%2Fagentic-server%2Fpackage.json"/></a>
 </p>
 
-Standalone Express LLM service — agent threads, chat streaming, billing metering, and inference logging via `@constructive-io/express-context`.
+Standalone, OpenAI-compatible LLM gateway — a stateless multi-provider proxy with pluggable inference metering.
 
 ## Overview
 
-`agentic-server` is the Express-only equivalent of what `graphile-llm` does inside PostGraphile. It provides the same capabilities (agent threads, chat, embeddings, billing, inference logging) but as a standalone Express router that uses `@constructive-io/express-context` for tenant-scoped database access.
+`agentic-server` is a small Express app that accepts OpenAI-compatible requests, routes them to a configured LLM provider (OpenAI, Anthropic, or Ollama), normalizes the response back to the OpenAI shape, and records usage through an injected sink. It is **backend-agnostic**: the gateway never imports a concrete telemetry/billing implementation — callers inject an `InferenceSink`, so the same gateway can meter to `compute_log`, a billing service, or nothing at all.
 
 ## Usage
 
 ```typescript
-import express from 'express';
-import { createContextMiddleware } from '@constructive-io/express-context';
-import { createAgenticRouter } from 'agentic-server';
+import { createAgenticServer } from 'agentic-server';
 
-const app = express();
-
-// Tenant context middleware (domain resolution, JWT, pgSettings, withPgClient)
-app.use(createContextMiddleware());
-
-// Mount the agentic router
-app.use(createAgenticRouter());
+const app = createAgenticServer({
+  providerType: 'ollama',
+  providerBaseUrl: 'http://localhost:11434',
+  defaultModel: 'llama3',
+  // Optional: record usage. Fire-and-forget; implementations must never throw.
+  inferenceSink: { logInference: (entry) => myBackend.record(entry) },
+});
 
 app.listen(3001, () => {
   console.log('agentic-server running on :3001');
@@ -42,42 +40,37 @@ app.listen(3001, () => {
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/v1/threads` | Create a new conversation thread |
-| POST | `/v1/threads/:thread_id/messages` | Send messages + get AI response (streaming SSE) |
-| POST | `/v1/orgs/:entity_id/threads` | Create thread (entity-scoped) |
-| POST | `/v1/orgs/:entity_id/threads/:thread_id/messages` | Send message (entity-scoped) |
-| POST | `/v1/embed` | Generate embeddings |
+| POST | `/v1/chat/completions` | OpenAI-compatible chat completion (multi-provider) |
+| POST | `/v1/embeddings` | OpenAI-compatible embeddings (multi-provider) |
+| POST | `/v1/usage` | Submit an external usage report to the metering sink |
+| GET | `/v1/providers` | List configured providers |
+| GET | `/healthz` | Health check |
 
-## Environment Variables
+## Identity & tenancy
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CHAT_PROVIDER` | `ollama` | Chat LLM provider |
-| `CHAT_MODEL` | `llama3` | Default chat model |
-| `CHAT_BASE_URL` | `http://localhost:11434` | Chat provider URL |
-| `EMBEDDER_PROVIDER` | `ollama` | Embedding provider |
-| `EMBEDDER_MODEL` | `nomic-embed-text` | Default embedding model |
-| `EMBEDDER_BASE_URL` | `http://localhost:11434` | Embedding provider URL |
+Requests carry tenant identity via headers: `X-Database-Id` (**required** — requests without it are rejected `400`), `X-Entity-Id`, and `X-Actor-Id`. Routing to a specific provider can be forced with `X-LLM-Provider`.
 
-## Features
+`isPublic` controls trust: when `false` (default) the server sits on a private network and trusts these headers directly; when `true` the identity headers are stripped from incoming requests (external clients cannot set tenant context), so such requests fail loud rather than being mis-attributed.
 
-- **Thread management**: Create and manage conversation threads with system prompts
-- **Streaming chat**: SSE streaming responses (OpenAI-compatible format)
-- **Batch chat**: Non-streaming JSON responses
-- **Embeddings**: Generate vector embeddings via `/v1/embed`
-- **Billing integration**: Automatic quota checks and usage recording (when billing module is provisioned)
-- **Inference logging**: Automatic token usage logging (when inference_log module is provisioned)
-- **RLS enforcement**: All database operations run within tenant-scoped RLS transactions
+## Metering
+
+Metering is injected, not built in:
+
+```typescript
+interface InferenceSink {
+  logInference(entry: InferenceEntry): void; // fire-and-forget; must not throw
+}
+```
+
+The gateway calls `logInference` after each chat/embedding (and for `/v1/usage` reports). Consumers own the concrete implementation — e.g. `constructive-db` injects a `compute_log`-backed sink built on its `ModuleLoader`.
 
 ## Architecture
 
 ```
-Cloud Function → POST /v1/threads/:id/messages → agentic-server
-                                                      │
-                                  ┌───────────────────┼───────────────────┐
-                                  │                   │                   │
-                         express-context        OllamaAdapter        Billing
-                        (tenant DB context)    (LLM provider)    (quota + usage)
+Client → POST /v1/chat/completions → agentic-server
+                                          │
+                        ┌─────────────────┼─────────────────┐
+                        │                 │                 │
+                 resolveProvider     LLM provider      InferenceSink
+                 + transforms      (OpenAI/Ollama/…)   (injected metering)
 ```
-
-The cloud function doesn't need to know about databases, billing, or LLM providers. It just POSTs `{ messages, model }` and gets back a streamed response.
