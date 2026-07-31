@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.14.6...@constructive-io/graphql-server@5.15.0) (2026-07-31)
+
+### Features
+
+- **agentic-server:** make canonical package the OpenAI-compatible gateway ([fa3851c](https://github.com/constructive-io/constructive/commit/fa3851cfd36e64b5b101da03a66d734a2c267c0b))
+
 ## [5.14.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.14.5...@constructive-io/graphql-server@5.14.6) (2026-07-31)
 
 ### Bug Fixes

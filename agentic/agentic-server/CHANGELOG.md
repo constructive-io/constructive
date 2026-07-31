@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.21.2...agentic-server@0.22.0) (2026-07-31)
+
+### Features
+
+- **agentic-server:** make canonical package the OpenAI-compatible gateway ([fa3851c](https://github.com/constructive-io/constructive/commit/fa3851cfd36e64b5b101da03a66d734a2c267c0b))
+
 ## [0.21.2](https://github.com/constructive-io/constructive/compare/agentic-server@0.21.1...agentic-server@0.21.2) (2026-07-31)
 
 **Note:** Version bump only for package agentic-server
