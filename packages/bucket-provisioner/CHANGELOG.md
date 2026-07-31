@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.1](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.23.0...@constructive-io/bucket-provisioner@0.23.1) (2026-07-31)
+
+**Note:** Version bump only for package @constructive-io/bucket-provisioner
+
 # [0.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.22.1...@constructive-io/bucket-provisioner@0.23.0) (2026-07-31)
 
 **Note:** Version bump only for package @constructive-io/bucket-provisioner
