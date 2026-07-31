@@ -15,6 +15,7 @@ Usage:
 
 Commands:
   audit           Audit grants, RLS flags, policy coverage, and anti-patterns
+  perf            Audit index hygiene and policy cost (audit --perf)
   doctor          Diagnose environment, connection, and configuration
   print-config    Show the resolved effective configuration
   help            Show this help message
@@ -27,6 +28,7 @@ const commandMap: Record<
   (argv: ParsedArgs, prompter: Inquirerer, options: CLIOptions) => unknown
 > = {
   audit,
+  perf: (argv, prompter, options) => audit({ ...argv, perf: true }, prompter, options),
   doctor,
   'print-config': printConfig
 };

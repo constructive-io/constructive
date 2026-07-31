@@ -94,6 +94,30 @@ export interface ScoringConfig {
   gradeBands?: Partial<Record<Exclude<Grade, 'F'>, number>>;
 }
 
+/**
+ * The optional performance dimension: index-hygiene and policy-cost rules
+ * (`X*`, plus P1/P1b), scored on their own axis against the same exposure
+ * surface. Off by default — `safegres perf` / `--perf` / `enabled: true`.
+ */
+export interface PerfConfig {
+  /** Collect and score perf findings without passing `--perf`. */
+  enabled?: boolean;
+  /**
+   * Rule settings for perf-dimension codes only. Applied on top of the
+   * top-level `rules`; naming a security rule here is a config error.
+   */
+  rules?: RulesConfig;
+  /**
+   * Glob patterns matched against the qualified `schema.table` name for
+   * tables whose perf findings are intentional (cold audit logs, tiny
+   * lookup tables the planner will seq-scan anyway). Acknowledged findings
+   * are reported as info and excluded from the perf score.
+   */
+  ignore?: string[];
+  /** Scoring settings for the perf axis (defaults mirror the security score). */
+  scoring?: ScoringConfig;
+}
+
 export interface FailOnConfig {
   /** Exit non-zero if any finding is at/above this severity. */
   severity?: Severity;
@@ -101,6 +125,10 @@ export interface FailOnConfig {
   score?: number;
   /** Exit non-zero if the grade is below this letter. */
   grade?: Grade;
+  /** Exit non-zero if the perf score is below this value (0-100). */
+  perfScore?: number;
+  /** Exit non-zero if the perf grade is below this letter. */
+  perfGrade?: Grade;
 }
 
 /**
@@ -115,6 +143,8 @@ export interface SafegresConfig {
   exposure?: ExposureConfig;
   /** Tables whose open reads are deliberate (declared public surface). */
   public?: PublicConfig;
+  /** The optional performance dimension. */
+  perf?: PerfConfig;
   schemas?: string[];
   excludeSchemas?: string[];
   roles?: string[];

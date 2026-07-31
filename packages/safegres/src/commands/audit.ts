@@ -17,6 +17,11 @@ import {
   checkUpdateWithCheckCoverage
 } from '../checks/coverage';
 import {
+  checkMissingPrimaryKey,
+  checkRedundantIndexes,
+  checkUnindexedForeignKeys
+} from '../checks/indexes';
+import {
   checkGrantsWithoutRls,
   checkRlsEnabledNoPolicies,
   checkRlsNotForced
@@ -31,12 +36,13 @@ import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRu
 import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { resolveExposure } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
+import { introspectIndexes } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
-import { RULES_BY_CODE } from '../rules/registry';
+import { dimensionOf, RULES_BY_CODE } from '../rules/registry';
 import { computeScore } from '../score/score';
-import type { ExposureReport, Finding, Report } from '../types';
+import type { ExposureReport, Finding, PerfReport, Report } from '../types';
 import { summarize } from '../types';
 import { version as PKG_VERSION } from '../version';
 
@@ -61,6 +67,12 @@ export interface AuditOptions extends IntrospectOptions {
    * exposed entry points. Adds `report.callGraph`.
    */
   callGraph?: boolean;
+  /**
+   * Collect and score the performance dimension: index-hygiene rules (`X*`)
+   * on top of the policy-cost rules (P1/P1b) the audit already runs. Adds
+   * `report.perf` with its own score. Overrides `config.perf.enabled`.
+   */
+  perf?: boolean;
   /**
    * Merged safegres configuration (rules, overrides, scoring). Rule settings
    * filter and retune findings; scoring settings drive the report score.
@@ -133,14 +145,43 @@ export async function audit(
     }
   }
 
+  // --- Performance dimension (opt-in): index hygiene ---
+  const perfEnabled = options.perf ?? config.perf?.enabled ?? false;
+  if (perfEnabled) {
+    const indexSnapshot = await introspectIndexes(exec, {
+      schemas: options.schemas ?? config.schemas,
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+    });
+    for (const table of indexSnapshot) {
+      findings.push(...checkUnindexedForeignKeys(table));
+      findings.push(...checkRedundantIndexes(table));
+      const x6 = checkMissingPrimaryKey(table);
+      if (x6) findings.push(x6);
+    }
+  }
+
   findings = applyRulesToFindings(resolved, findings);
 
   // Stamp direction (from the registry) and exposure on every finding.
   const publicRead = config.public?.read ?? [];
+  const perfIgnore = config.perf?.ignore ?? [];
   for (const f of findings) {
     const meta = RULES_BY_CODE.get(f.code);
     if (meta && f.direction === undefined) f.direction = meta.direction;
+    if (meta && f.dimension === undefined) f.dimension = dimensionOf(meta);
     if (exposure.known && f.schema) f.exposed = exposedSchemas.has(f.schema);
+
+    // Declared-intentional perf debt: cold tables, tiny lookups, anything the
+    // planner will seq-scan regardless. Reported, but off the perf score.
+    if (
+      f.dimension === 'perf' && f.schema && f.table
+      && perfIgnore.some((p) => matchTablePattern(p, `${f.schema}.${f.table}`))
+    ) {
+      f.acknowledged = true;
+      f.severity = 'info';
+      f.message += ' — acknowledged (perf.ignore)';
+      f.hint = 'This table is declared in `perf.ignore`, so the finding is treated as intentional and does not affect the perf score.';
+    }
 
     // Declared-public reads: an open SELECT on a table listed in
     // `public.read` is intent, not a finding — acknowledge it (info,
@@ -181,17 +222,32 @@ export async function audit(
     totalTables: snapshot.length
   };
 
+  const securityFindings = findings.filter((f) => f.dimension !== 'perf');
+  const perfFindings = findings.filter((f) => f.dimension === 'perf');
+
   const report: Report = {
     version: PKG_VERSION,
     generatedAt: new Date().toISOString(),
     summary: summarize(findings),
     findings,
-    score: computeScore(findings, config.scoring, {
+    score: computeScore(securityFindings, config.scoring, {
       exposedTables,
       exposureKnown: exposure.known
     }),
     exposure: exposureReport
   };
+
+  if (perfEnabled) {
+    const perf: PerfReport = {
+      findings: perfFindings,
+      summary: summarize(perfFindings),
+      score: computeScore(perfFindings, config.perf?.scoring, {
+        exposedTables,
+        exposureKnown: exposure.known
+      })
+    };
+    report.perf = perf;
+  }
 
   if (options.callGraph) {
     const functions = await introspectFunctions(exec, {

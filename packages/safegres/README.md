@@ -47,7 +47,7 @@ Pretty output prints the exposure line, score, and the exposed findings. Interna
 | A6 | info | fail-closed | coverage | UPDATE has `USING` but **no `WITH CHECK`** (row-smuggling surface) |
 | A7 | critical | fail-open | anti-pattern | Trivially-permissive **WRITE** policy (INSERT/UPDATE/DELETE/ALL with literal `true`) |
 | A8 | low | fail-open | anti-pattern | Trivially-permissive **SELECT** policy (`USING (true)` — confirm public-read is intended) |
-| P1 | high | neutral | anti-pattern | Policy body calls a **VOLATILE function** (per-row evaluation) |
+| P1 | high | neutral | anti-pattern | Policy body calls a **VOLATILE function** (per-row evaluation) — *scored on the [perf axis](#performance-dimension---perf)* |
 | P5 | high | fail-open | anti-pattern | Policy body references **`session_user`** / `current_user` / `pg_has_role(...)` |
 | R1 | critical | fail-open | anti-pattern | An **untrusted role** (options: `{ roles: [...] }`) holds a write privilege |
 | R2 | high | fail-open | anti-pattern | A permissive write policy applies to an untrusted role or PUBLIC |
@@ -99,6 +99,39 @@ Some open reads are deliberate — pricing tables, reference data, a public user
 - An open SELECT policy (`USING (true)` — rule A8) on a declared table is **acknowledged**: reported as info, excluded from the score.
 - An open read on any *undeclared* table stays a scored finding — even in a `*_public`-named schema. Naming is never treated as intent; the config declaration is.
 - `safegres doctor` warns about stale `public.read` patterns that no longer match any table.
+
+## Performance dimension (`--perf`)
+
+A slow database is a different problem from an unsafe one, so safegres scores them separately: `safegres perf` (or `safegres audit --perf`) adds `report.perf` with its own findings, summary, and 0-100 score. It is **off by default** — a plain `audit` behaves exactly as before, and no perf finding ever touches the security score.
+
+| Code | Severity | Category | Check |
+| --- | --- | --- | --- |
+| X1 | medium | index | **Foreign key with no covering index** — joins and cascading deletes seq-scan the child table |
+| X5 | low | index | **Redundant index** — an exact duplicate of, or a leading-column prefix of, another index |
+| X6 | low | index | **No primary key** and no usable replica identity — rows cannot be addressed by updates, deletes, or logical replication |
+| P1 | high | anti-pattern | Policy body calls a **VOLATILE function** — re-evaluated per row |
+| P1b | medium | anti-pattern | Policy body calls a **STABLE function** in a per-row position |
+
+Every check is pure catalog analysis: deterministic, workload-free, and safe to run against an empty CI database. An index covers a foreign key only when its *leading* columns are the FK's columns and it covers every row — partial and expression indexes don't count, because the planner can't use them for the referential-integrity lookup. Constraint-backed, unique, partial, and expression indexes are never reported as redundant.
+
+```bash
+safegres perf --database mydb
+safegres audit --database mydb --perf --fail-on-perf-grade B
+```
+
+```jsonc
+{
+  "perf": {
+    "enabled": true,
+    "rules": { "X6": "off" },          // perf-dimension codes only
+    "ignore": ["app_public.audit_*"],  // declared-intentional perf debt
+    "scoring": { "densityK": 0.17 }
+  },
+  "failOn": { "perfGrade": "B" }
+}
+```
+
+Tables matched by `perf.ignore` are acknowledged — reported as info, excluded from the perf score — the same way `public.read` works for open reads. Perf findings live in `report.findings` alongside the security ones (so `--fail-on <severity>` still sees them), but only they feed `report.perf.score`, and only security findings feed `report.score`.
 
 ## Call graph (`--call-graph`)
 

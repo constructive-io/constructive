@@ -1,5 +1,6 @@
 import yanse from 'yanse';
 
+import type { Score } from '../score/score';
 import type { Finding, Report, Severity } from '../types';
 import { renderCallGraph, renderCallGraphDiff } from './callgraph';
 
@@ -58,21 +59,12 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   }
 
   if (score) {
-    const gradePaint: (s: string) => string = colorEnabled
-      ? score.grade.startsWith('A')
-        ? yanse.green
-        : score.grade === 'B' || score.grade === 'C'
-          ? yanse.yellow
-          : yanse.red
-      : noop;
-    const capNote = score.cappedByUnknownExposure ? '  (capped: exposure unknown)' : '';
-    lines.push(`score: ${gradePaint(`${score.value} (${score.grade})`)}  — model: ${score.model}${capNote}`);
-    const top = score.deductions.slice(0, 3);
-    if (top.length > 0) {
-      lines.push(
-        `  top deductions: ${top.map((d) => `${d.code} −${d.points} (×${d.count})`).join('  ')}`
-      );
-    }
+    lines.push(...scoreLines('score', score, colorEnabled));
+    lines.push('');
+  }
+
+  if (report.perf) {
+    lines.push(...scoreLines('perf score', report.perf.score, colorEnabled));
     lines.push('');
   }
 
@@ -96,8 +88,11 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   }
   lines.push('');
 
-  const exposed = findings.filter((f) => f.exposed !== false);
-  const internal = findings.filter((f) => f.exposed === false);
+  // Perf findings render in their own section so the two dimensions never
+  // read as one list.
+  const security = report.perf ? findings.filter((f) => f.dimension !== 'perf') : findings;
+  const exposed = security.filter((f) => f.exposed !== false);
+  const internal = security.filter((f) => f.exposed === false);
 
   for (const f of exposed) {
     lines.push(renderFinding(f, paint));
@@ -126,8 +121,28 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     }
   }
 
-  if (findings.length === 0) {
+  if (security.length === 0) {
     lines.push('no findings.');
+  }
+
+  if (report.perf) {
+    const perfExposed = report.perf.findings.filter((f) => f.exposed !== false);
+    const perfInternal = report.perf.findings.length - perfExposed.length;
+    lines.push('', 'performance (index hygiene) — scored separately from security:', '');
+    if (perfExposed.length === 0) {
+      lines.push('no perf findings.');
+    } else {
+      for (const f of perfExposed) lines.push(renderFinding(f, paint));
+    }
+    if (perfInternal > 0 && !options.verbose) {
+      lines.push(
+        paint('info', `  (${perfInternal} internal perf advisor${perfInternal === 1 ? 'y' : 'ies'} excluded from the perf score)`)
+      );
+    } else if (perfInternal > 0) {
+      for (const f of report.perf.findings.filter((f) => f.exposed === false)) {
+        lines.push(renderFinding(f, paint));
+      }
+    }
   }
 
   if (report.callGraph) {
@@ -138,6 +153,27 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   }
 
   return lines.join('\n');
+}
+
+function scoreLines(label: string, score: Score, colorEnabled: boolean): string[] {
+  const gradePaint: (s: string) => string = colorEnabled
+    ? score.grade.startsWith('A')
+      ? yanse.green
+      : score.grade === 'B' || score.grade === 'C'
+        ? yanse.yellow
+        : yanse.red
+    : noop;
+  const capNote = score.cappedByUnknownExposure ? '  (capped: exposure unknown)' : '';
+  const lines = [
+    `${label}: ${gradePaint(`${score.value} (${score.grade})`)}  — model: ${score.model}${capNote}`
+  ];
+  const top = score.deductions.slice(0, 3);
+  if (top.length > 0) {
+    lines.push(
+      `  top deductions: ${top.map((d) => `${d.code} −${d.points} (×${d.count})`).join('  ')}`
+    );
+  }
+  return lines;
 }
 
 function renderFinding(f: Finding, paint: (sev: Severity, s: string) => string): string {
