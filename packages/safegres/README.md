@@ -35,6 +35,7 @@ Pretty output prints the exposure line, score, and the exposed findings. Interna
 - `--exposed-only` — drop internal findings entirely.
 - `--format json` / `--format json-pretty` — machine-readable output (always carries every finding).
 - `--format markdown` — the same report as GitHub-flavoured markdown, for a job summary or a PR comment (see [CI](#ci)).
+- `--format sarif` — SARIF 2.1.0 for GitHub code scanning (see [CI](#ci)).
 
 ### CI
 
@@ -52,6 +53,20 @@ A plain audit is one command and one gate; `--format markdown` writes the report
 ```
 
 Scores lead, then the severity counts, then a table per dimension; internal (non-exposed) advisories and accepted baseline debt fold into `<details>` so the summary stays skimmable. To post it as a PR comment instead, pipe it to `gh pr comment --body-file -`. The same renderer is available to library callers as `renderMarkdown(report)`.
+
+#### Code scanning (SARIF)
+
+`--format sarif` emits SARIF 2.1.0, so findings become GitHub code-scanning alerts — Security tab, inline PR annotations, dismissals that stick:
+
+```yaml
+- run: npx safegres audit --perf --format sarif --sarif-sources ./deploy > safegres.sarif
+- uses: github/codeql-action/upload-sarif@v3
+  with: { sarif_file: safegres.sarif }
+```
+
+An alert needs a file and a line, but safegres reads the catalog — a live database has no source location. `--sarif-sources <dir>` scans that directory's `.sql` for the `CREATE TABLE` / `CREATE POLICY` that defines each object, so a finding on `app_public.widgets` points at the migration that created it (policy findings resolve to the `CREATE POLICY` line). Findings that don't resolve are still emitted, without a location — GitHub drops those, other SARIF consumers keep them.
+
+Results are fingerprinted by finding *identity* (code + relation + policy + subject, the same key the [perf baseline](#perf-baseline-the-ratchet) uses), never by message text, so rewording a rule in a later release doesn't close and reopen every alert. Perf rules are tagged `performance`, security rules `security`.
 
 ## What it checks
 

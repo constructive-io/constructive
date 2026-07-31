@@ -223,6 +223,7 @@ safegres audit --stats             # + runtime-statistics rules S1-S4 (implies -
 safegres audit --explain           # + prove findings with EXPLAIN (implies --perf, PG16+)
 safegres audit --format json       # machine-readable
 safegres audit --format markdown >> "$GITHUB_STEP_SUMMARY"   # CI job summary / PR comment
+safegres audit --format sarif --sarif-sources ./deploy       # GitHub code scanning (upload-sarif)
 safegres audit --exposed-only      # hide internal advisories
 safegres doctor                    # config/parser/connection/catalog + exposure + stale public.read checks
 safegres print-config              # resolved effective config
