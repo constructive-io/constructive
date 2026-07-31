@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.3](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.7.2...@constructive-io/errors@0.7.3) (2026-07-31)
+
+### Bug Fixes
+
+- **server:** route middleware GraphQL errors through the error registry ([4057d45](https://github.com/constructive-io/constructive/commit/4057d45929091ddc3c0a3a5be5d43c11984fd17b))
+
 ## [0.7.2](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.7.1...@constructive-io/errors@0.7.2) (2026-07-30)
 
 **Note:** Version bump only for package @constructive-io/errors

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.12.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.12.7...@constructive-io/graphql-codegen@5.12.8) (2026-07-31)
+
+### Bug Fixes
+
+- **server:** route middleware GraphQL errors through the error registry ([4057d45](https://github.com/constructive-io/constructive/commit/4057d45929091ddc3c0a3a5be5d43c11984fd17b))
+
 ## [5.12.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.12.6...@constructive-io/graphql-codegen@5.12.7) (2026-07-31)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
