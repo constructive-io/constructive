@@ -7,7 +7,6 @@
 export {
   _buildFieldMeta,
   _buildScalarEncoding,
-  _cachedTablesMeta,
   _pgTypeToGqlType,
   getTablesMetaForSchema,
   MetaSchemaPlugin,
