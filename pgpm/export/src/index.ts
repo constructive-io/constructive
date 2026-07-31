@@ -7,6 +7,10 @@ export { EXPORT_GRANULARITIES, isExportGranularity, restructureExportRows } from
 export type { ExportGranularity, RestructureExportRowsOptions, RestructureExportRowsResult } from './restructure';
 export { loadModuleSource, stripTransactionWrapper } from './module-source';
 export type { ModuleSource, ModuleSourceChange } from './module-source';
+export { copyBlockToInsert, copyTargetOf, loadDumpSource, preprocessDumpText } from './dump-source';
+export type { CopyBlock, CopyTarget, DumpSource } from './dump-source';
+export { importDumpRows, MISC_CHANGE_PATH } from './import';
+export type { ImportDumpRowsOptions, ImportDumpRowsResult, ImportDumpSummary } from './import';
 export { parsePartitionConfig, partitionExportRows } from './partition';
 export type { PartitionConfig, PartitionedPackageRows, PartitionExportRowsResult } from './partition';
 export { diffCatalogSnapshots, snapshotCatalog } from './catalog-check';

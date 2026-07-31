@@ -14,6 +14,7 @@ import dump from './commands/dump';
 import env from './commands/env';
 import _export from './commands/export';
 import extension from './commands/extension';
+import _import from './commands/import';
 import init from './commands/init';
 import install from './commands/install';
 import kill from './commands/kill';
@@ -57,6 +58,7 @@ const ENGINE_EXEMPT_COMMANDS = new Set([
   'doctor',
   'env',
   'extension',
+  'import',
   'init',
   'install',
   'package',
@@ -102,6 +104,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     plan: pgt(plan),
     regen,
     export: pgt(_export),
+    import: pgt(_import),
     package: pgt(_package),
     tag: pgt(tag),
     kill: pgt(kill),

@@ -1,4 +1,4 @@
-import { PgpmMigrate, PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
+import { PgpmMigrate, PgpmPackage, PgpmRow } from '@pgpmjs/core';
 import {
   diffCatalogSnapshots,
   EXPORT_GRANULARITIES,
@@ -20,6 +20,10 @@ import * as path from 'path';
 import { getPgPool } from 'pg-cache';
 import type { PgConfig } from 'pg-env';
 import { getPgEnvOptions } from 'pg-env';
+
+import { checkOverwrite, writePackage } from '../utils/emit-package';
+
+export { checkOverwrite } from '../utils/emit-package';
 
 const log = new Logger('transform');
 
@@ -78,26 +82,6 @@ export const resolveOutBase = (modulePath: string, out?: string): string => {
   return path.dirname(modulePath);
 };
 
-/**
- * Guard against clobbering: writing into the source module requires --write,
- * as does overwriting any existing package directory.
- */
-export const checkOverwrite = (
-  targetDir: string,
-  modulePath: string,
-  write: boolean
-): string | null => {
-  const resolvedTarget = path.resolve(targetDir);
-  const resolvedSource = path.resolve(modulePath);
-  if (resolvedTarget === resolvedSource && !write) {
-    return `Refusing to overwrite the source module at ${resolvedSource} (pass --write to allow).`;
-  }
-  if (resolvedTarget !== resolvedSource && fs.existsSync(resolvedTarget) && !write) {
-    return `Output directory ${resolvedTarget} already exists (pass --write to overwrite).`;
-  }
-  return null;
-};
-
 /** Order partition packages so prerequisites come before dependents. */
 export const orderPackages = (packages: PartitionedPackageRows[]): PartitionedPackageRows[] => {
   const byName = new Map(packages.map(pkg => [pkg.name, pkg]));
@@ -122,43 +106,6 @@ const readControlRequires = (modulePath: string, name: string): string[] => {
   const match = fs.readFileSync(controlPath, 'utf-8').match(/^requires\s*=\s*'([^']*)'\s*$/m);
   if (!match) return [];
   return match[1].split(',').map(s => s.trim()).filter(Boolean);
-};
-
-const writeControlFile = (dir: string, name: string, requires: string[]): void => {
-  const lines = [
-    `# ${name} extension`,
-    `comment = '${name} extension'`,
-    `default_version = '0.0.1'`,
-    `relocatable = false`,
-    `superuser = false`
-  ];
-  if (requires.length) {
-    lines.push(`requires = '${requires.join(',')}'`);
-  }
-  fs.writeFileSync(path.join(dir, `${name}.control`), lines.join('\n') + '\n');
-};
-
-const writePackage = (
-  outBase: string,
-  pkg: PartitionedPackageRows,
-  sourceRequires: string[]
-): string => {
-  const dir = path.join(outBase, pkg.name);
-  fs.rmSync(path.join(dir, 'deploy'), { recursive: true, force: true });
-  fs.rmSync(path.join(dir, 'revert'), { recursive: true, force: true });
-  fs.rmSync(path.join(dir, 'verify'), { recursive: true, force: true });
-  fs.mkdirSync(dir, { recursive: true });
-
-  writeControlFile(dir, pkg.name, [...sourceRequires, ...pkg.requires]);
-
-  const opts: SqlWriteOptions = {
-    outdir: outBase,
-    name: pkg.name,
-    replacer: (str: string) => str.split('constructive-extension-name').join(pkg.name)
-  };
-  writePgpmPlan(pkg.rows, opts);
-  writePgpmFiles(pkg.rows, opts);
-  return dir;
 };
 
 const createScratchDb = async (config: PgConfig, dbName: string): Promise<void> => {
