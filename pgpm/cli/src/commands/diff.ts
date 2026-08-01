@@ -75,7 +75,7 @@ Options:
                            consolidated (default: object)
   --change-granularity <level>
                            Change-level distribution for emitted changes:
-                           object | alteration (default: object)
+                           alteration | object | single (default: object)
   --naming <style>         Change path naming style: directory | flat (default: directory)
   --json                   Machine-readable output
   --verify                 Oracle mode: deploy A plus the emitted migration into

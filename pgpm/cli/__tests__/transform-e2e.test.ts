@@ -261,6 +261,51 @@ describe('pgpm transform e2e', () => {
     expect(await testDb.exists('schema', 'tfx_app')).toBe(false);
   });
 
+  it('--change-granularity single collapses to one change, deploys equivalently, verifies, and reverts clean', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/${MODULE_NAME}
+      pgpm transform --granularity consolidated --change-granularity single --out ../single-out
+      `,
+      {}
+    );
+
+    const outDir = path.join(wsDir, 'single-out', `${MODULE_NAME}-consolidated`);
+    const plan = fs.readFileSync(path.join(outDir, 'pgpm.plan'), 'utf-8');
+    const entries = plan.split('\n').filter(l => l.trim() && !l.startsWith('%') && !l.startsWith('#'));
+    expect(entries).toHaveLength(1);
+    expect(plan).toContain('module/init');
+
+    const deploy = fs.readFileSync(path.join(outDir, 'deploy', 'module/init.sql'), 'utf-8');
+    expect(deploy).toContain('CREATE SCHEMA tfx_app');
+    expect(deploy).toContain('CREATE TABLE tfx_sec.audit');
+    expect(fs.readFileSync(path.join(outDir, 'revert', 'module/init.sql'), 'utf-8')).toContain('DROP SCHEMA tfx_app');
+    expect(fs.readFileSync(path.join(outDir, 'verify', 'module/init.sql'), 'utf-8')).toContain('information_schema');
+
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/single-out/${MODULE_NAME}-consolidated
+      pgpm deploy --database ${testDb.name} --package ${MODULE_NAME}-consolidated --yes
+      `,
+      { database: testDb.name }
+    );
+
+    const snapOriginal = await snapshotCatalog(originalDb);
+    const snapTransformed = await snapshotCatalog(testDb);
+    expect(diffCatalogSnapshots(snapOriginal, snapTransformed)).toEqual([]);
+
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/single-out/${MODULE_NAME}-consolidated
+      pgpm verify --database ${testDb.name} --package ${MODULE_NAME}-consolidated --yes
+      pgpm revert --database ${testDb.name} --package ${MODULE_NAME}-consolidated --yes
+      `,
+      { database: testDb.name }
+    );
+    expect(await testDb.exists('schema', 'tfx_app')).toBe(false);
+  });
+
   it('rewrites an existing output when --write is passed', async () => {
     // The refusal path (no --write) exits the process, so it is covered by the
     // checkOverwrite unit tests; here we prove --write re-generates in place.

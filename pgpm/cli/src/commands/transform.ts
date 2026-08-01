@@ -48,10 +48,11 @@ Options:
   --help, -h              Show this help message
   --granularity <level>   Target granularity: atomic | object | consolidated (required)
   --change-granularity <level>
-                          Change-level distribution: object | alteration
+                          Change-level distribution: alteration | object | single
                           (default: object). With alteration, every ADD COLUMN /
                           ADD CONSTRAINT becomes its own change with its own
-                          deploy/revert/verify and requires.
+                          deploy/revert/verify and requires. With single, the
+                          whole module becomes one change.
   --partition <file>      Partition config (JSON: rules/defaultPackage/splitRiders)
                           splitting the module into multiple pgpm packages with
                           derived cross-package requires.

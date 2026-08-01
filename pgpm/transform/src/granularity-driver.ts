@@ -36,16 +36,18 @@ export type { Granularity } from '@pgsql/transform';
  * How statements are distributed across pgpm changes — orthogonal to
  * `Granularity`, which shapes the SQL *within* a change.
  *
- * - `object`     — one change per created object (the default): a table's
- *                  CREATE and all its ALTERs share one plan entry.
  * - `alteration` — one change per alteration: every `ADD COLUMN` /
  *                  `ADD CONSTRAINT` becomes its own plan entry with its own
  *                  deploy/revert/verify and graph-derived requires, so a
  *                  single column can deploy or revert independently.
+ * - `object`     — one change per created object (the default): a table's
+ *                  CREATE and all its ALTERs share one plan entry.
+ * - `single`     — one change for the whole module: every statement lands in
+ *                  a single plan entry with one deploy/revert/verify.
  */
-export type ChangeGranularity = 'object' | 'alteration';
+export type ChangeGranularity = 'alteration' | 'object' | 'single';
 
-export const CHANGE_GRANULARITIES: readonly ChangeGranularity[] = ['object', 'alteration'];
+export const CHANGE_GRANULARITIES: readonly ChangeGranularity[] = ['alteration', 'object', 'single'];
 
 export const isChangeGranularity = (value: string): value is ChangeGranularity =>
   (CHANGE_GRANULARITIES as readonly string[]).includes(value);
@@ -85,8 +87,14 @@ export interface RestructureModuleOptions {
    * naming-spec path (`.../columns/{name}/column`,
    * `.../constraints/{name}/constraint`); unnamed constraints are first
    * given their Postgres default name so each change stays revertible.
+   * With `single`, the whole restructured script becomes one change.
    */
   changeGranularity?: ChangeGranularity;
+  /**
+   * Plan token for the single change (used only with `changeGranularity:
+   * 'single'`). Defaults to `module/init`.
+   */
+  singleChangeName?: string;
   /**
    * Derive a change name for an alteration group from its sub-object
    * identity (used only with `changeGranularity: 'alteration'`). Defaults to
@@ -163,6 +171,30 @@ export function restructureChanges(
   // target (creates[0]), so a table's CREATE and its remaining ALTERs land
   // in the same change regardless of statement kind.
   const facts = classifyStatements(sql);
+
+  if (options.changeGranularity === 'single') {
+    const name = options.singleChangeName ?? 'module/init';
+    const inputNames = new Set(changes.map(c => c.name));
+    const dependencies = [...new Set(
+      changes.flatMap(c => c.dependencies).filter(d => !inputNames.has(d))
+    )].sort();
+    const statements = facts
+      .map(f => sql.slice(f.span.start, f.span.start + f.span.len).trim())
+      .filter(Boolean)
+      .map(text => (text.endsWith(';') ? text : `${text};`));
+    const revert = revertFor(facts);
+    const verify = verifyFor(facts);
+    for (const warning of [...revert.warnings, ...verify.warnings]) {
+      warnings.push(`${name}: ${warning}`);
+    }
+    return {
+      changes: statements.length > 0
+        ? [{ name, dependencies, deploy: statements.join('\n\n'), revert: revert.sql, verify: verify.sql }]
+        : [],
+      warnings
+    };
+  }
+
   const graph = buildStatementGraph(facts);
 
   const groupOf: number[] = new Array(facts.length).fill(-1);

@@ -25,7 +25,7 @@ one canonical model:
 | Axis | Projections | What changes | What stays the same |
 | --- | --- | --- | --- |
 | **granularity** | `atomic` · `object` · `consolidated` | the SQL statement shape (one `ALTER` per column vs one statement per object vs the whole thing) | the schema |
-| **change granularity** | `object` · `alteration` | the plan-entry shape (one change per object vs one change per column/constraint, each with its own deploy/revert/verify) | the schema |
+| **change granularity** | `alteration` · `object` · `single` | the plan-entry shape (one change per column/constraint vs one per object vs one big change, each with its own deploy/revert/verify) | the schema |
 | **partition** | one module vs many | which objects live in which package | the combined schema |
 | **diff** | `v1 → v2` migration | — | derived, never hand-written |
 | **output** | pgpm module · linear `.sql` · bundle | the artifact format | the migration |
@@ -50,8 +50,10 @@ pgpm transform --granularity atomic
 pgpm transform --granularity consolidated
 
 # 2b. The fourth dial: one change PER ALTERATION — every column and constraint
-#     becomes its own plan entry with its own deploy/revert/verify + requires
+#     becomes its own plan entry with its own deploy/revert/verify + requires —
+#     or ONE BIG CHANGE for the whole module
 pgpm transform --granularity atomic --change-granularity alteration --out ../alteration
+pgpm transform --granularity consolidated --change-granularity single --out ../single
 
 # 3. Partition the source into app + security modules
 cd ../..
@@ -83,8 +85,8 @@ database needed, because equivalence is checked at the identity-keyed model:
   normalize to the same schema (empty diff), including standalone
   `ADD CONSTRAINT` placement.
 - **change-granularity-invariant** — one change per alteration (per column /
-  per constraint plan entries) still normalizes to the same schema (empty
-  diff).
+  per constraint plan entries) and one big change for the whole module both
+  still normalize to the same schema (empty diff).
 - **partition-invariant** — the `blog-core` + `blog-security` modules recombine
   to the same schema as the single module (empty diff).
 - **diff is exact** — `schema.sql → schema-v2.sql` derives precisely the real

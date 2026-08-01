@@ -4,7 +4,7 @@
 // to an identity-keyed object set and then *project* it into many shapes:
 //
 //   granularity          atomic | object | consolidated  (statement shape)
-//   change granularity   object | alteration             (plan-entry shape)
+//   change granularity   alteration | object | single    (plan-entry shape)
 //   partition            one module vs app + security modules
 //   diff                 schema.sql -> schema-v2.sql as a generated migration
 //   output               pgpm module | linear .sql
@@ -52,10 +52,15 @@ describe('pgpm projections: one schema, every shape, one meaning', () => {
     pgpm(work, ['transform', '--granularity', 'atomic', '--cwd', path.join(work, 'blog')]);
     pgpm(work, ['transform', '--granularity', 'consolidated', '--cwd', path.join(work, 'blog')]);
 
-    // The fourth dial: one change per alteration (per column / per constraint).
+    // The fourth dial: one change per alteration (per column / per constraint),
+    // or the whole module as one big change.
     pgpm(work, [
       'transform', '--granularity', 'atomic', '--change-granularity', 'alteration',
       '--cwd', path.join(work, 'blog'), '--out', path.join(work, 'alteration')
+    ]);
+    pgpm(work, [
+      'transform', '--granularity', 'consolidated', '--change-granularity', 'single',
+      '--cwd', path.join(work, 'blog'), '--out', path.join(work, 'single')
     ]);
 
     // Partition the same source into app + security modules.
@@ -120,6 +125,18 @@ describe('pgpm projections: one schema, every shape, one meaning', () => {
     const object = changesOf(path.join(work, 'blog'));
     const alteration = changesOf(alterationDir);
     expect(diffChangeSets(object, alteration).identical).toBe(true);
+  });
+
+  it('is change-granularity-invariant: one big change, same schema', () => {
+    const singleDir = path.join(work, 'single', 'blog-consolidated');
+    const plan = fs.readFileSync(path.join(singleDir, 'pgpm.plan'), 'utf-8');
+    const entries = plan.split('\n').filter(l => l.trim() && !l.startsWith('%') && !l.startsWith('#'));
+    // the whole module is one plan entry...
+    expect(entries).toHaveLength(1);
+    // ...and the meaning is untouched.
+    const object = changesOf(path.join(work, 'blog'));
+    const single = changesOf(singleDir);
+    expect(diffChangeSets(object, single).identical).toBe(true);
   });
 
   it('derives the v1 -> v2 migration: exactly the real changes, nothing guessed', () => {
