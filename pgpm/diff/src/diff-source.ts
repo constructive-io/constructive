@@ -7,13 +7,12 @@
  * `DiffInputChange[]` seam the semantic diff driver consumes, so the
  * comparison is source- and dial-invariant.
  */
-import { PgpmRow } from '@pgpmjs/core';
+import { PgpmRow } from '@pgpmjs/ast';
 import { alterationPathFor } from '@pgpmjs/naming-spec';
 import type { DiffInputChange, SemanticDeltaChange } from '@pgpmjs/transform';
+import { loadModuleSource, stripTransactionWrapper } from '@pgpmjs/transform';
 import * as fs from 'fs';
 import * as path from 'path';
-
-import { loadModuleSource, stripTransactionWrapper } from './module-source';
 
 /** What a diff side spec resolves to. */
 export type DiffSideKind = 'module' | 'sql' | 'database';

@@ -1,8 +1,8 @@
 {
-  "name": "@pgpmjs/transform",
-  "version": "0.18.0",
+  "name": "@pgpmjs/import",
+  "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Change-aware SQL transformation for PGPM — superset of @pgsql/transform plus change categorization, fixture closure, and bundle transpile/apply drivers",
+  "description": "pgpm import — pgpm-itize arbitrary SQL dumps (pg_dump output, raw .sql) through the dials pipeline",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -34,19 +34,16 @@
     "postgresql",
     "pgpm",
     "pgpmjs",
-    "transform",
-    "classify",
-    "plpgsql"
+    "import",
+    "pg_dump",
+    "migration"
   ],
   "devDependencies": {
-    "@pgpmjs/bundle": "workspace:^",
     "makage": "^0.3.0"
   },
   "dependencies": {
     "@pgpmjs/ast": "workspace:^",
     "@pgpmjs/naming-spec": "workspace:^",
-    "@pgsql/scripts": "^18.2.0",
-    "@pgsql/transform": "^18.11.0",
-    "plpgsql-parser": "^18.2.3"
+    "@pgpmjs/transform": "workspace:^"
   }
 }

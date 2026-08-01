@@ -2,21 +2,25 @@ import { PgpmMigrate, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } 
 import {
   deltaChangesToRows,
   DiffSide,
+  loadDiffSideFromDisk,
+  sqlToDiffChanges
+} from '@pgpmjs/diff';
+import { Logger } from '@pgpmjs/logger';
+import {
   diffCatalogSnapshots,
+  diffChangeSets,
   EXPORT_GRANULARITIES,
   ExportGranularity,
   isExportGranularity,
-  loadDiffSideFromDisk,
-  resolveDiffSideKind,
+  loadModule,
+  SemanticDiffResult,
+  SemanticObjectDiff,
   snapshotCatalog,
-  sqlToDiffChanges,
   withoutColumnOrder
-} from '@pgpmjs/export';
-import { Logger } from '@pgpmjs/logger';
-import { diffChangeSets, loadModule, SemanticDiffResult, SemanticObjectDiff } from '@pgpmjs/transform';
+} from '@pgpmjs/transform';
 import { spawn } from 'child_process';
 import * as fs from 'fs';
-import { CLIOptions, cliExitWithError, extractFirst, Inquirerer, ParsedArgs } from 'inquirerer';
+import { cliExitWithError, CLIOptions, extractFirst, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as os from 'os';
 import * as path from 'path';
 import { getPgPool } from 'pg-cache';

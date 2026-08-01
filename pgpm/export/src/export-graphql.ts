@@ -9,6 +9,7 @@
  */
 import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { createClient } from '@pgpmjs/migrate-client';
+import { ExportGranularity, PartitionConfig, partitionExportRows, restructureExportRows } from '@pgpmjs/transform';
 import { Inquirerer } from 'inquirerer';
 
 import { exportGraphQLMeta } from './export-graphql-meta';
@@ -26,8 +27,6 @@ import {
   SERVICE_REQUIRED_EXTENSIONS} from './export-utils';
 import { GraphQLClient } from './graphql-client';
 import { graphqlRowToPostgresRow } from './graphql-naming';
-import { PartitionConfig, partitionExportRows } from './partition';
-import { ExportGranularity, restructureExportRows } from './restructure';
 
 // =============================================================================
 // Public API

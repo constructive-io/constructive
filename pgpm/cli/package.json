@@ -47,8 +47,10 @@
   "dependencies": {
     "@inquirerer/utils": "^3.3.9",
     "@pgpmjs/core": "workspace:^",
+    "@pgpmjs/diff": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/export": "workspace:^",
+    "@pgpmjs/import": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/slice": "workspace:^",
     "@pgpmjs/transform": "workspace:^",

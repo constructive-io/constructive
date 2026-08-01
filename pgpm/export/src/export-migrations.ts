@@ -1,4 +1,5 @@
 import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
+import { ExportGranularity, PartitionConfig, partitionExportRows, restructureExportRows } from '@pgpmjs/transform';
 import { PgpmOptions } from '@pgpmjs/types';
 import { Inquirerer } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
@@ -15,8 +16,6 @@ import {
   normalizeOutdir,
   preparePackage,
   SERVICE_REQUIRED_EXTENSIONS} from './export-utils';
-import { PartitionConfig, partitionExportRows } from './partition';
-import { ExportGranularity, restructureExportRows } from './restructure';
 
 interface ExportMigrationsToDiskOptions {
   project: PgpmPackage;

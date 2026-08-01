@@ -1,17 +1,19 @@
 import {
   dumpCompatibilityWarnings,
+  importDumpRows,
+  linkTextualDeps,
+  loadDumpSource
+} from '@pgpmjs/import';
+import { Logger } from '@pgpmjs/logger';
+import {
   EXPORT_GRANULARITIES,
   ExportGranularity,
-  importDumpRows,
   isExportGranularity,
-  linkTextualDeps,
-  loadDumpSource,
   parsePartitionConfig,
   PartitionConfig,
+  PartitionCycleError,
   partitionExportRows
-} from '@pgpmjs/export';
-import { Logger } from '@pgpmjs/logger';
-import { PartitionCycleError } from '@pgpmjs/transform';
+} from '@pgpmjs/transform';
 import { cliExitWithError, CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
 

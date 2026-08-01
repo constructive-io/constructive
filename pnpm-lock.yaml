@@ -2807,12 +2807,18 @@ importers:
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
+      '@pgpmjs/diff':
+        specifier: workspace:^
+        version: link:../diff/dist
       '@pgpmjs/env':
         specifier: workspace:^
         version: link:../env/dist
       '@pgpmjs/export':
         specifier: workspace:^
         version: link:../export/dist
+      '@pgpmjs/import':
+        specifier: workspace:^
+        version: link:../import/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
@@ -2968,6 +2974,23 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
+  pgpm/diff:
+    dependencies:
+      '@pgpmjs/ast':
+        specifier: workspace:^
+        version: link:../ast/dist
+      '@pgpmjs/naming-spec':
+        specifier: workspace:^
+        version: link:../naming-spec/dist
+      '@pgpmjs/transform':
+        specifier: workspace:^
+        version: link:../transform/dist
+    devDependencies:
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
   pgpm/env:
     dependencies:
       12factor-env:
@@ -3041,6 +3064,23 @@ importers:
         version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
+  pgpm/import:
+    dependencies:
+      '@pgpmjs/ast':
+        specifier: workspace:^
+        version: link:../ast/dist
+      '@pgpmjs/naming-spec':
+        specifier: workspace:^
+        version: link:../naming-spec/dist
+      '@pgpmjs/transform':
+        specifier: workspace:^
+        version: link:../transform/dist
+    devDependencies:
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
   pgpm/logger:
     dependencies:
       yanse:
@@ -3104,6 +3144,9 @@ importers:
 
   pgpm/transform:
     dependencies:
+      '@pgpmjs/ast':
+        specifier: workspace:^
+        version: link:../ast/dist
       '@pgpmjs/naming-spec':
         specifier: workspace:^
         version: link:../naming-spec/dist
@@ -4256,10 +4299,7 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
   '@constructive-io/eslint-config@0.2.0':
-    resolution:
-      {
-        integrity: sha512-BaIBn/3Oi+DcyzNqMyUQmelSD7z7MMnFQtlKr4vVrgAv8PXVkYXaY2IlfZH4MeqYactf3mDunS11+7ndOf9oVw==,
-      }
+    resolution: {integrity: sha512-BaIBn/3Oi+DcyzNqMyUQmelSD7z7MMnFQtlKr4vVrgAv8PXVkYXaY2IlfZH4MeqYactf3mDunS11+7ndOf9oVw==}
     peerDependencies:
       eslint: ^9
 
@@ -7989,11 +8029,8 @@ packages:
     engines: {node: '>=18'}
 
   globals@17.8.0:
-    resolution:
-      {
-        integrity: sha512-Zz/LMDZScFmkakeL2cTHzf+PbWKdpU3uclqkZT7TjDG58j5WPt0PpA+n9uPI24fZtlw07q0OtEi84K+umsRzqQ==,
-      }
-    engines: { node: '>=18' }
+    resolution: {integrity: sha512-Zz/LMDZScFmkakeL2cTHzf+PbWKdpU3uclqkZT7TjDG58j5WPt0PpA+n9uPI24fZtlw07q0OtEi84K+umsRzqQ==}
+    engines: {node: '>=18'}
 
   google-auth-library@10.9.1:
     resolution: {integrity: sha512-i1ydyHrqcIxXkWh/uBmVkzCvIuq5yiK2ATndIe5XxKholrG/MTYP9xGYka4sQhrbIAgGjL2B6NOE7rFaiF3fXw==}
