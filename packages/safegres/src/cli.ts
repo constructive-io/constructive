@@ -26,6 +26,7 @@ const options: Partial<CLIOptions> = {
       'database',
       'schemas',
       'exclude-schemas',
+      'ignore-extensions',
       'roles',
       'exclude-roles',
       'format',

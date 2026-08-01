@@ -116,6 +116,15 @@ export function resolveRules(config: SafegresConfig): ResolvedRules {
       throw new ConfigValidationError('"perf.ignore" must be an array of non-empty schema.table glob patterns.');
     }
   }
+  const ignoredExtensions = config.extensions?.ignore;
+  if (ignoredExtensions !== undefined) {
+    if (
+      !Array.isArray(ignoredExtensions)
+      || ignoredExtensions.some((e) => typeof e !== 'string' || e.length === 0)
+    ) {
+      throw new ConfigValidationError('"extensions.ignore" must be an array of non-empty extension names.');
+    }
+  }
   return { rules, overrides };
 }
 

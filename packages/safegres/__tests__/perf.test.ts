@@ -151,6 +151,47 @@ describe('policy-aware perf rules', () => {
   });
 });
 
+describe('X9 — per-row policy calls that the planner could hoist', () => {
+  it('flags unwrapped STABLE calls and spares wrapped ones', async () => {
+    await applyFixture('x9-initplan.sql');
+    const report = await audit(pg.client as never, { schemas: ['fx_x9'], perf: true });
+    const x9 = report.perf!.findings.filter((f) => f.code === 'X9');
+
+    expect(tablesFor(x9, 'X9')).toEqual([
+      // Correlated subquery: runs per outer row, so the call inside it does too.
+      'fx_x9.bare',
+      'fx_x9.correlated',
+      // current_setting() is STABLE — dropping the wrapper doesn't fix anything.
+      'fx_x9.raw_guc',
+      'fx_x9.writes'
+    ]);
+
+    const bare = x9.find((f) => f.table === 'bare');
+    expect(bare?.severity).toBe('medium');
+    expect(bare?.dimension).toBe('perf');
+    expect(bare?.context).toMatchObject({ function: 'fx_x9.current_tenant', clause: 'USING' });
+    expect(bare?.hint).toContain('(SELECT fx_x9.current_tenant())');
+
+    expect(x9.find((f) => f.table === 'writes')?.context).toMatchObject({ clause: 'WITH CHECK' });
+  });
+
+  it('ignores row-dependent, volatile and immutable calls', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x9'], perf: true });
+    const tables = tablesFor(report.perf!.findings, 'X9');
+    // Argument references a column — nothing to hoist.
+    expect(tables).not.toContain('fx_x9.row_dependent');
+    // VOLATILE is per-row by definition; IMMUTABLE is folded at plan time.
+    expect(tables).not.toContain('fx_x9.other_volatility');
+    // Already an InitPlan.
+    expect(tables).not.toContain('fx_x9.hoisted');
+  });
+
+  it('stays off when perf is disabled', async () => {
+    const report = await audit(pg.client as never, { schemas: ['fx_x9'] });
+    expect(report.findings.filter((f) => f.code === 'X9')).toHaveLength(0);
+  });
+});
+
 describe('P1/P1b re-homed to the perf dimension', () => {
   it('keeps P1 out of the security score', async () => {
     await applyFixture('p1-volatile-func.sql');

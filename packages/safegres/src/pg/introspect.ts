@@ -89,6 +89,62 @@ export interface IntrospectOptions {
    * by {@link listAuditableRoles}.
    */
   roles?: string[];
+  /**
+   * How to treat relations that belong to an installed extension.
+   * Defaults to skipping them: they are the extension author's to secure and
+   * tune, not the application's, and they cannot be altered without breaking
+   * `pg_dump`/upgrade.
+   */
+  extensions?: ExtensionScopeOptions;
+}
+
+/**
+ * Extension relations are the `node_modules` of a database: physically present,
+ * scanned like anything else, and not yours to edit.
+ */
+export interface ExtensionScopeOptions {
+  /**
+   * Skip relations an extension owns (`pg_depend.deptype = 'e'`) and their
+   * partitions. Default `true`.
+   */
+  skipOwned?: boolean;
+  /**
+   * Extension names whose *schemas* are skipped wholesale, for objects the
+   * extension creates at runtime and never registers as dependencies —
+   * `pg_partman`'s child partitions and templates being the motivating case.
+   * Unknown/uninstalled names are ignored.
+   */
+  ignore?: string[];
+}
+
+/**
+ * SQL predicate excluding extension relations, for a query where `c` is the
+ * `pg_class` row and `n` its namespace. `paramIndex` is the bind position
+ * holding {@link ExtensionScopeOptions.ignore}.
+ */
+export function extensionFilter(options: ExtensionScopeOptions | undefined, paramIndex: number): string {
+  const skipOwned = options?.skipOwned ?? true;
+  const clauses: string[] = [];
+  if (skipOwned) {
+    // A partition carries no extension dependency of its own, so ownership
+    // has to be read off the partition tree it belongs to — at any depth.
+    clauses.push(`
+      AND NOT EXISTS (
+        SELECT 1 FROM pg_depend d
+        WHERE d.classid = 'pg_class'::regclass
+          AND d.refclassid = 'pg_extension'::regclass
+          AND d.deptype = 'e'
+          AND (
+            d.objid = c.oid
+            OR d.objid IN (SELECT relid FROM pg_partition_ancestors(c.oid))
+          )
+      )`);
+  }
+  clauses.push(`
+      AND NOT (n.oid = ANY (
+        SELECT e.extnamespace FROM pg_extension e WHERE e.extname = ANY($${paramIndex}::text[])
+      ))`);
+  return clauses.join('');
 }
 
 const DEFAULT_EXCLUDES = ['pg_catalog', 'information_schema', 'pg_toast'];
@@ -111,16 +167,18 @@ export async function introspectTables(
   const schemaFilter = options.schemas && options.schemas.length > 0
     ? `AND n.nspname = ANY($1::text[])`
     : `AND NOT (n.nspname = ANY($2::text[]))`;
+  const extFilter = extensionFilter(options.extensions, 4);
 
   // We reference every param at least once (even if trivially) so Postgres
-  // can infer types for all three. Unused parameters otherwise error with
+  // can infer types for all of them. Unused parameters otherwise error with
   // "could not determine data type of parameter $N".
   const sql = `
     WITH _params AS (
       SELECT
         $1::text[] AS include_schemas,
         $2::text[] AS exclude_schemas,
-        $3::text[] AS role_filter
+        $3::text[] AS role_filter,
+        $4::text[] AS ignore_extensions
     ),
     rels AS (
       SELECT
@@ -135,7 +193,7 @@ export async function introspectTables(
       FROM pg_class c
       JOIN pg_namespace n ON n.oid = c.relnamespace
       WHERE c.relkind IN ('r', 'p')
-        ${schemaFilter}
+        ${schemaFilter}${extFilter}
     ),
     grants_exploded AS (
       SELECT
@@ -213,7 +271,8 @@ export async function introspectTables(
   const params: unknown[] = [
     options.schemas ?? [],
     excludes,
-    options.roles ?? []
+    options.roles ?? [],
+    options.extensions?.ignore ?? []
   ];
 
   const { rows } = await exec.query<{

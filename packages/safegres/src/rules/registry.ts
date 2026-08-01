@@ -231,6 +231,15 @@ export const RULES: RuleMeta[] = [
     scope: 'index'
   },
   {
+    code: 'X9',
+    category: 'index',
+    defaultSeverity: 'medium',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'RLS policy calls a STABLE function per row — not wrapped in a scalar sub-select (no InitPlan)',
+    scope: 'policy-ast'
+  },
+  {
     code: 'S1',
     category: 'index',
     defaultSeverity: 'medium',

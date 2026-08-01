@@ -8,7 +8,7 @@
  * why the snapshot carries `statsReset` and why the checks take floors.
  */
 
-import type { IntrospectOptions, QueryExecutor } from './introspect';
+import { extensionFilter, type IntrospectOptions, type QueryExecutor } from './introspect';
 
 export interface IndexUsage {
   name: string;
@@ -71,7 +71,7 @@ export const DEFAULT_STATEMENT_LIMIT = 20;
 
 export async function introspectStats(
   exec: QueryExecutor,
-  options: Pick<IntrospectOptions, 'schemas' | 'excludeSchemas'> & {
+  options: Pick<IntrospectOptions, 'schemas' | 'excludeSchemas' | 'extensions'> & {
     statementLimit?: number;
   } = {}
 ): Promise<StatsSnapshot> {
@@ -80,11 +80,16 @@ export async function introspectStats(
     ? `AND s.schemaname = ANY($1::text[])`
     : `AND NOT (s.schemaname = ANY($2::text[]))`;
 
-  // Both parameters are referenced (even when only one filters) so Postgres
+  const extFilter = extensionFilter(options.extensions, 3);
+
+  // Every parameter is referenced (even when only one filters) so Postgres
   // can infer their types — an unused $N errors out at bind time.
   const sql = `
     WITH _params AS (
-      SELECT $1::text[] AS include_schemas, $2::text[] AS exclude_schemas
+      SELECT
+        $1::text[] AS include_schemas,
+        $2::text[] AS exclude_schemas,
+        $3::text[] AS ignore_extensions
     )
     SELECT
       s.schemaname                                      AS schema_name,
@@ -113,8 +118,10 @@ export async function introspectStats(
         '[]'::jsonb
       )                                                 AS indexes
     FROM pg_stat_user_tables s
+    JOIN pg_class c ON c.oid = s.relid
+    JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE true
-      ${schemaFilter}
+      ${schemaFilter}${extFilter}
     ORDER BY s.schemaname, s.relname
   `;
 
@@ -130,7 +137,7 @@ export async function introspectStats(
     last_vacuum: Date | string | null;
     last_analyze: Date | string | null;
     indexes: IndexUsage[];
-  }>(sql, [options.schemas ?? [], excludes]);
+  }>(sql, [options.schemas ?? [], excludes, options.extensions?.ignore ?? []]);
 
   const tables: TableUsage[] = rows.map((r) => ({
     schema: r.schema_name,

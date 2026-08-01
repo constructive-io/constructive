@@ -71,7 +71,12 @@ function mergePreset(preset: SafegresConfig, over: SafegresConfig): SafegresConf
     rules: { ...(base.rules ?? {}), ...(over.rules ?? {}) },
     scoring: { ...(base.scoring ?? {}), ...(over.scoring ?? {}) },
     failOn: { ...(base.failOn ?? {}), ...(over.failOn ?? {}) },
-    overrides: [...(base.overrides ?? []), ...(over.overrides ?? [])]
+    overrides: [...(base.overrides ?? []), ...(over.overrides ?? [])],
+    // Merged per-key so retuning `skipOwned` doesn't silently drop the
+    // preset's `ignore` list. Omitted entirely when neither side sets it.
+    ...(base.extensions || over.extensions
+      ? { extensions: { ...(base.extensions ?? {}), ...(over.extensions ?? {}) } }
+      : {})
   };
 }
 
