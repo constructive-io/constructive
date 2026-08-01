@@ -39,11 +39,15 @@ export const strict: SafegresConfig = {
  * - untrusted-role rules watch `anonymous`; anything that can leak rows
  *   across the role boundary is critical;
  * - A3 is off — API roles never own tables in the Constructive model, so
- *   non-FORCEd RLS is not an exposure.
+ *   non-FORCEd RLS is not an exposure;
+ * - `pg_partman`'s schema is skipped: it creates child partitions and
+ *   templates at runtime with no dependency on the extension, so ownership
+ *   alone leaves them looking like unsecured application tables.
  */
 export const constructive: SafegresConfig = {
   extends: 'safegres:recommended',
   exposure: { resolver: 'constructive' },
+  extensions: { ignore: ['pg_partman'] },
   rules: {
     A2: 'critical',
     A3: 'off',

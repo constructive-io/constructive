@@ -133,10 +133,13 @@ export async function audit(
   const exposure = await resolveExposure(exec, options.exposure ?? config.exposure);
   const exposedSchemas = new Set(exposure.schemas);
 
+  const extensions = options.extensions ?? config.extensions;
+
   const snapshot = await introspectTables(exec, {
     schemas: options.schemas ?? config.schemas,
     excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
-    roles: resolution.roles
+    roles: resolution.roles,
+    extensions
   });
 
   const exposedTables = exposure.known
@@ -149,7 +152,8 @@ export async function audit(
   const indexSnapshot = perfEnabled
     ? await introspectIndexes(exec, {
       schemas: options.schemas ?? config.schemas,
-      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
+      extensions
     })
     : [];
   const indexesByTable = new Map<string, TableIndexSnapshot>(
@@ -197,6 +201,7 @@ export async function audit(
     ? await introspectStats(exec, {
       schemas: options.schemas ?? config.schemas,
       excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
+      extensions,
       statementLimit: config.perf?.stats?.topStatements
     })
     : null;

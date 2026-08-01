@@ -3,7 +3,7 @@ import { Client } from 'pg';
 import { getPgEnvOptions, type PgConfig } from 'pg-env';
 
 import type { LoadConfigParams } from '../config/loader';
-import type { RulesConfig, SafegresConfig } from '../config/types';
+import type { ExtensionsConfig, RulesConfig, SafegresConfig } from '../config/types';
 
 export function csvList(value: unknown): string[] | undefined {
   if (typeof value !== 'string' || value.length === 0) return undefined;
@@ -11,6 +11,21 @@ export function csvList(value: unknown): string[] | undefined {
     .split(',')
     .map((p) => p.trim())
     .filter(Boolean);
+}
+
+/**
+ * Merge `--ignore-extensions` / `--audit-extension-owned` over the config's
+ * `extensions` block. Returns `undefined` when neither side says anything, so
+ * the introspection defaults apply.
+ */
+export function extensionScopeFromArgv(
+  argv: ParsedArgs,
+  config: SafegresConfig
+): ExtensionsConfig | undefined {
+  const ignore = csvList(argv['ignore-extensions']) ?? config.extensions?.ignore;
+  const skipOwned = argv['audit-extension-owned'] === true ? false : config.extensions?.skipOwned;
+  if (ignore === undefined && skipOwned === undefined) return undefined;
+  return { ...(ignore !== undefined && { ignore }), ...(skipOwned !== undefined && { skipOwned }) };
 }
 
 export function buildClient(argv: ParsedArgs): Client {

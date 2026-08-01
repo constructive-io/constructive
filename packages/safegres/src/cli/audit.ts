@@ -14,7 +14,7 @@ import { buildSourceIndex, renderSarif } from '../report/sarif';
 import { meetsGrade } from '../score/score';
 import type { Report, Severity } from '../types';
 import { meetsThreshold, SEVERITY_ORDER, summarize } from '../types';
-import { buildClient, configParamsFromArgv, csvList } from './shared';
+import { buildClient, configParamsFromArgv, csvList, extensionScopeFromArgv } from './shared';
 
 const log = new Logger('safegres');
 
@@ -98,6 +98,11 @@ Call graph (unscored; human review):
 Audit options:
   --schemas <csv>          Limit to these schemas (default: all non-system)
   --exclude-schemas <csv>  Skip these schemas
+  --ignore-extensions <csv> Skip everything in these extensions' schemas, for
+                           objects an extension creates without registering a
+                           dependency (e.g. pg_partman's child partitions)
+  --audit-extension-owned  Audit relations owned by an installed extension too
+                           (skipped by default — they are not yours to alter)
   --roles <csv>            Audit grants only for these roles (default: all)
   --exclude-roles <csv>    Skip grants for these roles
   --format <fmt>           "pretty" (default) | "json" | "json-pretty" | "markdown" | "sarif"
@@ -137,6 +142,7 @@ export default async (
   const auditOptions: AuditOptions = {
     schemas: csvList(argv.schemas),
     excludeSchemas: csvList(argv['exclude-schemas']),
+    extensions: extensionScopeFromArgv(argv, config),
     includeRoles: csvList(argv.roles),
     excludeRoles: csvList(argv['exclude-roles']),
     skipAstChecks: argv['skip-ast'] === true,

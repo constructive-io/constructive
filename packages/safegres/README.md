@@ -113,6 +113,23 @@ A database-wide score is meaningless if most of the database isn't reachable thr
 
 CLI: `--exposure-schemas <csv>`, `--exposed-only`. The `safegres:constructive` preset sets `exposure.resolver: "constructive"` so the surface is discovered automatically from the routing plane (including API roles from `role_name`/`anon_role`).
 
+## Extension objects
+
+An extension's tables are the `node_modules` of a database: they live in the same catalog, scan like anything else, and are not yours to alter — `ALTER TABLE` on one breaks `pg_dump` and upgrades. safegres skips relations an extension owns (`pg_depend.deptype = 'e'`), and their partitions, by default.
+
+Ownership alone is not enough. An extension that creates objects *at runtime* never registers them as dependencies: on one Constructive database only 2 of `pg_partman`'s 32 relations were owned, leaving 30 template tables looking like unsecured application tables (30 of the report's 39 criticals). Naming the extension skips its schema wholesale:
+
+```jsonc
+{
+  "extensions": {
+    "ignore": ["pg_partman"],   // skip everything in the extension's schema
+    "skipOwned": true           // default; false audits extension-owned relations too
+  }
+}
+```
+
+CLI: `--ignore-extensions <csv>`, `--audit-extension-owned`. Unknown or uninstalled names are ignored, so one config works across environments. The `safegres:constructive` preset ships `ignore: ["pg_partman"]`.
+
 ## Declared public surface
 
 Some open reads are deliberate — pricing tables, reference data, a public user directory. Declare them and safegres treats them as intent instead of findings:
@@ -346,7 +363,7 @@ export default defineConfig({
 | --- | --- |
 | `safegres:recommended` | Every rule at its default severity (the no-config behavior) |
 | `safegres:strict` | Everything escalated; fail-closed findings count 25% toward the score, `failOn: high` |
-| `safegres:constructive` | Auto-resolves exposure from the routing plane; R1/R2 watch `anonymous`; leak surfaces (A2, P5) critical; A3 off (API roles never own tables) |
+| `safegres:constructive` | Auto-resolves exposure from the routing plane; R1/R2 watch `anonymous`; leak surfaces (A2, P5) critical; A3 off (API roles never own tables); `pg_partman`'s schema ignored |
 | `safegres:minimal` | Structural flags only (A1–A3) — fast CI smoke check |
 
 CLI: `--config <path>`, `--preset <name>`, `--rule CODE=off|severity` (repeatable).

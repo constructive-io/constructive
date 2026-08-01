@@ -86,6 +86,7 @@ Config is discovered by walking up from cwd: `safegres.config.{ts,js,mjs,cjs}`, 
   "extends": "safegres:recommended",
   "exposure": { "schemas": ["app_public"], "roles": ["anonymous", "authenticated"] },
   "public": { "read": ["app_public.plans*", "app_public.event_types"] },
+  "extensions": { "ignore": ["pg_partman"] },   // skip the extension's schema
   "rules": {
     "A3": "off",         // disable
     "A5": "high",        // retune severity
@@ -148,7 +149,7 @@ Turns catalog inference into evidence: each probeable finding's query shape is p
 | --- | --- |
 | `safegres:recommended` | Every rule at its default severity (no-config behavior) |
 | `safegres:strict` | Everything escalated; fail-closed counts 25%; `failOn: high` |
-| `safegres:constructive` | Auto-resolves exposure from the routing plane; R1/R2 watch `anonymous`; A2/P5 critical; A3 off |
+| `safegres:constructive` | Auto-resolves exposure from the routing plane; R1/R2 watch `anonymous`; A2/P5 critical; A3 off; `pg_partman` ignored |
 | `safegres:minimal` | Structural flags only (A1–A3) — fast CI smoke check |
 
 On Constructive, a project config is usually just:
@@ -167,6 +168,14 @@ A database-wide score is meaningless when most of the DB isn't API-reachable. De
 - **Generic pgpm / plain Postgres**: declare `exposure.schemas` statically — do NOT assume routing tables exist and never infer exposure from schema names.
 
 CLI: `--exposure-schemas <csv>`, `--exposed-only`.
+
+## Extension objects
+
+Extension tables are a database's `node_modules` — present in the catalog, not yours to alter. Relations an extension **owns** (`pg_depend.deptype = 'e'`) and their partitions are skipped by default.
+
+Ownership is not enough for extensions that create objects at runtime: on a Constructive database only 2 of `pg_partman`'s 32 relations were owned, so 30 template tables scanned as unsecured application tables and produced 30 of the 39 criticals. Name the extension to skip its schema wholesale: `"extensions": { "ignore": ["pg_partman"] }` (already in `safegres:constructive`). Unknown names are ignored, so the same config works everywhere.
+
+CLI: `--ignore-extensions <csv>`, `--audit-extension-owned` (audit owned relations too, for auditing an extension itself).
 
 ## Declared public surface
 
