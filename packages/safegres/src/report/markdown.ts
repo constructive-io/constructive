@@ -11,7 +11,7 @@
 
 import type { Score } from '../score/score';
 import type { Finding, Report, Severity } from '../types';
-import { formatDelta, type ReportComparison, type ScoreDelta } from './compare';
+import { formatDelta, type ReportComparison, type RuleDelta, type ScoreDelta } from './compare';
 
 const SEV_ICON: Record<Severity, string> = {
   critical: '🔴',
@@ -20,6 +20,19 @@ const SEV_ICON: Record<Severity, string> = {
   low: '🔵',
   info: '⚪'
 };
+
+/**
+ * Movement, colored by whether it is good news — the severity icons already
+ * spend red on "this is serious", so a delta that reuses red for "+15 info
+ * findings" reads as a fire when nothing is burning. Green is fewer findings /
+ * a higher score, red is the reverse, grey is neither.
+ */
+function movement(delta: number, betterWhen: 'lower' | 'higher', digits = 0): string {
+  if (delta === 0) return `⚪ ${formatDelta(0)}`;
+  const improved = betterWhen === 'lower' ? delta < 0 : delta > 0;
+  const arrow = delta > 0 ? '▲' : '▼';
+  return `${improved ? '🟢' : '🔴'} ${arrow} ${formatDelta(delta, digits)}`;
+}
 
 export interface RenderMarkdownOptions {
   /** Scores and counts only — no per-finding tables. */
@@ -142,14 +155,23 @@ function scoreRow(label: string, score: Score, compared: boolean, delta?: ScoreD
  * a score can hold still while findings move underneath it.
  */
 function scoreDeltaCell(d: ScoreDelta): string {
-  const arrow = d.delta > 0 ? '🟢 ▲' : d.delta < 0 ? '🔴 ▼' : '⚪';
-  const score = d.delta === 0 ? 'no change' : `${formatDelta(d.delta, 1)} (from ${d.before})`;
+  const score =
+    d.delta === 0 ? '⚪ no change' : `${movement(d.delta, 'higher', 1)} (from ${d.before})`;
   const grade = d.gradeBefore === d.gradeAfter ? '' : ` · ${d.gradeBefore} → ${d.gradeAfter}`;
   const findings =
     d.findingsAfter === d.findingsBefore
       ? ''
-      : ` · ${d.findingsBefore} → ${d.findingsAfter} findings`;
-  return `${arrow} ${score}${grade}${findings}`;
+      : ` · ${d.findingsBefore} → ${d.findingsAfter} findings `
+        + `${movement(d.findingsAfter - d.findingsBefore, 'lower')}`;
+  return `${score}${grade}${findings}`;
+}
+
+/**
+ * A rule with no previous reading is not movement: the previous run simply did
+ * not report the code (a rule added since, or a dimension it never ran).
+ */
+function ruleDeltaCell(r: RuleDelta): string {
+  return r.unmeasuredBefore ? '⚪ not measured before' : movement(r.delta, 'lower');
 }
 
 /**
@@ -160,7 +182,13 @@ function comparisonSection(cmp: ReportComparison): string[] {
   const since = cmp.previous.ref ?? cmp.previous.generatedAt ?? 'the previous run';
   if (cmp.unchanged) return ['', `_No change since ${since}._`];
 
-  const out = ['', `<details open><summary>Changes since ${since}</summary>`, ''];
+  const out = [
+    '',
+    `<details open><summary>Changes since ${since}</summary>`,
+    '',
+    '🟢 improvement · 🔴 regression · ⚪ no change or no previous reading',
+    ''
+  ];
 
   const severities: Severity[] = ['critical', 'high', 'medium', 'low', 'info'];
   const moved = severities.filter((sev) => cmp.summary[sev].delta !== 0);
@@ -171,7 +199,7 @@ function comparisonSection(cmp: ReportComparison): string[] {
       `| ${moved
         .map((sev) => {
           const s = cmp.summary[sev];
-          return `${s.before} → **${s.after}** (${formatDelta(s.delta)})`;
+          return `${s.before} → **${s.after}** ${movement(s.delta, 'lower')}`;
         })
         .join(' | ')} |`,
       ''
@@ -184,8 +212,8 @@ function comparisonSection(cmp: ReportComparison): string[] {
       '| --- | --- | ---: | ---: | --- |',
       ...cmp.rules.map(
         (r) =>
-          `| \`${r.code}\` | ${r.dimension} | ${r.before} | ${r.after} | `
-          + `${r.delta > 0 ? '🔴 ▲' : '🟢 ▼'} ${formatDelta(r.delta)} |`
+          `| \`${r.code}\` | ${r.dimension} | ${r.unmeasuredBefore ? '—' : r.before} | `
+          + `${r.after} | ${ruleDeltaCell(r)} |`
       ),
       ''
     );

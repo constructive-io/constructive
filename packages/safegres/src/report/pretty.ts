@@ -62,7 +62,9 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   if (score) {
     lines.push(...scoreLines('score', score, colorEnabled));
     if (report.comparison?.security) {
-      lines.push(`  ${deltaLine(report.comparison.security, report.comparison.previous.ref)}`);
+      lines.push(
+        `  ${deltaLine(report.comparison.security, report.comparison.previous.ref, colorEnabled)}`
+      );
     }
     lines.push('');
   }
@@ -70,7 +72,9 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   if (report.perf) {
     lines.push(...scoreLines('perf score', report.perf.score, colorEnabled));
     if (report.comparison?.perf) {
-      lines.push(`  ${deltaLine(report.comparison.perf, report.comparison.previous.ref)}`);
+      lines.push(
+        `  ${deltaLine(report.comparison.perf, report.comparison.previous.ref, colorEnabled)}`
+      );
     }
     lines.push('');
   }
@@ -249,12 +253,21 @@ function scoreLines(label: string, score: Score, colorEnabled: boolean): string[
   return lines;
 }
 
-function deltaLine(d: ScoreDelta, ref?: string): string {
+function deltaLine(d: ScoreDelta, ref: string | undefined, colorEnabled: boolean): string {
   const since = ref ? ` vs ${ref}` : ' vs previous run';
   const arrow = d.delta > 0 ? '▲' : d.delta < 0 ? '▼' : '=';
+  // Same convention as the markdown report: green is the direction you want.
+  const paint = (better: boolean, s: string) =>
+    colorEnabled ? (better ? yanse.green(s) : yanse.red(s)) : s;
+  const movement = `${arrow} ${formatDelta(d.delta, 1)}`;
+  const score = d.delta === 0 ? movement : paint(d.delta > 0, movement);
   const grade = d.gradeBefore === d.gradeAfter ? '' : `, ${d.gradeBefore} → ${d.gradeAfter}`;
-  return `Δ${since}: ${arrow} ${formatDelta(d.delta, 1)} (from ${d.before}${grade})`
-    + `  findings ${d.findingsBefore} → ${d.findingsAfter}`;
+  const findingMove = `${d.findingsBefore} → ${d.findingsAfter}`;
+  const findings =
+    d.findingsAfter === d.findingsBefore
+      ? findingMove
+      : paint(d.findingsAfter < d.findingsBefore, findingMove);
+  return `Δ${since}: ${score} (from ${d.before}${grade})  findings ${findings}`;
 }
 
 function renderFinding(f: Finding, paint: (sev: Severity, s: string) => string): string {
