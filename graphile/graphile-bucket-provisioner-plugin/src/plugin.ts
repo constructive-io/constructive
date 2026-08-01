@@ -150,6 +150,41 @@ interface BucketRow {
   type: string;
   is_public: boolean;
   allowed_origins: string[] | null;
+  physical_name: string | null;
+}
+
+/**
+ * Normalize the recorded physical coordinate at the DB boundary.
+ *
+ * A bucket row either carries a recorded coordinate or it does not; SQL nulls
+ * and absent columns both mean "never provisioned". Collapsing them here is
+ * the single place that shape is interpreted — callers branch on `string`
+ * vs `null` and never coalesce a bucket name into existence.
+ */
+function storedPhysicalName(row: Pick<BucketRow, 'physical_name'>): string | null {
+  return row.physical_name == null ? null : row.physical_name;
+}
+
+/**
+ * Record the physical S3 bucket name on the source bucket row.
+ *
+ * Runs in the system lane (`withPgClient(null, ...)`) — server bookkeeping,
+ * RLS-independent. Idempotent via the `physical_name IS NULL` guard so a
+ * re-provision never clobbers an already-recorded coordinate.
+ */
+async function recordPhysicalName(
+  withPgClient: (pgSettings: null, cb: (client: any) => Promise<unknown>) => Promise<unknown>,
+  bucketsTable: string,
+  bucketId: string,
+  physicalName: string,
+): Promise<void> {
+  await withPgClient(null, (client: any) =>
+    client.query(
+      `UPDATE ${bucketsTable} SET physical_name = $1 WHERE id = $2 AND physical_name IS NULL`,
+      [physicalName, bucketId],
+    ),
+  );
+  log.info(`Recorded physical_name="${physicalName}" on bucket ${bucketId}`);
 }
 
 // --- Helpers ---
@@ -251,8 +286,8 @@ async function provisionBucketForRow(
   bucketType: string,
   bucketAllowedOrigins: string[] | null | undefined,
   options: BucketProvisionerPluginOptions,
+  s3BucketName: string,
 ): Promise<ProvisionResult> {
-  const s3BucketName = resolveBucketName(bucketKey, databaseId, options);
   const accessType = bucketType as 'public' | 'private' | 'temp';
 
   // Read storage module config to check for endpoint/provider/CORS overrides
@@ -298,8 +333,8 @@ async function updateBucketCors(
   bucketType: string,
   bucketAllowedOrigins: string[] | null | undefined,
   options: BucketProvisionerPluginOptions,
+  s3BucketName: string,
 ): Promise<void> {
-  const s3BucketName = resolveBucketName(bucketKey, databaseId, options);
   const accessType = bucketType as 'public' | 'private' | 'temp';
 
   const storageModule = await resolveStorageModule(pgClient, databaseId);
@@ -429,11 +464,11 @@ export function createBucketProvisionerPlugin(
               const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
               const bucketResult = await pgClient.query(
                 hasOwner
-                  ? `SELECT id, key, type, is_public, allowed_origins
+                  ? `SELECT id, key, type, is_public, allowed_origins, physical_name
                      FROM ${bucketsTable}
                      WHERE key = $1 AND owner_id = $2
                      LIMIT 1`
-                  : `SELECT id, key, type, is_public, allowed_origins
+                  : `SELECT id, key, type, is_public, allowed_origins, physical_name
                      FROM ${bucketsTable}
                      WHERE key = $1
                      LIMIT 1`,
@@ -446,6 +481,13 @@ export function createBucketProvisionerPlugin(
 
               const bucket = bucketResult.rows[0] as BucketRow;
 
+              // First provision mints a name; afterwards the stored coordinate
+              // is authoritative and the naming hook is never consulted again.
+              const recorded = storedPhysicalName(bucket);
+              const s3BucketName = recorded === null
+                ? resolveBucketName(bucket.key, databaseId, options)
+                : recorded;
+
               try {
                 const result = await provisionBucketForRow(
                   pgClient,
@@ -454,7 +496,11 @@ export function createBucketProvisionerPlugin(
                   bucket.type,
                   bucket.allowed_origins,
                   options,
+                  s3BucketName,
                 );
+
+                // Record the exact provisioned name on the source row.
+                await recordPhysicalName(withPgClient, bucketsTable, bucket.id, result.bucketName);
 
                 return {
                   success: true,
@@ -468,7 +514,7 @@ export function createBucketProvisionerPlugin(
                 log.error(`Failed to provision bucket "${bucketKey}": ${err.message}`);
                 return {
                   success: false,
-                  bucketName: resolveBucketName(bucket.key, databaseId, options),
+                  bucketName: s3BucketName,
                   accessType: bucket.type,
                   provider: resolveConnection(options).provider,
                   endpoint: resolveConnection(options).endpoint ?? null,
@@ -578,14 +624,28 @@ export function createBucketProvisionerPlugin(
                       return;
                     }
 
-                    await provisionBucketForRow(
+                    // Newly-created row has no stored coordinate yet — mint on first provision.
+                    const result = await provisionBucketForRow(
                       pgClient,
                       databaseId,
                       bucketInput.key,
                       bucketInput.type,
                       bucketInput.allowedOrigins ?? bucketInput.allowed_origins ?? null,
                       options,
+                      resolveBucketName(bucketInput.key, databaseId, options),
                     );
+
+                    // Record the provisioned name on the just-created row.
+                    const storageModule = await resolveStorageModule(pgClient, databaseId);
+                    if (storageModule) {
+                      const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
+                      const idResult = await pgClient.query(
+                        `SELECT id FROM ${bucketsTable} WHERE key = $1 LIMIT 1`,
+                        [bucketInput.key],
+                      );
+                      const bucketId = idResult.rows[0]?.id;
+                      if (bucketId) await recordPhysicalName(withPgClient, bucketsTable, bucketId, result.bucketName);
+                    }
                   });
                 } else {
                   // --- UPDATE: re-apply CORS if allowed_origins is in the patch ---
@@ -626,7 +686,7 @@ export function createBucketProvisionerPlugin(
                     // Read the full bucket row (post-update) to get type + origins
                     const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
                     const bucketResult = await pgClient.query(
-                      `SELECT id, key, type, is_public, allowed_origins
+                      `SELECT id, key, type, is_public, allowed_origins, physical_name
                        FROM ${bucketsTable}
                        WHERE key = $1
                        LIMIT 1`,
@@ -640,6 +700,11 @@ export function createBucketProvisionerPlugin(
 
                     const bucket = bucketResult.rows[0] as BucketRow;
 
+                    // CORS applies to the recorded physical bucket; if the row was
+                    // never provisioned there is nothing to update yet, so mint the
+                    // conventional name the first provision would use.
+                    const recorded = storedPhysicalName(bucket);
+
                     await updateBucketCors(
                       pgClient,
                       databaseId,
@@ -647,6 +712,9 @@ export function createBucketProvisionerPlugin(
                       bucket.type,
                       bucket.allowed_origins,
                       options,
+                      recorded === null
+                        ? resolveBucketName(bucket.key, databaseId, options)
+                        : recorded,
                     );
                   });
                 }

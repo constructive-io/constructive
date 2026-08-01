@@ -26,7 +26,7 @@ import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 
 import { generatePresignedGetUrl } from './s3-signer';
-import { loadAllStorageModules, resolveStorageConfigFromCodec } from './storage-module-cache';
+import { loadAllStorageModules, resolveStorageConfigFromCodec, storedPhysicalName } from './storage-module-cache';
 import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:download-url');
@@ -54,28 +54,27 @@ function resolveS3(options: PresignedUrlPluginOptions): S3Config {
 }
 
 /**
- * Build a per-database S3Config by overlaying storage_module overrides
- * onto the global S3Config. Same logic as plugin.ts resolveS3ForDatabase.
+ * Build a per-database S3Config for a *known* physical bucket. `physicalName`
+ * is required — the stored coordinate on the bucket row is the only source;
+ * no name is ever recomputed here. Same logic as plugin.ts resolveS3ForDatabase.
  */
 function resolveS3ForDatabase(
   options: PresignedUrlPluginOptions,
   storageConfig: StorageModuleConfig,
-  databaseId: string,
-  bucketKey: string,
+  physicalName: string,
 ): S3Config {
   const globalS3 = resolveS3(options);
-  const bucket = options.resolveBucketName
-    ? options.resolveBucketName(databaseId, bucketKey)
-    : globalS3.bucket;
-  const publicUrlPrefix = storageConfig.publicUrlPrefix ?? globalS3.publicUrlPrefix;
+  const publicUrlPrefix = storageConfig.publicUrlPrefix != null
+    ? storageConfig.publicUrlPrefix
+    : globalS3.publicUrlPrefix;
 
-  if (bucket === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
+  if (physicalName === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
     return globalS3;
   }
 
   return {
     ...globalS3,
-    bucket,
+    bucket: physicalName,
     ...(publicUrlPrefix != null ? { publicUrlPrefix } : {}),
   };
 }
@@ -164,26 +163,24 @@ export function createDownloadUrlPlugin(
                               await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId)),
                             )
                             : null;
-                          const resolved = config
+                          const resolved = config && bucketId
                             ? await withPgClient(pgSettings, async (pgClient: any) => {
-                              // Look up the bucket key for scoped S3 resolution
-                              let bucketKey = 'public';
-                              if (bucketId) {
-                                const bucketResult = await pgClient.query({
-                                  text: `SELECT key FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
-                                  values: [bucketId],
-                                });
-                                if (bucketResult.rows[0]?.key) {
-                                  bucketKey = bucketResult.rows[0].key;
-                                }
-                              }
-
-                              return { config, databaseId, bucketKey };
+                              // Look up the stored physical coordinate for scoped S3 resolution
+                              const bucketResult = await pgClient.query({
+                                text: `SELECT key, physical_name FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
+                                values: [bucketId],
+                              });
+                              const row = bucketResult.rows[0] as { key: string; physical_name?: string | null } | undefined;
+                              return row ? { config, physicalName: storedPhysicalName(row) } : null;
                             })
                             : null;
                           if (resolved) {
+                            if (resolved.physicalName === null) {
+                              // No physical bucket was ever provisioned — no object can exist.
+                              return null;
+                            }
                             downloadUrlExpirySeconds = resolved.config.downloadUrlExpirySeconds;
-                            s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.databaseId, resolved.bucketKey);
+                            s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.physicalName);
                           }
                         }
                       } catch {
