@@ -6,8 +6,11 @@ import {
 } from '@pgpmjs/import';
 import { Logger } from '@pgpmjs/logger';
 import {
+  CHANGE_GRANULARITIES,
+  ChangeGranularity,
   EXPORT_GRANULARITIES,
   ExportGranularity,
+  isChangeGranularity,
   isExportGranularity,
   parsePartitionConfig,
   PartitionConfig,
@@ -56,6 +59,9 @@ Options:
   --help, -h              Show this help message
   --pkg <name>            Module name for the generated package (required)
   --granularity <level>   Granularity dial: atomic | object | consolidated
+                          (default: object)
+  --change-granularity <level>
+                          Change-level distribution: object | alteration
                           (default: object)
   --naming <style>        Change path naming style: directory | flat (default: directory)
   --out <dir>             Output base directory (default: current directory);
@@ -116,6 +122,12 @@ export default async (
   }
   const granularity = granularityRaw as ExportGranularity;
 
+  const changeGranularityRaw = (argv['change-granularity'] as string) ?? (argv.changeGranularity as string) ?? 'object';
+  if (!isChangeGranularity(changeGranularityRaw)) {
+    await cliExitWithError(`Invalid --change-granularity "${changeGranularityRaw}". Expected one of: ${CHANGE_GRANULARITIES.join(', ')}.`);
+  }
+  const changeGranularity = changeGranularityRaw as ChangeGranularity;
+
   const namingRaw = (argv.naming as string) ?? 'directory';
   if (!(NAMING_STYLES as readonly string[]).includes(namingRaw)) {
     await cliExitWithError(`Invalid --naming "${namingRaw}". Expected one of: ${NAMING_STYLES.join(', ')}.`);
@@ -159,7 +171,7 @@ export default async (
     console.warn(`\nWARNING: ${warning}\n`);
   }
 
-  const result = await importDumpRows(source, { granularity, naming, withData });
+  const result = await importDumpRows(source, { granularity, changeGranularity, naming, withData });
 
   let packages: { name: string; requires: string[]; rows: typeof result.rows }[];
   if (partition) {

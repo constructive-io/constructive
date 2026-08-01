@@ -34,13 +34,16 @@ export type {
 } from './fixture-closure';
 export { resolveFixtureClosure } from './fixture-closure';
 export type {
+  ChangeGranularity,
   GranularityChange,
   RestructuredChange,
   RestructureModuleOptions,
   RestructureModuleResult,
 } from './granularity-driver';
 export {
+  CHANGE_GRANULARITIES,
   defaultChangeName,
+  isChangeGranularity,
   restructureChanges,
 } from './granularity-driver';
 export type { AppendModuleResult, PgpmModuleModel } from './module-emit';
@@ -93,5 +96,6 @@ export {
   diffChangeSets,
   diffSchemas,
 } from './semantic-diff-driver';
+export { nameUnnamedConstraints, subObjectIdentityOf } from './sub-object';
 export * from '@pgsql/transform';
 export { loadModule } from 'plpgsql-parser';

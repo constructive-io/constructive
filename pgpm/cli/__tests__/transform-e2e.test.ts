@@ -215,6 +215,52 @@ describe('pgpm transform e2e', () => {
     }
   );
 
+  it('--change-granularity alteration splits per column/constraint, deploys equivalently, verifies, and reverts clean', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/${MODULE_NAME}
+      pgpm transform --granularity atomic --change-granularity alteration --out ../alteration-out
+      `,
+      {}
+    );
+
+    const outDir = path.join(wsDir, 'alteration-out', `${MODULE_NAME}-atomic`);
+    const plan = fs.readFileSync(path.join(outDir, 'pgpm.plan'), 'utf-8');
+    expect(plan).toContain('schemas/tfx_app/tables/users/columns/id/column');
+    expect(plan).toContain('schemas/tfx_app/tables/users/columns/email/column');
+    expect(plan).toContain('schemas/tfx_app/tables/users/constraints/users_pkey/constraint');
+    expect(plan).toContain('schemas/tfx_sec/tables/audit/constraints/audit_user_id_fkey/constraint');
+
+    // Each alteration has its own deploy/revert/verify triple.
+    const columnChange = 'schemas/tfx_app/tables/users/columns/email/column';
+    expect(fs.readFileSync(path.join(outDir, 'deploy', `${columnChange}.sql`), 'utf-8')).toContain('ADD COLUMN email');
+    expect(fs.readFileSync(path.join(outDir, 'revert', `${columnChange}.sql`), 'utf-8')).toContain('DROP COLUMN email');
+    expect(fs.readFileSync(path.join(outDir, 'verify', `${columnChange}.sql`), 'utf-8')).toContain('information_schema.columns');
+
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/alteration-out/${MODULE_NAME}-atomic
+      pgpm deploy --database ${testDb.name} --package ${MODULE_NAME}-atomic --yes
+      `,
+      { database: testDb.name }
+    );
+
+    const snapOriginal = await snapshotCatalog(originalDb);
+    const snapTransformed = await snapshotCatalog(testDb);
+    expect(diffCatalogSnapshots(snapOriginal, snapTransformed)).toEqual([]);
+
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/alteration-out/${MODULE_NAME}-atomic
+      pgpm verify --database ${testDb.name} --package ${MODULE_NAME}-atomic --yes
+      pgpm revert --database ${testDb.name} --package ${MODULE_NAME}-atomic --yes
+      `,
+      { database: testDb.name }
+    );
+    expect(await testDb.exists('schema', 'tfx_app')).toBe(false);
+  });
+
   it('rewrites an existing output when --write is passed', async () => {
     // The refusal path (no --write) exits the process, so it is covered by the
     // checkOverwrite unit tests; here we prove --write re-generates in place.

@@ -8,9 +8,12 @@ import {
 import { Logger } from '@pgpmjs/logger';
 import {
   appendModule,
+  CHANGE_GRANULARITIES,
+  ChangeGranularity,
   diffChangeSets,
   EXPORT_GRANULARITIES,
   ExportGranularity,
+  isChangeGranularity,
   isExportGranularity,
   loadModule,
   SemanticDiffResult,
@@ -70,6 +73,9 @@ Options:
   --pkg <name>             Emitted migration package name (default: diff-migration)
   --granularity <level>    Granularity for emitted changes: atomic | object |
                            consolidated (default: object)
+  --change-granularity <level>
+                           Change-level distribution for emitted changes:
+                           object | alteration (default: object)
   --naming <style>         Change path naming style: directory | flat (default: directory)
   --json                   Machine-readable output
   --verify                 Oracle mode: deploy A plus the emitted migration into
@@ -230,6 +236,12 @@ export default async (
   }
   const granularity = granularityRaw as ExportGranularity;
 
+  const changeGranularityRaw = (argv['change-granularity'] as string) ?? (argv.changeGranularity as string) ?? 'object';
+  if (!isChangeGranularity(changeGranularityRaw)) {
+    await cliExitWithError(`Invalid --change-granularity "${changeGranularityRaw}". Expected one of: ${CHANGE_GRANULARITIES.join(', ')}.`);
+  }
+  const changeGranularity = changeGranularityRaw as ChangeGranularity;
+
   const namingRaw = (argv.naming as string) ?? 'directory';
   if (!(NAMING_STYLES as readonly string[]).includes(namingRaw)) {
     await cliExitWithError(`Invalid --naming "${namingRaw}". Expected one of: ${NAMING_STYLES.join(', ')}.`);
@@ -276,7 +288,7 @@ export default async (
     return;
   }
 
-  const result = diffChangeSets(sideA.changes, sideB.changes, { granularity, style: naming });
+  const result = diffChangeSets(sideA.changes, sideB.changes, { granularity, changeGranularity, style: naming });
   const warnings = [
     ...sideA.warnings.map(w => `${sideA.label}: ${w}`),
     ...sideB.warnings.map(w => `${sideB.label}: ${w}`),

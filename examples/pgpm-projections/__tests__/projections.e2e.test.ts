@@ -3,19 +3,21 @@
 // One SQL schema (schema/schema.sql) is the source of truth. We normalize it
 // to an identity-keyed object set and then *project* it into many shapes:
 //
-//   granularity   object | consolidated  (atomic too — see the note below)
-//   partition     one module vs app + security modules
-//   diff          schema.sql -> schema-v2.sql as a generated migration
-//   output        pgpm module | linear .sql
+//   granularity          atomic | object | consolidated  (statement shape)
+//   change granularity   object | alteration             (plan-entry shape)
+//   partition            one module vs app + security modules
+//   diff                 schema.sql -> schema-v2.sql as a generated migration
+//   output               pgpm module | linear .sql
 //
 // The headline guarantee: a projection changes the *representation*, never the
 // *meaning*. We prove it WITHOUT a database by normalizing each projection back
 // to its object set and asserting the diff is empty — authoring granularity,
-// naming, partitioning, ordering, and whitespace all wash out.
+// change granularity, naming, partitioning, ordering, and whitespace all wash
+// out.
 //
-// (Deploy-level catalog equivalence for every projection, including `atomic`,
-// is proven against live Postgres by the engine's own suites — pgpm/cli
-// transform-e2e "dial parity" and diff-e2e. See README.)
+// (Deploy-level catalog equivalence for every projection is also proven
+// against live Postgres by the engine's own suites — pgpm/cli transform-e2e
+// "dial parity" and diff-e2e. See README.)
 //
 // This suite is intentionally database-free: it only runs the CLI and compares
 // the emitted artifacts semantically.
@@ -49,6 +51,12 @@ describe('pgpm projections: one schema, every shape, one meaning', () => {
     // Re-dial the same module to other granularities (siblings blog-<gran>).
     pgpm(work, ['transform', '--granularity', 'atomic', '--cwd', path.join(work, 'blog')]);
     pgpm(work, ['transform', '--granularity', 'consolidated', '--cwd', path.join(work, 'blog')]);
+
+    // The fourth dial: one change per alteration (per column / per constraint).
+    pgpm(work, [
+      'transform', '--granularity', 'atomic', '--change-granularity', 'alteration',
+      '--cwd', path.join(work, 'blog'), '--out', path.join(work, 'alteration')
+    ]);
 
     // Partition the same source into app + security modules.
     pgpm(work, [
@@ -93,19 +101,25 @@ describe('pgpm projections: one schema, every shape, one meaning', () => {
     expect(diffChangeSets(object, partitioned).identical).toBe(true);
   });
 
-  it('emits the atomic projection as a deployable module covering the same schemas', () => {
-    // atomic explodes objects into per-column / per-constraint statements. It
-    // deploys to the same catalog as the other granularities (proven against
-    // live Postgres by pgpm/cli transform-e2e "dial parity"); here we assert it
-    // is a well-formed module spanning the same schemas.
-    const atomicDir = path.join(work, 'blog-atomic');
-    expect(fs.existsSync(path.join(atomicDir, 'pgpm.plan'))).toBe(true);
-    const atomicChanges = changesOf(atomicDir);
-    expect(atomicChanges.length).toBeGreaterThan(0);
+  it('is granularity-invariant: atomic normalizes to the same schema too', () => {
+    // atomic explodes objects into per-column / per-constraint statements, yet
+    // constraint-placement normalization folds them back — full semantic
+    // identity, not just catalog equivalence.
+    const object = changesOf(path.join(work, 'blog'));
+    const atomic = changesOf(path.join(work, 'blog-atomic'));
+    expect(diffChangeSets(object, atomic).identical).toBe(true);
+  });
 
-    const schemasOf = (changes: ChangeSet): string[] =>
-      [...new Set(changes.map(c => c.name.split('/')[1]).filter(Boolean))].sort();
-    expect(schemasOf(atomicChanges)).toEqual(schemasOf(changesOf(path.join(work, 'blog'))));
+  it('is change-granularity-invariant: one change per alteration, same schema', () => {
+    const alterationDir = path.join(work, 'alteration', 'blog-atomic');
+    const plan = fs.readFileSync(path.join(alterationDir, 'pgpm.plan'), 'utf-8');
+    // every column and constraint is its own plan entry...
+    expect(plan).toMatch(/\/columns\/[a-z_]+\/column/);
+    expect(plan).toMatch(/\/constraints\/[a-z_]+\/constraint/);
+    // ...and the meaning is untouched.
+    const object = changesOf(path.join(work, 'blog'));
+    const alteration = changesOf(alterationDir);
+    expect(diffChangeSets(object, alteration).identical).toBe(true);
   });
 
   it('derives the v1 -> v2 migration: exactly the real changes, nothing guessed', () => {

@@ -10,7 +10,7 @@ import { alterationPathFor, pathFor, PathStyle } from '@pgpmjs/naming-spec';
 import { Granularity, identityOf, StatementFacts } from '@pgsql/transform';
 import { loadModule } from 'plpgsql-parser';
 
-import { restructureChanges } from './granularity-driver';
+import { ChangeGranularity, restructureChanges } from './granularity-driver';
 
 export type ExportGranularity = Granularity;
 
@@ -27,6 +27,12 @@ export interface RestructureExportRowsResult {
 export interface RestructureExportRowsOptions {
   /** Naming-spec rendering style for derived paths (default `directory`). */
   naming?: PathStyle;
+  /**
+   * Change-level distribution (default `object`): with `alteration`, each
+   * `ADD COLUMN` / `ADD CONSTRAINT` becomes its own change. See
+   * {@link ChangeGranularity}.
+   */
+  changeGranularity?: ChangeGranularity;
 }
 
 /**
@@ -65,7 +71,12 @@ export const restructureExportRows = async (
       dependencies: row.deps ?? [],
       deploy: row.content
     })),
-    { granularity, changeName }
+    {
+      granularity,
+      changeGranularity: options.changeGranularity,
+      changeName,
+      subObjectName: identity => pathFor(identity, { style })
+    }
   );
 
   const counters = new Map<string, number>();

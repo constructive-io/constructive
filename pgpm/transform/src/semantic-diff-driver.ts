@@ -39,7 +39,7 @@ import {
 import { Deparser, parseSync } from 'plpgsql-parser';
 
 import { ConstraintNode, defaultConstraintName } from './constraint-names';
-import { GranularityChange, restructureChanges } from './granularity-driver';
+import { ChangeGranularity, GranularityChange, restructureChanges } from './granularity-driver';
 
 /** How one object differs between the two sides. */
 export type ObjectDelta = 'added' | 'removed' | 'modified';
@@ -58,6 +58,8 @@ export interface SemanticObjectDiff {
 export interface SemanticDiffOptions {
   /** Granularity for the emitted CREATE/ALTER changes (default `object`). */
   granularity?: Granularity;
+  /** Change-level distribution for emitted changes (default `object`). */
+  changeGranularity?: ChangeGranularity;
   /** Naming-spec rendering style (default `directory`). */
   style?: PathStyle;
 }
@@ -571,7 +573,11 @@ export function diffSchemas(
   if (forwardSql.length > 0) {
     const { changes, warnings: w } = restructureChanges(
       [{ name: 'delta', dependencies: [], deploy: forwardSql.join('\n\n') }],
-      { granularity: options.granularity ?? 'object' }
+      {
+        granularity: options.granularity ?? 'object',
+        changeGranularity: options.changeGranularity,
+        subObjectName: identity => pathFor(identity, { style })
+      }
     );
     forwardChanges = changes.map(c => ({
       ...c,
