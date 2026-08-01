@@ -229,7 +229,9 @@ describe('rendering a comparison', () => {
   it('paints the terminal delta green when the score improved', () => {
     const out = renderPretty(report, { color: true, summary: true });
     // Improvement green, regression red — matching the markdown convention.
-    expect(out).toMatch(/\u001b\[32m▲ \+[\d.]+/);
-    expect(out).toMatch(/\u001b\[31m▼ −[\d.]+/);
+    const green = String.fromCharCode(27) + '[32m';
+    const red = String.fromCharCode(27) + '[31m';
+    expect(out).toContain(`${green}▲ +`);
+    expect(out).toContain(`${red}▼ −`);
   });
 });
