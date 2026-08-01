@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.9.3...graphile-presigned-url-plugin@1.10.0) (2026-08-01)
+
+### Features
+
+- persist physical S3 bucket name on the bucket row at provision time ([c1ac393](https://github.com/constructive-io/constructive/commit/c1ac3936bc3b2b46bb721afcf778e500e2278862))
+
 ## [1.9.3](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.9.2...graphile-presigned-url-plugin@1.9.3) (2026-08-01)
 
 ### Bug Fixes

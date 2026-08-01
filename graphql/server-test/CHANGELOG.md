@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.13.9...graphql-server-test@3.14.0) (2026-08-01)
+
+### Features
+
+- persist physical S3 bucket name on the bucket row at provision time ([c1ac393](https://github.com/constructive-io/constructive/commit/c1ac3936bc3b2b46bb721afcf778e500e2278862))
+
 ## [3.13.9](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.13.8...graphql-server-test@3.13.9) (2026-08-01)
 
 **Note:** Version bump only for package graphql-server-test
