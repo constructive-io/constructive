@@ -48,3 +48,59 @@ export const emitModuleBundle = async (moduleDir: string, target: string): Promi
   fs.mkdirSync(path.dirname(resolved), { recursive: true });
   writeBundleArchiveFile(bundle, resolved);
 };
+
+/** Resolved `--emit-sql` / `--emit-bundle` projection targets for a command. */
+export interface EmitProjectionTargets {
+  /** Linear SQL target (absolute path, or `-` for stdout). */
+  emitSql?: string;
+  /** Bundle archive target (absolute path). */
+  emitBundle?: string;
+}
+
+/**
+ * Parse the shared `--emit-sql` / `--emit-bundle` projection flags off a parsed
+ * argv, resolving file targets against `cwd` (the `-` stdout sentinel for SQL is
+ * preserved). Keeps every command's projection flags identical.
+ */
+export const parseEmitProjectionTargets = (
+  argv: Record<string, unknown>,
+  cwd: string
+): EmitProjectionTargets => {
+  const sqlRaw = argv['emit-sql'] ?? argv.emitSql;
+  const emitSql =
+    typeof sqlRaw === 'string' && sqlRaw
+      ? sqlRaw === STDOUT_TARGET
+        ? STDOUT_TARGET
+        : path.resolve(cwd, sqlRaw)
+      : undefined;
+  const bundleRaw = argv['emit-bundle'] ?? argv.emitBundle;
+  const emitBundle =
+    typeof bundleRaw === 'string' && bundleRaw ? path.resolve(cwd, bundleRaw) : undefined;
+  return { emitSql, emitBundle };
+};
+
+/** Whether any projection target was requested. */
+export const hasEmitProjection = (targets: EmitProjectionTargets): boolean =>
+  Boolean(targets.emitSql || targets.emitBundle);
+
+/**
+ * Run the requested SQL/bundle projections against a written module directory.
+ * `onSuccess` (when provided) is invoked with a human-readable line per emitted
+ * artifact; it is skipped for stdout SQL so the stream stays valid SQL.
+ */
+export const projectModule = async (
+  moduleDir: string,
+  targets: EmitProjectionTargets,
+  onSuccess?: (message: string) => void
+): Promise<void> => {
+  if (targets.emitSql) {
+    await emitModuleSql(moduleDir, targets.emitSql);
+    if (targets.emitSql !== STDOUT_TARGET) {
+      onSuccess?.(`wrote linear SQL to ${targets.emitSql}`);
+    }
+  }
+  if (targets.emitBundle) {
+    await emitModuleBundle(moduleDir, targets.emitBundle);
+    onSuccess?.(`wrote bundle to ${targets.emitBundle}`);
+  }
+};

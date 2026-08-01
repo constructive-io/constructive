@@ -19,6 +19,12 @@ import type { PgConfig } from 'pg-env';
 import { getPgEnvOptions } from 'pg-env';
 
 import { checkOverwrite, writePackage } from '../utils/emit-package';
+import {
+  hasEmitProjection,
+  parseEmitProjectionTargets,
+  projectModule,
+  STDOUT_TARGET
+} from '../utils/module-projections';
 import { catalogDifferences, withScratchDatabases } from '../utils/scratch-db';
 
 export { checkOverwrite } from '../utils/emit-package';
@@ -45,14 +51,24 @@ Options:
   --cwd <directory>       Module or workspace directory (default: current directory)
   --out <dir>             Output directory (default: sibling <module>-<granularity>)
   --write                 Allow writing over an existing/module directory
+  --emit-sql <file|->      Also project the transformed module into a single
+                          linear SQL script (- for stdout). Requires a single
+                          output package (no workspace/partition fan-out).
+  --emit-bundle <file>     Also project the transformed module into a
+                          content-addressed .bundle.tar.gz. Same single-package
+                          requirement as --emit-sql.
   --check                 Deploy original and transformed output into scratch
                           databases and assert the catalogs are equivalent
   --dry-run               Print the resulting plan/paths without writing
+
+The transformed module is the canonical artifact; --emit-sql and --emit-bundle
+are pure projections of it (the same machinery pgpm package and pgpm diff use).
 
 Examples:
   pgpm transform --granularity object
   pgpm transform --granularity atomic --naming flat --out ./out
   pgpm transform --granularity object --partition partition.json --check
+  pgpm transform --granularity consolidated --emit-sql migration.sql
 `;
 
 const NAMING_STYLES = ['directory', 'flat'] as const;
@@ -223,6 +239,9 @@ export default async (
   const write = Boolean(argv.write);
   const check = Boolean(argv.check);
   const dryRun = Boolean(argv['dry-run'] ?? argv.dryRun);
+  const emit = parseEmitProjectionTargets(argv, cwd);
+  const emitRequested = hasEmitProjection(emit);
+  const sqlToStdout = emit.emitSql === STDOUT_TARGET;
 
   const pkg = new PgpmPackage(path.resolve(cwd));
 
@@ -243,6 +262,15 @@ export default async (
   } else {
     await cliExitWithError('Not inside a pgpm module or workspace (pass --cwd <dir>).');
     return;
+  }
+
+  if (emitRequested && modulePaths.length > 1) {
+    await cliExitWithError(
+      '--emit-sql/--emit-bundle target a single module; they are not supported when transforming a multi-module workspace.'
+    );
+  }
+  if (emitRequested && dryRun) {
+    await cliExitWithError('--emit-sql/--emit-bundle cannot be combined with --dry-run.');
   }
 
   for (const modulePath of modulePaths) {
@@ -274,10 +302,24 @@ export default async (
       }
     }
 
+    if (emitRequested && transformed.packages.length !== 1) {
+      await cliExitWithError(
+        '--emit-sql/--emit-bundle require a single output package; a --partition transform emits multiple packages.'
+      );
+    }
+
     const sourceRequires = readControlRequires(modulePath, transformed.name);
+    let firstDir: string | undefined;
     for (const pkgRows of transformed.packages) {
       const dir = writePackage(transformed.outBase, pkgRows, sourceRequires);
-      log.success(`wrote ${pkgRows.rows.length} changes to ${dir}`);
+      firstDir ??= dir;
+      if (!sqlToStdout) {
+        log.success(`wrote ${pkgRows.rows.length} changes to ${dir}`);
+      }
+    }
+
+    if (emitRequested && firstDir) {
+      await projectModule(firstDir, emit, sqlToStdout ? undefined : msg => log.success(msg));
     }
 
     if (check) {

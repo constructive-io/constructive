@@ -9,6 +9,7 @@
  *
  * PREREQUISITES: a running PostgreSQL instance via standard PG* env vars.
  */
+import { readBundleArchiveFile } from '@pgpmjs/core';
 import { diffCatalogSnapshots, snapshotCatalog } from '@pgpmjs/transform';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -274,6 +275,28 @@ describe('pgpm transform e2e', () => {
     const snapOriginal = await snapshotCatalog(originalDb);
     const snapPartitioned = await snapshotCatalog(testDb);
     expect(diffCatalogSnapshots(snapOriginal, snapPartitioned)).toEqual([]);
+  });
+
+  it('composes module + linear SQL + bundle projections from one transform run', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/${MODULE_NAME}
+      pgpm transform --granularity consolidated --out ../emit-out --emit-sql ../emit-out/transform.sql --emit-bundle ../emit-out/transform.bundle.tar.gz
+      `,
+      {}
+    );
+
+    const outDir = path.join(wsDir, 'emit-out', `${MODULE_NAME}-consolidated`);
+    expect(fs.existsSync(path.join(outDir, 'pgpm.plan'))).toBe(true);
+
+    // linear SQL projection: real, deployable SQL in plan order
+    const sql = fs.readFileSync(path.join(wsDir, 'emit-out', 'transform.sql'), 'utf-8');
+    expect(sql).toMatch(/CREATE SCHEMA tfx_app/);
+    expect(sql).toMatch(/CREATE TABLE tfx_app\.users/);
+
+    // bundle projection: a readable content-addressed archive of the changes
+    const bundle = readBundleArchiveFile(path.join(wsDir, 'emit-out', 'transform.bundle.tar.gz'));
+    expect(bundle.changes.length).toBeGreaterThan(0);
   });
 
   it('round-trips consolidated -> atomic -> consolidated to the same object set', async () => {
