@@ -26,6 +26,7 @@ import { getPgPool } from 'pg-cache';
 import type { PgConfig } from 'pg-env';
 import { getPgEnvOptions, getSpawnEnvWithPg } from 'pg-env';
 
+import { emitModuleBundle, emitModuleSql, STDOUT_TARGET } from '../utils/module-projections';
 import { catalogDifferences, withScratchDatabases } from '../utils/scratch-db';
 
 const log = new Logger('diff');
@@ -48,11 +49,19 @@ Sides:
     - a live database: a postgres:// connection string, or db:<name>
       (uses PG* env for host/port/user; schema is read via pg_dump)
 
+The delta is one model; every --emit-* flag is a projection of it, so they
+compose (a single run can emit a module, a linear SQL file, and a bundle).
+
 Options:
   --help, -h               Show this help message
   --emit-migration <dir>   Write the delta as a pgpm module (deploy/revert/
                            verify per change, spec-derived paths, graph-derived
                            requires) into <dir>/<pkg>
+  --emit-module <dir>      Alias of --emit-migration
+  --emit-sql <file|->      Also project the delta to a single consolidated SQL
+                           file (deparsed in plan order); - writes to stdout
+  --emit-bundle <file>     Also project the delta to a content-addressed
+                           .bundle.tar.gz archive
   --pkg <name>             Emitted migration package name (default: diff-migration)
   --granularity <level>    Granularity for emitted changes: atomic | object |
                            consolidated (default: object)
@@ -225,10 +234,19 @@ export default async (
   const cwd = (argv.cwd as string) || process.cwd();
   const json = Boolean(argv.json);
   const verify = Boolean(argv.verify);
-  const emitRaw = argv['emit-migration'] ?? argv.emitMigration;
-  const emitMigration = typeof emitRaw === 'string' && emitRaw
-    ? path.resolve(cwd, emitRaw)
+  const emitModuleRaw = argv['emit-migration'] ?? argv.emitMigration ?? argv['emit-module'] ?? argv.emitModule;
+  const emitModuleDir = typeof emitModuleRaw === 'string' && emitModuleRaw
+    ? path.resolve(cwd, emitModuleRaw)
     : undefined;
+  const emitSqlRaw = argv['emit-sql'] ?? argv.emitSql;
+  const emitSql = typeof emitSqlRaw === 'string' && emitSqlRaw
+    ? (emitSqlRaw === STDOUT_TARGET ? STDOUT_TARGET : path.resolve(cwd, emitSqlRaw))
+    : undefined;
+  const emitBundleRaw = argv['emit-bundle'] ?? argv.emitBundle;
+  const emitBundle = typeof emitBundleRaw === 'string' && emitBundleRaw
+    ? path.resolve(cwd, emitBundleRaw)
+    : undefined;
+  const sqlToStdout = emitSql === STDOUT_TARGET;
   const pkgName = (argv.pkg as string) || 'diff-migration';
 
   await loadModule();
@@ -265,18 +283,28 @@ export default async (
     }, null, 2));
   } else {
     for (const warning of warnings) console.warn(`diff: ${warning}`);
-    printSummary(result, sideA.label, sideB.label);
+    // Keep stdout clean when the SQL projection is piped there.
+    if (!sqlToStdout) printSummary(result, sideA.label, sideB.label);
   }
 
   let migrationDir: string | undefined;
-  if (emitMigration || (verify && !result.identical)) {
-    const outBase = emitMigration ?? fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-diff-'));
+  const needModule = Boolean(emitModuleDir || emitSql || emitBundle) || (verify && !result.identical);
+  if (needModule) {
+    const outBase = emitModuleDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-diff-'));
     const rows = deltaChangesToRows(result.changes);
     if (rows.length === 0) {
-      log.info('no migration changes to emit (sides are identical).');
+      if (!sqlToStdout) log.info('no migration changes to emit (sides are identical).');
     } else {
       migrationDir = writeModule(outBase, { name: pkgName, requires: [], rows });
-      if (emitMigration) log.success(`wrote ${rows.length} migration change(s) to ${migrationDir}`);
+      if (emitModuleDir && !sqlToStdout) log.success(`wrote ${rows.length} migration change(s) to ${migrationDir}`);
+      if (emitSql) {
+        await emitModuleSql(migrationDir, emitSql);
+        if (!sqlToStdout) log.success(`wrote linear SQL to ${emitSql}`);
+      }
+      if (emitBundle) {
+        await emitModuleBundle(migrationDir, emitBundle);
+        if (!sqlToStdout) log.success(`wrote bundle to ${emitBundle}`);
+      }
     }
   }
 
