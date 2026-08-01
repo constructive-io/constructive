@@ -9,7 +9,15 @@
  * `pgpm import` all emit byte-identical module layouts instead of each
  * carrying its own copy of the writer.
  */
-import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/ast';
+import {
+  parseAuthor,
+  parsePlanFile,
+  PgpmRow,
+  SqlWriteOptions,
+  writePgpmFiles,
+  writePgpmPlan,
+  writePlanFile
+} from '@pgpmjs/ast';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -69,6 +77,101 @@ export const writeModule = (
   writePgpmPlan(model.rows, opts);
   writePgpmFiles(model.rows, opts);
   return dir;
+};
+
+/** Result of appending changes into an existing module (see {@link appendModule}). */
+export interface AppendModuleResult {
+  /** The module directory that was appended to. */
+  dir: string;
+  /** Change names that were added to the plan. */
+  added: string[];
+  /** Change names skipped because they already exist in the plan. */
+  skipped: string[];
+  /** Non-fatal notices (skips, dropped dangling dependencies). */
+  warnings: string[];
+}
+
+/**
+ * Append plan-ordered {@link PgpmRow}s into an *existing* module rather than
+ * writing a fresh package. Existing changes, their scripts, and the `.control`
+ * file are left untouched; only the new changes are written (deploy/revert/
+ * verify) and appended to `pgpm.plan` after the current changes.
+ *
+ * Rows whose change name already exists are skipped (never overwritten).
+ * A new change's dependency bracket is filtered to names that resolve within
+ * the plan (existing changes, other appended changes, or `pkg:`-external
+ * references); a dangling internal dependency is dropped with a warning
+ * (plan order still sequences it after the current changes).
+ */
+export const appendModule = (
+  moduleDir: string,
+  rows: PgpmRow[],
+  options: { author?: string } = {}
+): AppendModuleResult => {
+  const planPath = path.join(moduleDir, 'pgpm.plan');
+  if (!fs.existsSync(planPath)) {
+    throw new Error(
+      `No pgpm.plan found at ${planPath}; append mode expects an existing pgpm module directory.`
+    );
+  }
+
+  const parsed = parsePlanFile(planPath);
+  if (!parsed.data) {
+    throw new Error(
+      `Failed to parse ${planPath}: ${parsed.errors
+        .map(e => `line ${e.line}: ${e.message}`)
+        .join('; ')}`
+    );
+  }
+  const plan = parsed.data;
+
+  const existingNames = new Set(plan.changes.map(c => c.name));
+  const incomingNames = new Set(rows.map(r => r.deploy));
+  const appended = new Set<string>();
+  const added: string[] = [];
+  const skipped: string[] = [];
+  const warnings: string[] = [];
+  const newRows: PgpmRow[] = [];
+
+  const { fullName, email } = parseAuthor(options.author || 'constructive');
+  const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+
+  for (const row of rows) {
+    if (existingNames.has(row.deploy) || appended.has(row.deploy)) {
+      skipped.push(row.deploy);
+      warnings.push(`change ${row.deploy} already exists in ${plan.package}; left untouched`);
+      continue;
+    }
+    const deps = (row.deps ?? []).filter(dep => {
+      if (dep.includes(':')) return true; // cross-package (pkg:change) external
+      if (existingNames.has(dep) || incomingNames.has(dep)) return true;
+      warnings.push(`change ${row.deploy}: dropped dependency ${dep} (not present in ${plan.package})`);
+      return false;
+    });
+    plan.changes.push({
+      name: row.deploy,
+      dependencies: deps,
+      timestamp,
+      planner: fullName,
+      email: email || `${fullName}@constructive.io`,
+      comment: `add ${row.name ?? row.deploy}`
+    });
+    newRows.push({ ...row, deps });
+    appended.add(row.deploy);
+    added.push(row.deploy);
+  }
+
+  if (newRows.length) {
+    const opts: SqlWriteOptions = {
+      outdir: path.dirname(moduleDir),
+      name: path.basename(moduleDir),
+      replacer: (str: string) => str
+    };
+    writePgpmFiles(newRows, opts);
+    writePlanFile(planPath, plan);
+  }
+
+  return { dir: moduleDir, added, skipped, warnings };
 };
 
 /**

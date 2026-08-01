@@ -7,6 +7,7 @@ import {
 } from '@pgpmjs/diff';
 import { Logger } from '@pgpmjs/logger';
 import {
+  appendModule,
   diffChangeSets,
   EXPORT_GRANULARITIES,
   ExportGranularity,
@@ -58,6 +59,10 @@ Options:
                            verify per change, spec-derived paths, graph-derived
                            requires) into <dir>/<pkg>
   --emit-module <dir>      Alias of --emit-migration
+  --append-module <dir>    Append the delta into an EXISTING pgpm module at
+                           <dir> (new changes only; existing changes, scripts,
+                           and .control are left untouched). Standalone: not
+                           combinable with --emit-*/--verify.
   --emit-sql <file|->      Also project the delta to a single consolidated SQL
                            file (deparsed in plan order); - writes to stdout
   --emit-bundle <file>     Also project the delta to a content-addressed
@@ -238,6 +243,10 @@ export default async (
   const emitModuleDir = typeof emitModuleRaw === 'string' && emitModuleRaw
     ? path.resolve(cwd, emitModuleRaw)
     : undefined;
+  const appendModuleRaw = argv['append-module'] ?? argv.appendModule;
+  const appendModuleDir = typeof appendModuleRaw === 'string' && appendModuleRaw
+    ? path.resolve(cwd, appendModuleRaw)
+    : undefined;
   const emitSqlRaw = argv['emit-sql'] ?? argv.emitSql;
   const emitSql = typeof emitSqlRaw === 'string' && emitSqlRaw
     ? (emitSqlRaw === STDOUT_TARGET ? STDOUT_TARGET : path.resolve(cwd, emitSqlRaw))
@@ -248,6 +257,12 @@ export default async (
     : undefined;
   const sqlToStdout = emitSql === STDOUT_TARGET;
   const pkgName = (argv.pkg as string) || 'diff-migration';
+
+  if (appendModuleDir && (emitModuleDir || emitSql || emitBundle || verify)) {
+    await cliExitWithError(
+      '--append-module is standalone; it cannot be combined with --emit-migration/--emit-module/--emit-sql/--emit-bundle/--verify.'
+    );
+  }
 
   await loadModule();
 
@@ -285,6 +300,22 @@ export default async (
     for (const warning of warnings) console.warn(`diff: ${warning}`);
     // Keep stdout clean when the SQL projection is piped there.
     if (!sqlToStdout) printSummary(result, sideA.label, sideB.label);
+  }
+
+  if (appendModuleDir) {
+    const rows = deltaChangesToRows(result.changes);
+    if (rows.length === 0) {
+      log.info('no migration changes to append (sides are identical).');
+    } else {
+      const appended = appendModule(appendModuleDir, rows);
+      for (const w of appended.warnings) console.warn(`diff: ${w}`);
+      log.success(
+        `appended ${appended.added.length} change(s) to ${appended.dir}` +
+        (appended.skipped.length ? ` (${appended.skipped.length} skipped)` : '')
+      );
+    }
+    prompter.close();
+    return argv;
   }
 
   let migrationDir: string | undefined;
