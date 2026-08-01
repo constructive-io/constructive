@@ -41,8 +41,8 @@ export {
   defaultChangeName,
   restructureChanges,
 } from './granularity-driver';
-export type { PgpmModuleModel } from './module-emit';
-export { checkOverwrite, writeControlFile, writeModule } from './module-emit';
+export type { AppendModuleResult, PgpmModuleModel } from './module-emit';
+export { appendModule, checkOverwrite, writeControlFile, writeModule } from './module-emit';
 export type { ModuleSource, ModuleSourceChange } from './module-source';
 export { loadModuleSource, stripTransactionWrapper } from './module-source';
 export type { PartitionedPackageRows, PartitionExportRowsResult } from './partition';

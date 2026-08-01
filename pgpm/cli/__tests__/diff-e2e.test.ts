@@ -251,6 +251,47 @@ describe('pgpm diff e2e', () => {
     expect(bundle.changes.length).toBeGreaterThan(0);
   });
 
+  it('appends the delta into an existing module and fresh-deploys to the v2 catalog', async () => {
+    // A standalone module with v1's schema (named so pgpm can deploy it), so
+    // the shared diff-v1 module is untouched.
+    const appendDir = path.join(wsDir, 'diff-append');
+    writeModule(appendDir, 'diff-append', V1);
+    const originalChangeCount = V1.length;
+    // existing change scripts must be left byte-for-byte untouched
+    const sentinel = 'schemas/dfx/tables/products/table';
+    const deployBefore = fs.readFileSync(path.join(appendDir, 'deploy', `${sentinel}.sql`), 'utf-8');
+
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}
+      pgpm diff diff-append diff-v2 --append-module diff-append
+      `,
+      {}
+    );
+
+    // existing changes are preserved (names + untouched scripts) and new ones appended
+    const planAfter = fs.readFileSync(path.join(appendDir, 'pgpm.plan'), 'utf-8');
+    for (const c of V1) expect(planAfter).toContain(c.name);
+    const changeLines = planAfter
+      .split('\n')
+      .filter(l => l.trim() && !l.startsWith('%') && !l.startsWith('@'));
+    expect(changeLines.length).toBeGreaterThan(originalChangeCount);
+    expect(fs.readFileSync(path.join(appendDir, 'deploy', `${sentinel}.sql`), 'utf-8')).toBe(deployBefore);
+
+    // the appended module (v1 + delta) fresh-deploys to a v2-equivalent catalog
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/diff-append
+      pgpm deploy --database ${testDb.name} --package diff-append --yes
+      `,
+      { database: testDb.name }
+    );
+    const snapAppended = await snapshotCatalog(testDb);
+    const snapV2 = await snapshotCatalog(v2Db);
+    expect(diffCatalogSnapshots(withoutColumnOrder(snapAppended), withoutColumnOrder(snapV2))).toEqual([]);
+  });
+
   it.each(['atomic', 'object', 'consolidated'])(
     'emits a %s-granularity migration that reaches the same v2 catalog (dial parity)',
     async granularity => {
