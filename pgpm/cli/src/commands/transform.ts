@@ -1,7 +1,6 @@
 import { PgpmMigrate, PgpmPackage, PgpmRow } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import {
-  diffCatalogSnapshots,
   EXPORT_GRANULARITIES,
   ExportGranularity,
   isExportGranularity,
@@ -11,17 +10,16 @@ import {
   PartitionCycleError,
   PartitionedPackageRows,
   partitionExportRows,
-  restructureExportRows,
-  snapshotCatalog
+  restructureExportRows
 } from '@pgpmjs/transform';
 import * as fs from 'fs';
 import { cliExitWithError, CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
-import { getPgPool } from 'pg-cache';
 import type { PgConfig } from 'pg-env';
 import { getPgEnvOptions } from 'pg-env';
 
 import { checkOverwrite, writePackage } from '../utils/emit-package';
+import { catalogDifferences, withScratchDatabases } from '../utils/scratch-db';
 
 export { checkOverwrite } from '../utils/emit-package';
 
@@ -108,17 +106,6 @@ const readControlRequires = (modulePath: string, name: string): string[] => {
   return match[1].split(',').map(s => s.trim()).filter(Boolean);
 };
 
-const createScratchDb = async (config: PgConfig, dbName: string): Promise<void> => {
-  const adminPool = getPgPool({ ...config, database: 'postgres' });
-  await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}"`);
-  await adminPool.query(`CREATE DATABASE "${dbName}"`);
-};
-
-const dropScratchDb = async (config: PgConfig, dbName: string): Promise<void> => {
-  const adminPool = getPgPool({ ...config, database: 'postgres' });
-  await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}" WITH (FORCE)`);
-};
-
 const deployModules = async (config: PgConfig, modulePaths: string[]): Promise<void> => {
   const client = new PgpmMigrate(config);
   for (const modulePath of modulePaths) {
@@ -136,33 +123,17 @@ const deployModules = async (config: PgConfig, modulePaths: string[]): Promise<v
 const runCheck = async (transformed: TransformedModule): Promise<string[]> => {
   const config = getPgEnvOptions();
   const stamp = Date.now();
-  const dbOriginal = `pgpm_transform_check_a_${stamp}`;
-  const dbTransformed = `pgpm_transform_check_b_${stamp}`;
-
-  try {
-    await createScratchDb(config, dbOriginal);
-    await createScratchDb(config, dbTransformed);
-
-    await deployModules({ ...config, database: dbOriginal }, [transformed.modulePath]);
+  const names = [`pgpm_transform_check_a_${stamp}`, `pgpm_transform_check_b_${stamp}`];
+  return withScratchDatabases(config, names, async ([cfgOriginal, cfgTransformed]) => {
+    await deployModules(cfgOriginal, [transformed.modulePath]);
 
     const orderedDirs = orderPackages(transformed.packages).map(pkg =>
       path.join(transformed.outBase, pkg.name)
     );
-    await deployModules({ ...config, database: dbTransformed }, orderedDirs);
+    await deployModules(cfgTransformed, orderedDirs);
 
-    const poolOriginal = getPgPool({ ...config, database: dbOriginal });
-    const poolTransformed = getPgPool({ ...config, database: dbTransformed });
-    const snapOriginal = await snapshotCatalog(poolOriginal);
-    const snapTransformed = await snapshotCatalog(poolTransformed);
-    return diffCatalogSnapshots(snapOriginal, snapTransformed);
-  } finally {
-    try {
-      await dropScratchDb(config, dbOriginal);
-      await dropScratchDb(config, dbTransformed);
-    } catch (err) {
-      log.warn(`failed to drop scratch databases: ${err instanceof Error ? err.message : err}`);
-    }
-  }
+    return catalogDifferences(cfgOriginal, cfgTransformed);
+  });
 };
 
 const transformModule = async (

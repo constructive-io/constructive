@@ -7,7 +7,6 @@ import {
 } from '@pgpmjs/diff';
 import { Logger } from '@pgpmjs/logger';
 import {
-  diffCatalogSnapshots,
   diffChangeSets,
   EXPORT_GRANULARITIES,
   ExportGranularity,
@@ -15,7 +14,6 @@ import {
   loadModule,
   SemanticDiffResult,
   SemanticObjectDiff,
-  snapshotCatalog,
   withoutColumnOrder,
   writeModule
 } from '@pgpmjs/transform';
@@ -27,6 +25,8 @@ import * as path from 'path';
 import { getPgPool } from 'pg-cache';
 import type { PgConfig } from 'pg-env';
 import { getPgEnvOptions, getSpawnEnvWithPg } from 'pg-env';
+
+import { catalogDifferences, withScratchDatabases } from '../utils/scratch-db';
 
 const log = new Logger('diff');
 
@@ -123,17 +123,6 @@ const loadSide = async (spec: string, cwd: string): Promise<DiffSide> => {
 const resolveDiffSideKindSafe = (spec: string): 'database' | 'disk' =>
   /^postgres(ql)?:\/\//.test(spec) || spec.startsWith('db:') ? 'database' : 'disk';
 
-const createScratchDb = async (config: PgConfig, dbName: string): Promise<void> => {
-  const adminPool = getPgPool({ ...config, database: 'postgres' });
-  await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}"`);
-  await adminPool.query(`CREATE DATABASE "${dbName}"`);
-};
-
-const dropScratchDb = async (config: PgConfig, dbName: string): Promise<void> => {
-  const adminPool = getPgPool({ ...config, database: 'postgres' });
-  await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}" WITH (FORCE)`);
-};
-
 /** Apply one diff side into a scratch database (module deploy or raw SQL). */
 const applySide = async (config: PgConfig, side: DiffSide, spec: string, cwd: string): Promise<void> => {
   if (side.kind === 'module') {
@@ -150,49 +139,34 @@ const applySide = async (config: PgConfig, side: DiffSide, spec: string, cwd: st
 };
 
 /**
- * Oracle mode: deploy A into a scratch database, deploy the emitted
- * migration module on top, and assert catalog equivalence with B deployed
- * fresh into a second scratch database.
+ * Oracle mode: deploy A into a scratch database, deploy the emitted migration
+ * module on top (when there is one), and assert catalog equivalence with B
+ * deployed fresh into a second scratch database. Column order is physical — a
+ * drop+add migration cannot reproduce a fresh deploy's ordinals — so
+ * equivalence is checked order-insensitively via `withoutColumnOrder`.
  */
 const runVerify = async (
   sideA: DiffSide,
   sideB: DiffSide,
   specA: string,
   specB: string,
-  migrationDir: string,
+  migrationDir: string | undefined,
   cwd: string
 ): Promise<string[]> => {
   const config = getPgEnvOptions();
   const stamp = Date.now();
-  const dbMigrated = `pgpm_diff_verify_a_${stamp}`;
-  const dbTarget = `pgpm_diff_verify_b_${stamp}`;
-
-  try {
-    await createScratchDb(config, dbMigrated);
-    await createScratchDb(config, dbTarget);
-
-    await applySide({ ...config, database: dbMigrated }, sideA, specA, cwd);
-    const client = new PgpmMigrate({ ...config, database: dbMigrated });
-    const result = await client.deploy({ modulePath: migrationDir });
-    if (result.failed) {
-      throw new Error(`migration deploy failed at change ${result.failed}`);
+  const names = [`pgpm_diff_verify_a_${stamp}`, `pgpm_diff_verify_b_${stamp}`];
+  return withScratchDatabases(config, names, async ([cfgMigrated, cfgTarget]) => {
+    await applySide(cfgMigrated, sideA, specA, cwd);
+    if (migrationDir) {
+      const result = await new PgpmMigrate(cfgMigrated).deploy({ modulePath: migrationDir });
+      if (result.failed) {
+        throw new Error(`migration deploy failed at change ${result.failed}`);
+      }
     }
-
-    await applySide({ ...config, database: dbTarget }, sideB, specB, cwd);
-
-    const snapMigrated = await snapshotCatalog(getPgPool({ ...config, database: dbMigrated }));
-    const snapTarget = await snapshotCatalog(getPgPool({ ...config, database: dbTarget }));
-    // Column order is physical: a drop+add migration cannot reproduce a fresh
-    // deploy's ordinals, so equivalence is checked order-insensitively.
-    return diffCatalogSnapshots(withoutColumnOrder(snapMigrated), withoutColumnOrder(snapTarget));
-  } finally {
-    try {
-      await dropScratchDb(config, dbMigrated);
-      await dropScratchDb(config, dbTarget);
-    } catch (err) {
-      log.warn(`failed to drop scratch databases: ${err instanceof Error ? err.message : err}`);
-    }
-  }
+    await applySide(cfgTarget, sideB, specB, cwd);
+    return catalogDifferences(cfgMigrated, cfgTarget, withoutColumnOrder);
+  });
 };
 
 const printSummary = (result: SemanticDiffResult, labelA: string, labelB: string): void => {
@@ -308,7 +282,7 @@ export default async (
 
   if (verify) {
     log.info('running --verify: deploying A plus the migration and B into scratch databases...');
-    const diffs = await runVerifyOrEquivalence(sideA, sideB, specA, specB, migrationDir, cwd);
+    const diffs = await runVerify(sideA, sideB, specA, specB, migrationDir, cwd);
     if (diffs.length) {
       console.error(`--verify failed: catalogs differ (${diffs.length} differences):`);
       for (const diff of diffs) console.error(`  ${diff}`);
@@ -319,36 +293,4 @@ export default async (
 
   prompter.close();
   return argv;
-};
-
-/** `runVerify`, tolerating an empty delta (no migration module to deploy). */
-const runVerifyOrEquivalence = async (
-  sideA: DiffSide,
-  sideB: DiffSide,
-  specA: string,
-  specB: string,
-  migrationDir: string | undefined,
-  cwd: string
-): Promise<string[]> => {
-  if (migrationDir) return runVerify(sideA, sideB, specA, specB, migrationDir, cwd);
-  const config = getPgEnvOptions();
-  const stamp = Date.now();
-  const dbA = `pgpm_diff_verify_a_${stamp}`;
-  const dbB = `pgpm_diff_verify_b_${stamp}`;
-  try {
-    await createScratchDb(config, dbA);
-    await createScratchDb(config, dbB);
-    await applySide({ ...config, database: dbA }, sideA, specA, cwd);
-    await applySide({ ...config, database: dbB }, sideB, specB, cwd);
-    const snapA = await snapshotCatalog(getPgPool({ ...config, database: dbA }));
-    const snapB = await snapshotCatalog(getPgPool({ ...config, database: dbB }));
-    return diffCatalogSnapshots(withoutColumnOrder(snapA), withoutColumnOrder(snapB));
-  } finally {
-    try {
-      await dropScratchDb(config, dbA);
-      await dropScratchDb(config, dbB);
-    } catch (err) {
-      log.warn(`failed to drop scratch databases: ${err instanceof Error ? err.message : err}`);
-    }
-  }
 };
