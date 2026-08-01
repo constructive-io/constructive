@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-import { copyBlockToInsert, copyTargetOf, loadDumpSource, preprocessDumpText } from '../src/dump-source';
+import { copyBlockToInsert, copyTargetOf, dumpCompatibilityWarnings, loadDumpSource, preprocessDumpText } from '../src/dump-source';
 
 describe('preprocessDumpText', () => {
   it('strips psql backslash meta-commands and reports them', () => {
@@ -123,5 +123,36 @@ describe('copyTargetOf / copyBlockToInsert', () => {
 
   it('returns an empty string for a COPY block with no rows', () => {
     expect(copyBlockToInsert({ statement: 'COPY app.t (id) FROM stdin;', dataLines: [] })).toBe('');
+  });
+});
+
+describe('dumpCompatibilityWarnings', () => {
+  it('warns loudly about COPY data blocks and recommends re-dump flags', () => {
+    const warnings = dumpCompatibilityWarnings({
+      copyBlocks: [{ statement: 'COPY app.t (id) FROM stdin;', dataLines: ['1'] }],
+      metaCommands: []
+    });
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain('NOT SQL');
+    expect(warnings[0]).toContain('pg_dump --schema-only');
+    expect(warnings[0]).toContain('pg_dump --inserts');
+  });
+
+  it('warns about non-preamble psql meta-commands', () => {
+    const warnings = dumpCompatibilityWarnings({
+      copyBlocks: [],
+      metaCommands: ['\\i other.sql']
+    });
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain('\\i');
+  });
+
+  it('is silent for a clean schema-only dump with only expected preamble', () => {
+    expect(
+      dumpCompatibilityWarnings({
+        copyBlocks: [],
+        metaCommands: ['\\restrict abc', '\\unrestrict abc', '\\connect db']
+      })
+    ).toEqual([]);
   });
 });

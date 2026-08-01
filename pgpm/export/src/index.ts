@@ -1,7 +1,7 @@
 export type { CatalogQueryable, CatalogSnapshot } from './catalog-check';
 export { diffCatalogSnapshots, snapshotCatalog } from './catalog-check';
 export type { CopyBlock, CopyTarget, DumpSource } from './dump-source';
-export { copyBlockToInsert, copyTargetOf, loadDumpSource, preprocessDumpText } from './dump-source';
+export { copyBlockToInsert, copyTargetOf, dumpCompatibilityWarnings, loadDumpSource, preprocessDumpText } from './dump-source';
 export * from './export-data';
 export * from './export-graphql';
 export * from './export-graphql-meta';

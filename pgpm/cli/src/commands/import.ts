@@ -1,4 +1,5 @@
 import {
+  dumpCompatibilityWarnings,
   EXPORT_GRANULARITIES,
   ExportGranularity,
   importDumpRows,
@@ -127,6 +128,10 @@ export default async (
 
   if (source.files.length > 1) {
     log.info(`concatenated ${source.files.length} .sql files in sorted order`);
+  }
+
+  for (const warning of dumpCompatibilityWarnings(source)) {
+    console.warn(`\nWARNING: ${warning}\n`);
   }
 
   const result = await importDumpRows(source, { granularity, naming, withData });

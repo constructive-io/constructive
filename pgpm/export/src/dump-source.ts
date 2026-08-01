@@ -133,6 +133,39 @@ export const loadDumpSource = (inputPath: string): DumpSource => {
   return { files, ...preprocessDumpText(text) };
 };
 
+/** psql meta-commands pg_dump always emits as preamble — expected noise. */
+const EXPECTED_META = /^\\(restrict|unrestrict|connect)\b/;
+
+/**
+ * Loud compatibility warnings for dump constructs we handle only best-effort
+ * because they are not SQL and cannot go through the real parser: COPY stdin
+ * data blocks and non-preamble psql meta-commands. The reliable path is to
+ * hand `pgpm import` pure parseable SQL.
+ */
+export const dumpCompatibilityWarnings = (
+  source: Pick<DumpSource, 'copyBlocks' | 'metaCommands'>
+): string[] => {
+  const warnings: string[] = [];
+  if (source.copyBlocks.length > 0) {
+    warnings.push(
+      `dump contains ${source.copyBlocks.length} COPY ... FROM stdin data block(s). ` +
+      `COPY data is NOT SQL and is handled by a best-effort text scanner — data could be missed or truncated. ` +
+      `For a guaranteed import, re-dump with:\n` +
+      `    pg_dump --schema-only            (schema only; recommended)\n` +
+      `    pg_dump --inserts                (data as parseable INSERT statements, for --with-data)`
+    );
+  }
+  const unexpected = source.metaCommands.filter(cmd => !EXPECTED_META.test(cmd));
+  if (unexpected.length > 0) {
+    warnings.push(
+      `dump contains ${unexpected.length} psql meta-command(s) beyond the standard pg_dump preamble ` +
+      `(e.g. ${unexpected[0].split(/\s/)[0]}). These are client-side psql commands, not SQL — they are stripped ` +
+      `and will NOT be part of the module. Feed pgpm import plain SQL (e.g. pg_dump output), not psql scripts.`
+    );
+  }
+  return warnings;
+};
+
 const COPY_TARGET = /^COPY\s+(.+?)(?:\s*\(([^)]*)\))?\s+FROM\s+stdin\s*;\s*$/i;
 
 /** The parsed target of a COPY statement. */
