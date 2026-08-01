@@ -211,7 +211,11 @@ describe('X7/X8: search and sort index coverage', () => {
 
   it('X8 is advisory — info findings never move the perf score', async () => {
     const report = await audit(pg.client as never, { schemas: ['fx_x7'], perf: true });
-    expect(report.perf!.score.deductions.some((d) => d.code === 'X8')).toBe(false);
+    const x8 = report.perf!.score.deductions.find((d) => d.code === 'X8')!;
+    // reported, so the count is visible, but explicitly worth nothing
+    expect(x8.unscored).toBe(true);
+    expect(x8.points).toBe(0);
+    expect(x8.potential).toBe(0);
   });
 
   it('X7/X8 stay off when perf is disabled', async () => {

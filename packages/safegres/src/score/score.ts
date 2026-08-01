@@ -6,6 +6,26 @@ export interface ScoreDeduction {
   code: string;
   count: number;
   points: number;
+  /**
+   * What the audit would score if this rule were its only problem — the same
+   * curve applied to this rule's points alone. Grades the rule rather than
+   * the database.
+   */
+  score: number;
+  grade: Grade;
+  /**
+   * Score the audit would *gain* by taking this rule to zero. Not
+   * interchangeable with `score`: because the curve is exponential a rule's
+   * payoff depends on how much other debt exists, so the same fix is worth
+   * more once the rest is clean.
+   */
+  potential: number;
+  /**
+   * The rule contributes no points by construction — every finding is
+   * `info`-weighted or fail-closed. Reported so a run cannot imply that
+   * fixing them would move the score; it cannot.
+   */
+  unscored?: boolean;
 }
 
 export interface Score {
@@ -14,7 +34,13 @@ export interface Score {
   grade: Grade;
   /** Scoring model identifier ('density' or 'weighted'). */
   model: string;
-  /** Per-rule deductions (weighted) or risk-point contributions (density), largest first. */
+  /**
+   * Every rule that produced a scorable finding, largest deduction first,
+   * with its own score, grade and payoff-to-fix. Rules that contribute no
+   * points (info-weighted, fail-closed) are listed last and flagged
+   * `unscored` rather than omitted — a report that silently drops them
+   * implies that fixing them would help, and it would not.
+   */
   deductions: ScoreDeduction[];
   /** Density model: risk points per exposed table. */
   density?: number;
@@ -101,22 +127,30 @@ function computeDensityScore(
   for (const f of scorable) {
     let weight = perRule[f.code] ?? weights[f.severity] ?? 0;
     if (f.direction === 'fail-closed') weight *= failClosedWeight;
-    if (weight <= 0) continue;
     const entry = byRule.get(f.code) ?? { count: 0, points: 0 };
     entry.count += 1;
-    entry.points += weight;
+    entry.points += Math.max(0, weight);
     byRule.set(f.code, entry);
   }
 
-  const deductions: ScoreDeduction[] = [...byRule.entries()]
-    .map(([code, { count, points }]) => ({ code, count, points }))
-    .sort((a, b) => b.points - a.points || a.code.localeCompare(b.code));
-
-  const riskPoints = deductions.reduce((sum, d) => sum + d.points, 0);
+  const riskPoints = [...byRule.values()].reduce((sum, r) => sum + r.points, 0);
   const exposedTables = Math.max(1, context.exposedTables ?? 1);
   const density = riskPoints / exposedTables;
+  const curve = (points: number) => round1(100 * Math.exp((-k * points) / exposedTables));
 
-  let value = Math.round(100 * Math.exp(-k * density) * 10) / 10;
+  let value = round1(100 * Math.exp(-k * density));
+
+  const deductions: ScoreDeduction[] = [...byRule.entries()]
+    .map(([code, { count, points }]) => ({
+      code,
+      count,
+      points,
+      score: curve(points),
+      grade: gradeFor(curve(points), bands),
+      potential: round1(curve(riskPoints - points) - value),
+      ...(points === 0 ? { unscored: true } : {})
+    }))
+    .sort(byPayoff);
 
   const cap = config.unknownExposureCap ?? DEFAULT_UNKNOWN_EXPOSURE_CAP;
   const capped = context.exposureKnown === false && cap !== false && value > cap;
@@ -171,13 +205,25 @@ function computeWeightedScore(
     byRule.set(f.code, entry);
   }
 
-  const deductions: ScoreDeduction[] = [...byRule.entries()]
-    .map(([code, { count, points }]) => ({ code, count, points: Math.min(points, cap) }))
-    .filter((d) => d.points > 0)
-    .sort((a, b) => b.points - a.points || a.code.localeCompare(b.code));
+  const byRuleCapped = [...byRule.entries()].map(
+    ([code, { count, points }]) => [code, { count, points: Math.min(points, cap) }] as const
+  );
 
-  const total = deductions.reduce((sum, d) => sum + d.points, 0);
-  let value = Math.max(0, Math.round((100 - total) * 10) / 10);
+  const total = byRuleCapped.reduce((sum, [, r]) => sum + r.points, 0);
+  let value = Math.max(0, round1(100 - total));
+
+  const remainder = (points: number) => Math.max(0, round1(100 - (total - points)));
+  const deductions: ScoreDeduction[] = byRuleCapped
+    .map(([code, { count, points }]) => ({
+      code,
+      count,
+      points,
+      score: Math.max(0, round1(100 - points)),
+      grade: gradeFor(Math.max(0, round1(100 - points)), bands),
+      potential: round1(remainder(points) - value),
+      ...(points === 0 ? { unscored: true } : {})
+    }))
+    .sort(byPayoff);
 
   const unknownCap = config.unknownExposureCap ?? DEFAULT_UNKNOWN_EXPOSURE_CAP;
   const capped = context.exposureKnown === false && unknownCap !== false && value > unknownCap;
@@ -195,6 +241,20 @@ function computeWeightedScore(
     deductions,
     ...(capped ? { cappedByUnknownExposure: true } : {})
   };
+}
+
+function round1(n: number): number {
+  return Math.round(n * 10) / 10;
+}
+
+/**
+ * Scored rules first, largest deduction at the top; unscored rules last, in
+ * code order. Points and payoff rank identically under a monotone curve, so
+ * this keeps the existing "top deductions" output stable.
+ */
+function byPayoff(a: ScoreDeduction, b: ScoreDeduction): number {
+  if (!!a.unscored !== !!b.unscored) return a.unscored ? 1 : -1;
+  return b.points - a.points || a.code.localeCompare(b.code);
 }
 
 const GRADE_ORDER: Grade[] = ['A+', 'A', 'B', 'C', 'D', 'F'];
