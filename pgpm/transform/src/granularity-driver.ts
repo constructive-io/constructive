@@ -17,6 +17,7 @@
  *                    (FKs, indexes, triggers, policies) stay separate.
  * - `consolidated` — additionally inlines FKs proven safe by the graph.
  */
+import type { ObjectIdentity as NamingIdentity } from '@pgpmjs/naming-spec';
 import { pathFor } from '@pgpmjs/naming-spec';
 import { revertFor, verifyFor } from '@pgsql/scripts';
 import type { Granularity, StatementFacts } from '@pgsql/transform';
@@ -27,7 +28,27 @@ import {
   restructureSql
 } from '@pgsql/transform';
 
+import { nameUnnamedConstraints, subObjectIdentityOf } from './sub-object';
+
 export type { Granularity } from '@pgsql/transform';
+
+/**
+ * How statements are distributed across pgpm changes — orthogonal to
+ * `Granularity`, which shapes the SQL *within* a change.
+ *
+ * - `object`     — one change per created object (the default): a table's
+ *                  CREATE and all its ALTERs share one plan entry.
+ * - `alteration` — one change per alteration: every `ADD COLUMN` /
+ *                  `ADD CONSTRAINT` becomes its own plan entry with its own
+ *                  deploy/revert/verify and graph-derived requires, so a
+ *                  single column can deploy or revert independently.
+ */
+export type ChangeGranularity = 'object' | 'alteration';
+
+export const CHANGE_GRANULARITIES: readonly ChangeGranularity[] = ['object', 'alteration'];
+
+export const isChangeGranularity = (value: string): value is ChangeGranularity =>
+  (CHANGE_GRANULARITIES as readonly string[]).includes(value);
 
 /** A change's deploy surface going into or out of the restructure. */
 export interface GranularityChange {
@@ -57,6 +78,21 @@ export interface RestructuredChange extends GranularityChange {
 
 export interface RestructureModuleOptions {
   granularity: Granularity;
+  /**
+   * Change-level distribution (default `object`). With `alteration`, every
+   * single-command `ALTER TABLE ADD COLUMN` / `ADD CONSTRAINT` in the
+   * restructured script becomes its own change, named by the sub-object's
+   * naming-spec path (`.../columns/{name}/column`,
+   * `.../constraints/{name}/constraint`); unnamed constraints are first
+   * given their Postgres default name so each change stays revertible.
+   */
+  changeGranularity?: ChangeGranularity;
+  /**
+   * Derive a change name for an alteration group from its sub-object
+   * identity (used only with `changeGranularity: 'alteration'`). Defaults to
+   * `pathFor` in `directory` style.
+   */
+  subObjectName?: (identity: NamingIdentity) => string;
   /**
    * Derive a change name for a statement group from the facts of its primary
    * (creating) statement. Defaults to {@link defaultChangeName}: naming spec
@@ -109,15 +145,19 @@ export function restructureChanges(
   options: RestructureModuleOptions
 ): RestructureModuleResult {
   const nameFor = options.changeName ?? defaultChangeName;
+  const subNameFor = options.subObjectName ?? ((identity: NamingIdentity): string => pathFor(identity));
+  const alteration = options.changeGranularity === 'alteration';
 
   const flattened = changes
     .map(c => c.deploy.trim())
     .filter(Boolean)
     .join('\n\n');
 
-  const { sql, warnings } = restructureSql(flattened, {
+  const restructured = restructureSql(flattened, {
     granularity: options.granularity
   });
+  const warnings = restructured.warnings;
+  const sql = alteration ? nameUnnamedConstraints(restructured.sql) : restructured.sql;
 
   // Re-classify the emitted script; group statements by the object they
   // target (creates[0]), so a table's CREATE and its remaining ALTERs land
@@ -129,6 +169,10 @@ export function restructureChanges(
   const groupKeys: string[] = [];
   const groupFacts: StatementFacts[] = [];
   const groupKeyToIndex = new Map<string, number>();
+  /** Sub-object path for alteration groups; null means name via `nameFor`. */
+  const groupSubName: (string | null)[] = [];
+  /** For alteration groups: the object-group key of the owning table. */
+  const groupOwnerKey: (string | null)[] = [];
 
   facts.forEach((f, i) => {
     const created = f.creates[0];
@@ -138,12 +182,31 @@ export function restructureChanges(
       if (i > 0 && groupOf[i - 1] !== -1) groupOf[i] = groupOf[i - 1];
       return;
     }
+    if (alteration) {
+      const sub = subObjectIdentityOf(f);
+      if (sub) {
+        const key = `sub\u0000${sub.kind}\u0000${sub.schema ?? ''}\u0000${sub.table}\u0000${sub.name}`;
+        let g = groupKeyToIndex.get(key);
+        if (g === undefined) {
+          g = groupKeys.length;
+          groupKeys.push(key);
+          groupFacts.push(f);
+          groupSubName.push(subNameFor(sub));
+          groupOwnerKey.push(`${sub.schema ?? ''}.${sub.table}`);
+          groupKeyToIndex.set(key, g);
+        }
+        groupOf[i] = g;
+        return;
+      }
+    }
     const key = `${created.schema ?? ''}.${created.name}`;
     let g = groupKeyToIndex.get(key);
     if (g === undefined) {
       g = groupKeys.length;
       groupKeys.push(key);
       groupFacts.push(f);
+      groupSubName.push(null);
+      groupOwnerKey.push(null);
       groupKeyToIndex.set(key, g);
     } else if (!(groupFacts[g].kind in KIND_DIRS) && groupFacts[g].kind !== 'schema' && (f.kind in KIND_DIRS || f.kind === 'schema')) {
       // Prefer naming the group after its creating statement over an ALTER.
@@ -152,7 +215,7 @@ export function restructureChanges(
     groupOf[i] = g;
   });
 
-  const groupNames = groupFacts.map(nameFor);
+  const groupNames = groupFacts.map((f, g) => groupSubName[g] ?? nameFor(f));
 
   // Schema producers, for schema-level change dependencies.
   const schemaGroup = new Map<string, number>();
@@ -197,6 +260,40 @@ export function restructureChanges(
       if (to !== undefined && to !== from) groupDeps[from].add(to);
     }
   });
+
+  // Alteration groups depend on their table's own change, and constraint
+  // groups additionally on the column changes they key on — the statement
+  // graph keys everything by the table, so these finer edges are added here.
+  if (alteration) {
+    const columnGroup = new Map<string, number>();
+    groupKeys.forEach((key, g) => {
+      const parts = key.split('\u0000');
+      if (parts[0] === 'sub' && parts[1] === 'column') {
+        columnGroup.set(`${parts[2]}.${parts[3]}.${parts[4]}`, g);
+      }
+    });
+    groupKeys.forEach((key, g) => {
+      const owner = groupOwnerKey[g];
+      if (owner === null) return;
+      const tableGroup = groupKeyToIndex.get(owner);
+      if (tableGroup !== undefined && tableGroup !== g) groupDeps[g].add(tableGroup);
+      const parts = key.split('\u0000');
+      if (parts[1] !== 'constraint') return;
+      const constraint = (groupFacts[g].stmt?.AlterTableStmt as {
+        cmds?: { AlterTableCmd?: { def?: { Constraint?: {
+          keys?: { String?: { sval?: string } }[];
+          fk_attrs?: { String?: { sval?: string } }[];
+        } } } }[];
+      } | undefined)?.cmds?.[0]?.AlterTableCmd?.def?.Constraint;
+      const referenced = [...(constraint?.keys ?? []), ...(constraint?.fk_attrs ?? [])]
+        .map(k => k.String?.sval)
+        .filter((s): s is string => typeof s === 'string');
+      for (const col of referenced) {
+        const to = columnGroup.get(`${owner}.${col}`);
+        if (to !== undefined && to !== g) groupDeps[g].add(to);
+      }
+    });
+  }
 
   // Emit groups in first-statement order (already topological).
   const order = [...groupNames.keys()].sort((a, b) => {

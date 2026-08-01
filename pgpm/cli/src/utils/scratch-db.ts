@@ -13,8 +13,8 @@
  * `PgpmMigrate` from `@pgpmjs/core`, and `core` already depends on `transform`
  * — hosting the oracle in `transform` would close that cycle.
  */
-import { CatalogSnapshot, diffCatalogSnapshots, snapshotCatalog } from '@pgpmjs/transform';
 import { Logger } from '@pgpmjs/logger';
+import { CatalogSnapshot, diffCatalogSnapshots, snapshotCatalog } from '@pgpmjs/transform';
 import { getPgPool } from 'pg-cache';
 import type { PgConfig } from 'pg-env';
 

@@ -38,6 +38,10 @@ describe('PGPM naming spec v1', () => {
       .toBe('schemas/app/tables/users/indexes/users_email_idx');
     expect(pathFor(id({ kind: 'constraint', name: 'users_pkey', table: 'users' })))
       .toBe('schemas/app/tables/users/constraints/users_pkey/constraint');
+    expect(pathFor(id({ kind: 'column', name: 'email', table: 'users' })))
+      .toBe('schemas/app/tables/users/columns/email/column');
+    expect(pathFor(id({ kind: 'column', name: 'email', table: 'users' }), { style: 'flat' }))
+      .toBe('schemas/app/tables/users/columns/email');
     expect(pathFor(id({ kind: 'seed_dml', name: 'users', table: 'users' })))
       .toBe('schemas/app/tables/users/fixtures/users');
   });

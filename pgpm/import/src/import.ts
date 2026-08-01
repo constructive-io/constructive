@@ -21,7 +21,7 @@
  */
 import { PgpmRow } from '@pgpmjs/ast';
 import { ObjectIdentity, pathFor, PathStyle } from '@pgpmjs/naming-spec';
-import { classifyStatements, ExportGranularity, loadModule, regenerateScripts, restructureExportRows, StatementFacts } from '@pgpmjs/transform';
+import { ChangeGranularity, classifyStatements, ExportGranularity, loadModule, regenerateScripts, restructureExportRows, StatementFacts } from '@pgpmjs/transform';
 
 import { copyBlockToInsert, copyTargetOf, DumpSource } from './dump-source';
 
@@ -30,6 +30,8 @@ export const MISC_CHANGE_PATH = 'misc/statements';
 export interface ImportDumpRowsOptions {
   /** Granularity dial (default: `object`). */
   granularity?: ExportGranularity;
+  /** Change-level distribution (default: `object`). */
+  changeGranularity?: ChangeGranularity;
   /** Naming spec path style (default: `directory`). */
   naming?: PathStyle;
   /** Emit data statements (COPY blocks, INSERTs) as seed fixture changes. */
@@ -494,7 +496,7 @@ export const importDumpRows = async (
       ? [{ name: 'import/dump', deploy: 'import/dump', deps: [], content: program }]
       : [],
     granularity,
-    { naming: style }
+    { naming: style, changeGranularity: options.changeGranularity }
   );
   warnings.push(...restructured.warnings);
 

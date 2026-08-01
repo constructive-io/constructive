@@ -24,7 +24,8 @@ one canonical model:
 
 | Axis | Projections | What changes | What stays the same |
 | --- | --- | --- | --- |
-| **granularity** | `atomic` · `object` · `consolidated` | how finely a change is split (one `ALTER` per column vs one statement per object vs the whole thing) | the resulting catalog |
+| **granularity** | `atomic` · `object` · `consolidated` | the SQL statement shape (one `ALTER` per column vs one statement per object vs the whole thing) | the schema |
+| **change granularity** | `object` · `alteration` | the plan-entry shape (one change per object vs one change per column/constraint, each with its own deploy/revert/verify) | the schema |
 | **partition** | one module vs many | which objects live in which package | the combined schema |
 | **diff** | `v1 → v2` migration | — | derived, never hand-written |
 | **output** | pgpm module · linear `.sql` · bundle | the artifact format | the migration |
@@ -47,6 +48,10 @@ pgpm import schema/schema.sql --pkg blog --out ./out
 cd out/blog
 pgpm transform --granularity atomic
 pgpm transform --granularity consolidated
+
+# 2b. The fourth dial: one change PER ALTERATION — every column and constraint
+#     becomes its own plan entry with its own deploy/revert/verify + requires
+pgpm transform --granularity atomic --change-granularity alteration --out ../alteration
 
 # 3. Partition the source into app + security modules
 cd ../..
@@ -74,8 +79,12 @@ The suite ([`__tests__/projections.e2e.test.ts`](./__tests__/projections.e2e.tes
 runs the real CLI and then compares the emitted artifacts **semantically** — no
 database needed, because equivalence is checked at the identity-keyed model:
 
-- **granularity-invariant** — `object` and `consolidated` normalize to the same
-  schema (empty diff).
+- **granularity-invariant** — `atomic`, `object`, and `consolidated` all
+  normalize to the same schema (empty diff), including standalone
+  `ADD CONSTRAINT` placement.
+- **change-granularity-invariant** — one change per alteration (per column /
+  per constraint plan entries) still normalizes to the same schema (empty
+  diff).
 - **partition-invariant** — the `blog-core` + `blog-security` modules recombine
   to the same schema as the single module (empty diff).
 - **diff is exact** — `schema.sql → schema-v2.sql` derives precisely the real
@@ -91,12 +100,5 @@ catalog**; that is the guarantee `--check` / `--verify` enforce, and it is
 covered against live Postgres by the engine's own suites
 (`pgpm/cli` `transform-e2e` "dial parity" and `diff-e2e`). This example is
 deliberately database-free and asserts the model-level invariants above.
-
-> Note: `atomic` authorship emits standalone `ALTER TABLE … ADD CONSTRAINT`
-> statements. Because Postgres names such constraints at deploy time, the
-> semantic normalizer does not yet fold every standalone constraint back into
-> its owning table object, so `atomic` is guaranteed **catalog-equivalent**
-> rather than AST-identical to `object`/`consolidated`. Tightening that
-> normalization is tracked in `constructive-planning`.
 
 It's a normal workspace package, so `pnpm install` at the repo root wires it up.

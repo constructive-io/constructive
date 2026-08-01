@@ -124,6 +124,77 @@ describe('restructureChanges', () => {
     )).toBe(true);
   });
 
+  describe('changeGranularity: alteration', () => {
+    const opts = { granularity: 'atomic' as const, changeGranularity: 'alteration' as const };
+
+    it('splits each ADD COLUMN / ADD CONSTRAINT into its own change', () => {
+      const result = restructureChanges(ATOMIC_CHANGES, opts);
+      const names = result.changes.map(c => c.name);
+      expect(names).toEqual([
+        'schemas/app/schema',
+        'schemas/app/tables/users/table',
+        'schemas/app/tables/users/columns/id/column',
+        'schemas/app/tables/users/constraints/users_pkey/constraint',
+        'schemas/app/tables/orders/table',
+        'schemas/app/tables/orders/columns/id/column',
+        'schemas/app/tables/orders/columns/user_id/column',
+        'schemas/app/tables/orders/constraints/orders_user_fk/constraint'
+      ]);
+    });
+
+    it('gives each alteration its own deploy/revert/verify', () => {
+      const result = restructureChanges(ATOMIC_CHANGES, opts);
+
+      const column = result.changes.find(c => c.name === 'schemas/app/tables/users/columns/id/column')!;
+      expect(column.deploy).toContain('ADD COLUMN id');
+      expect(column.revert).toContain('DROP COLUMN id');
+      expect(column.verify).toContain('information_schema.columns');
+
+      const pkey = result.changes.find(c => c.name === 'schemas/app/tables/users/constraints/users_pkey/constraint')!;
+      expect(pkey.deploy).toContain('ADD CONSTRAINT users_pkey');
+      expect(pkey.revert).toContain('DROP CONSTRAINT users_pkey');
+      expect(pkey.verify).toContain('information_schema.table_constraints');
+    });
+
+    it('derives per-alteration requires: column requires table, constraint requires its columns', () => {
+      const result = restructureChanges(ATOMIC_CHANGES, opts);
+
+      const column = result.changes.find(c => c.name === 'schemas/app/tables/users/columns/id/column')!;
+      expect(column.dependencies).toContain('schemas/app/tables/users/table');
+
+      const pkey = result.changes.find(c => c.name === 'schemas/app/tables/users/constraints/users_pkey/constraint')!;
+      expect(pkey.dependencies).toContain('schemas/app/tables/users/table');
+      expect(pkey.dependencies).toContain('schemas/app/tables/users/columns/id/column');
+
+      const fk = result.changes.find(c => c.name === 'schemas/app/tables/orders/constraints/orders_user_fk/constraint')!;
+      expect(fk.dependencies).toContain('schemas/app/tables/orders/columns/user_id/column');
+    });
+
+    it('names unnamed constraints with their Postgres default so each change is revertible', () => {
+      const result = restructureChanges([
+        {
+          name: 'schemas/app/tables/users/table',
+          dependencies: [],
+          deploy: [
+            'CREATE TABLE app.users ();',
+            'ALTER TABLE app.users ADD COLUMN id int;',
+            'ALTER TABLE app.users ADD PRIMARY KEY (id);'
+          ].join('\n')
+        }
+      ], opts);
+      const pkey = result.changes.find(c => c.name === 'schemas/app/tables/users/constraints/users_pkey/constraint')!;
+      expect(pkey.deploy).toContain('ADD CONSTRAINT users_pkey');
+      expect(pkey.revert).toContain('DROP CONSTRAINT users_pkey');
+      expect(result.warnings.filter(w => w.includes('revert not derivable'))).toEqual([]);
+    });
+
+    it('default object mode is unchanged', () => {
+      const object = restructureChanges(ATOMIC_CHANGES, { granularity: 'atomic' });
+      const explicit = restructureChanges(ATOMIC_CHANGES, { granularity: 'atomic', changeGranularity: 'object' });
+      expect(explicit.changes).toEqual(object.changes);
+    });
+  });
+
   it('supports custom change naming', () => {
     const result = restructureChanges(ATOMIC_CHANGES, {
       granularity: 'consolidated',

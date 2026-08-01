@@ -61,6 +61,7 @@ export type ObjectIdentityKind =
   | 'index'
   | 'trigger'
   | 'policy'
+  | 'column'
   | 'constraint'
   | 'seed_dml'
   | 'other';
@@ -99,6 +100,7 @@ const TABLE_SCOPED = new Set<ObjectIdentityKind>([
   'trigger',
   'policy',
   'index',
+  'column',
   'constraint',
   'seed_dml'
 ]);
@@ -116,6 +118,7 @@ const TABLE_DIRS: Partial<Record<ObjectIdentityKind, string>> = {
   trigger: 'triggers',
   policy: 'policies',
   index: 'indexes',
+  column: 'columns',
   constraint: 'constraints',
   seed_dml: 'fixtures'
 };
@@ -125,6 +128,7 @@ const KIND_TOKENS: Partial<Record<ObjectIdentityKind, string>> = {
   function: 'procedure',
   view: 'view',
   policy: 'policy',
+  column: 'column',
   constraint: 'constraint'
 };
 

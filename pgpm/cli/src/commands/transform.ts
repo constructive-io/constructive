@@ -1,8 +1,11 @@
 import { PgpmMigrate, PgpmPackage, PgpmRow } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import {
+  CHANGE_GRANULARITIES,
+  ChangeGranularity,
   EXPORT_GRANULARITIES,
   ExportGranularity,
+  isChangeGranularity,
   isExportGranularity,
   loadModuleSource,
   parsePartitionConfig,
@@ -44,6 +47,11 @@ Transform Command:
 Options:
   --help, -h              Show this help message
   --granularity <level>   Target granularity: atomic | object | consolidated (required)
+  --change-granularity <level>
+                          Change-level distribution: object | alteration
+                          (default: object). With alteration, every ADD COLUMN /
+                          ADD CONSTRAINT becomes its own change with its own
+                          deploy/revert/verify and requires.
   --partition <file>      Partition config (JSON: rules/defaultPackage/splitRiders)
                           splitting the module into multiple pgpm packages with
                           derived cross-package requires.
@@ -69,6 +77,7 @@ Examples:
   pgpm transform --granularity atomic --naming flat --out ./out
   pgpm transform --granularity object --partition partition.json --check
   pgpm transform --granularity consolidated --emit-sql migration.sql
+  pgpm transform --granularity atomic --change-granularity alteration
 `;
 
 const NAMING_STYLES = ['directory', 'flat'] as const;
@@ -155,6 +164,7 @@ const runCheck = async (transformed: TransformedModule): Promise<string[]> => {
 const transformModule = async (
   modulePath: string,
   granularity: ExportGranularity,
+  changeGranularity: ChangeGranularity,
   naming: NamingStyle,
   partition: PartitionConfig | undefined,
   out: string | undefined
@@ -169,7 +179,7 @@ const transformModule = async (
     content: change.deploy
   }));
 
-  const restructured = await restructureExportRows(rows, granularity, { naming });
+  const restructured = await restructureExportRows(rows, granularity, { naming, changeGranularity });
   warnings.push(...restructured.warnings.map(w => `restructure (${granularity}): ${w}`));
 
   const outBase = resolveOutBase(modulePath, out);
@@ -217,6 +227,12 @@ export default async (
     await cliExitWithError(`Invalid --granularity "${granularityRaw}". Expected one of: ${EXPORT_GRANULARITIES.join(', ')}.`);
   }
   const granularity = granularityRaw as ExportGranularity;
+
+  const changeGranularityRaw = (argv['change-granularity'] as string) ?? (argv.changeGranularity as string) ?? 'object';
+  if (!isChangeGranularity(changeGranularityRaw)) {
+    await cliExitWithError(`Invalid --change-granularity "${changeGranularityRaw}". Expected one of: ${CHANGE_GRANULARITIES.join(', ')}.`);
+  }
+  const changeGranularity = changeGranularityRaw as ChangeGranularity;
 
   const namingRaw = (argv.naming as string) ?? 'directory';
   if (!(NAMING_STYLES as readonly string[]).includes(namingRaw)) {
@@ -276,7 +292,7 @@ export default async (
   for (const modulePath of modulePaths) {
     let transformed: TransformedModule;
     try {
-      transformed = await transformModule(modulePath, granularity, naming, partition, out);
+      transformed = await transformModule(modulePath, granularity, changeGranularity, naming, partition, out);
     } catch (err) {
       if (err instanceof PartitionCycleError) {
         await cliExitWithError(`Partition failed: ${err.message}`);
