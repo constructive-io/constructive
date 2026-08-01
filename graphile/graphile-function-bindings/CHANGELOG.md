@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.9](https://github.com/constructive-io/constructive/compare/graphile-function-bindings@1.10.8...graphile-function-bindings@1.10.9) (2026-08-01)
+
+**Note:** Version bump only for package graphile-function-bindings
+
 ## [1.10.8](https://github.com/constructive-io/constructive/compare/graphile-function-bindings@1.10.7...graphile-function-bindings@1.10.8) (2026-08-01)
 
 **Note:** Version bump only for package graphile-function-bindings

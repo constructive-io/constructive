@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/naming-spec@0.1.2...@pgpmjs/naming-spec@0.2.0) (2026-08-01)
+
+### Features
+
+- **pgpm:** change granularity dial — one change per alteration (planning [#1342](https://github.com/constructive-io/constructive/issues/1342)) ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
+
 ## [0.1.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/naming-spec@0.1.1...@pgpmjs/naming-spec@0.1.2) (2026-07-31)
 
 **Note:** Version bump only for package @pgpmjs/naming-spec
