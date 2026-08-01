@@ -22,6 +22,24 @@ export const cleanTree = (tree: any): any => {
   });
 };
 
+/**
+ * Same as cleanTree, but also drops the byte-offset fields PG17+ added for list
+ * expressions (`ARRAY[...]`, `x IN (...)`). They are positional metadata, not
+ * semantics, so they must not count as a round-trip difference. Kept separate
+ * from cleanTree so migration hashes (hashSqlFile) stay stable.
+ */
+export const cleanTreeForDiff = (tree: any): any => {
+  return transformProps(tree, {
+    stmt_len: noop,
+    stmt_location: noop,
+    location: noop,
+    list_start: noop,
+    list_end: noop,
+    rexpr_list_start: noop,
+    rexpr_list_end: noop,
+  });
+};
+
 interface PackageModuleOptions {
   usePlan?: boolean;
   extension?: boolean;
@@ -94,11 +112,11 @@ export const mergeSqlStatements = async (
     sql: `${topLine}${finalSql}`,
   };
 
-  const diff = JSON.stringify(cleanTree(tree1)) !== JSON.stringify(cleanTree(tree2));
+  const diff = JSON.stringify(cleanTreeForDiff(tree1)) !== JSON.stringify(cleanTreeForDiff(tree2));
   if (diff) {
     results.diff = true;
-    results.tree1 = JSON.stringify(cleanTree(tree1), null, 2);
-    results.tree2 = JSON.stringify(cleanTree(tree2), null, 2);
+    results.tree1 = JSON.stringify(cleanTreeForDiff(tree1), null, 2);
+    results.tree2 = JSON.stringify(cleanTreeForDiff(tree2), null, 2);
   }
 
   return results;
