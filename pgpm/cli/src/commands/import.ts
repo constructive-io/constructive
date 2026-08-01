@@ -61,7 +61,7 @@ Options:
   --granularity <level>   Granularity dial: atomic | object | consolidated
                           (default: object)
   --change-granularity <level>
-                          Change-level distribution: object | alteration
+                          Change-level distribution: alteration | object | single
                           (default: object)
   --naming <style>        Change path naming style: directory | flat (default: directory)
   --out <dir>             Output base directory (default: current directory);

@@ -195,6 +195,38 @@ describe('restructureChanges', () => {
     });
   });
 
+  describe('changeGranularity: single', () => {
+    it('collapses the whole module into one change with one deploy/revert/verify', () => {
+      const result = restructureChanges(ATOMIC_CHANGES, {
+        granularity: 'consolidated',
+        changeGranularity: 'single'
+      });
+      expect(result.changes).toHaveLength(1);
+      const [change] = result.changes;
+      expect(change.name).toBe('module/init');
+      expect(change.deploy).toContain('CREATE SCHEMA app');
+      expect(change.deploy).toContain('CREATE TABLE app.users');
+      expect(change.deploy).toContain('CREATE TABLE app.orders');
+      expect(change.revert).toContain('DROP TABLE');
+      expect(change.revert).toContain('DROP SCHEMA app');
+      expect(change.verify).toContain('information_schema');
+    });
+
+    it('keeps only external requires and honors a custom single change name', () => {
+      const withExternal = ATOMIC_CHANGES.map((c, i) =>
+        i === 0 ? { ...c, dependencies: ['other-module:schemas/ext/schema'] } : c
+      );
+      const result = restructureChanges(withExternal, {
+        granularity: 'consolidated',
+        changeGranularity: 'single',
+        singleChangeName: 'migration/v1'
+      });
+      expect(result.changes).toHaveLength(1);
+      expect(result.changes[0].name).toBe('migration/v1');
+      expect(result.changes[0].dependencies).toEqual(['other-module:schemas/ext/schema']);
+    });
+  });
+
   it('supports custom change naming', () => {
     const result = restructureChanges(ATOMIC_CHANGES, {
       granularity: 'consolidated',
