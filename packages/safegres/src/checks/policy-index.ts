@@ -271,9 +271,10 @@ export function checkUnhoistedPolicyFunctions(
       message:
         `Policy "${policyName}" on ${table.schema}.${table.name} calls ${info.name}() per row — the call is not wrapped in a scalar sub-select`,
       hint:
-        `STABLE does not mean "evaluated once": the planner re-runs ${info.name}() for every row the scan considers. `
-        + `Wrap it as (SELECT ${info.name}()) so it references no column and the planner hoists it into an InitPlan, `
-        + 'evaluated once per query and usable as an index probe value.',
+        `STABLE does not mean "evaluated once". Whenever this qual lands in a Filter rather than an index `
+        + `condition — an unindexed policy column, a join, an OR branch — ${info.name}() is executed for every `
+        + `row the scan considers. Wrap it as (SELECT ${info.name}()) so the expression references no column and `
+        + 'the planner hoists it into an InitPlan: one call per query, whatever plan it picks.',
       context: { function: info.name, clause }
     });
   });
