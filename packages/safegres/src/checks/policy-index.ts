@@ -214,6 +214,109 @@ export function checkNonLeakproofPolicyFunctions(
   return out;
 }
 
+/**
+ * System functions worth flagging for X9 despite being built in: reading a GUC
+ * per row is the exact pattern the rule exists to catch, whether it goes
+ * through a wrapper or not.
+ */
+const HOISTABLE_SYSTEM_FUNCTIONS = new Set(['current_setting', 'pg_catalog.current_setting']);
+
+/**
+ * X9: the policy calls a STABLE function whose arguments don't depend on the
+ * row, but the call isn't wrapped in a scalar sub-select.
+ *
+ * `STABLE` promises the result won't change within the statement; it does *not*
+ * make the planner evaluate the call once. A bare `current_principal_id()` in a
+ * qual is executed for every row the scan considers. Wrapped as
+ * `(SELECT current_principal_id())` the expression references no column, so the
+ * planner hoists it into an InitPlan: one call per query, and the result is a
+ * constant the index can be probed with.
+ *
+ * VOLATILE calls are deliberately excluded — per-row evaluation is their
+ * defined behaviour, and hoisting one would change semantics (P1 covers those).
+ * IMMUTABLE calls with constant arguments are folded at plan time already.
+ */
+export function checkUnhoistedPolicyFunctions(
+  table: TableSnapshot,
+  expr: PgAstNode,
+  volatility: Map<string, ProcVolatility>,
+  policyName: string,
+  clause: PolicyClause
+): Finding[] {
+  const out: Finding[] = [];
+  const seen = new Set<string>();
+
+  walk(expr as object, (path: NodePath) => {
+    if (path.tag !== 'FuncCall') return;
+
+    const node = path.node as Record<string, unknown>;
+    const qualified = funcNameQualified(node);
+    const bare = qualified.split('.').pop() ?? qualified;
+    const info = volatility.get(qualified) ?? volatility.get(bare);
+    if (!info) return;
+    if (info.volatility !== 's') return;
+    if (info.isSystem && !HOISTABLE_SYSTEM_FUNCTIONS.has(info.name)) return;
+    if (referencesColumn(node)) return;
+    if (isHoisted(path)) return;
+    if (seen.has(info.name)) return;
+    seen.add(info.name);
+
+    out.push({
+      code: 'X9',
+      severity: 'medium',
+      category: 'index',
+      schema: table.schema,
+      table: table.name,
+      policy: policyName,
+      message:
+        `Policy "${policyName}" on ${table.schema}.${table.name} calls ${info.name}() per row — the call is not wrapped in a scalar sub-select`,
+      hint:
+        `STABLE does not mean "evaluated once": the planner re-runs ${info.name}() for every row the scan considers. `
+        + `Wrap it as (SELECT ${info.name}()) so it references no column and the planner hoists it into an InitPlan, `
+        + 'evaluated once per query and usable as an index probe value.',
+      context: { function: info.name, clause }
+    });
+  });
+
+  return out;
+}
+
+/** True when any argument of the call references a column (so it can't be hoisted). */
+function referencesColumn(funcCall: Record<string, unknown>): boolean {
+  const args = funcCall.args;
+  if (!Array.isArray(args) || args.length === 0) return false;
+
+  let found = false;
+  for (const arg of args) {
+    walk(arg as object, (path: NodePath) => {
+      if (path.tag === 'ColumnRef') found = true;
+    });
+    if (found) return true;
+  }
+  return false;
+}
+
+/**
+ * True when the call already sits inside an uncorrelated scalar sub-select —
+ * `(SELECT fn())` — which is what makes the planner hoist it.
+ *
+ * Being inside an `EXISTS` sub-select is *not* enough: that subquery is
+ * correlated with the outer row, so it runs per row and takes the function
+ * call with it.
+ */
+function isHoisted(path: NodePath): boolean {
+  for (let cursor = path.parent; cursor; cursor = cursor.parent) {
+    if (cursor.tag !== 'SubLink') continue;
+    const sublink = cursor.node as Record<string, unknown>;
+    if (sublink.subLinkType !== 'EXPR_SUBLINK') return false;
+    const subselect = sublink.subselect as Record<string, unknown> | undefined;
+    const stmt = (subselect?.SelectStmt ?? subselect) as Record<string, unknown> | undefined;
+    const from = stmt?.fromClause;
+    return !Array.isArray(from) || from.length === 0;
+  }
+  return false;
+}
+
 /** Columns that sit in the leading position of at least one index. */
 function leadingColumns(indexes: TableIndexSnapshot): Set<string> {
   const out = new Set<string>();

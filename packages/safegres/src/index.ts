@@ -46,6 +46,7 @@ export {
 export {
   checkNonLeakproofPolicyFunctions,
   checkPolicyColumnCasts,
+  checkUnhoistedPolicyFunctions,
   checkUnindexedPolicyColumns,
   collectPredicateColumns
 } from './checks/policy-index';

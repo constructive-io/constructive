@@ -26,6 +26,7 @@ import {
 import {
   checkNonLeakproofPolicyFunctions,
   checkPolicyColumnCasts,
+  checkUnhoistedPolicyFunctions,
   checkUnindexedPolicyColumns,
   collectPredicateColumns,
   type PredicateColumn
@@ -417,15 +418,19 @@ async function auditTableAst(
 
     if (!indexes) continue;
 
-    // --- Policy-aware perf rules (X2/X3/X4) ---
+    // --- Policy-aware perf rules (X2/X3/X4/X9) ---
     const cols: PredicateColumn[] = [];
     if (using) {
       cols.push(...collectPredicateColumns(using, 'USING', table.name));
       findings.push(...checkNonLeakproofPolicyFunctions(table, using, volatility, policy.name));
+      findings.push(...checkUnhoistedPolicyFunctions(table, using, volatility, policy.name, 'USING'));
     }
     if (withCheck) {
       cols.push(...collectPredicateColumns(withCheck, 'WITH CHECK', table.name));
       findings.push(...checkNonLeakproofPolicyFunctions(table, withCheck, volatility, policy.name));
+      findings.push(
+        ...checkUnhoistedPolicyFunctions(table, withCheck, volatility, policy.name, 'WITH CHECK')
+      );
     }
     if (cols.length > 0) predicateColumns.set(policy.name, cols);
   }
