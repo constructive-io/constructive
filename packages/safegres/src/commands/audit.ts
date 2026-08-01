@@ -47,8 +47,9 @@ import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { type ExplainReport, proveFindings } from '../perf/explain';
 import { resolveExposure } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
-import { introspectIndexes, type TableIndexSnapshot } from '../pg/indexes';
+import { introspectIndexes, introspectViewBodies, type TableIndexSnapshot } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
+import { type AccessPath, classifyPaths } from '../pg/paths';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
 import { introspectStats, type StatsSnapshot } from '../pg/stats';
@@ -155,6 +156,21 @@ export async function audit(
     indexSnapshot.map((t) => [`${t.schema}.${t.name}`, t])
   );
 
+  // Which foreign keys are query paths. Without this X1 demands an index for
+  // every key, including write-once provisioning pointers nothing reads —
+  // where the index is a write on every insert in exchange for nothing.
+  const paths: Map<string, AccessPath> = perfEnabled && config.perf?.paths?.infer !== false
+    ? classifyPaths(
+      indexSnapshot,
+      snapshot,
+      await introspectViewBodies(exec, {
+        schemas: options.schemas ?? config.schemas,
+        excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+      }),
+      { minPointers: config.perf?.paths?.minPointers }
+    )
+    : new Map();
+
   for (const table of snapshot) {
     // --- RLS flags (structural) ---
     const a1 = checkRlsEnabledNoPolicies(table);
@@ -202,7 +218,7 @@ export async function audit(
 
   if (perfEnabled) {
     for (const table of indexSnapshot) {
-      findings.push(...checkUnindexedForeignKeys(table));
+      findings.push(...checkUnindexedForeignKeys(table, paths));
       findings.push(...checkRedundantIndexes(table));
       findings.push(...checkUnindexedSearchColumns(table));
       findings.push(...checkUnindexedSortColumns(table));
@@ -320,6 +336,15 @@ export async function audit(
         exposureKnown: exposure.known
       })
     };
+
+    if (paths.size > 0) {
+      const cold = [...paths.values()].filter((p) => p.state === 'cold');
+      perf.paths = {
+        total: paths.size,
+        cold: cold.length,
+        tables: new Set(cold.map((p) => `${p.schema}.${p.table}`)).size
+      };
+    }
 
     if (statsSnapshot) {
       const stats: PerfStatsReport = {

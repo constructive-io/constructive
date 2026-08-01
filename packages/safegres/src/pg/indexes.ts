@@ -38,6 +38,10 @@ export interface ColumnInfo {
   type: string;
   /** Base type name without modifiers, e.g. `timestamptz`, `vector`. */
   baseType: string;
+  /** `pg_attribute.attnotnull`. */
+  notNull: boolean;
+  /** The column default as SQL, or `null` when it has none. */
+  defaultExpr: string | null;
 }
 
 export interface ForeignKeyInfo {
@@ -163,10 +167,13 @@ export async function introspectIndexes(
           'name', a.attname,
           'attnum', a.attnum,
           'type', format_type(a.atttypid, a.atttypmod),
-          'baseType', t.typname
+          'baseType', t.typname,
+          'notNull', a.attnotnull,
+          'defaultExpr', pg_get_expr(d.adbin, d.adrelid)
         ) ORDER BY a.attnum)
          FROM pg_attribute a
          JOIN pg_type t ON t.oid = a.atttypid
+         LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
          WHERE a.attrelid = r.oid AND a.attnum > 0 AND NOT a.attisdropped),
         '[]'::jsonb
       )                                                 AS columns
@@ -198,6 +205,38 @@ export async function introspectIndexes(
     indexes: r.indexes,
     foreignKeys: r.foreign_keys
   }));
+}
+
+/**
+ * Every view and materialized-view body in scope, as SQL text.
+ *
+ * A column named in a view definition is read by something, which is the
+ * cheapest available refutation of "nothing queries this column" — see
+ * {@link classifyPaths}.
+ */
+export async function introspectViewBodies(
+  exec: QueryExecutor,
+  options: Pick<IntrospectOptions, 'schemas' | 'excludeSchemas'> = {}
+): Promise<string[]> {
+  const excludes = [...DEFAULT_EXCLUDES, ...(options.excludeSchemas ?? [])];
+  const schemaFilter = options.schemas && options.schemas.length > 0
+    ? `AND n.nspname = ANY($1::text[])`
+    : `AND NOT (n.nspname = ANY($2::text[]))`;
+
+  const { rows } = await exec.query<{ definition: string }>(
+    // Both parameters are referenced (even when only one filters) so Postgres
+    // can infer their types — an unused $N errors out at bind time.
+    `WITH _params AS (
+       SELECT $1::text[] AS include_schemas, $2::text[] AS exclude_schemas
+     )
+     SELECT pg_get_viewdef(c.oid) AS definition
+     FROM pg_class c
+     JOIN pg_namespace n ON n.oid = c.relnamespace
+     WHERE c.relkind IN ('v', 'm')
+       ${schemaFilter}`,
+    [options.schemas ?? [], excludes]
+  );
+  return rows.map((r) => r.definition);
 }
 
 /**

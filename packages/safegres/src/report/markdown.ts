@@ -55,8 +55,15 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
 
   if (report.perf) {
     out.push(...findingSection('Performance findings', report.perf.findings, options));
-    const { stats, explain, diff } = report.perf;
+    const { paths, stats, explain, diff } = report.perf;
     const notes: string[] = [];
+    if (paths && paths.cold > 0) {
+      notes.push(
+        `Access paths: ${paths.cold} of ${paths.total} foreign keys across ${paths.tables} `
+          + 'provisioning-config tables are written once and read by nothing, so X1 does not '
+          + 'ask for an index on them (`perf.paths.infer: false` to disable).'
+      );
+    }
     if (stats) {
       notes.push(
         `Runtime statistics: ${stats.tables} tables, counters since ${stats.statsReset ?? 'server start'}`

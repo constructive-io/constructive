@@ -7,7 +7,7 @@ import type { ColumnInfo, IndexInfo, TableIndexSnapshot } from '../src/pg/indexe
  * and the check reads nothing but the catalog shape.
  */
 function column(name: string, attnum: number, type: string, baseType = type): ColumnInfo {
-  return { name, attnum, type, baseType };
+  return { name, attnum, type, baseType, notNull: false, defaultExpr: null };
 }
 
 function index(name: string, method: string, columns: number[], partial = false): IndexInfo {

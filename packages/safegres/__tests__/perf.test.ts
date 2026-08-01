@@ -47,6 +47,78 @@ describe('perf dimension', () => {
     expect(posts?.context).toMatchObject({ columns: ['author_id'] });
   });
 
+  describe('X1 cold access paths', () => {
+    function coldConstraints(findings: Finding[]): string[] {
+      return findings
+        .filter((f) => f.code === 'X1')
+        .map((f) => (f.context as { constraint: string }).constraint)
+        .sort();
+    }
+
+    it('exempts write-once pointers on a config record, but not its tenant key', async () => {
+      await applyFixture('x1-cold-paths.sql');
+      const report = await audit(pg.client as never, { schemas: ['fx_cold'], perf: true });
+
+      // agent_module: only the tenant key is a query path — a policy filters
+      // on it. The three pointer keys are cold and raise nothing.
+      expect(coldConstraints(report.perf!.findings).filter((c) => c.startsWith('agent_module')))
+        .toEqual(['agent_module_database_id_fkey']);
+    });
+
+    it('leaves hot relationships, single-pointer tables and view-read keys alone', async () => {
+      const report = await audit(pg.client as never, { schemas: ['fx_cold'], perf: true });
+      const all = coldConstraints(report.perf!.findings);
+
+      // No constant defaults: a real relationship table, every key hot.
+      expect(all).toEqual(expect.arrayContaining([
+        'grants_actor_id_fkey',
+        'grants_grantor_id_fkey'
+      ]));
+      // One pointer is below the config-record threshold.
+      expect(all).toEqual(expect.arrayContaining([
+        'one_pointer_owner_id_fkey',
+        'one_pointer_thread_table_id_fkey'
+      ]));
+      // A view reads these columns, which refutes coldness.
+      expect(all).toEqual(expect.arrayContaining([
+        'read_module_primary_view_table_id_fkey',
+        'read_module_secondary_view_table_id_fkey'
+      ]));
+    });
+
+    it('demands an index for every key when classification is off', async () => {
+      const report = await audit(pg.client as never, {
+        schemas: ['fx_cold'],
+        perf: true,
+        config: { perf: { paths: { infer: false } } }
+      });
+      expect(coldConstraints(report.perf!.findings).filter((c) => c.startsWith('agent_module')))
+        .toEqual([
+          'agent_module_database_id_fkey',
+          'agent_module_field_table_id_fkey',
+          'agent_module_message_table_id_fkey',
+          'agent_module_thread_table_id_fkey'
+        ]);
+    });
+
+    it('reports what it classified rather than suppressing findings silently', async () => {
+      const report = await audit(pg.client as never, { schemas: ['fx_cold'], perf: true });
+      expect(report.perf!.paths).toEqual({ total: 11, cold: 3, tables: 1 });
+    });
+
+    it('raises the config-record threshold on request', async () => {
+      const report = await audit(pg.client as never, {
+        schemas: ['fx_cold'],
+        perf: true,
+        config: { perf: { paths: { minPointers: 3 } } }
+      });
+      // agent_module has two write-once pointers, so a threshold of three
+      // stops classifying it and X1 returns for all four keys.
+      expect(coldConstraints(report.perf!.findings).filter((c) => c.startsWith('agent_module')))
+        .toHaveLength(4);
+    });
+  });
+
   it('X5: flags duplicate and prefix indexes, not unique/partial/expression ones', async () => {
     await applyFixture('x5-redundant-index.sql');
     const report = await audit(pg.client as never, { schemas: ['fx_x5'], perf: true });

@@ -120,6 +120,22 @@ export interface PerfConfig {
   stats?: PerfStatsConfig;
   /** Planner proof (`--explain`). Off unless enabled here or by flag. */
   explain?: PerfExplainConfig;
+  /** Access-path classification, which decides whether X1 applies to a key. */
+  paths?: PerfPathsConfig;
+}
+
+export interface PerfPathsConfig {
+  /**
+   * Classify write-once pointer keys on provisioning-config tables as cold,
+   * exempting them from X1. Default true. Set false to demand an index for
+   * every foreign key regardless of whether anything reads it.
+   */
+  infer?: boolean;
+  /**
+   * Write-once pointers a table needs before it counts as a config record.
+   * Default 2. Raise it to classify fewer tables.
+   */
+  minPointers?: number;
 }
 
 export interface PerfScoringConfig extends ScoringConfig {

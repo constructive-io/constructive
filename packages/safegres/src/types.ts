@@ -131,8 +131,24 @@ export interface PerfReport {
   diff?: import('./perf/baseline').PerfDiff;
   /** Runtime-statistics provenance, present when the audit ran with `--stats`. */
   stats?: PerfStatsReport;
+  /**
+   * Access-path classification: how many foreign keys X1 was not applied to,
+   * because nothing reads them. Reported so a suppression this broad is never
+   * silent.
+   */
+  paths?: PerfPathsReport;
   /** Planner-proof summary, present when the audit ran with `--explain`. */
   explain?: import('./perf/explain').ExplainReport;
+}
+
+/** What the access-path classifier concluded, and over what. */
+export interface PerfPathsReport {
+  /** Foreign keys considered. */
+  total: number;
+  /** Foreign keys classified as never queried, and so exempt from X1. */
+  cold: number;
+  /** Tables classified as provisioning-config records. */
+  tables: number;
 }
 
 /** Where the `S*` findings' numbers came from, and how much to trust them. */

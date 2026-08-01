@@ -163,7 +163,16 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
       }
     }
 
-    const { stats, explain } = report.perf;
+    const { paths, stats, explain } = report.perf;
+    if (paths && paths.cold > 0) {
+      lines.push(
+        paint(
+          'info',
+          `  access paths: ${paths.cold}/${paths.total} foreign keys on ${paths.tables} `
+            + 'config tables are written once and read by nothing — X1 exempt'
+        )
+      );
+    }
     if (stats) {
       lines.push(
         paint(

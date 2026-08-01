@@ -6,6 +6,7 @@
  */
 
 import type { IndexInfo, TableIndexSnapshot } from '../pg/indexes';
+import { type AccessPath, pathKey } from '../pg/paths';
 import type { Finding } from '../types';
 
 /**
@@ -19,8 +20,15 @@ import type { Finding } from '../types';
  *
  * Partial and expression indexes do not count: the planner cannot rely on
  * them for the referential-integrity lookup.
+ *
+ * `paths` classifies each foreign key as a query path or not. A cold path is
+ * skipped: the index would be paid for on every insert and read by nothing.
+ * See {@link classifyPaths}.
  */
-export function checkUnindexedForeignKeys(table: TableIndexSnapshot): Finding[] {
+export function checkUnindexedForeignKeys(
+  table: TableIndexSnapshot,
+  paths?: Map<string, AccessPath>
+): Finding[] {
   // Partitions inherit their parent's indexes; the parent carries the finding.
   if (table.isPartition) return [];
 
@@ -28,6 +36,7 @@ export function checkUnindexedForeignKeys(table: TableIndexSnapshot): Finding[] 
   for (const fk of table.foreignKeys) {
     if (fk.columns.length === 0) continue;
     if (table.indexes.some((idx) => indexCoversColumns(idx, fk.columns))) continue;
+    if (paths?.get(pathKey(table.schema, table.name, fk.name))?.state === 'cold') continue;
 
     const cols = fk.columnNames.join(', ');
     findings.push({
