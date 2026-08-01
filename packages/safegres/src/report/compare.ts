@@ -58,6 +58,14 @@ export interface RuleDelta {
   /** `after - before`. Positive means the rule fires more than it used to. */
   delta: number;
   dimension: 'security' | 'perf';
+  /**
+   * The previous run reported nothing for this code — a rule that did not
+   * exist in that version, or a dimension it never ran. Distinct from a real
+   * zero: `before: 0` means the rule ran and found nothing, and an increase
+   * off it is a regression; this means the movement is unknown, and rendering
+   * it as one is how a scanner upgrade comes out looking like a catastrophe.
+   */
+  unmeasuredBefore?: boolean;
 }
 
 export interface ReportComparison {
@@ -147,9 +155,18 @@ function ruleDeltas(
   ]);
   const out: RuleDelta[] = [];
   for (const code of codes) {
+    const measured = before?.rules[code] !== undefined;
     const b = before?.rules[code] ?? 0;
     const a = after?.rules[code] ?? 0;
-    if (a !== b) out.push({ code, before: b, after: a, delta: a - b, dimension });
+    if (a === b) continue;
+    out.push({
+      code,
+      before: b,
+      after: a,
+      delta: a - b,
+      dimension,
+      ...(measured ? {} : { unmeasuredBefore: true })
+    });
   }
   return out;
 }
@@ -169,7 +186,15 @@ export function compareReports(previous: ReportSnapshot, current: Report): Repor
   const rules = [
     ...ruleDeltas('security', previous.security, now.security),
     ...ruleDeltas('perf', previous.perf, now.perf)
-  ].sort((a, b) => b.delta - a.delta || a.code.localeCompare(b.code));
+  ]
+    // Regressions first, then improvements; rules with no previous reading
+    // last, since they are not movement and should not lead the table.
+    .sort(
+      (a, b) =>
+        Number(a.unmeasuredBefore ?? false) - Number(b.unmeasuredBefore ?? false)
+        || b.delta - a.delta
+        || a.code.localeCompare(b.code)
+    );
 
   const security = scoreDelta(previous.security, now.security);
   const perf = scoreDelta(previous.perf, now.perf);

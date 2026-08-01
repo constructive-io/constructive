@@ -68,6 +68,8 @@ safegres audit --perf --compare main-report.json --compare-ref main --format mar
 | Performance | **72.4**   | **C** | 🔴 ▼ −2.6 (from 75.0) · B → C · 40 → 46 findings | `X1` −18 (×46) |
 ```
 
+Colour tracks *direction*, never severity: 🟢 is a better score or fewer findings, 🔴 the reverse, ⚪ no movement. A rule the previous run never reported — one added by a newer safegres, or a dimension that run didn't scan — renders as `⚪ not measured before` rather than a red increase from zero, so upgrading the scanner doesn't read as a regression.
+
 The previous run is a file, not something safegres remembers: a scanner has no memory and shouldn't acquire one, so CI decides what "previous" means (the report artifact from the base branch, a committed scoreboard, last night's nightly) and hands it over. Any earlier `--format json` output works as input. When keeping whole reports is too much, `--write-snapshot <file>` writes just the aggregates the comparison reads — scores, grades, severity counts, per-rule counts — and `--compare` accepts either. `--compare-ref` labels the previous run in the output.
 
 Library callers get the same thing as `compareReports(previous, report)`, with `toSnapshot` / `parseSnapshot` / `serializeSnapshot` for the file side; the result is carried in JSON output as `comparison`.

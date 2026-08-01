@@ -130,8 +130,23 @@ describe('compareReports', () => {
     const cmp = compareReports(before, makeReport([finding()], [perfFinding()]));
     expect(cmp.perf).toBeUndefined();
     expect(cmp.rules).toEqual([
-      { code: 'X1', dimension: 'perf', before: 0, after: 1, delta: 1 }
+      { code: 'X1', dimension: 'perf', before: 0, after: 1, delta: 1, unmeasuredBefore: true }
     ]);
+  });
+
+  it('separates a rule the previous run never reported from a real zero', () => {
+    // A2 fired once before and twice now — a regression. A5 is new to this
+    // version of the scanner, so its count did not move, it appeared.
+    const before = toSnapshot(makeReport([finding()]));
+    const cmp = compareReports(
+      before,
+      makeReport([finding(), finding({ table: 'orders' }), finding({ code: 'A5' })])
+    );
+
+    expect(cmp.rules.find((r) => r.code === 'A2')?.unmeasuredBefore).toBeUndefined();
+    expect(cmp.rules.find((r) => r.code === 'A5')?.unmeasuredBefore).toBe(true);
+    // Real movement leads; an unmeasured rule is not a regression.
+    expect(cmp.rules[0].code).toBe('A2');
   });
 });
 
@@ -166,6 +181,27 @@ describe('rendering a comparison', () => {
     expect(out).toContain('Changes since main');
     expect(out).toMatch(/\| `X1` \| perf \| 1 \| 2 \| 🔴 ▲ \+1 \|/);
     expect(out).toMatch(/\| `A2` \| security \| 2 \| 1 \| 🟢 ▼ −1 \|/);
+    expect(out).toContain('🟢 improvement · 🔴 regression');
+  });
+
+  it('colors severity movement by direction, not by severity', () => {
+    const out = renderMarkdown(report, { summary: true });
+    // One fewer high (green) and one more medium (red), in a table whose
+    // header icons are red and yellow — the delta must not borrow those.
+    expect(out).toMatch(/2 → \*\*1\*\* 🟢 ▼ −1/);
+    expect(out).toMatch(/1 → \*\*2\*\* 🔴 ▲ \+1/);
+  });
+
+  it('does not paint a rule the previous run never measured as a regression', () => {
+    const upgraded = makeReport([finding(), finding({ code: 'A5' })]);
+    upgraded.comparison = compareReports(
+      toSnapshot(makeReport([finding()]), { ref: 'main' }),
+      upgraded
+    );
+    const out = renderMarkdown(upgraded, { summary: true });
+
+    expect(out).toMatch(/\| `A5` \| security \| — \| 1 \| ⚪ not measured before \|/);
+    expect(out).not.toMatch(/`A5`.*🔴/);
   });
 
   it('says so plainly when nothing changed', () => {
@@ -188,5 +224,12 @@ describe('rendering a comparison', () => {
     expect(out).toMatch(/Δ vs main: ▲ \+[\d.]+ \(from [\d.]+/);
     expect(out).toMatch(/Δ vs main: ▼ −[\d.]+/);
     expect(out).toContain('findings 1 → 2');
+  });
+
+  it('paints the terminal delta green when the score improved', () => {
+    const out = renderPretty(report, { color: true, summary: true });
+    // Improvement green, regression red — matching the markdown convention.
+    expect(out).toMatch(/\u001b\[32m▲ \+[\d.]+/);
+    expect(out).toMatch(/\u001b\[31m▼ −[\d.]+/);
   });
 });
