@@ -98,7 +98,14 @@ export function getPresignedUrlS3Config(): S3Config {
  */
 export function createBucketNameResolver(): BucketNameResolver {
   const { cdn } = getEnvOptions();
-  const prefix = cdn?.bucketName || 'test-bucket';
+  const prefix = cdn?.bucketName;
+
+  if (!prefix) {
+    throw new Error(
+      '[presigned-url-resolver] Missing CDN bucket name prefix. ' +
+      'Set CDN_BUCKET_NAME environment variable; there is no default bucket name.',
+    );
+  }
 
   return (databaseId: string, bucketKey: string): string => {
     return `${prefix}-${bucketKey}-${databaseId}`;

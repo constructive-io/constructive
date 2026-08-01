@@ -24,7 +24,7 @@ import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 
 import { deleteS3Object,generatePresignedPutUrl } from './s3-signer';
-import { getBucketConfig, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec } from './storage-module-cache';
+import { getBucketConfig, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, storedPhysicalName } from './storage-module-cache';
 import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:plugin');
@@ -90,63 +90,73 @@ function resolveS3(options: PresignedUrlPluginOptions): S3Config {
 }
 
 /**
- * Resolve the physical S3 bucket to read/write for a logical bucket row.
+ * Mint the physical S3 bucket name for a logical bucket's first provision.
  *
- * The row's stored `physical_name` is the source of truth once set; the
- * `resolveBucketName` hook only mints a name the first time (before the
- * physical bucket has been provisioned and recorded). Passing a `physicalName`
- * of `null` means "not provisioned yet" and falls back to the naming hook.
+ * This is a naming *policy*, consulted exactly once per bucket — before the
+ * physical bucket exists. Once provisioned, the recorded `physical_name` on
+ * the row is authoritative and this function must not be consulted again.
+ */
+function mintPhysicalBucketName(
+  options: PresignedUrlPluginOptions,
+  databaseId: string,
+  bucketKey: string,
+): string {
+  if (options.resolveBucketName) {
+    return options.resolveBucketName(databaseId, bucketKey);
+  }
+  // Single-bucket deployment: the globally configured bucket is the physical bucket.
+  return resolveS3(options).bucket;
+}
+
+/**
+ * Build the S3 config for a *known* physical bucket. `physicalName` is
+ * required — callers must resolve the coordinate (stored row value, or a
+ * freshly provisioned name) before getting here. No name is ever recomputed.
  */
 function resolveS3ForDatabase(
   options: PresignedUrlPluginOptions,
   storageConfig: StorageModuleConfig,
-  databaseId: string,
-  bucketKey: string,
-  physicalName: string | null,
+  physicalName: string,
 ): S3Config {
   const globalS3 = resolveS3(options);
-  const bucket = physicalName
-    ?? (options.resolveBucketName
-      ? options.resolveBucketName(databaseId, bucketKey)
-      : globalS3.bucket);
-  const publicUrlPrefix = storageConfig.publicUrlPrefix ?? globalS3.publicUrlPrefix;
+  const publicUrlPrefix = storageConfig.publicUrlPrefix != null
+    ? storageConfig.publicUrlPrefix
+    : globalS3.publicUrlPrefix;
 
-  if (bucket === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
+  if (physicalName === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
     return globalS3;
   }
 
   return {
     ...globalS3,
-    bucket,
+    bucket: physicalName,
     ...(publicUrlPrefix != null ? { publicUrlPrefix } : {}),
   };
 }
 
 /**
- * Ensure the physical S3 bucket exists and record its name on the bucket row.
+ * First provision of a logical bucket: mint a name, create the physical S3
+ * bucket, and record the exact name on the source row. Returns the recorded
+ * physical name.
  *
- * The stored `physical_name` on the row is the durable "provisioned" marker:
- * when it is already set we assume the physical bucket exists and do nothing.
- * On first use we (idempotently) create the physical bucket, then persist the
- * exact name onto the source row so route resolution and every later read hand
- * consumers the real coordinate instead of recomputing it.
+ * Only called when the row has no `physical_name` yet. Afterwards the stored
+ * value is the durable coordinate: route resolution and every later read use
+ * it verbatim; nothing is recomputed.
  *
  * The record write runs in the system lane (`withPgClient(null, ...)`) — it is
  * server bookkeeping, not request data, and anonymous request roles cannot
  * UPDATE bucket rows under RLS. `bucket` (the cached config) is mutated in place
  * so subsequent reads observe the recorded name without a DB round-trip.
  */
-async function ensureAndRecordPhysicalBucket(
+async function provisionAndRecordPhysicalBucket(
   options: PresignedUrlPluginOptions,
   withPgClient: (pgSettings: null, cb: (client: any) => Promise<unknown>) => Promise<unknown>,
   storageConfig: StorageModuleConfig,
   databaseId: string,
   bucket: BucketConfig,
-  s3BucketName: string,
   allowedOrigins: string[] | null,
-): Promise<void> {
-  // Row already carries the physical coordinate → the physical bucket exists.
-  if (bucket.physical_name) return;
+): Promise<string> {
+  const s3BucketName = mintPhysicalBucketName(options, databaseId, bucket.key);
 
   if (options.ensureBucketProvisioned && !isS3BucketProvisioned(s3BucketName)) {
     log.info(`Lazy-provisioning S3 bucket "${s3BucketName}" for database ${databaseId}`);
@@ -167,6 +177,7 @@ async function ensureAndRecordPhysicalBucket(
   );
   bucket.physical_name = s3BucketName;
   log.info(`Recorded physical_name="${s3BucketName}" on bucket ${bucket.id}`);
+  return s3BucketName;
 }
 
 // --- Plugin factory ---
@@ -330,10 +341,12 @@ export function createPresignedUrlPlugin(
                       );
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
-                      // Resolve the physical bucket (stored coordinate first), provision on
-                      // first use, and record the exact name on the source row.
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucket.key, bucket.physical_name);
-                      await ensureAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, s3ForDb.bucket, storageConfig.allowedOrigins);
+                      // First provision mints + records the coordinate; afterwards the
+                      // stored physical_name is authoritative and nothing is recomputed.
+                      const physicalName = bucket.physical_name === null
+                        ? await provisionAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, storageConfig.allowedOrigins)
+                        : bucket.physical_name;
+                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
 
                       // File row INSERT under the request role (RLS enforced).
                       return vals.withPgClient(vals.pgSettings, (pgClient: any) =>
@@ -455,10 +468,12 @@ export function createPresignedUrlPlugin(
                         );
                       }
 
-                      // Resolve the physical bucket (stored coordinate first), provision on
-                      // first use, and record the exact name on the source row.
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucket.key, bucket.physical_name);
-                      await ensureAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, s3ForDb.bucket, storageConfig.allowedOrigins);
+                      // First provision mints + records the coordinate; afterwards the
+                      // stored physical_name is authoritative and nothing is recomputed.
+                      const physicalName = bucket.physical_name === null
+                        ? await provisionAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, storageConfig.allowedOrigins)
+                        : bucket.physical_name;
+                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
 
                       // File row INSERTs under the request role (RLS enforced).
                       return vals.withPgClient(vals.pgSettings, (pgClient: any) =>
@@ -606,12 +621,18 @@ export function createPresignedUrlPlugin(
                         text: `SELECT key, physical_name FROM ${storageConfig.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
                         values: [fileRow!.bucket_id],
                       });
-                      const bucketKey = bucketResult.rows[0]?.key;
-                      if (!bucketKey) {
+                      const bucketRow = bucketResult.rows[0] as { key: string; physical_name?: string | null } | undefined;
+                      if (!bucketRow) {
                         log.warn(`Bucket not found for bucket_id=${fileRow!.bucket_id}; skipping S3 delete`);
                         return;
                       }
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucketKey, bucketResult.rows[0]?.physical_name ?? null);
+                      const physicalName = storedPhysicalName(bucketRow);
+                      if (physicalName === null) {
+                        // No physical bucket was ever provisioned — there is no object to delete.
+                        log.warn(`Bucket ${fileRow!.bucket_id} has no physical_name; skipping S3 delete`);
+                        return;
+                      }
+                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
                       await deleteS3Object(s3ForDb, fileRow!.key);
                       log.info(`Sync S3 delete succeeded for key=${fileRow!.key}`);
                     });

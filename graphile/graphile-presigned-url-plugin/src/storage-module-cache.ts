@@ -403,6 +403,18 @@ const bucketCache = new LRUCache<string, BucketConfig>({
 });
 
 /**
+ * Normalize the recorded physical coordinate at the DB boundary.
+ *
+ * A bucket row either carries a recorded coordinate or it does not; SQL nulls
+ * and absent columns both mean "never provisioned". Collapsing them here is
+ * the single place that shape is interpreted — callers branch on `string`
+ * vs `null` and never coalesce a bucket name into existence.
+ */
+export function storedPhysicalName(row: { physical_name?: string | null }): string | null {
+  return row.physical_name == null ? null : row.physical_name;
+}
+
+/**
  * Resolve bucket metadata for a given database + bucket key, using the LRU cache.
  *
  * On cache miss, queries the bucket table (RLS-enforced via pgSettings on
@@ -472,7 +484,7 @@ export async function getBucketConfig(
     allowed_mime_types: row.allowed_mime_types,
     max_file_size: row.max_file_size,
     allow_custom_keys: row.allow_custom_keys ?? false,
-    physical_name: row.physical_name ?? null,
+    physical_name: storedPhysicalName(row),
   };
 
   bucketCache.set(cacheKey, config);

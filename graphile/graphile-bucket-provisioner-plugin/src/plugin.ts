@@ -154,6 +154,18 @@ interface BucketRow {
 }
 
 /**
+ * Normalize the recorded physical coordinate at the DB boundary.
+ *
+ * A bucket row either carries a recorded coordinate or it does not; SQL nulls
+ * and absent columns both mean "never provisioned". Collapsing them here is
+ * the single place that shape is interpreted — callers branch on `string`
+ * vs `null` and never coalesce a bucket name into existence.
+ */
+function storedPhysicalName(row: Pick<BucketRow, 'physical_name'>): string | null {
+  return row.physical_name == null ? null : row.physical_name;
+}
+
+/**
  * Record the physical S3 bucket name on the source bucket row.
  *
  * Runs in the system lane (`withPgClient(null, ...)`) — server bookkeeping,
@@ -274,10 +286,8 @@ async function provisionBucketForRow(
   bucketType: string,
   bucketAllowedOrigins: string[] | null | undefined,
   options: BucketProvisionerPluginOptions,
-  storedPhysicalName: string | null,
+  s3BucketName: string,
 ): Promise<ProvisionResult> {
-  // Stored physical coordinate wins; the naming hook only mints on first provision.
-  const s3BucketName = storedPhysicalName ?? resolveBucketName(bucketKey, databaseId, options);
   const accessType = bucketType as 'public' | 'private' | 'temp';
 
   // Read storage module config to check for endpoint/provider/CORS overrides
@@ -323,9 +333,8 @@ async function updateBucketCors(
   bucketType: string,
   bucketAllowedOrigins: string[] | null | undefined,
   options: BucketProvisionerPluginOptions,
-  storedPhysicalName: string | null,
+  s3BucketName: string,
 ): Promise<void> {
-  const s3BucketName = storedPhysicalName ?? resolveBucketName(bucketKey, databaseId, options);
   const accessType = bucketType as 'public' | 'private' | 'temp';
 
   const storageModule = await resolveStorageModule(pgClient, databaseId);
@@ -472,6 +481,13 @@ export function createBucketProvisionerPlugin(
 
               const bucket = bucketResult.rows[0] as BucketRow;
 
+              // First provision mints a name; afterwards the stored coordinate
+              // is authoritative and the naming hook is never consulted again.
+              const recorded = storedPhysicalName(bucket);
+              const s3BucketName = recorded === null
+                ? resolveBucketName(bucket.key, databaseId, options)
+                : recorded;
+
               try {
                 const result = await provisionBucketForRow(
                   pgClient,
@@ -480,7 +496,7 @@ export function createBucketProvisionerPlugin(
                   bucket.type,
                   bucket.allowed_origins,
                   options,
-                  bucket.physical_name,
+                  s3BucketName,
                 );
 
                 // Record the exact provisioned name on the source row.
@@ -498,7 +514,7 @@ export function createBucketProvisionerPlugin(
                 log.error(`Failed to provision bucket "${bucketKey}": ${err.message}`);
                 return {
                   success: false,
-                  bucketName: bucket.physical_name ?? resolveBucketName(bucket.key, databaseId, options),
+                  bucketName: s3BucketName,
                   accessType: bucket.type,
                   provider: resolveConnection(options).provider,
                   endpoint: resolveConnection(options).endpoint ?? null,
@@ -616,7 +632,7 @@ export function createBucketProvisionerPlugin(
                       bucketInput.type,
                       bucketInput.allowedOrigins ?? bucketInput.allowed_origins ?? null,
                       options,
-                      null,
+                      resolveBucketName(bucketInput.key, databaseId, options),
                     );
 
                     // Record the provisioned name on the just-created row.
@@ -684,6 +700,11 @@ export function createBucketProvisionerPlugin(
 
                     const bucket = bucketResult.rows[0] as BucketRow;
 
+                    // CORS applies to the recorded physical bucket; if the row was
+                    // never provisioned there is nothing to update yet, so mint the
+                    // conventional name the first provision would use.
+                    const recorded = storedPhysicalName(bucket);
+
                     await updateBucketCors(
                       pgClient,
                       databaseId,
@@ -691,7 +712,9 @@ export function createBucketProvisionerPlugin(
                       bucket.type,
                       bucket.allowed_origins,
                       options,
-                      bucket.physical_name,
+                      recorded === null
+                        ? resolveBucketName(bucket.key, databaseId, options)
+                        : recorded,
                     );
                   });
                 }
