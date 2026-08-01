@@ -224,7 +224,14 @@ describe('computeScore', () => {
     );
     expect(score.value).toBe(100 - 25 - 4);
     expect(score.grade).toBe('C'); // 71 would be C anyway; floor also caps at C
-    expect(score.deductions[0]).toEqual({ code: 'A1', count: 1, points: 25 });
+    expect(score.deductions[0]).toEqual({
+      code: 'A1',
+      count: 1,
+      points: 25,
+      score: 75,
+      grade: 'C',
+      potential: 25
+    });
   });
 
   it('weighted model: caps per-rule deductions', () => {
@@ -264,7 +271,10 @@ describe('computeScore', () => {
     );
     const score = computeScore(failClosed, {}, { exposedTables: 10, exposureKnown: true });
     expect(score.value).toBe(100);
-    expect(score.deductions).toEqual([]);
+    // listed, but as an A+ that no amount of fixing can improve on
+    expect(score.deductions).toEqual([
+      { code: 'A4', count: 50, points: 0, score: 100, grade: 'A+', potential: 0, unscored: true }
+    ]);
 
     const strictish = computeScore(
       failClosed,
@@ -280,7 +290,9 @@ describe('computeScore', () => {
       finding({ code: 'A2', severity: 'high', exposed: true })
     ];
     const score = computeScore(findings, {}, { exposedTables: 10, exposureKnown: true });
-    expect(score.deductions).toEqual([{ code: 'A2', count: 1, points: 10 }]);
+    expect(score.deductions).toEqual([
+      { code: 'A2', count: 1, points: 10, score: 84.4, grade: 'B', potential: 15.6 }
+    ]);
     // the internal critical must not floor the grade either
     expect(score.grade).not.toBe('C');
   });
@@ -296,6 +308,52 @@ describe('computeScore', () => {
     const known = computeScore([], {}, { exposureKnown: true });
     expect(known.value).toBe(100);
     expect(known.cappedByUnknownExposure).toBeUndefined();
+  });
+
+  it('density model: grades each rule on its own and reports its payoff', () => {
+    const findings = [
+      ...Array.from({ length: 40 }, () => finding({ code: 'X1', severity: 'medium' })),
+      ...Array.from({ length: 20 }, () => finding({ code: 'X4', severity: 'low' }))
+    ];
+    const score = computeScore(findings, {}, { exposedTables: 100, exposureKnown: true });
+    const [x1, x4] = score.deductions;
+
+    expect(x1.code).toBe('X1');
+    expect(x1.points).toBe(160);
+    // 100·exp(−0.17·160/100) — the rule's own score, not the audit's
+    expect(x1.score).toBe(76.2);
+    expect(x1.grade).toBe('C');
+
+    // Payoffs are subadditive, because the curve is multiplicative: clearing
+    // both rules is worth more than the two individual payoffs added up, so a
+    // payoff is a floor on what a fix buys, never a share of a fixed budget.
+    expect(x1.potential + x4.potential).toBeLessThan(100 - score.value);
+    // The curve is steepest near zero, so payoff grows faster than points: a
+    // rule worth 8x the points is worth *more* than 8x the payoff. That is the
+    // fact the aggregate score hides and the per-rule payoff makes legible.
+    expect(x1.points / x4.points).toBe(8);
+    expect(x1.potential / x4.potential).toBeGreaterThan(8);
+  });
+
+  it('density model: lists zero-weight rules as unscored rather than dropping them', () => {
+    const findings = [
+      finding({ code: 'A2', severity: 'high' }),
+      finding({ code: 'X8', severity: 'info' })
+    ];
+    const score = computeScore(findings, {}, { exposedTables: 10, exposureKnown: true });
+    const x8 = score.deductions.find((d) => d.code === 'X8')!;
+
+    expect(x8).toEqual({
+      code: 'X8',
+      count: 1,
+      points: 0,
+      score: 100,
+      grade: 'A+',
+      potential: 0,
+      unscored: true
+    });
+    // unscored rules sort last so the "top deductions" line is unaffected
+    expect(score.deductions.map((d) => d.code)).toEqual(['A2', 'X8']);
   });
 
   it('compares grades', () => {
