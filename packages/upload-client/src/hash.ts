@@ -1,17 +1,17 @@
 /**
- * File hashing utilities using @constructive-io/noble-hashes.
+ * File hashing utilities using @decryption/hashes.
  *
  * Two strategies:
  * - `hashFile` — reads entire file into memory, fast for files up to ~200MB
  * - `hashFileChunked` — true incremental hashing via Blob.slice, suitable
  *   for arbitrarily large files (GB+). Only one chunk is in memory at a time.
  *
- * Both use @constructive-io/noble-hashes (pure JS, audited, 0 dependencies)
+ * Both use @decryption/hashes (pure JS, audited, 0 dependencies)
  * which supports incremental .update() — unlike Web Crypto API's one-shot digest().
  */
 
-import { sha256 } from '@constructive-io/noble-hashes/sha2';
-import { bytesToHex } from '@constructive-io/noble-hashes/utils';
+import { sha256 } from '@decryption/hashes/sha2';
+import { bytesToHex } from '@decryption/hashes/utils';
 
 import type { FileInput } from './types';
 import { UploadError } from './types';

@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "makage": "^0.3.0",
-    "pgsql-parser": "^18.1.2"
+    "pgsql-parser": "^18.2.1"
   },
   "keywords": [
     "csv",
@@ -44,10 +44,10 @@
   ],
   "dependencies": {
     "@pgsql/types": "^18.0.0",
-    "@pgsql/utils": "^18.1.2",
+    "@pgsql/utils": "^18.2.1",
     "csv-parser": "^3.2.1",
     "inquirerer": "^4.9.1",
     "js-yaml": "^4.1.0",
-    "pgsql-deparser": "^18.2.0"
+    "pgsql-deparser": "^18.3.1"
   }
 }

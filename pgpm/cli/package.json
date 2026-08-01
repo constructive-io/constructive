@@ -55,7 +55,7 @@
     "@pgpmjs/slice": "workspace:^",
     "@pgpmjs/transform": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "@pgsql/quotes": "^18.1.0",
+    "@pgsql/quotes": "^18.2.0",
     "appstash": "^0.7.0",
     "find-and-require-package-json": "^0.9.1",
     "genomic": "^5.6.2",
@@ -63,7 +63,7 @@
     "js-yaml": "^4.1.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^18.2.0",
+    "pgsql-deparser": "^18.3.1",
     "semver": "^7.8.1",
     "shelljs": "^0.10.0",
     "yanse": "^0.2.1"
