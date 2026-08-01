@@ -170,7 +170,19 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
       }
     }
 
-    const { stats, explain } = report.perf;
+    const { paths, stats, explain } = report.perf;
+    if (paths && paths.writeOnceShaped > 0) {
+      const acted = { report: 'reported', demote: 'demoted to info', suppress: 'suppressed' }[
+        paths.onWriteOncePointer
+      ];
+      lines.push(
+        paint(
+          'info',
+          `  access paths: ${paths.total} foreign keys — ${paths.read} read by a policy or view, `
+            + `${paths.writeOnceShaped} on ${paths.tables} tables write-once shaped (X1 ${acted})`
+        )
+      );
+    }
     if (stats) {
       lines.push(
         paint(

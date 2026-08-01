@@ -47,6 +47,117 @@ describe('perf dimension', () => {
     expect(posts?.context).toMatchObject({ columns: ['author_id'] });
   });
 
+  describe('X1 access-path signals', () => {
+    function x1Constraints(findings: Finding[]): string[] {
+      return findings
+        .filter((f) => f.code === 'X1')
+        .map((f) => (f.context as { constraint: string }).constraint)
+        .sort();
+    }
+
+    function x1For(findings: Finding[], constraint: string): Finding | undefined {
+      return findings.find(
+        (f) => f.code === 'X1' && (f.context as { constraint: string }).constraint === constraint
+      );
+    }
+
+    it('reports the shape without acting on it: every key still raises X1', async () => {
+      await applyFixture('x1-cold-paths.sql');
+      const report = await audit(pg.client as never, { schemas: ['fx_cold'], perf: true });
+
+      // A shape is not proof that nothing queries the relation — a generated
+      // API can expose a reverse relation over any of these keys — so the
+      // default changes no finding and no severity.
+      expect(x1Constraints(report.perf!.findings).filter((c) => c.startsWith('agent_module')))
+        .toEqual([
+          'agent_module_database_id_fkey',
+          'agent_module_field_table_id_fkey',
+          'agent_module_message_table_id_fkey',
+          'agent_module_thread_table_id_fkey'
+        ]);
+      expect(x1For(report.perf!.findings, 'agent_module_thread_table_id_fkey')?.severity)
+        .toBe('medium');
+    });
+
+    it('attaches the signals that fired to each finding', async () => {
+      const report = await audit(pg.client as never, { schemas: ['fx_cold'], perf: true });
+      const findings = report.perf!.findings;
+
+      // A write-once pointer on a config record: shape only.
+      expect(x1For(findings, 'agent_module_thread_table_id_fkey')?.context)
+        .toMatchObject({ pathSignals: ['write-once-pointer', 'config-record'] });
+      // The tenant key of the same table: an RLS policy filters on it.
+      expect(x1For(findings, 'agent_module_database_id_fkey')?.context)
+        .toMatchObject({ pathSignals: ['policy-read'] });
+      // A view reads these, which is a read signal wherever they sit.
+      expect(x1For(findings, 'read_module_primary_view_table_id_fkey')?.context)
+        .toMatchObject({ pathSignals: ['view-read'] });
+      // A real relationship table: no constant defaults, nothing to say.
+      expect(x1For(findings, 'grants_actor_id_fkey')?.context)
+        .toMatchObject({ pathSignals: [] });
+      // One pointer is below the config-record threshold, so the shape does
+      // not hold at the table level and the key is not write-once-shaped.
+      expect(x1For(findings, 'one_pointer_thread_table_id_fkey')?.context)
+        .toMatchObject({ pathSignals: ['write-once-pointer'] });
+    });
+
+    it('demotes write-once-shaped keys to info when asked', async () => {
+      const report = await audit(pg.client as never, {
+        schemas: ['fx_cold'],
+        perf: true,
+        config: { perf: { paths: { onWriteOncePointer: 'demote' } } }
+      });
+      const findings = report.perf!.findings;
+      expect(x1For(findings, 'agent_module_thread_table_id_fkey')?.severity).toBe('info');
+      // The tenant key is read by a policy, so it keeps its severity.
+      expect(x1For(findings, 'agent_module_database_id_fkey')?.severity).toBe('medium');
+    });
+
+    it('suppresses write-once-shaped keys when asked, but never a read one', async () => {
+      const report = await audit(pg.client as never, {
+        schemas: ['fx_cold'],
+        perf: true,
+        config: { perf: { paths: { onWriteOncePointer: 'suppress' } } }
+      });
+      expect(x1Constraints(report.perf!.findings).filter((c) => c.startsWith('agent_module')))
+        .toEqual(['agent_module_database_id_fkey']);
+    });
+
+    it('collects no signals at all when inference is off', async () => {
+      const report = await audit(pg.client as never, {
+        schemas: ['fx_cold'],
+        perf: true,
+        config: { perf: { paths: { infer: false, onWriteOncePointer: 'suppress' } } }
+      });
+      expect(report.perf!.paths).toBeUndefined();
+      expect(x1Constraints(report.perf!.findings).filter((c) => c.startsWith('agent_module')))
+        .toHaveLength(4);
+    });
+
+    it('reports the signal counts and what X1 did with them', async () => {
+      const report = await audit(pg.client as never, { schemas: ['fx_cold'], perf: true });
+      expect(report.perf!.paths).toEqual({
+        total: 11,
+        read: 4,
+        writeOnceShaped: 3,
+        tables: 1,
+        onWriteOncePointer: 'report'
+      });
+    });
+
+    it('raises the config-record threshold on request', async () => {
+      const report = await audit(pg.client as never, {
+        schemas: ['fx_cold'],
+        perf: true,
+        config: { perf: { paths: { minPointers: 3, onWriteOncePointer: 'suppress' } } }
+      });
+      // agent_module has two write-once pointers, so a threshold of three
+      // stops the config-record signal firing and X1 returns for all four keys.
+      expect(x1Constraints(report.perf!.findings).filter((c) => c.startsWith('agent_module')))
+        .toHaveLength(4);
+    });
+  });
+
   it('X5: flags duplicate and prefix indexes, not unique/partial/expression ones', async () => {
     await applyFixture('x5-redundant-index.sql');
     const report = await audit(pg.client as never, { schemas: ['fx_x5'], perf: true });

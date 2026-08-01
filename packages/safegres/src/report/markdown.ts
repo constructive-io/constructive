@@ -59,8 +59,21 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
 
   if (report.perf) {
     out.push(...findingSection('Performance findings', report.perf.findings, options));
-    const { stats, explain, diff } = report.perf;
+    const { paths, stats, explain, diff } = report.perf;
     const notes: string[] = [];
+    if (paths && paths.writeOnceShaped > 0) {
+      const acted = {
+        report: 'X1 still asks for an index on each of them',
+        demote: 'their X1 findings are demoted to `info`',
+        suppress: 'their X1 findings are suppressed'
+      }[paths.onWriteOncePointer];
+      notes.push(
+        `Access paths: of ${paths.total} foreign keys, ${paths.read} are named by an RLS policy `
+          + `or a view, and ${paths.writeOnceShaped} across ${paths.tables} tables look like `
+          + `write-once provisioning pointers — ${acted}. A shape is not proof that nothing `
+          + 'queries the relation (`perf.paths.onWriteOncePointer` to change what X1 does).'
+      );
+    }
     if (stats) {
       notes.push(
         `Runtime statistics: ${stats.tables} tables, counters since ${stats.statsReset ?? 'server start'}`

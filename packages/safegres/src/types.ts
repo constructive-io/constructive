@@ -131,8 +131,31 @@ export interface PerfReport {
   diff?: import('./perf/baseline').PerfDiff;
   /** Runtime-statistics provenance, present when the audit ran with `--stats`. */
   stats?: PerfStatsReport;
+  /**
+   * Access-path classification: how many foreign keys X1 was not applied to,
+   * because nothing reads them. Reported so a suppression this broad is never
+   * silent.
+   */
+  paths?: PerfPathsReport;
   /** Planner-proof summary, present when the audit ran with `--explain`. */
   explain?: import('./perf/explain').ExplainReport;
+}
+
+/**
+ * What the access-path signals found, and what X1 did about it. Reported so
+ * the evidence is visible even when — as by default — it changes nothing.
+ */
+export interface PerfPathsReport {
+  /** Foreign keys examined. */
+  total: number;
+  /** Keys with a `read` signal: an RLS policy or a view names the column. */
+  read: number;
+  /** Keys whose only signals are shape: they look like provisioning pointers. */
+  writeOnceShaped: number;
+  /** Tables carrying enough write-once pointers to look like config records. */
+  tables: number;
+  /** What X1 did with the write-once-shaped keys. */
+  onWriteOncePointer: 'report' | 'demote' | 'suppress';
 }
 
 /** Where the `S*` findings' numbers came from, and how much to trust them. */
