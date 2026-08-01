@@ -9,6 +9,7 @@
  *
  * PREREQUISITES: a running PostgreSQL instance via standard PG* env vars.
  */
+import { readBundleArchiveFile } from '@pgpmjs/core';
 import { loadDiffSideFromDisk } from '@pgpmjs/diff';
 import { diffCatalogSnapshots, diffChangeSets, loadModule, snapshotCatalog, withoutColumnOrder } from '@pgpmjs/transform';
 import * as fs from 'fs';
@@ -225,6 +226,29 @@ describe('pgpm diff e2e', () => {
     const snapReverted = await snapshotCatalog(testDb);
     const snapV1 = await snapshotCatalog(v1Db);
     expect(diffCatalogSnapshots(withoutColumnOrder(snapReverted), withoutColumnOrder(snapV1))).toEqual([]);
+  });
+
+  it('composes module, linear SQL, and bundle projections from one run', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}
+      pgpm diff diff-v1 diff-v2 --emit-module . --pkg diff-compose --emit-sql migration.sql --emit-bundle migration.bundle.tar.gz
+      `,
+      {}
+    );
+
+    // module projection
+    const moduleDir = path.join(wsDir, 'diff-compose');
+    expect(fs.existsSync(path.join(moduleDir, 'pgpm.plan'))).toBe(true);
+
+    // linear SQL projection: one consolidated file, statements in plan order
+    const sql = fs.readFileSync(path.join(wsDir, 'migration.sql'), 'utf-8');
+    expect(sql).toMatch(/CREATE TABLE dfx\.orders/);
+    expect(sql).toMatch(/DROP INDEX/i);
+
+    // bundle projection: a readable content-addressed archive of the changes
+    const bundle = readBundleArchiveFile(path.join(wsDir, 'migration.bundle.tar.gz'));
+    expect(bundle.changes.length).toBeGreaterThan(0);
   });
 
   it('--verify proves the emitted migration is a catalog-level oracle match', async () => {
