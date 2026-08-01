@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.10.0...graphile-bucket-provisioner-plugin@1.11.0) (2026-08-01)
+
+### Features
+
+- **storage:** tenant-aware eager bucket provisioning ([2f00655](https://github.com/constructive-io/constructive/commit/2f0065515206c3ed69debfdf105f8bf84d1237c0))
+
 # [1.10.0](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.9.3...graphile-bucket-provisioner-plugin@1.10.0) (2026-08-01)
 
 ### Features

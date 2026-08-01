@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.16.0](https://github.com/constructive-io/constructive/compare/safegres@1.15.4...safegres@1.16.0) (2026-08-01)
+
+### Features
+
+- **safegres:** classify cold access paths so X1 stops demanding useless indexes ([ce17e30](https://github.com/constructive-io/constructive/commit/ce17e30ce82c9c8f77599c6dea156e088e86b2e8))
+- **safegres:** compare a run against a previous one (score/severity/rule deltas) ([9e7f608](https://github.com/constructive-io/constructive/commit/9e7f608b222fcc63860f7f82ba23fe06a056accb))
+- **safegres:** perf rule X9 (RLS quals re-evaluated per row) ([20484d8](https://github.com/constructive-io/constructive/commit/20484d85f0832f07b6651b745c9be3044b047f60))
+- **safegres:** score and grade every rule, not just the database ([e18114f](https://github.com/constructive-io/constructive/commit/e18114f9b6b52795abf28c9e0868ed7364233823))
+- **safegres:** skip extension objects (owned relations + named extension schemas) ([a7e0907](https://github.com/constructive-io/constructive/commit/a7e09071c7a067a423c525f797dbb41fda0cc372))
+
 ## [1.15.4](https://github.com/constructive-io/constructive/compare/safegres@1.15.3...safegres@1.15.4) (2026-08-01)
 
 **Note:** Version bump only for package safegres

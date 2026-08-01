@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.12.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.11.10...graphile-settings@6.12.0) (2026-08-01)
+
+### Features
+
+- **storage:** make bucket provisioning lazy by default (autoProvision: false) ([bf88496](https://github.com/constructive-io/constructive/commit/bf8849651a31b3031082f56981e9ed7038fe02b3))
+- **storage:** tenant-aware eager bucket provisioning ([2f00655](https://github.com/constructive-io/constructive/commit/2f0065515206c3ed69debfdf105f8bf84d1237c0))
+
 ## [6.11.10](https://github.com/constructive-io/constructive/compare/graphile-settings@6.11.9...graphile-settings@6.11.10) (2026-08-01)
 
 **Note:** Version bump only for package graphile-settings
