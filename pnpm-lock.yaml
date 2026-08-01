@@ -314,6 +314,18 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pg-cache/dist
 
+  examples/pgpm-projections:
+    devDependencies:
+      '@pgpmjs/diff':
+        specifier: workspace:^
+        version: link:../../pgpm/diff/dist
+      '@pgpmjs/transform':
+        specifier: workspace:^
+        version: link:../../pgpm/transform/dist
+      pgpm:
+        specifier: workspace:^
+        version: link:../../pgpm/cli/dist
+
   graphile/graphile-bucket-provisioner-plugin:
     dependencies:
       '@constructive-io/bucket-provisioner':

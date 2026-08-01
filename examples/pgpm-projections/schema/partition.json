@@ -1,0 +1,9 @@
+{
+  "defaultPackage": "blog-core",
+  "rules": [
+    {
+      "package": "blog-security",
+      "select": [{ "schema": "blog_sec" }]
+    }
+  ]
+}
