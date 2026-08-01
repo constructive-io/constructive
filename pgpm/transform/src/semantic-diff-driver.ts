@@ -38,6 +38,7 @@ import {
 } from '@pgsql/transform';
 import { Deparser, parseSync } from 'plpgsql-parser';
 
+import { ConstraintNode, defaultConstraintName } from './constraint-names';
 import { GranularityChange, restructureChanges } from './granularity-driver';
 
 /** How one object differs between the two sides. */
@@ -165,7 +166,7 @@ function groupingIdentity(f: StatementFacts): ObjectIdentity | null {
   const identity = identityOf(f);
   if (!identity) return null;
   if (
-    (f.kind === 'table' || f.kind === 'constraint' || f.kind === 'rls_enable') &&
+    (f.kind === 'table' || f.kind === 'constraint' || f.kind === 'fk_constraint' || f.kind === 'rls_enable') &&
     identity.kind !== 'table'
   ) {
     return { kind: 'table', schema: identity.schema, name: identity.table ?? identity.name };
@@ -191,22 +192,62 @@ interface TableShape {
   extras: Map<string, unknown>;
 }
 
+/** JSON with recursively sorted object keys — an insertion-order-proof fingerprint. */
+function stablePrint(node: unknown): string {
+  if (Array.isArray(node)) return `[${node.map(stablePrint).join(',')}]`;
+  if (node && typeof node === 'object') {
+    const entries = Object.entries(node as Record<string, unknown>)
+      .filter(([, v]) => v !== undefined)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => `${JSON.stringify(k)}:${stablePrint(v)}`);
+    return `{${entries.join(',')}}`;
+  }
+  return JSON.stringify(node);
+}
+
+/** Constraint kinds that can move between column, table-elt, and ALTER form. */
+const RELOCATABLE = new Set(['CONSTR_PRIMARY', 'CONSTR_UNIQUE', 'CONSTR_FOREIGN', 'CONSTR_CHECK']);
+
 /**
  * Fold a table unit's statements (CREATE TABLE plus any ALTER TABLE
  * ADD COLUMN / ADD CONSTRAINT) into an effective shape, so atomic and
  * consolidated authorships of the same table compare equal.
+ *
+ * Constraint placement is representation, not semantics: `id bigint PRIMARY
+ * KEY`, a `PRIMARY KEY (id)` table elt, and `ALTER TABLE .. ADD CONSTRAINT
+ * t_pkey PRIMARY KEY (id)` all catalog identically. Relocatable constraints
+ * (PK/UNIQUE/FK/CHECK) are therefore lifted out of columns and ALTER
+ * commands into one canonical table-level set — keyed with the Postgres
+ * default name when unnamed, columns filled in from the owning column when
+ * column-attached — and PK columns gain the NOT NULL the catalog implies.
  */
 function tableShape(unit: ObjectUnit): TableShape {
   const shape: TableShape = { relation: null, columns: new Map(), extras: new Map() };
+  const table = unit.identity.name;
+  const rawColumns: { colname: string; def: Record<string, unknown> }[] = [];
+  const constraints: { node: ConstraintNode & Record<string, unknown>; column?: string }[] = [];
+  const pkColumns = new Set<string>();
 
   const addColumn = (node: Record<string, unknown>): void => {
-    const def = node as { colname?: string };
-    const clean = cleanTree(node);
-    shape.columns.set(def.colname ?? '', { def: clean, print: JSON.stringify(clean) });
+    const colname = (node as { colname?: string }).colname ?? '';
+    const attached = (node.constraints as { Constraint?: Record<string, unknown> }[] | undefined) ?? [];
+    const residual: unknown[] = [];
+    for (const item of attached) {
+      const c = item.Constraint as (ConstraintNode & Record<string, unknown>) | undefined;
+      if (c && RELOCATABLE.has(c.contype ?? '')) {
+        constraints.push({ node: c, column: colname });
+      } else {
+        residual.push(item);
+      }
+    }
+    rawColumns.push({ colname, def: { ...node, constraints: residual } });
+  };
+  const addConstraint = (node: Record<string, unknown>, column?: string): void => {
+    constraints.push({ node: node as ConstraintNode & Record<string, unknown>, column });
   };
   const addExtra = (node: unknown): void => {
     const clean = cleanTree(node);
-    shape.extras.set(JSON.stringify(clean), clean);
+    shape.extras.set(stablePrint(clean), clean);
   };
 
   for (const text of unit.texts) {
@@ -217,7 +258,9 @@ function tableShape(unit: ObjectUnit): TableShape {
         const elts = (stmt.CreateStmt.tableElts as Record<string, unknown>[] | undefined) ?? [];
         for (const elt of elts) {
           if (elt.ColumnDef) addColumn(elt.ColumnDef as Record<string, unknown>);
-          else addExtra(elt);
+          else if (elt.Constraint && RELOCATABLE.has((elt.Constraint as ConstraintNode).contype ?? '')) {
+            addConstraint(elt.Constraint as Record<string, unknown>);
+          } else addExtra(elt);
         }
       } else if (stmt.AlterTableStmt) {
         shape.relation ??= stmt.AlterTableStmt.relation;
@@ -228,6 +271,12 @@ function tableShape(unit: ObjectUnit): TableShape {
           const def = at.def as Record<string, unknown> | undefined;
           if (at.subtype === 'AT_AddColumn' && def?.ColumnDef) {
             addColumn(def.ColumnDef as Record<string, unknown>);
+          } else if (
+            at.subtype === 'AT_AddConstraint' &&
+            def?.Constraint &&
+            RELOCATABLE.has((def.Constraint as ConstraintNode).contype ?? '')
+          ) {
+            addConstraint(def.Constraint as Record<string, unknown>);
           } else {
             addExtra({ AlterTableCmd: at });
           }
@@ -236,6 +285,46 @@ function tableShape(unit: ObjectUnit): TableShape {
         addExtra(stmt);
       }
     }
+  }
+
+  for (const { node, column } of constraints) {
+    const canonical: Record<string, unknown> = { ...node };
+    canonical.conname = node.conname ?? defaultConstraintName(table, node, column) ?? undefined;
+    if (column && (node.keys ?? []).length === 0 && node.contype !== 'CONSTR_FOREIGN' && node.contype !== 'CONSTR_CHECK') {
+      canonical.keys = [{ String: { sval: column } }];
+    }
+    if (column && node.contype === 'CONSTR_FOREIGN' && (node.fk_attrs ?? []).length === 0) {
+      canonical.fk_attrs = [{ String: { sval: column } }];
+    }
+    if (node.contype === 'CONSTR_PRIMARY') {
+      const keyed = (canonical.keys as { String?: { sval?: string } }[] | undefined) ?? [];
+      for (const k of keyed) if (k.String?.sval) pkColumns.add(k.String.sval);
+    }
+    addExtra({ Constraint: canonical });
+  }
+
+  for (const { colname, def } of rawColumns) {
+    const residual = ((def.constraints as unknown[] | undefined) ?? []).map(c => {
+      const constraint = (c as { Constraint?: ConstraintNode & { conname?: string } }).Constraint;
+      // NOT NULL parses with parser-version-dependent extras (is_enforced,
+      // initially_valid); reduce to its semantic core so an authored NOT NULL
+      // equals the one a primary key implies.
+      if (constraint?.contype === 'CONSTR_NOTNULL') {
+        return { Constraint: { contype: 'CONSTR_NOTNULL', conname: constraint.conname } };
+      }
+      return c;
+    });
+    const hasNotNull = residual.some(
+      c => (c as { Constraint?: ConstraintNode }).Constraint?.contype === 'CONSTR_NOTNULL'
+    );
+    if (pkColumns.has(colname) && !hasNotNull) {
+      residual.push({ Constraint: { contype: 'CONSTR_NOTNULL' } });
+    }
+    const sorted = residual
+      .map(c => cleanTree(c))
+      .sort((x, y) => stablePrint(x).localeCompare(stablePrint(y)));
+    const clean = cleanTree({ ...def, constraints: sorted });
+    shape.columns.set(colname, { def: clean, print: stablePrint(clean) });
   }
   return shape;
 }

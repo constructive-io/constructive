@@ -23,6 +23,8 @@ export {
   categorizeChange,
   TIER_PROFILE,
 } from './categorize';
+export type { ConstraintNode } from './constraint-names';
+export { defaultConstraintName, firstColumnRef } from './constraint-names';
 export type {
   ClosureChange,
   ClosureInputChange,

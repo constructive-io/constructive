@@ -138,6 +138,62 @@ describe('diffSchemas', () => {
     expect(result.warnings.some(w => w.includes('column "note" changed beyond its type'))).toBe(true);
   });
 
+  it('is constraint-placement-invariant: inline, table-elt, and standalone ADD CONSTRAINT unify', () => {
+    const consolidated = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.users (id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, email text NOT NULL UNIQUE, age int CHECK (age > 0));',
+      'CREATE TABLE app.posts (id bigint PRIMARY KEY, user_id bigint NOT NULL REFERENCES app.users (id));'
+    ].join('\n');
+    const standalone = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.users (id bigint GENERATED ALWAYS AS IDENTITY NOT NULL, email text NOT NULL, age int);',
+      'ALTER TABLE app.users ADD CONSTRAINT users_pkey PRIMARY KEY (id);',
+      'ALTER TABLE app.users ADD CONSTRAINT users_email_key UNIQUE (email);',
+      'ALTER TABLE app.users ADD CONSTRAINT users_age_check CHECK (age > 0);',
+      'CREATE TABLE app.posts (id bigint NOT NULL, user_id bigint NOT NULL);',
+      'ALTER TABLE app.posts ADD CONSTRAINT posts_pkey PRIMARY KEY (id);',
+      'ALTER TABLE app.posts ADD CONSTRAINT posts_user_id_fkey FOREIGN KEY (user_id) REFERENCES app.users (id);'
+    ].join('\n');
+    const result = diffSchemas(consolidated, standalone);
+    expect(result.identical).toBe(true);
+    expect(result.changes).toEqual([]);
+  });
+
+  it('matches unnamed standalone constraints against their Postgres default names', () => {
+    const inline = 'CREATE TABLE app.users (id bigint PRIMARY KEY, email text UNIQUE);';
+    const unnamed = [
+      'CREATE TABLE app.users (id bigint NOT NULL, email text);',
+      'ALTER TABLE app.users ADD PRIMARY KEY (id);',
+      'ALTER TABLE app.users ADD UNIQUE (email);'
+    ].join('\n');
+    expect(diffSchemas(inline, unnamed).identical).toBe(true);
+  });
+
+  it('still surfaces a genuinely changed constraint, dropping it by its default name', () => {
+    const from = 'CREATE TABLE app.users (id bigint PRIMARY KEY, age int CHECK (age > 0));';
+    const to = 'CREATE TABLE app.users (id bigint PRIMARY KEY, age int CHECK (age > 1));';
+    const result = diffSchemas(from, to);
+    expect(result.identical).toBe(false);
+    const change = result.changes.find(c => c.name === 'schemas/app/tables/users/table/alter')!;
+    expect(change.deploy).toContain('DROP CONSTRAINT users_age_check');
+    expect(change.deploy).toContain('ADD CONSTRAINT users_age_check CHECK (age > 1)');
+  });
+
+  it('folds foreign keys into their table: fk placement never diffs', () => {
+    const inline = [
+      'CREATE TABLE app.users (id bigint PRIMARY KEY);',
+      'CREATE TABLE app.posts (id bigint PRIMARY KEY, user_id bigint REFERENCES app.users (id));'
+    ].join('\n');
+    const standalone = [
+      'CREATE TABLE app.users (id bigint PRIMARY KEY);',
+      'CREATE TABLE app.posts (id bigint PRIMARY KEY, user_id bigint);',
+      'ALTER TABLE app.posts ADD CONSTRAINT posts_user_id_fkey FOREIGN KEY (user_id) REFERENCES app.users (id);'
+    ].join('\n');
+    const result = diffSchemas(inline, standalone);
+    expect(result.identical).toBe(true);
+    expect(result.objects).toEqual([]);
+  });
+
   it('drops removed objects in reverse topological order', () => {
     const result = diffSchemas(BASE, 'CREATE SCHEMA app;\nCREATE TABLE app.users (id uuid PRIMARY KEY, name text);');
 
