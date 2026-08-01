@@ -13,6 +13,7 @@ export const usageText = `
     plan               Generate module deployment plans
     regen              Generate revert/verify scripts from deploy scripts
     transform          Re-dial a module through the dials pipeline (granularity/naming/partition)
+    diff               Identity-keyed semantic diff between two schema sources (+ migration generation)
     package            Package module for distribution
     materialize        Transpile an apply proxy into a plain, committed module
     sync-versions      Sync .control/Makefile/sql metadata to package.json versions

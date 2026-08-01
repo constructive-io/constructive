@@ -8,6 +8,7 @@ import analyze from './commands/analyze';
 import cache from './commands/cache';
 import clear from './commands/clear';
 import deploy from './commands/deploy';
+import diff from './commands/diff';
 import docker from './commands/docker';
 import doctor from './commands/doctor';
 import dump from './commands/dump';
@@ -90,6 +91,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     'admin-users': pgt(adminUsers),
     clear: pgt(clear),
     deploy: pgt(deploy),
+    diff: pgt(diff),
     docker,
     doctor,
     dump: pgt(dump),

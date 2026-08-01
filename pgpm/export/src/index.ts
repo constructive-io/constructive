@@ -1,5 +1,7 @@
 export type { CatalogQueryable, CatalogSnapshot } from './catalog-check';
-export { diffCatalogSnapshots, snapshotCatalog } from './catalog-check';
+export { diffCatalogSnapshots, snapshotCatalog, withoutColumnOrder } from './catalog-check';
+export type { DiffSide, DiffSideKind } from './diff-source';
+export { deltaChangesToRows, loadDiffSideFromDisk, resolveDiffSideKind, sqlToDiffChanges, stripDumpPreamble } from './diff-source';
 export * from './export-data';
 export * from './export-graphql';
 export * from './export-graphql-meta';

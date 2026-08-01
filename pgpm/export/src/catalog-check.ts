@@ -145,6 +145,20 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
 };
 
 /**
+ * Column-order-insensitive view of a snapshot. Migrations that drop and add
+ * columns can never reproduce a fresh deploy's physical column order
+ * (Postgres appends), so migration-equivalence checks (`pgpm diff --verify`)
+ * compare columns by name and definition only.
+ */
+export const withoutColumnOrder = (snap: CatalogSnapshot): CatalogSnapshot => {
+  const columns: Record<string, string> = {};
+  for (const [key, value] of Object.entries(snap.columns)) {
+    columns[key] = value.replace(/^#\d+ /, '');
+  }
+  return { ...snap, columns };
+};
+
+/**
  * Compare two catalog snapshots. Returns a flat list of human-readable
  * differences; an empty list means the catalogs are structurally equivalent.
  */
