@@ -15,6 +15,7 @@ import { BucketProvisioner } from '@constructive-io/bucket-provisioner';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { createS3Client } from '@constructive-io/s3-utils';
 import { Logger } from '@pgpmjs/logger';
+import type { BucketNameResolver as ProvisionerBucketNameResolver } from 'graphile-bucket-provisioner-plugin';
 import type { BucketNameResolver, EnsureBucketProvisioned,S3Config } from 'graphile-presigned-url-plugin';
 
 import { getBucketProvisionerConnection } from './bucket-provisioner-resolver';
@@ -87,16 +88,12 @@ export function getPresignedUrlS3Config(): S3Config {
 }
 
 /**
- * Create a per-(database, bucketKey) bucket name resolver.
+ * Read the configured physical-bucket-name prefix (CDN_BUCKET_NAME).
  *
- * Uses the BUCKET_NAME env var as a prefix. For each (database, bucketKey)
- * pair, the S3 bucket name becomes `{prefix}-{bucketKey}-{databaseId}`
- * (e.g., "myapp-public-abc123def456").
- *
- * This aligns with the bucket provisioner plugin which creates separate
- * S3 buckets per logical bucket key.
+ * There is no default: a missing prefix throws, mirroring
+ * getPresignedUrlS3Config, so an untenanted bucket name can never be minted.
  */
-export function createBucketNameResolver(): BucketNameResolver {
+function getBucketNamePrefix(): string {
   const { cdn } = getEnvOptions();
   const prefix = cdn?.bucketName;
 
@@ -107,9 +104,48 @@ export function createBucketNameResolver(): BucketNameResolver {
     );
   }
 
-  return (databaseId: string, bucketKey: string): string => {
-    return `${prefix}-${bucketKey}-${databaseId}`;
-  };
+  return prefix;
+}
+
+/**
+ * The single physical-bucket naming policy: `{prefix}-{bucketKey}-{databaseId}`
+ * (e.g., "myapp-public-abc123def456"). Both the presigned-upload (lazy) path
+ * and the bucket-provisioner (eager) path derive names from this one function
+ * so a bucket's physical name is identical regardless of which path mints it.
+ */
+function mintPhysicalBucketName(prefix: string, databaseId: string, bucketKey: string): string {
+  return `${prefix}-${bucketKey}-${databaseId}`;
+}
+
+/**
+ * Create a per-(database, bucketKey) bucket name resolver for the presigned
+ * URL plugin (argument order: `(databaseId, bucketKey)`).
+ *
+ * Uses CDN_BUCKET_NAME as a prefix. For each (database, bucketKey) pair, the
+ * S3 bucket name becomes `{prefix}-{bucketKey}-{databaseId}`.
+ *
+ * This aligns with the bucket provisioner plugin which creates separate
+ * S3 buckets per logical bucket key.
+ */
+export function createBucketNameResolver(): BucketNameResolver {
+  const prefix = getBucketNamePrefix();
+  return (databaseId: string, bucketKey: string): string =>
+    mintPhysicalBucketName(prefix, databaseId, bucketKey);
+}
+
+/**
+ * Create the bucket name resolver for the bucket provisioner plugin
+ * (argument order: `(bucketKey, databaseId)`).
+ *
+ * Produces the exact same physical name as createBucketNameResolver()
+ * (`{prefix}-{bucketKey}-{databaseId}`) so the eager `provisionBucket`
+ * mutation mints the identical tenant-aware name that the lazy first-upload
+ * path would. Throws on a missing prefix — no default bucket name.
+ */
+export function createProvisionerBucketNameResolver(): ProvisionerBucketNameResolver {
+  const prefix = getBucketNamePrefix();
+  return (bucketKey: string, databaseId: string): string =>
+    mintPhysicalBucketName(prefix, databaseId, bucketKey);
 }
 
 /**

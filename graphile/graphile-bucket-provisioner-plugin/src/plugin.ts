@@ -110,6 +110,22 @@ interface StorageModuleRow {
 }
 
 /**
+ * Run a query against a grafast `withPgClient` client.
+ *
+ * That client's `query` takes the `{ text, values }` object form (the same
+ * shape the presigned-url plugin uses) — NOT node-pg's positional
+ * `(text, params)` args, which surface as "A query must have either text or a
+ * name" at runtime.
+ */
+function runQuery(
+  pgClient: any,
+  text: string,
+  values?: unknown[],
+): Promise<{ rows: any[] }> {
+  return pgClient.query(values === undefined ? { text } : { text, values });
+}
+
+/**
  * Resolve the storage module for a given scope.
  * If ownerId is provided, probes entity tables to find the matching module.
  * Otherwise, returns the app-level module.
@@ -121,18 +137,19 @@ async function resolveStorageModule(
 ): Promise<StorageModuleRow | null> {
   if (!ownerId) {
     // App-level resolution
-    const result = await pgClient.query(APP_STORAGE_MODULE_QUERY, [databaseId]);
+    const result = await runQuery(pgClient, APP_STORAGE_MODULE_QUERY, [databaseId]);
     return (result.rows[0] as StorageModuleRow) ?? null;
   }
 
   // Entity-scoped: load all modules and probe entity tables
-  const result = await pgClient.query(ALL_STORAGE_MODULES_QUERY, [databaseId]);
+  const result = await runQuery(pgClient, ALL_STORAGE_MODULES_QUERY, [databaseId]);
   const modules = result.rows as StorageModuleRow[];
   const entityModules = modules.filter((m) => m.entity_schema && m.entity_table);
 
   for (const mod of entityModules) {
     const entityTable = QuoteUtils.quoteQualifiedIdentifier(mod.entity_schema!, mod.entity_table!);
-    const probe = await pgClient.query(
+    const probe = await runQuery(
+      pgClient,
       `SELECT 1 FROM ${entityTable} WHERE id = $1 LIMIT 1`,
       [ownerId],
     );
@@ -179,7 +196,8 @@ async function recordPhysicalName(
   physicalName: string,
 ): Promise<void> {
   await withPgClient(null, (client: any) =>
-    client.query(
+    runQuery(
+      client,
       `UPDATE ${bucketsTable} SET physical_name = $1 WHERE id = $2 AND physical_name IS NULL`,
       [physicalName, bucketId],
     ),
@@ -226,7 +244,8 @@ function resolveBucketName(
  * Resolve the database_id from the JWT context.
  */
 async function resolveDatabaseId(pgClient: any): Promise<string | null> {
-  const result = await pgClient.query(
+  const result = await runQuery(
+    pgClient,
     `SELECT jwt_private.current_database_id() AS id`,
   );
   return result.rows[0]?.id ?? null;
@@ -462,7 +481,8 @@ export function createBucketProvisionerPlugin(
               // Look up the bucket row (RLS enforced via pgSettings)
               const hasOwner = ownerId && storageModule.scope !== 'app';
               const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
-              const bucketResult = await pgClient.query(
+              const bucketResult = await runQuery(
+                pgClient,
                 hasOwner
                   ? `SELECT id, key, type, is_public, allowed_origins, physical_name
                      FROM ${bucketsTable}
@@ -639,7 +659,8 @@ export function createBucketProvisionerPlugin(
                     const storageModule = await resolveStorageModule(pgClient, databaseId);
                     if (storageModule) {
                       const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
-                      const idResult = await pgClient.query(
+                      const idResult = await runQuery(
+                        pgClient,
                         `SELECT id FROM ${bucketsTable} WHERE key = $1 LIMIT 1`,
                         [bucketInput.key],
                       );
@@ -685,7 +706,8 @@ export function createBucketProvisionerPlugin(
 
                     // Read the full bucket row (post-update) to get type + origins
                     const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
-                    const bucketResult = await pgClient.query(
+                    const bucketResult = await runQuery(
+                      pgClient,
                       `SELECT id, key, type, is_public, allowed_origins, physical_name
                        FROM ${bucketsTable}
                        WHERE key = $1

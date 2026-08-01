@@ -122,8 +122,11 @@ function createMockPgClient(overrides: Record<string, any> = {}) {
     },
   };
 
+  // The grafast `withPgClient` client takes the `{ text, values }` object form
+  // (mirrored here), not node-pg's positional `(text, params)` args.
   return {
-    query: jest.fn((sql: string, _params?: any[]) => {
+    query: jest.fn((arg: any) => {
+      const sql: string = typeof arg === 'string' ? arg : arg.text;
       for (const [key, value] of Object.entries({ ...defaultQueries, ...overrides })) {
         if (sql.includes(key)) {
           return Promise.resolve(value);
@@ -441,13 +444,13 @@ describe('createBucketProvisionerPlugin', () => {
       expect(result.success).toBe(true);
 
       const update = pgClient.query.mock.calls.find(
-        (c: any[]) => typeof c[0] === 'string' && c[0].includes('SET physical_name'),
+        (c: any[]) => c[0]?.text?.includes('SET physical_name'),
       );
       expect(update).toBeDefined();
       // Guarded so a re-provision never clobbers an already-recorded coordinate.
-      expect(update![0]).toContain('physical_name IS NULL');
+      expect(update![0].text).toContain('physical_name IS NULL');
       // Records the exact name returned by the provisioner against the row id.
-      expect(update![1]).toEqual(['public', 'bucket-uuid-789']);
+      expect(update![0].values).toEqual(['public', 'bucket-uuid-789']);
     });
 
     it('provisions the stored physical_name verbatim when already recorded', async () => {
@@ -512,7 +515,7 @@ describe('createBucketProvisionerPlugin', () => {
 
       expect(result.success).toBe(false);
       const update = pgClient.query.mock.calls.find(
-        (c: any[]) => typeof c[0] === 'string' && c[0].includes('SET physical_name'),
+        (c: any[]) => c[0]?.text?.includes('SET physical_name'),
       );
       expect(update).toBeUndefined();
     });
