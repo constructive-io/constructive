@@ -150,6 +150,11 @@ export interface PerfPathsReport {
   total: number;
   /** Keys with a `read` signal: an RLS policy or a view names the column. */
   read: number;
+  /**
+   * Keys a PostGraphile behavior declares absent from the API. Reported only;
+   * no rule acts on it yet.
+   */
+  declaredHidden?: number;
   /** Keys whose only signals are shape: they look like provisioning pointers. */
   writeOnceShaped: number;
   /** Tables carrying enough write-once pointers to look like config records. */

@@ -139,9 +139,60 @@ describe('perf dimension', () => {
       expect(report.perf!.paths).toEqual({
         total: 11,
         read: 4,
+        declaredHidden: 0,
         writeOnceShaped: 3,
         tables: 1,
         onWriteOncePointer: 'report'
+      });
+    });
+
+    describe('declared surface (PostGraphile behaviors)', () => {
+      function signalsFor(findings: Finding[], constraint: string): string[] {
+        const finding = x1For(findings, constraint);
+        return ((finding?.context as { pathSignals?: string[] })?.pathSignals ?? []);
+      }
+
+      it('reads an explicit denial off the constraint comment', async () => {
+        await applyFixture('paths-behaviors.sql');
+        const report = await audit(pg.client as never, { schemas: ['fx_bhv'], perf: true });
+        const findings = report.perf!.findings;
+
+        expect(signalsFor(findings, 'hidden_module_hidden_owner_id_fkey'))
+          .toEqual(['behavior-hidden']);
+        // The tag survives a description on the following lines.
+        expect(signalsFor(findings, 'hidden_module_table_id_fkey')).toEqual(['behavior-hidden']);
+        // A table nothing can select has no API path through any of its keys.
+        expect(signalsFor(findings, 'internal_log_log_owner_id_fkey'))
+          .toEqual(['behavior-hidden']);
+      });
+
+      it('treats a partial denial, a retraction and silence alike: no signal', async () => {
+        const report = await audit(pg.client as never, { schemas: ['fx_bhv'], perf: true });
+        const findings = report.perf!.findings;
+
+        // Still reachable as a single record.
+        expect(signalsFor(findings, 'partial_module_partial_owner_id_fkey')).toEqual([]);
+        // `-* +list +connection +single` denies nothing that matters here.
+        expect(signalsFor(findings, 'partial_module_table_id_fkey')).toEqual([]);
+        // No behavior at all is the preset default, which usually exposes it.
+        expect(signalsFor(findings, 'posts_author_id_fkey')).toEqual([]);
+      });
+
+      it('lets a read outrank the declaration: RLS traverses the key regardless', async () => {
+        const report = await audit(pg.client as never, { schemas: ['fx_bhv'], perf: true });
+        const finding = x1For(report.perf!.findings, 'tenant_scoped_tenant_owner_id_fkey');
+        expect((finding?.context as { pathSignals: string[] }).pathSignals)
+          .toEqual(['policy-read', 'behavior-hidden']);
+        expect((finding?.context as { pathAssessment: string }).pathAssessment).toBe('read');
+      });
+
+      it('changes no finding and no severity — the signal is reported only', async () => {
+        const report = await audit(pg.client as never, { schemas: ['fx_bhv'], perf: true });
+        const findings = report.perf!.findings;
+
+        expect(x1For(findings, 'hidden_module_hidden_owner_id_fkey')?.severity).toBe('medium');
+        // Four keys are declared hidden; the fifth denial loses to a policy read.
+        expect(report.perf!.paths).toMatchObject({ total: 7, read: 1, declaredHidden: 3 });
       });
     });
 

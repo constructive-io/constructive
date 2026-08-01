@@ -74,6 +74,13 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
     out.push(...findingSection('Performance findings', report.perf.findings, options));
     const { paths, stats, explain, diff } = report.perf;
     const notes: string[] = [];
+    if (paths && paths.declaredHidden) {
+      notes.push(
+        `Declared surface: ${paths.declaredHidden} of ${paths.total} foreign keys carry a `
+          + 'PostGraphile behavior denying the reverse relation, so no generated query reaches '
+          + 'them. Reported only — no rule acts on it yet.'
+      );
+    }
     if (paths && paths.writeOnceShaped > 0) {
       const acted = {
         report: 'X1 still asks for an index on each of them',

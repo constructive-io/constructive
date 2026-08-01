@@ -46,6 +46,7 @@ import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../c
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { type ExplainReport, proveFindings } from '../perf/explain';
+import { introspectBehaviors } from '../pg/behaviors';
 import { resolveExposure } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
 import { introspectIndexes, introspectViewBodies, type TableIndexSnapshot } from '../pg/indexes';
@@ -173,7 +174,13 @@ export async function audit(
         schemas: options.schemas ?? config.schemas,
         excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
       }),
-      { minPointers: config.perf?.paths?.minPointers }
+      {
+        minPointers: config.perf?.paths?.minPointers,
+        behaviors: await introspectBehaviors(exec, {
+          schemas: options.schemas ?? config.schemas,
+          excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+        })
+      }
     )
     : new Map();
 
@@ -362,6 +369,7 @@ export async function audit(
       perf.paths = {
         total: paths.size,
         read: all.filter((p) => p.assessment === 'read').length,
+        declaredHidden: all.filter((p) => p.assessment === 'declared-hidden').length,
         writeOnceShaped: shaped.length,
         tables: new Set(shaped.map((p) => `${p.schema}.${p.table}`)).size,
         onWriteOncePointer

@@ -206,6 +206,7 @@ So safegres collects **signals** about every foreign key, each pointing one way 
 | `view-read` | read | a view or materialized view names one of them |
 | `write-once-pointer` | shape | every column of the key has a constant default (`uuid_nil()`, a literal) |
 | `config-record` | shape | the table carries two or more write-once pointers (`perf.paths.minPointers`) |
+| `behavior-hidden` | declared | a PostGraphile `@behavior` on the constraint denies `list`, `connection` *and* `single`, or the table denies `select` |
 
 A **read** signal is decisive — the database itself traverses the column, so the key is a query path and X1 applies as written. That is what keeps the tenant key out of trouble with no special case: `database_id` appears in essentially every policy. A **shape** signal is not: a `NOT NULL` key defaulting to the nil UUID looks like a slot a provisioner fills in, but a generated API can expose a reverse relation over any foreign key regardless of how its default is written, and if it does, the index is wanted after all.
 
@@ -215,7 +216,11 @@ So by default the shape **changes nothing** — no finding is removed, no severi
 - `demote` — write-once-shaped keys drop to `info`, so they are read rather than gated on and contribute nothing to the score;
 - `suppress` — no finding. Only defensible once you know the generated API does not expose these relations; a shape is not a proof.
 
-The signal that *would* settle it is the one that isn't here yet: whether the generated GraphQL surface still contains the field. It slots in as another signal, and only then does "nothing can reach this key" become a conclusion anything should act on. `perf.paths.infer: false` skips the collection entirely.
+A **declared** signal is the third kind, and it is the one that answers the question the other two only circle: whether the generated API contains the field at all. PostGraphile v5 behaviors are written as an `@behavior` smart tag in the object's comment, so safegres reads them from `pg_description` — no running Graphile instance, no project-specific metadata tables, and the declaration means the same thing in an empty CI database as in production, which is exactly what `reltuples` and `idx_scan` do not.
+
+Only an **explicit denial** counts. Presets grant most behaviors by default, so the absence of `+list` says nothing at all, and a scanner that read silence as denial would recommend dropping an index a live API is using. All three of `list`, `connection` and `single` must be denied — a relation still reachable as a single record is still reachable — and later fragments win, so `-* +list` is a grant. A `read` signal outranks the declaration either way: RLS and views traverse a key whatever the API exposes.
+
+`behavior-hidden` is currently **reported only** — it appears in `context.pathSignals`, in `report.perf.paths.declaredHidden`, and nowhere in the score. Note also what it does *not* claim: the referential-integrity scan on a parent `DELETE` runs whatever the API exposes, so a hidden relation is not the same thing as an unwanted index. `perf.paths.infer: false` skips the collection entirely.
 
 X2–X4 and X9 are the checks a generic index linter can't make, because they read the policy predicate. RLS quals are evaluated *before* user quals, on every candidate row, for every caller — so an unindexed or cast-wrapped policy column is a whole-table tax rather than a slow query. X2 requires the policy column to be the *leading* column of some index (a trailing position can't serve the qual alone); X3 looks for an expression index matching the exact wrapped shape; X4 skips built-ins, whose leakproofness is a property of the server rather than a schema choice.
 

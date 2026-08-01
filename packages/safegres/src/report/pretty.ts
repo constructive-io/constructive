@@ -175,6 +175,14 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     }
 
     const { paths, stats, explain } = report.perf;
+    if (paths && paths.declaredHidden) {
+      lines.push(
+        paint(
+          'info',
+          `  declared surface: ${paths.declaredHidden}/${paths.total} foreign keys are behavior-hidden (reported only)`
+        )
+      );
+    }
     if (paths && paths.writeOnceShaped > 0) {
       const acted = { report: 'reported', demote: 'demoted to info', suppress: 'suppressed' }[
         paths.onWriteOncePointer

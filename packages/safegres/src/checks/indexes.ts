@@ -53,7 +53,12 @@ export function checkUnindexedForeignKeys(
     if (table.indexes.some((idx) => indexCoversColumns(idx, fk.columns))) continue;
 
     const path = paths?.get(pathKey(table.schema, table.name, fk.name));
-    const writeOnceShaped = path?.assessment === 'write-once-shaped';
+    // Tested on the signal, not the assessment: a path can be both write-once
+    // shaped and declared hidden, and the assessment reports only the stronger
+    // of the two. `onWriteOncePointer` must keep meaning what it meant.
+    const writeOnceShaped =
+      path?.assessment === 'write-once-shaped' ||
+      (path?.signals.some((s) => s.name === 'config-record') ?? false);
     if (writeOnceShaped && onWriteOncePointer === 'suppress') continue;
 
     const cols = fk.columnNames.join(', ');

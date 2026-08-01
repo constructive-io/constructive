@@ -28,24 +28,42 @@
  *
  * Shape alone must never suppress a finding. A generated API can expose a
  * reverse relation over any foreign key regardless of how its default is
- * written, and if it does, the path is reachable and the index is wanted. The
- * signal that settles it is therefore the one this module does *not* yet have:
- * whether the generated GraphQL surface still contains the field. Add it as
- * another {@link PathSignal} — the shape of the API is designed for that — and
- * only then is `unreachable` a conclusion anything should act on.
+ * written, and if it does, the path is reachable and the index is wanted.
+ *
+ * - `behavior-hidden` is the signal that settles it: a PostGraphile behavior
+ *   denying `list`, `connection` and `single` on the constraint is the author
+ *   *declaring* the reverse relation absent from the API, which is a fact about
+ *   the schema rather than a measurement of an empty database. It is decisive
+ *   in the negative direction the way a read is decisive in the positive — with
+ *   reads still winning ties, because RLS and views traverse a key whatever the
+ *   API exposes.
  */
 
+import { type BehaviorSnapshot, deniesAll, emptyBehaviorSnapshot } from './behaviors';
 import type { TableIndexSnapshot } from './indexes';
 import type { TableSnapshot } from './introspect';
 
 /**
  * Which way a signal points. `read` means something demonstrably traverses the
  * key; `shape` means the schema resembles an idiom in which nothing does, which
- * is a suspicion rather than a finding.
+ * is a suspicion rather than a finding; `declared` means the schema author said
+ * so, which is neither an observation nor a guess.
  */
-export type SignalDirection = 'read' | 'shape';
+export type SignalDirection = 'read' | 'shape' | 'declared';
 
-export type SignalName = 'policy-read' | 'view-read' | 'write-once-pointer' | 'config-record';
+export type SignalName =
+  | 'policy-read'
+  | 'view-read'
+  | 'write-once-pointer'
+  | 'config-record'
+  | 'behavior-hidden';
+
+/**
+ * Abilities that together constitute "the API can traverse this relation".
+ * All three must be explicitly denied before the path counts as declared
+ * hidden — a relation reachable as a single record is still reachable.
+ */
+export const REVERSE_RELATION_ABILITIES = ['list', 'connection', 'single'];
 
 export interface PathSignal {
   name: SignalName;
@@ -55,14 +73,17 @@ export interface PathSignal {
 }
 
 /**
- * The caller-facing summary of a path's signals. Note there is no `unreachable`
- * member: nothing safegres can currently observe proves a path is unreachable,
- * and inventing the state is how a scanner ends up recommending that you drop
- * an index a live API is using.
+ * The caller-facing summary of a path's signals. Note there is still no
+ * `unreachable` member: `declared-hidden` says the *API* does not expose the
+ * relation, which is not the same claim as nothing reading the key — a job, a
+ * trigger or a hand-written query can, and the referential-integrity scan on a
+ * parent delete does regardless.
  */
 export type PathAssessment =
   /** At least one `read` signal. The key is traversed; X1 applies as written. */
   | 'read'
+  /** The API surface is declared not to contain this relation. */
+  | 'declared-hidden'
   /** Only `shape` signals. Looks like a provisioning pointer; unproven. */
   | 'write-once-shaped'
   /** No signal fired either way. */
@@ -81,6 +102,11 @@ export interface AccessPath {
 }
 
 export interface ClassifyOptions {
+  /**
+   * Behavior tags read from object comments. Absent, no `behavior-hidden`
+   * signal fires and classification is exactly what it was before.
+   */
+  behaviors?: BehaviorSnapshot;
   /**
    * Write-once pointers a table needs before the `config-record` signal fires.
    * Default 2. Lifting the test from the column to the table is what catches
@@ -118,6 +144,7 @@ export function pathKey(schema: string, table: string, constraint: string): stri
  */
 export function assess(signals: PathSignal[]): PathAssessment {
   if (signals.some((s) => s.direction === 'read')) return 'read';
+  if (signals.some((s) => s.direction === 'declared')) return 'declared-hidden';
   if (signals.some((s) => s.name === 'config-record')) return 'write-once-shaped';
   return 'unknown';
 }
@@ -138,6 +165,7 @@ export function classifyPaths(
   options: ClassifyOptions = {}
 ): Map<string, AccessPath> {
   const minPointers = options.minPointers ?? DEFAULT_MIN_POINTERS;
+  const behaviors = options.behaviors ?? emptyBehaviorSnapshot();
   const policyTokens = identifierTokens(
     tables.flatMap((t) => t.policies.flatMap((p) => [p.using, p.withCheck]))
   );
@@ -175,6 +203,27 @@ export function classifyPaths(
           name: 'view-read',
           direction: 'read',
           detail: `a view or materialized view names ${inView.join(', ')}`
+        });
+      }
+
+      const relation = `${table.schema}.${table.name}`;
+      // Either the constraint's own reverse relation is denied, or the whole
+      // relation is — a table nothing can select is a table with no API paths
+      // through any of its keys.
+      const hiddenBy = deniesAll(
+        behaviors.constraints.get(`${relation}.${fk.name}`),
+        REVERSE_RELATION_ABILITIES
+      )
+        ? `${fk.name} denies ${REVERSE_RELATION_ABILITIES.join('/')}`
+        : deniesAll(behaviors.tables.get(relation), ['select'])
+          ? `${table.name} denies select`
+          : null;
+
+      if (hiddenBy) {
+        signals.push({
+          name: 'behavior-hidden',
+          direction: 'declared',
+          detail: `a PostGraphile behavior declares the relation absent from the API: ${hiddenBy}`
         });
       }
 
