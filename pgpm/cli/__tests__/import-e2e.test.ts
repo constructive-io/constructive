@@ -14,6 +14,7 @@
  *
  * PREREQUISITES: a running PostgreSQL instance via standard PG* env vars.
  */
+import { readBundleArchiveFile } from '@pgpmjs/core';
 import { copyBlockToInsert, preprocessDumpText } from '@pgpmjs/import';
 import { diffCatalogSnapshots, snapshotCatalog } from '@pgpmjs/transform';
 import * as fs from 'fs';
@@ -163,6 +164,25 @@ describe('pgpm import e2e', () => {
     const snapOriginal = await snapshotCatalog(originalDb);
     const snapPartitioned = await snapshotCatalog(testDb);
     expect(diffCatalogSnapshots(snapOriginal, snapPartitioned)).toEqual([]);
+  });
+
+  it('composes module + linear SQL + bundle projections from one import run', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}
+      pgpm import dump.sql --pkg imp-emit --emit-sql imp-emit.sql --emit-bundle imp-emit.bundle.tar.gz
+      `,
+      {}
+    );
+
+    expect(fs.existsSync(path.join(wsDir, 'imp-emit', 'pgpm.plan'))).toBe(true);
+
+    const sql = fs.readFileSync(path.join(wsDir, 'imp-emit.sql'), 'utf-8');
+    expect(sql).toMatch(/CREATE SCHEMA imp_app/);
+    expect(sql).toMatch(/CREATE TABLE imp_app\.users/);
+
+    const bundle = readBundleArchiveFile(path.join(wsDir, 'imp-emit.bundle.tar.gz'));
+    expect(bundle.changes.length).toBeGreaterThan(0);
   });
 
   it('--with-data deploys COPY/INSERT data as seed fixtures', async () => {

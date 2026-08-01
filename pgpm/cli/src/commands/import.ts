@@ -18,6 +18,12 @@ import { cliExitWithError, CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer
 import * as path from 'path';
 
 import { checkOverwrite, writePackage } from '../utils/emit-package';
+import {
+  hasEmitProjection,
+  parseEmitProjectionTargets,
+  projectModule,
+  STDOUT_TARGET
+} from '../utils/module-projections';
 
 const log = new Logger('import');
 
@@ -59,14 +65,24 @@ Options:
                           splitting the import into multiple pgpm packages with
                           derived cross-package requires
   --write                 Allow overwriting an existing module directory
+  --emit-sql <file|->      Also project the imported module into a single linear
+                          SQL script (- for stdout). Requires a single output
+                          package (not supported with --partition).
+  --emit-bundle <file>     Also project the imported module into a
+                          content-addressed .bundle.tar.gz. Same single-package
+                          requirement as --emit-sql.
   --cwd <directory>       Working directory (default: current directory)
   --dry-run               Print the resulting plan/paths without writing
+
+The imported module is the canonical artifact; --emit-sql and --emit-bundle are
+pure projections of it (the same machinery pgpm package and pgpm diff use).
 
 Examples:
   pgpm import dump.sql --pkg my-app
   pgpm import dump.sql --pkg my-app --granularity consolidated --naming flat
   pgpm import ./sql-files --pkg my-app --out ./packages --with-data
   pgpm import dump.sql --pkg my-app --partition partition.json
+  pgpm import dump.sql --pkg my-app --emit-sql my-app.sql
 `;
 
 const NAMING_STYLES = ['directory', 'flat'] as const;
@@ -119,6 +135,13 @@ export default async (
   const withData = Boolean(argv['with-data'] ?? argv.withData);
   const write = Boolean(argv.write);
   const dryRun = Boolean(argv['dry-run'] ?? argv.dryRun);
+  const emit = parseEmitProjectionTargets(argv, cwd);
+  const emitRequested = hasEmitProjection(emit);
+  const sqlToStdout = emit.emitSql === STDOUT_TARGET;
+
+  if (emitRequested && dryRun) {
+    await cliExitWithError('--emit-sql/--emit-bundle cannot be combined with --dry-run.');
+  }
 
   let source;
   try {
@@ -128,7 +151,7 @@ export default async (
     return;
   }
 
-  if (source.files.length > 1) {
+  if (source.files.length > 1 && !sqlToStdout) {
     log.info(`concatenated ${source.files.length} .sql files in sorted order`);
   }
 
@@ -175,24 +198,38 @@ export default async (
       }
     }
   } else {
+    if (emitRequested && packages.length !== 1) {
+      await cliExitWithError(
+        '--emit-sql/--emit-bundle require a single output package; a --partition import emits multiple packages.'
+      );
+    }
     for (const pkg of packages) {
       const guard = checkOverwrite(path.join(outBase, pkg.name), source.files[0], write);
       if (guard) {
         await cliExitWithError(guard);
       }
     }
+    let firstDir: string | undefined;
     for (const pkg of packages) {
       const dir = writePackage(outBase, pkg);
-      log.success(`wrote ${pkg.rows.length} changes to ${dir}`);
+      firstDir ??= dir;
+      if (!sqlToStdout) {
+        log.success(`wrote ${pkg.rows.length} changes to ${dir}`);
+      }
+    }
+    if (emitRequested && firstDir) {
+      await projectModule(firstDir, emit, sqlToStdout ? undefined : msg => log.success(msg));
     }
   }
 
   const { summary } = result;
-  log.success(
-    `import: ${summary.statements} statement(s) -> ${summary.changes} change(s), ` +
-    `${summary.skippedPreamble} preamble skipped, ${summary.skippedData} data skipped, ` +
-    `${summary.misc} in misc, ${result.warnings.length} warning(s)`
-  );
+  if (!sqlToStdout) {
+    log.success(
+      `import: ${summary.statements} statement(s) -> ${summary.changes} change(s), ` +
+      `${summary.skippedPreamble} preamble skipped, ${summary.skippedData} data skipped, ` +
+      `${summary.misc} in misc, ${result.warnings.length} warning(s)`
+    );
+  }
 
   prompter.close();
   return argv;
