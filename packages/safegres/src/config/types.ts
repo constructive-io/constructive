@@ -178,6 +178,28 @@ export interface PerfExplainConfig {
   minRows?: number;
 }
 
+/**
+ * Extension objects are a database's `node_modules`: they live in the same
+ * catalog and scan like anything else, but they are the extension author's
+ * to secure and tune, and altering them breaks `pg_dump` and upgrades.
+ */
+export interface ExtensionsConfig {
+  /**
+   * Skip relations an extension owns (`pg_depend.deptype = 'e'`) and their
+   * partitions. Default `true`. Set `false` to audit them anyway — useful
+   * when auditing an extension itself.
+   */
+  skipOwned?: boolean;
+  /**
+   * Extension names whose *schemas* are skipped wholesale, for objects an
+   * extension creates at runtime and never registers as dependencies.
+   * `pg_partman` is the motivating case: its child partitions and templates
+   * carry no dependency on the extension, so ownership alone misses them.
+   * Unknown or uninstalled names are ignored.
+   */
+  ignore?: string[];
+}
+
 export interface FailOnConfig {
   /** Exit non-zero if any finding is at/above this severity. */
   severity?: Severity;
@@ -203,6 +225,8 @@ export interface SafegresConfig {
   exposure?: ExposureConfig;
   /** Tables whose open reads are deliberate (declared public surface). */
   public?: PublicConfig;
+  /** How to treat objects belonging to installed extensions. */
+  extensions?: ExtensionsConfig;
   /** The optional performance dimension. */
   perf?: PerfConfig;
   schemas?: string[];

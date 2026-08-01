@@ -26,6 +26,7 @@ import {
 import {
   checkNonLeakproofPolicyFunctions,
   checkPolicyColumnCasts,
+  checkUnhoistedPolicyFunctions,
   checkUnindexedPolicyColumns,
   collectPredicateColumns,
   type PredicateColumn
@@ -133,10 +134,13 @@ export async function audit(
   const exposure = await resolveExposure(exec, options.exposure ?? config.exposure);
   const exposedSchemas = new Set(exposure.schemas);
 
+  const extensions = options.extensions ?? config.extensions;
+
   const snapshot = await introspectTables(exec, {
     schemas: options.schemas ?? config.schemas,
     excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
-    roles: resolution.roles
+    roles: resolution.roles,
+    extensions
   });
 
   const exposedTables = exposure.known
@@ -149,7 +153,8 @@ export async function audit(
   const indexSnapshot = perfEnabled
     ? await introspectIndexes(exec, {
       schemas: options.schemas ?? config.schemas,
-      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
+      extensions
     })
     : [];
   const indexesByTable = new Map<string, TableIndexSnapshot>(
@@ -212,6 +217,7 @@ export async function audit(
     ? await introspectStats(exec, {
       schemas: options.schemas ?? config.schemas,
       excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
+      extensions,
       statementLimit: config.perf?.stats?.topStatements
     })
     : null;
@@ -442,15 +448,19 @@ async function auditTableAst(
 
     if (!indexes) continue;
 
-    // --- Policy-aware perf rules (X2/X3/X4) ---
+    // --- Policy-aware perf rules (X2/X3/X4/X9) ---
     const cols: PredicateColumn[] = [];
     if (using) {
       cols.push(...collectPredicateColumns(using, 'USING', table.name));
       findings.push(...checkNonLeakproofPolicyFunctions(table, using, volatility, policy.name));
+      findings.push(...checkUnhoistedPolicyFunctions(table, using, volatility, policy.name, 'USING'));
     }
     if (withCheck) {
       cols.push(...collectPredicateColumns(withCheck, 'WITH CHECK', table.name));
       findings.push(...checkNonLeakproofPolicyFunctions(table, withCheck, volatility, policy.name));
+      findings.push(
+        ...checkUnhoistedPolicyFunctions(table, withCheck, volatility, policy.name, 'WITH CHECK')
+      );
     }
     if (cols.length > 0) predicateColumns.set(policy.name, cols);
   }

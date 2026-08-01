@@ -6,7 +6,7 @@
  * pays for it.
  */
 
-import type { IntrospectOptions, QueryExecutor } from './introspect';
+import { extensionFilter, type IntrospectOptions, type QueryExecutor } from './introspect';
 
 export interface IndexInfo {
   name: string;
@@ -77,18 +77,22 @@ const DEFAULT_EXCLUDES = ['pg_catalog', 'information_schema', 'pg_toast'];
  */
 export async function introspectIndexes(
   exec: QueryExecutor,
-  options: Pick<IntrospectOptions, 'schemas' | 'excludeSchemas'> = {}
+  options: Pick<IntrospectOptions, 'schemas' | 'excludeSchemas' | 'extensions'> = {}
 ): Promise<TableIndexSnapshot[]> {
   const excludes = [...DEFAULT_EXCLUDES, ...(options.excludeSchemas ?? [])];
   const schemaFilter = options.schemas && options.schemas.length > 0
     ? `AND n.nspname = ANY($1::text[])`
     : `AND NOT (n.nspname = ANY($2::text[]))`;
+  const extFilter = extensionFilter(options.extensions, 3);
 
-  // Both parameters are referenced (even when only one filters) so Postgres
+  // Every parameter is referenced (even when only one filters) so Postgres
   // can infer their types — an unused $N errors out at bind time.
   const sql = `
     WITH _params AS (
-      SELECT $1::text[] AS include_schemas, $2::text[] AS exclude_schemas
+      SELECT
+        $1::text[] AS include_schemas,
+        $2::text[] AS exclude_schemas,
+        $3::text[] AS ignore_extensions
     ),
     rels AS (
       SELECT
@@ -101,7 +105,7 @@ export async function introspectIndexes(
       FROM pg_class c
       JOIN pg_namespace n ON n.oid = c.relnamespace
       WHERE c.relkind IN ('r', 'p')
-        ${schemaFilter}
+        ${schemaFilter}${extFilter}
     ),
     indexes AS (
       SELECT
@@ -191,7 +195,7 @@ export async function introspectIndexes(
     indexes: IndexInfo[];
     foreign_keys: ForeignKeyInfo[];
     columns: ColumnInfo[];
-  }>(sql, [options.schemas ?? [], excludes]);
+  }>(sql, [options.schemas ?? [], excludes, options.extensions?.ignore ?? []]);
 
   return rows.map((r) => ({
     schema: r.schema_name,

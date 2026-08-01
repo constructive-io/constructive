@@ -216,10 +216,24 @@ function scoreLines(label: string, score: Score, colorEnabled: boolean): string[
   const lines = [
     `${label}: ${gradePaint(`${score.value} (${score.grade})`)}  — model: ${score.model}${capNote}`
   ];
-  const top = score.deductions.slice(0, 3);
+  const scored = score.deductions.filter((d) => !d.unscored);
+  const top = scored.slice(0, 3);
   if (top.length > 0) {
     lines.push(
       `  top deductions: ${top.map((d) => `${d.code} −${d.points} (×${d.count})`).join('  ')}`
+    );
+    // Payoff, not points: what the score becomes if the rule goes to zero.
+    lines.push(
+      `  by rule: ${scored
+        .map((d) => `${d.code} ${d.grade} (+${d.potential.toFixed(1)})`)
+        .join('  ')}`
+    );
+  }
+  const unscored = score.deductions.filter((d) => d.unscored);
+  if (unscored.length > 0) {
+    lines.push(
+      `  unscored: ${unscored.map((d) => `${d.code} (×${d.count})`).join('  ')}`
+        + '  — zero-weight, fixing these cannot move the score'
     );
   }
   return lines;

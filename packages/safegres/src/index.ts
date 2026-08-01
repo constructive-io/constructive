@@ -37,6 +37,7 @@ export type { PolicyClause, PredicateColumn } from './checks/policy-index';
 export {
   checkNonLeakproofPolicyFunctions,
   checkPolicyColumnCasts,
+  checkUnhoistedPolicyFunctions,
   checkUnindexedPolicyColumns,
   collectPredicateColumns
 } from './checks/policy-index';

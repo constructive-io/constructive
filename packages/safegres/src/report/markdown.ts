@@ -32,7 +32,7 @@ export interface RenderMarkdownOptions {
 export function renderMarkdown(report: Report, options: RenderMarkdownOptions = {}): string {
   const out: string[] = [`## ${options.title ?? 'safegres'}`, ''];
 
-  out.push(...scoreTable(report), '');
+  out.push(...scoreTable(report, options), '');
 
   if (report.exposure) {
     const { known, source, exposedTables, totalTables, roles } = report.exposure;
@@ -96,21 +96,50 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
   return out.join('\n');
 }
 
-function scoreTable(report: Report): string[] {
+function scoreTable(report: Report, options: RenderMarkdownOptions): string[] {
   const rows: string[] = [];
   if (report.score) rows.push(scoreRow('Security', report.score));
   if (report.perf) rows.push(scoreRow('Performance', report.perf.score));
   if (rows.length === 0) return [];
-  return ['| Dimension | Score | Grade | Top deductions |', '| --- | --- | --- | --- |', ...rows];
+  return [
+    '| Dimension | Score | Grade | Top deductions |',
+    '| --- | --- | --- | --- |',
+    ...rows,
+    '',
+    ...ruleTable('Security', report.score, options),
+    ...ruleTable('Performance', report.perf?.score, options)
+  ];
 }
 
 function scoreRow(label: string, score: Score): string {
   const top = score.deductions
+    .filter((d) => !d.unscored)
     .slice(0, 3)
     .map((d) => `\`${d.code}\` −${d.points} (×${d.count})`)
     .join(', ');
   const capped = score.cappedByUnknownExposure ? ' (capped)' : '';
   return `| ${label} | **${score.value}**${capped} | **${score.grade}** | ${top || '—'} |`;
+}
+
+/**
+ * Per-rule breakdown. `Payoff` is what the dimension score becomes if that
+ * rule alone goes to zero — the number worth ranking work by, and not
+ * proportional to the finding count, because the curve is exponential.
+ */
+function ruleTable(label: string, score: Score | undefined, options: RenderMarkdownOptions): string[] {
+  if (!score || score.deductions.length === 0) return [];
+  const table = [
+    '| Rule | Findings | Points | Grade | Payoff |',
+    '| --- | ---: | ---: | --- | ---: |',
+    ...score.deductions.map((d) =>
+      d.unscored
+        ? `| \`${d.code}\` | ${d.count} | — | — | *unscored* |`
+        : `| \`${d.code}\` | ${d.count} | −${d.points} | **${d.grade}** | +${d.potential.toFixed(1)} |`
+    )
+  ];
+  return options.verbose
+    ? [`### ${label} by rule`, '', ...table, '']
+    : [`<details><summary>${label} by rule</summary>`, '', ...table, '', '</details>', ''];
 }
 
 function countsTable(report: Report): string {
