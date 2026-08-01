@@ -1,0 +1,31 @@
+{
+  "name": "@constructive-io/examples-pgpm-projections",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Example: pgpm projections — one schema, projected into every granularity, naming, partition, and output shape, all proven to deploy to the identical Postgres catalog.",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "keywords": [
+    "postgres",
+    "postgresql",
+    "pgpm",
+    "migrations",
+    "projections",
+    "schema-diff",
+    "example"
+  ],
+  "scripts": {
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@pgpmjs/diff": "workspace:^",
+    "@pgpmjs/transform": "workspace:^",
+    "pgpm": "workspace:^"
+  }
+}
