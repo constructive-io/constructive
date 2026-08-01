@@ -96,6 +96,18 @@ const UPLOAD_APP_FILE = `
   }
 `;
 
+const PROVISION_BUCKET = `
+  mutation ProvisionBucket($input: ProvisionBucketInput!) {
+    provisionBucket(input: $input) {
+      success
+      bucketName
+      accessType
+      provider
+      error
+    }
+  }
+`;
+
 const APP_FILES = `
   query AppFiles {
     appFiles {
@@ -552,6 +564,113 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       expect(bucketFromPresignedUrl(payload.uploadUrl)).toBe(customPhysical);
       // ...and the stored coordinate is left untouched.
       expect(await physicalNameFor('custom-cdn')).toBe(customPhysical);
+    });
+  });
+
+  // ==========================================================================
+  // 1c. Eager provisioning via the provisionBucket mutation (Alice)
+  //
+  // The explicit provisionBucket mutation must mint the SAME tenant-aware
+  // physical name the lazy first-upload path would (`{prefix}-{key}-{db}`) and
+  // persist it on the bucket row — never the bare logical key. This is the
+  // regression guard for BucketProvisionerPreset being wired without a
+  // resolveBucketName.
+  // ==========================================================================
+
+  describe('Eager provisioning via provisionBucket (Alice)', () => {
+    const aliceBucketsTable = `"${aliceSchemas[0]}".app_buckets`;
+
+    const physicalNameFor = async (key: string): Promise<string | null> => {
+      const res = await pg.query(
+        `SELECT physical_name FROM ${aliceBucketsTable} WHERE key = $1`,
+        [key]
+      );
+      return res.rows[0]?.physical_name ?? null;
+    };
+
+    // MinIO uses path-style URLs: http://host:9000/<bucket>/<key>?...
+    const bucketFromPresignedUrl = (url: string): string =>
+      new URL(url).pathname.replace(/^\/+/, '').split('/')[0];
+
+    // Seed a fresh, never-provisioned bucket row (physical_name IS NULL).
+    const seedBucket = async (key: string): Promise<void> => {
+      await pg.query(
+        `INSERT INTO ${aliceBucketsTable} (key, type, is_public) VALUES ($1, 'public', true)`,
+        [key]
+      );
+    };
+
+    it('mints {prefix}-{key}-{databaseId} and records it, matching what the lazy path would mint', async () => {
+      // 1. Derive the naming prefix from a bucket the LAZY path provisions.
+      const lazyKey = 'eager-lazy';
+      await seedBucket(lazyKey);
+      const lazyRes = await postGraphQL({
+        query: UPLOAD_APP_FILE,
+        variables: {
+          input: {
+            bucketKey: lazyKey,
+            contentHash: await hashContent('eager-lazy-probe'),
+            contentType: 'text/plain',
+            size: 16,
+            filename: 'eager-lazy.txt'
+          }
+        }
+      });
+      const lazyUrl = expectSuccess(lazyRes).uploadAppFile.uploadUrl;
+      expect(lazyUrl).toBeTruthy();
+      const lazyPhysical = await physicalNameFor(lazyKey);
+      expect(lazyPhysical).toBeTruthy();
+      // The lazy path records the exact bucket the presigned PUT targets.
+      expect(bucketFromPresignedUrl(lazyUrl)).toBe(lazyPhysical);
+
+      // The shared convention: {prefix}-{key}-{databaseId}.
+      const suffix = `-${lazyKey}-${aliceDatabaseId}`;
+      expect(lazyPhysical!.endsWith(suffix)).toBe(true);
+      const prefix = lazyPhysical!.slice(0, -suffix.length);
+      expect(prefix.length).toBeGreaterThan(0);
+
+      // 2. EAGER path: a fresh bucket row, provisioned via the mutation.
+      const eagerKey = 'eager-prov';
+      await seedBucket(eagerKey);
+      expect(await physicalNameFor(eagerKey)).toBeNull();
+
+      const provRes = await postGraphQL({
+        query: PROVISION_BUCKET,
+        variables: { input: { bucketKey: eagerKey } }
+      });
+      const payload = expectSuccess(provRes).provisionBucket;
+      expect(payload.error).toBeNull();
+      expect(payload.success).toBe(true);
+
+      const expected = `${prefix}-${eagerKey}-${aliceDatabaseId}`;
+      // Eager mints the tenant-aware name — NOT the bare logical key.
+      expect(payload.bucketName).toBe(expected);
+      expect(payload.bucketName).not.toBe(eagerKey);
+      // ...and persists it on the row (physical_name IS NULL-guarded record).
+      expect(await physicalNameFor(eagerKey)).toBe(expected);
+    });
+
+    it('does not clobber a physical_name recorded by a prior provision', async () => {
+      const key = 'eager-idem';
+      await seedBucket(key);
+
+      const firstRes = await postGraphQL({
+        query: PROVISION_BUCKET,
+        variables: { input: { bucketKey: key } }
+      });
+      const firstPayload = expectSuccess(firstRes).provisionBucket;
+      expect(firstPayload.success).toBe(true);
+      const recorded = await physicalNameFor(key);
+      expect(recorded).toBe(firstPayload.bucketName);
+
+      const secondRes = await postGraphQL({
+        query: PROVISION_BUCKET,
+        variables: { input: { bucketKey: key } }
+      });
+      const secondPayload = expectSuccess(secondRes).provisionBucket;
+      expect(secondPayload.success).toBe(true);
+      // The stored coordinate is authoritative and left untouched.
+      expect(await physicalNameFor(key)).toBe(recorded);
     });
   });
 
