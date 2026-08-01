@@ -19,6 +19,9 @@ const options: Partial<CLIOptions> = {
     string: [
       'baseline',
       'write-baseline',
+      'compare',
+      'compare-ref',
+      'write-snapshot',
       'connection',
       'host',
       'user',

@@ -11,6 +11,7 @@
 
 import type { Score } from '../score/score';
 import type { Finding, Report, Severity } from '../types';
+import { formatDelta, type ReportComparison, type ScoreDelta } from './compare';
 
 const SEV_ICON: Record<Severity, string> = {
   critical: '🔴',
@@ -46,6 +47,9 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
   }
 
   out.push(countsTable(report), '');
+
+  if (report.comparison) out.push(...comparisonSection(report.comparison), '');
+
   if (options.summary) return out.join('\n');
 
   const security = report.perf
@@ -90,13 +94,15 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
 }
 
 function scoreTable(report: Report, options: RenderMarkdownOptions): string[] {
+  const cmp = report.comparison;
   const rows: string[] = [];
-  if (report.score) rows.push(scoreRow('Security', report.score));
-  if (report.perf) rows.push(scoreRow('Performance', report.perf.score));
+  if (report.score) rows.push(scoreRow('Security', report.score, !!cmp, cmp?.security));
+  if (report.perf) rows.push(scoreRow('Performance', report.perf.score, !!cmp, cmp?.perf));
   if (rows.length === 0) return [];
+  const deltaHeader = cmp ? ` Δ vs ${cmp.previous.ref ?? 'previous run'} |` : '';
   return [
-    '| Dimension | Score | Grade | Top deductions |',
-    '| --- | --- | --- | --- |',
+    `| Dimension | Score | Grade |${deltaHeader} Top deductions |`,
+    `| --- | --- | --- |${cmp ? ' --- |' : ''} --- |`,
     ...rows,
     '',
     ...ruleTable('Security', report.score, options),
@@ -104,14 +110,76 @@ function scoreTable(report: Report, options: RenderMarkdownOptions): string[] {
   ];
 }
 
-function scoreRow(label: string, score: Score): string {
+function scoreRow(label: string, score: Score, compared: boolean, delta?: ScoreDelta): string {
   const top = score.deductions
     .filter((d) => !d.unscored)
     .slice(0, 3)
     .map((d) => `\`${d.code}\` −${d.points} (×${d.count})`)
     .join(', ');
   const capped = score.cappedByUnknownExposure ? ' (capped)' : '';
-  return `| ${label} | **${score.value}**${capped} | **${score.grade}** | ${top || '—'} |`;
+  // The column exists for the whole table or not at all: a dimension the
+  // previous run didn't have still needs its cell.
+  const deltaCell = compared ? ` ${delta ? scoreDeltaCell(delta) : '— (new)'} |` : '';
+  return `| ${label} | **${score.value}**${capped} | **${score.grade}** |${deltaCell} ${top || '—'} |`;
+}
+
+/**
+ * The movement, made legible at a glance: an arrow for the direction, the
+ * grade transition when it crossed a band, and the finding count either way —
+ * a score can hold still while findings move underneath it.
+ */
+function scoreDeltaCell(d: ScoreDelta): string {
+  const arrow = d.delta > 0 ? '🟢 ▲' : d.delta < 0 ? '🔴 ▼' : '⚪';
+  const score = d.delta === 0 ? 'no change' : `${formatDelta(d.delta, 1)} (from ${d.before})`;
+  const grade = d.gradeBefore === d.gradeAfter ? '' : ` · ${d.gradeBefore} → ${d.gradeAfter}`;
+  const findings =
+    d.findingsAfter === d.findingsBefore
+      ? ''
+      : ` · ${d.findingsBefore} → ${d.findingsAfter} findings`;
+  return `${arrow} ${score}${grade}${findings}`;
+}
+
+/**
+ * Rendered after the counts so the two tables can be read together: what the
+ * numbers are, then which way they moved.
+ */
+function comparisonSection(cmp: ReportComparison): string[] {
+  const since = cmp.previous.ref ?? cmp.previous.generatedAt ?? 'the previous run';
+  if (cmp.unchanged) return ['', `_No change since ${since}._`];
+
+  const out = ['', `<details open><summary>Changes since ${since}</summary>`, ''];
+
+  const severities: Severity[] = ['critical', 'high', 'medium', 'low', 'info'];
+  const moved = severities.filter((sev) => cmp.summary[sev].delta !== 0);
+  if (moved.length > 0) {
+    out.push(
+      `| ${moved.map((sev) => `${SEV_ICON[sev]} ${sev}`).join(' | ')} |`,
+      `| ${moved.map(() => '---').join(' | ')} |`,
+      `| ${moved
+        .map((sev) => {
+          const s = cmp.summary[sev];
+          return `${s.before} → **${s.after}** (${formatDelta(s.delta)})`;
+        })
+        .join(' | ')} |`,
+      ''
+    );
+  }
+
+  if (cmp.rules.length > 0) {
+    out.push(
+      '| Rule | Dimension | Before | After | Δ |',
+      '| --- | --- | ---: | ---: | --- |',
+      ...cmp.rules.map(
+        (r) =>
+          `| \`${r.code}\` | ${r.dimension} | ${r.before} | ${r.after} | `
+          + `${r.delta > 0 ? '🔴 ▲' : '🟢 ▼'} ${formatDelta(r.delta)} |`
+      ),
+      ''
+    );
+  }
+
+  out.push('</details>');
+  return out;
 }
 
 /**

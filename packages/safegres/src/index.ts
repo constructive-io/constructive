@@ -121,6 +121,20 @@ export type {
 } from './pg/stats';
 export { introspectStats } from './pg/stats';
 export { renderCallGraph, renderCallGraphDiff } from './report/callgraph';
+export type {
+  DimensionSnapshot,
+  ReportComparison,
+  ReportSnapshot,
+  RuleDelta,
+  ScoreDelta
+} from './report/compare';
+export {
+  compareReports,
+  formatDelta,
+  parseSnapshot,
+  serializeSnapshot,
+  toSnapshot
+} from './report/compare';
 export { renderJson } from './report/json';
 export type { RenderMarkdownOptions } from './report/markdown';
 export { renderMarkdown } from './report/markdown';
