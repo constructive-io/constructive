@@ -251,6 +251,38 @@ describe('pgpm diff e2e', () => {
     expect(bundle.changes.length).toBeGreaterThan(0);
   });
 
+  it.each(['atomic', 'object', 'consolidated'])(
+    'emits a %s-granularity migration that reaches the same v2 catalog (dial parity)',
+    async granularity => {
+      const pkg = `diff-mig-${granularity}`;
+      await fixture.runTerminalCommands(
+        `
+        cd ${WS}
+        pgpm diff diff-v1 diff-v2 --emit-migration . --pkg ${pkg} --granularity ${granularity}
+        `,
+        {}
+      );
+      expect(fs.existsSync(path.join(wsDir, pkg, 'pgpm.plan'))).toBe(true);
+
+      // deploy v1 fresh, then this dial's migration -> catalog equivalent to v2,
+      // regardless of how atomic/consolidated the emitted changes are.
+      const testDb = await fixture.setupTestDatabase();
+      await fixture.runTerminalCommands(
+        `
+        cd ${WS}/diff-v1
+        pgpm deploy --database ${testDb.name} --package diff-v1 --yes
+        cd ../${pkg}
+        pgpm deploy --database ${testDb.name} --package ${pkg} --yes
+        `,
+        { database: testDb.name }
+      );
+
+      const snapMigrated = await snapshotCatalog(testDb);
+      const snapV2 = await snapshotCatalog(v2Db);
+      expect(diffCatalogSnapshots(withoutColumnOrder(snapMigrated), withoutColumnOrder(snapV2))).toEqual([]);
+    }
+  );
+
   it('--verify proves the emitted migration is a catalog-level oracle match', async () => {
     await fixture.runTerminalCommands(
       `
