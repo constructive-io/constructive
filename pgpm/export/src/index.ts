@@ -1,5 +1,7 @@
 export type { CatalogQueryable, CatalogSnapshot } from './catalog-check';
-export { diffCatalogSnapshots, snapshotCatalog } from './catalog-check';
+export { diffCatalogSnapshots, snapshotCatalog, withoutColumnOrder } from './catalog-check';
+export type { DiffSide, DiffSideKind } from './diff-source';
+export { deltaChangesToRows, loadDiffSideFromDisk, resolveDiffSideKind, sqlToDiffChanges, stripDumpPreamble } from './diff-source';
 export type { CopyBlock, CopyTarget, DumpSource } from './dump-source';
 export { copyBlockToInsert, copyTargetOf, dumpCompatibilityWarnings, loadDumpSource, preprocessDumpText } from './dump-source';
 export * from './export-data';
