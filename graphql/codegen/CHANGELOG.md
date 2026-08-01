@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.13.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.13.7...@constructive-io/graphql-codegen@5.13.8) (2026-08-01)
+
+### Bug Fixes
+
+- **lint:** don't lint codegen template sources ([0540573](https://github.com/constructive-io/constructive/commit/054057361a30efd87f5899074c6ae157ebbee8da))
+
 ## [5.13.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.13.6...@constructive-io/graphql-codegen@5.13.7) (2026-07-31)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

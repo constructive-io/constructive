@@ -1,6 +1,6 @@
 {
   "name": "@agentic-kit/agent",
-  "version": "0.17.2",
+  "version": "0.17.3",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "description": "Minimal stateful agent runtime for agentic-kit",
   "main": "index.js",

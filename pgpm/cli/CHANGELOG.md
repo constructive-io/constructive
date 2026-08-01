@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.20.0](https://github.com/constructive-io/constructive/compare/pgpm@5.19.1...pgpm@5.20.0) (2026-08-01)
+
+### Bug Fixes
+
+- **lint:** resolve remaining non-autofixable lint errors ([8534366](https://github.com/constructive-io/constructive/commit/853436620e969d4ca53f5d2f6c5b369adb94f2a5))
+- **pgpm:** link textual rider/serial deps after partitioning so partitioned imports deploy in order ([1c8ce14](https://github.com/constructive-io/constructive/commit/1c8ce141b17a52743f105619fbb85fb896063ce2))
+
+### Features
+
+- **pgpm:** add pgpm diff — identity-keyed semantic diff + migration generation ([42a3612](https://github.com/constructive-io/constructive/commit/42a36127b6c3f95fd491db31be50761f41d0220a))
+- **pgpm:** add pgpm import — pgpm-itize an arbitrary SQL dump (Part A of [#1340](https://github.com/constructive-io/constructive/issues/1340)) ([3052f5f](https://github.com/constructive-io/constructive/commit/3052f5f867eda6658fe538a35756cd00dc58d9bf))
+- **pgpm:** composable emit projections for pgpm diff (module + linear SQL + bundle) ([c6028a3](https://github.com/constructive-io/constructive/commit/c6028a3aba38025f6af6fb28c78e346e5270d6e5))
+- **pgpm:** loud compatibility warnings for COPY data blocks and non-preamble psql meta-commands in pgpm import ([0d28876](https://github.com/constructive-io/constructive/commit/0d288769d2853e06b05779578e771925788af8ba))
+- **pgpm:** pgpm import — pgpm-itize a SQL dump through the dials pipeline ([46d62ee](https://github.com/constructive-io/constructive/commit/46d62ee746f5bc5225ac5828c17110423217380d))
+- **pgpm:** pgpm transform — re-dial an existing module/workspace; wire --partition into pgpm export ([73a70ff](https://github.com/constructive-io/constructive/commit/73a70ff3fe9f15c3839cefcfe99f0d4a4877e217))
+
 ## [5.19.1](https://github.com/constructive-io/constructive/compare/pgpm@5.19.0...pgpm@5.19.1) (2026-07-31)
 
 **Note:** Version bump only for package pgpm

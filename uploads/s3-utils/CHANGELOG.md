@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.29.3](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-utils@2.29.2...@constructive-io/s3-utils@2.29.3) (2026-08-01)
+
+### Bug Fixes
+
+- **lint:** resolve remaining non-autofixable lint errors ([8534366](https://github.com/constructive-io/constructive/commit/853436620e969d4ca53f5d2f6c5b369adb94f2a5))
+
 ## [2.29.2](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-utils@2.29.1...@constructive-io/s3-utils@2.29.2) (2026-07-31)
 
 **Note:** Version bump only for package @constructive-io/s3-utils

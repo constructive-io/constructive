@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.3](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.9.2...graphile-presigned-url-plugin@1.9.3) (2026-08-01)
+
+### Bug Fixes
+
+- **lint:** resolve remaining non-autofixable lint errors ([8534366](https://github.com/constructive-io/constructive/commit/853436620e969d4ca53f5d2f6c5b369adb94f2a5))
+
 ## [1.9.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.9.1...graphile-presigned-url-plugin@1.9.2) (2026-07-31)
 
 **Note:** Version bump only for package graphile-presigned-url-plugin

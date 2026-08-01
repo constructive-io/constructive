@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.21.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.21.2...@pgpmjs/core@7.21.3) (2026-08-01)
+
+### Bug Fixes
+
+- **lint:** resolve remaining non-autofixable lint errors ([8534366](https://github.com/constructive-io/constructive/commit/853436620e969d4ca53f5d2f6c5b369adb94f2a5))
+- **pgpm:** ignore PG17+ list offsets in the AST round-trip check ([faaf439](https://github.com/constructive-io/constructive/commit/faaf43944851778c4b24a30c01d87aa99e6b96ed))
+
 ## [7.21.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.21.1...@pgpmjs/core@7.21.2) (2026-07-31)
 
 **Note:** Version bump only for package @pgpmjs/core

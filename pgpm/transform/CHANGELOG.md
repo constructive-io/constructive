@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.18.0...@pgpmjs/transform@0.19.0) (2026-08-01)
+
+### Features
+
+- **pgpm:** add pgpm diff — identity-keyed semantic diff + migration generation ([42a3612](https://github.com/constructive-io/constructive/commit/42a36127b6c3f95fd491db31be50761f41d0220a))
+
 # [0.18.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.17.0...@pgpmjs/transform@0.18.0) (2026-07-31)
 
 ### Features

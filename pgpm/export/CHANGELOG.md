@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.14.2...@pgpmjs/export@1.15.0) (2026-08-01)
+
+### Bug Fixes
+
+- **pgpm:** link textual rider/serial deps after partitioning so partitioned imports deploy in order ([1c8ce14](https://github.com/constructive-io/constructive/commit/1c8ce141b17a52743f105619fbb85fb896063ce2))
+
+### Features
+
+- **pgpm:** add pgpm diff — identity-keyed semantic diff + migration generation ([42a3612](https://github.com/constructive-io/constructive/commit/42a36127b6c3f95fd491db31be50761f41d0220a))
+- **pgpm:** add pgpm import — pgpm-itize an arbitrary SQL dump (Part A of [#1340](https://github.com/constructive-io/constructive/issues/1340)) ([3052f5f](https://github.com/constructive-io/constructive/commit/3052f5f867eda6658fe538a35756cd00dc58d9bf))
+- **pgpm:** loud compatibility warnings for COPY data blocks and non-preamble psql meta-commands in pgpm import ([0d28876](https://github.com/constructive-io/constructive/commit/0d288769d2853e06b05779578e771925788af8ba))
+- **pgpm:** pgpm import — pgpm-itize a SQL dump through the dials pipeline ([46d62ee](https://github.com/constructive-io/constructive/commit/46d62ee746f5bc5225ac5828c17110423217380d))
+- **pgpm:** pgpm transform — re-dial an existing module/workspace; wire --partition into pgpm export ([73a70ff](https://github.com/constructive-io/constructive/commit/73a70ff3fe9f15c3839cefcfe99f0d4a4877e217))
+
 ## [1.14.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.14.1...@pgpmjs/export@1.14.2) (2026-07-31)
 
 **Note:** Version bump only for package @pgpmjs/export

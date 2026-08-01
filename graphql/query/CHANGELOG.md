@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.11.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@4.11.7...@constructive-io/graphql-query@4.11.8) (2026-08-01)
+
+### Bug Fixes
+
+- **lint:** don't lint **fixtures** trees ([5268c03](https://github.com/constructive-io/constructive/commit/5268c0387898c67b2a6aff7e6fe1d7dd9213aee5))
+
 ## [4.11.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@4.11.6...@constructive-io/graphql-query@4.11.7) (2026-07-31)
 
 **Note:** Version bump only for package @constructive-io/graphql-query
