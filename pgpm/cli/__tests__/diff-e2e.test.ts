@@ -9,8 +9,8 @@
  *
  * PREREQUISITES: a running PostgreSQL instance via standard PG* env vars.
  */
-import { diffCatalogSnapshots, loadDiffSideFromDisk, snapshotCatalog, withoutColumnOrder } from '@pgpmjs/export';
-import { diffChangeSets, loadModule } from '@pgpmjs/transform';
+import { loadDiffSideFromDisk } from '@pgpmjs/diff';
+import { diffCatalogSnapshots, diffChangeSets, loadModule, snapshotCatalog, withoutColumnOrder } from '@pgpmjs/transform';
 import * as fs from 'fs';
 import * as path from 'path';
 import { teardownPgPools } from 'pg-cache';

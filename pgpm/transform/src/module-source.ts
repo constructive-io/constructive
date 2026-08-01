@@ -4,7 +4,7 @@
  * consume. `pgpm transform` uses this today; a future `pgpm import` (dumps)
  * and `pgpm diff` are expected to reuse the same seam.
  */
-import { parsePgpmHeader, parsePlanFile, readScript } from '@pgpmjs/core';
+import { parsePgpmHeader, parsePlanFile, readScript } from '@pgpmjs/ast';
 import * as path from 'path';
 
 /** One change of a loaded module: headerless, unwrapped deploy SQL. */

@@ -4,18 +4,15 @@
  * `partitionUnits` (`@pgpmjs/transform`), and lift the emitted packages back
  * onto the PgpmRow seam with generated revert/verify per change.
  */
-import { PgpmRow } from '@pgpmjs/core';
+import { PgpmRow } from '@pgpmjs/ast';
 import { PathStyle } from '@pgpmjs/naming-spec';
-import {
-  loadModule,
-  PartitionConfig,
-  PartitionInputChange,
-  partitionUnits,
-  regenerateScripts
-} from '@pgpmjs/transform';
 import * as fs from 'fs';
+import { loadModule } from 'plpgsql-parser';
 
-export type { PartitionConfig } from '@pgpmjs/transform';
+import { PartitionConfig, PartitionInputChange, partitionUnits } from './partition-driver';
+import { regenerateScripts } from './regen';
+
+export type { PartitionConfig } from './partition-driver';
 
 const PATH_STYLES: readonly PathStyle[] = ['directory', 'flat'];
 

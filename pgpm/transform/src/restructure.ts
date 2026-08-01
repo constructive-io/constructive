@@ -5,9 +5,12 @@
  * `requires` come from the statement dependency graph instead of the
  * hand-chained deps recorded at action time.
  */
-import { PgpmRow } from '@pgpmjs/core';
+import { PgpmRow } from '@pgpmjs/ast';
 import { alterationPathFor, pathFor, PathStyle } from '@pgpmjs/naming-spec';
-import { Granularity, identityOf, loadModule, restructureChanges, StatementFacts } from '@pgpmjs/transform';
+import { Granularity, identityOf, StatementFacts } from '@pgsql/transform';
+import { loadModule } from 'plpgsql-parser';
+
+import { restructureChanges } from './granularity-driver';
 
 export type ExportGranularity = Granularity;
 

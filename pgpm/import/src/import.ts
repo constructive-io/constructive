@@ -19,12 +19,11 @@
  *   default privileges, ...) land in a `misc/statements` change, first in
  *   the plan, with a warning — never dropped silently.
  */
-import { PgpmRow } from '@pgpmjs/core';
+import { PgpmRow } from '@pgpmjs/ast';
 import { ObjectIdentity, pathFor, PathStyle } from '@pgpmjs/naming-spec';
-import { classifyStatements, loadModule, regenerateScripts, StatementFacts } from '@pgpmjs/transform';
+import { classifyStatements, ExportGranularity, loadModule, regenerateScripts, restructureExportRows, StatementFacts } from '@pgpmjs/transform';
 
 import { copyBlockToInsert, copyTargetOf, DumpSource } from './dump-source';
-import { ExportGranularity, restructureExportRows } from './restructure';
 
 export const MISC_CHANGE_PATH = 'misc/statements';
 

@@ -12,6 +12,8 @@ export {
   makeNamespaceValidator,
   makeSchemaTranspiler,
 } from './bundle-driver';
+export type { CatalogQueryable, CatalogSnapshot } from './catalog-check';
+export { diffCatalogSnapshots, snapshotCatalog, withoutColumnOrder } from './catalog-check';
 export type {
   CategoryProfile,
   ChangeCategory,
@@ -39,6 +41,10 @@ export {
   defaultChangeName,
   restructureChanges,
 } from './granularity-driver';
+export type { ModuleSource, ModuleSourceChange } from './module-source';
+export { loadModuleSource, stripTransactionWrapper } from './module-source';
+export type { PartitionedPackageRows, PartitionExportRowsResult } from './partition';
+export { parsePartitionConfig, partitionExportRows } from './partition';
 export type {
   PartitionConfig,
   PartitionedChange,
@@ -69,6 +75,8 @@ export {
   isStubScript,
   regenerateScripts,
 } from './regen';
+export type { ExportGranularity, RestructureExportRowsOptions, RestructureExportRowsResult } from './restructure';
+export { EXPORT_GRANULARITIES, isExportGranularity, restructureExportRows } from './restructure';
 export type {
   DiffInputChange,
   ObjectDelta,

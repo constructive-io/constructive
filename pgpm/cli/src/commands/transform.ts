@@ -1,4 +1,5 @@
 import { PgpmMigrate, PgpmPackage, PgpmRow } from '@pgpmjs/core';
+import { Logger } from '@pgpmjs/logger';
 import {
   diffCatalogSnapshots,
   EXPORT_GRANULARITIES,
@@ -7,13 +8,12 @@ import {
   loadModuleSource,
   parsePartitionConfig,
   PartitionConfig,
+  PartitionCycleError,
   PartitionedPackageRows,
   partitionExportRows,
   restructureExportRows,
   snapshotCatalog
-} from '@pgpmjs/export';
-import { Logger } from '@pgpmjs/logger';
-import { PartitionCycleError } from '@pgpmjs/transform';
+} from '@pgpmjs/transform';
 import * as fs from 'fs';
 import { cliExitWithError, CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
