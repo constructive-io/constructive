@@ -211,7 +211,12 @@ export function createConstructivePreset(
         // eager provisionBucket mutation mints the identical physical name
         // (`{prefix}-{bucketKey}-{databaseId}`) instead of falling back to the
         // bare logical bucket key.
-        resolveBucketName: createProvisionerBucketNameResolver()
+        resolveBucketName: createProvisionerBucketNameResolver(),
+        // S3 buckets are provisioned lazily (on first upload) or explicitly via
+        // the provisionBucket mutation. Disable the auto-provision-on-create
+        // hook so a createBucket GraphQL mutation records the row without
+        // eagerly minting an S3 bucket that may never receive an upload.
+        autoProvision: false
       })
     );
   }
