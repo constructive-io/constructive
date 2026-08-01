@@ -161,9 +161,10 @@ export async function audit(
     indexSnapshot.map((t) => [`${t.schema}.${t.name}`, t])
   );
 
-  // Which foreign keys are query paths. Without this X1 demands an index for
-  // every key, including write-once provisioning pointers nothing reads —
-  // where the index is a write on every insert in exchange for nothing.
+  // Evidence about which foreign keys anything reads. Reported alongside the
+  // findings; by default it changes neither, because no signal available on an
+  // empty database proves a path is unreachable.
+  const onWriteOncePointer = config.perf?.paths?.onWriteOncePointer ?? 'report';
   const paths: Map<string, AccessPath> = perfEnabled && config.perf?.paths?.infer !== false
     ? classifyPaths(
       indexSnapshot,
@@ -224,7 +225,7 @@ export async function audit(
 
   if (perfEnabled) {
     for (const table of indexSnapshot) {
-      findings.push(...checkUnindexedForeignKeys(table, paths));
+      findings.push(...checkUnindexedForeignKeys(table, paths, onWriteOncePointer));
       findings.push(...checkRedundantIndexes(table));
       findings.push(...checkUnindexedSearchColumns(table));
       findings.push(...checkUnindexedSortColumns(table));
@@ -247,6 +248,18 @@ export async function audit(
     if (meta && f.direction === undefined) f.direction = meta.direction;
     if (meta && f.dimension === undefined) f.dimension = dimensionOf(meta);
     if (exposure.known && f.schema) f.exposed = exposedSchemas.has(f.schema);
+
+    // A key that looks like a write-once provisioning pointer, where the
+    // reviewer has chosen to read the finding rather than gate on it. Applied
+    // here because severities are restamped from the rule registry above.
+    if (
+      onWriteOncePointer === 'demote' && f.code === 'X1'
+      && (f.context as { pathAssessment?: string } | undefined)?.pathAssessment === 'write-once-shaped'
+    ) {
+      f.acknowledged = true;
+      f.severity = 'info';
+      f.message += ' — write-once-shaped (perf.paths.onWriteOncePointer)';
+    }
 
     // Declared-intentional perf debt: cold tables, tiny lookups, anything the
     // planner will seq-scan regardless. Reported, but off the perf score.
@@ -344,11 +357,14 @@ export async function audit(
     };
 
     if (paths.size > 0) {
-      const cold = [...paths.values()].filter((p) => p.state === 'cold');
+      const all = [...paths.values()];
+      const shaped = all.filter((p) => p.assessment === 'write-once-shaped');
       perf.paths = {
         total: paths.size,
-        cold: cold.length,
-        tables: new Set(cold.map((p) => `${p.schema}.${p.table}`)).size
+        read: all.filter((p) => p.assessment === 'read').length,
+        writeOnceShaped: shaped.length,
+        tables: new Set(shaped.map((p) => `${p.schema}.${p.table}`)).size,
+        onWriteOncePointer
       };
     }
 

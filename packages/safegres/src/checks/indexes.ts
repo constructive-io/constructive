@@ -10,6 +10,21 @@ import { type AccessPath, pathKey } from '../pg/paths';
 import type { Finding } from '../types';
 
 /**
+ * What X1 does with a foreign key whose only evidence is shape — it looks like
+ * a write-once provisioning pointer, but nothing has proven the path is
+ * unreachable.
+ *
+ * `report` is the default and the only honest one until a signal exists that
+ * can observe the generated API surface: the finding stands, and the shape is
+ * attached to it as context so a reviewer can act on it. The other two exist
+ * so the decision is a line of config rather than a fork of the scanner.
+ *
+ * `demote` is applied in `audit()` rather than here, because severities are
+ * restamped from the rule registry after the checks run.
+ */
+export type WriteOncePointerPolicy = 'report' | 'demote' | 'suppress';
+
+/**
  * X1: a foreign key with no index that can serve it.
  *
  * An index covers a FK when its *leading* columns are exactly the FK's
@@ -21,13 +36,13 @@ import type { Finding } from '../types';
  * Partial and expression indexes do not count: the planner cannot rely on
  * them for the referential-integrity lookup.
  *
- * `paths` classifies each foreign key as a query path or not. A cold path is
- * skipped: the index would be paid for on every insert and read by nothing.
- * See {@link classifyPaths}.
+ * `paths` supplies the access-path signals. They never remove a finding on
+ * their own — see {@link WriteOncePointerPolicy} and `classifyPaths`.
  */
 export function checkUnindexedForeignKeys(
   table: TableIndexSnapshot,
-  paths?: Map<string, AccessPath>
+  paths?: Map<string, AccessPath>,
+  onWriteOncePointer: WriteOncePointerPolicy = 'report'
 ): Finding[] {
   // Partitions inherit their parent's indexes; the parent carries the finding.
   if (table.isPartition) return [];
@@ -36,7 +51,10 @@ export function checkUnindexedForeignKeys(
   for (const fk of table.foreignKeys) {
     if (fk.columns.length === 0) continue;
     if (table.indexes.some((idx) => indexCoversColumns(idx, fk.columns))) continue;
-    if (paths?.get(pathKey(table.schema, table.name, fk.name))?.state === 'cold') continue;
+
+    const path = paths?.get(pathKey(table.schema, table.name, fk.name));
+    const writeOnceShaped = path?.assessment === 'write-once-shaped';
+    if (writeOnceShaped && onWriteOncePointer === 'suppress') continue;
 
     const cols = fk.columnNames.join(', ');
     findings.push({
@@ -47,9 +65,15 @@ export function checkUnindexedForeignKeys(
       table: table.name,
       message:
         `Foreign key ${fk.name} on ${table.schema}.${table.name} (${cols}) has no covering index`,
-      hint:
-        `CREATE INDEX ON ${table.schema}.${table.name} (${cols}); without it, deletes/updates on ${fk.references} and joins across this key scan the whole table.`,
-      context: { constraint: fk.name, columns: fk.columnNames, references: fk.references }
+      hint: writeOnceShaped
+        ? `CREATE INDEX ON ${table.schema}.${table.name} (${cols}) — or, if nothing queries this relation, stop exposing it. ${path!.signals.map((s) => s.detail).join('; ')}.`
+        : `CREATE INDEX ON ${table.schema}.${table.name} (${cols}); without it, deletes/updates on ${fk.references} and joins across this key scan the whole table.`,
+      context: {
+        constraint: fk.name,
+        columns: fk.columnNames,
+        references: fk.references,
+        ...(path ? { pathSignals: path.signals.map((s) => s.name), pathAssessment: path.assessment } : {})
+      }
     });
   }
   return findings;

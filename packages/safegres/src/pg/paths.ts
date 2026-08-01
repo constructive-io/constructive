@@ -1,6 +1,6 @@
 /**
- * Access-path classification: which foreign keys are query paths, and which
- * are write-once pointers nothing ever looks rows up by.
+ * Access-path signals: independent, individually-auditable pieces of evidence
+ * about whether anything reads a foreign key.
  *
  * X1 ("foreign key with no covering index") is right about the mechanics — a
  * `DELETE` on the parent really does scan the child — but it assumes the child
@@ -10,34 +10,63 @@
  *
  * The tempting gate, `pg_class.reltuples`, is useless here: safegres grades an
  * ephemeral CI database that has never held data, so every row estimate is 0
- * at exactly the moment we grade. Worse, row count is the wrong question —
- * a huge append-only log nobody joins on wants no FK index, and a tiny lookup
- * table hammered by every request does. The property we need is *reachability*,
- * and reachability is structural, which is why it survives an empty database.
+ * at exactly the moment we grade. Worse, row count is the wrong question — a
+ * huge append-only log nobody joins on wants no FK index, and a tiny lookup
+ * table hammered by every request does. The property we need is *reachability*.
  *
- * The classification is pure catalog arithmetic — same input, same output, no
- * statistics and no thresholds tuned against a corpus:
+ * Reachability is not one boolean, and this module deliberately does not
+ * compute one. It collects signals, each of which points in one direction and
+ * says why, and leaves the verdict to the caller:
  *
- * - a **degenerate pointer** is a foreign key whose every referencing column
- *   carries a constant default (`uuid_nil()`, a literal) and whose column names
- *   appear in no RLS policy predicate and no view body anywhere in the
- *   database. A `NOT NULL` key that starts life pointing at the nil UUID is a
- *   slot a provisioner fills in, not something rows are found by;
- * - a **config record** is a table with at least {@link ClassifyOptions.minPointers}
- *   degenerate pointers. On one, every foreign key whose columns are likewise
- *   absent from all policy predicates and view bodies is a **cold path**.
+ * - `policy-read` and `view-read` are **reads**. They are decisive: the
+ *   database itself traverses the column, so no amount of contrary evidence
+ *   makes the path unreachable.
+ * - `write-once-pointer` and `config-record` are **shape**. They are not
+ *   evidence of unreachability, only of a schema idiom — a `NOT NULL` key
+ *   defaulting to the nil UUID is a slot a provisioner fills in, and a table
+ *   with several of them looks like a config record rather than a relation.
  *
- * The tenant key is never cold and needs no special case: `database_id` appears
- * in essentially every RLS policy, so the policy check excludes it on its own.
+ * Shape alone must never suppress a finding. A generated API can expose a
+ * reverse relation over any foreign key regardless of how its default is
+ * written, and if it does, the path is reachable and the index is wanted. The
+ * signal that settles it is therefore the one this module does *not* yet have:
+ * whether the generated GraphQL surface still contains the field. Add it as
+ * another {@link PathSignal} — the shape of the API is designed for that — and
+ * only then is `unreachable` a conclusion anything should act on.
  */
 
 import type { TableIndexSnapshot } from './indexes';
 import type { TableSnapshot } from './introspect';
 
-export type PathState = 'hot' | 'cold';
+/**
+ * Which way a signal points. `read` means something demonstrably traverses the
+ * key; `shape` means the schema resembles an idiom in which nothing does, which
+ * is a suspicion rather than a finding.
+ */
+export type SignalDirection = 'read' | 'shape';
 
-/** How a path came to be classified — reported so a reviewer can audit it. */
-export type PathSource = 'inferred';
+export type SignalName = 'policy-read' | 'view-read' | 'write-once-pointer' | 'config-record';
+
+export interface PathSignal {
+  name: SignalName;
+  direction: SignalDirection;
+  /** Why this signal fired, in one human-readable clause. */
+  detail: string;
+}
+
+/**
+ * The caller-facing summary of a path's signals. Note there is no `unreachable`
+ * member: nothing safegres can currently observe proves a path is unreachable,
+ * and inventing the state is how a scanner ends up recommending that you drop
+ * an index a live API is using.
+ */
+export type PathAssessment =
+  /** At least one `read` signal. The key is traversed; X1 applies as written. */
+  | 'read'
+  /** Only `shape` signals. Looks like a provisioning pointer; unproven. */
+  | 'write-once-shaped'
+  /** No signal fired either way. */
+  | 'unknown';
 
 export interface AccessPath {
   schema: string;
@@ -46,15 +75,14 @@ export interface AccessPath {
   columns: string[];
   /** The foreign-key constraint this path belongs to. */
   constraint: string;
-  state: PathState;
-  source: PathSource;
-  /** Why the classifier reached this state, in one human-readable clause. */
-  reason: string;
+  /** Every signal that fired, so a reviewer can audit the assessment. */
+  signals: PathSignal[];
+  assessment: PathAssessment;
 }
 
 export interface ClassifyOptions {
   /**
-   * Degenerate pointers a table needs before it counts as a config record.
+   * Write-once pointers a table needs before the `config-record` signal fires.
    * Default 2. Lifting the test from the column to the table is what catches
    * the nullable, undefaulted pointer sitting alongside the defaulted ones.
    */
@@ -82,14 +110,26 @@ export function pathKey(schema: string, table: string, constraint: string): stri
 }
 
 /**
- * Classify every foreign key in the snapshot as a hot or cold access path.
+ * One real reader ends the discussion, so a `read` signal always wins. Absent
+ * one, the shape has to hold at the *table* level before it means anything: a
+ * lone defaulted column is a habit, whereas a table built entirely out of them
+ * is an idiom. `write-once-pointer` on its own is therefore reported and not
+ * acted on.
+ */
+export function assess(signals: PathSignal[]): PathAssessment {
+  if (signals.some((s) => s.direction === 'read')) return 'read';
+  if (signals.some((s) => s.name === 'config-record')) return 'write-once-shaped';
+  return 'unknown';
+}
+
+/**
+ * Collect the signals for every foreign key in the snapshot.
  *
  * `tables` supplies the RLS policy predicates (as SQL text) and `viewBodies`
- * the view definitions; a column named in either is read by something, which
- * refutes coldness. Both are matched as whole-word tokens across the *whole*
- * database rather than per relation — deliberately conservative, since the
- * cost of missing a cold path is one spurious finding while the cost of a
- * wrong one is a dropped index.
+ * the view definitions. Both are matched as whole-word tokens across the
+ * *whole* database rather than per relation — deliberately over-eager, because
+ * a spurious `read` signal costs one retained finding while a missing one
+ * could cost a dropped index.
  */
 export function classifyPaths(
   indexSnapshot: TableIndexSnapshot[],
@@ -98,29 +138,69 @@ export function classifyPaths(
   options: ClassifyOptions = {}
 ): Map<string, AccessPath> {
   const minPointers = options.minPointers ?? DEFAULT_MIN_POINTERS;
-  const referenced = referencedColumnNames(tables, viewBodies);
+  const policyTokens = identifierTokens(
+    tables.flatMap((t) => t.policies.flatMap((p) => [p.using, p.withCheck]))
+  );
+  const viewTokens = identifierTokens(viewBodies);
   const paths = new Map<string, AccessPath>();
 
   for (const table of indexSnapshot) {
     const defaults = new Map(table.columns.map((c) => [c.attnum, c.defaultExpr]));
-    const unread = (columns: string[]) => columns.every((c) => !referenced.has(c.toLowerCase()));
-    const degenerate = table.foreignKeys.filter(
-      (fk) => fk.columns.every((a) => isConstantDefault(defaults.get(a) ?? null)) && unread(fk.columnNames)
+    const readBy = (tokens: Set<string>, columns: string[]) =>
+      columns.filter((c) => tokens.has(c.toLowerCase()));
+
+    const pointers = table.foreignKeys.filter(
+      (fk) =>
+        fk.columns.length > 0 &&
+        fk.columns.every((a) => isConstantDefault(defaults.get(a) ?? null)) &&
+        readBy(policyTokens, fk.columnNames).length === 0 &&
+        readBy(viewTokens, fk.columnNames).length === 0
     );
-    const isConfigRecord = degenerate.length >= minPointers;
 
     for (const fk of table.foreignKeys) {
-      const cold = isConfigRecord && unread(fk.columnNames);
+      const signals: PathSignal[] = [];
+
+      const inPolicy = readBy(policyTokens, fk.columnNames);
+      if (inPolicy.length > 0) {
+        signals.push({
+          name: 'policy-read',
+          direction: 'read',
+          detail: `an RLS policy predicate names ${inPolicy.join(', ')}`
+        });
+      }
+
+      const inView = readBy(viewTokens, fk.columnNames);
+      if (inView.length > 0) {
+        signals.push({
+          name: 'view-read',
+          direction: 'read',
+          detail: `a view or materialized view names ${inView.join(', ')}`
+        });
+      }
+
+      if (pointers.some((p) => p.name === fk.name)) {
+        signals.push({
+          name: 'write-once-pointer',
+          direction: 'shape',
+          detail: `every column of ${fk.name} has a constant default`
+        });
+      }
+
+      if (pointers.length >= minPointers && inPolicy.length === 0 && inView.length === 0) {
+        signals.push({
+          name: 'config-record',
+          direction: 'shape',
+          detail: `${table.name} carries ${pointers.length} write-once pointers`
+        });
+      }
+
       paths.set(pathKey(table.schema, table.name, fk.name), {
         schema: table.schema,
         table: table.name,
         columns: fk.columnNames,
         constraint: fk.name,
-        state: cold ? 'cold' : 'hot',
-        source: 'inferred',
-        reason: cold
-          ? `config record: ${degenerate.length} write-once pointer${degenerate.length === 1 ? '' : 's'} with a constant default, and no policy or view reads ${fk.columnNames.join(', ')}`
-          : 'no evidence the path is unreachable'
+        signals,
+        assessment: assess(signals)
       });
     }
   }
@@ -129,22 +209,15 @@ export function classifyPaths(
 }
 
 /**
- * Every identifier-shaped token appearing in an RLS policy predicate or a view
- * body, lowercased. Tokenising rather than substring-matching keeps `schema_id`
- * from being "found" inside `private_schema_id`.
+ * Every identifier-shaped token appearing in the given SQL, lowercased.
+ * Tokenising rather than substring-matching keeps `schema_id` from being
+ * "found" inside `private_schema_id`.
  */
-function referencedColumnNames(tables: TableSnapshot[], viewBodies: string[]): Set<string> {
+function identifierTokens(sources: (string | null)[]): Set<string> {
   const out = new Set<string>();
-  const add = (sql: string | null) => {
-    if (!sql) return;
+  for (const sql of sources) {
+    if (!sql) continue;
     for (const token of sql.toLowerCase().match(/[a-z_][a-z0-9_$]*/g) ?? []) out.add(token);
-  };
-  for (const table of tables) {
-    for (const policy of table.policies) {
-      add(policy.using);
-      add(policy.withCheck);
-    }
   }
-  for (const body of viewBodies) add(body);
   return out;
 }

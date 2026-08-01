@@ -141,14 +141,21 @@ export interface PerfReport {
   explain?: import('./perf/explain').ExplainReport;
 }
 
-/** What the access-path classifier concluded, and over what. */
+/**
+ * What the access-path signals found, and what X1 did about it. Reported so
+ * the evidence is visible even when — as by default — it changes nothing.
+ */
 export interface PerfPathsReport {
-  /** Foreign keys considered. */
+  /** Foreign keys examined. */
   total: number;
-  /** Foreign keys classified as never queried, and so exempt from X1. */
-  cold: number;
-  /** Tables classified as provisioning-config records. */
+  /** Keys with a `read` signal: an RLS policy or a view names the column. */
+  read: number;
+  /** Keys whose only signals are shape: they look like provisioning pointers. */
+  writeOnceShaped: number;
+  /** Tables carrying enough write-once pointers to look like config records. */
   tables: number;
+  /** What X1 did with the write-once-shaped keys. */
+  onWriteOncePointer: 'report' | 'demote' | 'suppress';
 }
 
 /** Where the `S*` findings' numbers came from, and how much to trust them. */

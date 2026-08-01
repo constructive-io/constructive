@@ -57,11 +57,17 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
     out.push(...findingSection('Performance findings', report.perf.findings, options));
     const { paths, stats, explain, diff } = report.perf;
     const notes: string[] = [];
-    if (paths && paths.cold > 0) {
+    if (paths && paths.writeOnceShaped > 0) {
+      const acted = {
+        report: 'X1 still asks for an index on each of them',
+        demote: 'their X1 findings are demoted to `info`',
+        suppress: 'their X1 findings are suppressed'
+      }[paths.onWriteOncePointer];
       notes.push(
-        `Access paths: ${paths.cold} of ${paths.total} foreign keys across ${paths.tables} `
-          + 'provisioning-config tables are written once and read by nothing, so X1 does not '
-          + 'ask for an index on them (`perf.paths.infer: false` to disable).'
+        `Access paths: of ${paths.total} foreign keys, ${paths.read} are named by an RLS policy `
+          + `or a view, and ${paths.writeOnceShaped} across ${paths.tables} tables look like `
+          + `write-once provisioning pointers — ${acted}. A shape is not proof that nothing `
+          + 'queries the relation (`perf.paths.onWriteOncePointer` to change what X1 does).'
       );
     }
     if (stats) {

@@ -126,16 +126,28 @@ export interface PerfConfig {
 
 export interface PerfPathsConfig {
   /**
-   * Classify write-once pointer keys on provisioning-config tables as cold,
-   * exempting them from X1. Default true. Set false to demand an index for
-   * every foreign key regardless of whether anything reads it.
+   * Collect access-path signals for every foreign key. Default true. Signals
+   * are reported, and by default change no finding and no score; set false to
+   * skip the introspection entirely.
    */
   infer?: boolean;
   /**
-   * Write-once pointers a table needs before it counts as a config record.
-   * Default 2. Raise it to classify fewer tables.
+   * Write-once pointers a table needs before the `config-record` signal fires.
+   * Default 2. Raise it for a narrower signal.
    */
   minPointers?: number;
+  /**
+   * What X1 does with a key whose only evidence is shape — it looks like a
+   * write-once provisioning pointer, but nothing has proven the path is
+   * unreachable.
+   *
+   * - `report` (default) — the finding stands, with the signals attached.
+   * - `demote` — the finding drops to `info`, so it is read rather than gated
+   *   on and contributes nothing to the score.
+   * - `suppress` — no finding. Only defensible once you know the generated API
+   *   does not expose these relations; a shape is not a proof.
+   */
+  onWriteOncePointer?: 'report' | 'demote' | 'suppress';
 }
 
 export interface PerfScoringConfig extends ScoringConfig {

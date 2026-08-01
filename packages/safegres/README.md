@@ -172,15 +172,30 @@ Every check is pure catalog + AST analysis: deterministic, workload-free, and sa
 
 X7 exists because the column type *is* the API declaration: `graphile-search` exposes a full-text filter for every `tsvector` column and a similarity search for every `vector` column, purely from the codec — so an unindexed one is a first-class API field backed by a sequential scan plus a per-row match or distance computation. BM25 and pg_trgm are deliberately not checked: those adapters are discovered *from* their indexes, so a missing index means the feature was never exposed. X8 is the one heuristic in the set — any column is orderable over a connection, but timestamps are what feeds are actually sorted and keyset-paginated by — so it defaults to `info`, contributes 0 to the score, and is meant to be read, not gated on (`perf.rules: { "X8": "off" }` to silence it). Trailing-position and partial indexes don't count for either rule: neither can serve the sort or the search on its own.
 
-### Access paths: which foreign keys X1 applies to
+### Access paths: the evidence behind X1
 
 X1 is right about the mechanics — a `DELETE` on the parent really does scan the child — but it assumes the child is a relation somebody traverses. On a provisioning-config table, one whose keys are written once at setup and never looked rows up by, the index it asks for is a write on every insert in exchange for speeding up a scan of one row. Acting on X1 across such a schema makes the database measurably worse while the grade goes up.
 
 The tempting gate, `pg_class.reltuples`, doesn't work here: safegres grades an ephemeral CI database that has never held data, so every row estimate is 0 at exactly the moment it grades. And row count is the wrong question anyway — a huge append-only log nobody joins on wants no FK index, while a tiny lookup table every request hits does. The property that matters is whether anything reads the key, which is structural, so it survives an empty database.
 
-So before running X1, safegres classifies every foreign key. A **write-once pointer** is a key whose every column has a constant default (`uuid_nil()`, a literal) and whose column names appear in no RLS policy predicate and no view body anywhere in the database — a `NOT NULL` key that starts life pointing at the nil UUID is a slot a provisioner fills in, not something rows are found by. A table with two or more of them is a **config record**, and on one, every key nothing reads is exempt from X1. The count of exempted keys is reported in `report.perf.paths` and printed with the findings, so the suppression is never silent.
+So safegres collects **signals** about every foreign key, each pointing one way and saying why, and reports them on the finding (`context.pathSignals`) and in aggregate (`report.perf.paths`):
 
-The tenant key needs no special case: `database_id` appears in essentially every RLS policy, so the policy check keeps it hot on its own. Turn the whole thing off with `perf.paths.infer: false`, or demand more pointers before a table counts with `perf.paths.minPointers`.
+| Signal | Direction | Fires when |
+| --- | --- | --- |
+| `policy-read` | read | an RLS policy predicate names one of the key's columns |
+| `view-read` | read | a view or materialized view names one of them |
+| `write-once-pointer` | shape | every column of the key has a constant default (`uuid_nil()`, a literal) |
+| `config-record` | shape | the table carries two or more write-once pointers (`perf.paths.minPointers`) |
+
+A **read** signal is decisive — the database itself traverses the column, so the key is a query path and X1 applies as written. That is what keeps the tenant key out of trouble with no special case: `database_id` appears in essentially every policy. A **shape** signal is not: a `NOT NULL` key defaulting to the nil UUID looks like a slot a provisioner fills in, but a generated API can expose a reverse relation over any foreign key regardless of how its default is written, and if it does, the index is wanted after all.
+
+So by default the shape **changes nothing** — no finding is removed, no severity moves, no score shifts. What it does is tell you where to look, and `perf.paths.onWriteOncePointer` decides what X1 does about it:
+
+- `report` (default) — the finding stands, with the signals attached to it;
+- `demote` — write-once-shaped keys drop to `info`, so they are read rather than gated on and contribute nothing to the score;
+- `suppress` — no finding. Only defensible once you know the generated API does not expose these relations; a shape is not a proof.
+
+The signal that *would* settle it is the one that isn't here yet: whether the generated GraphQL surface still contains the field. It slots in as another signal, and only then does "nothing can reach this key" become a conclusion anything should act on. `perf.paths.infer: false` skips the collection entirely.
 
 X2–X4 and X9 are the checks a generic index linter can't make, because they read the policy predicate. RLS quals are evaluated *before* user quals, on every candidate row, for every caller — so an unindexed or cast-wrapped policy column is a whole-table tax rather than a slow query. X2 requires the policy column to be the *leading* column of some index (a trailing position can't serve the qual alone); X3 looks for an expression index matching the exact wrapped shape; X4 skips built-ins, whose leakproofness is a property of the server rather than a schema choice.
 
@@ -204,7 +219,7 @@ safegres audit --database mydb --perf --fail-on-perf-grade B
     "enabled": true,
     "rules": { "X6": "off" },          // perf-dimension codes only
     "ignore": ["app_public.audit_*"],  // declared-intentional perf debt
-    "paths": { "infer": true },        // X1 skips keys nothing reads (default)
+    "paths": { "onWriteOncePointer": "report" }, // signals are reported, not acted on (default)
     "scoring": { "densityK": 0.17 }
   },
   "failOn": { "perfGrade": "B" }

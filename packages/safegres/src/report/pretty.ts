@@ -164,12 +164,15 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     }
 
     const { paths, stats, explain } = report.perf;
-    if (paths && paths.cold > 0) {
+    if (paths && paths.writeOnceShaped > 0) {
+      const acted = { report: 'reported', demote: 'demoted to info', suppress: 'suppressed' }[
+        paths.onWriteOncePointer
+      ];
       lines.push(
         paint(
           'info',
-          `  access paths: ${paths.cold}/${paths.total} foreign keys on ${paths.tables} `
-            + 'config tables are written once and read by nothing — X1 exempt'
+          `  access paths: ${paths.total} foreign keys — ${paths.read} read by a policy or view, `
+            + `${paths.writeOnceShaped} on ${paths.tables} tables write-once shaped (X1 ${acted})`
         )
       );
     }
