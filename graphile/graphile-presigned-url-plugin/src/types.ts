@@ -12,6 +12,13 @@ export interface BucketConfig {
   allowed_mime_types: string[] | null;
   max_file_size: number | null;
   allow_custom_keys: boolean;
+  /**
+   * The physical S3/MinIO bucket name recorded when the physical bucket was
+   * first provisioned. NULL until the first upload provisions it. Once set,
+   * it is the source of truth for the physical bucket — reads never
+   * reconstruct the name from a prefix convention.
+   */
+  physical_name: string | null;
 }
 
 /**

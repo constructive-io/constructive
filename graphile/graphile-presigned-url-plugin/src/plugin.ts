@@ -89,16 +89,26 @@ function resolveS3(options: PresignedUrlPluginOptions): S3Config {
   return options.s3;
 }
 
+/**
+ * Resolve the physical S3 bucket to read/write for a logical bucket row.
+ *
+ * The row's stored `physical_name` is the source of truth once set; the
+ * `resolveBucketName` hook only mints a name the first time (before the
+ * physical bucket has been provisioned and recorded). Passing a `physicalName`
+ * of `null` means "not provisioned yet" and falls back to the naming hook.
+ */
 function resolveS3ForDatabase(
   options: PresignedUrlPluginOptions,
   storageConfig: StorageModuleConfig,
   databaseId: string,
   bucketKey: string,
+  physicalName: string | null,
 ): S3Config {
   const globalS3 = resolveS3(options);
-  const bucket = options.resolveBucketName
-    ? options.resolveBucketName(databaseId, bucketKey)
-    : globalS3.bucket;
+  const bucket = physicalName
+    ?? (options.resolveBucketName
+      ? options.resolveBucketName(databaseId, bucketKey)
+      : globalS3.bucket);
   const publicUrlPrefix = storageConfig.publicUrlPrefix ?? globalS3.publicUrlPrefix;
 
   if (bucket === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
@@ -112,20 +122,51 @@ function resolveS3ForDatabase(
   };
 }
 
-async function ensureS3BucketExists(
+/**
+ * Ensure the physical S3 bucket exists and record its name on the bucket row.
+ *
+ * The stored `physical_name` on the row is the durable "provisioned" marker:
+ * when it is already set we assume the physical bucket exists and do nothing.
+ * On first use we (idempotently) create the physical bucket, then persist the
+ * exact name onto the source row so route resolution and every later read hand
+ * consumers the real coordinate instead of recomputing it.
+ *
+ * The record write runs in the system lane (`withPgClient(null, ...)`) — it is
+ * server bookkeeping, not request data, and anonymous request roles cannot
+ * UPDATE bucket rows under RLS. `bucket` (the cached config) is mutated in place
+ * so subsequent reads observe the recorded name without a DB round-trip.
+ */
+async function ensureAndRecordPhysicalBucket(
   options: PresignedUrlPluginOptions,
-  s3BucketName: string,
-  bucket: BucketConfig,
+  withPgClient: (pgSettings: null, cb: (client: any) => Promise<unknown>) => Promise<unknown>,
+  storageConfig: StorageModuleConfig,
   databaseId: string,
+  bucket: BucketConfig,
+  s3BucketName: string,
   allowedOrigins: string[] | null,
 ): Promise<void> {
-  if (!options.ensureBucketProvisioned) return;
-  if (isS3BucketProvisioned(s3BucketName)) return;
+  // Row already carries the physical coordinate → the physical bucket exists.
+  if (bucket.physical_name) return;
 
-  log.info(`Lazy-provisioning S3 bucket "${s3BucketName}" for database ${databaseId}`);
-  await options.ensureBucketProvisioned(s3BucketName, bucket.type, databaseId, allowedOrigins);
-  markS3BucketProvisioned(s3BucketName);
-  log.info(`Lazy-provisioned S3 bucket "${s3BucketName}" successfully`);
+  if (options.ensureBucketProvisioned && !isS3BucketProvisioned(s3BucketName)) {
+    log.info(`Lazy-provisioning S3 bucket "${s3BucketName}" for database ${databaseId}`);
+    await options.ensureBucketProvisioned(s3BucketName, bucket.type, databaseId, allowedOrigins);
+    markS3BucketProvisioned(s3BucketName);
+    log.info(`Lazy-provisioned S3 bucket "${s3BucketName}" successfully`);
+  }
+
+  // Record the physical coordinate on the source row. The `physical_name IS NULL`
+  // guard keeps this idempotent and race-safe across concurrent first uploads.
+  await withPgClient(null, (client: any) =>
+    client.query({
+      text: `UPDATE ${storageConfig.bucketsQualifiedName}
+             SET physical_name = $1
+             WHERE id = $2 AND physical_name IS NULL`,
+      values: [s3BucketName, bucket.id],
+    }),
+  );
+  bucket.physical_name = s3BucketName;
+  log.info(`Recorded physical_name="${s3BucketName}" on bucket ${bucket.id}`);
 }
 
 // --- Plugin factory ---
@@ -283,25 +324,29 @@ export function createPresignedUrlPlugin(
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
 
-                      return vals.withPgClient(vals.pgSettings, async (pgClient: any) => {
-                        return pgClient.withTransaction(async (txClient: any) => {
-                          const bucket = await getBucketConfig(
-                            txClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined,
-                          );
-                          if (!bucket) throw new Error('BUCKET_NOT_FOUND');
+                      // Bucket config read under the request role (RLS-gated visibility).
+                      const bucket = await vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                        getBucketConfig(pgClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined),
+                      );
+                      if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
-                          const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucket.key);
-                          await ensureS3BucketExists(options, s3ForDb.bucket, bucket, databaseId, storageConfig.allowedOrigins);
+                      // Resolve the physical bucket (stored coordinate first), provision on
+                      // first use, and record the exact name on the source row.
+                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucket.key, bucket.physical_name);
+                      await ensureAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, s3ForDb.bucket, storageConfig.allowedOrigins);
 
-                          return processSingleFile(options, txClient, storageConfig, databaseId, bucket, s3ForDb, {
+                      // File row INSERT under the request role (RLS enforced).
+                      return vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                        pgClient.withTransaction((txClient: any) =>
+                          processSingleFile(options, txClient, storageConfig, databaseId, bucket, s3ForDb, {
                             contentHash: vals.contentHash,
                             contentType: vals.contentType,
                             size: vals.size,
                             filename: vals.filename,
                             key: vals.customKey,
-                          });
-                        });
-                      });
+                          }),
+                        ),
+                      );
                     });
                   },
                 },
@@ -390,30 +435,34 @@ export function createPresignedUrlPlugin(
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
 
-                      return vals.withPgClient(vals.pgSettings, async (pgClient: any) => {
-                        return pgClient.withTransaction(async (txClient: any) => {
-                          const bucket = await getBucketConfig(
-                            txClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined,
-                          );
-                          if (!bucket) throw new Error('BUCKET_NOT_FOUND');
+                      // Bucket config read under the request role (RLS-gated visibility).
+                      const bucket = await vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                        getBucketConfig(pgClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined),
+                      );
+                      if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
-                          // Enforce bulk upload limits
-                          const filesArray = vals.files as any[];
-                          if (filesArray.length > storageConfig.maxBulkFiles) {
-                            throw new Error(
-                              `BULK_UPLOAD_FILES_EXCEEDED: ${filesArray.length} files exceeds maximum of ${storageConfig.maxBulkFiles} per batch`,
-                            );
-                          }
-                          const totalSize = filesArray.reduce((sum: number, f: any) => sum + (f.size || 0), 0);
-                          if (totalSize > storageConfig.maxBulkTotalSize) {
-                            throw new Error(
-                              `BULK_UPLOAD_SIZE_EXCEEDED: ${totalSize} bytes exceeds maximum of ${storageConfig.maxBulkTotalSize} bytes per batch`,
-                            );
-                          }
+                      // Enforce bulk upload limits
+                      const filesArray = vals.files as any[];
+                      if (filesArray.length > storageConfig.maxBulkFiles) {
+                        throw new Error(
+                          `BULK_UPLOAD_FILES_EXCEEDED: ${filesArray.length} files exceeds maximum of ${storageConfig.maxBulkFiles} per batch`,
+                        );
+                      }
+                      const totalSize = filesArray.reduce((sum: number, f: any) => sum + (f.size || 0), 0);
+                      if (totalSize > storageConfig.maxBulkTotalSize) {
+                        throw new Error(
+                          `BULK_UPLOAD_SIZE_EXCEEDED: ${totalSize} bytes exceeds maximum of ${storageConfig.maxBulkTotalSize} bytes per batch`,
+                        );
+                      }
 
-                          const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucket.key);
-                          await ensureS3BucketExists(options, s3ForDb.bucket, bucket, databaseId, storageConfig.allowedOrigins);
+                      // Resolve the physical bucket (stored coordinate first), provision on
+                      // first use, and record the exact name on the source row.
+                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucket.key, bucket.physical_name);
+                      await ensureAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, s3ForDb.bucket, storageConfig.allowedOrigins);
 
+                      // File row INSERTs under the request role (RLS enforced).
+                      return vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                        pgClient.withTransaction(async (txClient: any) => {
                           const results = [];
                           for (const file of filesArray) {
                             results.push(
@@ -427,8 +476,8 @@ export function createPresignedUrlPlugin(
                             );
                           }
                           return { files: results };
-                        });
-                      });
+                        }),
+                      );
                     });
                   },
                 },
@@ -550,10 +599,11 @@ export function createPresignedUrlPlugin(
                         return;
                       }
 
-                      // No other references — attempt sync S3 delete
-                      // Look up the bucket key for scoped S3 resolution
+                      // No other references — attempt sync S3 delete.
+                      // Read the stored physical coordinate; the object lives in the
+                      // recorded bucket, never a recomputed prefix name.
                       const bucketResult = await pgClient.query({
-                        text: `SELECT key FROM ${storageConfig.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
+                        text: `SELECT key, physical_name FROM ${storageConfig.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
                         values: [fileRow!.bucket_id],
                       });
                       const bucketKey = bucketResult.rows[0]?.key;
@@ -561,7 +611,7 @@ export function createPresignedUrlPlugin(
                         log.warn(`Bucket not found for bucket_id=${fileRow!.bucket_id}; skipping S3 delete`);
                         return;
                       }
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucketKey);
+                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucketKey, bucketResult.rows[0]?.physical_name ?? null);
                       await deleteS3Object(s3ForDb, fileRow!.key);
                       log.info(`Sync S3 delete succeeded for key=${fileRow!.key}`);
                     });

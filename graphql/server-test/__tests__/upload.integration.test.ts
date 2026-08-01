@@ -30,6 +30,7 @@
 
 import { hashContent, putToPresignedUrl } from '@constructive-io/upload-client';
 import path from 'path';
+import type { PgTestClient } from 'pgsql-test';
 import type supertest from 'supertest';
 
 import { getConnections, seed } from '../src';
@@ -265,6 +266,7 @@ function expectSuccess(res: supertest.Response): Record<string, any> {
 
 describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   let request: supertest.Agent;
+  let pg: PgTestClient;
   let teardown: () => Promise<void>;
 
   const postGraphQL = (payload: {
@@ -310,7 +312,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
 
   // Single setup: one server, one pool, all three schemas registered
   beforeAll(async () => {
-    ({ request, teardown } = await getConnections(
+    ({ request, pg, teardown } = await getConnections(
       {
         schemas: [...aliceSchemas, ...bobSchemas, ...mallorySchemas],
         authRole: 'anonymous',
@@ -445,6 +447,111 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         expect(payload.expiresAt).toBeNull();
         expect(payload.fileId).toBeTruthy();
       });
+    });
+  });
+
+  // ==========================================================================
+  // 1b. physical_name persistence (Alice)
+  //
+  // The provisioner records the exact physical S3 bucket name on the source
+  // bucket row at first-provision time; every later read uses that stored
+  // coordinate instead of recomputing it from a prefix convention.
+  // ==========================================================================
+
+  describe('physical_name persistence (Alice)', () => {
+    const aliceBucketsTable = `"${aliceSchemas[0]}".app_buckets`;
+
+    const physicalNameFor = async (key: string): Promise<string | null> => {
+      const res = await pg.query(
+        `SELECT physical_name FROM ${aliceBucketsTable} WHERE key = $1`,
+        [key]
+      );
+      return res.rows[0]?.physical_name ?? null;
+    };
+
+    // MinIO uses path-style URLs: http://host:9000/<bucket>/<key>?...
+    const bucketFromPresignedUrl = (url: string): string =>
+      new URL(url).pathname.replace(/^\/+/, '').split('/')[0];
+
+    it('records physical_name on the row after upload, matching the presigned URL bucket', async () => {
+      const fileContent = 'physical-name coordinate check';
+      const contentHash = await hashContent(fileContent);
+
+      const res = await postGraphQL({
+        query: UPLOAD_APP_FILE,
+        variables: {
+          input: {
+            bucketKey: 'public',
+            contentHash,
+            contentType: 'text/plain',
+            size: Buffer.byteLength(fileContent),
+            filename: 'physical-name-check.txt'
+          }
+        }
+      });
+      const payload = expectSuccess(res).uploadAppFile;
+      expect(payload.uploadUrl).toBeTruthy();
+
+      const stored = await physicalNameFor('public');
+      expect(stored).toBeTruthy();
+      // Matches the resolver contract: {prefix}-{bucketKey}-{databaseId}
+      expect(stored).toContain('public');
+      expect(stored).toContain(aliceDatabaseId);
+      // ...and is exactly the bucket the presigned PUT targets.
+      expect(bucketFromPresignedUrl(payload.uploadUrl)).toBe(stored);
+    });
+
+    it('does not clobber physical_name on subsequent uploads', async () => {
+      const before = await physicalNameFor('public');
+      expect(before).toBeTruthy();
+
+      const fileContent = 'second upload, same bucket';
+      const contentHash = await hashContent(fileContent);
+      const res = await postGraphQL({
+        query: UPLOAD_APP_FILE,
+        variables: {
+          input: {
+            bucketKey: 'public',
+            contentHash,
+            contentType: 'text/plain',
+            size: Buffer.byteLength(fileContent),
+            filename: 'second-upload.txt'
+          }
+        }
+      });
+      expectSuccess(res);
+
+      expect(await physicalNameFor('public')).toBe(before);
+    });
+
+    it('honors a preexisting custom physical_name verbatim (resolver never consulted)', async () => {
+      const customPhysical = 'preexisting-custom-cdn-bucket';
+      await pg.query(
+        `INSERT INTO ${aliceBucketsTable} (key, type, is_public, physical_name)
+         VALUES ($1, 'public', true, $2)`,
+        ['custom-cdn', customPhysical]
+      );
+
+      const fileContent = 'custom physical bucket check';
+      const contentHash = await hashContent(fileContent);
+      const res = await postGraphQL({
+        query: UPLOAD_APP_FILE,
+        variables: {
+          input: {
+            bucketKey: 'custom-cdn',
+            contentHash,
+            contentType: 'text/plain',
+            size: Buffer.byteLength(fileContent),
+            filename: 'custom-cdn.txt'
+          }
+        }
+      });
+      const payload = expectSuccess(res).uploadAppFile;
+
+      // The presigned URL targets the stored custom bucket, not a resolver-minted name.
+      expect(bucketFromPresignedUrl(payload.uploadUrl)).toBe(customPhysical);
+      // ...and the stored coordinate is left untouched.
+      expect(await physicalNameFor('custom-cdn')).toBe(customPhysical);
     });
   });
 

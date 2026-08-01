@@ -436,11 +436,11 @@ export async function getBucketConfig(
   const hasOwner = ownerId && isEntityScoped;
   const result = await pgClient.query({
     text: hasOwner
-      ? `SELECT id, key, type, is_public, owner_id, allowed_mime_types, max_file_size, allow_custom_keys
+      ? `SELECT id, key, type, is_public, owner_id, allowed_mime_types, max_file_size, allow_custom_keys, physical_name
          FROM ${storageConfig.bucketsQualifiedName}
          WHERE key = $1 AND owner_id = $2
          LIMIT 1`
-      : `SELECT id, key, type, is_public, ${isEntityScoped ? 'owner_id,' : ''} allowed_mime_types, max_file_size, allow_custom_keys
+      : `SELECT id, key, type, is_public, ${isEntityScoped ? 'owner_id,' : ''} allowed_mime_types, max_file_size, allow_custom_keys, physical_name
          FROM ${storageConfig.bucketsQualifiedName}
          WHERE key = $1
          LIMIT 1`,
@@ -460,6 +460,7 @@ export async function getBucketConfig(
     allowed_mime_types: string[] | null;
     max_file_size: number | null;
     allow_custom_keys: boolean;
+    physical_name: string | null;
   };
 
   const config: BucketConfig = {
@@ -471,6 +472,7 @@ export async function getBucketConfig(
     allowed_mime_types: row.allowed_mime_types,
     max_file_size: row.max_file_size,
     allow_custom_keys: row.allow_custom_keys ?? false,
+    physical_name: row.physical_name ?? null,
   };
 
   bucketCache.set(cacheKey, config);

@@ -27,6 +27,7 @@ BEGIN
        allowed_mime_types text[] NULL,
        max_file_size bigint NULL,
        allow_custom_keys boolean NOT NULL DEFAULT false,
+       physical_name text NULL,
        created_at timestamptz DEFAULT now(),
        updated_at timestamptz DEFAULT now(),
        UNIQUE (key)

@@ -62,11 +62,13 @@ function resolveS3ForDatabase(
   storageConfig: StorageModuleConfig,
   databaseId: string,
   bucketKey: string,
+  physicalName: string | null,
 ): S3Config {
   const globalS3 = resolveS3(options);
-  const bucket = options.resolveBucketName
-    ? options.resolveBucketName(databaseId, bucketKey)
-    : globalS3.bucket;
+  const bucket = physicalName
+    ?? (options.resolveBucketName
+      ? options.resolveBucketName(databaseId, bucketKey)
+      : globalS3.bucket);
   const publicUrlPrefix = storageConfig.publicUrlPrefix ?? globalS3.publicUrlPrefix;
 
   if (bucket === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
@@ -166,24 +168,26 @@ export function createDownloadUrlPlugin(
                             : null;
                           const resolved = config
                             ? await withPgClient(pgSettings, async (pgClient: any) => {
-                              // Look up the bucket key for scoped S3 resolution
+                              // Look up the bucket key + stored physical coordinate for scoped S3 resolution
                               let bucketKey = 'public';
+                              let physicalName: string | null = null;
                               if (bucketId) {
                                 const bucketResult = await pgClient.query({
-                                  text: `SELECT key FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
+                                  text: `SELECT key, physical_name FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
                                   values: [bucketId],
                                 });
                                 if (bucketResult.rows[0]?.key) {
                                   bucketKey = bucketResult.rows[0].key;
                                 }
+                                physicalName = bucketResult.rows[0]?.physical_name ?? null;
                               }
 
-                              return { config, databaseId, bucketKey };
+                              return { config, databaseId, bucketKey, physicalName };
                             })
                             : null;
                           if (resolved) {
                             downloadUrlExpirySeconds = resolved.config.downloadUrlExpirySeconds;
-                            s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.databaseId, resolved.bucketKey);
+                            s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.databaseId, resolved.bucketKey, resolved.physicalName);
                           }
                         }
                       } catch {

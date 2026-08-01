@@ -424,6 +424,99 @@ describe('createBucketProvisionerPlugin', () => {
       expect(result.bucketName).toBe('public');
     });
 
+    it('records physical_name on the bucket row after successful provisioning', async () => {
+      createBucketProvisionerPlugin(createDefaultOptions());
+
+      const pgClient = createMockPgClient();
+      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
+        callback(pgClient),
+      );
+
+      const result = await capturedLambdaCallback!({
+        input: { bucketKey: 'public' },
+        withPgClient: mockWithPgClient,
+        pgSettings: { role: 'admin' },
+      });
+
+      expect(result.success).toBe(true);
+
+      const update = pgClient.query.mock.calls.find(
+        (c: any[]) => typeof c[0] === 'string' && c[0].includes('SET physical_name'),
+      );
+      expect(update).toBeDefined();
+      // Guarded so a re-provision never clobbers an already-recorded coordinate.
+      expect(update![0]).toContain('physical_name IS NULL');
+      // Records the exact name returned by the provisioner against the row id.
+      expect(update![1]).toEqual(['public', 'bucket-uuid-789']);
+    });
+
+    it('provisions the stored physical_name verbatim when already recorded', async () => {
+      createBucketProvisionerPlugin(createDefaultOptions());
+
+      const pgClient = createMockPgClient({
+        app_public: {
+          rows: [{
+            id: 'bucket-uuid-789',
+            key: 'public',
+            type: 'public',
+            is_public: true,
+            allowed_origins: null,
+            physical_name: 'preexisting-cdn-bucket',
+          }],
+        },
+      });
+      mockProvision.mockResolvedValue({
+        bucketName: 'preexisting-cdn-bucket',
+        accessType: 'public',
+        endpoint: 'http://minio:9000',
+        provider: 'minio',
+        region: 'us-east-1',
+        publicUrlPrefix: null,
+        blockPublicAccess: false,
+        versioning: false,
+        corsRules: [],
+        lifecycleRules: [],
+      });
+      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
+        callback(pgClient),
+      );
+
+      const result = await capturedLambdaCallback!({
+        input: { bucketKey: 'public' },
+        withPgClient: mockWithPgClient,
+        pgSettings: { role: 'admin' },
+      });
+
+      expect(result.success).toBe(true);
+      // The stored coordinate is provisioned as-is; no prefix/resolver name is minted.
+      expect(mockProvision).toHaveBeenCalledWith(
+        expect.objectContaining({ bucketName: 'preexisting-cdn-bucket' }),
+      );
+    });
+
+    it('does not record physical_name when provisioning fails', async () => {
+      mockProvision.mockRejectedValue(new Error('S3 connection refused'));
+
+      createBucketProvisionerPlugin(createDefaultOptions());
+
+      const pgClient = createMockPgClient();
+      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
+        callback(pgClient),
+      );
+
+      const result = await capturedLambdaCallback!({
+        input: { bucketKey: 'public' },
+        withPgClient: mockWithPgClient,
+        pgSettings: {},
+      });
+
+      expect(result.success).toBe(false);
+      const update = pgClient.query.mock.calls.find(
+        (c: any[]) => typeof c[0] === 'string' && c[0].includes('SET physical_name'),
+      );
+      expect(update).toBeUndefined();
+    });
+
     it('applies per-database endpoint override from storage module', async () => {
       createBucketProvisionerPlugin(createDefaultOptions());
 
