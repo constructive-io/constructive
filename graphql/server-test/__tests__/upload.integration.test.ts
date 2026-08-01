@@ -675,6 +675,69 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   });
 
   // ==========================================================================
+  // 1d. Auto-provision-on-create is disabled (Alice)
+  //
+  // ConstructivePreset wires BucketProvisionerPreset with autoProvision:false,
+  // so creating a bucket row via the createAppBucket GraphQL mutation records
+  // the row WITHOUT eagerly minting an S3 bucket. Buckets are provisioned only
+  // lazily (first upload) or explicitly (provisionBucket) — no empty-bucket
+  // sprawl on every create call.
+  // ==========================================================================
+
+  describe('Auto-provision on bucket create is disabled (Alice)', () => {
+    const aliceBucketsTable = `"${aliceSchemas[0]}".app_buckets`;
+
+    const physicalNameFor = async (key: string): Promise<string | null> => {
+      const res = await pg.query(
+        `SELECT physical_name FROM ${aliceBucketsTable} WHERE key = $1`,
+        [key]
+      );
+      return res.rows[0]?.physical_name ?? null;
+    };
+
+    const bucketFromPresignedUrl = (url: string): string =>
+      new URL(url).pathname.replace(/^\/+/, '').split('/')[0];
+
+    it('createAppBucket records the row without minting an S3 bucket; first upload provisions lazily', async () => {
+      const key = 'no-eager';
+
+      // Create the bucket ROW via the GraphQL mutation.
+      const createRes = await postGraphQL({
+        query: CREATE_APP_BUCKET,
+        variables: {
+          input: { appBucket: { key, type: 'public', isPublic: true } }
+        }
+      });
+      const created = expectSuccess(createRes).createAppBucket.appBucket;
+      expect(created.key).toBe(key);
+
+      // autoProvision:false => the create hook never runs, so no S3 bucket is
+      // minted and nothing is recorded on the row.
+      expect(await physicalNameFor(key)).toBeNull();
+
+      // The lazy path still provisions the bucket on first upload.
+      const uploadRes = await postGraphQL({
+        query: UPLOAD_APP_FILE,
+        variables: {
+          input: {
+            bucketKey: key,
+            contentHash: await hashContent('no-eager-probe'),
+            contentType: 'text/plain',
+            size: 14,
+            filename: 'no-eager.txt'
+          }
+        }
+      });
+      const uploadUrl = expectSuccess(uploadRes).uploadAppFile.uploadUrl;
+      const physical = await physicalNameFor(key);
+      expect(physical).toBeTruthy();
+      // Lazy mints the same tenant-aware name the presigned PUT targets.
+      expect(bucketFromPresignedUrl(uploadUrl)).toBe(physical);
+      expect(physical!.endsWith(`-${key}-${aliceDatabaseId}`)).toBe(true);
+    });
+  });
+
+  // ==========================================================================
   // 2. Feature flag gating via database_settings / api_settings
   // ==========================================================================
 

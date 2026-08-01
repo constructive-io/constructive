@@ -61,6 +61,11 @@ describe('ConstructivePreset bucket-provisioner wiring', () => {
     expect(resolveBucketName('private', DATABASE_ID)).toBe(`${PREFIX}-private-${DATABASE_ID}`);
   });
 
+  it('disables auto-provision-on-create so buckets are minted lazily / explicitly', () => {
+    createConstructivePreset();
+    expect(captured.bucketProvisionerOptions.autoProvision).toBe(false);
+  });
+
   it('does not wire the provisioner preset when presigned uploads are disabled', () => {
     createConstructivePreset({ enablePresignedUploads: false });
     expect(captured.bucketProvisionerOptions).toBeUndefined();
