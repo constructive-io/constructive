@@ -54,6 +54,24 @@ A plain audit is one command and one gate; `--format markdown` writes the report
 
 Scores lead, then the severity counts, then a table per dimension; internal (non-exposed) advisories and accepted baseline debt fold into `<details>` so the summary stays skimmable. To post it as a PR comment instead, pipe it to `gh pr comment --body-file -`. The same renderer is available to library callers as `renderMarkdown(report)`.
 
+#### What changed (`--compare`)
+
+A report says what the database *is*; on a pull request the only question is what the branch *did* to it. `--compare` diffs this run against a previous one and renders the movement — a Δ column in the score table, the severity counts that moved, and every rule whose finding count changed:
+
+```bash
+safegres audit --perf --compare main-report.json --compare-ref main --format markdown
+```
+
+```
+| Dimension   | Score      | Grade | Δ vs main                                | Top deductions   |
+| Security    | **99.3**   | **A+**| 🟢 ▲ +1.2 (from 98.1)                    | `A3` −4 (×2)     |
+| Performance | **72.4**   | **C** | 🔴 ▼ −2.6 (from 75.0) · B → C · 40 → 46 findings | `X1` −18 (×46) |
+```
+
+The previous run is a file, not something safegres remembers: a scanner has no memory and shouldn't acquire one, so CI decides what "previous" means (the report artifact from the base branch, a committed scoreboard, last night's nightly) and hands it over. Any earlier `--format json` output works as input. When keeping whole reports is too much, `--write-snapshot <file>` writes just the aggregates the comparison reads — scores, grades, severity counts, per-rule counts — and `--compare` accepts either. `--compare-ref` labels the previous run in the output.
+
+Library callers get the same thing as `compareReports(previous, report)`, with `toSnapshot` / `parseSnapshot` / `serializeSnapshot` for the file side; the result is carried in JSON output as `comparison`.
+
 #### Code scanning (SARIF)
 
 `--format sarif` emits SARIF 2.1.0, so findings become GitHub code-scanning alerts — Security tab, inline PR annotations, dismissals that stick:

@@ -170,6 +170,12 @@ export interface Report {
    * that were resolved.
    */
   callGraphDiff?: import('./callgraph/baseline').CallGraphDiff;
+  /**
+   * Movement against a previous run (`--compare`): score deltas, severity
+   * deltas and the rules that changed. A report describes a database; this is
+   * the only part that describes a change to one.
+   */
+  comparison?: import('./report/compare').ReportComparison;
 }
 
 export function newSummary(): Summary {

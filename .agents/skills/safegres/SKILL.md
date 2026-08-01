@@ -135,6 +135,10 @@ safegres audit --perf-baseline .safegres-perf.json --fail-on-new-perf   # exit 1
 
 Entries are keyed by code + relation + policy + subject (constraint/index/expression/column/function), never by message text, so safegres upgrades don't invalidate a committed baseline. Fixed findings are reported so you can re-baseline and stop them regressing. Library: `toPerfBaseline(findings)` / `diffPerf(findings, baseline)` → `{ added, removed, accepted }`; also emitted as `report.perf.diff`. Prefer this over asserting a perf grade in a test — it fails on the change, not on inherited debt.
 
+### Delta against a previous run (`--compare`)
+
+The baseline answers "is there new debt?"; `--compare` answers "which way did the numbers move?" — a Δ column in the markdown score table (arrow, points, grade transition, finding count), the severity counts that changed, and every rule whose count changed. It reads a file, because safegres keeps no history: pass any earlier `--format json` report, or the smaller `--write-snapshot` output. `--compare-ref <label>` names the previous run in the report. Library: `compareReports(previous, report)` → `report.comparison`; `toSnapshot` / `parseSnapshot` / `serializeSnapshot` for the file. Purely descriptive — it never fails a build; that stays the baseline's job.
+
 ### Runtime statistics (`--stats`, implies `--perf`)
 
 The `S*` rules read what the workload did, from `pg_stat_user_tables` / `pg_stat_user_indexes` / optional `pg_stat_statements`: **S1** seq-scan-dominant table (medium), **S2** index the planner has never chosen (low), **S3** dead-tuple bloat (low), **S4** statement hotspot on a table in scope (info). Only meaningful against a database that has served real traffic — never in a fresh CI database. Every threshold is a floor and configurable under `perf.stats` (`minRows`, `seqScanRatio`, `minIndexBytes`, `deadTupleRatio`, `minTimeShare`, `topStatements`). `S*` findings **are scored** on the perf axis (asking for `--stats` is the opt-in); `perf.scoring.includeStats: false` demotes them to advisories. `report.perf.stats` carries provenance: tables read, `statsReset` (the window the counters describe), whether they were scored, and a note when `pg_stat_statements` isn't installed — a missing extension is never an error.
@@ -234,6 +238,8 @@ safegres audit --stats             # + runtime-statistics rules S1-S4 (implies -
 safegres audit --explain           # + prove findings with EXPLAIN (implies --perf, PG16+)
 safegres audit --format json       # machine-readable
 safegres audit --format markdown >> "$GITHUB_STEP_SUMMARY"   # CI job summary / PR comment
+safegres audit --compare main.json --compare-ref main         # + Δ vs a previous run's JSON
+safegres audit --write-snapshot scoreboard.json               # aggregates only, for a later --compare
 safegres audit --format sarif --sarif-sources ./deploy       # GitHub code scanning (upload-sarif)
 safegres audit --exposed-only      # hide internal advisories
 safegres doctor                    # config/parser/connection/catalog + exposure + stale public.read checks

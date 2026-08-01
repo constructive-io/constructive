@@ -7,6 +7,7 @@ import { audit, type AuditOptions } from '../commands/audit';
 import { loadConfig } from '../config/loader';
 import type { Grade } from '../config/types';
 import { diffPerf, parsePerfBaseline, serializePerfBaseline, toPerfBaseline } from '../perf/baseline';
+import { compareReports, parseSnapshot, serializeSnapshot, toSnapshot } from '../report/compare';
 import { renderJson } from '../report/json';
 import { renderMarkdown } from '../report/markdown';
 import { renderPretty } from '../report/pretty';
@@ -83,6 +84,17 @@ Performance dimension (optional; scored separately from security):
                            EXPLAIN (GENERIC_PLAN) and attach the plan as
                            evidence; findings the planner refutes are reported
                            but unscored (implies --perf, needs PostgreSQL 16+)
+
+Comparison with a previous run (what changed, not just what is):
+  --compare <file>         Diff scores, severity counts and per-rule counts
+                           against a previous run and render the delta.
+                           <file> is any earlier --format json output, or a
+                           snapshot written by --write-snapshot
+  --compare-ref <label>    How to name the previous run in the report
+                           (e.g. "main", a commit sha). Default "previous run"
+  --write-snapshot <file>  Write the aggregate slice of this run (scores,
+                           counts, per-rule counts) for a later --compare,
+                           when keeping the whole report is too much
 
 Call graph (unscored; human review):
   --call-graph             Analyze the functions reachable from the exposed entry
@@ -202,6 +214,38 @@ export default async (
       process.exit(2);
     }
     report.perf.diff = diffPerf(report.perf.findings, parsePerfBaseline(raw));
+  }
+
+  if (typeof argv['write-snapshot'] === 'string') {
+    fs.writeFileSync(
+      argv['write-snapshot'],
+      serializeSnapshot(
+        toSnapshot(report, typeof argv['compare-ref'] === 'string' ? { ref: argv['compare-ref'] } : {})
+      )
+    );
+    log.info(`wrote snapshot: ${argv['write-snapshot']}`);
+  }
+
+  if (typeof argv.compare === 'string') {
+    let raw: string;
+    try {
+      raw = fs.readFileSync(argv.compare, 'utf8');
+    } catch {
+      log.error(
+        `cannot read --compare file: ${argv.compare} `
+          + '(any earlier `--format json` report or `--write-snapshot` output works)'
+      );
+      process.exit(2);
+    }
+    let previous;
+    try {
+      previous = parseSnapshot(raw);
+    } catch (err) {
+      log.error(`--compare file is not a safegres report: ${(err as Error).message}`);
+      process.exit(2);
+    }
+    if (typeof argv['compare-ref'] === 'string') previous.ref = argv['compare-ref'];
+    report.comparison = compareReports(previous, report);
   }
 
   if (typeof argv.baseline === 'string' && report.callGraph) {

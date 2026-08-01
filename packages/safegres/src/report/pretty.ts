@@ -3,6 +3,7 @@ import yanse from 'yanse';
 import type { Score } from '../score/score';
 import type { Finding, Report, Severity } from '../types';
 import { renderCallGraph, renderCallGraphDiff } from './callgraph';
+import { formatDelta, type ScoreDelta } from './compare';
 
 const SEV_LABEL: Record<Severity, string> = {
   critical: 'CRIT',
@@ -60,11 +61,17 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
 
   if (score) {
     lines.push(...scoreLines('score', score, colorEnabled));
+    if (report.comparison?.security) {
+      lines.push(`  ${deltaLine(report.comparison.security, report.comparison.previous.ref)}`);
+    }
     lines.push('');
   }
 
   if (report.perf) {
     lines.push(...scoreLines('perf score', report.perf.score, colorEnabled));
+    if (report.comparison?.perf) {
+      lines.push(`  ${deltaLine(report.comparison.perf, report.comparison.previous.ref)}`);
+    }
     lines.push('');
   }
 
@@ -228,6 +235,14 @@ function scoreLines(label: string, score: Score, colorEnabled: boolean): string[
     );
   }
   return lines;
+}
+
+function deltaLine(d: ScoreDelta, ref?: string): string {
+  const since = ref ? ` vs ${ref}` : ' vs previous run';
+  const arrow = d.delta > 0 ? '▲' : d.delta < 0 ? '▼' : '=';
+  const grade = d.gradeBefore === d.gradeAfter ? '' : `, ${d.gradeBefore} → ${d.gradeAfter}`;
+  return `Δ${since}: ${arrow} ${formatDelta(d.delta, 1)} (from ${d.before}${grade})`
+    + `  findings ${d.findingsBefore} → ${d.findingsAfter}`;
 }
 
 function renderFinding(f: Finding, paint: (sev: Severity, s: string) => string): string {
