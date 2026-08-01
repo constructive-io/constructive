@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.16.1](https://github.com/constructive-io/constructive/compare/safegres@1.16.0...safegres@1.16.1) (2026-08-01)
+
+### Bug Fixes
+
+- **safegres:** color comparison deltas by direction, not severity ([8cb23b7](https://github.com/constructive-io/constructive/commit/8cb23b73ea659d478343c570a9933352458add35))
+
 # [1.16.0](https://github.com/constructive-io/constructive/compare/safegres@1.15.4...safegres@1.16.0) (2026-08-01)
 
 ### Features

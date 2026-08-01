@@ -1,6 +1,6 @@
 {
   "name": "safegres",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "Pure-Postgres Row-Level Security auditor: grants, RLS enforcement, policy coverage, and risky SQL policy patterns, plus an optional index-hygiene performance score. No app framework required.",
   "main": "index.js",
