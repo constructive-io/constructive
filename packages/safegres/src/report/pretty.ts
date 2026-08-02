@@ -136,6 +136,28 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     lines.push('no findings.');
   }
 
+  if (report.roleAccess && report.roleAccess.roles.length > 0) {
+    lines.push('', 'role access — effective grants (direct, PUBLIC, inherited):', '');
+    for (const entry of report.roleAccess.roles) {
+      lines.push(
+        `  ${entry.role}: ${entry.accessibleTables} relation(s) accessible — `
+          + `${entry.unmediated.length} unmediated (no RLS), ${entry.mediated} policy-mediated`
+          + `${entry.dead > 0 ? `, ${entry.dead} dead (RLS default-deny)` : ''}`
+      );
+      const shown = options.verbose ? entry.unmediated : entry.unmediated.slice(0, 20);
+      for (const r of shown) {
+        lines.push(
+          paint('medium', `    ${r.schema}.${r.table}  ${r.privileges.join(', ')}  (via ${r.via})`)
+        );
+      }
+      if (shown.length < entry.unmediated.length) {
+        lines.push(
+          paint('info', `    … ${entry.unmediated.length - shown.length} more — run with --verbose to list.`)
+        );
+      }
+    }
+  }
+
   if (report.perf?.diff) {
     const { added, removed, accepted } = report.perf.diff;
     lines.push('', 'performance vs baseline:', '');

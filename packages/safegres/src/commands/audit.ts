@@ -24,6 +24,15 @@ import {
   checkUnindexedSortColumns
 } from '../checks/indexes';
 import {
+  checkDeadPolicies,
+  checkDeadSchemaUsage,
+  checkIndirectCoverageGaps,
+  checkUnreachableGrants,
+  checkUntrustedIndirectAccess,
+  computeRoleAccess,
+  type LatticeRoleOptions
+} from '../checks/lattice';
+import {
   checkNonLeakproofPolicyFunctions,
   checkPolicyColumnCasts,
   checkUnhoistedPolicyFunctions,
@@ -46,6 +55,7 @@ import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../c
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { type ExplainReport, proveFindings } from '../perf/explain';
+import { introspectRoleGraph, introspectSchemaAcls } from '../pg/acl';
 import { introspectBehaviors } from '../pg/behaviors';
 import { resolveExposure } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
@@ -57,7 +67,7 @@ import { listAuditableRoles, resolveRoles } from '../pg/roles';
 import { introspectStats, type StatsSnapshot } from '../pg/stats';
 import { dimensionOf, RULES_BY_CODE } from '../rules/registry';
 import { computeScore } from '../score/score';
-import type { ExposureReport, Finding, PerfReport, PerfStatsReport, Report } from '../types';
+import type { ExposureReport, Finding, PerfReport, PerfStatsReport, Report, RoleAccessReport } from '../types';
 import { summarize } from '../types';
 import { version as PKG_VERSION } from '../version';
 
@@ -148,6 +158,15 @@ export async function audit(
     ? snapshot.filter((t) => exposedSchemas.has(t.schema)).length
     : snapshot.length;
 
+  // Effective-access inputs for the lattice rules: the INHERIT-following
+  // role graph and the schema USAGE ACLs. Both are single cheap queries.
+  const roleGraph = await introspectRoleGraph(exec);
+  const schemaAcls = await introspectSchemaAcls(exec, {
+    schemas: options.schemas ?? config.schemas,
+    excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+  });
+  const schemaAclsByName = new Map(schemaAcls.map((a) => [a.schema, a]));
+
   let findings: Finding[] = [];
 
   // --- Performance dimension (opt-in): index hygiene ---
@@ -209,6 +228,18 @@ export async function audit(
     );
     findings.push(...checkPublicGrants(table));
 
+    // --- Grant/RLS/policy lattice (effective access: PUBLIC + inheritance) ---
+    findings.push(...checkIndirectCoverageGaps(table, roleGraph));
+    findings.push(...checkDeadPolicies(table, roleGraph));
+    findings.push(...checkUnreachableGrants(table, schemaAclsByName, roleGraph));
+    findings.push(
+      ...checkUntrustedIndirectAccess(
+        table,
+        roleGraph,
+        tableRules.get('L5')?.options as LatticeRoleOptions
+      )
+    );
+
     // --- AST-level anti-patterns (and, with perf on, policy-aware index rules) ---
     if (!skipAst) {
       findings.push(
@@ -220,6 +251,8 @@ export async function audit(
       );
     }
   }
+
+  findings.push(...checkDeadSchemaUsage(schemaAcls, snapshot, roleGraph));
 
   const statsSnapshot: StatsSnapshot | null = statsEnabled
     ? await introspectStats(exec, {
@@ -345,6 +378,20 @@ export async function audit(
     }),
     exposure: exposureReport
   };
+
+  // Per-role exposure: computed for the configured untrusted roles (L5/R1
+  // options), so the report answers "what can anonymous access?" directly
+  // even when no finding fires.
+  const untrustedRoles = [...new Set([
+    ...((resolved.rules.get('L5')?.options as LatticeRoleOptions | undefined)?.roles ?? []),
+    ...((resolved.rules.get('R1')?.options as RoleTrustOptions | undefined)?.roles ?? [])
+  ])].sort();
+  if (untrustedRoles.length > 0) {
+    const roleAccess: RoleAccessReport = {
+      roles: computeRoleAccess(snapshot, roleGraph, untrustedRoles)
+    };
+    report.roleAccess = roleAccess;
+  }
 
   if (perfEnabled) {
     // `S*` findings are scored by default — opting into `--stats` is the
