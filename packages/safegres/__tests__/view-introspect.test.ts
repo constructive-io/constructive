@@ -36,6 +36,18 @@ beforeAll(async () => {
       DO INSTEAD INSERT INTO fx_viewwrite.audit (note) VALUES ('x');
     CREATE RULE v_ruled_del AS ON DELETE TO fx_viewwrite.v_ruled DO INSTEAD NOTHING;
 
+    CREATE SCHEMA fx_viewtrig;
+    CREATE TABLE fx_viewtrig.t (id int);
+    CREATE FUNCTION fx_viewtrig.tg() RETURNS trigger LANGUAGE plpgsql AS $fn$
+      BEGIN INSERT INTO fx_viewtrig.t (id) VALUES (NEW.id); RETURN NEW; END
+    $fn$;
+    CREATE VIEW fx_viewtrig.v AS SELECT id FROM fx_viewtrig.t;
+    CREATE TRIGGER v_ins INSTEAD OF INSERT ON fx_viewtrig.v
+      FOR EACH ROW EXECUTE FUNCTION fx_viewtrig.tg();
+    -- One trigger, several events: the type bits carry all of them at once.
+    CREATE TRIGGER v_upd_del INSTEAD OF UPDATE OR DELETE ON fx_viewtrig.v
+      FOR EACH ROW EXECUTE FUNCTION fx_viewtrig.tg();
+
     CREATE SCHEMA fx_viewbarrier;
     CREATE TABLE fx_viewbarrier.t (id int, owner_name text);
     CREATE VIEW fx_viewbarrier.v_plain AS
@@ -100,6 +112,27 @@ describe('introspectViews — write paths', () => {
       ['v_ruled_ins', 'INSERT', true]
     ]);
     expect(byName.v_ruled.rules[0].definition).toContain('CREATE RULE');
+  });
+});
+
+describe('introspectViews — INSTEAD OF triggers', () => {
+  it('reads which function each trigger runs, and on which events', async () => {
+    const views = await introspectViews(pg.client as never, { schemas: ['fx_viewtrig'] });
+    const v = views.find((view) => view.name === 'v')!;
+
+    expect(v.insteadOfTriggers).toBe(true);
+    // Which function is the whole point: whether the write escalates depends
+    // on *that function's* security attribute, not on the view's.
+    expect(v.insteadOf.map((t) => [t.name, t.functionSchema, t.functionName, t.events.sort()]))
+      .toEqual([
+        ['v_ins', 'fx_viewtrig', 'tg', ['INSERT']],
+        ['v_upd_del', 'fx_viewtrig', 'tg', ['DELETE', 'UPDATE']]
+      ]);
+  });
+
+  it('leaves a view with no INSTEAD OF triggers with an empty list', async () => {
+    const views = await introspectViews(pg.client as never, { schemas: ['fx_viewwrite'] });
+    expect(views.find((v) => v.name === 'v_auto')!.insteadOf).toEqual([]);
   });
 });
 

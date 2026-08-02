@@ -1,0 +1,38 @@
+{
+  "title": "Anonymous role writes a locked table through an INSTEAD OF trigger's definer function",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_trigger_write"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L20",
+      "relation": "c_trigger_write.submissions",
+      "role": "corpus_anon",
+      "note": "the write never reaches `submissions` directly — it becomes the trigger function's body, which is SECURITY DEFINER, so it lands as c_trigger_write_owner. This is the write L9 suppressed as unfollowable"
+    },
+    {
+      "code": "A3",
+      "relation": "c_trigger_write.submissions",
+      "note": "RLS is not FORCEd, which is why the owner's insert inside the trigger body is not checked against the table's own policy"
+    }
+  ],
+  "forbid": [
+    "L8",
+    "L9",
+    "L15",
+    "L19"
+  ],
+  "worstSeverity": "low",
+  "fix": "Make c_trigger_write.tg_submission_inbox() SECURITY INVOKER so the caller's own grants apply, authorize the caller inside the body, or give the function an owner whose reach matches what the view is meant to accept. Revoking corpus_anon's INSERT on the view is not the fix — that grant is what the API serves.",
+  "id": "50-instead-of-trigger-write"
+}

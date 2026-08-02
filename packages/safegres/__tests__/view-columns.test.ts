@@ -34,6 +34,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     columnDeps: [{ schema: 'app', table: 'people', columns: ['email', 'id'] }],
     writable: [],
     insteadOfTriggers: false,
+    insteadOf: [],
     rules: [],
     ...partial
   };

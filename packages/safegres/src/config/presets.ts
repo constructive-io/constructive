@@ -55,7 +55,12 @@ export const recommended: SafegresConfig = {
     // — RLS does not apply to a sequence and cannot be enabled on a foreign
     // table at all — so both are reach the table rules never saw.
     L16: ['info', { rolesFrom: 'anon' }],
-    L17: ['info', { rolesFrom: 'anon' }]
+    L17: ['info', { rolesFrom: 'anon' }],
+    // Privilege that arrives through a function body: a definer function's
+    // reach, and the write an INSTEAD OF trigger's definer function performs.
+    // Both are the L8 escalation with different syntax, and ship the same way.
+    L19: ['info', { rolesFrom: 'anon' }],
+    L20: ['info', { rolesFrom: 'anon' }]
   }
 };
 

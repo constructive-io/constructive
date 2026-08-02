@@ -18,6 +18,12 @@ import {
   checkUpdateWithCheckCoverage
 } from '../checks/coverage';
 import {
+  analyzeFunctionBodies,
+  checkDefinerFunctionReach,
+  checkInsteadOfTriggerWrite,
+  checkUnreadableFunctionReach
+} from '../checks/definer-function';
+import {
   analyzeViewBodies,
   checkDefinerViewBypass,
   checkUnauditedViewReach,
@@ -289,6 +295,17 @@ export async function audit(
     resolved.rules.get('L15')?.options as LatticeRoleOptions,
     exposure
   )?.roles ?? [];
+  // Function bodies: L19 is the reach a definer function's body confers, L20
+  // the write an INSTEAD OF trigger's definer function performs, and L15
+  // reports the bodies neither could read.
+  const definerFunctionRoles = withExposedRoles(
+    resolved.rules.get('L19')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
+  const triggerWriteRoles = withExposedRoles(
+    resolved.rules.get('L20')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
   // Sequences and foreign tables: one introspection, two rules, and no reason
   // to run it when neither is configured with a role list.
   const sequenceRoles = withExposedRoles(
@@ -306,6 +323,11 @@ export async function audit(
     && ((definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false)
       || (unauditedReachRoles.length > 0 && resolved.rules.get('L14')?.enabled !== false)
       || (unreadableViewRoles.length > 0 && resolved.rules.get('L15')?.enabled !== false));
+  const functionBodiesEnabled =
+    !skipAst
+    && ((definerFunctionRoles.length > 0 && resolved.rules.get('L19')?.enabled !== false)
+      || (triggerWriteRoles.length > 0 && resolved.rules.get('L20')?.enabled !== false)
+      || (unreadableViewRoles.length > 0 && resolved.rules.get('L15')?.enabled !== false));
   const viewExposureEnabled =
     !skipAst
     && ((matviewRoles.length > 0 && resolved.rules.get('L11')?.enabled !== false)
@@ -319,7 +341,8 @@ export async function audit(
     || resolved.rules.get('L4')?.enabled !== false
     || viewBodiesEnabled
     || viewWritesEnabled
-    || viewExposureEnabled;
+    || viewExposureEnabled
+    || functionBodiesEnabled;
   const viewSnapshot = needsViews
     ? await introspectViews(exec, {
       schemas: options.schemas ?? config.schemas,
@@ -473,6 +496,39 @@ export async function audit(
     if (ruleBypassRoles.length > 0 && resolved.rules.get('L10')?.enabled !== false) {
       findings.push(
         ...checkViewRuleBypass(writes.ruleDriven, snapshot, roleGraph, { roles: ruleBypassRoles })
+      );
+    }
+  }
+
+  // L19/L20 are the function half of "SQL bodies confer privilege": what a
+  // definer function's body reaches, and where an INSTEAD OF trigger's write
+  // actually lands. One body pass serves both, plus L15's coverage report.
+  if (functionBodiesEnabled) {
+    const bodies = await analyzeFunctionBodies(
+      await getFunctions(),
+      viewSnapshot,
+      snapshot,
+      auditedSchemas
+    );
+    if (definerFunctionRoles.length > 0 && resolved.rules.get('L19')?.enabled !== false) {
+      findings.push(
+        ...checkDefinerFunctionReach(bodies.functions, snapshot, roleGraph, schemaAclsByName, {
+          roles: definerFunctionRoles
+        })
+      );
+    }
+    if (triggerWriteRoles.length > 0 && resolved.rules.get('L20')?.enabled !== false) {
+      findings.push(
+        ...checkInsteadOfTriggerWrite(bodies.triggers, snapshot, roleGraph, {
+          roles: triggerWriteRoles
+        })
+      );
+    }
+    if (unreadableViewRoles.length > 0 && resolved.rules.get('L15')?.enabled !== false) {
+      findings.push(
+        ...checkUnreadableFunctionReach(bodies.functions, roleGraph, schemaAclsByName, {
+          roles: unreadableViewRoles
+        })
       );
     }
   }

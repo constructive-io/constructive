@@ -263,12 +263,29 @@ export interface ViewSnapshot {
   /** The view has `INSTEAD OF` triggers: writes go wherever their bodies say. */
   insteadOfTriggers: boolean;
   /**
+   * Those triggers, with the function each one runs. A write against the view
+   * becomes that function's body, and the body is permission-checked against
+   * the *function's* effective user — the caller, unless the function is
+   * SECURITY DEFINER. The view's own owner does not enter into it, which is
+   * why the trigger function has to be named rather than assumed.
+   */
+  insteadOf: InsteadOfTrigger[];
+  /**
    * Rewrite rules other than the view's own `_RETURN` SELECT rule. These are
    * invisible to `pg_get_viewdef`, and their actions are permission-checked
    * against the *rule's table owner* — the view owner — regardless of
    * `security_invoker`, which only governs the view's own base relations.
    */
   rules: ViewRule[];
+}
+
+/** An `INSTEAD OF` trigger on a view, and the function it fires. */
+export interface InsteadOfTrigger {
+  name: string;
+  /** The commands on the view that fire it. */
+  events: Array<'INSERT' | 'UPDATE' | 'DELETE'>;
+  functionSchema: string;
+  functionName: string;
 }
 
 /** A rewrite rule on a view, other than the `_RETURN` rule that defines it. */
@@ -321,6 +338,7 @@ export async function introspectViews(
     column_deps: Array<{ schema: string; table: string; columns: string[] }>;
     updatable_bits: number;
     instead_of_triggers: boolean;
+    instead_of: Array<{ name: string; tgtype: number; fnSchema: string; fnName: string }>;
     rules: Array<{ name: string; event: string; instead: boolean; definition: string }>;
   }>(
     // Both parameters are referenced (even when only one filters) so Postgres
@@ -403,6 +421,21 @@ export async function introspectViews(
          AND d.refobjsubid > 0
          AND r.ev_class <> d.refobjid
      ),
+     instead_of AS (
+       -- The same TRIGGER_TYPE_INSTEAD bit as above, but carrying the function:
+       -- where a write against the view actually goes is in that body.
+       SELECT
+         t.tgrelid  AS oid,
+         t.tgname,
+         t.tgtype,
+         pn.nspname AS fn_schema,
+         p.proname  AS fn_name
+       FROM pg_trigger t
+       JOIN views v ON v.oid = t.tgrelid
+       JOIN pg_proc p ON p.oid = t.tgfoid
+       JOIN pg_namespace pn ON pn.oid = p.pronamespace
+       WHERE NOT t.tgisinternal AND (t.tgtype & 64) <> 0
+     ),
      rules AS (
        -- _RETURN is the SELECT rule that *is* the view; every other rule is
        -- behaviour pg_get_viewdef does not show.
@@ -451,6 +484,15 @@ export async function introspectViews(
        v.instead_of_triggers,
        COALESCE(
          (SELECT jsonb_agg(jsonb_build_object(
+           'name', i.tgname,
+           'tgtype', i.tgtype,
+           'fnSchema', i.fn_schema,
+           'fnName', i.fn_name
+         )) FROM instead_of i WHERE i.oid = v.oid),
+         '[]'::jsonb
+       )                                          AS instead_of,
+       COALESCE(
+         (SELECT jsonb_agg(jsonb_build_object(
            'name', r.rulename,
            'event', r.ev_type,
            'instead', r.is_instead,
@@ -485,6 +527,17 @@ export async function introspectViews(
       ...(r.updatable_bits & 16 ? ['DELETE' as const] : [])
     ],
     insteadOfTriggers: r.instead_of_triggers,
+    insteadOf: r.instead_of.map((t) => ({
+      name: t.name,
+      // tgtype bits: INSERT 1 << 2, DELETE 1 << 3, UPDATE 1 << 4.
+      events: [
+        ...(t.tgtype & 4 ? ['INSERT' as const] : []),
+        ...(t.tgtype & 16 ? ['UPDATE' as const] : []),
+        ...(t.tgtype & 8 ? ['DELETE' as const] : [])
+      ],
+      functionSchema: t.fnSchema,
+      functionName: t.fnName
+    })),
     rules: r.rules.flatMap((rule) => {
       const event = RULE_EVENTS[rule.event];
       return event

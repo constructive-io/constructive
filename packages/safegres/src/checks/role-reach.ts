@@ -21,8 +21,9 @@
  * `proof: 'ast'`. SECURITY DEFINER function edges come later.
  */
 
+import type { FunctionGrant } from '../pg/functions';
 import type { GrantInfo, PgPrivilege, TableSnapshot } from '../pg/introspect';
-import { effectiveGrants, type GrantVia, type RoleGraph } from './lattice';
+import { effectiveExecute, effectiveGrants, type GrantVia, type RoleGraph } from './lattice';
 
 /** One hop in the path by which a role reaches a relation. */
 export type RoleReachEdge =
@@ -47,7 +48,21 @@ export type RoleReachEdge =
    * are permission-checked against the rule's table owner, and unlike the
    * view edge this is *not* governed by `security_invoker`.
    */
-  | { kind: 'rule'; view: string; rule: string; owner: string };
+  | { kind: 'rule'; view: string; rule: string; owner: string }
+  /**
+   * The caller executed a function that runs as `owner` — a SECURITY DEFINER,
+   * or anything called from one. Every relation the body touches is touched
+   * with the owner's privileges, which is the function twin of the view edge.
+   */
+  | { kind: 'function'; fn: string; owner: string }
+  /**
+   * The caller's write against `view` fired an `INSTEAD OF` trigger. The
+   * write itself never reaches a base relation: it becomes the trigger
+   * function's body, checked against *that function's* effective user — the
+   * caller, unless the function is SECURITY DEFINER. The view's own owner and
+   * `security_invoker` do not enter into it.
+   */
+  | { kind: 'trigger'; view: string; trigger: string; fn: string; owner: string };
 
 /**
  * How well-founded a reach cell is. Stage 1 is entirely `catalog` — every
@@ -259,6 +274,172 @@ export function computeViewReach(
           ],
           proof: 'opaque-tainted',
           taint: view.unreadable
+        });
+      }
+    }
+
+    return { role, cells };
+  });
+}
+
+/** One hop of a call chain, and the role in force once it is taken. */
+export interface FunctionHop {
+  /** `schema.name` — overloads collapse, as they do in the call graph. */
+  fn: string;
+  owner: string;
+}
+
+/** One relation a function body touches, under the role in force there. */
+export interface FunctionAccess {
+  schema: string;
+  table: string;
+  privilege: PgPrivilege;
+  /** Call hops, entry first; the last hop's owner executes the access. */
+  hops: FunctionHop[];
+  /** Views the access passed through after the call chain, outermost first. */
+  viewHops?: Array<{ view: string; owner: string }>;
+  /** The relation is outside the audited schemas: nothing about it is known. */
+  external?: boolean;
+}
+
+/** A function, its EXECUTE ACL, and the relations its body reaches. */
+export interface FunctionReachInput {
+  schema: string;
+  name: string;
+  /** Identity arguments — what distinguishes one overload from another. */
+  args: string;
+  owner: string;
+  grants: FunctionGrant[];
+  /** The EXECUTE came from Postgres's default ACL, not a deliberate grant. */
+  defaultAcl: boolean;
+  accesses: FunctionAccess[];
+  /**
+   * The body was wholly or partly unreadable, and why. `accesses` is then a
+   * lower bound: what is there is proven, what is missing is unknowable.
+   */
+  unreadable?: string;
+}
+
+/**
+ * Project the function-execution edge into the reach model: for every role
+ * that can EXECUTE a function running as someone else, one cell per relation
+ * its body touches, under the role in force at that point in the call chain.
+ *
+ * The shape mirrors {@link computeViewReach} deliberately — a definer function
+ * and a definer view are the same escalation with different syntax — and, as
+ * there, a body that could not be read yields one `opaque-tainted` cell naming
+ * the *function*: the execution is proven, its far end is not.
+ */
+export function computeFunctionReach(
+  functions: FunctionReachInput[],
+  graph: RoleGraph,
+  roles: string[]
+): RoleReach[] {
+  return roles.map((role) => {
+    const cells: RoleReachCell[] = [];
+
+    for (const fn of functions) {
+      const via = effectiveExecute(fn, role, graph);
+      if (!via) continue;
+
+      for (const access of fn.accesses) {
+        if (access.hops.length === 0) continue;
+        const viewHops = access.viewHops ?? [];
+        const last = viewHops.length > 0
+          ? viewHops[viewHops.length - 1].owner
+          : access.hops[access.hops.length - 1].owner;
+        cells.push({
+          schema: access.schema,
+          table: access.table,
+          privileges: [access.privilege],
+          effectiveRole: last,
+          path: [
+            { kind: 'grant', via, privilege: 'EXECUTE' },
+            ...access.hops.map((h) => ({ kind: 'function' as const, fn: h.fn, owner: h.owner })),
+            ...viewHops.map((h) => ({ kind: 'view' as const, view: h.view, owner: h.owner }))
+          ],
+          proof: 'ast',
+          ...(access.external ? { external: true } : {})
+        });
+      }
+
+      if (fn.unreadable) {
+        cells.push({
+          schema: fn.schema,
+          table: `${fn.name}(${fn.args})`,
+          privileges: ['EXECUTE'],
+          effectiveRole: fn.owner,
+          path: [
+            { kind: 'grant', via, privilege: 'EXECUTE' },
+            { kind: 'function', fn: `${fn.schema}.${fn.name}`, owner: fn.owner }
+          ],
+          proof: 'opaque-tainted',
+          taint: fn.unreadable
+        });
+      }
+    }
+
+    return { role, cells };
+  });
+}
+
+/** A view, its ACL, and the relations an `INSTEAD OF` trigger's body reaches. */
+export interface TriggerWriteInput {
+  schema: string;
+  name: string;
+  /** ACL rows on the view — what the caller must hold to fire the trigger. */
+  grants: GrantInfo[];
+  trigger: string;
+  /** The commands on the view that fire it. */
+  events: PgPrivilege[];
+  /** `schema.name` of the trigger function. */
+  fn: string;
+  /** The role the trigger function's body executes as. */
+  fnOwner: string;
+  /** Relations the body touches, under `fnOwner`. */
+  accesses: Array<{ schema: string; table: string; privilege: PgPrivilege; external?: boolean }>;
+}
+
+/**
+ * Project the `INSTEAD OF` trigger edge: for every role holding a command the
+ * trigger fires on, one cell per relation the trigger function's body touches.
+ *
+ * Callers must only pass triggers whose function actually re-owns the write —
+ * an invoker trigger function runs the body as the caller, which is no edge at
+ * all, and Postgres denies it exactly as it would deny the direct write.
+ */
+export function computeTriggerWriteReach(
+  triggers: TriggerWriteInput[],
+  graph: RoleGraph,
+  roles: string[]
+): RoleReach[] {
+  return roles.map((role) => {
+    const cells: RoleReachCell[] = [];
+
+    for (const trigger of triggers) {
+      const held = effectiveGrants(trigger, role, graph);
+      const fired = trigger.events.filter((e) => held.some((g) => g.privilege === e));
+      if (fired.length === 0) continue;
+      const grant = held.find((g) => g.privilege === fired[0])!;
+
+      for (const access of trigger.accesses) {
+        cells.push({
+          schema: access.schema,
+          table: access.table,
+          privileges: [access.privilege],
+          effectiveRole: trigger.fnOwner,
+          path: [
+            { kind: 'grant', via: grant.via, privilege: fired[0] },
+            {
+              kind: 'trigger',
+              view: `${trigger.schema}.${trigger.name}`,
+              trigger: trigger.trigger,
+              fn: trigger.fn,
+              owner: trigger.fnOwner
+            }
+          ],
+          proof: 'ast',
+          ...(access.external ? { external: true } : {})
         });
       }
     }
