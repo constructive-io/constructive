@@ -421,6 +421,21 @@ deploys it into an ephemeral one:
       - run: npx safegres audit   # or: "audit": "safegres lint" in package.json
 ```
 
+Or the first-party action, which installs the CLI, runs that config, and turns the report into a
+job summary, annotations and a sticky PR comment:
+
+```yaml
+      - uses: constructive-io/constructive/packages/safegres@main
+        with:
+          out: safegres-reports
+          comment: true          # sticky PR comment (needs pull-requests: write)
+          upload-sarif: true     # code scanning (needs security-events: write)
+```
+
+It exposes `security-score`, `security-grade` and `perf-score` as step outputs — on a failing run
+too, which is when they get read. Everything else stays in the config file; see
+**[docs/reporting.md](https://github.com/constructive-io/constructive/blob/main/packages/safegres/docs/reporting.md#the-action)**.
+
 `outputs.dir` writes `safegres.json`, `safegres.md` and `safegres.sarif` into one directory — name
 an individual file (`outputs.json`) only when the name matters. Directories are created as needed,
 and a flag still wins over the file for a one-off run (`safegres audit --out reports`). Naming a

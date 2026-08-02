@@ -1,0 +1,160 @@
+name: safegres
+description: >-
+  Audit a PostgreSQL database for security and performance, and report the
+  result as a job summary, annotations, a sticky PR comment and SARIF.
+author: Constructive
+branding:
+  icon: shield
+  color: blue
+
+# Everything a run repeats belongs in the committed config file, so the common
+# case is no inputs at all. The inputs below are the things that legitimately
+# differ *between jobs sharing one config*: which database, whether the gates
+# bite, and which artifacts leave the runner.
+inputs:
+  version:
+    description: 'npm version of the safegres CLI to install (dist-tag or exact version).'
+    required: false
+    default: 'latest'
+  config:
+    description: >-
+      Path to the config file. Omit to let safegres discover it
+      (safegres.config.{ts,js,mjs,cjs}, .safegresrc{,.json,.yaml,.yml,.js},
+      safegres.json, or package.json "safegres").
+    required: false
+    default: ''
+  working-directory:
+    description: 'Directory to run the audit from. Config discovery starts here.'
+    required: false
+    default: '.'
+  database:
+    description: >-
+      Audit this existing database instead of the config file's `source.pgpm`
+      workspace. Beats the file; the PG* environment variables supply the rest
+      of the connection.
+    required: false
+    default: ''
+  pgpm:
+    description: >-
+      Deploy this pgpm workspace into an ephemeral database and audit that.
+      Overrides `source.pgpm`; needs no connection.
+    required: false
+    default: ''
+  preset:
+    description: 'Built-in preset to apply (constructive, postgrest, supabase, graphile, hasura, strict, …).'
+    required: false
+    default: ''
+  out:
+    description: 'Directory to write safegres.json, safegres.md and safegres.sarif into.'
+    required: false
+    default: ''
+  fail-on-grade:
+    description: 'Fail the job below this security grade (A+|A|B|C|D). Overrides `failOn.grade`.'
+    required: false
+    default: ''
+  report-only:
+    description: >-
+      Evaluate every gate, report what would have failed, and exit 0 anyway —
+      how to run a gated config as an advisory job.
+    required: false
+    default: 'false'
+  comment:
+    description: 'Upsert the sticky PR comment. Needs `github-token` and `pull-requests: write`.'
+    required: false
+    default: 'false'
+  compare:
+    description: 'A previous run''s JSON report to diff this one against (renders the delta).'
+    required: false
+    default: ''
+  compare-ref:
+    description: 'What to call the previous run in the delta (e.g. "main", a commit sha).'
+    required: false
+    default: ''
+  upload-sarif:
+    description: >-
+      Upload the SARIF report to GitHub code scanning. Requires `out` (or an
+      `outputs.sarif`/`outputs.dir` in the config) and `security-events: write`.
+    required: false
+    default: 'false'
+  github-token:
+    description: 'Token used for the PR comment. Defaults to the workflow token.'
+    required: false
+    default: ${{ github.token }}
+  args:
+    description: 'Extra CLI arguments, appended verbatim. The escape hatch; prefer the config file.'
+    required: false
+    default: ''
+
+outputs:
+  security-score:
+    description: 'The security score (0-100) of the primary exposure plane.'
+    value: ${{ steps.audit.outputs.security-score }}
+  security-grade:
+    description: 'The security grade (A+|A|B|C|D|F).'
+    value: ${{ steps.audit.outputs.security-grade }}
+  perf-score:
+    description: 'The performance score (0-100), empty when the perf dimension is off.'
+    value: ${{ steps.audit.outputs.perf-score }}
+  report:
+    description: 'Path to the JSON report, when the run wrote one.'
+    value: ${{ steps.audit.outputs.report }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install safegres
+      shell: bash
+      run: npm install -g safegres@${{ inputs.version }}
+
+    - name: Audit
+      id: audit
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        args=(audit --github)
+        # `if` rather than `test && append`: the composite shell runs with
+        # `-e`, and a false test is the last command on its line.
+        add() { if [ -n "$2" ]; then args+=("$1" "$2"); fi; }
+        add --config        "${{ inputs.config }}"
+        add --database      "${{ inputs.database }}"
+        add --pgpm          "${{ inputs.pgpm }}"
+        add --preset        "${{ inputs.preset }}"
+        add --out           "${{ inputs.out }}"
+        add --fail-on-grade "${{ inputs.fail-on-grade }}"
+        add --compare       "${{ inputs.compare }}"
+        add --compare-ref   "${{ inputs.compare-ref }}"
+        if [ "${{ inputs.report-only }}" = "true" ]; then args+=(--report-only); fi
+        if [ "${{ inputs.comment }}" = "true" ]; then args+=(--github-comment); fi
+        # Unquoted on purpose: this is the verbatim-arguments escape hatch.
+        read -r -a extra <<< "${{ inputs.args }}"
+        # The gate's exit code is the job's, but the outputs below are worth
+        # having on a failing run too — that is when someone reads them.
+        status=0
+        safegres "${args[@]}" "${extra[@]}" || status=$?
+
+        report=""
+        if [ -n "${{ inputs.out }}" ] && [ -f "${{ inputs.out }}/safegres.json" ]; then
+          report="${{ inputs.out }}/safegres.json"
+        fi
+        if [ -n "$report" ]; then
+          node -e '
+            const r = require("path").resolve(process.argv[1]);
+            const { score, perf } = require(r);
+            const out = [
+              `security-score=${score?.value ?? ""}`,
+              `security-grade=${score?.grade ?? ""}`,
+              `perf-score=${perf?.score?.value ?? ""}`,
+              `report=${process.argv[1]}`
+            ].join("\n");
+            require("fs").appendFileSync(process.env.GITHUB_OUTPUT, out + "\n");
+          ' "$report"
+        fi
+        exit $status
+
+    - name: Upload SARIF
+      if: ${{ inputs.upload-sarif == 'true' && always() }}
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.working-directory }}/${{ inputs.out }}/safegres.sarif
