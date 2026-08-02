@@ -25,6 +25,7 @@ import { Logger } from '@pgpmjs/logger';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 
+import { withRequestPgClient } from './request-pg-client';
 import { generatePresignedGetUrl } from './s3-signer';
 import { loadAllStorageModules, resolveStorageConfigFromCodec, storedPhysicalName } from './storage-module-cache';
 import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
@@ -149,11 +150,11 @@ export function createDownloadUrlPlugin(
                       let downloadUrlExpirySeconds = 3600;
                       try {
                         if (withPgClient && pgSettings) {
-                          const databaseId = await withPgClient(pgSettings, async (pgClient: any) => {
+                          const databaseId = await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
                             const dbResult = await pgClient.query({
                               text: `SELECT jwt_private.current_database_id() AS id`,
                             });
-                            return dbResult.rows[0]?.id ?? null;
+                            return (dbResult.rows[0]?.id as string | undefined) ?? null;
                           });
                           // Module registration is server config, not user data:
                           // resolve it without the request role's pgSettings.
@@ -164,7 +165,7 @@ export function createDownloadUrlPlugin(
                             )
                             : null;
                           const resolved = config && bucketId
-                            ? await withPgClient(pgSettings, async (pgClient: any) => {
+                            ? await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
                               // Look up the stored physical coordinate for scoped S3 resolution
                               const bucketResult = await pgClient.query({
                                 text: `SELECT key, physical_name FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,

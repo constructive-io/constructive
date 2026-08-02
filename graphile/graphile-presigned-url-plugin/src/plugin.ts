@@ -23,6 +23,7 @@ import { Logger } from '@pgpmjs/logger';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 
+import { type WithPgClient,withRequestPgClient } from './request-pg-client';
 import { deleteS3Object,generatePresignedPutUrl } from './s3-signer';
 import { getBucketConfig, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, storedPhysicalName } from './storage-module-cache';
 import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
@@ -143,14 +144,19 @@ function resolveS3ForDatabase(
  * value is the durable coordinate: route resolution and every later read use
  * it verbatim; nothing is recomputed.
  *
- * The record write runs in the system lane (`withPgClient(null, ...)`) — it is
- * server bookkeeping, not request data, and anonymous request roles cannot
- * UPDATE bucket rows under RLS. `bucket` (the cached config) is mutated in place
- * so subsequent reads observe the recorded name without a DB round-trip.
+ * The record write runs in the system lane (privileged role, so it bypasses the
+ * RLS that stops request roles from UPDATE-ing bucket rows) — it is server
+ * bookkeeping, not request data. It still carries the tenant `database_id`
+ * claim, because the buckets table's catalog-sync trigger calls
+ * `jwt_private.current_database_id()` and would otherwise raise
+ * DATABASE_CLAIM_REQUIRED; `withRequestPgClient` applies that claim inside the
+ * write's transaction without switching off the privileged role.
+ * `bucket` (the cached config) is mutated in place so subsequent reads observe
+ * the recorded name without a DB round-trip.
  */
 async function provisionAndRecordPhysicalBucket(
   options: PresignedUrlPluginOptions,
-  withPgClient: (pgSettings: null, cb: (client: any) => Promise<unknown>) => Promise<unknown>,
+  withPgClient: WithPgClient,
   storageConfig: StorageModuleConfig,
   databaseId: string,
   bucket: BucketConfig,
@@ -167,7 +173,9 @@ async function provisionAndRecordPhysicalBucket(
 
   // Record the physical coordinate on the source row. The `physical_name IS NULL`
   // guard keeps this idempotent and race-safe across concurrent first uploads.
-  await withPgClient(null, (client: any) =>
+  // The catalog-sync trigger on this UPDATE needs `jwt.claims.database_id`, so the
+  // write runs under the resolved database claim (privileged role preserved).
+  await withRequestPgClient(withPgClient, { 'jwt.claims.database_id': databaseId }, (client) =>
     client.query({
       text: `UPDATE ${storageConfig.bucketsQualifiedName}
              SET physical_name = $1
@@ -322,7 +330,10 @@ export function createPresignedUrlPlugin(
                     });
 
                     return lambda($combined, async (vals: any) => {
-                      const databaseId = await vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                      // Request-lane reads/writes run under the request role's pgSettings
+                      // inside an explicit transaction so the jwt claims stay applied
+                      // across every statement (see withRequestPgClient).
+                      const databaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         resolveDatabaseId(pgClient),
                       );
                       if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
@@ -336,7 +347,7 @@ export function createPresignedUrlPlugin(
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
 
                       // Bucket config read under the request role (RLS-gated visibility).
-                      const bucket = await vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                      const bucket = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         getBucketConfig(pgClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined),
                       );
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
@@ -349,16 +360,14 @@ export function createPresignedUrlPlugin(
                       const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
 
                       // File row INSERT under the request role (RLS enforced).
-                      return vals.withPgClient(vals.pgSettings, (pgClient: any) =>
-                        pgClient.withTransaction((txClient: any) =>
-                          processSingleFile(options, txClient, storageConfig, databaseId, bucket, s3ForDb, {
-                            contentHash: vals.contentHash,
-                            contentType: vals.contentType,
-                            size: vals.size,
-                            filename: vals.filename,
-                            key: vals.customKey,
-                          }),
-                        ),
+                      return withRequestPgClient(vals.withPgClient, vals.pgSettings, (txClient) =>
+                        processSingleFile(options, txClient, storageConfig, databaseId, bucket, s3ForDb, {
+                          contentHash: vals.contentHash,
+                          contentType: vals.contentType,
+                          size: vals.size,
+                          filename: vals.filename,
+                          key: vals.customKey,
+                        }),
                       );
                     });
                   },
@@ -435,7 +444,10 @@ export function createPresignedUrlPlugin(
                     });
 
                     return lambda($combined, async (vals: any) => {
-                      const databaseId = await vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                      // Request-lane reads/writes run under the request role's pgSettings
+                      // inside an explicit transaction so the jwt claims stay applied
+                      // across every statement (see withRequestPgClient).
+                      const databaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         resolveDatabaseId(pgClient),
                       );
                       if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
@@ -449,7 +461,7 @@ export function createPresignedUrlPlugin(
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
 
                       // Bucket config read under the request role (RLS-gated visibility).
-                      const bucket = await vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                      const bucket = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         getBucketConfig(pgClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined),
                       );
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
@@ -476,23 +488,21 @@ export function createPresignedUrlPlugin(
                       const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
 
                       // File row INSERTs under the request role (RLS enforced).
-                      return vals.withPgClient(vals.pgSettings, (pgClient: any) =>
-                        pgClient.withTransaction(async (txClient: any) => {
-                          const results = [];
-                          for (const file of filesArray) {
-                            results.push(
-                              await processSingleFile(options, txClient, storageConfig, databaseId, bucket, s3ForDb, {
-                                contentHash: file.contentHash,
-                                contentType: file.contentType,
-                                size: file.size,
-                                filename: file.filename,
-                                key: file.key,
-                              }),
-                            );
-                          }
-                          return { files: results };
-                        }),
-                      );
+                      return withRequestPgClient(vals.withPgClient, vals.pgSettings, async (txClient) => {
+                        const results = [];
+                        for (const file of filesArray) {
+                          results.push(
+                            await processSingleFile(options, txClient, storageConfig, databaseId, bucket, s3ForDb, {
+                              contentHash: file.contentHash,
+                              contentType: file.contentType,
+                              size: file.size,
+                              filename: file.filename,
+                              key: file.key,
+                            }),
+                          );
+                        }
+                        return { files: results };
+                      });
                     });
                   },
                 },
@@ -557,7 +567,7 @@ export function createPresignedUrlPlugin(
 
                 if (withPgClient) {
                   try {
-                    const databaseId = await withPgClient(pgSettings, (pgClient: any) => resolveDatabaseId(pgClient));
+                    const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
                     // Module registration is server config, not user data:
                     // resolve it without the request role's pgSettings.
                     const allConfigs = databaseId
@@ -566,7 +576,7 @@ export function createPresignedUrlPlugin(
                     const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
 
                     if (storageConfig) {
-                      await withPgClient(pgSettings, async (pgClient: any) => {
+                      await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
                         // Read the file row (RLS enforced)
                         const result = await pgClient.query({
                           text: `SELECT key, bucket_id FROM ${storageConfig.filesQualifiedName} WHERE id = $1 LIMIT 1`,
@@ -593,7 +603,7 @@ export function createPresignedUrlPlugin(
 
                 if (withPgClient) {
                   try {
-                    const databaseId = await withPgClient(pgSettings, (pgClient: any) => resolveDatabaseId(pgClient));
+                    const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
                     // Module registration is server config, not user data:
                     // resolve it without the request role's pgSettings.
                     const allConfigs = databaseId
@@ -601,13 +611,13 @@ export function createPresignedUrlPlugin(
                       : [];
                     const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
 
-                    if (storageConfig) await withPgClient(pgSettings, async (pgClient: any) => {
+                    if (storageConfig) await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
                       // Check refcount: any other file with the same key in this bucket?
                       const refResult = await pgClient.query({
                         text: `SELECT COUNT(*)::int AS ref_count FROM ${storageConfig.filesQualifiedName} WHERE key = $1 AND bucket_id = $2`,
                         values: [fileRow!.key, fileRow!.bucket_id],
                       });
-                      const refCount = refResult.rows[0]?.ref_count ?? 0;
+                      const refCount = (refResult.rows[0]?.ref_count as number | undefined) ?? 0;
 
                       if (refCount > 0) {
                         log.info(`File deleted from DB; S3 key ${fileRow!.key} still referenced by ${refCount} file(s)`);
