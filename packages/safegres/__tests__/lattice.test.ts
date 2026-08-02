@@ -230,6 +230,15 @@ describe('L4 checkDeadSchemaUsage', () => {
     const t = table({ grants: [grant('PUBLIC', 'SELECT')] });
     expect(checkDeadSchemaUsage([aclRel], [t], BASE_GRAPH)).toEqual([]);
   });
+
+  it('counts a view: USAGE is load-bearing when a view is all the role reaches', () => {
+    const acl = schemaAcl({ grants: [{ role: 'anonymous', privilege: 'USAGE' }] });
+    const view = { schema: 'app', grants: [grant('anonymous', 'SELECT')] };
+    expect(checkDeadSchemaUsage([acl], [table()], BASE_GRAPH, [view])).toEqual([]);
+    // A view in another schema says nothing about this one.
+    const elsewhere = { schema: 'other', grants: [grant('anonymous', 'SELECT')] };
+    expect(checkDeadSchemaUsage([acl], [table()], BASE_GRAPH, [elsewhere])).toHaveLength(1);
+  });
 });
 
 describe('L5 checkUntrustedIndirectAccess', () => {

@@ -29,7 +29,10 @@ cell each `(relation, role, privilege)` triple lands in:
 | no | — | yes | dead policy (L2) |
 
 plus schema composition: an object grant is unreachable without `USAGE` on its schema (L3), and
-`USAGE` that reaches no relation and no function is dead surface (L4).
+`USAGE` that reaches no relation and no function is dead surface (L4). Views count as relations
+for L4: a role whose only reachable object is a view holds `USAGE` the API depends on — and by L8
+that view may be its entire read path — so counting tables alone would recommend revoking a
+load-bearing grant.
 
 L6 composes the lattice with [API reach](../README.md#api-reach--the-relations-the-api-can-actually-name):
 an API-edge role holding privileges on a relation the generated API cannot address. It is not a
