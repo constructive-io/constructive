@@ -24,7 +24,7 @@ CREATE INDEX notes_tenant_idx ON c_checked_view_write.notes (tenant);
 GRANT SELECT, INSERT ON c_checked_view_write.notes TO corpus_user;
 GRANT USAGE ON SEQUENCE c_checked_view_write.notes_id_seq TO corpus_user;
 
--- Case 43 with the one clause that makes the filter apply to writes: a row
+-- Case 46 with the one clause that makes the filter apply to writes: a row
 -- written through the view must satisfy the view's own condition. L18 must
 -- stay silent. L9 still fires — the write does still land on `notes` as the
 -- view's owner, which is what the view is for; the check option only settles
