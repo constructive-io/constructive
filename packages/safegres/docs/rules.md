@@ -40,6 +40,23 @@ policy predicate anywhere may reference the relation. The second is the importan
 can subquery a table under the querying role, so the grant is load-bearing however invisible it is
 to the API, and a naive recommendation to revoke it would break authorization at runtime.
 
+L8 is the first rule whose evidence is a SQL body rather than the catalog. A view that was not
+created `WITH (security_invoker = true)` executes as its **owner**, so a role holding nothing but
+SELECT on the view reads the view's base relations under the owner's privileges — tables no ACL
+row names it on, and, when the owner owns the table or holds `BYPASSRLS`, without the row filter
+the table's policies would have applied. No amount of catalog closure can see that edge: it exists
+only inside the view definition, which is why the reach cells it produces carry `proof: 'ast'`
+rather than `proof: 'catalog'`, and why the effective role on them is the view's owner.
+
+Three things gate it, and all three are refusals to guess. A body safegres cannot read — dynamic
+SQL, an unparseable definition, a chain of views deeper than it will follow — suppresses the view
+entirely, because an unread body is *unknown*, not empty. A reference it cannot pin to exactly one
+relation resolves to nothing rather than to a plausible candidate. And the remedy is never a
+revoke: the SELECT on the view is what the API serves, so L8 recommends `security_invoker = true`
+or a different owner, and says so explicitly. Only SELECT is modelled — an auto-updatable view can
+carry writes the same way, but proving which write reaches which base relation needs more than the
+body's relation set.
+
 Restrictive-only policies never count as coverage. `BYPASSRLS` and superuser roles are exempt from
 policy checks — they are not subject to RLS, so a "missing policy" finding for them would be
 noise. Policies are matched with `pg_has_role` semantics: a policy `TO authenticated` covers a

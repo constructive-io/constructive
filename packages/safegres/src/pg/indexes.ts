@@ -6,7 +6,7 @@
  * pays for it.
  */
 
-import { extensionFilter, type IntrospectOptions, type QueryExecutor } from './introspect';
+import { extensionFilter, type GrantInfo, type IntrospectOptions, type QueryExecutor } from './introspect';
 
 export interface IndexInfo {
   name: string;
@@ -211,6 +211,137 @@ export async function introspectIndexes(
   }));
 }
 
+/** A view (or materialized view) with everything an access check needs. */
+export interface ViewSnapshot {
+  schema: string;
+  name: string;
+  /**
+   * The role a non-`security_invoker` view executes as. Postgres checks the
+   * base relations' ACLs and policies against *this* role, not the caller's.
+   */
+  owner: string;
+  /** `relkind = 'm'` — stored rows, so a query never touches the bases. */
+  materialized: boolean;
+  /**
+   * `reloptions.security_invoker`. When true the view executes as the caller
+   * and confers nothing; when false (the default) it executes as `owner`.
+   */
+  securityInvoker: boolean;
+  /** The owner is a superuser or has BYPASSRLS: the bases' policies never run. */
+  ownerBypassesRls: boolean;
+  /** ACL rows on the view itself, in the same shape as a table's. */
+  grants: GrantInfo[];
+  /** `pg_get_viewdef()` — the body, as SQL text. */
+  definition: string;
+}
+
+/**
+ * Every view and materialized view in scope, with its owner, its
+ * `security_invoker` setting and its own ACL.
+ *
+ * The definition alone answers "is this column read by anything" (see
+ * {@link classifyPaths}); the owner and `security_invoker` answer *whose*
+ * privileges the read runs under, which is what the view-ownership reach edge
+ * needs (L8).
+ */
+export async function introspectViews(
+  exec: QueryExecutor,
+  options: Pick<IntrospectOptions, 'schemas' | 'excludeSchemas'> = {}
+): Promise<ViewSnapshot[]> {
+  const excludes = [...DEFAULT_EXCLUDES, ...(options.excludeSchemas ?? [])];
+  const schemaFilter = options.schemas && options.schemas.length > 0
+    ? `AND n.nspname = ANY($1::text[])`
+    : `AND NOT (n.nspname = ANY($2::text[]))`;
+
+  const { rows } = await exec.query<{
+    schema_name: string;
+    view_name: string;
+    owner: string;
+    materialized: boolean;
+    security_invoker: boolean;
+    owner_bypasses_rls: boolean;
+    grants: Array<{ role: string; privilege: string; grantable: boolean; bypassRls: boolean }>;
+    definition: string;
+  }>(
+    // Both parameters are referenced (even when only one filters) so Postgres
+    // can infer their types — an unused $N errors out at bind time.
+    `WITH _params AS (
+       SELECT $1::text[] AS include_schemas, $2::text[] AS exclude_schemas
+     ),
+     views AS (
+       SELECT
+         n.nspname                                AS schema_name,
+         c.relname                                AS view_name,
+         c.oid                                    AS oid,
+         c.relkind = 'm'                          AS materialized,
+         pg_catalog.pg_get_userbyid(c.relowner)   AS owner,
+         COALESCE(o.rolsuper OR o.rolbypassrls, false) AS owner_bypasses_rls,
+         COALESCE(
+           (SELECT option_value FROM pg_options_to_table(c.reloptions)
+            WHERE option_name = 'security_invoker'),
+           'false'
+         ) = 'true'                               AS security_invoker,
+         c.relacl                                 AS relacl,
+         pg_get_viewdef(c.oid)                    AS definition
+       FROM pg_class c
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+       LEFT JOIN pg_roles o ON o.oid = c.relowner
+       WHERE c.relkind IN ('v', 'm')
+         ${schemaFilter}
+     ),
+     grants AS (
+       SELECT
+         v.oid,
+         CASE WHEN a.grantee = 0 THEN 'PUBLIC' ELSE rol.rolname END AS grantee,
+         a.privilege_type,
+         a.is_grantable,
+         CASE
+           WHEN a.grantee = 0 THEN false
+           ELSE COALESCE(rol.rolsuper OR rol.rolbypassrls, false)
+         END AS bypass_rls
+       FROM views v, aclexplode(v.relacl) a
+       LEFT JOIN pg_roles rol ON rol.oid = a.grantee
+       WHERE v.relacl IS NOT NULL
+     )
+     SELECT
+       v.schema_name,
+       v.view_name,
+       v.owner,
+       v.materialized,
+       v.security_invoker,
+       v.owner_bypasses_rls,
+       v.definition,
+       COALESCE(
+         (SELECT jsonb_agg(jsonb_build_object(
+           'role', g.grantee,
+           'privilege', g.privilege_type,
+           'grantable', g.is_grantable,
+           'bypassRls', g.bypass_rls
+         )) FROM grants g WHERE g.oid = v.oid),
+         '[]'::jsonb
+       )                                          AS grants
+     FROM views v
+     ORDER BY v.schema_name, v.view_name`,
+    [options.schemas ?? [], excludes]
+  );
+
+  return rows.map((r) => ({
+    schema: r.schema_name,
+    name: r.view_name,
+    owner: r.owner,
+    materialized: r.materialized,
+    securityInvoker: r.security_invoker,
+    ownerBypassesRls: r.owner_bypasses_rls,
+    grants: r.grants.map((g) => ({
+      role: g.role,
+      privilege: g.privilege as GrantInfo['privilege'],
+      grantable: g.grantable,
+      bypassRls: g.bypassRls
+    })),
+    definition: r.definition
+  }));
+}
+
 /**
  * Every view and materialized-view body in scope, as SQL text.
  *
@@ -222,25 +353,7 @@ export async function introspectViewBodies(
   exec: QueryExecutor,
   options: Pick<IntrospectOptions, 'schemas' | 'excludeSchemas'> = {}
 ): Promise<string[]> {
-  const excludes = [...DEFAULT_EXCLUDES, ...(options.excludeSchemas ?? [])];
-  const schemaFilter = options.schemas && options.schemas.length > 0
-    ? `AND n.nspname = ANY($1::text[])`
-    : `AND NOT (n.nspname = ANY($2::text[]))`;
-
-  const { rows } = await exec.query<{ definition: string }>(
-    // Both parameters are referenced (even when only one filters) so Postgres
-    // can infer their types — an unused $N errors out at bind time.
-    `WITH _params AS (
-       SELECT $1::text[] AS include_schemas, $2::text[] AS exclude_schemas
-     )
-     SELECT pg_get_viewdef(c.oid) AS definition
-     FROM pg_class c
-     JOIN pg_namespace n ON n.oid = c.relnamespace
-     WHERE c.relkind IN ('v', 'm')
-       ${schemaFilter}`,
-    [options.schemas ?? [], excludes]
-  );
-  return rows.map((r) => r.definition);
+  return (await introspectViews(exec, options)).map((v) => v.definition);
 }
 
 /**

@@ -43,9 +43,13 @@ const RLS_PRIVILEGES: PgPrivilege[] = ['SELECT', 'INSERT', 'UPDATE', 'DELETE'];
  * Every privilege `role` effectively holds on `table`: direct grants, grants
  * TO PUBLIC, and grants to roles it inherits from. Deduplicated per privilege
  * with the most direct provenance winning (direct > PUBLIC > inherited).
+ *
+ * Takes anything carrying an ACL, not just a table: a view's own grants
+ * compose the same way, and the view-ownership reach edge asks this same
+ * question of them.
  */
 export function effectiveGrants(
-  table: TableSnapshot,
+  table: Pick<TableSnapshot, 'grants'>,
   role: string,
   graph: RoleGraph
 ): EffectiveGrant[] {

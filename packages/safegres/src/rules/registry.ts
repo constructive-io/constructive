@@ -212,6 +212,25 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L8',
+    category: 'anti-pattern',
+    // Ships `info` (signal-only, zero score weight) because the rule is new
+    // and, uniquely among the L rules, reads SQL bodies rather than pure
+    // catalog. The fact is not informational: a definer view handing an
+    // anonymous role a table it holds no grant on is A2/L5 laundered through
+    // a view, and it is `medium` on its own merits — `high` when the base
+    // table has RLS the view owner is exempt from (`context.rlsBypassed`),
+    // because then the view also deletes the row filter. Escalate via
+    // config/preset once the finding proves itself in the field.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'DEFINER view bypass — an untrusted role reads a base relation as the view owner (options: { roles: [...] })',
+    // Reported against the base relation, and gated on `skipAstChecks` in the
+    // audit rather than on `policy-ast`: the body it parses is a view's, not a
+    // policy's, so turning the `P*` rules off does not turn this one off.
+    scope: 'table'
+  },
+  {
     code: 'W1',
     category: 'meta',
     defaultSeverity: 'medium',
