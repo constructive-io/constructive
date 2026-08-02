@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.17.0](https://github.com/constructive-io/constructive/compare/safegres@1.16.1...safegres@1.17.0) (2026-08-02)
+
+### Bug Fixes
+
+- **safegres:** L4 counts views, so a view-only read path is not dead schema USAGE ([147e8b4](https://github.com/constructive-io/constructive/commit/147e8b4e7edb31ff75686e6cc594fd792ca162c0))
+- **safegres:** read security_invoker as a boolean, not the string 'true' ([cad3640](https://github.com/constructive-io/constructive/commit/cad36407b9b0811904397d4f22b941336623a91b))
+
+### Features
+
+- **safegres:** --report-only runs a gated config as an advisory job ([e7c0565](https://github.com/constructive-io/constructive/commit/e7c0565bb8bd948b1378314c1a5f48df70451a57))
+- **safegres:** an explicit connection flag beats a configured pgpm source ([91ea4bc](https://github.com/constructive-io/constructive/commit/91ea4bcf13ed19962428f8a2cdd0cd8790351752))
+- **safegres:** configurable job-summary detail, ratchet verdict in summaries ([9be6a98](https://github.com/constructive-io/constructive/commit/9be6a9822fcbf713e68d208ba479384153126278))
+- **safegres:** consume @pgsql/lint instead of the bundled linter copy ([1d5406f](https://github.com/constructive-io/constructive/commit/1d5406feccd2098650ce32ccbfc96e25dc40aa5f))
+- **safegres:** drive source, outputs and baselines from the config file ([b2f918b](https://github.com/constructive-io/constructive/commit/b2f918bd9fcbe4a41c81993cea792c01379a34da))
+- **safegres:** eval — grade the auditor against a corpus with known answers ([5122f6c](https://github.com/constructive-io/constructive/commit/5122f6c660eb8220d1aa4eaee8ac06e3d194f24e))
+- **safegres:** exposure planes, view layer, adapters, GitHub reporting ([87ba22b](https://github.com/constructive-io/constructive/commit/87ba22bb8cb69b062bf1be2123f34db9d9b8e7ca))
+- **safegres:** grant/RLS/policy lattice rules (L1-L5) and per-role exposure report ([9c7d2ae](https://github.com/constructive-io/constructive/commit/9c7d2ae20106dae160d6f79afa62ad629e0fd96a))
+- **safegres:** L11/L12 — materialized-view snapshots and non-barrier filtering views ([9f858cb](https://github.com/constructive-io/constructive/commit/9f858cbf64fb42bbf9ece8130ac6d87d645ce5e3))
+- **safegres:** L8 — DEFINER-view bypass as an AST reach edge ([d74b81f](https://github.com/constructive-io/constructive/commit/d74b81fa2921a32aeee9ed30e42aafb32d0378b2))
+- **safegres:** L9/L10 — write reachability through definer views and rewrite rules ([63f13b4](https://github.com/constructive-io/constructive/commit/63f13b46d8ab9ad75035870d0c1bbe149509571e))
+- **safegres:** outputs.dir / --out writes the whole report set into one directory ([dea5e18](https://github.com/constructive-io/constructive/commit/dea5e18f1a93d2e33f1b0873988f54afec70a010))
+- **safegres:** relation-level API reach via exposure adapters (L6) ([582eabf](https://github.com/constructive-io/constructive/commit/582eabf73742e8fc1219738506c79c459e294a24))
+- **safegres:** resolve untrusted roles from the catalog; split supabase adapter ([dd7b4f5](https://github.com/constructive-io/constructive/commit/dd7b4f58be6c162b4b2d4320c5e999831d8dd5eb))
+- **safegres:** sealed runs and a configuration fingerprint ([44e5aa3](https://github.com/constructive-io/constructive/commit/44e5aa3440a31c9b9c939674575ce20003a2547d))
+- **safegres:** SET ROLE reachability and L7 escalation rule ([18d8f9a](https://github.com/constructive-io/constructive/commit/18d8f9a0a5c0909db345fb2ee1c8af7a6063444a))
+- **safegres:** ship an evaluation corpus with known answers ([bea16a4](https://github.com/constructive-io/constructive/commit/bea16a4abf787800af8b3f5a4df5a2ec444f92f9))
+- **safegres:** source-level convention linter (C1-C4) in the constructive preset ([8772930](https://github.com/constructive-io/constructive/commit/8772930aff9e6898eab15f19a48d6090f0d12403))
+- **safegres:** split anon roles out of the exposure surface ([c191dc4](https://github.com/constructive-io/constructive/commit/c191dc42d39bf8335a6b61376e102394fa8c70a9))
+- **safegres:** stack + posture presets, PostgREST/Supabase/Hasura/Graphile adapters ([36bb071](https://github.com/constructive-io/constructive/commit/36bb07154714d7038a0ccb89c28ddb92cdf41cf6))
+
 ## [1.16.1](https://github.com/constructive-io/constructive/compare/safegres@1.16.0...safegres@1.16.1) (2026-08-01)
 
 ### Bug Fixes

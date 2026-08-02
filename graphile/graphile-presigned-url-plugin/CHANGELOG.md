@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.10.0...graphile-presigned-url-plugin@1.10.1) (2026-08-02)
+
+### Bug Fixes
+
+- **presigned-url:** apply request pgSettings inside a transaction so the database claim survives ([6bef3b6](https://github.com/constructive-io/constructive/commit/6bef3b676f4fe74fff64b9bd64d47f78de1c74d7))
+
 # [1.10.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.9.3...graphile-presigned-url-plugin@1.10.0) (2026-08-01)
 
 ### Features
