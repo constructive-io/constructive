@@ -3,6 +3,7 @@ import { CLIOptions, extractFirst, Inquirerer, ParsedArgs } from 'inquirerer';
 
 import audit from './audit';
 import doctor from './doctor';
+import evalCommand from './eval';
 import printConfig from './print-config';
 
 const log = new Logger('safegres');
@@ -17,6 +18,7 @@ Commands:
   audit           Audit grants, RLS flags, policy coverage, and anti-patterns
   perf            Audit index hygiene and policy cost (audit --perf)
   doctor          Diagnose environment, connection, and configuration
+  eval            Grade the auditor against a corpus with known answers
   print-config    Show the resolved effective configuration
   help            Show this help message
 
@@ -30,6 +32,7 @@ const commandMap: Record<
   audit,
   perf: (argv, prompter, options) => audit({ ...argv, perf: true }, prompter, options),
   doctor,
+  eval: evalCommand,
   'print-config': printConfig
 };
 

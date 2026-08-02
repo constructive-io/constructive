@@ -424,6 +424,32 @@ corpus in [`corpus/`](corpus/README.md) is for: ~20 small schemas, each with one
 and a written-down answer — the findings a correct audit must produce, the false positives it must
 not, and the one-sentence fix.
 
+`safegres eval` is the whole loop in one command: it deploys each case into the connected
+database, audits it under a sealed preset, grades the report against the answer key, drops the
+case's schemas again, and exits non-zero if any case fails.
+
+```console
+$ safegres eval --database scratch
+  PASS  01-anon-write-grant              security 1.2 (F )  R1
+  PASS  17-foreign-key-without-index     perf    71.2 (C )  X1
+  FAIL  18-policy-column-unindexed       perf     100 (A+)  missed X2
+
+25/26 cases passed · recall 98% · precision 100%
+```
+
+| Flag | |
+| --- | --- |
+| `--preset <name>` | the preset every case is graded under (default `recommended`) |
+| `--corpus <dir>` | your own corpus of `<id>/{case.json,schema.sql}` |
+| `--case <id>` | run one case, or an id prefix — comma-separated |
+| `--list` | print the corpus without touching a database |
+| `--json` | the `EvalReport`: per-case recall, precision, score, fingerprint |
+| `--keep` | leave the case schemas behind, to poke at one by hand |
+
+A config file may set `eval.corpus`, `eval.preset` and `eval.cases` — *what* to run. It cannot
+retune the rules for a run: cases are always graded by the named preset alone, or the corpus would
+be grading itself. The same loop is a library call (`runEval`), and its pieces are public:
+
 ```ts
 import { audit, gradeCase, loadConfig, loadCorpus } from 'safegres';
 
@@ -560,6 +586,7 @@ score would move if that rule's findings went away. Gate with `--fail-on <severi
 safegres audit          # audit the connected database (default command)
 safegres perf           # audit + the performance dimension (= audit --perf)
 safegres doctor         # diagnose config, parser, connection, catalog visibility, exposure
+safegres eval           # grade the auditor against a corpus with known answers
 safegres print-config   # the resolved effective config (--explain for per-key provenance)
 ```
 

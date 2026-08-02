@@ -79,6 +79,8 @@ export type { AuditOptions } from './commands/audit';
 export { audit } from './commands/audit';
 export type { DoctorCheck, DoctorOptions, DoctorReport, DoctorStatus } from './commands/doctor';
 export { doctor } from './commands/doctor';
+export type { EvalCaseResult, EvalOptions, EvalReport } from './commands/eval';
+export { runEval } from './commands/eval';
 export type { Provenance } from './config/fingerprint';
 export { configFingerprint } from './config/fingerprint';
 export type { LoadConfigParams } from './config/loader';
@@ -108,6 +110,7 @@ export {
   rulesForTable
 } from './config/resolve';
 export type {
+  EvalConfig,
   ExposureConfig,
   FailOnConfig,
   GithubCommentConfig,
@@ -125,7 +128,7 @@ export type {
   ScoringConfig
 } from './config/types';
 export type { CaseResult, CorpusCase, ExpectedFinding } from './corpus';
-export { corpusDir, gradeCase, loadCase, loadCorpus } from './corpus';
+export { corpusBootstrap, corpusDir, gradeCase, loadCase, loadCorpus } from './corpus';
 export type { ExposureAdapter, PlaneInput, ReachContext } from './exposure/adapters';
 export {
   BUILTIN_ADAPTERS,
