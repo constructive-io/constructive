@@ -1,0 +1,32 @@
+{
+  "title": "An invoker function over the same body is not a reach edge",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_invoker_fn"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A3",
+      "relation": "c_invoker_fn.secrets",
+      "note": "the only real finding left: RLS is not FORCEd, so the table owner still reads every row"
+    }
+  ],
+  "forbid": [
+    "L8",
+    "L15",
+    "L19",
+    "L20"
+  ],
+  "worstSeverity": "low",
+  "fix": "ALTER TABLE c_invoker_fn.secrets FORCE ROW LEVEL SECURITY. The function needs no fix — running as the caller is what the definer-function reach (case 48) is fixed *into*.",
+  "id": "49-invoker-function-no-reach"
+}

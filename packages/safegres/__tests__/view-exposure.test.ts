@@ -37,6 +37,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     definition: 'SELECT id, body FROM app.secrets',
     writable: [],
     insteadOfTriggers: false,
+    insteadOf: [],
     rules: [],
     ...partial
   };

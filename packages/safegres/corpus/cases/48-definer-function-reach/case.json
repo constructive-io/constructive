@@ -1,0 +1,38 @@
+{
+  "title": "Anonymous role reads a locked table by executing a SECURITY DEFINER function",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_definer_fn"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L19",
+      "relation": "c_definer_fn.secrets",
+      "role": "corpus_anon",
+      "note": "the body runs as c_definer_fn_owner, who owns `secrets`, so corpus_anon reads every row through EXECUTE alone — a privilege no ACL entry on the table confers on it"
+    },
+    {
+      "code": "A3",
+      "relation": "c_definer_fn.secrets",
+      "note": "RLS is not FORCEd, which is why the owner's read inside the body is not filtered by the table's own policy"
+    }
+  ],
+  "forbid": [
+    "L8",
+    "L9",
+    "L15",
+    "L20"
+  ],
+  "worstSeverity": "low",
+  "fix": "Narrow the body to what the function is meant to expose, authorize the caller inside it, or give the function an owner whose reach matches its job — and make it SECURITY INVOKER if the hand-off of c_definer_fn_owner's privileges was not intended. Revoking EXECUTE is not the fix: that grant is what the API serves.",
+  "id": "48-definer-function-reach"
+}

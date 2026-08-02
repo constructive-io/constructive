@@ -150,9 +150,11 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L12 | info | fail-open | **Non-barrier filtering view** — a view is an untrusted role's only path to a relation, but its row filter is not a boundary † |
 | L13 | info | fail-open | **Column-level grant** — an untrusted role reaches a relation through `pg_attribute.attacl`, which no relation ACL shows † |
 | L14 | info | neutral | **Unaudited base relation** — a definer view reads a relation in a schema the audit never introspected † |
-| L15 | info | neutral | **Unreadable view body** — an untrusted role reads a definer view whose definition the analysis could not follow † |
+| L15 | info | neutral | **Unreadable body** — an untrusted role reaches through a definer view or function whose body the analysis could not follow † |
 | L16 | info | fail-open | **Sequence privilege** — an untrusted role can advance or read a sequence, which no policy filters † |
 | L17 | info | fail-open | **Foreign-table grant** — an untrusted role reaches a relation that cannot carry RLS at all † |
+| L19 | info | fail-open | **Definer-function reach** — an untrusted role touches a relation by executing a `SECURITY DEFINER` function, which runs as its owner † |
+| L20 | info | fail-open | **`INSTEAD OF` trigger write** — a write against a view becomes a trigger function's body, and a definer one lands it as the function's owner † |
 | W1 | medium | — | **No exposure surface configured** — whole database assumed reachable, score capped |
 
 † R1/R2/L5 are no-ops until you name the untrusted roles:

@@ -36,6 +36,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     definition: 'SELECT rolname FROM private.secrets',
     writable: [],
     insteadOfTriggers: false,
+    insteadOf: [],
     rules: [],
     ...partial
   };

@@ -75,6 +75,35 @@ export function effectiveGrants(
     .sort((a, b) => a.privilege.localeCompare(b.privilege));
 }
 
+/**
+ * How `role` comes to hold EXECUTE on a function, or `null` when it does not.
+ *
+ * A function ACL carries one privilege, so the closure {@link effectiveGrants}
+ * performs per privilege collapses to a single provenance — but it is the same
+ * closure: a grant to PUBLIC and a grant to a role the caller INHERITs from
+ * both confer EXECUTE without naming the caller anywhere.
+ */
+export function effectiveExecute(
+  fn: { grants: Array<{ role: string }> },
+  role: string,
+  graph: RoleGraph
+): GrantVia | null {
+  const ancestors = new Set(graph.get(role)?.inheritsFrom ?? []);
+  let best: GrantVia | null = null;
+  const rank = (via: GrantVia): number => (via === 'direct' ? 0 : via === 'PUBLIC' ? 1 : 2);
+
+  for (const g of fn.grants) {
+    const via: GrantVia | null =
+      g.role === role ? 'direct'
+        : g.role === 'PUBLIC' ? 'PUBLIC'
+          : ancestors.has(g.role) ? `member of ${g.role}`
+            : null;
+    if (via && (best === null || rank(via) < rank(best))) best = via;
+  }
+
+  return best;
+}
+
 /** A privilege `role` holds on some, but not all, of a relation's columns. */
 export interface EffectiveColumnGrant extends EffectiveGrant {
   /** The columns it covers, sorted. */

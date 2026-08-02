@@ -34,6 +34,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     definition: 'SELECT id FROM app.orders',
     writable: [],
     insteadOfTriggers: false,
+    insteadOf: [],
     rules: [],
     ...partial
   };

@@ -38,6 +38,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     definition: 'SELECT id, body FROM app.submissions',
     writable: ['INSERT', 'UPDATE', 'DELETE'],
     insteadOfTriggers: false,
+    insteadOf: [],
     rules: [],
     ...partial
   };

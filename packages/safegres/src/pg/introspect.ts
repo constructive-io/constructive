@@ -14,11 +14,13 @@ export interface QueryExecutor {
 
 /**
  * `USAGE` never appears on a table — it is the sequence privilege (`nextval`),
- * and is in this union because sequences are graded through the same grant
- * closure as everything else.
+ * and `EXECUTE` is the function one. Both are in this union because sequences
+ * and functions are graded through the same grant closure as everything else,
+ * and a reach path routinely starts on one and ends on a table.
  */
 export type PgPrivilege =
-  | 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'TRUNCATE' | 'REFERENCES' | 'TRIGGER' | 'USAGE';
+  | 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'TRUNCATE' | 'REFERENCES' | 'TRIGGER'
+  | 'USAGE' | 'EXECUTE';
 
 /**
  * Mapping of ACL single-letter codes (from `aclexplode`) to our privilege names.
