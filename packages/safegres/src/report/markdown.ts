@@ -76,7 +76,19 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
 
   if (report.comparison) out.push(...comparisonSection(report.comparison), '');
 
-  if (view.detail === 'summary') return out.join('\n');
+  if (view.detail === 'summary') {
+    // The ratchet's verdict is the one perf number a summary reader needs:
+    // the absolute score is dominated by accepted debt, the delta is not.
+    const diff = report.perf?.diff;
+    if (diff) {
+      out.push(
+        `Perf baseline: **${diff.added.length} new**, ${diff.accepted.length} accepted, `
+          + `${diff.removed.length} resolved.`,
+        ''
+      );
+    }
+    return out.join('\n');
+  }
 
   out.push(
     ...findingSection('Security findings', [...view.security.exposed, ...view.security.internal], options),

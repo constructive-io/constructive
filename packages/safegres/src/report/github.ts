@@ -73,10 +73,12 @@ export function renderGithubSummary(report: Report, options: GithubRenderOptions
   const config = options.config ?? {};
   const badges = config.badges !== false;
   const selectors = config.summary ?? ['security', 'perf'];
-  const view = selectView(report, {
+  const viewConfig: ViewConfig = {
     planes: planePatterns(selectors),
+    ...(config.detail ? { detail: config.detail } : {}),
     ...options.view
-  });
+  };
+  const view = selectView(report, viewConfig);
 
   const out: string[] = [];
   const line = selectedScores(view.scores, selectors)
@@ -84,7 +86,7 @@ export function renderGithubSummary(report: Report, options: GithubRenderOptions
     .join(' ');
   if (line) out.push(line, '');
 
-  out.push(renderMarkdown(report, { view: { planes: planePatterns(selectors), ...options.view } }));
+  out.push(renderMarkdown(report, { view: viewConfig }));
   return out.join('\n');
 }
 
