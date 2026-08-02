@@ -5,6 +5,9 @@
  * (read vs write), and auth-context mutations it contains. Dynamic SQL
  * (`EXECUTE format(...)`) and unparseable bodies are surfaced as `opaque`
  * rather than silently dropped — static analysis ends there.
+ *
+ * A view body is the same question asked of a different object, so
+ * {@link extractQuery} exposes the plain-SQL half directly.
  */
 
 import { parsePlPgSQL } from 'libpg-query';
@@ -46,7 +49,7 @@ export async function extractBody(fn: FunctionSnapshot): Promise<ExtractedBody> 
 
   if (fn.language === 'sql') {
     if (!fn.source || fn.source.trim() === '') return EMPTY;
-    return extractFromSql(fn.source, 'statement');
+    return extractQuery(fn.source);
   }
 
   // plpgsql: parse the full CREATE FUNCTION, then analyze every embedded
@@ -74,7 +77,7 @@ export async function extractBody(fn: FunctionSnapshot): Promise<ExtractedBody> 
       q = q.replace(/^\s*[a-zA-Z_"][\w$".]*(\[[^\]]*\])*\s*:?=\s*/, '');
     }
     const sql = e.parseMode === 0 ? q : `SELECT ${q}`;
-    const part = await extractFromSql(sql, 'statement');
+    const part = await extractQuery(sql);
     mergeBody(out, part);
   }
 
@@ -112,7 +115,11 @@ function collectPlpgsql(node: unknown, exprs: Array<{ query: string; parseMode: 
   for (const value of Object.values(rec)) collectPlpgsql(value, exprs, out);
 }
 
-async function extractFromSql(sql: string, _mode: 'statement'): Promise<ExtractedBody> {
+/**
+ * The same extraction over a standalone SQL statement — a view body, a policy
+ * predicate, anything that is already plain SQL rather than a function.
+ */
+export async function extractQuery(sql: string): Promise<ExtractedBody> {
   let ast: unknown;
   try {
     ast = await parse(sql);

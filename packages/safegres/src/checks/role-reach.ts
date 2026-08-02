@@ -14,14 +14,14 @@
  * #1358/#1361): it projects a role's reach into each relation as a set of
  * cells, each carrying the role the access actually *executes as*
  * (`effectiveRole`) and how that reach arrived (`path`). Stage 1 models two
- * edge kinds — passive grants and `SET ROLE` — and every fact is
- * catalog-proven (`proof: 'catalog'`). View-ownership and SECURITY DEFINER
- * edges (which need body analysis and carry `proof: 'ast' | 'opaque-tainted'`)
- * come in later stages; the types leave room for them without committing to
- * them now.
+ * edge kinds — passive grants and `SET ROLE` — both catalog-proven
+ * (`proof: 'catalog'`). Stage 2 adds the view-ownership edge: a read through a
+ * non-`security_invoker` view executes as the view's owner, and the base
+ * relations it touches are read out of the view body, so those cells carry
+ * `proof: 'ast'`. SECURITY DEFINER function edges come later.
  */
 
-import type { PgPrivilege, TableSnapshot } from '../pg/introspect';
+import type { GrantInfo, PgPrivilege, TableSnapshot } from '../pg/introspect';
 import { effectiveGrants, type GrantVia, type RoleGraph } from './lattice';
 
 /** One hop in the path by which a role reaches a relation. */
@@ -29,7 +29,12 @@ export type RoleReachEdge =
   /** A privilege held passively: directly, via PUBLIC, or via INHERIT. */
   | { kind: 'grant'; via: GrantVia; privilege: PgPrivilege }
   /** The caller assumed `to` with `SET ROLE` (`pg_auth_members.set_option`). */
-  | { kind: 'setrole'; to: string };
+  | { kind: 'setrole'; to: string }
+  /**
+   * The caller read through a view that executes as `owner` — every relation
+   * the body names is read under the owner's privileges, not the caller's.
+   */
+  | { kind: 'view'; view: string; owner: string };
 
 /**
  * How well-founded a reach cell is. Stage 1 is entirely `catalog` — every
@@ -115,6 +120,72 @@ export function computeRoleReach(
             ...assumed.map((g) => ({ kind: 'grant' as const, via: g.via, privilege: g.privilege }))
           ],
           proof: 'catalog'
+        });
+      }
+    }
+
+    return { role, cells };
+  });
+}
+
+/** One relation a view body reads, with the roles the hops execute as. */
+export interface ViewBaseRelation {
+  schema: string;
+  table: string;
+  /**
+   * The view hops the read passes through, outermost first. The last hop's
+   * owner is the role the base relation is actually read as.
+   */
+  hops: Array<{ view: string; owner: string }>;
+}
+
+/** A view, its own ACL, and the base relations its body was found to read. */
+export interface ViewReachInput {
+  schema: string;
+  name: string;
+  owner: string;
+  /** ACL rows on the view itself — who can SELECT the view at all. */
+  grants: GrantInfo[];
+  baseRelations: ViewBaseRelation[];
+}
+
+/**
+ * Project the view-ownership edge into the same reach model: for every role
+ * that can SELECT a view, one cell per base relation the view body reads,
+ * under the owner the hop executes as.
+ *
+ * Only SELECT is modelled. An auto-updatable or `INSTEAD OF`-triggered view
+ * can carry writes the same way, but proving *which* write reaches *which*
+ * base relation needs more than the body's relation set, and an unproven
+ * write edge is exactly the kind of guess this model refuses to make.
+ *
+ * A view whose body could not be read (dynamic SQL, an unparseable body) must
+ * not appear in `views`: an unreadable body is unknown, not empty.
+ */
+export function computeViewReach(
+  views: ViewReachInput[],
+  graph: RoleGraph,
+  roles: string[]
+): RoleReach[] {
+  return roles.map((role) => {
+    const cells: RoleReachCell[] = [];
+
+    for (const view of views) {
+      const select = effectiveGrants(view, role, graph).find((g) => g.privilege === 'SELECT');
+      if (!select) continue;
+
+      for (const base of view.baseRelations) {
+        if (base.hops.length === 0) continue;
+        cells.push({
+          schema: base.schema,
+          table: base.table,
+          privileges: ['SELECT'],
+          effectiveRole: base.hops[base.hops.length - 1].owner,
+          path: [
+            { kind: 'grant', via: select.via, privilege: 'SELECT' },
+            ...base.hops.map((h) => ({ kind: 'view' as const, view: h.view, owner: h.owner }))
+          ],
+          proof: 'ast'
         });
       }
     }

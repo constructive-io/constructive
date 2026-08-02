@@ -16,6 +16,7 @@ import {
   checkCoverageGaps,
   checkUpdateWithCheckCoverage
 } from '../checks/coverage';
+import { analyzeViewBodies, checkDefinerViewBypass } from '../checks/definer-view';
 import {
   checkMissingPrimaryKey,
   checkRedundantIndexes,
@@ -63,7 +64,7 @@ import { introspectRoleGraph, introspectSchemaAcls } from '../pg/acl';
 import type { ResolvedExposure } from '../pg/exposure';
 import { resolveExposure, resolvePlanes, resolveReach } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
-import { introspectIndexes, introspectViewBodies, type TableIndexSnapshot } from '../pg/indexes';
+import { introspectIndexes, introspectViews, type TableIndexSnapshot } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
 import { type AccessPath, classifyPaths } from '../pg/paths';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
@@ -220,6 +221,23 @@ export async function audit(
     indexSnapshot.map((t) => [`${t.schema}.${t.name}`, t])
   );
 
+  // Views are read for two independent reasons: their bodies refute "nothing
+  // queries this column" for the perf paths, and their owners carry the L8
+  // reach edge. One introspection serves both.
+  const definerViewRoles = withExposedRoles(
+    resolved.rules.get('L8')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
+  const needsViews =
+    (perfEnabled && config.perf?.paths?.infer !== false)
+    || (!skipAst && definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false);
+  const viewSnapshot = needsViews
+    ? await introspectViews(exec, {
+      schemas: options.schemas ?? config.schemas,
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+    })
+    : [];
+
   // Evidence about which foreign keys anything reads. Reported alongside the
   // findings; by default it changes neither, because no signal available on an
   // empty database proves a path is unreachable.
@@ -228,10 +246,7 @@ export async function audit(
     ? classifyPaths(
       indexSnapshot,
       snapshot,
-      await introspectViewBodies(exec, {
-        schemas: options.schemas ?? config.schemas,
-        excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
-      }),
+      viewSnapshot.map((v) => v.definition),
       {
         minPointers: config.perf?.paths?.minPointers,
         hiddenBackwardRelations: new Set(apiReach?.hiddenBackwardRelations ?? [])
@@ -310,6 +325,14 @@ export async function audit(
   }
 
   findings.push(...checkDeadSchemaUsage(schemaAcls, snapshot, roleGraph));
+
+  // L8 is per-view, not per-table: a view body names its own base relations.
+  if (!skipAst && definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false) {
+    const viewBodies = await analyzeViewBodies(viewSnapshot, snapshot);
+    findings.push(
+      ...checkDefinerViewBypass(viewBodies.views, snapshot, roleGraph, { roles: definerViewRoles })
+    );
+  }
 
   const statsSnapshot: StatsSnapshot | null = statsEnabled
     ? await introspectStats(exec, {

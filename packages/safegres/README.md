@@ -129,6 +129,7 @@ are performance, `P5` is security.
 | L4 | info | neutral | **Dead schema `USAGE`** — reaches no relation and no function |
 | L5 | info | fail-open | An untrusted role reaches an **RLS-off table** via PUBLIC/inheritance † |
 | L6 | info | neutral | **Unaddressable grant** — an API role holds privileges on a relation its API cannot name ‡ |
+| L8 | info | fail-open | **DEFINER view bypass** — an untrusted role reads a base relation as the view's owner † |
 | W1 | medium | — | **No exposure surface configured** — whole database assumed reachable, score capped |
 
 † R1/R2/L5 are no-ops until you name the untrusted roles:

@@ -26,6 +26,8 @@ export type {
   ChecklistItem
 } from './callgraph/graph';
 export { buildCallGraph } from './callgraph/graph';
+export type { SuppressedView, ViewBodyAnalysis } from './checks/definer-view';
+export { analyzeViewBodies, checkDefinerViewBypass } from './checks/definer-view';
 export {
   checkMissingPrimaryKey,
   checkRedundantIndexes,
@@ -175,8 +177,8 @@ export {
 } from './pg/exposure';
 export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from './pg/functions';
 export { introspectFunctions } from './pg/functions';
-export type { ColumnInfo, ForeignKeyInfo, IndexInfo, TableIndexSnapshot } from './pg/indexes';
-export { introspectIndexes } from './pg/indexes';
+export type { ColumnInfo, ForeignKeyInfo, IndexInfo, TableIndexSnapshot, ViewSnapshot } from './pg/indexes';
+export { introspectIndexes, introspectViews } from './pg/indexes';
 export {
   type IntrospectOptions,
   introspectTables,

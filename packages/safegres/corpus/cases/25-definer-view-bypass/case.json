@@ -1,0 +1,30 @@
+{
+  "title": "Anonymous role reads a locked table through a DEFINER view",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_definer_view_bypass"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L8",
+      "relation": "c_definer_view_bypass.orders",
+      "note": "the view is not security_invoker, so corpus_anon's SELECT on it reads `orders` as c_definer_view_owner — a grant no ACL row on `orders` gives it"
+    }
+  ],
+  "forbid": [
+    "A2",
+    "R1"
+  ],
+  "worstSeverity": "info",
+  "fix": "Recreate c_definer_view_bypass.order_totals WITH (security_invoker = true) so the caller's own grants and policies apply, or give it an owner whose reach matches what the view is meant to expose. Revoking corpus_anon's SELECT on the view is not the fix — that grant is what the API serves.",
+  "id": "25-definer-view-bypass"
+}

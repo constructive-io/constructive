@@ -22,7 +22,11 @@ export const recommended: SafegresConfig = {
     // Signal-only for now: an unauthenticated role that can SET ROLE to a role
     // with more reach is a real escalation, but the rule is new and unproven,
     // so it reports at zero weight until validated. See the registry entry.
-    L7: ['info', { rolesFrom: 'anon' }]
+    L7: ['info', { rolesFrom: 'anon' }],
+    // Same posture, same reason: a view that executes as its owner hands its
+    // readers that owner's reach, which is a real bypass, but the rule is new
+    // and body-derived, so it reports at zero weight until validated.
+    L8: ['info', { rolesFrom: 'anon' }]
   }
 };
 
