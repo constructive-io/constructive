@@ -276,11 +276,15 @@ export async function introspectViews(
          c.relkind = 'm'                          AS materialized,
          pg_catalog.pg_get_userbyid(c.relowner)   AS owner,
          COALESCE(o.rolsuper OR o.rolbypassrls, false) AS owner_bypasses_rls,
+         -- Postgres stores a boolean reloption verbatim, so this is any of
+         -- true/on/1/yes/t/y depending on how the view was written; the cast
+         -- accepts every spelling the option itself accepts, and reloption
+         -- validation at CREATE time guarantees it parses.
          COALESCE(
            (SELECT option_value FROM pg_options_to_table(c.reloptions)
             WHERE option_name = 'security_invoker'),
            'false'
-         ) = 'true'                               AS security_invoker,
+         )::boolean                               AS security_invoker,
          c.relacl                                 AS relacl,
          pg_get_viewdef(c.oid)                    AS definition
        FROM pg_class c

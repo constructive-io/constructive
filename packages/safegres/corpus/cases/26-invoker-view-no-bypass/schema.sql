@@ -32,3 +32,13 @@ CREATE VIEW c_invoker_view_no_bypass.order_totals
   SELECT id, customer, total FROM c_invoker_view_no_bypass.orders;
 ALTER VIEW c_invoker_view_no_bypass.order_totals OWNER TO c_invoker_view_owner;
 GRANT SELECT ON c_invoker_view_no_bypass.order_totals TO corpus_anon;
+
+-- `security_invoker` is a boolean reloption, and Postgres stores whichever
+-- spelling was written: `on` here is exactly as invoker as `true` above. A
+-- reader that string-matches 'true' calls this view a definer view and tells
+-- the author to fix a schema that is already correct.
+CREATE VIEW c_invoker_view_no_bypass.order_totals_on
+  WITH (security_invoker = on) AS
+  SELECT id, customer, total FROM c_invoker_view_no_bypass.orders;
+ALTER VIEW c_invoker_view_no_bypass.order_totals_on OWNER TO c_invoker_view_owner;
+GRANT SELECT ON c_invoker_view_no_bypass.order_totals_on TO corpus_anon;
