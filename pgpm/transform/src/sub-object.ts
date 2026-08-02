@@ -10,7 +10,7 @@
  * every alteration.
  */
 import type { ObjectIdentity } from '@pgpmjs/naming-spec';
-import type { StatementFacts } from '@pgsql/transform';
+import type { StatementFacts } from '@pgsql/semantics';
 import { Deparser, parseSync } from 'plpgsql-parser';
 
 import { ConstraintNode, defaultConstraintName } from './constraint-names';

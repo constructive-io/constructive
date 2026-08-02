@@ -8,7 +8,7 @@ export { loadModule } from 'plpgsql-parser';
 
 /**
  * A (possibly schema-qualified) database object name extracted from SQL.
- * Alias of `@pgsql/transform`'s `QualifiedName` — one name type across the
+ * Alias of `@pgsql/semantics`'s `QualifiedName` — one name type across the
  * facts substrate and the slice layer.
  */
 export type SqlObjectRef = QualifiedName;
@@ -45,7 +45,7 @@ function pushUnique(list: SqlObjectRef[], r: SqlObjectRef): void {
  * including references reached inside PL/pgSQL function bodies (which are
  * opaque strings in `CREATE FUNCTION` and invisible to a plain SQL parse).
  *
- * A thin change-level adapter over `@pgsql/transform`: `classifyStatements`
+ * A thin change-level adapter over the facts layer: `classifyStatements`
  * produces the per-statement facts and `buildStatementGraph`'s producer index
  * decides which references are internal — a reference with an in-script
  * producer is satisfied by the change itself, so only external references

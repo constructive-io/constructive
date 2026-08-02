@@ -1,4 +1,4 @@
-import { classifyStatements } from '@pgsql/transform';
+import { classifyStatements } from '@pgsql/semantics';
 import { loadModule } from 'plpgsql-parser';
 
 import { nameUnnamedConstraints, subObjectIdentityOf } from '../src/sub-object';

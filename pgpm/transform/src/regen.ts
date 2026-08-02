@@ -13,8 +13,8 @@
  */
 import type { GeneratedScript } from '@pgsql/scripts';
 import { revertFor, verifyFor } from '@pgsql/scripts';
-import type { StatementFacts } from '@pgsql/transform';
-import { classifyStatements } from '@pgsql/transform';
+import type { StatementFacts } from '@pgsql/semantics';
+import { classifyStatements } from '@pgsql/semantics';
 
 export type { GeneratedScript } from '@pgsql/scripts';
 
