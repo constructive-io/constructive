@@ -45,6 +45,6 @@
     "@pgpmjs/ast": "workspace:^",
     "@pgpmjs/transform": "workspace:^",
     "minimatch": "^10.2.5",
-    "plpgsql-parser": "^18.5.1"
+    "plpgsql-parser": "^18.5.2"
   }
 }
