@@ -1,0 +1,37 @@
+{
+  "title": "The same writable view WITH LOCAL CHECK OPTION constrains its writes, and L15 stays silent",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_checked_view_write"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L9",
+      "relation": "c_checked_view_write.notes",
+      "note": "the write still reaches `notes` as the view's owner \u2014 the check option constrains which rows may be written, not whose privileges write them"
+    },
+    {
+      "code": "A3",
+      "relation": "c_checked_view_write.notes",
+      "note": "RLS is still not FORCEd, unchanged from case 43"
+    }
+  ],
+  "forbid": [
+    "L15",
+    "L8",
+    "L10",
+    "L11",
+    "L12"
+  ],
+  "worstSeverity": "low",
+  "fix": "Nothing on the check option. This case is case 43 after its fix, and exists to pin that L15 stops firing once the view's condition governs writes as well as reads."
+}

@@ -65,7 +65,12 @@ import {
   checkLeakyFilterView,
   checkMatviewSnapshot
 } from '../checks/view-exposure';
-import { analyzeViewWrites, checkDefinerViewWrite, checkViewRuleBypass } from '../checks/view-writes';
+import {
+  analyzeViewWrites,
+  checkDefinerViewWrite,
+  checkUncheckedViewWrite,
+  checkViewRuleBypass
+} from '../checks/view-writes';
 import { configFingerprint } from '../config/fingerprint';
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
@@ -267,6 +272,10 @@ export async function audit(
     resolved.rules.get('L10')?.options as LatticeRoleOptions,
     exposure
   )?.roles ?? [];
+  const uncheckedWriteRoles = withExposedRoles(
+    resolved.rules.get('L15')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
   const matviewRoles = withExposedRoles(
     resolved.rules.get('L11')?.options as LatticeRoleOptions,
     exposure
@@ -292,7 +301,8 @@ export async function audit(
   const viewWritesEnabled =
     !skipAst
     && ((viewWriteRoles.length > 0 && resolved.rules.get('L9')?.enabled !== false)
-      || (ruleBypassRoles.length > 0 && resolved.rules.get('L10')?.enabled !== false));
+      || (ruleBypassRoles.length > 0 && resolved.rules.get('L10')?.enabled !== false)
+      || (uncheckedWriteRoles.length > 0 && resolved.rules.get('L15')?.enabled !== false));
   const needsViews =
     (perfEnabled && config.perf?.paths?.infer !== false)
     || resolved.rules.get('L4')?.enabled !== false
@@ -416,7 +426,7 @@ export async function audit(
     }
   }
 
-  // L9/L10 are the write half of the same question, and share one analysis.
+  // L9/L10/L15 are the write half of the same question, and share one analysis.
   if (viewWritesEnabled) {
     const writes = await analyzeViewWrites(viewSnapshot, snapshot);
     if (viewWriteRoles.length > 0 && resolved.rules.get('L9')?.enabled !== false) {
@@ -427,6 +437,13 @@ export async function audit(
     if (ruleBypassRoles.length > 0 && resolved.rules.get('L10')?.enabled !== false) {
       findings.push(
         ...checkViewRuleBypass(writes.ruleDriven, snapshot, roleGraph, { roles: ruleBypassRoles })
+      );
+    }
+    if (uncheckedWriteRoles.length > 0 && resolved.rules.get('L15')?.enabled !== false) {
+      findings.push(
+        ...checkUncheckedViewWrite(writes.unchecked, snapshot, roleGraph, {
+          roles: uncheckedWriteRoles
+        })
       );
     }
   }

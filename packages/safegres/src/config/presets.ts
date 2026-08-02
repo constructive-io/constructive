@@ -47,7 +47,11 @@ export const recommended: SafegresConfig = {
     L13: ['info', { rolesFrom: 'anon' }],
     // The coverage half of L8: a body reference the audit could not follow
     // because the schema was out of scope. Reports an unknown, never a leak.
-    L14: ['info', { rolesFrom: 'anon' }]
+    L14: ['info', { rolesFrom: 'anon' }],
+    // The write-side twin of L12: a writable view whose `WHERE` is a read
+    // filter only, because `WITH CHECK OPTION` is not the default. Same
+    // posture again.
+    L15: ['info', { rolesFrom: 'anon' }]
   }
 };
 

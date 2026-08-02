@@ -35,6 +35,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     grants: [{ role: 'anon', privilege: 'SELECT', grantable: false, bypassRls: false }],
     definition: 'SELECT rolname FROM private.secrets',
     writable: [],
+    checkOption: 'none',
     insteadOfTriggers: false,
     rules: [],
     ...partial

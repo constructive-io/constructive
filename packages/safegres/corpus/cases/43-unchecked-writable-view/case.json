@@ -1,0 +1,41 @@
+{
+  "title": "A writable view's row filter is a read filter: no WITH CHECK OPTION, so writes escape it",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_unchecked_view_write"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L15",
+      "relation": "c_unchecked_view_write.notes",
+      "note": "the view filters on `tenant` and carries no WITH CHECK OPTION, so corpus_anon's INSERT/UPDATE through it stores rows for any tenant \u2014 rows the view will not then show it"
+    },
+    {
+      "code": "L9",
+      "relation": "c_unchecked_view_write.notes",
+      "note": "the same view is auto-updatable and not security_invoker, so the write reaches `notes` as c_unchecked_write_owner at all \u2014 L9 is *whether* the write lands, L15 is whether the view's own condition constrains it"
+    },
+    {
+      "code": "A3",
+      "relation": "c_unchecked_view_write.notes",
+      "note": "RLS is not FORCEd, which is why the owner's rewritten write is not filtered by the table's own policy either"
+    }
+  ],
+  "forbid": [
+    "L8",
+    "L10",
+    "L11",
+    "L12"
+  ],
+  "worstSeverity": "low",
+  "fix": "Recreate c_unchecked_view_write.tenant_notes WITH LOCAL CHECK OPTION so a row written through it must satisfy the condition it is served under, or put the tenant predicate in an RLS policy's WITH CHECK clause on `notes`, which applies however the row arrives. Do not revoke corpus_anon's INSERT on the view \u2014 that grant is what the API serves."
+}

@@ -33,6 +33,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     definition: 'SELECT id, email FROM app.people',
     columnDeps: [{ schema: 'app', table: 'people', columns: ['email', 'id'] }],
     writable: [],
+    checkOption: 'none',
     insteadOfTriggers: false,
     rules: [],
     ...partial

@@ -1,5 +1,5 @@
 /**
- * L9 and L10: what a view does *beyond* its SELECT.
+ * L9, L10 and L15: what a view does *beyond* its SELECT.
  *
  * L8 models the read edge — a non-`security_invoker` view hands its readers
  * the owner's privileges on the relations its body names. Two write paths
@@ -21,14 +21,21 @@
  *     relations — `security_invoker` does **not** govern them. An invoker view
  *     with such a rule still writes `audit` as the view owner.
  *
- * Both keep L8's conservatism. An `INSTEAD OF` trigger sends the write into a
+ *   - **L15, an unchecked write.** `WITH CHECK OPTION` is not the default, so
+ *     a view whose `WHERE` decides which rows a role may *see* says nothing
+ *     about which rows it may *write*: `INSERT INTO tenant_rows VALUES (...)`
+ *     through a `WHERE tenant_id = current_tenant()` view stores a row for
+ *     another tenant, which the writer then cannot see. It is the write-side
+ *     twin of L12 — the view's filter is a read filter, not a boundary.
+ *
+ * All three keep L8's conservatism. An `INSTEAD OF` trigger sends the write into a
  * function body whose target this analysis cannot prove, a multi-relation body
  * is not auto-updatable in a way we can pin to one target, and an unreadable
  * rule action is unknown — all three suppress rather than guess. And, as in
  * L8, the fix is never a revoke: the grant on the view is what the API serves.
  */
 
-import { extractAccess, extractQuery } from '../callgraph/extract';
+import { bodyFiltersRows, extractAccess, extractQuery } from '../callgraph/extract';
 import type { ViewRule, ViewSnapshot } from '../pg/indexes';
 import type { PgPrivilege, TableSnapshot } from '../pg/introspect';
 import type { Finding } from '../types';
@@ -49,6 +56,11 @@ export interface ViewWriteAnalysis {
   autoUpdatable: ViewWriteInput[];
   /** Views carrying rewrite rules whose actions reach other relations. */
   ruleDriven: ViewWriteInput[];
+  /**
+   * The subset of {@link autoUpdatable} whose body filters rows and which
+   * carries no `WITH CHECK OPTION` — L15 inputs.
+   */
+  unchecked: ViewWriteInput[];
   /** Views deliberately left out, with why. */
   suppressed: SuppressedView[];
 }
@@ -66,6 +78,7 @@ export async function analyzeViewWrites(
 
   const autoUpdatable: ViewWriteInput[] = [];
   const ruleDriven: ViewWriteInput[] = [];
+  const unchecked: ViewWriteInput[] = [];
   const suppressed: SuppressedView[] = [];
 
   for (const view of queryable) {
@@ -73,13 +86,31 @@ export async function analyzeViewWrites(
 
     const auto = await autoUpdateEdges(view, index, suppressed);
     if (auto.length > 0) {
-      autoUpdatable.push({
+      const input: ViewWriteInput = {
         schema: view.schema,
         name: view.name,
         owner: view.owner,
         grants: view.grants,
         writeEdges: auto
-      });
+      };
+      autoUpdatable.push(input);
+
+      if (view.checkOption === 'none') {
+        // A view with no `WHERE` excludes no rows, so there is nothing a write
+        // could land outside of; an unparseable body is unknown, not clean.
+        const filters = await bodyFiltersRows(view.definition);
+        if (filters === null) {
+          suppressed.push({
+            view: name,
+            reason: 'body could not be parsed to look for a row filter'
+          });
+        } else if (filters) {
+          // WITH CHECK OPTION constrains the rows a write *produces*, so only
+          // the commands that produce rows can escape it.
+          const writes = auto.filter((e) => e.privilege !== 'DELETE');
+          if (writes.length > 0) unchecked.push({ ...input, writeEdges: writes });
+        }
+      }
     }
 
     const fromRules: ViewWriteEdge[] = [];
@@ -106,7 +137,7 @@ export async function analyzeViewWrites(
     }
   }
 
-  return { autoUpdatable, ruleDriven, suppressed };
+  return { autoUpdatable, ruleDriven, unchecked, suppressed };
 }
 
 /**
@@ -286,6 +317,35 @@ export function checkViewRuleBypass(
   }));
 }
 
+/**
+ * L15: an untrusted role writes rows a filtering view will not show it.
+ *
+ * Fires on the L9 population narrowed to filtering views with no `WITH CHECK
+ * OPTION`, minus DELETE — which removes rows the view already showed rather
+ * than producing new ones. It overlaps L9 by design and answers a different
+ * question: L9 is *whether* the role can write the relation at all, L15 is
+ * whether the view's own condition constrains what it writes.
+ */
+export function checkUncheckedViewWrite(
+  views: ViewWriteInput[],
+  tables: TableSnapshot[],
+  graph: RoleGraph,
+  options: LatticeRoleOptions = {}
+): Finding[] {
+  return writeFindings(views, tables, graph, options, 'L15', (ctx) => ({
+    message:
+      `Untrusted role ${ctx.role} can ${ctx.privilege} rows into ${ctx.target} through view `
+      + `${ctx.view} that the view's own row filter excludes — the view has no WITH CHECK OPTION, `
+      + `so its \`WHERE\` governs reads only`,
+    hint:
+      `Recreate the view \`WITH LOCAL CHECK OPTION\` (or \`CASCADED\`, to enforce every underlying `
+      + `view's condition too) so a row written through it must satisfy the condition it is served `
+      + `under. Where the filter is per-caller, an RLS policy with a \`WITH CHECK\` clause on `
+      + `${ctx.target} is the stronger form — it applies however the row arrives. Do not revoke the `
+      + `${ctx.privilege} on the view; that grant is what the API serves.`
+  }));
+}
+
 interface WriteContext {
   role: string;
   view: string;
@@ -301,7 +361,7 @@ function writeFindings(
   tables: TableSnapshot[],
   graph: RoleGraph,
   options: LatticeRoleOptions,
-  code: 'L9' | 'L10',
+  code: 'L9' | 'L10' | 'L15',
   render: (ctx: WriteContext) => { message: string; hint: string }
 ): Finding[] {
   const untrusted = options.roles ?? [];
