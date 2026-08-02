@@ -150,10 +150,12 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L12 | info | fail-open | **Non-barrier filtering view** — a view is an untrusted role's only path to a relation, but its row filter is not a boundary † |
 | L13 | info | fail-open | **Column-level grant** — an untrusted role reaches a relation through `pg_attribute.attacl`, which no relation ACL shows † |
 | L14 | info | neutral | **Unaudited base relation** — a definer view reads a relation in a schema the audit never introspected † |
-| L15 | info | neutral | **Unreadable view body** — an untrusted role reads a definer view whose definition the analysis could not follow † |
+| L15 | info | neutral | **Unreadable body** — an untrusted role reaches through a definer view or function whose body the analysis could not follow † |
 | L16 | info | fail-open | **Sequence privilege** — an untrusted role can advance or read a sequence, which no policy filters † |
 | L17 | info | fail-open | **Foreign-table grant** — an untrusted role reaches a relation that cannot carry RLS at all † |
 | L18 | info | fail-open | **Writable filtering view without `WITH CHECK OPTION`** — an untrusted role writes rows the view's own filter excludes † |
+| L19 | info | fail-open | **Definer-function reach** — an untrusted role touches a relation by executing a `SECURITY DEFINER` function, which runs as its owner † |
+| L20 | info | fail-open | **`INSTEAD OF` trigger write** — a write against a view becomes a trigger function's body, and a definer one lands it as the function's owner † |
 | W1 | medium | — | **No exposure surface configured** — whole database assumed reachable, score capped |
 
 † R1/R2/L5 are no-ops until you name the untrusted roles:
@@ -421,6 +423,21 @@ deploys it into an ephemeral one:
 ```yaml
       - run: npx safegres audit   # or: "audit": "safegres lint" in package.json
 ```
+
+Or the first-party action, which installs the CLI, runs that config, and turns the report into a
+job summary, annotations and a sticky PR comment:
+
+```yaml
+      - uses: constructive-io/constructive/packages/safegres@main
+        with:
+          out: safegres-reports
+          comment: true          # sticky PR comment (needs pull-requests: write)
+          upload-sarif: true     # code scanning (needs security-events: write)
+```
+
+It exposes `security-score`, `security-grade` and `perf-score` as step outputs — on a failing run
+too, which is when they get read. Everything else stays in the config file; see
+**[docs/reporting.md](https://github.com/constructive-io/constructive/blob/main/packages/safegres/docs/reporting.md#the-action)**.
 
 `outputs.dir` writes `safegres.json`, `safegres.md` and `safegres.sarif` into one directory — name
 an individual file (`outputs.json`) only when the name matters. Directories are created as needed,

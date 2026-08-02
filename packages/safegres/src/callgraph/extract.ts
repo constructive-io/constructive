@@ -88,20 +88,42 @@ export async function extractBody(fn: FunctionSnapshot): Promise<ExtractedBody> 
 
   // plpgsql: parse the full CREATE FUNCTION, then analyze every embedded
   // SQL expression/statement the PL/pgSQL parser hands back.
-  if (!fn.definition) return { ...EMPTY, opaque: true, opaqueReason: 'no function definition available' };
+  const embedded = await plpgsqlStatements(fn);
+  if ('opaqueReason' in embedded) {
+    return { ...EMPTY, opaque: true, opaqueReason: embedded.opaqueReason };
+  }
+
+  const out: MutableBody = { calls: [], tables: [], settings: [], opaque: false, ...embedded.flags };
+  for (const sql of embedded.statements) mergeBody(out, await extractQuery(sql));
+
+  return finalize(out);
+}
+
+/**
+ * The SQL a PL/pgSQL body embeds, as statements ready to parse, plus whether
+ * the body also runs SQL nothing can see (`EXECUTE`).
+ *
+ * Both body walkers need this and they need it identically — the read/write
+ * one for the call graph, the per-privilege one for the reach model — so the
+ * PL/pgSQL half is factored out rather than written twice.
+ */
+async function plpgsqlStatements(
+  fn: FunctionSnapshot
+): Promise<{ statements: string[]; flags: { opaque: boolean; opaqueReason?: string } } | { opaqueReason: string }> {
+  if (!fn.definition) return { opaqueReason: 'no function definition available' };
 
   let parsed: unknown;
   try {
     parsed = await parsePlPgSQL(fn.definition);
   } catch {
-    return { ...EMPTY, opaque: true, opaqueReason: 'PL/pgSQL body failed to parse' };
+    return { opaqueReason: 'PL/pgSQL body failed to parse' };
   }
 
-  const out: MutableBody = { calls: [], tables: [], settings: [], opaque: false };
+  const flags: MutableBody = { calls: [], tables: [], settings: [], opaque: false };
   const exprs: Array<{ query: string; parseMode: number }> = [];
-  collectPlpgsql(parsed, exprs, out);
+  collectPlpgsql(parsed, exprs, flags);
 
-  for (const e of exprs) {
+  const statements = exprs.map((e) => {
     // parseMode 0 = full statement; 3 = assignment (`target := expr` or
     // `target = expr`) — strip the anchored target so the RHS parses. The
     // RHS may itself contain `:=` (named arguments), so only the leading
@@ -110,12 +132,64 @@ export async function extractBody(fn: FunctionSnapshot): Promise<ExtractedBody> 
     if (e.parseMode === 3) {
       q = q.replace(/^\s*[a-zA-Z_"][\w$".]*(\[[^\]]*\])*\s*:?=\s*/, '');
     }
-    const sql = e.parseMode === 0 ? q : `SELECT ${q}`;
-    const part = await extractQuery(sql);
-    mergeBody(out, part);
+    return e.parseMode === 0 ? q : `SELECT ${q}`;
+  });
+
+  return {
+    statements,
+    flags: { opaque: flags.opaque, ...(flags.opaqueReason ? { opaqueReason: flags.opaqueReason } : {}) }
+  };
+}
+
+/**
+ * {@link extractAccess} asked of a whole function rather than one statement:
+ * every relation the body touches, with the privilege the touch exercises.
+ *
+ * This is what a SECURITY DEFINER function's reach is made of — the body runs
+ * as the owner, so each `INSERT INTO t` in it is an INSERT on `t` that the
+ * caller never needed a grant for. A body that cannot be read is `opaque`,
+ * and an opaque body's access list is a fragment its caller must discard.
+ */
+export async function extractFunctionAccess(fn: FunctionSnapshot): Promise<ExtractedAccess> {
+  if (!ANALYZABLE.has(fn.language)) {
+    if (fn.language === 'internal' || fn.language === 'c') return { accesses: [], opaque: false };
+    return {
+      accesses: [],
+      opaque: true,
+      opaqueReason: `language "${fn.language}" is not statically analyzable`
+    };
   }
 
-  return finalize(out);
+  if (fn.language === 'sql') {
+    if (!fn.source || fn.source.trim() === '') return { accesses: [], opaque: false };
+    return extractAccess(fn.source);
+  }
+
+  const embedded = await plpgsqlStatements(fn);
+  if ('opaqueReason' in embedded) {
+    return { accesses: [], opaque: true, opaqueReason: embedded.opaqueReason };
+  }
+
+  const accesses: RelationAccess[] = [];
+  const seen = new Set<string>();
+  let opaque = embedded.flags.opaque;
+  let opaqueReason = embedded.flags.opaqueReason;
+
+  for (const sql of embedded.statements) {
+    const part = await extractAccess(sql);
+    if (part.opaque && !opaque) {
+      opaque = true;
+      opaqueReason = part.opaqueReason;
+    }
+    for (const a of part.accesses) {
+      const key = `${a.schema ?? ''}.${a.name}::${a.privilege}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      accesses.push(a);
+    }
+  }
+
+  return { accesses, opaque, ...(opaqueReason ? { opaqueReason } : {}) };
 }
 
 interface MutableBody {

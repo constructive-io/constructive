@@ -37,6 +37,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     writable: [],
     checkOption: 'none',
     insteadOfTriggers: false,
+    insteadOf: [],
     rules: [],
     ...partial
   };

@@ -134,6 +134,42 @@ What appears is configuration, not code:
 GitHub Markdown has no text color, so a genuinely colored score has to be an image; `badges: false`
 falls back to emoji for air-gapped runners that cannot reach shields.io.
 
+## The action
+
+`packages/safegres/action.yml` is the same run as a composite action — it installs the CLI, runs the
+audit with `--github`, and optionally posts the comment and uploads the SARIF:
+
+```yaml
+- uses: constructive-io/constructive/packages/safegres@main
+  with:
+    out: safegres-reports
+    comment: true
+    upload-sarif: true
+```
+
+Its inputs are deliberately only the things that differ *between jobs sharing one config* —
+`database`/`pgpm` (what to audit), `fail-on-grade` and `report-only` (whether the gates bite),
+`out`/`comment`/`upload-sarif` (what leaves the runner), `compare`/`compare-ref` (the delta), plus
+`version`, `config`, `preset`, `working-directory` and an `args` escape hatch. Everything a run
+repeats belongs in the committed config file, so the common case passes nothing at all.
+
+Two jobs can then share one config and differ only where they should: a gated merge check
+(`safegres audit`, the file's `failOn` in force) and an advisory scan of a deployed database
+(`database: staging`, `report-only: true`). The step exports `security-score`, `security-grade`,
+`perf-score` and `report` as outputs on failing runs too — a gate failure is exactly when the score
+is worth reading:
+
+```yaml
+- uses: constructive-io/constructive/packages/safegres@main
+  id: audit
+  with: { out: safegres-reports, fail-on-grade: B }
+- if: always()
+  run: echo "graded ${{ steps.audit.outputs.security-grade }}"
+```
+
+Permissions are the caller's: `pull-requests: write` for `comment`, `security-events: write` for
+`upload-sarif`, `actions: read` if the job downloads a base-branch report for `compare`.
+
 ## What changed (`--compare`)
 
 A report says what the database *is*; on a pull request the only question is what the branch *did*

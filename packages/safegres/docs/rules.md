@@ -206,6 +206,56 @@ When untrusted roles are configured (via the L5/R1 options), the report also car
 with provenance (`direct`, `PUBLIC`, `member of <role>`) and whether RLS mediates the access.
 Rendered as a "Role access" section in pretty and markdown output.
 
+## Privilege through a function body (L19, L20)
+
+L8–L12 covered the view half of "SQL bodies confer privilege". L19 and L20 are the function half,
+and the larger one.
+
+**L19 — `SECURITY DEFINER` functions.** A definer function executes as its owner, so every relation
+its body touches is touched with the owner's privileges: tables the caller holds nothing on, and —
+where the owner owns the table and RLS is not `FORCE`d, or the owner has `BYPASSRLS` — without the
+row filter the policies would have applied. `EXECUTE` on the function is the only grant the caller
+needs, and no ACL entry on the base relation names it. Verified on PostgreSQL 18: an anonymous role
+with `EXECUTE` read every row of an RLS-protected table it had no grant on, while the invoker twin
+of the same function was denied. Postgres also grants `EXECUTE` to `PUBLIC` by default, so this
+reach routinely exists where nobody wrote a grant at all; the finding says so (`context.defaultAcl`)
+rather than treating a default as a decision.
+
+The walk is the view walk with the roles rewired. `extractFunctionAccess` returns the *privilege*
+each reference exercises rather than a read/write bit, so an `INSERT` in a body is an `INSERT`
+finding. Calls are followed: an inner definer re-owns the execution, an invoker callee keeps
+whichever owner is already in force, recursion is cut at the first repeat, and a view read from a
+body continues through L8's resolution so a definer function selecting from a definer view reaches
+that view's bases too. Overloads collapse by `schema.name`, as they do in the call graph, because
+the argument types a call binds are not in the reference.
+
+Two shapes are deliberately *not* reach. An invoker function confers nothing — its body runs with
+the caller's own privileges, which is exactly what the negative corpus case pins. And a trigger
+function is never graded by L19 however wide its `EXECUTE` ACL: Postgres refuses to call one
+directly, so the ACL is not a path. That is `returnsTrigger` on the snapshot, and it is what keeps
+every definer trigger function in a schema from reporting itself twice.
+
+**L20 — `INSTEAD OF` triggers.** This is the suppression L9 has carried since it shipped. A write
+against a view carrying `INSTEAD OF` triggers never reaches a base relation: Postgres replaces it
+with the trigger function's body, and that body is permission-checked against the **function's**
+effective user. So the escalation exists only when the trigger function is `SECURITY DEFINER` — the
+view's own owner and its `security_invoker` setting decide nothing here. Both halves were probed on
+PG 18: the invoker trigger function was denied on the relation its body wrote, the definer one wrote
+it as its owner. Both corpus cases invert the view's setting relative to the function's, so a rule
+that read the view's attribute instead of the function's would fail them.
+
+`ViewSnapshot.insteadOf` carries each trigger's target function and the events it fires on (decoded
+from `tgtype`), which the introspection did not previously read at all. A trigger whose function is
+outside the audited schemas, or whose body cannot be read, still suppresses: the write goes
+*somewhere*, and guessing where is the one thing this analysis must not do.
+
+Neither rule ever recommends a revoke. `EXECUTE` on the function is what the API serves, and the
+grant on the view is what the write path serves; the defect is what the body does with the owner's
+rights, so the remedies are to narrow the body, authorize the caller inside it, change the owner, or
+make the function `SECURITY INVOKER`. Both ship `info` and score-neutral on the usual new-rule
+posture — a definer function handing an anonymous role a table it holds nothing on is not an
+informational fact, and the honest severity once proven is A2's.
+
 ## Coverage semantics
 
 Coverage is aggregated `(table, role) → { hasUsing, hasWithCheck }` across every applicable

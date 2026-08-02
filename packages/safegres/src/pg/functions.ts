@@ -40,6 +40,12 @@ export interface FunctionSnapshot {
   grants: FunctionGrant[];
   /** True when the grants came from the default ACL (no explicit GRANT/REVOKE). */
   defaultAcl: boolean;
+  /**
+   * The function returns `trigger`, so Postgres refuses to call it directly
+   * however wide its EXECUTE ACL is. EXECUTE on one confers nothing on its
+   * own: the body is only reachable by firing the trigger it is attached to.
+   */
+  returnsTrigger: boolean;
 }
 
 const DEFAULT_EXCLUDES = ['pg_catalog', 'information_schema', 'pg_toast'];
@@ -76,6 +82,7 @@ export async function introspectFunctions(
           WHERE cfg LIKE 'search_path=%'
         )                                            AS search_path_pinned,
         l.lanname                                    AS language,
+        p.prorettype = 'pg_catalog.trigger'::regtype  AS returns_trigger,
         p.prosrc                                     AS source,
         CASE WHEN l.lanname IN ('sql', 'plpgsql')
              THEN pg_get_functiondef(p.oid)
@@ -108,6 +115,7 @@ export async function introspectFunctions(
       p.owner_bypasses_rls,
       p.security_definer,
       p.search_path_pinned,
+      p.returns_trigger,
       p.language,
       p.source,
       p.definition,
@@ -130,6 +138,7 @@ export async function introspectFunctions(
     owner_bypasses_rls: boolean;
     security_definer: boolean;
     search_path_pinned: boolean;
+    returns_trigger: boolean;
     language: string;
     source: string | null;
     definition: string | null;
@@ -146,6 +155,7 @@ export async function introspectFunctions(
     ownerBypassesRls: r.owner_bypasses_rls,
     isSecurityDefiner: r.security_definer,
     searchPathPinned: r.search_path_pinned,
+    returnsTrigger: r.returns_trigger,
     language: r.language,
     source: r.source,
     definition: r.definition,

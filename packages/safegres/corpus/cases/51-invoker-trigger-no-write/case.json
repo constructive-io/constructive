@@ -1,0 +1,33 @@
+{
+  "title": "An INSTEAD OF trigger whose function runs as the caller is not a write bypass",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_invoker_trigger"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A3",
+      "relation": "c_invoker_trigger.submissions",
+      "note": "the only real finding left: RLS is not FORCEd, so the table owner still writes every row"
+    }
+  ],
+  "forbid": [
+    "L8",
+    "L9",
+    "L15",
+    "L19",
+    "L20"
+  ],
+  "worstSeverity": "low",
+  "fix": "ALTER TABLE c_invoker_trigger.submissions FORCE ROW LEVEL SECURITY. Neither the trigger nor the view needs a fix — an invoker trigger function is what case 50 is fixed *into*, and the view being a definer changes nothing, because it is the function's security attribute that decides who the write runs as.",
+  "id": "51-invoker-trigger-no-write"
+}

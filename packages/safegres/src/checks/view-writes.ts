@@ -29,7 +29,8 @@
  *     twin of L12 — the view's filter is a read filter, not a boundary.
  *
  * All three keep L8's conservatism. An `INSTEAD OF` trigger sends the write into a
- * function body whose target this analysis cannot prove, a multi-relation body
+ * function body, which auto-update cannot place and L20 follows instead
+ * (`definer-function.ts`); a multi-relation body
  * is not auto-updatable in a way we can pin to one target, and an unreadable
  * rule action is unknown — all three suppress rather than guess. And, as in
  * L8, the fix is never a revoke: the grant on the view is what the API serves.
@@ -160,7 +161,7 @@ async function autoUpdateEdges(
   if (view.insteadOfTriggers) {
     suppressed.push({
       view: name,
-      reason: 'INSTEAD OF triggers decide where the write lands, in a body this analysis does not follow'
+      reason: 'INSTEAD OF triggers decide where the write lands, in a trigger function body — L20, not auto-update'
     });
     return [];
   }

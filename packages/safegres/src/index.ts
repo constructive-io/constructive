@@ -27,6 +27,13 @@ export type {
 } from './callgraph/graph';
 export { buildCallGraph } from './callgraph/graph';
 export { checkUntrustedColumnGrants } from './checks/column-grants';
+export type { FunctionBodyAnalysis } from './checks/definer-function';
+export {
+  analyzeFunctionBodies,
+  checkDefinerFunctionReach,
+  checkInsteadOfTriggerWrite,
+  checkUnreadableFunctionReach
+} from './checks/definer-function';
 export type { SuppressedView, ViewBodyAnalysis } from './checks/definer-view';
 export {
   analyzeViewBodies,

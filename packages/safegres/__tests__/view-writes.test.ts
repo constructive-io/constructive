@@ -40,6 +40,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     writable: ['INSERT', 'UPDATE', 'DELETE'],
     checkOption: 'none',
     insteadOfTriggers: false,
+    insteadOf: [],
     rules: [],
     ...partial
   };

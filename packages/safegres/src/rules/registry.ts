@@ -321,7 +321,7 @@ export const RULES: RuleMeta[] = [
     category: 'coverage',
     defaultSeverity: 'info',
     direction: 'neutral',
-    title: 'Unreadable view body — an untrusted role reads a definer view whose body could not be followed (options: { roles: [...] })',
+    title: 'Unreadable body — an untrusted role reaches through a definer view or function whose body could not be followed (options: { roles: [...] })',
     scope: 'table'
   },
   {
@@ -356,6 +356,31 @@ export const RULES: RuleMeta[] = [
     defaultSeverity: 'info',
     direction: 'fail-open',
     title: 'Writable filtering view without WITH CHECK OPTION — an untrusted role writes rows the view excludes (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
+    code: 'L19',
+    category: 'anti-pattern',
+    // The largest reach edge in the L-series, shipping on the same new-rule
+    // posture as the rest. Proven, the honest severity is A2's: a definer
+    // function hands an anonymous role a relation it holds nothing on, and
+    // unlike a view there is no `security_invoker` default to fall back on —
+    // Postgres grants EXECUTE to PUBLIC unless someone says otherwise.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Definer-function reach — an untrusted role touches a relation by executing a SECURITY DEFINER function (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
+    code: 'L20',
+    category: 'anti-pattern',
+    // The write half of L19, and the suppression L9 has carried since it
+    // shipped: a write against a view with INSTEAD OF triggers becomes the
+    // trigger function's body, so it is that function's security attribute —
+    // not the view's — that decides who the write runs as.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'INSTEAD OF trigger write — an untrusted role writes a relation through a trigger function that runs as its owner (options: { roles: [...] })',
     scope: 'table'
   },
   {
