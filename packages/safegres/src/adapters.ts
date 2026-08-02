@@ -12,5 +12,6 @@ export {
   graphileAdapter,
   hasuraAdapter,
   postgrestAdapter,
-  resolveAdapters
+  resolveAdapters,
+  supabaseAdapter
 } from './exposure/adapters';

@@ -217,10 +217,16 @@ export async function audit(
     // --- Role-trust (options-driven; per-table overrides can retune roles) ---
     const tableRules = rulesForTable(resolved, table.schema, table.name);
     findings.push(
-      ...checkUntrustedRoleWrites(table, tableRules.get('R1')?.options as RoleTrustOptions)
+      ...checkUntrustedRoleWrites(
+        table,
+        withExposedRoles(tableRules.get('R1')?.options as RoleTrustOptions, exposure.roles)
+      )
     );
     findings.push(
-      ...checkUntrustedRolePolicies(table, tableRules.get('R2')?.options as RoleTrustOptions)
+      ...checkUntrustedRolePolicies(
+        table,
+        withExposedRoles(tableRules.get('R2')?.options as RoleTrustOptions, exposure.roles)
+      )
     );
     findings.push(...checkPublicGrants(table));
 
@@ -232,7 +238,7 @@ export async function audit(
       ...checkUntrustedIndirectAccess(
         table,
         roleGraph,
-        tableRules.get('L5')?.options as LatticeRoleOptions
+        withExposedRoles(tableRules.get('L5')?.options as LatticeRoleOptions, exposure.roles)
       )
     );
 
@@ -405,8 +411,14 @@ export async function audit(
   // options), so the report answers "what can anonymous access?" directly
   // even when no finding fires.
   const untrustedRoles = [...new Set([
-    ...((resolved.rules.get('L5')?.options as LatticeRoleOptions | undefined)?.roles ?? []),
-    ...((resolved.rules.get('R1')?.options as RoleTrustOptions | undefined)?.roles ?? [])
+    ...(withExposedRoles(
+      resolved.rules.get('L5')?.options as LatticeRoleOptions | undefined,
+      exposure.roles
+    )?.roles ?? []),
+    ...(withExposedRoles(
+      resolved.rules.get('R1')?.options as RoleTrustOptions | undefined,
+      exposure.roles
+    )?.roles ?? [])
   ])].sort();
   if (untrustedRoles.length > 0) {
     const roleAccess: RoleAccessReport = {
@@ -477,6 +489,23 @@ export async function audit(
   }
 
   return report;
+}
+
+/**
+ * Materializes `rolesFrom: 'exposure'` into concrete role names. An adapter
+ * resolves the API-edge roles from the catalog (a Constructive API's
+ * `anon_role`, PostgREST's `pgrst.db_anon_role`, the role a graphile
+ * authenticator can `SET ROLE` to); those roles are exactly the untrusted
+ * ones, and their names are per-deployment, so a preset names the *source*
+ * instead of the roles. Explicit `roles` still apply — the two union.
+ */
+function withExposedRoles<T extends { roles?: string[]; rolesFrom?: 'exposure' }>(
+  options: T | undefined,
+  exposedRoles: string[] | undefined
+): T | undefined {
+  if (!options?.rolesFrom) return options;
+  const roles = [...new Set([...(options.roles ?? []), ...(exposedRoles ?? [])])].sort();
+  return { ...options, roles };
 }
 
 /** Stats floors, config over defaults. */

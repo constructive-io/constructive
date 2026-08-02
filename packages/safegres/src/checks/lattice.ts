@@ -320,6 +320,8 @@ export function checkDeadSchemaUsage(
 export interface LatticeRoleOptions {
   /** Role names considered untrusted (exact match). */
   roles?: string[];
+  /** Take the untrusted roles from the resolved exposure surface. See `RoleTrustOptions`. */
+  rolesFrom?: 'exposure';
 }
 
 /**

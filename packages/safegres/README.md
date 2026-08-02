@@ -387,15 +387,33 @@ what it finds; both are just partial configs, so `extends` takes an array:
 | Stack | Resolves exposure from | Treats as untrusted |
 | --- | --- | --- |
 | `safegres:constructive` | `routing_public.apis` → `api_schemas` → `metaschema_public.schema` | `anonymous` |
-| `safegres:postgrest` | `pgrst.db_schemas` in `pg_db_role_setting` | `anon` |
-| `safegres:supabase` | same (Supabase *is* PostgREST) | `anon`, `authenticated` |
+| `safegres:postgrest` | `pgrst.db_schemas` in `pg_db_role_setting` | `pgrst.db_anon_role` |
+| `safegres:supabase` | the GUCs if self-hosted, else Supabase's fixed surface | `anon`, `authenticated` |
 | `safegres:hasura` | tracked tables in `hdb_catalog` | `anonymous`, `public` |
-| `safegres:graphile` | the `graphile-starter` layout (`app_public` + `app_hidden`) | `visitor` |
+| `safegres:graphile` | the `graphile-starter` layout (`app_public` + `app_hidden`) | `<app>_visitor` |
 
-Each reads a real catalog signal — not a schema name. The one exception is `graphile`, because
-PostGraphile's schema list is a process argument that leaves no trace in the database: naming that
-preset *is* the declaration that the starter layout holds. If it doesn't, list
-`exposure.schemas` instead.
+Each reads a real catalog signal — not a schema name. Two carry a caveat worth knowing:
+
+- **`graphile`** — PostGraphile's schema list is a process argument that leaves no trace in the
+  database, so this preset resolves the starter layout by convention. Naming it *is* the
+  declaration that the convention holds; when it doesn't, `exposure.schemas` still wins.
+- **`supabase`** — Supabase configures PostgREST outside the database, so the GUCs are usually
+  absent. Its adapter falls back to the platform's fixed surface, but only after proving it is
+  looking at Supabase (`auth.users` plus the `anon`/`authenticated`/`service_role` trio). The
+  fallback lives in that adapter alone: plain `postgrest` never guesses, and an unconfigured
+  PostgREST resolves nothing — reported as unknown exposure, not as a surface.
+
+Untrusted roles are usually *resolved*, not named. `pgrst.db_anon_role` and graphile's
+`<app>_visitor` are per-deployment, so those presets point the rules at the surface instead of
+guessing a name:
+
+```jsonc
+{ "rules": { "R1": ["critical", { "rolesFrom": "exposure" }] } }
+```
+
+`rolesFrom: "exposure"` hands R1/R2/L5 whatever roles the adapter resolved, and unions with any
+explicit `roles`. Rules that ask for neither stay inert — resolved roles never leak into a rule
+that didn't opt in.
 
 | Posture | Behavior |
 | --- | --- |
