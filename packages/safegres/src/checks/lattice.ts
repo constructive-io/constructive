@@ -324,6 +324,62 @@ export interface LatticeRoleOptions {
   rolesFrom?: 'exposure' | 'anon';
 }
 
+export interface UnaddressableGrantOptions {
+  /** API-edge roles: the roles requests actually arrive as. */
+  roles: string[];
+  /**
+   * Relations named by some RLS policy predicate anywhere in the database.
+   *
+   * The reason this parameter exists: a grant on a relation the API cannot
+   * address is *not* automatically dead, because a policy on a different
+   * relation may subquery it under the querying role. Revoking that grant
+   * breaks authorization at runtime, silently, everywhere. A relation any
+   * predicate mentions is therefore never reported, whatever the API says.
+   */
+  policyReferenced: Set<string>;
+}
+
+/**
+ * L6: an API-edge role holds privileges on a relation its own API cannot
+ * address.
+ *
+ * The composition the two halves of safegres were built for: the lattice knows
+ * what a role effectively holds, exposure reach knows what the generated API
+ * can name, and the difference is grant surface that exists for nothing. It is
+ * not a leak — the role would have to connect directly to use it — which is
+ * exactly why it is the kind of finding that survives for years.
+ */
+export function checkUnaddressableGrant(
+  table: TableSnapshot,
+  graph: RoleGraph,
+  unaddressable: Set<string>,
+  options: UnaddressableGrantOptions
+): Finding[] {
+  const key = `${table.schema}.${table.name}`;
+  if (!unaddressable.has(key) || options.policyReferenced.has(key)) return [];
+
+  const out: Finding[] = [];
+  for (const role of options.roles) {
+    const grants = effectiveGrants(table, role, graph).filter((e) =>
+      RLS_PRIVILEGES.includes(e.privilege)
+    );
+    if (grants.length === 0) continue;
+    const privileges = grants.map((e) => e.privilege).join(', ');
+    out.push({
+      code: 'L6',
+      severity: 'info',
+      category: 'coverage',
+      schema: table.schema,
+      table: table.name,
+      role,
+      privilege: privileges,
+      message: `API role ${role} holds ${privileges} on ${key}, which the generated API declares it cannot address — the grant serves no request`,
+      hint: 'Revoke the grant, or drop the behavior denial if the relation is meant to be exposed. No policy predicate references this relation, so nothing else depends on the grant.'
+    });
+  }
+  return out;
+}
+
 /**
  * L5: an untrusted role reaches an RLS-disabled table *indirectly* — through
  * a grant TO PUBLIC or by inheriting from a granted role. Direct grants are

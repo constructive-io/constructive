@@ -31,6 +31,15 @@ cell each `(relation, role, privilege)` triple lands in:
 plus schema composition: an object grant is unreachable without `USAGE` on its schema (L3), and
 `USAGE` that reaches no relation and no function is dead surface (L4).
 
+L6 composes the lattice with [API reach](../README.md#api-reach--the-relations-the-api-can-actually-name):
+an API-edge role holding privileges on a relation the generated API cannot address. It is not a
+leak — the role would have to connect directly to use the grant — which is exactly why such grants
+survive for years. Two conditions gate it, both deliberately conservative: an adapter must have
+*proved* the relation unaddressable (silence in the behavior tags is never denial), and no RLS
+policy predicate anywhere may reference the relation. The second is the important one: a policy
+can subquery a table under the querying role, so the grant is load-bearing however invisible it is
+to the API, and a naive recommendation to revoke it would break authorization at runtime.
+
 Restrictive-only policies never count as coverage. `BYPASSRLS` and superuser roles are exempt from
 policy checks — they are not subject to RLS, so a "missing policy" finding for them would be
 noise. Policies are matched with `pg_has_role` semantics: a policy `TO authenticated` covers a
