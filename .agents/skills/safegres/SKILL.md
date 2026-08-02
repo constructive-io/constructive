@@ -278,7 +278,7 @@ Report-only first, gate after a week of stable scores. Never write a bespoke aud
   "source":  { "pgpm": "application/app" },   // deploy into an ephemeral DB — no connection needed
   "callGraph": { "enabled": true },
   "perf":    { "enabled": true, "baseline": "ci/safegres-perf-baseline.json", "failOnNew": true },
-  "outputs": { "json": "safegres-reports/safegres.json", "sarif": "safegres-reports/safegres.sarif" },
+  "outputs": { "dir": "safegres-reports" },   // safegres.json + .md + .sarif; or name files individually
   "failOn":  { "grade": "B" }
 }
 ```

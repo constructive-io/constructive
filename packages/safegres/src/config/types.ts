@@ -336,6 +336,12 @@ export interface SourceConfig {
  * `safegres audit`, with the artifact list versioned alongside the rules.
  */
 export interface OutputsConfig {
+  /**
+   * Write the whole set into one directory as `safegres.json`, `safegres.md`
+   * and `safegres.sarif`. The usual case, and nobody has to remember three
+   * paths; the keys below still override an individual file.
+   */
+  dir?: string;
   json?: string;
   markdown?: string;
   sarif?: string;

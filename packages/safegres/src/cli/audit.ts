@@ -147,6 +147,8 @@ Audit options:
   --sarif-sources <dir>    With --format sarif: scan <dir> for the CREATE TABLE /
                            CREATE POLICY that defines each object, so alerts point
                            at the SQL that produced the finding
+  --out <dir>              Write safegres.json, safegres.md and safegres.sarif
+                           into <dir> (created as needed)
   --write-json <file>      Also write the JSON report to <file>
   --write-markdown <file>  Also write the markdown report to <file>
   --write-sarif <file>     Also write the SARIF report to <file>
@@ -179,7 +181,7 @@ the job is just \`safegres audit\` (paths are relative to the config file):
     "source":  { "pgpm": "application/app" },
     "callGraph": { "enabled": true },
     "perf":    { "enabled": true, "baseline": "ci/perf-baseline.json", "failOnNew": true },
-    "outputs": { "json": "reports/safegres.json", "sarif": "reports/safegres.sarif" },
+    "outputs": { "dir": "safegres-reports" },
     "failOn":  { "grade": "B" }
   }
 `;

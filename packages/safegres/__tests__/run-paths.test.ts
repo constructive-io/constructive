@@ -52,6 +52,26 @@ describe('resolveRunPaths', () => {
     expect(paths.outputs.json).toBe('out.json');
   });
 
+  it('expands a directory into the conventional file names', () => {
+    const paths = resolveRunPaths(argv(), { outputs: { dir: 'reports' } }, CONFIG_DIR);
+
+    expect(paths.outputs.json).toBe(path.join(CONFIG_DIR, 'reports/safegres.json'));
+    expect(paths.outputs.markdown).toBe(path.join(CONFIG_DIR, 'reports/safegres.md'));
+    expect(paths.outputs.sarif).toBe(path.join(CONFIG_DIR, 'reports/safegres.sarif'));
+    // The directory is the report set, not every artifact: a snapshot and a PR
+    // comment are asked for by name or not at all.
+    expect(paths.outputs.snapshot).toBeUndefined();
+    expect(paths.outputs.githubComment).toBeUndefined();
+  });
+
+  it('lets a named file beat the directory, and --out beat the config', () => {
+    const config: SafegresConfig = { outputs: { dir: 'reports', json: 'reports/full.json' } };
+    const paths = resolveRunPaths(argv({ out: 'tmp' }), config, CONFIG_DIR);
+
+    expect(paths.outputs.json).toBe(path.join(CONFIG_DIR, 'reports/full.json'));
+    expect(paths.outputs.sarif).toBe(path.join('tmp', 'safegres.sarif'));
+  });
+
   it('treats a bare --pgpm as "the nearest workspace"', () => {
     const paths = resolveRunPaths(argv({ pgpm: true }), {}, CONFIG_DIR);
     expect(paths.usePgpm).toBe(true);

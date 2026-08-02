@@ -391,7 +391,7 @@ deploys it into an ephemeral one:
   "extends": "safegres:constructive",
   "source":  { "pgpm": "application/app" },
   "perf":    { "enabled": true, "baseline": "ci/perf-baseline.json", "failOnNew": true },
-  "outputs": { "json": "reports/safegres.json", "sarif": "reports/safegres.sarif" },
+  "outputs": { "dir": "safegres-reports" },
   "failOn":  { "grade": "B" }
 }
 ```
@@ -400,7 +400,9 @@ deploys it into an ephemeral one:
       - run: npx safegres audit   # or: "audit": "safegres lint" in package.json
 ```
 
-Output directories are created as needed, and a flag still wins over the file for a one-off run.
+`outputs.dir` writes `safegres.json`, `safegres.md` and `safegres.sarif` into one directory — name
+an individual file (`outputs.json`) only when the name matters. Directories are created as needed,
+and a flag still wins over the file for a one-off run (`safegres audit --out reports`).
 
 Scores lead the markdown, then severity counts, then a table per dimension; internal advisories
 and accepted baseline debt fold into `<details>`. Pipe it to `gh pr comment --body-file -` to post
@@ -657,13 +659,13 @@ safegres print-config   # the resolved effective config (--explain for per-key p
 | Exposure | `--exposure-schemas <csv>`, `--exposed-only` |
 | Scope | `--schemas`, `--exclude-schemas`, `--roles`, `--exclude-roles`, `--ignore-extensions`, `--audit-extension-owned` |
 | Performance | `--perf`, `--stats`, `--explain`, `--perf-baseline <f>`, `--write-perf-baseline <f>`, `--fail-on-new-perf` |
-| Reporting | `--format pretty\|json\|json-pretty\|markdown\|sarif`, `--sarif-sources <dir>`, `--summary`/`-q`, `--verbose`, `--compare <f>`, `--compare-ref <label>`, `--write-snapshot <f>` |
+| Reporting | `--format pretty\|json\|json-pretty\|markdown\|sarif`, `--out <dir>`, `--sarif-sources <dir>`, `--summary`/`-q`, `--verbose`, `--compare <f>`, `--compare-ref <label>`, `--write-snapshot <f>` |
 | Call graph | `--call-graph`, `--baseline <f>`, `--write-baseline <f>`, `--fail-on-new-boundaries` |
 | Gating | `--fail-on <severity>`, `--fail-on-score <n>`, `--fail-on-grade <g>`, `--fail-on-perf-score`, `--fail-on-perf-grade` |
 | Misc | `--skip-ast`, `--no-color`, `--help`, `--version` |
 
 The paths among those — `--pgpm`, the two baselines, and every `--write-*` — have config-file
-equivalents (`source.pgpm`, `perf.baseline`, `callGraph.baseline`, `outputs.*`), so CI can carry
+equivalents (`source.pgpm`, `perf.baseline`, `callGraph.baseline`, `outputs.dir`/`outputs.*`), so CI can carry
 them in version control rather than in a command line.
 
 ## Going further

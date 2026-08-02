@@ -93,15 +93,20 @@ export function resolveRunPaths(
   const pick = (flag: unknown, configured?: string): string | undefined =>
     typeof flag === 'string' ? flag : configured && path.resolve(configDir, configured);
 
+  // A directory is the common case: one path, conventional names, no remembering
+  // which extension goes with which renderer. A named file still wins.
+  const dir = pick(argv.out, config.outputs?.dir);
+  const inDir = (name: string): string | undefined => dir && path.join(dir, name);
+
   return {
     pgpm: pick(argv.pgpm, config.source?.pgpm),
     usePgpm: argv.pgpm !== undefined || config.source?.pgpm !== undefined,
     perfBaseline: pick(argv['perf-baseline'], config.perf?.baseline),
     callGraphBaseline: pick(argv.baseline, config.callGraph?.baseline),
     outputs: {
-      json: pick(argv['write-json'], config.outputs?.json),
-      markdown: pick(argv['write-markdown'], config.outputs?.markdown),
-      sarif: pick(argv['write-sarif'], config.outputs?.sarif),
+      json: pick(argv['write-json'], config.outputs?.json) ?? inDir('safegres.json'),
+      markdown: pick(argv['write-markdown'], config.outputs?.markdown) ?? inDir('safegres.md'),
+      sarif: pick(argv['write-sarif'], config.outputs?.sarif) ?? inDir('safegres.sarif'),
       sarifSources: pick(argv['sarif-sources'], config.outputs?.sarifSources),
       snapshot: pick(argv['write-snapshot'], config.outputs?.snapshot),
       githubComment: pick(argv['write-github-comment'], config.outputs?.githubComment)
