@@ -155,6 +155,43 @@ describe('stack adapters', () => {
     }
   });
 
+  it("separates the anon role from the API edge's other roles", async () => {
+    const planes = await postgrestAdapter.resolve(pg.client as never);
+    const primary = planes.find((p) => p.primary);
+    // fx_anon is pgrst.db_anon_role; fx_authenticator holds the config but is
+    // a connecting role, not an API-edge one.
+    expect(primary!.anonRoles).toEqual(['fx_anon']);
+    expect(planes.find((p) => p.name === 'direct:fx_authenticator')!.anonRoles).toBeUndefined();
+  });
+
+  it("rolesFrom 'anon' targets only what an unauthenticated caller reaches", async () => {
+    // The distinction that keeps the constructive preset usable: a signed-in
+    // role writing is the product; the anon role writing is the bug.
+    await pg.any('GRANT INSERT ON fx_pgrst_api.notes TO fx_anon, fx_signed_in');
+    try {
+      const forAnon = await audit(pg.client as never, {
+        schemas: ['fx_pgrst_api'],
+        exposure: { adapters: ['postgrest'], roles: ['fx_signed_in'] },
+        config: { rules: { R1: ['critical', { rolesFrom: 'anon' }] } }
+      });
+      expect(forAnon.findings.filter((f) => f.code === 'R1').map((f) => f.role)).toEqual([
+        'fx_anon'
+      ]);
+
+      // The stricter reading still available for a surface that wants it.
+      const forAll = await audit(pg.client as never, {
+        schemas: ['fx_pgrst_api'],
+        exposure: { adapters: ['postgrest'], roles: ['fx_signed_in'] },
+        config: { rules: { R1: ['critical', { rolesFrom: 'exposure' }] } }
+      });
+      expect(
+        forAll.findings.filter((f) => f.code === 'R1').map((f) => f.role).sort()
+      ).toEqual(['fx_anon', 'fx_signed_in']);
+    } finally {
+      await pg.any('REVOKE INSERT ON fx_pgrst_api.notes FROM fx_anon, fx_signed_in');
+    }
+  });
+
   it('leaves rules inert when a preset names no roles and none resolve', async () => {
     // Without `rolesFrom` and without explicit roles, R1 stays a no-op —
     // adapter-resolved roles must never leak into rules that did not ask.

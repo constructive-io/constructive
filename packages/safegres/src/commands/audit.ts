@@ -57,6 +57,7 @@ import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { resolvePlaneReach, scorePlane, stampPlanes } from '../exposure/planes';
 import { type ExplainReport, proveFindings } from '../perf/explain';
 import { introspectRoleGraph, introspectSchemaAcls } from '../pg/acl';
+import type { ResolvedExposure } from '../pg/exposure';
 import { resolveExposure, resolvePlanes } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
 import { introspectIndexes, introspectViewBodies, type TableIndexSnapshot } from '../pg/indexes';
@@ -219,13 +220,13 @@ export async function audit(
     findings.push(
       ...checkUntrustedRoleWrites(
         table,
-        withExposedRoles(tableRules.get('R1')?.options as RoleTrustOptions, exposure.roles)
+        withExposedRoles(tableRules.get('R1')?.options as RoleTrustOptions, exposure)
       )
     );
     findings.push(
       ...checkUntrustedRolePolicies(
         table,
-        withExposedRoles(tableRules.get('R2')?.options as RoleTrustOptions, exposure.roles)
+        withExposedRoles(tableRules.get('R2')?.options as RoleTrustOptions, exposure)
       )
     );
     findings.push(...checkPublicGrants(table));
@@ -238,7 +239,7 @@ export async function audit(
       ...checkUntrustedIndirectAccess(
         table,
         roleGraph,
-        withExposedRoles(tableRules.get('L5')?.options as LatticeRoleOptions, exposure.roles)
+        withExposedRoles(tableRules.get('L5')?.options as LatticeRoleOptions, exposure)
       )
     );
 
@@ -363,6 +364,9 @@ export async function audit(
     plane: planes[0].name,
     schemas: exposure.schemas,
     ...(exposure.roles ? { roles: exposure.roles } : {}),
+    ...(exposure.anonRoles && exposure.anonRoles.length > 0
+      ? { anonRoles: exposure.anonRoles }
+      : {}),
     exposedTables,
     totalTables: snapshot.length
   };
@@ -413,11 +417,11 @@ export async function audit(
   const untrustedRoles = [...new Set([
     ...(withExposedRoles(
       resolved.rules.get('L5')?.options as LatticeRoleOptions | undefined,
-      exposure.roles
+      exposure
     )?.roles ?? []),
     ...(withExposedRoles(
       resolved.rules.get('R1')?.options as RoleTrustOptions | undefined,
-      exposure.roles
+      exposure
     )?.roles ?? [])
   ])].sort();
   if (untrustedRoles.length > 0) {
@@ -499,12 +503,13 @@ export async function audit(
  * ones, and their names are per-deployment, so a preset names the *source*
  * instead of the roles. Explicit `roles` still apply — the two union.
  */
-function withExposedRoles<T extends { roles?: string[]; rolesFrom?: 'exposure' }>(
+function withExposedRoles<T extends { roles?: string[]; rolesFrom?: 'exposure' | 'anon' }>(
   options: T | undefined,
-  exposedRoles: string[] | undefined
+  exposure: ResolvedExposure
 ): T | undefined {
   if (!options?.rolesFrom) return options;
-  const roles = [...new Set([...(options.roles ?? []), ...(exposedRoles ?? [])])].sort();
+  const resolved = options.rolesFrom === 'anon' ? exposure.anonRoles : exposure.roles;
+  const roles = [...new Set([...(options.roles ?? []), ...(resolved ?? [])])].sort();
   return { ...options, roles };
 }
 

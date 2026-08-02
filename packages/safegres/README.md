@@ -408,12 +408,21 @@ Untrusted roles are usually *resolved*, not named. `pgrst.db_anon_role` and grap
 guessing a name:
 
 ```jsonc
-{ "rules": { "R1": ["critical", { "rolesFrom": "exposure" }] } }
+{ "rules": { "R1": ["critical", { "rolesFrom": "anon" }] } }
 ```
 
-`rolesFrom: "exposure"` hands R1/R2/L5 whatever roles the adapter resolved, and unions with any
-explicit `roles`. Rules that ask for neither stay inert — resolved roles never leak into a rule
-that didn't opt in.
+An adapter resolves two role sets, because "at the API edge" and "reachable without credentials"
+are different questions:
+
+| `rolesFrom` | Roles | Use when |
+| --- | --- | --- |
+| `anon` | Only what an unauthenticated caller arrives as — `apis.anon_role`, `pgrst.db_anon_role`, Supabase's `anon`, graphile's visitor | Almost always. A signed-in role holding a write grant is the product; the anon role holding one is the bug. |
+| `exposure` | Every role at the edge, signed-in ones included | A surface where no role should be writing directly. |
+
+Both union with any explicit `roles`, so a preset can name a platform default *and* pick up a
+custom one. Rules that ask for neither stay inert — resolved roles never leak into a rule that
+didn't opt in. `report.exposure.anonRoles` carries the anonymous subset, and the pretty renderer
+marks it inline (`api roles: authenticated, anonymous (anon)`).
 
 | Posture | Behavior |
 | --- | --- |

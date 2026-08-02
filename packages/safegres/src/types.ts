@@ -146,6 +146,11 @@ export interface ExposureReport {
   schemas: string[];
   /** API-edge roles, when the resolver can discover them. */
   roles?: string[];
+  /**
+   * The subset of `roles` an unauthenticated caller arrives as — the answer to
+   * "what can someone with no credentials reach?". Omitted when none resolve.
+   */
+  anonRoles?: string[];
   /** Tables on the exposed surface (the score denominator). */
   exposedTables: number;
   /** All tables the audit introspected. */

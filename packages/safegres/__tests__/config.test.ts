@@ -160,12 +160,14 @@ describe('presets', () => {
     const { rules } = resolveRules(config);
     expect(rules.get('A2')!.severity).toBe('critical');
     expect(rules.get('P5')!.severity).toBe('critical');
+    // `anonymous` is the platform default, kept explicit; `rolesFrom` picks up
+    // an API that declares a custom `anon_role` instead of missing it.
     expect(rules.get('R1')).toEqual({
       enabled: true,
       severity: 'critical',
-      options: { roles: ['anonymous'] }
+      options: { roles: ['anonymous'], rolesFrom: 'anon' }
     });
-    expect(rules.get('R2')!.options).toEqual({ roles: ['anonymous'] });
+    expect(rules.get('R2')!.options).toEqual({ roles: ['anonymous'], rolesFrom: 'anon' });
     expect(config.scoring?.floorOnCritical).toBe('C');
   });
 });
