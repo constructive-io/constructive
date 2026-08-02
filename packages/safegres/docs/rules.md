@@ -108,6 +108,26 @@ weighted rules: column-level SELECT for an anonymous role on an RLS-off table is
 A2 grades `high`, and promoting it there is a scoring change to make once the rule has been
 validated against real schemas.
 
+**L14** is the coverage half of L8, and the only rule here that reports an *absence of knowledge*.
+Excluding a schema — by `excludeSchemas`, by naming only some in `schemas`, or because it is a
+system catalog — is a statement about what gets *graded*, not about what is *reachable*. A definer
+view in an audited schema whose body reads `information_schema`, an extension's tables, or a private
+schema left out of the surface produced nothing at all: the base relation was not in the snapshot,
+so every rule that grades a base relation dropped the edge and the view scanned clean. The resolver
+now separates the two kinds of miss — a qualified reference into a schema the audit *did* read is
+still an unresolved name (a CTE, an alias) and is still dropped, while a qualified reference into a
+schema it never read is `external`: the reach is proven, its consequences are not.
+
+The finding is `info`/`neutral` and stays there however the reach is graded later, because an
+unknown is not a leak and scoring one would let an excluded schema move the number. It is exposure-
+stamped by the *view*, not by the out-of-scope relation, or every instance would file itself as an
+internal advisory and disappear from the report that matters. The remedy is to bring the schema into
+scope or to satisfy yourself the projection is safe — never a revoke. Note the boundary the negative
+corpus case pins: an out-of-scope *reference* is not a finding, only an out-of-scope *reach* is. An
+invoker view over the same table confers nothing, so it reports nothing, which is what keeps every
+view that touches a system catalog from becoming noise. L9–L12 take the conservative side of the
+same distinction: an external relation has no owner, ACL or RLS to reason about, so it suppresses.
+
 Restrictive-only policies never count as coverage. `BYPASSRLS` and superuser roles are exempt from
 policy checks — they are not subject to RLS, so a "missing policy" finding for them would be
 noise. Policies are matched with `pg_has_role` semantics: a policy `TO authenticated` covers a

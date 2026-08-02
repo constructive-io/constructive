@@ -301,6 +301,18 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L14',
+    // `coverage`, not `anti-pattern`: the finding is that the audit stopped at
+    // the schema boundary, not that the view is wrong. Severity stays `info`
+    // however the reach is graded later — an unknown is never a proven leak,
+    // and scoring one would let an excluded schema move the number.
+    category: 'coverage',
+    defaultSeverity: 'info',
+    direction: 'neutral',
+    title: 'Unaudited base relation — a definer view reads a relation in a schema the audit did not introspect (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
     code: 'W1',
     category: 'meta',
     defaultSeverity: 'medium',

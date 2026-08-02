@@ -75,13 +75,16 @@ export async function analyzeViewExposure(
         suppressed.push({ view: label, reason: opaque });
         continue;
       }
-      if (bases.length === 0) continue;
+      // Relations outside the audited schemas carry no ACL or policy to
+      // compare the stored rows against; L14 reports the reach instead.
+      const graded = bases.filter((b) => !b.external);
+      if (graded.length === 0) continue;
       matviews.push({
         schema: view.schema,
         name: view.name,
         owner: view.owner,
         grants: view.grants,
-        baseRelations: bases,
+        baseRelations: graded,
         materialized: true
       });
       continue;
@@ -104,13 +107,14 @@ export async function analyzeViewExposure(
       suppressed.push({ view: label, reason: opaque });
       continue;
     }
-    if (bases.length === 0) continue;
+    const gradedBases = bases.filter((b) => !b.external);
+    if (gradedBases.length === 0) continue;
     leaky.push({
       schema: view.schema,
       name: view.name,
       owner: view.owner,
       grants: view.grants,
-      baseRelations: bases
+      baseRelations: gradedBases
     });
   }
 

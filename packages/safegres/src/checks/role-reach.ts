@@ -73,6 +73,11 @@ export interface RoleReachCell {
   /** The edges, caller-first, by which the reach arrived. */
   path: RoleReachEdge[];
   proof: ReachProof;
+  /**
+   * The relation was not introspected: it is outside the audited schemas.
+   * `privileges` is what the path exercises, not what the relation permits.
+   */
+  external?: boolean;
 }
 
 /** Everything one role reaches, across the relations examined. */
@@ -150,6 +155,12 @@ export interface ViewBaseRelation {
    * owner is the role the base relation is actually read as.
    */
   hops: Array<{ view: string; owner: string }>;
+  /**
+   * The relation lives outside the audited schemas, so nothing is known about
+   * its ACL, its RLS or its owner. The read is proven; its consequences are
+   * not, and a consumer must not grade it as if the relation were in scope.
+   */
+  external?: boolean;
 }
 
 /** A view, its own ACL, and the base relations its body was found to read. */
@@ -207,7 +218,8 @@ export function computeViewReach(
               owner: h.owner
             }))
           ],
-          proof: 'ast'
+          proof: 'ast',
+          ...(base.external ? { external: true } : {})
         });
       }
     }

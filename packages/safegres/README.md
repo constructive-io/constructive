@@ -149,6 +149,7 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L11 | info | fail-open | **Materialized-view snapshot** — stored rows serve an untrusted role what the base relation's grants and policies would not † |
 | L12 | info | fail-open | **Non-barrier filtering view** — a view is an untrusted role's only path to a relation, but its row filter is not a boundary † |
 | L13 | info | fail-open | **Column-level grant** — an untrusted role reaches a relation through `pg_attribute.attacl`, which no relation ACL shows † |
+| L14 | info | neutral | **Unaudited base relation** — a definer view reads a relation in a schema the audit never introspected † |
 | W1 | medium | — | **No exposure surface configured** — whole database assumed reachable, score capped |
 
 † R1/R2/L5 are no-ops until you name the untrusted roles:

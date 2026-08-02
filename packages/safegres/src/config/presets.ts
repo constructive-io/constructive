@@ -44,7 +44,10 @@ export const recommended: SafegresConfig = {
     // Reach that only `pg_attribute.attacl` shows. New, so zero weight — but
     // note this one is catalog-derived, not body-derived: what was missing was
     // the introspection, not the proof.
-    L13: ['info', { rolesFrom: 'anon' }]
+    L13: ['info', { rolesFrom: 'anon' }],
+    // The coverage half of L8: a body reference the audit could not follow
+    // because the schema was out of scope. Reports an unknown, never a leak.
+    L14: ['info', { rolesFrom: 'anon' }]
   }
 };
 

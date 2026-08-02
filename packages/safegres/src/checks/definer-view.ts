@@ -57,12 +57,13 @@ export interface ViewBodyAnalysis {
  */
 export async function analyzeViewBodies(
   views: ViewSnapshot[],
-  tables: TableSnapshot[]
+  tables: TableSnapshot[],
+  auditedSchemas?: Iterable<string>
 ): Promise<ViewBodyAnalysis> {
   // A materialized view stores its rows: reading it touches no base relation,
   // so it is a leaf here, never an edge.
   const queryable = views.filter((v) => !v.materialized);
-  const index = buildRelationIndex(queryable, tables);
+  const index = buildRelationIndex(queryable, tables, auditedSchemas);
 
   const bodies = await readBodies(queryable);
 
@@ -152,7 +153,12 @@ export function resolveViewBases(
       const dedupe = `${relKey}::${hops[hops.length - 1].owner}`;
       if (seen.has(dedupe)) continue;
       seen.add(dedupe);
-      bases.push({ schema: relation.schema, table: relation.name, hops: [...hops] });
+      bases.push({
+        schema: relation.schema,
+        table: relation.name,
+        hops: [...hops],
+        ...(relation.kind === 'external' ? { external: true } : {})
+      });
     }
   };
 
@@ -163,22 +169,42 @@ export function resolveViewBases(
 
 export type Resolved =
   | { kind: 'table'; schema: string; name: string }
-  | { kind: 'view'; view: ViewSnapshot };
+  | { kind: 'view'; view: ViewSnapshot }
+  /**
+   * A schema-qualified relation in a schema the audit did not introspect —
+   * excluded by config, owned by an extension, or a system catalog. The
+   * reference is unambiguous, so dropping it would under-report the view's
+   * reach; nothing about the relation itself is known.
+   */
+  | { kind: 'external'; schema: string; name: string };
 
 /** The lookup tables {@link resolveRelation} needs, built once per snapshot. */
 export interface RelationIndex {
   tableKeys: Set<string>;
   viewKeys: Map<string, ViewSnapshot>;
   viewsByName: Map<string, ViewSnapshot[]>;
+  /**
+   * The schemas the snapshot covers. A qualified reference into a schema
+   * *not* in this set is external rather than unresolvable; a miss inside it
+   * is a name the audit genuinely could not pin down.
+   */
+  auditedSchemas: Set<string>;
 }
 
-export function buildRelationIndex(views: ViewSnapshot[], tables: TableSnapshot[]): RelationIndex {
+export function buildRelationIndex(
+  views: ViewSnapshot[],
+  tables: TableSnapshot[],
+  auditedSchemas?: Iterable<string>
+): RelationIndex {
   const viewsByName = new Map<string, ViewSnapshot[]>();
   for (const v of views) viewsByName.set(v.name, [...(viewsByName.get(v.name) ?? []), v]);
   return {
     tableKeys: new Set(tables.map((t) => `${t.schema}.${t.name}`)),
     viewKeys: new Map(views.map((v) => [`${v.schema}.${v.name}`, v])),
-    viewsByName
+    viewsByName,
+    auditedSchemas: new Set(
+      auditedSchemas ?? [...tables.map((t) => t.schema), ...views.map((v) => v.schema)]
+    )
   };
 }
 
@@ -195,7 +221,7 @@ export function buildRelationIndex(views: ViewSnapshot[], tables: TableSnapshot[
 export function resolveRelation(
   ref: { schema?: string; name: string },
   viewSchema: string,
-  { tableKeys, viewKeys, viewsByName }: RelationIndex
+  { tableKeys, viewKeys, viewsByName, auditedSchemas }: RelationIndex
 ): Resolved | null {
   const candidates = ref.schema ? [ref.schema] : [viewSchema];
   for (const schema of candidates) {
@@ -204,7 +230,13 @@ export function resolveRelation(
     if (view) return { kind: 'view', view };
     if (tableKeys.has(key)) return { kind: 'table', schema, name: ref.name };
   }
-  if (ref.schema) return null;
+  // Qualified and unknown: either a relation the audit skipped (external, and
+  // the reach is still real) or a genuine miss inside a schema it did read.
+  if (ref.schema) {
+    return auditedSchemas.has(ref.schema)
+      ? null
+      : { kind: 'external', schema: ref.schema, name: ref.name };
+  }
 
   const matches = [
     ...[...tableKeys]
@@ -281,6 +313,75 @@ export function checkDefinerViewBypass(
           viaViews: hops.map((h) => h.view),
           baseRlsEnabled: base.rlsEnabled,
           rlsBypassed,
+          proof: cell.proof
+        }
+      });
+    }
+  }
+
+  return out;
+}
+
+/**
+ * L14: a definer view hands an untrusted role a relation the audit never
+ * looked at.
+ *
+ * Excluding a schema is a statement about what is *graded*, not about what is
+ * *reachable*. A view in an audited schema can read `information_schema`,
+ * `pg_catalog`, an extension's tables, or any schema left out of
+ * `exposure.schemas` — and because that relation is not in the snapshot,
+ * every rule that grades a base relation silently drops the edge. The view
+ * looked clean because the audit could not see the far end.
+ *
+ * This is the one L-rule that reports an *absence of knowledge*. It says the
+ * read happens and that nothing was graded on the other side; it does not
+ * claim the relation is sensitive, and it recommends no revoke — the remedy
+ * is to bring the schema into scope, or to satisfy yourself that the
+ * projection is safe and leave it.
+ */
+export function checkUnauditedViewReach(
+  views: ViewReachInput[],
+  graph: RoleGraph,
+  options: LatticeRoleOptions = {}
+): Finding[] {
+  const untrusted = options.roles ?? [];
+  if (untrusted.length === 0 || views.length === 0) return [];
+
+  const out: Finding[] = [];
+
+  for (const { role, cells } of computeViewReach(views, graph, untrusted)) {
+    for (const cell of cells) {
+      if (!cell.external) continue;
+
+      const hops = cell.path.filter((e): e is { kind: 'view'; view: string; owner: string } =>
+        e.kind === 'view'
+      );
+      const outermost = hops[0];
+      if (!outermost) continue;
+      const owner = cell.effectiveRole;
+
+      out.push({
+        code: 'L14',
+        severity: 'info',
+        category: 'coverage',
+        schema: cell.schema,
+        table: cell.table,
+        role,
+        privilege: 'SELECT',
+        message:
+          `Untrusted role ${role} reads ${cell.schema}.${cell.table} through view ${outermost.view} `
+          + `as its owner ${owner}, and ${cell.schema} is outside the audited schemas — nothing `
+          + 'graded what that relation exposes',
+        hint:
+          `The read is proven from the view body; its consequences are not, because ${cell.schema} `
+          + 'was never introspected. Add the schema to the audit (`schemas`, or remove it from '
+          + '`excludeSchemas`) to grade the far end, or confirm the projection is safe to serve. '
+          + 'This is a gap in coverage, not a proven leak: do not revoke anything on its strength.',
+        context: {
+          view: outermost.view,
+          effectiveRole: owner,
+          viaViews: hops.map((h) => h.view),
+          unauditedSchema: cell.schema,
           proof: cell.proof
         }
       });

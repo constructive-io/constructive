@@ -1,0 +1,30 @@
+{
+  "title": "A definer view reads a relation in a schema the audit never introspected",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_unaudited_view"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L14",
+      "relation": "c_unaudited_hidden.credentials",
+      "role": "corpus_anon",
+      "note": "the reach is proven from the view body; nothing on the far end was graded, because c_unaudited_hidden is outside the audited schemas"
+    }
+  ],
+  "forbid": [
+    "L8"
+  ],
+  "worstSeverity": "info",
+  "fix": "Bring c_unaudited_hidden into the audit (add it to `schemas`, or drop it from `excludeSchemas`) so the base relation's ACL and policies are graded — then L8 can answer whether this is a bypass. Excluding a schema scopes what is scored, never what is reachable.",
+  "id": "37-unaudited-base-relation"
+}

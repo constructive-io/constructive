@@ -1,0 +1,30 @@
+{
+  "title": "An invoker view over the same out-of-scope table confers nothing, so nothing is reported",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_invoker_unaudited"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A3",
+      "relation": "c_invoker_unaudited.sessions",
+      "note": "the only finding left, and it is about the in-scope table: RLS is not FORCEd, so the owner still reads every row"
+    }
+  ],
+  "forbid": [
+    "L14",
+    "L8"
+  ],
+  "worstSeverity": "low",
+  "fix": "Nothing on the view. This case pins the boundary: L14 reports an out-of-scope *reach*, not an out-of-scope *reference*. `security_invoker` means the caller reads with its own privileges, so no edge crosses the schema boundary and reporting one would be noise on every view that touches a system catalog.",
+  "id": "38-invoker-view-unaudited-base"
+}

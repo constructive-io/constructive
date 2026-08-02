@@ -17,7 +17,11 @@ import {
   checkCoverageGaps,
   checkUpdateWithCheckCoverage
 } from '../checks/coverage';
-import { analyzeViewBodies, checkDefinerViewBypass } from '../checks/definer-view';
+import {
+  analyzeViewBodies,
+  checkDefinerViewBypass,
+  checkUnauditedViewReach
+} from '../checks/definer-view';
 import {
   checkMissingPrimaryKey,
   checkRedundantIndexes,
@@ -221,6 +225,10 @@ export async function audit(
     excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
   });
   const schemaAclsByName = new Map(schemaAcls.map((a) => [a.schema, a]));
+  // Which schemas the audit actually looked at — the same include/exclude
+  // filters the table snapshot used. A view body naming anything outside this
+  // set reaches past the audit rather than reaching nothing (L14).
+  const auditedSchemas = new Set(schemaAcls.map((a) => a.schema));
 
   // Roles requests arrive as, and the relations some policy predicate names.
   // L6 needs both: the first is whose grants it is talking about, the second
@@ -267,6 +275,16 @@ export async function audit(
     resolved.rules.get('L12')?.options as LatticeRoleOptions,
     exposure
   )?.roles ?? [];
+  const unauditedReachRoles = withExposedRoles(
+    resolved.rules.get('L14')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
+  // L8 and L14 are two answers from one body pass: the base relations that
+  // were graded, and the ones that could not be because they are out of scope.
+  const viewBodiesEnabled =
+    !skipAst
+    && ((definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false)
+      || (unauditedReachRoles.length > 0 && resolved.rules.get('L14')?.enabled !== false));
   const viewExposureEnabled =
     !skipAst
     && ((matviewRoles.length > 0 && resolved.rules.get('L11')?.enabled !== false)
@@ -278,7 +296,7 @@ export async function audit(
   const needsViews =
     (perfEnabled && config.perf?.paths?.infer !== false)
     || resolved.rules.get('L4')?.enabled !== false
-    || (!skipAst && definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false)
+    || viewBodiesEnabled
     || viewWritesEnabled
     || viewExposureEnabled;
   const viewSnapshot = needsViews
@@ -384,11 +402,18 @@ export async function audit(
   findings.push(...checkDeadSchemaUsage(schemaAcls, snapshot, roleGraph, viewSnapshot));
 
   // L8 is per-view, not per-table: a view body names its own base relations.
-  if (!skipAst && definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false) {
-    const viewBodies = await analyzeViewBodies(viewSnapshot, snapshot);
-    findings.push(
-      ...checkDefinerViewBypass(viewBodies.views, snapshot, roleGraph, { roles: definerViewRoles })
-    );
+  if (viewBodiesEnabled) {
+    const viewBodies = await analyzeViewBodies(viewSnapshot, snapshot, auditedSchemas);
+    if (definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false) {
+      findings.push(
+        ...checkDefinerViewBypass(viewBodies.views, snapshot, roleGraph, { roles: definerViewRoles })
+      );
+    }
+    if (unauditedReachRoles.length > 0 && resolved.rules.get('L14')?.enabled !== false) {
+      findings.push(
+        ...checkUnauditedViewReach(viewBodies.views, roleGraph, { roles: unauditedReachRoles })
+      );
+    }
   }
 
   // L9/L10 are the write half of the same question, and share one analysis.
@@ -475,7 +500,17 @@ export async function audit(
     const meta = RULES_BY_CODE.get(f.code);
     if (meta && f.direction === undefined) f.direction = meta.direction;
     if (meta && f.dimension === undefined) f.dimension = dimensionOf(meta);
-    if (exposure.known && f.schema) f.exposed = isExposed(f.schema, f.table);
+    if (exposure.known && f.schema) {
+      // L14 names a relation outside the audited schemas by construction, so
+      // grading it by its own schema would file every finding as an internal
+      // advisory. What is exposed is the view an API role reads it through.
+      const viewRef = f.code === 'L14'
+        ? (f.context as { view?: string } | undefined)?.view
+        : undefined;
+      f.exposed = viewRef
+        ? isExposed(viewRef.slice(0, viewRef.lastIndexOf('.')), viewRef.slice(viewRef.lastIndexOf('.') + 1))
+        : isExposed(f.schema, f.table);
+    }
 
     // A key that looks like a write-once provisioning pointer, where the
     // reviewer has chosen to read the finding rather than gate on it. Applied

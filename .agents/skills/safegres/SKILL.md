@@ -71,11 +71,42 @@ The score only improves by being **explicit** (declaring exposure and intent) or
 | R1 | critical | fail-open | An **untrusted role** holds a write privilege |
 | R2 | high | fail-open | Permissive write policy applies to untrusted role or PUBLIC |
 | R3 | medium | fail-open | RLS table has grants **TO PUBLIC** |
+| L1 | medium | fail-open | **Indirect access** — an untrusted role reaches a table via PUBLIC or role inheritance, not a direct grant |
+| L2 | low | fail-closed | **Dead policy** — the policy's role holds no grant the policy could mediate |
+| L3 | low | fail-closed | **Unreachable grant** — the grant's role can never authenticate or be assumed |
+| L4 | low | fail-closed | **Dead schema `USAGE`** — the role reaches no table *or view* in the schema |
+| L5 | high | fail-open | **Indirect coverage gap** — inherited/PUBLIC reach lands on a table with no covering policy |
+| L6 | low | fail-closed | **Unaddressable grant** — no exposed API can name the relation, and no policy references it |
+| L7 | info | fail-open | **`SET ROLE` reach** — a membership confers `set_option` without `INHERIT`, so a role assumes privileges it does not passively hold |
+| L8 | info | fail-open | **DEFINER-view bypass** — a non-`security_invoker` view reads its base relations as the *owner* |
+| L9 | info | fail-open | **DEFINER-view write** — an auto-updatable definer view writes a base relation as its owner |
+| L10 | info | fail-open | **Rewrite-rule bypass** — a rule's actions run as the view owner, `security_invoker` notwithstanding |
+| L11 | info | fail-open | **Materialized-view snapshot** — stored rows are served without consulting base ACLs or RLS |
+| L12 | info | fail-open | **Non-barrier filtering view** — the row filter is not a boundary, so a leaky caller predicate reads below it |
+| L13 | info | fail-open | **Column-level grant** — reach through `pg_attribute.attacl`, which no relation ACL shows |
+| L14 | info | neutral | **Unaudited base relation** — a definer view reads a schema the audit never introspected |
 | W1 | medium | meta | No exposure surface configured — DB assumed reachable, score capped |
+
+**The L-series is the reachability lattice: what an untrusted role can make Postgres *do*, not what the ACL rows say.** Four things feed it, and they compose:
+
+- **Effective grants** (`checks/lattice.ts`) — the closure of direct grants, grants `TO PUBLIC`, and grants inherited through role membership; every cell carries its provenance (`direct` | `PUBLIC` | `member of <role>`). L13 adds the column-scoped closure from `pg_attribute.attacl`, suppressed where the whole-relation grant already covers the privilege.
+- **Schema `USAGE`** — a grant on a relation in a schema the role cannot enter is not reach (L4).
+- **Exposure** — which relations an API can actually name (L6), and which roles a request can arrive as (`exposure.anonRoles` drives every untrusted-role option).
+- **`SET ROLE`** — on PG16+ a membership can confer `set_option` without `INHERIT`, so a role that passively holds nothing still executes as its target (L7).
+
+Reach is modelled as cells in `checks/role-reach.ts`, each carrying the role the access **executes as** (`effectiveRole`), the **path** of edges it arrived by (`grant` / `setrole` / `view` / `matview` / `rule`), and a **proof** bit: `catalog` (an ACL row or `pg_auth_members`) or `ast` (read out of a SQL body). `opaque-tainted` exists for a chain that could not be followed; nothing produces it yet, because opacity is currently whole-body.
+
+**L8–L12 are the AST half: a view is not what its definition looks like.** A view without `security_invoker` runs as its owner, so a caller's SELECT on the view reads base relations under the *owner's* privileges (L8), and if the view is auto-updatable, writes land the same way (L9). Rewrite rules are worse: their actions are **not** governed by `security_invoker`, so L10 fires on invoker views where L9 does not. A materialized view stores rows computed at REFRESH time, so the bases are never consulted and their policies never run (L11). And a filtering view that is not `security_barrier` lets a leaky caller predicate be pushed below the filter (L12).
+
+**Conservatism is the rule, not a nicety.** A body safegres cannot see through — dynamic SQL, an unparseable definition, a chain deeper than the hop limit — **suppresses** the finding; it never becomes a weaker guess. L14 is the one place that reports the *absence* of knowledge: a qualified reference into a schema the audit never introspected is real reach with an ungraded far end, distinct from a name it simply could not resolve (a CTE, an alias), which is still dropped.
+
+**No rule may recommend revoking a grant it cannot prove unused.** The L-series remedies are *fix the view* (`security_invoker = true`, change the owner, add `security_barrier`), *bring the schema into scope*, or *narrow the role model* — never "revoke this grant", because the grant is usually what the API serves. L2/L3/L4/L6 are the exceptions that do recommend removal, and each carries an explicit veto (a policy reference, a live column grant, a reachable view) that suppresses the advice when anything is load-bearing.
+
+New L-rules ship `info` and **score-neutral** on purpose: the honest severity of a definer view handing an anonymous role a table is not informational, but a new rule earns its weight after it has been run against real schemas. Promoting one is a deliberate scoring change.
 
 Perf-dimension rules (only collected with `--perf`, scored on their own axis; `S*` additionally need `--stats`): **X1** FK with no covering index (medium), **X2** policy filters on a column that leads no index (medium), **X3** policy casts/wraps its own column with no matching expression index (medium), **X4** policy calls a non-LEAKPROOF function (low), **X5** redundant/duplicate index (low), **X6** no primary key and no usable replica identity (low), **X7** search column with no index the search can use — `tsvector` w/o GIN/GiST, `vector` w/o HNSW/IVFFlat (medium), **X8** sort-shaped `timestamptz`/`date` column leading no index (info, heuristic), **X9** policy calls a STABLE function per row because it is not wrapped in a scalar sub-select (medium), plus P1/P1b and the runtime-statistics rules **S1**-**S4**.
 
-**Direction is the key idea:** `fail-open` = real exposure (untrusted side reaches more than intended). `fail-closed` = denied at runtime (hygiene/availability, not a leak) — contributes **0** to the score by default. R1/R2 are no-ops until you configure a role list; `safegres:constructive` sets them for `anonymous`.
+**Direction is the key idea:** `fail-open` = real exposure (untrusted side reaches more than intended). `fail-closed` = denied at runtime (hygiene/availability, not a leak) — contributes **0** to the score by default. R1/R2 and the untrusted-role L-rules are no-ops until you configure a role list: `"L8": ["info", { "roles": ["anonymous"] }]`, or `{ "rolesFrom": "anon" }` to take them from `exposure.anonRoles`, which is what `safegres:recommended` does for L5 and L7–L14. `safegres:constructive` sets R1/R2 for `anonymous`.
 
 ## Configuration (confstash)
 

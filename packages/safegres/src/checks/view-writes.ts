@@ -158,6 +158,9 @@ async function autoUpdateEdges(
     if (resolved.length !== 1) return [];
 
     const target = resolved[0];
+    // A relation outside the audited schemas cannot be graded: its owner, its
+    // ACL and its RLS are all unknown, so the write is not placeable here.
+    if (target.kind === 'external') return [];
     if (target.kind === 'table') {
       return view.writable.map((privilege) => ({
         schema: target.schema,
@@ -205,6 +208,7 @@ async function ruleEdges(
 
     const target = resolveRelation(access, view.schema, index);
     if (!target) continue;
+    if (target.kind === 'external') continue;
     if (target.kind === 'view') {
       // The write recurses into another view's rewrite path; proving where it
       // finally lands is more than this analysis can do.
