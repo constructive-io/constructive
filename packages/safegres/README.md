@@ -104,10 +104,10 @@ trust boundaries on the way.
 
 ## What it checks
 
-29 rules across two dimensions. The prefix letter is a family, **not** the dimension: `P1`/`P1b`
+30 rules across two dimensions. The prefix letter is a family, **not** the dimension: `P1`/`P1b`
 are performance, `P5` is security.
 
-### Security (18 rules)
+### Security (19 rules)
 
 | Code | Severity | Direction | Check |
 | --- | --- | --- | --- |
@@ -128,11 +128,15 @@ are performance, `P5` is security.
 | L3 | low | fail-closed | **Unreachable grant** — object privilege without schema `USAGE` |
 | L4 | info | neutral | **Dead schema `USAGE`** — reaches no relation and no function |
 | L5 | info | fail-open | An untrusted role reaches an **RLS-off table** via PUBLIC/inheritance † |
+| L6 | info | neutral | **Unaddressable grant** — an API role holds privileges on a relation its API cannot name ‡ |
 | W1 | medium | — | **No exposure surface configured** — whole database assumed reachable, score capped |
 
 † R1/R2/L5 are no-ops until you name the untrusted roles:
 `"R1": ["critical", { "roles": ["anonymous"] }]`. They cost nothing on databases without an
 untrusted-role model; the `safegres:constructive` preset configures them for `anonymous`.
+
+‡ L6 needs an adapter that can compute [API reach](#api-reach--the-relations-the-api-can-actually-name);
+without one nothing is unaddressable and it never fires.
 
 **Direction is the load-bearing idea.** `fail-open` findings are exposure — the untrusted side
 reaches more than intended. `fail-closed` findings are *denied by Postgres at runtime*: an
@@ -263,6 +267,7 @@ interface ExposureAdapter {
   name: string;
   detect(exec: QueryExecutor): Promise<boolean>;      // is this stack present?
   resolve(exec: QueryExecutor): Promise<PlaneInput[]>; // one or more planes
+  reach?(exec: QueryExecutor, ctx: ReachContext): Promise<ApiReach>; // optional precision
 }
 ```
 
@@ -270,6 +275,35 @@ The built-in `constructive` adapter introspects `routing_public.apis → api_sch
 primary `api` plane plus one `api:<name>` plane per API. JSON configs may name a built-in
 (`"adapters": ["constructive"]`); anything else is an error rather than a silent no-op. The old
 `"resolver": "constructive"` still works.
+
+### API reach — the relations the API can actually name
+
+A plane made of schemas answers *is this relation in the API's schemas?*, which over-counts: a
+generated API exposes fields, and a schema routinely holds relations it deliberately does not
+surface — join tables, denormalized shadows, machine-only back-pointers. `reach()` is where an
+adapter narrows a plane from its schemas to its **relations**. The built-in `postgraphile` adapter
+(also used by `constructive`, since a Constructive API is a PostGraphile API) reads the
+`@behavior` / `@forwardBehavior` / `@backwardBehavior` smart tags to do it:
+
+```jsonc
+{ "exposure": { "schemas": ["app_public"], "adapters": ["postgraphile"] } }
+```
+
+Three properties keep it from quietly deleting findings:
+
+- **Only an explicit denial counts.** Presets grant most behaviors by default, so the *absence* of
+  `+list` says nothing. Silence is never read as denial.
+- **Unreachable means unreachable by every route.** A relation with no root entry is still
+  addressable by traversing a relation field from one that has, so reach is graph traversal over
+  foreign keys, not a per-table test. Hiding one reverse relation is one missing path, not proof.
+- **A role plane is never narrowed.** The API not exposing a table says nothing about a role
+  holding a direct connection. Behavior only ever refines `api`/`schema` planes.
+
+Anything subtracted is listed in `report.exposure.unaddressable` rather than silently dropped, and
+`"reach": false` turns the whole thing off. Where an API-edge role still holds privileges on a
+relation its own API cannot name, **L6** reports the grant — unless some RLS policy predicate
+references the relation, since a grant a policy subqueries under the querying role is load-bearing
+however invisible it is to the API.
 
 ## CI in one job
 

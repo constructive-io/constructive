@@ -60,11 +60,15 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
   out.push(...scoreTable(report, options), '');
 
   if (report.exposure) {
-    const { known, source, exposedTables, totalTables, roles } = report.exposure;
+    const { known, source, exposedTables, totalTables, roles, unaddressable } = report.exposure;
     out.push(
       known
         ? `Exposure (${source}): **${exposedTables}/${totalTables}** tables reachable`
           + `${roles && roles.length > 0 ? ` via \`${roles.join('`, `')}\`` : ''}.`
+          + (unaddressable && unaddressable.length > 0
+            ? ` ${unaddressable.length} relation(s) in those schemas are declared unaddressable`
+              + ` by the API: ${unaddressable.map((r) => `\`${r.schema}.${r.table}\``).join(', ')}.`
+            : '')
         : '> [!WARNING]\n> Exposure unknown — the entire database is assumed reachable and the score is capped.',
       ''
     );

@@ -21,7 +21,10 @@
  */
 
 import type { PlaneKind } from '../config/types';
+import { introspectBehaviors, SYSTEM_SCHEMAS } from '../pg/behaviors';
 import type { QueryExecutor } from '../pg/introspect';
+import type { ApiReach, ReachEdge } from './reach';
+import { computeApiReach } from './reach';
 
 /** A plane as an adapter reports it, before roles are resolved against the catalog. */
 export interface PlaneInput {
@@ -32,6 +35,13 @@ export interface PlaneInput {
   roles?: string[];
 }
 
+/** What an adapter is asked to compute reach for. */
+export interface ReachContext {
+  /** Schemas on the plane. Empty means "the whole database". */
+  schemas: string[];
+  excludeSchemas?: string[];
+}
+
 export interface ExposureAdapter {
   /** Stable identifier, reported as the exposure `source`. */
   name: string;
@@ -39,6 +49,15 @@ export interface ExposureAdapter {
   detect(exec: QueryExecutor): Promise<boolean>;
   /** The planes this stack exposes. An empty array means "present, exposes nothing". */
   resolve(exec: QueryExecutor): Promise<PlaneInput[]>;
+  /**
+   * Optional relation-level precision *within* a plane's schemas: which
+   * relations the stack's generated API cannot address at all.
+   *
+   * Separate from `resolve` because it answers a different question and most
+   * adapters cannot answer it. An adapter that knows the schemas but not the
+   * fields simply omits this, and the plane stays schema-granular.
+   */
+  reach?(exec: QueryExecutor, context: ReachContext): Promise<ApiReach>;
 }
 
 /**
@@ -134,12 +153,97 @@ export const constructiveAdapter: ExposureAdapter = {
       }
     }
     return planes;
+  },
+
+  // A Constructive API *is* a PostGraphile API, so the reach question has the
+  // same answer. Delegated rather than duplicated, and defined below the
+  // delegate — see `postgraphileAdapter`.
+  reach: (exec, context) => postgraphileAdapter.reach!(exec, context)
+};
+
+/**
+ * PostGraphile behaviors as relation-level reach.
+ *
+ * Deliberately *not* folded into {@link constructiveAdapter}, even though
+ * Constructive is a PostGraphile stack: behaviors are a Graphile convention
+ * that any Graphile database follows, and each adapter should say one true
+ * thing. This one contributes no planes — it has no idea which schemas an API
+ * serves — and only narrows the planes another adapter, or the config, already
+ * established.
+ */
+export const postgraphileAdapter: ExposureAdapter = {
+  name: 'postgraphile',
+
+  async detect(exec: QueryExecutor): Promise<boolean> {
+    const { rows } = await exec.query<{ ok: boolean }>(
+      `SELECT EXISTS (
+         SELECT 1 FROM pg_description
+         WHERE description ~ '(^|\n)@(behavior|forwardBehavior|backwardBehavior)\\s'
+       ) AS ok`
+    );
+    return rows[0]?.ok === true;
+  },
+
+  async resolve(): Promise<PlaneInput[]> {
+    return [];
+  },
+
+  async reach(exec: QueryExecutor, context: ReachContext): Promise<ApiReach> {
+    const behaviors = await introspectBehaviors(exec, {
+      schemas: context.schemas,
+      excludeSchemas: context.excludeSchemas
+    });
+
+    // `schemas` empty means "the whole database", so the filter is built
+    // rather than passed as an always-bound parameter: an unreferenced
+    // placeholder has no inferable type and Postgres rejects the statement.
+    const params: string[][] = [[...SYSTEM_SCHEMAS]];
+    const filters: string[] = [`n.nspname <> ALL ($1::text[])`];
+    if (context.schemas.length > 0) {
+      params.push(context.schemas);
+      filters.push(`n.nspname = ANY ($${params.length}::text[])`);
+    }
+    if (context.excludeSchemas && context.excludeSchemas.length > 0) {
+      params.push(context.excludeSchemas);
+      filters.push(`n.nspname <> ALL ($${params.length}::text[])`);
+    }
+
+    const { rows } = await exec.query<{
+      relation: string;
+      constraint_name: string | null;
+      references: string | null;
+    }>(
+      `SELECT n.nspname || '.' || c.relname AS relation,
+              co.conname AS constraint_name,
+              CASE WHEN co.oid IS NULL THEN NULL
+                   ELSE fn.nspname || '.' || fc.relname END AS references
+         FROM pg_class c
+         JOIN pg_namespace n ON n.oid = c.relnamespace
+         LEFT JOIN pg_constraint co ON co.conrelid = c.oid AND co.contype = 'f'
+         LEFT JOIN pg_class fc ON fc.oid = co.confrelid
+         LEFT JOIN pg_namespace fn ON fn.oid = fc.relnamespace
+        WHERE c.relkind IN ('r', 'p')
+          AND ${filters.join('\n          AND ')}`,
+      params
+    );
+
+    const relations = new Set<string>();
+    const edges: ReachEdge[] = [];
+    for (const row of rows) {
+      relations.add(row.relation);
+      if (row.constraint_name && row.references) {
+        edges.push({ from: row.relation, to: row.references, constraint: row.constraint_name });
+      }
+    }
+
+    return computeApiReach({ relations: [...relations].sort(), edges, behaviors });
   }
 };
 
 /** Every adapter a config may name with a string. */
 export const BUILTIN_ADAPTERS: Record<string, ExposureAdapter> = {
-  constructive: constructiveAdapter
+  constructive: constructiveAdapter,
+  postgraphile: postgraphileAdapter
 };
 
 /**

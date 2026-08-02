@@ -108,11 +108,12 @@ export type {
   SafegresConfig,
   ScoringConfig
 } from './config/types';
-export type { ExposureAdapter, PlaneInput } from './exposure/adapters';
+export type { ExposureAdapter, PlaneInput, ReachContext } from './exposure/adapters';
 export {
   BUILTIN_ADAPTERS,
   constructiveAdapter,
   definePlanes,
+  postgraphileAdapter,
   resolveAdapters
 } from './exposure/adapters';
 export type { PlaneReach } from './exposure/planes';
@@ -123,6 +124,13 @@ export {
   scorePlane,
   stampPlanes
 } from './exposure/planes';
+export type { ApiReach, ReachEdge, ReachInputs, UnreachableRelation } from './exposure/reach';
+export {
+  BACKWARD_ABILITIES,
+  computeApiReach,
+  FORWARD_ABILITIES,
+  ROOT_ABILITIES
+} from './exposure/reach';
 export type { BaselineFinding, PerfBaseline, PerfDiff } from './perf/baseline';
 export {
   diffPerf,
@@ -142,6 +150,7 @@ export {
   resolveConstructiveExposure,
   resolveExposure,
   resolvePlanes,
+  resolveReach,
   UNKNOWN_EXPOSURE
 } from './pg/exposure';
 export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from './pg/functions';

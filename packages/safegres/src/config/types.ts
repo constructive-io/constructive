@@ -40,12 +40,17 @@ export interface ExposureConfig {
    *   (`routing_public.apis` → `api_schemas` → `metaschema_public.schema`,
    *   plus the platform plane) to discover exposed schemas and API roles.
    *
+   * - `postgraphile`: contribute no planes, but read behavior tags so the
+   *   planes another resolver or `schemas` establishes are narrowed from
+   *   "every relation in the schema" to the relations the generated API can
+   *   address. Pair it with `schemas`, or use it alone for the reach only.
+   *
    * Equivalent to listing the corresponding built-in in `adapters`.
    */
-  resolver?: 'static' | 'constructive';
+  resolver?: 'static' | 'constructive' | 'postgraphile';
   /**
    * Exposure adapters: objects implementing `ExposureAdapter`, or the name of
-   * a built-in (`'constructive'`). An adapter whose `detect()` succeeds
+   * a built-in (`'constructive'`, `'postgraphile'`). An adapter whose `detect()` succeeds
    * contributes planes; static `schemas`/`roles` extend, never replace, what
    * it found. Adapters are values, not module names — a custom one is an
    * object you construct, and nothing is resolved by package name.
@@ -57,6 +62,15 @@ export interface ExposureConfig {
   roles?: string[];
   /** Name of the primary plane. Default `api`. */
   name?: string;
+  /**
+   * Let adapters narrow a plane's reach from its schemas to the relations the
+   * generated API can actually address (`postgraphile` reads behavior tags for
+   * this). Default `true`; an adapter that cannot answer changes nothing.
+   *
+   * Set `false` to grade every relation in an exposed schema as exposed, which
+   * is the safer reading if you do not trust your behavior declarations.
+   */
+  reach?: boolean;
   /**
    * Additional access planes to grade: the ways into the database that are
    * not the declared API. Each is scored on the security axis with the same

@@ -124,6 +124,11 @@ export interface PlaneReport {
   roles?: string[];
   /** Relations the plane reaches (the density denominator). */
   exposedTables: number;
+  /**
+   * Relations in the plane's schemas its API cannot address, and which are
+   * therefore excluded from `exposedTables`.
+   */
+  unaddressableTables?: number;
   /** Role planes: the most direct way the reach arrives. */
   reachedVia?: 'grant' | 'PUBLIC' | 'inheritance';
   /** Security score for this plane, same model as the headline. */
@@ -150,6 +155,13 @@ export interface ExposureReport {
   exposedTables: number;
   /** All tables the audit introspected. */
   totalTables: number;
+  /**
+   * Relations in the exposed schemas the generated API cannot address, and
+   * which are therefore excluded from `exposedTables`. Present only when an
+   * adapter could prove it; listed rather than counted, because a subtraction
+   * from the score denominator should be readable.
+   */
+  unaddressable?: import('./exposure/reach').UnreachableRelation[];
 }
 
 /**
@@ -195,6 +207,11 @@ export interface PerfPathsReport {
   tables: number;
   /** What X1 did with the write-once-shaped keys. */
   onWriteOncePointer: 'report' | 'demote' | 'suppress';
+  /**
+   * Keys whose reverse relation an API behavior declares absent. Reported
+   * only: one missing path is not proof that nothing traverses the key.
+   */
+  declaredHidden?: number;
 }
 
 /** Where the `S*` findings' numbers came from, and how much to trust them. */

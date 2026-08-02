@@ -63,6 +63,12 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
       if (exposure.roles && exposure.roles.length > 0) {
         lines.push(`  api roles: ${exposure.roles.join(', ')}`);
       }
+      if (exposure.unaddressable && exposure.unaddressable.length > 0) {
+        lines.push(
+          `  ${exposure.unaddressable.length} relation(s) in those schemas the API cannot address: `
+            + exposure.unaddressable.map((r) => `${r.schema}.${r.table}`).join(', ')
+        );
+      }
     } else {
       lines.push(
         paint('medium', 'exposure: unknown — entire database assumed reachable (score capped)')

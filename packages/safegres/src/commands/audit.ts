@@ -27,6 +27,7 @@ import {
   checkDeadPolicies,
   checkDeadSchemaUsage,
   checkIndirectCoverageGaps,
+  checkUnaddressableGrant,
   checkUnreachableGrants,
   checkUntrustedIndirectAccess,
   computeRoleAccess,
@@ -57,7 +58,7 @@ import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { resolvePlaneReach, scorePlane, stampPlanes } from '../exposure/planes';
 import { type ExplainReport, proveFindings } from '../perf/explain';
 import { introspectRoleGraph, introspectSchemaAcls } from '../pg/acl';
-import { resolveExposure, resolvePlanes } from '../pg/exposure';
+import { resolveExposure, resolvePlanes, resolveReach } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
 import { introspectIndexes, introspectViewBodies, type TableIndexSnapshot } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
@@ -146,6 +147,18 @@ export async function audit(
   const exposure = await resolveExposure(exec, exposureConfig);
   const exposedSchemas = new Set(exposure.schemas);
   const planes = await resolvePlanes(exec, exposureConfig, exposure);
+  // Relation-level precision within those schemas: what the generated API can
+  // actually name. Schema membership is the coarse answer; this is the fine
+  // one, and only an adapter that can prove it contributes.
+  const apiReach = exposure.known
+    ? await resolveReach(exec, exposureConfig, {
+      schemas: exposure.schemas,
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+    })
+    : undefined;
+  const unaddressable = new Set(
+    (apiReach?.unreachable ?? []).map((r) => `${r.schema}.${r.table}`)
+  );
 
   const extensions = options.extensions ?? config.extensions;
 
@@ -156,8 +169,13 @@ export async function audit(
     extensions
   });
 
+  const isExposed = (schema: string, table?: string): boolean => {
+    if (!exposedSchemas.has(schema)) return false;
+    return table === undefined || !unaddressable.has(`${schema}.${table}`);
+  };
+
   const exposedTables = exposure.known
-    ? snapshot.filter((t) => exposedSchemas.has(t.schema)).length
+    ? snapshot.filter((t) => isExposed(t.schema, t.name)).length
     : snapshot.length;
 
   // Effective-access inputs for the lattice rules: the INHERIT-following
@@ -168,6 +186,12 @@ export async function audit(
     excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
   });
   const schemaAclsByName = new Map(schemaAcls.map((a) => [a.schema, a]));
+
+  // Roles requests arrive as, and the relations some policy predicate names.
+  // L6 needs both: the first is whose grants it is talking about, the second
+  // is the veto that stops it recommending a revoke of a load-bearing grant.
+  const apiRoles = exposure.roles ?? [];
+  const policyReferenced = policyReferencedRelations(snapshot);
 
   let findings: Finding[] = [];
 
@@ -195,7 +219,10 @@ export async function audit(
         schemas: options.schemas ?? config.schemas,
         excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
       }),
-      { minPointers: config.perf?.paths?.minPointers }
+      {
+        minPointers: config.perf?.paths?.minPointers,
+        hiddenBackwardRelations: new Set(apiReach?.hiddenBackwardRelations ?? [])
+      }
     )
     : new Map();
 
@@ -235,6 +262,14 @@ export async function audit(
         tableRules.get('L5')?.options as LatticeRoleOptions
       )
     );
+    if (unaddressable.size > 0 && apiRoles.length > 0) {
+      findings.push(
+        ...checkUnaddressableGrant(table, roleGraph, unaddressable, {
+          roles: apiRoles,
+          policyReferenced
+        })
+      );
+    }
 
     // --- AST-level anti-patterns (and, with perf on, policy-aware index rules) ---
     if (!skipAst) {
@@ -283,7 +318,7 @@ export async function audit(
     const meta = RULES_BY_CODE.get(f.code);
     if (meta && f.direction === undefined) f.direction = meta.direction;
     if (meta && f.dimension === undefined) f.dimension = dimensionOf(meta);
-    if (exposure.known && f.schema) f.exposed = exposedSchemas.has(f.schema);
+    if (exposure.known && f.schema) f.exposed = isExposed(f.schema, f.table);
 
     // A key that looks like a write-once provisioning pointer, where the
     // reviewer has chosen to read the finding rather than gate on it. Applied
@@ -358,7 +393,10 @@ export async function audit(
     schemas: exposure.schemas,
     ...(exposure.roles ? { roles: exposure.roles } : {}),
     exposedTables,
-    totalTables: snapshot.length
+    totalTables: snapshot.length,
+    ...(apiReach && apiReach.unreachable.length > 0
+      ? { unaddressable: apiReach.unreachable.filter((r) => exposedSchemas.has(r.schema)) }
+      : {})
   };
 
   const securityFindings = findings.filter((f) => f.dimension !== 'perf');
@@ -379,7 +417,7 @@ export async function audit(
   // Access planes. The primary plane's score is `report.score` — computed
   // above, against the exposure surface — so declaring planes can never move
   // the headline number; the secondaries answer what the headline cannot.
-  const reaches = resolvePlaneReach(planes, snapshot, roleGraph);
+  const reaches = resolvePlaneReach(planes, snapshot, roleGraph, apiReach);
   stampPlanes(findings, reaches);
   if (reaches.length > 1) {
     report.planes = reaches.map((reach) => {
@@ -435,12 +473,16 @@ export async function audit(
     if (paths.size > 0) {
       const all = [...paths.values()];
       const shaped = all.filter((p) => p.assessment === 'write-once-shaped');
+      const declaredHidden = all.filter((p) =>
+        p.signals.some((s) => s.name === 'behavior-hidden')
+      ).length;
       perf.paths = {
         total: paths.size,
         read: all.filter((p) => p.assessment === 'read').length,
         writeOnceShaped: shaped.length,
         tables: new Set(shaped.map((p) => `${p.schema}.${p.table}`)).size,
-        onWriteOncePointer
+        onWriteOncePointer,
+        ...(declaredHidden > 0 ? { declaredHidden } : {})
       };
     }
 
@@ -563,6 +605,37 @@ async function auditTableAst(
   }
 
   return dedupe(findings);
+}
+
+/**
+ * Relations named by any RLS policy predicate in the snapshot.
+ *
+ * Whole-word token matching over the predicate text, matching both the bare
+ * and the schema-qualified name. Deliberately over-eager: a spurious match
+ * costs one unreported L6, a missed one costs a recommendation to revoke a
+ * grant that authorization depends on.
+ */
+function policyReferencedRelations(tables: TableSnapshot[]): Set<string> {
+  const tokens = new Set<string>();
+  for (const table of tables) {
+    for (const policy of table.policies) {
+      for (const clause of [policy.using, policy.withCheck]) {
+        if (!clause) continue;
+        for (const match of clause.matchAll(/[A-Za-z_][A-Za-z0-9_$]*(?:\.[A-Za-z_][A-Za-z0-9_$]*)?/g)) {
+          tokens.add(match[0].toLowerCase());
+        }
+      }
+    }
+  }
+
+  const referenced = new Set<string>();
+  for (const table of tables) {
+    const key = `${table.schema}.${table.name}`;
+    if (tokens.has(key.toLowerCase()) || tokens.has(table.name.toLowerCase())) {
+      referenced.add(key);
+    }
+  }
+  return referenced;
 }
 
 function compareFindings(a: Finding, b: Finding): number {
