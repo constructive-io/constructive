@@ -1,0 +1,36 @@
+{
+  "title": "Anonymous role writes a locked table through an auto-updatable DEFINER view",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_definer_view_write"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L9",
+      "relation": "c_definer_view_write.submissions",
+      "note": "the view is auto-updatable and not security_invoker, so corpus_anon's INSERT on it inserts into `submissions` as c_view_write_owner — a write no ACL row on `submissions` gives it"
+    },
+    {
+      "code": "A3",
+      "relation": "c_definer_view_write.submissions",
+      "note": "RLS is not FORCEd, which is exactly why the owner's rewritten insert is not filtered by the table's own policy"
+    }
+  ],
+  "forbid": [
+    "L8",
+    "L10",
+    "L4"
+  ],
+  "worstSeverity": "low",
+  "fix": "Recreate c_definer_view_write.submission_inbox WITH (security_invoker = true) so the insert is checked against the caller, or give the view an owner whose reach matches what it is meant to expose. Revoking corpus_anon's INSERT on the view is not the fix — that grant is what the API serves.",
+  "id": "27-definer-view-write"
+}

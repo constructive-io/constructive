@@ -34,7 +34,13 @@ export type RoleReachEdge =
    * The caller read through a view that executes as `owner` — every relation
    * the body names is read under the owner's privileges, not the caller's.
    */
-  | { kind: 'view'; view: string; owner: string };
+  | { kind: 'view'; view: string; owner: string }
+  /**
+   * The caller's command fired a rewrite rule on `view`. The rule's actions
+   * are permission-checked against the rule's table owner, and unlike the
+   * view edge this is *not* governed by `security_invoker`.
+   */
+  | { kind: 'rule'; view: string; rule: string; owner: string };
 
 /**
  * How well-founded a reach cell is. Stage 1 is entirely `catalog` — every
@@ -154,10 +160,9 @@ export interface ViewReachInput {
  * that can SELECT a view, one cell per base relation the view body reads,
  * under the owner the hop executes as.
  *
- * Only SELECT is modelled. An auto-updatable or `INSTEAD OF`-triggered view
- * can carry writes the same way, but proving *which* write reaches *which*
- * base relation needs more than the body's relation set, and an unproven
- * write edge is exactly the kind of guess this model refuses to make.
+ * Only SELECT is modelled here; the write half is
+ * {@link computeViewWriteReach}, which needs the catalog's updatability
+ * answer on top of the body's relation set.
  *
  * A view whose body could not be read (dynamic SQL, an unparseable body) must
  * not appear in `views`: an unreadable body is unknown, not empty.
@@ -184,6 +189,82 @@ export function computeViewReach(
           path: [
             { kind: 'grant', via: select.via, privilege: 'SELECT' },
             ...base.hops.map((h) => ({ kind: 'view' as const, view: h.view, owner: h.owner }))
+          ],
+          proof: 'ast'
+        });
+      }
+    }
+
+    return { role, cells };
+  });
+}
+
+/**
+ * One relation a *write* against a view lands on.
+ *
+ * The two privileges are distinct on purpose. `via` is what the caller must
+ * hold on the view to issue the command; `privilege` is what the rewritten
+ * command exercises on the target. They coincide for an auto-updatable view
+ * (an INSERT on the view is an INSERT on its base relation) and routinely
+ * differ for a rewrite rule, where `ON INSERT ... DO INSTEAD UPDATE other`
+ * turns one into the other.
+ */
+export interface ViewWriteEdge {
+  schema: string;
+  table: string;
+  via: PgPrivilege;
+  privilege: PgPrivilege;
+  /** View hops, outermost first; the last hop's owner executes the write. */
+  hops: Array<{ view: string; owner: string }>;
+  /** Set when the edge exists because of a rewrite rule, not auto-update. */
+  rule?: string;
+}
+
+/** A view, its own ACL, and the relations writes against it reach. */
+export interface ViewWriteInput {
+  schema: string;
+  name: string;
+  owner: string;
+  grants: GrantInfo[];
+  writeEdges: ViewWriteEdge[];
+}
+
+/**
+ * Project write edges through views into the reach model: for every role that
+ * holds the triggering command on the view, one cell per relation that write
+ * lands on, under the role the landing executes as.
+ *
+ * As with {@link computeViewReach}, a view whose write target could not be
+ * proven must not appear in `views` — an `INSTEAD OF` trigger's body, a
+ * multi-relation body, or an unreadable rule action is unknown, not empty.
+ */
+export function computeViewWriteReach(
+  views: ViewWriteInput[],
+  graph: RoleGraph,
+  roles: string[]
+): RoleReach[] {
+  return roles.map((role) => {
+    const cells: RoleReachCell[] = [];
+
+    for (const view of views) {
+      const held = effectiveGrants(view, role, graph);
+      for (const edge of view.writeEdges) {
+        if (edge.hops.length === 0) continue;
+        const grant = held.find((g) => g.privilege === edge.via);
+        if (!grant) continue;
+
+        const last = edge.hops[edge.hops.length - 1];
+        cells.push({
+          schema: edge.schema,
+          table: edge.table,
+          privileges: [edge.privilege],
+          effectiveRole: last.owner,
+          path: [
+            { kind: 'grant', via: grant.via, privilege: edge.via },
+            ...edge.hops.map((h) => ({ kind: 'view' as const, view: h.view, owner: h.owner })),
+            ...(edge.rule
+              ? [{ kind: 'rule' as const, view: last.view, rule: edge.rule, owner: last.owner }]
+              : [])
           ],
           proof: 'ast'
         });

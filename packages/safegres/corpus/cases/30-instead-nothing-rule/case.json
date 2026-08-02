@@ -1,0 +1,31 @@
+{
+  "title": "A DO INSTEAD NOTHING rule reaches nothing and is not a write bypass",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_instead_nothing_rule"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A3",
+      "relation": "c_instead_nothing_rule.messages",
+      "note": "the only real finding: RLS is not FORCEd, so the table owner still reads every row — the rules themselves confer nothing"
+    }
+  ],
+  "forbid": [
+    "L8",
+    "L9",
+    "L10"
+  ],
+  "worstSeverity": "low",
+  "fix": "ALTER TABLE c_instead_nothing_rule.messages FORCE ROW LEVEL SECURITY. The view and its rules need no fix — `DO INSTEAD NOTHING` is what a read-only view is *built* from, and this case exists to pin that the write rules stay silent on it.",
+  "id": "30-instead-nothing-rule"
+}

@@ -62,12 +62,7 @@ export async function analyzeViewBodies(
   // A materialized view stores its rows: reading it touches no base relation,
   // so it is a leaf here, never an edge.
   const queryable = views.filter((v) => !v.materialized);
-  const tableKeys = new Set(tables.map((t) => `${t.schema}.${t.name}`));
-  const byName = new Map<string, ViewSnapshot[]>();
-  for (const v of queryable) {
-    byName.set(v.name, [...(byName.get(v.name) ?? []), v]);
-  }
-  const viewKeys = new Map(queryable.map((v) => [`${v.schema}.${v.name}`, v]));
+  const index = buildRelationIndex(queryable, tables);
 
   const bodies = new Map<string, Awaited<ReturnType<typeof extractQuery>>>();
   for (const v of queryable) {
@@ -98,7 +93,7 @@ export async function analyzeViewBodies(
       }
 
       for (const ref of body.tables) {
-        const relation = resolve(ref, current.schema, tableKeys, viewKeys, byName);
+        const relation = resolveRelation(ref, current.schema, index);
         if (!relation) continue; // a CTE, an alias, or a name we cannot pin down
 
         if (relation.kind === 'view') {
@@ -139,9 +134,26 @@ export async function analyzeViewBodies(
   return { views: out, suppressed };
 }
 
-type Resolved =
+export type Resolved =
   | { kind: 'table'; schema: string; name: string }
   | { kind: 'view'; view: ViewSnapshot };
+
+/** The lookup tables {@link resolveRelation} needs, built once per snapshot. */
+export interface RelationIndex {
+  tableKeys: Set<string>;
+  viewKeys: Map<string, ViewSnapshot>;
+  viewsByName: Map<string, ViewSnapshot[]>;
+}
+
+export function buildRelationIndex(views: ViewSnapshot[], tables: TableSnapshot[]): RelationIndex {
+  const viewsByName = new Map<string, ViewSnapshot[]>();
+  for (const v of views) viewsByName.set(v.name, [...(viewsByName.get(v.name) ?? []), v]);
+  return {
+    tableKeys: new Set(tables.map((t) => `${t.schema}.${t.name}`)),
+    viewKeys: new Map(views.map((v) => [`${v.schema}.${v.name}`, v])),
+    viewsByName
+  };
+}
 
 /**
  * Pin a body reference to a relation in the snapshot.
@@ -153,12 +165,10 @@ type Resolved =
  * table alias, a relation outside the audited schemas) resolves to nothing:
  * over-approximating here would attribute a read to a relation nobody named.
  */
-function resolve(
+export function resolveRelation(
   ref: { schema?: string; name: string },
   viewSchema: string,
-  tableKeys: Set<string>,
-  viewKeys: Map<string, ViewSnapshot>,
-  viewsByName: Map<string, ViewSnapshot[]>
+  { tableKeys, viewKeys, viewsByName }: RelationIndex
 ): Resolved | null {
   const candidates = ref.schema ? [ref.schema] : [viewSchema];
   for (const schema of candidates) {

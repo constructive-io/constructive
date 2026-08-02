@@ -26,7 +26,12 @@ export const recommended: SafegresConfig = {
     // Same posture, same reason: a view that executes as its owner hands its
     // readers that owner's reach, which is a real bypass, but the rule is new
     // and body-derived, so it reports at zero weight until validated.
-    L8: ['info', { rolesFrom: 'anon' }]
+    L8: ['info', { rolesFrom: 'anon' }],
+    // The write half of the same story: an auto-updatable definer view, and a
+    // rewrite rule whose action runs as the view owner. Same posture again —
+    // new, body-derived, zero weight until validated.
+    L9: ['info', { rolesFrom: 'anon' }],
+    L10: ['info', { rolesFrom: 'anon' }]
   }
 };
 
