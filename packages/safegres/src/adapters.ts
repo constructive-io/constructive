@@ -9,5 +9,8 @@ export {
   BUILTIN_ADAPTERS,
   constructiveAdapter,
   definePlanes,
+  graphileAdapter,
+  hasuraAdapter,
+  postgrestAdapter,
   resolveAdapters
 } from './exposure/adapters';
