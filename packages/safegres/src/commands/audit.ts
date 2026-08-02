@@ -51,6 +51,7 @@ import {
   checkUntrustedRoleWrites,
   type RoleTrustOptions
 } from '../checks/role-trust';
+import { checkSetRoleEscalation } from '../checks/set-role';
 import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../checks/stats';
 import { configFingerprint } from '../config/fingerprint';
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
@@ -251,6 +252,13 @@ export async function audit(
         table,
         roleGraph,
         withExposedRoles(tableRules.get('L5')?.options as LatticeRoleOptions, exposure)
+      )
+    );
+    findings.push(
+      ...checkSetRoleEscalation(
+        table,
+        roleGraph,
+        withExposedRoles(tableRules.get('L7')?.options as LatticeRoleOptions, exposure)
       )
     );
 

@@ -26,6 +26,14 @@ export interface RoleAttributes {
    * that actually confer inheritance (INHERIT) are followed.
    */
   inheritsFrom: string[];
+  /**
+   * Roles this role can assume with `SET ROLE`, transitively. Distinct from
+   * `inheritsFrom`: on PG16+ a membership can confer the ability to `SET ROLE`
+   * (`pg_auth_members.set_option`) *without* passive inheritance, so a role
+   * that reaches nothing by inheritance can still execute with a target
+   * role's full privileges by assuming it. Excludes the role itself.
+   */
+  canSetRole: string[];
 }
 
 export interface SchemaAclGrant {
@@ -42,8 +50,9 @@ export interface SchemaAclInfo {
 }
 
 /**
- * Every non-system role with its RLS-bypass flags and its transitive
- * INHERIT-following membership closure.
+ * Every non-system role with its RLS-bypass flags, its transitive
+ * INHERIT-following membership closure, and its transitive `SET ROLE`
+ * (`set_option`) closure.
  */
 export async function introspectRoleGraph(
   exec: QueryExecutor
@@ -60,13 +69,16 @@ export async function introspectRoleGraph(
     ORDER BY rolname
   `);
 
-  // PG16+ decides inheritance per membership (`inherit_option`); before that
-  // it is the member role's INHERIT attribute. Read the per-membership flag
-  // when the column exists, fall back to the role attribute otherwise.
-  let memberRows: Array<{ member: string; parent: string; inherits: boolean }>;
+  // PG16+ decides both inheritance and role assumption per membership
+  // (`inherit_option`, `set_option`); before that inheritance is the member
+  // role's INHERIT attribute and membership *always* permits `SET ROLE`. Read
+  // the per-membership flags when the columns exist, fall back otherwise.
+  type MemberRow = { member: string; parent: string; inherits: boolean; canSet: boolean };
+  let memberRows: MemberRow[];
   try {
-    const { rows } = await exec.query<{ member: string; parent: string; inherits: boolean }>(`
-      SELECT m.rolname AS member, p.rolname AS parent, am.inherit_option AS inherits
+    const { rows } = await exec.query<MemberRow>(`
+      SELECT m.rolname AS member, p.rolname AS parent,
+             am.inherit_option AS inherits, am.set_option AS "canSet"
       FROM pg_auth_members am
       JOIN pg_roles m ON m.oid = am.member
       JOIN pg_roles p ON p.oid = am.roleid
@@ -75,8 +87,9 @@ export async function introspectRoleGraph(
     memberRows = rows;
   } catch (e) {
     if (!isUndefinedColumn(e)) throw e;
-    const { rows } = await exec.query<{ member: string; parent: string; inherits: boolean }>(`
-      SELECT m.rolname AS member, p.rolname AS parent, m.rolinherit AS inherits
+    const { rows } = await exec.query<MemberRow>(`
+      SELECT m.rolname AS member, p.rolname AS parent,
+             m.rolinherit AS inherits, true AS "canSet"
       FROM pg_auth_members am
       JOIN pg_roles m ON m.oid = am.member
       JOIN pg_roles p ON p.oid = am.roleid
@@ -86,11 +99,18 @@ export async function introspectRoleGraph(
   }
 
   const parents = new Map<string, string[]>();
+  const setTargets = new Map<string, string[]>();
   for (const m of memberRows) {
-    if (!m.inherits) continue;
-    const list = parents.get(m.member) ?? [];
-    list.push(m.parent);
-    parents.set(m.member, list);
+    if (m.inherits) {
+      const list = parents.get(m.member) ?? [];
+      list.push(m.parent);
+      parents.set(m.member, list);
+    }
+    if (m.canSet) {
+      const list = setTargets.get(m.member) ?? [];
+      list.push(m.parent);
+      setTargets.set(m.member, list);
+    }
   }
 
   const graph = new Map<string, RoleAttributes>();
@@ -99,7 +119,8 @@ export async function introspectRoleGraph(
       name: r.rolname,
       bypassRls: r.rolsuper || r.rolbypassrls,
       isSuper: r.rolsuper,
-      inheritsFrom: closure(r.rolname, parents)
+      inheritsFrom: closure(r.rolname, parents),
+      canSetRole: closure(r.rolname, setTargets)
     });
   }
   return graph;
