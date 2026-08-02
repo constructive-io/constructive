@@ -54,7 +54,8 @@ export const constructive: SafegresConfig = {
     P5: 'critical',
     R1: ['critical', { roles: ['anonymous'] }],
     R2: ['high', { roles: ['anonymous'] }],
-    R3: 'medium'
+    R3: 'medium',
+    L5: ['info', { roles: ['anonymous'] }]
   },
   scoring: { floorOnCritical: 'C' }
 };

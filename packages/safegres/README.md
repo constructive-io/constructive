@@ -105,13 +105,46 @@ Results are fingerprinted by finding *identity* (code + relation + policy + subj
 | R1 | critical | fail-open | anti-pattern | An **untrusted role** (options: `{ roles: [...] }`) holds a write privilege |
 | R2 | high | fail-open | anti-pattern | A permissive write policy applies to an untrusted role or PUBLIC |
 | R3 | medium | fail-open | anti-pattern | An RLS table has grants **TO PUBLIC** (includes all current/future roles) |
+| L1 | low | fail-closed | coverage | **Dead indirect grant** — a privilege arriving via `PUBLIC` or role inheritance that no permissive policy can admit |
+| L2 | low | fail-closed | coverage | **Dead policy** — a permissive policy applies to a role holding no corresponding grant (direct, PUBLIC, or inherited) |
+| L3 | low | fail-closed | coverage | **Unreachable grant** — object privilege without `USAGE` on the schema |
+| L4 | info | neutral | coverage | **Dead schema USAGE** — the role reaches no relation and no function in the schema (advisory) |
+| L5 | info | fail-open | anti-pattern | An untrusted role (options: `{ roles: [...] }`) reaches an **RLS-off table via PUBLIC or inheritance** |
 | W1 | medium | — | meta | No exposure surface configured — whole database assumed reachable, score capped |
 
 **Direction matters**: `fail-open` findings are actual exposure (the untrusted side can reach more than intended). `fail-closed` findings are denied at runtime — an availability/hygiene concern, not a leak — and contribute **nothing to the score** by default (tune with `scoring.failClosedWeight`).
 
 Coverage is aggregated `(table, role) → { hasUsing, hasWithCheck }` across every applicable permissive policy (FOR ALL + PUBLIC-role policies considered). Roles with `BYPASSRLS` are suppressed.
 
-R1/R2 are no-ops until a role list is configured — e.g. `"R1": ["critical", { "roles": ["anonymous"] }]` — so they cost nothing on databases without an untrusted-role model. The `safegres:constructive` preset configures them for `anonymous`.
+R1/R2 (and L5) are no-ops until a role list is configured — e.g. `"R1": ["critical", { "roles": ["anonymous"] }]` — so they cost nothing on databases without an untrusted-role model. The `safegres:constructive` preset configures them for `anonymous`.
+
+### The grant/RLS/policy lattice (L rules)
+
+The A/R rules read grants exactly as the catalog stores them, which misses the
+two ways access actually arrives without an ACL row naming the role:
+`GRANT ... TO PUBLIC` (applies to every role) and role inheritance
+(`pg_auth_members`, INHERIT-following). The L rules evaluate the *effective*
+cell each `(relation, role, privilege)` lands in:
+
+| grant | RLS | policy | verdict |
+| --- | --- | --- | --- |
+| yes | on | yes | normal — policy-mediated access |
+| yes | on | no | dead grant (L1 indirect; A4/A5 direct) |
+| yes | off | — | unmediated (A2 table-level; L5 per untrusted role, indirect) |
+| no | — | yes | dead policy (L2) |
+
+plus schema composition: an object grant is unreachable without `USAGE` on
+its schema (L3), and `USAGE` that reaches no relation and no function is dead
+surface (L4). Restrictive-only policies never count as coverage, `BYPASSRLS`
+and superuser roles are exempt from policy checks, and policies are matched
+with `pg_has_role` semantics (a policy `TO authenticated` covers a member of
+`authenticated`).
+
+When untrusted roles are configured (via L5/R1 options), the report also
+carries `roleAccess` — the direct answer to “what can role X access?”: every
+relation the role effectively reaches, with provenance (`direct`, `PUBLIC`,
+`member of <role>`) and whether RLS mediates the access. Rendered as a
+“Role access” section in pretty and markdown output.
 
 ## Exposure surface
 

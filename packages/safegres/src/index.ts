@@ -33,6 +33,23 @@ export {
   checkUnindexedSearchColumns,
   checkUnindexedSortColumns
 } from './checks/indexes';
+export type {
+  EffectiveGrant,
+  GrantVia,
+  LatticeRoleOptions,
+  RoleAccessEntry,
+  RoleAccessRelation,
+  RoleGraph
+} from './checks/lattice';
+export {
+  checkDeadPolicies,
+  checkDeadSchemaUsage,
+  checkIndirectCoverageGaps,
+  checkUnreachableGrants,
+  checkUntrustedIndirectAccess,
+  computeRoleAccess,
+  effectiveGrants
+} from './checks/lattice';
 export type { PolicyClause, PredicateColumn } from './checks/policy-index';
 export {
   checkNonLeakproofPolicyFunctions,
@@ -97,6 +114,8 @@ export {
 } from './perf/baseline';
 export type { ExplainOptions, ExplainReport } from './perf/explain';
 export { proveFindings } from './perf/explain';
+export type { RoleAttributes, SchemaAclGrant, SchemaAclInfo, SchemaAclOptions } from './pg/acl';
+export { introspectRoleGraph, introspectSchemaAcls } from './pg/acl';
 export type { ResolvedExposure } from './pg/exposure';
 export { resolveConstructiveExposure, resolveExposure, UNKNOWN_EXPOSURE } from './pg/exposure';
 export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from './pg/functions';

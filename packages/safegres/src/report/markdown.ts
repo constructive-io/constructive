@@ -9,6 +9,7 @@
  * parts (internal advisories, accepted debt) collapsed into `<details>`.
  */
 
+import type { RoleAccessEntry } from '../checks/lattice';
 import type { Score } from '../score/score';
 import type { Finding, Report, Severity } from '../types';
 import { formatDelta, type ReportComparison, type RuleDelta, type ScoreDelta } from './compare';
@@ -70,6 +71,10 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
     : report.findings;
   out.push(...findingSection('Security findings', security, options), '');
 
+  if (report.roleAccess && report.roleAccess.roles.length > 0) {
+    out.push(...roleAccessSection(report.roleAccess.roles), '');
+  }
+
   if (report.perf) {
     out.push(...findingSection('Performance findings', report.perf.findings, options));
     const { paths, stats, explain, diff } = report.perf;
@@ -117,6 +122,33 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
   }
 
   return out.join('\n');
+}
+
+/**
+ * The direct answer to "what can role X access?" — effective grants
+ * (direct, TO PUBLIC, inherited), classified by whether RLS mediates them.
+ */
+function roleAccessSection(roles: RoleAccessEntry[]): string[] {
+  const out: string[] = ['### Role access', ''];
+  for (const entry of roles) {
+    out.push(
+      `\`${entry.role}\`: **${entry.accessibleTables}** relation(s) accessible — `
+        + `${entry.unmediated.length} unmediated (no RLS), ${entry.mediated} policy-mediated`
+        + `${entry.dead > 0 ? `, ${entry.dead} dead (RLS default-deny)` : ''}.`,
+      ''
+    );
+    if (entry.unmediated.length > 0) {
+      out.push(
+        '| Relation | Privileges | Via |',
+        '| --- | --- | --- |',
+        ...entry.unmediated.map(
+          (r) => `| \`${r.schema}.${r.table}\` | ${r.privileges.join(', ')} | ${r.via} |`
+        ),
+        ''
+      );
+    }
+  }
+  return out;
 }
 
 function scoreTable(report: Report, options: RenderMarkdownOptions): string[] {

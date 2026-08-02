@@ -22,9 +22,9 @@ import type { Finding } from '../types';
  */
 
 /** What clause kind satisfies coverage for a given privilege. */
-type ClauseKind = 'USING' | 'WITH CHECK';
+export type ClauseKind = 'USING' | 'WITH CHECK';
 
-const CLAUSE_REQUIRED: Partial<Record<PgPrivilege, ClauseKind>> = {
+export const CLAUSE_REQUIRED: Partial<Record<PgPrivilege, ClauseKind>> = {
   SELECT: 'USING',
   INSERT: 'WITH CHECK',
   UPDATE: 'USING',
@@ -32,7 +32,7 @@ const CLAUSE_REQUIRED: Partial<Record<PgPrivilege, ClauseKind>> = {
 };
 
 /** `polcmd` → the single verb the policy can satisfy (`ALL` satisfies every verb). */
-const POLICY_CMDS: Record<PolicyCmd, PgPrivilege[]> = {
+export const POLICY_CMDS: Record<PolicyCmd, PgPrivilege[]> = {
   SELECT: ['SELECT'],
   INSERT: ['INSERT'],
   UPDATE: ['UPDATE'],
@@ -135,7 +135,7 @@ export function checkUpdateWithCheckCoverage(table: TableSnapshot): Finding[] {
   return out;
 }
 
-function policyProvidesClause(
+export function policyProvidesClause(
   p: PolicyInfo,
   role: string,
   privilege: PgPrivilege,
