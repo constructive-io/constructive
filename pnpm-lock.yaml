@@ -2648,6 +2648,9 @@ importers:
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
+      '@pgsql/lint':
+        specifier: ^18.1.0
+        version: 18.1.0
       '@pgsql/traverse':
         specifier: ^18.7.1
         version: 18.7.1
@@ -6515,6 +6518,13 @@ packages:
       {
         integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==,
       }
+
+  '@pgsql/lint@18.1.0':
+    resolution:
+      {
+        integrity: sha512-lMKacnInGGNo76vjIrV9o8aNUB6sheWorGpMsXZJlA7UJ2UhxO78/yOCjDxExFdFLZZjbVpck7zdBm1eGEi2QQ==,
+      }
+    hasBin: true
 
   '@pgsql/quotes@18.2.0':
     resolution:
@@ -17840,6 +17850,16 @@ snapshots:
   '@paralleldrive/cuid2@2.3.1':
     dependencies:
       '@noble/hashes': 1.8.0
+
+  '@pgsql/lint@18.1.0':
+    dependencies:
+      '@pgsql/traverse': 18.7.1
+      chalk: 4.1.2
+      libpg-query: 18.1.2
+      minimist: 1.2.8
+      pgsql-parser: 18.2.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@pgsql/quotes@18.2.0': {}
 
