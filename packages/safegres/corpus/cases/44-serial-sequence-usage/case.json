@@ -1,0 +1,27 @@
+{
+  "title": "The same grant on a sequence that backs a serial insert path",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_seq_serial"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L16",
+      "relation": "c_seq_serial.tickets_id_seq",
+      "role": "corpus_anon",
+      "note": "reported with the column it feeds, which is what turns the advice from `REVOKE` into `AS IDENTITY`: a `serial` column cannot be written by any role without USAGE on its sequence"
+    }
+  ],
+  "worstSeverity": "info",
+  "fix": "Establish whether corpus_anon writes c_seq_serial.tickets before touching this grant — a `serial` column cannot be inserted without USAGE on its sequence, so a revoke on the wrong assumption breaks the write path rather than closing a hole. Converting the column to `GENERATED ALWAYS AS IDENTITY` removes the need for any grant on the sequence, which is the fix that does not trade one break for another.",
+  "id": "44-serial-sequence-usage"
+}

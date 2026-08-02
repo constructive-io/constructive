@@ -1,0 +1,27 @@
+{
+  "title": "An untrusted role holds privileges on a sequence, which no policy filters",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_seq_grant"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L16",
+      "relation": "c_seq_grant.invoice_number",
+      "role": "corpus_anon",
+      "note": "USAGE is `nextval`/`setval` and SELECT is `last_value`; the table beside it is fully RLS-protected, and none of that protection reaches the sequence"
+    }
+  ],
+  "worstSeverity": "info",
+  "fix": "Nothing here is row-filterable, so the question is whether corpus_anon needs the sequence at all. This one feeds no column (no `OWNED BY`), so no insert depends on it — but confirm a DEFAULT elsewhere does not name it before revoking. Where a serial column is involved, `GENERATED ... AS IDENTITY` removes the need for the grant instead of breaking the insert.",
+  "id": "43-anon-sequence-grant"
+}

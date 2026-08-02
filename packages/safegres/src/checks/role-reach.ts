@@ -80,6 +80,12 @@ export interface RoleReachCell {
   external?: boolean;
   /** The columns of the relation the path reaches, where they are known. */
   columns?: string[];
+  /**
+   * Why the path is only a lower bound, on a `opaque-tainted` cell: the body
+   * that produced it executes SQL this analysis cannot follow, so the relation
+   * it names is the *view itself* and what lies beyond it is unknown.
+   */
+  taint?: string;
 }
 
 /** Everything one role reaches, across the relations examined. */
@@ -184,6 +190,12 @@ export interface ViewReachInput {
    * through on demand.
    */
   materialized?: boolean;
+  /**
+   * The body was wholly or partly unreadable, and why. `baseRelations` is
+   * then a *lower bound*: everything in it is proven, but the body reaches
+   * relations this analysis cannot name.
+   */
+  unreadable?: string;
 }
 
 /**
@@ -195,8 +207,12 @@ export interface ViewReachInput {
  * {@link computeViewWriteReach}, which needs the catalog's updatability
  * answer on top of the body's relation set.
  *
- * A view whose body could not be read (dynamic SQL, an unparseable body) must
- * not appear in `views`: an unreadable body is unknown, not empty.
+ * A view whose body could not be read (dynamic SQL, an unparseable body)
+ * still belongs in `views`, carrying {@link ViewReachInput.unreadable}: an
+ * unreadable body is unknown, not empty, and it yields one extra cell naming
+ * the *view* with `proof: 'opaque-tainted'` — the reach is real, its far end
+ * is not knowable here. Grading rules must skip those cells; only a coverage
+ * rule should report them.
  */
 export function computeViewReach(
   views: ViewReachInput[],
@@ -228,6 +244,21 @@ export function computeViewReach(
           proof: 'ast',
           ...(base.external ? { external: true } : {}),
           ...(base.columns ? { columns: base.columns } : {})
+        });
+      }
+
+      if (view.unreadable) {
+        cells.push({
+          schema: view.schema,
+          table: view.name,
+          privileges: ['SELECT'],
+          effectiveRole: view.owner,
+          path: [
+            { kind: 'grant', via: select.via, privilege: 'SELECT' },
+            { kind: 'view', view: `${view.schema}.${view.name}`, owner: view.owner }
+          ],
+          proof: 'opaque-tainted',
+          taint: view.unreadable
         });
       }
     }

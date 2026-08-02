@@ -31,7 +31,8 @@ export type { SuppressedView, ViewBodyAnalysis } from './checks/definer-view';
 export {
   analyzeViewBodies,
   checkDefinerViewBypass,
-  checkUnauditedViewReach
+  checkUnauditedViewReach,
+  checkUnreadableViewReach
 } from './checks/definer-view';
 export {
   checkMissingPrimaryKey,
@@ -59,6 +60,10 @@ export {
   effectiveColumnGrants,
   effectiveGrants
 } from './checks/lattice';
+export {
+  checkUntrustedForeignTableGrants,
+  checkUntrustedSequenceGrants
+} from './checks/object-acls';
 export type { PolicyClause, PredicateColumn } from './checks/policy-index';
 export {
   checkNonLeakproofPolicyFunctions,
@@ -217,6 +222,8 @@ export {
   type QueryExecutor,
   type TableSnapshot
 } from './pg/introspect';
+export type { ObjectAclSnapshot, PgObjectKind } from './pg/objects';
+export { introspectObjectAcls } from './pg/objects';
 export { listAuditableRoles, resolveRoles } from './pg/roles';
 export type {
   IndexUsage,

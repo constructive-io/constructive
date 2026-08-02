@@ -117,12 +117,16 @@ describe('analyzeViewBodies', () => {
     ]);
   });
 
-  it('suppresses a view whose body it cannot read, rather than reporting an empty one', async () => {
+  it('grades nothing from a body it cannot read, and says so rather than reporting an empty one', async () => {
     const { views, suppressed } = await analyzeViewBodies(
       [view({ definition: 'SELECT ((( FROM nowhere' })],
       [table()]
     );
-    expect(views).toEqual([]);
+    // No relation is graded — a fragment of an unread body under-reports what
+    // the view reaches — but the view itself stays in the model, carrying why,
+    // so the gap is reportable (L15) instead of a silent clean bill.
+    expect(views[0].baseRelations).toEqual([]);
+    expect(views[0].unreadable).toBe('SQL fragment failed to parse');
     expect(suppressed).toEqual([
       { view: 'app.order_totals', reason: 'SQL fragment failed to parse' }
     ]);

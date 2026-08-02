@@ -1,0 +1,33 @@
+{
+  "title": "A definer view whose body runs SQL of its own is reported as a gap, not scanned clean",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_unreadable_view"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L15",
+      "relation": "c_unreadable_view.activity",
+      "role": "corpus_anon",
+      "note": "`query_to_xml` carries its query in a string, so the relations it reaches are unknowable here — the reach is proven and its far end is not"
+    },
+    {
+      "code": "L8",
+      "relation": "c_unreadable_view.ledger",
+      "role": "corpus_anon",
+      "note": "the half the analysis *could* read is still graded: taint suppresses nothing that was proven"
+    }
+  ],
+  "worstSeverity": "info",
+  "fix": "Rewrite the body so the relations it reads are visible statically — a plain sub-select instead of `query_to_xml` — or satisfy yourself that what it returns is safe to serve corpus_anon. The gap is in what the audit could see, not proof of a leak, so nothing here justifies a revoke.",
+  "id": "41-unreadable-view-body"
+}
