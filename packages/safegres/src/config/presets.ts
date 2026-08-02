@@ -16,6 +16,10 @@ import type { SafegresConfig } from './types';
  */
 export const recommended: SafegresConfig = {
   rules: {
+    // The convention linter (`C*`) enforces Constructive house style rather
+    // than a universal security fact, so the big-tent preset leaves it off;
+    // the `constructive` preset turns it on.
+    'C*': 'off',
     R1: ['critical', { rolesFrom: 'anon' }],
     R2: ['high', { rolesFrom: 'anon' }],
     L5: ['info', { rolesFrom: 'anon' }],
@@ -81,7 +85,17 @@ export const constructive: SafegresConfig = {
     R1: ['critical', { roles: ['anonymous'], rolesFrom: 'anon' }],
     R2: ['high', { roles: ['anonymous'], rolesFrom: 'anon' }],
     R3: 'medium',
-    L5: ['info', { roles: ['anonymous'], rolesFrom: 'anon' }]
+    L5: ['info', { roles: ['anonymous'], rolesFrom: 'anon' }],
+    // House-style convention rules, enforced here for the first time:
+    // never set search_path (C1), never use #variable_conflict (C2),
+    // schema-qualify every relation (C3, adoption severity — ratchet to
+    // error once clean), and no dynamic SQL (C4) unless waived inline with a
+    // categorized reason (`-- safegres-disable-next-line no-dynamic-sql --
+    // lookup-only: …`).
+    C1: 'high',
+    C2: 'medium',
+    C3: 'low',
+    C4: 'high'
   },
   scoring: { floorOnCritical: 'C' }
 };

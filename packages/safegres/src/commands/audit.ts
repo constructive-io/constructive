@@ -59,11 +59,12 @@ import { configFingerprint } from '../config/fingerprint';
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { resolvePlaneReach, scorePlane, stampPlanes } from '../exposure/planes';
+import { LINT_RULES, LINT_RULES_BY_ID, lintDefinition, type LintProblem, type SuppressedProblem } from '../lint';
 import { type ExplainReport, proveFindings } from '../perf/explain';
 import { introspectRoleGraph, introspectSchemaAcls } from '../pg/acl';
 import type { ResolvedExposure } from '../pg/exposure';
 import { resolveExposure, resolvePlanes, resolveReach } from '../pg/exposure';
-import { introspectFunctions } from '../pg/functions';
+import { type FunctionSnapshot, introspectFunctions } from '../pg/functions';
 import { introspectIndexes, introspectViews, type TableIndexSnapshot } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
 import { type AccessPath, classifyPaths } from '../pg/paths';
@@ -140,6 +141,19 @@ export async function audit(
   const exec = asExecutor(client);
   const config = options.config ?? {};
   const resolved = resolveRules(config);
+
+  // Function definitions are read by two independent features (the convention
+  // linter and the call graph); introspect them at most once.
+  let functionsCache: FunctionSnapshot[] | undefined;
+  const getFunctions = async (): Promise<FunctionSnapshot[]> => {
+    if (!functionsCache) {
+      functionsCache = await introspectFunctions(exec, {
+        schemas: options.schemas ?? config.schemas,
+        excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+      });
+    }
+    return functionsCache;
+  };
   const statsEnabled = options.stats ?? config.perf?.stats?.enabled ?? false;
   const explainEnabled = options.explain ?? config.perf?.explain?.enabled ?? false;
   // Both tiers are refinements of the perf dimension: asking for either turns
@@ -361,6 +375,26 @@ export async function audit(
     findings.push(...checkStats(statsSnapshot, statsThresholds(config)));
   }
 
+  // --- Convention linter (C*): source-level rules over function definitions ---
+  const enabledLintRules = LINT_RULES.filter(
+    (r) => resolved.rules.get(r.code)?.enabled !== false
+  );
+  if (enabledLintRules.length > 0) {
+    const lintRuleIds = enabledLintRules.map((r) => r.id);
+    for (const fn of await getFunctions()) {
+      if (!fn.definition) continue;
+      const subject = `${fn.schema}.${fn.name}(${fn.args})`;
+      const { problems, suppressed } = await lintDefinition(
+        fn.definition,
+        fn.language,
+        subject,
+        { rules: lintRuleIds }
+      );
+      for (const p of problems) findings.push(lintFinding(fn, subject, p));
+      for (const s of suppressed) findings.push(lintFinding(fn, subject, s, true));
+    }
+  }
+
   findings = applyRulesToFindings(resolved, findings);
 
   // Stamp direction (from the registry) and exposure on every finding.
@@ -571,10 +605,7 @@ export async function audit(
   }
 
   if (options.callGraph) {
-    const functions = await introspectFunctions(exec, {
-      schemas: options.schemas ?? config.schemas,
-      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
-    });
+    const functions = await getFunctions();
     report.callGraph = await buildCallGraph({
       functions,
       tables: snapshot,
@@ -721,6 +752,44 @@ function policyReferencedRelations(tables: TableSnapshot[]): Set<string> {
     }
   }
   return referenced;
+}
+
+/**
+ * Map a source-level lint problem onto a `Finding`. The function's name rides
+ * in the `table` slot so overrides, exposure and sorting key on it the same
+ * way they do for table findings. Suppressed problems are emitted as
+ * acknowledged findings — visible as accepted risk, off the score — carrying
+ * their waiver reason and scope in `context`.
+ */
+function lintFinding(
+  fn: FunctionSnapshot,
+  subject: string,
+  problem: LintProblem | SuppressedProblem,
+  suppressed = false
+): Finding {
+  const meta = LINT_RULES_BY_ID.get(problem.ruleId)!;
+  return {
+    code: meta.code,
+    severity: RULES_BY_CODE.get(meta.code)!.defaultSeverity,
+    category: 'convention',
+    schema: fn.schema,
+    table: fn.name,
+    message: `${problem.message} in ${subject}`,
+    ...(problem.hint ? { hint: problem.hint } : {}),
+    ...(suppressed ? { acknowledged: true } : {}),
+    context: {
+      ...problem.context,
+      function: subject,
+      line: problem.line,
+      ...(suppressed
+        ? {
+          suppressed: true,
+          reason: (problem as SuppressedProblem).reason,
+          suppressionScope: (problem as SuppressedProblem).scope
+        }
+        : {})
+    }
+  };
 }
 
 function compareFindings(a: Finding, b: Finding): number {

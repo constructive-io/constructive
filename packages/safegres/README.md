@@ -104,8 +104,8 @@ trust boundaries on the way.
 
 ## What it checks
 
-30 rules across two dimensions. The prefix letter is a family, **not** the dimension: `P1`/`P1b`
-are performance, `P5` is security.
+34 rules across two dimensions, plus a source-level convention linter. The prefix letter is a
+family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 
 ### Security (19 rules)
 
@@ -143,6 +143,42 @@ without one nothing is unaddressable and it never fires.
 reaches more than intended. `fail-closed` findings are *denied by Postgres at runtime*: an
 availability and hygiene concern, not a leak. They contribute **zero** to the score by default
 (`scoring.failClosedWeight`). safegres does not cry wolf about a grant the database already refuses.
+
+### Convention (source-level lint, 4 rules — `safegres:constructive`)
+
+House-style rules that read function **definitions** (`pg_get_functiondef`), not the catalog. They
+are pure `source → findings` — no `pg` dependency in the lint module — and are **off outside the
+`safegres:constructive` preset**, which enables them. A function on a non-exposed schema costs
+nothing, like every other rule.
+
+| Code | Severity | Direction | Check |
+| --- | --- | --- | --- |
+| C1 | high | fail-open | Function **sets `search_path`** (house rule: never set it — fully-qualify instead) |
+| C2 | medium | neutral | Function uses a **`#variable_conflict`** directive |
+| C3 | low | neutral | Function has an **unqualified relation reference** (relies on `search_path`) |
+| C4 | high | fail-open | Function uses **dynamic SQL** (`EXECUTE` / `EXECUTE … USING` / `FOR … IN EXECUTE`) |
+
+C3 ships at `low` (adoption severity — ratchet to error once the tree is clean). C4 cannot be
+statically proven read-only, so every dynamic-SQL site is flagged and must be **waived inline with a
+categorized reason** (`lookup-only`, `codegen`); a reasonless waiver does not suppress it.
+
+**Inline suppressions** (ESLint/Prettier style), written as SQL comments inside the body:
+
+```sql
+-- safegres-disable-next-line no-dynamic-sql -- lookup-only: building an IN-list of integers
+EXECUTE format('SELECT ... WHERE id = ANY(%L)', ids);
+
+EXECUTE 'REFRESH MATERIALIZED VIEW app.mv';  -- safegres-disable-line no-dynamic-sql -- codegen: fixed DDL
+
+-- safegres-disable no-dynamic-sql -- lookup-only: this whole block probes the catalog
+...
+-- safegres-enable no-dynamic-sql
+
+-- safegres-disable-file no-set-search-path -- vendored extension shim
+```
+
+A directive with no rule id applies to every convention rule. Waived findings are **not dropped** —
+they surface as `acknowledged` (accepted-risk) findings carrying their reason, off the score.
 
 ### Performance (11 rules, `--perf`)
 

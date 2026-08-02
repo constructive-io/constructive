@@ -26,8 +26,10 @@ export interface RuleMeta {
   /**
    * Rules with `scope: 'policy-ast'` require parsing policy expressions.
    * When every one of them is disabled the audit skips AST work entirely.
+   * `function-src` rules are the source-level convention linter (`C*`): they
+   * read function definitions rather than the catalog, and run their own pass.
    */
-  scope: 'table' | 'policy-ast' | 'index' | 'stats';
+  scope: 'table' | 'policy-ast' | 'index' | 'stats' | 'function-src';
 }
 
 /** The scoring axis a rule belongs to (`security` unless declared otherwise). */
@@ -354,6 +356,38 @@ export const RULES: RuleMeta[] = [
     dimension: 'perf',
     title: 'Statement hotspot on a table in scope (pg_stat_statements)',
     scope: 'stats'
+  },
+  {
+    code: 'C1',
+    category: 'convention',
+    defaultSeverity: 'high',
+    direction: 'fail-open',
+    title: 'Function sets search_path (house rule: never set it — fully-qualify instead)',
+    scope: 'function-src'
+  },
+  {
+    code: 'C2',
+    category: 'convention',
+    defaultSeverity: 'medium',
+    direction: 'neutral',
+    title: 'Function uses a #variable_conflict directive',
+    scope: 'function-src'
+  },
+  {
+    code: 'C3',
+    category: 'convention',
+    defaultSeverity: 'low',
+    direction: 'neutral',
+    title: 'Function has an unqualified relation reference (relies on search_path)',
+    scope: 'function-src'
+  },
+  {
+    code: 'C4',
+    category: 'convention',
+    defaultSeverity: 'high',
+    direction: 'fail-open',
+    title: 'Function uses dynamic SQL (waivable with a categorized reason)',
+    scope: 'function-src'
   }
 ];
 

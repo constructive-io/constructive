@@ -38,7 +38,7 @@ export interface Finding {
   code: string;
   severity: Severity;
   /** High-level bucket — helps renderers group findings. */
-  category: 'flags' | 'coverage' | 'anti-pattern' | 'index' | 'sync' | 'match' | 'meta';
+  category: 'flags' | 'coverage' | 'anti-pattern' | 'index' | 'sync' | 'match' | 'meta' | 'convention';
   /** Leak vs deny vs directionless. Stamped from the rule registry. */
   direction?: Direction;
   /** Scoring axis. Stamped from the rule registry; defaults to `security`. */
