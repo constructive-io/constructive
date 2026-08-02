@@ -15,7 +15,19 @@ if (process.argv.includes('--version') || process.argv.includes('-v')) {
 const options: Partial<CLIOptions> = {
   minimistOpts: {
     alias: { v: 'version', h: 'help', q: 'summary' },
-    boolean: ['skip-ast', 'color', 'help', 'version', 'summary', 'verbose', 'call-graph', 'fail-on-new-boundaries'],
+    boolean: [
+      'skip-ast',
+      'color',
+      'help',
+      'version',
+      'summary',
+      'verbose',
+      'call-graph',
+      'fail-on-new-boundaries',
+      'keep',
+      'list',
+      'json'
+    ],
     string: [
       'baseline',
       'write-baseline',
@@ -33,7 +45,10 @@ const options: Partial<CLIOptions> = {
       'roles',
       'exclude-roles',
       'format',
-      'fail-on'
+      'fail-on',
+      'preset',
+      'corpus',
+      'case'
     ]
   }
 };

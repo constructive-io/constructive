@@ -381,4 +381,20 @@ export interface SafegresConfig {
   failOn?: FailOnConfig;
   /** What a rendered report shows — selection, not analysis. */
   report?: ReportConfig;
+  /** Defaults for `safegres eval` — which corpus, graded by which preset. */
+  eval?: EvalConfig;
+}
+
+/**
+ * `safegres eval` defaults. Deliberately only says *what* to run: a case is
+ * graded by a named preset, never by the rest of this file, so a project can
+ * point eval at its own corpus without also being able to move the answers.
+ */
+export interface EvalConfig {
+  /** Corpus directory of `<id>/{case.json,schema.sql}`. Defaults to the shipped one. */
+  corpus?: string;
+  /** Preset every case is graded under. Defaults to `recommended`. */
+  preset?: string;
+  /** Case ids (or id prefixes) to run. Defaults to all of them. */
+  cases?: string[];
 }

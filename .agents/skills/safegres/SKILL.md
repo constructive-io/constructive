@@ -26,6 +26,7 @@ Use this skill when asked to:
 - **Audit the function call graph** — what exposed functions transitively reach: SECURITY DEFINER hops, RLS-bypass paths, auth-context mutations, dynamic SQL (`safegres audit --call-graph`).
 - **Wire safegres into CI** (per-push audit, grade gate) or a pgpm test.
 - **Diagnose** the environment/config (`safegres doctor`, `safegres print-config`).
+- **Calibrate or evaluate** — run the corpus of known-answer cases against a scratch database (`safegres eval`), as a regression check or as the harness scoring an agent's fix.
 
 ## Quick Start
 
@@ -243,6 +244,8 @@ safegres audit --write-snapshot scoreboard.json               # aggregates only,
 safegres audit --format sarif --sarif-sources ./deploy       # GitHub code scanning (upload-sarif)
 safegres audit --exposed-only      # hide internal advisories
 safegres doctor                    # config/parser/connection/catalog + exposure + stale public.read checks
+safegres eval                      # grade the auditor itself against the shipped corpus
+safegres eval --case 01 --json     # one case, machine-readable (recall/precision/fingerprint)
 safegres print-config              # resolved effective config
 safegres print-config --explain    # per-key provenance (which layer set each value)
 ```

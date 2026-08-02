@@ -70,6 +70,14 @@ export function corpusDir(): string {
   return found;
 }
 
+/**
+ * The SQL creating the roles every case is graded against (`corpus_anon`,
+ * `corpus_user`). Idempotent, so a harness can run it before every case.
+ */
+export function corpusBootstrap(dir: string = corpusDir()): string {
+  return fs.readFileSync(path.resolve(dir, '..', 'bootstrap.sql'), 'utf8');
+}
+
 /** Load every case in `dir` (default: the shipped corpus), ordered by id. */
 export function loadCorpus(dir: string = corpusDir()): CorpusCase[] {
   return fs
