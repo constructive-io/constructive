@@ -38,8 +38,10 @@ export const strict: SafegresConfig = {
  *   so only what the exposed APIs can reach drives the score;
  * - untrusted-role rules watch `anonymous`; anything that can leak rows
  *   across the role boundary is critical;
- * - A3 is off — API roles never own tables in the Constructive model, so
- *   non-FORCEd RLS is not an exposure;
+ * - A3 is demoted to `info` rather than switched off — API roles never own
+ *   tables in the Constructive model, so non-FORCEd RLS is not an exposure
+ *   here, but the finding stays visible (info carries zero weight, so the
+ *   score is identical to switching it off) and re-tunable;
  * - `pg_partman`'s schema is skipped: it creates child partitions and
  *   templates at runtime with no dependency on the extension, so ownership
  *   alone leaves them looking like unsecured application tables.
@@ -50,7 +52,7 @@ export const constructive: SafegresConfig = {
   extensions: { ignore: ['pg_partman'] },
   rules: {
     A2: 'critical',
-    A3: 'off',
+    A3: 'info',
     P5: 'critical',
     R1: ['critical', { roles: ['anonymous'] }],
     R2: ['high', { roles: ['anonymous'] }],
@@ -70,9 +72,154 @@ export const minimal: SafegresConfig = {
   }
 };
 
+/**
+ * PostgREST: the exposed schemas come from `pgrst.db_schemas` in the catalog,
+ * and `anon` is the role an unauthenticated request runs as — so anything it
+ * can write, or any policy that lets it through, is the whole threat model.
+ *
+ * The connecting role (`authenticator`) is graded as a secondary plane rather
+ * than folded into the headline: it can `SET ROLE`, so its own grants are a
+ * separate question from what the API serves.
+ */
+export const postgrest: SafegresConfig = {
+  extends: 'safegres:recommended',
+  exposure: { adapters: ['postgrest'] },
+  rules: {
+    R1: ['critical', { roles: ['anon'] }],
+    R2: ['critical', { roles: ['anon'] }],
+    R3: 'high',
+    L5: ['high', { roles: ['anon'] }]
+  },
+  scoring: { floorOnCritical: 'C' }
+};
+
+/**
+ * Supabase is PostgREST with a fixed role vocabulary: `anon` (unauthenticated)
+ * and `authenticated` (any signed-up user — a much weaker boundary than it
+ * reads, since anyone can sign up) are both untrusted; `service_role` bypasses
+ * RLS by design, so its plane reports as skipped rather than F.
+ *
+ * `auth`, `storage`, `realtime`, `vault` and friends are Supabase's own
+ * schemas: they ship with their own policies and are not the developer's to
+ * fix, so they are scoped out of the score while staying in the report.
+ */
+export const supabase: SafegresConfig = {
+  extends: 'safegres:postgrest',
+  exposure: { adapters: ['supabase'] },
+  rules: {
+    R1: ['critical', { roles: ['anon', 'authenticated'] }],
+    R2: ['critical', { roles: ['anon', 'authenticated'] }],
+    L5: ['high', { roles: ['anon', 'authenticated'] }]
+  },
+  overrides: [
+    // Supabase-managed schemas: their policies ship with the platform, not
+    // with your migrations. Demoted, not excluded — still in the report.
+    {
+      tables: [
+        'auth.*',
+        'storage.*',
+        'realtime.*',
+        'vault.*',
+        'extensions.*',
+        'graphql.*',
+        'supabase_migrations.*'
+      ],
+      rules: { '*': 'info' }
+    }
+  ]
+};
+
+/**
+ * PostGraphile / graphile-starter: `app_public` is served, `app_hidden` is
+ * reachable through it, `app_private` is not exposed. The role vocabulary is
+ * the starter's (`*_visitor` is the request role, anonymous or not).
+ *
+ * A3 stays at its default: in this layout the API role is *not* the table
+ * owner, so a missing FORCE genuinely is an owner-bypass hole.
+ */
+export const graphile: SafegresConfig = {
+  extends: 'safegres:recommended',
+  exposure: { adapters: ['graphile'] },
+  rules: {
+    R1: ['high', { roles: ['visitor', 'app_visitor'] }],
+    R2: ['high', { roles: ['visitor', 'app_visitor'] }],
+    R3: 'high',
+    L5: ['medium', { roles: ['visitor', 'app_visitor'] }]
+  }
+};
+
+/** Hasura: the surface is whatever is *tracked* in `hdb_catalog`. */
+export const hasura: SafegresConfig = {
+  extends: 'safegres:recommended',
+  exposure: { adapters: ['hasura'] },
+  rules: {
+    R1: ['critical', { roles: ['anonymous', 'public'] }],
+    R2: ['critical', { roles: ['anonymous', 'public'] }],
+    R3: 'high'
+  },
+  overrides: [
+    // Hasura's own metadata catalog, managed by the engine.
+    { tables: ['hdb_catalog.*'], rules: { '*': 'info' } }
+  ]
+};
+
+/**
+ * Tenancy posture, independent of stack: in a shared-table multi-tenant
+ * database every RLS gap is a cross-tenant read, not a self-service leak, so
+ * the row-visibility rules are escalated and a single critical caps the grade
+ * at D. Owner-bypass hygiene is *not* escalated — it is a deployment property,
+ * and drowning the report in it hides the boundary findings.
+ *
+ * Compose it: `"extends": ["safegres:supabase", "safegres:multi-tenant"]`.
+ */
+export const multiTenant: SafegresConfig = {
+  rules: {
+    A1: 'critical',
+    A2: 'critical',
+    A4: 'high',
+    L1: 'critical',
+    L2: 'critical',
+    L3: 'high',
+    L5: 'high',
+    P5: 'high'
+  },
+  scoring: { floorOnCritical: 'D' },
+  failOn: { severity: 'critical' }
+};
+
+/**
+ * Perf posture for a read-heavy OLTP database, where a sequential scan behind
+ * an RLS policy is a production incident rather than a slow report. Security
+ * stays at whatever the composed preset says; this only retunes the P/X axis
+ * and gates on the perf grade, which is only meaningful once a baseline
+ * exists — see `--write-baseline`.
+ */
+export const oltp: SafegresConfig = {
+  rules: {
+    // The four that turn a policy into a per-row function call or defeat the
+    // index it should be using — the difference between an index scan and a
+    // seq scan per request.
+    X2: 'critical',
+    X3: 'critical',
+    X4: 'high',
+    X9: 'high',
+    X1: 'high',
+    X6: 'high',
+    P1b: 'high',
+    P5: 'high'
+  },
+  failOn: { perfGrade: 'C' }
+};
+
 export const PRESETS: Record<string, SafegresConfig> = {
   'safegres:recommended': recommended,
   'safegres:strict': strict,
   'safegres:constructive': constructive,
-  'safegres:minimal': minimal
+  'safegres:minimal': minimal,
+  'safegres:postgrest': postgrest,
+  'safegres:supabase': supabase,
+  'safegres:graphile': graphile,
+  'safegres:hasura': hasura,
+  'safegres:multi-tenant': multiTenant,
+  'safegres:oltp': oltp
 };

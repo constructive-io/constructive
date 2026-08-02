@@ -57,7 +57,9 @@ Connection (priority order, top wins):
 Configuration:
   --config <path>          Explicit config file (else discovered: safegres.config.{ts,js,mjs,cjs},
                            .safegresrc{,.json,.yaml,.yml,.js}, safegres.json, package.json "safegres")
-  --preset <name>          Apply a built-in preset (recommended|strict|constructive|minimal)
+  --preset <name>          Apply a built-in preset. Posture: recommended, strict, minimal.
+                           Stack: constructive, postgrest, supabase, graphile, hasura.
+                           Composable: multi-tenant, oltp (extends: [stack, posture]).
   --rule <CODE=SETTING>    Retune a rule (repeatable), e.g. --rule A3=off --rule A5=high
 
 Exposure (what the score is computed against):
