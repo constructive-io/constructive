@@ -47,7 +47,15 @@ export const recommended: SafegresConfig = {
     L13: ['info', { rolesFrom: 'anon' }],
     // The coverage half of L8: a body reference the audit could not follow
     // because the schema was out of scope. Reports an unknown, never a leak.
-    L14: ['info', { rolesFrom: 'anon' }]
+    L14: ['info', { rolesFrom: 'anon' }],
+    // And the coverage half of the body itself: a view an untrusted role reads
+    // whose definition this analysis could not follow. Also an unknown.
+    L15: ['info', { rolesFrom: 'anon' }],
+    // Privileges on the objects that are not tables. Neither is row-filterable
+    // — RLS does not apply to a sequence and cannot be enabled on a foreign
+    // table at all — so both are reach the table rules never saw.
+    L16: ['info', { rolesFrom: 'anon' }],
+    L17: ['info', { rolesFrom: 'anon' }]
   }
 };
 

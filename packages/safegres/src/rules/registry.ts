@@ -313,6 +313,37 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L15',
+    // The other half of L14's coverage story: there the far end was out of
+    // scope, here the body itself is. Both report that nothing was graded,
+    // which is why neither is scored — an unreadable view is not evidence of
+    // a leak, and letting one move the number would reward opacity.
+    category: 'coverage',
+    defaultSeverity: 'info',
+    direction: 'neutral',
+    title: 'Unreadable view body — an untrusted role reads a definer view whose body could not be followed (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
+    code: 'L16',
+    category: 'anti-pattern',
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Sequence privilege — an untrusted role can advance or read a sequence, which no policy filters (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
+    code: 'L17',
+    // The A2 shape on an object where A2's remedy does not exist: Postgres
+    // refuses RLS on a foreign table, so "add a policy" is not available and
+    // the grant is unconditionally unfiltered.
+    category: 'anti-pattern',
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Foreign-table grant — an untrusted role reaches a relation that cannot carry RLS (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
     code: 'W1',
     category: 'meta',
     defaultSeverity: 'medium',

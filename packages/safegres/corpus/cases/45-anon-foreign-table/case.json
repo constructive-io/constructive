@@ -1,0 +1,27 @@
+{
+  "title": "A grant on a foreign table, where RLS is not merely absent but impossible",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_foreign_grant"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L17",
+      "relation": "c_foreign_grant.remote_customers",
+      "role": "corpus_anon",
+      "note": "the table snapshot reads relkind 'r'/'p' and never saw this relation at all, so no rule graded the grant before"
+    }
+  ],
+  "worstSeverity": "info",
+  "fix": "Expose the foreign table through a view that carries the filter and grant on the view instead, or push the filter to the remote side. Adding RLS is not an option here — Postgres refuses it on a foreign table — so the usual A2 remedy does not apply.",
+  "id": "45-anon-foreign-table"
+}

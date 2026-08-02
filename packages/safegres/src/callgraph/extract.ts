@@ -50,9 +50,27 @@ export interface ExtractedBody {
   opaque: boolean;
   /** Why the body is (partially) opaque, when it is. */
   opaqueReason?: string;
+  /**
+   * The body executes SQL this analysis cannot see, *alongside* references it
+   * could read: `calls`, `tables` and `settings` are correct but incomplete.
+   *
+   * This is the distinction {@link opaque} cannot make. `opaque` says the
+   * whole body is unknown and its references must be discarded; `tainted`
+   * says what was read is real and what was missed is unknowable, which is
+   * what a reach model needs in order to report the gap instead of the view
+   * disappearing from the analysis altogether.
+   */
+  tainted?: string;
 }
 
 const EMPTY: ExtractedBody = { calls: [], tables: [], settings: [], opaque: false };
+
+/**
+ * Functions that run SQL of their own. The relations they touch are in a
+ * string argument, not in this AST, so a body calling one has a relation set
+ * that is a lower bound rather than an answer.
+ */
+const SQL_EXECUTING = new Set(['query_to_xml', 'dblink', 'dblink_exec', 'dblink_send_query']);
 
 /** Languages whose bodies we can statically analyze. */
 const ANALYZABLE = new Set(['sql', 'plpgsql']);
@@ -106,6 +124,7 @@ interface MutableBody {
   settings: string[];
   opaque: boolean;
   opaqueReason?: string;
+  tainted?: string;
 }
 
 /** Walk the PL/pgSQL JSON tree: collect embedded SQL, flag dynamic EXECUTE. */
@@ -155,6 +174,12 @@ export async function extractQuery(sql: string): Promise<ExtractedBody> {
     if (ref.name === 'set_config' && (!ref.schema || ref.schema === 'pg_catalog')) {
       const setting = firstStringArg(call);
       if (setting) out.settings.push(setting);
+    }
+
+    // Not opaque: the rest of the body still reads correctly. Tainted: the
+    // relations this call reaches are in a string, and we do not follow it.
+    if (SQL_EXECUTING.has(ref.name)) {
+      out.tainted ??= `\`${ref.name}\` executes SQL this analysis cannot see`;
     }
   }
 
@@ -280,6 +305,7 @@ function mergeBody(into: MutableBody, from: ExtractedBody): void {
     into.opaque = true;
     into.opaqueReason = from.opaqueReason;
   }
+  into.tainted ??= from.tainted;
 }
 
 function finalize(body: MutableBody): ExtractedBody {
@@ -302,6 +328,7 @@ function finalize(body: MutableBody): ExtractedBody {
     tables: [...tableKeys.values()],
     settings: [...new Set(body.settings)],
     opaque: body.opaque,
-    ...(body.opaqueReason ? { opaqueReason: body.opaqueReason } : {})
+    ...(body.opaqueReason ? { opaqueReason: body.opaqueReason } : {}),
+    ...(body.tainted ? { tainted: body.tainted } : {})
   };
 }
