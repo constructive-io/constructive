@@ -36,6 +36,20 @@ executed and nothing written — safe to point at a production replica.
 *No database handy? See [CI](#ci-in-one-job): one service container plus the migration command you
 already have.*
 
+## Features
+
+* 🛡️ **Complete RLS Auditing** – Grants, RLS enforcement, policy coverage and policy behavior, across every schema and role in the database
+* 🎯 **Operation-Level Coverage** – Every granted `SELECT`/`INSERT`/`UPDATE`/`DELETE` checked against the policies that actually cover it, per role
+* 🔍 **Risky Policy Detection** – Permissive checks, volatile and session-dependent predicates, definer escalation and role bypass, found in the parsed AST rather than by regex
+* ⚡ **Performance on Its Own Axis** – Policy predicates that no index can serve, per-row function calls, missing foreign-key indexes — scored separately, so hardening never reads as a regression
+* 🧭 **Exposure Planes** – The declared API surface is the headline grade; direct-connection and per-role planes are graded beside it, so "what can an anonymous caller reach?" is a number
+* 📊 **Security Scoring & Grades** – Scores, grades, severity counts and per-rule deductions with the payoff of fixing each one
+* 🐘 **Pure PostgreSQL Analysis** – Reads the catalog and parses SQL; no agent, no traffic, no ORM, no application changes, nothing executed
+* ⚙️ **Built for CI** – Summaries, Markdown, JSON and SARIF, GitHub job summaries, annotations and a sticky PR comment, with configurable failure thresholds
+* Δ **Change-Aware Audits** – Compare two reports to show exactly what a branch introduced, fixed or worsened; baselines accept inherited debt and gate only what's new
+* 🧪 **Graded Against a Corpus** – `safegres eval` scores the auditor itself on fixtures with known answers, sealed against config that could game the number
+* 📦 **CLI and Library APIs** – Run it from the command line, or import the analysis, report and renderers into your own tooling
+
 ## What you get
 
 ```
