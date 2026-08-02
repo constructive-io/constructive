@@ -14,6 +14,7 @@ function table(partial: Partial<TableSnapshot> = {}): TableSnapshot {
     isPartitioned: false,
     owner: 'app_owner',
     grants: [],
+    columnGrants: [],
     policies: [],
     ...partial
   };

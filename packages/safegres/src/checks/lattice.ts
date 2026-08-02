@@ -75,6 +75,56 @@ export function effectiveGrants(
     .sort((a, b) => a.privilege.localeCompare(b.privilege));
 }
 
+/** A privilege `role` holds on some, but not all, of a relation's columns. */
+export interface EffectiveColumnGrant extends EffectiveGrant {
+  /** The columns it covers, sorted. */
+  columns: string[];
+}
+
+/**
+ * Every privilege `role` effectively holds on individual *columns* of `table`,
+ * composed exactly like {@link effectiveGrants} — direct, PUBLIC, inherited.
+ *
+ * A column grant lives in `pg_attribute.attacl` and never appears in the
+ * relation's ACL, so a role can hold nothing at all by `effectiveGrants` and
+ * still read the columns that matter. Privileges the role already holds on the
+ * whole relation are dropped: the column grant then adds no reach, and
+ * reporting it would double-count the same access.
+ */
+export function effectiveColumnGrants(
+  table: Pick<TableSnapshot, 'grants' | 'columnGrants'>,
+  role: string,
+  graph: RoleGraph
+): EffectiveColumnGrant[] {
+  if (table.columnGrants.length === 0) return [];
+  const wholeRelation = new Set(effectiveGrants(table, role, graph).map((g) => g.privilege));
+
+  const rank = (via: GrantVia): number => (via === 'direct' ? 0 : via === 'PUBLIC' ? 1 : 2);
+  const ancestors = new Set(graph.get(role)?.inheritsFrom ?? []);
+  const byPrivilege = new Map<PgPrivilege, { via: GrantVia; columns: Set<string> }>();
+
+  for (const g of table.columnGrants) {
+    if (wholeRelation.has(g.privilege)) continue;
+    const via: GrantVia | null =
+      g.role === role ? 'direct'
+        : g.role === 'PUBLIC' ? 'PUBLIC'
+          : ancestors.has(g.role) ? `member of ${g.role}`
+            : null;
+    if (!via) continue;
+
+    const entry = byPrivilege.get(g.privilege);
+    if (!entry) byPrivilege.set(g.privilege, { via, columns: new Set([g.column]) });
+    else {
+      entry.columns.add(g.column);
+      if (rank(via) < rank(entry.via)) entry.via = via;
+    }
+  }
+
+  return [...byPrivilege.entries()]
+    .map(([privilege, e]) => ({ privilege, via: e.via, columns: [...e.columns].sort() }))
+    .sort((a, b) => a.privilege.localeCompare(b.privilege));
+}
+
 /**
  * Whether a policy applies to `role` at runtime: named directly, via PUBLIC,
  * or via a role it inherits from (`pg_has_role(..., 'member')` semantics).
@@ -181,7 +231,9 @@ export function checkDeadPolicies(table: TableSnapshot, graph: RoleGraph): Findi
   if (!table.rlsEnabled) return [];
   const out: Finding[] = [];
 
-  const anyGrantee = table.grants.some((g) => g.role !== table.owner);
+  const anyGrantee =
+    table.grants.some((g) => g.role !== table.owner)
+    || table.columnGrants.some((g) => g.role !== table.owner);
 
   for (const policy of table.policies) {
     if (!policy.permissive) continue;
@@ -198,7 +250,12 @@ export function checkDeadPolicies(table: TableSnapshot, graph: RoleGraph): Findi
     for (const role of policy.roles) {
       const attrs = graph.get(role);
       if (attrs?.bypassRls) continue; // policies never apply to it anyway
-      const held = effectiveGrants(table, role, graph).map((e) => e.privilege);
+      // A column grant is a grant: the policy it mediates is not dead just
+      // because the privilege is scoped to a projection of the relation.
+      const held = [
+        ...effectiveGrants(table, role, graph),
+        ...effectiveColumnGrants(table, role, graph)
+      ].map((e) => e.privilege);
       if (privileges.some((p) => held.includes(p))) continue;
       out.push(deadPolicyFinding(table, policy, role,
         `Permissive ${policy.cmd} policy ${policy.name} on ${table.schema}.${table.name} applies to ${role}, but ${role} holds no ${privileges.join('/')} grant (directly, via PUBLIC, or by inheritance)`));
@@ -306,9 +363,13 @@ export function checkDeadSchemaUsage(
       if (!attrs || attrs.isSuper) continue;
       if (g.role === acl.owner) continue;
 
-      const reachesRelation = [...schemaTables, ...(viewsBySchema.get(acl.schema) ?? [])].some(
-        (r) => effectiveGrants(r, g.role, graph).length > 0
-      );
+      const reachesRelation =
+        [...schemaTables, ...(viewsBySchema.get(acl.schema) ?? [])].some(
+          (r) => effectiveGrants(r, g.role, graph).length > 0
+        )
+        // A column grant is reach the relation's own ACL does not show, and
+        // the USAGE it needs is every bit as load-bearing.
+        || schemaTables.some((t) => effectiveColumnGrants(t, g.role, graph).length > 0);
       if (reachesRelation) continue;
 
       const reachesFunction =
@@ -440,6 +501,12 @@ export interface RoleAccessRelation {
   privileges: PgPrivilege[];
   /** Most direct provenance across the privileges. */
   via: GrantVia;
+  /**
+   * Present when the reach is column-scoped: the columns reachable, and the
+   * privileges above are the column-level ones. Absent for whole-relation
+   * access.
+   */
+  columns?: string[];
   /** `unmediated` = RLS off or bypassed; `mediated` = at least one applicable policy; `dead` = RLS default-deny. */
   access: 'unmediated' | 'mediated' | 'dead';
 }
@@ -480,17 +547,35 @@ export function computeRoleAccess(
       const grants = effectiveGrants(table, role, graph).filter((e) =>
         RLS_PRIVILEGES.includes(e.privilege)
       );
-      if (grants.length === 0) continue;
+      // Column grants are reported only when the relation is reachable by
+      // nothing else — otherwise the whole-relation row already covers them.
+      const columnGrants = grants.length > 0
+        ? []
+        : effectiveColumnGrants(table, role, graph).filter((e) =>
+          RLS_PRIVILEGES.includes(e.privilege)
+        );
+      if (grants.length === 0 && columnGrants.length === 0) continue;
 
-      const privileges = grants.map((g) => g.privilege);
-      const via = grants.reduce<GrantVia>(
+      const columns = columnGrants.length > 0
+        ? [...new Set(columnGrants.flatMap((g) => g.columns))].sort()
+        : undefined;
+      const effective = grants.length > 0 ? grants : columnGrants;
+      const privileges = effective.map((g) => g.privilege);
+      const via = effective.reduce<GrantVia>(
         (best, g) => (rankVia(g.via) < rankVia(best) ? g.via : best),
-        grants[0].via
+        effective[0].via
       );
 
       if (!table.rlsEnabled || attrs?.bypassRls || (role === table.owner && !table.rlsForced)) {
         entry.accessibleTables += 1;
-        entry.unmediated.push({ schema: table.schema, table: table.name, privileges, via, access: 'unmediated' });
+        entry.unmediated.push({
+          schema: table.schema,
+          table: table.name,
+          privileges,
+          via,
+          ...(columns ? { columns } : {}),
+          access: 'unmediated'
+        });
         continue;
       }
 

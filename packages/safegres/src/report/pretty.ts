@@ -174,7 +174,11 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
       const shown = verbose ? entry.unmediated : entry.unmediated.slice(0, 20);
       for (const r of shown) {
         lines.push(
-          paint('medium', `    ${r.schema}.${r.table}  ${r.privileges.join(', ')}  (via ${r.via})`)
+          paint(
+            'medium',
+            `    ${r.schema}.${r.table}  ${r.privileges.join(', ')}`
+              + `${r.columns ? ` on (${r.columns.join(', ')})` : ''}  (via ${r.via})`
+          )
         );
       }
       if (shown.length < entry.unmediated.length) {

@@ -95,6 +95,19 @@ Both inherit the same refusals, with one addition: a body safegres cannot parse 
 the remedies are `security_barrier = true`, an RLS policy on the base relation (policy quals already
 get barrier treatment), or not materializing rows that are not safe to hand out unconditionally.
 
+**L13** is not about views at all — it is about a place the catalog keeps privileges that nothing in
+this package used to read. `GRANT SELECT (email) ON t TO anon` writes `pg_attribute.attacl` and
+leaves `pg_class.relacl` untouched, so a role whose entire access to a relation is column-scoped was
+reported as reaching *nothing*: no A2, no R1, no L-series, and "0 relation(s) accessible" in the
+role access report. The privilege is real, and a column grant restricts *which columns*, never which
+rows — with RLS off it reads every row of the columns it names. Two consequences beyond the new
+finding: L4 no longer calls a role's schema `USAGE` dead when its only reach into that schema is a
+column grant (that was a recommend-a-revoke on a load-bearing grant), and L2 no longer calls a
+policy dead when the grant it mediates is column-scoped. What L13 does *not* do yet is feed the
+weighted rules: column-level SELECT for an anonymous role on an RLS-off table is the same exposure
+A2 grades `high`, and promoting it there is a scoring change to make once the rule has been
+validated against real schemas.
+
 Restrictive-only policies never count as coverage. `BYPASSRLS` and superuser roles are exempt from
 policy checks — they are not subject to RLS, so a "missing policy" finding for them would be
 noise. Policies are matched with `pg_has_role` semantics: a policy `TO authenticated` covers a

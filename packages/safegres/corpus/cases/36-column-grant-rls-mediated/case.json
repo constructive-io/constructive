@@ -1,0 +1,27 @@
+{
+  "title": "A column grant under RLS is reported as reach, but as mediated reach",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_column_grant_rls"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L13",
+      "relation": "c_column_grant_rls.notes",
+      "role": "corpus_anon",
+      "note": "policies mediate the rows and the grant narrows the columns — reported because nothing else in the audit sees the grant at all, not because it is wrong"
+    }
+  ],
+  "worstSeverity": "info",
+  "fix": "Nothing. This case pins two things: that a mediated column grant is still surfaced, and that corpus_user — which holds SELECT on the whole relation — is not reported a second time for the redundant column grant.",
+  "id": "36-column-grant-rls-mediated"
+}
