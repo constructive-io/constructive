@@ -116,12 +116,14 @@ export {
   rulesForTable
 } from './config/resolve';
 export type {
+  CallGraphConfig,
   EvalConfig,
   ExposureConfig,
   FailOnConfig,
   GithubCommentConfig,
   GithubReportConfig,
   Grade,
+  OutputsConfig,
   OverrideEntry,
   PerfConfig,
   PlaneConfig,
@@ -131,7 +133,8 @@ export type {
   RulesConfig,
   RuleSetting,
   SafegresConfig,
-  ScoringConfig
+  ScoringConfig,
+  SourceConfig
 } from './config/types';
 export type { CaseResult, CorpusCase, ExpectedFinding } from './corpus';
 export { corpusBootstrap, corpusDir, gradeCase, loadCase, loadCorpus } from './corpus';

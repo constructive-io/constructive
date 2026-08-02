@@ -186,6 +186,14 @@ export interface PerfConfig {
   stats?: PerfStatsConfig;
   /** Planner proof (`--explain`). Off unless enabled here or by flag. */
   explain?: PerfExplainConfig;
+  /**
+   * Baseline of accepted perf debt. Present → the run diffs against it, the
+   * same as `--perf-baseline`. Writing one stays a flag (`--write-perf-baseline`):
+   * accepting debt is an act, not a setting.
+   */
+  baseline?: string;
+  /** Exit non-zero on a perf finding that isn't in the baseline. */
+  failOnNew?: boolean;
   /** Access-path classification, which decides whether X1 applies to a key. */
   paths?: PerfPathsConfig;
 }
@@ -308,6 +316,54 @@ export interface PlaneFailOnConfig {
 }
 
 /** Which scores and sections a rendered report shows. */
+/**
+ * The database under audit. A repository that always audits the same thing —
+ * a pgpm workspace deployed into an ephemeral database — should say so once,
+ * in the file, rather than in every invocation.
+ */
+export interface SourceConfig {
+  /**
+   * Deploy the pgpm workspace or module at this path (relative to the config
+   * file) into an ephemeral test database and audit that. Equivalent to
+   * `--pgpm <dir>`; requires the optional peer dependency `pgsql-test`.
+   * A connection named on the command line (`--connection`, `--database`,
+   * `--host`, `--port`) wins: the same config then audits that database.
+   */
+  pgpm?: string;
+}
+
+/**
+ * Files one run writes. Paths are relative to the config file, and the
+ * directories are created as needed: the point is that a CI job is
+ * `safegres audit`, with the artifact list versioned alongside the rules.
+ */
+export interface OutputsConfig {
+  /**
+   * Write the whole set into one directory as `safegres.json`, `safegres.md`
+   * and `safegres.sarif`. The usual case, and nobody has to remember three
+   * paths; the keys below still override an individual file.
+   */
+  dir?: string;
+  json?: string;
+  markdown?: string;
+  sarif?: string;
+  /** Root scanned to resolve SARIF findings to their SQL source lines. */
+  sarifSources?: string;
+  /** Aggregate-only snapshot, for a later run's `compare`. */
+  snapshot?: string;
+  /** The rendered sticky PR comment, for a workflow that posts it itself. */
+  githubComment?: string;
+}
+
+export interface CallGraphConfig {
+  /** Build the call-graph audit without passing `--call-graph`. */
+  enabled?: boolean;
+  /** Baseline of accepted trust boundaries; enables the diff. */
+  baseline?: string;
+  /** Exit non-zero on a boundary that isn't in the baseline. */
+  failOnNew?: boolean;
+}
+
 export interface ReportConfig {
   /**
    * Planes to render, by name or glob (`primary`, `*`, `direct:*`). Default:
@@ -379,6 +435,12 @@ export interface SafegresConfig {
   overrides?: OverrideEntry[];
   scoring?: ScoringConfig;
   failOn?: FailOnConfig;
+  /** Where the database to audit comes from, when it isn't a live connection. */
+  source?: SourceConfig;
+  /** Files a single run writes, so CI doesn't have to spell them as flags. */
+  outputs?: OutputsConfig;
+  /** The unscored call-graph audit (`--call-graph`) and its baseline. */
+  callGraph?: CallGraphConfig;
   /** What a rendered report shows — selection, not analysis. */
   report?: ReportConfig;
   /** Defaults for `safegres eval` — which corpus, graded by which preset. */

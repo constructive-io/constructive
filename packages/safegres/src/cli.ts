@@ -46,6 +46,7 @@ const options: Partial<CLIOptions> = {
       'exclude-roles',
       'format',
       'fail-on',
+      'out',
       'preset',
       'corpus',
       'case'

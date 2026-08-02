@@ -36,6 +36,20 @@ executed and nothing written — safe to point at a production replica.
 *No database handy? See [CI](#ci-in-one-job): one service container plus the migration command you
 already have.*
 
+## Features
+
+* 🛡️ **Complete RLS Auditing** – Grants, RLS enforcement, policy coverage and policy behavior, across every schema and role in the database
+* 🎯 **Operation-Level Coverage** – Every granted `SELECT`/`INSERT`/`UPDATE`/`DELETE` checked against the policies that actually cover it, per role
+* 🔍 **Risky Policy Detection** – Permissive checks, volatile and session-dependent predicates, definer escalation and role bypass, found in the parsed AST rather than by regex
+* ⚡ **Performance on Its Own Axis** – Policy predicates that no index can serve, per-row function calls, missing foreign-key indexes — scored separately, so hardening never reads as a regression
+* 🧭 **Exposure Planes** – The declared API surface is the headline grade; direct-connection and per-role planes are graded beside it, so "what can an anonymous caller reach?" is a number
+* 📊 **Security Scoring & Grades** – Scores, grades, severity counts and per-rule deductions with the payoff of fixing each one
+* 🐘 **Pure PostgreSQL Analysis** – Reads the catalog and parses SQL; no agent, no traffic, no ORM, no application changes, nothing executed
+* ⚙️ **Built for CI** – Summaries, Markdown, JSON and SARIF, GitHub job summaries, annotations and a sticky PR comment, with configurable failure thresholds
+* Δ **Change-Aware Audits** – Compare two reports to show exactly what a branch introduced, fixed or worsened; baselines accept inherited debt and gate only what's new
+* 🧪 **Graded Against a Corpus** – `safegres eval` scores the auditor itself on fixtures with known answers, sealed against config that could game the number
+* 📦 **CLI and Library APIs** – Run it from the command line, or import the analysis, report and renderers into your own tooling
+
 ## What you get
 
 ```
@@ -381,6 +395,31 @@ jobs:
             --perf-baseline ci/safegres-perf-baseline.json --fail-on-new-perf
 ```
 
+Everything a job repeats every run belongs in the config file instead, so the job is one word. A
+repository whose schema is a pgpm workspace does not need a database at all — `source.pgpm`
+deploys it into an ephemeral one:
+
+```jsonc
+// .safegresrc.json — paths are relative to this file
+{
+  "extends": "safegres:constructive",
+  "source":  { "pgpm": "application/app" },
+  "perf":    { "enabled": true, "baseline": "ci/perf-baseline.json", "failOnNew": true },
+  "outputs": { "dir": "safegres-reports" },
+  "failOn":  { "grade": "B" }
+}
+```
+
+```yaml
+      - run: npx safegres audit   # or: "audit": "safegres lint" in package.json
+```
+
+`outputs.dir` writes `safegres.json`, `safegres.md` and `safegres.sarif` into one directory — name
+an individual file (`outputs.json`) only when the name matters. Directories are created as needed,
+and a flag still wins over the file for a one-off run (`safegres audit --out reports`). Naming a
+connection wins too, so the same config audits a database you already have:
+`safegres audit --database staging`.
+
 Scores lead the markdown, then severity counts, then a table per dimension; internal advisories
 and accepted baseline debt fold into `<details>`. Pipe it to `gh pr comment --body-file -` to post
 it on the pull request instead. Library callers get the same renderer as `renderMarkdown(report)`.
@@ -622,6 +661,7 @@ score would move if that rule's findings went away. Gate with `--fail-on <severi
 
 ```bash
 safegres audit          # audit the connected database (default command)
+safegres lint           # alias for audit, for a package.json script
 safegres perf           # audit + the performance dimension (= audit --perf)
 safegres doctor         # diagnose config, parser, connection, catalog visibility, exposure
 safegres eval           # grade the auditor against a corpus with known answers
@@ -635,10 +675,14 @@ safegres print-config   # the resolved effective config (--explain for per-key p
 | Exposure | `--exposure-schemas <csv>`, `--exposed-only` |
 | Scope | `--schemas`, `--exclude-schemas`, `--roles`, `--exclude-roles`, `--ignore-extensions`, `--audit-extension-owned` |
 | Performance | `--perf`, `--stats`, `--explain`, `--perf-baseline <f>`, `--write-perf-baseline <f>`, `--fail-on-new-perf` |
-| Reporting | `--format pretty\|json\|json-pretty\|markdown\|sarif`, `--sarif-sources <dir>`, `--summary`/`-q`, `--verbose`, `--compare <f>`, `--compare-ref <label>`, `--write-snapshot <f>` |
+| Reporting | `--format pretty\|json\|json-pretty\|markdown\|sarif`, `--out <dir>`, `--sarif-sources <dir>`, `--summary`/`-q`, `--verbose`, `--compare <f>`, `--compare-ref <label>`, `--write-snapshot <f>` |
 | Call graph | `--call-graph`, `--baseline <f>`, `--write-baseline <f>`, `--fail-on-new-boundaries` |
-| Gating | `--fail-on <severity>`, `--fail-on-score <n>`, `--fail-on-grade <g>`, `--fail-on-perf-score`, `--fail-on-perf-grade` |
+| Gating | `--fail-on <severity>`, `--fail-on-score <n>`, `--fail-on-grade <g>`, `--fail-on-perf-score`, `--fail-on-perf-grade`, `--report-only` |
 | Misc | `--skip-ast`, `--no-color`, `--help`, `--version` |
+
+The paths among those — `--pgpm`, the two baselines, and every `--write-*` — have config-file
+equivalents (`source.pgpm`, `perf.baseline`, `callGraph.baseline`, `outputs.dir`/`outputs.*`), so CI can carry
+them in version control rather than in a command line.
 
 ## Going further
 

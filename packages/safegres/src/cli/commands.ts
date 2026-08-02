@@ -16,6 +16,7 @@ Usage:
 
 Commands:
   audit           Audit grants, RLS flags, policy coverage, and anti-patterns
+  lint            Alias for audit, for a package.json script
   perf            Audit index hygiene and policy cost (audit --perf)
   doctor          Diagnose environment, connection, and configuration
   eval            Grade the auditor against a corpus with known answers
@@ -30,6 +31,7 @@ const commandMap: Record<
   (argv: ParsedArgs, prompter: Inquirerer, options: CLIOptions) => unknown
 > = {
   audit,
+  lint: audit,
   perf: (argv, prompter, options) => audit({ ...argv, perf: true }, prompter, options),
   doctor,
   eval: evalCommand,
