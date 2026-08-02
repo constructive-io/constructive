@@ -54,10 +54,11 @@ import {
 import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../checks/stats';
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
+import { resolvePlaneReach, scorePlane, stampPlanes } from '../exposure/planes';
 import { type ExplainReport, proveFindings } from '../perf/explain';
 import { introspectRoleGraph, introspectSchemaAcls } from '../pg/acl';
 import { introspectBehaviors } from '../pg/behaviors';
-import { resolveExposure } from '../pg/exposure';
+import { resolveExposure, resolvePlanes } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
 import { introspectIndexes, introspectViewBodies, type TableIndexSnapshot } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
@@ -142,8 +143,10 @@ export async function audit(
     options.excludeRoles ?? config.excludeRoles
   );
 
-  const exposure = await resolveExposure(exec, options.exposure ?? config.exposure);
+  const exposureConfig = options.exposure ?? config.exposure;
+  const exposure = await resolveExposure(exec, exposureConfig);
   const exposedSchemas = new Set(exposure.schemas);
+  const planes = await resolvePlanes(exec, exposureConfig, exposure);
 
   const extensions = options.extensions ?? config.extensions;
 
@@ -358,6 +361,7 @@ export async function audit(
   const exposureReport: ExposureReport = {
     known: exposure.known,
     source: exposure.source,
+    plane: planes[0].name,
     schemas: exposure.schemas,
     ...(exposure.roles ? { roles: exposure.roles } : {}),
     exposedTables,
@@ -378,6 +382,31 @@ export async function audit(
     }),
     exposure: exposureReport
   };
+
+  // Access planes. The primary plane's score is `report.score` — computed
+  // above, against the exposure surface — so declaring planes can never move
+  // the headline number; the secondaries answer what the headline cannot.
+  const reaches = resolvePlaneReach(planes, snapshot, roleGraph);
+  stampPlanes(findings, reaches);
+  if (reaches.length > 1) {
+    report.planes = reaches.map((reach) => {
+      if (reach.skipped) {
+        return {
+          ...scorePlane(reach, [], config.scoring, exposure.known),
+          skipped: reach.skipped
+        };
+      }
+      if (reach.plane.primary) {
+        return {
+          ...scorePlane(reach, securityFindings, config.scoring, exposure.known),
+          exposedTables,
+          score: report.score!,
+          summary: summarize(securityFindings.filter((f) => f.exposed !== false))
+        };
+      }
+      return scorePlane(reach, securityFindings, config.scoring, exposure.known);
+    });
+  }
 
   // Per-role exposure: computed for the configured untrusted roles (L5/R1
   // options), so the report answers "what can anonymous access?" directly

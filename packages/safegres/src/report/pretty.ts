@@ -1,9 +1,10 @@
 import yanse from 'yanse';
 
 import type { Score } from '../score/score';
-import type { Finding, Report, Severity } from '../types';
+import type { Finding, PlaneReport, Report, Severity } from '../types';
 import { renderCallGraph, renderCallGraphDiff } from './callgraph';
 import { formatDelta, type ScoreDelta } from './compare';
+import { type ReportView, selectView, type ViewConfig } from './view';
 
 const SEV_LABEL: Record<Severity, string> = {
   critical: 'CRIT',
@@ -30,13 +31,24 @@ export interface RenderPrettyOptions {
   summary?: boolean;
   /** Expand the internal (non-exposed) advisories instead of collapsing them to a count. */
   verbose?: boolean;
+  /** Secondary planes to expand, by name or glob. Default: summarized in one line each. */
+  planes?: string[];
+  /** Everything else the view layer selects. Beats the flags above. */
+  view?: ViewConfig;
 }
 
 export function renderPretty(report: Report, options: RenderPrettyOptions = {}): string {
   const colorEnabled = options.color ?? process.stdout.isTTY === true;
   const paint = (sev: Severity, s: string) => (colorEnabled ? SEV_PAINT[sev](s) : noop(s));
 
-  const { summary: s, findings, score, exposure } = report;
+  const view = selectView(report, {
+    detail: options.summary ? 'summary' : options.verbose ? 'verbose' : 'normal',
+    ...(options.planes ? { planes: options.planes } : {}),
+    ...options.view
+  });
+  const verbose = view.detail === 'verbose';
+
+  const { summary: s, score, exposure } = report;
   const lines: string[] = [
     `safegres ${report.version}  (${report.generatedAt})`,
     ''
@@ -79,6 +91,10 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     lines.push('');
   }
 
+  if (view.has('planes')) {
+    lines.push(...planeLines(view, colorEnabled), '');
+  }
+
   lines.push(
     `summary: ${paint('critical', String(s.critical))} critical  `
       + `${paint('high', String(s.high))} high  `
@@ -88,7 +104,7 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   );
 
   // --summary: score + counts only, no per-finding lines.
-  if (options.summary) {
+  if (view.detail === 'summary') {
     if (report.callGraph) {
       lines.push('', renderCallGraph(report.callGraph, { color: colorEnabled, summary: true }));
     }
@@ -101,9 +117,7 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
 
   // Perf findings render in their own section so the two dimensions never
   // read as one list.
-  const security = report.perf ? findings.filter((f) => f.dimension !== 'perf') : findings;
-  const exposed = security.filter((f) => f.exposed !== false);
-  const internal = security.filter((f) => f.exposed === false);
+  const { exposed, internal } = view.security;
 
   for (const f of exposed) {
     lines.push(renderFinding(f, paint));
@@ -111,7 +125,7 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
 
   if (internal.length > 0) {
     // Collapse internal advisories to a count by default; --verbose lists them.
-    if (options.verbose) {
+    if (verbose) {
       lines.push(
         '',
         `internal advisories (${internal.length}) — not exposed via any API, excluded from the score:`,
@@ -132,7 +146,7 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     }
   }
 
-  if (security.length === 0) {
+  if (exposed.length + internal.length === 0) {
     lines.push('no findings.');
   }
 
@@ -144,7 +158,7 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
           + `${entry.unmediated.length} unmediated (no RLS), ${entry.mediated} policy-mediated`
           + `${entry.dead > 0 ? `, ${entry.dead} dead (RLS default-deny)` : ''}`
       );
-      const shown = options.verbose ? entry.unmediated : entry.unmediated.slice(0, 20);
+      const shown = verbose ? entry.unmediated : entry.unmediated.slice(0, 20);
       for (const r of shown) {
         lines.push(
           paint('medium', `    ${r.schema}.${r.table}  ${r.privileges.join(', ')}  (via ${r.via})`)
@@ -186,7 +200,7 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     } else {
       for (const f of perfExposed) lines.push(renderFinding(f, paint));
     }
-    if (perfInternal > 0 && !options.verbose) {
+    if (perfInternal > 0 && !verbose) {
       lines.push(
         paint('info', `  (${perfInternal} internal perf advisor${perfInternal === 1 ? 'y' : 'ies'} excluded from the perf score)`)
       );
@@ -248,14 +262,47 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   return lines.join('\n');
 }
 
+/**
+ * Secondary planes: one line each, because they are not the headline. The
+ * primary score answers "how safe is the product"; these answer "and what if
+ * somebody doesn't come through it" — worth seeing, not worth competing with
+ * the number the team is being graded on. `--plane <name>` expands one.
+ */
+function planeLines(view: ReportView, colorEnabled: boolean): string[] {
+  const lines = ['other access planes — advisory, not part of the score above:'];
+  for (const plane of view.planes) {
+    lines.push(`  ${planeLine(plane, colorEnabled)}`);
+  }
+  for (const plane of view.expandedPlanes) {
+    if (plane.skipped) continue;
+    lines.push('', `plane ${plane.name}:`, ...scoreLines('  score', plane.score, colorEnabled));
+  }
+  if (view.expandedPlanes.length === 0 && view.planes.some((p) => !p.skipped)) {
+    lines.push('  (run with --plane <name> to expand one, or --plane \'*\' for all)');
+  }
+  return lines;
+}
+
+function planeLine(plane: PlaneReport, colorEnabled: boolean): string {
+  const who = plane.roles && plane.roles.length > 0
+    ? ` (${plane.roles.join(', ')})`
+    : plane.schemas.length > 0
+      ? ` (${plane.schemas.join(', ')})`
+      : '';
+  if (plane.skipped) return `${plane.name}${who}: not graded — ${plane.skipped}`;
+  const grade = colorEnabled ? gradePaintFor(plane.score)(`${plane.score.value} (${plane.score.grade})`) : `${plane.score.value} (${plane.score.grade})`;
+  const via = plane.reachedVia ? `, reached via ${plane.reachedVia}` : '';
+  return `${plane.name} [${plane.kind}]${who}: ${grade}`
+    + `  — ${plane.exposedTables} relation(s)${via}`;
+}
+
+function gradePaintFor(score: Score): Painter {
+  if (score.grade.startsWith('A')) return yanse.green;
+  return score.grade === 'B' || score.grade === 'C' ? yanse.yellow : yanse.red;
+}
+
 function scoreLines(label: string, score: Score, colorEnabled: boolean): string[] {
-  const gradePaint: (s: string) => string = colorEnabled
-    ? score.grade.startsWith('A')
-      ? yanse.green
-      : score.grade === 'B' || score.grade === 'C'
-        ? yanse.yellow
-        : yanse.red
-    : noop;
+  const gradePaint: Painter = colorEnabled ? gradePaintFor(score) : noop;
   const capNote = score.cappedByUnknownExposure ? '  (capped: exposure unknown)' : '';
   const lines = [
     `${label}: ${gradePaint(`${score.value} (${score.grade})`)}  — model: ${score.model}${capNote}`
