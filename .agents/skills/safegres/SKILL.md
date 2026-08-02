@@ -1,10 +1,10 @@
 ---
 name: safegres
-description: Postgres Row-Level Security scanner. Audits a live PostgreSQL database for RLS gaps, grant/policy coverage, and risky policy patterns; produces a config-driven 0–100 score scoped to the exposed API surface, plus an unscored function call-graph audit of trust boundaries (SECURITY DEFINER hops, RLS-bypass paths, auth-context mutations). Use when asked to "audit RLS", "run safegres", "scan the database for security issues", "check row-level security", "score the schema's security", "audit the function call graph", "find SECURITY DEFINER risks", "set up the security audit in CI", "declare the exposure surface", "declare public-read tables", or when configuring `.safegresrc`/`safegres.config.*` or the safegres CI workflow. safegres is the scanner — it does NOT generate policies or manage security-node types.
+description: Postgres Row-Level Security scanner. Audits a live PostgreSQL database for RLS gaps, grant/policy coverage, and risky policy patterns; produces a config-driven 0–100 score scoped to the exposed API surface, plus an unscored function call-graph audit of trust boundaries (SECURITY DEFINER hops, RLS-bypass paths, auth-context mutations). Use when asked to "audit RLS", "run safegres", "scan the database for security issues", "check row-level security", "score the schema's security", "audit the function call graph", "find SECURITY DEFINER risks", "set up the security audit in CI", "declare the exposure surface", "declare public-read tables", "share one safegres config between CI jobs", "validate the safegres config", or when configuring `.safegresrc`/`safegres.config.*` or the safegres CI workflow. safegres is the scanner — it does NOT generate policies or manage security-node types.
 compatibility: safegres CLI, PostgreSQL 14+, Node.js 22+, confstash, pgsql-test (optional, pgpm mode)
 metadata:
   author: constructive-io
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # safegres — Postgres RLS Security Scanner
@@ -102,6 +102,14 @@ Config is discovered by walking up from cwd: `safegres.config.{ts,js,mjs,cjs}`, 
 ```
 
 Typed variant (`defineConfig` from `confstash`) works too — see the package README.
+
+**`extends` takes a path, not just a preset.** `"extends": "../../safegres.base.json"` is how two CI jobs share one surface declaration and differ only in gates; a preset name, a relative/absolute path and an npm package are all accepted, lowest precedence first. Every *path-valued* key (`source.pgpm`, `perf.baseline`, `callGraph.baseline`, `outputs.*`, `eval.corpus`) resolves against **the file that declared it**, so a baseline named in a shared base means that file's directory whichever job inherited it. Objects merge per key and arrays replace, except `overrides` — a list of scoped exceptions, so it unions across the chain. `--sealed` does no discovery and therefore reaches no file-based inheritance at all.
+
+**Unknown keys are an error, not a no-op** — `"failon": { "grade": "B" }` used to read as a passing build. The config shape is declared once in `src/config/schema.ts`, which generates both the committed `schema/safegres.schema.json` (regenerate with `pnpm schema`; a test fails if it drifts) and the load-time validator, so adding a config key means describing it there or the build fails. Point an editor at the schema for completion:
+
+```jsonc
+{ "$schema": "https://raw.githubusercontent.com/constructive-io/constructive/main/packages/safegres/schema/safegres.schema.json" }
+```
 
 ## Performance dimension (`--perf`, off by default)
 
@@ -247,8 +255,14 @@ safegres audit --exposed-only      # hide internal advisories
 safegres doctor                    # config/parser/connection/catalog + exposure + stale public.read checks
 safegres eval                      # grade the auditor itself against the shipped corpus
 safegres eval --case 01 --json     # one case, machine-readable (recall/precision/fingerprint)
+```
+
+**Adding a rule means adding two corpus cases.** `corpus/cases/NN-<name>/{schema.sql,case.json}` — a positive whose `expect` names the finding, and a **negative**: the same schema with the flaw fixed, `expect: []` plus `forbid: ["<code>"]`. The negative is the stronger of the two, because `corpus.test.ts` additionally requires an unweighted case to score exactly **100** on its dimension: a rule that survives its own fix, or that taxes a correct schema, fails there rather than in front of a user. Keep each case to one flaw — anything incidental shows up as an extra finding and muddies the answer.
+
+```bash
 safegres print-config              # resolved effective config
 safegres print-config --explain    # per-key provenance (which layer set each value)
+safegres print-config --schema     # the config JSON Schema, for an editor
 ```
 
 ## Library use
@@ -279,11 +293,12 @@ Report-only first, gate after a week of stable scores. Never write a bespoke aud
   "callGraph": { "enabled": true },
   "perf":    { "enabled": true, "baseline": "ci/safegres-perf-baseline.json", "failOnNew": true },
   "outputs": { "dir": "safegres-reports" },   // safegres.json + .md + .sarif; or name files individually
+  // paths resolve against the file that declared them, not against cwd
   "failOn":  { "grade": "B" }
 }
 ```
 
-Inside Actions the job summary, annotations and PR comment are emitted automatically (`report.github` configures them). Add `failOn.grade` only once the baseline is stable.
+Inside Actions the job summary, annotations and PR comment are emitted automatically (`report.github` configures them). Add `failOn.grade` only once the baseline is stable. A second job that needs the same surface but different gates extends this file rather than copying it — `{ "extends": "../../.safegresrc.json", "failOn": { "grade": "D" } }`.
 
 ## Guardrails
 
