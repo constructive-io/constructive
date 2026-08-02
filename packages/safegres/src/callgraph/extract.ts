@@ -239,6 +239,29 @@ export async function extractAccess(sql: string): Promise<ExtractedAccess> {
   return { accesses, opaque, ...(opaqueReason ? { opaqueReason } : {}) };
 }
 
+/**
+ * Does this body restrict which rows come back?
+ *
+ * `null` when the SQL could not be parsed — "unknown", never "no". A view that
+ * filters is a view someone may be relying on as a row-level boundary, which
+ * is the precondition for the `security_barrier` question: without a `WHERE`
+ * there are no hidden rows for a leaky qual to reach.
+ *
+ * Only an explicit `WHERE`/`HAVING` counts. Row-limiting through a join,
+ * `DISTINCT` or `LIMIT` is real but is not the pattern that gets written as a
+ * security boundary, and treating it as one would fire on ordinary reporting
+ * views.
+ */
+export async function bodyFiltersRows(sql: string): Promise<boolean | null> {
+  let ast: unknown;
+  try {
+    ast = await parse(sql);
+  } catch {
+    return null;
+  }
+  return findAll(ast, 'SelectStmt').some((s) => !!s.whereClause || !!s.havingClause);
+}
+
 function firstStringArg(call: Record<string, unknown>): string | null {
   const args = call.args;
   if (!Array.isArray(args) || args.length === 0) return null;

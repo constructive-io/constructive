@@ -35,6 +35,17 @@ beforeAll(async () => {
     CREATE RULE v_ruled_ins AS ON INSERT TO fx_viewwrite.v_ruled
       DO INSTEAD INSERT INTO fx_viewwrite.audit (note) VALUES ('x');
     CREATE RULE v_ruled_del AS ON DELETE TO fx_viewwrite.v_ruled DO INSTEAD NOTHING;
+
+    CREATE SCHEMA fx_viewbarrier;
+    CREATE TABLE fx_viewbarrier.t (id int, owner_name text);
+    CREATE VIEW fx_viewbarrier.v_plain AS
+      SELECT id FROM fx_viewbarrier.t WHERE owner_name = CURRENT_USER;
+    CREATE VIEW fx_viewbarrier.v_barrier WITH (security_barrier = true) AS
+      SELECT id FROM fx_viewbarrier.t WHERE owner_name = CURRENT_USER;
+    -- Both reloptions at once: reading one must not disturb the other.
+    CREATE VIEW fx_viewbarrier.v_both WITH (security_barrier = on, security_invoker = 1) AS
+      SELECT id FROM fx_viewbarrier.t;
+    CREATE MATERIALIZED VIEW fx_viewbarrier.mv AS SELECT id FROM fx_viewbarrier.t;
   `);
 });
 
@@ -78,5 +89,24 @@ describe('introspectViews — write paths', () => {
       ['v_ruled_ins', 'INSERT', true]
     ]);
     expect(byName.v_ruled.rules[0].definition).toContain('CREATE RULE');
+  });
+});
+
+describe('introspectViews — security_barrier and materialization', () => {
+  it('reads the barrier flag independently of security_invoker', async () => {
+    const views = await introspectViews(pg.client as never, { schemas: ['fx_viewbarrier'] });
+    const byName = Object.fromEntries(views.map((v) => [v.name, v]));
+
+    expect(byName.v_plain.securityBarrier).toBe(false);
+    expect(byName.v_barrier.securityBarrier).toBe(true);
+    expect(byName.v_both).toMatchObject({ securityBarrier: true, securityInvoker: true });
+
+    // A matview carries neither option — both are view-only reloptions — and
+    // that is precisely why it cannot be made to execute as its reader.
+    expect(byName.mv).toMatchObject({
+      materialized: true,
+      securityBarrier: false,
+      securityInvoker: false
+    });
   });
 });

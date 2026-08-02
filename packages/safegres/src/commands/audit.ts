@@ -55,6 +55,11 @@ import {
 } from '../checks/role-trust';
 import { checkSetRoleEscalation } from '../checks/set-role';
 import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../checks/stats';
+import {
+  analyzeViewExposure,
+  checkLeakyFilterView,
+  checkMatviewSnapshot
+} from '../checks/view-exposure';
 import { analyzeViewWrites, checkDefinerViewWrite, checkViewRuleBypass } from '../checks/view-writes';
 import { configFingerprint } from '../config/fingerprint';
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
@@ -253,6 +258,18 @@ export async function audit(
     resolved.rules.get('L10')?.options as LatticeRoleOptions,
     exposure
   )?.roles ?? [];
+  const matviewRoles = withExposedRoles(
+    resolved.rules.get('L11')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
+  const leakyViewRoles = withExposedRoles(
+    resolved.rules.get('L12')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
+  const viewExposureEnabled =
+    !skipAst
+    && ((matviewRoles.length > 0 && resolved.rules.get('L11')?.enabled !== false)
+      || (leakyViewRoles.length > 0 && resolved.rules.get('L12')?.enabled !== false));
   const viewWritesEnabled =
     !skipAst
     && ((viewWriteRoles.length > 0 && resolved.rules.get('L9')?.enabled !== false)
@@ -261,7 +278,8 @@ export async function audit(
     (perfEnabled && config.perf?.paths?.infer !== false)
     || resolved.rules.get('L4')?.enabled !== false
     || (!skipAst && definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false)
-    || viewWritesEnabled;
+    || viewWritesEnabled
+    || viewExposureEnabled;
   const viewSnapshot = needsViews
     ? await introspectViews(exec, {
       schemas: options.schemas ?? config.schemas,
@@ -376,6 +394,22 @@ export async function audit(
     if (ruleBypassRoles.length > 0 && resolved.rules.get('L10')?.enabled !== false) {
       findings.push(
         ...checkViewRuleBypass(writes.ruleDriven, snapshot, roleGraph, { roles: ruleBypassRoles })
+      );
+    }
+  }
+
+  // L11/L12 are the other two things a readable view does: store rows, and
+  // filter them without being a boundary. One body pass serves both.
+  if (viewExposureEnabled) {
+    const exposureViews = await analyzeViewExposure(viewSnapshot, snapshot);
+    if (matviewRoles.length > 0 && resolved.rules.get('L11')?.enabled !== false) {
+      findings.push(
+        ...checkMatviewSnapshot(exposureViews.matviews, snapshot, roleGraph, { roles: matviewRoles })
+      );
+    }
+    if (leakyViewRoles.length > 0 && resolved.rules.get('L12')?.enabled !== false) {
+      findings.push(
+        ...checkLeakyFilterView(exposureViews.leaky, snapshot, roleGraph, { roles: leakyViewRoles })
       );
     }
   }

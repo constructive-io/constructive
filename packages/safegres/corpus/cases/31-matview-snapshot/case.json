@@ -1,0 +1,32 @@
+{
+  "title": "Anonymous role reads an RLS-protected table's rows out of a materialized view",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_matview_snapshot"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L11",
+      "relation": "c_matview_snapshot.readings",
+      "note": "the matview stores rows computed as c_matview_owner, so corpus_anon reads every tenant's readings without holding a grant on the table and without its policies ever running"
+    }
+  ],
+  "forbid": [
+    "L8",
+    "L9",
+    "L10",
+    "L12"
+  ],
+  "worstSeverity": "info",
+  "fix": "Serve the rollup from a `security_invoker` view, or materialize only the columns and rows that are safe to hand out unconditionally and keep the full snapshot in a schema the API does not expose. A materialized view can carry neither RLS policies nor `security_invoker`, so there is no option on the matview itself that reinstates the filter — and revoking corpus_anon's SELECT on it is not the fix, that grant is what the API serves.",
+  "id": "31-matview-snapshot"
+}

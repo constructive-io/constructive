@@ -227,6 +227,12 @@ export interface ViewSnapshot {
    * and confers nothing; when false (the default) it executes as `owner`.
    */
   securityInvoker: boolean;
+  /**
+   * `reloptions.security_barrier`. Without it the planner may push a caller's
+   * own qual below the view's `WHERE`, so a leaky operator or function sees
+   * the rows the view filters out — the view is a filter, not a boundary.
+   */
+  securityBarrier: boolean;
   /** The owner is a superuser or has BYPASSRLS: the bases' policies never run. */
   ownerBypassesRls: boolean;
   /** ACL rows on the view itself, in the same shape as a table's. */
@@ -299,6 +305,7 @@ export async function introspectViews(
     owner: string;
     materialized: boolean;
     security_invoker: boolean;
+    security_barrier: boolean;
     owner_bypasses_rls: boolean;
     grants: Array<{ role: string; privilege: string; grantable: boolean; bypassRls: boolean }>;
     definition: string;
@@ -328,6 +335,13 @@ export async function introspectViews(
             WHERE option_name = 'security_invoker'),
            'false'
          )::boolean                               AS security_invoker,
+         -- Same spelling latitude, and the same reason to read it: a view
+         -- used as a row filter is only a boundary when it is a barrier.
+         COALESCE(
+           (SELECT option_value FROM pg_options_to_table(c.reloptions)
+            WHERE option_name = 'security_barrier'),
+           'false'
+         )::boolean                               AS security_barrier,
          c.relacl                                 AS relacl,
          pg_get_viewdef(c.oid)                    AS definition,
          -- Bitmask over 1 << CMD_*: UPDATE 4, INSERT 8, DELETE 16. The second
@@ -378,6 +392,7 @@ export async function introspectViews(
        v.owner,
        v.materialized,
        v.security_invoker,
+       v.security_barrier,
        v.owner_bypasses_rls,
        v.definition,
        COALESCE(
@@ -411,6 +426,7 @@ export async function introspectViews(
     owner: r.owner,
     materialized: r.materialized,
     securityInvoker: r.security_invoker,
+    securityBarrier: r.security_barrier,
     ownerBypassesRls: r.owner_bypasses_rls,
     grants: r.grants.map((g) => ({
       role: g.role,

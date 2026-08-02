@@ -24,7 +24,7 @@
  *     `security_invoker = true` or a different owner, and nothing else.
  */
 
-import { extractQuery } from '../callgraph/extract';
+import { type ExtractedBody, extractQuery } from '../callgraph/extract';
 import type { ViewSnapshot } from '../pg/indexes';
 import type { TableSnapshot } from '../pg/introspect';
 import type { Finding } from '../types';
@@ -64,10 +64,7 @@ export async function analyzeViewBodies(
   const queryable = views.filter((v) => !v.materialized);
   const index = buildRelationIndex(queryable, tables);
 
-  const bodies = new Map<string, Awaited<ReturnType<typeof extractQuery>>>();
-  for (const v of queryable) {
-    bodies.set(`${v.schema}.${v.name}`, await extractQuery(v.definition));
-  }
+  const bodies = await readBodies(queryable);
 
   const out: ViewReachInput[] = [];
   const suppressed: SuppressedView[] = [];
@@ -75,47 +72,7 @@ export async function analyzeViewBodies(
   for (const view of queryable) {
     if (view.securityInvoker) continue;
 
-    const bases: ViewBaseRelation[] = [];
-    const seen = new Set<string>();
-    let opaque: string | undefined;
-
-    const walk = (current: ViewSnapshot, hops: Array<{ view: string; owner: string }>): void => {
-      const key = `${current.schema}.${current.name}`;
-      if (hops.length > MAX_VIEW_DEPTH) {
-        opaque ??= `view chain deeper than ${MAX_VIEW_DEPTH} hops`;
-        return;
-      }
-      const body = bodies.get(key);
-      if (!body) return;
-      if (body.opaque) {
-        opaque ??= body.opaqueReason ?? 'body could not be read';
-        return;
-      }
-
-      for (const ref of body.tables) {
-        const relation = resolveRelation(ref, current.schema, index);
-        if (!relation) continue; // a CTE, an alias, or a name we cannot pin down
-
-        if (relation.kind === 'view') {
-          const nested = relation.view;
-          if (`${nested.schema}.${nested.name}` === key) continue;
-          // An inner definer view re-owns the read; an inner invoker view runs
-          // under whichever owner is already in force.
-          const owner = nested.securityInvoker ? hops[hops.length - 1].owner : nested.owner;
-          walk(nested, [...hops, { view: `${nested.schema}.${nested.name}`, owner }]);
-          continue;
-        }
-
-        const relKey = `${relation.schema}.${relation.name}`;
-        const dedupe = `${relKey}::${hops[hops.length - 1].owner}`;
-        if (seen.has(dedupe)) continue;
-        seen.add(dedupe);
-        bases.push({ schema: relation.schema, table: relation.name, hops: [...hops] });
-      }
-    };
-
-    walk(view, [{ view: `${view.schema}.${view.name}`, owner: view.owner }]);
-
+    const { bases, opaque } = resolveViewBases(view, index, bodies);
     if (opaque) {
       suppressed.push({ view: `${view.schema}.${view.name}`, reason: opaque });
       continue;
@@ -132,6 +89,76 @@ export async function analyzeViewBodies(
   }
 
   return { views: out, suppressed };
+}
+
+/** Parsed bodies, keyed `schema.name`, as {@link resolveViewBases} expects. */
+export type ViewBodies = Map<string, ExtractedBody>;
+
+export async function readBodies(views: ViewSnapshot[]): Promise<ViewBodies> {
+  const bodies: ViewBodies = new Map();
+  for (const v of views) bodies.set(`${v.schema}.${v.name}`, await extractQuery(v.definition));
+  return bodies;
+}
+
+/**
+ * The base relations `root` reads, following nested views, with the owner in
+ * force at each hop.
+ *
+ * `opaque` is set to the first reason the walk had to stop, and when it is set
+ * the relation list is a fragment: the caller must discard it, because a body
+ * we could only partly read under-reports what the view reaches.
+ *
+ * `root` itself need not be in `index` — a materialized view is not a
+ * queryable relation for the purposes of resolving *other* bodies, but its own
+ * body reads the same way.
+ */
+export function resolveViewBases(
+  root: ViewSnapshot,
+  index: RelationIndex,
+  bodies: ViewBodies
+): { bases: ViewBaseRelation[]; opaque?: string } {
+  const bases: ViewBaseRelation[] = [];
+  const seen = new Set<string>();
+  let opaque: string | undefined;
+
+  const walk = (current: ViewSnapshot, hops: Array<{ view: string; owner: string }>): void => {
+    const key = `${current.schema}.${current.name}`;
+    if (hops.length > MAX_VIEW_DEPTH) {
+      opaque ??= `view chain deeper than ${MAX_VIEW_DEPTH} hops`;
+      return;
+    }
+    const body = bodies.get(key);
+    if (!body) return;
+    if (body.opaque) {
+      opaque ??= body.opaqueReason ?? 'body could not be read';
+      return;
+    }
+
+    for (const ref of body.tables) {
+      const relation = resolveRelation(ref, current.schema, index);
+      if (!relation) continue; // a CTE, an alias, or a name we cannot pin down
+
+      if (relation.kind === 'view') {
+        const nested = relation.view;
+        if (`${nested.schema}.${nested.name}` === key) continue;
+        // An inner definer view re-owns the read; an inner invoker view runs
+        // under whichever owner is already in force.
+        const owner = nested.securityInvoker ? hops[hops.length - 1].owner : nested.owner;
+        walk(nested, [...hops, { view: `${nested.schema}.${nested.name}`, owner }]);
+        continue;
+      }
+
+      const relKey = `${relation.schema}.${relation.name}`;
+      const dedupe = `${relKey}::${hops[hops.length - 1].owner}`;
+      if (seen.has(dedupe)) continue;
+      seen.add(dedupe);
+      bases.push({ schema: relation.schema, table: relation.name, hops: [...hops] });
+    }
+  };
+
+  walk(root, [{ view: `${root.schema}.${root.name}`, owner: root.owner }]);
+
+  return { bases, ...(opaque ? { opaque } : {}) };
 }
 
 export type Resolved =

@@ -262,6 +262,32 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L11',
+    category: 'anti-pattern',
+    // Ships `info` on the same new-rule posture, and understates: a matview is
+    // a stored copy, so a SELECT grant on it is an unconditional grant on the
+    // rows a REFRESH captured — RLS on the base relation never runs, and the
+    // matview can carry neither policies nor `security_invoker`. On its own
+    // merits that is `high` when the base is RLS-protected.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Materialized-view snapshot — an untrusted role reads stored rows the base relation would not serve it (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
+    code: 'L12',
+    category: 'anti-pattern',
+    // Ships `info`, and is the weakest of the L-series on purpose: the leak
+    // needs a leaky operator or a cheap function in the caller's own qual, so
+    // it is a capability rather than an unconditional read. `medium` once
+    // proven — the rows it exposes are precisely the ones the view was written
+    // to withhold.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Non-barrier filtering view — a view is an untrusted role\'s only path to a relation but its row filter is not a boundary (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
     code: 'W1',
     category: 'meta',
     defaultSeverity: 'medium',

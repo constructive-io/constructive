@@ -132,6 +132,8 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L8 | info | fail-open | **DEFINER view bypass** — an untrusted role reads a base relation as the view's owner † |
 | L9 | info | fail-open | **DEFINER view write** — an auto-updatable definer view writes a base relation as its owner † |
 | L10 | info | fail-open | **Rewrite-rule bypass** — a rule on a view writes a relation as the view's owner, `security_invoker` notwithstanding † |
+| L11 | info | fail-open | **Materialized-view snapshot** — stored rows serve an untrusted role what the base relation's grants and policies would not † |
+| L12 | info | fail-open | **Non-barrier filtering view** — a view is an untrusted role's only path to a relation, but its row filter is not a boundary † |
 | W1 | medium | — | **No exposure surface configured** — whole database assumed reachable, score capped |
 
 † R1/R2/L5 are no-ops until you name the untrusted roles:

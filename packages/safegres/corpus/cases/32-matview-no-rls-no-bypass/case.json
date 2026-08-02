@@ -1,0 +1,30 @@
+{
+  "title": "A materialized view over a table the role can already read is a cache, not a bypass",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_matview_no_bypass"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A2",
+      "relation": "c_matview_no_bypass.regions",
+      "note": "the only real finding left: the table is granted without RLS, which is the intent here — it is public reference data"
+    }
+  ],
+  "forbid": [
+    "L11",
+    "L12"
+  ],
+  "worstSeverity": "high",
+  "fix": "Nothing on the matview. The snapshot shows corpus_anon exactly what `regions` would, and no policy was skipped because there is none — this case exists to pin that L11 stays silent when materialization changes nothing about reach.",
+  "id": "32-matview-no-rls-no-bypass"
+}

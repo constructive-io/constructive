@@ -31,6 +31,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     owner: 'app_owner',
     materialized: false,
     securityInvoker: false,
+    securityBarrier: false,
     ownerBypassesRls: false,
     grants: [grant('anon', 'INSERT')],
     definition: 'SELECT id, body FROM app.submissions',
