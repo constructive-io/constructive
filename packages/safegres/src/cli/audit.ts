@@ -37,7 +37,7 @@ function importPgpmTest(): typeof import('../pgpm-test') {
 }
 
 const usage = `
-safegres audit — pure-PostgreSQL RLS auditor
+safegres audit — Postgres security and performance auditor
 
   safegres audit [OPTIONS]
 
