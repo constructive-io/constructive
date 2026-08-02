@@ -1,6 +1,17 @@
-Requires Node.js >= 22 (`nvm use` picks it up from `.nvmrc`). Older Node versions
-break all GraphQL list/connection queries at runtime — see "Node Version
-Requirement" in [GRAPHILE.md](GRAPHILE.md).
+Requires Node.js >= 22 (`nvm use` picks it up from `.nvmrc`); CI runs Node 22.
+
+Older Node does **not** fail fast. `grafast` and `@dataplan/pg` use
+`Promise.withResolvers()`, unavailable before Node 22, in their query execution
+paths — so every list/connection query (`{ things { nodes { ... } } }`) fails at
+runtime with:
+
+```
+TypeError: Cannot read properties of undefined (reading 'items')
+    at grafast/src/steps/connection.ts (ConnectionStep.execute)
+```
+
+while mutations and single-record lookups keep working, which makes it look like
+a grafast `ConnectionStep` bug. Check `node --version` first.
 
 First initialize the database for testing:
 

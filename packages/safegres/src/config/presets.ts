@@ -85,10 +85,12 @@ export const postgrest: SafegresConfig = {
   extends: 'safegres:recommended',
   exposure: { adapters: ['postgrest'] },
   rules: {
-    R1: ['critical', { roles: ['anon'] }],
-    R2: ['critical', { roles: ['anon'] }],
+    // The anon role is `pgrst.db_anon_role`, so the adapter knows its name and
+    // the rules take it from the resolved surface rather than assuming `anon`.
+    R1: ['critical', { rolesFrom: 'exposure' }],
+    R2: ['critical', { rolesFrom: 'exposure' }],
     R3: 'high',
-    L5: ['high', { roles: ['anon'] }]
+    L5: ['high', { rolesFrom: 'exposure' }]
   },
   scoring: { floorOnCritical: 'C' }
 };
@@ -107,6 +109,8 @@ export const supabase: SafegresConfig = {
   extends: 'safegres:postgrest',
   exposure: { adapters: ['supabase'] },
   rules: {
+    // Named outright: these three are fixed by the platform, and unlike
+    // PostgREST's configurable anon role they are the same on every project.
     R1: ['critical', { roles: ['anon', 'authenticated'] }],
     R2: ['critical', { roles: ['anon', 'authenticated'] }],
     L5: ['high', { roles: ['anon', 'authenticated'] }]
@@ -131,8 +135,13 @@ export const supabase: SafegresConfig = {
 
 /**
  * PostGraphile / graphile-starter: `app_public` is served, `app_hidden` is
- * reachable through it, `app_private` is not exposed. The role vocabulary is
- * the starter's (`*_visitor` is the request role, anonymous or not).
+ * reachable through it, `app_private` is not exposed.
+ *
+ * The request role is `<app>_visitor` — project-specific, so it cannot be
+ * named here. The adapter resolves it from role membership and the rules take
+ * it from there. Every request runs as that role, authenticated or not (the
+ * caller is a JWT claim, not a role), which is exactly what makes it
+ * untrusted.
  *
  * A3 stays at its default: in this layout the API role is *not* the table
  * owner, so a missing FORCE genuinely is an owner-bypass hole.
@@ -141,10 +150,10 @@ export const graphile: SafegresConfig = {
   extends: 'safegres:recommended',
   exposure: { adapters: ['graphile'] },
   rules: {
-    R1: ['high', { roles: ['visitor', 'app_visitor'] }],
-    R2: ['high', { roles: ['visitor', 'app_visitor'] }],
+    R1: ['high', { rolesFrom: 'exposure' }],
+    R2: ['high', { rolesFrom: 'exposure' }],
     R3: 'high',
-    L5: ['medium', { roles: ['visitor', 'app_visitor'] }]
+    L5: ['medium', { rolesFrom: 'exposure' }]
   }
 };
 

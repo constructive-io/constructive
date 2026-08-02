@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { getConnections, PgTestClient } from 'pgsql-test';
 
+import { audit } from '../src/commands/audit';
 import { PRESETS } from '../src/config/presets';
 import { resolveRules } from '../src/config/resolve';
 import type { SafegresConfig } from '../src/config/types';
@@ -9,7 +10,8 @@ import {
   BUILTIN_ADAPTERS,
   graphileAdapter,
   hasuraAdapter,
-  postgrestAdapter
+  postgrestAdapter,
+  supabaseAdapter
 } from '../src/exposure/adapters';
 
 jest.setTimeout(120000);
@@ -110,6 +112,58 @@ describe('stack adapters', () => {
       schemas: ['app_public', 'app_hidden']
     });
     expect(planes[1]).toMatchObject({ name: 'internal', kind: 'schema', schemas: ['app_private'] });
+  });
+
+  it('resolves the visitor role by membership, not by name', async () => {
+    // The fixture names it `fxapp_visitor`, which no preset could hardcode:
+    // it is found because `fxapp_authenticator` can SET ROLE to it.
+    const planes = await graphileAdapter.resolve(pg.client as never);
+    expect(planes[0].roles).toEqual(['fxapp_visitor']);
+  });
+
+  it('does not treat a plain PostgREST database as Supabase', async () => {
+    // The fixture has PostgREST but no auth.users and no anon/authenticated/
+    // service_role trio, so the static fallback must stay out of reach.
+    expect(await supabaseAdapter.detect(pg.client as never)).toBe(false);
+  });
+
+  it('never guesses a surface for an unconfigured PostgREST', async () => {
+    // No pgrst.db_schemas anywhere -> no planes, which the audit reports as
+    // unknown exposure rather than a surface presented as fact.
+    const empty = {
+      query: async () => ({ rows: [] as unknown[] })
+    };
+    expect(await postgrestAdapter.resolve(empty as never)).toEqual([]);
+    expect(await postgrestAdapter.detect(empty as never)).toBe(false);
+  });
+
+  it('feeds adapter-resolved roles to the rules via rolesFrom', async () => {
+    // The point of the whole mechanism: fx_anon is named nowhere in the
+    // config, and R1 still fires on its write grant. `exposure.roles` comes
+    // from the adapter; `rolesFrom` is what lets a rule consume it.
+    await pg.any('GRANT INSERT ON fx_pgrst_api.notes TO fx_anon');
+    try {
+      const report = await audit(pg.client as never, {
+        schemas: ['fx_pgrst_api'],
+        exposure: { adapters: ['postgrest'] },
+        config: { rules: { R1: ['critical', { rolesFrom: 'exposure' }] } }
+      });
+      const r1 = report.findings.filter((f) => f.code === 'R1');
+      expect(r1.map((f) => f.role)).toContain('fx_anon');
+    } finally {
+      await pg.any('REVOKE INSERT ON fx_pgrst_api.notes FROM fx_anon');
+    }
+  });
+
+  it('leaves rules inert when a preset names no roles and none resolve', async () => {
+    // Without `rolesFrom` and without explicit roles, R1 stays a no-op —
+    // adapter-resolved roles must never leak into rules that did not ask.
+    const report = await audit(pg.client as never, {
+      schemas: ['fx_pgrst_api'],
+      exposure: { adapters: ['postgrest'] },
+      config: { rules: { R1: 'critical' } }
+    });
+    expect(report.findings.filter((f) => f.code === 'R1')).toEqual([]);
   });
 
   it('does not detect a stack that is not installed', async () => {
