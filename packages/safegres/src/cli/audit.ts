@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { diffCallGraph, parseBaseline, serializeBaseline, toBaseline } from '../callgraph/baseline';
 import { audit, type AuditOptions } from '../commands/audit';
-import { loadConfig } from '../config/loader';
+import { configPathBase, loadConfig } from '../config/loader';
 import type { Grade } from '../config/types';
 import { diffPerf, parsePerfBaseline, serializePerfBaseline, toPerfBaseline } from '../perf/baseline';
 import { compareReports, parseSnapshot, serializeSnapshot, toSnapshot } from '../report/compare';
@@ -228,7 +228,7 @@ export default async (
   const { pgpm: pgpmSource, usePgpm, perfBaseline, callGraphBaseline, outputs } = resolveRunPaths(
     argv,
     config,
-    loaded.filepath ? path.dirname(loaded.filepath) : process.cwd()
+    configPathBase(loaded)
   );
 
   const exposureSchemas = csvList(argv['exposure-schemas']);

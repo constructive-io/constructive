@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Client } from 'pg';
 import { getPgEnvOptions, type PgConfig } from 'pg-env';
 
-import type { LoadConfigParams } from '../config/loader';
+import type { ConfigPathBase, LoadConfigParams } from '../config/loader';
 import type { ExtensionsConfig, RulesConfig, SafegresConfig } from '../config/types';
 
 export function csvList(value: unknown): string[] | undefined {
@@ -86,38 +86,48 @@ export interface RunPaths {
 }
 
 /**
- * Flags win over the config file. A path from the config file is resolved
- * against that file, so a CI job can run from any directory; a path on the
- * command line stays relative to cwd, like every other command's arguments.
+ * Flags win over the config file. A path from a config file is resolved
+ * against *the file that declared it* — which is not always the discovered
+ * one, since a file can extend another — so a CI job can run from any
+ * directory; a path on the command line stays relative to cwd, like every
+ * other command's arguments.
  */
 export function resolveRunPaths(
   argv: ParsedArgs,
   config: SafegresConfig,
-  configDir: string
+  base: ConfigPathBase | string
 ): RunPaths {
-  const pick = (flag: unknown, configured?: string): string | undefined =>
-    typeof flag === 'string' ? flag : configured && path.resolve(configDir, configured);
+  const dirFor = typeof base === 'string' ? () => base : (key: string): string => base.dirFor(key);
+  const pick = (flag: unknown, key: string, configured?: string): string | undefined =>
+    typeof flag === 'string' ? flag : configured && path.resolve(dirFor(key), configured);
 
   // A directory is the common case: one path, conventional names, no remembering
   // which extension goes with which renderer. A named file still wins.
-  const dir = pick(argv.out, config.outputs?.dir);
+  const dir = pick(argv.out, 'outputs.dir', config.outputs?.dir);
   const inDir = (name: string): string | undefined => dir && path.join(dir, name);
 
   return {
-    pgpm: pick(argv.pgpm, config.source?.pgpm),
+    pgpm: pick(argv.pgpm, 'source.pgpm', config.source?.pgpm),
     // An explicit connection on the command line beats a configured source:
     // pointing the same config at a database you already have is the whole
     // reason to type one, and deploying a throwaway copy instead would ignore it.
     usePgpm: argv.pgpm !== undefined || (config.source?.pgpm !== undefined && !hasConnectionFlag(argv)),
-    perfBaseline: pick(argv['perf-baseline'], config.perf?.baseline),
-    callGraphBaseline: pick(argv.baseline, config.callGraph?.baseline),
+    perfBaseline: pick(argv['perf-baseline'], 'perf.baseline', config.perf?.baseline),
+    callGraphBaseline: pick(argv.baseline, 'callGraph.baseline', config.callGraph?.baseline),
     outputs: {
-      json: pick(argv['write-json'], config.outputs?.json) ?? inDir('safegres.json'),
-      markdown: pick(argv['write-markdown'], config.outputs?.markdown) ?? inDir('safegres.md'),
-      sarif: pick(argv['write-sarif'], config.outputs?.sarif) ?? inDir('safegres.sarif'),
-      sarifSources: pick(argv['sarif-sources'], config.outputs?.sarifSources),
-      snapshot: pick(argv['write-snapshot'], config.outputs?.snapshot),
-      githubComment: pick(argv['write-github-comment'], config.outputs?.githubComment)
+      json: pick(argv['write-json'], 'outputs.json', config.outputs?.json) ?? inDir('safegres.json'),
+      markdown:
+        pick(argv['write-markdown'], 'outputs.markdown', config.outputs?.markdown)
+        ?? inDir('safegres.md'),
+      sarif:
+        pick(argv['write-sarif'], 'outputs.sarif', config.outputs?.sarif) ?? inDir('safegres.sarif'),
+      sarifSources: pick(argv['sarif-sources'], 'outputs.sarifSources', config.outputs?.sarifSources),
+      snapshot: pick(argv['write-snapshot'], 'outputs.snapshot', config.outputs?.snapshot),
+      githubComment: pick(
+        argv['write-github-comment'],
+        'outputs.githubComment',
+        config.outputs?.githubComment
+      )
     }
   };
 }

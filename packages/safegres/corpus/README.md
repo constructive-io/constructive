@@ -42,6 +42,13 @@ Cases are **data, not code**: another tool can consume the corpus without runnin
 `expect` is a lower bound, not an equality check — a later release adding an unrelated advisory
 must not invalidate the corpus. What a case pins *negatively* goes in `forbid`.
 
+A **negative case** is one whose whole answer is negative: `expect` is empty and `forbid` names the
+rules that must stay quiet. It is the fixed form of a positive case — `38-foreign-key-with-index`
+is `17-foreign-key-without-index` with the index added — so the pair states both halves of what a
+rule means, and a rule that fires on the fix is caught by the corpus rather than by a user. A
+negative case must also score **100** on its dimension: precision is not just "the forbidden code
+didn't appear", it is "a correct schema costs nothing".
+
 ```ts
 import { audit, gradeCase, loadCorpus, loadConfig } from 'safegres';
 
@@ -68,8 +75,9 @@ instead of leaving it to the number.
 
 ## Adding a case
 
-Keep it to one flaw. Anything the case does *not* mean to demonstrate — an unforced RLS table, an
-open read policy left in to make the SQL shorter — shows up as an extra finding and muddies the
-answer, so the surrounding schema should be otherwise correct. `__tests__/corpus.test.ts` runs
-every case and additionally checks that the flaw costs points exactly when the rule carries weight
-(`info` severities and fail-closed rules are weightless by construction).
+Keep it to one flaw, and add the negative alongside it. Anything the case does *not* mean to
+demonstrate — an unforced RLS table, an open read policy left in to make the SQL shorter — shows up
+as an extra finding and muddies the answer, so the surrounding schema should be otherwise correct.
+`__tests__/corpus.test.ts` runs every case and additionally checks that the flaw costs points
+exactly when the rule carries weight (`info` severities and fail-closed rules are weightless by
+construction).

@@ -121,6 +121,7 @@ export {
   ruleCodesForDimension,
   rulesForTable
 } from './config/resolve';
+export { CONFIG_SHAPE, SCHEMA_ID, toJsonSchema } from './config/schema';
 export type {
   CallGraphConfig,
   EvalConfig,
@@ -142,6 +143,7 @@ export type {
   ScoringConfig,
   SourceConfig
 } from './config/types';
+export { validateConfigShape } from './config/validate';
 export type { CaseResult, CorpusCase, ExpectedFinding } from './corpus';
 export { corpusBootstrap, corpusDir, gradeCase, loadCase, loadCorpus } from './corpus';
 export type { ExposureAdapter, PlaneInput, ReachContext } from './exposure/adapters';

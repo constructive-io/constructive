@@ -1,0 +1,24 @@
+{
+  "title": "Sort-shaped column leading no index",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_sort_no_index"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "X8",
+      "relation": "c_sort_no_index.feed_items",
+      "note": "every page of a feed ordered by created_at sorts the whole RLS-filtered result; keyset pagination degenerates into scan-and-discard"
+    }
+  ],
+  "fix": "CREATE INDEX ON c_sort_no_index.feed_items (created_at DESC) — or turn X8 off if nothing orders by it, which is why the rule ships as info."
+}

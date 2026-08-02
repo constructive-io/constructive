@@ -43,9 +43,11 @@ describe('evaluation corpus', () => {
     expect(CORPUS.some((c) => c.dimension === 'security')).toBe(true);
     expect(CORPUS.some((c) => c.dimension === 'perf')).toBe(true);
     // Every case must document its answer: an unexplained fixture is a
-    // regression test, not an evaluation.
+    // regression test, not an evaluation. A negative case answers with what
+    // must *not* fire, so `forbid` is an answer too.
     for (const c of CORPUS) {
-      expect(`${c.id}:${c.expect.length > 0 && c.fix.length > 0}`).toBe(`${c.id}:true`);
+      const answered = (c.expect.length > 0 || (c.forbid?.length ?? 0) > 0) && c.fix.length > 0;
+      expect(`${c.id}:${answered}`).toBe(`${c.id}:true`);
     }
   });
 

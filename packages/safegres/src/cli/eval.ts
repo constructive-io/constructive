@@ -1,9 +1,10 @@
 import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
+import * as path from 'path';
 import type { Client } from 'pg';
 import yanse from 'yanse';
 
 import { type EvalCaseResult, type EvalReport, runEval } from '../commands/eval';
-import { loadConfig } from '../config/loader';
+import { configPathBase, loadConfig } from '../config/loader';
 import type { EvalConfig } from '../config/types';
 import { loadCorpus } from '../corpus';
 import { buildClient, csvList } from './shared';
@@ -44,7 +45,12 @@ graded by the named preset alone, or the corpus would be measuring itself.
  */
 function evalDefaults(configFile?: string): EvalConfig {
   try {
-    return loadConfig({ configFile }).config.eval ?? {};
+    const loaded = loadConfig({ configFile });
+    const config = loaded.config.eval ?? {};
+    if (config.corpus === undefined) return config;
+    // Like every other configured path: relative to the file that declared it,
+    // so a corpus committed next to the config is found from any cwd.
+    return { ...config, corpus: path.resolve(configPathBase(loaded).dirFor('eval.corpus'), config.corpus) };
   } catch {
     return {};
   }

@@ -1,0 +1,837 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/constructive-io/constructive/main/packages/safegres/schema/safegres.schema.json",
+  "title": "safegres configuration",
+  "description": "Configuration for safegres, the PostgreSQL security and performance auditor. Discovered as safegres.config.{ts,js,mjs,cjs}, .safegresrc{,.json,.yaml,.yml,.js}, safegres.json, or the \"safegres\" key in package.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference, for editor completion."
+    },
+    "extends": {
+      "anyOf": [
+        {
+          "type": "string",
+          "description": "Preset name, path, or package"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Preset name, path, or package"
+          },
+          "description": "Several, lowest precedence first"
+        }
+      ],
+      "description": "Presets (safegres:recommended, …), relative file paths, or npm packages"
+    },
+    "exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resolver": {
+          "type": "string",
+          "enum": [
+            "static",
+            "constructive",
+            "postgraphile"
+          ],
+          "description": "How to resolve the exposed surface"
+        },
+        "adapters": {
+          "type": "array",
+          "items": {
+            "description": "Built-in name or adapter object"
+          },
+          "description": "Exposure adapters: built-in names, or ExposureAdapter objects in a JS/TS config"
+        },
+        "schemas": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Schema name"
+          },
+          "description": "Schemas reachable from the exposed APIs"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Role name"
+          },
+          "description": "Roles reachable at the API edge"
+        },
+        "anonRoles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Role name"
+          },
+          "description": "The subset of roles an unauthenticated caller arrives as"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the primary plane. Default api."
+        },
+        "reach": {
+          "type": "boolean",
+          "description": "Let adapters narrow a plane to the relations the API can address. Default true."
+        },
+        "planes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Plane identifier, e.g. api, direct:app, internal"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "api",
+                  "role",
+                  "schema"
+                ],
+                "description": "What kind of access path this plane describes"
+              },
+              "primary": {
+                "type": "boolean",
+                "description": "Make this plane the headline score. At most one plane may claim it."
+              },
+              "schemas": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Schema name"
+                },
+                "description": "Schemas this plane reaches"
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Role name"
+                },
+                "description": "Roles this plane grants access as"
+              },
+              "anonRoles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Role name"
+                },
+                "description": "The subset of roles reachable without authenticating"
+              }
+            },
+            "description": "One graded access plane"
+          },
+          "description": "Additional access planes to grade"
+        }
+      },
+      "description": "The exposed API surface — what the score is computed against"
+    },
+    "public": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "read": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "schema.table glob"
+          },
+          "description": "Table globs whose open SELECT policies are by design"
+        }
+      },
+      "description": "Declared-public surface: open reads that are deliberate"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "skipOwned": {
+          "type": "boolean",
+          "description": "Skip relations an extension owns. Default true."
+        },
+        "ignore": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Extension name"
+          },
+          "description": "Extension names whose schemas are skipped wholesale"
+        }
+      },
+      "description": "How to treat objects belonging to installed extensions"
+    },
+    "perf": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Collect and score perf findings without passing --perf"
+        },
+        "rules": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "critical",
+                  "high",
+                  "medium",
+                  "low",
+                  "info"
+                ],
+                "description": "Rule setting"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "description": "Severity or options object"
+                },
+                "description": "Severity plus rule options"
+              }
+            ],
+            "description": "off, a severity, or [severity, options]"
+          },
+          "description": "Rule settings by code or prefix wildcard (A*, P*, *). Exact codes win."
+        },
+        "ignore": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "schema.table glob"
+          },
+          "description": "Table globs whose perf findings are intentional"
+        },
+        "scoring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "type": "string",
+              "enum": [
+                "density",
+                "weighted"
+              ],
+              "description": "Scoring model. Default density."
+            },
+            "weights": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number",
+                "description": "Points"
+              },
+              "description": "Points deducted per finding severity"
+            },
+            "perRuleWeights": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number",
+                "description": "Points"
+              },
+              "description": "Per-rule weight, beating the severity weight"
+            },
+            "maxDeductionPerRule": {
+              "type": "number",
+              "description": "Cap on one rule’s total deduction (weighted model)"
+            },
+            "failClosedWeight": {
+              "type": "number",
+              "description": "Multiplier for fail-closed findings. Default 0."
+            },
+            "densityK": {
+              "type": "number",
+              "description": "Density falloff constant. Default 0.17."
+            },
+            "unknownExposureCap": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "description": "Cap"
+                },
+                {
+                  "type": "boolean",
+                  "description": "false to disable"
+                }
+              ],
+              "description": "Maximum score when no exposure surface resolves. Default 80; false disables the cap."
+            },
+            "floorOnCritical": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "A+",
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "F"
+                  ],
+                  "description": "Grade"
+                },
+                {
+                  "type": "boolean",
+                  "description": "false to disable"
+                }
+              ],
+              "description": "Grade any critical finding floors the score at. Default C; false disables."
+            },
+            "gradeBands": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number",
+                "description": "Score"
+              },
+              "description": "Minimum score for each grade"
+            },
+            "includeStats": {
+              "type": "boolean",
+              "description": "Whether S* runtime-statistics findings count toward the perf score. Default true."
+            }
+          },
+          "description": "Scoring for the perf axis"
+        },
+        "stats": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Collect runtime statistics without passing --stats"
+            },
+            "minRows": {
+              "type": "number",
+              "description": "Ignore tables with fewer live rows than this. Default 1000."
+            },
+            "seqScanRatio": {
+              "type": "number",
+              "description": "S1 fires above this seq-scan/index-scan ratio. Default 10."
+            },
+            "minIndexBytes": {
+              "type": "number",
+              "description": "S2 ignores indexes smaller than this. Default 1048576."
+            },
+            "deadTupleRatio": {
+              "type": "number",
+              "description": "S3 fires above this dead/live tuple ratio. Default 0.2."
+            },
+            "minTimeShare": {
+              "type": "number",
+              "description": "S4 reports statements at or above this share of total time. Default 0.05."
+            },
+            "topStatements": {
+              "type": "number",
+              "description": "S4 reports at most this many statements. Default 5."
+            }
+          },
+          "description": "Runtime statistics (S*)"
+        },
+        "explain": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Probe findings with EXPLAIN without passing --explain"
+            },
+            "minRows": {
+              "type": "number",
+              "description": "Below this planner row estimate a seq scan is right. Default 1000."
+            }
+          },
+          "description": "Planner proof (--explain)"
+        },
+        "baseline": {
+          "type": "string",
+          "description": "Baseline of accepted perf debt; its presence enables the diff"
+        },
+        "failOnNew": {
+          "type": "boolean",
+          "description": "Exit non-zero on a perf finding absent from the baseline"
+        },
+        "paths": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "infer": {
+              "type": "boolean",
+              "description": "Collect access-path signals for every foreign key. Default true."
+            },
+            "minPointers": {
+              "type": "number",
+              "description": "Write-once pointers before the config-record signal fires. Default 2."
+            },
+            "onWriteOncePointer": {
+              "type": "string",
+              "enum": [
+                "report",
+                "demote",
+                "suppress"
+              ],
+              "description": "What X1 does with a shape-only write-once pointer"
+            }
+          },
+          "description": "Access-path classification, which decides whether X1 applies"
+        }
+      },
+      "description": "The optional performance dimension"
+    },
+    "schemas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Schema name"
+      },
+      "description": "Only audit these schemas"
+    },
+    "excludeSchemas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Schema name"
+      },
+      "description": "Never audit these schemas"
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Role name"
+      },
+      "description": "Only audit these roles"
+    },
+    "excludeRoles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Role name"
+      },
+      "description": "Never audit these roles"
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "off",
+              "critical",
+              "high",
+              "medium",
+              "low",
+              "info"
+            ],
+            "description": "Rule setting"
+          },
+          {
+            "type": "array",
+            "items": {
+              "description": "Severity or options object"
+            },
+            "description": "Severity plus rule options"
+          }
+        ],
+        "description": "off, a severity, or [severity, options]"
+      },
+      "description": "Rule settings by code or prefix wildcard (A*, P*, *). Exact codes win."
+    },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tables": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "schema.table glob"
+            },
+            "description": "schema.table globs this entry applies to"
+          },
+          "rules": {
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "off",
+                    "critical",
+                    "high",
+                    "medium",
+                    "low",
+                    "info"
+                  ],
+                  "description": "Rule setting"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "description": "Severity or options object"
+                  },
+                  "description": "Severity plus rule options"
+                }
+              ],
+              "description": "off, a severity, or [severity, options]"
+            },
+            "description": "Rule settings by code or prefix wildcard (A*, P*, *). Exact codes win."
+          }
+        },
+        "description": "One override"
+      },
+      "description": "Per-scope retuning, ESLint overrides-style"
+    },
+    "scoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": [
+            "density",
+            "weighted"
+          ],
+          "description": "Scoring model. Default density."
+        },
+        "weights": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "description": "Points"
+          },
+          "description": "Points deducted per finding severity"
+        },
+        "perRuleWeights": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "description": "Points"
+          },
+          "description": "Per-rule weight, beating the severity weight"
+        },
+        "maxDeductionPerRule": {
+          "type": "number",
+          "description": "Cap on one rule’s total deduction (weighted model)"
+        },
+        "failClosedWeight": {
+          "type": "number",
+          "description": "Multiplier for fail-closed findings. Default 0."
+        },
+        "densityK": {
+          "type": "number",
+          "description": "Density falloff constant. Default 0.17."
+        },
+        "unknownExposureCap": {
+          "anyOf": [
+            {
+              "type": "number",
+              "description": "Cap"
+            },
+            {
+              "type": "boolean",
+              "description": "false to disable"
+            }
+          ],
+          "description": "Maximum score when no exposure surface resolves. Default 80; false disables the cap."
+        },
+        "floorOnCritical": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "A+",
+                "A",
+                "B",
+                "C",
+                "D",
+                "F"
+              ],
+              "description": "Grade"
+            },
+            {
+              "type": "boolean",
+              "description": "false to disable"
+            }
+          ],
+          "description": "Grade any critical finding floors the score at. Default C; false disables."
+        },
+        "gradeBands": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "description": "Score"
+          },
+          "description": "Minimum score for each grade"
+        }
+      },
+      "description": "The security scoring model"
+    },
+    "failOn": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "info"
+          ],
+          "description": "Exit non-zero on any finding at or above this severity"
+        },
+        "score": {
+          "type": "number",
+          "description": "Exit non-zero below this security score"
+        },
+        "grade": {
+          "type": "string",
+          "enum": [
+            "A+",
+            "A",
+            "B",
+            "C",
+            "D",
+            "F"
+          ],
+          "description": "Exit non-zero below this security grade"
+        },
+        "perfScore": {
+          "type": "number",
+          "description": "Exit non-zero below this perf score"
+        },
+        "perfGrade": {
+          "type": "string",
+          "enum": [
+            "A+",
+            "A",
+            "B",
+            "C",
+            "D",
+            "F"
+          ],
+          "description": "Exit non-zero below this perf grade"
+        },
+        "planes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "score": {
+                "type": "number",
+                "description": "Exit non-zero below this plane score"
+              },
+              "grade": {
+                "type": "string",
+                "enum": [
+                  "A+",
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                  "F"
+                ],
+                "description": "Exit non-zero below this plane grade"
+              }
+            },
+            "description": "One plane gate"
+          },
+          "description": "Per-plane gates, keyed by plane name. A floor is the useful shape."
+        }
+      },
+      "description": "Gates — what makes the run exit non-zero"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pgpm": {
+          "type": "string",
+          "description": "Deploy the pgpm workspace at this path into an ephemeral database and audit it"
+        }
+      },
+      "description": "Where the database to audit comes from"
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dir": {
+          "type": "string",
+          "description": "Write safegres.{json,md,sarif} into this directory"
+        },
+        "json": {
+          "type": "string",
+          "description": "Path for the JSON report"
+        },
+        "markdown": {
+          "type": "string",
+          "description": "Path for the Markdown report"
+        },
+        "sarif": {
+          "type": "string",
+          "description": "Path for the SARIF report"
+        },
+        "sarifSources": {
+          "type": "string",
+          "description": "Root scanned to resolve SARIF findings to SQL source lines"
+        },
+        "snapshot": {
+          "type": "string",
+          "description": "Path for the aggregate-only snapshot, for a later compare"
+        },
+        "githubComment": {
+          "type": "string",
+          "description": "Path for the rendered sticky PR comment"
+        }
+      },
+      "description": "Files a single run writes"
+    },
+    "callGraph": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Build the call-graph audit without passing --call-graph"
+        },
+        "baseline": {
+          "type": "string",
+          "description": "Baseline of accepted trust boundaries; enables the diff"
+        },
+        "failOnNew": {
+          "type": "boolean",
+          "description": "Exit non-zero on a boundary absent from the baseline"
+        }
+      },
+      "description": "The unscored call-graph audit and its baseline"
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "planes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Plane name or glob"
+          },
+          "description": "Planes to render, by name or glob"
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "security",
+              "perf"
+            ],
+            "description": "Dimension"
+          },
+          "description": "Dimensions to render. Default both."
+        },
+        "github": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "summary": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Score"
+              },
+              "description": "Scores in the job summary, in order (security, perf, planes:<glob>)"
+            },
+            "comment": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "sticky": {
+                  "type": "boolean",
+                  "description": "Reuse one comment per PR instead of appending. Default true."
+                },
+                "sections": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "scores",
+                      "delta",
+                      "new-findings",
+                      "findings",
+                      "planes"
+                    ],
+                    "description": "Section"
+                  },
+                  "description": "Sections to include. Default scores, delta, new-findings."
+                }
+              },
+              "description": "Sticky PR comment"
+            },
+            "annotations": {
+              "type": "string",
+              "enum": [
+                "all",
+                "gate-failures",
+                "none"
+              ],
+              "description": "Which findings become annotations. Default gate-failures."
+            },
+            "detail": {
+              "type": "string",
+              "enum": [
+                "summary",
+                "normal",
+                "verbose"
+              ],
+              "description": "How much of the report goes in the job summary. Default normal."
+            },
+            "badges": {
+              "type": "boolean",
+              "description": "Render scores as colored shields.io badges. Default true."
+            }
+          },
+          "description": "GitHub Actions output"
+        }
+      },
+      "description": "What a rendered report shows — selection, not analysis"
+    },
+    "eval": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "corpus": {
+          "type": "string",
+          "description": "Corpus directory of <id>/{case.json,schema.sql}"
+        },
+        "preset": {
+          "type": "string",
+          "description": "Preset every case is graded under. Default recommended."
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Case id"
+          },
+          "description": "Case ids (or id prefixes) to run"
+        }
+      },
+      "description": "Defaults for safegres eval"
+    }
+  }
+}

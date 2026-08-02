@@ -1,0 +1,23 @@
+{
+  "title": "A STABLE policy function wrapped in a scalar sub-select is hoisted",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_stable_hoisted"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [],
+  "forbid": [
+    "X2",
+    "X4",
+    "X9"
+  ],
+  "fix": "Nothing to fix — this is case 20 fixed: the sub-select references no column, so the planner evaluates it once per query."
+}
