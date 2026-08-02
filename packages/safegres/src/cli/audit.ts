@@ -8,12 +8,14 @@ import { loadConfig } from '../config/loader';
 import type { Grade } from '../config/types';
 import { diffPerf, parsePerfBaseline, serializePerfBaseline, toPerfBaseline } from '../perf/baseline';
 import { compareReports, parseSnapshot, serializeSnapshot, toSnapshot } from '../report/compare';
+import { emitGithub, postStickyComment, renderGithubComment, renderGithubSummary } from '../report/github';
 import { renderJson } from '../report/json';
 import { renderMarkdown } from '../report/markdown';
 import { renderPretty } from '../report/pretty';
 import { buildSourceIndex, renderSarif } from '../report/sarif';
+import { matchPlane, type ViewConfig, viewConfigFromReportConfig } from '../report/view';
 import { meetsGrade } from '../score/score';
-import type { Report, Severity } from '../types';
+import type { Finding, Report, Severity } from '../types';
 import { meetsThreshold, SEVERITY_ORDER, summarize } from '../types';
 import { buildClient, configParamsFromArgv, csvList, extensionScopeFromArgv } from './shared';
 
@@ -62,6 +64,10 @@ Exposure (what the score is computed against):
   --exposure-schemas <csv> Declare the API-exposed schemas; findings outside
                            them become unscored internal advisories
   --exposed-only           Hide internal (non-exposed) findings from output
+  --plane <name|glob>      Expand a secondary access plane (repeatable; '*' for
+                           all). Planes are declared in exposure.planes and
+                           graded separately — the headline score is always the
+                           primary (API) plane and never moves
 
 Performance dimension (optional; scored separately from security):
   --perf                   Also audit index hygiene (X1/X5/X6/X7/X8), policy-aware
@@ -123,6 +129,10 @@ Audit options:
   --sarif-sources <dir>    With --format sarif: scan <dir> for the CREATE TABLE /
                            CREATE POLICY that defines each object, so alerts point
                            at the SQL that produced the finding
+  --write-json <file>      Also write the JSON report to <file>
+  --write-markdown <file>  Also write the markdown report to <file>
+  --write-sarif <file>     Also write the SARIF report to <file>
+                           (one audit, as many outputs as CI needs)
   --summary, -q            Print only exposure, score, and severity counts (no findings)
   --verbose                Expand internal (non-exposed) advisories (listed as a count otherwise)
   --fail-on <severity>     Exit non-zero if any finding >= severity
@@ -132,6 +142,16 @@ Audit options:
   --skip-ast               Skip AST-level anti-pattern checks (faster)
   --no-color               Disable ANSI colors in pretty output
   --help, -h               Show this help message
+
+GitHub Actions:
+  --github                 Write the job summary to $GITHUB_STEP_SUMMARY and
+                           emit workflow annotations (auto-detected when
+                           GITHUB_ACTIONS=true). Configure what appears with
+                           report.github in the config file
+  --github-comment         Upsert the sticky PR comment (needs GITHUB_TOKEN)
+  --write-github-comment <file>
+                           Write the PR-comment markdown to <file> instead of
+                           posting it
 `;
 
 export default async (
@@ -264,6 +284,13 @@ export default async (
     report.summary = summarize(report.findings);
   }
 
+  const planeSelectors = listArg(argv.plane);
+  const viewConfig: ViewConfig = {
+    ...viewConfigFromReportConfig(config.report),
+    ...(planeSelectors.length > 0 ? { planes: planeSelectors } : {}),
+    ...(argv['exposed-only'] === true ? { exposedOnly: true } : {})
+  };
+
   const fmt = typeof argv.format === 'string' ? argv.format : 'pretty';
   let output: string;
   switch (fmt) {
@@ -284,14 +311,16 @@ export default async (
   case 'md':
     output = renderMarkdown(report, {
       summary: argv.summary === true,
-      verbose: argv.verbose === true
+      verbose: argv.verbose === true,
+      view: viewConfig
     });
     break;
   case 'pretty':
     output = renderPretty(report, {
       color: colorEnabled,
       summary: argv.summary === true,
-      verbose: argv.verbose === true
+      verbose: argv.verbose === true,
+      view: viewConfig
     });
     break;
   default:
@@ -301,6 +330,39 @@ export default async (
   process.stdout.write(output);
   process.stdout.write('\n');
 
+  // One audit, as many renderings as CI asked for.
+  if (typeof argv['write-json'] === 'string') {
+    fs.writeFileSync(argv['write-json'], `${renderJson(report, { pretty: true })}\n`);
+    log.info(`wrote json report: ${argv['write-json']}`);
+  }
+  if (typeof argv['write-markdown'] === 'string') {
+    fs.writeFileSync(
+      argv['write-markdown'],
+      `${renderMarkdown(report, { verbose: argv.verbose === true, view: viewConfig })}\n`
+    );
+    log.info(`wrote markdown report: ${argv['write-markdown']}`);
+  }
+  if (typeof argv['write-sarif'] === 'string') {
+    fs.writeFileSync(
+      argv['write-sarif'],
+      `${renderSarif(report, {
+        sources: typeof argv['sarif-sources'] === 'string'
+          ? buildSourceIndex(argv['sarif-sources'])
+          : undefined
+      })}\n`
+    );
+    log.info(`wrote sarif report: ${argv['write-sarif']}`);
+  }
+
+  // Gates are evaluated before anything exits, so the GitHub renderers can
+  // annotate exactly the findings that failed the build.
+  let failed = false;
+  const gateFailures: Finding[] = [];
+  const fail = (message: string): void => {
+    log.error(message);
+    failed = true;
+  };
+
   const failOnSeverity =
     typeof argv['fail-on'] === 'string' ? (argv['fail-on'] as Severity) : config.failOn?.severity;
   if (failOnSeverity) {
@@ -308,23 +370,23 @@ export default async (
       log.error(`Unknown --fail-on severity: ${failOnSeverity}`);
       process.exit(2);
     }
-    if (report.findings.some((f) => meetsThreshold(f.severity, failOnSeverity))) {
-      process.exit(1);
+    const over = report.findings.filter((f) => meetsThreshold(f.severity, failOnSeverity));
+    if (over.length > 0) {
+      gateFailures.push(...over);
+      fail(`${over.length} finding(s) at or above --fail-on ${failOnSeverity}`);
     }
   }
 
   const failOnScore =
     typeof argv['fail-on-score'] === 'number' ? argv['fail-on-score'] : config.failOn?.score;
   if (failOnScore != null && report.score && report.score.value < failOnScore) {
-    log.error(`score ${report.score.value} is below --fail-on-score ${failOnScore}`);
-    process.exit(1);
+    fail(`score ${report.score.value} is below --fail-on-score ${failOnScore}`);
   }
 
   const failOnGrade =
     typeof argv['fail-on-grade'] === 'string' ? (argv['fail-on-grade'] as Grade) : config.failOn?.grade;
   if (failOnGrade && report.score && !meetsGrade(report.score.grade, failOnGrade)) {
-    log.error(`grade ${report.score.grade} is below --fail-on-grade ${failOnGrade}`);
-    process.exit(1);
+    fail(`grade ${report.score.grade} is below --fail-on-grade ${failOnGrade}`);
   }
 
   const failOnPerfScore =
@@ -332,8 +394,7 @@ export default async (
       ? argv['fail-on-perf-score']
       : config.failOn?.perfScore;
   if (failOnPerfScore != null && report.perf && report.perf.score.value < failOnPerfScore) {
-    log.error(`perf score ${report.perf.score.value} is below --fail-on-perf-score ${failOnPerfScore}`);
-    process.exit(1);
+    fail(`perf score ${report.perf.score.value} is below --fail-on-perf-score ${failOnPerfScore}`);
   }
 
   const failOnPerfGrade =
@@ -341,16 +402,30 @@ export default async (
       ? (argv['fail-on-perf-grade'] as Grade)
       : config.failOn?.perfGrade;
   if (failOnPerfGrade && report.perf && !meetsGrade(report.perf.score.grade, failOnPerfGrade)) {
-    log.error(`perf grade ${report.perf.score.grade} is below --fail-on-perf-grade ${failOnPerfGrade}`);
-    process.exit(1);
+    fail(`perf grade ${report.perf.score.grade} is below --fail-on-perf-grade ${failOnPerfGrade}`);
+  }
+
+  // Per-plane gates. A secondary plane gates nothing unless the config asks:
+  // the direct-connection surface is legitimately worse than the API's, and a
+  // parity gate would only get the plane deleted.
+  for (const [pattern, gate] of Object.entries(config.failOn?.planes ?? {})) {
+    const planes = (report.planes ?? []).filter((p) => !p.skipped && matchPlane(pattern, p.name));
+    for (const plane of planes) {
+      if (gate.score != null && plane.score.value < gate.score) {
+        fail(`plane ${plane.name} score ${plane.score.value} is below failOn.planes["${pattern}"].score ${gate.score}`);
+      }
+      if (gate.grade && !meetsGrade(plane.score.grade, gate.grade)) {
+        fail(`plane ${plane.name} grade ${plane.score.grade} is below failOn.planes["${pattern}"].grade ${gate.grade}`);
+      }
+    }
   }
 
   if (argv['fail-on-new-perf'] === true && report.perf?.diff && report.perf.diff.added.length > 0) {
     const count = report.perf.diff.added.length;
-    log.error(
+    gateFailures.push(...report.perf.diff.added);
+    fail(
       `${count} new performance finding${count === 1 ? '' : 's'} since the perf baseline — fix them, or re-baseline with --write-perf-baseline to accept`
     );
-    process.exit(1);
   }
 
   if (
@@ -358,9 +433,48 @@ export default async (
     && report.callGraphDiff
     && report.callGraphDiff.added.length > 0
   ) {
-    log.error(
+    fail(
       `${report.callGraphDiff.added.length} new trust boundar${report.callGraphDiff.added.length === 1 ? 'y' : 'ies'} since the baseline — review and re-baseline to accept`
     );
-    process.exit(1);
   }
+
+  // GitHub output: on by default inside Actions, because a report nobody has
+  // to wire up is a report people actually read.
+  const githubConfig = config.report?.github;
+  const githubMode =
+    argv.github === true || (argv.github !== false && process.env.GITHUB_ACTIONS === 'true');
+  const githubOptions = {
+    ...(githubConfig ? { config: githubConfig } : {}),
+    gateFailures,
+    view: viewConfig
+  };
+  if (githubMode) {
+    if (!emitGithub(report, githubOptions)) {
+      log.warn('--github: no $GITHUB_STEP_SUMMARY in the environment — summary not written');
+      process.stdout.write(`${renderGithubSummary(report, githubOptions)}\n`);
+    }
+  }
+
+  if (typeof argv['write-github-comment'] === 'string') {
+    fs.writeFileSync(
+      argv['write-github-comment'],
+      `${renderGithubComment(report, githubOptions)}\n`
+    );
+    log.info(`wrote github comment: ${argv['write-github-comment']}`);
+  }
+
+  if (argv['github-comment'] === true) {
+    const result = await postStickyComment(renderGithubComment(report, githubOptions));
+    if (result.posted) log.info('updated the safegres PR comment');
+    else log.warn(`--github-comment: not posted — ${result.reason}`);
+  }
+
+  if (failed) process.exit(1);
 };
+
+/** A repeatable flag: `--plane a --plane b` (minimist gives an array). */
+function listArg(value: unknown): string[] {
+  if (typeof value === 'string') return [value];
+  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === 'string');
+  return [];
+}

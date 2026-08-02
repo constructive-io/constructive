@@ -1,3 +1,4 @@
+import type { ExposureAdapter } from '../exposure/adapters';
 import type { Severity } from '../types';
 
 /**
@@ -38,11 +39,54 @@ export interface ExposureConfig {
    * - `constructive`: introspect the Constructive routing plane
    *   (`routing_public.apis` → `api_schemas` → `metaschema_public.schema`,
    *   plus the platform plane) to discover exposed schemas and API roles.
+   *
+   * Equivalent to listing the corresponding built-in in `adapters`.
    */
   resolver?: 'static' | 'constructive';
+  /**
+   * Exposure adapters: objects implementing `ExposureAdapter`, or the name of
+   * a built-in (`'constructive'`). An adapter whose `detect()` succeeds
+   * contributes planes; static `schemas`/`roles` extend, never replace, what
+   * it found. Adapters are values, not module names — a custom one is an
+   * object you construct, and nothing is resolved by package name.
+   */
+  adapters?: Array<string | ExposureAdapter>;
   /** Schemas reachable from the exposed APIs (static resolver). */
   schemas?: string[];
   /** Roles reachable from the API edge (static resolver). */
+  roles?: string[];
+  /** Name of the primary plane. Default `api`. */
+  name?: string;
+  /**
+   * Additional access planes to grade: the ways into the database that are
+   * not the declared API. Each is scored on the security axis with the same
+   * model, reported alongside the primary plane, and — unless `failOn.planes`
+   * says otherwise — gates nothing.
+   */
+  planes?: PlaneConfig[];
+}
+
+/** What kind of access path a plane describes. */
+export type PlaneKind = 'api' | 'role' | 'schema';
+
+/**
+ * One graded access plane. `api`/`schema` planes are a set of schemas; a
+ * `role` plane is whatever its roles can effectively reach (direct grants,
+ * grants TO PUBLIC, and role inheritance), so it never has to be kept in
+ * sync with a schema list by hand.
+ */
+export interface PlaneConfig {
+  /** Plane identifier, e.g. `api`, `direct:app`, `internal`. */
+  name: string;
+  /** Default: `role` when `roles` is set and `schemas` is not, else `schema`. */
+  kind?: PlaneKind;
+  /**
+   * Make this plane the headline score (`report.score`). At most one plane
+   * may claim it; declaring two is a configuration error rather than a
+   * silent pick. Default: the declared API surface is primary.
+   */
+  primary?: boolean;
+  schemas?: string[];
   roles?: string[];
 }
 
@@ -223,6 +267,64 @@ export interface FailOnConfig {
   perfScore?: number;
   /** Exit non-zero if the perf grade is below this letter. */
   perfGrade?: Grade;
+  /**
+   * Per-plane gates, keyed by plane name. Secondary planes gate nothing by
+   * default: an internal role legitimately reaches internal tables, so its
+   * plane scores worse than the API's by construction and gating it at parity
+   * would only force the plane to be deleted. A floor (`{ grade: 'D' }`) is
+   * the useful shape — the direct-connection surface may be a D, but it may
+   * not become an F.
+   */
+  planes?: Record<string, PlaneFailOnConfig>;
+}
+
+export interface PlaneFailOnConfig {
+  /** Exit non-zero if the plane's score is below this value (0-100). */
+  score?: number;
+  /** Exit non-zero if the plane's grade is below this letter. */
+  grade?: Grade;
+}
+
+/** Which scores and sections a rendered report shows. */
+export interface ReportConfig {
+  /**
+   * Planes to render, by name or glob (`primary`, `*`, `direct:*`). Default:
+   * the primary plane in full, secondaries as a one-line advisory.
+   */
+  planes?: string[];
+  /** Dimensions to render. Default: both. */
+  dimensions?: Array<'security' | 'perf'>;
+  /** GitHub Actions output (job summary, annotations, PR comment). */
+  github?: GithubReportConfig;
+}
+
+/**
+ * What the GitHub integration emits. Defaults render both headline scores,
+ * the delta against the compared run, and annotations for gate failures only.
+ */
+export interface GithubReportConfig {
+  /**
+   * Scores in the job summary, in order. `security`, `perf`, and
+   * `planes:<glob>` for secondary planes (e.g. `planes:direct:*`).
+   * Default `['security', 'perf']`.
+   */
+  summary?: string[];
+  /** Sticky PR comment. */
+  comment?: GithubCommentConfig;
+  /** Which findings become workflow annotations. Default `gate-failures`. */
+  annotations?: 'all' | 'gate-failures' | 'none';
+  /**
+   * Render scores as colored shields.io badges. Default `true`; `false` falls
+   * back to 🟢/🟡/🔴 text, which needs no network fetch.
+   */
+  badges?: boolean;
+}
+
+export interface GithubCommentConfig {
+  /** Reuse one comment per PR instead of appending. Default `true`. */
+  sticky?: boolean;
+  /** Sections to include. Default `['scores', 'delta', 'new-findings']`. */
+  sections?: Array<'scores' | 'delta' | 'new-findings' | 'findings' | 'planes'>;
 }
 
 /**
@@ -249,4 +351,6 @@ export interface SafegresConfig {
   overrides?: OverrideEntry[];
   scoring?: ScoringConfig;
   failOn?: FailOnConfig;
+  /** What a rendered report shows — selection, not analysis. */
+  report?: ReportConfig;
 }

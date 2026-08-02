@@ -1,7 +1,10 @@
 # Reporting — output formats, deltas, and code scanning
 
 - [Output and verbosity](#output-and-verbosity)
+- [Planes in the report](#planes-in-the-report)
+- [Analysis → view → render](#analysis--view--render)
 - [Markdown for CI](#markdown-for-ci)
+- [GitHub Actions (`--github`)](#github-actions---github)
 - [What changed (`--compare`)](#what-changed---compare)
 - [Code scanning (SARIF)](#code-scanning-sarif)
 
@@ -19,6 +22,66 @@ stays readable.
   `score`, `perf`, `exposure`, `roleAccess`, `comparison`, `callGraph` and any diffs.
 - `--format markdown` — GitHub-flavoured markdown for a job summary or PR comment.
 - `--format sarif` — SARIF 2.1.0 for GitHub code scanning.
+- `--plane <name|glob>` — expand a secondary access plane (repeatable; `'*'` for all).
+
+One audit can produce several artifacts at once, which is cheaper and less error-prone than
+auditing three times with three `--format` values:
+
+```bash
+safegres audit --perf --summary \
+  --write-json     reports/safegres.json \
+  --write-markdown reports/safegres.md \
+  --write-sarif    reports/safegres.sarif
+```
+
+## Planes in the report
+
+Every declared [plane](../README.md#planes-the-other-ways-in) appears in `report.planes` — the
+primary one first, whose score *is* `report.score`:
+
+```jsonc
+{
+  "score": { "value": 87, "grade": "B", "deductions": […] },
+  "planes": [
+    { "name": "api", "kind": "api", "primary": true, "schemas": ["app_public"],
+      "exposedTables": 24, "score": { "value": 87, "grade": "B" } },
+    { "name": "direct:reporting", "kind": "role", "primary": false, "roles": ["reporting"],
+      "reachedVia": "grant", "exposedTables": 12, "score": { "value": 41, "grade": "F" } }
+  ]
+}
+```
+
+Findings carry `planes: string[]` — every plane the finding is reachable on. It is *not* part of a
+finding's identity: `exposed`, the baseline keys, and the SARIF fingerprints are unchanged by
+adding a plane, so a plane can never invalidate a baseline. A plane whose role bypasses RLS
+(`BYPASSRLS`, superuser) reports `skipped` instead of a grade.
+
+Pretty and markdown output summarize secondary planes in one line/row each; `--plane` expands the
+per-rule deductions for the ones you name.
+
+## Analysis → view → render
+
+The library separates *what was found* from *what to show*. `audit()` produces a `Report` and
+nothing presentational; `selectView(report, viewConfig)` decides which planes, dimensions, and
+sections appear; the renderers are functions of the result.
+
+```ts
+import { audit, renderMarkdown, selectView } from 'safegres';
+
+const report = await audit(client, { exposure });
+const view = selectView(report, { planes: ['direct:*'], dimensions: ['security'] });
+view.scores;         // [{ id: 'security', … }, { id: 'plane:direct:app', … }]
+view.security;       // { exposed, internal } — partitioned, report untouched
+renderMarkdown(report, { view: { planes: ['direct:*'] } });
+```
+
+The same selection is available in config, so it is versioned with the repo:
+
+```jsonc
+{ "report": { "planes": ["direct:*"], "dimensions": ["security", "perf"] } }
+```
+
+`--summary`, `--verbose`, and `--exposed-only` remain shorthands for view settings.
 
 ## Markdown for CI
 
@@ -35,6 +98,41 @@ Library callers get the same renderer as `renderMarkdown(report)`, which additio
 `{ summary: true, title: '…' }` — the compact variant worth using when the full report is large
 (GitHub caps a job summary at 1 MB, and a report with thousands of baselined perf findings will
 exceed it). Keep the full report as a CI artifact and put the summary in the job summary.
+
+## GitHub Actions (`--github`)
+
+Inside Actions (`GITHUB_ACTIONS=true`) safegres writes its own job summary and annotations, so the
+shell plumbing above becomes unnecessary:
+
+```yaml
+- run: npx safegres audit --perf --fail-on-grade B --github --github-comment
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # only needed for the PR comment
+```
+
+- **Job summary** — grade-colored [shields.io](https://shields.io) badges, then the markdown report.
+- **Annotations** — `::error`/`::warning` on the findings that *failed a gate*, so the one finding
+  that blocked the merge is not buried under a hundred advisories.
+- **Sticky PR comment** — one comment, edited in place on every push (`--github-comment`, or
+  `--write-github-comment <file>` to post it yourself).
+
+What appears is configuration, not code:
+
+```jsonc
+{
+  "report": {
+    "github": {
+      "summary": ["security", "perf", "planes:direct:*"],  // which scores get a badge, in order
+      "comment": { "sticky": true, "sections": ["scores", "delta", "new-findings"] },
+      "annotations": "gate-failures",                       // "all" | "gate-failures" | "none"
+      "badges": true                                        // false → 🟢🟡🔴 text, no images
+    }
+  }
+}
+```
+
+GitHub Markdown has no text color, so a genuinely colored score has to be an image; `badges: false`
+falls back to emoji for air-gapped runners that cannot reach shields.io.
 
 ## What changed (`--compare`)
 

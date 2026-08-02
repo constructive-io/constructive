@@ -201,6 +201,76 @@ and `perf.ignore` for accepted performance debt. Extension-owned relations are s
 and an extension that creates objects at runtime can be skipped wholesale with
 `extensions.ignore` — see [docs/rules.md](https://github.com/constructive-io/constructive/blob/main/packages/safegres/docs/rules.md#extension-objects).
 
+### Planes: the other ways in
+
+An API is one way into a database, not the only one. Declare the others as **planes** and each
+gets its own grade — while the headline score stays exactly what it was:
+
+```jsonc
+{
+  "exposure": {
+    "schemas": ["app_public"],
+    "planes": [
+      { "name": "direct:reporting", "kind": "role", "roles": ["reporting"] },
+      { "name": "internal", "kind": "schema", "schemas": ["app_private"] }
+    ]
+  }
+}
+```
+
+```
+score  87  (B)   security      ← still the declared API surface, unchanged
+other access planes — advisory, not part of the score above:
+  direct:reporting [role] (reporting): 41 (F)  — 12 relation(s), reached via grant
+  internal [schema] (app_private): 63 (D)  — 9 relation(s)
+```
+
+A role plane is resolved through the same effective-access lattice the `L*` rules use — direct
+grants, `PUBLIC`, and role inheritance — so it answers the question a reviewer actually asks: *if
+this connection string leaks, what does it reach?* Roles with `BYPASSRLS` or superuser are
+reported as not graded rather than given a meaningless F.
+
+Secondary planes never move the headline and never touch finding identity, so adding one cannot
+invalidate a baseline. They gate nothing unless you ask — `failOn.planes` takes a name or glob:
+
+```jsonc
+{ "failOn": { "grade": "B", "planes": { "direct:*": { "grade": "D" } } } }
+```
+
+`--plane direct:reporting` (or `--plane '*'`) expands one in the terminal and markdown output;
+`--format json` always carries them all in `report.planes`.
+
+### Adapters
+
+Where the exposed surface comes from is an interface, not a hard-coded integration. An adapter is
+an object — no plugin resolution, nothing load-bearing about a package name:
+
+```ts
+// safegres.config.ts
+import type { SafegresConfig } from 'safegres';
+import { constructiveAdapter } from 'safegres/adapters';
+
+import { myGatewayAdapter } from './my-gateway-adapter';
+
+const config: SafegresConfig = {
+  exposure: { adapters: [constructiveAdapter, myGatewayAdapter] }
+};
+export default config;
+```
+
+```ts
+interface ExposureAdapter {
+  name: string;
+  detect(exec: QueryExecutor): Promise<boolean>;      // is this stack present?
+  resolve(exec: QueryExecutor): Promise<PlaneInput[]>; // one or more planes
+}
+```
+
+The built-in `constructive` adapter introspects `routing_public.apis → api_schemas` and emits a
+primary `api` plane plus one `api:<name>` plane per API. JSON configs may name a built-in
+(`"adapters": ["constructive"]`); anything else is an error rather than a silent no-op. The old
+`"resolver": "constructive"` still works.
+
 ## CI in one job
 
 One service container, your existing migration command, one audit:

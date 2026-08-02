@@ -1,2 +1,2 @@
-// Auto-synced from package.json during publish.
-export const version = '0.1.0';
+// Auto-synced from package.json by scripts/sync-version.js.
+export const version = '1.16.1';

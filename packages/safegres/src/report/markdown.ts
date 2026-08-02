@@ -11,8 +11,9 @@
 
 import type { RoleAccessEntry } from '../checks/lattice';
 import type { Score } from '../score/score';
-import type { Finding, Report, Severity } from '../types';
+import type { Finding, PlaneReport, Report, Severity } from '../types';
 import { formatDelta, type ReportComparison, type RuleDelta, type ScoreDelta } from './compare';
+import { type ReportView, selectView, type ViewConfig } from './view';
 
 const SEV_ICON: Record<Severity, string> = {
   critical: '🔴',
@@ -42,9 +43,18 @@ export interface RenderMarkdownOptions {
   verbose?: boolean;
   /** Heading text. Default `safegres`. */
   title?: string;
+  /** Secondary planes to expand, by name or glob. Default: one summary table. */
+  planes?: string[];
+  /** Everything else the view layer selects. Beats the flags above. */
+  view?: ViewConfig;
 }
 
 export function renderMarkdown(report: Report, options: RenderMarkdownOptions = {}): string {
+  const view = selectView(report, {
+    detail: options.summary ? 'summary' : options.verbose ? 'verbose' : 'normal',
+    ...(options.planes ? { planes: options.planes } : {}),
+    ...options.view
+  });
   const out: string[] = [`## ${options.title ?? 'safegres'}`, ''];
 
   out.push(...scoreTable(report, options), '');
@@ -60,16 +70,18 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
     );
   }
 
+  if (view.has('planes')) out.push(...planeSection(view), '');
+
   out.push(countsTable(report), '');
 
   if (report.comparison) out.push(...comparisonSection(report.comparison), '');
 
-  if (options.summary) return out.join('\n');
+  if (view.detail === 'summary') return out.join('\n');
 
-  const security = report.perf
-    ? report.findings.filter((f) => f.dimension !== 'perf')
-    : report.findings;
-  out.push(...findingSection('Security findings', security, options), '');
+  out.push(
+    ...findingSection('Security findings', [...view.security.exposed, ...view.security.internal], options),
+    ''
+  );
 
   if (report.roleAccess && report.roleAccess.roles.length > 0) {
     out.push(...roleAccessSection(report.roleAccess.roles), '');
@@ -122,6 +134,53 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
   }
 
   return out.join('\n');
+}
+
+/**
+ * The other ways in, as one table. Secondary planes are advisory by
+ * construction — an internal role reaching internal tables is the schema
+ * working as designed — so they read as context under the headline rather
+ * than as a second verdict competing with it.
+ */
+function planeSection(view: ReportView): string[] {
+  const out: string[] = [
+    '### Other access planes',
+    '',
+    '_Advisory: these are not the score above. The headline grades the declared API surface; '
+      + 'a plane grades what somebody reaches without going through it._',
+    '',
+    '| Plane | Kind | Reaches | Relations | Score | Grade |',
+    '| --- | --- | --- | ---: | ---: | --- |'
+  ];
+  for (const plane of view.planes) out.push(planeRow(plane));
+  for (const plane of view.expandedPlanes) {
+    if (plane.skipped || plane.score.deductions.length === 0) continue;
+    out.push(
+      '',
+      `#### Plane \`${plane.name}\` by rule`,
+      '',
+      '| Rule | Findings | Points | Grade | Payoff |',
+      '| --- | ---: | ---: | --- | ---: |',
+      ...plane.score.deductions.map((d) =>
+        d.unscored
+          ? `| \`${d.code}\` | ${d.count} | — | — | *unscored* |`
+          : `| \`${d.code}\` | ${d.count} | −${d.points} | **${d.grade}** | +${d.potential.toFixed(1)} |`
+      )
+    );
+  }
+  return out;
+}
+
+function planeRow(plane: PlaneReport): string {
+  const who = plane.roles && plane.roles.length > 0
+    ? plane.roles.map((r) => `\`${r}\``).join(', ')
+    : plane.schemas.map((s) => `\`${s}\``).join(', ') || '—';
+  if (plane.skipped) {
+    return `| \`${plane.name}\` | ${plane.kind} | ${who} | — | — | not graded — ${plane.skipped} |`;
+  }
+  const via = plane.reachedVia ? ` (via ${plane.reachedVia})` : '';
+  return `| \`${plane.name}\` | ${plane.kind} | ${who}${via} | ${plane.exposedTables} `
+    + `| **${plane.score.value}** | **${plane.score.grade}** |`;
 }
 
 /**

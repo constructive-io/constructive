@@ -25,7 +25,8 @@
   "scripts": {
     "clean": "makage clean",
     "prepack": "npm run build",
-    "build": "makage build && chmod +x dist/cli.js",
+    "version:sync": "node scripts/sync-version.js",
+    "build": "npm run version:sync && makage build && chmod +x dist/cli.js",
     "build:dev": "makage build --dev && chmod +x dist/cli.js",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",

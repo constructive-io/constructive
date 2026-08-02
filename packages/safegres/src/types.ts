@@ -44,11 +44,19 @@ export interface Finding {
   /** Scoring axis. Stamped from the rule registry; defaults to `security`. */
   dimension?: Dimension;
   /**
-   * Whether the finding's table is on the resolved exposure surface.
-   * `undefined` when no exposure surface is known (everything is assumed
-   * reachable).
+   * Whether the finding's table is on the resolved exposure surface — i.e.
+   * reachable on the *primary* plane. `undefined` when no exposure surface is
+   * known (everything is assumed reachable).
    */
   exposed?: boolean;
+  /**
+   * Every access plane the finding is reachable on, by name. A relation that
+   * is internal to the API can still be reachable by a role holding a direct
+   * connection, and this is where that shows up. Not part of a finding's
+   * identity: baselines and comparisons key on the finding, not on who can
+   * reach it.
+   */
+  planes?: string[];
   /**
    * The finding is acknowledged by config as intentional (e.g. an open read
    * on a table declared in `public.read`) — reported, but excluded from the
@@ -97,12 +105,43 @@ export interface Summary {
   info: number;
 }
 
+/**
+ * One graded access plane: a way into the database, with its own score.
+ *
+ * The primary plane is the declared API surface, and its score *is*
+ * `report.score` — secondary planes never move it. They answer the question
+ * the headline cannot: what does this database grade for somebody who does
+ * not come through the API?
+ */
+export interface PlaneReport {
+  name: string;
+  kind: 'api' | 'role' | 'schema';
+  /** The headline plane. Exactly one plane is primary. */
+  primary: boolean;
+  /** Adapter name, `config`, or `none`. */
+  source: string;
+  schemas: string[];
+  roles?: string[];
+  /** Relations the plane reaches (the density denominator). */
+  exposedTables: number;
+  /** Role planes: the most direct way the reach arrives. */
+  reachedVia?: 'grant' | 'PUBLIC' | 'inheritance';
+  /** Security score for this plane, same model as the headline. */
+  score: import('./score/score').Score;
+  /** Severity counts for the findings reachable on this plane. */
+  summary: Summary;
+  /** Present when the plane was reported but deliberately not graded. */
+  skipped?: string;
+}
+
 /** The resolved exposure surface an audit was scored against. */
 export interface ExposureReport {
   /** True when a surface was configured or auto-resolved. */
   known: boolean;
-  /** Where the surface came from. */
-  source: 'config' | 'constructive' | 'none';
+  /** Where the surface came from: an adapter name, `config`, or `none`. */
+  source: string;
+  /** Name of the primary plane. */
+  plane?: string;
   /** Schemas reachable from the exposed APIs. Empty when unknown. */
   schemas: string[];
   /** API-edge roles, when the resolver can discover them. */
@@ -192,6 +231,12 @@ export interface Report {
   perf?: PerfReport;
   /** The exposure surface the score was computed against. */
   exposure?: ExposureReport;
+  /**
+   * Every graded access plane, primary first. `planes[0].score` is
+   * `report.score`; the rest are advisory unless `failOn.planes` opts them
+   * into gating.
+   */
+  planes?: PlaneReport[];
   /** Effective per-role access, for the configured untrusted roles. */
   roleAccess?: RoleAccessReport;
   /**
