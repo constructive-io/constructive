@@ -61,6 +61,15 @@ Configuration:
                            Stack: constructive, postgrest, supabase, graphile, hasura.
                            Composable: multi-tenant, oltp (extends: [stack, posture]).
   --rule <CODE=SETTING>    Retune a rule (repeatable), e.g. --rule A3=off --rule A5=high
+  --sealed                 Grade under a built-in preset ALONE: no config-file
+                           discovery, and --config/--rule/--exposure-schemas and
+                           every baseline flag are refused. For evaluating an
+                           agent, where editing the rules is the cheapest way to
+                           win. Pair with --preset; the resolved rule set is
+                           fingerprinted into report.provenance either way
+  --verify-fingerprint <f> Exit non-zero unless the run's configuration
+                           fingerprint is <f> — the harness's proof that the
+                           score it is reading was produced under its own rules
 
 Exposure (what the score is computed against):
   --exposure-schemas <csv> Declare the API-exposed schemas; findings outside
@@ -170,6 +179,26 @@ export default async (
   const colorEnabled = argv.color !== false;
 
   const pgpmCwd = typeof argv.pgpm === 'string' ? argv.pgpm : undefined;
+  const sealed = argv.sealed === true;
+  if (sealed) {
+    // Everything below is a way to change the score without changing the
+    // database. A sealed run refuses them outright rather than ignoring them:
+    // an evaluation that silently dropped the flag it was handed would be
+    // reporting a number for rules nobody chose.
+    const banned = [
+      'config',
+      'rule',
+      'baseline',
+      'write-baseline',
+      'perf-baseline',
+      'write-perf-baseline',
+      'exposure-schemas'
+    ].filter((flag) => argv[flag] !== undefined);
+    if (banned.length > 0) {
+      log.error(`--sealed refuses local configuration: remove ${banned.map((f) => `--${f}`).join(', ')}`);
+      process.exit(2);
+    }
+  }
   const { config } = loadConfig({ cwd: pgpmCwd, ...configParamsFromArgv(argv) });
 
   const exposureSchemas = csvList(argv['exposure-schemas']);
@@ -195,7 +224,9 @@ export default async (
     exposure: exposureSchemas
       ? { ...config.exposure, schemas: exposureSchemas }
       : undefined,
-    config
+    config,
+    sealed,
+    ...(typeof argv.preset === 'string' ? { preset: argv.preset } : {})
   };
 
   let report: Report;
@@ -364,6 +395,16 @@ export default async (
     log.error(message);
     failed = true;
   };
+
+  // Checked first: if the ruler is wrong, nothing measured with it is worth
+  // gating on.
+  const expected = argv['verify-fingerprint'];
+  if (typeof expected === 'string' && report.provenance?.fingerprint !== expected) {
+    fail(
+      `configuration fingerprint ${report.provenance?.fingerprint ?? 'unknown'} `
+        + `does not match --verify-fingerprint ${expected}`
+    );
+  }
 
   const failOnSeverity =
     typeof argv['fail-on'] === 'string' ? (argv['fail-on'] as Severity) : config.failOn?.severity;

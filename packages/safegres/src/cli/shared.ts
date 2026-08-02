@@ -71,6 +71,7 @@ export function configParamsFromArgv(argv: ParsedArgs): LoadConfigParams {
   return {
     configFile: typeof argv.config === 'string' ? argv.config : undefined,
     preset: typeof argv.preset === 'string' ? argv.preset : undefined,
-    overrides: Object.keys(overrides).length > 0 ? overrides : undefined
+    overrides: Object.keys(overrides).length > 0 ? overrides : undefined,
+    sealed: argv.sealed === true
   };
 }

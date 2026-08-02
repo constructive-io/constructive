@@ -77,6 +77,8 @@ export type { AuditOptions } from './commands/audit';
 export { audit } from './commands/audit';
 export type { DoctorCheck, DoctorOptions, DoctorReport, DoctorStatus } from './commands/doctor';
 export { doctor } from './commands/doctor';
+export type { Provenance } from './config/fingerprint';
+export { configFingerprint } from './config/fingerprint';
 export type { LoadConfigParams } from './config/loader';
 export { loadConfig, safegresConfigLoader } from './config/loader';
 export {

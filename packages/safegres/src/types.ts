@@ -228,6 +228,12 @@ export interface RoleAccessReport {
 export interface Report {
   version: string;
   generatedAt: string;
+  /**
+   * What ruler this score was measured with: a fingerprint of the resolved
+   * configuration, and whether the run refused local config entirely. Two
+   * reports are comparable when their fingerprints match.
+   */
+  provenance?: import('./config/fingerprint').Provenance;
   summary: Summary;
   findings: Finding[];
   /** Config-driven audit score (weighted deductions, 0-100 + grade). */

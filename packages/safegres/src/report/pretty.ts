@@ -51,6 +51,9 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   const { summary: s, score, exposure } = report;
   const lines: string[] = [
     `safegres ${report.version}  (${report.generatedAt})`,
+    ...(report.provenance?.sealed
+      ? [`sealed: ${report.provenance.preset ?? 'recommended'}  ${report.provenance.fingerprint}`]
+      : []),
     ''
   ];
 

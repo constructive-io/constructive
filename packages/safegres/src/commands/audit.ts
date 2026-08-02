@@ -52,6 +52,7 @@ import {
   type RoleTrustOptions
 } from '../checks/role-trust';
 import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../checks/stats';
+import { configFingerprint } from '../config/fingerprint';
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { resolvePlaneReach, scorePlane, stampPlanes } from '../exposure/planes';
@@ -117,6 +118,16 @@ export interface AuditOptions extends IntrospectOptions {
    * the config are used as fallbacks for the corresponding AuditOptions.
    */
   config?: SafegresConfig;
+  /**
+   * Record the run as sealed: produced under configuration the caller
+   * controls, with no local config file, rule overrides or baselines. The
+   * audit behaves identically — sealing is enforced by whoever assembles the
+   * config (the CLI's `--sealed`) — but the claim lands in
+   * `report.provenance` so a harness can require it.
+   */
+  sealed?: boolean;
+  /** The preset a sealed run was graded under, recorded in the provenance. */
+  preset?: string;
 }
 
 export async function audit(
@@ -377,6 +388,12 @@ export async function audit(
   const report: Report = {
     version: PKG_VERSION,
     generatedAt: new Date().toISOString(),
+    provenance: {
+      version: PKG_VERSION,
+      fingerprint: configFingerprint(config, PKG_VERSION),
+      sealed: options.sealed === true,
+      ...(options.preset ? { preset: options.preset } : {})
+    },
     summary: summarize(findings),
     findings,
     score: computeScore(securityFindings, config.scoring, {
