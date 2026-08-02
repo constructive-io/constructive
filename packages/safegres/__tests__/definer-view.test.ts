@@ -30,6 +30,9 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     ownerBypassesRls: false,
     grants: [grant('anon', 'SELECT')],
     definition: 'SELECT id, total FROM app.orders',
+    writable: [],
+    insteadOfTriggers: false,
+    rules: [],
     ...partial
   };
 }

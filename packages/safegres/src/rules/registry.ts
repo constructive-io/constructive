@@ -233,6 +233,35 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L9',
+    category: 'anti-pattern',
+    // Ships `info` for the same reason as L8, and understates the same way: a
+    // definer view that is auto-updatable does not just leak rows, it lets an
+    // untrusted role *write* a table it holds nothing on, as the owner. On its
+    // own merits that is `high` — the write is unconditional, and when the
+    // base table has RLS the owner is exempt from (`context.rlsBypassed`) it
+    // also writes rows no policy would have admitted. Escalate via
+    // config/preset once the finding proves itself in the field.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'DEFINER view write — an untrusted role writes a base relation as the view owner (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
+    code: 'L10',
+    category: 'anti-pattern',
+    // Ships `info` on the same new-rule posture. Note this one fires on
+    // `security_invoker` views too: `security_invoker` governs the view's own
+    // base relations, not the relations a rewrite rule's actions name, which
+    // are checked against the rule's table owner either way (verified against
+    // PG 18). A rule is also invisible to `pg_get_viewdef`, so this is reach
+    // no reading of the view's definition can find.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Rewrite-rule bypass — a rule on a view writes a relation as the view owner (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
     code: 'W1',
     category: 'meta',
     defaultSeverity: 'medium',

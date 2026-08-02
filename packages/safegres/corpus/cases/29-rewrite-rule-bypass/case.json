@@ -1,0 +1,36 @@
+{
+  "title": "Anonymous role writes an audit table through a rewrite rule on a view",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_rewrite_rule_bypass"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L10",
+      "relation": "c_rewrite_rule_bypass.audit_log",
+      "note": "the rule's action runs as the view owner c_rule_owner, so corpus_anon's INSERT on the view appends to `audit_log` — and `security_invoker` on the view does not govern it"
+    },
+    {
+      "code": "A1",
+      "relation": "c_rewrite_rule_bypass.audit_log",
+      "note": "the audit table has RLS on and no policies, which is the correct posture for a table only its owner writes — and exactly why the rule's owner-privileged write is worth naming"
+    }
+  ],
+  "forbid": [
+    "L8",
+    "L9",
+    "L4"
+  ],
+  "worstSeverity": "low",
+  "fix": "Move the audit write into a function corpus_anon must be granted EXECUTE on, or give c_rewrite_rule_bypass.message_inbox an owner whose reach matches what the rule is meant to do. Revoking corpus_anon's INSERT on the view is not the fix — that grant is what the API serves.",
+  "id": "29-rewrite-rule-bypass"
+}

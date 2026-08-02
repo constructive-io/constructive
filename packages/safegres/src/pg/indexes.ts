@@ -233,7 +233,47 @@ export interface ViewSnapshot {
   grants: GrantInfo[];
   /** `pg_get_viewdef()` — the body, as SQL text. */
   definition: string;
+  /**
+   * The write commands Postgres accepts on the view, from
+   * `pg_relation_is_updatable`. A simple view is *auto-updatable*: the write
+   * is rewritten onto its single base relation, and on a definer view that
+   * rewrite runs with the owner's privileges — a write edge the body alone
+   * cannot prove, which is why it is read from the catalog.
+   *
+   * The bitmask also counts updatability conferred by rules and `INSTEAD OF`
+   * triggers, so it is only auto-updatability when {@link rules} is empty and
+   * {@link insteadOfTriggers} is false.
+   */
+  writable: Array<'INSERT' | 'UPDATE' | 'DELETE'>;
+  /** The view has `INSTEAD OF` triggers: writes go wherever their bodies say. */
+  insteadOfTriggers: boolean;
+  /**
+   * Rewrite rules other than the view's own `_RETURN` SELECT rule. These are
+   * invisible to `pg_get_viewdef`, and their actions are permission-checked
+   * against the *rule's table owner* — the view owner — regardless of
+   * `security_invoker`, which only governs the view's own base relations.
+   */
+  rules: ViewRule[];
 }
+
+/** A rewrite rule on a view, other than the `_RETURN` rule that defines it. */
+export interface ViewRule {
+  name: string;
+  /** The command on the view that fires the rule. */
+  event: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE';
+  /** `DO INSTEAD` — the original command is replaced by the rule's actions. */
+  instead: boolean;
+  /** `pg_get_ruledef()` — the whole `CREATE RULE`, actions included. */
+  definition: string;
+}
+
+/** `pg_rewrite.ev_type` is a char code, not the command name. */
+const RULE_EVENTS: Record<string, ViewRule['event']> = {
+  1: 'SELECT',
+  2: 'UPDATE',
+  3: 'INSERT',
+  4: 'DELETE'
+};
 
 /**
  * Every view and materialized view in scope, with its owner, its
@@ -262,6 +302,9 @@ export async function introspectViews(
     owner_bypasses_rls: boolean;
     grants: Array<{ role: string; privilege: string; grantable: boolean; bypassRls: boolean }>;
     definition: string;
+    updatable_bits: number;
+    instead_of_triggers: boolean;
+    rules: Array<{ name: string; event: string; instead: boolean; definition: string }>;
   }>(
     // Both parameters are referenced (even when only one filters) so Postgres
     // can infer their types — an unused $N errors out at bind time.
@@ -286,7 +329,16 @@ export async function introspectViews(
            'false'
          )::boolean                               AS security_invoker,
          c.relacl                                 AS relacl,
-         pg_get_viewdef(c.oid)                    AS definition
+         pg_get_viewdef(c.oid)                    AS definition,
+         -- Bitmask over 1 << CMD_*: UPDATE 4, INSERT 8, DELETE 16. The second
+         -- argument asks the same question the rewriter asks at runtime, so
+         -- rules and INSTEAD OF triggers count towards it too.
+         pg_relation_is_updatable(c.oid, true)    AS updatable_bits,
+         -- TRIGGER_TYPE_INSTEAD = 1 << 6.
+         EXISTS (
+           SELECT 1 FROM pg_trigger t
+           WHERE t.tgrelid = c.oid AND NOT t.tgisinternal AND (t.tgtype & 64) <> 0
+         )                                        AS instead_of_triggers
        FROM pg_class c
        JOIN pg_namespace n ON n.oid = c.relnamespace
        LEFT JOIN pg_roles o ON o.oid = c.relowner
@@ -306,6 +358,19 @@ export async function introspectViews(
        FROM views v, aclexplode(v.relacl) a
        LEFT JOIN pg_roles rol ON rol.oid = a.grantee
        WHERE v.relacl IS NOT NULL
+     ),
+     rules AS (
+       -- _RETURN is the SELECT rule that *is* the view; every other rule is
+       -- behaviour pg_get_viewdef does not show.
+       SELECT
+         r.ev_class AS oid,
+         r.rulename,
+         r.ev_type,
+         r.is_instead,
+         pg_get_ruledef(r.oid) AS definition
+       FROM pg_rewrite r
+       JOIN views v ON v.oid = r.ev_class
+       WHERE r.rulename <> '_RETURN'
      )
      SELECT
        v.schema_name,
@@ -323,7 +388,18 @@ export async function introspectViews(
            'bypassRls', g.bypass_rls
          )) FROM grants g WHERE g.oid = v.oid),
          '[]'::jsonb
-       )                                          AS grants
+       )                                          AS grants,
+       v.updatable_bits,
+       v.instead_of_triggers,
+       COALESCE(
+         (SELECT jsonb_agg(jsonb_build_object(
+           'name', r.rulename,
+           'event', r.ev_type,
+           'instead', r.is_instead,
+           'definition', r.definition
+         )) FROM rules r WHERE r.oid = v.oid),
+         '[]'::jsonb
+       )                                          AS rules
      FROM views v
      ORDER BY v.schema_name, v.view_name`,
     [options.schemas ?? [], excludes]
@@ -342,7 +418,19 @@ export async function introspectViews(
       grantable: g.grantable,
       bypassRls: g.bypassRls
     })),
-    definition: r.definition
+    definition: r.definition,
+    writable: [
+      ...(r.updatable_bits & 8 ? ['INSERT' as const] : []),
+      ...(r.updatable_bits & 4 ? ['UPDATE' as const] : []),
+      ...(r.updatable_bits & 16 ? ['DELETE' as const] : [])
+    ],
+    insteadOfTriggers: r.instead_of_triggers,
+    rules: r.rules.flatMap((rule) => {
+      const event = RULE_EVENTS[rule.event];
+      return event
+        ? [{ name: rule.name, event, instead: rule.instead, definition: rule.definition }]
+        : [];
+    })
   }));
 }
 

@@ -56,9 +56,24 @@ SQL, an unparseable definition, a chain of views deeper than it will follow — 
 entirely, because an unread body is *unknown*, not empty. A reference it cannot pin to exactly one
 relation resolves to nothing rather than to a plausible candidate. And the remedy is never a
 revoke: the SELECT on the view is what the API serves, so L8 recommends `security_invoker = true`
-or a different owner, and says so explicitly. Only SELECT is modelled — an auto-updatable view can
-carry writes the same way, but proving which write reaches which base relation needs more than the
-body's relation set.
+or a different owner, and says so explicitly.
+
+L9 and L10 are the write half of the same question, and neither is answerable from the view body
+alone. **L9** is auto-update: a simple view over one relation is updatable, so Postgres rewrites an
+INSERT/UPDATE/DELETE on the view onto that relation, and on a definer view the rewritten command is
+checked against the *owner*. The body says which relation; only `pg_relation_is_updatable` says the
+write lands there at all. **L10** is rewrite rules: a rule other than the view's own `_RETURN` rule
+is invisible to `pg_get_viewdef`, so `ON INSERT ... DO INSTEAD INSERT INTO audit` reaches a relation
+the definition never names. Two properties of L10 are worth stating plainly, both verified against
+Postgres 18 rather than inferred: rule actions are permission-checked against the owner of the
+relation the rule is on, and `security_invoker` does **not** govern them — it governs the view's own
+base relations. An invoker view with such a rule still writes as its owner.
+
+Both inherit L8's refusals. An `INSTEAD OF` trigger sends the write into a function body whose
+target is not proven here, a body that does not resolve to exactly one relation places no write, and
+an unreadable rule action is unknown — all three suppress. `DO INSTEAD NOTHING`, the commonest rule
+in the wild, reaches no relation and so reports nothing, which is the correct answer for the
+read-only views it is used to build.
 
 Restrictive-only policies never count as coverage. `BYPASSRLS` and superuser roles are exempt from
 policy checks — they are not subject to RLS, so a "missing policy" finding for them would be

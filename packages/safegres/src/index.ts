@@ -75,6 +75,12 @@ export {
   checkUnusedIndexes,
   DEFAULT_STATS_THRESHOLDS
 } from './checks/stats';
+export type { ViewWriteAnalysis } from './checks/view-writes';
+export {
+  analyzeViewWrites,
+  checkDefinerViewWrite,
+  checkViewRuleBypass
+} from './checks/view-writes';
 export type { AuditOptions } from './commands/audit';
 export { audit } from './commands/audit';
 export type { DoctorCheck, DoctorOptions, DoctorReport, DoctorStatus } from './commands/doctor';

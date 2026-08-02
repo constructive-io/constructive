@@ -25,6 +25,22 @@ export interface TableRef extends NameRef {
   write: boolean;
 }
 
+/**
+ * A relation reference with the privilege the reference actually exercises,
+ * rather than the read/write bit {@link TableRef} carries. `INSERT INTO audit`
+ * and `UPDATE audit` are both writes, but they are not the same grant, and a
+ * rule action can mix them in one statement.
+ */
+export interface RelationAccess extends NameRef {
+  privilege: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE';
+}
+
+export interface ExtractedAccess {
+  accesses: RelationAccess[];
+  opaque: boolean;
+  opaqueReason?: string;
+}
+
 export interface ExtractedBody {
   calls: NameRef[];
   tables: TableRef[];
@@ -164,6 +180,63 @@ export async function extractQuery(sql: string): Promise<ExtractedBody> {
   }
 
   return finalize(out);
+}
+
+/**
+ * The same walk as {@link extractQuery}, but resolving each relation
+ * reference to the privilege it exercises instead of a read/write bit.
+ *
+ * Used for statements whose interesting content is *which grant* a reference
+ * needs — a rewrite rule's actions, where `INSERT INTO audit` means the rule
+ * needs INSERT on `audit` and nothing else tells you so.
+ */
+export async function extractAccess(sql: string): Promise<ExtractedAccess> {
+  let ast: unknown;
+  try {
+    ast = await parse(sql);
+  } catch {
+    return { accesses: [], opaque: true, opaqueReason: 'SQL fragment failed to parse' };
+  }
+
+  const byNode = new Map<Record<string, unknown>, RelationAccess['privilege']>();
+  const commands = [
+    ['InsertStmt', 'INSERT'],
+    ['UpdateStmt', 'UPDATE'],
+    ['DeleteStmt', 'DELETE']
+  ] as const;
+  for (const [tag, privilege] of commands) {
+    for (const stmt of findAll(ast, tag)) {
+      const rel = stmt.relation as Record<string, unknown> | undefined;
+      if (rel) byNode.set(rel, privilege);
+    }
+  }
+
+  let opaque = false;
+  let opaqueReason: string | undefined;
+  for (const call of findAll(ast, 'FuncCall')) {
+    const ref = funcNameParts(call);
+    // A rule action can hide its real target behind a function call; the
+    // relations that call touches are not in this AST.
+    if (ref.name === 'query_to_xml' || ref.name === 'dblink' || ref.name === 'dblink_exec') {
+      opaque = true;
+      opaqueReason ??= `\`${ref.name}\` executes SQL this analysis cannot see`;
+    }
+  }
+
+  const accesses: RelationAccess[] = [];
+  const seen = new Set<string>();
+  for (const rv of findAll(ast, 'RangeVar')) {
+    const name = typeof rv.relname === 'string' ? rv.relname : undefined;
+    if (!name) continue;
+    const schema = typeof rv.schemaname === 'string' ? rv.schemaname : undefined;
+    const privilege = byNode.get(rv) ?? 'SELECT';
+    const key = `${schema ?? ''}.${name}::${privilege}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    accesses.push({ ...(schema ? { schema } : {}), name, privilege });
+  }
+
+  return { accesses, opaque, ...(opaqueReason ? { opaqueReason } : {}) };
 }
 
 function firstStringArg(call: Record<string, unknown>): string | null {
