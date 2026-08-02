@@ -343,7 +343,7 @@ Report-only first, gate after a week of stable scores. Never write a bespoke aud
 }
 ```
 
-Inside Actions the job summary, annotations and PR comment are emitted automatically (`report.github` configures them). Add `failOn.grade` only once the baseline is stable. A second job that needs the same surface but different gates extends this file rather than copying it — `{ "extends": "../../.safegresrc.json", "failOn": { "grade": "D" } }`.
+Inside Actions the job summary, annotations and PR comment are emitted automatically (`report.github` configures them). The step itself can be the first-party composite action, `uses: constructive-io/constructive/packages/safegres@main` (`packages/safegres/action.yml`): it installs the CLI, runs that config with `--github`, and takes only the inputs that legitimately differ between jobs sharing one config (`database`/`pgpm`, `fail-on-grade`, `report-only`, `out`, `comment`, `upload-sarif`, `compare`), exporting `security-score`/`security-grade`/`perf-score` as step outputs even on a gate failure. Anything you would pass every run belongs in the config file, not in `with:`. Add `failOn.grade` only once the baseline is stable. A second job that needs the same surface but different gates extends this file rather than copying it — `{ "extends": "../../.safegresrc.json", "failOn": { "grade": "D" } }`.
 
 ## Guardrails
 
