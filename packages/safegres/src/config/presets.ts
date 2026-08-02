@@ -6,9 +6,20 @@ import type { SafegresConfig } from './types';
  * or npm packages.
  */
 
-/** Today's default behavior: every rule at its registry default severity. */
+/**
+ * Today's default behavior: every rule at its registry default severity.
+ *
+ * The untrusted-role rules take whichever roles the surface says are reachable
+ * without credentials, so a declared `exposure.anonRoles` (or an adapter that
+ * resolves one) is enough to switch them on. With no such surface `anonRoles`
+ * is empty and they stay inert, exactly as before.
+ */
 export const recommended: SafegresConfig = {
-  rules: {}
+  rules: {
+    R1: ['critical', { rolesFrom: 'anon' }],
+    R2: ['high', { rolesFrom: 'anon' }],
+    L5: ['info', { rolesFrom: 'anon' }]
+  }
 };
 
 /**

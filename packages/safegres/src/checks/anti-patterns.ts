@@ -46,6 +46,26 @@ export function checkVolatileFunctions(
     const info = volatility.get(qualified) ?? volatility.get(lookupKey) ?? volatility.get(name);
 
     if (!info) continue; // unknown function (e.g. operator expansion) — skip silently
+
+    // A SECURITY DEFINER call is a plan fence whatever its volatility: the
+    // planner cannot inline it, so the qual never reaches an index. Checked
+    // before the volatility filter below, which would otherwise let every
+    // STABLE wrapper — the common shape — through unreported.
+    if (info.isSecurityDefiner) {
+      out.push({
+        code: 'P1b',
+        severity: 'medium',
+        category: 'anti-pattern',
+        schema: table.schema,
+        table: table.name,
+        policy: policyName,
+        message:
+          `Policy "${policyName}" on ${table.schema}.${table.name} calls SECURITY DEFINER function ${info.name}`,
+        hint: 'SECURITY DEFINER wrappers can\'t be inlined by the planner — every row forces a function call. Convert to a STABLE SQL function or replace with a direct expression.',
+        context: { function: info.name }
+      });
+    }
+
     if (info.volatility !== 'v') continue;
     if (SAFE_VOLATILE_ALLOWLIST.has(info.name.split('.').pop() ?? '')) continue;
     if (info.isSystem && SAFE_VOLATILE_ALLOWLIST.has(name)) continue;
@@ -63,21 +83,6 @@ export function checkVolatileFunctions(
         'Volatile functions re-execute for every row considered by the planner. Mark the function STABLE if safe, or precompute the result in a CTE / subquery.',
       context: { function: info.name, securityDefiner: info.isSecurityDefiner }
     });
-
-    if (info.isSecurityDefiner) {
-      out.push({
-        code: 'P1b',
-        severity: 'medium',
-        category: 'anti-pattern',
-        schema: table.schema,
-        table: table.name,
-        policy: policyName,
-        message:
-          `Policy "${policyName}" on ${table.schema}.${table.name} calls SECURITY DEFINER function ${info.name}`,
-        hint: 'SECURITY DEFINER wrappers can\'t be inlined by the planner — every row forces a function call. Convert to a STABLE SQL function or replace with a direct expression.',
-        context: { function: info.name }
-      });
-    }
   }
 
   return out;

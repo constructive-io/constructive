@@ -1,0 +1,29 @@
+{
+  "title": "RLS enabled with no policies \u2014 a silent deny-all",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_rls_no_policies"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A1",
+      "relation": "c_rls_no_policies.settings"
+    },
+    {
+      "code": "A5",
+      "relation": "c_rls_no_policies.settings",
+      "note": "the SELECT grant is dead: no policy can admit it"
+    }
+  ],
+  "fix": "Add the policy that was meant to exist, or drop the grant and say the lock is deliberate.",
+  "id": "07-rls-enabled-no-policies"
+}

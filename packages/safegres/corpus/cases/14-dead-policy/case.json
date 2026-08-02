@@ -1,0 +1,24 @@
+{
+  "title": "Dead policy \u2014 written for a role that holds no grant",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_dead_policy"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L2",
+      "relation": "c_dead_policy.drafts"
+    }
+  ],
+  "fix": "Grant SELECT to the role the policy names, or point the policy at the role that has the grant.",
+  "id": "14-dead-policy"
+}

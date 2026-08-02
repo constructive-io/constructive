@@ -1,0 +1,24 @@
+{
+  "title": "Write grant with no covering policy",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_write_no_policy"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A4",
+      "relation": "c_write_no_policy.comments"
+    }
+  ],
+  "fix": "Add FOR INSERT / FOR UPDATE policies, or revoke the grants.",
+  "id": "09-write-grant-no-policy"
+}

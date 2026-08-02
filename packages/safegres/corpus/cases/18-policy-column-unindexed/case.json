@@ -1,0 +1,24 @@
+{
+  "title": "RLS predicate column leads no index",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_policy_unindexed"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "X2",
+      "relation": "c_policy_unindexed.documents"
+    }
+  ],
+  "fix": "CREATE INDEX ON c_policy_unindexed.documents (tenant_id) \u2014 the policy column belongs first.",
+  "id": "18-policy-column-unindexed"
+}

@@ -1,0 +1,25 @@
+{
+  "title": "USING (true) SELECT policy on a table with private columns",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_public_read_policy"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A8",
+      "relation": "c_public_read_policy.profiles",
+      "note": "public-read is sometimes intended, which is why this is a low, not a critical"
+    }
+  ],
+  "fix": "Expose a view with the public columns, or scope the policy to the owner.",
+  "id": "05-public-read-policy"
+}

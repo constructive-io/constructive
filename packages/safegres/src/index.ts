@@ -122,6 +122,8 @@ export type {
   SafegresConfig,
   ScoringConfig
 } from './config/types';
+export type { CaseResult, CorpusCase, ExpectedFinding } from './corpus';
+export { corpusDir, gradeCase, loadCase, loadCorpus } from './corpus';
 export type { ExposureAdapter, PlaneInput } from './exposure/adapters';
 export {
   BUILTIN_ADAPTERS,

@@ -1,0 +1,24 @@
+{
+  "title": "Foreign key with no covering index",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_fk_no_index"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "X1",
+      "relation": "c_fk_no_index.books"
+    }
+  ],
+  "fix": "CREATE INDEX ON c_fk_no_index.books (author_id).",
+  "id": "17-foreign-key-without-index"
+}

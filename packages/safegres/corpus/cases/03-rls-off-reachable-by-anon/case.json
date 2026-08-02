@@ -1,0 +1,30 @@
+{
+  "title": "RLS-off table reachable by the anonymous role via PUBLIC",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_rls_off_public"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A2",
+      "relation": "c_rls_off_public.audit_log",
+      "note": "grants exist and RLS is off: every granted role sees every row"
+    },
+    {
+      "code": "L5",
+      "relation": "c_rls_off_public.audit_log",
+      "note": "the reach is indirect \u2014 nothing names corpus_anon"
+    }
+  ],
+  "fix": "ENABLE ROW LEVEL SECURITY with a scoped policy, and revoke the PUBLIC grant.",
+  "id": "03-rls-off-reachable-by-anon"
+}

@@ -380,6 +380,28 @@ non-zero rather than let one be read as if it were.
 None of this constrains ordinary use: an unsealed run still gets a fingerprint, and `sealed: false`
 is simply the honest statement that local configuration participated.
 
+## The evaluation corpus
+
+A sealed score says the ruler did not move. It does not say the ruler is right. That is what the
+corpus in [`corpus/`](corpus/README.md) is for: ~20 small schemas, each with one deliberate flaw
+and a written-down answer — the findings a correct audit must produce, the false positives it must
+not, and the one-sentence fix.
+
+```ts
+import { audit, gradeCase, loadConfig, loadCorpus } from 'safegres';
+
+const { config } = loadConfig({ sealed: true, preset: 'recommended' });
+for (const c of loadCorpus()) {
+  await client.query(c.sql);
+  const { missed, falsePositives } = gradeCase(await audit(client, { config, ...c }), c);
+}
+```
+
+Cases are data — `schema.sql` plus a `case.json` answer key — so a harness that never runs safegres
+can still use them. Three uses: safegres's own regression suite, worked examples short enough to
+read, and an agent evaluation — hand the agent a case, ask for a fix, and require the expected
+findings to be *gone* with the dimension back at 100 rather than merely a better number.
+
 ## Configuration
 
 Configured like a linter. Discovered by walking up from the current directory:

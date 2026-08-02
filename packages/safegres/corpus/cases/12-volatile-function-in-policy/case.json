@@ -1,0 +1,24 @@
+{
+  "title": "Policy calls a VOLATILE function (per-row evaluation)",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_volatile_policy"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "P1",
+      "relation": "c_volatile_policy.events"
+    }
+  ],
+  "fix": "Mark the function STABLE and wrap the call in a scalar sub-select so it becomes an InitPlan.",
+  "id": "12-volatile-function-in-policy"
+}

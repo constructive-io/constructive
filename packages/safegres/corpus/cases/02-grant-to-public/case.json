@@ -1,0 +1,25 @@
+{
+  "title": "Grant to PUBLIC on an RLS table",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_public_grant"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "R3",
+      "relation": "c_public_grant.invoices",
+      "note": "PUBLIC includes roles created after this grant, so the surface grows on its own"
+    }
+  ],
+  "fix": "REVOKE SELECT ON c_public_grant.invoices FROM PUBLIC and grant to the named API role instead.",
+  "id": "02-grant-to-public"
+}

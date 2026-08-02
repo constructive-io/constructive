@@ -1,0 +1,24 @@
+{
+  "title": "RLS enabled without FORCE \u2014 the owner bypasses every policy",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_owner_bypass"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A3",
+      "relation": "c_owner_bypass.secrets"
+    }
+  ],
+  "fix": "ALTER TABLE c_owner_bypass.secrets FORCE ROW LEVEL SECURITY.",
+  "id": "10-rls-not-forced"
+}
