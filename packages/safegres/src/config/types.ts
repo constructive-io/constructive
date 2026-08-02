@@ -417,7 +417,17 @@ export interface GithubCommentConfig {
  * key in package.json.
  */
 export interface SafegresConfig {
-  /** Presets (`safegres:recommended`, …), relative paths, or npm packages. */
+  /**
+   * Presets (`safegres:recommended`, …), relative paths (`./safegres.base.json`),
+   * or npm packages — recursively, lowest precedence first.
+   *
+   * A path is resolved against the file that declared it, and so is every
+   * *path-valued* key inherited from it (`source.pgpm`, `perf.baseline`,
+   * `outputs.*`, `eval.corpus`): a baseline written in a shared base file means
+   * that file's directory, whichever job inherited it. Objects merge per key
+   * and arrays replace, except `overrides`, which is a list of scoped
+   * exceptions and so unions across the chain.
+   */
   extends?: string | string[];
   /** The exposed API surface — what the score is computed against. */
   exposure?: ExposureConfig;

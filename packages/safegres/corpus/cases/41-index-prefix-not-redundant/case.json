@@ -1,0 +1,21 @@
+{
+  "title": "A single-column index is not redundant with a composite that ends in it",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_index_not_redundant"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [],
+  "forbid": [
+    "X5"
+  ],
+  "fix": "Nothing to fix — dropping either index costs a plan. X5 may only fire on a leading-column prefix, and (tenant_id) is not a prefix of (region, tenant_id)."
+}

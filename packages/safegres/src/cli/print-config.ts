@@ -2,6 +2,7 @@ import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 
 import { loadConfig, safegresConfigLoader } from '../config/loader';
 import { resolveRules } from '../config/resolve';
+import { toJsonSchema } from '../config/schema';
 import { RULES } from '../rules/registry';
 import { configParamsFromArgv } from './shared';
 
@@ -15,6 +16,7 @@ Options:
   --preset <name>          Apply a built-in preset
   --rule <CODE=SETTING>    Retune a rule (repeatable)
   --explain                Show per-key provenance (which layer set each value)
+  --schema                 Print the config JSON Schema instead, for an editor
   --help, -h               Show this help message
 `;
 
@@ -25,6 +27,11 @@ export default async (
 ): Promise<void> => {
   if (argv.help || argv.h) {
     process.stdout.write(usage);
+    return;
+  }
+
+  if (argv.schema === true) {
+    process.stdout.write(`${JSON.stringify(toJsonSchema(), null, 2)}\n`);
     return;
   }
 

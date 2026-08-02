@@ -1,0 +1,22 @@
+{
+  "title": "A foreign key with a covering index is not a finding",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_fk_indexed"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [],
+  "forbid": [
+    "X1",
+    "X5"
+  ],
+  "fix": "Nothing to fix — this is case 17 fixed. X5 is forbidden too: a single-column index on a foreign key is not made redundant by the primary key it references."
+}

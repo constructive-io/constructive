@@ -1,0 +1,24 @@
+{
+  "title": "A LEAKPROOF policy function is not a planner obstacle",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_policy_fn_leakproof"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [],
+  "forbid": [
+    "X2",
+    "X3",
+    "X4",
+    "X9"
+  ],
+  "fix": "Nothing to fix — this is case 35 fixed, and a rule firing here would be telling you to undo the fix."
+}

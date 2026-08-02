@@ -1,0 +1,21 @@
+{
+  "title": "A tsvector column with a GIN index is not a finding",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_search_indexed"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [],
+  "forbid": [
+    "X7"
+  ],
+  "fix": "Nothing to fix — this is case 23 fixed, and the index is the one full-text search can actually use."
+}

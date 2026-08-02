@@ -500,9 +500,11 @@ is simply the honest statement that local configuration participated.
 ## The evaluation corpus
 
 A sealed score says the ruler did not move. It does not say the ruler is right. That is what the
-corpus in [`corpus/`](corpus/README.md) is for: ~20 small schemas, each with one deliberate flaw
-and a written-down answer — the findings a correct audit must produce, the false positives it must
-not, and the one-sentence fix.
+corpus in [`corpus/`](corpus/README.md) is for: small schemas, each with one deliberate flaw and a
+written-down answer — the findings a correct audit must produce, the false positives it must not,
+and the one-sentence fix. Many come in pairs: 18 cases pin what must *not* fire, and six of those
+are the earlier case with its flaw fixed — an answer key consisting entirely of silence and a score
+of 100, because a rule that survives its own fix is worse than a rule that never existed.
 
 `safegres eval` is the whole loop in one command: it deploys each case into the connected
 database, audits it under a sealed preset, grades the report against the answer key, drops the
@@ -514,7 +516,7 @@ $ safegres eval --database scratch
   PASS  17-foreign-key-without-index     perf    71.2 (C )  X1
   FAIL  18-policy-column-unindexed       perf     100 (A+)  missed X2
 
-25/26 cases passed · recall 98% · precision 100%
+41/42 cases passed · recall 98% · precision 100%
 ```
 
 | Flag | |
@@ -636,6 +638,36 @@ marks it inline (`api roles: authenticated, anonymous (anon)`).
 Presets **retune**, they don't delete: a rule that doesn't apply to a stack is demoted to `info`
 (zero weight, so the score is unchanged) rather than switched off, so it stays in the report and
 stays re-tunable. `minimal` is the deliberate exception — being a smoke check is its whole job.
+
+`extends` also takes a **path**, which is how a repository with more than one audit job keeps one
+copy of its rules. The gated PR job and the nightly advisory run against a deployed database
+differ by their gates and their baseline, not by their 19-entry `public.read` list:
+
+```jsonc
+// ci/nightly/.safegresrc.json
+{ "extends": "../../safegres.base.json",
+  "perf":    { "baseline": "ci/nightly/perf.json" },
+  "failOn":  { "grade": "D" } }
+```
+
+A path in an inherited file resolves against **the file that wrote it**, so a base file's
+`"baseline": "ci/perf.json"` keeps meaning the base file's `ci/`, whichever job inherits it —
+the same rule as a discovered config, applied per key. Objects merge per key and arrays replace,
+except `overrides`, which is a list of scoped exceptions and so unions across the chain:
+inheriting a config can't silently drop the exceptions that came with it. `--sealed` reaches none
+of this — it does no discovery at all, so there is no file to extend from.
+
+The file is **validated on load**, against a schema derived from the same declaration the editor
+completes against — an unknown key is an error naming the key it thinks you meant, not a silent
+no-op, because `"failon": { "grade": "B" }` otherwise reads as a passing build rather than as a
+typo. Point an editor at the schema for completion and inline documentation:
+
+```jsonc
+{ "$schema": "https://raw.githubusercontent.com/constructive-io/constructive/main/packages/safegres/schema/safegres.schema.json" }
+```
+
+It also ships in the package (`safegres/schema/safegres.schema.json`), and
+`safegres print-config --schema` writes it to stdout for an offline copy.
 
 CLI: `--config <path>`, `--preset <name>`, `--rule CODE=off|severity` (repeatable).
 

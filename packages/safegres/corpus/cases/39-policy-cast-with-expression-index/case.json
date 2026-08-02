@@ -1,0 +1,23 @@
+{
+  "title": "A cast in a policy is fine when a matching expression index exists",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_policy_cast_indexed"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [],
+  "forbid": [
+    "X2",
+    "X3",
+    "X9"
+  ],
+  "fix": "Nothing to fix — this is case 19 fixed with an expression index rather than by moving the cast, and X3 must recognize the index it asked for."
+}
