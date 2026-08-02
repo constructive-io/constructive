@@ -1,0 +1,24 @@
+{
+  "title": "Policy authorizes on current_user rather than on request identity",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_session_user"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "P5",
+      "relation": "c_session_user.reports"
+    }
+  ],
+  "fix": "Authorize on the request claim (current_setting('jwt.claims.user_id')), not the connection role.",
+  "id": "11-session-user-in-policy"
+}

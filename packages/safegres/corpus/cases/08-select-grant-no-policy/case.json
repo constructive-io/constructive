@@ -1,0 +1,25 @@
+{
+  "title": "SELECT grant with no covering policy",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_select_no_policy"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A5",
+      "relation": "c_select_no_policy.orders",
+      "note": "fail-closed: nothing leaks, but the feature silently does not work"
+    }
+  ],
+  "fix": "Add a FOR SELECT policy scoped to the caller.",
+  "id": "08-select-grant-no-policy"
+}

@@ -26,8 +26,8 @@
     "clean": "makage clean",
     "prepack": "npm run build",
     "version:sync": "node scripts/sync-version.js",
-    "build": "npm run version:sync && makage build && chmod +x dist/cli.js",
-    "build:dev": "makage build --dev && chmod +x dist/cli.js",
+    "build": "npm run version:sync && makage build && chmod +x dist/cli.js && mkdir -p dist/corpus && cp -r corpus/. dist/corpus/",
+    "build:dev": "makage build --dev && chmod +x dist/cli.js && mkdir -p dist/corpus && cp -r corpus/. dist/corpus/",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"

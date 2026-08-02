@@ -17,6 +17,10 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'fx_authenticator') THEN
     CREATE ROLE fx_authenticator NOLOGIN;
   END IF;
+  -- A signed-in API role: at the edge, but never reached anonymously.
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'fx_signed_in') THEN
+    CREATE ROLE fx_signed_in NOLOGIN;
+  END IF;
 END
 $$;
 
@@ -37,7 +41,22 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 
 -- graphile-starter layout: app_public served, app_hidden reachable through it,
--- app_private not exposed.
+-- app_private not exposed. The request role is <app>_visitor, reached by
+-- SET ROLE from <app>_authenticator — project-specific names, which is the
+-- whole point: the adapter must resolve them from membership.
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'fxapp_visitor') THEN
+    CREATE ROLE fxapp_visitor NOLOGIN;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'fxapp_authenticator') THEN
+    CREATE ROLE fxapp_authenticator NOLOGIN;
+  END IF;
+END
+$$;
+
+GRANT fxapp_visitor TO fxapp_authenticator;
+
 CREATE SCHEMA IF NOT EXISTS app_public;
 CREATE SCHEMA IF NOT EXISTS app_hidden;
 CREATE SCHEMA IF NOT EXISTS app_private;

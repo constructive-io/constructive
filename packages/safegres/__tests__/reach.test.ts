@@ -197,7 +197,8 @@ describe('plane reach', () => {
       primary: true,
       source: 'config',
       schemas: [SCHEMA],
-      roles: []
+      roles: [],
+      anonRoles: []
     };
     const [reach] = resolvePlaneReach([plane], tables, new Map(), apiReach);
     expect([...reach.relations]).toEqual([`${SCHEMA}.posts`]);
@@ -211,7 +212,8 @@ describe('plane reach', () => {
       primary: false,
       source: 'config',
       schemas: [],
-      roles: ['fx_reach_api_role']
+      roles: ['fx_reach_api_role'],
+      anonRoles: []
     };
     const withReach = resolvePlaneReach([plane], tables, new Map(), apiReach)[0];
     const withoutReach = resolvePlaneReach([plane], tables, new Map())[0];

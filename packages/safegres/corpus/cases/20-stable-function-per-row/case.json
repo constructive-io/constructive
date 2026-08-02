@@ -1,0 +1,24 @@
+{
+  "title": "STABLE function evaluated per row (no InitPlan)",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_stable_per_row"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "X9",
+      "relation": "c_stable_per_row.ledger"
+    }
+  ],
+  "fix": "USING (tenant_id = (SELECT current_tenant())) \u2014 the sub-select is what makes it an InitPlan.",
+  "id": "20-stable-function-per-row"
+}

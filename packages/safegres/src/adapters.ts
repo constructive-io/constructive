@@ -13,6 +13,7 @@ export {
   hasuraAdapter,
   postgraphileAdapter,
   postgrestAdapter,
-  resolveAdapters
+  resolveAdapters,
+  supabaseAdapter
 } from './exposure/adapters';
 export type { ApiReach, UnreachableRelation } from './exposure/reach';

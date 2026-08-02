@@ -12,6 +12,20 @@ import type { Finding } from '../types';
 export interface RoleTrustOptions {
   /** Role names considered untrusted (exact match). */
   roles?: string[];
+   /**
+   * Take the untrusted roles from the resolved exposure surface instead of
+   * naming them — their names are per-deployment (`myapp_visitor`, a
+   * Constructive API's `anon_role`), so a preset cannot hardcode them.
+   *
+   * - `anon`: only the roles an *unauthenticated* caller arrives as. The right
+   *   default for a stack whose signed-in role legitimately writes: flagging
+   *   `authenticated` for holding an INSERT grant would flag the product.
+   * - `exposure`: every role at the API edge, signed-in ones included. The
+   *   stricter reading, for a surface where no role should write directly.
+   *
+   * Unions with `roles`.
+   */
+  rolesFrom?: 'exposure' | 'anon';
 }
 
 const WRITE_PRIVILEGES: PgPrivilege[] = ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'];

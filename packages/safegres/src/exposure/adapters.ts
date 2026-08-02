@@ -32,7 +32,16 @@ export interface PlaneInput {
   kind?: PlaneKind;
   primary?: boolean;
   schemas?: string[];
+  /** Every role that reaches this plane, anonymous ones included. */
   roles?: string[];
+  /**
+   * The subset of `roles` an *unauthenticated* caller arrives as. Every stack
+   * knows which one this is — Constructive's `apis.anon_role`, PostgREST's
+   * `pgrst.db_anon_role`, Supabase's `anon`, graphile's visitor — and the
+   * distinction is the difference between "a signed-in user can write this"
+   * (usually the point) and "anyone on the internet can" (usually the bug).
+   */
+  anonRoles?: string[];
 }
 
 /** What an adapter is asked to compute reach for. */
@@ -113,12 +122,19 @@ export const constructiveAdapter: ExposureAdapter = {
       anon_role: string | null;
     }>(sources.join(' UNION ALL '));
 
-    const byApi = new Map<string, { schemas: Set<string>; roles: Set<string> }>();
-    const all = { schemas: new Set<string>(), roles: new Set<string>() };
+    type Entry = { schemas: Set<string>; roles: Set<string>; anonRoles: Set<string> };
+    const entryOf = (): Entry => ({
+      schemas: new Set<string>(),
+      roles: new Set<string>(),
+      anonRoles: new Set<string>()
+    });
+
+    const byApi = new Map<string, Entry>();
+    const all = entryOf();
     for (const r of rows) {
       if (!r.schema_name) continue;
       const key = r.api ?? 'api';
-      const entry = byApi.get(key) ?? { schemas: new Set<string>(), roles: new Set<string>() };
+      const entry = byApi.get(key) ?? entryOf();
       entry.schemas.add(r.schema_name);
       all.schemas.add(r.schema_name);
       for (const role of [r.role_name, r.anon_role]) {
@@ -126,6 +142,12 @@ export const constructiveAdapter: ExposureAdapter = {
           entry.roles.add(role);
           all.roles.add(role);
         }
+      }
+      // `role_name` is the signed-in role (`authenticated`); only `anon_role`
+      // is reachable without credentials.
+      if (r.anon_role) {
+        entry.anonRoles.add(r.anon_role);
+        all.anonRoles.add(r.anon_role);
       }
       byApi.set(key, entry);
     }
@@ -137,7 +159,8 @@ export const constructiveAdapter: ExposureAdapter = {
         kind: 'api',
         primary: true,
         schemas: sorted(all.schemas),
-        roles: sorted(all.roles)
+        roles: sorted(all.roles),
+        anonRoles: sorted(all.anonRoles)
       }
     ];
     // One plane per API, but only where there is more than one to tell apart:
@@ -148,7 +171,8 @@ export const constructiveAdapter: ExposureAdapter = {
           name: `api:${api}`,
           kind: 'api',
           schemas: sorted(entry.schemas),
-          roles: sorted(entry.roles)
+          roles: sorted(entry.roles),
+          anonRoles: sorted(entry.anonRoles)
         });
       }
     }
@@ -280,13 +304,70 @@ export const postgrestAdapter: ExposureAdapter = {
         kind: 'api',
         primary: true,
         schemas,
-        roles: anon ? [anon] : []
+        roles: anon ? [anon] : [],
+        // db_anon_role is by definition the unauthenticated one.
+        anonRoles: anon ? [anon] : []
       },
       ...authenticators.map((role): PlaneInput => ({
         name: `direct:${role}`,
         kind: 'role',
         roles: [role]
       }))
+    ];
+  }
+};
+
+/**
+ * Supabase runs PostgREST, but configures it *outside* the database — the
+ * schema list is a platform setting, so `pgrst.db_schemas` is usually absent
+ * and `postgrestAdapter` correctly resolves nothing. Hence a separate
+ * adapter: it prefers the GUCs when a self-hosted stack sets them, and only
+ * falls back to the platform's fixed surface once it has *proved* it is
+ * looking at Supabase — `auth.users` plus the three roles every project has.
+ *
+ * The fallback is deliberately confined here. `postgrestAdapter` never
+ * guesses: an unconfigured PostgREST resolves no planes, which surfaces as
+ * unknown exposure (a capped score and a W1) rather than a wrong surface
+ * presented as fact.
+ */
+export const supabaseAdapter: ExposureAdapter = {
+  name: 'supabase',
+
+  async detect(exec: QueryExecutor): Promise<boolean> {
+    const { rows } = await exec.query<{ ok: boolean }>(
+      `SELECT to_regclass('auth.users') IS NOT NULL
+              AND (SELECT count(*) FROM pg_roles
+                    WHERE rolname IN ('anon', 'authenticated', 'service_role')) = 3 AS ok`
+    );
+    return rows[0]?.ok === true;
+  },
+
+  async resolve(exec: QueryExecutor): Promise<PlaneInput[]> {
+    const configured = await postgrestAdapter.resolve(exec);
+    if (configured.length > 0) return configured;
+
+    // Supabase's default exposure, and only reachable once detect() has
+    // confirmed this really is a Supabase database.
+    const { rows } = await exec.query<{ nspname: string }>(
+      `SELECT nspname::text FROM pg_namespace
+        WHERE nspname IN ('public', 'graphql_public', 'storage')`
+    );
+    const schemas = rows.map((r) => r.nspname).sort();
+    if (schemas.length === 0) return [];
+
+    return [
+      {
+        name: 'api',
+        kind: 'api',
+        primary: true,
+        schemas,
+        roles: ['anon', 'authenticated'],
+        // `authenticated` still requires a sign-up; `anon` requires nothing.
+        anonRoles: ['anon']
+      },
+      // service_role bypasses RLS by design; planes.ts reports it as skipped
+      // rather than inventing an ordinary grade for it.
+      { name: 'direct:service_role', kind: 'role', roles: ['service_role'] }
     ];
   }
 };
@@ -369,6 +450,8 @@ export const graphileAdapter: ExposureAdapter = {
     const present = new Set(rows.map((r) => r.nspname));
     if (!present.has('app_public')) return [];
 
+    const visitors = await graphileVisitorRoles(exec);
+
     const planes: PlaneInput[] = [
       {
         name: 'api',
@@ -376,7 +459,11 @@ export const graphileAdapter: ExposureAdapter = {
         primary: true,
         // app_hidden is reachable through app_public's views and functions —
         // served indirectly, so it belongs to the surface.
-        schemas: ['app_public', ...(present.has('app_hidden') ? ['app_hidden'] : [])]
+        schemas: ['app_public', ...(present.has('app_hidden') ? ['app_hidden'] : [])],
+        roles: visitors,
+        // PostGraphile runs *every* request as the visitor role, signed in or
+        // not — the caller is a JWT claim — so it is anonymous-reachable.
+        anonRoles: visitors
       }
     ];
     if (present.has('app_private')) {
@@ -388,6 +475,38 @@ export const graphileAdapter: ExposureAdapter = {
   reach: (exec, context) => postgraphileAdapter.reach!(exec, context)
 };
 
+/**
+ * The role PostGraphile runs requests as. graphile-starter names it
+ * `<app>_visitor` — project-specific, so it cannot be hardcoded — and reaches
+ * it by `SET ROLE` from `<app>_authenticator`. Membership is the reliable
+ * signal: the authenticator is a LOGIN role whose only purpose is to become
+ * the visitor, so its grantees *are* the request roles. The `%_visitor`
+ * suffix is the fallback for a database whose authenticator is provisioned
+ * elsewhere (a managed connection pooler, a role created outside migrations).
+ *
+ * This matters because every unauthenticated request arrives as this role:
+ * logged-in or not, PostGraphile uses the same role and distinguishes callers
+ * by JWT claims, so it is by definition untrusted.
+ */
+async function graphileVisitorRoles(exec: QueryExecutor): Promise<string[]> {
+  // Roles an `%_authenticator` may SET ROLE to — the request roles by
+  // construction, whatever they are named.
+  const { rows: granted } = await exec.query<{ rolname: string }>(
+    `SELECT DISTINCT member.rolname::text AS rolname
+       FROM pg_auth_members m
+       JOIN pg_roles authenticator ON authenticator.oid = m.roleid
+       JOIN pg_roles member ON member.oid = m.member
+      WHERE authenticator.rolname LIKE '%\\_authenticator'`
+  );
+  if (granted.length > 0) return granted.map((r) => r.rolname).sort();
+
+  const { rows: bySuffix } = await exec.query<{ rolname: string }>(
+    `SELECT rolname::text FROM pg_roles
+      WHERE rolname = 'visitor' OR rolname LIKE '%\\_visitor'`
+  );
+  return bySuffix.map((r) => r.rolname).sort();
+}
+
 /** Every adapter a config may name with a string. */
 export const BUILTIN_ADAPTERS: Record<string, ExposureAdapter> = {
   constructive: constructiveAdapter,
@@ -395,8 +514,7 @@ export const BUILTIN_ADAPTERS: Record<string, ExposureAdapter> = {
   hasura: hasuraAdapter,
   postgraphile: postgraphileAdapter,
   postgrest: postgrestAdapter,
-  // Supabase *is* PostgREST; the preset supplies the role vocabulary.
-  supabase: postgrestAdapter
+  supabase: supabaseAdapter
 };
 
 /**

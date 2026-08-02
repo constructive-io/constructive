@@ -1,0 +1,25 @@
+{
+  "title": "UPDATE policy with USING but no WITH CHECK",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_update_no_check"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A6",
+      "relation": "c_update_no_check.tasks",
+      "note": "row smuggling: the row can be updated out of the caller's own scope"
+    }
+  ],
+  "fix": "Add WITH CHECK with the same predicate as USING.",
+  "id": "06-update-without-with-check"
+}

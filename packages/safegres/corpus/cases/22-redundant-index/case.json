@@ -1,0 +1,24 @@
+{
+  "title": "Redundant index \u2014 a prefix of another index",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_redundant_index"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "X5",
+      "relation": "c_redundant_index.shipments"
+    }
+  ],
+  "fix": "DROP INDEX c_redundant_index.shipments_tenant_idx.",
+  "id": "22-redundant-index"
+}

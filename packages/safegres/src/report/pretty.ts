@@ -51,6 +51,9 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   const { summary: s, score, exposure } = report;
   const lines: string[] = [
     `safegres ${report.version}  (${report.generatedAt})`,
+    ...(report.provenance?.sealed
+      ? [`sealed: ${report.provenance.preset ?? 'recommended'}  ${report.provenance.fingerprint}`]
+      : []),
     ''
   ];
 
@@ -61,7 +64,11 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
           + `  — ${exposure.exposedTables}/${exposure.totalTables} tables exposed`
       );
       if (exposure.roles && exposure.roles.length > 0) {
-        lines.push(`  api roles: ${exposure.roles.join(', ')}`);
+        // Marking the anonymous ones answers the question a reader actually
+        // has: which of these does a caller reach with no credentials?
+        const anon = new Set(exposure.anonRoles ?? []);
+        const roles = exposure.roles.map((r) => (anon.has(r) ? `${r} (anon)` : r));
+        lines.push(`  api roles: ${roles.join(', ')}`);
       }
       if (exposure.unaddressable && exposure.unaddressable.length > 0) {
         lines.push(

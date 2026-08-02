@@ -6,9 +6,20 @@ import type { SafegresConfig } from './types';
  * or npm packages.
  */
 
-/** Today's default behavior: every rule at its registry default severity. */
+/**
+ * Today's default behavior: every rule at its registry default severity.
+ *
+ * The untrusted-role rules take whichever roles the surface says are reachable
+ * without credentials, so a declared `exposure.anonRoles` (or an adapter that
+ * resolves one) is enough to switch them on. With no such surface `anonRoles`
+ * is empty and they stay inert, exactly as before.
+ */
 export const recommended: SafegresConfig = {
-  rules: {}
+  rules: {
+    R1: ['critical', { rolesFrom: 'anon' }],
+    R2: ['high', { rolesFrom: 'anon' }],
+    L5: ['info', { rolesFrom: 'anon' }]
+  }
 };
 
 /**
@@ -54,10 +65,15 @@ export const constructive: SafegresConfig = {
     A2: 'critical',
     A3: 'info',
     P5: 'critical',
-    R1: ['critical', { roles: ['anonymous'] }],
-    R2: ['high', { roles: ['anonymous'] }],
+    // Each API declares its own `anon_role`; the adapter reads it, so a
+    // custom one is picked up instead of being missed, with the platform
+    // default kept explicitly so an unresolved surface still checks it.
+    // `role_name` (`authenticated`) is deliberately *not* included: a
+    // signed-in user holding a write grant is the product, not a finding.
+    R1: ['critical', { roles: ['anonymous'], rolesFrom: 'anon' }],
+    R2: ['high', { roles: ['anonymous'], rolesFrom: 'anon' }],
     R3: 'medium',
-    L5: ['info', { roles: ['anonymous'] }]
+    L5: ['info', { roles: ['anonymous'], rolesFrom: 'anon' }]
   },
   scoring: { floorOnCritical: 'C' }
 };
@@ -85,10 +101,12 @@ export const postgrest: SafegresConfig = {
   extends: 'safegres:recommended',
   exposure: { adapters: ['postgrest'] },
   rules: {
-    R1: ['critical', { roles: ['anon'] }],
-    R2: ['critical', { roles: ['anon'] }],
+    // The anon role is `pgrst.db_anon_role`, so the adapter knows its name and
+    // the rules take it from the resolved surface rather than assuming `anon`.
+    R1: ['critical', { rolesFrom: 'anon' }],
+    R2: ['critical', { rolesFrom: 'anon' }],
     R3: 'high',
-    L5: ['high', { roles: ['anon'] }]
+    L5: ['high', { rolesFrom: 'anon' }]
   },
   scoring: { floorOnCritical: 'C' }
 };
@@ -107,9 +125,13 @@ export const supabase: SafegresConfig = {
   extends: 'safegres:postgrest',
   exposure: { adapters: ['supabase'] },
   rules: {
-    R1: ['critical', { roles: ['anon', 'authenticated'] }],
-    R2: ['critical', { roles: ['anon', 'authenticated'] }],
-    L5: ['high', { roles: ['anon', 'authenticated'] }]
+    // Both are named outright, not just the anon one: on Supabase anyone can
+    // sign up, so `authenticated` is a boundary the internet crosses at will.
+    // Fixed by the platform, so unlike PostgREST's anon role they are safe to
+    // name — and the adapter's anon set unions in on a self-hosted project.
+    R1: ['critical', { roles: ['anon', 'authenticated'], rolesFrom: 'anon' }],
+    R2: ['critical', { roles: ['anon', 'authenticated'], rolesFrom: 'anon' }],
+    L5: ['high', { roles: ['anon', 'authenticated'], rolesFrom: 'anon' }]
   },
   overrides: [
     // Supabase-managed schemas: their policies ship with the platform, not
@@ -131,8 +153,13 @@ export const supabase: SafegresConfig = {
 
 /**
  * PostGraphile / graphile-starter: `app_public` is served, `app_hidden` is
- * reachable through it, `app_private` is not exposed. The role vocabulary is
- * the starter's (`*_visitor` is the request role, anonymous or not).
+ * reachable through it, `app_private` is not exposed.
+ *
+ * The request role is `<app>_visitor` — project-specific, so it cannot be
+ * named here. The adapter resolves it from role membership and the rules take
+ * it from there. Every request runs as that role, authenticated or not (the
+ * caller is a JWT claim, not a role), which is exactly what makes it
+ * untrusted.
  *
  * A3 stays at its default: in this layout the API role is *not* the table
  * owner, so a missing FORCE genuinely is an owner-bypass hole.
@@ -141,10 +168,12 @@ export const graphile: SafegresConfig = {
   extends: 'safegres:recommended',
   exposure: { adapters: ['graphile'] },
   rules: {
-    R1: ['high', { roles: ['visitor', 'app_visitor'] }],
-    R2: ['high', { roles: ['visitor', 'app_visitor'] }],
+    // Every request is the visitor role, signed in or not, so for graphile the
+    // anon set and the API-edge set are the same thing.
+    R1: ['high', { rolesFrom: 'anon' }],
+    R2: ['high', { rolesFrom: 'anon' }],
     R3: 'high',
-    L5: ['medium', { roles: ['visitor', 'app_visitor'] }]
+    L5: ['medium', { rolesFrom: 'anon' }]
   }
 };
 

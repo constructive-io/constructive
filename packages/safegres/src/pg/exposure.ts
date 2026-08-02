@@ -20,6 +20,8 @@ export interface ResolvedExposure {
   source: string;
   schemas: string[];
   roles?: string[];
+  /** The subset of `roles` reachable without authenticating. */
+  anonRoles?: string[];
 }
 
 /** A plane before its reach is computed against the table snapshot. */
@@ -32,6 +34,7 @@ export interface ResolvedPlane {
   source: string;
   schemas: string[];
   roles: string[];
+  anonRoles: string[];
 }
 
 export const UNKNOWN_EXPOSURE: ResolvedExposure = {
@@ -59,7 +62,8 @@ export async function resolveExposure(
       known: true,
       source: adapter.name,
       schemas: union(primary.schemas ?? [], config.schemas),
-      roles: union(primary.roles ?? [], config.roles)
+      roles: union(primary.roles ?? [], config.roles),
+      anonRoles: union(primary.anonRoles ?? [], config.anonRoles)
     };
   }
 
@@ -68,7 +72,8 @@ export async function resolveExposure(
       known: true,
       source: 'config',
       schemas: [...config.schemas].sort(),
-      roles: config.roles
+      roles: config.roles,
+      anonRoles: config.anonRoles
     };
   }
 
@@ -96,7 +101,8 @@ export async function resolvePlanes(
       primary: true,
       source: primary.source,
       schemas: primary.schemas,
-      roles: primary.roles ?? []
+      roles: primary.roles ?? [],
+      anonRoles: primary.anonRoles ?? []
     }
   ];
 
@@ -110,7 +116,8 @@ export async function resolvePlanes(
       primary: false,
       source,
       schemas: [...(input.schemas ?? [])].sort(),
-      roles: [...(input.roles ?? [])].sort()
+      roles: [...(input.roles ?? [])].sort(),
+      anonRoles: [...(input.anonRoles ?? [])].sort()
     });
   };
 
@@ -140,7 +147,8 @@ export async function resolvePlanes(
       primary: true,
       source: 'config',
       schemas: [...(override.schemas ?? [])].sort(),
-      roles: [...(override.roles ?? [])].sort()
+      roles: [...(override.roles ?? [])].sort(),
+      anonRoles: [...(override.anonRoles ?? [])].sort()
     };
   }
 

@@ -1,0 +1,24 @@
+{
+  "title": "Policy calls a SECURITY DEFINER wrapper",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_definer_wrapper"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "P1b",
+      "relation": "c_definer_wrapper.memberships"
+    }
+  ],
+  "fix": "Inline the predicate, or hoist the definer call out of the per-row path.",
+  "id": "13-security-definer-policy-wrapper"
+}
