@@ -56,6 +56,10 @@ export const recommended: SafegresConfig = {
     // table at all — so both are reach the table rules never saw.
     L16: ['info', { rolesFrom: 'anon' }],
     L17: ['info', { rolesFrom: 'anon' }],
+    // The write-side twin of L12: a writable view whose `WHERE` is a read
+    // filter only, because `WITH CHECK OPTION` is not the default. Same
+    // posture again.
+    L18: ['info', { rolesFrom: 'anon' }],
     // Privilege that arrives through a function body: a definer function's
     // reach, and the write an INSTEAD OF trigger's definer function performs.
     // Both are the L8 escalation with different syntax, and ship the same way.

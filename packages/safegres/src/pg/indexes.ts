@@ -271,6 +271,15 @@ export interface ViewSnapshot {
    */
   insteadOf: InsteadOfTrigger[];
   /**
+   * `WITH [LOCAL | CASCADED] CHECK OPTION`, from `reloptions.check_option`.
+   * `'none'` — the default — means the view's own `WHERE` constrains which
+   * rows come *out* and nothing about which rows go *in*: a writer can insert
+   * or update rows the view will not then show them, straight past the filter
+   * the view exists to apply. `'local'` enforces this view's condition,
+   * `'cascaded'` also enforces every underlying view's.
+   */
+  checkOption: 'none' | 'local' | 'cascaded';
+  /**
    * Rewrite rules other than the view's own `_RETURN` SELECT rule. These are
    * invisible to `pg_get_viewdef`, and their actions are permission-checked
    * against the *rule's table owner* — the view owner — regardless of
@@ -337,6 +346,7 @@ export async function introspectViews(
     definition: string;
     column_deps: Array<{ schema: string; table: string; columns: string[] }>;
     updatable_bits: number;
+    check_option: string;
     instead_of_triggers: boolean;
     instead_of: Array<{ name: string; tgtype: number; fnSchema: string; fnName: string }>;
     rules: Array<{ name: string; event: string; instead: boolean; definition: string }>;
@@ -376,6 +386,14 @@ export async function introspectViews(
          -- argument asks the same question the rewriter asks at runtime, so
          -- rules and INSTEAD OF triggers count towards it too.
          pg_relation_is_updatable(c.oid, true)    AS updatable_bits,
+         -- 'local' | 'cascaded' when the view was created WITH CHECK OPTION,
+         -- absent otherwise. Unlike the boolean reloptions above this one is
+         -- already a keyword, so it needs no cast.
+         COALESCE(
+           (SELECT option_value FROM pg_options_to_table(c.reloptions)
+            WHERE option_name = 'check_option'),
+           'none'
+         )                                        AS check_option,
          -- TRIGGER_TYPE_INSTEAD = 1 << 6.
          EXISTS (
            SELECT 1 FROM pg_trigger t
@@ -481,6 +499,7 @@ export async function introspectViews(
          '[]'::jsonb
        )                                          AS column_deps,
        v.updatable_bits,
+       v.check_option,
        v.instead_of_triggers,
        COALESCE(
          (SELECT jsonb_agg(jsonb_build_object(
@@ -526,6 +545,9 @@ export async function introspectViews(
       ...(r.updatable_bits & 4 ? ['UPDATE' as const] : []),
       ...(r.updatable_bits & 16 ? ['DELETE' as const] : [])
     ],
+    checkOption: r.check_option === 'local' || r.check_option === 'cascaded'
+      ? r.check_option
+      : 'none',
     insteadOfTriggers: r.instead_of_triggers,
     insteadOf: r.instead_of.map((t) => ({
       name: t.name,

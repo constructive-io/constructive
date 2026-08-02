@@ -344,6 +344,21 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L18',
+    category: 'anti-pattern',
+    // Ships `info` on the same new-rule posture. The honest severity is
+    // `medium`: the view's `WHERE` is the only thing standing between an
+    // untrusted role and the relation, and without `WITH CHECK OPTION` that
+    // condition governs reads alone — the role writes rows outside it, which
+    // on a tenant or ownership predicate is a cross-boundary write. It stays
+    // below L9 because the write path itself is intended; what is missing is
+    // the constraint on it.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Writable filtering view without WITH CHECK OPTION — an untrusted role writes rows the view excludes (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
     code: 'L19',
     category: 'anti-pattern',
     // The largest reach edge in the L-series, shipping on the same new-rule

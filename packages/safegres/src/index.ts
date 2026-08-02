@@ -104,6 +104,7 @@ export type { ViewWriteAnalysis } from './checks/view-writes';
 export {
   analyzeViewWrites,
   checkDefinerViewWrite,
+  checkUncheckedViewWrite,
   checkViewRuleBypass
 } from './checks/view-writes';
 export type { AuditOptions } from './commands/audit';

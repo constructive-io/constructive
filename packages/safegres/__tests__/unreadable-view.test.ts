@@ -33,6 +33,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     grants: [{ role: 'anon', privilege: 'SELECT', grantable: false, bypassRls: false }],
     definition: 'SELECT id FROM app.orders',
     writable: [],
+    checkOption: 'none',
     insteadOfTriggers: false,
     insteadOf: [],
     rules: [],

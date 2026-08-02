@@ -72,6 +72,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     grants: [grant('anon', 'INSERT')],
     definition: 'SELECT id, body FROM app.secrets',
     writable: ['INSERT'],
+    checkOption: 'none',
     insteadOfTriggers: false,
     insteadOf: [],
     rules: [],

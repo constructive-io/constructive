@@ -69,9 +69,9 @@ projection is beside the point: the owner reads rows the caller's policies hide,
 stands. An unknown column set is unknown, never narrow — a snapshot without dependency rows reports
 as before.
 
-L9 and L10 are the write half of the same question, and neither is answerable from the view body
-alone. **L9** is auto-update: a simple view over one relation is updatable, so Postgres rewrites an
-INSERT/UPDATE/DELETE on the view onto that relation, and on a definer view the rewritten command is
+L9, L10 and L18 are the write half of the same question, and none of them is answerable from the
+view body alone. **L9** is auto-update: a simple view over one relation is updatable, so Postgres
+rewrites an INSERT/UPDATE/DELETE on the view onto that relation, and on a definer view the rewritten command is
 checked against the *owner*. The body says which relation; only `pg_relation_is_updatable` says the
 write lands there at all. **L10** is rewrite rules: a rule other than the view's own `_RETURN` rule
 is invisible to `pg_get_viewdef`, so `ON INSERT ... DO INSTEAD INSERT INTO audit` reaches a relation
@@ -80,7 +80,18 @@ Postgres 18 rather than inferred: rule actions are permission-checked against th
 relation the rule is on, and `security_invoker` does **not** govern them — it governs the view's own
 base relations. An invoker view with such a rule still writes as its owner.
 
-Both inherit L8's refusals. An `INSTEAD OF` trigger sends the write into a function body whose
+**L18** is the third: `WITH CHECK OPTION` is not the default, so a writable view's `WHERE` decides
+which rows come *out* and nothing about which rows go *in*. A role writing through a
+`WHERE tenant_id = current_tenant()` view stores rows for any tenant it names — rows the view will
+not then show it. It is the write-side twin of L12 and, like L12, needs the view to actually filter;
+it fires on the L9 population narrowed to filtering views with no check option, and it drops DELETE,
+which removes rows the view already served rather than producing new ones. It overlaps L9 by design
+and answers a different question: L9 is *whether* the write reaches the relation, L18 is whether the
+view's own condition constrains what it writes, and the two have different remedies —
+`security_invoker`/ownership for the first, `WITH LOCAL CHECK OPTION` or an RLS `WITH CHECK` clause
+for the second.
+
+All three inherit L8's refusals. An `INSTEAD OF` trigger sends the write into a function body whose
 target is not proven here, a body that does not resolve to exactly one relation places no write, and
 an unreadable rule action is unknown — all three suppress. `DO INSTEAD NOTHING`, the commonest rule
 in the wild, reaches no relation and so reports nothing, which is the correct answer for the

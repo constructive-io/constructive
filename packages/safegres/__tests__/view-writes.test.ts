@@ -3,6 +3,7 @@ import { computeViewWriteReach } from '../src/checks/role-reach';
 import {
   analyzeViewWrites,
   checkDefinerViewWrite,
+  checkUncheckedViewWrite,
   checkViewRuleBypass
 } from '../src/checks/view-writes';
 import type { RoleAttributes } from '../src/pg/acl';
@@ -37,6 +38,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     grants: [grant('anon', 'INSERT')],
     definition: 'SELECT id, body FROM app.submissions',
     writable: ['INSERT', 'UPDATE', 'DELETE'],
+    checkOption: 'none',
     insteadOfTriggers: false,
     insteadOf: [],
     rules: [],
@@ -300,6 +302,50 @@ describe('checkDefinerViewWrite (L9)', () => {
     const [finding] = await check([view({ writable: ['INSERT'] })], [base], ['anon']);
     expect(finding.context).toMatchObject({ rlsBypassed: true });
     expect(finding.message).toContain('not subject to its RLS policies');
+  });
+});
+
+describe('checkUncheckedViewWrite (L18)', () => {
+  const FILTERED = "SELECT id, body FROM app.submissions WHERE tenant_id = current_setting('app.tenant')";
+
+  async function check(views: ViewSnapshot[], tables: TableSnapshot[], roles: string[]) {
+    const { unchecked } = await analyzeViewWrites(views, tables);
+    return checkUncheckedViewWrite(unchecked, tables, GRAPH, { roles });
+  }
+
+  it('flags a filtering view a role writes through without WITH CHECK OPTION', async () => {
+    const writable = view({
+      definition: FILTERED,
+      grants: [grant('anon', 'INSERT'), grant('anon', 'UPDATE')]
+    });
+    const findings = await check([writable], [table()], ['anon']);
+    expect(findings.map((f) => f.privilege).sort()).toEqual(['INSERT', 'UPDATE']);
+    expect(findings[0]).toMatchObject({ code: 'L18', severity: 'info', table: 'submissions' });
+    expect(findings[0].message).toContain('no WITH CHECK OPTION');
+  });
+
+  it('stays silent once the view carries a check option', async () => {
+    const checked = view({ definition: FILTERED, checkOption: 'cascaded' });
+    expect(await check([checked], [table()], ['anon'])).toEqual([]);
+  });
+
+  it('stays silent for a writable view with no row filter to escape', async () => {
+    expect(await check([view()], [table()], ['anon'])).toEqual([]);
+  });
+
+  it('suppresses a view whose body cannot be read rather than clearing it', async () => {
+    const { unchecked, suppressed } = await analyzeViewWrites(
+      [view({ definition: 'SELECT ((( FROM app.submissions' })],
+      [table()]
+    );
+    expect(unchecked).toEqual([]);
+    expect(suppressed).not.toEqual([]);
+  });
+
+  it('never recommends revoking a grant', async () => {
+    const [finding] = await check([view({ definition: FILTERED })], [table()], ['anon']);
+    expect(finding.hint).toContain('CHECK OPTION');
+    expect(finding.hint).toContain('Do not revoke');
   });
 });
 
