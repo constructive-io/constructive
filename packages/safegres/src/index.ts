@@ -79,7 +79,19 @@ export type { DoctorCheck, DoctorOptions, DoctorReport, DoctorStatus } from './c
 export { doctor } from './commands/doctor';
 export type { LoadConfigParams } from './config/loader';
 export { loadConfig, safegresConfigLoader } from './config/loader';
-export { constructive, minimal, PRESETS, recommended, strict } from './config/presets';
+export {
+  constructive,
+  graphile,
+  hasura,
+  minimal,
+  multiTenant,
+  oltp,
+  postgrest,
+  PRESETS,
+  recommended,
+  strict,
+  supabase
+} from './config/presets';
 export type { ResolvedRule, ResolvedRules } from './config/resolve';
 export {
   allAstRulesDisabled,
@@ -113,6 +125,9 @@ export {
   BUILTIN_ADAPTERS,
   constructiveAdapter,
   definePlanes,
+  graphileAdapter,
+  hasuraAdapter,
+  postgrestAdapter,
   resolveAdapters
 } from './exposure/adapters';
 export type { PlaneReach } from './exposure/planes';

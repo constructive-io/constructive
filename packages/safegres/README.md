@@ -266,10 +266,14 @@ interface ExposureAdapter {
 }
 ```
 
-The built-in `constructive` adapter introspects `routing_public.apis → api_schemas` and emits a
-primary `api` plane plus one `api:<name>` plane per API. JSON configs may name a built-in
-(`"adapters": ["constructive"]`); anything else is an error rather than a silent no-op. The old
-`"resolver": "constructive"` still works.
+Built-ins ship for `constructive`, `postgrest`, `supabase`, `hasura` and `graphile` — each reading
+the signal its stack actually leaves in the catalog (see [Configuration](#configuration)), and
+each emitting a primary `api` plane plus whatever secondary planes it can prove: one `api:<name>`
+per API for Constructive, a `direct:<authenticator>` role plane for PostgREST, `app_private` as an
+internal plane for graphile-starter. JSON configs may name a built-in
+(`"adapters": ["supabase"]`); anything else is an error rather than a silent no-op — a typo'd
+adapter would otherwise present as an unexposed database. The old `"resolver": "constructive"`
+still works.
 
 ## CI in one job
 
@@ -356,8 +360,9 @@ Precedence: **CLI > project config > preset > built-in defaults**.
   "public": { "read": ["app_public.plans*", "app_public.event_types"] },
   "extensions": { "ignore": ["pg_partman"] },
   "rules": {
-    "A3": "off",          // disable
+    "A3": "info",         // demote — still reported, contributes nothing
     "A5": "high",         // retune a severity
+    "A7": "off",          // disable outright
     "P*": "medium"        // prefix wildcard (exact codes win)
   },
   "overrides": [
@@ -371,12 +376,38 @@ Precedence: **CLI > project config > preset > built-in defaults**.
 
 A typed `safegres.config.ts` with `defineConfig` from `confstash` works identically.
 
-| Preset | Behavior |
+Presets come in three kinds, and they compose. A **stack** preset knows how your framework
+declares exposure and what its role names mean; a **posture** preset says how harshly to read
+what it finds; both are just partial configs, so `extends` takes an array:
+
+```jsonc
+{ "extends": ["safegres:supabase", "safegres:multi-tenant"] }
+```
+
+| Stack | Resolves exposure from | Treats as untrusted |
+| --- | --- | --- |
+| `safegres:constructive` | `routing_public.apis` → `api_schemas` → `metaschema_public.schema` | `anonymous` |
+| `safegres:postgrest` | `pgrst.db_schemas` in `pg_db_role_setting` | `anon` |
+| `safegres:supabase` | same (Supabase *is* PostgREST) | `anon`, `authenticated` |
+| `safegres:hasura` | tracked tables in `hdb_catalog` | `anonymous`, `public` |
+| `safegres:graphile` | the `graphile-starter` layout (`app_public` + `app_hidden`) | `visitor` |
+
+Each reads a real catalog signal — not a schema name. The one exception is `graphile`, because
+PostGraphile's schema list is a process argument that leaves no trace in the database: naming that
+preset *is* the declaration that the starter layout holds. If it doesn't, list
+`exposure.schemas` instead.
+
+| Posture | Behavior |
 | --- | --- |
 | `safegres:recommended` | Every rule at its default severity (the no-config behavior) |
 | `safegres:strict` | Everything escalated; fail-closed counts 25%; `failOn: high` |
-| `safegres:constructive` | Exposure auto-resolved from the routing plane; R1/R2 watch `anonymous`; A2/P5 critical; A3 off; `pg_partman` ignored |
+| `safegres:multi-tenant` | Row-visibility rules (A1/A2, L1–L3, L5) escalated — in a shared-table database an RLS gap is a cross-tenant read; one critical floors the grade at D |
+| `safegres:oltp` | Perf axis first: the policy-shape rules that turn an index scan into a per-row function call (X2–X4, X9) escalated; `failOn: perfGrade C` |
 | `safegres:minimal` | Structural flags only (A1–A3) — fast smoke check |
+
+Presets **retune**, they don't delete: a rule that doesn't apply to a stack is demoted to `info`
+(zero weight, so the score is unchanged) rather than switched off, so it stays in the report and
+stays re-tunable. `minimal` is the deliberate exception — being a smoke check is its whole job.
 
 CLI: `--config <path>`, `--preset <name>`, `--rule CODE=off|severity` (repeatable).
 
@@ -460,5 +491,3 @@ console.log(report.score.grade, report.perf?.score.grade);
   database. The `X*` and `A*`/`L*`/`R*` rules are deterministic and work fine on an empty one.
 - safegres **reads**. It never creates, alters, or drops anything, and `--explain` plans without
   executing.
-
-MIT © Constructive
