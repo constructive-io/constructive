@@ -191,6 +191,14 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L6',
+    category: 'coverage',
+    defaultSeverity: 'info',
+    direction: 'neutral',
+    title: 'Unaddressable grant — an API role holds privileges on a relation its API cannot name',
+    scope: 'table'
+  },
+  {
     code: 'L7',
     category: 'anti-pattern',
     // Ships `info` (signal-only, zero score weight) because the rule is new

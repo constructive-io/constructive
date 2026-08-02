@@ -11,6 +11,7 @@
 import type { ExposureConfig, PlaneKind } from '../config/types';
 import type { ExposureAdapter, PlaneInput } from '../exposure/adapters';
 import { BUILTIN_ADAPTERS, resolveAdapters } from '../exposure/adapters';
+import type { ApiReach, UnreachableRelation } from '../exposure/reach';
 import type { QueryExecutor } from './introspect';
 
 export interface ResolvedExposure {
@@ -152,6 +153,50 @@ export async function resolvePlanes(
   }
 
   return planes;
+}
+
+/**
+ * Relation-level reach for the exposed schemas, from whichever adapters can
+ * compute it.
+ *
+ * Adapters *intersect*: a relation is subtracted from a plane only when every
+ * adapter that has an opinion agrees it is unaddressable. One adapter's
+ * silence is not agreement, so an adapter without `reach` is not consulted,
+ * but an adapter that ran and did not name a relation is a positive vote to
+ * keep it.
+ */
+export async function resolveReach(
+  exec: QueryExecutor,
+  config: ExposureConfig | undefined,
+  context: { schemas: string[]; excludeSchemas?: string[] }
+): Promise<ApiReach | undefined> {
+  if (!config || config.reach === false) return undefined;
+
+  let agreed: Map<string, UnreachableRelation> | undefined;
+  const hidden = new Set<string>();
+  let ran = false;
+
+  for (const adapter of adaptersFor(config)) {
+    if (!adapter.reach) continue;
+    if (!(await adapter.detect(exec))) continue;
+    const reach = await adapter.reach(exec, context);
+    ran = true;
+    for (const key of reach.hiddenBackwardRelations) hidden.add(key);
+
+    const named = new Map<string, UnreachableRelation>(
+      reach.unreachable.map((r) => [`${r.schema}.${r.table}`, r])
+    );
+    if (agreed === undefined) agreed = named;
+    else for (const key of [...agreed.keys()]) if (!named.has(key)) agreed.delete(key);
+  }
+
+  if (!ran) return undefined;
+  return {
+    unreachable: [...(agreed?.values() ?? [])].sort((a, b) =>
+      `${a.schema}.${a.table}`.localeCompare(`${b.schema}.${b.table}`)
+    ),
+    hiddenBackwardRelations: [...hidden].sort()
+  };
 }
 
 function defaultKind(plane: PlaneInput): PlaneKind {

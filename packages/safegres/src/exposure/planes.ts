@@ -18,6 +18,7 @@ import type { TableSnapshot } from '../pg/introspect';
 import { computeScore } from '../score/score';
 import type { Finding, PlaneReport } from '../types';
 import { summarize } from '../types';
+import type { ApiReach, UnreachableRelation } from './reach';
 
 /** A plane with its reach resolved against the catalog. */
 export interface PlaneReach {
@@ -30,6 +31,12 @@ export interface PlaneReach {
   reachedVia?: 'grant' | 'PUBLIC' | 'inheritance';
   /** Why a declared plane was not graded. */
   skipped?: string;
+  /**
+   * Relations in the plane's schemas that its API cannot address, subtracted
+   * from `relations`. Reported so the subtraction is auditable rather than
+   * invisible.
+   */
+  unaddressable?: UnreachableRelation[];
 }
 
 export function relationKey(schema: string, table: string): string {
@@ -46,16 +53,32 @@ export function relationKey(schema: string, table: string): string {
 export function resolvePlaneReach(
   planes: ResolvedPlane[],
   tables: TableSnapshot[],
-  graph: RoleGraph
+  graph: RoleGraph,
+  apiReach?: ApiReach
 ): PlaneReach[] {
   return planes.map((plane) => {
+    // A role plane is grant-truth and no API declaration narrows it: the
+    // GraphQL API not exposing a table says nothing about a role holding a
+    // direct connection to the database. This is the whole reason relation
+    // reach is safe to apply at all.
     if (plane.kind === 'role') return roleReach(plane, tables, graph);
 
     const schemas = new Set(plane.schemas);
     const relations = new Set(
       tables.filter((t) => schemas.has(t.schema)).map((t) => relationKey(t.schema, t.name))
     );
-    return { plane, relations, schemas: [...schemas].sort() };
+
+    const unaddressable = (apiReach?.unreachable ?? []).filter((r) =>
+      relations.has(relationKey(r.schema, r.table))
+    );
+    for (const r of unaddressable) relations.delete(relationKey(r.schema, r.table));
+
+    return {
+      plane,
+      relations,
+      schemas: [...schemas].sort(),
+      ...(unaddressable.length > 0 ? { unaddressable } : {})
+    };
   });
 }
 
@@ -156,6 +179,9 @@ export function scorePlane(
     schemas: reach.schemas,
     ...(plane.roles.length > 0 ? { roles: plane.roles } : {}),
     exposedTables: reach.relations.size,
+    ...(reach.unaddressable && reach.unaddressable.length > 0
+      ? { unaddressableTables: reach.unaddressable.length }
+      : {}),
     ...(reach.reachedVia ? { reachedVia: reach.reachedVia } : {}),
     score: computeScore(findings, scoring, {
       exposedTables: reach.relations.size,

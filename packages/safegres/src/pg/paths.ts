@@ -28,11 +28,15 @@
  *
  * Shape alone must never suppress a finding. A generated API can expose a
  * reverse relation over any foreign key regardless of how its default is
- * written, and if it does, the path is reachable and the index is wanted. The
- * signal that settles it is therefore the one this module does *not* yet have:
- * whether the generated GraphQL surface still contains the field. Add it as
- * another {@link PathSignal} — the shape of the API is designed for that — and
- * only then is `unreachable` a conclusion anything should act on.
+ * written, and if it does, the path is reachable and the index is wanted.
+ *
+ * - `behavior-hidden` is the third kind, **declared**: the schema author has
+ *   said the reverse relation is not in the generated API. It comes from the
+ *   same behavior tags exposure reach reads, so the two axes agree about what
+ *   the API contains rather than each guessing separately. It is reported and
+ *   not acted on — a hidden relation is one missing path, not proof that
+ *   nothing traverses the key, since the referential-integrity scan on a
+ *   parent `DELETE` runs whatever the API exposes.
  */
 
 import type { TableIndexSnapshot } from './indexes';
@@ -43,9 +47,14 @@ import type { TableSnapshot } from './introspect';
  * key; `shape` means the schema resembles an idiom in which nothing does, which
  * is a suspicion rather than a finding.
  */
-export type SignalDirection = 'read' | 'shape';
+export type SignalDirection = 'read' | 'shape' | 'declared';
 
-export type SignalName = 'policy-read' | 'view-read' | 'write-once-pointer' | 'config-record';
+export type SignalName =
+  | 'policy-read'
+  | 'view-read'
+  | 'write-once-pointer'
+  | 'config-record'
+  | 'behavior-hidden';
 
 export interface PathSignal {
   name: SignalName;
@@ -87,6 +96,11 @@ export interface ClassifyOptions {
    * the nullable, undefaulted pointer sitting alongside the defaulted ones.
    */
   minPointers?: number;
+  /**
+   * `schema.table.constraint` keys whose reverse relation an API declares
+   * absent, as computed by exposure reach.
+   */
+  hiddenBackwardRelations?: Set<string>;
 }
 
 export const DEFAULT_MIN_POINTERS = 2;
@@ -138,6 +152,7 @@ export function classifyPaths(
   options: ClassifyOptions = {}
 ): Map<string, AccessPath> {
   const minPointers = options.minPointers ?? DEFAULT_MIN_POINTERS;
+  const hidden = options.hiddenBackwardRelations ?? new Set<string>();
   const policyTokens = identifierTokens(
     tables.flatMap((t) => t.policies.flatMap((p) => [p.using, p.withCheck]))
   );
@@ -191,6 +206,14 @@ export function classifyPaths(
           name: 'config-record',
           direction: 'shape',
           detail: `${table.name} carries ${pointers.length} write-once pointers`
+        });
+      }
+
+      if (hidden.has(pathKey(table.schema, table.name, fk.name))) {
+        signals.push({
+          name: 'behavior-hidden',
+          direction: 'declared',
+          detail: `a behavior declares the reverse relation over ${fk.name} absent from the API`
         });
       }
 
