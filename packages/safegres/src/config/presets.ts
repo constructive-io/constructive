@@ -40,7 +40,11 @@ export const recommended: SafegresConfig = {
     // materialized view serves rows RLS never filtered, and a filtering view
     // without `security_barrier` is not a boundary. Same posture again.
     L11: ['info', { rolesFrom: 'anon' }],
-    L12: ['info', { rolesFrom: 'anon' }]
+    L12: ['info', { rolesFrom: 'anon' }],
+    // Reach that only `pg_attribute.attacl` shows. New, so zero weight — but
+    // note this one is catalog-derived, not body-derived: what was missing was
+    // the introspection, not the proof.
+    L13: ['info', { rolesFrom: 'anon' }]
   }
 };
 

@@ -12,6 +12,7 @@ import {
   collectFunctionNames,
   parseOrNull
 } from '../checks/anti-patterns';
+import { checkUntrustedColumnGrants } from '../checks/column-grants';
 import {
   checkCoverageGaps,
   checkUpdateWithCheckCoverage
@@ -358,6 +359,13 @@ export async function audit(
         table,
         roleGraph,
         withExposedRoles(tableRules.get('L7')?.options as LatticeRoleOptions, exposure)
+      )
+    );
+    findings.push(
+      ...checkUntrustedColumnGrants(
+        table,
+        roleGraph,
+        withExposedRoles(tableRules.get('L13')?.options as LatticeRoleOptions, exposure)
       )
     );
 

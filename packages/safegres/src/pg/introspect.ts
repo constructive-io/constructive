@@ -42,6 +42,18 @@ export interface GrantInfo {
   bypassRls: boolean;
 }
 
+/**
+ * A grant on one column (`pg_attribute.attacl`), which Postgres keeps entirely
+ * separate from the table's own ACL: `GRANT SELECT (secret) ON t TO anon`
+ * leaves `relacl` untouched, so any analysis that reads only `relacl`
+ * concludes the role reaches nothing.
+ *
+ * Only SELECT, INSERT, UPDATE and REFERENCES can be column-scoped.
+ */
+export interface ColumnGrantInfo extends GrantInfo {
+  column: string;
+}
+
 /** `pg_policy.polcmd` uses: `r` SELECT, `a` INSERT, `w` UPDATE, `d` DELETE, `*` ALL. */
 export type PolicyCmd = 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL';
 
@@ -73,6 +85,12 @@ export interface TableSnapshot {
   isPartitioned: boolean;
   owner: string;
   grants: GrantInfo[];
+  /**
+   * Grants on individual columns. Disjoint from {@link TableSnapshot.grants}:
+   * a column grant never appears in `relacl`, and a table grant never appears
+   * in `attacl`, so a role can reach a relation through this list alone.
+   */
+  columnGrants: ColumnGrantInfo[];
   policies: PolicyInfo[];
 }
 
@@ -222,6 +240,37 @@ export async function introspectTables(
       WHERE true
         ${roleFilter}
     ),
+    -- Column ACLs live on pg_attribute, not pg_class: a column grant is
+    -- invisible to relacl, and this is the only place it surfaces.
+    col_grants_exploded AS (
+      SELECT
+        r.oid,
+        a.attname                             AS column_name,
+        (aclexplode(a.attacl)).grantee        AS grantee_oid,
+        (aclexplode(a.attacl)).privilege_type AS privilege_type,
+        (aclexplode(a.attacl)).is_grantable   AS is_grantable
+      FROM rels r
+      JOIN pg_attribute a ON a.attrelid = r.oid
+      WHERE a.attacl IS NOT NULL
+        AND a.attnum > 0
+        AND NOT a.attisdropped
+    ),
+    col_grants AS (
+      SELECT
+        g.oid,
+        g.column_name,
+        CASE WHEN g.grantee_oid = 0 THEN 'PUBLIC' ELSE rol.rolname END AS grantee,
+        g.privilege_type,
+        g.is_grantable,
+        CASE
+          WHEN g.grantee_oid = 0 THEN false
+          ELSE COALESCE(rol.rolsuper OR rol.rolbypassrls, false)
+        END AS bypass_rls
+      FROM col_grants_exploded g
+      LEFT JOIN pg_roles rol ON rol.oid = g.grantee_oid
+      WHERE true
+        ${roleFilter}
+    ),
     policies AS (
       SELECT
         p.polrelid                                  AS oid,
@@ -258,6 +307,17 @@ export async function introspectTables(
       )                                                   AS grants,
       COALESCE(
         (SELECT jsonb_agg(jsonb_build_object(
+          'role', g.grantee,
+          'column', g.column_name,
+          'privilege', g.privilege_type,
+          'grantable', g.is_grantable,
+          'bypassRls', g.bypass_rls
+        ) ORDER BY g.grantee, g.column_name, g.privilege_type)
+         FROM col_grants g WHERE g.oid = r.oid),
+        '[]'::jsonb
+      )                                                   AS column_grants,
+      COALESCE(
+        (SELECT jsonb_agg(jsonb_build_object(
           'name', p.name,
           'cmd', p.cmd::text,
           'permissive', p.permissive,
@@ -287,6 +347,13 @@ export async function introspectTables(
     is_partitioned: boolean;
     owner: string;
     grants: Array<{ role: string; privilege: string; grantable: boolean; bypassRls: boolean }>;
+    column_grants: Array<{
+      role: string;
+      column: string;
+      privilege: string;
+      grantable: boolean;
+      bypassRls: boolean;
+    }>;
     policies: Array<{
       name: string;
       cmd: string;
@@ -307,6 +374,13 @@ export async function introspectTables(
     owner: r.owner,
     grants: r.grants.map((g) => ({
       role: g.role,
+      privilege: normalizePrivilege(g.privilege),
+      grantable: g.grantable,
+      bypassRls: g.bypassRls === true
+    })),
+    columnGrants: r.column_grants.map((g) => ({
+      role: g.role,
+      column: g.column,
       privilege: normalizePrivilege(g.privilege),
       grantable: g.grantable,
       bypassRls: g.bypassRls === true

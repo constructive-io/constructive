@@ -26,6 +26,7 @@ export type {
   ChecklistItem
 } from './callgraph/graph';
 export { buildCallGraph } from './callgraph/graph';
+export { checkUntrustedColumnGrants } from './checks/column-grants';
 export type { SuppressedView, ViewBodyAnalysis } from './checks/definer-view';
 export { analyzeViewBodies, checkDefinerViewBypass } from './checks/definer-view';
 export {
@@ -36,6 +37,7 @@ export {
   checkUnindexedSortColumns
 } from './checks/indexes';
 export type {
+  EffectiveColumnGrant,
   EffectiveGrant,
   GrantVia,
   LatticeRoleOptions,
@@ -50,6 +52,7 @@ export {
   checkUnreachableGrants,
   checkUntrustedIndirectAccess,
   computeRoleAccess,
+  effectiveColumnGrants,
   effectiveGrants
 } from './checks/lattice';
 export type { PolicyClause, PredicateColumn } from './checks/policy-index';
@@ -198,6 +201,8 @@ export { introspectFunctions } from './pg/functions';
 export type { ColumnInfo, ForeignKeyInfo, IndexInfo, TableIndexSnapshot, ViewSnapshot } from './pg/indexes';
 export { introspectIndexes, introspectViews } from './pg/indexes';
 export {
+  type ColumnGrantInfo,
+  type GrantInfo,
   type IntrospectOptions,
   introspectTables,
   type PgPrivilege,

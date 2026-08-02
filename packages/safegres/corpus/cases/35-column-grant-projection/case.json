@@ -1,0 +1,27 @@
+{
+  "title": "A column grant is reach that lives only in pg_attribute.attacl",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_column_grant"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L13",
+      "relation": "c_column_grant.profiles",
+      "role": "corpus_anon",
+      "note": "column-level SELECT on an RLS-off table: every row of handle and display_name, and until this rule existed the audit reported the relation as unreachable"
+    }
+  ],
+  "worstSeverity": "info",
+  "fix": "Not a revoke. Either the projection is intended and public — in which case this is correct as written — or the relation needs RLS, because a column grant restricts which columns, never which rows.",
+  "id": "35-column-grant-projection"
+}

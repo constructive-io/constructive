@@ -217,7 +217,9 @@ function roleAccessSection(roles: RoleAccessEntry[]): string[] {
         '| Relation | Privileges | Via |',
         '| --- | --- | --- |',
         ...entry.unmediated.map(
-          (r) => `| \`${r.schema}.${r.table}\` | ${r.privileges.join(', ')} | ${r.via} |`
+          (r) =>
+            `| \`${r.schema}.${r.table}\` | ${r.privileges.join(', ')}`
+            + `${r.columns ? ` (${r.columns.join(', ')})` : ''} | ${r.via} |`
         ),
         ''
       );

@@ -288,6 +288,19 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L13',
+    category: 'anti-pattern',
+    // Ships `info` on the same new-rule posture. The honest severity depends
+    // entirely on the relation: column-level SELECT on an RLS-off table for an
+    // anonymous role is the same exposure A2 calls `high`, and until this rule
+    // existed nothing in the package saw it at all, because every grant query
+    // read `relacl` and a column grant lives in `pg_attribute.attacl`.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Column-level grant — an untrusted role reaches a relation through column privileges no relation ACL shows (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
     code: 'W1',
     category: 'meta',
     defaultSeverity: 'medium',
