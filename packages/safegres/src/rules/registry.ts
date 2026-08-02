@@ -199,6 +199,19 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L7',
+    category: 'anti-pattern',
+    // Ships `info` (signal-only, zero score weight) because the rule is new
+    // and unproven — NOT because the fact is minor. An unauthenticated role
+    // that can SET ROLE to a role with extra grants is a real escalation, and
+    // when the assumed role bypasses RLS (context.targetBypassesRls) it should
+    // be `high`; escalate via config/preset once the finding proves itself.
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Untrusted role can SET ROLE to a role with more reach (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
     code: 'W1',
     category: 'meta',
     defaultSeverity: 'medium',

@@ -18,7 +18,11 @@ export const recommended: SafegresConfig = {
   rules: {
     R1: ['critical', { rolesFrom: 'anon' }],
     R2: ['high', { rolesFrom: 'anon' }],
-    L5: ['info', { rolesFrom: 'anon' }]
+    L5: ['info', { rolesFrom: 'anon' }],
+    // Signal-only for now: an unauthenticated role that can SET ROLE to a role
+    // with more reach is a real escalation, but the rule is new and unproven,
+    // so it reports at zero weight until validated. See the registry entry.
+    L7: ['info', { rolesFrom: 'anon' }]
   }
 };
 

@@ -43,7 +43,7 @@ function policy(partial: Partial<PolicyInfo> = {}): PolicyInfo {
 }
 
 function role(name: string, partial: Partial<RoleAttributes> = {}): [string, RoleAttributes] {
-  return [name, { name, bypassRls: false, isSuper: false, inheritsFrom: [], ...partial }];
+  return [name, { name, bypassRls: false, isSuper: false, inheritsFrom: [], canSetRole: [], ...partial }];
 }
 
 function graph(...entries: Array<[string, RoleAttributes]>): RoleGraph {

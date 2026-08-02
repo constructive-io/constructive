@@ -52,6 +52,7 @@ import {
   checkUntrustedRoleWrites,
   type RoleTrustOptions
 } from '../checks/role-trust';
+import { checkSetRoleEscalation } from '../checks/set-role';
 import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../checks/stats';
 import { configFingerprint } from '../config/fingerprint';
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
@@ -288,6 +289,13 @@ export async function audit(
         })
       );
     }
+    findings.push(
+      ...checkSetRoleEscalation(
+        table,
+        roleGraph,
+        withExposedRoles(tableRules.get('L7')?.options as LatticeRoleOptions, exposure)
+      )
+    );
 
     // --- AST-level anti-patterns (and, with perf on, policy-aware index rules) ---
     if (!skipAst) {

@@ -1,0 +1,29 @@
+{
+  "title": "Anonymous role can SET ROLE to a more-privileged role",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_anon_set_role_escalation"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L7",
+      "relation": "c_anon_set_role_escalation.secrets",
+      "note": "corpus_anon inherits nothing from c_priv_role (INHERIT FALSE) but can assume it (SET TRUE), gaining a SELECT it holds no passive grant for"
+    }
+  ],
+  "forbid": [
+    "A2",
+    "L5"
+  ],
+  "fix": "GRANT c_priv_role TO corpus_anon WITH SET FALSE (or REVOKE the membership) — the anonymous role must not be able to assume a privileged role.",
+  "id": "24-anon-set-role-escalation"
+}
