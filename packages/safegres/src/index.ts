@@ -75,6 +75,12 @@ export {
   checkUnusedIndexes,
   DEFAULT_STATS_THRESHOLDS
 } from './checks/stats';
+export type { ViewExposureAnalysis } from './checks/view-exposure';
+export {
+  analyzeViewExposure,
+  checkLeakyFilterView,
+  checkMatviewSnapshot
+} from './checks/view-exposure';
 export type { ViewWriteAnalysis } from './checks/view-writes';
 export {
   analyzeViewWrites,

@@ -1,0 +1,36 @@
+{
+  "title": "A view's WHERE is the only boundary an anonymous role faces, and it is not a security barrier",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_leaky_filter_view"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L12",
+      "relation": "c_leaky_filter_view.documents",
+      "note": "corpus_anon reaches `documents` only through the view, so the view's `visibility = 'public'` is a security boundary — and without `security_barrier` a caller-supplied leaky qual is evaluated against the private rows too"
+    },
+    {
+      "code": "L8",
+      "relation": "c_leaky_filter_view.documents",
+      "note": "the same view also executes as its owner, which is what puts corpus_anon in reach of the table at all"
+    }
+  ],
+  "forbid": [
+    "L9",
+    "L10",
+    "L11"
+  ],
+  "worstSeverity": "info",
+  "fix": "Recreate c_leaky_filter_view.public_documents WITH (security_barrier = true) so the planner cannot evaluate a caller's qual below the view's own. Where the filter is per-caller rather than a constant, an RLS policy on `documents` is stronger still: policy quals already get barrier treatment. Do not revoke corpus_anon's SELECT on the view.",
+  "id": "33-leaky-filter-view"
+}

@@ -35,7 +35,12 @@ export const recommended: SafegresConfig = {
     // rewrite rule whose action runs as the view owner. Same posture again —
     // new, body-derived, zero weight until validated.
     L9: ['info', { rolesFrom: 'anon' }],
-    L10: ['info', { rolesFrom: 'anon' }]
+    L10: ['info', { rolesFrom: 'anon' }],
+    // The other two ways a readable view is not what its definition says: a
+    // materialized view serves rows RLS never filtered, and a filtering view
+    // without `security_barrier` is not a boundary. Same posture again.
+    L11: ['info', { rolesFrom: 'anon' }],
+    L12: ['info', { rolesFrom: 'anon' }]
   }
 };
 

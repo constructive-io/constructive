@@ -36,6 +36,13 @@ export type RoleReachEdge =
    */
   | { kind: 'view'; view: string; owner: string }
   /**
+   * The caller read a materialized view whose rows were computed as `owner`
+   * at REFRESH time. Unlike the view edge this holds whatever the reader's
+   * privileges are: the rows are stored, so the bases are never consulted and
+   * their policies never run.
+   */
+  | { kind: 'matview'; view: string; owner: string }
+  /**
    * The caller's command fired a rewrite rule on `view`. The rule's actions
    * are permission-checked against the rule's table owner, and unlike the
    * view edge this is *not* governed by `security_invoker`.
@@ -153,6 +160,12 @@ export interface ViewReachInput {
   /** ACL rows on the view itself — who can SELECT the view at all. */
   grants: GrantInfo[];
   baseRelations: ViewBaseRelation[];
+  /**
+   * The outermost relation is a materialized view, so its first hop is a
+   * `matview` edge: the rows were computed at REFRESH time rather than read
+   * through on demand.
+   */
+  materialized?: boolean;
 }
 
 /**
@@ -188,7 +201,11 @@ export function computeViewReach(
           effectiveRole: base.hops[base.hops.length - 1].owner,
           path: [
             { kind: 'grant', via: select.via, privilege: 'SELECT' },
-            ...base.hops.map((h) => ({ kind: 'view' as const, view: h.view, owner: h.owner }))
+            ...base.hops.map((h, i) => ({
+              kind: view.materialized && i === 0 ? ('matview' as const) : ('view' as const),
+              view: h.view,
+              owner: h.owner
+            }))
           ],
           proof: 'ast'
         });

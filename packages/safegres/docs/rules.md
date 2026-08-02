@@ -75,6 +75,26 @@ an unreadable rule action is unknown — all three suppress. `DO INSTEAD NOTHING
 in the wild, reaches no relation and so reports nothing, which is the correct answer for the
 read-only views it is used to build.
 
+L11 and L12 are the last two things a *readable* view does that neither its owner nor its body
+explains on its own. **L11** is materialization: a matview's rows were computed once, by whoever ran
+`REFRESH`, and are then served verbatim — the base relations are never consulted at read time, so
+their ACLs do not apply and their policies do not run. A matview can carry neither policies (RLS
+attaches to tables) nor `security_invoker` (a view-only reloption), so there is no option on the
+object that reinstates the filter; the finding fires both when the role holds no grant on the base
+relation and when it holds one but is subject to policies the stored rows never passed. **L12** is
+`security_barrier`: without it the planner may push the *caller's* qual below the view's own, so a
+leaky operator or a `COST 0.0001` function is evaluated against the rows the view was written to
+hide. They are not returned, but they are seen — enough to read them out through a notice, an error
+or a timing difference. L12 is deliberately narrow: it needs the view to actually filter (an
+explicit `WHERE`/`HAVING` — row-limiting through a join or a `LIMIT` is not how a boundary gets
+written), to be a definer view, and to be the role's *only* path to the relation. A caller that can
+read the base table directly loses nothing to a pushed-down qual.
+
+Both inherit the same refusals, with one addition: a body safegres cannot parse is *unknown*, never
+"does not filter", so it suppresses rather than clearing the view. And neither recommends a revoke —
+the remedies are `security_barrier = true`, an RLS policy on the base relation (policy quals already
+get barrier treatment), or not materializing rows that are not safe to hand out unconditionally.
+
 Restrictive-only policies never count as coverage. `BYPASSRLS` and superuser roles are exempt from
 policy checks — they are not subject to RLS, so a "missing policy" finding for them would be
 noise. Policies are matched with `pg_has_role` semantics: a policy `TO authenticated` covers a

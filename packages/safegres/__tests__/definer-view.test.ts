@@ -27,6 +27,7 @@ function view(partial: Partial<ViewSnapshot> = {}): ViewSnapshot {
     owner: 'app_owner',
     materialized: false,
     securityInvoker: false,
+    securityBarrier: false,
     ownerBypassesRls: false,
     grants: [grant('anon', 'SELECT')],
     definition: 'SELECT id, total FROM app.orders',
