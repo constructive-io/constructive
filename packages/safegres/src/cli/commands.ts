@@ -8,7 +8,7 @@ import printConfig from './print-config';
 const log = new Logger('safegres');
 
 const usage = `
-safegres — pure-PostgreSQL RLS auditor
+safegres — Postgres security and performance auditor
 
 Usage:
   safegres <command> [OPTIONS]

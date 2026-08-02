@@ -94,14 +94,35 @@ export {
 export type {
   ExposureConfig,
   FailOnConfig,
+  GithubCommentConfig,
+  GithubReportConfig,
   Grade,
   OverrideEntry,
   PerfConfig,
+  PlaneConfig,
+  PlaneFailOnConfig,
+  PlaneKind,
+  ReportConfig,
   RulesConfig,
   RuleSetting,
   SafegresConfig,
   ScoringConfig
 } from './config/types';
+export type { ExposureAdapter, PlaneInput } from './exposure/adapters';
+export {
+  BUILTIN_ADAPTERS,
+  constructiveAdapter,
+  definePlanes,
+  resolveAdapters
+} from './exposure/adapters';
+export type { PlaneReach } from './exposure/planes';
+export {
+  onPlane,
+  relationKey,
+  resolvePlaneReach,
+  scorePlane,
+  stampPlanes
+} from './exposure/planes';
 export type { BaselineFinding, PerfBaseline, PerfDiff } from './perf/baseline';
 export {
   diffPerf,
@@ -116,8 +137,13 @@ export type { ExplainOptions, ExplainReport } from './perf/explain';
 export { proveFindings } from './perf/explain';
 export type { RoleAttributes, SchemaAclGrant, SchemaAclInfo, SchemaAclOptions } from './pg/acl';
 export { introspectRoleGraph, introspectSchemaAcls } from './pg/acl';
-export type { ResolvedExposure } from './pg/exposure';
-export { resolveConstructiveExposure, resolveExposure, UNKNOWN_EXPOSURE } from './pg/exposure';
+export type { ResolvedExposure, ResolvedPlane } from './pg/exposure';
+export {
+  resolveConstructiveExposure,
+  resolveExposure,
+  resolvePlanes,
+  UNKNOWN_EXPOSURE
+} from './pg/exposure';
 export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from './pg/functions';
 export { introspectFunctions } from './pg/functions';
 export type { ColumnInfo, ForeignKeyInfo, IndexInfo, TableIndexSnapshot } from './pg/indexes';
@@ -154,12 +180,33 @@ export {
   serializeSnapshot,
   toSnapshot
 } from './report/compare';
+export type { GithubRenderOptions } from './report/github';
+export {
+  COMMENT_MARKER,
+  emitGithub,
+  gradeBadge,
+  postStickyComment,
+  renderAnnotations,
+  renderGithubComment,
+  renderGithubSummary,
+  scoreBadge
+} from './report/github';
 export { renderJson } from './report/json';
 export type { RenderMarkdownOptions } from './report/markdown';
 export { renderMarkdown } from './report/markdown';
+export type { RenderPrettyOptions } from './report/pretty';
 export { renderPretty } from './report/pretty';
 export type { BuildSourceIndexOptions, RenderSarifOptions, SourceIndex, SourceLocation } from './report/sarif';
 export { buildSourceIndex, renderSarif } from './report/sarif';
+export type {
+  ReportView,
+  ViewConfig,
+  ViewDimension,
+  ViewFindings,
+  ViewScore,
+  ViewSection
+} from './report/view';
+export { ALL_SECTIONS, matchPlane, selectView, viewConfigFromReportConfig } from './report/view';
 export type { RuleMeta } from './rules/registry';
 export { dimensionOf, expandRuleSelector, isKnownRule, RULES, RULES_BY_CODE } from './rules/registry';
 export type { Score, ScoreContext, ScoreDeduction } from './score/score';
