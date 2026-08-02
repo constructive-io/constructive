@@ -171,6 +171,16 @@ export interface PerfStatsReport {
   notes?: string[];
 }
 
+/**
+ * The per-role exposure report: the direct answer to "what can role X
+ * access?", computed over effective grants (direct, TO PUBLIC, inherited)
+ * for the configured untrusted roles. Present whenever such roles are
+ * configured (e.g. L5/R1 options), independent of any findings.
+ */
+export interface RoleAccessReport {
+  roles: import('./checks/lattice').RoleAccessEntry[];
+}
+
 export interface Report {
   version: string;
   generatedAt: string;
@@ -182,6 +192,8 @@ export interface Report {
   perf?: PerfReport;
   /** The exposure surface the score was computed against. */
   exposure?: ExposureReport;
+  /** Effective per-role access, for the configured untrusted roles. */
+  roleAccess?: RoleAccessReport;
   /**
    * Unscored call-graph audit (`--call-graph`): trust boundaries reachable
    * from the exposed entry points, for human review.

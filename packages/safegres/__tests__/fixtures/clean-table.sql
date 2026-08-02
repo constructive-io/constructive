@@ -19,6 +19,7 @@ CREATE TABLE fx_clean.items (
 ALTER TABLE fx_clean.items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fx_clean.items FORCE ROW LEVEL SECURITY;
 
+GRANT USAGE ON SCHEMA fx_clean TO fx_clean_user;
 GRANT SELECT, INSERT, UPDATE ON fx_clean.items TO fx_clean_user;
 
 -- Non-trivial policies gated on the row owner column.

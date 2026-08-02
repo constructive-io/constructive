@@ -151,6 +151,46 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L1',
+    category: 'coverage',
+    defaultSeverity: 'low',
+    direction: 'fail-closed',
+    title: 'Dead indirect grant — privilege arrives via PUBLIC or role inheritance but no policy can admit it',
+    scope: 'table'
+  },
+  {
+    code: 'L2',
+    category: 'coverage',
+    defaultSeverity: 'low',
+    direction: 'fail-closed',
+    title: 'Dead policy — a permissive policy applies to a role holding no corresponding grant',
+    scope: 'table'
+  },
+  {
+    code: 'L3',
+    category: 'coverage',
+    defaultSeverity: 'low',
+    direction: 'fail-closed',
+    title: 'Unreachable grant — object privilege without USAGE on the schema',
+    scope: 'table'
+  },
+  {
+    code: 'L4',
+    category: 'coverage',
+    defaultSeverity: 'info',
+    direction: 'neutral',
+    title: 'Dead schema USAGE — the role reaches no relation and no function in the schema (advisory)',
+    scope: 'table'
+  },
+  {
+    code: 'L5',
+    category: 'anti-pattern',
+    defaultSeverity: 'info',
+    direction: 'fail-open',
+    title: 'Untrusted role reaches an RLS-off table via PUBLIC or inheritance (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
     code: 'W1',
     category: 'meta',
     defaultSeverity: 'medium',
