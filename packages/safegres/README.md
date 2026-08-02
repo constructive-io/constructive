@@ -143,7 +143,7 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L4 | info | neutral | **Dead schema `USAGE`** — reaches no relation and no function |
 | L5 | info | fail-open | An untrusted role reaches an **RLS-off table** via PUBLIC/inheritance † |
 | L6 | info | neutral | **Unaddressable grant** — an API role holds privileges on a relation its API cannot name ‡ |
-| L8 | info | fail-open | **DEFINER view bypass** — an untrusted role reads a base relation as the view's owner † |
+| L8 | info | fail-open | **DEFINER view bypass** — an untrusted role reads a base relation, and named columns of it, as the view's owner † |
 | L9 | info | fail-open | **DEFINER view write** — an auto-updatable definer view writes a base relation as its owner † |
 | L10 | info | fail-open | **Rewrite-rule bypass** — a rule on a view writes a relation as the view's owner, `security_invoker` notwithstanding † |
 | L11 | info | fail-open | **Materialized-view snapshot** — stored rows serve an untrusted role what the base relation's grants and policies would not † |

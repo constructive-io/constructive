@@ -28,7 +28,12 @@ import { type ExtractedBody, extractQuery } from '../callgraph/extract';
 import type { ViewSnapshot } from '../pg/indexes';
 import type { TableSnapshot } from '../pg/introspect';
 import type { Finding } from '../types';
-import { effectiveGrants, type LatticeRoleOptions, type RoleGraph } from './lattice';
+import {
+  effectiveColumnGrants,
+  effectiveGrants,
+  type LatticeRoleOptions,
+  type RoleGraph
+} from './lattice';
 import { computeViewReach, type ViewBaseRelation, type ViewReachInput } from './role-reach';
 
 /** How deep a chain of views on views is followed before giving up. */
@@ -153,11 +158,17 @@ export function resolveViewBases(
       const dedupe = `${relKey}::${hops[hops.length - 1].owner}`;
       if (seen.has(dedupe)) continue;
       seen.add(dedupe);
+      // Which columns escape is the catalog's answer, not the body's: the
+      // rewriter recorded one dependency row per column the view reads.
+      const columns = current.columnDeps?.find(
+        (d) => d.schema === relation.schema && d.table === relation.name
+      )?.columns;
       bases.push({
         schema: relation.schema,
         table: relation.name,
         hops: [...hops],
-        ...(relation.kind === 'external' ? { external: true } : {})
+        ...(relation.kind === 'external' ? { external: true } : {}),
+        ...(columns ? { columns } : {})
       });
     }
   };
@@ -277,6 +288,17 @@ export function checkDefinerViewBypass(
       // Already reachable in its own right: the view launders nothing.
       if (effectiveGrants(base, role, graph).some((g) => g.privilege === 'SELECT')) continue;
 
+      // Nor does it when the columns that escape are ones the role could
+      // already read column-by-column (L13's closure) and the base has no RLS
+      // for the owner's read to skip. With RLS on, the projection matching is
+      // beside the point: the owner sees rows the caller's policies hide.
+      const granted = effectiveColumnGrants(base, role, graph)
+        .find((g) => g.privilege === 'SELECT');
+      if (
+        cell.columns && granted && !base.rlsEnabled
+        && cell.columns.every((c) => granted.columns.includes(c))
+      ) continue;
+
       const hops = cell.path.filter((e): e is { kind: 'view'; view: string; owner: string } =>
         e.kind === 'view'
       );
@@ -299,7 +321,9 @@ export function checkDefinerViewBypass(
         role,
         privilege: 'SELECT',
         message:
-          `Untrusted role ${role} reads ${base.schema}.${base.name} through view ${outermost.view}, `
+          `Untrusted role ${role} reads ${base.schema}.${base.name}`
+          + (cell.columns ? ` (${cell.columns.join(', ')})` : '')
+          + ` through view ${outermost.view}, `
           + `which executes as its owner ${owner} — ${role} holds no SELECT on the base relation`
           + (rlsBypassed ? `, and ${owner} is not subject to its RLS policies` : ''),
         hint:
@@ -313,6 +337,8 @@ export function checkDefinerViewBypass(
           viaViews: hops.map((h) => h.view),
           baseRlsEnabled: base.rlsEnabled,
           rlsBypassed,
+          ...(cell.columns ? { columns: cell.columns } : {}),
+          ...(granted ? { grantedColumns: granted.columns } : {}),
           proof: cell.proof
         }
       });

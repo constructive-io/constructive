@@ -78,6 +78,8 @@ export interface RoleReachCell {
    * `privileges` is what the path exercises, not what the relation permits.
    */
   external?: boolean;
+  /** The columns of the relation the path reaches, where they are known. */
+  columns?: string[];
 }
 
 /** Everything one role reaches, across the relations examined. */
@@ -161,6 +163,11 @@ export interface ViewBaseRelation {
    * not, and a consumer must not grade it as if the relation were in scope.
    */
   external?: boolean;
+  /**
+   * The columns of the relation that actually escape through the view, from
+   * the catalog's own dependency rows. Absent means unknown — never "none".
+   */
+  columns?: string[];
 }
 
 /** A view, its own ACL, and the base relations its body was found to read. */
@@ -219,7 +226,8 @@ export function computeViewReach(
             }))
           ],
           proof: 'ast',
-          ...(base.external ? { external: true } : {})
+          ...(base.external ? { external: true } : {}),
+          ...(base.columns ? { columns: base.columns } : {})
         });
       }
     }

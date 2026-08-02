@@ -78,7 +78,7 @@ The score only improves by being **explicit** (declaring exposure and intent) or
 | L5 | high | fail-open | **Indirect coverage gap** — inherited/PUBLIC reach lands on a table with no covering policy |
 | L6 | low | fail-closed | **Unaddressable grant** — no exposed API can name the relation, and no policy references it |
 | L7 | info | fail-open | **`SET ROLE` reach** — a membership confers `set_option` without `INHERIT`, so a role assumes privileges it does not passively hold |
-| L8 | info | fail-open | **DEFINER-view bypass** — a non-`security_invoker` view reads its base relations as the *owner* |
+| L8 | info | fail-open | **DEFINER-view bypass** — a non-`security_invoker` view reads its base relations as the *owner*, naming the columns that escape |
 | L9 | info | fail-open | **DEFINER-view write** — an auto-updatable definer view writes a base relation as its owner |
 | L10 | info | fail-open | **Rewrite-rule bypass** — a rule's actions run as the view owner, `security_invoker` notwithstanding |
 | L11 | info | fail-open | **Materialized-view snapshot** — stored rows are served without consulting base ACLs or RLS |
@@ -97,6 +97,8 @@ The score only improves by being **explicit** (declaring exposure and intent) or
 Reach is modelled as cells in `checks/role-reach.ts`, each carrying the role the access **executes as** (`effectiveRole`), the **path** of edges it arrived by (`grant` / `setrole` / `view` / `matview` / `rule`), and a **proof** bit: `catalog` (an ACL row or `pg_auth_members`) or `ast` (read out of a SQL body). `opaque-tainted` exists for a chain that could not be followed; nothing produces it yet, because opacity is currently whole-body.
 
 **L8–L12 are the AST half: a view is not what its definition looks like.** A view without `security_invoker` runs as its owner, so a caller's SELECT on the view reads base relations under the *owner's* privileges (L8), and if the view is auto-updatable, writes land the same way (L9). Rewrite rules are worse: their actions are **not** governed by `security_invoker`, so L10 fires on invoker views where L9 does not. A materialized view stores rows computed at REFRESH time, so the bases are never consulted and their policies never run (L11). And a filtering view that is not `security_barrier` lets a leaky caller predicate be pushed below the filter (L12).
+
+**Which columns escape is a catalog fact, not a parsing problem.** `ViewSnapshot.columnDeps` reads the `pg_depend` rows the rewriter wrote for the view's `_RETURN` rule: `SELECT *` arrives expanded, a column used only in a `WHERE` counts as read, and a nested view depends on the *inner view's* columns. L8 puts that set in the message and in `context.columns`, and suppresses itself when every escaping column is one the role already holds by column grant **and** the base has no RLS — with RLS on, the owner reads rows the caller's policies hide, so the projection is beside the point. An absent column set is unknown, never narrow.
 
 **Conservatism is the rule, not a nicety.** A body safegres cannot see through — dynamic SQL, an unparseable definition, a chain deeper than the hop limit — **suppresses** the finding; it never becomes a weaker guess. L14 is the one place that reports the *absence* of knowledge: a qualified reference into a schema the audit never introspected is real reach with an ungraded far end, distinct from a name it simply could not resolve (a CTE, an alias), which is still dropped.
 

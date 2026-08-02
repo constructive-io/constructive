@@ -46,6 +46,17 @@ beforeAll(async () => {
     CREATE VIEW fx_viewbarrier.v_both WITH (security_barrier = on, security_invoker = 1) AS
       SELECT id FROM fx_viewbarrier.t;
     CREATE MATERIALIZED VIEW fx_viewbarrier.mv AS SELECT id FROM fx_viewbarrier.t;
+
+    CREATE SCHEMA fx_viewcols;
+    CREATE TABLE fx_viewcols.people (id int, email text, ssn text, note text);
+    CREATE VIEW fx_viewcols.v_narrow AS SELECT id, email FROM fx_viewcols.people;
+    CREATE VIEW fx_viewcols.v_star AS SELECT * FROM fx_viewcols.people;
+    -- A column used only in the WHERE clause never appears in the output,
+    -- but the view still reads it.
+    CREATE VIEW fx_viewcols.v_filtered AS
+      SELECT id FROM fx_viewcols.people WHERE ssn IS NOT NULL;
+    -- A nested view depends on the inner *view's* columns, not the table's.
+    CREATE VIEW fx_viewcols.v_nested AS SELECT email FROM fx_viewcols.v_narrow;
   `);
 });
 
@@ -89,6 +100,27 @@ describe('introspectViews — write paths', () => {
       ['v_ruled_ins', 'INSERT', true]
     ]);
     expect(byName.v_ruled.rules[0].definition).toContain('CREATE RULE');
+  });
+});
+
+describe('introspectViews — column dependencies', () => {
+  it('reads which columns of a base relation a view body actually touches', async () => {
+    const views = await introspectViews(pg.client as never, { schemas: ['fx_viewcols'] });
+    const deps = (name: string, table: string): string[] | undefined =>
+      views
+        .find((v) => v.name === name)
+        ?.columnDeps?.find((d) => d.schema === 'fx_viewcols' && d.table === table)?.columns;
+
+    expect(deps('v_narrow', 'people')).toEqual(['email', 'id']);
+    // `*` is expanded at CREATE time, so the catalog knows the real set.
+    expect(deps('v_star', 'people')).toEqual(['email', 'id', 'note', 'ssn']);
+    // Read is read: a qual column escapes as surely as a projected one.
+    expect(deps('v_filtered', 'people')).toEqual(['id', 'ssn']);
+
+    // Per hop: the outer view depends on the inner view, and the inner view
+    // is what depends on the table.
+    expect(deps('v_nested', 'people')).toBeUndefined();
+    expect(deps('v_nested', 'v_narrow')).toEqual(['email']);
   });
 });
 

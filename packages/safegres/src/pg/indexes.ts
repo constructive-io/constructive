@@ -240,6 +240,15 @@ export interface ViewSnapshot {
   /** `pg_get_viewdef()` — the body, as SQL text. */
   definition: string;
   /**
+   * The columns of each relation the view body actually reads, from the
+   * `pg_depend` rows on the view's `_RETURN` rule. The catalog answers this
+   * exactly — `SELECT *` is expanded at CREATE time, expressions and joins
+   * are accounted for, and a nested view depends on the *inner view's*
+   * columns, so the list is per hop. Absent when the caller built the
+   * snapshot without it.
+   */
+  columnDeps?: Array<{ schema: string; table: string; columns: string[] }>;
+  /**
    * The write commands Postgres accepts on the view, from
    * `pg_relation_is_updatable`. A simple view is *auto-updatable*: the write
    * is rewritten onto its single base relation, and on a definer view that
@@ -309,6 +318,7 @@ export async function introspectViews(
     owner_bypasses_rls: boolean;
     grants: Array<{ role: string; privilege: string; grantable: boolean; bypassRls: boolean }>;
     definition: string;
+    column_deps: Array<{ schema: string; table: string; columns: string[] }>;
     updatable_bits: number;
     instead_of_triggers: boolean;
     rules: Array<{ name: string; event: string; instead: boolean; definition: string }>;
@@ -373,6 +383,26 @@ export async function introspectViews(
        LEFT JOIN pg_roles rol ON rol.oid = a.grantee
        WHERE v.relacl IS NOT NULL
      ),
+     -- Which columns of which relation the view body reads. The rewriter
+     -- records one pg_depend row per referenced column, so this is the
+     -- catalog's own answer to "what escapes through this view" — no parsing,
+     -- no star expansion, no alias resolution.
+     column_deps AS (
+       SELECT DISTINCT
+         r.ev_class    AS view_oid,
+         dn.nspname    AS dep_schema,
+         dc.relname    AS dep_table,
+         a.attname     AS dep_column
+       FROM pg_depend d
+       JOIN pg_rewrite r ON r.oid = d.objid AND d.classid = 'pg_rewrite'::regclass
+       JOIN views v ON v.oid = r.ev_class
+       JOIN pg_class dc ON dc.oid = d.refobjid
+       JOIN pg_namespace dn ON dn.oid = dc.relnamespace
+       JOIN pg_attribute a ON a.attrelid = d.refobjid AND a.attnum = d.refobjsubid
+       WHERE d.refclassid = 'pg_class'::regclass
+         AND d.refobjsubid > 0
+         AND r.ev_class <> d.refobjid
+     ),
      rules AS (
        -- _RETURN is the SELECT rule that *is* the view; every other rule is
        -- behaviour pg_get_viewdef does not show.
@@ -404,6 +434,19 @@ export async function introspectViews(
          )) FROM grants g WHERE g.oid = v.oid),
          '[]'::jsonb
        )                                          AS grants,
+       COALESCE(
+         (SELECT jsonb_agg(t) FROM (
+           SELECT jsonb_build_object(
+             'schema', cd.dep_schema,
+             'table', cd.dep_table,
+             'columns', jsonb_agg(cd.dep_column ORDER BY cd.dep_column)
+           ) AS t
+           FROM column_deps cd
+           WHERE cd.view_oid = v.oid
+           GROUP BY cd.dep_schema, cd.dep_table
+         ) deps),
+         '[]'::jsonb
+       )                                          AS column_deps,
        v.updatable_bits,
        v.instead_of_triggers,
        COALESCE(
@@ -435,6 +478,7 @@ export async function introspectViews(
       bypassRls: g.bypassRls
     })),
     definition: r.definition,
+    columnDeps: r.column_deps,
     writable: [
       ...(r.updatable_bits & 8 ? ['INSERT' as const] : []),
       ...(r.updatable_bits & 4 ? ['UPDATE' as const] : []),

@@ -58,6 +58,17 @@ relation resolves to nothing rather than to a plausible candidate. And the remed
 revoke: the SELECT on the view is what the API serves, so L8 recommends `security_invoker = true`
 or a different owner, and says so explicitly.
 
+What escapes through a view is a *projection*, not a relation, and the catalog says exactly which
+one: the rewriter records a `pg_depend` row per column the view body reads, so `SELECT *` arrives
+already expanded, a column used only in a `WHERE` counts as read, and a nested view depends on the
+inner view's columns rather than the table's. L8 carries that set into the finding — the message and
+`context.columns` name the columns, not just the relation — and uses it for one refusal: when every
+column that escapes is one the role could already read through its own column grants (L13's closure)
+*and* the base relation has no RLS, the view launders nothing and L8 stays silent. With RLS on, the
+projection is beside the point: the owner reads rows the caller's policies hide, so the finding
+stands. An unknown column set is unknown, never narrow — a snapshot without dependency rows reports
+as before.
+
 L9 and L10 are the write half of the same question, and neither is answerable from the view body
 alone. **L9** is auto-update: a simple view over one relation is updatable, so Postgres rewrites an
 INSERT/UPDATE/DELETE on the view onto that relation, and on a definer view the rewritten command is
