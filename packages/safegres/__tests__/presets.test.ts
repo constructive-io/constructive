@@ -56,6 +56,11 @@ describe('built-in presets', () => {
     for (const [name, config] of Object.entries(PRESETS)) {
       if (name === 'safegres:minimal') continue;
       for (const [rule, setting] of Object.entries(settings(config))) {
+        // The `C*` convention linter is Constructive house style, not a
+        // universal fact, so the big-tent presets carry it off and only
+        // `constructive` turns it on — a deliberate opt-in, not a hidden
+        // finding.
+        if (rule.startsWith('C')) continue;
         const severity = Array.isArray(setting) ? setting[0] : setting;
         expect(`${name}/${rule}=${severity as string}`).not.toContain('=off');
       }
