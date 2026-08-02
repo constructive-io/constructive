@@ -29,7 +29,16 @@ export interface PlaneInput {
   kind?: PlaneKind;
   primary?: boolean;
   schemas?: string[];
+  /** Every role that reaches this plane, anonymous ones included. */
   roles?: string[];
+  /**
+   * The subset of `roles` an *unauthenticated* caller arrives as. Every stack
+   * knows which one this is — Constructive's `apis.anon_role`, PostgREST's
+   * `pgrst.db_anon_role`, Supabase's `anon`, graphile's visitor — and the
+   * distinction is the difference between "a signed-in user can write this"
+   * (usually the point) and "anyone on the internet can" (usually the bug).
+   */
+  anonRoles?: string[];
 }
 
 export interface ExposureAdapter {
@@ -94,12 +103,19 @@ export const constructiveAdapter: ExposureAdapter = {
       anon_role: string | null;
     }>(sources.join(' UNION ALL '));
 
-    const byApi = new Map<string, { schemas: Set<string>; roles: Set<string> }>();
-    const all = { schemas: new Set<string>(), roles: new Set<string>() };
+    type Entry = { schemas: Set<string>; roles: Set<string>; anonRoles: Set<string> };
+    const entryOf = (): Entry => ({
+      schemas: new Set<string>(),
+      roles: new Set<string>(),
+      anonRoles: new Set<string>()
+    });
+
+    const byApi = new Map<string, Entry>();
+    const all = entryOf();
     for (const r of rows) {
       if (!r.schema_name) continue;
       const key = r.api ?? 'api';
-      const entry = byApi.get(key) ?? { schemas: new Set<string>(), roles: new Set<string>() };
+      const entry = byApi.get(key) ?? entryOf();
       entry.schemas.add(r.schema_name);
       all.schemas.add(r.schema_name);
       for (const role of [r.role_name, r.anon_role]) {
@@ -107,6 +123,12 @@ export const constructiveAdapter: ExposureAdapter = {
           entry.roles.add(role);
           all.roles.add(role);
         }
+      }
+      // `role_name` is the signed-in role (`authenticated`); only `anon_role`
+      // is reachable without credentials.
+      if (r.anon_role) {
+        entry.anonRoles.add(r.anon_role);
+        all.anonRoles.add(r.anon_role);
       }
       byApi.set(key, entry);
     }
@@ -118,7 +140,8 @@ export const constructiveAdapter: ExposureAdapter = {
         kind: 'api',
         primary: true,
         schemas: sorted(all.schemas),
-        roles: sorted(all.roles)
+        roles: sorted(all.roles),
+        anonRoles: sorted(all.anonRoles)
       }
     ];
     // One plane per API, but only where there is more than one to tell apart:
@@ -129,7 +152,8 @@ export const constructiveAdapter: ExposureAdapter = {
           name: `api:${api}`,
           kind: 'api',
           schemas: sorted(entry.schemas),
-          roles: sorted(entry.roles)
+          roles: sorted(entry.roles),
+          anonRoles: sorted(entry.anonRoles)
         });
       }
     }
@@ -177,7 +201,9 @@ export const postgrestAdapter: ExposureAdapter = {
         kind: 'api',
         primary: true,
         schemas,
-        roles: anon ? [anon] : []
+        roles: anon ? [anon] : [],
+        // db_anon_role is by definition the unauthenticated one.
+        anonRoles: anon ? [anon] : []
       },
       ...authenticators.map((role): PlaneInput => ({
         name: `direct:${role}`,
@@ -232,7 +258,9 @@ export const supabaseAdapter: ExposureAdapter = {
         kind: 'api',
         primary: true,
         schemas,
-        roles: ['anon', 'authenticated']
+        roles: ['anon', 'authenticated'],
+        // `authenticated` still requires a sign-up; `anon` requires nothing.
+        anonRoles: ['anon']
       },
       // service_role bypasses RLS by design; planes.ts reports it as skipped
       // rather than inventing an ordinary grade for it.
@@ -324,7 +352,10 @@ export const graphileAdapter: ExposureAdapter = {
         // app_hidden is reachable through app_public's views and functions —
         // served indirectly, so it belongs to the surface.
         schemas: ['app_public', ...(present.has('app_hidden') ? ['app_hidden'] : [])],
-        roles: visitors
+        roles: visitors,
+        // PostGraphile runs *every* request as the visitor role, signed in or
+        // not — the caller is a JWT claim — so it is anonymous-reachable.
+        anonRoles: visitors
       }
     ];
     if (present.has('app_private')) {

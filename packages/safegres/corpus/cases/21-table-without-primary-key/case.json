@@ -1,0 +1,24 @@
+{
+  "title": "Table with no primary key",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_no_pk"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "X6",
+      "relation": "c_no_pk.click_events"
+    }
+  ],
+  "fix": "Add a primary key, or set an explicit REPLICA IDENTITY.",
+  "id": "21-table-without-primary-key"
+}

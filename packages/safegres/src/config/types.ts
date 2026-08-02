@@ -55,6 +55,12 @@ export interface ExposureConfig {
   schemas?: string[];
   /** Roles reachable from the API edge (static resolver). */
   roles?: string[];
+  /**
+   * The subset of `roles` an unauthenticated caller arrives as. Adapters
+   * resolve this themselves (`apis.anon_role`, `pgrst.db_anon_role`, ...);
+   * set it only for a surface you are declaring statically.
+   */
+  anonRoles?: string[];
   /** Name of the primary plane. Default `api`. */
   name?: string;
   /**
@@ -88,6 +94,8 @@ export interface PlaneConfig {
   primary?: boolean;
   schemas?: string[];
   roles?: string[];
+  /** The subset of `roles` reachable without authenticating. */
+  anonRoles?: string[];
 }
 
 /**
@@ -313,6 +321,12 @@ export interface GithubReportConfig {
   comment?: GithubCommentConfig;
   /** Which findings become workflow annotations. Default `gate-failures`. */
   annotations?: 'all' | 'gate-failures' | 'none';
+  /**
+   * How much of the report goes in the job summary. Default `normal`. Set
+   * `summary` on a database with thousands of findings: GitHub truncates a job
+   * summary at 1 MB, and a truncated report is worse than a short one.
+   */
+  detail?: 'summary' | 'normal' | 'verbose';
   /**
    * Render scores as colored shields.io badges. Default `true`; `false` falls
    * back to 🟢/🟡/🔴 text, which needs no network fetch.

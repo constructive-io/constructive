@@ -1,0 +1,24 @@
+{
+  "title": "Search column with no index the search can use",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_search_no_index"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "X7",
+      "relation": "c_search_no_index.articles"
+    }
+  ],
+  "fix": "CREATE INDEX ON c_search_no_index.articles USING gin (search_doc).",
+  "id": "23-tsvector-without-index"
+}

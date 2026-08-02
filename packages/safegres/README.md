@@ -344,6 +344,64 @@ gate it on a grade you can hold today and raise it as the score climbs.
 The same mechanism exists for call-graph trust boundaries (`--write-baseline`, `--baseline`,
 `--fail-on-new-boundaries`).
 
+## Sealed runs
+
+Every knob above is deliberate when a team declares its intent in CI, and is the cheapest possible
+cheat when a *score* is the thing being evaluated — of an agent's migration, of a template, of a
+submission. Turning off the rule and re-baselining the debt both raise the number without touching
+the database.
+
+So every report carries the ruler it was measured with:
+
+```jsonc
+"provenance": {
+  "version": "1.17.0",
+  "fingerprint": "sha256:8f14e45fceea167a…",   // over the *resolved* rules, overrides,
+  "sealed": true,                              // scoring weights, exposure and ignores
+  "preset": "strict"
+}
+```
+
+`--sealed` grades under a built-in preset alone: no config-file discovery, and `--config`,
+`--rule`, `--exposure-schemas` and every baseline flag are *refused* rather than ignored — a run
+that silently dropped a flag would report a number for rules nobody chose. A harness pins the
+answer it expects:
+
+```bash
+safegres audit --sealed --preset strict --verify-fingerprint sha256:8f14e45fceea167a… --format json
+```
+
+The fingerprint covers the resolved rule set rather than the config text, so it is invariant to how
+a posture was spelled (preset vs. explicit rules, key order) and sensitive to anything that changes
+it — including the safegres version, because a rule's meaning can change without its configuration
+changing. Reports whose fingerprints differ are not comparable, and `--verify-fingerprint` exits
+non-zero rather than let one be read as if it were.
+
+None of this constrains ordinary use: an unsealed run still gets a fingerprint, and `sealed: false`
+is simply the honest statement that local configuration participated.
+
+## The evaluation corpus
+
+A sealed score says the ruler did not move. It does not say the ruler is right. That is what the
+corpus in [`corpus/`](corpus/README.md) is for: ~20 small schemas, each with one deliberate flaw
+and a written-down answer — the findings a correct audit must produce, the false positives it must
+not, and the one-sentence fix.
+
+```ts
+import { audit, gradeCase, loadConfig, loadCorpus } from 'safegres';
+
+const { config } = loadConfig({ sealed: true, preset: 'recommended' });
+for (const c of loadCorpus()) {
+  await client.query(c.sql);
+  const { missed, falsePositives } = gradeCase(await audit(client, { config, ...c }), c);
+}
+```
+
+Cases are data — `schema.sql` plus a `case.json` answer key — so a harness that never runs safegres
+can still use them. Three uses: safegres's own regression suite, worked examples short enough to
+read, and an agent evaluation — hand the agent a case, ask for a fix, and require the expected
+findings to be *gone* with the dimension back at 100 rather than merely a better number.
+
 ## Configuration
 
 Configured like a linter. Discovered by walking up from the current directory:
@@ -408,12 +466,21 @@ Untrusted roles are usually *resolved*, not named. `pgrst.db_anon_role` and grap
 guessing a name:
 
 ```jsonc
-{ "rules": { "R1": ["critical", { "rolesFrom": "exposure" }] } }
+{ "rules": { "R1": ["critical", { "rolesFrom": "anon" }] } }
 ```
 
-`rolesFrom: "exposure"` hands R1/R2/L5 whatever roles the adapter resolved, and unions with any
-explicit `roles`. Rules that ask for neither stay inert — resolved roles never leak into a rule
-that didn't opt in.
+An adapter resolves two role sets, because "at the API edge" and "reachable without credentials"
+are different questions:
+
+| `rolesFrom` | Roles | Use when |
+| --- | --- | --- |
+| `anon` | Only what an unauthenticated caller arrives as — `apis.anon_role`, `pgrst.db_anon_role`, Supabase's `anon`, graphile's visitor | Almost always. A signed-in role holding a write grant is the product; the anon role holding one is the bug. |
+| `exposure` | Every role at the edge, signed-in ones included | A surface where no role should be writing directly. |
+
+Both union with any explicit `roles`, so a preset can name a platform default *and* pick up a
+custom one. Rules that ask for neither stay inert — resolved roles never leak into a rule that
+didn't opt in. `report.exposure.anonRoles` carries the anonymous subset, and the pretty renderer
+marks it inline (`api roles: authenticated, anonymous (anon)`).
 
 | Posture | Behavior |
 | --- | --- |

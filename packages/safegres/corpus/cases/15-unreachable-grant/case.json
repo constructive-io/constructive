@@ -1,0 +1,24 @@
+{
+  "title": "Table grant without USAGE on the schema",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_unreachable_grant"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L3",
+      "relation": "c_unreachable_grant.attachments"
+    }
+  ],
+  "fix": "GRANT USAGE ON SCHEMA c_unreachable_grant TO corpus_anon, or drop the table grant.",
+  "id": "15-unreachable-grant"
+}

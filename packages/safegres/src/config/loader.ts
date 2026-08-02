@@ -31,10 +31,18 @@ export interface LoadConfigParams {
   preset?: string;
   /** Highest-precedence partial config (parsed CLI flags). */
   overrides?: Partial<SafegresConfig>;
+  /**
+   * Grade under a built-in preset alone: skip config-file discovery entirely,
+   * so nothing in the working tree can move the score. For an evaluation
+   * harness, where the configuration is part of what is being tested.
+   */
+  sealed?: boolean;
 }
 
 /** Load and merge the effective safegres config. */
 export function loadConfig(params: LoadConfigParams = {}): LoadResult<SafegresConfig> {
+  if (params.sealed) return loadSealedConfig(params.preset);
+
   const loader = safegresConfigLoader();
   const overrides: Partial<SafegresConfig> = { ...(params.overrides ?? {}) };
   if (params.preset) {
@@ -56,6 +64,19 @@ export function loadConfig(params: LoadConfigParams = {}): LoadResult<SafegresCo
     return { ...result, config: mergePreset(presetConfig, result.config) };
   }
   return result;
+}
+
+/**
+ * The sealed config: one named preset, expanded, and nothing else. No
+ * discovery, no overrides, no `extends` to a local file — so the only thing
+ * that can change the score is the database.
+ */
+function loadSealedConfig(preset = 'recommended'): LoadResult<SafegresConfig> {
+  const name = preset.includes(':') ? preset : `safegres:${preset}`;
+  if (!(name in PRESETS)) {
+    throw new Error(`Unknown preset "${preset}". Available: ${Object.keys(PRESETS).join(', ')}`);
+  }
+  return { config: expandPreset(PRESETS[name]), layers: [], isEmpty: true };
 }
 
 function stripExtends(config: Partial<SafegresConfig>): Partial<SafegresConfig> {

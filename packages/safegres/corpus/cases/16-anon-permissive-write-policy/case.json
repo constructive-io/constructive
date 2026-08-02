@@ -1,0 +1,34 @@
+{
+  "title": "Open write policy applying to the anonymous role",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_anon_permissive_write"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A7",
+      "relation": "c_anon_permissive_write.signups"
+    },
+    {
+      "code": "R1",
+      "relation": "c_anon_permissive_write.signups"
+    },
+    {
+      "code": "R2",
+      "relation": "c_anon_permissive_write.signups",
+      "note": "the policy, not just the grant, lets the anonymous role through"
+    }
+  ],
+  "worstSeverity": "critical",
+  "fix": "Constrain the WITH CHECK (approved = false), or take signups through a SECURITY DEFINER function.",
+  "id": "16-anon-permissive-write-policy"
+}

@@ -1,0 +1,30 @@
+{
+  "title": "Trivially-permissive write policy",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_permissive_write"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A7",
+      "relation": "c_permissive_write.documents",
+      "note": "USING (true) on a write policy: any signed-in tenant can rewrite another tenant's rows"
+    }
+  ],
+  "forbid": [
+    "R1",
+    "R2"
+  ],
+  "worstSeverity": "critical",
+  "fix": "Scope the write policy to the caller's tenant, or make it RESTRICTIVE.",
+  "id": "04-permissive-write-policy"
+}

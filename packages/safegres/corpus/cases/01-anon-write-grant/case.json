@@ -1,0 +1,26 @@
+{
+  "title": "The anonymous role holds a write grant",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_anon_write_grant"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "R1",
+      "relation": "c_anon_write_grant.posts",
+      "note": "an unauthenticated caller can INSERT; RLS narrows which rows, not whether it may write at all"
+    }
+  ],
+  "worstSeverity": "critical",
+  "fix": "REVOKE INSERT ON c_anon_write_grant.posts FROM corpus_anon \u2014 writes belong to the signed-in role.",
+  "id": "01-anon-write-grant"
+}

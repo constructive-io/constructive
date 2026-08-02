@@ -17,6 +17,10 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'fx_authenticator') THEN
     CREATE ROLE fx_authenticator NOLOGIN;
   END IF;
+  -- A signed-in API role: at the edge, but never reached anonymously.
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'fx_signed_in') THEN
+    CREATE ROLE fx_signed_in NOLOGIN;
+  END IF;
 END
 $$;
 

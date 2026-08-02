@@ -93,6 +93,23 @@ describe('renderGithubSummary', () => {
     });
     expect(out.split('\n')[0]).toContain('badge/direct%3Aapp-');
   });
+
+  it('drops the finding tables at detail: summary, keeping the ratchet verdict', () => {
+    // A job summary is capped at 1 MB; a database with thousands of baselined
+    // findings needs the scores and the delta, not every row.
+    const report = makeReport();
+    report.perf = {
+      score: computeScore([], undefined, { exposedTables: 10, exposureKnown: true }),
+      findings: [],
+      diff: { added: [finding({ code: 'X1', dimension: 'perf' })], accepted: [], removed: [] }
+    } as never;
+
+    const full = renderGithubSummary(report);
+    const brief = renderGithubSummary(report, { config: { detail: 'summary' } });
+    expect(full).toContain('### Security findings');
+    expect(brief).not.toContain('### Security findings');
+    expect(brief).toContain('Perf baseline: **1 new**, 0 accepted, 0 resolved.');
+  });
 });
 
 describe('renderGithubComment', () => {

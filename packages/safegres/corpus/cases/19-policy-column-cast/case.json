@@ -1,0 +1,24 @@
+{
+  "title": "Policy casts its own column, defeating the index",
+  "dimension": "perf",
+  "exposure": {
+    "schemas": [
+      "c_policy_cast"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "X3",
+      "relation": "c_policy_cast.accounts"
+    }
+  ],
+  "fix": "Cast the parameter instead: tenant_id = current_setting(...)::uuid.",
+  "id": "19-policy-column-cast"
+}
