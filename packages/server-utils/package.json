@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/server-utils",
-  "version": "3.24.3",
+  "version": "3.25.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM server utils",
   "main": "index.js",

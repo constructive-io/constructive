@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/constructive-io/constructive/compare/graphile-realtime-subscriptions@1.9.3...graphile-realtime-subscriptions@1.10.0) (2026-08-02)
+
+**Note:** Version bump only for package graphile-realtime-subscriptions
+
 ## [1.9.3](https://github.com/constructive-io/constructive/compare/graphile-realtime-subscriptions@1.9.2...graphile-realtime-subscriptions@1.9.3) (2026-08-01)
 
 **Note:** Version bump only for package graphile-realtime-subscriptions

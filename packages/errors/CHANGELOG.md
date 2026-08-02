@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.8.2...@constructive-io/errors@0.9.0) (2026-08-02)
+
+**Note:** Version bump only for package @constructive-io/errors
+
 ## [0.8.2](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.8.1...@constructive-io/errors@0.8.2) (2026-07-31)
 
 **Note:** Version bump only for package @constructive-io/errors

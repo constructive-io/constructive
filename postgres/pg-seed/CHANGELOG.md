@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.27.0](https://github.com/constructive-io/constructive/compare/pg-seed@0.26.2...pg-seed@0.27.0) (2026-08-02)
+
+**Note:** Version bump only for package pg-seed
+
 ## [0.26.2](https://github.com/constructive-io/constructive/compare/pg-seed@0.26.1...pg-seed@0.26.2) (2026-07-31)
 
 **Note:** Version bump only for package pg-seed
