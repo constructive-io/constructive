@@ -28,7 +28,11 @@ export type {
 export { buildCallGraph } from './callgraph/graph';
 export { checkUntrustedColumnGrants } from './checks/column-grants';
 export type { SuppressedView, ViewBodyAnalysis } from './checks/definer-view';
-export { analyzeViewBodies, checkDefinerViewBypass } from './checks/definer-view';
+export {
+  analyzeViewBodies,
+  checkDefinerViewBypass,
+  checkUnauditedViewReach
+} from './checks/definer-view';
 export {
   checkMissingPrimaryKey,
   checkRedundantIndexes,

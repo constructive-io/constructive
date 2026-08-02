@@ -1,0 +1,30 @@
+{
+  "title": "A definer view exposing only the columns the caller already holds is not a bypass",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_view_columns"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L13",
+      "relation": "c_view_columns.people",
+      "role": "corpus_anon",
+      "note": "the column grant itself is real reach, and L13 reports it — that is the baseline the definer view adds nothing to"
+    }
+  ],
+  "forbid": [
+    "L8"
+  ],
+  "worstSeverity": "info",
+  "fix": "Nothing. corpus_anon reads (id, handle) by column grant and the view returns exactly those columns of exactly those rows, so the owner's read launders nothing. Reporting L8 here would recommend rewriting a view that gives away nothing the ACL did not already give away.",
+  "id": "39-definer-view-column-subset"
+}

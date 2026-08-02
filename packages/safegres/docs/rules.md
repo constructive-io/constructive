@@ -58,6 +58,17 @@ relation resolves to nothing rather than to a plausible candidate. And the remed
 revoke: the SELECT on the view is what the API serves, so L8 recommends `security_invoker = true`
 or a different owner, and says so explicitly.
 
+What escapes through a view is a *projection*, not a relation, and the catalog says exactly which
+one: the rewriter records a `pg_depend` row per column the view body reads, so `SELECT *` arrives
+already expanded, a column used only in a `WHERE` counts as read, and a nested view depends on the
+inner view's columns rather than the table's. L8 carries that set into the finding — the message and
+`context.columns` name the columns, not just the relation — and uses it for one refusal: when every
+column that escapes is one the role could already read through its own column grants (L13's closure)
+*and* the base relation has no RLS, the view launders nothing and L8 stays silent. With RLS on, the
+projection is beside the point: the owner reads rows the caller's policies hide, so the finding
+stands. An unknown column set is unknown, never narrow — a snapshot without dependency rows reports
+as before.
+
 L9 and L10 are the write half of the same question, and neither is answerable from the view body
 alone. **L9** is auto-update: a simple view over one relation is updatable, so Postgres rewrites an
 INSERT/UPDATE/DELETE on the view onto that relation, and on a definer view the rewritten command is
@@ -107,6 +118,26 @@ policy dead when the grant it mediates is column-scoped. What L13 does *not* do 
 weighted rules: column-level SELECT for an anonymous role on an RLS-off table is the same exposure
 A2 grades `high`, and promoting it there is a scoring change to make once the rule has been
 validated against real schemas.
+
+**L14** is the coverage half of L8, and the only rule here that reports an *absence of knowledge*.
+Excluding a schema — by `excludeSchemas`, by naming only some in `schemas`, or because it is a
+system catalog — is a statement about what gets *graded*, not about what is *reachable*. A definer
+view in an audited schema whose body reads `information_schema`, an extension's tables, or a private
+schema left out of the surface produced nothing at all: the base relation was not in the snapshot,
+so every rule that grades a base relation dropped the edge and the view scanned clean. The resolver
+now separates the two kinds of miss — a qualified reference into a schema the audit *did* read is
+still an unresolved name (a CTE, an alias) and is still dropped, while a qualified reference into a
+schema it never read is `external`: the reach is proven, its consequences are not.
+
+The finding is `info`/`neutral` and stays there however the reach is graded later, because an
+unknown is not a leak and scoring one would let an excluded schema move the number. It is exposure-
+stamped by the *view*, not by the out-of-scope relation, or every instance would file itself as an
+internal advisory and disappear from the report that matters. The remedy is to bring the schema into
+scope or to satisfy yourself the projection is safe — never a revoke. Note the boundary the negative
+corpus case pins: an out-of-scope *reference* is not a finding, only an out-of-scope *reach* is. An
+invoker view over the same table confers nothing, so it reports nothing, which is what keeps every
+view that touches a system catalog from becoming noise. L9–L12 take the conservative side of the
+same distinction: an external relation has no owner, ACL or RLS to reason about, so it suppresses.
 
 Restrictive-only policies never count as coverage. `BYPASSRLS` and superuser roles are exempt from
 policy checks — they are not subject to RLS, so a "missing policy" finding for them would be

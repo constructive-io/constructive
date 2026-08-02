@@ -1,0 +1,27 @@
+{
+  "title": "One column past the caller's grant, and the same shape is a definer-view bypass",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_view_columns_wide"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L8",
+      "relation": "c_view_columns_wide.people",
+      "role": "corpus_anon",
+      "note": "`email` is in no grant corpus_anon holds; the finding names the escaping columns, so the report says which ones"
+    }
+  ],
+  "worstSeverity": "info",
+  "fix": "Narrow c_view_columns_wide.contacts to the columns the caller is entitled to, recreate it `WITH (security_invoker = true)`, or give it an owner whose reach matches what it is meant to expose. Do not revoke the column grants — they are what the narrow projection legitimately serves.",
+  "id": "40-definer-view-column-overreach"
+}
