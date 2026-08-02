@@ -159,6 +159,8 @@ Audit options:
                            (critical|high|medium|low|info; default: none)
   --fail-on-score <n>      Exit non-zero if the score is below n (0-100)
   --fail-on-grade <g>      Exit non-zero if the grade is below g (A+|A|B|C|D)
+  --report-only            Evaluate and report every gate, then exit 0 anyway —
+                           the way to run a gated config as an advisory job
   --skip-ast               Skip AST-level anti-pattern checks (faster)
   --no-color               Disable ANSI colors in pretty output
   --help, -h               Show this help message
@@ -535,7 +537,8 @@ export default async (
     else log.warn(`--github-comment: not posted — ${result.reason}`);
   }
 
-  if (failed) process.exit(1);
+  if (failed && argv['report-only'] !== true) process.exit(1);
+  if (failed) log.warn('--report-only: gates failed, exiting 0');
 };
 
 /** Write an output file, creating its directory: CI should not have to mkdir. */

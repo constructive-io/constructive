@@ -663,7 +663,7 @@ safegres print-config   # the resolved effective config (--explain for per-key p
 | Performance | `--perf`, `--stats`, `--explain`, `--perf-baseline <f>`, `--write-perf-baseline <f>`, `--fail-on-new-perf` |
 | Reporting | `--format pretty\|json\|json-pretty\|markdown\|sarif`, `--out <dir>`, `--sarif-sources <dir>`, `--summary`/`-q`, `--verbose`, `--compare <f>`, `--compare-ref <label>`, `--write-snapshot <f>` |
 | Call graph | `--call-graph`, `--baseline <f>`, `--write-baseline <f>`, `--fail-on-new-boundaries` |
-| Gating | `--fail-on <severity>`, `--fail-on-score <n>`, `--fail-on-grade <g>`, `--fail-on-perf-score`, `--fail-on-perf-grade` |
+| Gating | `--fail-on <severity>`, `--fail-on-score <n>`, `--fail-on-grade <g>`, `--fail-on-perf-score`, `--fail-on-perf-grade`, `--report-only` |
 | Misc | `--skip-ast`, `--no-color`, `--help`, `--version` |
 
 The paths among those — `--pgpm`, the two baselines, and every `--write-*` — have config-file
