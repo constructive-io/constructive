@@ -221,15 +221,18 @@ export async function audit(
     indexSnapshot.map((t) => [`${t.schema}.${t.name}`, t])
   );
 
-  // Views are read for two independent reasons: their bodies refute "nothing
-  // queries this column" for the perf paths, and their owners carry the L8
-  // reach edge. One introspection serves both.
+  // Views are read for three independent reasons: their bodies refute "nothing
+  // queries this column" for the perf paths, their owners carry the L8 reach
+  // edge, and their ACLs keep L4 from calling schema USAGE dead when a view is
+  // the only thing in the schema the role can reach. One introspection serves
+  // all three.
   const definerViewRoles = withExposedRoles(
     resolved.rules.get('L8')?.options as LatticeRoleOptions,
     exposure
   )?.roles ?? [];
   const needsViews =
     (perfEnabled && config.perf?.paths?.infer !== false)
+    || resolved.rules.get('L4')?.enabled !== false
     || (!skipAst && definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false);
   const viewSnapshot = needsViews
     ? await introspectViews(exec, {
@@ -324,7 +327,7 @@ export async function audit(
     }
   }
 
-  findings.push(...checkDeadSchemaUsage(schemaAcls, snapshot, roleGraph));
+  findings.push(...checkDeadSchemaUsage(schemaAcls, snapshot, roleGraph, viewSnapshot));
 
   // L8 is per-view, not per-table: a view body names its own base relations.
   if (!skipAst && definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false) {

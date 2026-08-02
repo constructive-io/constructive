@@ -23,7 +23,7 @@
  */
 
 import type { RoleAttributes, SchemaAclInfo } from '../pg/acl';
-import type { PgPrivilege, PolicyInfo, TableSnapshot } from '../pg/introspect';
+import type { GrantInfo, PgPrivilege, PolicyInfo, TableSnapshot } from '../pg/introspect';
 import type { Finding } from '../types';
 import { CLAUSE_REQUIRED, POLICY_CMDS } from './coverage';
 
@@ -273,15 +273,26 @@ export function checkUnreachableGrants(
  * relation (directly, via PUBLIC, or by inheritance) and can EXECUTE no
  * function in the schema. Advisory only: sequences, types and future objects
  * are not modeled, so this is a review candidate, not a proof.
+ *
+ * `views` matters more than its optionality suggests: a role whose only
+ * reachable object in the schema is a view holds USAGE that is load-bearing,
+ * and L8 exists precisely because that view can be the role's entire read
+ * path. Called without them, L4 sees a table-only schema and reports a grant
+ * the API depends on as revokable — so pass them wherever they are available.
  */
 export function checkDeadSchemaUsage(
   schemaAcls: SchemaAclInfo[],
   tables: TableSnapshot[],
-  graph: RoleGraph
+  graph: RoleGraph,
+  views: Array<{ schema: string; grants: GrantInfo[] }> = []
 ): Finding[] {
   const tablesBySchema = new Map<string, TableSnapshot[]>();
   for (const t of tables) {
     tablesBySchema.set(t.schema, [...(tablesBySchema.get(t.schema) ?? []), t]);
+  }
+  const viewsBySchema = new Map<string, Array<{ grants: GrantInfo[] }>>();
+  for (const v of views) {
+    viewsBySchema.set(v.schema, [...(viewsBySchema.get(v.schema) ?? []), v]);
   }
 
   const out: Finding[] = [];
@@ -295,8 +306,8 @@ export function checkDeadSchemaUsage(
       if (!attrs || attrs.isSuper) continue;
       if (g.role === acl.owner) continue;
 
-      const reachesRelation = schemaTables.some(
-        (t) => effectiveGrants(t, g.role, graph).length > 0
+      const reachesRelation = [...schemaTables, ...(viewsBySchema.get(acl.schema) ?? [])].some(
+        (r) => effectiveGrants(r, g.role, graph).length > 0
       );
       if (reachesRelation) continue;
 

@@ -22,7 +22,8 @@
   ],
   "forbid": [
     "A2",
-    "R1"
+    "R1",
+    "L4"
   ],
   "worstSeverity": "info",
   "fix": "Recreate c_definer_view_bypass.order_totals WITH (security_invoker = true) so the caller's own grants and policies apply, or give it an owner whose reach matches what the view is meant to expose. Revoking corpus_anon's SELECT on the view is not the fix — that grant is what the API serves.",
