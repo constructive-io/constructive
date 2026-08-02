@@ -402,7 +402,9 @@ deploys it into an ephemeral one:
 
 `outputs.dir` writes `safegres.json`, `safegres.md` and `safegres.sarif` into one directory — name
 an individual file (`outputs.json`) only when the name matters. Directories are created as needed,
-and a flag still wins over the file for a one-off run (`safegres audit --out reports`).
+and a flag still wins over the file for a one-off run (`safegres audit --out reports`). Naming a
+connection wins too, so the same config audits a database you already have:
+`safegres audit --database staging`.
 
 Scores lead the markdown, then severity counts, then a table per dimension; internal advisories
 and accepted baseline debt fold into `<details>`. Pipe it to `gh pr comment --body-file -` to post

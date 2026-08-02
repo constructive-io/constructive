@@ -326,6 +326,8 @@ export interface SourceConfig {
    * Deploy the pgpm workspace or module at this path (relative to the config
    * file) into an ephemeral test database and audit that. Equivalent to
    * `--pgpm <dir>`; requires the optional peer dependency `pgsql-test`.
+   * A connection named on the command line (`--connection`, `--database`,
+   * `--host`, `--port`) wins: the same config then audits that database.
    */
   pgpm?: string;
 }

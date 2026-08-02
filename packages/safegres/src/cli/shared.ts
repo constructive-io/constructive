@@ -63,6 +63,11 @@ export function parseRuleFlags(value: unknown): RulesConfig | undefined {
   return Object.keys(rules).length > 0 ? rules : undefined;
 }
 
+/** Did the caller name a database on the command line, rather than in the environment? */
+function hasConnectionFlag(argv: ParsedArgs): boolean {
+  return ['connection', 'database', 'host', 'port'].some((flag) => typeof argv[flag] === 'string' || typeof argv[flag] === 'number');
+}
+
 /** Every file a run reads or writes, after flags and config have been merged. */
 export interface RunPaths {
   /** The pgpm workspace to deploy, when `usePgpm`. Undefined means "nearest". */
@@ -100,7 +105,10 @@ export function resolveRunPaths(
 
   return {
     pgpm: pick(argv.pgpm, config.source?.pgpm),
-    usePgpm: argv.pgpm !== undefined || config.source?.pgpm !== undefined,
+    // An explicit connection on the command line beats a configured source:
+    // pointing the same config at a database you already have is the whole
+    // reason to type one, and deploying a throwaway copy instead would ignore it.
+    usePgpm: argv.pgpm !== undefined || (config.source?.pgpm !== undefined && !hasConnectionFlag(argv)),
     perfBaseline: pick(argv['perf-baseline'], config.perf?.baseline),
     callGraphBaseline: pick(argv.baseline, config.callGraph?.baseline),
     outputs: {

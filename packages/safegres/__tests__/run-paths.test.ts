@@ -72,6 +72,15 @@ describe('resolveRunPaths', () => {
     expect(paths.outputs.sarif).toBe(path.join('tmp', 'safegres.sarif'));
   });
 
+  it('lets an explicit connection beat a configured pgpm source', () => {
+    const config: SafegresConfig = { source: { pgpm: 'application/app' } };
+
+    expect(resolveRunPaths(argv({ database: 'live' }), config, CONFIG_DIR).usePgpm).toBe(false);
+    expect(resolveRunPaths(argv({ connection: 'postgres://…' }), config, CONFIG_DIR).usePgpm).toBe(false);
+    // …but the environment doesn't: PGDATABASE is set on every CI runner.
+    expect(resolveRunPaths(argv(), config, CONFIG_DIR).usePgpm).toBe(true);
+  });
+
   it('treats a bare --pgpm as "the nearest workspace"', () => {
     const paths = resolveRunPaths(argv({ pgpm: true }), {}, CONFIG_DIR);
     expect(paths.usePgpm).toBe(true);
