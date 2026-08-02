@@ -20,10 +20,11 @@
 import type { ObjectIdentity as NamingIdentity } from '@pgpmjs/naming-spec';
 import { pathFor } from '@pgpmjs/naming-spec';
 import { revertFor, verifyFor } from '@pgsql/scripts';
-import type { Granularity, StatementFacts } from '@pgsql/transform';
+import type { StatementFacts } from '@pgsql/semantics';
+import { classifyStatements } from '@pgsql/semantics';
+import type { Granularity } from '@pgsql/transform';
 import {
   buildStatementGraph,
-  classifyStatements,
   identityOf,
   restructureSql
 } from '@pgsql/transform';

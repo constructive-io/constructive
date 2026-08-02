@@ -9,8 +9,8 @@
  * untouched statements). A program with no dirty statements emits its source
  * byte-identically, so content-addressed hashes are preserved.
  */
-import type { StatementFacts } from '@pgsql/transform';
-import { classifyStatements } from '@pgsql/transform';
+import type { StatementFacts } from '@pgsql/semantics';
+import { classifyStatements } from '@pgsql/semantics';
 import { Deparser, parseSql } from 'plpgsql-parser';
 
 /** A statement's location in the source script (byte offsets). */

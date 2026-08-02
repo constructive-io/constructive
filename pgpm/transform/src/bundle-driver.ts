@@ -8,7 +8,7 @@
  * stays a pure function factory over `transformSql` and `classifyStatements`.
  */
 
-import { classifyStatements } from '@pgsql/transform';
+import { classifyStatements } from '@pgsql/semantics';
 import {
   createExtensionResult,
   createRoleResult,

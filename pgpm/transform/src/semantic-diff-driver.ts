@@ -28,10 +28,11 @@
  */
 import { pathFor, PathStyle } from '@pgpmjs/naming-spec';
 import { existenceCheck, invertStatement, revertFor, verifyFor } from '@pgsql/scripts';
-import type { ObjectIdentity, StatementFacts } from '@pgsql/transform';
+import type { StatementFacts } from '@pgsql/semantics';
+import { classifyStatements } from '@pgsql/semantics';
+import type { ObjectIdentity } from '@pgsql/transform';
 import {
   buildStatementGraph,
-  classifyStatements,
   cleanTree,
   Granularity,
   identityOf

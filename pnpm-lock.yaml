@@ -2469,8 +2469,8 @@ importers:
         specifier: ^18.0.0
         version: 18.0.0
       '@pgsql/utils':
-        specifier: ^18.2.1
-        version: 18.2.1
+        specifier: ^18.2.2
+        version: 18.2.2
       csv-parser:
         specifier: ^3.2.1
         version: 3.2.1
@@ -2571,8 +2571,8 @@ importers:
         specifier: ^18.0.0
         version: 18.0.0
       '@pgsql/utils':
-        specifier: ^18.2.1
-        version: 18.2.1
+        specifier: ^18.2.2
+        version: 18.2.2
       pgsql-deparser:
         specifier: ^18.3.1
         version: 18.3.1
@@ -3162,11 +3162,14 @@ importers:
         specifier: workspace:^
         version: link:../naming-spec/dist
       '@pgsql/scripts':
-        specifier: ^18.3.1
-        version: 18.3.1
+        specifier: ^18.3.2
+        version: 18.3.2
+      '@pgsql/semantics':
+        specifier: ^18.1.0
+        version: 18.1.0
       '@pgsql/transform':
-        specifier: ^18.14.1
-        version: 18.14.1
+        specifier: ^18.15.0
+        version: 18.15.0
       plpgsql-parser:
         specifier: ^18.5.1
         version: 18.5.1
@@ -6519,16 +6522,22 @@ packages:
         integrity: sha512-iAbNljBqhOu1zwcCGrZlS+5asih64d5QZwle6fVOVK6KqPYP6byw59xa8+tSGH/wj+PWrA0GzMB1ak6OWzEcBA==,
       }
 
-  '@pgsql/scripts@18.3.1':
+  '@pgsql/scripts@18.3.2':
     resolution:
       {
-        integrity: sha512-Nk7GTySEc2cgHc8tGSjMq37W56l/YnHENRE6kZDcIFbRQ3Yc1/km4ytHZdGPvhwRWfNbdXMeslgZkW3zWsCsYw==,
+        integrity: sha512-qZMcAk4jDBixiPjYH0+sxiXGcrpm9YI33RedAQELYGRa1idI9vqVevQ89x8TKmR3Qgegw9mMjyMAt3jLFLzEQQ==,
       }
 
-  '@pgsql/transform@18.14.1':
+  '@pgsql/semantics@18.1.0':
     resolution:
       {
-        integrity: sha512-jqzJjKRLyoW/orD/78Qa+nXpZhxZ1vY9meDLEimbv75cuD4cyNOBABybrQD7FRewpdgbEUJ3affAlcuRCuTmDg==,
+        integrity: sha512-7QewtC6GgnSy8lLWeZUfKfurz7V3YdVWgKPkwlFOiSaDoinwVbmyfZxyK1qtTE8//wUW1gVoybc0ARNnBMyH8w==,
+      }
+
+  '@pgsql/transform@18.15.0':
+    resolution:
+      {
+        integrity: sha512-JSdPCUPuRWQ/gE1qyZtQHv2MGXf0Yz97d/4qoTuSemIHnXruKH4VPIBFElfbZqHAGTnBDu43s6Av+1SeMkgWGQ==,
       }
 
   '@pgsql/traverse@18.7.1':
@@ -6543,10 +6552,10 @@ packages:
         integrity: sha512-jtAY4JU7jdVYZ/Vv3zlZqVP+FRWZokyCLKPPCnAApiaJAElpyyiMC3HRiquBu29kSrVs+rkqZD50SUIb/zyEGw==,
       }
 
-  '@pgsql/utils@18.2.1':
+  '@pgsql/utils@18.2.2':
     resolution:
       {
-        integrity: sha512-iwCN06r7zTY0frrr5O9jgIbsfnmaXlGiwqk47B8GCCyeHtcJlYqVGPF9t8efBmhqgDaJieaeNsLyRLnnpLbkbg==,
+        integrity: sha512-nZkLQfrYBDTzqczP9y3+XKYODe7Cs/Kk0/qoaftz/ikb17Oa0HVd91wVnfYFbvWElzUNnauslR3V52VAhH20tg==,
       }
 
   '@pkgjs/parseargs@0.11.0':
@@ -17834,17 +17843,25 @@ snapshots:
 
   '@pgsql/quotes@18.2.0': {}
 
-  '@pgsql/scripts@18.3.1':
+  '@pgsql/scripts@18.3.2':
     dependencies:
       '@pgsql/quotes': 18.2.0
-      '@pgsql/transform': 18.14.1
+      '@pgsql/transform': 18.15.0
       plpgsql-parser: 18.5.1
     transitivePeerDependencies:
       - supports-color
 
-  '@pgsql/transform@18.14.1':
+  '@pgsql/semantics@18.1.0':
+    dependencies:
+      '@pgsql/traverse': 18.7.1
+      plpgsql-parser: 18.5.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@pgsql/transform@18.15.0':
     dependencies:
       '@pgsql/quotes': 18.2.0
+      '@pgsql/semantics': 18.1.0
       '@pgsql/traverse': 18.7.1
       plpgsql-parser: 18.5.1
     transitivePeerDependencies:
@@ -17860,7 +17877,7 @@ snapshots:
 
   '@pgsql/types@18.0.0': {}
 
-  '@pgsql/utils@18.2.1':
+  '@pgsql/utils@18.2.2':
     dependencies:
       '@pgsql/types': 18.0.0
       nested-obj: 0.2.2

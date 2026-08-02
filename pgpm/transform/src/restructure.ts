@@ -7,7 +7,8 @@
  */
 import { PgpmRow } from '@pgpmjs/ast';
 import { alterationPathFor, pathFor, PathStyle } from '@pgpmjs/naming-spec';
-import { Granularity, identityOf, StatementFacts } from '@pgsql/transform';
+import { StatementFacts } from '@pgsql/semantics';
+import { Granularity, identityOf } from '@pgsql/transform';
 import { loadModule } from 'plpgsql-parser';
 
 import { ChangeGranularity, restructureChanges } from './granularity-driver';

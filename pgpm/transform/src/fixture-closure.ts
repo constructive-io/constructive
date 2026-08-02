@@ -1,4 +1,4 @@
-import { classifyStatements, QualifiedName, StatementFacts } from '@pgsql/transform';
+import { classifyStatements, QualifiedName, StatementFacts } from '@pgsql/semantics';
 
 import {
   CategoryProfile,

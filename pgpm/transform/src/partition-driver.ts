@@ -1,7 +1,7 @@
 /**
  * Partition dial: project one deploy surface into a set of pgpm packages.
  *
- * The object graph (statements classified by `@pgsql/transform`, grouped
+ * The object graph (statements classified by `@pgsql/semantics`, grouped
  * into identity-keyed units) is the source of truth; which package a unit
  * lives in is a *derived projection* of a declarative partition config.
  * Units can be assigned by schema, by object kind, by explicit cherry-pick
@@ -21,14 +21,12 @@
  * pgpm.plan + deploy trees, feed a bundle, ...).
  */
 import { pathFor, PathStyle } from '@pgpmjs/naming-spec';
+import { classifyStatements, StatementFacts, StatementKind } from '@pgsql/semantics';
 import {
   buildStatementGraph,
-  classifyStatements,
   identityOf,
   ObjectIdentity,
-  ObjectIdentityKind,
-  StatementFacts,
-  StatementKind
+  ObjectIdentityKind
 } from '@pgsql/transform';
 
 /** One deployable unit: an object (by identity) and the statements that build it. */

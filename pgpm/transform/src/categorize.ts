@@ -1,4 +1,4 @@
-import { classifyStatements, StatementFacts } from '@pgsql/transform';
+import { classifyStatements, StatementFacts } from '@pgsql/semantics';
 
 /**
  * A category is a chunk-seam key a change is assigned to. Free-form string; the
