@@ -1,5 +1,5 @@
 /**
- * L9, L10 and L15: what a view does *beyond* its SELECT.
+ * L9, L10 and L18: what a view does *beyond* its SELECT.
  *
  * L8 models the read edge — a non-`security_invoker` view hands its readers
  * the owner's privileges on the relations its body names. Two write paths
@@ -21,7 +21,7 @@
  *     relations — `security_invoker` does **not** govern them. An invoker view
  *     with such a rule still writes `audit` as the view owner.
  *
- *   - **L15, an unchecked write.** `WITH CHECK OPTION` is not the default, so
+ *   - **L18, an unchecked write.** `WITH CHECK OPTION` is not the default, so
  *     a view whose `WHERE` decides which rows a role may *see* says nothing
  *     about which rows it may *write*: `INSERT INTO tenant_rows VALUES (...)`
  *     through a `WHERE tenant_id = current_tenant()` view stores a row for
@@ -58,7 +58,7 @@ export interface ViewWriteAnalysis {
   ruleDriven: ViewWriteInput[];
   /**
    * The subset of {@link autoUpdatable} whose body filters rows and which
-   * carries no `WITH CHECK OPTION` — L15 inputs.
+   * carries no `WITH CHECK OPTION` — L18 inputs.
    */
   unchecked: ViewWriteInput[];
   /** Views deliberately left out, with why. */
@@ -318,12 +318,12 @@ export function checkViewRuleBypass(
 }
 
 /**
- * L15: an untrusted role writes rows a filtering view will not show it.
+ * L18: an untrusted role writes rows a filtering view will not show it.
  *
  * Fires on the L9 population narrowed to filtering views with no `WITH CHECK
  * OPTION`, minus DELETE — which removes rows the view already showed rather
  * than producing new ones. It overlaps L9 by design and answers a different
- * question: L9 is *whether* the role can write the relation at all, L15 is
+ * question: L9 is *whether* the role can write the relation at all, L18 is
  * whether the view's own condition constrains what it writes.
  */
 export function checkUncheckedViewWrite(
@@ -332,7 +332,7 @@ export function checkUncheckedViewWrite(
   graph: RoleGraph,
   options: LatticeRoleOptions = {}
 ): Finding[] {
-  return writeFindings(views, tables, graph, options, 'L15', (ctx) => ({
+  return writeFindings(views, tables, graph, options, 'L18', (ctx) => ({
     message:
       `Untrusted role ${ctx.role} can ${ctx.privilege} rows into ${ctx.target} through view `
       + `${ctx.view} that the view's own row filter excludes — the view has no WITH CHECK OPTION, `
@@ -361,7 +361,7 @@ function writeFindings(
   tables: TableSnapshot[],
   graph: RoleGraph,
   options: LatticeRoleOptions,
-  code: 'L9' | 'L10' | 'L15',
+  code: 'L9' | 'L10' | 'L18',
   render: (ctx: WriteContext) => { message: string; hint: string }
 ): Finding[] {
   const untrusted = options.roles ?? [];

@@ -1,0 +1,30 @@
+{
+  "title": "An invoker view with the same unreadable body confers nothing, so there is no gap to report",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_invoker_unreadable"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "A2",
+      "relation": "c_invoker_unreadable.ledger",
+      "note": "the real finding here, and unrelated to the view: a grant on a table with no RLS"
+    }
+  ],
+  "forbid": [
+    "L15",
+    "L8"
+  ],
+  "worstSeverity": "high",
+  "fix": "Enable RLS on c_invoker_unreadable.ledger. The view needs no fix: `security_invoker` means the body runs with the caller's own privileges, so an unreadable body confers nothing and reporting a coverage gap on it would make every view calling a SQL-executing function into noise.",
+  "id": "42-invoker-view-unreadable-body"
+}

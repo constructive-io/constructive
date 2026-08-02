@@ -304,7 +304,7 @@ describe('checkDefinerViewWrite (L9)', () => {
   });
 });
 
-describe('checkUncheckedViewWrite (L15)', () => {
+describe('checkUncheckedViewWrite (L18)', () => {
   const FILTERED = "SELECT id, body FROM app.submissions WHERE tenant_id = current_setting('app.tenant')";
 
   async function check(views: ViewSnapshot[], tables: TableSnapshot[], roles: string[]) {
@@ -319,7 +319,7 @@ describe('checkUncheckedViewWrite (L15)', () => {
     });
     const findings = await check([writable], [table()], ['anon']);
     expect(findings.map((f) => f.privilege).sort()).toEqual(['INSERT', 'UPDATE']);
-    expect(findings[0]).toMatchObject({ code: 'L15', severity: 'info', table: 'submissions' });
+    expect(findings[0]).toMatchObject({ code: 'L18', severity: 'info', table: 'submissions' });
     expect(findings[0].message).toContain('no WITH CHECK OPTION');
   });
 

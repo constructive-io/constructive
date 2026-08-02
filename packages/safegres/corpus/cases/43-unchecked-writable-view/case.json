@@ -15,14 +15,14 @@
   },
   "expect": [
     {
-      "code": "L15",
+      "code": "L18",
       "relation": "c_unchecked_view_write.notes",
       "note": "the view filters on `tenant` and carries no WITH CHECK OPTION, so corpus_anon's INSERT/UPDATE through it stores rows for any tenant \u2014 rows the view will not then show it"
     },
     {
       "code": "L9",
       "relation": "c_unchecked_view_write.notes",
-      "note": "the same view is auto-updatable and not security_invoker, so the write reaches `notes` as c_unchecked_write_owner at all \u2014 L9 is *whether* the write lands, L15 is whether the view's own condition constrains it"
+      "note": "the same view is auto-updatable and not security_invoker, so the write reaches `notes` as c_unchecked_write_owner at all \u2014 L9 is *whether* the write lands, L18 is whether the view's own condition constrains it"
     },
     {
       "code": "A3",

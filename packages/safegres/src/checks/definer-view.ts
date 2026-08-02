@@ -78,19 +78,21 @@ export async function analyzeViewBodies(
   for (const view of queryable) {
     if (view.securityInvoker) continue;
 
-    const { bases, opaque } = resolveViewBases(view, index, bodies);
-    if (opaque) {
-      suppressed.push({ view: `${view.schema}.${view.name}`, reason: opaque });
-      continue;
-    }
-    if (bases.length === 0) continue;
+    const { bases, opaque, tainted } = resolveViewBases(view, index, bodies);
+    // An unreadable body is unknown, not empty: its fragmentary relation list
+    // is discarded, but the view stays in the model so the gap is reportable
+    // rather than a silent clean bill (L15).
+    if (opaque) suppressed.push({ view: `${view.schema}.${view.name}`, reason: opaque });
+    const unreadable = opaque ?? tainted;
+    if (!unreadable && bases.length === 0) continue;
 
     out.push({
       schema: view.schema,
       name: view.name,
       owner: view.owner,
       grants: view.grants,
-      baseRelations: bases
+      baseRelations: opaque ? [] : bases,
+      ...(unreadable ? { unreadable } : {})
     });
   }
 
@@ -122,10 +124,11 @@ export function resolveViewBases(
   root: ViewSnapshot,
   index: RelationIndex,
   bodies: ViewBodies
-): { bases: ViewBaseRelation[]; opaque?: string } {
+): { bases: ViewBaseRelation[]; opaque?: string; tainted?: string } {
   const bases: ViewBaseRelation[] = [];
   const seen = new Set<string>();
   let opaque: string | undefined;
+  let tainted: string | undefined;
 
   const walk = (current: ViewSnapshot, hops: Array<{ view: string; owner: string }>): void => {
     const key = `${current.schema}.${current.name}`;
@@ -139,6 +142,9 @@ export function resolveViewBases(
       opaque ??= body.opaqueReason ?? 'body could not be read';
       return;
     }
+    // Readable, but it runs SQL of its own: the relations below are real and
+    // the list of them is a lower bound.
+    if (body.tainted) tainted ??= `${key}: ${body.tainted}`;
 
     for (const ref of body.tables) {
       const relation = resolveRelation(ref, current.schema, index);
@@ -175,7 +181,7 @@ export function resolveViewBases(
 
   walk(root, [{ view: `${root.schema}.${root.name}`, owner: root.owner }]);
 
-  return { bases, ...(opaque ? { opaque } : {}) };
+  return { bases, ...(opaque ? { opaque } : {}), ...(tainted ? { tainted } : {}) };
 }
 
 export type Resolved =
@@ -282,6 +288,9 @@ export function checkDefinerViewBypass(
   for (const { role, cells } of computeViewReach(views, graph, untrusted)) {
     for (const cell of cells) {
       if (cell.effectiveRole === role) continue;
+      // A tainted cell names the view, not a base relation: there is nothing
+      // here to grade, and L15 reports it instead.
+      if (cell.proof === 'opaque-tainted') continue;
 
       const base = byKey.get(`${cell.schema}.${cell.table}`);
       if (!base) continue;
@@ -377,7 +386,7 @@ export function checkUnauditedViewReach(
 
   for (const { role, cells } of computeViewReach(views, graph, untrusted)) {
     for (const cell of cells) {
-      if (!cell.external) continue;
+      if (!cell.external || cell.proof === 'opaque-tainted') continue;
 
       const hops = cell.path.filter((e): e is { kind: 'view'; view: string; owner: string } =>
         e.kind === 'view'
@@ -408,6 +417,71 @@ export function checkUnauditedViewReach(
           effectiveRole: owner,
           viaViews: hops.map((h) => h.view),
           unauditedSchema: cell.schema,
+          proof: cell.proof
+        }
+      });
+    }
+  }
+
+  return out;
+}
+
+/**
+ * **L15 — an untrusted role reads a view whose body this analysis cannot
+ * read.** The coverage sibling of L14: there, the far end was out of scope;
+ * here, the body itself is.
+ *
+ * Two shapes reach this rule, and the distinction is the point of the
+ * `tainted` bit in {@link ExtractedBody}. A body that could not be read at all
+ * — an unparseable definition, a chain deeper than the hop limit — yields no
+ * relations, and every rule that grades a base relation had nothing to grade.
+ * A body that *was* read but calls something executing SQL of its own
+ * (`dblink`, `query_to_xml`) yields relations that are all real and not all of
+ * them: the graded ones still grade, and the gap is what is reported here.
+ *
+ * Either way the view executes as its owner and an untrusted role can read it,
+ * so the reach is proven and only its far end is unknown — which is exactly
+ * `proof: 'opaque-tainted'`, the state the reach model has carried since it
+ * was written and nothing could produce until now.
+ *
+ * Like L14 it is `info`/`neutral` and recommends no revoke: an unknown is not
+ * a leak, and scoring one would let an unreadable body move the number.
+ */
+export function checkUnreadableViewReach(
+  views: ViewReachInput[],
+  graph: RoleGraph,
+  options: LatticeRoleOptions = {}
+): Finding[] {
+  const untrusted = options.roles ?? [];
+  if (untrusted.length === 0 || views.length === 0) return [];
+
+  const out: Finding[] = [];
+
+  for (const { role, cells } of computeViewReach(views, graph, untrusted)) {
+    for (const cell of cells) {
+      if (cell.proof !== 'opaque-tainted') continue;
+
+      out.push({
+        code: 'L15',
+        severity: 'info',
+        category: 'coverage',
+        schema: cell.schema,
+        table: cell.table,
+        role,
+        privilege: 'SELECT',
+        message:
+          `Untrusted role ${role} reads view ${cell.schema}.${cell.table}, which executes as its `
+          + `owner ${cell.effectiveRole} and whose body this analysis could not fully read `
+          + `(${cell.taint}) — what it reaches under that owner was never graded`,
+        hint:
+          'The read is proven; what it reaches is not, so no view rule graded this path. Rewrite '
+          + 'the body so the relations it reads are visible statically, or satisfy yourself that '
+          + 'what it returns is safe to serve this role. Reporting stayed silent rather than '
+          + 'guessing, and nothing here justifies a revoke.',
+        context: {
+          view: `${cell.schema}.${cell.table}`,
+          effectiveRole: cell.effectiveRole,
+          taint: cell.taint,
           proof: cell.proof
         }
       });

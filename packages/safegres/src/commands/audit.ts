@@ -20,7 +20,8 @@ import {
 import {
   analyzeViewBodies,
   checkDefinerViewBypass,
-  checkUnauditedViewReach
+  checkUnauditedViewReach,
+  checkUnreadableViewReach
 } from '../checks/definer-view';
 import {
   checkMissingPrimaryKey,
@@ -39,6 +40,10 @@ import {
   computeRoleAccess,
   type LatticeRoleOptions
 } from '../checks/lattice';
+import {
+  checkUntrustedForeignTableGrants,
+  checkUntrustedSequenceGrants
+} from '../checks/object-acls';
 import {
   checkNonLeakproofPolicyFunctions,
   checkPolicyColumnCasts,
@@ -83,6 +88,7 @@ import { resolveExposure, resolvePlanes, resolveReach } from '../pg/exposure';
 import { type FunctionSnapshot, introspectFunctions } from '../pg/functions';
 import { introspectIndexes, introspectViews, type TableIndexSnapshot } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
+import { introspectObjectAcls } from '../pg/objects';
 import { type AccessPath, classifyPaths } from '../pg/paths';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
@@ -273,7 +279,7 @@ export async function audit(
     exposure
   )?.roles ?? [];
   const uncheckedWriteRoles = withExposedRoles(
-    resolved.rules.get('L15')?.options as LatticeRoleOptions,
+    resolved.rules.get('L18')?.options as LatticeRoleOptions,
     exposure
   )?.roles ?? [];
   const matviewRoles = withExposedRoles(
@@ -288,12 +294,27 @@ export async function audit(
     resolved.rules.get('L14')?.options as LatticeRoleOptions,
     exposure
   )?.roles ?? [];
+  const unreadableViewRoles = withExposedRoles(
+    resolved.rules.get('L15')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
+  // Sequences and foreign tables: one introspection, two rules, and no reason
+  // to run it when neither is configured with a role list.
+  const sequenceRoles = withExposedRoles(
+    resolved.rules.get('L16')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
+  const foreignTableRoles = withExposedRoles(
+    resolved.rules.get('L17')?.options as LatticeRoleOptions,
+    exposure
+  )?.roles ?? [];
   // L8 and L14 are two answers from one body pass: the base relations that
   // were graded, and the ones that could not be because they are out of scope.
   const viewBodiesEnabled =
     !skipAst
     && ((definerViewRoles.length > 0 && resolved.rules.get('L8')?.enabled !== false)
-      || (unauditedReachRoles.length > 0 && resolved.rules.get('L14')?.enabled !== false));
+      || (unauditedReachRoles.length > 0 && resolved.rules.get('L14')?.enabled !== false)
+      || (unreadableViewRoles.length > 0 && resolved.rules.get('L15')?.enabled !== false));
   const viewExposureEnabled =
     !skipAst
     && ((matviewRoles.length > 0 && resolved.rules.get('L11')?.enabled !== false)
@@ -302,7 +323,7 @@ export async function audit(
     !skipAst
     && ((viewWriteRoles.length > 0 && resolved.rules.get('L9')?.enabled !== false)
       || (ruleBypassRoles.length > 0 && resolved.rules.get('L10')?.enabled !== false)
-      || (uncheckedWriteRoles.length > 0 && resolved.rules.get('L15')?.enabled !== false));
+      || (uncheckedWriteRoles.length > 0 && resolved.rules.get('L18')?.enabled !== false));
   const needsViews =
     (perfEnabled && config.perf?.paths?.infer !== false)
     || resolved.rules.get('L4')?.enabled !== false
@@ -411,6 +432,26 @@ export async function audit(
 
   findings.push(...checkDeadSchemaUsage(schemaAcls, snapshot, roleGraph, viewSnapshot));
 
+  // L16/L17 grade relations that are not tables, so they sit outside the
+  // per-table loop entirely.
+  const objectAclsEnabled =
+    (sequenceRoles.length > 0 && resolved.rules.get('L16')?.enabled !== false)
+    || (foreignTableRoles.length > 0 && resolved.rules.get('L17')?.enabled !== false);
+  if (objectAclsEnabled) {
+    const objects = await introspectObjectAcls(exec, {
+      schemas: options.schemas ?? config.schemas,
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+    });
+    if (sequenceRoles.length > 0 && resolved.rules.get('L16')?.enabled !== false) {
+      findings.push(...checkUntrustedSequenceGrants(objects, roleGraph, { roles: sequenceRoles }));
+    }
+    if (foreignTableRoles.length > 0 && resolved.rules.get('L17')?.enabled !== false) {
+      findings.push(
+        ...checkUntrustedForeignTableGrants(objects, roleGraph, { roles: foreignTableRoles })
+      );
+    }
+  }
+
   // L8 is per-view, not per-table: a view body names its own base relations.
   if (viewBodiesEnabled) {
     const viewBodies = await analyzeViewBodies(viewSnapshot, snapshot, auditedSchemas);
@@ -424,9 +465,14 @@ export async function audit(
         ...checkUnauditedViewReach(viewBodies.views, roleGraph, { roles: unauditedReachRoles })
       );
     }
+    if (unreadableViewRoles.length > 0 && resolved.rules.get('L15')?.enabled !== false) {
+      findings.push(
+        ...checkUnreadableViewReach(viewBodies.views, roleGraph, { roles: unreadableViewRoles })
+      );
+    }
   }
 
-  // L9/L10/L15 are the write half of the same question, and share one analysis.
+  // L9/L10/L18 are the write half of the same question, and share one analysis.
   if (viewWritesEnabled) {
     const writes = await analyzeViewWrites(viewSnapshot, snapshot);
     if (viewWriteRoles.length > 0 && resolved.rules.get('L9')?.enabled !== false) {
@@ -439,7 +485,7 @@ export async function audit(
         ...checkViewRuleBypass(writes.ruleDriven, snapshot, roleGraph, { roles: ruleBypassRoles })
       );
     }
-    if (uncheckedWriteRoles.length > 0 && resolved.rules.get('L15')?.enabled !== false) {
+    if (uncheckedWriteRoles.length > 0 && resolved.rules.get('L18')?.enabled !== false) {
       findings.push(
         ...checkUncheckedViewWrite(writes.unchecked, snapshot, roleGraph, {
           roles: uncheckedWriteRoles

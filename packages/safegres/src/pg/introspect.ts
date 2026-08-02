@@ -12,8 +12,13 @@ export interface QueryExecutor {
   query<T = unknown>(text: string, params?: unknown[]): Promise<{ rows: T[] }>;
 }
 
-/** PostgreSQL privilege codes as they appear in `pg_policy.polcmd` / ACL items. */
-export type PgPrivilege = 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'TRUNCATE' | 'REFERENCES' | 'TRIGGER';
+/**
+ * `USAGE` never appears on a table — it is the sequence privilege (`nextval`),
+ * and is in this union because sequences are graded through the same grant
+ * closure as everything else.
+ */
+export type PgPrivilege =
+  | 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'TRUNCATE' | 'REFERENCES' | 'TRIGGER' | 'USAGE';
 
 /**
  * Mapping of ACL single-letter codes (from `aclexplode`) to our privilege names.

@@ -69,7 +69,7 @@ projection is beside the point: the owner reads rows the caller's policies hide,
 stands. An unknown column set is unknown, never narrow — a snapshot without dependency rows reports
 as before.
 
-L9, L10 and L15 are the write half of the same question, and none of them is answerable from the
+L9, L10 and L18 are the write half of the same question, and none of them is answerable from the
 view body alone. **L9** is auto-update: a simple view over one relation is updatable, so Postgres
 rewrites an INSERT/UPDATE/DELETE on the view onto that relation, and on a definer view the rewritten command is
 checked against the *owner*. The body says which relation; only `pg_relation_is_updatable` says the
@@ -80,13 +80,13 @@ Postgres 18 rather than inferred: rule actions are permission-checked against th
 relation the rule is on, and `security_invoker` does **not** govern them — it governs the view's own
 base relations. An invoker view with such a rule still writes as its owner.
 
-**L15** is the third: `WITH CHECK OPTION` is not the default, so a writable view's `WHERE` decides
+**L18** is the third: `WITH CHECK OPTION` is not the default, so a writable view's `WHERE` decides
 which rows come *out* and nothing about which rows go *in*. A role writing through a
 `WHERE tenant_id = current_tenant()` view stores rows for any tenant it names — rows the view will
 not then show it. It is the write-side twin of L12 and, like L12, needs the view to actually filter;
 it fires on the L9 population narrowed to filtering views with no check option, and it drops DELETE,
 which removes rows the view already served rather than producing new ones. It overlaps L9 by design
-and answers a different question: L9 is *whether* the write reaches the relation, L15 is whether the
+and answers a different question: L9 is *whether* the write reaches the relation, L18 is whether the
 view's own condition constrains what it writes, and the two have different remedies —
 `security_invoker`/ownership for the first, `WITH LOCAL CHECK OPTION` or an RLS `WITH CHECK` clause
 for the second.
@@ -149,6 +149,52 @@ corpus case pins: an out-of-scope *reference* is not a finding, only an out-of-s
 invoker view over the same table confers nothing, so it reports nothing, which is what keeps every
 view that touches a system catalog from becoming noise. L9–L12 take the conservative side of the
 same distinction: an external relation has no owner, ACL or RLS to reason about, so it suppresses.
+
+**L15** finishes the thought L14 started, on the other axis. Until now a body safegres could not read
+was dropped whole: an unparseable definition, or one calling something that carries its query in a
+*string* (`query_to_xml`, `dblink`), produced no `ViewReachInput` at all, so a definer view an
+anonymous role reads scanned exactly as clean as a view that reads nothing. That is the one failure
+mode conservatism must not have — silence that looks like a pass. Extraction now separates the two
+kinds of blindness: a body that cannot be parsed is `opaque` and grades nothing, while a body that
+parses but *executes SQL of its own* is `tainted` — the references it named are still proven and
+still graded by L8–L14, and only what lies past the SQL-executing call is unknown. Either way the
+view stays in the model, and a role holding SELECT on it produces a reach cell on the *view itself*
+with `proof: 'opaque-tainted'` — which is the first producer that bit has ever had. No base-relation
+rule grades that cell (it names no base relation to grade), so L15 exists to say the path was never
+graded rather than let it pass silently.
+
+It is `info`/`neutral` for the same reason L14 is: an unreadable body is not evidence of a leak, and
+letting one move the score would reward opacity. The negative case is the load-bearing one — an
+*invoker* view with the identical unreadable body reports nothing, because the body runs with the
+caller's own privileges and confers nothing to be ungraded, which is what keeps every view calling a
+SQL-executing function from becoming noise.
+
+## Objects that are not tables (L16, L17)
+
+The table snapshot reads `relkind IN ('r','p')` and the view snapshot reads views and matviews,
+which left two kinds of relation carrying real privileges that no rule had ever looked at.
+
+**L16 — sequences.** `USAGE` or `UPDATE` on a sequence is the right to call `nextval`/`setval`: an
+untrusted role can consume the identifier space of whatever the sequence feeds, or reset the counter
+so the next insert collides with an existing row. `SELECT` is the right to read `last_value`, which
+is a live row-count estimate for the owning table and a standard way "how many customers do they
+have" gets answered through an API that exposes no customers. None of it is row-filterable — RLS
+does not apply to a sequence — so the protection on the table beside it says nothing about the
+sequence. The no-revoke constraint has teeth here: a role holding `INSERT` on a table with a
+`serial` column **must** hold `USAGE` on its backing sequence, so the finding carries the `OWNED BY`
+link from `pg_depend` and the remedy leads with `GENERATED ... AS IDENTITY` (which needs no grant at
+all) rather than with a `REVOKE` that breaks the write path. Where no such link exists the hint
+still stops short of advising removal, because a `DEFAULT` can name a sequence without recording an
+ownership dependency.
+
+**L17 — foreign tables.** A foreign table cannot carry RLS at all: Postgres rejects
+`ALTER FOREIGN TABLE ... ENABLE ROW LEVEL SECURITY` outright (verified on 18, and pinned by a live
+test). That makes it strictly worse than the A2 shape it resembles — A2 reports "grants and no RLS"
+and its remedy is to add a policy, which here is not an available move. The remedy is to expose the
+relation through a view that carries the filter, or to push the filter to the remote side.
+
+Both are `info` and score-neutral to start, like every new rule; the honest severity of an anonymous
+role reading an unfiltered foreign table is not informational.
 
 Restrictive-only policies never count as coverage. `BYPASSRLS` and superuser roles are exempt from
 policy checks — they are not subject to RLS, so a "missing policy" finding for them would be

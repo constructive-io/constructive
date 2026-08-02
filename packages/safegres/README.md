@@ -150,7 +150,10 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L12 | info | fail-open | **Non-barrier filtering view** — a view is an untrusted role's only path to a relation, but its row filter is not a boundary † |
 | L13 | info | fail-open | **Column-level grant** — an untrusted role reaches a relation through `pg_attribute.attacl`, which no relation ACL shows † |
 | L14 | info | neutral | **Unaudited base relation** — a definer view reads a relation in a schema the audit never introspected † |
-| L15 | info | fail-open | **Writable filtering view without `WITH CHECK OPTION`** — an untrusted role writes rows the view's own filter excludes † |
+| L15 | info | neutral | **Unreadable view body** — an untrusted role reads a definer view whose definition the analysis could not follow † |
+| L16 | info | fail-open | **Sequence privilege** — an untrusted role can advance or read a sequence, which no policy filters † |
+| L17 | info | fail-open | **Foreign-table grant** — an untrusted role reaches a relation that cannot carry RLS at all † |
+| L18 | info | fail-open | **Writable filtering view without `WITH CHECK OPTION`** — an untrusted role writes rows the view's own filter excludes † |
 | W1 | medium | — | **No exposure surface configured** — whole database assumed reachable, score capped |
 
 † R1/R2/L5 are no-ops until you name the untrusted roles:

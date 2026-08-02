@@ -1,5 +1,5 @@
 {
-  "title": "The same writable view WITH LOCAL CHECK OPTION constrains its writes, and L15 stays silent",
+  "title": "The same writable view WITH LOCAL CHECK OPTION constrains its writes, and L18 stays silent",
   "dimension": "security",
   "exposure": {
     "schemas": [
@@ -26,12 +26,12 @@
     }
   ],
   "forbid": [
-    "L15",
+    "L18",
     "L8",
     "L10",
     "L11",
     "L12"
   ],
   "worstSeverity": "low",
-  "fix": "Nothing on the check option. This case is case 43 after its fix, and exists to pin that L15 stops firing once the view's condition governs writes as well as reads."
+  "fix": "Nothing on the check option. This case is case 43 after its fix, and exists to pin that L18 stops firing once the view's condition governs writes as well as reads."
 }
