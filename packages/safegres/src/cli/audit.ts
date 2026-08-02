@@ -1,6 +1,7 @@
 import { Logger } from '@pgpmjs/logger';
 import * as fs from 'fs';
 import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
+import * as path from 'path';
 
 import { diffCallGraph, parseBaseline, serializeBaseline, toBaseline } from '../callgraph/baseline';
 import { audit, type AuditOptions } from '../commands/audit';
@@ -17,7 +18,13 @@ import { matchPlane, type ViewConfig, viewConfigFromReportConfig } from '../repo
 import { meetsGrade } from '../score/score';
 import type { Finding, Report, Severity } from '../types';
 import { meetsThreshold, SEVERITY_ORDER, summarize } from '../types';
-import { buildClient, configParamsFromArgv, csvList, extensionScopeFromArgv } from './shared';
+import {
+  buildClient,
+  configParamsFromArgv,
+  csvList,
+  extensionScopeFromArgv,
+  resolveRunPaths
+} from './shared';
 
 const log = new Logger('safegres');
 
@@ -163,6 +170,18 @@ GitHub Actions:
   --write-github-comment <file>
                            Write the PR-comment markdown to <file> instead of
                            posting it
+
+Everything a CI job repeats every run belongs in the config file instead, so
+the job is just \`safegres audit\` (paths are relative to the config file):
+
+  {
+    "extends": "safegres:constructive",
+    "source":  { "pgpm": "application/app" },
+    "callGraph": { "enabled": true },
+    "perf":    { "enabled": true, "baseline": "ci/perf-baseline.json", "failOnNew": true },
+    "outputs": { "json": "reports/safegres.json", "sarif": "reports/safegres.sarif" },
+    "failOn":  { "grade": "B" }
+  }
 `;
 
 export default async (
@@ -199,7 +218,14 @@ export default async (
       process.exit(2);
     }
   }
-  const { config } = loadConfig({ cwd: pgpmCwd, ...configParamsFromArgv(argv) });
+  const loaded = loadConfig({ cwd: pgpmCwd, ...configParamsFromArgv(argv) });
+  const config = loaded.config;
+
+  const { pgpm: pgpmSource, usePgpm, perfBaseline, callGraphBaseline, outputs } = resolveRunPaths(
+    argv,
+    config,
+    loaded.filepath ? path.dirname(loaded.filepath) : process.cwd()
+  );
 
   const exposureSchemas = csvList(argv['exposure-schemas']);
   const auditOptions: AuditOptions = {
@@ -211,7 +237,7 @@ export default async (
     skipAstChecks: argv['skip-ast'] === true,
     perf:
       argv.perf === true
-      || typeof argv['perf-baseline'] === 'string'
+      || perfBaseline !== undefined
       || typeof argv['write-perf-baseline'] === 'string'
         ? true
         : undefined,
@@ -219,7 +245,8 @@ export default async (
     explain: argv.explain === true ? true : undefined,
     callGraph:
       argv['call-graph'] === true
-      || typeof argv.baseline === 'string'
+      || config.callGraph?.enabled === true
+      || callGraphBaseline !== undefined
       || typeof argv['write-baseline'] === 'string',
     exposure: exposureSchemas
       ? { ...config.exposure, schemas: exposureSchemas }
@@ -230,9 +257,9 @@ export default async (
   };
 
   let report: Report;
-  if (argv.pgpm) {
+  if (usePgpm) {
     const { auditPgpmWorkspace } = importPgpmTest();
-    report = await auditPgpmWorkspace({ ...auditOptions, cwd: pgpmCwd });
+    report = await auditPgpmWorkspace({ ...auditOptions, cwd: pgpmSource });
   } else {
     const client = buildClient(argv);
     await client.connect();
@@ -256,27 +283,27 @@ export default async (
     log.info(`wrote perf baseline: ${argv['write-perf-baseline']}`);
   }
 
-  if (typeof argv['perf-baseline'] === 'string' && report.perf) {
+  if (perfBaseline !== undefined && report.perf) {
     let raw: string;
     try {
-      raw = fs.readFileSync(argv['perf-baseline'], 'utf8');
+      raw = fs.readFileSync(perfBaseline, 'utf8');
     } catch {
       log.error(
-        `cannot read --perf-baseline file: ${argv['perf-baseline']} (create one with --write-perf-baseline)`
+        `cannot read perf baseline: ${perfBaseline} (create one with --write-perf-baseline)`
       );
       process.exit(2);
     }
     report.perf.diff = diffPerf(report.perf.findings, parsePerfBaseline(raw));
   }
 
-  if (typeof argv['write-snapshot'] === 'string') {
-    fs.writeFileSync(
-      argv['write-snapshot'],
+  if (outputs.snapshot !== undefined) {
+    writeOut(
+      outputs.snapshot,
       serializeSnapshot(
         toSnapshot(report, typeof argv['compare-ref'] === 'string' ? { ref: argv['compare-ref'] } : {})
       )
     );
-    log.info(`wrote snapshot: ${argv['write-snapshot']}`);
+    log.info(`wrote snapshot: ${outputs.snapshot}`);
   }
 
   if (typeof argv.compare === 'string') {
@@ -301,12 +328,12 @@ export default async (
     report.comparison = compareReports(previous, report);
   }
 
-  if (typeof argv.baseline === 'string' && report.callGraph) {
+  if (callGraphBaseline !== undefined && report.callGraph) {
     let raw: string;
     try {
-      raw = fs.readFileSync(argv.baseline, 'utf8');
+      raw = fs.readFileSync(callGraphBaseline, 'utf8');
     } catch {
-      log.error(`cannot read --baseline file: ${argv.baseline} (create one with --write-baseline)`);
+      log.error(`cannot read call-graph baseline: ${callGraphBaseline} (create one with --write-baseline)`);
       process.exit(2);
     }
     report.callGraphDiff = diffCallGraph(report.callGraph, parseBaseline(raw));
@@ -335,9 +362,7 @@ export default async (
     break;
   case 'sarif':
     output = renderSarif(report, {
-      sources: typeof argv['sarif-sources'] === 'string'
-        ? buildSourceIndex(argv['sarif-sources'])
-        : undefined
+      sources: outputs.sarifSources ? buildSourceIndex(outputs.sarifSources) : undefined
     });
     break;
   case 'markdown':
@@ -364,27 +389,25 @@ export default async (
   process.stdout.write('\n');
 
   // One audit, as many renderings as CI asked for.
-  if (typeof argv['write-json'] === 'string') {
-    fs.writeFileSync(argv['write-json'], `${renderJson(report, { pretty: true })}\n`);
-    log.info(`wrote json report: ${argv['write-json']}`);
+  if (outputs.json !== undefined) {
+    writeOut(outputs.json, `${renderJson(report, { pretty: true })}\n`);
+    log.info(`wrote json report: ${outputs.json}`);
   }
-  if (typeof argv['write-markdown'] === 'string') {
-    fs.writeFileSync(
-      argv['write-markdown'],
+  if (outputs.markdown !== undefined) {
+    writeOut(
+      outputs.markdown,
       `${renderMarkdown(report, { verbose: argv.verbose === true, view: viewConfig })}\n`
     );
-    log.info(`wrote markdown report: ${argv['write-markdown']}`);
+    log.info(`wrote markdown report: ${outputs.markdown}`);
   }
-  if (typeof argv['write-sarif'] === 'string') {
-    fs.writeFileSync(
-      argv['write-sarif'],
+  if (outputs.sarif !== undefined) {
+    writeOut(
+      outputs.sarif,
       `${renderSarif(report, {
-        sources: typeof argv['sarif-sources'] === 'string'
-          ? buildSourceIndex(argv['sarif-sources'])
-          : undefined
+        sources: outputs.sarifSources ? buildSourceIndex(outputs.sarifSources) : undefined
       })}\n`
     );
-    log.info(`wrote sarif report: ${argv['write-sarif']}`);
+    log.info(`wrote sarif report: ${outputs.sarif}`);
   }
 
   // Gates are evaluated before anything exits, so the GitHub renderers can
@@ -463,7 +486,8 @@ export default async (
     }
   }
 
-  if (argv['fail-on-new-perf'] === true && report.perf?.diff && report.perf.diff.added.length > 0) {
+  const failOnNewPerf = argv['fail-on-new-perf'] === true || config.perf?.failOnNew === true;
+  if (failOnNewPerf && report.perf?.diff && report.perf.diff.added.length > 0) {
     const count = report.perf.diff.added.length;
     gateFailures.push(...report.perf.diff.added);
     fail(
@@ -472,7 +496,7 @@ export default async (
   }
 
   if (
-    argv['fail-on-new-boundaries'] === true
+    (argv['fail-on-new-boundaries'] === true || config.callGraph?.failOnNew === true)
     && report.callGraphDiff
     && report.callGraphDiff.added.length > 0
   ) {
@@ -498,12 +522,9 @@ export default async (
     }
   }
 
-  if (typeof argv['write-github-comment'] === 'string') {
-    fs.writeFileSync(
-      argv['write-github-comment'],
-      `${renderGithubComment(report, githubOptions)}\n`
-    );
-    log.info(`wrote github comment: ${argv['write-github-comment']}`);
+  if (outputs.githubComment !== undefined) {
+    writeOut(outputs.githubComment, `${renderGithubComment(report, githubOptions)}\n`);
+    log.info(`wrote github comment: ${outputs.githubComment}`);
   }
 
   if (argv['github-comment'] === true) {
@@ -514,6 +535,12 @@ export default async (
 
   if (failed) process.exit(1);
 };
+
+/** Write an output file, creating its directory: CI should not have to mkdir. */
+function writeOut(file: string, contents: string): void {
+  fs.mkdirSync(path.dirname(path.resolve(file)), { recursive: true });
+  fs.writeFileSync(file, contents);
+}
 
 /** A repeatable flag: `--plane a --plane b` (minimist gives an array). */
 function listArg(value: unknown): string[] {

@@ -232,6 +232,7 @@ score = 100 · exp(−k · riskPoints / exposedTables)
 
 ```bash
 safegres audit                     # audit the connected DB (default command)
+safegres lint                      # alias for audit, for a package.json script
 safegres perf                      # audit + index-hygiene dimension (= audit --perf)
 safegres audit --perf --fail-on-perf-grade B
 safegres audit --perf-baseline .safegres-perf.json --fail-on-new-perf   # ratchet: only new debt fails
@@ -269,7 +270,20 @@ console.log(perfReport.perf?.score);   // separate 0-100 perf axis (undefined un
 
 ## CI integration
 
-Report-only first, gate after a week of stable scores. In this monorepo's DB repos the pattern is: start Postgres → install `pgpm` + `safegres` → deploy the schema → `safegres audit` → write to `$GITHUB_STEP_SUMMARY`. Commit `.safegresrc.json` (`{ "extends": "safegres:constructive" }`) as the source of truth so local and CI agree. Add `--fail-on-grade B` only once the baseline is stable.
+Report-only first, gate after a week of stable scores. Never write a bespoke audit script: everything a job repeats belongs in `.safegresrc.json`, so the job is `safegres audit` (or a `"lint": "safegres lint"` package.json script). Paths in the file are relative to it.
+
+```jsonc
+{
+  "extends": "safegres:constructive",
+  "source":  { "pgpm": "application/app" },   // deploy into an ephemeral DB — no connection needed
+  "callGraph": { "enabled": true },
+  "perf":    { "enabled": true, "baseline": "ci/safegres-perf-baseline.json", "failOnNew": true },
+  "outputs": { "json": "safegres-reports/safegres.json", "sarif": "safegres-reports/safegres.sarif" },
+  "failOn":  { "grade": "B" }
+}
+```
+
+Inside Actions the job summary, annotations and PR comment are emitted automatically (`report.github` configures them). Add `failOn.grade` only once the baseline is stable.
 
 ## Guardrails
 

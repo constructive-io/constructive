@@ -1,4 +1,5 @@
 import type { ParsedArgs } from 'inquirerer';
+import * as path from 'path';
 import { Client } from 'pg';
 import { getPgEnvOptions, type PgConfig } from 'pg-env';
 
@@ -60,6 +61,52 @@ export function parseRuleFlags(value: unknown): RulesConfig | undefined {
     rules[code] = setting as RulesConfig[string];
   }
   return Object.keys(rules).length > 0 ? rules : undefined;
+}
+
+/** Every file a run reads or writes, after flags and config have been merged. */
+export interface RunPaths {
+  /** The pgpm workspace to deploy, when `usePgpm`. Undefined means "nearest". */
+  pgpm?: string;
+  usePgpm: boolean;
+  perfBaseline?: string;
+  callGraphBaseline?: string;
+  outputs: {
+    json?: string;
+    markdown?: string;
+    sarif?: string;
+    sarifSources?: string;
+    snapshot?: string;
+    githubComment?: string;
+  };
+}
+
+/**
+ * Flags win over the config file. A path from the config file is resolved
+ * against that file, so a CI job can run from any directory; a path on the
+ * command line stays relative to cwd, like every other command's arguments.
+ */
+export function resolveRunPaths(
+  argv: ParsedArgs,
+  config: SafegresConfig,
+  configDir: string
+): RunPaths {
+  const pick = (flag: unknown, configured?: string): string | undefined =>
+    typeof flag === 'string' ? flag : configured && path.resolve(configDir, configured);
+
+  return {
+    pgpm: pick(argv.pgpm, config.source?.pgpm),
+    usePgpm: argv.pgpm !== undefined || config.source?.pgpm !== undefined,
+    perfBaseline: pick(argv['perf-baseline'], config.perf?.baseline),
+    callGraphBaseline: pick(argv.baseline, config.callGraph?.baseline),
+    outputs: {
+      json: pick(argv['write-json'], config.outputs?.json),
+      markdown: pick(argv['write-markdown'], config.outputs?.markdown),
+      sarif: pick(argv['write-sarif'], config.outputs?.sarif),
+      sarifSources: pick(argv['sarif-sources'], config.outputs?.sarifSources),
+      snapshot: pick(argv['write-snapshot'], config.outputs?.snapshot),
+      githubComment: pick(argv['write-github-comment'], config.outputs?.githubComment)
+    }
+  };
 }
 
 /** Build config-loading params from shared CLI flags. */

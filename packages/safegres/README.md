@@ -381,6 +381,27 @@ jobs:
             --perf-baseline ci/safegres-perf-baseline.json --fail-on-new-perf
 ```
 
+Everything a job repeats every run belongs in the config file instead, so the job is one word. A
+repository whose schema is a pgpm workspace does not need a database at all — `source.pgpm`
+deploys it into an ephemeral one:
+
+```jsonc
+// .safegresrc.json — paths are relative to this file
+{
+  "extends": "safegres:constructive",
+  "source":  { "pgpm": "application/app" },
+  "perf":    { "enabled": true, "baseline": "ci/perf-baseline.json", "failOnNew": true },
+  "outputs": { "json": "reports/safegres.json", "sarif": "reports/safegres.sarif" },
+  "failOn":  { "grade": "B" }
+}
+```
+
+```yaml
+      - run: npx safegres audit   # or: "audit": "safegres lint" in package.json
+```
+
+Output directories are created as needed, and a flag still wins over the file for a one-off run.
+
 Scores lead the markdown, then severity counts, then a table per dimension; internal advisories
 and accepted baseline debt fold into `<details>`. Pipe it to `gh pr comment --body-file -` to post
 it on the pull request instead. Library callers get the same renderer as `renderMarkdown(report)`.
@@ -622,6 +643,7 @@ score would move if that rule's findings went away. Gate with `--fail-on <severi
 
 ```bash
 safegres audit          # audit the connected database (default command)
+safegres lint           # alias for audit, for a package.json script
 safegres perf           # audit + the performance dimension (= audit --perf)
 safegres doctor         # diagnose config, parser, connection, catalog visibility, exposure
 safegres eval           # grade the auditor against a corpus with known answers
@@ -639,6 +661,10 @@ safegres print-config   # the resolved effective config (--explain for per-key p
 | Call graph | `--call-graph`, `--baseline <f>`, `--write-baseline <f>`, `--fail-on-new-boundaries` |
 | Gating | `--fail-on <severity>`, `--fail-on-score <n>`, `--fail-on-grade <g>`, `--fail-on-perf-score`, `--fail-on-perf-grade` |
 | Misc | `--skip-ast`, `--no-color`, `--help`, `--version` |
+
+The paths among those — `--pgpm`, the two baselines, and every `--write-*` — have config-file
+equivalents (`source.pgpm`, `perf.baseline`, `callGraph.baseline`, `outputs.*`), so CI can carry
+them in version control rather than in a command line.
 
 ## Going further
 
