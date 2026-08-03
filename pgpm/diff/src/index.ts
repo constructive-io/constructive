@@ -8,6 +8,8 @@ export {
   workspaceModulesToDiffChanges
 } from './diff-source';
 export type {
+  BackfillSelection,
+  CoverageStatus,
   LedgerBackfillEntry,
   LedgerChangeRecord,
   LedgerClassification,
@@ -15,4 +17,4 @@ export type {
   LedgerStatus,
   PlanChangeRef
 } from './ledger';
-export { classifyAgainstLedger, emitLedgerBackfill } from './ledger';
+export { classifyAgainstLedger, emitLedgerBackfill, selectBackfillEntries } from './ledger';

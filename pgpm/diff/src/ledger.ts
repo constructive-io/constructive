@@ -102,6 +102,78 @@ export function classifyAgainstLedger(
   return { entries, orphaned, outOfOrder };
 }
 
+/**
+ * A change's semantic coverage, as produced by `coverChanges`. Structural so
+ * this layer stays free of the transform driver's imports.
+ */
+export interface CoverageStatus {
+  /** Change name as the diff side reported it (`pkg:change` or `change`). */
+  name: string;
+  status: 'satisfied' | 'unsatisfied' | 'partial' | 'inert';
+}
+
+/** Which plan entries a ledger backfill should record, and which it cannot. */
+export interface BackfillSelection {
+  /** Ledger rows to write, in plan order. */
+  entries: LedgerBackfillEntry[];
+  /** Entries backfilled: semantically satisfied but absent from the ledger. */
+  backfilled: string[];
+  /** Entries whose satisfaction is unprovable (inert/partial); left to deploy. */
+  unprovable: string[];
+}
+
+/**
+ * Choose which plan entries to backfill: those the ledger does not record
+ * (`pending`) but whose objects side A already has (coverage `satisfied`).
+ * Entries with `inert` or `partial` coverage are reported as unprovable and
+ * left for a normal deploy — backfilling them would claim DDL ran that did
+ * not. Pure: the caller supplies the plan refs, the ledger classification,
+ * and the coverage.
+ */
+export function selectBackfillEntries(
+  refs: PlanChangeRef[],
+  classification: LedgerClassification,
+  coverage: CoverageStatus[]
+): BackfillSelection {
+  // Coverage names follow the side: `pkg:change` for workspaces, bare change
+  // names for a single module. Accept either.
+  const coverageByName = new Map<string, CoverageStatus>();
+  for (const cov of coverage) coverageByName.set(cov.name, cov);
+  const coverageFor = (ref: PlanChangeRef): CoverageStatus | undefined =>
+    coverageByName.get(refKey(ref.package, ref.name)) ?? coverageByName.get(ref.name);
+
+  const pending = new Set(
+    classification.entries.filter(e => e.status === 'pending').map(e => refKey(e.package, e.name))
+  );
+
+  const backfilled: string[] = [];
+  const unprovable: string[] = [];
+  const entries: LedgerBackfillEntry[] = [];
+
+  for (const ref of refs) {
+    if (!pending.has(refKey(ref.package, ref.name))) continue;
+    const status = coverageFor(ref)?.status;
+    if (status === 'inert' || status === 'partial') {
+      unprovable.push(refKey(ref.package, ref.name));
+      continue;
+    }
+    if (status !== 'satisfied') continue;
+    // The content hash is what a default `pgpm deploy` records and skips by;
+    // without one there is nothing meaningful to record.
+    const scriptHash = ref.hashes[0];
+    if (!scriptHash) continue;
+    backfilled.push(refKey(ref.package, ref.name));
+    entries.push({
+      package: ref.package,
+      changeName: ref.name,
+      scriptHash,
+      requires: ref.dependencies
+    });
+  }
+
+  return { entries, backfilled, unprovable };
+}
+
 /** One ledger row to backfill without executing anything. */
 export interface LedgerBackfillEntry {
   package: string;

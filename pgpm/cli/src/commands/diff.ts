@@ -1,42 +1,36 @@
-import { PgpmMigrate } from '@pgpmjs/core';
+import type { LedgerReport } from '@pgpmjs/core';
 import {
-  classifyAgainstLedger,
-  deltaChangesToRows,
-  DiffSide,
-  emitLedgerBackfill,
-  LedgerClassification,
-  loadDiffSideFromDisk,
-  sqlToDiffChanges
-} from '@pgpmjs/diff';
+  buildLedgerReport,
+  isDatabaseSpec,
+  loadDiffSide,
+  PgpmMigrate,
+  resolveDatabaseSpec
+} from '@pgpmjs/core';
+import { deltaChangesToRows, DiffSide, resolveDiffSideKind } from '@pgpmjs/diff';
 import { Logger } from '@pgpmjs/logger';
 import {
   appendModule,
   CHANGE_GRANULARITIES,
-  ChangeCoverage,
   ChangeGranularity,
-  coverChanges,
   diffChangeSets,
   EXPORT_GRANULARITIES,
   ExportGranularity,
   isChangeGranularity,
   isExportGranularity,
   loadModule,
-  loadModuleSource,
   SemanticDiffResult,
   SemanticObjectDiff,
   withoutColumnOrder,
   writeModule
 } from '@pgpmjs/transform';
-import { spawn } from 'child_process';
 import * as fs from 'fs';
 import { cliExitWithError, CLIOptions, extractFirst, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as os from 'os';
 import * as path from 'path';
 import { getPgPool } from 'pg-cache';
 import type { PgConfig } from 'pg-env';
-import { getPgEnvOptions, getSpawnEnvWithPg } from 'pg-env';
+import { getPgEnvOptions } from 'pg-env';
 
-import { loadLedger, loadWorkspaceModules, loadWorkspaceSide, planChangeRefs } from '../utils/diff-sides';
 import { emitModuleBundle, emitModuleSql, STDOUT_TARGET } from '../utils/module-projections';
 import { catalogDifferences, withScratchDatabases } from '../utils/scratch-db';
 
@@ -116,102 +110,16 @@ Examples:
 const NAMING_STYLES = ['directory', 'flat'] as const;
 type NamingStyle = (typeof NAMING_STYLES)[number];
 
-/**
- * The pg_dump command to run. Defaults to the `pg_dump` on PATH, but honours
- * PGPM_PG_DUMP — a whitespace-separated command such as
- * `docker exec <container> pg_dump` — so callers can run a version-matched
- * pg_dump from a Postgres container instead of installing client tools.
- */
-const resolvePgDump = (): { cmd: string; prefixArgs: string[] } => {
-  const override = (process.env.PGPM_PG_DUMP ?? '').trim();
-  if (override) {
-    const parts = override.split(/\s+/);
-    return { cmd: parts[0], prefixArgs: parts.slice(1) };
+/** A plan-bearing on-disk side (workspace or module directory). */
+const isPlanSide = (spec: string, cwd: string): boolean => {
+  if (isDatabaseSpec(spec)) return false;
+  try {
+    const kind = resolveDiffSideKind(path.resolve(cwd, spec));
+    return kind === 'workspace' || kind === 'module';
+  } catch {
+    return false;
   }
-  return { cmd: 'pg_dump', prefixArgs: [] };
 };
-
-/**
- * pg_dump a side's schema: `db:<name>` uses PG* env; DSNs pass through.
- * Migration metadata schemas (pgpm_migrate, sqitch) are excluded — they are
- * the ledger, not the schema under comparison.
- */
-const dumpDatabase = async (spec: string): Promise<string> => {
-  const args = ['--schema-only', '--no-owner', '--exclude-schema=pgpm_migrate', '--exclude-schema=sqitch'];
-  let env = process.env;
-  if (spec.startsWith('db:')) {
-    const config = getPgEnvOptions({ database: spec.slice(3) });
-    env = getSpawnEnvWithPg(config);
-    // Pass the database explicitly (not just via PG* env) so the command still
-    // targets the right database when PGPM_PG_DUMP wraps it (e.g. `docker exec`,
-    // which does not inherit the host's environment).
-    args.push('--dbname', config.database);
-  } else {
-    args.push('--dbname', spec);
-  }
-  // pg_dump must match the server's major version. Allow overriding the binary
-  // (e.g. to run pg_dump from a matching-version Postgres container) via
-  // PGPM_PG_DUMP, a command string like `docker exec <container> pg_dump`.
-  const { cmd, prefixArgs } = resolvePgDump();
-  return new Promise<string>((resolve, reject) => {
-    const child = spawn(cmd, [...prefixArgs, ...args], { env, stdio: ['ignore', 'pipe', 'pipe'] });
-    let out = '';
-    let err = '';
-    child.stdout.on('data', chunk => { out += chunk; });
-    child.stderr.on('data', chunk => { err += chunk; });
-    child.on('error', (e: NodeJS.ErrnoException) => {
-      if (e.code === 'ENOENT') {
-        reject(new Error('pg_dump not found; ensure PostgreSQL client tools are installed and in PATH'));
-        return;
-      }
-      reject(e);
-    });
-    child.on('close', code => {
-      if (code === 0) resolve(out);
-      else reject(new Error(`pg_dump exited with code ${code}: ${err.trim()}`));
-    });
-  });
-};
-
-/** Resolve one side spec into diff input changes. */
-const loadSide = async (spec: string, cwd: string): Promise<DiffSide> => {
-  if (resolveDiffSideKindSafe(spec) === 'database') {
-    const label = spec.startsWith('db:') ? spec.slice(3) : spec;
-    return {
-      kind: 'database',
-      label,
-      changes: sqlToDiffChanges(await dumpDatabase(spec), label),
-      warnings: []
-    };
-  }
-  const resolved = path.resolve(cwd, spec);
-  if (isWorkspaceDir(resolved)) return loadWorkspaceSide(resolved);
-  return loadDiffSideFromDisk(resolved);
-};
-
-/** A directory that is a workspace root rather than a module root. */
-const isWorkspaceDir = (dir: string): boolean =>
-  fs.existsSync(dir) &&
-  fs.statSync(dir).isDirectory() &&
-  !fs.existsSync(path.join(dir, 'pgpm.plan')) &&
-  ['pgpm.json', 'pgpm.config.js'].some(f => fs.existsSync(path.join(dir, f)));
-
-/** PgConfig for a `db:<name>` spec or a postgres:// connection string. */
-const ledgerConfig = (spec: string): PgConfig => {
-  if (spec.startsWith('db:')) return getPgEnvOptions({ database: spec.slice(3) });
-  const url = new URL(spec);
-  return getPgEnvOptions({
-    ...(url.hostname && { host: url.hostname }),
-    ...(url.port && { port: Number(url.port) }),
-    ...(url.username && { user: decodeURIComponent(url.username) }),
-    ...(url.password && { password: decodeURIComponent(url.password) }),
-    ...(url.pathname.length > 1 && { database: url.pathname.slice(1) })
-  });
-};
-
-/** `resolveDiffSideKind` without throwing on relative on-disk paths. */
-const resolveDiffSideKindSafe = (spec: string): 'database' | 'disk' =>
-  /^postgres(ql)?:\/\//.test(spec) || spec.startsWith('db:') ? 'database' : 'disk';
 
 /** Apply one diff side into a scratch database (module deploy or raw SQL). */
 const applySide = async (config: PgConfig, side: DiffSide, spec: string, cwd: string): Promise<void> => {
@@ -257,84 +165,6 @@ const runVerify = async (
     await applySide(cfgTarget, sideB, specB, cwd);
     return catalogDifferences(cfgMigrated, cfgTarget, withoutColumnOrder);
   });
-};
-
-interface LedgerReport {
-  classification: LedgerClassification;
-  coverage: ChangeCoverage[];
-  /** Plan entries backfilled: semantically satisfied but absent from the ledger. */
-  backfilled: string[];
-  /** Satisfied-but-unprovable entries (inert/partial coverage), not backfilled. */
-  unprovable: string[];
-  backfillSql?: string;
-}
-
-/**
- * Ledger mode: relate side B's plan to a database's pgpm_migrate ledger.
- * Name/hash classification says what the ledger records; semantic coverage
- * (identity-keyed against side A's actual schema) says what is genuinely
- * satisfied even when a regenerated plan renamed or reordered everything.
- * The backfill records the satisfied-but-unrecorded entries so a subsequent
- * `pgpm deploy` of side B executes only the true delta.
- */
-const buildLedgerReport = async (
-  ledgerSpec: string,
-  specB: string,
-  cwd: string,
-  sideB: DiffSide,
-  result: SemanticDiffResult
-): Promise<LedgerReport> => {
-  const resolvedB = path.resolve(cwd, specB);
-  const modules = isWorkspaceDir(resolvedB)
-    ? (await loadWorkspaceModules(resolvedB)).modules
-    : [loadModuleSource(resolvedB)];
-  const refs = await planChangeRefs(modules);
-  const ledger = await loadLedger(ledgerConfig(ledgerSpec));
-  const classification = classifyAgainstLedger(refs, ledger);
-  const coverage = coverChanges(sideB.changes, result);
-
-  // Coverage names are the side's change names: `pkg:change` for workspaces,
-  // plain change names for a single module. Key both ways.
-  const coverageByName = new Map<string, ChangeCoverage>();
-  for (const cov of coverage) coverageByName.set(cov.name, cov);
-  const statusFor = (pkg: string, name: string): ChangeCoverage | undefined =>
-    coverageByName.get(`${pkg}:${name}`) ?? coverageByName.get(name);
-
-  const pendingInLedger = new Set(
-    classification.entries.filter(e => e.status === 'pending').map(e => `${e.package}:${e.name}`)
-  );
-
-  const backfilled: string[] = [];
-  const unprovable: string[] = [];
-  const entries = refs
-    .filter(ref => pendingInLedger.has(`${ref.package}:${ref.name}`))
-    .filter(ref => {
-      const cov = statusFor(ref.package, ref.name);
-      if (cov?.status === 'satisfied') {
-        backfilled.push(`${ref.package}:${ref.name}`);
-        return true;
-      }
-      if (cov && (cov.status === 'inert' || cov.status === 'partial')) {
-        unprovable.push(`${ref.package}:${ref.name}`);
-      }
-      return false;
-    })
-    .map(ref => ({
-      package: ref.package,
-      changeName: ref.name,
-      // The content hash is what a default `pgpm deploy` records and skips by.
-      scriptHash: ref.hashes[0] ?? '',
-      requires: ref.dependencies
-    }))
-    .filter(entry => entry.scriptHash);
-
-  return {
-    classification,
-    coverage,
-    backfilled,
-    unprovable,
-    backfillSql: entries.length > 0 ? emitLedgerBackfill(entries) : undefined
-  };
 };
 
 const printLedgerSummary = (report: LedgerReport, ledgerSpec: string): void => {
@@ -450,14 +280,8 @@ export default async (
   if (emitLedgerTarget && !ledgerSpec) {
     await cliExitWithError('--emit-ledger requires --ledger <db> (the database whose pgpm_migrate ledger is backfilled).');
   }
-  if (ledgerSpec) {
-    const resolvedB = path.resolve(cwd, specB!);
-    const hasPlanSide =
-      resolveDiffSideKindSafe(specB!) === 'disk' &&
-      (isWorkspaceDir(resolvedB) || fs.existsSync(path.join(resolvedB, 'pgpm.plan')));
-    if (!hasPlanSide) {
-      await cliExitWithError('--ledger requires side B to be a pgpm workspace or module directory (it needs a plan to classify).');
-    }
+  if (ledgerSpec && !isPlanSide(specB!, cwd)) {
+    await cliExitWithError('--ledger requires side B to be a pgpm workspace or module directory (it needs a plan to classify).');
   }
 
   if (appendModuleDir && (emitModuleDir || emitSql || emitBundle || verify)) {
@@ -471,8 +295,8 @@ export default async (
   let sideA: DiffSide;
   let sideB: DiffSide;
   try {
-    sideA = await loadSide(specA, cwd);
-    sideB = await loadSide(specB, cwd);
+    sideA = await loadDiffSide(specA, cwd);
+    sideB = await loadDiffSide(specB, cwd);
   } catch (err) {
     await cliExitWithError(err instanceof Error ? err.message : String(err));
     return;
@@ -487,7 +311,13 @@ export default async (
 
   let ledgerReport: LedgerReport | undefined;
   if (ledgerSpec) {
-    ledgerReport = await buildLedgerReport(ledgerSpec, specB!, cwd, sideB, result);
+    ledgerReport = await buildLedgerReport({
+      config: resolveDatabaseSpec(ledgerSpec),
+      spec: specB!,
+      cwd,
+      changes: sideB.changes,
+      diff: result
+    });
     if (emitLedgerTarget) {
       if (ledgerReport.backfillSql) {
         fs.mkdirSync(path.dirname(emitLedgerTarget), { recursive: true });

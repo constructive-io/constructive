@@ -1,11 +1,11 @@
+import { pgDump } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { QuoteUtils } from '@pgsql/quotes';
-import { spawn } from 'child_process';
 import fs from 'fs';
 import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import path from 'path';
 import { getPgPool } from 'pg-cache';
-import { getPgEnvOptions, getSpawnEnvWithPg } from 'pg-env';
+import { getPgEnvOptions } from 'pg-env';
 
 import { getTargetDatabase } from '../utils';
 
@@ -36,31 +36,6 @@ function nowStamp(): string {
   const d = new Date();
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-}
-
-async function runPgDump(args: string[], env: NodeJS.ProcessEnv): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    const child = spawn('pg_dump', args, {
-      env,
-      stdio: 'inherit',
-      shell: false
-    });
-
-    child.on('error', (err: any) => {
-      if (err.code === 'ENOENT') {
-        log.error('pg_dump not found; ensure PostgreSQL client tools are installed and in PATH');
-      }
-      reject(err);
-    });
-
-    child.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-      reject(new Error(`pg_dump exited with code ${code ?? 1}`));
-    });
-  });
 }
 
 async function resolveDatabaseId(dbname: string, databaseIdRaw: string): Promise<{ id: string; name: string } | null> {
@@ -167,18 +142,14 @@ export default async (
   }
 
   const pgEnv = getPgEnvOptions({ database: dbname });
-  const spawnEnv = getSpawnEnvWithPg(pgEnv);
 
-  const args = [
-    '--format=plain',
-    '--no-owner',
-    '--no-privileges',
-    '--file',
-    outPath,
-    dbname
-  ];
-
-  await runPgDump(args, spawnEnv);
+  await pgDump({
+    config: pgEnv,
+    format: 'plain',
+    noOwner: true,
+    noPrivileges: true,
+    file: outPath
+  });
 
   if (databaseIdInfo) {
     const pruneSql = await buildPruneSql(dbname, databaseIdInfo.id);
