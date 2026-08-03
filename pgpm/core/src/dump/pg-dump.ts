@@ -8,7 +8,7 @@
  */
 import { spawn } from 'child_process';
 import type { PgConfig } from 'pg-env';
-import { getSpawnEnvWithPg } from 'pg-env';
+import { getPgClientCommand, getSpawnEnvWithPg } from 'pg-env';
 
 /**
  * Schemas that record deployment history rather than authored schema.
@@ -56,17 +56,13 @@ export interface PgDumpOptions {
 }
 
 /**
- * The `pg_dump` argv to use. `pg_dump` must match the server's major version;
- * when the local client is older (or absent), `PGPM_PG_DUMP` can point at a
- * version-matched one — including one inside a container, e.g.
- * `docker exec -e PGUSER=postgres <container> pg_dump`. This is a tool
- * location, not connection configuration: connection settings still come from
- * `pg-env`.
+ * The `pg_dump` argv to use, resolved by the typed env layer
+ * ({@link getPgClientCommand}): honors `PGPM_PG_DUMP` / `PGPM_PG_CLIENT_PREFIX`
+ * so an older/absent local client can be pointed at a version-matched one,
+ * including inside a container. Tool location only; connection still comes
+ * from `pg-env`.
  */
-export const resolvePgDumpCommand = (): string[] => {
-  const override = (process.env.PGPM_PG_DUMP ?? '').trim();
-  return override ? override.split(/\s+/) : ['pg_dump'];
-};
+export const resolvePgDumpCommand = (): string[] => getPgClientCommand('pg_dump');
 
 /** Assemble `pg_dump` flags from options (exported for testing/inspection). */
 export const buildPgDumpArgs = (options: PgDumpOptions): string[] => {
@@ -109,7 +105,7 @@ export const pgDump = async (options: PgDumpOptions): Promise<string> => {
       if (e.code === 'ENOENT') {
         reject(new Error(
           `${cmd} not found; ensure PostgreSQL client tools are installed and in PATH, ` +
-          'or set PGPM_PG_DUMP to a version-matched pg_dump command'
+          'or set PGPM_PG_DUMP / PGPM_PG_CLIENT_PREFIX to a version-matched pg_dump command'
         ));
         return;
       }

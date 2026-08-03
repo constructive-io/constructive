@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import { readFileSync } from 'fs';
+import { getPgClientCommand } from 'pg-env';
 
 export type Platform = 'macos' | 'linux' | 'wsl' | 'windows' | 'unknown';
 
@@ -242,7 +243,8 @@ export async function checkPsql(
   info: PlatformInfo,
   exec: CommandRunner = runCommand
 ): Promise<CheckResult> {
-  const result = await exec('psql', ['--version']);
+  const [cmd, ...prefixArgs] = getPgClientCommand('psql');
+  const result = await exec(cmd, [...prefixArgs, '--version']);
   if (result.code !== 0) {
     return {
       name: 'psql',
