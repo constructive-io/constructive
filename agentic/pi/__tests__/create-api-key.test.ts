@@ -200,6 +200,7 @@ describe('create_api_key execute', () => {
     });
     expect(host.deliverSecret).toHaveBeenCalledWith({
       databaseId: 'db-1',
+      cwd: '/tmp/project',
       envVar: 'DEPLOY_BOT_API_KEY',
       plaintext: PLAINTEXT,
       keyId: 'key-1',
@@ -223,7 +224,11 @@ describe('create_api_key execute', () => {
     const result = await run({ key_name: 'deploy bot' });
     expect(result.details.success).toBe(true);
     expect(host.requestStepUp).toHaveBeenCalledTimes(1);
-    expect(host.requestStepUp).toHaveBeenCalledWith('db-1');
+    expect(host.requestStepUp).toHaveBeenCalledWith({
+      databaseId: 'db-1',
+      databaseName: 'demo',
+      apiEndpoint: 'http://api.localhost:6464/graphql',
+    });
     expect(client.mutation.createApiKey).toHaveBeenCalledTimes(2);
     expect(JSON.stringify(result)).not.toContain(PLAINTEXT);
   });

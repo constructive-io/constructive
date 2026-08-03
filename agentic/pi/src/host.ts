@@ -62,10 +62,22 @@ export interface HostProvisionOverlay {
  */
 export type SecretDelivery = {
   databaseId: string;
+  /** Project directory whose `.env` receives the key. */
+  cwd: string;
   envVar: string;
   plaintext: string;
   keyId: string;
   expiresAt?: string;
+};
+
+/**
+ * Context for a host-side step-up: enough to derive the per-database auth
+ * endpoint and look up the app session without re-resolving the project.
+ */
+export type StepUpRequest = {
+  databaseId: string;
+  databaseName: string;
+  apiEndpoint: string;
 };
 
 export interface PiToolsHost {
@@ -101,7 +113,7 @@ export interface PiToolsHost {
    * process (password dialog + verifyPassword). The password never passes
    * through pi or the model. Resolve true when step-up succeeded.
    */
-  requestStepUp?(databaseId: string): Promise<boolean>;
+  requestStepUp?(request: StepUpRequest): Promise<boolean>;
   /**
    * Deliver a minted secret to the user (.env write + one-time reveal).
    * Required for create_api_key — without it the tool refuses to mint.

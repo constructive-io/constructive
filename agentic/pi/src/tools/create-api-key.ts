@@ -223,7 +223,7 @@ export const createApiKeyTool: ToolDefinition<typeof CreateApiKeySchema, CreateA
             'Creating this key requires MFA step-up, and this host has no step-up flow. Complete step-up in the app (verify your password), then retry.',
           );
         }
-        const verified = await host.requestStepUp(databaseId);
+        const verified = await host.requestStepUp({ databaseId, databaseName, apiEndpoint });
         if (!verified) return fail('Step-up verification was not completed. No key was minted.');
         minted = await mint();
       }
@@ -237,6 +237,7 @@ export const createApiKeyTool: ToolDefinition<typeof CreateApiKeySchema, CreateA
       const envVar = toEnvVar(keyName);
       await host.deliverSecret({
         databaseId,
+        cwd: ctx.cwd,
         envVar,
         plaintext: record.apiKey,
         keyId: record.keyId,
