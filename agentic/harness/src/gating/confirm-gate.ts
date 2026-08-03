@@ -93,6 +93,10 @@ export function createConfirmGate(deps: ConfirmGateDeps): ConfirmGate {
 
       const input = event.input;
 
+      // manage_entity_types multiplexes read + write actions behind one tool
+      // name; its read action is not a mutation, so it skips the gate.
+      if (event.toolName === 'manage_entity_types' && input?.action === 'list') return;
+
       const retryBlock = declineGuard.checkRetry(event.toolName, input);
       if (retryBlock) {
         if (host.hasUI) {

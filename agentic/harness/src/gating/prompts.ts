@@ -12,6 +12,7 @@ export const MUTATING_DB_TOOLS = new Set<string>([
   'update_template',
   'delete_template',
   'add_records',
+  'manage_entity_types',
   'run_codegen',
 ]);
 
@@ -180,6 +181,25 @@ export function buildConfirmPrompt(
       message: `Insert ${count || ''} row${count === 1 ? '' : 's'} into table "${tableName}".`,
       preview: count > 0 ? { kind: 'records', tableName, rows } : undefined,
     };
+  }
+  case 'manage_entity_types': {
+    const action = str(input, 'action');
+    const name = str(input, 'name');
+    const id = str(input, 'entity_type_id');
+    switch (action) {
+    case 'create':
+      return {
+        title: 'Create entity type?',
+        message: `Provision entity type "${name ?? '?'}" in the project database (creates its entity table and membership wiring).`,
+      };
+    case 'delete':
+      return {
+        title: 'Delete entity type?',
+        message: `Delete the registration of entity type ${id ?? '?'}. The provisioned entity table and its data stay in the API schema.`,
+      };
+    default:
+      return { title: 'Manage entity types?', message: 'Change entity types in the project database.' };
+    }
   }
   case 'run_codegen':
     return {

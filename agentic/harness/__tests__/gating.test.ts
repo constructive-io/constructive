@@ -170,6 +170,28 @@ describe('confirm gate: declines are respected', () => {
     expect(result).toBeUndefined();
     expect(confirmCalls()).toBe(0);
   });
+
+  it('lets manage_entity_types list pass without a prompt', async () => {
+    const { gate, host, confirmCalls } = createHarness({ isProjectRunnable: async () => true });
+    const result = await gate.onToolCall(
+      call('manage_entity_types', 'tc-1', { action: 'list' }),
+      host,
+      CWD
+    );
+    expect(result).toBeUndefined();
+    expect(confirmCalls()).toBe(0);
+  });
+
+  it('gates manage_entity_types mutations', async () => {
+    const { gate, host, confirmCalls } = createHarness({ isProjectRunnable: async () => true });
+    const result = await gate.onToolCall(
+      call('manage_entity_types', 'tc-1', { action: 'create', name: 'org' }),
+      host,
+      CWD
+    );
+    expect(result?.block).toBe(true);
+    expect(confirmCalls()).toBe(1);
+  });
 });
 
 describe('decline guard canonicalization', () => {
@@ -216,5 +238,18 @@ describe('buildConfirmPrompt', () => {
   it('falls back to a generic prompt for unknown tools', () => {
     const prompt = buildConfirmPrompt('mystery_tool', {});
     expect(prompt.message).toContain('mystery_tool');
+  });
+
+  it('builds action-specific prompts for manage_entity_types', () => {
+    const create = buildConfirmPrompt('manage_entity_types', { action: 'create', name: 'org' });
+    expect(create.title).toBe('Create entity type?');
+    expect(create.message).toContain('"org"');
+
+    const remove = buildConfirmPrompt('manage_entity_types', {
+      action: 'delete',
+      entity_type_id: 'etp-1',
+    });
+    expect(remove.title).toBe('Delete entity type?');
+    expect(remove.message).toMatch(/stay in the API schema/);
   });
 });
