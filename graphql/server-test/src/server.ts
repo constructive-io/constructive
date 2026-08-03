@@ -47,9 +47,6 @@ export const createTestServer = async (
     ...opts,
     server: {
       ...opts.server,
-      ...(serverOpts.strictAuth !== undefined && {
-        strictAuth: serverOpts.strictAuth
-      }),
       host,
       port
     }
