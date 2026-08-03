@@ -441,7 +441,8 @@ export const RULES: RuleMeta[] = [
     defaultSeverity: 'info',
     direction: 'fail-closed',
     title: 'Revocable grant — a role holds EXECUTE no reachable path exercises (options: { roles: [...] })',
-    scope: 'table'
+    scope: 'table',
+    subject: 'routine'
   },
   {
     code: 'W1',
