@@ -62,6 +62,12 @@ export interface PiToolsHost {
   backendConfig(): HostBackendConfig | null | undefined;
   /** Optional data-plane token broker (see DataAuthBroker). */
   dataAuthBroker?: DataAuthBroker;
+  /**
+   * Host-specific sign-in instruction, substituted into signed-out failure
+   * reasons (e.g. the CLI's "Run `agent login` to sign in."). Absent hosts get
+   * the desktop wording.
+   */
+  signInHint?: string;
   /** Harvest an end-user token from the host's app preview, if it has one. */
   previewToken?(): Promise<PreviewToken | null>;
   /** Treat tokens expiring within this window as already expired. Default 30s. */

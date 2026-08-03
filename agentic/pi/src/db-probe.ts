@@ -38,6 +38,7 @@ export async function probeDatabase(args: {
   bearer: string;
   databaseId: string;
   executor?: ProbeExecutor;
+  signInHint?: string;
 }): Promise<DatabaseProbe> {
   const executor =
     args.executor ??
@@ -63,7 +64,9 @@ export async function probeDatabase(args: {
     if (AUTH_ERROR_RE.test(detail)) {
       return {
         outcome: 'unreachable',
-        detail: `${detail} — the account credential was rejected; sign in again, then retry`,
+        detail: `${detail} — the account credential was rejected. ${
+          args.signInHint ?? 'Sign in again, then retry.'
+        }`,
       };
     }
     return { outcome: 'missing' };

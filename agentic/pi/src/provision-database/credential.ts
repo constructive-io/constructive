@@ -20,6 +20,7 @@ export type ProvisionCredential =
 
 export function selectProvisionCredential(
   account: AccountCredential | null | undefined,
+  signInHint?: string,
 ): ProvisionCredential {
   const bearer = account?.apiKey ?? account?.accessToken;
   if (account?.userId && bearer) {
@@ -27,7 +28,8 @@ export function selectProvisionCredential(
   }
   return {
     mode: 'error',
-    reason:
-      'No usable account credential. Sign in (or unlock your session) before provisioning a database.',
+    reason: `No usable account credential. ${
+      signInHint ?? 'Sign in (or unlock your session) before provisioning a database.'
+    }`,
   };
 }

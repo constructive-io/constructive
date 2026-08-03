@@ -121,8 +121,9 @@ export async function resolveProjectContext(
   if (!accountBearer) {
     return {
       context: null,
-      reason:
-        'No usable account credential to reach the Constructive control plane. Sign in to the app, then retry.',
+      reason: `No usable account credential to reach the Constructive control plane. ${
+        host.signInHint ?? 'Sign in to the app, then retry.'
+      }`,
       code: 'missing-credentials',
     };
   }
@@ -137,6 +138,7 @@ export async function resolveProjectContext(
     endpoint: controlApiEndpoint,
     bearer: accountBearer,
     databaseId,
+    signInHint: host.signInHint,
   });
   if (probe.outcome === 'unreachable') {
     return {
@@ -206,8 +208,11 @@ export async function resolveProjectContext(
   };
 }
 
-const NEEDS_AUTH_REASON =
-  'Not signed in to the app database yet. Sign in from the Sheets tab, or open the Preview and sign in to your app, then try again.';
+const needsAuthReason = (): string =>
+  `Not signed in to the app database yet. ${
+    getHost().signInHint ??
+    'Sign in from the Sheets tab, or open the Preview and sign in to your app, then try again.'
+  }`;
 
 export type DataTokenResult = { token?: string; userId?: string; reason?: string };
 
@@ -224,15 +229,15 @@ export async function resolveDataToken(context: ProjectContext): Promise<DataTok
   if (active) return { token: active.token, userId: active.userId };
 
   const preview = host.previewToken ? await host.previewToken() : null;
-  if (!preview) return { reason: NEEDS_AUTH_REASON };
+  if (!preview) return { reason: needsAuthReason() };
   if (broker?.isInvalidToken(context.databaseId, preview.accessToken)) {
-    return { reason: NEEDS_AUTH_REASON };
+    return { reason: needsAuthReason() };
   }
 
   const parsed = preview.accessTokenExpiresAt ? Date.parse(preview.accessTokenExpiresAt) : NaN;
   const expiresAt = Number.isNaN(parsed) ? Date.now() + 60 * 60 * 1000 : parsed;
   const skewMs = host.dataTokenSkewMs ?? DEFAULT_DATA_TOKEN_SKEW_MS;
-  if (expiresAt <= Date.now() + skewMs) return { reason: NEEDS_AUTH_REASON };
+  if (expiresAt <= Date.now() + skewMs) return { reason: needsAuthReason() };
 
   broker?.adoptToken(context.databaseId, {
     userId: preview.userId,

@@ -143,7 +143,7 @@ export const provisionDatabaseTool: ToolDefinition<
     // with no usable bearer errors out here rather than silently minting a
     // throwaway owner. Gate BEFORE prewarm so an error return doesn't leak a
     // detached background scaffold/install.
-    const credential = selectProvisionCredential(host.account());
+    const credential = selectProvisionCredential(host.account(), host.signInHint);
     if (credential.mode === 'error') {
       return fail(`Cannot provision a database: ${credential.reason}`);
     }
@@ -164,6 +164,7 @@ export const provisionDatabaseTool: ToolDefinition<
         endpoint: apiEndpoint,
         bearer: credential.bearer,
         databaseId: existingEnv.DATABASE_ID,
+        signInHint: host.signInHint,
       });
       if (probe.outcome === 'unreachable') {
         return fail(
