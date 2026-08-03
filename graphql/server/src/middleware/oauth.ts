@@ -193,24 +193,49 @@ function isEmailVerified(profile: OAuthProfile): boolean {
   return profile.emailVerified === true;
 }
 
-function redirectToError(
+function redirectWithErrorCode(
   res: Response,
   baseUrl: string,
   errorPath: string,
-  error: ConstructiveError | string,
+  errorCode: string,
   provider: string,
   errorDescription?: string
 ): void {
   const errorUrl = new URL(errorPath, baseUrl);
-  errorUrl.searchParams.set(
-    'error',
-    typeof error === 'string' ? error : error.code
-  );
+  errorUrl.searchParams.set('error', errorCode);
   errorUrl.searchParams.set('provider', provider);
   if (errorDescription) {
     errorUrl.searchParams.set('error_description', errorDescription);
   }
   res.redirect(errorUrl.toString());
+}
+
+function redirectToError(
+  res: Response,
+  baseUrl: string,
+  errorPath: string,
+  error: ConstructiveError,
+  provider: string
+): void {
+  redirectWithErrorCode(res, baseUrl, errorPath, error.code, provider);
+}
+
+function redirectToProviderError(
+  res: Response,
+  baseUrl: string,
+  errorPath: string,
+  providerErrorCode: string,
+  provider: string,
+  providerErrorDescription?: string
+): void {
+  redirectWithErrorCode(
+    res,
+    baseUrl,
+    errorPath,
+    providerErrorCode,
+    provider,
+    providerErrorDescription
+  );
 }
 
 export function createOAuthRoutes(opts: ConstructiveOptions): Router {
@@ -392,7 +417,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
     // Handle OAuth provider errors
     if (oauthError) {
       log.warn(`[oauth] Provider ${provider} returned error: ${oauthError}`);
-      return redirectToError(
+      return redirectToProviderError(
         res,
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,

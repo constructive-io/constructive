@@ -199,6 +199,25 @@ function createStatePayload(
 }
 
 describe('OAuth routes', () => {
+  it('passes provider errors through without treating them as registered errors', async () => {
+    await withOAuthServer(async (baseUrl) => {
+      const callbackUrl = new URL('/auth/github/callback', baseUrl);
+      callbackUrl.searchParams.set('error', 'access_denied');
+      callbackUrl.searchParams.set('error_description', 'User denied access');
+
+      const response = await request(callbackUrl.toString());
+
+      expect(response.statusCode).toBe(302);
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.pathname).toBe('/auth/error');
+      expect(redirect.searchParams.get('error')).toBe('access_denied');
+      expect(redirect.searchParams.get('provider')).toBe('github');
+      expect(redirect.searchParams.get('error_description')).toBe(
+        'User denied access'
+      );
+    });
+  });
+
   it('binds PKCE verifier to the signed state cookie without exposing it in the redirect URL', async () => {
     await withOAuthServer(async (baseUrl) => {
       const response = await request(
