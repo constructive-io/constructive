@@ -49,7 +49,7 @@ describe('materializeDbTools', () => {
       on: () => {}
     });
     expect(registered).toContain('provision_database');
-    expect(registered).toHaveLength(16);
+    expect(registered).toHaveLength(18);
   });
 
   function loadHost() {
