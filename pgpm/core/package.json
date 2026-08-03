@@ -50,6 +50,7 @@
   "dependencies": {
     "@pgpmjs/ast": "workspace:^",
     "@pgpmjs/bundle": "workspace:^",
+    "@pgpmjs/diff": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
@@ -63,8 +64,8 @@
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^18.3.2",
-    "pgsql-parser": "^18.2.2",
+    "pgsql-deparser": "^18.3.3",
+    "pgsql-parser": "^18.2.3",
     "yanse": "^0.2.1"
   }
 }

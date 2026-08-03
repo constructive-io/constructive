@@ -1,3 +1,4 @@
+import { buildBaselineBackfill } from '@pgpmjs/core';
 import {
   dumpCompatibilityWarnings,
   importDumpRows,
@@ -17,6 +18,7 @@ import {
   PartitionCycleError,
   partitionExportRows
 } from '@pgpmjs/transform';
+import { writeFileSync } from 'fs';
 import { cliExitWithError, CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
 
@@ -77,6 +79,12 @@ Options:
   --emit-bundle <file>     Also project the imported module into a
                           content-addressed .bundle.tar.gz. Same single-package
                           requirement as --emit-sql.
+  --baseline              After writing each package, also write a
+                          <pkg>/baseline.sql: an idempotent, log-only
+                          pgpm_migrate backfill recording every generated
+                          change as already deployed. Adopts the source
+                          database — apply the script (after 'pgpm migrate
+                          init'), then 'pgpm deploy' runs only real changes.
   --cwd <directory>       Working directory (default: current directory)
   --dry-run               Print the resulting plan/paths without writing
 
@@ -89,6 +97,7 @@ Examples:
   pgpm import ./sql-files --pkg my-app --out ./packages --with-data
   pgpm import dump.sql --pkg my-app --partition partition.json
   pgpm import dump.sql --pkg my-app --emit-sql my-app.sql
+  pgpm import dump.sql --pkg my-app --baseline
 `;
 
 const NAMING_STYLES = ['directory', 'flat'] as const;
@@ -150,9 +159,13 @@ export default async (
   const emit = parseEmitProjectionTargets(argv, cwd);
   const emitRequested = hasEmitProjection(emit);
   const sqlToStdout = emit.emitSql === STDOUT_TARGET;
+  const baseline = Boolean(argv.baseline);
 
   if (emitRequested && dryRun) {
     await cliExitWithError('--emit-sql/--emit-bundle cannot be combined with --dry-run.');
+  }
+  if (baseline && dryRun) {
+    await cliExitWithError('--baseline cannot be combined with --dry-run.');
   }
 
   let source;
@@ -222,15 +235,25 @@ export default async (
       }
     }
     let firstDir: string | undefined;
+    const writtenDirs: string[] = [];
     for (const pkg of packages) {
       const dir = writePackage(outBase, pkg);
       firstDir ??= dir;
+      writtenDirs.push(dir);
       if (!sqlToStdout) {
         log.success(`wrote ${pkg.rows.length} changes to ${dir}`);
       }
     }
     if (emitRequested && firstDir) {
       await projectModule(firstDir, emit, sqlToStdout ? undefined : msg => log.success(msg));
+    }
+    if (baseline) {
+      for (const dir of writtenDirs) {
+        const { entries, backfillSql } = await buildBaselineBackfill(dir);
+        const baselinePath = path.join(dir, 'baseline.sql');
+        writeFileSync(baselinePath, backfillSql);
+        log.success(`wrote baseline backfill for ${entries.length} change(s) to ${baselinePath}`);
+      }
     }
   }
 

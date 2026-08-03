@@ -1,5 +1,6 @@
 import { CLIOptions, extractFirst,Inquirerer, ParsedArgs } from 'inquirerer';
 
+import baseline from './migrate/baseline';
 import deps from './migrate/deps';
 // Migrate subcommands
 import init from './migrate/init';
@@ -10,7 +11,8 @@ const subcommandMap: Record<string, Function> = {
   init,
   status,
   list,
-  deps
+  deps,
+  baseline
 };
 
 const migrateUsageText = `
@@ -20,6 +22,7 @@ Migrate Commands:
   pgpm migrate status    Show current migration status
   pgpm migrate list      List all changes (deployed and pending)
   pgpm migrate deps      Show change dependencies
+  pgpm migrate baseline  Record a plan as already deployed (log-only), adopting an existing database
 
 Options:
   --help, -h     Show this help message
@@ -68,7 +71,8 @@ function getSubcommandDescription(cmd: string): string {
     init: 'Initialize migration tracking in database',
     status: 'Show current migration status',
     list: 'List all changes (deployed and pending)',
-    deps: 'Show change dependencies'
+    deps: 'Show change dependencies',
+    baseline: 'Record a plan as already deployed (log-only), adopting an existing database'
   };
   return descriptions[cmd] || '';
 }

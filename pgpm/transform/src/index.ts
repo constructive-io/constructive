@@ -85,6 +85,10 @@ export {
 export type { ExportGranularity, RestructureExportRowsOptions, RestructureExportRowsResult } from './restructure';
 export { EXPORT_GRANULARITIES, isExportGranularity, restructureExportRows } from './restructure';
 export type {
+  ChangeCoverage,
+  ChangeObjectCoverage,
+  ChangeObjectDelta,
+  ChangeSatisfaction,
   DiffInputChange,
   ObjectDelta,
   SemanticDeltaChange,
@@ -93,6 +97,7 @@ export type {
   SemanticObjectDiff,
 } from './semantic-diff-driver';
 export {
+  coverChanges,
   diffChangeSets,
   diffSchemas,
 } from './semantic-diff-driver';

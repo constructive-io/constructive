@@ -185,6 +185,73 @@ describe('pgpm import e2e', () => {
     expect(bundle.changes.length).toBeGreaterThan(0);
   });
 
+  it('--baseline writes an idempotent log-only pgpm_migrate backfill', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}
+      pgpm import dump.sql --pkg imp-baseline-file --baseline
+      `,
+      {}
+    );
+
+    const baselinePath = path.join(wsDir, 'imp-baseline-file', 'baseline.sql');
+    expect(fs.existsSync(baselinePath)).toBe(true);
+    const backfill = fs.readFileSync(baselinePath, 'utf-8');
+    // Every recorded change is log-only (p_log_only => TRUE, empty DDL body).
+    expect(backfill).toMatch(/CALL pgpm_migrate\.deploy\(/);
+    expect(backfill).toContain('TRUE');
+    expect(backfill).not.toMatch(/CREATE SCHEMA/);
+    expect(backfill).toContain('BEGIN;');
+    expect(backfill).toContain('COMMIT;');
+  });
+
+  it('migrate baseline adopts a non-pgpm database so deploy runs nothing', async () => {
+    // A database that already carries the schema but was never pgpm-managed:
+    // apply the raw dump (no pgpm_migrate ledger), exactly like a restore.
+    const adopted = await fixture.setupTestDatabase();
+    const { sql } = preprocessDumpText(fs.readFileSync(DUMP_PATH, 'utf-8'));
+    await adopted.query(sql);
+
+    // Import the dump into a pgpm module (files only; no DB contact).
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}
+      pgpm import dump.sql --pkg imp-adopt
+      `,
+      {}
+    );
+
+    // Baseline: record every change as deployed (log-only) — no DDL re-run.
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/imp-adopt
+      pgpm migrate baseline --database ${adopted.name} --yes
+      `,
+      { database: adopted.name }
+    );
+
+    const planCount = fs
+      .readFileSync(path.join(wsDir, 'imp-adopt', 'pgpm.plan'), 'utf-8')
+      .split('\n')
+      .filter(line => line.trim() && !line.startsWith('%') && !line.startsWith('@')).length;
+    const recorded = await adopted.query(
+      `SELECT COUNT(*)::int AS count FROM pgpm_migrate.changes WHERE package = 'imp-adopt'`
+    );
+    expect(recorded.rows[0].count).toBe(planCount);
+
+    // The schema is untouched and a subsequent deploy is a no-op.
+    const before = await snapshotCatalog(adopted);
+    await fixture.runTerminalCommands(
+      `
+      cd ${WS}/imp-adopt
+      pgpm deploy --database ${adopted.name} --package imp-adopt --yes
+      `,
+      { database: adopted.name }
+    );
+    const after = await snapshotCatalog(adopted);
+    expect(diffCatalogSnapshots(before, after)).toEqual([]);
+  });
+
   it('--with-data deploys COPY/INSERT data as seed fixtures', async () => {
     await fixture.runTerminalCommands(
       `
