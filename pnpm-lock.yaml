@@ -2665,8 +2665,8 @@ importers:
         specifier: ^4.9.1
         version: 4.9.1
       libpg-query:
-        specifier: ^18.1.2
-        version: 18.1.2
+        specifier: ^18.1.4
+        version: 18.1.4
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -8853,9 +8853,6 @@ packages:
   libnpmpublish@9.0.9:
     resolution: {integrity: sha512-26zzwoBNAvX9AWOPiqqF6FG4HrSCPsHFkQm7nT+xU1ggAujL/eae81RnCv4CJ2In9q9fh10B88sYSzKCUh/Ghg==}
     engines: {node: ^16.14.0 || >=18.0.0}
-
-  libpg-query@18.1.2:
-    resolution: {integrity: sha512-8epkLd4hMoUVfYu2RlXWiUTxnGw1S6adm6/rMgWqlUB6+KsVb5BmJrDY8CjaPB9NWbEt6OnvQnfGxol2iBxn4A==}
 
   libpg-query@18.1.4:
     resolution: {integrity: sha512-6jF9qn9ln4yLnmSF+bS/DBvAfNcPhGI05+pkQy+n3cRd3p9aO8LWjquEin8SLO0k7zYk745ZGBXYUiL9AUI7gA==}
@@ -17061,10 +17058,6 @@ snapshots:
       ssri: 10.0.6
     transitivePeerDependencies:
       - supports-color
-
-  libpg-query@18.1.2:
-    dependencies:
-      '@pgsql/types': 18.0.0
 
   libpg-query@18.1.4:
     dependencies:
