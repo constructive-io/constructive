@@ -337,6 +337,54 @@ describe('computeScore', () => {
     expect(x1.potential / x4.potential).toBeGreaterThan(8);
   });
 
+  it('density model: charges a rule per unit of repair, not per finding', () => {
+    // L19 emits one finding per (relation × function) pair; two functions
+    // reaching five relations each is ten findings and two revokes.
+    const findings = ['f_one', 'f_two'].flatMap((fn) =>
+      Array.from({ length: 5 }, (_, i) =>
+        finding({
+          code: 'L19',
+          severity: 'medium',
+          table: `t${i}`,
+          context: { function: `private.${fn}` }
+        }))
+    );
+    const score = computeScore(findings, {}, { exposedTables: 100, exposureKnown: true });
+    const [l19] = score.deductions;
+
+    expect(l19.count).toBe(10);
+    expect(l19.units).toBe(2);
+    // Two units at medium, not ten findings: 8 points rather than 40.
+    expect(l19.points).toBe(8);
+  });
+
+  it('density model: caps one rule at half the points that would fail an audit', () => {
+    // 300 criticals over 100 tables is 7500 raw points — an F many times
+    // over on one rule's say-so. The cap is 0.5·ln(100/50)/k·tables ≈ 203.9.
+    const findings = Array.from({ length: 300 }, (_, i) =>
+      finding({ code: 'A7', severity: 'critical', table: `t${i}` }));
+    const score = computeScore(findings, { floorOnCritical: false }, {
+      exposedTables: 100,
+      exposureKnown: true
+    });
+    const [a7] = score.deductions;
+
+    expect(a7.count).toBe(300);
+    expect(a7.capped).toBe(true);
+    expect(a7.points).toBeCloseTo(203.9, 1);
+    // One rule alone lands a C, never an F: breadth is what fails an audit.
+    expect(score.value).toBe(70.7);
+    expect(score.grade).toBe('C');
+
+    // Opt out and the raw arithmetic is back.
+    const uncapped = computeScore(findings, { maxRuleDensity: false, floorOnCritical: false }, {
+      exposedTables: 100,
+      exposureKnown: true
+    });
+    expect(uncapped.deductions[0].points).toBe(7500);
+    expect(uncapped.grade).toBe('F');
+  });
+
   it('density model: lists zero-weight rules as unscored rather than dropping them', () => {
     const findings = [
       finding({ code: 'A2', severity: 'high' }),

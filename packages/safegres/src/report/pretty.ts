@@ -1,6 +1,6 @@
 import yanse from 'yanse';
 
-import type { Score } from '../score/score';
+import type { Score, ScoreDeduction } from '../score/score';
 import type { Finding, PlaneReport, Report, Severity } from '../types';
 import { renderCallGraph, renderCallGraphDiff } from './callgraph';
 import { formatDelta, type ScoreDelta } from './compare';
@@ -102,6 +102,10 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
       );
     }
     lines.push('');
+  }
+
+  if (view.has('scorecards')) {
+    lines.push(...scorecardLines(view, colorEnabled), '');
   }
 
   if (view.has('planes')) {
@@ -272,6 +276,26 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
 }
 
 /**
+ * The other named scores. One line each: the headline answers the question
+ * the preset was written for, and these answer the ones a particular team
+ * actually gates on. `raw` sits among them deliberately — a number no
+ * configuration softened, next to the one that was.
+ */
+function scorecardLines(view: ReportView, colorEnabled: boolean): string[] {
+  const lines = ['scorecards — the same findings, scored by question:'];
+  for (const card of view.scorecards) {
+    const grade = colorEnabled
+      ? gradePaintFor(card.score)(`${card.score.value} (${card.score.grade})`)
+      : `${card.score.value} (${card.score.grade})`;
+    lines.push(
+      `  ${card.name}: ${grade}  — ${card.findings} finding(s)`
+        + (card.description ? `  ${card.description}` : '')
+    );
+  }
+  return lines;
+}
+
+/**
  * Secondary planes: one line each, because they are not the headline. The
  * primary score answers "how safe is the product"; these answer "and what if
  * somebody doesn't come through it" — worth seeing, not worth competing with
@@ -320,13 +344,20 @@ function scoreLines(label: string, score: Score, colorEnabled: boolean): string[
   const top = scored.slice(0, 3);
   if (top.length > 0) {
     lines.push(
-      `  top deductions: ${top.map((d) => `${d.code} −${d.points} (×${d.count})`).join('  ')}`
+      `  top deductions: ${top.map(deductionLabel).join('  ')}`
     );
     // Payoff, not points: what the score becomes if the rule goes to zero.
     lines.push(
       `  by rule: ${scored
         .map((d) => `${d.code} ${d.grade} (+${d.potential.toFixed(1)})`)
         .join('  ')}`
+    );
+  }
+  const capped = scored.filter((d) => d.capped);
+  if (capped.length > 0) {
+    lines.push(
+      `  capped: ${capped.map((d) => d.code).join(', ')}`
+        + '  — one rule cannot decide the grade; the finding count is unchanged'
     );
   }
   const unscored = score.deductions.filter((d) => d.unscored);
@@ -337,6 +368,17 @@ function scoreLines(label: string, score: Score, colorEnabled: boolean): string[
     );
   }
   return lines;
+}
+
+/**
+ * `L19 −664 (×568 → 166 fixes)` — the finding count and what it costs to
+ * clear are different numbers, and only the second one is charged.
+ */
+function deductionLabel(d: ScoreDeduction): string {
+  const count = d.units === undefined
+    ? `×${d.count}`
+    : `×${d.count} → ${d.units} fix${d.units === 1 ? '' : 'es'}`;
+  return `${d.code} −${d.points} (${count})`;
 }
 
 function deltaLine(d: ScoreDelta, ref: string | undefined, colorEnabled: boolean): string {

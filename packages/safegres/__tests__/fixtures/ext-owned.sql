@@ -56,3 +56,23 @@ CREATE TABLE fx_ext_runtime.runtime_child (
   label text
 );
 GRANT SELECT ON fx_ext_runtime.runtime_child TO PUBLIC;
+
+-- The same distinction for routines, which the convention linter reads. All
+-- three use dynamic SQL (C4) and pin search_path (C1); only `app_helper` is
+-- the application's to fix.
+CREATE FUNCTION fx_ext.ext_helper() RETURNS void
+LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN EXECUTE 'SELECT 1'; END;
+$$;
+ALTER EXTENSION hstore ADD FUNCTION fx_ext.ext_helper();
+
+CREATE FUNCTION fx_ext.app_helper() RETURNS void
+LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN EXECUTE 'SELECT 1'; END;
+$$;
+
+-- Unregistered, but inside an extension's schema — the pg_partman shape.
+CREATE FUNCTION fx_ext_runtime.runtime_helper() RETURNS void
+LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN EXECUTE 'SELECT 1'; END;
+$$;

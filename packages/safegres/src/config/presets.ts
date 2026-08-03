@@ -131,7 +131,34 @@ export const constructive: SafegresConfig = {
     C3: 'low',
     C4: 'high'
   },
-  scoring: { floorOnCritical: 'C' }
+  scoring: { floorOnCritical: 'C' },
+  // The headline grades the API surface, which is the product's own question.
+  // These are the two other questions this codebase actually gates on, and
+  // neither is well served by being averaged into the first.
+  scorecards: {
+    'anon-surface': {
+      title: 'Anonymous surface',
+      description: 'What an unauthenticated caller reaches — exposure ignored, leaks only.',
+      select: {
+        roles: ['anonymous'],
+        direction: 'fail-open',
+        exposure: 'all',
+        denominator: 'all',
+        severities: 'declared'
+      },
+      // Nothing about the anonymous surface is informational. The L-series
+      // ships at `info` because each rule is new, not because "an
+      // unauthenticated caller reaches this" is a matter of interest — so on
+      // the card that asks exactly that question, a finding costs a point.
+      weights: { info: 1 },
+      floorOnCritical: 'C'
+    },
+    'sql-conventions': {
+      title: 'SQL conventions',
+      description: 'House style in function bodies — reachable or not, it is still the codebase.',
+      select: { rules: ['C*'], exposure: 'all', denominator: 'all' }
+    }
+  }
 };
 
 /** Structural flags only — a fast CI smoke check. */

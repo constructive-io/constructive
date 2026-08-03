@@ -10,6 +10,7 @@
  */
 
 import type { ReportConfig } from '../config/types';
+import type { ScorecardReport } from '../score/scorecards';
 import type { Finding, PlaneReport, Report } from '../types';
 import type { ScoreDelta } from './compare';
 
@@ -18,6 +19,7 @@ export type ViewSection =
   | 'delta'
   | 'findings'
   | 'planes'
+  | 'scorecards'
   | 'role-access'
   | 'call-graph';
 
@@ -26,6 +28,7 @@ export const ALL_SECTIONS: ViewSection[] = [
   'delta',
   'findings',
   'planes',
+  'scorecards',
   'role-access',
   'call-graph'
 ];
@@ -78,6 +81,12 @@ export interface ReportView {
   planes: PlaneReport[];
   /** Planes the view config asked to see in full. */
   expandedPlanes: PlaneReport[];
+  /**
+   * Named scores other than `default`, which is the headline and is already
+   * rendered as the score. Kept in config order so the file decides what a
+   * reader sees first.
+   */
+  scorecards: ScorecardReport[];
   security: ViewFindings;
   perf?: ViewFindings;
   has(section: ViewSection): boolean;
@@ -144,6 +153,8 @@ export function selectView(report: Report, config: ViewConfig = {}): ReportView 
     });
   }
 
+  const scorecards = (report.scorecards ?? []).filter((c) => c.name !== 'default');
+
   const securityAll = report.perf
     ? report.findings.filter((f) => f.dimension !== 'perf')
     : report.findings;
@@ -154,6 +165,7 @@ export function selectView(report: Report, config: ViewConfig = {}): ReportView 
     scores,
     planes: secondary,
     expandedPlanes,
+    scorecards,
     security: partition(securityAll, config),
     ...(report.perf && dimensions.has('perf')
       ? { perf: partition(report.perf.findings, config) }
@@ -165,6 +177,8 @@ export function selectView(report: Report, config: ViewConfig = {}): ReportView 
         return report.comparison != null;
       case 'planes':
         return secondary.length > 0;
+      case 'scorecards':
+        return scorecards.length > 0;
       case 'role-access':
         return (report.roleAccess?.roles.length ?? 0) > 0;
       case 'call-graph':

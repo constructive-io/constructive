@@ -244,6 +244,19 @@
               "type": "number",
               "description": "Cap on one rule’s total deduction (weighted model)"
             },
+            "maxRuleDensity": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "description": "Fraction"
+                },
+                {
+                  "type": "boolean",
+                  "description": "false to disable"
+                }
+              ],
+              "description": "Cap on one rule’s contribution, as a fraction of the points that fail an audit alone. Default 0.5; false disables the cap."
+            },
             "failClosedWeight": {
               "type": "number",
               "description": "Multiplier for fail-closed findings. Default 0."
@@ -525,6 +538,19 @@
           "type": "number",
           "description": "Cap on one rule’s total deduction (weighted model)"
         },
+        "maxRuleDensity": {
+          "anyOf": [
+            {
+              "type": "number",
+              "description": "Fraction"
+            },
+            {
+              "type": "boolean",
+              "description": "false to disable"
+            }
+          ],
+          "description": "Cap on one rule’s contribution, as a fraction of the points that fail an audit alone. Default 0.5; false disables the cap."
+        },
         "failClosedWeight": {
           "type": "number",
           "description": "Multiplier for fail-closed findings. Default 0."
@@ -577,6 +603,225 @@
         }
       },
       "description": "The security scoring model"
+    },
+    "scorecards": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": [
+              "density",
+              "weighted"
+            ],
+            "description": "Scoring model. Default density."
+          },
+          "weights": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "description": "Points"
+            },
+            "description": "Points deducted per finding severity"
+          },
+          "perRuleWeights": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "description": "Points"
+            },
+            "description": "Per-rule weight, beating the severity weight"
+          },
+          "maxDeductionPerRule": {
+            "type": "number",
+            "description": "Cap on one rule’s total deduction (weighted model)"
+          },
+          "maxRuleDensity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "description": "Fraction"
+              },
+              {
+                "type": "boolean",
+                "description": "false to disable"
+              }
+            ],
+            "description": "Cap on one rule’s contribution, as a fraction of the points that fail an audit alone. Default 0.5; false disables the cap."
+          },
+          "failClosedWeight": {
+            "type": "number",
+            "description": "Multiplier for fail-closed findings. Default 0."
+          },
+          "densityK": {
+            "type": "number",
+            "description": "Density falloff constant. Default 0.17."
+          },
+          "unknownExposureCap": {
+            "anyOf": [
+              {
+                "type": "number",
+                "description": "Cap"
+              },
+              {
+                "type": "boolean",
+                "description": "false to disable"
+              }
+            ],
+            "description": "Maximum score when no exposure surface resolves. Default 80; false disables the cap."
+          },
+          "floorOnCritical": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "A+",
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                  "F"
+                ],
+                "description": "Grade"
+              },
+              {
+                "type": "boolean",
+                "description": "false to disable"
+              }
+            ],
+            "description": "Grade any critical finding floors the score at. Default C; false disables."
+          },
+          "gradeBands": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "description": "Score"
+            },
+            "description": "Minimum score for each grade"
+          },
+          "title": {
+            "type": "string",
+            "description": "Heading for reports. Defaults to the config key."
+          },
+          "description": {
+            "type": "string",
+            "description": "What decision this score informs. Rendered with it."
+          },
+          "select": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "rules": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Rule code or wildcard"
+                },
+                "description": "Rule codes or C* prefix wildcards to grade"
+              },
+              "exclude": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Rule code or wildcard"
+                },
+                "description": "Rule codes or wildcards to drop after rules selected"
+              },
+              "dimension": {
+                "type": "string",
+                "enum": [
+                  "security",
+                  "perf",
+                  "all"
+                ],
+                "description": "Which axis: security (default), perf, or all"
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Role name"
+                },
+                "description": "Only findings about these roles"
+              },
+              "planes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Plane name"
+                },
+                "description": "Only findings reachable on these access planes"
+              },
+              "schemas": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Schema name"
+                },
+                "description": "Only findings in these schemas"
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "fail-open",
+                  "fail-closed",
+                  "none",
+                  "any"
+                ],
+                "description": "fail-open leaks, fail-closed denials, or any"
+              },
+              "minSeverity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low",
+                  "info"
+                ],
+                "description": "Drop findings below this severity before scoring"
+              },
+              "exposure": {
+                "type": "string",
+                "enum": [
+                  "exposed",
+                  "all"
+                ],
+                "description": "exposed (default) grades the API surface; all ignores exposure"
+              },
+              "acknowledged": {
+                "type": "string",
+                "enum": [
+                  "skip",
+                  "include"
+                ],
+                "description": "include grades acknowledged findings too. Default skip."
+              },
+              "severities": {
+                "type": "string",
+                "enum": [
+                  "configured",
+                  "declared"
+                ],
+                "description": "configured (default) uses this config’s severities; declared uses each rule’s registry default"
+              },
+              "denominator": {
+                "type": "string",
+                "enum": [
+                  "exposed",
+                  "all"
+                ],
+                "description": "Density denominator: exposed relations (default) or all"
+              }
+            },
+            "description": "Which findings it grades"
+          }
+        },
+        "description": "One scorecard"
+      },
+      "description": "Named scores over slices of the same findings, keyed by name"
     },
     "failOn": {
       "type": "object",
@@ -651,6 +896,33 @@
             "description": "One plane gate"
           },
           "description": "Per-plane gates, keyed by plane name. A floor is the useful shape."
+        },
+        "scorecards": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "score": {
+                "type": "number",
+                "description": "Exit non-zero below this plane score"
+              },
+              "grade": {
+                "type": "string",
+                "enum": [
+                  "A+",
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                  "F"
+                ],
+                "description": "Exit non-zero below this plane grade"
+              }
+            },
+            "description": "One scorecard gate"
+          },
+          "description": "Per-scorecard gates, keyed by scorecard name."
         }
       },
       "description": "Gates — what makes the run exit non-zero"

@@ -10,7 +10,7 @@
  */
 
 import type { RoleAccessEntry } from '../checks/lattice';
-import type { Score } from '../score/score';
+import type { Score, ScoreDeduction } from '../score/score';
 import type { Finding, PlaneReport, Report, Severity } from '../types';
 import { formatDelta, type ReportComparison, type RuleDelta, type ScoreDelta } from './compare';
 import { type ReportView, selectView, type ViewConfig } from './view';
@@ -73,6 +73,8 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
       ''
     );
   }
+
+  if (view.has('scorecards')) out.push(...scorecardSection(view), '');
 
   if (view.has('planes')) out.push(...planeSection(view), '');
 
@@ -158,6 +160,31 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
  * working as designed — so they read as context under the headline rather
  * than as a second verdict competing with it.
  */
+/**
+ * The other named scores. Same findings, different questions — which is the
+ * point: a team that gates on `anon-surface` is not being asked to care
+ * about the headline, and `raw` is there so nobody has to trust that the
+ * config was written in good faith.
+ */
+function scorecardSection(view: ReportView): string[] {
+  const out: string[] = [
+    '### Scorecards',
+    '',
+    '_The same findings, scored by question. Nothing here filters the report — '
+      + 'a scorecard decides what a number is *about*, never what is reported._',
+    '',
+    '| Scorecard | Score | Grade | Findings | Question |',
+    '| --- | ---: | --- | ---: | --- |'
+  ];
+  for (const card of view.scorecards) {
+    out.push(
+      `| \`${card.name}\` | ${card.score.value} | **${card.score.grade}** | ${card.findings} `
+        + `| ${card.description ?? card.title ?? ''} |`
+    );
+  }
+  return out;
+}
+
 function planeSection(view: ReportView): string[] {
   const out: string[] = [
     '### Other access planes',
@@ -177,11 +204,7 @@ function planeSection(view: ReportView): string[] {
       '',
       '| Rule | Findings | Points | Grade | Payoff |',
       '| --- | ---: | ---: | --- | ---: |',
-      ...plane.score.deductions.map((d) =>
-        d.unscored
-          ? `| \`${d.code}\` | ${d.count} | — | — | *unscored* |`
-          : `| \`${d.code}\` | ${d.count} | −${d.points} | **${d.grade}** | +${d.potential.toFixed(1)} |`
-      )
+      ...plane.score.deductions.map(deductionRow)
     );
   }
   return out;
@@ -337,16 +360,24 @@ function comparisonSection(cmp: ReportComparison): string[] {
  * rule alone goes to zero — the number worth ranking work by, and not
  * proportional to the finding count, because the curve is exponential.
  */
+/**
+ * One rule's row. Findings and fixes are different numbers when a rule fans
+ * out over a single repair, and points are charged on the second.
+ */
+function deductionRow(d: ScoreDeduction): string {
+  const found = d.units === undefined ? `${d.count}` : `${d.count} (${d.units} fixes)`;
+  const points = d.capped ? `−${d.points} (capped)` : `−${d.points}`;
+  return d.unscored
+    ? `| \`${d.code}\` | ${found} | — | — | *unscored* |`
+    : `| \`${d.code}\` | ${found} | ${points} | **${d.grade}** | +${d.potential.toFixed(1)} |`;
+}
+
 function ruleTable(label: string, score: Score | undefined, options: RenderMarkdownOptions): string[] {
   if (!score || score.deductions.length === 0) return [];
   const table = [
     '| Rule | Findings | Points | Grade | Payoff |',
     '| --- | ---: | ---: | --- | ---: |',
-    ...score.deductions.map((d) =>
-      d.unscored
-        ? `| \`${d.code}\` | ${d.count} | — | — | *unscored* |`
-        : `| \`${d.code}\` | ${d.count} | −${d.points} | **${d.grade}** | +${d.potential.toFixed(1)} |`
-    )
+    ...score.deductions.map(deductionRow)
   ];
   return options.verbose
     ? [`### ${label} by rule`, '', ...table, '']

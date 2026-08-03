@@ -1,4 +1,5 @@
 import type { Grade, ScoringConfig } from '../config/types';
+import { RULES_BY_CODE } from '../rules/registry';
 import type { Finding, Severity } from '../types';
 import { meetsThreshold } from '../types';
 
@@ -26,6 +27,18 @@ export interface ScoreDeduction {
    * fixing them would move the score; it cannot.
    */
   unscored?: boolean;
+  /**
+   * The rule's raw points exceeded `maxRuleDensity` and were cut to it. The
+   * finding count is unchanged: what is capped is the rule's influence on the
+   * score, not the size of the problem it reports.
+   */
+  capped?: boolean;
+  /**
+   * Distinct units of repair behind `count`, when a rule declares one
+   * (`RuleMeta.dedupBy`). Points are charged per unit, so a rule that emits
+   * one finding per (relation × function) pair costs what fixing it costs.
+   */
+  units?: number;
 }
 
 export interface Score {
@@ -56,6 +69,13 @@ export interface ScoreContext {
   exposedTables?: number;
   /** Whether an exposure surface was configured/resolved. */
   exposureKnown?: boolean;
+  /**
+   * The caller has already decided which findings count (a scorecard's
+   * selector). Skips the built-in exposure/acknowledgement/meta filtering,
+   * which would otherwise silently overrule a selector that asked for
+   * unexposed findings.
+   */
+  prefiltered?: boolean;
 }
 
 export const DEFAULT_WEIGHTS: Record<Severity, number> = {
@@ -75,6 +95,7 @@ export const DEFAULT_GRADE_BANDS: Record<Exclude<Grade, 'F'>, number> = {
 };
 
 const DEFAULT_MAX_DEDUCTION_PER_RULE = 40;
+const DEFAULT_MAX_RULE_DENSITY = 0.5;
 const DEFAULT_DENSITY_K = 0.17;
 const DEFAULT_UNKNOWN_EXPOSURE_CAP = 80;
 const DEFAULT_FAIL_CLOSED_WEIGHT = 0;
@@ -106,6 +127,12 @@ export function computeScore(
  * `failClosedWeight`, default 0 — denied-at-runtime hygiene doesn't reduce
  * the score). With the default k, one critical per ~10 exposed tables lands
  * around a C; one critical per table is an F.
+ *
+ * Two things keep a rule's *shape* out of the arithmetic. Points are charged
+ * per unit of repair, not per finding, for rules that declare one — a rule
+ * emitting a row per (relation × function) pair costs what fixing it costs.
+ * And each rule's total is capped at a fraction of the points that would fail
+ * an audit alone (`maxRuleDensity`), so no single rule can decide the grade.
  */
 function computeDensityScore(
   findings: Finding[],
@@ -121,40 +148,70 @@ function computeDensityScore(
 
   // Meta findings (e.g. W1) are advisories about the audit itself — the
   // unknown-exposure cap is their penalty, not weighted points.
-  const scorable = findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
+  const scorable = context.prefiltered
+    ? findings
+    : findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
 
-  const byRule = new Map<string, { count: number; points: number }>();
+  const exposedTables = Math.max(1, context.exposedTables ?? 1);
+
+  const byRule = new Map<string, RuleTally>();
   for (const f of scorable) {
     let weight = perRule[f.code] ?? weights[f.severity] ?? 0;
     if (f.direction === 'fail-closed') weight *= failClosedWeight;
-    const entry = byRule.get(f.code) ?? { count: 0, points: 0 };
+    const entry = byRule.get(f.code) ?? { count: 0, points: 0, units: new Set<string>() };
     entry.count += 1;
-    entry.points += Math.max(0, weight);
+    // A rule with a declared unit of repair is charged once per unit: the
+    // second finding against the same function is the same fix, and letting
+    // it charge again grades fan-out rather than risk.
+    const unit = repairUnit(f);
+    if (unit === undefined || !entry.units.has(unit)) {
+      entry.points += Math.max(0, weight);
+      if (unit !== undefined) entry.units.add(unit);
+    }
     byRule.set(f.code, entry);
   }
 
-  const riskPoints = [...byRule.values()].reduce((sum, r) => sum + r.points, 0);
-  const exposedTables = Math.max(1, context.exposedTables ?? 1);
+  // No single rule may contribute more than `maxRuleDensity` of the points
+  // that would take the score to F alone — at the default half, one rule can
+  // cost two grade bands but an F still takes breadth. Solved from the curve
+  // rather than fixed, so retuning `k` or the bands moves the cap with them.
+  const maxRuleDensity = config.maxRuleDensity ?? DEFAULT_MAX_RULE_DENSITY;
+  const pointsToF = (Math.log(100 / (bands.D || 50)) / k) * exposedTables;
+  const ruleCap = maxRuleDensity === false ? Infinity : maxRuleDensity * pointsToF;
+
+  const capped = new Map<string, { count: number; points: number; raw: number; units?: number }>();
+  for (const [code, tally] of byRule) {
+    capped.set(code, {
+      count: tally.count,
+      points: Math.min(tally.points, ruleCap),
+      raw: tally.points,
+      ...(tally.units.size > 0 ? { units: tally.units.size } : {})
+    });
+  }
+
+  const riskPoints = [...capped.values()].reduce((sum, r) => sum + r.points, 0);
   const density = riskPoints / exposedTables;
   const curve = (points: number) => round1(100 * Math.exp((-k * points) / exposedTables));
 
   let value = round1(100 * Math.exp(-k * density));
 
-  const deductions: ScoreDeduction[] = [...byRule.entries()]
-    .map(([code, { count, points }]) => ({
+  const deductions: ScoreDeduction[] = [...capped.entries()]
+    .map(([code, { count, points, raw, units }]) => ({
       code,
       count,
       points,
       score: curve(points),
       grade: gradeFor(curve(points), bands),
       potential: round1(curve(riskPoints - points) - value),
+      ...(units !== undefined && units !== count ? { units } : {}),
+      ...(raw > points ? { capped: true } : {}),
       ...(points === 0 ? { unscored: true } : {})
     }))
     .sort(byPayoff);
 
-  const cap = config.unknownExposureCap ?? DEFAULT_UNKNOWN_EXPOSURE_CAP;
-  const capped = context.exposureKnown === false && cap !== false && value > cap;
-  if (capped) value = cap;
+  const unknownCap = config.unknownExposureCap ?? DEFAULT_UNKNOWN_EXPOSURE_CAP;
+  const cappedByUnknown = context.exposureKnown === false && unknownCap !== false && value > unknownCap;
+  if (cappedByUnknown) value = unknownCap;
 
   let grade = gradeFor(value, bands);
   if (
@@ -173,8 +230,30 @@ function computeDensityScore(
     deductions,
     density: Math.round(density * 1000) / 1000,
     exposedTables,
-    ...(capped ? { cappedByUnknownExposure: true } : {})
+    ...(cappedByUnknown ? { cappedByUnknownExposure: true } : {})
   };
+}
+
+interface RuleTally {
+  count: number;
+  points: number;
+  /** Distinct repair units seen, for rules that declare one. */
+  units: Set<string>;
+}
+
+/**
+ * The finding's unit of repair, from the rule's declared `dedupBy` path.
+ * `undefined` when the rule declares none — one finding, one unit.
+ */
+function repairUnit(finding: Finding): string | undefined {
+  const path = RULES_BY_CODE.get(finding.code)?.dedupBy;
+  if (!path) return undefined;
+  let value: unknown = finding;
+  for (const key of path.split('.')) {
+    if (value === null || typeof value !== 'object') return undefined;
+    value = (value as Record<string, unknown>)[key];
+  }
+  return typeof value === 'string' ? value : undefined;
 }
 
 /**
@@ -194,7 +273,9 @@ function computeWeightedScore(
   const bands = { ...DEFAULT_GRADE_BANDS, ...(config.gradeBands ?? {}) };
   const floor = config.floorOnCritical === undefined ? 'C' : config.floorOnCritical;
 
-  const scorable = findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
+  const scorable = context.prefiltered
+    ? findings
+    : findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
 
   const byRule = new Map<string, { count: number; points: number }>();
   for (const f of scorable) {
