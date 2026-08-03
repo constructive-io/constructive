@@ -15,6 +15,9 @@ service or client without pulling in pgpm.
   registry, e.g. `throw errors.MODULE_NOT_FOUND({ name })`.
 - **`classify(code)`** — `public` or `internal`; unknown codes are `internal`
   (fail safe) so transports never leak unregistered errors.
+- **`httpStatusFor(code)`** — the canonical code → HTTP status mapping, so no
+  transport keeps its own table. Unregistered codes answer `500` *and are
+  reported*, never silently.
 
 ```ts
 import { parse, format, errors, classify } from '@constructive-io/errors';
@@ -45,6 +48,32 @@ throw errors.ACCOUNT_EXISTS();
     that matter most (public auth/limit copy, native PostgreSQL constraint codes,
     pgpm CLI codes). These override the generated entries.
 - Unregistered codes still `parse()` and are classified `internal` (masked).
+
+## HTTP status
+
+Every registry entry carries `http`, so an HTTP surface never needs its own
+code → status table: `toError(err).http`, or `httpStatusFor(code)` when all you
+have is a code.
+
+```ts
+import { httpStatusFor, setUnmappedStatusReporter, toError } from '@constructive-io/errors';
+
+setUnmappedStatusReporter(code => log.warn({ code }, 'error code has no HTTP status'));
+
+const err = toError(caught);
+res.status(err.http).json(err.toExtensions());
+
+httpStatusFor('ACCOUNT_DISABLED'); // { status: 403, mapped: true }
+httpStatusFor('BRAND_NEW_CODE');   // { status: 500, mapped: false } + one report
+```
+
+`mapped: false` is the one case where a 500 does not mean "the server broke" —
+it means the code never reached the registry. That is the failure mode this
+exists to make loud: a refusal that is plainly a 403 or a 409 answering 500
+looks like a crash, and the codes most likely to be missing are the newest ones.
+When a constructive-db release adds codes, refresh the registry (below);
+`__tests__/registry-sync.test.ts` fails if the snapshot and the generated
+registry disagree.
 
 ## Regenerating the full registry
 

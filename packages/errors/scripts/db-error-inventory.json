@@ -1,34 +1,34 @@
 {
   "ACCOUNT_DISABLED": {
-    "count": 15,
+    "count": 11,
     "dynamic": false,
     "sample": "ACCOUNT_DISABLED",
     "n_source": 1,
-    "n_generated": 10,
+    "n_generated": 6,
     "class": "public"
   },
   "ACCOUNT_EXISTS": {
-    "count": 37,
+    "count": 32,
     "dynamic": false,
     "sample": "ACCOUNT_EXISTS",
     "n_source": 9,
-    "n_generated": 12,
+    "n_generated": 7,
     "class": "public"
   },
   "ACCOUNT_LOCKED_EXCEED_ATTEMPTS": {
-    "count": 26,
+    "count": 19,
     "dynamic": false,
     "sample": "ACCOUNT_LOCKED_EXCEED_ATTEMPTS",
     "n_source": 3,
-    "n_generated": 16,
+    "n_generated": 9,
     "class": "public"
   },
   "ACCOUNT_NOT_FOUND": {
-    "count": 11,
+    "count": 10,
     "dynamic": false,
     "sample": "ACCOUNT_NOT_FOUND",
     "n_source": 4,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "ALREADY_SCHEDULED": {
@@ -46,27 +46,27 @@
     "n_generated": 2
   },
   "API_KEYS_DISABLED": {
-    "count": 6,
+    "count": 4,
     "dynamic": false,
     "sample": "API_KEYS_DISABLED",
     "n_source": 0,
-    "n_generated": 5,
+    "n_generated": 3,
     "class": "public"
   },
   "API_KEY_LIMIT_REACHED": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "API_KEY_LIMIT_REACHED",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "API_KEY_NOT_FOUND": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "API_KEY_NOT_FOUND",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "APPLY_RLS": {
@@ -93,12 +93,28 @@
     "n_generated": 1,
     "class": "public"
   },
+  "APP_INSTALLATION_MISSING": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "APP_INSTALLATION_MISSING",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
+  },
+  "APP_INSTALL_NO_SERVICE": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "APP_INSTALL_NO_SERVICE",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
+  },
   "ASSIGN_PROFILES_PERMISSION_REQUIRED": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "ASSIGN_PROFILES_PERMISSION_REQUIRED",
     "n_source": 2,
-    "n_generated": 6
+    "n_generated": 4
   },
   "AUTHZ_COLUMN_SECURITY_AUTHZ_NODE_REQUIRED": {
     "count": 2,
@@ -165,11 +181,11 @@
     "class": "public"
   },
   "AUTH_METHOD_NOT_ALLOWED": {
-    "count": 21,
+    "count": 15,
     "dynamic": false,
     "sample": "AUTH_METHOD_NOT_ALLOWED",
     "n_source": 1,
-    "n_generated": 14,
+    "n_generated": 8,
     "class": "public"
   },
   "BAD_CASING_FUNC": {
@@ -371,6 +387,14 @@
     "n_generated": 1,
     "class": "public"
   },
+  "BEHAVIOR_FRAGMENT_EMPTY": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BEHAVIOR_FRAGMENT_EMPTY",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
+  },
   "BM25": {
     "count": 2,
     "dynamic": false,
@@ -412,27 +436,27 @@
     "class": "internal"
   },
   "CANNOT_DISCONNECT_LAST_AUTH_METHOD": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "CANNOT_DISCONNECT_LAST_AUTH_METHOD",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "CANNOT_REVOKE_CURRENT_SESSION": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "CANNOT_REVOKE_CURRENT_SESSION",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "CAP_CHECK_TRIGGER_ARGS": {
-    "count": 12,
+    "count": 10,
     "dynamic": true,
     "sample": "CAP_CHECK_TRIGGER_ARGS (%)",
     "n_source": 1,
-    "n_generated": 8
+    "n_generated": 6
   },
   "CATALOG_BACKFILL": {
     "count": 4,
@@ -471,11 +495,11 @@
     "class": "public"
   },
   "CONNECTED_ACCOUNT_NOT_FOUND": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "CONNECTED_ACCOUNT_NOT_FOUND",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "CONSTRUCT_BLUEPRINT_ACHIEVEMENT_ENTITY_ID_REQUIRED": {
@@ -644,12 +668,20 @@
     "class": "public"
   },
   "CSRF_TOKEN_REQUIRED": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "CSRF_TOKEN_REQUIRED",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
+  },
+  "DATABASE_CLAIM_REQUIRED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "DATABASE_CLAIM_REQUIRED",
+    "n_source": 0,
+    "n_generated": 4,
+    "class": "internal"
   },
   "DATABASE_FIELD_RESERVED_WORD": {
     "count": 2,
@@ -898,6 +930,38 @@
     "n_generated": 1,
     "class": "public"
   },
+  "DATA_HISTORY_NO_COPY_FIELDS": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DATA_HISTORY_NO_COPY_FIELDS",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "DATA_HISTORY_ON_HISTORY_TABLE": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DATA_HISTORY_ON_HISTORY_TABLE",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "DATA_HISTORY_REQUIRES_PK": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DATA_HISTORY_REQUIRES_PK",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "DATA_HISTORY_TABLE_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DATA_HISTORY_TABLE_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "DATA_I18N_FIELDS_REQUIRED": {
     "count": 2,
     "dynamic": false,
@@ -1093,6 +1157,14 @@
     "count": 2,
     "dynamic": false,
     "sample": "DATA_JOB_TRIGGER_CONDITION_FIELD_WATCH_FIELDS_CONFLICT",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "DATA_JOB_TRIGGER_DATABASE_ID_FIELD_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DATA_JOB_TRIGGER_DATABASE_ID_FIELD_NOT_FOUND",
     "n_source": 1,
     "n_generated": 1,
     "class": "public"
@@ -1401,74 +1473,74 @@
     "n_generated": 1
   },
   "DOMAIN_CHECK_CERT_NOT_ISSUING": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_CHECK_CERT_NOT_ISSUING: managed_domain % has cert_status % (issue a cert first)",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_CHECK_CERT_UNKNOWN_DOMAIN": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_CHECK_CERT_UNKNOWN_DOMAIN: no managed_domain with id %",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_ISSUE_CERT_BAD_ISSUER": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_ISSUE_CERT_BAD_ISSUER: unsupported issuer_env % (expected staging|production)",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_ISSUE_CERT_NOT_VERIFIED": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_ISSUE_CERT_NOT_VERIFIED: managed_domain % is % (must be verified before issuing a cert)",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_ISSUE_CERT_UNKNOWN_DOMAIN": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_ISSUE_CERT_UNKNOWN_DOMAIN: no managed_domain with id %",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_ISSUE_CHALLENGE_BAD_METHOD": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_ISSUE_CHALLENGE_BAD_METHOD: unsupported verification method %",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_ISSUE_CHALLENGE_UNKNOWN_DOMAIN": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_ISSUE_CHALLENGE_UNKNOWN_DOMAIN: no managed_domain with id %",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_RENEW_NOT_ACTIVE": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_RENEW_NOT_ACTIVE: managed_domain % has cert_status % (only an active cert can be renewed)",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_RENEW_UNKNOWN_DOMAIN": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_RENEW_UNKNOWN_DOMAIN: no managed_domain with id %",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_REVOKE_UNKNOWN_DOMAIN": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_REVOKE_UNKNOWN_DOMAIN: no managed_domain with id %",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_ROOT_NOT_PUBLISHED": {
     "count": 2,
@@ -1478,25 +1550,25 @@
     "n_generated": 2
   },
   "DOMAIN_VERIFY_BAD_METHOD": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_VERIFY_BAD_METHOD: unsupported verification method %",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "DOMAIN_VERIFY_NO_CHALLENGE": {
-    "count": 7,
+    "count": 6,
     "dynamic": true,
     "sample": "DOMAIN_VERIFY_NO_CHALLENGE: no outstanding % challenge for managed_domain %",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 6
   },
   "EMAIL_NOT_VERIFIED": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "EMAIL_NOT_VERIFIED",
     "n_source": 2,
-    "n_generated": 6
+    "n_generated": 4
   },
   "ENTITY_NOT_FOUND": {
     "count": 4,
@@ -1766,11 +1838,11 @@
     "n_generated": 1
   },
   "FEATURE_DISABLED": {
-    "count": 16,
+    "count": 14,
     "dynamic": true,
     "sample": "FEATURE_DISABLED (%)",
     "n_source": 1,
-    "n_generated": 8
+    "n_generated": 6
   },
   "FIELDS_MISMATCH": {
     "count": 2,
@@ -1779,6 +1851,14 @@
     "n_source": 1,
     "n_generated": 1,
     "class": "public"
+  },
+  "FOREIGN_KEY_CONSTRAINT_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "FOREIGN_KEY_CONSTRAINT_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
   },
   "FUNCTION_GRAPH_NOT_FOUND": {
     "count": 16,
@@ -2045,11 +2125,11 @@
     "class": "public"
   },
   "HIERARCHY_CYCLE_DETECTED": {
-    "count": 5,
+    "count": 4,
     "dynamic": true,
     "sample": "HIERARCHY_CYCLE_DETECTED: Setting % as parent of % would create a cycle",
     "n_source": 1,
-    "n_generated": 4
+    "n_generated": 3
   },
   "HIERARCHY_DEPTH_EXCEEDED": {
     "count": 4,
@@ -2059,18 +2139,25 @@
     "n_generated": 1
   },
   "HIERARCHY_INACTIVE_MEMBER": {
-    "count": 10,
+    "count": 8,
     "dynamic": true,
     "sample": "HIERARCHY_INACTIVE_MEMBER: Cannot add user % to hierarchy - user must be an active member of the organization first",
     "n_source": 1,
-    "n_generated": 4
+    "n_generated": 3
   },
   "HIERARCHY_MEMBER_IN_USE": {
-    "count": 5,
+    "count": 4,
     "dynamic": true,
     "sample": "HIERARCHY_MEMBER_IN_USE: Cannot deactivate user % - user must be removed from the organization hierarchy first",
     "n_source": 1,
-    "n_generated": 4
+    "n_generated": 3
+  },
+  "HISTORY": {
+    "count": 4,
+    "dynamic": true,
+    "sample": "HISTORY: history %.% registration has no copy_fields",
+    "n_source": 1,
+    "n_generated": 1
   },
   "HOSTNAME_BINDING_SYNC": {
     "count": 2,
@@ -2094,59 +2181,59 @@
     "n_generated": 1
   },
   "IDENTITY_ACCOUNT_NOT_FOUND": {
-    "count": 11,
+    "count": 10,
     "dynamic": false,
     "sample": "IDENTITY_ACCOUNT_NOT_FOUND",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "IDENTITY_ALREADY_LINKED": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "IDENTITY_ALREADY_LINKED",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "IDENTITY_LINK_AVAILABLE": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "IDENTITY_LINK_AVAILABLE",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "IDENTITY_PROVIDER_NOT_CONFIGURED": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "IDENTITY_PROVIDER_NOT_CONFIGURED",
     "n_source": 2,
-    "n_generated": 6,
-    "class": "public"
-  },
-  "IDENTITY_PROVIDER_NOT_FOUND": {
-    "count": 5,
-    "dynamic": false,
-    "sample": "IDENTITY_PROVIDER_NOT_FOUND",
-    "n_source": 1,
     "n_generated": 4,
     "class": "public"
   },
-  "IDENTITY_SIGN_IN_DISABLED": {
-    "count": 3,
+  "IDENTITY_PROVIDER_NOT_FOUND": {
+    "count": 4,
     "dynamic": false,
-    "sample": "IDENTITY_SIGN_IN_DISABLED",
-    "n_source": 0,
+    "sample": "IDENTITY_PROVIDER_NOT_FOUND",
+    "n_source": 1,
     "n_generated": 3,
     "class": "public"
   },
+  "IDENTITY_SIGN_IN_DISABLED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "IDENTITY_SIGN_IN_DISABLED",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "public"
+  },
   "IDENTITY_SIGN_UP_DISABLED": {
-    "count": 3,
+    "count": 2,
     "dynamic": false,
     "sample": "IDENTITY_SIGN_UP_DISABLED",
     "n_source": 0,
-    "n_generated": 3,
+    "n_generated": 2,
     "class": "public"
   },
   "IMMUTABLE_FIELD": {
@@ -2173,11 +2260,11 @@
     "class": "public"
   },
   "IMMUTABLE_PROPERTY": {
-    "count": 12,
+    "count": 8,
     "dynamic": false,
     "sample": "IMMUTABLE_PROPERTY",
     "n_source": 0,
-    "n_generated": 9
+    "n_generated": 5
   },
   "IMMUTABLE_PROPS": {
     "count": 4,
@@ -2196,11 +2283,11 @@
     "class": "public"
   },
   "INCORRECT_PASSWORD": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "INCORRECT_PASSWORD",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "INFRA_API_NOT_PROVISIONED": {
@@ -2220,19 +2307,19 @@
     "class": "internal"
   },
   "INTERNAL_ERROR": {
-    "count": 290,
+    "count": 326,
     "dynamic": false,
     "sample": "INTERNAL_ERROR",
-    "n_source": 64,
+    "n_source": 67,
     "n_generated": 3,
     "class": "internal"
   },
   "INVALID_ACCESS_LEVEL": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "INVALID_ACCESS_LEVEL",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "INVALID_CHECK_OPTION": {
@@ -2243,11 +2330,11 @@
     "n_generated": 1
   },
   "INVALID_CODE": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "INVALID_CODE",
     "n_source": 2,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "INVALID_COMPOSITE_TYPE_ATTRIBUTE": {
@@ -2259,11 +2346,11 @@
     "class": "public"
   },
   "INVALID_CSRF_TOKEN": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "INVALID_CSRF_TOKEN",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "INVALID_DEFAULT_LIMIT_ID": {
@@ -2304,19 +2391,19 @@
     "n_generated": 1
   },
   "INVALID_MFA_LEVEL": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "INVALID_MFA_LEVEL",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "INVALID_ORGANIZATION": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "INVALID_ORGANIZATION",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "INVALID_TOKEN": {
@@ -2341,25 +2428,25 @@
     "n_generated": 6
   },
   "INVITE_EMAIL_NOT_FOUND": {
-    "count": 19,
+    "count": 16,
     "dynamic": false,
     "sample": "INVITE_EMAIL_NOT_FOUND",
     "n_source": 2,
-    "n_generated": 6
+    "n_generated": 4
   },
   "INVITE_LIMIT": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "INVITE_LIMIT",
     "n_source": 2,
-    "n_generated": 6
+    "n_generated": 4
   },
   "INVITE_NOT_FOUND": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "INVITE_NOT_FOUND",
     "n_source": 2,
-    "n_generated": 6
+    "n_generated": 4
   },
   "INVOCATION_QUOTA_GATE": {
     "count": 4,
@@ -2584,11 +2671,11 @@
     "class": "public"
   },
   "LIMIT_REACHED": {
-    "count": 30,
+    "count": 24,
     "dynamic": false,
     "sample": "LIMIT_REACHED",
     "n_source": 2,
-    "n_generated": 17
+    "n_generated": 11
   },
   "LIMIT_TRACK_USAGE_BILLING_MODULE_NOT_FOUND": {
     "count": 2,
@@ -2639,11 +2726,11 @@
     "class": "public"
   },
   "LIMIT_TRIGGER_ARGS": {
-    "count": 50,
+    "count": 38,
     "dynamic": true,
     "sample": "LIMIT_TRIGGER_ARGS (%)",
     "n_source": 3,
-    "n_generated": 24
+    "n_generated": 15
   },
   "LIMIT_WARNING_AGGREGATE_AGGREGATE_TABLE_NOT_PROVISIONED": {
     "count": 2,
@@ -2798,18 +2885,18 @@
     "class": "public"
   },
   "MANAGED_DOMAIN_PUBLISH_FORBIDDEN": {
-    "count": 6,
+    "count": 4,
     "dynamic": false,
     "sample": "MANAGED_DOMAIN_PUBLISH_FORBIDDEN: not authorized to modify column(s): allow_public_usage",
     "n_source": 0,
-    "n_generated": 5
+    "n_generated": 3
   },
   "MEMBERSHIP_NOT_FOUND": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "MEMBERSHIP_NOT_FOUND",
     "n_source": 2,
-    "n_generated": 6
+    "n_generated": 4
   },
   "MEMBERSHIP_TYPE_MUST_BE_INT": {
     "count": 2,
@@ -2904,11 +2991,11 @@
     "class": "public"
   },
   "MONOTONIC_FIELD": {
-    "count": 9,
+    "count": 6,
     "dynamic": false,
     "sample": "MONOTONIC_FIELD",
     "n_source": 0,
-    "n_generated": 7
+    "n_generated": 4
   },
   "NONEXISTENT_TYPE": {
     "count": 2,
@@ -2919,11 +3006,11 @@
     "class": "public"
   },
   "NOT_AUTHENTICATED": {
-    "count": 80,
+    "count": 70,
     "dynamic": false,
     "sample": "NOT_AUTHENTICATED",
-    "n_source": 21,
-    "n_generated": 28,
+    "n_source": 22,
+    "n_generated": 15,
     "class": "public"
   },
   "NOT_FOUND": {
@@ -2935,27 +3022,27 @@
     "class": "public"
   },
   "NOT_ORG_ADMIN": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "NOT_ORG_ADMIN",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "NOT_ORG_PRINCIPAL": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "NOT_ORG_PRINCIPAL",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "NOT_OWNER": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "NOT_OWNER",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "NO_PRIMARY_IDENTIFIER": {
@@ -2967,19 +3054,19 @@
     "class": "internal"
   },
   "NULL_VALUES_DISALLOWED": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "NULL_VALUES_DISALLOWED",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "OBJECT_NOT_FOUND": {
-    "count": 24,
+    "count": 22,
     "dynamic": false,
     "sample": "OBJECT_NOT_FOUND",
     "n_source": 7,
-    "n_generated": 7,
+    "n_generated": 5,
     "class": "public"
   },
   "OBJECT_NO_UPDATE": {
@@ -2991,11 +3078,11 @@
     "class": "public"
   },
   "ORG_API_KEY_NOT_FOUND": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "ORG_API_KEY_NOT_FOUND",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "OWNER_FIELD_NOT_FOUND": {
@@ -3014,6 +3101,14 @@
     "n_generated": 1,
     "class": "public"
   },
+  "PAGES_MODULE": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "PAGES_MODULE",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
+  },
   "PARENT_ENTITY_TYPE_NOT_FOUND": {
     "count": 4,
     "dynamic": false,
@@ -3029,43 +3124,43 @@
     "n_generated": 1
   },
   "PASSWORD_INSECURE": {
-    "count": 7,
+    "count": 6,
     "dynamic": false,
     "sample": "PASSWORD_INSECURE",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "PASSWORD_LEN": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "PASSWORD_LEN",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS": {
-    "count": 3,
+    "count": 2,
     "dynamic": false,
     "sample": "PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS",
     "n_source": 0,
-    "n_generated": 3,
+    "n_generated": 2,
     "class": "public"
   },
   "PASSWORD_SIGN_IN_DISABLED": {
-    "count": 3,
+    "count": 2,
     "dynamic": false,
     "sample": "PASSWORD_SIGN_IN_DISABLED",
     "n_source": 0,
-    "n_generated": 3,
+    "n_generated": 2,
     "class": "public"
   },
   "PASSWORD_SIGN_UP_DISABLED": {
-    "count": 3,
+    "count": 2,
     "dynamic": false,
     "sample": "PASSWORD_SIGN_UP_DISABLED",
     "n_source": 0,
-    "n_generated": 3,
+    "n_generated": 2,
     "class": "public"
   },
   "PLATFORM_FLAG_IMMUTABLE": {
@@ -3116,96 +3211,96 @@
     "n_generated": 1
   },
   "PRIMARY_AUTH_METHOD_MISMATCH": {
-    "count": 12,
+    "count": 9,
     "dynamic": false,
     "sample": "PRIMARY_AUTH_METHOD_MISMATCH",
     "n_source": 1,
-    "n_generated": 8,
+    "n_generated": 5,
     "class": "public"
   },
   "PRIMARY_REQUIRES_VERIFIED": {
-    "count": 23,
+    "count": 17,
     "dynamic": false,
     "sample": "PRIMARY_REQUIRES_VERIFIED",
     "n_source": 1,
-    "n_generated": 14
+    "n_generated": 8
   },
   "PRINCIPAL_CANNOT_CREATE_API_KEY": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "PRINCIPAL_CANNOT_CREATE_API_KEY",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "PRINCIPAL_CANNOT_CREATE_PRINCIPAL": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "PRINCIPAL_CANNOT_CREATE_PRINCIPAL",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "PRINCIPAL_CANNOT_DELETE_PRINCIPAL": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "PRINCIPAL_CANNOT_DELETE_PRINCIPAL",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "PRINCIPAL_CANNOT_REVOKE_API_KEY": {
-    "count": 10,
+    "count": 8,
     "dynamic": false,
     "sample": "PRINCIPAL_CANNOT_REVOKE_API_KEY",
     "n_source": 2,
-    "n_generated": 6,
+    "n_generated": 4,
     "class": "public"
   },
   "PRINCIPAL_NOT_FOUND": {
-    "count": 15,
+    "count": 12,
     "dynamic": false,
     "sample": "PRINCIPAL_NOT_FOUND",
     "n_source": 3,
-    "n_generated": 8,
+    "n_generated": 5,
     "class": "public"
   },
   "PRINCIPAL_NOT_IN_ORG": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "PRINCIPAL_NOT_IN_ORG",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "PRINCIPAL_NOT_OWNED": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "PRINCIPAL_NOT_OWNED",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "PROFILE_ASSIGNMENT_REQUIRES_EMAIL_INVITE": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "PROFILE_ASSIGNMENT_REQUIRES_EMAIL_INVITE",
     "n_source": 2,
-    "n_generated": 6
+    "n_generated": 4
   },
   "PROFILE_EXCEEDS_PERMISSIONS": {
-    "count": 12,
+    "count": 10,
     "dynamic": false,
     "sample": "PROFILE_EXCEEDS_PERMISSIONS",
     "n_source": 2,
-    "n_generated": 6
+    "n_generated": 4
   },
   "PROFILE_NOT_FOUND": {
-    "count": 14,
+    "count": 12,
     "dynamic": false,
     "sample": "PROFILE_NOT_FOUND",
     "n_source": 2,
-    "n_generated": 6
+    "n_generated": 4
   },
   "PROVISION_CHECK_CONSTRAINT": {
     "count": 18,
@@ -3310,11 +3405,11 @@
     "class": "internal"
   },
   "REPO_EXISTS": {
-    "count": 6,
+    "count": 5,
     "dynamic": false,
     "sample": "REPO_EXISTS",
     "n_source": 1,
-    "n_generated": 4
+    "n_generated": 3
   },
   "REQUEST_DATABASE_INVALID_INPUT": {
     "count": 2,
@@ -3333,19 +3428,19 @@
     "class": "public"
   },
   "REQUIRES": {
-    "count": 124,
+    "count": 126,
     "dynamic": false,
     "sample": "REQUIRES",
-    "n_source": 30,
+    "n_source": 31,
     "n_generated": 2,
     "class": "internal"
   },
   "REQUIRES_ONE_OWNER": {
-    "count": 17,
+    "count": 14,
     "dynamic": false,
     "sample": "REQUIRES_ONE_OWNER",
     "n_source": 2,
-    "n_generated": 10
+    "n_generated": 7
   },
   "RESOLVE_BLUEPRINT_FIELD": {
     "count": 2,
@@ -3395,18 +3490,18 @@
     "n_generated": 1
   },
   "ROUTE_TARGET_NOT_VISIBLE": {
-    "count": 12,
+    "count": 22,
     "dynamic": false,
     "sample": "ROUTE_TARGET_NOT_VISIBLE",
     "n_source": 0,
-    "n_generated": 4
+    "n_generated": 6
   },
   "ROUTE_TARGET_REQUIRED": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "ROUTE_TARGET_REQUIRED",
     "n_source": 0,
-    "n_generated": 4
+    "n_generated": 6
   },
   "ROUTING_API_TABLES_SCOPE_REQUIRED": {
     "count": 2,
@@ -3417,10 +3512,10 @@
     "class": "public"
   },
   "ROUTING_SURFACE_NOT_PROVISIONED": {
-    "count": 28,
+    "count": 26,
     "dynamic": false,
     "sample": "ROUTING_SURFACE_NOT_PROVISIONED",
-    "n_source": 7,
+    "n_source": 6,
     "n_generated": 4,
     "class": "public"
   },
@@ -3673,14 +3768,14 @@
     "class": "public"
   },
   "SEED_CAP_DEFAULTS_REQUIRED": {
-    "count": 7,
+    "count": 8,
     "dynamic": false,
     "sample": "SEED_CAP_DEFAULTS_REQUIRED",
     "n_source": 1,
     "n_generated": 5
   },
   "SEED_LIMIT_DEFAULTS_REQUIRED": {
-    "count": 7,
+    "count": 8,
     "dynamic": false,
     "sample": "SEED_LIMIT_DEFAULTS_REQUIRED",
     "n_source": 1,
@@ -3701,11 +3796,11 @@
     "n_generated": 3
   },
   "SESSION_NOT_FOUND": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "SESSION_NOT_FOUND",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "SETTINGS_SURFACE_NOT_PROVISIONED": {
@@ -3717,11 +3812,11 @@
     "class": "public"
   },
   "SIGN_UP_DISABLED": {
-    "count": 6,
+    "count": 4,
     "dynamic": false,
     "sample": "SIGN_UP_DISABLED",
     "n_source": 0,
-    "n_generated": 5,
+    "n_generated": 3,
     "class": "public"
   },
   "SITE_NOT_PROVISIONED": {
@@ -3741,19 +3836,19 @@
     "class": "public"
   },
   "SMS_SIGN_IN_DISABLED": {
-    "count": 6,
+    "count": 4,
     "dynamic": false,
     "sample": "SMS_SIGN_IN_DISABLED",
     "n_source": 0,
-    "n_generated": 5,
+    "n_generated": 3,
     "class": "public"
   },
   "SMS_SIGN_UP_DISABLED": {
-    "count": 3,
+    "count": 2,
     "dynamic": false,
     "sample": "SMS_SIGN_UP_DISABLED",
     "n_source": 0,
-    "n_generated": 3,
+    "n_generated": 2,
     "class": "public"
   },
   "SOURCE_COMMIT_NOT_FOUND": {
@@ -3787,6 +3882,14 @@
     "n_generated": 1,
     "class": "internal"
   },
+  "STATIC_SITES_LIMIT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "STATIC_SITES_LIMIT",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "STEP_UP_INVALID_TYPE": {
     "count": 4,
     "dynamic": false,
@@ -3796,11 +3899,11 @@
     "class": "public"
   },
   "STEP_UP_REQUIRED": {
-    "count": 14,
+    "count": 11,
     "dynamic": false,
     "sample": "STEP_UP_REQUIRED",
     "n_source": 1,
-    "n_generated": 8,
+    "n_generated": 5,
     "class": "public"
   },
   "STEP_UP_REQUIRED_FRESH_AUTH": {
@@ -3812,27 +3915,44 @@
     "class": "public"
   },
   "STEP_UP_REQUIRED_MFA": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "STEP_UP_REQUIRED_MFA",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "STEP_UP_REQUIRED_PASSWORD": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "STEP_UP_REQUIRED_PASSWORD",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
-  "STEP_UP_REQUIRED_PASSWORD_OR_MFA": {
-    "count": 1,
+  "SUBDOMAIN_APEX_NOT_PUBLISHED": {
+    "count": 4,
     "dynamic": false,
-    "sample": "STEP_UP_REQUIRED_PASSWORD_OR_MFA",
-    "n_source": 0,
-    "n_generated": 1
+    "sample": "SUBDOMAIN_APEX_NOT_PUBLISHED",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
+  },
+  "SUBDOMAIN_LABEL_EXHAUSTED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "SUBDOMAIN_LABEL_EXHAUSTED",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
+  },
+  "SUBDOMAIN_LABEL_INVALID": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "SUBDOMAIN_LABEL_INVALID",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
   },
   "SUPER_CONSTRUCTIVE_REQUIRED": {
     "count": 2,
@@ -3907,11 +4027,11 @@
     "class": "internal"
   },
   "TOO_MANY_REQUESTS": {
-    "count": 59,
+    "count": 41,
     "dynamic": false,
     "sample": "TOO_MANY_REQUESTS",
     "n_source": 1,
-    "n_generated": 38,
+    "n_generated": 20,
     "class": "public"
   },
   "TOTP_ALREADY_ENABLED": {
@@ -3922,11 +4042,11 @@
     "n_generated": 1
   },
   "TOTP_NOT_ENABLED": {
-    "count": 7,
+    "count": 6,
     "dynamic": false,
     "sample": "TOTP_NOT_ENABLED",
     "n_source": 2,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "TOTP_SETUP_NOT_INITIATED": {
@@ -4102,43 +4222,43 @@
     "class": "public"
   },
   "WEBAUTHN_CREDENTIAL_NOT_FOUND": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "WEBAUTHN_CREDENTIAL_NOT_FOUND",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "WEBAUTHN_REGISTER_CHALLENGE_NOT_FOUND_OR_EXPIRED": {
-    "count": 6,
+    "count": 5,
     "dynamic": false,
     "sample": "WEBAUTHN_REGISTER_CHALLENGE_NOT_FOUND_OR_EXPIRED",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "WEBAUTHN_SIGN_IN_CHALLENGE_NOT_FOUND_OR_EXPIRED": {
-    "count": 5,
+    "count": 4,
     "dynamic": false,
     "sample": "WEBAUTHN_SIGN_IN_CHALLENGE_NOT_FOUND_OR_EXPIRED",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "WEBAUTHN_SIGN_IN_DISABLED": {
-    "count": 6,
+    "count": 4,
     "dynamic": false,
     "sample": "WEBAUTHN_SIGN_IN_DISABLED",
     "n_source": 0,
-    "n_generated": 5,
+    "n_generated": 3,
     "class": "public"
   },
   "WEBAUTHN_SIGN_UP_DISABLED": {
-    "count": 6,
+    "count": 4,
     "dynamic": false,
     "sample": "WEBAUTHN_SIGN_UP_DISABLED",
     "n_source": 0,
-    "n_generated": 5,
+    "n_generated": 3,
     "class": "public"
   },
   "WITH_CHECK_NOT_ALLOWED": {

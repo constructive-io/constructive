@@ -1,6 +1,7 @@
 import { classify } from './classify';
 import { ConstructiveError } from './error';
 import { format } from './format';
+import { httpStatusFor } from './http';
 import { extractPgErrorFields, RAISE_EXCEPTION_SQLSTATE, SQLSTATE_TO_CODE } from './pg';
 import { getDefinition } from './registry';
 import type { ContextValue, ErrorClass, ErrorContext, ParsedError } from './types';
@@ -187,7 +188,9 @@ export function parse(error: unknown): ParsedError {
  * Delegates to {@link parse} for code/context/class recovery, then resolves a
  * localized message from the registry catalogs (falling back to the source
  * error's raw message when the code is unknown) and the registry's HTTP hint.
- * Codes that could not be resolved become `UNKNOWN_ERROR` (internal).
+ * Codes that could not be resolved become `UNKNOWN_ERROR` (internal); a code
+ * with no registered status is reported by {@link httpStatusFor} rather than
+ * quietly becoming a 500.
  */
 export function toError(error: unknown, locale?: string): ConstructiveError {
   if (error instanceof ConstructiveError) return error;
@@ -203,7 +206,7 @@ export function toError(error: unknown, locale?: string): ConstructiveError {
     code,
     message,
     errorClass: parsed.class,
-    http: def?.http ?? 500,
+    http: def ? def.http : httpStatusFor(code).status,
     context: parsed.context
   });
 }

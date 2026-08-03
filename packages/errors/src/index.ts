@@ -2,6 +2,7 @@ export * from './classify';
 export * from './error';
 export * from './factory';
 export * from './format';
+export * from './http';
 export * from './interpolate';
 export * from './parse';
 export * from './pg';
