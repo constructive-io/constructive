@@ -28,6 +28,18 @@ export interface FunctionApiBinding {
   id: string | null;
   updatedAt: string | null;
 }
+export interface FunctionCapabilityBinding {
+  bucketId: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  functionId: string | null;
+  graphId: string | null;
+  id: string | null;
+  key: string | null;
+  lifecycle: string | null;
+  metadata: unknown | null;
+  updatedAt: string | null;
+}
 export interface FunctionDefinition {
   accessChannels: string[] | null;
   category: string | null;
@@ -349,6 +361,17 @@ export interface PlatformFunctionApiBinding {
   id: string | null;
   updatedAt: string | null;
 }
+export interface PlatformFunctionCapabilityBinding {
+  bucketId: string | null;
+  createdAt: string | null;
+  functionId: string | null;
+  graphId: string | null;
+  id: string | null;
+  key: string | null;
+  lifecycle: string | null;
+  metadata: unknown | null;
+  updatedAt: string | null;
+}
 export interface PlatformFunctionDefinition {
   accessChannels: string[] | null;
   billable: boolean | null;
@@ -551,6 +574,7 @@ export interface PlatformResource {
   memoryRequestBytes: string | null;
   name: string | null;
   namespaceId: string | null;
+  realm: string | null;
   replicas: number | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredSecrets: ResourceRequirement[] | null;
@@ -591,6 +615,7 @@ export interface PlatformResourceDefinition {
   labels: unknown | null;
   name: string | null;
   namespaceId: string | null;
+  paramsSchema: unknown | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredSecrets: ResourceRequirement[] | null;
   slug: string | null;
@@ -692,6 +717,7 @@ export interface PlatformResourcesHealth {
   memoryRequestBytes: string | null;
   name: string | null;
   namespaceId: string | null;
+  realm: string | null;
   replicas: number | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredSecrets: ResourceRequirement[] | null;
@@ -721,6 +747,7 @@ export interface PlatformResourcesResolvedRequirement {
   name: string | null;
   namespaceId: string | null;
   present: boolean | null;
+  realm: string | null;
   required: boolean | null;
   requirementKind: string | null;
   resourceId: string | null;
@@ -775,6 +802,7 @@ export interface Resource {
   memoryRequestBytes: string | null;
   name: string | null;
   namespaceId: string | null;
+  realm: string | null;
   replicas: number | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredSecrets: ResourceRequirement[] | null;
@@ -816,6 +844,7 @@ export interface ResourceDefinition {
   labels: unknown | null;
   name: string | null;
   namespaceId: string | null;
+  paramsSchema: unknown | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredSecrets: ResourceRequirement[] | null;
   slug: string | null;
@@ -923,6 +952,7 @@ export interface ResourcesHealth {
   memoryRequestBytes: string | null;
   name: string | null;
   namespaceId: string | null;
+  realm: string | null;
   replicas: number | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredSecrets: ResourceRequirement[] | null;
@@ -952,6 +982,7 @@ export interface ResourcesResolvedRequirement {
   name: string | null;
   namespaceId: string | null;
   present: boolean | null;
+  realm: string | null;
   required: boolean | null;
   requirementKind: string | null;
   resourceId: string | null;

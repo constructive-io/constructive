@@ -99,6 +99,8 @@ export * from './useNamespaceModulesQuery';
 export * from './useNamespaceModuleQuery';
 export * from './useNotificationsModulesQuery';
 export * from './useNotificationsModuleQuery';
+export * from './usePagesModulesQuery';
+export * from './usePagesModuleQuery';
 export * from './usePermissionsModulesQuery';
 export * from './usePermissionsModuleQuery';
 export * from './usePhoneNumbersModulesQuery';

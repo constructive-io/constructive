@@ -17,6 +17,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import {
   dbPresetKeys,
   functionApiBindingKeys,
+  functionCapabilityBindingKeys,
   functionDefinitionKeys,
   functionDeploymentKeys,
   functionDeploymentEventKeys,
@@ -41,6 +42,7 @@ import {
   namespaceKeys,
   namespaceEventKeys,
   platformFunctionApiBindingKeys,
+  platformFunctionCapabilityBindingKeys,
   platformFunctionDefinitionKeys,
   platformFunctionDeploymentKeys,
   platformFunctionDeploymentEventKeys,
@@ -132,6 +134,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: functionApiBindingKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionCapabilityBinding queries */ functionCapabilityBinding: {
+    /** Invalidate all functionCapabilityBinding queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionCapabilityBindingKeys.all,
+      }),
+    /** Invalidate functionCapabilityBinding list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionCapabilityBindingKeys.lists(),
+      }),
+    /** Invalidate a specific functionCapabilityBinding */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionCapabilityBindingKeys.detail(id),
       }),
   },
   /** Invalidate functionDefinition queries */ functionDefinition: {
@@ -539,6 +558,27 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: platformFunctionApiBindingKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformFunctionCapabilityBinding queries */ platformFunctionCapabilityBinding: {
+    /** Invalidate all platformFunctionCapabilityBinding queries */ all: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionCapabilityBindingKeys.all,
+      }),
+    /** Invalidate platformFunctionCapabilityBinding list queries */ lists: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionCapabilityBindingKeys.lists(),
+      }),
+    /** Invalidate a specific platformFunctionCapabilityBinding */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionCapabilityBindingKeys.detail(id),
       }),
   },
   /** Invalidate platformFunctionDefinition queries */ platformFunctionDefinition: {
@@ -1284,6 +1324,14 @@ export const remove = {
       queryKey: functionApiBindingKeys.detail(id),
     });
   },
+  /** Remove functionCapabilityBinding from cache */ functionCapabilityBinding: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionCapabilityBindingKeys.detail(id),
+    });
+  },
   /** Remove functionDefinition from cache */ functionDefinition: (
     queryClient: QueryClient,
     id: string | number
@@ -1468,6 +1516,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: platformFunctionApiBindingKeys.detail(id),
+    });
+  },
+  /** Remove platformFunctionCapabilityBinding from cache */ platformFunctionCapabilityBinding: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformFunctionCapabilityBindingKeys.detail(id),
     });
   },
   /** Remove platformFunctionDefinition from cache */ platformFunctionDefinition: (

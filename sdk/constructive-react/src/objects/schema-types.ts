@@ -563,6 +563,7 @@ export interface MetaTable {
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
@@ -576,6 +577,8 @@ export interface MetaTable {
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
   storage?: MetaStorage | null;
+  /** PostgreSQL table name */
+  tableName: string;
   uniqueConstraints: MetaUniqueConstraint[];
 }
 /** A `Commit` edge in the connection. */
@@ -627,6 +630,8 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** PostgreSQL column name */
+  columnName: string;
   description?: string | null;
   /** Enum metadata if this field has an enum type */
   enumValues?: MetaEnum | null;
@@ -634,6 +639,7 @@ export interface MetaField {
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Final GraphQL field name */
   name: string;
   type: MetaType;
 }
@@ -683,7 +689,7 @@ export interface MetaPrimaryKeyConstraint {
 }
 /** Table query/mutation names */
 export interface MetaQuery {
-  all: string;
+  all?: string | null;
   create?: string | null;
   delete?: string | null;
   one?: string | null;

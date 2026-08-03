@@ -7,7 +7,7 @@ Execute the platformInternalSecretsRemoveArray mutation
 ## Usage
 
 ```bash
-csdk platform-internal-secrets-remove-array --input.clientMutationId <String> --input.namespaceId <UUID> --input.secretNames <String>
+csdk platform-internal-secrets-remove-array --input.clientMutationId <String> --input.namespaceId <UUID> --input.realm <String> --input.secretNames <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk platform-internal-secrets-remove-array --input.clientMutationId <String> --
 ### Run platformInternalSecretsRemoveArray
 
 ```bash
-csdk platform-internal-secrets-remove-array --input.clientMutationId <String> --input.namespaceId <UUID> --input.secretNames <String>
+csdk platform-internal-secrets-remove-array --input.clientMutationId <String> --input.namespaceId <UUID> --input.realm <String> --input.secretNames <String>
 ```

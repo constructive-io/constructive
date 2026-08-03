@@ -1068,6 +1068,8 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """PostgreSQL column name"""
+  columnName: String!
   description: String
 
   """Enum metadata if this field has an enum type"""
@@ -1076,6 +1078,8 @@ type MetaField {
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
+
+  """Final GraphQL field name"""
   name: String!
   type: MetaType!
 }
@@ -1164,7 +1168,7 @@ type MetaPrimaryKeyConstraint {
 
 """Table query/mutation names"""
 type MetaQuery {
-  all: String!
+  all: String
   create: String
   delete: String
   one: String
@@ -1301,6 +1305,8 @@ type MetaTable {
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
@@ -1318,6 +1324,9 @@ type MetaTable {
 
   """Storage metadata (null if not a storage table)"""
   storage: MetaStorage
+
+  """PostgreSQL table name"""
+  tableName: String!
   uniqueConstraints: [MetaUniqueConstraint!]!
 }
 

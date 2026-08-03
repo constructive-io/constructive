@@ -2546,12 +2546,101 @@ input BooleanFilter {
 
 type CatalogModule {
   apiName: String
+
+  """Reads and enables pagination through a set of `ApiSurfaceModule`."""
+  apiSurfaceModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ApiSurfaceModule`."""
+    orderBy: [ApiSurfaceModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ApiSurfaceModuleFilter
+  ): ApiSurfaceModuleConnection!
   apisTableId: UUID!
   apisTableName: String!
+
+  """Reads and enables pagination through a set of `AppModule`."""
+  appModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AppModule`."""
+    orderBy: [AppModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppModuleFilter
+  ): AppModuleConnection!
   appsTableId: UUID!
   appsTableName: String!
+  bucketsTableId: UUID!
+  bucketsTableName: String!
   databaseId: UUID!
   defaultPermissions: [String]
+
+  """Reads and enables pagination through a set of `DomainModule`."""
+  domainModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainModule`."""
+    orderBy: [DomainModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainModuleFilter
+  ): DomainModuleConnection!
   domainsTableId: UUID!
   domainsTableName: String!
   entityTableId: UUID
@@ -2570,10 +2659,76 @@ type CatalogModule {
   resourceInstallationsTableName: String!
   resourcesTableId: UUID!
   resourcesTableName: String!
+
+  """Reads and enables pagination through a set of `RouteModule`."""
+  routeModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RouteModule`."""
+    orderBy: [RouteModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RouteModuleFilter
+  ): RouteModuleConnection!
   schemaId: UUID!
   scope: String!
+
+  """Reads and enables pagination through a set of `SiteSurfaceModule`."""
+  siteSurfaceModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SiteSurfaceModule`."""
+    orderBy: [SiteSurfaceModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SiteSurfaceModuleFilter
+  ): SiteSurfaceModuleConnection!
+  sitesAppLinksTableId: UUID!
+  sitesAppLinksTableName: String!
+  sitesDeepLinksTableId: UUID!
+  sitesDeepLinksTableName: String!
+  sitesErrorPagesTableId: UUID!
+  sitesErrorPagesTableName: String!
   sitesTableId: UUID!
   sitesTableName: String!
+  sitesWebConfigTableId: UUID!
+  sitesWebConfigTableName: String!
 }
 
 """A connection to a list of `CatalogModule` values."""
@@ -2612,11 +2767,23 @@ input CatalogModuleFilter {
   """Filter by the object’s `apiName` field."""
   apiName: StringFilter
 
+  """Filter by the object’s `apiSurfaceModules` relation."""
+  apiSurfaceModules: CatalogModuleToManyApiSurfaceModuleFilter
+
+  """`apiSurfaceModules` exist."""
+  apiSurfaceModulesExist: Boolean
+
   """Filter by the object’s `apisTableId` field."""
   apisTableId: UUIDFilter
 
   """Filter by the object’s `apisTableName` field."""
   apisTableName: StringFilter
+
+  """Filter by the object’s `appModules` relation."""
+  appModules: CatalogModuleToManyAppModuleFilter
+
+  """`appModules` exist."""
+  appModulesExist: Boolean
 
   """Filter by the object’s `appsTableId` field."""
   appsTableId: UUIDFilter
@@ -2624,11 +2791,23 @@ input CatalogModuleFilter {
   """Filter by the object’s `appsTableName` field."""
   appsTableName: StringFilter
 
+  """Filter by the object’s `bucketsTableId` field."""
+  bucketsTableId: UUIDFilter
+
+  """Filter by the object’s `bucketsTableName` field."""
+  bucketsTableName: StringFilter
+
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
   """Filter by the object’s `defaultPermissions` field."""
   defaultPermissions: StringListFilter
+
+  """Filter by the object’s `domainModules` relation."""
+  domainModules: CatalogModuleToManyDomainModuleFilter
+
+  """`domainModules` exist."""
+  domainModulesExist: Boolean
 
   """Filter by the object’s `domainsTableId` field."""
   domainsTableId: UUIDFilter
@@ -2690,17 +2869,53 @@ input CatalogModuleFilter {
   """Filter by the object’s `resourcesTableName` field."""
   resourcesTableName: StringFilter
 
+  """Filter by the object’s `routeModules` relation."""
+  routeModules: CatalogModuleToManyRouteModuleFilter
+
+  """`routeModules` exist."""
+  routeModulesExist: Boolean
+
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
 
   """Filter by the object’s `scope` field."""
   scope: StringFilter
 
+  """Filter by the object’s `siteSurfaceModules` relation."""
+  siteSurfaceModules: CatalogModuleToManySiteSurfaceModuleFilter
+
+  """`siteSurfaceModules` exist."""
+  siteSurfaceModulesExist: Boolean
+
+  """Filter by the object’s `sitesAppLinksTableId` field."""
+  sitesAppLinksTableId: UUIDFilter
+
+  """Filter by the object’s `sitesAppLinksTableName` field."""
+  sitesAppLinksTableName: StringFilter
+
+  """Filter by the object’s `sitesDeepLinksTableId` field."""
+  sitesDeepLinksTableId: UUIDFilter
+
+  """Filter by the object’s `sitesDeepLinksTableName` field."""
+  sitesDeepLinksTableName: StringFilter
+
+  """Filter by the object’s `sitesErrorPagesTableId` field."""
+  sitesErrorPagesTableId: UUIDFilter
+
+  """Filter by the object’s `sitesErrorPagesTableName` field."""
+  sitesErrorPagesTableName: StringFilter
+
   """Filter by the object’s `sitesTableId` field."""
   sitesTableId: UUIDFilter
 
   """Filter by the object’s `sitesTableName` field."""
   sitesTableName: StringFilter
+
+  """Filter by the object’s `sitesWebConfigTableId` field."""
+  sitesWebConfigTableId: UUIDFilter
+
+  """Filter by the object’s `sitesWebConfigTableName` field."""
+  sitesWebConfigTableName: StringFilter
 }
 
 """An input for mutations affecting `CatalogModule`"""
@@ -2710,6 +2925,8 @@ input CatalogModuleInput {
   apisTableName: String
   appsTableId: UUID
   appsTableName: String
+  bucketsTableId: UUID
+  bucketsTableName: String
   databaseId: UUID!
   defaultPermissions: [String]
   domainsTableId: UUID
@@ -2732,8 +2949,16 @@ input CatalogModuleInput {
   resourcesTableName: String
   schemaId: UUID
   scope: String!
+  sitesAppLinksTableId: UUID
+  sitesAppLinksTableName: String
+  sitesDeepLinksTableId: UUID
+  sitesDeepLinksTableName: String
+  sitesErrorPagesTableId: UUID
+  sitesErrorPagesTableName: String
   sitesTableId: UUID
   sitesTableName: String
+  sitesWebConfigTableId: UUID
+  sitesWebConfigTableName: String
 }
 
 """Methods to use when ordering `CatalogModule`."""
@@ -2748,6 +2973,10 @@ enum CatalogModuleOrderBy {
   APPS_TABLE_ID_DESC
   APPS_TABLE_NAME_ASC
   APPS_TABLE_NAME_DESC
+  BUCKETS_TABLE_ID_ASC
+  BUCKETS_TABLE_ID_DESC
+  BUCKETS_TABLE_NAME_ASC
+  BUCKETS_TABLE_NAME_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DEFAULT_PERMISSIONS_ASC
@@ -2795,10 +3024,26 @@ enum CatalogModuleOrderBy {
   SCHEMA_ID_DESC
   SCOPE_ASC
   SCOPE_DESC
+  SITES_APP_LINKS_TABLE_ID_ASC
+  SITES_APP_LINKS_TABLE_ID_DESC
+  SITES_APP_LINKS_TABLE_NAME_ASC
+  SITES_APP_LINKS_TABLE_NAME_DESC
+  SITES_DEEP_LINKS_TABLE_ID_ASC
+  SITES_DEEP_LINKS_TABLE_ID_DESC
+  SITES_DEEP_LINKS_TABLE_NAME_ASC
+  SITES_DEEP_LINKS_TABLE_NAME_DESC
+  SITES_ERROR_PAGES_TABLE_ID_ASC
+  SITES_ERROR_PAGES_TABLE_ID_DESC
+  SITES_ERROR_PAGES_TABLE_NAME_ASC
+  SITES_ERROR_PAGES_TABLE_NAME_DESC
   SITES_TABLE_ID_ASC
   SITES_TABLE_ID_DESC
   SITES_TABLE_NAME_ASC
   SITES_TABLE_NAME_DESC
+  SITES_WEB_CONFIG_TABLE_ID_ASC
+  SITES_WEB_CONFIG_TABLE_ID_DESC
+  SITES_WEB_CONFIG_TABLE_NAME_ASC
+  SITES_WEB_CONFIG_TABLE_NAME_DESC
 }
 
 """
@@ -2810,6 +3055,8 @@ input CatalogModulePatch {
   apisTableName: String
   appsTableId: UUID
   appsTableName: String
+  bucketsTableId: UUID
+  bucketsTableName: String
   databaseId: UUID
   defaultPermissions: [String]
   domainsTableId: UUID
@@ -2832,8 +3079,86 @@ input CatalogModulePatch {
   resourcesTableName: String
   schemaId: UUID
   scope: String
+  sitesAppLinksTableId: UUID
+  sitesAppLinksTableName: String
+  sitesDeepLinksTableId: UUID
+  sitesDeepLinksTableName: String
+  sitesErrorPagesTableId: UUID
+  sitesErrorPagesTableName: String
   sitesTableId: UUID
   sitesTableName: String
+  sitesWebConfigTableId: UUID
+  sitesWebConfigTableName: String
+}
+
+"""
+A filter to be used against many `ApiSurfaceModule` object types. All fields are combined with a logical ‘and.’
+"""
+input CatalogModuleToManyApiSurfaceModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: ApiSurfaceModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: ApiSurfaceModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: ApiSurfaceModuleFilter
+}
+
+"""
+A filter to be used against many `AppModule` object types. All fields are combined with a logical ‘and.’
+"""
+input CatalogModuleToManyAppModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: AppModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AppModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: AppModuleFilter
+}
+
+"""
+A filter to be used against many `DomainModule` object types. All fields are combined with a logical ‘and.’
+"""
+input CatalogModuleToManyDomainModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: DomainModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: DomainModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: DomainModuleFilter
+}
+
+"""
+A filter to be used against many `RouteModule` object types. All fields are combined with a logical ‘and.’
+"""
+input CatalogModuleToManyRouteModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: RouteModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: RouteModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: RouteModuleFilter
+}
+
+"""
+A filter to be used against many `SiteSurfaceModule` object types. All fields are combined with a logical ‘and.’
+"""
+input CatalogModuleToManySiteSurfaceModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: SiteSurfaceModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: SiteSurfaceModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: SiteSurfaceModuleFilter
 }
 
 type ComputeLogModule {
@@ -5047,6 +5372,41 @@ type CreateNotificationsModulePayload {
     """The method to use when ordering `NotificationsModule`."""
     orderBy: [NotificationsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NotificationsModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PagesModule` mutation."""
+input CreatePagesModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PagesModule` to be created by this mutation."""
+  pagesModule: PagesModuleInput!
+}
+
+"""The output of our create `PagesModule` mutation."""
+type CreatePagesModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PagesModule` that was created by this mutation."""
+  pagesModule: PagesModule
+
+  """An edge for our `PagesModule`. May be used by Relay 1."""
+  pagesModuleEdge(
+    """The method to use when ordering `PagesModule`."""
+    orderBy: [PagesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PagesModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -9507,6 +9867,39 @@ type DeleteNotificationsModulePayload {
   query: Query
 }
 
+"""All input for the `deletePagesModule` mutation."""
+input DeletePagesModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PagesModule` mutation."""
+type DeletePagesModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PagesModule` that was deleted by this mutation."""
+  pagesModule: PagesModule
+
+  """An edge for our `PagesModule`. May be used by Relay 1."""
+  pagesModuleEdge(
+    """The method to use when ordering `PagesModule`."""
+    orderBy: [PagesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PagesModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deletePermissionsModule` mutation."""
 input DeletePermissionsModuleInput {
   """
@@ -10702,6 +11095,35 @@ type DomainModule {
   privateSchemaName: String
   provisions: JSON
   publicSchemaName: String
+
+  """Reads and enables pagination through a set of `RouteModule`."""
+  routeModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RouteModule`."""
+    orderBy: [RouteModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RouteModuleFilter
+  ): RouteModuleConnection!
   schemaId: UUID!
   scope: String!
 }
@@ -10816,6 +11238,12 @@ input DomainModuleFilter {
 
   """Filter by the object’s `publicSchemaName` field."""
   publicSchemaName: StringFilter
+
+  """Filter by the object’s `routeModules` relation."""
+  routeModules: DomainModuleToManyRouteModuleFilter
+
+  """`routeModules` exist."""
+  routeModulesExist: Boolean
 
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
@@ -10935,6 +11363,20 @@ input DomainModulePatch {
   publicSchemaName: String
   schemaId: UUID
   scope: String
+}
+
+"""
+A filter to be used against many `RouteModule` object types. All fields are combined with a logical ‘and.’
+"""
+input DomainModuleToManyRouteModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: RouteModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: RouteModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: RouteModuleFilter
 }
 
 type EmailsModule {
@@ -12889,6 +13331,35 @@ type FunctionInvocationModule {
   publicSchemaName: String
   schemaId: UUID!
   scope: String!
+
+  """Reads and enables pagination through a set of `WebhookModule`."""
+  webhookModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebhookModule`."""
+    orderBy: [WebhookModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebhookModuleFilter
+  ): WebhookModuleConnection!
 }
 
 """A connection to a list of `FunctionInvocationModule` values."""
@@ -12994,6 +13465,12 @@ input FunctionInvocationModuleFilter {
 
   """Filter by the object’s `scope` field."""
   scope: StringFilter
+
+  """Filter by the object’s `webhookModules` relation."""
+  webhookModules: FunctionInvocationModuleToManyWebhookModuleFilter
+
+  """`webhookModules` exist."""
+  webhookModulesExist: Boolean
 }
 
 """An input for mutations affecting `FunctionInvocationModule`"""
@@ -13097,17 +13574,92 @@ input FunctionInvocationModulePatch {
   scope: String
 }
 
+"""
+A filter to be used against many `WebhookModule` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionInvocationModuleToManyWebhookModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: WebhookModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: WebhookModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: WebhookModuleFilter
+}
+
 type FunctionModule {
   apiName: String
   bindingsTableId: UUID!
   bindingsTableName: String
+  capabilityBindingsTableId: UUID
   databaseId: UUID!
   defaultPermissions: [String]
   definitionsTableId: UUID!
   definitionsTableName: String!
   entityField: String
   entityTableId: UUID
+
+  """
+  Reads and enables pagination through a set of `FunctionDeploymentModule`.
+  """
+  functionDeploymentModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `FunctionDeploymentModule`."""
+    orderBy: [FunctionDeploymentModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FunctionDeploymentModuleFilter
+  ): FunctionDeploymentModuleConnection!
   hasCron: Boolean!
+
+  """Reads and enables pagination through a set of `HttpRouteModule`."""
+  httpRouteModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `HttpRouteModule`."""
+    orderBy: [HttpRouteModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: HttpRouteModuleFilter
+  ): HttpRouteModuleConnection!
   id: UUID!
   policies: JSON
   prefix: String!
@@ -13119,6 +13671,35 @@ type FunctionModule {
   schedulesTableId: UUID
   schemaId: UUID!
   scope: String!
+
+  """Reads and enables pagination through a set of `WebhookModule`."""
+  webhookModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebhookModule`."""
+    orderBy: [WebhookModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebhookModuleFilter
+  ): WebhookModuleConnection!
 }
 
 """A connection to a list of `FunctionModule` values."""
@@ -13163,6 +13744,9 @@ input FunctionModuleFilter {
   """Filter by the object’s `bindingsTableName` field."""
   bindingsTableName: StringFilter
 
+  """Filter by the object’s `capabilityBindingsTableId` field."""
+  capabilityBindingsTableId: UUIDFilter
+
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
@@ -13181,8 +13765,20 @@ input FunctionModuleFilter {
   """Filter by the object’s `entityTableId` field."""
   entityTableId: UUIDFilter
 
+  """Filter by the object’s `functionDeploymentModules` relation."""
+  functionDeploymentModules: FunctionModuleToManyFunctionDeploymentModuleFilter
+
+  """`functionDeploymentModules` exist."""
+  functionDeploymentModulesExist: Boolean
+
   """Filter by the object’s `hasCron` field."""
   hasCron: BooleanFilter
+
+  """Filter by the object’s `httpRouteModules` relation."""
+  httpRouteModules: FunctionModuleToManyHttpRouteModuleFilter
+
+  """`httpRouteModules` exist."""
+  httpRouteModulesExist: Boolean
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
@@ -13222,6 +13818,12 @@ input FunctionModuleFilter {
 
   """Filter by the object’s `scope` field."""
   scope: StringFilter
+
+  """Filter by the object’s `webhookModules` relation."""
+  webhookModules: FunctionModuleToManyWebhookModuleFilter
+
+  """`webhookModules` exist."""
+  webhookModulesExist: Boolean
 }
 
 """An input for mutations affecting `FunctionModule`"""
@@ -13229,6 +13831,7 @@ input FunctionModuleInput {
   apiName: String
   bindingsTableId: UUID
   bindingsTableName: String
+  capabilityBindingsTableId: UUID
   databaseId: UUID!
   defaultPermissions: [String]
   definitionsTableId: UUID
@@ -13257,6 +13860,8 @@ enum FunctionModuleOrderBy {
   BINDINGS_TABLE_ID_DESC
   BINDINGS_TABLE_NAME_ASC
   BINDINGS_TABLE_NAME_DESC
+  CAPABILITY_BINDINGS_TABLE_ID_ASC
+  CAPABILITY_BINDINGS_TABLE_ID_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DEFAULT_PERMISSIONS_ASC
@@ -13305,6 +13910,7 @@ input FunctionModulePatch {
   apiName: String
   bindingsTableId: UUID
   bindingsTableName: String
+  capabilityBindingsTableId: UUID
   databaseId: UUID
   defaultPermissions: [String]
   definitionsTableId: UUID
@@ -13323,6 +13929,48 @@ input FunctionModulePatch {
   schedulesTableId: UUID
   schemaId: UUID
   scope: String
+}
+
+"""
+A filter to be used against many `FunctionDeploymentModule` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionModuleToManyFunctionDeploymentModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: FunctionDeploymentModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: FunctionDeploymentModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: FunctionDeploymentModuleFilter
+}
+
+"""
+A filter to be used against many `HttpRouteModule` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionModuleToManyHttpRouteModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: HttpRouteModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: HttpRouteModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: HttpRouteModuleFilter
+}
+
+"""
+A filter to be used against many `WebhookModule` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionModuleToManyWebhookModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: WebhookModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: WebhookModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: WebhookModuleFilter
 }
 
 type GraphExecutionModule {
@@ -13586,6 +14234,35 @@ type GraphModule {
   defaultPermissions: [String]
   entityField: String
   entityTableId: UUID
+
+  """Reads and enables pagination through a set of `GraphExecutionModule`."""
+  graphExecutionModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GraphExecutionModule`."""
+    orderBy: [GraphExecutionModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: GraphExecutionModuleFilter
+  ): GraphExecutionModuleConnection!
   graphsTableId: UUID!
   id: UUID!
 
@@ -13655,6 +14332,12 @@ input GraphModuleFilter {
 
   """Filter by the object’s `entityTableId` field."""
   entityTableId: UUIDFilter
+
+  """Filter by the object’s `graphExecutionModules` relation."""
+  graphExecutionModules: GraphModuleToManyGraphExecutionModuleFilter
+
+  """`graphExecutionModules` exist."""
+  graphExecutionModulesExist: Boolean
 
   """Filter by the object’s `graphsTableId` field."""
   graphsTableId: UUIDFilter
@@ -13789,6 +14472,20 @@ input GraphModulePatch {
   publicSchemaId: UUID
   publicSchemaName: String
   scope: String
+}
+
+"""
+A filter to be used against many `GraphExecutionModule` object types. All fields are combined with a logical ‘and.’
+"""
+input GraphModuleToManyGraphExecutionModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: GraphExecutionModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: GraphExecutionModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: GraphExecutionModuleFilter
 }
 
 type HierarchyModule {
@@ -15048,6 +15745,35 @@ type InfraSecretsModule {
   scope: String!
   secretsTableId: UUID!
   secretsTableName: String!
+
+  """Reads and enables pagination through a set of `WebhookModule`."""
+  webhookModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebhookModule`."""
+    orderBy: [WebhookModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebhookModuleFilter
+  ): WebhookModuleConnection!
 }
 
 """A connection to a list of `InfraSecretsModule` values."""
@@ -15138,6 +15864,12 @@ input InfraSecretsModuleFilter {
 
   """Filter by the object’s `secretsTableName` field."""
   secretsTableName: StringFilter
+
+  """Filter by the object’s `webhookModules` relation."""
+  webhookModules: InfraSecretsModuleToManyWebhookModuleFilter
+
+  """`webhookModules` exist."""
+  webhookModulesExist: Boolean
 }
 
 """An input for mutations affecting `InfraSecretsModule`"""
@@ -15219,6 +15951,20 @@ input InfraSecretsModulePatch {
   scope: String
   secretsTableId: UUID
   secretsTableName: String
+}
+
+"""
+A filter to be used against many `WebhookModule` object types. All fields are combined with a logical ‘and.’
+"""
+input InfraSecretsModuleToManyWebhookModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: WebhookModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: WebhookModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: WebhookModuleFilter
 }
 
 """
@@ -16993,6 +17739,35 @@ type MerkleStoreModule {
   ): GraphModuleConnection!
   id: UUID!
   objectTableId: UUID!
+
+  """Reads and enables pagination through a set of `PagesModule`."""
+  pagesModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PagesModule`."""
+    orderBy: [PagesModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PagesModuleFilter
+  ): PagesModuleConnection!
   permissionKey: String
   prefix: String!
   privateApiName: String
@@ -17000,6 +17775,35 @@ type MerkleStoreModule {
   privateSchemaName: String
   publicSchemaName: String
   refTableId: UUID!
+
+  """Reads and enables pagination through a set of `ResourceModule`."""
+  resourceModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ResourceModule`."""
+    orderBy: [ResourceModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ResourceModuleFilter
+  ): ResourceModuleConnection!
   schemaId: UUID!
   scope: String!
   storeTableId: UUID!
@@ -17082,6 +17886,12 @@ input MerkleStoreModuleFilter {
   """Checks for any expressions in this list."""
   or: [MerkleStoreModuleFilter!]
 
+  """Filter by the object’s `pagesModules` relation."""
+  pagesModules: MerkleStoreModuleToManyPagesModuleFilter
+
+  """`pagesModules` exist."""
+  pagesModulesExist: Boolean
+
   """Filter by the object’s `permissionKey` field."""
   permissionKey: StringFilter
 
@@ -17102,6 +17912,12 @@ input MerkleStoreModuleFilter {
 
   """Filter by the object’s `refTableId` field."""
   refTableId: UUIDFilter
+
+  """Filter by the object’s `resourceModules` relation."""
+  resourceModules: MerkleStoreModuleToManyResourceModuleFilter
+
+  """`resourceModules` exist."""
+  resourceModulesExist: Boolean
 
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
@@ -17230,6 +18046,34 @@ input MerkleStoreModuleToManyGraphModuleFilter {
   some: GraphModuleFilter
 }
 
+"""
+A filter to be used against many `PagesModule` object types. All fields are combined with a logical ‘and.’
+"""
+input MerkleStoreModuleToManyPagesModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: PagesModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PagesModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PagesModuleFilter
+}
+
+"""
+A filter to be used against many `ResourceModule` object types. All fields are combined with a logical ‘and.’
+"""
+input MerkleStoreModuleToManyResourceModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: ResourceModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: ResourceModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: ResourceModuleFilter
+}
+
 """A belongs-to (forward FK) relation"""
 type MetaBelongsToRelation {
   fieldName: String
@@ -17257,6 +18101,8 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """PostgreSQL column name"""
+  columnName: String!
   description: String
 
   """Enum metadata if this field has an enum type"""
@@ -17265,6 +18111,8 @@ type MetaField {
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
+
+  """Final GraphQL field name"""
   name: String!
   type: MetaType!
 }
@@ -17353,7 +18201,7 @@ type MetaPrimaryKeyConstraint {
 
 """Table query/mutation names"""
 type MetaQuery {
-  all: String!
+  all: String
   create: String
   delete: String
   one: String
@@ -17490,6 +18338,8 @@ type MetaTable {
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
@@ -17507,6 +18357,9 @@ type MetaTable {
 
   """Storage metadata (null if not a storage table)"""
   storage: MetaStorage
+
+  """PostgreSQL table name"""
+  tableName: String!
   uniqueConstraints: [MetaUniqueConstraint!]!
 }
 
@@ -17935,6 +18788,14 @@ type Mutation {
     """
     input: CreateNotificationsModuleInput!
   ): CreateNotificationsModulePayload
+
+  """Creates a single `PagesModule`."""
+  createPagesModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePagesModuleInput!
+  ): CreatePagesModulePayload
 
   """Creates a single `PermissionsModule`."""
   createPermissionsModule(
@@ -18535,6 +19396,14 @@ type Mutation {
     """
     input: DeleteNotificationsModuleInput!
   ): DeleteNotificationsModulePayload
+
+  """Deletes a single `PagesModule` using a unique key."""
+  deletePagesModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePagesModuleInput!
+  ): DeletePagesModulePayload
 
   """Deletes a single `PermissionsModule` using a unique key."""
   deletePermissionsModule(
@@ -19249,6 +20118,14 @@ type Mutation {
     input: UpdateNotificationsModuleInput!
   ): UpdateNotificationsModulePayload
 
+  """Updates a single `PagesModule` using a unique key and a patch."""
+  updatePagesModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePagesModuleInput!
+  ): UpdatePagesModulePayload
+
   """Updates a single `PermissionsModule` using a unique key and a patch."""
   updatePermissionsModule(
     """
@@ -19482,6 +20359,37 @@ type NamespaceModule {
   defaultPermissions: [String]
   entityField: String
   entityTableId: UUID
+
+  """
+  Reads and enables pagination through a set of `FunctionDeploymentModule`.
+  """
+  functionDeploymentModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `FunctionDeploymentModule`."""
+    orderBy: [FunctionDeploymentModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FunctionDeploymentModuleFilter
+  ): FunctionDeploymentModuleConnection!
   id: UUID!
   namespaceEventsTableId: UUID!
   namespaceEventsTableName: String!
@@ -19494,8 +20402,66 @@ type NamespaceModule {
   privateSchemaName: String
   provisions: JSON
   publicSchemaName: String
+
+  """Reads and enables pagination through a set of `ResourceModule`."""
+  resourceModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ResourceModule`."""
+    orderBy: [ResourceModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ResourceModuleFilter
+  ): ResourceModuleConnection!
   schemaId: UUID!
   scope: String!
+
+  """Reads and enables pagination through a set of `WebhookModule`."""
+  webhookModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebhookModule`."""
+    orderBy: [WebhookModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebhookModuleFilter
+  ): WebhookModuleConnection!
 }
 
 """A connection to a list of `NamespaceModule` values."""
@@ -19548,6 +20514,12 @@ input NamespaceModuleFilter {
   """Filter by the object’s `entityTableId` field."""
   entityTableId: UUIDFilter
 
+  """Filter by the object’s `functionDeploymentModules` relation."""
+  functionDeploymentModules: NamespaceModuleToManyFunctionDeploymentModuleFilter
+
+  """`functionDeploymentModules` exist."""
+  functionDeploymentModulesExist: Boolean
+
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
@@ -19590,11 +20562,23 @@ input NamespaceModuleFilter {
   """Filter by the object’s `publicSchemaName` field."""
   publicSchemaName: StringFilter
 
+  """Filter by the object’s `resourceModules` relation."""
+  resourceModules: NamespaceModuleToManyResourceModuleFilter
+
+  """`resourceModules` exist."""
+  resourceModulesExist: Boolean
+
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
 
   """Filter by the object’s `scope` field."""
   scope: StringFilter
+
+  """Filter by the object’s `webhookModules` relation."""
+  webhookModules: NamespaceModuleToManyWebhookModuleFilter
+
+  """`webhookModules` exist."""
+  webhookModulesExist: Boolean
 }
 
 """An input for mutations affecting `NamespaceModule`"""
@@ -19688,6 +20672,48 @@ input NamespaceModulePatch {
   publicSchemaName: String
   schemaId: UUID
   scope: String
+}
+
+"""
+A filter to be used against many `FunctionDeploymentModule` object types. All fields are combined with a logical ‘and.’
+"""
+input NamespaceModuleToManyFunctionDeploymentModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: FunctionDeploymentModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: FunctionDeploymentModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: FunctionDeploymentModuleFilter
+}
+
+"""
+A filter to be used against many `ResourceModule` object types. All fields are combined with a logical ‘and.’
+"""
+input NamespaceModuleToManyResourceModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: ResourceModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: ResourceModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: ResourceModuleFilter
+}
+
+"""
+A filter to be used against many `WebhookModule` object types. All fields are combined with a logical ‘and.’
+"""
+input NamespaceModuleToManyWebhookModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: WebhookModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: WebhookModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: WebhookModuleFilter
 }
 
 type NotificationsModule {
@@ -19957,6 +20983,237 @@ type PageInfo {
 
   """When paginating backwards, the cursor to continue."""
   startCursor: Cursor
+}
+
+type PagesModule {
+  apiName: String
+  createdAt: Datetime!
+  databaseId: UUID!
+  entityTableId: UUID
+  id: UUID!
+
+  """
+  Reads a single `MerkleStoreModule` that is related to this `PagesModule`.
+  """
+  merkleStoreModule: MerkleStoreModule
+  merkleStoreModuleId: UUID!
+  pagesTableId: UUID!
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  privateSchemaId: UUID!
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaId: UUID!
+  publicSchemaName: String
+  scope: String!
+
+  """
+  Reads a single `SiteSurfaceModule` that is related to this `PagesModule`.
+  """
+  siteSurfaceModule: SiteSurfaceModule
+  siteSurfaceModuleId: UUID
+  sitesTableId: UUID!
+  storeNamePrefix: String!
+}
+
+"""A connection to a list of `PagesModule` values."""
+type PagesModuleConnection {
+  """
+  A list of edges which contains the `PagesModule` and cursor to aid in pagination.
+  """
+  edges: [PagesModuleEdge]!
+
+  """A list of `PagesModule` objects."""
+  nodes: [PagesModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PagesModule` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PagesModule` edge in the connection."""
+type PagesModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PagesModule` at the end of the edge."""
+  node: PagesModule
+}
+
+"""
+A filter to be used against `PagesModule` object types. All fields are combined with a logical ‘and.’
+"""
+input PagesModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [PagesModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `merkleStoreModule` relation."""
+  merkleStoreModule: MerkleStoreModuleFilter
+
+  """Filter by the object’s `merkleStoreModuleId` field."""
+  merkleStoreModuleId: UUIDFilter
+
+  """Negates the expression."""
+  not: PagesModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [PagesModuleFilter!]
+
+  """Filter by the object’s `pagesTableId` field."""
+  pagesTableId: UUIDFilter
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `publicSchemaId` field."""
+  publicSchemaId: UUIDFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `siteSurfaceModule` relation."""
+  siteSurfaceModule: SiteSurfaceModuleFilter
+
+  """A related `siteSurfaceModule` exists."""
+  siteSurfaceModuleExists: Boolean
+
+  """Filter by the object’s `siteSurfaceModuleId` field."""
+  siteSurfaceModuleId: UUIDFilter
+
+  """Filter by the object’s `sitesTableId` field."""
+  sitesTableId: UUIDFilter
+
+  """Filter by the object’s `storeNamePrefix` field."""
+  storeNamePrefix: StringFilter
+}
+
+"""An input for mutations affecting `PagesModule`"""
+input PagesModuleInput {
+  apiName: String
+  createdAt: Datetime
+  databaseId: UUID!
+  entityTableId: UUID
+  id: UUID
+  merkleStoreModuleId: UUID!
+  pagesTableId: UUID
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaId: UUID
+  publicSchemaName: String
+  scope: String!
+  siteSurfaceModuleId: UUID
+  sitesTableId: UUID
+  storeNamePrefix: String
+}
+
+"""Methods to use when ordering `PagesModule`."""
+enum PagesModuleOrderBy {
+  API_NAME_ASC
+  API_NAME_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  ID_ASC
+  ID_DESC
+  MERKLE_STORE_MODULE_ID_ASC
+  MERKLE_STORE_MODULE_ID_DESC
+  NATURAL
+  PAGES_TABLE_ID_ASC
+  PAGES_TABLE_ID_DESC
+  POLICIES_ASC
+  POLICIES_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBLIC_SCHEMA_ID_ASC
+  PUBLIC_SCHEMA_ID_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  SITES_TABLE_ID_ASC
+  SITES_TABLE_ID_DESC
+  SITE_SURFACE_MODULE_ID_ASC
+  SITE_SURFACE_MODULE_ID_DESC
+  STORE_NAME_PREFIX_ASC
+  STORE_NAME_PREFIX_DESC
+}
+
+"""
+Represents an update to a `PagesModule`. Fields that are set will be updated.
+"""
+input PagesModulePatch {
+  apiName: String
+  createdAt: Datetime
+  databaseId: UUID
+  entityTableId: UUID
+  id: UUID
+  merkleStoreModuleId: UUID
+  pagesTableId: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaId: UUID
+  publicSchemaName: String
+  scope: String
+  siteSurfaceModuleId: UUID
+  sitesTableId: UUID
+  storeNamePrefix: String
 }
 
 type PermissionsModule {
@@ -22707,6 +23964,35 @@ type Query {
     where: NotificationsModuleFilter
   ): NotificationsModuleConnection
 
+  """Reads and enables pagination through a set of `PagesModule`."""
+  pagesModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PagesModule`."""
+    orderBy: [PagesModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PagesModuleFilter
+  ): PagesModuleConnection
+
   """Reads and enables pagination through a set of `PermissionsModule`."""
   permissionsModules(
     """Read all values in the set after (below) this cursor."""
@@ -24703,6 +25989,35 @@ type ResourceModule {
   defaultPermissions: [String]
   entityField: String
   entityTableId: UUID
+
+  """Reads and enables pagination through a set of `HttpRouteModule`."""
+  httpRouteModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `HttpRouteModule`."""
+    orderBy: [HttpRouteModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: HttpRouteModuleFilter
+  ): HttpRouteModuleConnection!
   id: UUID!
   installationStoreName: String!
 
@@ -24793,6 +26108,12 @@ input ResourceModuleFilter {
 
   """Filter by the object’s `entityTableId` field."""
   entityTableId: UUIDFilter
+
+  """Filter by the object’s `httpRouteModules` relation."""
+  httpRouteModules: ResourceModuleToManyHttpRouteModuleFilter
+
+  """`httpRouteModules` exist."""
+  httpRouteModulesExist: Boolean
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
@@ -25065,6 +26386,20 @@ input ResourceModulePatch {
   rollupResourceUsageSummaryFunction: String
   schemaId: UUID
   scope: String
+}
+
+"""
+A filter to be used against many `HttpRouteModule` object types. All fields are combined with a logical ‘and.’
+"""
+input ResourceModuleToManyHttpRouteModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: HttpRouteModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: HttpRouteModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: HttpRouteModuleFilter
 }
 
 type RlsModule {
@@ -26057,19 +27392,58 @@ type SiteSurfaceModule {
   entityField: String
   entityTableId: UUID
   id: UUID!
+
+  """Reads and enables pagination through a set of `PagesModule`."""
+  pagesModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PagesModule`."""
+    orderBy: [PagesModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PagesModuleFilter
+  ): PagesModuleConnection!
   policies: JSON
   prefix: String!
   privateApiName: String
+  privateSchemaId: UUID!
+  privateSchemaName: String
   provisions: JSON
   publicSchemaName: String
   schemaId: UUID!
   scope: String!
+  siteAppLinksTableId: UUID!
+  siteAppLinksTableName: String!
+  siteDeepLinksTableId: UUID!
+  siteDeepLinksTableName: String!
+  siteErrorPagesTableId: UUID!
+  siteErrorPagesTableName: String!
   siteMetadataTableId: UUID!
   siteMetadataTableName: String!
   siteModulesTableId: UUID!
   siteModulesTableName: String!
   siteThemesTableId: UUID!
   siteThemesTableName: String!
+  siteWebConfigTableId: UUID!
+  siteWebConfigTableName: String!
   sitesTableId: UUID!
   sitesTableName: String!
 }
@@ -26142,6 +27516,12 @@ input SiteSurfaceModuleFilter {
   """Checks for any expressions in this list."""
   or: [SiteSurfaceModuleFilter!]
 
+  """Filter by the object’s `pagesModules` relation."""
+  pagesModules: SiteSurfaceModuleToManyPagesModuleFilter
+
+  """`pagesModules` exist."""
+  pagesModulesExist: Boolean
+
   """Filter by the object’s `policies` field."""
   policies: JSONFilter
 
@@ -26150,6 +27530,12 @@ input SiteSurfaceModuleFilter {
 
   """Filter by the object’s `privateApiName` field."""
   privateApiName: StringFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
 
   """Filter by the object’s `provisions` field."""
   provisions: JSONFilter
@@ -26162,6 +27548,24 @@ input SiteSurfaceModuleFilter {
 
   """Filter by the object’s `scope` field."""
   scope: StringFilter
+
+  """Filter by the object’s `siteAppLinksTableId` field."""
+  siteAppLinksTableId: UUIDFilter
+
+  """Filter by the object’s `siteAppLinksTableName` field."""
+  siteAppLinksTableName: StringFilter
+
+  """Filter by the object’s `siteDeepLinksTableId` field."""
+  siteDeepLinksTableId: UUIDFilter
+
+  """Filter by the object’s `siteDeepLinksTableName` field."""
+  siteDeepLinksTableName: StringFilter
+
+  """Filter by the object’s `siteErrorPagesTableId` field."""
+  siteErrorPagesTableId: UUIDFilter
+
+  """Filter by the object’s `siteErrorPagesTableName` field."""
+  siteErrorPagesTableName: StringFilter
 
   """Filter by the object’s `siteMetadataTableId` field."""
   siteMetadataTableId: UUIDFilter
@@ -26180,6 +27584,12 @@ input SiteSurfaceModuleFilter {
 
   """Filter by the object’s `siteThemesTableName` field."""
   siteThemesTableName: StringFilter
+
+  """Filter by the object’s `siteWebConfigTableId` field."""
+  siteWebConfigTableId: UUIDFilter
+
+  """Filter by the object’s `siteWebConfigTableName` field."""
+  siteWebConfigTableName: StringFilter
 
   """Filter by the object’s `sitesTableId` field."""
   sitesTableId: UUIDFilter
@@ -26200,16 +27610,26 @@ input SiteSurfaceModuleInput {
   policies: JSON
   prefix: String
   privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
   provisions: JSON
   publicSchemaName: String
   schemaId: UUID
   scope: String!
+  siteAppLinksTableId: UUID
+  siteAppLinksTableName: String
+  siteDeepLinksTableId: UUID
+  siteDeepLinksTableName: String
+  siteErrorPagesTableId: UUID
+  siteErrorPagesTableName: String
   siteMetadataTableId: UUID
   siteMetadataTableName: String
   siteModulesTableId: UUID
   siteModulesTableName: String
   siteThemesTableId: UUID
   siteThemesTableName: String
+  siteWebConfigTableId: UUID
+  siteWebConfigTableName: String
   sitesTableId: UUID
   sitesTableName: String
 }
@@ -26239,6 +27659,10 @@ enum SiteSurfaceModuleOrderBy {
   PRIMARY_KEY_DESC
   PRIVATE_API_NAME_ASC
   PRIVATE_API_NAME_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
   PROVISIONS_ASC
   PROVISIONS_DESC
   PUBLIC_SCHEMA_NAME_ASC
@@ -26251,6 +27675,18 @@ enum SiteSurfaceModuleOrderBy {
   SITES_TABLE_ID_DESC
   SITES_TABLE_NAME_ASC
   SITES_TABLE_NAME_DESC
+  SITE_APP_LINKS_TABLE_ID_ASC
+  SITE_APP_LINKS_TABLE_ID_DESC
+  SITE_APP_LINKS_TABLE_NAME_ASC
+  SITE_APP_LINKS_TABLE_NAME_DESC
+  SITE_DEEP_LINKS_TABLE_ID_ASC
+  SITE_DEEP_LINKS_TABLE_ID_DESC
+  SITE_DEEP_LINKS_TABLE_NAME_ASC
+  SITE_DEEP_LINKS_TABLE_NAME_DESC
+  SITE_ERROR_PAGES_TABLE_ID_ASC
+  SITE_ERROR_PAGES_TABLE_ID_DESC
+  SITE_ERROR_PAGES_TABLE_NAME_ASC
+  SITE_ERROR_PAGES_TABLE_NAME_DESC
   SITE_METADATA_TABLE_ID_ASC
   SITE_METADATA_TABLE_ID_DESC
   SITE_METADATA_TABLE_NAME_ASC
@@ -26263,6 +27699,10 @@ enum SiteSurfaceModuleOrderBy {
   SITE_THEMES_TABLE_ID_DESC
   SITE_THEMES_TABLE_NAME_ASC
   SITE_THEMES_TABLE_NAME_DESC
+  SITE_WEB_CONFIG_TABLE_ID_ASC
+  SITE_WEB_CONFIG_TABLE_ID_DESC
+  SITE_WEB_CONFIG_TABLE_NAME_ASC
+  SITE_WEB_CONFIG_TABLE_NAME_DESC
 }
 
 """
@@ -26279,18 +27719,42 @@ input SiteSurfaceModulePatch {
   policies: JSON
   prefix: String
   privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
   provisions: JSON
   publicSchemaName: String
   schemaId: UUID
   scope: String
+  siteAppLinksTableId: UUID
+  siteAppLinksTableName: String
+  siteDeepLinksTableId: UUID
+  siteDeepLinksTableName: String
+  siteErrorPagesTableId: UUID
+  siteErrorPagesTableName: String
   siteMetadataTableId: UUID
   siteMetadataTableName: String
   siteModulesTableId: UUID
   siteModulesTableName: String
   siteThemesTableId: UUID
   siteThemesTableName: String
+  siteWebConfigTableId: UUID
+  siteWebConfigTableName: String
   sitesTableId: UUID
   sitesTableName: String
+}
+
+"""
+A filter to be used against many `PagesModule` object types. All fields are combined with a logical ‘and.’
+"""
+input SiteSurfaceModuleToManyPagesModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: PagesModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PagesModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PagesModuleFilter
 }
 
 type StorageLogModule {
@@ -26521,6 +27985,7 @@ type StorageModule {
   bucketsTableId: UUID!
   bucketsTableName: String!
   cacheTtlSeconds: Int
+  catalogModuleId: UUID
   confirmUploadDelay: Interval!
   databaseId: UUID!
   defaultMaxFileSize: BigInt
@@ -26538,6 +28003,35 @@ type StorageModule {
   hasCustomKeys: Boolean!
   hasPathShares: Boolean!
   hasVersioning: Boolean!
+
+  """Reads and enables pagination through a set of `HttpRouteModule`."""
+  httpRouteModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `HttpRouteModule`."""
+    orderBy: [HttpRouteModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: HttpRouteModuleFilter
+  ): HttpRouteModuleConnection!
   id: UUID!
   maxBulkFiles: Int
   maxBulkTotalSize: BigInt
@@ -26606,6 +28100,9 @@ input StorageModuleFilter {
   """Filter by the object’s `cacheTtlSeconds` field."""
   cacheTtlSeconds: IntFilter
 
+  """Filter by the object’s `catalogModuleId` field."""
+  catalogModuleId: UUIDFilter
+
   """Filter by the object’s `confirmUploadDelay` field."""
   confirmUploadDelay: IntervalFilter
 
@@ -26656,6 +28153,12 @@ input StorageModuleFilter {
 
   """Filter by the object’s `hasVersioning` field."""
   hasVersioning: BooleanFilter
+
+  """Filter by the object’s `httpRouteModules` relation."""
+  httpRouteModules: StorageModuleToManyHttpRouteModuleFilter
+
+  """`httpRouteModules` exist."""
+  httpRouteModulesExist: Boolean
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
@@ -26725,6 +28228,7 @@ input StorageModuleInput {
   bucketsTableId: UUID
   bucketsTableName: String
   cacheTtlSeconds: Int
+  catalogModuleId: UUID
   confirmUploadDelay: IntervalInput
   databaseId: UUID!
   defaultMaxFileSize: BigInt
@@ -26774,6 +28278,8 @@ enum StorageModuleOrderBy {
   BUCKETS_TABLE_NAME_DESC
   CACHE_TTL_SECONDS_ASC
   CACHE_TTL_SECONDS_DESC
+  CATALOG_MODULE_ID_ASC
+  CATALOG_MODULE_ID_DESC
   CONFIRM_UPLOAD_DELAY_ASC
   CONFIRM_UPLOAD_DELAY_DESC
   DATABASE_ID_ASC
@@ -26858,6 +28364,7 @@ input StorageModulePatch {
   bucketsTableId: UUID
   bucketsTableName: String
   cacheTtlSeconds: Int
+  catalogModuleId: UUID
   confirmUploadDelay: IntervalInput
   databaseId: UUID
   defaultMaxFileSize: BigInt
@@ -26893,6 +28400,20 @@ input StorageModulePatch {
   schemaId: UUID
   scope: String
   uploadUrlExpirySeconds: Int
+}
+
+"""
+A filter to be used against many `HttpRouteModule` object types. All fields are combined with a logical ‘and.’
+"""
+input StorageModuleToManyHttpRouteModuleFilter {
+  """Filters to entities where every related entity matches."""
+  every: HttpRouteModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: HttpRouteModuleFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: HttpRouteModuleFilter
 }
 
 """
@@ -29247,6 +30768,44 @@ type UpdateNotificationsModulePayload {
     """The method to use when ordering `NotificationsModule`."""
     orderBy: [NotificationsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NotificationsModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePagesModule` mutation."""
+input UpdatePagesModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PagesModule` being updated.
+  """
+  pagesModulePatch: PagesModulePatch!
+}
+
+"""The output of our update `PagesModule` mutation."""
+type UpdatePagesModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PagesModule` that was updated by this mutation."""
+  pagesModule: PagesModule
+
+  """An edge for our `PagesModule`. May be used by Relay 1."""
+  pagesModuleEdge(
+    """The method to use when ordering `PagesModule`."""
+    orderBy: [PagesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PagesModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

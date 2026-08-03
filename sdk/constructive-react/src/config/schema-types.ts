@@ -53,6 +53,8 @@ export type ConfigOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'VALUE_ASC'
@@ -80,6 +82,8 @@ export type PlatformConfigOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'VALUE_ASC'
@@ -101,6 +105,8 @@ export type PlatformInternalSecretOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RETIRED_AT_ASC'
   | 'RETIRED_AT_DESC'
   | 'ROTATED_AT_ASC'
@@ -126,6 +132,8 @@ export type PlatformSecretOrderBy =
   | 'NATURAL'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RETIRED_AT_ASC'
   | 'RETIRED_AT_DESC'
   | 'ROTATED_AT_ASC'
@@ -153,6 +161,8 @@ export type SecretOrderBy =
   | 'NATURAL'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RETIRED_AT_ASC'
   | 'RETIRED_AT_DESC'
   | 'ROTATED_AT_ASC'
@@ -187,6 +197,8 @@ export interface ConfigFilter {
   or?: ConfigFilter[];
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `value` field. */
@@ -213,6 +225,8 @@ export interface ConfigInput {
   namespaceId: string;
   /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
   provider?: string;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string;
   updatedAt?: string;
   /** Plaintext config value */
   value?: string;
@@ -238,6 +252,8 @@ export interface ConfigPatch {
   namespaceId?: string;
   /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
   provider?: string;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string;
   updatedAt?: string;
   /** Plaintext config value */
   value?: string;
@@ -288,6 +304,8 @@ export interface PlatformConfigFilter {
   or?: PlatformConfigFilter[];
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `value` field. */
@@ -312,6 +330,8 @@ export interface PlatformConfigInput {
   namespaceId: string;
   /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
   provider?: string;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string;
   updatedAt?: string;
   /** Plaintext config value */
   value?: string;
@@ -335,6 +355,8 @@ export interface PlatformConfigPatch {
   namespaceId?: string;
   /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
   provider?: string;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string;
   updatedAt?: string;
   /** Plaintext config value */
   value?: string;
@@ -361,6 +383,8 @@ export interface PlatformInternalSecretFilter {
   not?: PlatformInternalSecretFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformInternalSecretFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `retiredAt` field. */
   retiredAt?: DatetimeFilter;
   /** Filter by the object’s `rotatedAt` field. */
@@ -371,17 +395,20 @@ export interface PlatformInternalSecretFilter {
 export interface PlatformInternalSecretsDelInput {
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
 }
 export interface PlatformInternalSecretsRemoveArrayInput {
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretNames?: string[];
 }
 export interface PlatformInternalSecretsRotateInput {
   algo?: string;
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
   secretValue?: string;
 }
@@ -390,6 +417,7 @@ export interface PlatformInternalSecretsSetInput {
   clientMutationId?: string;
   secretName?: string;
   secretNamespaceId?: string;
+  secretRealm?: string;
   secretValue?: string;
 }
 /** A filter to be used against `PlatformSecret` object types. All fields are combined with a logical ‘and.’ */
@@ -416,6 +444,8 @@ export interface PlatformSecretFilter {
   or?: PlatformSecretFilter[];
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `retiredAt` field. */
   retiredAt?: DatetimeFilter;
   /** Filter by the object’s `rotatedAt` field. */
@@ -426,17 +456,20 @@ export interface PlatformSecretFilter {
 export interface PlatformSecretsDelInput {
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
 }
 export interface PlatformSecretsRemoveArrayInput {
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretNames?: string[];
 }
 export interface PlatformSecretsRotateInput {
   algo?: string;
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
   secretValue?: string;
 }
@@ -446,6 +479,7 @@ export interface PlatformSecretsSetInput {
   provider?: string;
   secretName?: string;
   secretNamespaceId?: string;
+  secretRealm?: string;
   secretValue?: string;
 }
 export interface ProvisionBucketInput {
@@ -483,6 +517,8 @@ export interface SecretFilter {
   or?: SecretFilter[];
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `retiredAt` field. */
   retiredAt?: DatetimeFilter;
   /** Filter by the object’s `rotatedAt` field. */
@@ -508,12 +544,14 @@ export interface _SecretsDelInput {
   clientMutationId?: string;
   databaseId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
 }
 export interface _SecretsRemoveArrayInput {
   clientMutationId?: string;
   databaseId?: string;
   namespaceId?: string;
+  realm?: string;
   secretNames?: string[];
 }
 export interface _SecretsRotateInput {
@@ -521,6 +559,7 @@ export interface _SecretsRotateInput {
   clientMutationId?: string;
   databaseId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
   secretValue?: string;
 }
@@ -531,6 +570,7 @@ export interface _SecretsSetInput {
   scopeDatabaseId?: string;
   secretName?: string;
   secretNamespaceId?: string;
+  secretRealm?: string;
   secretValue?: string;
 }
 /** Root meta schema type */
@@ -673,6 +713,7 @@ export interface MetaTable {
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
@@ -686,6 +727,8 @@ export interface MetaTable {
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
   storage?: MetaStorage | null;
+  /** PostgreSQL table name */
+  tableName: string;
   uniqueConstraints: MetaUniqueConstraint[];
 }
 /** A `Config` edge in the connection. */
@@ -737,6 +780,8 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** PostgreSQL column name */
+  columnName: string;
   description?: string | null;
   /** Enum metadata if this field has an enum type */
   enumValues?: MetaEnum | null;
@@ -744,6 +789,7 @@ export interface MetaField {
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Final GraphQL field name */
   name: string;
   type: MetaType;
 }
@@ -793,7 +839,7 @@ export interface MetaPrimaryKeyConstraint {
 }
 /** Table query/mutation names */
 export interface MetaQuery {
-  all: string;
+  all?: string | null;
   create?: string | null;
   delete?: string | null;
   one?: string | null;

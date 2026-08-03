@@ -2275,6 +2275,8 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """PostgreSQL column name"""
+  columnName: String!
   description: String
 
   """Enum metadata if this field has an enum type"""
@@ -2283,6 +2285,8 @@ type MetaField {
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
+
+  """Final GraphQL field name"""
   name: String!
   type: MetaType!
 }
@@ -2371,7 +2375,7 @@ type MetaPrimaryKeyConstraint {
 
 """Table query/mutation names"""
 type MetaQuery {
-  all: String!
+  all: String
   create: String
   delete: String
   one: String
@@ -2508,6 +2512,8 @@ type MetaTable {
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
@@ -2525,6 +2531,9 @@ type MetaTable {
 
   """Storage metadata (null if not a storage table)"""
   storage: MetaStorage
+
+  """PostgreSQL table name"""
+  tableName: String!
   uniqueConstraints: [MetaUniqueConstraint!]!
 }
 
@@ -4342,35 +4351,6 @@ type RevokeSessionPayload {
 type RoleType {
   id: Int!
   name: String!
-
-  """Reads and enables pagination through a set of `User`."""
-  usersByType(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `User`."""
-    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: UserFilter
-  ): UserConnection!
 }
 
 """A connection to a list of `RoleType` values."""
@@ -4417,12 +4397,6 @@ input RoleTypeFilter {
 
   """Checks for any expressions in this list."""
   or: [RoleTypeFilter!]
-
-  """Filter by the object’s `usersByType` relation."""
-  usersByType: RoleTypeToManyUserFilter
-
-  """`usersByType` exist."""
-  usersByTypeExist: Boolean
 }
 
 """An input for mutations affecting `RoleType`"""
@@ -4448,20 +4422,6 @@ Represents an update to a `RoleType`. Fields that are set will be updated.
 input RoleTypePatch {
   id: Int
   name: String
-}
-
-"""
-A filter to be used against many `User` object types. All fields are combined with a logical ‘and.’
-"""
-input RoleTypeToManyUserFilter {
-  """Filters to entities where every related entity matches."""
-  every: UserFilter
-
-  """Filters to entities where no related entity matches."""
-  none: UserFilter
-
-  """Filters to entities where at least one related entity matches."""
-  some: UserFilter
 }
 
 """All input for the `sendAccountDeletionEmail` mutation."""
@@ -5458,7 +5418,7 @@ scalar Upload
 
 type User {
   """Reads and enables pagination through a set of `AuditLogAuth`."""
-  auditLogAuthsByActorId(
+  authAuditLog(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -5486,16 +5446,9 @@ type User {
     where: AuditLogAuthFilter
   ): AuditLogAuthConnection!
   createdAt: Datetime
-  displayName: String
-
-  """
-  TRGM similarity when searching `displayName`. Returns null when no trgm search filter is active.
-  """
-  displayNameTrgmSimilarity: Float
-  id: UUID!
 
   """Reads and enables pagination through a set of `CryptoAddress`."""
-  ownedCryptoAddresses(
+  cryptoAddresses(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -5522,9 +5475,15 @@ type User {
     """
     where: CryptoAddressFilter
   ): CryptoAddressConnection!
+  displayName: String
+
+  """
+  TRGM similarity when searching `displayName`. Returns null when no trgm search filter is active.
+  """
+  displayNameTrgmSimilarity: Float
 
   """Reads and enables pagination through a set of `Email`."""
-  ownedEmails(
+  emails(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -5551,9 +5510,10 @@ type User {
     """
     where: EmailFilter
   ): EmailConnection!
+  id: UUID!
 
   """Reads and enables pagination through a set of `PhoneNumber`."""
-  ownedPhoneNumbers(
+  phoneNumbers(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -5580,122 +5540,6 @@ type User {
     """
     where: PhoneNumberFilter
   ): PhoneNumberConnection!
-
-  """Reads and enables pagination through a set of `PrincipalEntity`."""
-  ownedPrincipalEntities(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PrincipalEntity`."""
-    orderBy: [PrincipalEntityOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PrincipalEntityFilter
-  ): PrincipalEntityConnection!
-
-  """Reads and enables pagination through a set of `Principal`."""
-  ownedPrincipals(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `Principal`."""
-    orderBy: [PrincipalOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PrincipalFilter
-  ): PrincipalConnection!
-
-  """Reads and enables pagination through a set of `WebauthnCredential`."""
-  ownedWebauthnCredentials(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `WebauthnCredential`."""
-    orderBy: [WebauthnCredentialOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: WebauthnCredentialFilter
-  ): WebauthnCredentialConnection!
-
-  """Reads and enables pagination through a set of `PrincipalEntity`."""
-  principalEntitiesByEntityId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PrincipalEntity`."""
-    orderBy: [PrincipalEntityOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PrincipalEntityFilter
-  ): PrincipalEntityConnection!
 
   """Reads and enables pagination through a set of `Principal`."""
   principals(
@@ -5730,6 +5574,35 @@ type User {
   """Reads a single `RoleType` that is related to this `User`."""
   roleType: RoleType
 
+  """Reads and enables pagination through a set of `PrincipalEntity`."""
+  scopedPrincipals(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PrincipalEntity`."""
+    orderBy: [PrincipalEntityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalEntityFilter
+  ): PrincipalEntityConnection!
+
   """
   Composite search relevance score (0..1, higher = more relevant). Computed using Reciprocal Rank Fusion (RRF) across all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
   """
@@ -5743,6 +5616,35 @@ type User {
   type: Int!
   updatedAt: Datetime
   username: String
+
+  """Reads and enables pagination through a set of `WebauthnCredential`."""
+  webauthnCredentials(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnCredential`."""
+    orderBy: [WebauthnCredentialOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnCredentialFilter
+  ): WebauthnCredentialConnection!
 }
 
 type UserConnectedAccount {
@@ -5876,17 +5778,29 @@ input UserFilter {
   """Checks for all expressions in this list."""
   and: [UserFilter!]
 
-  """Filter by the object’s `auditLogAuthsByActorId` relation."""
-  auditLogAuthsByActorId: UserToManyAuditLogAuthFilter
+  """Filter by the object’s `authAuditLog` relation."""
+  authAuditLog: UserToManyAuditLogAuthFilter
 
-  """`auditLogAuthsByActorId` exist."""
-  auditLogAuthsByActorIdExist: Boolean
+  """`authAuditLog` exist."""
+  authAuditLogExist: Boolean
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `cryptoAddresses` relation."""
+  cryptoAddresses: UserToManyCryptoAddressFilter
+
+  """`cryptoAddresses` exist."""
+  cryptoAddressesExist: Boolean
+
   """Filter by the object’s `displayName` field."""
   displayName: StringTrgmFilter
+
+  """Filter by the object’s `emails` relation."""
+  emails: UserToManyEmailFilter
+
+  """`emails` exist."""
+  emailsExist: Boolean
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
@@ -5897,47 +5811,11 @@ input UserFilter {
   """Checks for any expressions in this list."""
   or: [UserFilter!]
 
-  """Filter by the object’s `ownedCryptoAddresses` relation."""
-  ownedCryptoAddresses: UserToManyCryptoAddressFilter
+  """Filter by the object’s `phoneNumbers` relation."""
+  phoneNumbers: UserToManyPhoneNumberFilter
 
-  """`ownedCryptoAddresses` exist."""
-  ownedCryptoAddressesExist: Boolean
-
-  """Filter by the object’s `ownedEmails` relation."""
-  ownedEmails: UserToManyEmailFilter
-
-  """`ownedEmails` exist."""
-  ownedEmailsExist: Boolean
-
-  """Filter by the object’s `ownedPhoneNumbers` relation."""
-  ownedPhoneNumbers: UserToManyPhoneNumberFilter
-
-  """`ownedPhoneNumbers` exist."""
-  ownedPhoneNumbersExist: Boolean
-
-  """Filter by the object’s `ownedPrincipalEntities` relation."""
-  ownedPrincipalEntities: UserToManyPrincipalEntityFilter
-
-  """`ownedPrincipalEntities` exist."""
-  ownedPrincipalEntitiesExist: Boolean
-
-  """Filter by the object’s `ownedPrincipals` relation."""
-  ownedPrincipals: UserToManyPrincipalFilter
-
-  """`ownedPrincipals` exist."""
-  ownedPrincipalsExist: Boolean
-
-  """Filter by the object’s `ownedWebauthnCredentials` relation."""
-  ownedWebauthnCredentials: UserToManyWebauthnCredentialFilter
-
-  """`ownedWebauthnCredentials` exist."""
-  ownedWebauthnCredentialsExist: Boolean
-
-  """Filter by the object’s `principalEntitiesByEntityId` relation."""
-  principalEntitiesByEntityId: UserToManyPrincipalEntityFilter
-
-  """`principalEntitiesByEntityId` exist."""
-  principalEntitiesByEntityIdExist: Boolean
+  """`phoneNumbers` exist."""
+  phoneNumbersExist: Boolean
 
   """Filter by the object’s `principals` relation."""
   principals: UserToManyPrincipalFilter
@@ -5950,6 +5828,12 @@ input UserFilter {
 
   """Filter by the object’s `roleType` relation."""
   roleType: RoleTypeFilter
+
+  """Filter by the object’s `scopedPrincipals` relation."""
+  scopedPrincipals: UserToManyPrincipalEntityFilter
+
+  """`scopedPrincipals` exist."""
+  scopedPrincipalsExist: Boolean
 
   """Filter by the object’s `searchTsv` field."""
   searchTsv: FullTextFilter
@@ -5977,6 +5861,12 @@ input UserFilter {
 
   """Filter by the object’s `username` field."""
   username: StringTrgmFilter
+
+  """Filter by the object’s `webauthnCredentials` relation."""
+  webauthnCredentials: UserToManyWebauthnCredentialFilter
+
+  """`webauthnCredentials` exist."""
+  webauthnCredentialsExist: Boolean
 }
 
 """An input for mutations affecting `User`"""

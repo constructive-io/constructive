@@ -7,7 +7,7 @@ Execute the _secretsRotate mutation
 ## Usage
 
 ```typescript
-db.mutation._secretsRotate({ input: { algo: '<String>', databaseId: '<UUID>', namespaceId: '<UUID>', secretName: '<String>', secretValue: '<String>' } }).execute()
+db.mutation._secretsRotate({ input: '<_SecretsRotateInput>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation._secretsRotate({ input: { algo: '<String>', databaseId: '<UUID>', na
 ### Run _secretsRotate
 
 ```typescript
-const result = await db.mutation._secretsRotate({ input: { algo: '<String>', databaseId: '<UUID>', namespaceId: '<UUID>', secretName: '<String>', secretValue: '<String>' } }).execute();
+const result = await db.mutation._secretsRotate({ input: '<_SecretsRotateInput>' }).execute();
 ```

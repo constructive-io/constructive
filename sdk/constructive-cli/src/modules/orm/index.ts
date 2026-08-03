@@ -53,6 +53,7 @@ import { MembershipsModuleModel } from './models/membershipsModule';
 import { MerkleStoreModuleModel } from './models/merkleStoreModule';
 import { NamespaceModuleModel } from './models/namespaceModule';
 import { NotificationsModuleModel } from './models/notificationsModule';
+import { PagesModuleModel } from './models/pagesModule';
 import { PermissionsModuleModel } from './models/permissionsModule';
 import { PhoneNumbersModuleModel } from './models/phoneNumbersModule';
 import { PlansModuleModel } from './models/plansModule';
@@ -163,6 +164,7 @@ export function createClient(config: OrmClientConfig) {
     merkleStoreModule: new MerkleStoreModuleModel(client),
     namespaceModule: new NamespaceModuleModel(client),
     notificationsModule: new NotificationsModuleModel(client),
+    pagesModule: new PagesModuleModel(client),
     permissionsModule: new PermissionsModuleModel(client),
     phoneNumbersModule: new PhoneNumbersModuleModel(client),
     plansModule: new PlansModuleModel(client),

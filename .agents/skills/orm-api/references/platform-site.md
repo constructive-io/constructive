@@ -9,8 +9,8 @@ Site surfaces exposed by this scope; publication makes a surface bindable from o
 ```typescript
 db.platformSite.findMany({ select: { id: true } }).execute()
 db.platformSite.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformSite.create({ data: { config: '<JSON>', description: '<String>', isPublished: '<Boolean>', name: '<String>', title: '<String>' }, select: { id: true } }).execute()
-db.platformSite.update({ where: { id: '<UUID>' }, data: { config: '<JSON>' }, select: { id: true } }).execute()
+db.platformSite.create({ data: { activeCommitId: '<UUID>', bucketId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>' }, select: { id: true } }).execute()
+db.platformSite.update({ where: { id: '<UUID>' }, data: { activeCommitId: '<UUID>' }, select: { id: true } }).execute()
 db.platformSite.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.platformSite.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.platformSite.findMany({
-  select: { id: true, config: true }
+  select: { id: true, activeCommitId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.platformSite.findMany({
 
 ```typescript
 const item = await db.platformSite.create({
-  data: { config: '<JSON>', description: '<String>', isPublished: '<Boolean>', name: '<String>', title: '<String>' },
+  data: { activeCommitId: '<UUID>', bucketId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>' },
   select: { id: true }
 }).execute();
 ```

@@ -467,21 +467,17 @@ export interface PrincipalEntityRelations {
 export interface PrincipalScopeOverrideRelations {
   principal?: Principal | null;
 }
-export interface RoleTypeRelations {
-  usersByType?: ConnectionResult<User>;
-}
+export interface RoleTypeRelations {}
 export interface UserConnectedAccountRelations {}
 export interface UserRelations {
   roleType?: RoleType | null;
-  auditLogAuthsByActorId?: ConnectionResult<AuditLogAuth>;
-  ownedCryptoAddresses?: ConnectionResult<CryptoAddress>;
-  ownedEmails?: ConnectionResult<Email>;
-  ownedPhoneNumbers?: ConnectionResult<PhoneNumber>;
-  ownedPrincipalEntities?: ConnectionResult<PrincipalEntity>;
-  ownedPrincipals?: ConnectionResult<Principal>;
-  ownedWebauthnCredentials?: ConnectionResult<WebauthnCredential>;
-  principalEntitiesByEntityId?: ConnectionResult<PrincipalEntity>;
+  authAuditLog?: ConnectionResult<AuditLogAuth>;
+  cryptoAddresses?: ConnectionResult<CryptoAddress>;
+  emails?: ConnectionResult<Email>;
+  phoneNumbers?: ConnectionResult<PhoneNumber>;
   principals?: ConnectionResult<Principal>;
+  scopedPrincipals?: ConnectionResult<PrincipalEntity>;
+  webauthnCredentials?: ConnectionResult<WebauthnCredential>;
 }
 export interface WebauthnCredentialRelations {
   owner?: User | null;
@@ -639,12 +635,6 @@ export type PrincipalScopeOverrideSelect = {
 export type RoleTypeSelect = {
   id?: boolean;
   name?: boolean;
-  usersByType?: {
-    select: UserSelect;
-    first?: number;
-    filter?: UserFilter;
-    orderBy?: UserOrderBy[];
-  };
 };
 export type UserConnectedAccountSelect = {
   createdAt?: boolean;
@@ -671,59 +661,47 @@ export type UserSelect = {
   roleType?: {
     select: RoleTypeSelect;
   };
-  auditLogAuthsByActorId?: {
+  authAuditLog?: {
     select: AuditLogAuthSelect;
     first?: number;
     filter?: AuditLogAuthFilter;
     orderBy?: AuditLogAuthOrderBy[];
   };
-  ownedCryptoAddresses?: {
+  cryptoAddresses?: {
     select: CryptoAddressSelect;
     first?: number;
     filter?: CryptoAddressFilter;
     orderBy?: CryptoAddressOrderBy[];
   };
-  ownedEmails?: {
+  emails?: {
     select: EmailSelect;
     first?: number;
     filter?: EmailFilter;
     orderBy?: EmailOrderBy[];
   };
-  ownedPhoneNumbers?: {
+  phoneNumbers?: {
     select: PhoneNumberSelect;
     first?: number;
     filter?: PhoneNumberFilter;
     orderBy?: PhoneNumberOrderBy[];
-  };
-  ownedPrincipalEntities?: {
-    select: PrincipalEntitySelect;
-    first?: number;
-    filter?: PrincipalEntityFilter;
-    orderBy?: PrincipalEntityOrderBy[];
-  };
-  ownedPrincipals?: {
-    select: PrincipalSelect;
-    first?: number;
-    filter?: PrincipalFilter;
-    orderBy?: PrincipalOrderBy[];
-  };
-  ownedWebauthnCredentials?: {
-    select: WebauthnCredentialSelect;
-    first?: number;
-    filter?: WebauthnCredentialFilter;
-    orderBy?: WebauthnCredentialOrderBy[];
-  };
-  principalEntitiesByEntityId?: {
-    select: PrincipalEntitySelect;
-    first?: number;
-    filter?: PrincipalEntityFilter;
-    orderBy?: PrincipalEntityOrderBy[];
   };
   principals?: {
     select: PrincipalSelect;
     first?: number;
     filter?: PrincipalFilter;
     orderBy?: PrincipalOrderBy[];
+  };
+  scopedPrincipals?: {
+    select: PrincipalEntitySelect;
+    first?: number;
+    filter?: PrincipalEntityFilter;
+    orderBy?: PrincipalEntityOrderBy[];
+  };
+  webauthnCredentials?: {
+    select: WebauthnCredentialSelect;
+    first?: number;
+    filter?: WebauthnCredentialFilter;
+    orderBy?: WebauthnCredentialOrderBy[];
   };
 };
 export type WebauthnCredentialSelect = {
@@ -1005,10 +983,6 @@ export interface RoleTypeFilter {
   not?: RoleTypeFilter;
   /** Checks for any expressions in this list. */
   or?: RoleTypeFilter[];
-  /** Filter by the object’s `usersByType` relation. */
-  usersByType?: RoleTypeToManyUserFilter;
-  /** `usersByType` exist. */
-  usersByTypeExist?: boolean;
 }
 export interface UserConnectedAccountFilter {
   /** Checks for all expressions in this list. */
@@ -1037,48 +1011,32 @@ export interface UserConnectedAccountFilter {
 export interface UserFilter {
   /** Checks for all expressions in this list. */
   and?: UserFilter[];
-  /** Filter by the object’s `auditLogAuthsByActorId` relation. */
-  auditLogAuthsByActorId?: UserToManyAuditLogAuthFilter;
-  /** `auditLogAuthsByActorId` exist. */
-  auditLogAuthsByActorIdExist?: boolean;
+  /** Filter by the object’s `authAuditLog` relation. */
+  authAuditLog?: UserToManyAuditLogAuthFilter;
+  /** `authAuditLog` exist. */
+  authAuditLogExist?: boolean;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `cryptoAddresses` relation. */
+  cryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `cryptoAddresses` exist. */
+  cryptoAddressesExist?: boolean;
   /** Filter by the object’s `displayName` field. */
   displayName?: StringTrgmFilter;
+  /** Filter by the object’s `emails` relation. */
+  emails?: UserToManyEmailFilter;
+  /** `emails` exist. */
+  emailsExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
   not?: UserFilter;
   /** Checks for any expressions in this list. */
   or?: UserFilter[];
-  /** Filter by the object’s `ownedCryptoAddresses` relation. */
-  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
-  /** `ownedCryptoAddresses` exist. */
-  ownedCryptoAddressesExist?: boolean;
-  /** Filter by the object’s `ownedEmails` relation. */
-  ownedEmails?: UserToManyEmailFilter;
-  /** `ownedEmails` exist. */
-  ownedEmailsExist?: boolean;
-  /** Filter by the object’s `ownedPhoneNumbers` relation. */
-  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
-  /** `ownedPhoneNumbers` exist. */
-  ownedPhoneNumbersExist?: boolean;
-  /** Filter by the object’s `ownedPrincipalEntities` relation. */
-  ownedPrincipalEntities?: UserToManyPrincipalEntityFilter;
-  /** `ownedPrincipalEntities` exist. */
-  ownedPrincipalEntitiesExist?: boolean;
-  /** Filter by the object’s `ownedPrincipals` relation. */
-  ownedPrincipals?: UserToManyPrincipalFilter;
-  /** `ownedPrincipals` exist. */
-  ownedPrincipalsExist?: boolean;
-  /** Filter by the object’s `ownedWebauthnCredentials` relation. */
-  ownedWebauthnCredentials?: UserToManyWebauthnCredentialFilter;
-  /** `ownedWebauthnCredentials` exist. */
-  ownedWebauthnCredentialsExist?: boolean;
-  /** Filter by the object’s `principalEntitiesByEntityId` relation. */
-  principalEntitiesByEntityId?: UserToManyPrincipalEntityFilter;
-  /** `principalEntitiesByEntityId` exist. */
-  principalEntitiesByEntityIdExist?: boolean;
+  /** Filter by the object’s `phoneNumbers` relation. */
+  phoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `phoneNumbers` exist. */
+  phoneNumbersExist?: boolean;
   /** Filter by the object’s `principals` relation. */
   principals?: UserToManyPrincipalFilter;
   /** `principals` exist. */
@@ -1087,6 +1045,10 @@ export interface UserFilter {
   profilePicture?: ConstructiveInternalTypeImageFilter;
   /** Filter by the object’s `roleType` relation. */
   roleType?: RoleTypeFilter;
+  /** Filter by the object’s `scopedPrincipals` relation. */
+  scopedPrincipals?: UserToManyPrincipalEntityFilter;
+  /** `scopedPrincipals` exist. */
+  scopedPrincipalsExist?: boolean;
   /** Filter by the object’s `searchTsv` field. */
   searchTsv?: FullTextFilter;
   /** TRGM search on the `display_name` column. */
@@ -1107,6 +1069,10 @@ export interface UserFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `username` field. */
   username?: StringTrgmFilter;
+  /** Filter by the object’s `webauthnCredentials` relation. */
+  webauthnCredentials?: UserToManyWebauthnCredentialFilter;
+  /** `webauthnCredentials` exist. */
+  webauthnCredentialsExist?: boolean;
 }
 export interface WebauthnCredentialFilter {
   /** Checks for all expressions in this list. */
@@ -1767,19 +1733,14 @@ export const connectionFieldsMap = {
     principalEntities: 'PrincipalEntity',
     principalScopeOverrides: 'PrincipalScopeOverride',
   },
-  RoleType: {
-    usersByType: 'User',
-  },
   User: {
-    auditLogAuthsByActorId: 'AuditLogAuth',
-    ownedCryptoAddresses: 'CryptoAddress',
-    ownedEmails: 'Email',
-    ownedPhoneNumbers: 'PhoneNumber',
-    ownedPrincipalEntities: 'PrincipalEntity',
-    ownedPrincipals: 'Principal',
-    ownedWebauthnCredentials: 'WebauthnCredential',
-    principalEntitiesByEntityId: 'PrincipalEntity',
+    authAuditLog: 'AuditLogAuth',
+    cryptoAddresses: 'CryptoAddress',
+    emails: 'Email',
+    phoneNumbers: 'PhoneNumber',
     principals: 'Principal',
+    scopedPrincipals: 'PrincipalEntity',
+    webauthnCredentials: 'WebauthnCredential',
   },
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
@@ -2118,15 +2079,6 @@ export interface PrincipalToManyPrincipalScopeOverrideFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: PrincipalScopeOverrideFilter;
 }
-/** A filter to be used against many `User` object types. All fields are combined with a logical ‘and.’ */
-export interface RoleTypeToManyUserFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: UserFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: UserFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: UserFilter;
-}
 /** A filter to be used against many `AuditLogAuth` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyAuditLogAuthFilter {
   /** Filters to entities where every related entity matches. */
@@ -2135,6 +2087,15 @@ export interface UserToManyAuditLogAuthFilter {
   none?: AuditLogAuthFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: AuditLogAuthFilter;
+}
+/** A filter to be used against many `CryptoAddress` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyCryptoAddressFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: CryptoAddressFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CryptoAddressFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: CryptoAddressFilter;
 }
 /** A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’ */
 export interface StringTrgmFilter {
@@ -2217,15 +2178,6 @@ export interface StringTrgmFilter {
   /** Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value. */
   wordSimilarTo?: TrgmSearchInput;
 }
-/** A filter to be used against many `CryptoAddress` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyCryptoAddressFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: CryptoAddressFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: CryptoAddressFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: CryptoAddressFilter;
-}
 /** A filter to be used against many `Email` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyEmailFilter {
   /** Filters to entities where every related entity matches. */
@@ -2244,15 +2196,6 @@ export interface UserToManyPhoneNumberFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: PhoneNumberFilter;
 }
-/** A filter to be used against many `PrincipalEntity` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyPrincipalEntityFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: PrincipalEntityFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: PrincipalEntityFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: PrincipalEntityFilter;
-}
 /** A filter to be used against many `Principal` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyPrincipalFilter {
   /** Filters to entities where every related entity matches. */
@@ -2261,15 +2204,6 @@ export interface UserToManyPrincipalFilter {
   none?: PrincipalFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: PrincipalFilter;
-}
-/** A filter to be used against many `WebauthnCredential` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyWebauthnCredentialFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: WebauthnCredentialFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: WebauthnCredentialFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: WebauthnCredentialFilter;
 }
 /** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeImageFilter {
@@ -2306,12 +2240,30 @@ export interface ConstructiveInternalTypeImageFilter {
   /** Not included in the specified list. */
   notIn?: ConstructiveInternalTypeImage[];
 }
+/** A filter to be used against many `PrincipalEntity` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyPrincipalEntityFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PrincipalEntityFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PrincipalEntityFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PrincipalEntityFilter;
+}
 /** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
 export interface TrgmSearchInput {
   /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
   threshold?: number;
   /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
   value: string;
+}
+/** A filter to be used against many `WebauthnCredential` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyWebauthnCredentialFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebauthnCredentialFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebauthnCredentialFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebauthnCredentialFilter;
 }
 /** A filter to be used against Base64EncodedBinary fields. All fields are combined with a logical ‘and.’ */
 export interface Base64EncodedBinaryFilter {
@@ -2523,81 +2475,6 @@ export interface PrincipalScopeOverrideFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `useAdminOwner` field. */
   useAdminOwner?: BooleanFilter;
-}
-/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
-export interface UserFilter {
-  /** Checks for all expressions in this list. */
-  and?: UserFilter[];
-  /** Filter by the object’s `auditLogAuthsByActorId` relation. */
-  auditLogAuthsByActorId?: UserToManyAuditLogAuthFilter;
-  /** `auditLogAuthsByActorId` exist. */
-  auditLogAuthsByActorIdExist?: boolean;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `displayName` field. */
-  displayName?: StringTrgmFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Negates the expression. */
-  not?: UserFilter;
-  /** Checks for any expressions in this list. */
-  or?: UserFilter[];
-  /** Filter by the object’s `ownedCryptoAddresses` relation. */
-  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
-  /** `ownedCryptoAddresses` exist. */
-  ownedCryptoAddressesExist?: boolean;
-  /** Filter by the object’s `ownedEmails` relation. */
-  ownedEmails?: UserToManyEmailFilter;
-  /** `ownedEmails` exist. */
-  ownedEmailsExist?: boolean;
-  /** Filter by the object’s `ownedPhoneNumbers` relation. */
-  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
-  /** `ownedPhoneNumbers` exist. */
-  ownedPhoneNumbersExist?: boolean;
-  /** Filter by the object’s `ownedPrincipalEntities` relation. */
-  ownedPrincipalEntities?: UserToManyPrincipalEntityFilter;
-  /** `ownedPrincipalEntities` exist. */
-  ownedPrincipalEntitiesExist?: boolean;
-  /** Filter by the object’s `ownedPrincipals` relation. */
-  ownedPrincipals?: UserToManyPrincipalFilter;
-  /** `ownedPrincipals` exist. */
-  ownedPrincipalsExist?: boolean;
-  /** Filter by the object’s `ownedWebauthnCredentials` relation. */
-  ownedWebauthnCredentials?: UserToManyWebauthnCredentialFilter;
-  /** `ownedWebauthnCredentials` exist. */
-  ownedWebauthnCredentialsExist?: boolean;
-  /** Filter by the object’s `principalEntitiesByEntityId` relation. */
-  principalEntitiesByEntityId?: UserToManyPrincipalEntityFilter;
-  /** `principalEntitiesByEntityId` exist. */
-  principalEntitiesByEntityIdExist?: boolean;
-  /** Filter by the object’s `principals` relation. */
-  principals?: UserToManyPrincipalFilter;
-  /** `principals` exist. */
-  principalsExist?: boolean;
-  /** Filter by the object’s `profilePicture` field. */
-  profilePicture?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `roleType` relation. */
-  roleType?: RoleTypeFilter;
-  /** Filter by the object’s `searchTsv` field. */
-  searchTsv?: FullTextFilter;
-  /** TRGM search on the `display_name` column. */
-  trgmDisplayName?: TrgmSearchInput;
-  /** TSV search on the `search_tsv` column. */
-  tsvSearchTsv?: string;
-  /** Filter by the object’s `type` field. */
-  type?: IntFilter;
-  /**
-   * Composite unified search. Provide a search string and it will be dispatched to
-   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. When the LLM plugin is active, pgvector also participates via
-   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  unifiedSearch?: string;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `username` field. */
-  username?: StringTrgmFilter;
 }
 /** A filter to be used against `AuditLogAuth` object types. All fields are combined with a logical ‘and.’ */
 export interface AuditLogAuthFilter {
@@ -2814,6 +2691,73 @@ export interface DatetimeFilter {
   /** Not included in the specified list. */
   notIn?: string[];
 }
+/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
+export interface UserFilter {
+  /** Checks for all expressions in this list. */
+  and?: UserFilter[];
+  /** Filter by the object’s `authAuditLog` relation. */
+  authAuditLog?: UserToManyAuditLogAuthFilter;
+  /** `authAuditLog` exist. */
+  authAuditLogExist?: boolean;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `cryptoAddresses` relation. */
+  cryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `cryptoAddresses` exist. */
+  cryptoAddressesExist?: boolean;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringTrgmFilter;
+  /** Filter by the object’s `emails` relation. */
+  emails?: UserToManyEmailFilter;
+  /** `emails` exist. */
+  emailsExist?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: UserFilter;
+  /** Checks for any expressions in this list. */
+  or?: UserFilter[];
+  /** Filter by the object’s `phoneNumbers` relation. */
+  phoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `phoneNumbers` exist. */
+  phoneNumbersExist?: boolean;
+  /** Filter by the object’s `principals` relation. */
+  principals?: UserToManyPrincipalFilter;
+  /** `principals` exist. */
+  principalsExist?: boolean;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** Filter by the object’s `scopedPrincipals` relation. */
+  scopedPrincipals?: UserToManyPrincipalEntityFilter;
+  /** `scopedPrincipals` exist. */
+  scopedPrincipalsExist?: boolean;
+  /** Filter by the object’s `searchTsv` field. */
+  searchTsv?: FullTextFilter;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** Filter by the object’s `type` field. */
+  type?: IntFilter;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringTrgmFilter;
+  /** Filter by the object’s `webauthnCredentials` relation. */
+  webauthnCredentials?: UserToManyWebauthnCredentialFilter;
+  /** `webauthnCredentials` exist. */
+  webauthnCredentialsExist?: boolean;
+}
 /** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDFilter {
   /** Not equal to the specified value, treating null like an ordinary value. */
@@ -2913,42 +2857,6 @@ export interface IntFilter {
   notEqualTo?: number;
   /** Not included in the specified list. */
   notIn?: number[];
-}
-/** A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’ */
-export interface RoleTypeFilter {
-  /** Checks for all expressions in this list. */
-  and?: RoleTypeFilter[];
-  /** Filter by the object’s `id` field. */
-  id?: IntFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: RoleTypeFilter;
-  /** Checks for any expressions in this list. */
-  or?: RoleTypeFilter[];
-  /** Filter by the object’s `usersByType` relation. */
-  usersByType?: RoleTypeToManyUserFilter;
-  /** `usersByType` exist. */
-  usersByTypeExist?: boolean;
-}
-/** A filter to be used against FullText fields. All fields are combined with a logical ‘and.’ */
-export interface FullTextFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Performs a full text search on the field. */
-  matches?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not included in the specified list. */
-  notIn?: string[];
 }
 /** A filter to be used against String fields. All fields are combined with a logical ‘and.’ */
 export interface StringFilter {
@@ -3125,6 +3033,38 @@ export interface StringListFilter {
   notEqualTo?: string[];
   /** Overlaps the specified list of values. */
   overlaps?: string[];
+}
+/** A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’ */
+export interface RoleTypeFilter {
+  /** Checks for all expressions in this list. */
+  and?: RoleTypeFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: RoleTypeFilter;
+  /** Checks for any expressions in this list. */
+  or?: RoleTypeFilter[];
+}
+/** A filter to be used against FullText fields. All fields are combined with a logical ‘and.’ */
+export interface FullTextFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Performs a full text search on the field. */
+  matches?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface CheckPasswordPayload {

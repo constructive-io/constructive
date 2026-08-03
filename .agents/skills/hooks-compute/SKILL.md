@@ -1,13 +1,13 @@
 ---
 name: hooks-compute
-description: React Query hooks for the compute API — provides typed query and mutation hooks for 67 tables and 29 custom operations
+description: React Query hooks for the compute API — provides typed query and mutation hooks for 69 tables and 29 custom operations
 ---
 
 # hooks-compute
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the compute API — provides typed query and mutation hooks for 67 tables and 29 custom operations
+React Query hooks for the compute API — provides typed query and mutation hooks for 69 tables and 29 custom operations
 
 ## Usage
 
@@ -40,6 +40,7 @@ See the `references/` directory for detailed per-entity API documentation:
 
 - [db-preset](references/db-preset.md)
 - [function-api-binding](references/function-api-binding.md)
+- [function-capability-binding](references/function-capability-binding.md)
 - [function-definition](references/function-definition.md)
 - [function-deployment](references/function-deployment.md)
 - [function-deployment-event](references/function-deployment-event.md)
@@ -64,6 +65,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [namespace](references/namespace.md)
 - [namespace-event](references/namespace-event.md)
 - [platform-function-api-binding](references/platform-function-api-binding.md)
+- [platform-function-capability-binding](references/platform-function-capability-binding.md)
 - [platform-function-definition](references/platform-function-definition.md)
 - [platform-function-deployment](references/platform-function-deployment.md)
 - [platform-function-deployment-event](references/platform-function-deployment-event.md)

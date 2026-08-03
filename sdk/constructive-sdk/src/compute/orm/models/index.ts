@@ -5,6 +5,7 @@
  */
 export { DbPresetModel } from './dbPreset';
 export { FunctionApiBindingModel } from './functionApiBinding';
+export { FunctionCapabilityBindingModel } from './functionCapabilityBinding';
 export { FunctionDefinitionModel } from './functionDefinition';
 export { FunctionDeploymentModel } from './functionDeployment';
 export { FunctionDeploymentEventModel } from './functionDeploymentEvent';
@@ -29,6 +30,7 @@ export { IntegrationProviderModel } from './integrationProvider';
 export { NamespaceModel } from './namespace';
 export { NamespaceEventModel } from './namespaceEvent';
 export { PlatformFunctionApiBindingModel } from './platformFunctionApiBinding';
+export { PlatformFunctionCapabilityBindingModel } from './platformFunctionCapabilityBinding';
 export { PlatformFunctionDefinitionModel } from './platformFunctionDefinition';
 export { PlatformFunctionDeploymentModel } from './platformFunctionDeployment';
 export { PlatformFunctionDeploymentEventModel } from './platformFunctionDeploymentEvent';

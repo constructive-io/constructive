@@ -26,6 +26,7 @@ const fieldSchema: FieldSchema = {
   name: 'string',
   namespaceId: 'uuid',
   provider: 'string',
+  realm: 'string',
   updatedAt: 'string',
   value: 'string',
 };
@@ -90,6 +91,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       name: true,
       namespaceId: true,
       provider: true,
+      realm: true,
       updatedAt: true,
       value: true,
     };
@@ -122,6 +124,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       name: true,
       namespaceId: true,
       provider: true,
+      realm: true,
       updatedAt: true,
       value: true,
     };
@@ -166,6 +169,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           name: true,
           namespaceId: true,
           provider: true,
+          realm: true,
           updatedAt: true,
           value: true,
         },
@@ -238,6 +242,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'realm',
+        message: 'realm',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'value',
         message: 'value',
         required: false,
@@ -258,6 +269,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           namespaceId: cleanedData.namespaceId,
           provider: cleanedData.provider,
+          realm: cleanedData.realm,
           value: cleanedData.value,
         },
         select: {
@@ -271,6 +283,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: true,
           namespaceId: true,
           provider: true,
+          realm: true,
           updatedAt: true,
           value: true,
         },
@@ -349,6 +362,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'realm',
+        message: 'realm',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'value',
         message: 'value',
         required: false,
@@ -372,6 +392,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           namespaceId: cleanedData.namespaceId,
           provider: cleanedData.provider,
+          realm: cleanedData.realm,
           value: cleanedData.value,
         },
         select: {
@@ -385,6 +406,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: true,
           namespaceId: true,
           provider: true,
+          realm: true,
           updatedAt: true,
           value: true,
         },

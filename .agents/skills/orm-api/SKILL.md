@@ -1,13 +1,13 @@
 ---
 name: orm-api
-description: ORM client for the api API — provides typed CRUD operations for 64 tables and 11 custom operations
+description: ORM client for the api API — provides typed CRUD operations for 80 tables and 17 custom operations
 ---
 
 # orm-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the api API — provides typed CRUD operations for 64 tables and 11 custom operations
+ORM client for the api API — provides typed CRUD operations for 80 tables and 17 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the api API — provides typed CRUD operations for 64 tables and 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: api, apiSchema, apiSetting, astMigration, checkConstraint, compositeType, corsSetting, database, ...
+// Available models: apiSchema, apiSetting, apis, astMigration, checkConstraint, compositeType, corsSetting, database, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -28,7 +28,7 @@ db.<model>.delete({ where: { id: '<UUID>' } }).execute()
 ### Query records
 
 ```typescript
-const items = await db.api.findMany({
+const items = await db.apiSchema.findMany({
   select: { id: true }
 }).execute();
 ```
@@ -37,9 +37,9 @@ const items = await db.api.findMany({
 
 See the `references/` directory for detailed per-entity API documentation:
 
-- [api](references/api.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
+- [apis](references/apis.md)
 - [ast-migration](references/ast-migration.md)
 - [check-constraint](references/check-constraint.md)
 - [composite-type](references/composite-type.md)
@@ -48,6 +48,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [database-setting](references/database-setting.md)
 - [database-transfer](references/database-transfer.md)
 - [default-privilege](references/default-privilege.md)
+- [derive](references/derive.md)
 - [domain](references/domain.md)
 - [domain-event](references/domain-event.md)
 - [domain-type](references/domain-type.md)
@@ -55,7 +56,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [embedding-chunk](references/embedding-chunk.md)
 - [enum](references/enum.md)
 - [exclusion-constraint](references/exclusion-constraint.md)
+- [field-behavior](references/field-behavior.md)
 - [field](references/field.md)
+- [foreign-key-constraint-behavior](references/foreign-key-constraint-behavior.md)
 - [foreign-key-constraint](references/foreign-key-constraint.md)
 - [full-text-search](references/full-text-search.md)
 - [function](references/function.md)
@@ -64,19 +67,25 @@ See the `references/` directory for detailed per-entity API documentation:
 - [index](references/index.md)
 - [managed-domain](references/managed-domain.md)
 - [node-type-registry](references/node-type-registry.md)
+- [page](references/page.md)
 - [partition](references/partition.md)
-- [platform-api](references/platform-api.md)
 - [platform-api-schema](references/platform-api-schema.md)
 - [platform-api-setting](references/platform-api-setting.md)
+- [platform-apis](references/platform-apis.md)
 - [platform-cors-setting](references/platform-cors-setting.md)
 - [platform-domain](references/platform-domain.md)
 - [platform-domain-event](references/platform-domain-event.md)
 - [platform-domain-verification](references/platform-domain-verification.md)
 - [platform-managed-domain](references/platform-managed-domain.md)
+- [platform-page](references/platform-page.md)
+- [platform-site-app-link](references/platform-site-app-link.md)
 - [platform-site](references/platform-site.md)
+- [platform-site-deep-link](references/platform-site-deep-link.md)
+- [platform-site-error-page](references/platform-site-error-page.md)
 - [platform-site-metadatum](references/platform-site-metadatum.md)
 - [platform-site-module](references/platform-site-module.md)
 - [platform-site-theme](references/platform-site-theme.md)
+- [platform-site-web-config](references/platform-site-web-config.md)
 - [policy](references/policy.md)
 - [primary-key-constraint](references/primary-key-constraint.md)
 - [pubkey-setting](references/pubkey-setting.md)
@@ -85,17 +94,24 @@ See the `references/` directory for detailed per-entity API documentation:
 - [route](references/route.md)
 - [schema](references/schema.md)
 - [schema-grant](references/schema-grant.md)
+- [site-app-link](references/site-app-link.md)
 - [site](references/site.md)
+- [site-deep-link](references/site-deep-link.md)
+- [site-error-page](references/site-error-page.md)
 - [site-metadatum](references/site-metadatum.md)
 - [site-module](references/site-module.md)
 - [site-theme](references/site-theme.md)
+- [site-web-config](references/site-web-config.md)
 - [spatial-relation](references/spatial-relation.md)
 - [sql-action](references/sql-action.md)
+- [table-behavior](references/table-behavior.md)
 - [table](references/table.md)
 - [table-grant](references/table-grant.md)
 - [trigger](references/trigger.md)
 - [trigger-function](references/trigger-function.md)
+- [unique-constraint-behavior](references/unique-constraint-behavior.md)
 - [unique-constraint](references/unique-constraint.md)
+- [view-behavior](references/view-behavior.md)
 - [view](references/view.md)
 - [view-grant](references/view-grant.md)
 - [view-rule](references/view-rule.md)
@@ -103,12 +119,18 @@ See the `references/` directory for detailed per-entity API documentation:
 - [webauthn-setting](references/webauthn-setting.md)
 - [api-schema-names](references/api-schema-names.md)
 - [apply-registry-defaults](references/apply-registry-defaults.md)
+- [resolve-deep-link](references/resolve-deep-link.md)
 - [resolve-http-route](references/resolve-http-route.md)
 - [resolve-route](references/resolve-route.md)
+- [resolve-site-app-links](references/resolve-site-app-links.md)
 - [accept-database-transfer](references/accept-database-transfer.md)
 - [apply-rls](references/apply-rls.md)
 - [cancel-database-transfer](references/cancel-database-transfer.md)
+- [domains-assign-subdomain](references/domains-assign-subdomain.md)
+- [platform-domains-assign-subdomain](references/platform-domains-assign-subdomain.md)
+- [platform-sites-provision-static-site](references/platform-sites-provision-static-site.md)
 - [provision-bucket](references/provision-bucket.md)
 - [reject-database-transfer](references/reject-database-transfer.md)
 - [request-database](references/request-database.md)
 - [set-field-order](references/set-field-order.md)
+- [sites-provision-static-site](references/sites-provision-static-site.md)

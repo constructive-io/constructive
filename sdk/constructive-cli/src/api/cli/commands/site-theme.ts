@@ -16,10 +16,14 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  commitId: 'uuid',
   createdAt: 'string',
   databaseId: 'uuid',
   id: 'uuid',
+  isActive: 'boolean',
+  name: 'string',
   siteId: 'uuid',
+  storeId: 'uuid',
   theme: 'json',
   updatedAt: 'string',
 };
@@ -74,10 +78,14 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      commitId: true,
       createdAt: true,
       databaseId: true,
       id: true,
+      isActive: true,
+      name: true,
       siteId: true,
+      storeId: true,
       theme: true,
       updatedAt: true,
     };
@@ -100,10 +108,14 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      commitId: true,
       createdAt: true,
       databaseId: true,
       id: true,
+      isActive: true,
+      name: true,
       siteId: true,
+      storeId: true,
       theme: true,
       updatedAt: true,
     };
@@ -138,10 +150,14 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          commitId: true,
           createdAt: true,
           databaseId: true,
           id: true,
+          isActive: true,
+          name: true,
           siteId: true,
+          storeId: true,
           theme: true,
           updatedAt: true,
         },
@@ -161,15 +177,43 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'commitId',
+        message: 'commitId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isActive',
+        message: 'isActive',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'siteId',
         message: 'siteId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'storeId',
+        message: 'storeId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'json',
@@ -184,15 +228,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.siteTheme
       .create({
         data: {
+          commitId: cleanedData.commitId,
           databaseId: cleanedData.databaseId,
+          isActive: cleanedData.isActive,
+          name: cleanedData.name,
           siteId: cleanedData.siteId,
+          storeId: cleanedData.storeId,
           theme: cleanedData.theme,
         },
         select: {
+          commitId: true,
           createdAt: true,
           databaseId: true,
           id: true,
+          isActive: true,
+          name: true,
           siteId: true,
+          storeId: true,
           theme: true,
           updatedAt: true,
         },
@@ -218,15 +270,43 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'commitId',
+        message: 'commitId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+      },
+      {
+        type: 'boolean',
+        name: 'isActive',
+        message: 'isActive',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'siteId',
         message: 'siteId',
         required: false,
+      },
+      {
+        type: 'text',
+        name: 'storeId',
+        message: 'storeId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'json',
@@ -244,15 +324,23 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          commitId: cleanedData.commitId,
           databaseId: cleanedData.databaseId,
+          isActive: cleanedData.isActive,
+          name: cleanedData.name,
           siteId: cleanedData.siteId,
+          storeId: cleanedData.storeId,
           theme: cleanedData.theme,
         },
         select: {
+          commitId: true,
           createdAt: true,
           databaseId: true,
           id: true,
+          isActive: true,
+          name: true,
           siteId: true,
+          storeId: true,
           theme: true,
           updatedAt: true,
         },

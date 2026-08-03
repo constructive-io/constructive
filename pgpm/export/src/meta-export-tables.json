@@ -67,6 +67,11 @@
       "table": "check_constraint"
     },
     {
+      "key": "derives",
+      "schema": "metaschema_public",
+      "table": "derives"
+    },
+    {
       "key": "exclusion_constraint",
       "schema": "metaschema_public",
       "table": "exclusion_constraint"
@@ -100,6 +105,11 @@
       "key": "primary_key_constraint",
       "schema": "metaschema_public",
       "table": "primary_key_constraint"
+    },
+    {
+      "key": "table_behavior",
+      "schema": "metaschema_public",
+      "table": "table_behavior"
     },
     {
       "key": "table_grant",
@@ -392,9 +402,29 @@
       "table": "embedding_chunks"
     },
     {
+      "key": "field_behavior",
+      "schema": "metaschema_public",
+      "table": "field_behavior"
+    },
+    {
+      "key": "foreign_key_constraint_behavior",
+      "schema": "metaschema_public",
+      "table": "foreign_key_constraint_behavior"
+    },
+    {
       "key": "spatial_relation",
       "schema": "metaschema_public",
       "table": "spatial_relation"
+    },
+    {
+      "key": "unique_constraint_behavior",
+      "schema": "metaschema_public",
+      "table": "unique_constraint_behavior"
+    },
+    {
+      "key": "view_behavior",
+      "schema": "metaschema_public",
+      "table": "view_behavior"
     },
     {
       "key": "view_grant",
@@ -477,6 +507,11 @@
       "table": "http_route_module"
     },
     {
+      "key": "pages_module",
+      "schema": "metaschema_modules_public",
+      "table": "pages_module"
+    },
+    {
       "key": "route_module",
       "schema": "metaschema_modules_public",
       "table": "route_module"
@@ -532,6 +567,11 @@
       "table": "managed_domains"
     },
     {
+      "key": "pages",
+      "schema": "routing_public",
+      "table": "pages"
+    },
+    {
       "key": "pubkey_settings",
       "schema": "routing_public",
       "table": "pubkey_settings"
@@ -547,6 +587,21 @@
       "table": "routes"
     },
     {
+      "key": "site_app_links",
+      "schema": "routing_public",
+      "table": "site_app_links"
+    },
+    {
+      "key": "site_deep_links",
+      "schema": "routing_public",
+      "table": "site_deep_links"
+    },
+    {
+      "key": "site_error_pages",
+      "schema": "routing_public",
+      "table": "site_error_pages"
+    },
+    {
       "key": "site_metadata",
       "schema": "routing_public",
       "table": "site_metadata"
@@ -560,6 +615,11 @@
       "key": "site_themes",
       "schema": "routing_public",
       "table": "site_themes"
+    },
+    {
+      "key": "site_web_configs",
+      "schema": "routing_public",
+      "table": "site_web_configs"
     },
     {
       "key": "sites",
@@ -590,6 +650,11 @@
       "key": "catalog_public.apps",
       "schema": "catalog_public",
       "table": "apps"
+    },
+    {
+      "key": "buckets",
+      "schema": "catalog_public",
+      "table": "buckets"
     },
     {
       "key": "catalog_public.domains",
@@ -625,6 +690,26 @@
       "key": "catalog_public.sites",
       "schema": "catalog_public",
       "table": "sites"
+    },
+    {
+      "key": "sites_app_links",
+      "schema": "catalog_public",
+      "table": "sites_app_links"
+    },
+    {
+      "key": "sites_deep_links",
+      "schema": "catalog_public",
+      "table": "sites_deep_links"
+    },
+    {
+      "key": "sites_error_pages",
+      "schema": "catalog_public",
+      "table": "sites_error_pages"
+    },
+    {
+      "key": "sites_web_config",
+      "schema": "catalog_public",
+      "table": "sites_web_config"
     }
   ],
   "timestampDefaultColumns": {
@@ -641,6 +726,10 @@
       "updated_at"
     ],
     "catalog_public.apps": [
+      "created_at",
+      "updated_at"
+    ],
+    "catalog_public.buckets": [
       "created_at",
       "updated_at"
     ],
@@ -672,6 +761,22 @@
       "created_at",
       "updated_at"
     ],
+    "catalog_public.sites_app_links": [
+      "created_at",
+      "updated_at"
+    ],
+    "catalog_public.sites_deep_links": [
+      "created_at",
+      "updated_at"
+    ],
+    "catalog_public.sites_error_pages": [
+      "created_at",
+      "updated_at"
+    ],
+    "catalog_public.sites_web_config": [
+      "created_at",
+      "updated_at"
+    ],
     "metaschema_modules_public.db_preset_module": [
       "created_at"
     ],
@@ -687,11 +792,18 @@
     "metaschema_modules_public.merkle_store_module": [
       "created_at"
     ],
+    "metaschema_modules_public.pages_module": [
+      "created_at"
+    ],
     "metaschema_public.check_constraint": [
       "created_at",
       "updated_at"
     ],
     "metaschema_public.database": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.derives": [
       "created_at",
       "updated_at"
     ],
@@ -707,7 +819,15 @@
       "created_at",
       "updated_at"
     ],
+    "metaschema_public.field_behavior": [
+      "created_at",
+      "updated_at"
+    ],
     "metaschema_public.foreign_key_constraint": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.foreign_key_constraint_behavior": [
       "created_at",
       "updated_at"
     ],
@@ -743,6 +863,10 @@
       "created_at",
       "updated_at"
     ],
+    "metaschema_public.table_behavior": [
+      "created_at",
+      "updated_at"
+    ],
     "metaschema_public.table_grant": [
       "created_at",
       "updated_at"
@@ -756,6 +880,14 @@
       "updated_at"
     ],
     "metaschema_public.unique_constraint": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.unique_constraint_behavior": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.view_behavior": [
       "created_at",
       "updated_at"
     ],
@@ -811,6 +943,18 @@
       "created_at",
       "updated_at"
     ],
+    "routing_public.site_app_links": [
+      "created_at",
+      "updated_at"
+    ],
+    "routing_public.site_deep_links": [
+      "created_at",
+      "updated_at"
+    ],
+    "routing_public.site_error_pages": [
+      "created_at",
+      "updated_at"
+    ],
     "routing_public.site_metadata": [
       "created_at",
       "updated_at"
@@ -820,6 +964,10 @@
       "updated_at"
     ],
     "routing_public.site_themes": [
+      "created_at",
+      "updated_at"
+    ],
+    "routing_public.site_web_configs": [
       "created_at",
       "updated_at"
     ],

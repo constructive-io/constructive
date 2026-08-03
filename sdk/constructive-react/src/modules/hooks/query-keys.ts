@@ -452,6 +452,15 @@ export const notificationsModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...notificationsModuleKeys.details(), id] as const,
 } as const;
+export const pagesModuleKeys = {
+  /** All pagesModule queries */ all: ['pagesmodule'] as const,
+  /** List query keys */ lists: () => [...pagesModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...pagesModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...pagesModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...pagesModuleKeys.details(), id] as const,
+} as const;
 export const permissionsModuleKeys = {
   /** All permissionsModule queries */ all: ['permissionsmodule'] as const,
   /** List query keys */ lists: () => [...permissionsModuleKeys.all, 'list'] as const,
@@ -777,6 +786,7 @@ export const queryKeys = {
   merkleStoreModule: merkleStoreModuleKeys,
   namespaceModule: namespaceModuleKeys,
   notificationsModule: notificationsModuleKeys,
+  pagesModule: pagesModuleKeys,
   permissionsModule: permissionsModuleKeys,
   phoneNumbersModule: phoneNumbersModuleKeys,
   plansModule: plansModuleKeys,

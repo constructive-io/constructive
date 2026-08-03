@@ -7,7 +7,7 @@ Execute the _secretsSet mutation
 ## Usage
 
 ```bash
-csdk secrets-set --input.algo <String> --input.clientMutationId <String> --input.provider <String> --input.scopeDatabaseId <UUID> --input.secretName <String> --input.secretNamespaceId <UUID> --input.secretValue <String>
+csdk secrets-set --input.algo <String> --input.clientMutationId <String> --input.provider <String> --input.scopeDatabaseId <UUID> --input.secretName <String> --input.secretNamespaceId <UUID> --input.secretRealm <String> --input.secretValue <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk secrets-set --input.algo <String> --input.clientMutationId <String> --input
 ### Run _secretsSet
 
 ```bash
-csdk secrets-set --input.algo <String> --input.clientMutationId <String> --input.provider <String> --input.scopeDatabaseId <UUID> --input.secretName <String> --input.secretNamespaceId <UUID> --input.secretValue <String>
+csdk secrets-set --input.algo <String> --input.clientMutationId <String> --input.provider <String> --input.scopeDatabaseId <UUID> --input.secretName <String> --input.secretNamespaceId <UUID> --input.secretRealm <String> --input.secretValue <String>
 ```

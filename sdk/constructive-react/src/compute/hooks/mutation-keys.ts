@@ -35,6 +35,18 @@ export const functionApiBindingMutationKeys = {
   /** Delete functionApiBinding mutation key */ delete: (id: string | number) =>
     ['mutation', 'functionapibinding', 'delete', id] as const,
 } as const;
+export const functionCapabilityBindingMutationKeys = {
+  /** All functionCapabilityBinding mutation keys */ all: [
+    'mutation',
+    'functioncapabilitybinding',
+  ] as const,
+  /** Create functionCapabilityBinding mutation key */ create: () =>
+    ['mutation', 'functioncapabilitybinding', 'create'] as const,
+  /** Update functionCapabilityBinding mutation key */ update: (id: string | number) =>
+    ['mutation', 'functioncapabilitybinding', 'update', id] as const,
+  /** Delete functionCapabilityBinding mutation key */ delete: (id: string | number) =>
+    ['mutation', 'functioncapabilitybinding', 'delete', id] as const,
+} as const;
 export const functionDefinitionMutationKeys = {
   /** All functionDefinition mutation keys */ all: ['mutation', 'functiondefinition'] as const,
   /** Create functionDefinition mutation key */ create: () =>
@@ -271,6 +283,18 @@ export const platformFunctionApiBindingMutationKeys = {
     ['mutation', 'platformfunctionapibinding', 'update', id] as const,
   /** Delete platformFunctionApiBinding mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformfunctionapibinding', 'delete', id] as const,
+} as const;
+export const platformFunctionCapabilityBindingMutationKeys = {
+  /** All platformFunctionCapabilityBinding mutation keys */ all: [
+    'mutation',
+    'platformfunctioncapabilitybinding',
+  ] as const,
+  /** Create platformFunctionCapabilityBinding mutation key */ create: () =>
+    ['mutation', 'platformfunctioncapabilitybinding', 'create'] as const,
+  /** Update platformFunctionCapabilityBinding mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformfunctioncapabilitybinding', 'update', id] as const,
+  /** Delete platformFunctionCapabilityBinding mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformfunctioncapabilitybinding', 'delete', id] as const,
 } as const;
 export const platformFunctionDefinitionMutationKeys = {
   /** All platformFunctionDefinition mutation keys */ all: [
@@ -871,6 +895,7 @@ export const customMutationKeys = {
 export const mutationKeys = {
   dbPreset: dbPresetMutationKeys,
   functionApiBinding: functionApiBindingMutationKeys,
+  functionCapabilityBinding: functionCapabilityBindingMutationKeys,
   functionDefinition: functionDefinitionMutationKeys,
   functionDeployment: functionDeploymentMutationKeys,
   functionDeploymentEvent: functionDeploymentEventMutationKeys,
@@ -895,6 +920,7 @@ export const mutationKeys = {
   namespace: namespaceMutationKeys,
   namespaceEvent: namespaceEventMutationKeys,
   platformFunctionApiBinding: platformFunctionApiBindingMutationKeys,
+  platformFunctionCapabilityBinding: platformFunctionCapabilityBindingMutationKeys,
   platformFunctionDefinition: platformFunctionDefinitionMutationKeys,
   platformFunctionDeployment: platformFunctionDeploymentMutationKeys,
   platformFunctionDeploymentEvent: platformFunctionDeploymentEventMutationKeys,
