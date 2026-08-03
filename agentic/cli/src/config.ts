@@ -17,6 +17,10 @@ export interface AgentCliConfig {
   overlayDir: string;
   /** Path of the user-editable manifest: `<config>/skills-manifest.json`. */
   manifestFile: string;
+  /** Signed-in platform session: `<config>/agent/account.json`. */
+  accountFile: string;
+  /** Persisted backend endpoints: `<config>/agent/backend-config.json`. */
+  backendFile: string;
   manifest: SkillsManifest;
   skillsRepo: string;
   skillsPin: string;
@@ -39,8 +43,12 @@ export function loadConfig(baseDir?: string): AgentCliConfig {
   const agentDir = path.join(dirs.stash.data, 'agent');
   const overlayDir = path.join(dirs.stash.config, 'skills-overlay');
   const manifestFile = path.join(dirs.stash.config, 'skills-manifest.json');
+  const accountDir = path.join(dirs.stash.config, 'agent');
+  const accountFile = path.join(accountDir, 'account.json');
+  const backendFile = path.join(accountDir, 'backend-config.json');
   fs.mkdirSync(agentDir, { recursive: true });
   fs.mkdirSync(overlayDir, { recursive: true });
+  fs.mkdirSync(accountDir, { recursive: true });
 
   let file: ManifestFile = {};
   if (fs.existsSync(manifestFile)) {
@@ -52,6 +60,8 @@ export function loadConfig(baseDir?: string): AgentCliConfig {
     agentDir,
     overlayDir,
     manifestFile,
+    accountFile,
+    backendFile,
     manifest: file.manifest ?? defaultManifest(),
     skillsRepo: process.env.AGENT_SKILLS_REPO ?? file.repo ?? DEFAULT_SKILLS_REPO,
     skillsPin: process.env.AGENT_SKILLS_PIN ?? file.pin ?? DEFAULT_SKILLS_PIN
