@@ -458,7 +458,7 @@ describe('OAuth routes', () => {
       expect(redirect.origin).toBe(baseUrl);
       expect(redirect.pathname).toBe('/auth/error');
       expect(redirect.searchParams.get('error')).toBe(
-        'INVALID_REDIRECT_URI'
+        'OAUTH_INVALID_REDIRECT_URI'
       );
       expect(getSetCookieValues(response.headers)).toHaveLength(0);
     });
@@ -480,7 +480,7 @@ describe('OAuth routes', () => {
       const redirect = new URL(response.headers.location!);
       expect(redirect.origin).toBe(baseUrl);
       expect(redirect.searchParams.get('error')).toBe(
-        'INVALID_REDIRECT_URI'
+        'OAUTH_INVALID_REDIRECT_URI'
       );
       expect(routingQueryMock).not.toHaveBeenCalled();
     });
@@ -498,7 +498,7 @@ describe('OAuth routes', () => {
 
       const redirect = new URL(response.headers.location!);
       expect(redirect.searchParams.get('error')).toBe(
-        'INVALID_REDIRECT_URI'
+        'OAUTH_INVALID_REDIRECT_URI'
       );
       expect(routingQueryMock).not.toHaveBeenCalled();
     });
@@ -583,7 +583,7 @@ describe('OAuth routes', () => {
       });
 
       const redirect = new URL(response.headers.location!);
-      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(redirect.searchParams.get('error')).toBe('OAUTH_INVALID_STATE');
       expect(fetchMock).not.toHaveBeenCalled();
       expect(authQueryMock).not.toHaveBeenCalled();
     });
@@ -838,7 +838,7 @@ describe('OAuth routes', () => {
 
       const redirect = new URL(response.headers.location!);
       expect(redirect.origin).toBe(baseUrl);
-      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(redirect.searchParams.get('error')).toBe('OAUTH_INVALID_STATE');
       expect(fetchMock).not.toHaveBeenCalled();
       expect(authQueryMock).not.toHaveBeenCalled();
     });
