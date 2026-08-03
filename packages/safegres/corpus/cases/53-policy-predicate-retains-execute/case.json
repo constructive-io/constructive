@@ -1,0 +1,23 @@
+{
+  "title": "A grant that looks dead but is reached through an RLS policy predicate — retained, not revocable",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_policy_reach",
+      "c_policy_priv"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [],
+  "forbid": [
+    "L21"
+  ],
+  "fix": "Do not revoke. corpus_anon's EXECUTE on c_policy_priv.can_read(bigint) is exercised by the docs_visible policy predicate on every read of c_policy_reach.docs, which evaluates as the querying role. Revoking it makes the policy raise `permission denied for function can_read` and fails authorization closed for every anonymous read — the load-bearing grant the rule is built to protect.",
+  "id": "53-policy-predicate-retains-execute"
+}
