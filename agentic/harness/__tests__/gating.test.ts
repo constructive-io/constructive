@@ -192,6 +192,30 @@ describe('confirm gate: declines are respected', () => {
     expect(result?.block).toBe(true);
     expect(confirmCalls()).toBe(1);
   });
+
+  it('skips the confirm for tokenless create_api_key but gates it with a token', async () => {
+    const tokenless = createHarness({ isProjectRunnable: async () => true });
+    expect(
+      await tokenless.gate.onToolCall(
+        call('create_api_key', 'tc-1', { key_name: 'deploy bot' }),
+        tokenless.host,
+        CWD
+      )
+    ).toBeUndefined();
+    expect(tokenless.confirmCalls()).toBe(0);
+
+    const withToken = createHarness({
+      isProjectRunnable: async () => true,
+      hasDataToken: async () => true,
+    });
+    const result = await withToken.gate.onToolCall(
+      call('create_api_key', 'tc-1', { key_name: 'deploy bot' }),
+      withToken.host,
+      CWD
+    );
+    expect(result?.block).toBe(true);
+    expect(withToken.confirmCalls()).toBe(1);
+  });
 });
 
 describe('decline guard canonicalization', () => {
@@ -251,5 +275,21 @@ describe('buildConfirmPrompt', () => {
     });
     expect(remove.title).toBe('Delete entity type?');
     expect(remove.message).toMatch(/stay in the API schema/);
+  });
+
+  it('summarizes scope in the create_api_key prompt', async () => {
+    const unscoped = buildConfirmPrompt('create_api_key', { key_name: 'deploy bot' });
+    expect(unscoped.title).toBe('Create API key?');
+    expect(unscoped.message).toContain('"deploy bot"');
+    expect(unscoped.message).toContain('unscoped');
+    expect(unscoped.message).toMatch(/never to the agent/);
+
+    const scoped = buildConfirmPrompt('create_api_key', {
+      key_name: 'ci',
+      entity_ids: ['e-1', 'e-2'],
+      read_only: true,
+    });
+    expect(scoped.message).toContain('scoped to 2 entities');
+    expect(scoped.message).toContain('read-only');
   });
 });

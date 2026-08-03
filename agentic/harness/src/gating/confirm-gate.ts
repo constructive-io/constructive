@@ -119,7 +119,15 @@ export function createConfirmGate(deps: ConfirmGateDeps): ConfirmGate {
       }
 
       if (!(await deps.isProjectRunnable(cwd))) return;
-      if (event.toolName === 'add_records' && !(await deps.hasDataToken(cwd))) return;
+      // Tools that need an app sign-in skip the confirm when no data token
+      // exists — the tool returns its sign-in prompt instead of making the
+      // user approve something that fails.
+      if (
+        (event.toolName === 'add_records' || event.toolName === 'create_api_key') &&
+        !(await deps.hasDataToken(cwd))
+      ) {
+        return;
+      }
 
       let resolvedPreview: ConfirmPreview | undefined;
       if (event.toolName === 'create_template') {
