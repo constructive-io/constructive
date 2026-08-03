@@ -36,7 +36,11 @@ const STEP_UP = {
   errors: [{ message: 'STEP_UP_REQUIRED: verify your password' }],
 };
 
-function makeClient(mintResults: unknown[], existingPrincipal: unknown = null) {
+function makeClient(
+  mintResults: unknown[],
+  existingPrincipal: unknown = null,
+  existingScopeRow: unknown = null,
+) {
   const createApiKey = jest.fn();
   for (const result of mintResults) {
     createApiKey.mockReturnValueOnce({ execute: async (): Promise<unknown> => result });
@@ -45,6 +49,11 @@ function makeClient(mintResults: unknown[], existingPrincipal: unknown = null) {
     principal: {
       findFirst: jest.fn().mockReturnValue({
         unwrap: async (): Promise<unknown> => ({ principal: existingPrincipal }),
+      }),
+    },
+    principalEntity: {
+      findFirst: jest.fn().mockReturnValue({
+        unwrap: async (): Promise<unknown> => ({ principalEntity: existingScopeRow }),
       }),
     },
     mutation: { createApiKey },
@@ -176,6 +185,72 @@ describe('create_api_key execute', () => {
     const result = await run({ key_name: 'k', principal_name: 'bot', entity_ids: ['e-1'] });
     expect(result.details.success).toBe(false);
     expect(result.details.message).toMatch(/already exists/);
+    expect(client.mutation.createApiKey).not.toHaveBeenCalled();
+  });
+
+  it('fails explicit for a read-only request when isReadOnly is absent', async () => {
+    useContext();
+    mockGetHost.mockReturnValue(makeHost() as never);
+    mockToken.mockResolvedValue({ token: 'tok' });
+    global.fetch = jest.fn(async () => ({
+      json: async () => ({
+        data: { __type: { inputFields: [{ name: 'name' }, { name: 'entityIds' }] } },
+      }),
+    })) as never;
+    const client = makeClient([MINTED]);
+    mockCreateClient.mockReturnValue(client);
+
+    const result = await run({ key_name: 'ro key', read_only: true });
+    expect(result.details.success).toBe(false);
+    expect(result.details.message).toMatch(/isReadOnly/);
+    expect(client.mutation.createApiKey).not.toHaveBeenCalled();
+  });
+
+  it('reuses an existing principal only after verifying it is unscoped', async () => {
+    useContext();
+    mockGetHost.mockReturnValue(makeHost() as never);
+    mockToken.mockResolvedValue({ token: 'tok' });
+    global.fetch = mockFetchWith(true) as never;
+    const client = makeClient([MINTED], { id: 'prin-old', name: 'bot', isReadOnly: false });
+    mockCreateClient.mockReturnValue(client);
+
+    const result = await run({ key_name: 'k', principal_name: 'bot' });
+    expect(result.details.success).toBe(true);
+    expect(result.details.principalId).toBe('prin-old');
+    expect(client.principalEntity.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { principalId: { equalTo: 'prin-old' } } }),
+    );
+  });
+
+  it('refuses to reuse an entity-scoped principal for an unscoped key', async () => {
+    useContext();
+    mockGetHost.mockReturnValue(makeHost() as never);
+    mockToken.mockResolvedValue({ token: 'tok' });
+    global.fetch = mockFetchWith(true) as never;
+    const client = makeClient(
+      [MINTED],
+      { id: 'prin-old', name: 'bot', isReadOnly: false },
+      { id: 'pe-1' },
+    );
+    mockCreateClient.mockReturnValue(client);
+
+    const result = await run({ key_name: 'k', principal_name: 'bot' });
+    expect(result.details.success).toBe(false);
+    expect(result.details.message).toMatch(/narrower scope/);
+    expect(client.mutation.createApiKey).not.toHaveBeenCalled();
+  });
+
+  it('refuses to reuse a read-only principal for an unscoped key', async () => {
+    useContext();
+    mockGetHost.mockReturnValue(makeHost() as never);
+    mockToken.mockResolvedValue({ token: 'tok' });
+    global.fetch = mockFetchWith(true) as never;
+    const client = makeClient([MINTED], { id: 'prin-old', name: 'bot', isReadOnly: true });
+    mockCreateClient.mockReturnValue(client);
+
+    const result = await run({ key_name: 'k', principal_name: 'bot' });
+    expect(result.details.success).toBe(false);
+    expect(result.details.message).toMatch(/narrower scope/);
     expect(client.mutation.createApiKey).not.toHaveBeenCalled();
   });
 

@@ -99,14 +99,14 @@ async function rawGraphql(
   return (await res.json()) as { data?: Record<string, unknown>; errors?: { message: string }[] };
 }
 
-async function supportsCreateTimeScoping(endpoint: string): Promise<boolean> {
+async function createPrincipalInputFields(endpoint: string): Promise<Set<string>> {
   const probe = await rawGraphql(
     endpoint,
     undefined,
     '{ __type(name: "CreatePrincipalInput") { inputFields { name } } }',
   );
   const type = probe.data?.__type as { inputFields?: { name: string }[] } | null | undefined;
-  return Boolean(type?.inputFields?.some((f) => f.name === 'entityIds'));
+  return new Set((type?.inputFields ?? []).map((f) => f.name));
 }
 
 type Params = z.infer<typeof CreateApiKeyZod>;
@@ -152,10 +152,17 @@ export const createApiKeyTool: ToolDefinition<typeof CreateApiKeySchema, CreateA
 
     const scoped = Boolean(params.entity_ids?.length) || params.read_only === true;
     try {
-      if (scoped && !(await supportsCreateTimeScoping(authEndpoint))) {
-        return fail(
-          'This deployment does not support scoping a principal at create time (no entityIds on createPrincipal). No key was minted. If an unscoped key that acts as the signed-in user is acceptable, ask for one explicitly.',
-        );
+      if (scoped) {
+        const fields = await createPrincipalInputFields(authEndpoint);
+        const missing = [
+          ...(params.entity_ids?.length && !fields.has('entityIds') ? ['entityIds'] : []),
+          ...(params.read_only === true && !fields.has('isReadOnly') ? ['isReadOnly'] : []),
+        ];
+        if (missing.length) {
+          return fail(
+            `This deployment does not support scoping a principal at create time (no ${missing.join(', ')} on createPrincipal). No key was minted. If an unscoped key that acts as the signed-in user is acceptable, ask for one explicitly.`,
+          );
+        }
       }
 
       const dbAuth = auth.createClient({
@@ -167,7 +174,7 @@ export const createApiKeyTool: ToolDefinition<typeof CreateApiKeySchema, CreateA
       const existing = await dbAuth.principal
         .findFirst({
           where: { name: { equalTo: principalName } },
-          select: { id: true, name: true },
+          select: { id: true, name: true, isReadOnly: true },
         })
         .unwrap();
 
@@ -176,6 +183,19 @@ export const createApiKeyTool: ToolDefinition<typeof CreateApiKeySchema, CreateA
         return fail(
           `Principal "${principalName}" already exists, and its scope cannot be verified against the requested one. No key was minted. Use a new principal_name for a scoped key, or mint an unscoped key on the existing principal explicitly.`,
         );
+      }
+      if (principalId) {
+        const scopeRow = await dbAuth.principalEntity
+          .findFirst({
+            where: { principalId: { equalTo: principalId } },
+            select: { id: true },
+          })
+          .unwrap();
+        if (scopeRow.principalEntity || existing.principal?.isReadOnly) {
+          return fail(
+            `Principal "${principalName}" already exists with a narrower scope (entity-scoped or read-only), so a key minted under it would not act as the signed-in user. No key was minted. Use a new principal_name for an unscoped key.`,
+          );
+        }
       }
       if (!principalId) {
         // The SDK's PrincipalModel.create sends a nested {principal} input, but
