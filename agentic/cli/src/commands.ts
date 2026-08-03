@@ -5,6 +5,7 @@ import { loadSession } from './account-store';
 import { signIn, signOut } from './auth';
 import { BACKEND_PRESETS, BackendConfig, loadBackendConfig, saveBackendConfig } from './backend-store';
 import { AgentCliConfig, defaultManifest, saveManifestFile } from './config';
+import { splitCoalescedKeypresses } from './keypress-chunks';
 import { assembleSkills } from './skills';
 
 const log = (msg: string) => console.log(`[agent] ${msg}`);
@@ -73,6 +74,7 @@ export async function login(config: AgentCliConfig, argv: Record<string, unknown
   // inquirerer applies its 15s inactivity timeout in TTY mode; a person pausing
   // at the password prompt must not get killed, so push it to setTimeout's max.
   const prompter = new Inquirerer({ noTty: !process.stdin.isTTY, timeout: 0x7fffffff });
+  splitCoalescedKeypresses(prompter);
   try {
     const answers = await prompter.prompt(argv, [
       {
