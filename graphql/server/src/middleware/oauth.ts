@@ -16,6 +16,7 @@
  * the manual `set_config()` calls in the original implementation.
  */
 
+import { ConstructiveError, errors } from '@constructive-io/errors';
 import type {
   AuthSettings,
   ConnectedAccountsModuleConfig,
@@ -196,12 +197,15 @@ function redirectToError(
   res: Response,
   baseUrl: string,
   errorPath: string,
-  error: string,
+  error: ConstructiveError | string,
   provider: string,
   errorDescription?: string
 ): void {
   const errorUrl = new URL(errorPath, baseUrl);
-  errorUrl.searchParams.set('error', error);
+  errorUrl.searchParams.set(
+    'error',
+    typeof error === 'string' ? error : error.code
+  );
   errorUrl.searchParams.set('provider', provider);
   if (errorDescription) {
     errorUrl.searchParams.set('error_description', errorDescription);
@@ -214,7 +218,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
   const isProduction = getNodeEnv() === 'production';
 
   // GET /auth/providers - List available providers from database
-  router.get('/providers', async (req: Request, res: Response) => {
+  router.get('/providers', async (req: Request, res: Response, next) => {
     const ctx = req.constructive;
     if (!ctx) {
       return res.json({ providers: [] });
@@ -230,7 +234,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       res.json({ providers });
     } catch (error) {
       log.error('[oauth] Failed to fetch providers:', error);
-      res.status(500).json({ error: 'OAUTH_CONFIGURATION_ERROR' });
+      next(errors.OAUTH_CONFIGURATION_ERROR());
     }
   });
 
@@ -255,7 +259,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         res,
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,
-        'API_NOT_CONFIGURED',
+        errors.OAUTH_API_NOT_CONFIGURED(),
         provider
       );
     }
@@ -268,7 +272,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           res,
           baseUrl,
           DEFAULT_ERROR_REDIRECT_PATH,
-          'MODULES_NOT_CONFIGURED',
+          errors.OAUTH_MODULES_NOT_CONFIGURED(),
           provider
         );
       }
@@ -284,7 +288,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           res,
           baseUrl,
           errorRedirectPath,
-          'INVALID_REDIRECT_URI',
+          errors.OAUTH_INVALID_REDIRECT_URI(),
           provider
         );
       }
@@ -297,7 +301,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           res,
           baseUrl,
           errorRedirectPath,
-          'PROVIDER_NOT_CONFIGURED',
+          errors.IDENTITY_PROVIDER_NOT_CONFIGURED(),
           provider
         );
       }
@@ -311,7 +315,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           res,
           baseUrl,
           errorRedirectPath,
-          'API_NOT_CONFIGURED',
+          errors.OAUTH_API_NOT_CONFIGURED(),
           provider
         );
       }
@@ -363,7 +367,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         res,
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,
-        'OAUTH_INIT_FAILED',
+        errors.OAUTH_INIT_FAILED(),
         provider
       );
     }
@@ -405,7 +409,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         res,
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,
-        'INVALID_STATE',
+        errors.OAUTH_INVALID_STATE(),
         provider
       );
     }
@@ -420,7 +424,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         res,
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,
-        'INVALID_STATE',
+        errors.OAUTH_INVALID_STATE(),
         provider
       );
     }
@@ -431,7 +435,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         res,
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,
-        'INVALID_STATE',
+        errors.OAUTH_INVALID_STATE(),
         provider
       );
     }
@@ -445,7 +449,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         res,
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,
-        'API_NOT_CONFIGURED',
+        errors.OAUTH_API_NOT_CONFIGURED(),
         provider
       );
     }
@@ -459,7 +463,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         res,
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,
-        'INVALID_STATE',
+        errors.OAUTH_INVALID_STATE(),
         provider
       );
     }
@@ -473,7 +477,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           res,
           baseUrl,
           DEFAULT_ERROR_REDIRECT_PATH,
-          'MODULES_NOT_CONFIGURED',
+          errors.OAUTH_MODULES_NOT_CONFIGURED(),
           provider
         );
       }
@@ -491,7 +495,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           res,
           baseUrl,
           errorRedirectPath,
-          'INVALID_REDIRECT_URI',
+          errors.OAUTH_INVALID_REDIRECT_URI(),
           provider
         );
       }
@@ -504,7 +508,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           res,
           baseUrl,
           errorRedirectPath,
-          'PROVIDER_NOT_CONFIGURED',
+          errors.IDENTITY_PROVIDER_NOT_CONFIGURED(),
           provider
         );
       }
@@ -525,7 +529,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
             res,
             baseUrl,
             errorRedirectPath,
-            'INVALID_PKCE',
+            errors.OAUTH_INVALID_PKCE(),
             provider
           );
         }
@@ -573,7 +577,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
 
       // If new identity, check email verification requirement before proceeding
       if (!identityExists && requireVerifiedEmail && !emailVerified) {
-        throw new Error('EMAIL_NOT_VERIFIED');
+        throw errors.EMAIL_NOT_VERIFIED();
       }
 
       const result = await ctx.withPgClient<SignInIdentityResult>(
@@ -652,25 +656,34 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
 
       log.info(`[oauth] OAuth success for ${profile.email}`);
       return res.redirect(redirectUri);
-    } catch (error: any) {
+    } catch (error: unknown) {
       const fallbackPath =
         modules?.authSettings?.oauthErrorRedirectPath ||
         DEFAULT_ERROR_REDIRECT_PATH;
 
       // Handle specific error cases
-      if (error.message === 'EMAIL_NOT_VERIFIED') {
+      if (
+        error instanceof ConstructiveError &&
+        error.code === 'EMAIL_NOT_VERIFIED'
+      ) {
         log.warn(`[oauth] Rejecting unverified email for signup: ${provider}`);
         return redirectToError(
           res,
           baseUrl,
           fallbackPath,
-          'EMAIL_NOT_VERIFIED',
+          error,
           provider
         );
       }
 
       log.error(`[oauth] Callback failed for ${provider}:`, error);
-      redirectToError(res, baseUrl, fallbackPath, 'CALLBACK_FAILED', provider);
+      redirectToError(
+        res,
+        baseUrl,
+        fallbackPath,
+        errors.OAUTH_CALLBACK_FAILED(),
+        provider
+      );
     }
   });
 

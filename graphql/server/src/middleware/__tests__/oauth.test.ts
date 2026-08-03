@@ -7,6 +7,7 @@ import express from 'express';
 import http from 'http';
 import type { AddressInfo } from 'net';
 
+import { errorHandler } from '../error-handler';
 import { createOAuthRoutes } from '../oauth';
 
 const OAUTH_STATE_SECRET = 'test-oauth-state-secret';
@@ -119,6 +120,7 @@ async function withOAuthServer<T>(
   const app = express();
   app.use((req, _res, next) => {
     (req as any).constructive = contextFactory();
+    (req as any).requestId = 'oauth-test-request';
     next();
   });
   app.use(
@@ -129,6 +131,7 @@ async function withOAuthServer<T>(
       }
     } as any)
   );
+  app.use(errorHandler);
 
   const server = await new Promise<http.Server>((resolve) => {
     const listening = app.listen(0, '127.0.0.1', () => resolve(listening));
@@ -287,7 +290,7 @@ describe('OAuth routes', () => {
       expect(response.statusCode).toBe(302);
       const redirect = new URL(response.headers.location!);
       expect(redirect.pathname).toBe('/auth/error');
-      expect(redirect.searchParams.get('error')).toBe('INVALID_PKCE');
+      expect(redirect.searchParams.get('error')).toBe('OAUTH_INVALID_PKCE');
       expect(redirect.searchParams.get('provider')).toBe('github');
     });
   });
@@ -311,7 +314,7 @@ describe('OAuth routes', () => {
       expect(response.statusCode).toBe(302);
       const redirect = new URL(response.headers.location!);
       expect(redirect.pathname).toBe('/auth/error');
-      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(redirect.searchParams.get('error')).toBe('OAUTH_INVALID_STATE');
       expect(redirect.searchParams.get('provider')).toBe('google');
       expect(fetchMock).not.toHaveBeenCalled();
       expect(authQueryMock).not.toHaveBeenCalled();
@@ -338,7 +341,7 @@ describe('OAuth routes', () => {
 
       expect(response.statusCode).toBe(302);
       const redirect = new URL(response.headers.location!);
-      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(redirect.searchParams.get('error')).toBe('OAUTH_INVALID_STATE');
       expect(fetchMock).not.toHaveBeenCalled();
       expect(authQueryMock).not.toHaveBeenCalled();
     });
@@ -364,7 +367,7 @@ describe('OAuth routes', () => {
 
       expect(response.statusCode).toBe(302);
       const redirect = new URL(response.headers.location!);
-      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(redirect.searchParams.get('error')).toBe('OAUTH_INVALID_STATE');
       expect(fetchMock).not.toHaveBeenCalled();
       expect(authQueryMock).not.toHaveBeenCalled();
     });
@@ -390,7 +393,7 @@ describe('OAuth routes', () => {
 
       expect(response.statusCode).toBe(302);
       const redirect = new URL(response.headers.location!);
-      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(redirect.searchParams.get('error')).toBe('OAUTH_INVALID_STATE');
       expect(fetchMock).not.toHaveBeenCalled();
       expect(authQueryMock).not.toHaveBeenCalled();
     });
@@ -419,7 +422,11 @@ describe('OAuth routes', () => {
 
         expect(response.statusCode).toBe(500);
         expect(JSON.parse(response.body)).toEqual({
-          error: 'OAUTH_CONFIGURATION_ERROR'
+          error: {
+            code: 'OAUTH_CONFIGURATION_ERROR',
+            message: 'An unexpected error occurred',
+            requestId: 'oauth-test-request'
+          }
         });
       },
       OAUTH_STATE_SECRET,
