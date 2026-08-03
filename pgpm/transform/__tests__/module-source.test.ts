@@ -86,6 +86,63 @@ describe('loadModuleSource', () => {
   it('throws on a missing plan', () => {
     expect(() => loadModuleSource(join(dir, 'nope'))).toThrow();
   });
+
+  const writeTaggedModule = (dep: string) => {
+    writeFileSync(
+      join(dir, 'pgpm.plan'),
+      [
+        '%syntax-version=1.0.0',
+        '%project=my-mod',
+        '%uri=my-mod',
+        '',
+        'schemas/app/schema 2017-08-11T08:11:51Z tester <tester@x> # add schema',
+        '@v1 schemas/app/schema 2017-08-11T08:11:51Z tester <tester@x> # release v1',
+        `schemas/app/tables/users/table [${dep}] 2017-08-11T08:11:51Z tester <tester@x> # add table`,
+        ''
+      ].join('\n')
+    );
+    mkdirSync(join(dir, 'deploy', 'schemas', 'app', 'tables', 'users'), { recursive: true });
+    writeFileSync(
+      join(dir, 'deploy', 'schemas', 'app', 'schema.sql'),
+      '-- Deploy: schemas/app/schema to pg\nCREATE SCHEMA app;\n'
+    );
+    writeFileSync(
+      join(dir, 'deploy', 'schemas', 'app', 'tables', 'users', 'table.sql'),
+      '-- Deploy: schemas/app/tables/users/table to pg\nCREATE TABLE app.users (id int);\n'
+    );
+  };
+
+  it('resolves a local tag dependency to its change name', () => {
+    writeTaggedModule('@v1');
+    const source = loadModuleSource(dir);
+    const table = source.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
+    expect(table.dependencies).toEqual(['schemas/app/schema']);
+    expect(source.warnings).toEqual([]);
+  });
+
+  it('leaves plain (non-tag) dependencies untouched', () => {
+    writeTaggedModule('schemas/app/schema');
+    const source = loadModuleSource(dir);
+    const table = source.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
+    expect(table.dependencies).toEqual(['schemas/app/schema']);
+    expect(source.warnings).toEqual([]);
+  });
+
+  it('warns and keeps an unknown tag dependency verbatim', () => {
+    writeTaggedModule('@nope');
+    const source = loadModuleSource(dir);
+    const table = source.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
+    expect(table.dependencies).toEqual(['@nope']);
+    expect(source.warnings.some(w => w.includes('@nope'))).toBe(true);
+  });
+
+  it('leaves a cross-package tag dependency unresolved with a warning', () => {
+    writeTaggedModule('other:@v1');
+    const source = loadModuleSource(dir);
+    const table = source.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
+    expect(table.dependencies).toEqual(['other:@v1']);
+    expect(source.warnings.some(w => w.includes('cross-package'))).toBe(true);
+  });
 });
 
 describe('parsePartitionConfig', () => {
