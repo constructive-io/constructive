@@ -3,6 +3,7 @@ import { createContextMiddleware, createDefaultRegistry, requestIdMiddleware } f
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
+import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
@@ -37,6 +38,7 @@ import { flush, flushService } from './middleware/flush';
 import { createFnRouter } from './middleware/fn';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
+import { createOAuthRoutes } from './middleware/oauth';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
@@ -93,6 +95,7 @@ class Server {
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
     const requestLogger = createRequestLogger({ observabilityEnabled });
+    const isProduction = getNodeEnv() === 'production';
 
     // Log startup configuration (non-sensitive values only)
     const apiOpts = (effectiveOpts as any).api || {};
@@ -137,7 +140,7 @@ class Server {
     trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
     const fallbackOrigin = effectiveOpts.server?.origin?.trim();
-    if (fallbackOrigin && process.env.NODE_ENV === 'production') {
+    if (fallbackOrigin && isProduction) {
       if (fallbackOrigin === '*') {
         log.warn(
           'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.'
@@ -175,7 +178,7 @@ class Server {
     const csrf = createCsrfMiddleware({
       cookieOptions: {
         httpOnly: false, // SPA clients need to read this via document.cookie
-        secure: process.env.NODE_ENV === 'production',
+        secure: isProduction,
         sameSite: 'lax'
       }
     });
@@ -198,6 +201,12 @@ class Server {
     };
     app.use(csrfSetToken); // Set CSRF token cookie on all requests
     app.use('/graphql', csrfProtect); // Enforce CSRF on GraphQL mutations
+
+    // OAuth / SSO routes — mounted before graphile so OAuth callbacks
+    // are handled without going through PostGraphile
+    if (effectiveOpts.oauth?.enabled) {
+      app.use('/auth', createOAuthRoutes(effectiveOpts));
+    }
 
     // LLM Agent REST API — mounted before graphile so SSE streaming
     // routes are handled without going through PostGraphile

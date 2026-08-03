@@ -1,5 +1,6 @@
 import './types';
 
+import { ConstructiveError } from '@constructive-io/errors';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
@@ -31,6 +32,7 @@ interface ErrorResponse {
   code: string;
   message: string;
   logLevel: 'warn' | 'error';
+  forceJson?: boolean;
 }
 
 const isCsrfError = (err: Error): boolean => {
@@ -39,6 +41,18 @@ const isCsrfError = (err: Error): boolean => {
 };
 
 const categorizeError = (err: Error): ErrorResponse => {
+  if (err instanceof ConstructiveError) {
+    return {
+      statusCode: err.http,
+      code: err.code,
+      message:
+        err.isPublic || isDevelopment()
+          ? err.message
+          : 'An unexpected error occurred',
+      logLevel: err.http >= 500 ? 'error' : 'warn',
+      forceJson: true,
+    };
+  }
   if (isApiError(err)) {
     return {
       statusCode: err.statusCode,
@@ -60,8 +74,12 @@ const categorizeError = (err: Error): ErrorResponse => {
   return { statusCode: 500, code: 'INTERNAL_ERROR', message: sanitizeMessage(err), logLevel: 'error' };
 };
 
-const sendResponse = (req: Request, res: Response, { statusCode, code, message }: ErrorResponse): void => {
-  if (wantsJson(req)) {
+const sendResponse = (
+  req: Request,
+  res: Response,
+  { statusCode, code, message, forceJson }: ErrorResponse
+): void => {
+  if (forceJson || wantsJson(req)) {
     res.status(statusCode).json({ error: { code, message, requestId: req.requestId } });
   } else {
     res.status(statusCode).send(statusCode >= 500 ? errorPage50x : errorPage404Message(message));
@@ -79,7 +97,17 @@ const logError = (err: Error, req: Request, level: 'warn' | 'error'): void => {
     clientIp: req.clientIp,
   };
 
-  if (isApiError(err)) {
+  if (err instanceof ConstructiveError) {
+    log[level]({
+      event: 'constructive_error',
+      code: err.code,
+      statusCode: err.http,
+      errorClass: err.errorClass,
+      message: err.message,
+      errorContext: err.context,
+      ...context,
+    });
+  } else if (isApiError(err)) {
     log[level]({ event: 'api_error', code: err.code, statusCode: err.statusCode, message: err.message, ...context });
   } else {
     log[level]({ event: 'unexpected_error', name: err.name, message: err.message, stack: isDevelopment() ? err.stack : undefined, ...context });

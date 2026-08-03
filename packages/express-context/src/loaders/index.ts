@@ -12,6 +12,9 @@
  *   - pubkeyChallengeSettings (routing-plane pubkey_settings)
  *   - webauthnSettings(routing-plane webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
+ *   - userAuthModule  (metaschema_modules_public.user_auth_module)
+ *   - identityProviders (metaschema_modules_public.identity_providers_module + providers Map)
+ *   - connectedAccountsModule (metaschema_modules_public.connected_accounts_module)
  *
  * To add a new per-db lookup, implement a ModuleLoader and register it:
  *
@@ -42,12 +45,15 @@ export { agentChatLoader } from './agent-chat';
 export { authSettingsLoader } from './auth-settings';
 export { billingLoader } from './billing';
 export { computeLoader } from './compute';
+export { connectedAccountsModuleLoader } from './connected-accounts-module';
 export { corsLoader } from './cors';
 export { databaseSettingsLoader } from './database-settings';
+export { identityProvidersLoader } from './identity-providers';
 export { inferenceLogLoader } from './inference-log';
 export { llmLoader } from './llm';
 export { pubkeyLoader } from './pubkey';
 export { rlsLoader } from './rls';
+export { userAuthModuleLoader } from './user-auth-module';
 export { webauthnLoader } from './webauthn';
 
 /**
@@ -57,13 +63,16 @@ import { agentChatLoader } from './agent-chat';
 import { authSettingsLoader } from './auth-settings';
 import { billingLoader } from './billing';
 import { computeLoader } from './compute';
+import { connectedAccountsModuleLoader } from './connected-accounts-module';
 import { corsLoader } from './cors';
 import { databaseSettingsLoader } from './database-settings';
+import { identityProvidersLoader } from './identity-providers';
 import { inferenceLogLoader } from './inference-log';
 import { llmLoader } from './llm';
 import { pubkeyLoader } from './pubkey';
 import { createLoaderRegistry } from './registry';
 import { rlsLoader } from './rls';
+import { userAuthModuleLoader } from './user-auth-module';
 import { webauthnLoader } from './webauthn';
 
 export function createDefaultRegistry() {
@@ -79,5 +88,8 @@ export function createDefaultRegistry() {
   registry.register(agentChatLoader);
   registry.register(llmLoader);
   registry.register(computeLoader);
+  registry.register(userAuthModuleLoader);
+  registry.register(identityProvidersLoader);
+  registry.register(connectedAccountsModuleLoader);
   return registry;
 }

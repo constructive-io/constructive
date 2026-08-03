@@ -13,6 +13,7 @@ interface LinkedInProfile {
 export const linkedinProvider: OAuthProviderConfig = {
   id: 'linkedin',
   name: 'LinkedIn',
+  kind: 'oidc',
   authorizationUrl: 'https://www.linkedin.com/oauth/v2/authorization',
   tokenUrl: 'https://www.linkedin.com/oauth/v2/accessToken',
   userInfoUrl: 'https://api.linkedin.com/v2/userinfo',
@@ -26,6 +27,7 @@ export const linkedinProvider: OAuthProviderConfig = {
       email: profile.email || null,
       name: profile.name || null,
       picture: profile.picture || null,
+      emailVerified: profile.email_verified ?? null,
       raw: data,
     };
   },

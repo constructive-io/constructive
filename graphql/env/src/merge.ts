@@ -3,6 +3,7 @@ import { getEnvOptions as getPgpmEnvOptions, loadConfigSync, replaceArrays } fro
 import deepmerge from 'deepmerge';
 
 import { getGraphQLEnvVars } from './env';
+import { validateOAuthOptions } from './oauth';
 
 /**
  * Get Constructive environment options by merging:
@@ -31,12 +32,12 @@ export const getEnvOptions = (
   const graphqlEnvOptions = getGraphQLEnvVars(env);
   
   // Load config again to get any GraphQL-specific config
-  // Config files can contain Constructive options (graphile, features, api, sms)
+  // Config files can contain Constructive options (graphile, features, api, sms, oauth)
   // even though loadConfigSync returns PgpmOptions type
   const configOptions = loadConfigSync(cwd) as Partial<ConstructiveOptions>;
   
   // Merge in order: core -> graphql defaults -> config (for graphql keys) -> graphql env -> overrides
-  return deepmerge.all([
+  const mergedOptions = deepmerge.all([
     coreOptions,
     constructiveGraphqlDefaults,
     // Only merge graphql-related keys from config (if present)
@@ -45,12 +46,15 @@ export const getEnvOptions = (
       ...(configOptions.features && { features: configOptions.features }),
       ...(configOptions.api && { api: configOptions.api }),
       ...(configOptions.sms && { sms: configOptions.sms }),
+      ...(configOptions.oauth && { oauth: configOptions.oauth }),
     },
     graphqlEnvOptions,
     overrides
   ], {
     arrayMerge: replaceArrays
   }) as ConstructiveOptions;
+
+  return validateOAuthOptions(mergedOptions, env);
 };
 
 /**

@@ -148,6 +148,64 @@ export const registry = {
     http: 404,
     message: 'No single sign-on account was found.'
   }),
+
+  // ===========================================================================
+  // OAuth protocol / routing
+  // ===========================================================================
+  OAUTH_API_NOT_CONFIGURED: defineError({
+    code: 'OAUTH_API_NOT_CONFIGURED',
+    class: 'internal',
+    http: 500,
+    message: 'OAuth is not configured for this API.'
+  }),
+  OAUTH_MODULES_NOT_CONFIGURED: defineError({
+    code: 'OAUTH_MODULES_NOT_CONFIGURED',
+    class: 'internal',
+    http: 500,
+    message: 'Required OAuth modules are not configured.'
+  }),
+  OAUTH_INVALID_REDIRECT_URI: defineError({
+    code: 'OAUTH_INVALID_REDIRECT_URI',
+    class: 'public',
+    http: 400,
+    message: 'The OAuth redirect URI is invalid.'
+  }),
+  IDENTITY_PROVIDER_NOT_CONFIGURED: defineError({
+    code: 'IDENTITY_PROVIDER_NOT_CONFIGURED',
+    class: 'public',
+    http: 400,
+    message: 'Identity provider not configured.'
+  }),
+  OAUTH_INIT_FAILED: defineError({
+    code: 'OAUTH_INIT_FAILED',
+    class: 'internal',
+    http: 500,
+    message: 'OAuth sign-in could not be started.'
+  }),
+  OAUTH_INVALID_STATE: defineError({
+    code: 'OAUTH_INVALID_STATE',
+    class: 'public',
+    http: 400,
+    message: 'The OAuth state is invalid or has expired.'
+  }),
+  OAUTH_INVALID_PKCE: defineError({
+    code: 'OAUTH_INVALID_PKCE',
+    class: 'public',
+    http: 400,
+    message: 'The OAuth PKCE verifier is invalid or has expired.'
+  }),
+  OAUTH_CALLBACK_FAILED: defineError({
+    code: 'OAUTH_CALLBACK_FAILED',
+    class: 'internal',
+    http: 500,
+    message: 'OAuth sign-in could not be completed.'
+  }),
+  OAUTH_CONFIGURATION_ERROR: defineError({
+    code: 'OAUTH_CONFIGURATION_ERROR',
+    class: 'internal',
+    http: 500,
+    message: 'OAuth configuration could not be loaded.'
+  }),
   MAGIC_LINK_SIGN_IN_DISABLED: defineError({
     code: 'MAGIC_LINK_SIGN_IN_DISABLED',
     class: 'public',

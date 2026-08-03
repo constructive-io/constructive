@@ -1,4 +1,4 @@
-import type { ApiOptions,GraphileOptions } from '@constructive-io/graphql-types';
+import type { ApiOptions,GraphileOptions, OAuthOptions } from '@constructive-io/graphql-types';
 import type { DocumentNode, GraphQLError } from 'graphql';
 import type { Server } from 'http';
 import type { PgTestClient } from 'pgsql-test/test-client';
@@ -71,6 +71,8 @@ export interface GetConnectionsInput {
   authRole?: string;
   /** Graphile/PostGraphile configuration options */
   graphile?: GraphileOptions;
+  /** OAuth configuration options */
+  oauth?: OAuthOptions;
   /** Server configuration options (port, host, and API configuration) */
   server?: ServerOptions;
 }

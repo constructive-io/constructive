@@ -20,6 +20,31 @@
 
 SET session_replication_role TO replica;
 
+-- Current constructive-db module metadata resolves physical tables by stable
+-- table id. The lightweight CNC fixture installs the metadata tables without
+-- the full metaschema runtime package, so provide the same lookup contract for
+-- scoped server integration tests.
+CREATE SCHEMA IF NOT EXISTS metaschema;
+
+DO $block$
+BEGIN
+  IF to_regprocedure('metaschema.schema_and_table(uuid)') IS NULL THEN
+    EXECUTE $function$
+      CREATE FUNCTION metaschema.schema_and_table(target_table_id uuid)
+      RETURNS TABLE(schema_name text, table_name text)
+      LANGUAGE sql
+      STABLE
+      AS $$
+        SELECT s.schema_name, t.name
+        FROM metaschema_public.table t
+        JOIN metaschema_public.schema s ON s.id = t.schema_id
+        WHERE t.id = target_table_id
+      $$
+    $function$;
+  END IF;
+END
+$block$;
+
 -- =====================================================
 -- METASCHEMA DATA
 -- =====================================================

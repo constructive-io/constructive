@@ -1,7 +1,7 @@
 import { BucketProvider,PgpmOptions } from '@pgpmjs/types';
-import { parseEnvBoolean, parseEnvList, parseEnvNumber } from '12factor-env';
+import { getNodeEnv, parseEnvBoolean, parseEnvList, parseEnvNumber } from '12factor-env';
 
-export { parseEnvBoolean, parseEnvList, parseEnvNumber };
+export { getNodeEnv, parseEnvBoolean, parseEnvList, parseEnvNumber };
 
 /**
  * Parse core PGPM environment variables.
@@ -175,12 +175,4 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...(SMTP_DEBUG && { debug: parseEnvBoolean(SMTP_DEBUG) }),
     }
   };
-};
-
-type NodeEnv = 'development' | 'production' | 'test';
-
-export const getNodeEnv = (): NodeEnv => {
-  const env = process.env.NODE_ENV?.toLowerCase();
-  if (env === 'production' || env === 'test') return env;
-  return 'development';
 };

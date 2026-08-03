@@ -55,7 +55,8 @@ export const getConnections = async (
       exposedSchemas: input.schemas,
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     },
-    graphile: input.graphile
+    graphile: input.graphile,
+    oauth: input.oauth
   });
 
   // Start the HTTP server. Suites default to the production scoped-routing
