@@ -31,6 +31,24 @@ export const routingSchemaOf = (
 };
 
 /**
+ * Assert a loader was handed the tenant it is resolving for.
+ *
+ * Every tenant-DB discovery query keys on `database_id`, because one serving
+ * database holds several tenants' schemas: without the key the query returns an
+ * arbitrary tenant's row, which is a cross-tenant config read rather than a
+ * crash. A context with no `databaseId` is therefore a wiring fault, and must
+ * fail here rather than degrade into an unkeyed query.
+ */
+export function requireDatabaseId(
+  databaseId: string | undefined,
+  loaderName: string
+): asserts databaseId is string {
+  if (!databaseId) {
+    throw new Error(`loader ${loaderName}: context carries no databaseId`);
+  }
+}
+
+/**
  * Context passed to every loader's resolve function.
  * Provides both pool references so the loader can query whichever
  * database tier it needs.
