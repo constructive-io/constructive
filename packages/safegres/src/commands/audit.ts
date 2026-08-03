@@ -59,6 +59,11 @@ import {
   type PredicateColumn
 } from '../checks/policy-index';
 import {
+  analyzeRevocableGrants,
+  revocableGrantFindings,
+  type RevocableGrantsReport
+} from '../checks/revocable-grants';
+import {
   checkGrantsWithoutRls,
   checkRlsEnabledNoPolicies,
   checkRlsNotForced
@@ -97,6 +102,7 @@ import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecuto
 import { introspectObjectAcls } from '../pg/objects';
 import { type AccessPath, classifyPaths } from '../pg/paths';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
+import { introspectReachInputs } from '../pg/reach-inputs';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
 import { introspectStats, type StatsSnapshot } from '../pg/stats';
 import { dimensionOf, RULES_BY_CODE } from '../rules/registry';
@@ -325,6 +331,17 @@ export async function audit(
     resolved.rules.get('L17')?.options as LatticeRoleOptions,
     exposure
   )?.roles ?? [];
+  // L21 (`granted − reachable`) runs on the untrusted roles by default — its
+  // question is precisely "which of anonymous's grants are load-bearing?" — so
+  // it reads its role list from `exposure.anonRoles` unless the config overrides
+  // it. It reads function/view bodies, so it is gated on `skipAst` like the
+  // other body rules.
+  const revocableRoles = withExposedRoles(
+    { rolesFrom: 'anon', ...(resolved.rules.get('L21')?.options as LatticeRoleOptions) },
+    exposure
+  )?.roles ?? [];
+  const revocableEnabled =
+    !skipAst && revocableRoles.length > 0 && resolved.rules.get('L21')?.enabled !== false;
   // L8 and L14 are two answers from one body pass: the base relations that
   // were graded, and the ones that could not be because they are out of scope.
   const viewBodiesEnabled =
@@ -352,7 +369,8 @@ export async function audit(
     || viewBodiesEnabled
     || viewWritesEnabled
     || viewExposureEnabled
-    || functionBodiesEnabled;
+    || functionBodiesEnabled
+    || revocableEnabled;
   const viewSnapshot = needsViews
     ? await introspectViews(exec, {
       schemas: options.schemas ?? config.schemas,
@@ -564,6 +582,32 @@ export async function audit(
         ...checkLeakyFilterView(exposureViews.leaky, snapshot, roleGraph, { roles: leakyViewRoles })
       );
     }
+  }
+
+  // L21: the EXECUTE grants each untrusted role holds that no reachable path
+  // exercises. Its own reachability closure — policy predicates, trigger
+  // bodies, write-time expressions and views — needs the trigger/expression
+  // inputs no other rule reads. The revocable recommendations enter the finding
+  // stream; the retained-and-suppressed proof lists ride on the report.
+  let revocableGrants: RevocableGrantsReport | undefined;
+  if (revocableEnabled) {
+    const reachInputs = await introspectReachInputs(exec, {
+      schemas: options.schemas ?? config.schemas,
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+    });
+    revocableGrants = await analyzeRevocableGrants({
+      roles: revocableRoles,
+      functions: await getFunctions(),
+      tables: snapshot,
+      views: viewSnapshot,
+      graph: roleGraph,
+      schemaAcls: schemaAclsByName,
+      reachInputs,
+      exposedSchemas,
+      exposureKnown: exposure.known,
+      unaddressable
+    });
+    findings.push(...revocableGrantFindings(revocableGrants));
   }
 
   const statsSnapshot: StatsSnapshot | null = statsEnabled
@@ -778,6 +822,8 @@ export async function audit(
     };
     report.roleAccess = roleAccess;
   }
+
+  if (revocableGrants) report.revocableGrants = revocableGrants;
 
   if (perfEnabled) {
     // `S*` findings are scored by default — opting into `--stats` is the

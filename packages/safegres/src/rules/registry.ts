@@ -384,6 +384,29 @@ export const RULES: RuleMeta[] = [
     scope: 'table'
   },
   {
+    code: 'L21',
+    // `granted − reachable`. The user asked for "L10", but L10 has been the
+    // rewrite-rule bypass rule since it shipped; this takes the next free
+    // L-code and keeps every existing identity intact.
+    //
+    // `coverage`, not `anti-pattern`: like L1/L3/L6 the finding is about what a
+    // grant can and cannot reach, not a leak — and it is `fail-closed`, so it
+    // is weightless and never moves the score. It ships `info` because it is
+    // new and, uniquely, its verdict is a *revoke recommendation*: the cost of
+    // a wrong one is an outage, so it stays advisory until the reachability
+    // proof has earned trust in the field. Its honest severity once proven is
+    // `low` — a revocable grant is latent surface, not an active leak, and the
+    // value is the retained-grant proof list, which is emitted whatever the
+    // severity. The rule is fail-closed by construction: it recommends a revoke
+    // only for a grant it proved unreachable, and suppresses (retains) every
+    // grant whose closure it could not fully read.
+    category: 'coverage',
+    defaultSeverity: 'info',
+    direction: 'fail-closed',
+    title: 'Revocable grant — a role holds EXECUTE no reachable path exercises (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
     code: 'W1',
     category: 'meta',
     defaultSeverity: 'medium',

@@ -1,0 +1,30 @@
+{
+  "title": "A role holds EXECUTE on a trigger function it can neither call nor fire — revocable",
+  "dimension": "security",
+  "exposure": {
+    "schemas": [
+      "c_revocable"
+    ],
+    "roles": [
+      "corpus_anon",
+      "corpus_user"
+    ],
+    "anonRoles": [
+      "corpus_anon"
+    ]
+  },
+  "expect": [
+    {
+      "code": "L21",
+      "relation": "c_revocable.stamp_created_by",
+      "role": "corpus_anon",
+      "note": "corpus_anon's EXECUTE arrives from a blanket default-privileges grant, but the reachability closure never lands on the function: a trigger function is not directly callable, and corpus_anon holds no write grant on `events` to fire the trigger. Granted minus reachable is non-empty, so the grant is revocable."
+    }
+  ],
+  "forbid": [
+    "L19",
+    "L20"
+  ],
+  "fix": "REVOKE EXECUTE ON FUNCTION c_revocable.stamp_created_by() FROM corpus_anon. No path exercises the grant — corpus_anon cannot call a trigger function directly, and cannot fire the trigger without a write grant on c_revocable.events — so dropping it changes nothing corpus_anon can do.",
+  "id": "52-revocable-execute-grant"
+}

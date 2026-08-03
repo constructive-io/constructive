@@ -268,6 +268,14 @@ export interface Report {
   /** Effective per-role access, for the configured untrusted roles. */
   roleAccess?: RoleAccessReport;
   /**
+   * L21's `granted − reachable` result: per role, the EXECUTE grants that are
+   * revocable, the ones retained (each with the reachability path that proves
+   * it load-bearing), and the ones suppressed because the closure could not be
+   * fully read. The retained-and-suppressed lists are the point of the rule —
+   * they are what a human reviews before dropping anything.
+   */
+  revocableGrants?: import('./checks/revocable-grants').RevocableGrantsReport;
+  /**
    * Unscored call-graph audit (`--call-graph`): trust boundaries reachable
    * from the exposed entry points, for human review.
    */
