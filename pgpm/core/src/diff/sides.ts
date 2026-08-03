@@ -7,6 +7,8 @@
  * SQL wrapping); this module supplies the I/O they need and that only core
  * has: workspace module-map resolution (`PgpmPackage`) and `pg_dump`.
  */
+import type { ExtendedPlanFile } from '@pgpmjs/ast';
+import { parsePlanFile } from '@pgpmjs/ast';
 import type { DiffSide } from '@pgpmjs/diff';
 import {
   loadDiffSideFromDisk,
@@ -52,7 +54,12 @@ export const loadWorkspaceModuleSources = async (
   const { resolved, external } = await pkg.resolveWorkspaceExtensionDependencies();
 
   const warnings: string[] = [];
-  const modules: ModuleSource[] = [];
+
+  // First pass: collect the plan-bearing local modules and their parsed plans,
+  // keyed by package name (`%project`), so the second pass can resolve
+  // cross-package tag dependencies (`pkg:@tag`) against the plan that owns them.
+  const eligible: { name: string; moduleDir: string }[] = [];
+  const crossPackagePlans = new Map<string, ExtendedPlanFile>();
   for (const name of resolved) {
     if (external.includes(name)) continue;
     const entry = moduleMap[name];
@@ -65,7 +72,14 @@ export const loadWorkspaceModuleSources = async (
       warnings.push(`${name}: no pgpm.plan (proxy or apply-spec module); skipped`);
       continue;
     }
-    const source = loadModuleSource(moduleDir);
+    eligible.push({ name, moduleDir });
+    const parsed = parsePlanFile(path.join(moduleDir, 'pgpm.plan'));
+    if (parsed.data) crossPackagePlans.set(parsed.data.package, parsed.data);
+  }
+
+  const modules: ModuleSource[] = [];
+  for (const { name, moduleDir } of eligible) {
+    const source = loadModuleSource(moduleDir, { crossPackagePlans });
     warnings.push(...source.warnings.map(w => `${name}: ${w}`));
     modules.push(source);
   }

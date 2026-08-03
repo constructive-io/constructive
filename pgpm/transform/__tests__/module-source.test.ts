@@ -1,3 +1,5 @@
+import type { ExtendedPlanFile } from '@pgpmjs/ast';
+import { parsePlanFile } from '@pgpmjs/ast';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -136,13 +138,45 @@ describe('loadModuleSource', () => {
     expect(source.warnings.some(w => w.includes('@nope'))).toBe(true);
   });
 
-  it('leaves a cross-package tag dependency unresolved with a warning', () => {
+  it('leaves a cross-package tag dependency unresolved with a warning when no plan is in context', () => {
     writeTaggedModule('other:@v1');
     const source = loadModuleSource(dir);
     const table = source.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
     expect(table.dependencies).toEqual(['other:@v1']);
     expect(source.warnings.some(w => w.includes('cross-package'))).toBe(true);
   });
+
+  it('resolves a cross-package tag to pkg:change when the owning plan is in context', () => {
+    writeTaggedModule('other:@v1');
+    // The "other" package's plan: a tag @v1 pointing at a concrete change.
+    const otherPlan = parsePlanFile(writeOtherPlan());
+    expect(otherPlan.data).toBeTruthy();
+    const crossPackagePlans = new Map<string, ExtendedPlanFile>([
+      ['other', otherPlan.data!]
+    ]);
+
+    const source = loadModuleSource(dir, { crossPackagePlans });
+    const table = source.changes.find(c => c.name === 'schemas/app/tables/users/table')!;
+    expect(table.dependencies).toEqual(['other:schemas/other/schema']);
+    expect(source.warnings).toEqual([]);
+  });
+
+  const writeOtherPlan = (): string => {
+    const otherPlanPath = join(dir, 'other.plan');
+    writeFileSync(
+      otherPlanPath,
+      [
+        '%syntax-version=1.0.0',
+        '%project=other',
+        '%uri=other',
+        '',
+        'schemas/other/schema 2017-08-11T08:11:51Z tester <tester@x> # add schema',
+        '@v1 schemas/other/schema 2017-08-11T08:11:51Z tester <tester@x> # release v1',
+        ''
+      ].join('\n')
+    );
+    return otherPlanPath;
+  };
 });
 
 describe('parsePartitionConfig', () => {

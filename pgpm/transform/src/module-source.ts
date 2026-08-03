@@ -44,36 +44,70 @@ export const stripTransactionWrapper = (sql: string): string =>
     .join('\n')
     .trim();
 
+/** Options controlling how {@link loadModuleSource} ingests a module. */
+export interface LoadModuleSourceOptions {
+  /**
+   * Parsed plans of the other packages in the same workspace, keyed by
+   * package name (`%project`). Lets a cross-package tag dependency
+   * (`pkg:@tag`) resolve against the plan that defines the tag. Without it,
+   * cross-package tags cannot be resolved from a single module's plan and are
+   * left verbatim with a warning.
+   */
+  crossPackagePlans?: Map<string, ExtendedPlanFile>;
+}
+
+const CROSS_PACKAGE_TAG = /^([^:]+):@(.+)$/;
+
 /**
- * Resolve a plan dependency token to a concrete change name.
+ * Resolve a plan dependency token to a concrete change identity.
  *
  * Non-tag tokens (a bare change name, or a `pkg:change` cross-package name)
  * pass through unchanged — they are already the identity the ledger and
- * generated plans record. A tag token (`@tag`) is resolved to its change via
- * the plan that defines it, so a dependency written against a tag is not
- * re-emitted verbatim into a generated plan or a ledger row. Cross-package
- * tags (`pkg:@tag`) cannot be resolved from a single module's plan and are
- * left as-is with a warning; the resolver returns them unchanged. Anything
- * that fails to resolve is kept verbatim (never dropped) with a warning.
+ * generated plans record. A tag token is resolved so a dependency written
+ * against a tag is never re-emitted verbatim into a generated plan or a
+ * ledger row:
+ * - a local tag (`@tag`) resolves to its change name via this plan;
+ * - a cross-package tag (`pkg:@tag`) resolves to the canonical `pkg:change`
+ *   qualified name via `crossPackagePlans[pkg]` when available.
+ *
+ * Anything that cannot be resolved (unknown tag, or a cross-package tag with
+ * no plan in context) is kept verbatim — never dropped — with a warning.
  */
 const resolveDependencyToken = (
   token: string,
   plan: ExtendedPlanFile,
   warnings: string[],
-  changeName: string
+  changeName: string,
+  crossPackagePlans?: Map<string, ExtendedPlanFile>
 ): string => {
   if (!token.includes('@')) return token;
+
+  const cross = token.match(CROSS_PACKAGE_TAG);
+  if (cross && cross[1] !== plan.package) {
+    const pkg = cross[1];
+    const otherPlan = crossPackagePlans?.get(pkg);
+    if (!otherPlan) {
+      warnings.push(
+        `${changeName}: dependency tag "${token}" is cross-package; left unresolved (no plan for "${pkg}" in context)`
+      );
+      return token;
+    }
+    const resolved = resolveReference(token, otherPlan, pkg);
+    if (resolved.error || !resolved.change) {
+      warnings.push(
+        `${changeName}: could not resolve cross-package dependency tag "${token}" (${resolved.error ?? 'no matching change'}); left as-is`
+      );
+      return token;
+    }
+    return `${pkg}:${resolved.change}`;
+  }
+
   const resolved = resolveReference(token, plan, plan.package);
   if (resolved.error || !resolved.change) {
     warnings.push(
       `${changeName}: could not resolve dependency tag "${token}" (${resolved.error ?? 'no matching change'}); left as-is`
     );
     return token;
-  }
-  if (resolved.change === token) {
-    warnings.push(
-      `${changeName}: dependency tag "${token}" is cross-package; left unresolved (resolve it in workspace context)`
-    );
   }
   return resolved.change;
 };
@@ -84,7 +118,10 @@ const resolveDependencyToken = (
  * result can be flattened straight into the dials pipeline
  * (`restructureChanges` / `partitionUnits`).
  */
-export const loadModuleSource = (moduleDir: string): ModuleSource => {
+export const loadModuleSource = (
+  moduleDir: string,
+  options: LoadModuleSourceOptions = {}
+): ModuleSource => {
   const modulePath = path.resolve(moduleDir);
   const planResult = parsePlanFile(path.join(modulePath, 'pgpm.plan'));
   if (!planResult.data) {
@@ -106,7 +143,7 @@ export const loadModuleSource = (moduleDir: string): ModuleSource => {
     changes.push({
       name: change.name,
       dependencies: (change.dependencies ?? []).map(dep =>
-        resolveDependencyToken(dep, plan, warnings, change.name)
+        resolveDependencyToken(dep, plan, warnings, change.name, options.crossPackagePlans)
       ),
       deploy: stripTransactionWrapper(body)
     });
