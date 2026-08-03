@@ -20,6 +20,7 @@ export * from './apply';
 export * from './bundle';
 export { PgpmInit } from './init/client';
 export { cleanSql } from './migrate/clean';
+export type { DeployedChangeRecord } from './migrate/client';
 export { PgpmMigrate } from './migrate/client';
 export {
   DeployOptions, 
@@ -31,7 +32,7 @@ export {
   StatusResult,
   VerifyOptions, 
   VerifyResult} from './migrate/types';
-export { hashFile, hashString } from './migrate/utils/hash';
+export { hashFile, hashSqlFile, hashString } from './migrate/utils/hash';
 export { executeQuery,TransactionContext, TransactionOptions, withTransaction } from './migrate/utils/transaction';
 export * from './refactor';
 export * from './roles';

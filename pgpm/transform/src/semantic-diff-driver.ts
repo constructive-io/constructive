@@ -618,3 +618,69 @@ export function diffChangeSets(
     changes.map(c => c.deploy.trim()).filter(Boolean).join('\n\n');
   return diffSchemas(flatten(from), flatten(to), options);
 }
+
+/** How one object a change touches relates to the diff's delta. */
+export type ChangeObjectDelta = ObjectDelta | 'unchanged';
+
+/**
+ * Whether a `to`-side change is already satisfied by the `from` side:
+ * - `satisfied`: every object it touches is unchanged in the diff
+ * - `unsatisfied`: every object it touches is added/modified in the diff
+ * - `partial`: a mix of unchanged and delta objects
+ * - `inert`: no identifiable objects (seed data, grants-only, dynamic SQL)
+ */
+export type ChangeSatisfaction = 'satisfied' | 'unsatisfied' | 'partial' | 'inert';
+
+export interface ChangeObjectCoverage {
+  /** Canonical naming-spec path for the object. */
+  path: string;
+  delta: ChangeObjectDelta;
+}
+
+export interface ChangeCoverage {
+  /** The input change's name (as given, e.g. `pkg:change`). */
+  name: string;
+  status: ChangeSatisfaction;
+  objects: ChangeObjectCoverage[];
+}
+
+/**
+ * Cover each `to`-side change against a semantic diff's per-object delta:
+ * which of the objects the change touches are already present and identical
+ * on the `from` side. A `satisfied` change deploys nothing new — its ledger
+ * entry can be backfilled instead of executing it; an `unsatisfied` change is
+ * the genuine delta. Identity keying is shared with the diff itself, so
+ * regrouped/renamed/reordered authorship of the same objects covers the same.
+ *
+ * `diff` must come from diffing the same `from` side against these changes
+ * (`diffChangeSets(fromChanges, toChanges)`).
+ */
+export function coverChanges(
+  changes: DiffInputChange[],
+  diff: SemanticDiffResult,
+  options: { style?: PathStyle } = {}
+): ChangeCoverage[] {
+  const style = options.style ?? 'directory';
+  const deltaByKey = new Map<string, ObjectDelta>();
+  for (const obj of diff.objects) {
+    deltaByKey.set(identityKey(obj.identity), obj.delta);
+  }
+  return changes.map(change => {
+    const sideWarnings: string[] = [];
+    const side = readSide(change.deploy, sideWarnings, change.name);
+    const objects: ChangeObjectCoverage[] = side.order.map(key => {
+      const unit = side.units.get(key)!;
+      return {
+        path: pathFor(unit.identity, { style }),
+        delta: deltaByKey.get(key) ?? 'unchanged'
+      };
+    });
+    const touched = objects.filter(o => o.delta !== 'unchanged').length;
+    const status: ChangeSatisfaction =
+      objects.length === 0 ? 'inert'
+        : touched === 0 ? 'satisfied'
+          : touched === objects.length ? 'unsatisfied'
+            : 'partial';
+    return { name: change.name, status, objects };
+  });
+}

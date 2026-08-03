@@ -1,7 +1,8 @@
 /**
  * Input ingestion + migration emission for `pgpm diff`.
  *
- * A diff side can be a pgpm module directory, a raw .sql file, or a live
+ * A diff side can be a pgpm module directory, a pgpm workspace (flattened by
+ * the CLI, which owns module-map resolution), a raw .sql file, or a live
  * database (handled by the CLI via pg_dump; the dump text lands here through
  * {@link sqlToDiffChanges}). Every side normalizes to the same
  * `DiffInputChange[]` seam the semantic diff driver consumes, so the
@@ -9,13 +10,16 @@
  */
 import { PgpmRow } from '@pgpmjs/ast';
 import { alterationPathFor } from '@pgpmjs/naming-spec';
-import type { DiffInputChange, SemanticDeltaChange } from '@pgpmjs/transform';
+import type { DiffInputChange, ModuleSource, SemanticDeltaChange } from '@pgpmjs/transform';
 import { loadModuleSource, stripTransactionWrapper } from '@pgpmjs/transform';
 import * as fs from 'fs';
 import * as path from 'path';
 
 /** What a diff side spec resolves to. */
-export type DiffSideKind = 'module' | 'sql' | 'database';
+export type DiffSideKind = 'module' | 'sql' | 'database' | 'workspace';
+
+/** Files whose presence marks a directory as a pgpm workspace root. */
+const WORKSPACE_CONFIG_FILES = ['pgpm.json', 'pgpm.config.js'];
 
 /** A diff side normalized to the semantic diff driver's input seam. */
 export interface DiffSide {
@@ -29,7 +33,8 @@ export interface DiffSide {
 /**
  * Classify a side spec: `db:<name>` or a postgres:// / postgresql://
  * connection string is a live database; a directory containing pgpm.plan is
- * a module; an existing file is raw SQL.
+ * a module; a directory containing a workspace config (pgpm.json /
+ * pgpm.config.js) is a workspace; an existing file is raw SQL.
  */
 export const resolveDiffSideKind = (spec: string): DiffSideKind => {
   if (/^postgres(ql)?:\/\//.test(spec) || spec.startsWith('db:')) return 'database';
@@ -37,11 +42,12 @@ export const resolveDiffSideKind = (spec: string): DiffSideKind => {
   if (fs.existsSync(resolved)) {
     if (fs.statSync(resolved).isDirectory()) {
       if (fs.existsSync(path.join(resolved, 'pgpm.plan'))) return 'module';
-      throw new Error(`${spec}: directory has no pgpm.plan (not a pgpm module)`);
+      if (WORKSPACE_CONFIG_FILES.some(f => fs.existsSync(path.join(resolved, f)))) return 'workspace';
+      throw new Error(`${spec}: directory has no pgpm.plan or workspace config (not a pgpm module or workspace)`);
     }
     return 'sql';
   }
-  throw new Error(`${spec}: not a module directory, .sql file, db:<name>, or connection string`);
+  throw new Error(`${spec}: not a module directory, workspace, .sql file, db:<name>, or connection string`);
 };
 
 /** Lines pg_dump emits that carry no schema content. */
@@ -73,13 +79,35 @@ export const sqlToDiffChanges = (sql: string, name: string): DiffInputChange[] =
 ];
 
 /**
+ * Flatten loaded workspace modules (in cross-module topological order) into
+ * diff input changes. Names are package-qualified (`pkg:change`) and local
+ * dependencies are qualified with their own package, matching how the ledger
+ * records cross-package requires.
+ */
+export const workspaceModulesToDiffChanges = (modules: ModuleSource[]): DiffInputChange[] =>
+  modules.flatMap(mod =>
+    mod.changes.map(change => ({
+      name: `${mod.name}:${change.name}`,
+      dependencies: change.dependencies.map(dep =>
+        dep.includes(':') ? dep : `${mod.name}:${dep}`
+      ),
+      deploy: change.deploy
+    }))
+  );
+
+/**
  * Load an on-disk diff side (module directory or .sql file). Live databases
- * are dumped by the caller and fed through {@link sqlToDiffChanges}.
+ * are dumped by the caller and fed through {@link sqlToDiffChanges};
+ * workspaces are flattened by the caller (module-map resolution needs
+ * `@pgpmjs/core`) and fed through {@link workspaceModulesToDiffChanges}.
  */
 export const loadDiffSideFromDisk = (spec: string): DiffSide => {
   const kind = resolveDiffSideKind(spec);
   if (kind === 'database') {
     throw new Error(`${spec}: live database sides must be dumped by the caller`);
+  }
+  if (kind === 'workspace') {
+    throw new Error(`${spec}: workspace sides must be flattened by the caller`);
   }
   const resolved = path.resolve(spec);
   if (kind === 'module') {
