@@ -32,7 +32,7 @@
  */
 
 import { extractBody, extractFunctionAccess } from '../callgraph/extract';
-import type { SchemaAclInfo } from '../pg/acl';
+import { canEnterSchema, type SchemaAclInfo } from '../pg/acl';
 import type { FunctionSnapshot } from '../pg/functions';
 import type { ViewSnapshot } from '../pg/indexes';
 import type { PgPrivilege, TableSnapshot } from '../pg/introspect';
@@ -550,30 +550,6 @@ export function checkUnreadableFunctionReach(
   }
 
   return out;
-}
-
-/**
- * The role can enter the schema, so a grant on something inside it is reach.
- *
- * The same gate L3 applies to a table grant, applied to EXECUTE: without
- * `USAGE` the function cannot be named, and Postgres's default
- * EXECUTE-to-PUBLIC would otherwise make every definer function in an
- * internal schema look reachable by every role in the database.
- */
-function canEnterSchema(
-  schema: string,
-  role: string,
-  graph: RoleGraph,
-  schemaAcls: Map<string, SchemaAclInfo>
-): boolean {
-  const acl = schemaAcls.get(schema);
-  if (!acl) return true; // not introspected: assume reachable rather than silently drop
-  const attrs = graph.get(role);
-  if (attrs?.isSuper) return true;
-  if (role === acl.owner) return true;
-  const usage = new Set(acl.grants.filter((g) => g.privilege === 'USAGE').map((g) => g.role));
-  if (usage.has('PUBLIC') || usage.has(role)) return true;
-  return (attrs?.inheritsFrom ?? []).some((a) => usage.has(a) || a === acl.owner);
 }
 
 /** The owner is exempt from the relation's policies on this path. */

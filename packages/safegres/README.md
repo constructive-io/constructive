@@ -165,6 +165,13 @@ untrusted-role model; the `safegres:constructive` preset configures them for `an
 ‡ L6 needs an adapter that can compute [API reach](#api-reach--the-relations-the-api-can-actually-name);
 without one nothing is unaddressable and it never fires.
 
+**Exposure is asked per subject.** A relation finding is exposed when the API can address the
+relation. A *routine* finding — the convention rules, L19, L20 — is exposed when an untrusted role
+can **call the function**: `USAGE` on its schema and `EXECUTE` on the function, directly, by
+inheritance, or through Postgres's default `EXECUTE TO PUBLIC`. Grading a definer function by the
+schema it sits in is not conservative, it is wrong in the dangerous direction: the function is
+private precisely so that calling it is the only way in.
+
 **Direction is the load-bearing idea.** `fail-open` findings are exposure — the untrusted side
 reaches more than intended. `fail-closed` findings are *denied by Postgres at runtime*: an
 availability and hygiene concern, not a leak. They contribute **zero** to the score by default
@@ -594,7 +601,7 @@ Precedence: **CLI > project config > preset > built-in defaults**.
     { "tables": ["app_public.audit_*"], "rules": { "A2": "off" } }
   ],
   "perf": { "enabled": true, "ignore": ["app_public.audit_*"], "rules": { "X6": "off" } },
-  "scoring": { "densityK": 0.17, "unknownExposureCap": 80 },
+  "scoring": { "densityK": 0.17, "maxRuleDensity": 0.5, "unknownExposureCap": 80 },
   "failOn": { "grade": "B", "perfGrade": "B" }
 }
 ```
@@ -709,6 +716,17 @@ exposed tables lands at a C). Non-exposed findings score 0; fail-closed findings
 `scoring.failClosedWeight` is raised; unknown exposure caps the score; any exposed critical floors
 the grade at C (`scoring.floorOnCritical`). Grades: A+ 97 · A 90 · B 80 · C 65 · D 50 · F below.
 The legacy flat-deduction model is `scoring.model: "weighted"`.
+
+Two corrections keep a rule's **shape** out of the arithmetic, because a rule's fan-out is a
+property of how it reports, not of how much risk it found.
+
+- **Points are charged per unit of repair.** A rule that emits one finding per (relation ×
+  function) pair — L19 does, and on one real database that is 853 findings over 166 functions —
+  costs what fixing it costs: 166 revokes. The finding count is unchanged in the report; the
+  deduction reads `−664 (×853 → 166 fixes)`.
+- **No single rule can decide the grade.** Each rule's contribution is capped at
+  `scoring.maxRuleDensity` (default 0.5) of the points that would score an F alone, so one rule
+  at its ceiling costs two grade bands and an F still takes breadth. `false` disables it.
 
 Every report carries its own arithmetic: per-rule points, grade, and the **payoff** — how far the
 score would move if that rule's findings went away. Gate with `--fail-on <severity>`,

@@ -10,7 +10,7 @@
  */
 
 import type { RoleAccessEntry } from '../checks/lattice';
-import type { Score } from '../score/score';
+import type { Score, ScoreDeduction } from '../score/score';
 import type { Finding, PlaneReport, Report, Severity } from '../types';
 import { formatDelta, type ReportComparison, type RuleDelta, type ScoreDelta } from './compare';
 import { type ReportView, selectView, type ViewConfig } from './view';
@@ -177,11 +177,7 @@ function planeSection(view: ReportView): string[] {
       '',
       '| Rule | Findings | Points | Grade | Payoff |',
       '| --- | ---: | ---: | --- | ---: |',
-      ...plane.score.deductions.map((d) =>
-        d.unscored
-          ? `| \`${d.code}\` | ${d.count} | — | — | *unscored* |`
-          : `| \`${d.code}\` | ${d.count} | −${d.points} | **${d.grade}** | +${d.potential.toFixed(1)} |`
-      )
+      ...plane.score.deductions.map(deductionRow)
     );
   }
   return out;
@@ -337,16 +333,24 @@ function comparisonSection(cmp: ReportComparison): string[] {
  * rule alone goes to zero — the number worth ranking work by, and not
  * proportional to the finding count, because the curve is exponential.
  */
+/**
+ * One rule's row. Findings and fixes are different numbers when a rule fans
+ * out over a single repair, and points are charged on the second.
+ */
+function deductionRow(d: ScoreDeduction): string {
+  const found = d.units === undefined ? `${d.count}` : `${d.count} (${d.units} fixes)`;
+  const points = d.capped ? `−${d.points} (capped)` : `−${d.points}`;
+  return d.unscored
+    ? `| \`${d.code}\` | ${found} | — | — | *unscored* |`
+    : `| \`${d.code}\` | ${found} | ${points} | **${d.grade}** | +${d.potential.toFixed(1)} |`;
+}
+
 function ruleTable(label: string, score: Score | undefined, options: RenderMarkdownOptions): string[] {
   if (!score || score.deductions.length === 0) return [];
   const table = [
     '| Rule | Findings | Points | Grade | Payoff |',
     '| --- | ---: | ---: | --- | ---: |',
-    ...score.deductions.map((d) =>
-      d.unscored
-        ? `| \`${d.code}\` | ${d.count} | — | — | *unscored* |`
-        : `| \`${d.code}\` | ${d.count} | −${d.points} | **${d.grade}** | +${d.potential.toFixed(1)} |`
-    )
+    ...score.deductions.map(deductionRow)
   ];
   return options.verbose
     ? [`### ${label} by rule`, '', ...table, '']

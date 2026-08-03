@@ -143,6 +143,17 @@ export interface ScoringConfig {
   /** Cap on total deduction any single rule can contribute (weighted model). */
   maxDeductionPerRule?: number;
   /**
+   * Cap on any single rule's contribution (density model), as a fraction of
+   * the points that would take the score to F on their own. Default 0.5 — one
+   * rule at its cap costs two grade bands, and an F still takes breadth.
+   *
+   * The density curve has no natural ceiling, so before this a rule's weight
+   * and its *fan-out* were indistinguishable: L19 emitting one finding per
+   * (relation × function) pair took a real audit from A+ to F on one severity
+   * notch. `false` removes the cap.
+   */
+  maxRuleDensity?: number | false;
+  /**
    * Multiplier applied to fail-closed findings' weights (density model).
    * Default 0 — denied-at-runtime hygiene findings don't reduce the score.
    */

@@ -60,6 +60,34 @@ beforeAll(async () => {
     $$;
   `);
 
+  // An internal schema no API serves, holding a function anonymous can call.
+  // Relation reach says unexposed; callability says otherwise, and the
+  // second is the question a routine finding is about.
+  await pg.any('CREATE SCHEMA fx_lint_private');
+  await pg.any(`
+    CREATE FUNCTION fx_lint_private.reachable() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+      EXECUTE 'SELECT 1';
+    END;
+    $$;
+  `);
+  await pg.any(`
+    CREATE FUNCTION fx_lint_private.locked() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+      EXECUTE 'SELECT 1';
+    END;
+    $$;
+  `);
+  await pg.any(
+    'DO $$ BEGIN CREATE ROLE fx_anon NOLOGIN; EXCEPTION WHEN duplicate_object THEN NULL; END $$;'
+  );
+  await pg.any('GRANT USAGE ON SCHEMA fx_lint_private TO fx_anon');
+  await pg.any('REVOKE EXECUTE ON FUNCTION fx_lint_private.locked() FROM PUBLIC');
+
   // Clean: fully-qualified, no search_path, no dynamic SQL.
   await pg.any(`
     CREATE FUNCTION fx_lint.clean() RETURNS bigint
@@ -128,6 +156,28 @@ describe('audit: convention linter wiring (C*)', () => {
       (f) => (f.context as { function?: string }).function?.startsWith('fx_lint.clean(')
     );
     expect(onClean).toEqual([]);
+  });
+
+  it('grades a routine finding by who can call the function, not by its schema', async () => {
+    const report = await audit(pg.client as never, {
+      schemas: ['fx_lint', 'fx_lint_private'],
+      config: {
+        rules: { C4: 'high' },
+        exposure: { schemas: ['fx_lint'], roles: ['fx_anon'], anonRoles: ['fx_anon'] }
+      }
+    });
+    const c4 = (name: string) =>
+      report.findings.find(
+        (f) =>
+          f.code === 'C4'
+          && (f.context as { function?: string }).function?.startsWith(`fx_lint_private.${name}(`)
+      );
+
+    // Off the API surface, but `fx_anon` holds USAGE and the default
+    // EXECUTE-to-PUBLIC: it can call the body, so the finding scores.
+    expect(c4('reachable')?.exposed).toBe(true);
+    // Same schema, EXECUTE revoked from PUBLIC — genuinely out of reach.
+    expect(c4('locked')?.exposed).toBe(false);
   });
 
   it('runs the linter under the constructive preset but not under recommended', () => {

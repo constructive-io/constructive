@@ -103,6 +103,11 @@ const SCORING: Shape<ScoringConfig> = {
   weights: { type: 'record', description: 'Points deducted per finding severity', values: num('Points') },
   perRuleWeights: { type: 'record', description: 'Per-rule weight, beating the severity weight', values: num('Points') },
   maxDeductionPerRule: num('Cap on one rule\u2019s total deduction (weighted model)'),
+  maxRuleDensity: oneOf(
+    'Cap on one rule\u2019s contribution, as a fraction of the points that fail an audit alone. Default 0.5; false disables the cap.',
+    num('Fraction'),
+    bool('false to disable')
+  ),
   failClosedWeight: num('Multiplier for fail-closed findings. Default 0.'),
   densityK: num('Density falloff constant. Default 0.17.'),
   unknownExposureCap: oneOf(

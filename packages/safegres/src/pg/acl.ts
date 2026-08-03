@@ -231,3 +231,27 @@ export async function introspectSchemaAcls(
     executeRoles: r.execute_roles
   }));
 }
+
+/**
+ * The role can enter the schema, so a grant on something inside it is reach.
+ *
+ * The same gate L3 applies to a table grant, applied to a schema's contents:
+ * without `USAGE` the object cannot be named, and Postgres's default
+ * EXECUTE-to-PUBLIC would otherwise make every function in an internal schema
+ * look reachable by every role in the database.
+ */
+export function canEnterSchema(
+  schema: string,
+  role: string,
+  graph: Map<string, RoleAttributes>,
+  schemaAcls: Map<string, SchemaAclInfo>
+): boolean {
+  const acl = schemaAcls.get(schema);
+  if (!acl) return true; // not introspected: assume reachable rather than silently drop
+  const attrs = graph.get(role);
+  if (attrs?.isSuper) return true;
+  if (role === acl.owner) return true;
+  const usage = new Set(acl.grants.filter((g) => g.privilege === 'USAGE').map((g) => g.role));
+  if (usage.has('PUBLIC') || usage.has(role)) return true;
+  return (attrs?.inheritsFrom ?? []).some((a) => usage.has(a) || a === acl.owner);
+}
