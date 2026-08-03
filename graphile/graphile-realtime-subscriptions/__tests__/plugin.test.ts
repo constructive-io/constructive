@@ -379,7 +379,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(result.plans['Subscription']).toBeDefined();
       expect(result.plans['Subscription']['onProjectsChanged']).toBeDefined();
 
-      const mockArgs = { get: jest.fn(() => 'test-id') };
+      const mockArgs = { getRaw: jest.fn(() => 'test-id') };
       result.plans['Subscription']['onProjectsChanged'].subscribePlan(null, mockArgs);
 
       expect(mockConstant).toHaveBeenCalledWith('realtime:app_public.projects');
@@ -398,7 +398,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
 
       const result = capturedFactory!(build);
 
-      const mockArgs = { get: jest.fn(() => 'test-id') };
+      const mockArgs = { getRaw: jest.fn(() => 'test-id') };
       result.plans['Subscription']['onItemsChanged'].subscribePlan(null, mockArgs);
 
       expect(mockConstant).toHaveBeenCalledWith('realtime:inventory_public.items');
@@ -430,7 +430,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       });
 
       const result = capturedFactory!(build);
-      const mockArgs = { get: jest.fn(() => 'some-id') };
+      const mockArgs = { getRaw: jest.fn(() => 'some-id') };
 
       result.plans['Subscription']['onTasksChanged'].subscribePlan(null, mockArgs);
 
@@ -573,14 +573,14 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       });
 
       const result = capturedFactory!(build);
-      const mockArgs = { get: jest.fn((key: string) => {
+      const mockArgs = { getRaw: jest.fn((key: string) => {
         if (key === 'ids') return ['id-a', 'id-b'];
         return null;
       }) };
 
       result.plans['Subscription']['onTasksChanged'].subscribePlan(null, mockArgs);
 
-      expect(mockArgs.get).toHaveBeenCalledWith('ids');
+      expect(mockArgs.getRaw).toHaveBeenCalledWith('ids');
 
       // The listen callback is captured but not invoked by the mock.
       // Invoke it manually to verify ids are threaded through.

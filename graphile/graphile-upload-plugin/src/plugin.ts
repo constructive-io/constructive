@@ -25,6 +25,7 @@ import 'graphile-build';
 import 'graphile-build-pg';
 
 import type { GraphileConfig } from 'graphile-config';
+import { isInputType } from 'graphql';
 import { Readable, Transform } from 'stream';
 
 import type { UploadFieldDefinition, UploadPluginOptions } from './types';
@@ -196,8 +197,12 @@ export function createUploadPlugin(
             return fields;
           }
 
+          // getTypeByName is untyped beyond GraphQLNamedType, and the field
+          // below needs an input type — narrow rather than assert, so a
+          // non-input 'Upload' registered by another plugin skips instead of
+          // building an invalid schema.
           const UploadType = build.getTypeByName('Upload');
-          if (!UploadType) {
+          if (!UploadType || !isInputType(UploadType)) {
             return fields;
           }
 
