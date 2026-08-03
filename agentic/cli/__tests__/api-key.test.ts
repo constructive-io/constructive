@@ -5,8 +5,8 @@ import {
   MintedApiKey,
   needsRemint,
   parseMintedKey,
-  remintApiKey,
-  REMINT_THRESHOLD_MS
+  REMINT_THRESHOLD_MS,
+  remintApiKey
 } from '../src/api-key';
 
 describe('buildCreateApiKeyInput', () => {

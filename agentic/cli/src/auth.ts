@@ -1,5 +1,6 @@
 import { auth } from '@constructive-io/sdk';
 
+import { AccountSession, clearSession, loadSession, saveSession } from './account-store';
 import {
   API_KEY_YEARS,
   buildCreateApiKeyInput,
@@ -9,7 +10,6 @@ import {
   parseMintedKey,
   remintApiKey
 } from './api-key';
-import { AccountSession, clearSession, loadSession, saveSession } from './account-store';
 import { describeAuthError, withAuthTimeout } from './auth-error';
 
 type AuthClient = ReturnType<typeof auth.createClient>;
