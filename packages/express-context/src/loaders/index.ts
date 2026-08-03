@@ -12,6 +12,10 @@
  *   - pubkeyChallengeSettings (routing-plane pubkey_settings)
  *   - webauthnSettings(routing-plane webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
+ *   - authSurface     (identity/connected-accounts/emails modules → tenant DB)
+ *
+ * Opt-in (not in the default registry, register it explicitly):
+ *   - identityProviders (three round trips, decrypts client secrets)
  *
  * To add a new per-db lookup, implement a ModuleLoader and register it:
  *
@@ -28,6 +32,7 @@
 
 // Core types
 export type { LoaderContext, ModuleLoader } from './types';
+export { requireDatabaseId } from './types';
 
 // Factory
 export type { CreateLoaderOptions } from './create-loader';
@@ -40,10 +45,12 @@ export { createLoaderRegistry } from './registry';
 // Built-in loaders
 export { agentChatLoader } from './agent-chat';
 export { authSettingsLoader } from './auth-settings';
+export { authSurfaceLoader } from './auth-surface';
 export { billingLoader } from './billing';
 export { computeLoader } from './compute';
 export { corsLoader } from './cors';
 export { databaseSettingsLoader } from './database-settings';
+export { identityProvidersLoader, requireIdentityProvider } from './identity-providers';
 export { inferenceLogLoader } from './inference-log';
 export { llmLoader } from './llm';
 export { pubkeyLoader } from './pubkey';
@@ -55,6 +62,7 @@ export { webauthnLoader } from './webauthn';
  */
 import { agentChatLoader } from './agent-chat';
 import { authSettingsLoader } from './auth-settings';
+import { authSurfaceLoader } from './auth-surface';
 import { billingLoader } from './billing';
 import { computeLoader } from './compute';
 import { corsLoader } from './cors';
@@ -74,6 +82,7 @@ export function createDefaultRegistry() {
   registry.register(pubkeyLoader);
   registry.register(webauthnLoader);
   registry.register(authSettingsLoader);
+  registry.register(authSurfaceLoader);
   registry.register(billingLoader);
   registry.register(inferenceLogLoader);
   registry.register(agentChatLoader);
