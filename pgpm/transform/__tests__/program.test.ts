@@ -69,3 +69,43 @@ describe('emitSqlProgram', () => {
     expect(reparsed.statements).toHaveLength(3);
   });
 });
+
+// Statement spans are UTF-8 byte offsets; a multibyte character shifts every
+// later offset past its JS-string index, so raw slicing and gap reassembly
+// must both go through the bytes.
+const multibyte = `-- Header — with an em dash
+CREATE SCHEMA app;
+
+COMMENT ON SCHEMA app IS 'Application schema — core';
+
+CREATE TABLE app.users (
+  id uuid PRIMARY KEY
+);
+`;
+
+describe('multibyte sources', () => {
+  it('extracts verbatim raw text correctly past a multibyte character', () => {
+    const program = parseSqlProgram(multibyte);
+    const comment = program.statements[1];
+    expect(comment.facts.kind).toBe('comment');
+    expect(comment.raw.trim()).toBe("COMMENT ON SCHEMA app IS 'Application schema — core'");
+    expect(program.statements[2].raw).toContain('CREATE TABLE app.users');
+  });
+
+  it('emits byte-identical source with a multibyte character and nothing dirty', () => {
+    const program = parseSqlProgram(multibyte);
+    expect(emitSqlProgram(program)).toBe(multibyte);
+  });
+
+  it('preserves multibyte gaps when a statement is dirty', () => {
+    const program = parseSqlProgram(multibyte);
+    const table = program.statements[2];
+    table.stmt.CreateStmt.relation.schemaname = 'tenant';
+    table.dirty = true;
+
+    const out = emitSqlProgram(program);
+    expect(out).toContain('-- Header — with an em dash');
+    expect(out).toContain("COMMENT ON SCHEMA app IS 'Application schema — core';");
+    expect(out).toContain('tenant.users');
+  });
+});

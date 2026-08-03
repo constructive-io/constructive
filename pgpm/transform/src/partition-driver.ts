@@ -29,6 +29,8 @@ import {
   ObjectIdentityKind
 } from '@pgsql/transform';
 
+import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
+
 /** One deployable unit: an object (by identity) and the statements that build it. */
 export interface PartitionUnit {
   /** The object's identity, or `null` for split riders and the residual unit. */
@@ -201,6 +203,7 @@ interface UnitGraph {
  */
 function buildUnitGraph(sql: string, style: PathStyle, splitRiders: Set<StatementKind>): UnitGraph {
   const facts = classifyStatements(sql);
+  const sqlBytes = sqlSourceBytes(sql);
   const graph = buildStatementGraph(facts);
 
   const unitOf: number[] = new Array(facts.length).fill(-1);
@@ -287,7 +290,7 @@ function buildUnitGraph(sql: string, style: PathStyle, splitRiders: Set<Statemen
   });
 
   facts.forEach((f, i) => {
-    const text = sql.slice(f.span.start, f.span.start + f.span.len).trim();
+    const text = sliceStatementBytes(sqlBytes, f.span.start, f.span.len).trim();
     if (!text) return;
     const unit = units[unitOf[i]];
     unit.statements.push(i);

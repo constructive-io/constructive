@@ -29,6 +29,7 @@ import {
   restructureSql
 } from '@pgsql/transform';
 
+import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
 import { nameUnnamedConstraints, subObjectIdentityOf } from './sub-object';
 
 export type { Granularity } from '@pgsql/transform';
@@ -172,6 +173,7 @@ export function restructureChanges(
   // target (creates[0]), so a table's CREATE and its remaining ALTERs land
   // in the same change regardless of statement kind.
   const facts = classifyStatements(sql);
+  const sqlBytes = sqlSourceBytes(sql);
 
   if (options.changeGranularity === 'single') {
     const name = options.singleChangeName ?? 'module/init';
@@ -180,7 +182,7 @@ export function restructureChanges(
       changes.flatMap(c => c.dependencies).filter(d => !inputNames.has(d))
     )].sort();
     const statements = facts
-      .map(f => sql.slice(f.span.start, f.span.start + f.span.len).trim())
+      .map(f => sliceStatementBytes(sqlBytes, f.span.start, f.span.len).trim())
       .filter(Boolean)
       .map(text => (text.endsWith(';') ? text : `${text};`));
     const revert = revertFor(facts);
@@ -264,7 +266,7 @@ export function restructureChanges(
   const groupStatements: StatementFacts[][] = groupNames.map((): StatementFacts[] => []);
 
   facts.forEach((f, i) => {
-    const text = sql.slice(f.span.start, f.span.start + f.span.len).trim();
+    const text = sliceStatementBytes(sqlBytes, f.span.start, f.span.len).trim();
     const g = groupOf[i];
     if (g !== -1 && text) {
       groupSql[g].push(text.endsWith(';') ? text : `${text};`);

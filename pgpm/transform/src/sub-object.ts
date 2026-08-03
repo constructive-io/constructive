@@ -13,6 +13,7 @@ import type { ObjectIdentity } from '@pgpmjs/naming-spec';
 import type { StatementFacts } from '@pgsql/semantics';
 import { Deparser, parseSync } from 'plpgsql-parser';
 
+import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
 import { ConstraintNode, defaultConstraintName } from './constraint-names';
 
 interface AlterTableCmdNode {
@@ -74,6 +75,7 @@ export function subObjectIdentityOf(facts: StatementFacts): ObjectIdentity | nul
  */
 export function nameUnnamedConstraints(sql: string): string {
   const parsed = parseSync(sql);
+  const sqlBytes = sqlSourceBytes(sql);
   const pieces: string[] = [];
   for (const raw of parsed.sql.stmts) {
     const node = raw.stmt as Record<string, unknown>;
@@ -98,7 +100,7 @@ export function nameUnnamedConstraints(sql: string): string {
     } else {
       const start = (raw as { stmt_location?: number }).stmt_location ?? 0;
       const len = (raw as { stmt_len?: number }).stmt_len;
-      const text = len === undefined ? sql.slice(start) : sql.slice(start, start + len);
+      const text = sliceStatementBytes(sqlBytes, start, len);
       const trimmed = text.trim();
       pieces.push(trimmed.endsWith(';') ? trimmed : `${trimmed};`);
     }

@@ -13,6 +13,8 @@ import type { StatementFacts } from '@pgsql/semantics';
 import { classifyStatements } from '@pgsql/semantics';
 import { Deparser, parseSql } from 'plpgsql-parser';
 
+import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
+
 /** A statement's location in the source script (byte offsets). */
 export type SqlStatementSpan = StatementFacts['span'];
 
@@ -44,6 +46,7 @@ export function parseSqlProgram(source: string): SqlProgram {
   const parseResult = parseSql(source);
   const stmts: any[] = parseResult?.stmts ?? [];
   const facts = classifyStatements(source);
+  const sourceBytes = sqlSourceBytes(source);
   const statements: SqlStatementAst[] = [];
   for (let i = 0; i < stmts.length; i++) {
     const rawStmt = stmts[i];
@@ -53,7 +56,7 @@ export function parseSqlProgram(source: string): SqlProgram {
       stmt: rawStmt.stmt,
       facts: facts[i],
       span: { start, len },
-      raw: source.slice(start, start + len),
+      raw: sliceStatementBytes(sourceBytes, start, len),
       dirty: false
     });
   }
@@ -69,14 +72,22 @@ export function parseSqlProgram(source: string): SqlProgram {
 export function emitSqlProgram(program: SqlProgram): string {
   const { source, statements } = program;
   if (!statements.some(s => s.dirty)) return source;
+  // Spans are UTF-8 byte offsets; slice statements and the verbatim gaps
+  // between them on the bytes so a multibyte character never mis-cuts the
+  // reassembly. Statement boundaries fall on character boundaries.
+  const sourceBytes = sqlSourceBytes(source);
   const pieces: string[] = [];
   let cursor = 0;
   for (const statement of statements) {
     const { start, len } = statement.span;
-    if (start > cursor) pieces.push(source.slice(cursor, start));
-    pieces.push(statement.dirty ? Deparser.deparse(statement.stmt) : source.slice(start, start + len));
+    if (start > cursor) pieces.push(sliceStatementBytes(sourceBytes, cursor, start - cursor));
+    pieces.push(
+      statement.dirty
+        ? Deparser.deparse(statement.stmt)
+        : sliceStatementBytes(sourceBytes, start, len)
+    );
     cursor = start + len;
   }
-  if (cursor < source.length) pieces.push(source.slice(cursor));
+  if (cursor < sourceBytes.length) pieces.push(sliceStatementBytes(sourceBytes, cursor));
   return pieces.join('');
 }
