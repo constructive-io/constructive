@@ -70,7 +70,9 @@ export async function login(config: AgentCliConfig, argv: Record<string, unknown
   }
 
   const saved = loadBackendConfig(config.backendFile);
-  const prompter = new Inquirerer({ noTty: !process.stdin.isTTY });
+  // inquirerer applies its 15s inactivity timeout in TTY mode; a person pausing
+  // at the password prompt must not get killed, so push it to setTimeout's max.
+  const prompter = new Inquirerer({ noTty: !process.stdin.isTTY, timeout: 0x7fffffff });
   try {
     const answers = await prompter.prompt(argv, [
       {
