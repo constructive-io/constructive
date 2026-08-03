@@ -55,6 +55,7 @@ export function createDbTools(host: PiToolsHost): ExtensionFactory {
 
 export { type ConfirmGate, type ConfirmGateDeps, createConfirmGate } from './confirm-gate';
 export {
+  deriveSubdomainEndpoint,
   type ModulesClient,
   type ProjectContext,
   resolveDataToken,
