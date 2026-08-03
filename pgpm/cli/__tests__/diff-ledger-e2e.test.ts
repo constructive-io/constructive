@@ -34,38 +34,30 @@ interface ChangeSpec {
 
 const META_SQL = {
   schema: 'CREATE SCHEMA metax;',
-  entities: [
-    'CREATE TABLE metax.entities (',
-    '  id int PRIMARY KEY,',
-    '  name text NOT NULL',
-    ');'
-  ].join('\n'),
-  fields: [
-    'CREATE TABLE metax.fields (',
-    '  id int PRIMARY KEY,',
-    '  entity_id int NOT NULL REFERENCES metax.entities (id),',
-    '  name text NOT NULL',
-    ');'
-  ].join('\n')
+  entities: `CREATE TABLE metax.entities (
+  id int PRIMARY KEY,
+  name text NOT NULL
+);`,
+  fields: `CREATE TABLE metax.fields (
+  id int PRIMARY KEY,
+  entity_id int NOT NULL REFERENCES metax.entities (id),
+  name text NOT NULL
+);`
 };
 
 const GEN_SQL = {
   schema: 'CREATE SCHEMA genx;',
-  customers: [
-    'CREATE TABLE genx.customers (',
-    '  id int PRIMARY KEY,',
-    '  email text NOT NULL',
-    ');'
-  ].join('\n'),
+  customers: `CREATE TABLE genx.customers (
+  id int PRIMARY KEY,
+  email text NOT NULL
+);`,
   customer_count:
     'CREATE FUNCTION genx.customer_count() RETURNS bigint LANGUAGE sql AS $$ SELECT count(*) FROM genx.customers $$;',
   // v2 only: the genuine delta
-  orders: [
-    'CREATE TABLE genx.orders (',
-    '  id int PRIMARY KEY,',
-    '  customer_id int NOT NULL REFERENCES genx.customers (id)',
-    ');'
-  ].join('\n')
+  orders: `CREATE TABLE genx.orders (
+  id int PRIMARY KEY,
+  customer_id int NOT NULL REFERENCES genx.customers (id)
+);`
 };
 
 /** v1: the originally generated plans. */

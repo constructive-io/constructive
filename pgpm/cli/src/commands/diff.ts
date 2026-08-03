@@ -117,6 +117,21 @@ const NAMING_STYLES = ['directory', 'flat'] as const;
 type NamingStyle = (typeof NAMING_STYLES)[number];
 
 /**
+ * The pg_dump command to run. Defaults to the `pg_dump` on PATH, but honours
+ * PGPM_PG_DUMP — a whitespace-separated command such as
+ * `docker exec <container> pg_dump` — so callers can run a version-matched
+ * pg_dump from a Postgres container instead of installing client tools.
+ */
+const resolvePgDump = (): { cmd: string; prefixArgs: string[] } => {
+  const override = (process.env.PGPM_PG_DUMP ?? '').trim();
+  if (override) {
+    const parts = override.split(/\s+/);
+    return { cmd: parts[0], prefixArgs: parts.slice(1) };
+  }
+  return { cmd: 'pg_dump', prefixArgs: [] };
+};
+
+/**
  * pg_dump a side's schema: `db:<name>` uses PG* env; DSNs pass through.
  * Migration metadata schemas (pgpm_migrate, sqitch) are excluded — they are
  * the ledger, not the schema under comparison.
@@ -127,11 +142,19 @@ const dumpDatabase = async (spec: string): Promise<string> => {
   if (spec.startsWith('db:')) {
     const config = getPgEnvOptions({ database: spec.slice(3) });
     env = getSpawnEnvWithPg(config);
+    // Pass the database explicitly (not just via PG* env) so the command still
+    // targets the right database when PGPM_PG_DUMP wraps it (e.g. `docker exec`,
+    // which does not inherit the host's environment).
+    args.push('--dbname', config.database);
   } else {
     args.push('--dbname', spec);
   }
+  // pg_dump must match the server's major version. Allow overriding the binary
+  // (e.g. to run pg_dump from a matching-version Postgres container) via
+  // PGPM_PG_DUMP, a command string like `docker exec <container> pg_dump`.
+  const { cmd, prefixArgs } = resolvePgDump();
   return new Promise<string>((resolve, reject) => {
-    const child = spawn('pg_dump', args, { env, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(cmd, [...prefixArgs, ...args], { env, stdio: ['ignore', 'pipe', 'pipe'] });
     let out = '';
     let err = '';
     child.stdout.on('data', chunk => { out += chunk; });

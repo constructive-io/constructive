@@ -289,16 +289,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # `pgpm diff db:<name>` shells out to pg_dump, which must match the
-      # Postgres 18 service container (the runner's default client is older).
-      - name: Install PostgreSQL 18 client tools
-        run: |
-          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq postgresql-client-18
-          pg_dump --version
-
       # Durability is irrelevant for throwaway CI databases. Disabling fsync
       # and synchronous commit avoids checkpoint I/O stalls on CI runners.
       - name: Tune Postgres for CI (disable durability)
@@ -313,6 +303,13 @@ jobs:
         run: pnpm fixtures:install
 
       - name: Test ${{ matrix.batch }}
+        # `pgpm diff db:<name>` shells out to pg_dump, which must match the
+        # Postgres 18 server. Rather than install client tools on the runner,
+        # run pg_dump straight from the postgres-plus:18 service container.
+        env:
+          # -e PGUSER: docker exec does not inherit the runner env, and pg_dump
+          # would otherwise default to the container's OS user (no such role).
+          PGPM_PG_DUMP: docker exec -e PGUSER=postgres ${{ job.services.pg_db.id }} pg_dump
         run: |
           for pkg in ${{ matrix.packages }}; do
             echo "::group::Testing $pkg"
