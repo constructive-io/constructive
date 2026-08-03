@@ -1,6 +1,6 @@
 {
   "name": "pg-env",
-  "version": "1.28.0",
+  "version": "1.29.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL environment configuration utilities",
   "main": "index.js",

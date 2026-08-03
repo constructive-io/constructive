@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.14.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.14.0...@constructive-io/graphql-codegen@5.14.1) (2026-08-03)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
 # [5.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.13.12...@constructive-io/graphql-codegen@5.14.0) (2026-08-02)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

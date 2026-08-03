@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.19.0](https://github.com/constructive-io/constructive/compare/safegres@1.18.0...safegres@1.19.0) (2026-08-03)
+
+### Bug Fixes
+
+- **safegres:** grade L21 revocable-grant findings by routine callability ([edcb277](https://github.com/constructive-io/constructive/commit/edcb27760a787d4eb41e1dd8769dc492b1181167))
+- **safegres:** grade routine findings by callability, charge per repair unit ([4595aee](https://github.com/constructive-io/constructive/commit/4595aeeba3e8ad16739136dfce2e062cdb9a310d))
+- **safegres:** read the analyzer version from the manifest, not a generated constant ([24356df](https://github.com/constructive-io/constructive/commit/24356dfdff805b4754b9b671a8b202bf2de0d70f))
+
+### Features
+
+- **safegres:** a first-party GitHub Action wrapping the config-driven audit ([f266b1a](https://github.com/constructive-io/constructive/commit/f266b1aeb3ed4611847b06a9299cdf0b1fd57505))
+- **safegres:** add L21 revocable-grant rule (granted − reachable) ([d48121d](https://github.com/constructive-io/constructive/commit/d48121d5c97670557db37beb93cccd9d896a7eeb))
+- **safegres:** extends a local file, a config schema, and a negative perf corpus ([7f4b143](https://github.com/constructive-io/constructive/commit/7f4b1432820958a4c793bd341b143f692c834c23))
+- **safegres:** L13 — column-level ACLs, the grants relacl never showed ([0f34f49](https://github.com/constructive-io/constructive/commit/0f34f491deae7d58b5ca9e08f40b112c6867812b))
+- **safegres:** L14 — a definer view's reach into a schema the audit never read ([33b97dd](https://github.com/constructive-io/constructive/commit/33b97dda508f450112bf888a2e61169845162ac6))
+- **safegres:** L15 — a writable view's filter is a read filter without WITH CHECK OPTION ([3f29904](https://github.com/constructive-io/constructive/commit/3f29904d2f30db03d6f2e26164ad341087b58339))
+- **safegres:** L15-L17 - opaque-tainted reach, and the objects that are not tables ([9237f89](https://github.com/constructive-io/constructive/commit/9237f89f929476c996e1e45214032e124a4242cf))
+- **safegres:** L19/L20 — SECURITY DEFINER function bodies as role reach ([036d399](https://github.com/constructive-io/constructive/commit/036d3995a12c4d1ef94f1c502003746617201b7f))
+- **safegres:** L8 reads the projection, not just the relation ([03cb1c0](https://github.com/constructive-io/constructive/commit/03cb1c035916e7ac9b49978bb40b9e4b5b23c181))
+- **safegres:** named scorecards — one report, several graded questions ([1f87d17](https://github.com/constructive-io/constructive/commit/1f87d17f816958cd4824d1ccc5fd11df9d2b8d47))
+
 # [1.18.0](https://github.com/constructive-io/constructive/compare/safegres@1.17.0...safegres@1.18.0) (2026-08-02)
 
 **Note:** Version bump only for package safegres

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.21.0...@pgpmjs/transform@0.22.0) (2026-08-03)
+
+### Features
+
+- **pgpm:** ledger-aware diff — workspace sides, pgpm_migrate classification, and ledger backfill ([cf2c4c1](https://github.com/constructive-io/constructive/commit/cf2c4c1bd402a761ac1a98d1d183ed745a2b5be3))
+- **pgpm:** non-pgpm DB adoption (migrate baseline / import --baseline) + tag resolution at ingestion seam ([06dc660](https://github.com/constructive-io/constructive/commit/06dc6609c822267f2dce58288598546456da745c))
+
 # [0.21.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.20.1...@pgpmjs/transform@0.21.0) (2026-08-02)
 
 **Note:** Version bump only for package @pgpmjs/transform

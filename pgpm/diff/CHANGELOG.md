@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.2.0...@pgpmjs/diff@0.3.0) (2026-08-03)
+
+### Features
+
+- **pgpm:** ledger-aware diff — workspace sides, pgpm_migrate classification, and ledger backfill ([cf2c4c1](https://github.com/constructive-io/constructive/commit/cf2c4c1bd402a761ac1a98d1d183ed745a2b5be3))
+
 # [0.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.1.3...@pgpmjs/diff@0.2.0) (2026-08-02)
 
 **Note:** Version bump only for package @pgpmjs/diff
