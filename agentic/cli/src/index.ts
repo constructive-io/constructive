@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { init, skillsList, skillsUpdate, usage } from './commands';
+import { init, login, logout, skillsList, skillsUpdate, usage, whoami } from './commands';
 import { loadConfig } from './config';
 import { materializeDbTools } from './db-tools';
 import { assembleSkills } from './skills';
@@ -21,6 +21,18 @@ async function run(args: string[]): Promise<void> {
   }
   if (first === 'init') {
     await init(config, {});
+    return;
+  }
+  if (first === 'login') {
+    await login(config, {});
+    return;
+  }
+  if (first === 'logout') {
+    await logout(config);
+    return;
+  }
+  if (first === 'whoami') {
+    whoami(config);
     return;
   }
   if (first === 'skills') {
