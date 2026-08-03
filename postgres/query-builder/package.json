@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "pg-ast": "workspace:^",
-    "pgsql-deparser": "^18.3.2",
+    "pgsql-deparser": "^18.3.3",
     "query-spec": "workspace:^"
   }
 }
