@@ -244,6 +244,19 @@
               "type": "number",
               "description": "Cap on one rule’s total deduction (weighted model)"
             },
+            "maxRuleDensity": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "description": "Fraction"
+                },
+                {
+                  "type": "boolean",
+                  "description": "false to disable"
+                }
+              ],
+              "description": "Cap on one rule’s contribution, as a fraction of the points that fail an audit alone. Default 0.5; false disables the cap."
+            },
             "failClosedWeight": {
               "type": "number",
               "description": "Multiplier for fail-closed findings. Default 0."
@@ -524,6 +537,19 @@
         "maxDeductionPerRule": {
           "type": "number",
           "description": "Cap on one rule’s total deduction (weighted model)"
+        },
+        "maxRuleDensity": {
+          "anyOf": [
+            {
+              "type": "number",
+              "description": "Fraction"
+            },
+            {
+              "type": "boolean",
+              "description": "false to disable"
+            }
+          ],
+          "description": "Cap on one rule’s contribution, as a fraction of the points that fail an audit alone. Default 0.5; false disables the cap."
         },
         "failClosedWeight": {
           "type": "number",

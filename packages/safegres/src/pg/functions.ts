@@ -7,7 +7,7 @@
  * is pinned, the language, the body source, and EXECUTE grants per role.
  */
 
-import type { QueryExecutor } from './introspect';
+import type { ExtensionScopeOptions, QueryExecutor } from './introspect';
 
 export interface FunctionGrant {
   role: string;
@@ -53,6 +53,39 @@ const DEFAULT_EXCLUDES = ['pg_catalog', 'information_schema', 'pg_toast'];
 export interface IntrospectFunctionOptions {
   schemas?: string[];
   excludeSchemas?: string[];
+  extensions?: ExtensionScopeOptions;
+}
+
+/**
+ * Extension scoping for routines. The table-side filter reads ownership off
+ * `pg_class`; a function's is on `pg_proc`, and nothing about a routine is
+ * inherited the way a partition inherits its parent's dependency — so this is
+ * the same rule expressed against the other catalog, not a shared helper.
+ *
+ * Without it `extensions.ignore` narrowed the relation rules and left the
+ * routine rules reading the extension's own bodies: `pg_partman` alone
+ * accounted for every C1 finding and 60% of C4 on a real audit.
+ */
+function routineExtensionFilter(
+  options: ExtensionScopeOptions | undefined,
+  paramIndex: number
+): string {
+  const clauses: string[] = [];
+  if (options?.skipOwned ?? true) {
+    clauses.push(`
+        AND NOT EXISTS (
+          SELECT 1 FROM pg_depend d
+          WHERE d.classid = 'pg_proc'::regclass
+            AND d.refclassid = 'pg_extension'::regclass
+            AND d.deptype = 'e'
+            AND d.objid = p.oid
+        )`);
+  }
+  clauses.push(`
+        AND NOT (n.oid = ANY (
+          SELECT e.extnamespace FROM pg_extension e WHERE e.extname = ANY($${paramIndex}::text[])
+        ))`);
+  return clauses.join('');
 }
 
 export async function introspectFunctions(
@@ -63,10 +96,12 @@ export async function introspectFunctions(
   const schemaFilter = options.schemas && options.schemas.length > 0
     ? `AND n.nspname = ANY($1::text[])`
     : `AND NOT (n.nspname = ANY($2::text[]))`;
+  const extFilter = routineExtensionFilter(options.extensions, 3);
 
   const sql = `
     WITH _params AS (
-      SELECT $1::text[] AS include_schemas, $2::text[] AS exclude_schemas
+      SELECT $1::text[] AS include_schemas, $2::text[] AS exclude_schemas,
+             $3::text[] AS ignore_extensions
     ),
     procs AS (
       SELECT
@@ -93,7 +128,7 @@ export async function introspectFunctions(
       JOIN pg_language l  ON l.oid = p.prolang
       LEFT JOIN pg_roles o ON o.oid = p.proowner
       WHERE p.prokind IN ('f', 'p')
-        ${schemaFilter}
+        ${schemaFilter}${extFilter}
     ),
     grants AS (
       SELECT
@@ -144,7 +179,7 @@ export async function introspectFunctions(
     definition: string | null;
     grants: Array<{ role: string; grantable: boolean }>;
     default_acl: boolean;
-  }>(sql, [options.schemas ?? [], excludes]);
+  }>(sql, [options.schemas ?? [], excludes, options.extensions?.ignore ?? []]);
 
   return rows.map((r) => ({
     oid: r.oid,

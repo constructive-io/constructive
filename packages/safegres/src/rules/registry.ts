@@ -30,11 +30,41 @@ export interface RuleMeta {
    * read function definitions rather than the catalog, and run their own pass.
    */
   scope: 'table' | 'policy-ast' | 'index' | 'stats' | 'function-src';
+  /**
+   * What the finding is *about*, which decides how its exposure is judged.
+   *
+   * A `relation` finding is exposed when its table is on the API surface. A
+   * `routine` finding is exposed when an untrusted role can *call the
+   * function* — schema USAGE plus EXECUTE — which is a different question and
+   * frequently a different answer: a definer function in a private schema is
+   * off the API surface and still one grant away from anonymous.
+   *
+   * Judging routine findings by relation reach is why a real audit reported
+   * every `C*` and `L19` finding as `exposed: false`, and therefore scored
+   * them at zero. Defaults to `relation`.
+   */
+  subject?: 'relation' | 'routine';
+  /**
+   * The finding's unit of repair, as a dotted path into the finding
+   * (`context.function`). The score counts *distinct* units, not findings,
+   * so a rule that emits one finding per (relation × function) pair moves the
+   * score by how much work it represents rather than by its own fan-out.
+   *
+   * L19 is the case that forced this: 568 findings over 166 functions, where
+   * promoting the rule one notch took the audit from A+ to F on multiplicity
+   * alone. Omitted means one finding is one unit.
+   */
+  dedupBy?: string;
 }
 
 /** The scoring axis a rule belongs to (`security` unless declared otherwise). */
 export function dimensionOf(meta: RuleMeta): Dimension {
   return meta.dimension ?? 'security';
+}
+
+/** What a rule's findings are about (`relation` unless declared otherwise). */
+export function subjectOf(meta: RuleMeta): 'relation' | 'routine' {
+  return meta.subject ?? 'relation';
 }
 
 export const RULES: RuleMeta[] = [
@@ -369,7 +399,12 @@ export const RULES: RuleMeta[] = [
     defaultSeverity: 'info',
     direction: 'fail-open',
     title: 'Definer-function reach — an untrusted role touches a relation by executing a SECURITY DEFINER function (options: { roles: [...] })',
-    scope: 'table'
+    scope: 'table',
+    // The reach is the function's, not the relation's: a definer function in
+    // an unexposed schema still runs as its owner for whoever holds EXECUTE.
+    subject: 'routine',
+    // One finding per (relation × function) pair, but one revoke per function.
+    dedupBy: 'context.function'
   },
   {
     code: 'L20',
@@ -381,7 +416,9 @@ export const RULES: RuleMeta[] = [
     defaultSeverity: 'info',
     direction: 'fail-open',
     title: 'INSTEAD OF trigger write — an untrusted role writes a relation through a trigger function that runs as its owner (options: { roles: [...] })',
-    scope: 'table'
+    scope: 'table',
+    subject: 'routine',
+    dedupBy: 'context.function'
   },
   {
     code: 'L21',
@@ -537,7 +574,8 @@ export const RULES: RuleMeta[] = [
     defaultSeverity: 'high',
     direction: 'fail-open',
     title: 'Function sets search_path (house rule: never set it — fully-qualify instead)',
-    scope: 'function-src'
+    scope: 'function-src',
+    subject: 'routine'
   },
   {
     code: 'C2',
@@ -545,7 +583,8 @@ export const RULES: RuleMeta[] = [
     defaultSeverity: 'medium',
     direction: 'neutral',
     title: 'Function uses a #variable_conflict directive',
-    scope: 'function-src'
+    scope: 'function-src',
+    subject: 'routine'
   },
   {
     code: 'C3',
@@ -553,7 +592,10 @@ export const RULES: RuleMeta[] = [
     defaultSeverity: 'low',
     direction: 'neutral',
     title: 'Function has an unqualified relation reference (relies on search_path)',
-    scope: 'function-src'
+    scope: 'function-src',
+    subject: 'routine',
+    // Every unqualified reference in one body is one edit to that body.
+    dedupBy: 'context.function'
   },
   {
     code: 'C4',
@@ -561,7 +603,9 @@ export const RULES: RuleMeta[] = [
     defaultSeverity: 'high',
     direction: 'fail-open',
     title: 'Function uses dynamic SQL (waivable with a categorized reason)',
-    scope: 'function-src'
+    scope: 'function-src',
+    subject: 'routine',
+    dedupBy: 'context.function'
   }
 ];
 

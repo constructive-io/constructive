@@ -91,6 +91,38 @@ describe('extension-owned relations', () => {
     expect(tables(report.findings)).toContain('fx_ext.app_widget');
   });
 
+  it('applies the same exclusions to routines, which the convention linter reads', async () => {
+    // The linter reads function bodies, and an extension's bodies are not the
+    // application's to fix. Before this, `extensions.ignore` filtered
+    // relations only, so partman's 300-odd functions arrived as house-style
+    // violations against a house that did not write them.
+    const fns = (findings: Finding[]) =>
+      [...new Set(
+        findings
+          .filter((f) => f.category === 'convention')
+          .map((f) => (f.context as { function?: string }).function?.replace(/\(.*$/, ''))
+      )];
+
+    const report = await audit(pg.client as never, {
+      schemas: SCHEMAS,
+      extensions: { ignore: ['pg_trgm'] },
+      config: { rules: { C1: 'high', C4: 'high' } }
+    });
+    const found = fns(report.findings);
+
+    expect(found).toContain('fx_ext.app_helper');
+    expect(found).not.toContain('fx_ext.ext_helper');       // extension-owned
+    expect(found).not.toContain('fx_ext_runtime.runtime_helper'); // ignored schema
+
+    // Ask for them and they arrive: the extension author is the audience.
+    const audited = await audit(pg.client as never, {
+      schemas: SCHEMAS,
+      extensions: { skipOwned: false },
+      config: { rules: { C1: 'high', C4: 'high' } }
+    });
+    expect(fns(audited.findings)).toContain('fx_ext.ext_helper');
+  });
+
   it('the constructive preset ships pg_partman in the ignore list', () => {
     const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'safegres-'));
     const { config } = loadConfig({ cwd, preset: 'constructive' });

@@ -91,6 +91,7 @@ import { configFingerprint } from '../config/fingerprint';
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { resolvePlaneReach, scorePlane, stampPlanes } from '../exposure/planes';
+import { resolveRoutineReach } from '../exposure/routines';
 import { LINT_RULES, LINT_RULES_BY_ID, lintDefinition, type LintProblem, type SuppressedProblem } from '../lint';
 import { type ExplainReport, proveFindings } from '../perf/explain';
 import { introspectRoleGraph, introspectSchemaAcls } from '../pg/acl';
@@ -105,7 +106,7 @@ import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { introspectReachInputs } from '../pg/reach-inputs';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
 import { introspectStats, type StatsSnapshot } from '../pg/stats';
-import { dimensionOf, RULES_BY_CODE } from '../rules/registry';
+import { dimensionOf, RULES_BY_CODE, subjectOf } from '../rules/registry';
 import { computeScore } from '../score/score';
 import type { ExposureReport, Finding, PerfReport, PerfStatsReport, Report, RoleAccessReport } from '../types';
 import { summarize } from '../types';
@@ -176,6 +177,8 @@ export async function audit(
   const config = options.config ?? {};
   const resolved = resolveRules(config);
 
+  const extensions = options.extensions ?? config.extensions;
+
   // Function definitions are read by two independent features (the convention
   // linter and the call graph); introspect them at most once.
   let functionsCache: FunctionSnapshot[] | undefined;
@@ -183,7 +186,8 @@ export async function audit(
     if (!functionsCache) {
       functionsCache = await introspectFunctions(exec, {
         schemas: options.schemas ?? config.schemas,
-        excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+        excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
+        extensions
       });
     }
     return functionsCache;
@@ -221,8 +225,6 @@ export async function audit(
   const unaddressable = new Set(
     (apiReach?.unreachable ?? []).map((r) => `${r.schema}.${r.table}`)
   );
-
-  const extensions = options.extensions ?? config.extensions;
 
   const snapshot = await introspectTables(exec, {
     schemas: options.schemas ?? config.schemas,
@@ -656,6 +658,24 @@ export async function audit(
 
   findings = applyRulesToFindings(resolved, findings);
 
+  // Routine findings are graded by whether an untrusted role can *call the
+  // function*, not by whether its schema is on the API surface — see
+  // `RuleMeta.subject`. Resolved only when such a finding exists, so an audit
+  // with the routine rules off still costs one query less.
+  const routineRoles = [...new Set([...apiRoles, ...(exposure.anonRoles ?? [])])];
+  let routineReach: Set<string> | undefined;
+  const isRoutineExposed = async (schema: string, name: string): Promise<boolean> => {
+    if (!routineReach) {
+      routineReach = resolveRoutineReach(await getFunctions(), {
+        roles: routineRoles,
+        graph: roleGraph,
+        schemaAcls: schemaAclsByName,
+        exposedSchemas
+      });
+    }
+    return routineReach.has(`${schema}.${name}`);
+  };
+
   // Stamp direction (from the registry) and exposure on every finding.
   const publicRead = config.public?.read ?? [];
   const perfIgnore = config.perf?.ignore ?? [];
@@ -670,9 +690,25 @@ export async function audit(
       const viewRef = f.code === 'L14'
         ? (f.context as { view?: string } | undefined)?.view
         : undefined;
-      f.exposed = viewRef
-        ? isExposed(viewRef.slice(0, viewRef.lastIndexOf('.')), viewRef.slice(viewRef.lastIndexOf('.') + 1))
-        : isExposed(f.schema, f.table);
+      // A routine finding names a function somewhere in the finding — in
+      // `context.function` for the reach rules, in `schema`/`table` for the
+      // convention linter, which files a function under the fields a relation
+      // finding uses.
+      const routineRef = meta && subjectOf(meta) === 'routine'
+        ? (f.context as { function?: string } | undefined)?.function?.replace(/\(.*$/, '')
+          ?? (f.table ? `${f.schema}.${f.table}` : undefined)
+        : undefined;
+      if (routineRef) {
+        const dot = routineRef.lastIndexOf('.');
+        f.exposed = await isRoutineExposed(routineRef.slice(0, dot), routineRef.slice(dot + 1));
+      } else if (viewRef) {
+        f.exposed = isExposed(
+          viewRef.slice(0, viewRef.lastIndexOf('.')),
+          viewRef.slice(viewRef.lastIndexOf('.') + 1)
+        );
+      } else {
+        f.exposed = isExposed(f.schema, f.table);
+      }
     }
 
     // A key that looks like a write-once provisioning pointer, where the
