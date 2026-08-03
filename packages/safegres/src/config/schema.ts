@@ -18,6 +18,8 @@ import type {
   PublicConfig,
   ReportConfig,
   SafegresConfig,
+  ScorecardConfig,
+  ScorecardSelector,
   ScoringConfig,
   SourceConfig
 } from './types';
@@ -165,6 +167,31 @@ const PERF: Shape<PerfConfig> = {
   paths: obj('Access-path classification, which decides whether X1 applies', PERF_PATHS)
 };
 
+const SCORECARD_SELECT: Shape<ScorecardSelector> = {
+  rules: list('Rule codes or C* prefix wildcards to grade', str('Rule code or wildcard')),
+  exclude: list('Rule codes or wildcards to drop after rules selected', str('Rule code or wildcard')),
+  dimension: str('Which axis: security (default), perf, or all', ['security', 'perf', 'all']),
+  roles: list('Only findings about these roles', str('Role name')),
+  planes: list('Only findings reachable on these access planes', str('Plane name')),
+  schemas: list('Only findings in these schemas', str('Schema name')),
+  direction: str('fail-open leaks, fail-closed denials, or any', ['fail-open', 'fail-closed', 'none', 'any']),
+  minSeverity: str('Drop findings below this severity before scoring', SEVERITIES),
+  exposure: str('exposed (default) grades the API surface; all ignores exposure', ['exposed', 'all']),
+  acknowledged: str('include grades acknowledged findings too. Default skip.', ['skip', 'include']),
+  severities: str(
+    'configured (default) uses this config\u2019s severities; declared uses each rule\u2019s registry default',
+    ['configured', 'declared']
+  ),
+  denominator: str('Density denominator: exposed relations (default) or all', ['exposed', 'all'])
+};
+
+const SCORECARD: Shape<ScorecardConfig> = {
+  ...SCORING,
+  title: str('Heading for reports. Defaults to the config key.'),
+  description: str('What decision this score informs. Rendered with it.'),
+  select: obj('Which findings it grades', SCORECARD_SELECT)
+};
+
 const FAIL_ON_PLANE: Shape<PlaneFailOnConfig> = {
   score: num('Exit non-zero below this plane score'),
   grade: str('Exit non-zero below this plane grade', GRADES)
@@ -180,6 +207,11 @@ const FAIL_ON: Shape<FailOnConfig> = {
     type: 'record',
     description: 'Per-plane gates, keyed by plane name. A floor is the useful shape.',
     values: obj('One plane gate', FAIL_ON_PLANE)
+  },
+  scorecards: {
+    type: 'record',
+    description: 'Per-scorecard gates, keyed by scorecard name.',
+    values: obj('One scorecard gate', FAIL_ON_PLANE)
   }
 };
 
@@ -271,6 +303,11 @@ export const CONFIG_SHAPE: Shape<SafegresConfig> = {
   rules: RULES,
   overrides: list('Per-scope retuning, ESLint overrides-style', obj('One override', OVERRIDE)),
   scoring: obj('The security scoring model', SCORING),
+  scorecards: {
+    type: 'record',
+    description: 'Named scores over slices of the same findings, keyed by name',
+    values: obj('One scorecard', SCORECARD)
+  },
   failOn: obj('Gates \u2014 what makes the run exit non-zero', FAIL_ON),
   source: obj('Where the database to audit comes from', SOURCE),
   outputs: obj('Files a single run writes', OUTPUTS),

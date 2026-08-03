@@ -265,6 +265,13 @@ export interface Report {
    * into gating.
    */
   planes?: PlaneReport[];
+  /**
+   * Named scores over slices of the same findings (`scorecards` config), the
+   * reserved `default` and `raw` cards first. Different teams gate on
+   * different questions; this is where each one's answer lives, computed
+   * from the one set of findings so they can never disagree about the facts.
+   */
+  scorecards?: import('./score/scorecards').ScorecardReport[];
   /** Effective per-role access, for the configured untrusted roles. */
   roleAccess?: RoleAccessReport;
   /**

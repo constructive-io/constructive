@@ -102,6 +102,7 @@ import { listAuditableRoles, resolveRoles } from '../pg/roles';
 import { introspectStats, type StatsSnapshot } from '../pg/stats';
 import { dimensionOf, RULES_BY_CODE, subjectOf } from '../rules/registry';
 import { computeScore } from '../score/score';
+import { computeScorecards, RESERVED_SCORECARDS } from '../score/scorecards';
 import type { ExposureReport, Finding, PerfReport, PerfStatsReport, Report, RoleAccessReport } from '../types';
 import { summarize } from '../types';
 import { version as PKG_VERSION } from '../version';
@@ -864,6 +865,16 @@ export async function audit(
 
     report.perf = perf;
   }
+
+  // Scorecards last: they are named questions asked of the finished finding
+  // set, so every stamp a scorecard can select on (exposure, planes, perf
+  // dimension) is already on the findings by now.
+  report.scorecards = computeScorecards(
+    findings,
+    report.score!,
+    { ...RESERVED_SCORECARDS, ...(config.scorecards ?? {}) },
+    { exposedTables, totalTables: snapshot.length, exposureKnown: exposure.known }
+  );
 
   if (options.callGraph) {
     const functions = await getFunctions();

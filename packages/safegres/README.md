@@ -732,6 +732,47 @@ Every report carries its own arithmetic: per-rule points, grade, and the **payof
 score would move if that rule's findings went away. Gate with `--fail-on <severity>`,
 `--fail-on-score <n>`, `--fail-on-grade <g>` and their `--fail-on-perf-*` counterparts.
 
+### Scorecards: one report, several questions
+
+"How secure is this database" is not one question, and a single grade answers it for at most one
+reader. A platform team gates on what an unauthenticated caller reaches; an application team gates
+on house style; a reviewer wants the number no preset softened. A **scorecard** is that question
+written down — a selector over the findings, plus the weighting to grade what it selects:
+
+```jsonc
+{
+  "scorecards": {
+    "anon-surface": {
+      "description": "What an unauthenticated caller reaches.",
+      "select": { "roles": ["anonymous"], "direction": "fail-open", "exposure": "all" },
+      "perRuleWeights": { "L19": 10 },
+      "floorOnCritical": "C"
+    },
+    "sql-conventions": {
+      "select": { "rules": ["C*"], "exposure": "all", "denominator": "all" }
+    }
+  },
+  "failOn": { "scorecards": { "anon-surface": { "grade": "A" } } }
+}
+```
+
+Selectors narrow on `rules` (with `C*` wildcards) and `exclude`, `dimension`, `roles`, `planes`,
+`schemas`, `direction`, `minSeverity`, `exposure`, `acknowledged`, `severities` and `denominator`.
+Every scoring key is available per card, and `failOn.scorecards` gates on the one that matters to
+you rather than on somebody else's headline.
+
+Two cards always run and cannot be redefined into something flattering:
+
+- **`default`** — the Safegres score: the headline, exposure-scoped and preset-tuned, i.e. graded
+  the way you actually use the database. Naming it in the config cannot move it.
+- **`raw`** — every finding at its *declared* (registry) severity, exposure ignored,
+  acknowledgements included, fail-closed findings weighted like anything else. Not flattering, and
+  not meant to be: it is the number that is comparable between two databases and that no
+  configuration talked down.
+
+A scorecard decides what a number is *about* — never what is reported. `report.findings` is always
+the complete set, so the JSON is the raw data and the scores are queries over it.
+
 ## Commands
 
 ```bash

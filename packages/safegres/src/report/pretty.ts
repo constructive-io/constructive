@@ -104,6 +104,10 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     lines.push('');
   }
 
+  if (view.has('scorecards')) {
+    lines.push(...scorecardLines(view, colorEnabled), '');
+  }
+
   if (view.has('planes')) {
     lines.push(...planeLines(view, colorEnabled), '');
   }
@@ -269,6 +273,26 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
   }
 
   return lines.join('\n');
+}
+
+/**
+ * The other named scores. One line each: the headline answers the question
+ * the preset was written for, and these answer the ones a particular team
+ * actually gates on. `raw` sits among them deliberately — a number no
+ * configuration softened, next to the one that was.
+ */
+function scorecardLines(view: ReportView, colorEnabled: boolean): string[] {
+  const lines = ['scorecards — the same findings, scored by question:'];
+  for (const card of view.scorecards) {
+    const grade = colorEnabled
+      ? gradePaintFor(card.score)(`${card.score.value} (${card.score.grade})`)
+      : `${card.score.value} (${card.score.grade})`;
+    lines.push(
+      `  ${card.name}: ${grade}  — ${card.findings} finding(s)`
+        + (card.description ? `  ${card.description}` : '')
+    );
+  }
+  return lines;
 }
 
 /**

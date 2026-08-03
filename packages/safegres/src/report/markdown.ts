@@ -74,6 +74,8 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
     );
   }
 
+  if (view.has('scorecards')) out.push(...scorecardSection(view), '');
+
   if (view.has('planes')) out.push(...planeSection(view), '');
 
   out.push(countsTable(report), '');
@@ -158,6 +160,31 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
  * working as designed — so they read as context under the headline rather
  * than as a second verdict competing with it.
  */
+/**
+ * The other named scores. Same findings, different questions — which is the
+ * point: a team that gates on `anon-surface` is not being asked to care
+ * about the headline, and `raw` is there so nobody has to trust that the
+ * config was written in good faith.
+ */
+function scorecardSection(view: ReportView): string[] {
+  const out: string[] = [
+    '### Scorecards',
+    '',
+    '_The same findings, scored by question. Nothing here filters the report — '
+      + 'a scorecard decides what a number is *about*, never what is reported._',
+    '',
+    '| Scorecard | Score | Grade | Findings | Question |',
+    '| --- | ---: | --- | ---: | --- |'
+  ];
+  for (const card of view.scorecards) {
+    out.push(
+      `| \`${card.name}\` | ${card.score.value} | **${card.score.grade}** | ${card.findings} `
+        + `| ${card.description ?? card.title ?? ''} |`
+    );
+  }
+  return out;
+}
+
 function planeSection(view: ReportView): string[] {
   const out: string[] = [
     '### Other access planes',
