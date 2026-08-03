@@ -12,7 +12,8 @@ export {
   constructiveDefaults,
   constructiveGraphqlDefaults,
   ConstructiveGraphQLOptions,
-  ConstructiveOptions} from './constructive';
+  ConstructiveOptions,
+  OAuthOptions} from './constructive';
 
 // Export GraphQL adapter types
 export {

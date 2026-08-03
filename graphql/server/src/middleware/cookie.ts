@@ -1,3 +1,4 @@
+import { getNodeEnv } from '@pgpmjs/env';
 import type { Request, Response } from 'express';
 
 import type { AuthSettings } from '../types';
@@ -31,7 +32,7 @@ export const getSessionCookieConfig = (
   const maxAge = pgIntervalToSeconds(configuredMaxAge) ?? DEFAULT_MAX_AGE;
 
   return {
-    secure: authSettings?.cookieSecure ?? process.env.NODE_ENV === 'production',
+    secure: authSettings?.cookieSecure ?? getNodeEnv() === 'production',
     sameSite:
       (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
     domain: authSettings?.cookieDomain ?? undefined,
@@ -48,7 +49,7 @@ export const getDeviceTokenCookieConfig = (
   authSettings?: AuthSettings
 ): CookieConfig => {
   return {
-    secure: authSettings?.cookieSecure ?? process.env.NODE_ENV === 'production',
+    secure: authSettings?.cookieSecure ?? getNodeEnv() === 'production',
     sameSite:
       (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
     domain: authSettings?.cookieDomain ?? undefined,

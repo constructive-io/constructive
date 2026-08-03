@@ -1,7 +1,7 @@
 import { BucketProvider,PgpmOptions } from '@pgpmjs/types';
-import { parseEnvBoolean, parseEnvList, parseEnvNumber } from '12factor-env';
+import { getNodeEnv, parseEnvBoolean, parseEnvList, parseEnvNumber } from '12factor-env';
 
-export { parseEnvBoolean, parseEnvList, parseEnvNumber };
+export { getNodeEnv, parseEnvBoolean, parseEnvList, parseEnvNumber };
 
 /**
  * Parse core PGPM environment variables.
@@ -78,10 +78,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     SMTP_MAX_MESSAGES,
     SMTP_NAME,
     SMTP_LOGGER,
-    SMTP_DEBUG,
-
-    // OAuth env vars
-    OAUTH_STATE_SECRET
+    SMTP_DEBUG
   } = env;
 
   return {
@@ -176,17 +173,6 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...(SMTP_NAME && { name: SMTP_NAME }),
       ...(SMTP_LOGGER && { logger: parseEnvBoolean(SMTP_LOGGER) }),
       ...(SMTP_DEBUG && { debug: parseEnvBoolean(SMTP_DEBUG) }),
-    },
-    oauth: {
-      ...(OAUTH_STATE_SECRET && { stateSecret: OAUTH_STATE_SECRET }),
     }
   };
-};
-
-type NodeEnv = 'development' | 'production' | 'test';
-
-export const getNodeEnv = (): NodeEnv => {
-  const env = process.env.NODE_ENV?.toLowerCase();
-  if (env === 'production' || env === 'test') return env;
-  return 'development';
 };

@@ -75,7 +75,7 @@ function getStateSecret(opts: ConstructiveOptions): string | undefined {
 function requireStateSecret(opts: ConstructiveOptions): string {
   const secret = getStateSecret(opts);
   if (!secret) {
-    throw new Error('OAUTH_STATE_SECRET environment variable is required');
+    throw new Error('OAuth state secret is missing from validated server options');
   }
   return secret;
 }

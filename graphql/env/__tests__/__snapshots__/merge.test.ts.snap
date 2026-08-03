@@ -80,7 +80,9 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
       "useTx": false,
     },
   },
-  "oauth": {},
+  "oauth": {
+    "enabled": false,
+  },
   "pg": {
     "database": "config-db",
     "host": "override-host",

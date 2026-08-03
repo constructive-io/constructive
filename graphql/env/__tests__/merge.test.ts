@@ -4,6 +4,7 @@ import * as path from 'path';
 
 import { getGraphQLEnvVars } from '../src/env';
 import { getEnvOptions } from '../src/merge';
+import { DEV_OAUTH_STATE_SECRET, validateOAuthOptions } from '../src/oauth';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
   fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
@@ -156,6 +157,122 @@ describe('getEnvOptions', () => {
         baseUrl: 'http://localhost:4000'
       }
     });
+  });
+
+  it('parses OAuth environment variables into typed options', () => {
+    const stateSecret = 'e'.repeat(32);
+    const result = getGraphQLEnvVars({
+      OAUTH_ENABLED: 'true',
+      OAUTH_STATE_SECRET: stateSecret
+    });
+
+    expect(result.oauth).toEqual({
+      enabled: true,
+      stateSecret
+    });
+  });
+
+  it('rejects non-standard OAuth boolean values', () => {
+    expect(() => getGraphQLEnvVars({ OAUTH_ENABLED: 'yes' })).toThrow(
+      /OAUTH_ENABLED/
+    );
+  });
+
+  it('keeps OAuth disabled by default without requiring a secret', () => {
+    const result = getEnvOptions({}, process.cwd(), {});
+
+    expect(result.oauth).toEqual({ enabled: false });
+  });
+
+  it('does not validate the state secret while OAuth is explicitly disabled', () => {
+    const result = getEnvOptions({}, process.cwd(), {
+      OAUTH_ENABLED: 'false',
+      OAUTH_STATE_SECRET: 'short'
+    });
+
+    expect(result.oauth?.enabled).toBe(false);
+  });
+
+  it('uses a development-only state secret when OAuth is enabled locally', () => {
+    const result = getEnvOptions({}, process.cwd(), {
+      OAUTH_ENABLED: 'true'
+    });
+
+    expect(result.oauth).toEqual({
+      enabled: true,
+      stateSecret: DEV_OAUTH_STATE_SECRET
+    });
+  });
+
+  it('requires the OAuth state secret at startup in production', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    try {
+      expect(() =>
+        getEnvOptions({}, process.cwd(), {
+          NODE_ENV: 'production',
+          OAUTH_ENABLED: 'true'
+        })
+      ).toThrow(/OAUTH_STATE_SECRET/);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it.each([
+    ['too short', 'short'],
+    ['blank', ' '.repeat(32)],
+    ['surrounding whitespace', ` ${'s'.repeat(32)}`]
+  ])('rejects a %s OAuth state secret', (_description, stateSecret) => {
+    expect(() =>
+      getEnvOptions({}, process.cwd(), {
+        NODE_ENV: 'test',
+        OAUTH_ENABLED: 'true',
+        OAUTH_STATE_SECRET: stateSecret
+      })
+    ).toThrow(/OAUTH_STATE_SECRET/);
+  });
+
+  it('applies config, env, and runtime precedence before OAuth validation', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-oauth-'));
+    writeConfig(tempDir, {
+      oauth: {
+        enabled: true,
+        stateSecret: 'c'.repeat(32)
+      }
+    });
+
+    const result = getEnvOptions(
+      {
+        oauth: {
+          stateSecret: 'r'.repeat(32)
+        }
+      },
+      tempDir,
+      {
+        OAUTH_STATE_SECRET: 'e'.repeat(32)
+      }
+    );
+
+    expect(result.oauth).toEqual({
+      enabled: true,
+      stateSecret: 'r'.repeat(32)
+    });
+  });
+
+  it('allows a runtime override to satisfy the production secret requirement', () => {
+    const stateSecret = 'r'.repeat(32);
+    const result = validateOAuthOptions(
+      {
+        oauth: {
+          enabled: true,
+          stateSecret
+        }
+      },
+      { NODE_ENV: 'production' }
+    );
+
+    expect(result.oauth).toEqual({ enabled: true, stateSecret });
   });
 
   it('accepts custom SMS provider names', () => {

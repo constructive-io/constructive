@@ -1,6 +1,8 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 
+import { parseOAuthEnabled } from './oauth';
+
 /**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
@@ -30,7 +32,10 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     SMS_SENDER_ID,
     SMS_REQUEST_TIMEOUT_MS,
     SEND_SMS_DRY_RUN,
-    DEVSMS_BASE_URL
+    DEVSMS_BASE_URL,
+
+    OAUTH_ENABLED,
+    OAUTH_STATE_SECRET
   } = env;
 
   // Keep this function as a partial env-override parser. SMS runtime defaults
@@ -45,6 +50,9 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     smsDryRun !== undefined ||
     DEVSMS_BASE_URL
   );
+  const oauthEnabled = parseOAuthEnabled(OAUTH_ENABLED);
+  const hasOAuthEnvOverrides =
+    oauthEnabled !== undefined || OAUTH_STATE_SECRET !== undefined;
 
   return {
     graphile: {
@@ -97,6 +105,14 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
           devsms: {
             baseUrl: DEVSMS_BASE_URL
           }
+        })
+      }
+    }),
+    ...(hasOAuthEnvOverrides && {
+      oauth: {
+        ...(oauthEnabled !== undefined && { enabled: oauthEnabled }),
+        ...(OAUTH_STATE_SECRET !== undefined && {
+          stateSecret: OAUTH_STATE_SECRET
         })
       }
     })

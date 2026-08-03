@@ -18,11 +18,12 @@ git status --short --branch
 
 Prepare two groups of environment variables:
 
-- GraphQL server runtime: `OAUTH_STATE_SECRET`. The server requires this only when a configured OAuth flow starts, then uses it to sign and verify `oauth_state` / `oauth_pkce` cookies.
+- GraphQL server runtime: `OAUTH_ENABLED` and `OAUTH_STATE_SECRET`. OAuth routes are absent unless explicitly enabled. When enabled, startup validates the secret before accepting traffic; production has no fallback.
 - Provider initialization SQL: `GITHUB_OAUTH_*` and `GOOGLE_OAUTH_*`. These are passed into the provider setup `psql` scripts below, then written or rotated into the database. The GraphQL server does not read these provider credential env vars directly.
 
 ```bash
 # GraphQL server runtime.
+export OAUTH_ENABLED=true
 export OAUTH_STATE_SECRET="$(openssl rand -hex 32)"
 
 # Provider initialization scripts only.
@@ -105,6 +106,7 @@ PGPASSWORD=password \
 PGDATABASE=constructive \
 NODE_USE_ENV_PROXY=1 \
 NO_PROXY="localhost,127.0.0.1,::1,.localhost" \
+OAUTH_ENABLED="$OAUTH_ENABLED" \
 OAUTH_STATE_SECRET="$OAUTH_STATE_SECRET" \
 pnpm --filter @constructive-io/graphql-server dev
 ```
@@ -115,7 +117,7 @@ Expected:
 listening at http://localhost:3000
 ```
 
-`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, and `PGDATABASE` are the GraphQL server's database connection settings for this local run. `OAUTH_STATE_SECRET` is the OAuth state-cookie signing secret. `NODE_USE_ENV_PROXY` and `NO_PROXY` control Node's outbound HTTP behavior.
+`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, and `PGDATABASE` are the GraphQL server's database connection settings for this local run. `OAUTH_ENABLED` mounts the OAuth routes, and `OAUTH_STATE_SECRET` is the state-cookie signing secret. Keep the secret in the environment or a runtime override rather than `pgpm.json`; rotating it invalidates in-flight flows (normally no more than the configured state max age). `NODE_USE_ENV_PROXY` and `NO_PROXY` control Node's outbound HTTP behavior.
 
 Keep `NODE_USE_ENV_PROXY=1` when the local network needs `HTTP_PROXY` / `HTTPS_PROXY`. Without it, Node's native `fetch` can fail during OAuth token exchange with `CALLBACK_FAILED` and `TypeError: fetch failed`.
 

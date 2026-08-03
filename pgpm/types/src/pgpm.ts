@@ -132,14 +132,6 @@ export interface CDNOptions {
 }
 
 /**
- * OAuth configuration options
- */
-export interface OAuthOptions {
-    /** Secret key for signing OAuth state and PKCE cookies (HMAC-SHA256) */
-    stateSecret?: string;
-}
-
-/**
  * SMTP email configuration options
  */
 export interface SmtpOptions {
@@ -307,8 +299,6 @@ export interface PgpmOptions {
     errorOutput?: ErrorOutputOptions;
     /** SMTP email configuration */
     smtp?: SmtpOptions;
-    /** OAuth configuration */
-    oauth?: OAuthOptions;
     /**
      * Directory (relative to the workspace root) where pgpm modules are installed
      * by `pgpm install`. Defaults to `extensions`.

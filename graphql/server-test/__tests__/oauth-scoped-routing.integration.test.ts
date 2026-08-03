@@ -2,9 +2,8 @@
  * OAuth route integration on the production scoped-routing server.
  *
  * The shared fixture deliberately does not provision OAuth modules. These
- * assertions prove the route still receives an explicit database/API scope
- * from routing_public and that OAUTH_STATE_SECRET is required lazily only
- * after a configured provider can start a flow.
+ * assertions prove the explicitly enabled route receives a database/API scope
+ * from routing_public and can start a flow with validated OAuth options.
  */
 
 import path from 'path';
@@ -53,6 +52,9 @@ beforeAll(async () => {
     {
       schemas,
       authRole: 'anonymous',
+      oauth: {
+        enabled: true
+      },
       server: {
         useRouting: true,
         api: {
@@ -77,20 +79,23 @@ describe('OAuth routes over scoped routing', () => {
     expect(response.body).toEqual({ providers: ['github'] });
   });
 
-  it('requires the state secret lazily only when a configured flow starts', async () => {
+  it('starts a configured flow with signed state and PKCE cookies', async () => {
     const response = await request.get('/auth/github').set('Host', API_HOST);
 
     expect(response.status).toBe(302);
     const redirect = new URL(response.headers.location);
-    expect(redirect.searchParams.get('error')).toBe('OAUTH_INIT_FAILED');
+    expect(redirect.origin).toBe('https://github.example.test');
+    expect(redirect.pathname).toBe('/authorize');
+    expect(redirect.searchParams.get('client_id')).toBe('scoped-routing-client');
+    expect(redirect.searchParams.get('state')).toBeTruthy();
     const setCookieHeader = response.headers['set-cookie'];
     const setCookies: string[] = Array.isArray(setCookieHeader)
       ? setCookieHeader
       : setCookieHeader
         ? [setCookieHeader]
         : [];
-    expect(setCookies.join('\n')).not.toContain('oauth_state=');
-    expect(setCookies.join('\n')).not.toContain('oauth_pkce=');
+    expect(setCookies.join('\n')).toContain('oauth_state=');
+    expect(setCookies.join('\n')).toContain('oauth_pkce=');
   });
 
   it('does not fall back to a default database for an unknown host', async () => {

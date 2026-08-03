@@ -20,6 +20,16 @@ import { LlmOptions } from './llm';
 import { SmsOptions } from './sms';
 
 /**
+ * OAuth configuration options
+ */
+export interface OAuthOptions {
+  /** Whether OAuth routes are mounted. Defaults to false. */
+  enabled?: boolean;
+  /** Secret key for signing OAuth state and PKCE cookies (HMAC-SHA256). */
+  stateSecret?: string;
+}
+
+/**
  * GraphQL-specific options for Constructive
  */
 export interface ConstructiveGraphQLOptions {
@@ -29,6 +39,8 @@ export interface ConstructiveGraphQLOptions {
   features?: GraphileFeatureOptions;
   /** API configuration options */
   api?: ApiOptions;
+  /** OAuth route and state-cookie configuration */
+  oauth?: OAuthOptions;
 }
 
 /**
@@ -58,6 +70,8 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   llm?: LlmOptions;
   /** SMS provider configuration */
   sms?: SmsOptions;
+  /** OAuth route and state-cookie configuration */
+  oauth?: OAuthOptions;
 }
 
 /**
@@ -66,7 +80,10 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
 export const constructiveGraphqlDefaults: ConstructiveGraphQLOptions = {
   graphile: graphileDefaults,
   features: graphileFeatureDefaults,
-  api: apiDefaults
+  api: apiDefaults,
+  oauth: {
+    enabled: false
+  }
 };
 
 /**
