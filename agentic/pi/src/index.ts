@@ -7,6 +7,7 @@ import { addPoliciesTool } from './tools/add-policies';
 import { addRecordsTool } from './tools/add-records';
 import { addRelationTool } from './tools/add-relation';
 import { describeSchemaTool } from './tools/describe-schema';
+import { manageEntityTypesTool } from './tools/manage-entity-types';
 import { createFieldTool, deleteFieldTool, deleteTableTool, updateFieldTool } from './tools/mutations';
 import { provisionBlueprintTool } from './tools/provision-blueprint';
 import { provisionDatabaseTool } from './tools/provision-database';
@@ -36,6 +37,7 @@ export const dbTools: ExtensionFactory = (pi) => {
   pi.registerTool(updateTemplateTool);
   pi.registerTool(deleteTemplateTool);
   pi.registerTool(addRecordsTool);
+  pi.registerTool(manageEntityTypesTool);
   pi.registerTool(runCodegenTool);
 
   const gate = createConfirmGate({

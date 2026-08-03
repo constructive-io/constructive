@@ -45,7 +45,7 @@ describe('toolSchema', () => {
 });
 
 describe('dbTools extension', () => {
-  it('registers the 16 tools and both gate events', () => {
+  it('registers the 17 tools and both gate events', () => {
     const registered: string[] = [];
     const events: string[] = [];
     const fakePi = {
@@ -54,7 +54,7 @@ describe('dbTools extension', () => {
     };
     (dbTools as (pi: unknown) => void)(fakePi);
 
-    expect(registered).toHaveLength(16);
+    expect(registered).toHaveLength(17);
     expect(registered).toEqual(
       expect.arrayContaining([
         'provision_database',
@@ -67,6 +67,7 @@ describe('dbTools extension', () => {
         'delete_field',
         'add_policies',
         'add_records',
+        'manage_entity_types',
         'run_codegen',
         'list_templates',
         'create_template',
