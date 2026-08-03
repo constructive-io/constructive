@@ -179,7 +179,7 @@ describe('create_api_key execute', () => {
     mockGetHost.mockReturnValue(makeHost() as never);
     mockToken.mockResolvedValue({ token: 'tok' });
     global.fetch = mockFetchWith(true) as never;
-    const client = makeClient([MINTED], { id: 'prin-old', name: 'bot' });
+    const client = makeClient([MINTED], { id: 'prin-row', name: 'bot', userId: 'prin-user' });
     mockCreateClient.mockReturnValue(client);
 
     const result = await run({ key_name: 'k', principal_name: 'bot', entity_ids: ['e-1'] });
@@ -211,15 +211,21 @@ describe('create_api_key execute', () => {
     mockGetHost.mockReturnValue(makeHost() as never);
     mockToken.mockResolvedValue({ token: 'tok' });
     global.fetch = mockFetchWith(true) as never;
-    const client = makeClient([MINTED], { id: 'prin-old', name: 'bot', isReadOnly: false });
+    const client = makeClient([MINTED], {
+      id: 'prin-row',
+      name: 'bot',
+      userId: 'prin-user',
+      isReadOnly: false,
+    });
     mockCreateClient.mockReturnValue(client);
 
     const result = await run({ key_name: 'k', principal_name: 'bot' });
     expect(result.details.success).toBe(true);
-    expect(result.details.principalId).toBe('prin-old');
+    expect(result.details.principalId).toBe('prin-user');
     expect(client.principalEntity.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { principalId: { equalTo: 'prin-old' } } }),
+      expect.objectContaining({ where: { principalId: { equalTo: 'prin-row' } } }),
     );
+    expect(client.mutation.createApiKey.mock.calls[0][0].input.principalId).toBe('prin-user');
   });
 
   it('refuses to reuse an entity-scoped principal for an unscoped key', async () => {
@@ -229,7 +235,7 @@ describe('create_api_key execute', () => {
     global.fetch = mockFetchWith(true) as never;
     const client = makeClient(
       [MINTED],
-      { id: 'prin-old', name: 'bot', isReadOnly: false },
+      { id: 'prin-row', name: 'bot', userId: 'prin-user', isReadOnly: false },
       { id: 'pe-1' },
     );
     mockCreateClient.mockReturnValue(client);
@@ -245,7 +251,7 @@ describe('create_api_key execute', () => {
     mockGetHost.mockReturnValue(makeHost() as never);
     mockToken.mockResolvedValue({ token: 'tok' });
     global.fetch = mockFetchWith(true) as never;
-    const client = makeClient([MINTED], { id: 'prin-old', name: 'bot', isReadOnly: true });
+    const client = makeClient([MINTED], { id: 'prin-row', name: 'bot', userId: 'prin-user', isReadOnly: true });
     mockCreateClient.mockReturnValue(client);
 
     const result = await run({ key_name: 'k', principal_name: 'bot' });

@@ -174,20 +174,22 @@ export const createApiKeyTool: ToolDefinition<typeof CreateApiKeySchema, CreateA
       const existing = await dbAuth.principal
         .findFirst({
           where: { name: { equalTo: principalName } },
-          select: { id: true, name: true, isReadOnly: true },
+          select: { id: true, name: true, userId: true, isReadOnly: true },
         })
         .unwrap();
 
-      let principalId = existing.principal?.id;
-      if (principalId && scoped) {
+      // createApiKey (like createPrincipal.result) takes the principal's
+      // identity userId; principal_entity.principalId references the row id.
+      let principalId = existing.principal?.userId;
+      if (existing.principal && scoped) {
         return fail(
           `Principal "${principalName}" already exists, and its scope cannot be verified against the requested one. No key was minted. Use a new principal_name for a scoped key, or mint an unscoped key on the existing principal explicitly.`,
         );
       }
-      if (principalId) {
+      if (existing.principal) {
         const scopeRow = await dbAuth.principalEntity
           .findFirst({
-            where: { principalId: { equalTo: principalId } },
+            where: { principalId: { equalTo: existing.principal.id } },
             select: { id: true },
           })
           .unwrap();
