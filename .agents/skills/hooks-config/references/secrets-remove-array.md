@@ -7,7 +7,7 @@ React Query mutation hook for _secretsRemoveArray
 ## Usage
 
 ```typescript
-const { mutate } = use_secretsRemoveArrayMutation(); mutate({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretNames: '<String>' } });
+const { mutate } = use_secretsRemoveArrayMutation(); mutate({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', realm: '<String>', secretNames: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = use_secretsRemoveArrayMutation(); mutate({ input: { databaseI
 
 ```typescript
 const { mutate, isLoading } = use_secretsRemoveArrayMutation();
-mutate({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretNames: '<String>' } });
+mutate({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', realm: '<String>', secretNames: '<String>' } });
 ```

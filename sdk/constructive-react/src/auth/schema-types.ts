@@ -1163,10 +1163,6 @@ export interface RoleTypeFilter {
   not?: RoleTypeFilter;
   /** Checks for any expressions in this list. */
   or?: RoleTypeFilter[];
-  /** Filter by the object’s `usersByType` relation. */
-  usersByType?: RoleTypeToManyUserFilter;
-  /** `usersByType` exist. */
-  usersByTypeExist?: boolean;
 }
 /** An input for mutations affecting `RoleType` */
 export interface RoleTypeInput {
@@ -1177,15 +1173,6 @@ export interface RoleTypeInput {
 export interface RoleTypePatch {
   id?: number;
   name?: string;
-}
-/** A filter to be used against many `User` object types. All fields are combined with a logical ‘and.’ */
-export interface RoleTypeToManyUserFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: UserFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: UserFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: UserFilter;
 }
 export interface SendAccountDeletionEmailInput {
   clientMutationId?: string;
@@ -1408,48 +1395,32 @@ export interface UserConnectedAccountFilter {
 export interface UserFilter {
   /** Checks for all expressions in this list. */
   and?: UserFilter[];
-  /** Filter by the object’s `auditLogAuthsByActorId` relation. */
-  auditLogAuthsByActorId?: UserToManyAuditLogAuthFilter;
-  /** `auditLogAuthsByActorId` exist. */
-  auditLogAuthsByActorIdExist?: boolean;
+  /** Filter by the object’s `authAuditLog` relation. */
+  authAuditLog?: UserToManyAuditLogAuthFilter;
+  /** `authAuditLog` exist. */
+  authAuditLogExist?: boolean;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `cryptoAddresses` relation. */
+  cryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `cryptoAddresses` exist. */
+  cryptoAddressesExist?: boolean;
   /** Filter by the object’s `displayName` field. */
   displayName?: StringTrgmFilter;
+  /** Filter by the object’s `emails` relation. */
+  emails?: UserToManyEmailFilter;
+  /** `emails` exist. */
+  emailsExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
   not?: UserFilter;
   /** Checks for any expressions in this list. */
   or?: UserFilter[];
-  /** Filter by the object’s `ownedCryptoAddresses` relation. */
-  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
-  /** `ownedCryptoAddresses` exist. */
-  ownedCryptoAddressesExist?: boolean;
-  /** Filter by the object’s `ownedEmails` relation. */
-  ownedEmails?: UserToManyEmailFilter;
-  /** `ownedEmails` exist. */
-  ownedEmailsExist?: boolean;
-  /** Filter by the object’s `ownedPhoneNumbers` relation. */
-  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
-  /** `ownedPhoneNumbers` exist. */
-  ownedPhoneNumbersExist?: boolean;
-  /** Filter by the object’s `ownedPrincipalEntities` relation. */
-  ownedPrincipalEntities?: UserToManyPrincipalEntityFilter;
-  /** `ownedPrincipalEntities` exist. */
-  ownedPrincipalEntitiesExist?: boolean;
-  /** Filter by the object’s `ownedPrincipals` relation. */
-  ownedPrincipals?: UserToManyPrincipalFilter;
-  /** `ownedPrincipals` exist. */
-  ownedPrincipalsExist?: boolean;
-  /** Filter by the object’s `ownedWebauthnCredentials` relation. */
-  ownedWebauthnCredentials?: UserToManyWebauthnCredentialFilter;
-  /** `ownedWebauthnCredentials` exist. */
-  ownedWebauthnCredentialsExist?: boolean;
-  /** Filter by the object’s `principalEntitiesByEntityId` relation. */
-  principalEntitiesByEntityId?: UserToManyPrincipalEntityFilter;
-  /** `principalEntitiesByEntityId` exist. */
-  principalEntitiesByEntityIdExist?: boolean;
+  /** Filter by the object’s `phoneNumbers` relation. */
+  phoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `phoneNumbers` exist. */
+  phoneNumbersExist?: boolean;
   /** Filter by the object’s `principals` relation. */
   principals?: UserToManyPrincipalFilter;
   /** `principals` exist. */
@@ -1458,6 +1429,10 @@ export interface UserFilter {
   profilePicture?: ConstructiveInternalTypeImageFilter;
   /** Filter by the object’s `roleType` relation. */
   roleType?: RoleTypeFilter;
+  /** Filter by the object’s `scopedPrincipals` relation. */
+  scopedPrincipals?: UserToManyPrincipalEntityFilter;
+  /** `scopedPrincipals` exist. */
+  scopedPrincipalsExist?: boolean;
   /** Filter by the object’s `searchTsv` field. */
   searchTsv?: FullTextFilter;
   /** TRGM search on the `display_name` column. */
@@ -1478,6 +1453,10 @@ export interface UserFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `username` field. */
   username?: StringTrgmFilter;
+  /** Filter by the object’s `webauthnCredentials` relation. */
+  webauthnCredentials?: UserToManyWebauthnCredentialFilter;
+  /** `webauthnCredentials` exist. */
+  webauthnCredentialsExist?: boolean;
 }
 /** An input for mutations affecting `User` */
 export interface UserInput {
@@ -2049,6 +2028,7 @@ export interface MetaTable {
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
@@ -2062,6 +2042,8 @@ export interface MetaTable {
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
   storage?: MetaStorage | null;
+  /** PostgreSQL table name */
+  tableName: string;
   uniqueConstraints: MetaUniqueConstraint[];
 }
 /** A `AuditLogAuth` edge in the connection. */
@@ -2212,6 +2194,8 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** PostgreSQL column name */
+  columnName: string;
   description?: string | null;
   /** Enum metadata if this field has an enum type */
   enumValues?: MetaEnum | null;
@@ -2219,6 +2203,7 @@ export interface MetaField {
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Final GraphQL field name */
   name: string;
   type: MetaType;
 }
@@ -2268,7 +2253,7 @@ export interface MetaPrimaryKeyConstraint {
 }
 /** Table query/mutation names */
 export interface MetaQuery {
-  all: string;
+  all?: string | null;
   create?: string | null;
   delete?: string | null;
   one?: string | null;

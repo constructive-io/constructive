@@ -1,13 +1,13 @@
 ---
 name: orm-compute
-description: ORM client for the compute API — provides typed CRUD operations for 67 tables and 29 custom operations
+description: ORM client for the compute API — provides typed CRUD operations for 69 tables and 29 custom operations
 ---
 
 # orm-compute
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the compute API — provides typed CRUD operations for 67 tables and 29 custom operations
+ORM client for the compute API — provides typed CRUD operations for 69 tables and 29 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the compute API — provides typed CRUD operations for 67 tables 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: dbPreset, functionApiBinding, functionDefinition, functionDeployment, functionDeploymentEvent, functionExecutionLog, functionGraphCommit, functionGraph, ...
+// Available models: dbPreset, functionApiBinding, functionCapabilityBinding, functionDefinition, functionDeployment, functionDeploymentEvent, functionExecutionLog, functionGraphCommit, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -39,6 +39,7 @@ See the `references/` directory for detailed per-entity API documentation:
 
 - [db-preset](references/db-preset.md)
 - [function-api-binding](references/function-api-binding.md)
+- [function-capability-binding](references/function-capability-binding.md)
 - [function-definition](references/function-definition.md)
 - [function-deployment](references/function-deployment.md)
 - [function-deployment-event](references/function-deployment-event.md)
@@ -63,6 +64,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [namespace](references/namespace.md)
 - [namespace-event](references/namespace-event.md)
 - [platform-function-api-binding](references/platform-function-api-binding.md)
+- [platform-function-capability-binding](references/platform-function-capability-binding.md)
 - [platform-function-definition](references/platform-function-definition.md)
 - [platform-function-deployment](references/platform-function-deployment.md)
 - [platform-function-deployment-event](references/platform-function-deployment-event.md)

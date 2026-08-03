@@ -488,6 +488,15 @@ export const notificationsModuleMutationKeys = {
   /** Delete notificationsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'notificationsmodule', 'delete', id] as const,
 } as const;
+export const pagesModuleMutationKeys = {
+  /** All pagesModule mutation keys */ all: ['mutation', 'pagesmodule'] as const,
+  /** Create pagesModule mutation key */ create: () =>
+    ['mutation', 'pagesmodule', 'create'] as const,
+  /** Update pagesModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'pagesmodule', 'update', id] as const,
+  /** Delete pagesModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'pagesmodule', 'delete', id] as const,
+} as const;
 export const permissionsModuleMutationKeys = {
   /** All permissionsModule mutation keys */ all: ['mutation', 'permissionsmodule'] as const,
   /** Create permissionsModule mutation key */ create: () =>
@@ -863,6 +872,7 @@ export const mutationKeys = {
   merkleStoreModule: merkleStoreModuleMutationKeys,
   namespaceModule: namespaceModuleMutationKeys,
   notificationsModule: notificationsModuleMutationKeys,
+  pagesModule: pagesModuleMutationKeys,
   permissionsModule: permissionsModuleMutationKeys,
   phoneNumbersModule: phoneNumbersModuleMutationKeys,
   plansModule: plansModuleMutationKeys,

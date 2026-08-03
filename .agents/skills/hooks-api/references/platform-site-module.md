@@ -7,8 +7,8 @@ Frontend module configuration for a site surface; stores module name and JSON se
 ## Usage
 
 ```typescript
-usePlatformSiteModulesQuery({ selection: { fields: { createdAt: true, data: true, id: true, name: true, siteId: true, updatedAt: true } } })
-usePlatformSiteModuleQuery({ id: '<UUID>', selection: { fields: { createdAt: true, data: true, id: true, name: true, siteId: true, updatedAt: true } } })
+usePlatformSiteModulesQuery({ selection: { fields: { createdAt: true, data: true, id: true, isEnabled: true, name: true, position: true, siteId: true, updatedAt: true } } })
+usePlatformSiteModuleQuery({ id: '<UUID>', selection: { fields: { createdAt: true, data: true, id: true, isEnabled: true, name: true, position: true, siteId: true, updatedAt: true } } })
 useCreatePlatformSiteModuleMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformSiteModuleMutation({ selection: { fields: { id: true } } })
 useDeletePlatformSiteModuleMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformSiteModuleMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformSiteModulesQuery({
-  selection: { fields: { createdAt: true, data: true, id: true, name: true, siteId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, data: true, id: true, isEnabled: true, name: true, position: true, siteId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformSiteModulesQuery({
 const { mutate } = useCreatePlatformSiteModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ data: '<JSON>', name: '<String>', siteId: '<UUID>' });
+mutate({ data: '<JSON>', isEnabled: '<Boolean>', name: '<String>', position: '<Int>', siteId: '<UUID>' });
 ```

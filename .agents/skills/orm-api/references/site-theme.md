@@ -9,8 +9,8 @@ Theme (colors, fonts, design tokens) for a site surface
 ```typescript
 db.siteTheme.findMany({ select: { id: true } }).execute()
 db.siteTheme.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.siteTheme.create({ data: { databaseId: '<UUID>', siteId: '<UUID>', theme: '<JSON>' }, select: { id: true } }).execute()
-db.siteTheme.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.siteTheme.create({ data: { commitId: '<UUID>', databaseId: '<UUID>', isActive: '<Boolean>', name: '<String>', siteId: '<UUID>', storeId: '<UUID>', theme: '<JSON>' }, select: { id: true } }).execute()
+db.siteTheme.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute()
 db.siteTheme.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.siteTheme.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.siteTheme.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, commitId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.siteTheme.findMany({
 
 ```typescript
 const item = await db.siteTheme.create({
-  data: { databaseId: '<UUID>', siteId: '<UUID>', theme: '<JSON>' },
+  data: { commitId: '<UUID>', databaseId: '<UUID>', isActive: '<Boolean>', name: '<String>', siteId: '<UUID>', storeId: '<UUID>', theme: '<JSON>' },
   select: { id: true }
 }).execute();
 ```

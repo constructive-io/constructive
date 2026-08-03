@@ -140,6 +140,16 @@ export interface OrmClientConfig {
 }
 
 /**
+ * Describe a single GraphQL error, falling back to its `extensions.code` when
+ * the server omits `message` so the error never renders as an empty string.
+ */
+function describeGraphQLError(error: GraphQLError): string {
+  if (error.message) return error.message;
+  const code = error.extensions?.code;
+  return typeof code === 'string' ? code : 'Unknown error';
+}
+
+/**
  * Error thrown when GraphQL request fails
  */
 export class GraphQLRequestError extends Error {
@@ -147,7 +157,7 @@ export class GraphQLRequestError extends Error {
     public readonly errors: GraphQLError[],
     public readonly data: unknown = null
   ) {
-    const messages = errors.map((e) => e.message).join('; ');
+    const messages = errors.map(describeGraphQLError).join('; ');
     super(`GraphQL Error: ${messages}`);
     this.name = 'GraphQLRequestError';
   }

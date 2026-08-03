@@ -1,13 +1,13 @@
 ---
 name: orm-modules
-description: ORM client for the modules API — provides typed CRUD operations for 75 tables and 12 custom operations
+description: ORM client for the modules API — provides typed CRUD operations for 76 tables and 12 custom operations
 ---
 
 # orm-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the modules API — provides typed CRUD operations for 75 tables and 12 custom operations
+ORM client for the modules API — provides typed CRUD operations for 76 tables and 12 custom operations
 
 ## Usage
 
@@ -85,6 +85,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [merkle-store-module](references/merkle-store-module.md)
 - [namespace-module](references/namespace-module.md)
 - [notifications-module](references/notifications-module.md)
+- [pages-module](references/pages-module.md)
 - [permissions-module](references/permissions-module.md)
 - [phone-numbers-module](references/phone-numbers-module.md)
 - [plans-module](references/plans-module.md)

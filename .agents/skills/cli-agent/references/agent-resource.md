@@ -19,8 +19,8 @@ csdk agent-resource list --limit 10 --after <cursor>
 csdk agent-resource find-first --where.<field>.<op> <value>
 csdk agent-resource search <query>
 csdk agent-resource get --id <UUID>
-csdk agent-resource create --body <String> --databaseId <UUID> --slug <String> --title <String> [--archivedAt <Datetime>] [--createdBy <UUID>] [--description <String>] [--embedding <Vector>] [--embeddingUpdatedAt <Datetime>] [--isActive <Boolean>] [--isArchived <Boolean>] [--keywords <String>] [--kind <String>] [--metadata <JSON>] [--updatedBy <UUID>]
-csdk agent-resource update --id <UUID> [--archivedAt <Datetime>] [--body <String>] [--createdBy <UUID>] [--databaseId <UUID>] [--description <String>] [--embedding <Vector>] [--embeddingUpdatedAt <Datetime>] [--isActive <Boolean>] [--isArchived <Boolean>] [--keywords <String>] [--kind <String>] [--metadata <JSON>] [--slug <String>] [--title <String>] [--updatedBy <UUID>]
+csdk agent-resource create --body <String> --databaseId <UUID> --slug <String> --title <String> [--archivedAt <Datetime>] [--createdBy <UUID>] [--description <String>] [--embedding <Vector>] [--isActive <Boolean>] [--isArchived <Boolean>] [--keywords <String>] [--kind <String>] [--metadata <JSON>] [--updatedBy <UUID>]
+csdk agent-resource update --id <UUID> [--archivedAt <Datetime>] [--body <String>] [--createdBy <UUID>] [--databaseId <UUID>] [--description <String>] [--embedding <Vector>] [--isActive <Boolean>] [--isArchived <Boolean>] [--keywords <String>] [--kind <String>] [--metadata <JSON>] [--slug <String>] [--title <String>] [--updatedBy <UUID>]
 csdk agent-resource delete --id <UUID>
 ```
 
@@ -131,7 +131,7 @@ csdk agent-resource search "query" --limit 10 --select id,title,searchScore
 ### Create a agentResource
 
 ```bash
-csdk agent-resource create --body <String> --databaseId <UUID> --slug <String> --title <String> [--archivedAt <Datetime>] [--createdBy <UUID>] [--description <String>] [--embedding <Vector>] [--embeddingUpdatedAt <Datetime>] [--isActive <Boolean>] [--isArchived <Boolean>] [--keywords <String>] [--kind <String>] [--metadata <JSON>] [--updatedBy <UUID>]
+csdk agent-resource create --body <String> --databaseId <UUID> --slug <String> --title <String> [--archivedAt <Datetime>] [--createdBy <UUID>] [--description <String>] [--embedding <Vector>] [--isActive <Boolean>] [--isArchived <Boolean>] [--keywords <String>] [--kind <String>] [--metadata <JSON>] [--updatedBy <UUID>]
 ```
 
 ### Get a agentResource by id

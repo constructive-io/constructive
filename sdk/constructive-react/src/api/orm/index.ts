@@ -5,9 +5,9 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { ApiModel } from './models/api';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiSettingModel } from './models/apiSetting';
+import { ApisModel } from './models/apis';
 import { AstMigrationModel } from './models/astMigration';
 import { CheckConstraintModel } from './models/checkConstraint';
 import { CompositeTypeModel } from './models/compositeType';
@@ -16,6 +16,7 @@ import { DatabaseModel } from './models/database';
 import { DatabaseSettingModel } from './models/databaseSetting';
 import { DatabaseTransferModel } from './models/databaseTransfer';
 import { DefaultPrivilegeModel } from './models/defaultPrivilege';
+import { DeriveModel } from './models/derive';
 import { DomainModel } from './models/domain';
 import { DomainEventModel } from './models/domainEvent';
 import { DomainTypeModel } from './models/domainType';
@@ -23,7 +24,9 @@ import { DomainVerificationModel } from './models/domainVerification';
 import { EmbeddingChunkModel } from './models/embeddingChunk';
 import { EnumModel } from './models/enum';
 import { ExclusionConstraintModel } from './models/exclusionConstraint';
+import { FieldBehaviorModel } from './models/fieldBehavior';
 import { FieldModel } from './models/field';
+import { ForeignKeyConstraintBehaviorModel } from './models/foreignKeyConstraintBehavior';
 import { ForeignKeyConstraintModel } from './models/foreignKeyConstraint';
 import { FullTextSearchModel } from './models/fullTextSearch';
 import { FunctionModel } from './models/function';
@@ -32,19 +35,25 @@ import { HttpRouteModel } from './models/httpRoute';
 import { IndexModel } from './models/index';
 import { ManagedDomainModel } from './models/managedDomain';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
+import { PageModel } from './models/page';
 import { PartitionModel } from './models/partition';
-import { PlatformApiModel } from './models/platformApi';
 import { PlatformApiSchemaModel } from './models/platformApiSchema';
 import { PlatformApiSettingModel } from './models/platformApiSetting';
+import { PlatformApisModel } from './models/platformApis';
 import { PlatformCorsSettingModel } from './models/platformCorsSetting';
 import { PlatformDomainModel } from './models/platformDomain';
 import { PlatformDomainEventModel } from './models/platformDomainEvent';
 import { PlatformDomainVerificationModel } from './models/platformDomainVerification';
 import { PlatformManagedDomainModel } from './models/platformManagedDomain';
+import { PlatformPageModel } from './models/platformPage';
+import { PlatformSiteAppLinkModel } from './models/platformSiteAppLink';
 import { PlatformSiteModel } from './models/platformSite';
+import { PlatformSiteDeepLinkModel } from './models/platformSiteDeepLink';
+import { PlatformSiteErrorPageModel } from './models/platformSiteErrorPage';
 import { PlatformSiteMetadatumModel } from './models/platformSiteMetadatum';
 import { PlatformSiteModuleModel } from './models/platformSiteModule';
 import { PlatformSiteThemeModel } from './models/platformSiteTheme';
+import { PlatformSiteWebConfigModel } from './models/platformSiteWebConfig';
 import { PolicyModel } from './models/policy';
 import { PrimaryKeyConstraintModel } from './models/primaryKeyConstraint';
 import { PubkeySettingModel } from './models/pubkeySetting';
@@ -53,17 +62,24 @@ import { RouteBindingModel } from './models/routeBinding';
 import { RouteModel } from './models/route';
 import { SchemaModel } from './models/schema';
 import { SchemaGrantModel } from './models/schemaGrant';
+import { SiteAppLinkModel } from './models/siteAppLink';
 import { SiteModel } from './models/site';
+import { SiteDeepLinkModel } from './models/siteDeepLink';
+import { SiteErrorPageModel } from './models/siteErrorPage';
 import { SiteMetadatumModel } from './models/siteMetadatum';
 import { SiteModuleModel } from './models/siteModule';
 import { SiteThemeModel } from './models/siteTheme';
+import { SiteWebConfigModel } from './models/siteWebConfig';
 import { SpatialRelationModel } from './models/spatialRelation';
 import { SqlActionModel } from './models/sqlAction';
+import { TableBehaviorModel } from './models/tableBehavior';
 import { TableModel } from './models/table';
 import { TableGrantModel } from './models/tableGrant';
 import { TriggerModel } from './models/trigger';
 import { TriggerFunctionModel } from './models/triggerFunction';
+import { UniqueConstraintBehaviorModel } from './models/uniqueConstraintBehavior';
 import { UniqueConstraintModel } from './models/uniqueConstraint';
+import { ViewBehaviorModel } from './models/viewBehavior';
 import { ViewModel } from './models/view';
 import { ViewGrantModel } from './models/viewGrant';
 import { ViewRuleModel } from './models/viewRule';
@@ -104,9 +120,9 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    api: new ApiModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiSetting: new ApiSettingModel(client),
+    apis: new ApisModel(client),
     astMigration: new AstMigrationModel(client),
     checkConstraint: new CheckConstraintModel(client),
     compositeType: new CompositeTypeModel(client),
@@ -115,6 +131,7 @@ export function createClient(config: OrmClientConfig) {
     databaseSetting: new DatabaseSettingModel(client),
     databaseTransfer: new DatabaseTransferModel(client),
     defaultPrivilege: new DefaultPrivilegeModel(client),
+    derive: new DeriveModel(client),
     domain: new DomainModel(client),
     domainEvent: new DomainEventModel(client),
     domainType: new DomainTypeModel(client),
@@ -122,7 +139,9 @@ export function createClient(config: OrmClientConfig) {
     embeddingChunk: new EmbeddingChunkModel(client),
     enum: new EnumModel(client),
     exclusionConstraint: new ExclusionConstraintModel(client),
+    fieldBehavior: new FieldBehaviorModel(client),
     field: new FieldModel(client),
+    foreignKeyConstraintBehavior: new ForeignKeyConstraintBehaviorModel(client),
     foreignKeyConstraint: new ForeignKeyConstraintModel(client),
     fullTextSearch: new FullTextSearchModel(client),
     function: new FunctionModel(client),
@@ -131,19 +150,25 @@ export function createClient(config: OrmClientConfig) {
     index: new IndexModel(client),
     managedDomain: new ManagedDomainModel(client),
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
+    page: new PageModel(client),
     partition: new PartitionModel(client),
-    platformApi: new PlatformApiModel(client),
     platformApiSchema: new PlatformApiSchemaModel(client),
     platformApiSetting: new PlatformApiSettingModel(client),
+    platformApis: new PlatformApisModel(client),
     platformCorsSetting: new PlatformCorsSettingModel(client),
     platformDomain: new PlatformDomainModel(client),
     platformDomainEvent: new PlatformDomainEventModel(client),
     platformDomainVerification: new PlatformDomainVerificationModel(client),
     platformManagedDomain: new PlatformManagedDomainModel(client),
+    platformPage: new PlatformPageModel(client),
+    platformSiteAppLink: new PlatformSiteAppLinkModel(client),
     platformSite: new PlatformSiteModel(client),
+    platformSiteDeepLink: new PlatformSiteDeepLinkModel(client),
+    platformSiteErrorPage: new PlatformSiteErrorPageModel(client),
     platformSiteMetadatum: new PlatformSiteMetadatumModel(client),
     platformSiteModule: new PlatformSiteModuleModel(client),
     platformSiteTheme: new PlatformSiteThemeModel(client),
+    platformSiteWebConfig: new PlatformSiteWebConfigModel(client),
     policy: new PolicyModel(client),
     primaryKeyConstraint: new PrimaryKeyConstraintModel(client),
     pubkeySetting: new PubkeySettingModel(client),
@@ -152,17 +177,24 @@ export function createClient(config: OrmClientConfig) {
     route: new RouteModel(client),
     schema: new SchemaModel(client),
     schemaGrant: new SchemaGrantModel(client),
+    siteAppLink: new SiteAppLinkModel(client),
     site: new SiteModel(client),
+    siteDeepLink: new SiteDeepLinkModel(client),
+    siteErrorPage: new SiteErrorPageModel(client),
     siteMetadatum: new SiteMetadatumModel(client),
     siteModule: new SiteModuleModel(client),
     siteTheme: new SiteThemeModel(client),
+    siteWebConfig: new SiteWebConfigModel(client),
     spatialRelation: new SpatialRelationModel(client),
     sqlAction: new SqlActionModel(client),
+    tableBehavior: new TableBehaviorModel(client),
     table: new TableModel(client),
     tableGrant: new TableGrantModel(client),
     trigger: new TriggerModel(client),
     triggerFunction: new TriggerFunctionModel(client),
+    uniqueConstraintBehavior: new UniqueConstraintBehaviorModel(client),
     uniqueConstraint: new UniqueConstraintModel(client),
+    viewBehavior: new ViewBehaviorModel(client),
     view: new ViewModel(client),
     viewGrant: new ViewGrantModel(client),
     viewRule: new ViewRuleModel(client),

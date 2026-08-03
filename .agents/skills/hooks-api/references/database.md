@@ -7,8 +7,8 @@ React Query hooks for Database data operations
 ## Usage
 
 ```typescript
-useDatabasesQuery({ selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, schemaHash: true, updatedAt: true } } })
-useDatabaseQuery({ id: '<UUID>', selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, schemaHash: true, updatedAt: true } } })
+useDatabasesQuery({ selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, updatedAt: true } } })
+useDatabaseQuery({ id: '<UUID>', selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, updatedAt: true } } })
 useCreateDatabaseMutation({ selection: { fields: { id: true } } })
 useUpdateDatabaseMutation({ selection: { fields: { id: true } } })
 useDeleteDatabaseMutation({})
@@ -20,7 +20,7 @@ useDeleteDatabaseMutation({})
 
 ```typescript
 const { data, isLoading } = useDatabasesQuery({
-  selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, schemaHash: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDatabasesQuery({
 const { mutate } = useCreateDatabaseMutation({
   selection: { fields: { id: true } },
 });
-mutate({ hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>', platform: '<Boolean>', schemaHash: '<String>' });
+mutate({ hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>', platform: '<Boolean>' });
 ```

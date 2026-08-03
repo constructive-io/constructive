@@ -7,7 +7,7 @@ Execute the resourceInstallationsInstall mutation
 ## Usage
 
 ```bash
-csdk resource-installations-install --input.clientMutationId <String> --input.name <String> --input.namespaceId <UUID> --input.newParams <JSON> --input.slug <String>
+csdk resource-installations-install --input.clientMutationId <String> --input.definitionIds <UUID> --input.name <String> --input.namespaceId <UUID> --input.newParams <JSON> --input.slug <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk resource-installations-install --input.clientMutationId <String> --input.na
 ### Run resourceInstallationsInstall
 
 ```bash
-csdk resource-installations-install --input.clientMutationId <String> --input.name <String> --input.namespaceId <UUID> --input.newParams <JSON> --input.slug <String>
+csdk resource-installations-install --input.clientMutationId <String> --input.definitionIds <UUID> --input.name <String> --input.namespaceId <UUID> --input.newParams <JSON> --input.slug <String>
 ```

@@ -1,13 +1,13 @@
 ---
 name: hooks-modules
-description: React Query hooks for the modules API — provides typed query and mutation hooks for 75 tables and 12 custom operations
+description: React Query hooks for the modules API — provides typed query and mutation hooks for 76 tables and 12 custom operations
 ---
 
 # hooks-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the modules API — provides typed query and mutation hooks for 75 tables and 12 custom operations
+React Query hooks for the modules API — provides typed query and mutation hooks for 76 tables and 12 custom operations
 
 ## Usage
 
@@ -86,6 +86,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [merkle-store-module](references/merkle-store-module.md)
 - [namespace-module](references/namespace-module.md)
 - [notifications-module](references/notifications-module.md)
+- [pages-module](references/pages-module.md)
 - [permissions-module](references/permissions-module.md)
 - [phone-numbers-module](references/phone-numbers-module.md)
 - [plans-module](references/plans-module.md)

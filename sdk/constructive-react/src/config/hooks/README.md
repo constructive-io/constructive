@@ -81,20 +81,20 @@ and lifecycle settings. |
 ```typescript
 // List all configs
 const { data, isLoading } = useConfigsQuery({
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } },
 });
 
 // Get one config
 const { data: item } = useConfigQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } },
 });
 
 // Create a config
 const { mutate: create } = useCreateConfigMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', value: '<String>' });
+create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', value: '<String>' });
 ```
 
 ### PlatformConfig
@@ -102,20 +102,20 @@ create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', e
 ```typescript
 // List all platformConfigs
 const { data, isLoading } = usePlatformConfigsQuery({
-  selection: { fields: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } },
 });
 
 // Get one platformConfig
 const { data: item } = usePlatformConfigQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } },
 });
 
 // Create a platformConfig
 const { mutate: create } = useCreatePlatformConfigMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', value: '<String>' });
+create({ annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', value: '<String>' });
 ```
 
 ### PlatformInternalSecret
@@ -123,20 +123,20 @@ create({ annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>'
 ```typescript
 // List all platformInternalSecrets
 const { data, isLoading } = usePlatformInternalSecretsQuery({
-  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Get one platformInternalSecret
 const { data: item } = usePlatformInternalSecretQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Create a platformInternalSecret
 const { mutate: create } = useCreatePlatformInternalSecretMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
+create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ### PlatformSecret
@@ -144,20 +144,20 @@ create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name:
 ```typescript
 // List all platformSecrets
 const { data, isLoading } = usePlatformSecretsQuery({
-  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Get one platformSecret
 const { data: item } = usePlatformSecretQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Create a platformSecret
 const { mutate: create } = useCreatePlatformSecretMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
+create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ### Secret
@@ -165,20 +165,20 @@ create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name:
 ```typescript
 // List all secrets
 const { data, isLoading } = useSecretsQuery({
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Get one secret
 const { data: item } = useSecretQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Create a secret
 const { mutate: create } = useCreateSecretMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
+create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ## Custom Operation Hooks

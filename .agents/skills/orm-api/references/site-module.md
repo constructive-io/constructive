@@ -9,7 +9,7 @@ Frontend module configuration for a site surface; stores module name and JSON se
 ```typescript
 db.siteModule.findMany({ select: { id: true } }).execute()
 db.siteModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.siteModule.create({ data: { data: '<JSON>', databaseId: '<UUID>', name: '<String>', siteId: '<UUID>' }, select: { id: true } }).execute()
+db.siteModule.create({ data: { data: '<JSON>', databaseId: '<UUID>', isEnabled: '<Boolean>', name: '<String>', position: '<Int>', siteId: '<UUID>' }, select: { id: true } }).execute()
 db.siteModule.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute()
 db.siteModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.siteModule.findMany({
 
 ```typescript
 const item = await db.siteModule.create({
-  data: { data: '<JSON>', databaseId: '<UUID>', name: '<String>', siteId: '<UUID>' },
+  data: { data: '<JSON>', databaseId: '<UUID>', isEnabled: '<Boolean>', name: '<String>', position: '<Int>', siteId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

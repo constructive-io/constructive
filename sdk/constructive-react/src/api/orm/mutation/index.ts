@@ -10,24 +10,36 @@ import type {
   AcceptDatabaseTransferInput,
   ApplyRlsInput,
   CancelDatabaseTransferInput,
+  DomainsAssignSubdomainInput,
+  PlatformDomainsAssignSubdomainInput,
+  PlatformSitesProvisionStaticSiteInput,
   ProvisionBucketInput,
   RejectDatabaseTransferInput,
   RequestDatabaseInput,
   SetFieldOrderInput,
+  SitesProvisionStaticSiteInput,
   AcceptDatabaseTransferPayload,
   ApplyRlsPayload,
   CancelDatabaseTransferPayload,
+  DomainsAssignSubdomainPayload,
+  PlatformDomainsAssignSubdomainPayload,
+  PlatformSitesProvisionStaticSitePayload,
   ProvisionBucketPayload,
   RejectDatabaseTransferPayload,
   RequestDatabasePayload,
   SetFieldOrderPayload,
+  SitesProvisionStaticSitePayload,
   AcceptDatabaseTransferPayloadSelect,
   ApplyRlsPayloadSelect,
   CancelDatabaseTransferPayloadSelect,
+  DomainsAssignSubdomainPayloadSelect,
+  PlatformDomainsAssignSubdomainPayloadSelect,
+  PlatformSitesProvisionStaticSitePayloadSelect,
   ProvisionBucketPayloadSelect,
   RejectDatabaseTransferPayloadSelect,
   RequestDatabasePayloadSelect,
   SetFieldOrderPayloadSelect,
+  SitesProvisionStaticSitePayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface AcceptDatabaseTransferVariables {
@@ -38,6 +50,15 @@ export interface ApplyRlsVariables {
 }
 export interface CancelDatabaseTransferVariables {
   input: CancelDatabaseTransferInput;
+}
+export interface DomainsAssignSubdomainVariables {
+  input: DomainsAssignSubdomainInput;
+}
+export interface PlatformDomainsAssignSubdomainVariables {
+  input: PlatformDomainsAssignSubdomainInput;
+}
+export interface PlatformSitesProvisionStaticSiteVariables {
+  input: PlatformSitesProvisionStaticSiteInput;
 }
 /**
  * Variables for provisionBucket
@@ -67,6 +88,9 @@ export interface RequestDatabaseVariables {
 }
 export interface SetFieldOrderVariables {
   input: SetFieldOrderInput;
+}
+export interface SitesProvisionStaticSiteVariables {
+  input: SitesProvisionStaticSiteInput;
 }
 export function createMutationOperations(client: OrmClient) {
   return {
@@ -155,6 +179,99 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'CancelDatabaseTransferPayload'
+        ),
+      }),
+    domainsAssignSubdomain: <S extends DomainsAssignSubdomainPayloadSelect>(
+      args: DomainsAssignSubdomainVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DomainsAssignSubdomainPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        domainsAssignSubdomain: InferSelectResult<DomainsAssignSubdomainPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DomainsAssignSubdomain',
+        fieldName: 'domainsAssignSubdomain',
+        ...buildCustomDocument(
+          'mutation',
+          'DomainsAssignSubdomain',
+          'domainsAssignSubdomain',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DomainsAssignSubdomainInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DomainsAssignSubdomainPayload'
+        ),
+      }),
+    platformDomainsAssignSubdomain: <S extends PlatformDomainsAssignSubdomainPayloadSelect>(
+      args: PlatformDomainsAssignSubdomainVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformDomainsAssignSubdomainPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformDomainsAssignSubdomain: InferSelectResult<
+          PlatformDomainsAssignSubdomainPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformDomainsAssignSubdomain',
+        fieldName: 'platformDomainsAssignSubdomain',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformDomainsAssignSubdomain',
+          'platformDomainsAssignSubdomain',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformDomainsAssignSubdomainInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformDomainsAssignSubdomainPayload'
+        ),
+      }),
+    platformSitesProvisionStaticSite: <S extends PlatformSitesProvisionStaticSitePayloadSelect>(
+      args: PlatformSitesProvisionStaticSiteVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformSitesProvisionStaticSitePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformSitesProvisionStaticSite: InferSelectResult<
+          PlatformSitesProvisionStaticSitePayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformSitesProvisionStaticSite',
+        fieldName: 'platformSitesProvisionStaticSite',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformSitesProvisionStaticSite',
+          'platformSitesProvisionStaticSite',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformSitesProvisionStaticSiteInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformSitesProvisionStaticSitePayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(
@@ -271,6 +388,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SetFieldOrderPayload'
+        ),
+      }),
+    sitesProvisionStaticSite: <S extends SitesProvisionStaticSitePayloadSelect>(
+      args: SitesProvisionStaticSiteVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SitesProvisionStaticSitePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        sitesProvisionStaticSite: InferSelectResult<SitesProvisionStaticSitePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SitesProvisionStaticSite',
+        fieldName: 'sitesProvisionStaticSite',
+        ...buildCustomDocument(
+          'mutation',
+          'SitesProvisionStaticSite',
+          'sitesProvisionStaticSite',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SitesProvisionStaticSiteInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SitesProvisionStaticSitePayload'
         ),
       }),
   };

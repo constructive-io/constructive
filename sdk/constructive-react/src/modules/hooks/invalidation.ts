@@ -63,6 +63,7 @@ import {
   merkleStoreModuleKeys,
   namespaceModuleKeys,
   notificationsModuleKeys,
+  pagesModuleKeys,
   permissionsModuleKeys,
   phoneNumbersModuleKeys,
   plansModuleKeys,
@@ -924,6 +925,23 @@ export const invalidate = {
         queryKey: notificationsModuleKeys.detail(id),
       }),
   },
+  /** Invalidate pagesModule queries */ pagesModule: {
+    /** Invalidate all pagesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: pagesModuleKeys.all,
+      }),
+    /** Invalidate pagesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: pagesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific pagesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: pagesModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate permissionsModule queries */ permissionsModule: {
     /** Invalidate all permissionsModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1769,6 +1787,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: notificationsModuleKeys.detail(id),
+    });
+  },
+  /** Remove pagesModule from cache */ pagesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: pagesModuleKeys.detail(id),
     });
   },
   /** Remove permissionsModule from cache */ permissionsModule: (

@@ -252,6 +252,8 @@ export interface Config {
   namespaceId?: string | null;
   /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
   provider?: string | null;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string | null;
   updatedAt?: string | null;
   /** Plaintext config value */
   value?: string | null;
@@ -275,6 +277,8 @@ export interface PlatformConfig {
   namespaceId?: string | null;
   /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
   provider?: string | null;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string | null;
   updatedAt?: string | null;
   /** Plaintext config value */
   value?: string | null;
@@ -287,6 +291,7 @@ export interface PlatformInternalSecret {
   labels?: Record<string, unknown> | null;
   name?: string | null;
   namespaceId?: string | null;
+  realm?: string | null;
   retiredAt?: string | null;
   rotatedAt?: string | null;
   updatedAt?: string | null;
@@ -300,6 +305,7 @@ export interface PlatformSecret {
   name?: string | null;
   namespaceId?: string | null;
   provider?: string | null;
+  realm?: string | null;
   retiredAt?: string | null;
   rotatedAt?: string | null;
   updatedAt?: string | null;
@@ -314,6 +320,7 @@ export interface Secret {
   name?: string | null;
   namespaceId?: string | null;
   provider?: string | null;
+  realm?: string | null;
   retiredAt?: string | null;
   rotatedAt?: string | null;
   updatedAt?: string | null;
@@ -355,6 +362,7 @@ export type ConfigSelect = {
   name?: boolean;
   namespaceId?: boolean;
   provider?: boolean;
+  realm?: boolean;
   updatedAt?: boolean;
   value?: boolean;
 };
@@ -368,6 +376,7 @@ export type PlatformConfigSelect = {
   name?: boolean;
   namespaceId?: boolean;
   provider?: boolean;
+  realm?: boolean;
   updatedAt?: boolean;
   value?: boolean;
 };
@@ -379,6 +388,7 @@ export type PlatformInternalSecretSelect = {
   labels?: boolean;
   name?: boolean;
   namespaceId?: boolean;
+  realm?: boolean;
   retiredAt?: boolean;
   rotatedAt?: boolean;
   updatedAt?: boolean;
@@ -392,6 +402,7 @@ export type PlatformSecretSelect = {
   name?: boolean;
   namespaceId?: boolean;
   provider?: boolean;
+  realm?: boolean;
   retiredAt?: boolean;
   rotatedAt?: boolean;
   updatedAt?: boolean;
@@ -406,6 +417,7 @@ export type SecretSelect = {
   name?: boolean;
   namespaceId?: boolean;
   provider?: boolean;
+  realm?: boolean;
   retiredAt?: boolean;
   rotatedAt?: boolean;
   updatedAt?: boolean;
@@ -438,6 +450,8 @@ export interface ConfigFilter {
   or?: ConfigFilter[];
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `value` field. */
@@ -468,6 +482,8 @@ export interface PlatformConfigFilter {
   or?: PlatformConfigFilter[];
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `value` field. */
@@ -494,6 +510,8 @@ export interface PlatformInternalSecretFilter {
   not?: PlatformInternalSecretFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformInternalSecretFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `retiredAt` field. */
   retiredAt?: DatetimeFilter;
   /** Filter by the object’s `rotatedAt` field. */
@@ -524,6 +542,8 @@ export interface PlatformSecretFilter {
   or?: PlatformSecretFilter[];
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `retiredAt` field. */
   retiredAt?: DatetimeFilter;
   /** Filter by the object’s `rotatedAt` field. */
@@ -556,6 +576,8 @@ export interface SecretFilter {
   or?: SecretFilter[];
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `retiredAt` field. */
   retiredAt?: DatetimeFilter;
   /** Filter by the object’s `rotatedAt` field. */
@@ -588,6 +610,8 @@ export type ConfigOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'VALUE_ASC'
@@ -614,6 +638,8 @@ export type PlatformConfigOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'VALUE_ASC'
@@ -634,6 +660,8 @@ export type PlatformInternalSecretOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RETIRED_AT_ASC'
   | 'RETIRED_AT_DESC'
   | 'ROTATED_AT_ASC'
@@ -658,6 +686,8 @@ export type PlatformSecretOrderBy =
   | 'NATURAL'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RETIRED_AT_ASC'
   | 'RETIRED_AT_DESC'
   | 'ROTATED_AT_ASC'
@@ -684,6 +714,8 @@ export type SecretOrderBy =
   | 'NATURAL'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RETIRED_AT_ASC'
   | 'RETIRED_AT_DESC'
   | 'ROTATED_AT_ASC'
@@ -702,6 +734,7 @@ export interface CreateConfigInput {
     name: string;
     namespaceId: string;
     provider?: string;
+    realm?: string;
     value?: string;
   };
 }
@@ -714,6 +747,7 @@ export interface ConfigPatch {
   name?: string | null;
   namespaceId?: string | null;
   provider?: string | null;
+  realm?: string | null;
   value?: string | null;
 }
 export interface UpdateConfigInput {
@@ -735,6 +769,7 @@ export interface CreatePlatformConfigInput {
     name: string;
     namespaceId: string;
     provider?: string;
+    realm?: string;
     value?: string;
   };
 }
@@ -746,6 +781,7 @@ export interface PlatformConfigPatch {
   name?: string | null;
   namespaceId?: string | null;
   provider?: string | null;
+  realm?: string | null;
   value?: string | null;
 }
 export interface UpdatePlatformConfigInput {
@@ -765,6 +801,7 @@ export interface CreatePlatformInternalSecretInput {
     labels?: Record<string, unknown>;
     name?: string;
     namespaceId: string;
+    realm?: string;
     retiredAt?: string;
     rotatedAt?: string;
   };
@@ -775,6 +812,7 @@ export interface PlatformInternalSecretPatch {
   labels?: Record<string, unknown> | null;
   name?: string | null;
   namespaceId?: string | null;
+  realm?: string | null;
   retiredAt?: string | null;
   rotatedAt?: string | null;
 }
@@ -796,6 +834,7 @@ export interface CreatePlatformSecretInput {
     name?: string;
     namespaceId: string;
     provider?: string;
+    realm?: string;
     retiredAt?: string;
     rotatedAt?: string;
   };
@@ -807,6 +846,7 @@ export interface PlatformSecretPatch {
   name?: string | null;
   namespaceId?: string | null;
   provider?: string | null;
+  realm?: string | null;
   retiredAt?: string | null;
   rotatedAt?: string | null;
 }
@@ -829,6 +869,7 @@ export interface CreateSecretInput {
     name?: string;
     namespaceId: string;
     provider?: string;
+    realm?: string;
     retiredAt?: string;
     rotatedAt?: string;
   };
@@ -841,6 +882,7 @@ export interface SecretPatch {
   name?: string | null;
   namespaceId?: string | null;
   provider?: string | null;
+  realm?: string | null;
   retiredAt?: string | null;
   rotatedAt?: string | null;
 }
@@ -860,12 +902,14 @@ export interface _SecretsDelInput {
   clientMutationId?: string;
   databaseId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
 }
 export interface _SecretsRemoveArrayInput {
   clientMutationId?: string;
   databaseId?: string;
   namespaceId?: string;
+  realm?: string;
   secretNames?: string[];
 }
 export interface _SecretsRotateInput {
@@ -873,6 +917,7 @@ export interface _SecretsRotateInput {
   clientMutationId?: string;
   databaseId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
   secretValue?: string;
 }
@@ -883,22 +928,26 @@ export interface _SecretsSetInput {
   scopeDatabaseId?: string;
   secretName?: string;
   secretNamespaceId?: string;
+  secretRealm?: string;
   secretValue?: string;
 }
 export interface PlatformInternalSecretsDelInput {
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
 }
 export interface PlatformInternalSecretsRemoveArrayInput {
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretNames?: string[];
 }
 export interface PlatformInternalSecretsRotateInput {
   algo?: string;
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
   secretValue?: string;
 }
@@ -907,22 +956,26 @@ export interface PlatformInternalSecretsSetInput {
   clientMutationId?: string;
   secretName?: string;
   secretNamespaceId?: string;
+  secretRealm?: string;
   secretValue?: string;
 }
 export interface PlatformSecretsDelInput {
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
 }
 export interface PlatformSecretsRemoveArrayInput {
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretNames?: string[];
 }
 export interface PlatformSecretsRotateInput {
   algo?: string;
   clientMutationId?: string;
   namespaceId?: string;
+  realm?: string;
   secretName?: string;
   secretValue?: string;
 }
@@ -932,6 +985,7 @@ export interface PlatformSecretsSetInput {
   provider?: string;
   secretName?: string;
   secretNamespaceId?: string;
+  secretRealm?: string;
   secretValue?: string;
 }
 export interface ProvisionBucketInput {
@@ -964,6 +1018,8 @@ export interface ConfigInput {
   namespaceId: string;
   /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
   provider?: string;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string;
   updatedAt?: string;
   /** Plaintext config value */
   value?: string;
@@ -987,6 +1043,8 @@ export interface PlatformConfigInput {
   namespaceId: string;
   /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
   provider?: string;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string;
   updatedAt?: string;
   /** Plaintext config value */
   value?: string;

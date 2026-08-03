@@ -12,8 +12,8 @@ csdk site-theme list --where.<field>.<op> <value> --orderBy <values>
 csdk site-theme list --limit 10 --after <cursor>
 csdk site-theme find-first --where.<field>.<op> <value>
 csdk site-theme get --id <UUID>
-csdk site-theme create --databaseId <UUID> --siteId <UUID> --theme <JSON>
-csdk site-theme update --id <UUID> [--databaseId <UUID>] [--siteId <UUID>] [--theme <JSON>]
+csdk site-theme create --databaseId <UUID> --siteId <UUID> --theme <JSON> [--commitId <UUID>] [--isActive <Boolean>] [--name <String>] [--storeId <UUID>]
+csdk site-theme update --id <UUID> [--commitId <UUID>] [--databaseId <UUID>] [--isActive <Boolean>] [--name <String>] [--siteId <UUID>] [--storeId <UUID>] [--theme <JSON>]
 csdk site-theme delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk site-theme list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a siteTheme
 
 ```bash
-csdk site-theme create --databaseId <UUID> --siteId <UUID> --theme <JSON>
+csdk site-theme create --databaseId <UUID> --siteId <UUID> --theme <JSON> [--commitId <UUID>] [--isActive <Boolean>] [--name <String>] [--storeId <UUID>]
 ```
 
 ### Get a siteTheme by id

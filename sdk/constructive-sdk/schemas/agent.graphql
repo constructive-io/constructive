@@ -1241,11 +1241,7 @@ input AgentPromptToManyAgentThreadFilter {
   some: AgentThreadFilter
 }
 
-"""
-@@hasChunks {"parentFk": "agent_resource_id", "parentPk": "id", "chunksTable": "agent_resource_chunks", "searchField": null, "contentField": "body", "searchIndexes": ["tsvector"], "embeddingField": "embedding"}
-@@searchConfig {"weights": {"tsv": 1}, "fts_field": "search", "fts_source_fields": [{"field": "title", "weight": "A"}, {"field": "description", "weight": "B"}, {"field": "body", "weight": "C"}]}
-Unified skills and knowledge resources for agent retrieval
-"""
+"""Unified skills and knowledge resources for agent retrieval"""
 type AgentResource {
   """Reads and enables pagination through a set of `AgentResourceChunk`."""
   agentResourceChunks(
@@ -1300,8 +1296,6 @@ type AgentResource {
   """
   descriptionTrgmSimilarity: Float
   embedding: Vector
-
-  """@@behavior -insert -update"""
   embeddingUpdatedAt: Datetime
 
   """
@@ -1355,9 +1349,6 @@ type AgentResource {
   updatedBy: UUID
 }
 
-"""
-@@chunksOf {"parentFk": "agent_resource_id", "parentTable": "agent_resource"}
-"""
 type AgentResourceChunk {
   """
   Reads a single `AgentResource` that is related to this `AgentResourceChunk`.
@@ -1669,9 +1660,6 @@ input AgentResourceInput {
   Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
   """
   embeddingText: String
-
-  """@@behavior -insert -update"""
-  embeddingUpdatedAt: Datetime
   id: UUID
 
   """Whether this resource is active and retrievable"""
@@ -1780,9 +1768,6 @@ input AgentResourcePatch {
   Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
   """
   embeddingText: String
-
-  """@@behavior -insert -update"""
-  embeddingUpdatedAt: Datetime
   id: UUID
 
   """Whether this resource is active and retrievable"""
@@ -3454,6 +3439,8 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """PostgreSQL column name"""
+  columnName: String!
   description: String
 
   """Enum metadata if this field has an enum type"""
@@ -3462,6 +3449,8 @@ type MetaField {
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
+
+  """Final GraphQL field name"""
   name: String!
   type: MetaType!
 }
@@ -3550,7 +3539,7 @@ type MetaPrimaryKeyConstraint {
 
 """Table query/mutation names"""
 type MetaQuery {
-  all: String!
+  all: String
   create: String
   delete: String
   one: String
@@ -3687,6 +3676,8 @@ type MetaTable {
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
@@ -3704,6 +3695,9 @@ type MetaTable {
 
   """Storage metadata (null if not a storage table)"""
   storage: MetaStorage
+
+  """PostgreSQL table name"""
+  tableName: String!
   uniqueConstraints: [MetaUniqueConstraint!]!
 }
 

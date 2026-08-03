@@ -53,6 +53,7 @@ import type {
   MerkleStoreModule,
   NamespaceModule,
   NotificationsModule,
+  PagesModule,
   PermissionsModule,
   PhoneNumbersModule,
   PlansModule,
@@ -492,6 +493,10 @@ export type CatalogModuleOrderBy =
   | 'APPS_TABLE_ID_DESC'
   | 'APPS_TABLE_NAME_ASC'
   | 'APPS_TABLE_NAME_DESC'
+  | 'BUCKETS_TABLE_ID_ASC'
+  | 'BUCKETS_TABLE_ID_DESC'
+  | 'BUCKETS_TABLE_NAME_ASC'
+  | 'BUCKETS_TABLE_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEFAULT_PERMISSIONS_ASC'
@@ -539,10 +544,26 @@ export type CatalogModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
+  | 'SITES_APP_LINKS_TABLE_ID_ASC'
+  | 'SITES_APP_LINKS_TABLE_ID_DESC'
+  | 'SITES_APP_LINKS_TABLE_NAME_ASC'
+  | 'SITES_APP_LINKS_TABLE_NAME_DESC'
+  | 'SITES_DEEP_LINKS_TABLE_ID_ASC'
+  | 'SITES_DEEP_LINKS_TABLE_ID_DESC'
+  | 'SITES_DEEP_LINKS_TABLE_NAME_ASC'
+  | 'SITES_DEEP_LINKS_TABLE_NAME_DESC'
+  | 'SITES_ERROR_PAGES_TABLE_ID_ASC'
+  | 'SITES_ERROR_PAGES_TABLE_ID_DESC'
+  | 'SITES_ERROR_PAGES_TABLE_NAME_ASC'
+  | 'SITES_ERROR_PAGES_TABLE_NAME_DESC'
   | 'SITES_TABLE_ID_ASC'
   | 'SITES_TABLE_ID_DESC'
   | 'SITES_TABLE_NAME_ASC'
-  | 'SITES_TABLE_NAME_DESC';
+  | 'SITES_TABLE_NAME_DESC'
+  | 'SITES_WEB_CONFIG_TABLE_ID_ASC'
+  | 'SITES_WEB_CONFIG_TABLE_ID_DESC'
+  | 'SITES_WEB_CONFIG_TABLE_NAME_ASC'
+  | 'SITES_WEB_CONFIG_TABLE_NAME_DESC';
 /** Methods to use when ordering `ComputeLogModule`. */
 export type ComputeLogModuleOrderBy =
   | 'ACTOR_FK_TABLE_ID_ASC'
@@ -1345,6 +1366,8 @@ export type FunctionModuleOrderBy =
   | 'BINDINGS_TABLE_ID_DESC'
   | 'BINDINGS_TABLE_NAME_ASC'
   | 'BINDINGS_TABLE_NAME_DESC'
+  | 'CAPABILITY_BINDINGS_TABLE_ID_ASC'
+  | 'CAPABILITY_BINDINGS_TABLE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEFAULT_PERMISSIONS_ASC'
@@ -2178,6 +2201,49 @@ export type NotificationsModuleOrderBy =
   | 'SUPPRESSIONS_TABLE_ID_DESC'
   | 'USER_SETTINGS_TABLE_ID_ASC'
   | 'USER_SETTINGS_TABLE_ID_DESC';
+/** Methods to use when ordering `PagesModule`. */
+export type PagesModuleOrderBy =
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MERKLE_STORE_MODULE_ID_ASC'
+  | 'MERKLE_STORE_MODULE_ID_DESC'
+  | 'NATURAL'
+  | 'PAGES_TABLE_ID_ASC'
+  | 'PAGES_TABLE_ID_DESC'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'PUBLIC_SCHEMA_ID_ASC'
+  | 'PUBLIC_SCHEMA_ID_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'SITES_TABLE_ID_ASC'
+  | 'SITES_TABLE_ID_DESC'
+  | 'SITE_SURFACE_MODULE_ID_ASC'
+  | 'SITE_SURFACE_MODULE_ID_DESC'
+  | 'STORE_NAME_PREFIX_ASC'
+  | 'STORE_NAME_PREFIX_DESC';
 /** Methods to use when ordering `PermissionsModule`. */
 export type PermissionsModuleOrderBy =
   | 'ACTOR_TABLE_ID_ASC'
@@ -2798,6 +2864,10 @@ export type SiteSurfaceModuleOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PRIVATE_API_NAME_ASC'
   | 'PRIVATE_API_NAME_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
   | 'PROVISIONS_ASC'
   | 'PROVISIONS_DESC'
   | 'PUBLIC_SCHEMA_NAME_ASC'
@@ -2810,6 +2880,18 @@ export type SiteSurfaceModuleOrderBy =
   | 'SITES_TABLE_ID_DESC'
   | 'SITES_TABLE_NAME_ASC'
   | 'SITES_TABLE_NAME_DESC'
+  | 'SITE_APP_LINKS_TABLE_ID_ASC'
+  | 'SITE_APP_LINKS_TABLE_ID_DESC'
+  | 'SITE_APP_LINKS_TABLE_NAME_ASC'
+  | 'SITE_APP_LINKS_TABLE_NAME_DESC'
+  | 'SITE_DEEP_LINKS_TABLE_ID_ASC'
+  | 'SITE_DEEP_LINKS_TABLE_ID_DESC'
+  | 'SITE_DEEP_LINKS_TABLE_NAME_ASC'
+  | 'SITE_DEEP_LINKS_TABLE_NAME_DESC'
+  | 'SITE_ERROR_PAGES_TABLE_ID_ASC'
+  | 'SITE_ERROR_PAGES_TABLE_ID_DESC'
+  | 'SITE_ERROR_PAGES_TABLE_NAME_ASC'
+  | 'SITE_ERROR_PAGES_TABLE_NAME_DESC'
   | 'SITE_METADATA_TABLE_ID_ASC'
   | 'SITE_METADATA_TABLE_ID_DESC'
   | 'SITE_METADATA_TABLE_NAME_ASC'
@@ -2821,7 +2903,11 @@ export type SiteSurfaceModuleOrderBy =
   | 'SITE_THEMES_TABLE_ID_ASC'
   | 'SITE_THEMES_TABLE_ID_DESC'
   | 'SITE_THEMES_TABLE_NAME_ASC'
-  | 'SITE_THEMES_TABLE_NAME_DESC';
+  | 'SITE_THEMES_TABLE_NAME_DESC'
+  | 'SITE_WEB_CONFIG_TABLE_ID_ASC'
+  | 'SITE_WEB_CONFIG_TABLE_ID_DESC'
+  | 'SITE_WEB_CONFIG_TABLE_NAME_ASC'
+  | 'SITE_WEB_CONFIG_TABLE_NAME_DESC';
 /** Methods to use when ordering `StorageLogModule`. */
 export type StorageLogModuleOrderBy =
   | 'ACTOR_FK_TABLE_ID_ASC'
@@ -2879,6 +2965,8 @@ export type StorageModuleOrderBy =
   | 'BUCKETS_TABLE_NAME_DESC'
   | 'CACHE_TTL_SECONDS_ASC'
   | 'CACHE_TTL_SECONDS_DESC'
+  | 'CATALOG_MODULE_ID_ASC'
+  | 'CATALOG_MODULE_ID_DESC'
   | 'CONFIRM_UPLOAD_DELAY_ASC'
   | 'CONFIRM_UPLOAD_DELAY_DESC'
   | 'DATABASE_ID_ASC'
@@ -4200,18 +4288,34 @@ export interface CatalogModuleFilter {
   and?: CatalogModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `apiSurfaceModules` relation. */
+  apiSurfaceModules?: CatalogModuleToManyApiSurfaceModuleFilter;
+  /** `apiSurfaceModules` exist. */
+  apiSurfaceModulesExist?: boolean;
   /** Filter by the object’s `apisTableId` field. */
   apisTableId?: UUIDFilter;
   /** Filter by the object’s `apisTableName` field. */
   apisTableName?: StringFilter;
+  /** Filter by the object’s `appModules` relation. */
+  appModules?: CatalogModuleToManyAppModuleFilter;
+  /** `appModules` exist. */
+  appModulesExist?: boolean;
   /** Filter by the object’s `appsTableId` field. */
   appsTableId?: UUIDFilter;
   /** Filter by the object’s `appsTableName` field. */
   appsTableName?: StringFilter;
+  /** Filter by the object’s `bucketsTableId` field. */
+  bucketsTableId?: UUIDFilter;
+  /** Filter by the object’s `bucketsTableName` field. */
+  bucketsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultPermissions` field. */
   defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `domainModules` relation. */
+  domainModules?: CatalogModuleToManyDomainModuleFilter;
+  /** `domainModules` exist. */
+  domainModulesExist?: boolean;
   /** Filter by the object’s `domainsTableId` field. */
   domainsTableId?: UUIDFilter;
   /** Filter by the object’s `domainsTableName` field. */
@@ -4252,14 +4356,38 @@ export interface CatalogModuleFilter {
   resourcesTableId?: UUIDFilter;
   /** Filter by the object’s `resourcesTableName` field. */
   resourcesTableName?: StringFilter;
+  /** Filter by the object’s `routeModules` relation. */
+  routeModules?: CatalogModuleToManyRouteModuleFilter;
+  /** `routeModules` exist. */
+  routeModulesExist?: boolean;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `siteSurfaceModules` relation. */
+  siteSurfaceModules?: CatalogModuleToManySiteSurfaceModuleFilter;
+  /** `siteSurfaceModules` exist. */
+  siteSurfaceModulesExist?: boolean;
+  /** Filter by the object’s `sitesAppLinksTableId` field. */
+  sitesAppLinksTableId?: UUIDFilter;
+  /** Filter by the object’s `sitesAppLinksTableName` field. */
+  sitesAppLinksTableName?: StringFilter;
+  /** Filter by the object’s `sitesDeepLinksTableId` field. */
+  sitesDeepLinksTableId?: UUIDFilter;
+  /** Filter by the object’s `sitesDeepLinksTableName` field. */
+  sitesDeepLinksTableName?: StringFilter;
+  /** Filter by the object’s `sitesErrorPagesTableId` field. */
+  sitesErrorPagesTableId?: UUIDFilter;
+  /** Filter by the object’s `sitesErrorPagesTableName` field. */
+  sitesErrorPagesTableName?: StringFilter;
   /** Filter by the object’s `sitesTableId` field. */
   sitesTableId?: UUIDFilter;
   /** Filter by the object’s `sitesTableName` field. */
   sitesTableName?: StringFilter;
+  /** Filter by the object’s `sitesWebConfigTableId` field. */
+  sitesWebConfigTableId?: UUIDFilter;
+  /** Filter by the object’s `sitesWebConfigTableName` field. */
+  sitesWebConfigTableName?: StringFilter;
 }
 /** An input for mutations affecting `CatalogModule` */
 export interface CatalogModuleInput {
@@ -4268,6 +4396,8 @@ export interface CatalogModuleInput {
   apisTableName?: string;
   appsTableId?: string;
   appsTableName?: string;
+  bucketsTableId?: string;
+  bucketsTableName?: string;
   databaseId: string;
   defaultPermissions?: string[];
   domainsTableId?: string;
@@ -4290,8 +4420,16 @@ export interface CatalogModuleInput {
   resourcesTableName?: string;
   schemaId?: string;
   scope: string;
+  sitesAppLinksTableId?: string;
+  sitesAppLinksTableName?: string;
+  sitesDeepLinksTableId?: string;
+  sitesDeepLinksTableName?: string;
+  sitesErrorPagesTableId?: string;
+  sitesErrorPagesTableName?: string;
   sitesTableId?: string;
   sitesTableName?: string;
+  sitesWebConfigTableId?: string;
+  sitesWebConfigTableName?: string;
 }
 /** Represents an update to a `CatalogModule`. Fields that are set will be updated. */
 export interface CatalogModulePatch {
@@ -4300,6 +4438,8 @@ export interface CatalogModulePatch {
   apisTableName?: string;
   appsTableId?: string;
   appsTableName?: string;
+  bucketsTableId?: string;
+  bucketsTableName?: string;
   databaseId?: string;
   defaultPermissions?: string[];
   domainsTableId?: string;
@@ -4322,8 +4462,61 @@ export interface CatalogModulePatch {
   resourcesTableName?: string;
   schemaId?: string;
   scope?: string;
+  sitesAppLinksTableId?: string;
+  sitesAppLinksTableName?: string;
+  sitesDeepLinksTableId?: string;
+  sitesDeepLinksTableName?: string;
+  sitesErrorPagesTableId?: string;
+  sitesErrorPagesTableName?: string;
   sitesTableId?: string;
   sitesTableName?: string;
+  sitesWebConfigTableId?: string;
+  sitesWebConfigTableName?: string;
+}
+/** A filter to be used against many `ApiSurfaceModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CatalogModuleToManyApiSurfaceModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ApiSurfaceModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiSurfaceModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiSurfaceModuleFilter;
+}
+/** A filter to be used against many `AppModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CatalogModuleToManyAppModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AppModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppModuleFilter;
+}
+/** A filter to be used against many `DomainModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CatalogModuleToManyDomainModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainModuleFilter;
+}
+/** A filter to be used against many `RouteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CatalogModuleToManyRouteModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RouteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RouteModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RouteModuleFilter;
+}
+/** A filter to be used against many `SiteSurfaceModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CatalogModuleToManySiteSurfaceModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: SiteSurfaceModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteSurfaceModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteSurfaceModuleFilter;
 }
 /** A filter to be used against `ComputeLogModule` object types. All fields are combined with a logical ‘and.’ */
 export interface ComputeLogModuleFilter {
@@ -4770,6 +4963,11 @@ export interface CreateNotificationsModuleInput {
   clientMutationId?: string;
   /** The `NotificationsModule` to be created by this mutation. */
   notificationsModule: NotificationsModuleInput;
+}
+export interface CreatePagesModuleInput {
+  clientMutationId?: string;
+  /** The `PagesModule` to be created by this mutation. */
+  pagesModule: PagesModuleInput;
 }
 export interface CreatePermissionsModuleInput {
   clientMutationId?: string;
@@ -5825,6 +6023,10 @@ export interface DeleteNotificationsModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeletePagesModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeletePermissionsModuleInput {
   clientMutationId?: string;
   id: string;
@@ -6097,6 +6299,10 @@ export interface DomainModuleFilter {
   provisions?: JSONFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
+  /** Filter by the object’s `routeModules` relation. */
+  routeModules?: DomainModuleToManyRouteModuleFilter;
+  /** `routeModules` exist. */
+  routeModulesExist?: boolean;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
@@ -6155,6 +6361,15 @@ export interface DomainModulePatch {
   publicSchemaName?: string;
   schemaId?: string;
   scope?: string;
+}
+/** A filter to be used against many `RouteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainModuleToManyRouteModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RouteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RouteModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RouteModuleFilter;
 }
 /** A filter to be used against `EmailsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface EmailsModuleFilter {
@@ -7146,6 +7361,10 @@ export interface FunctionInvocationModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `webhookModules` relation. */
+  webhookModules?: FunctionInvocationModuleToManyWebhookModuleFilter;
+  /** `webhookModules` exist. */
+  webhookModulesExist?: boolean;
 }
 /** An input for mutations affecting `FunctionInvocationModule` */
 export interface FunctionInvocationModuleInput {
@@ -7195,6 +7414,15 @@ export interface FunctionInvocationModulePatch {
   schemaId?: string;
   scope?: string;
 }
+/** A filter to be used against many `WebhookModule` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionInvocationModuleToManyWebhookModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebhookModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebhookModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebhookModuleFilter;
+}
 /** A filter to be used against `FunctionModule` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionModuleFilter {
   /** Checks for all expressions in this list. */
@@ -7205,6 +7433,8 @@ export interface FunctionModuleFilter {
   bindingsTableId?: UUIDFilter;
   /** Filter by the object’s `bindingsTableName` field. */
   bindingsTableName?: StringFilter;
+  /** Filter by the object’s `capabilityBindingsTableId` field. */
+  capabilityBindingsTableId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultPermissions` field. */
@@ -7217,8 +7447,16 @@ export interface FunctionModuleFilter {
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `functionDeploymentModules` relation. */
+  functionDeploymentModules?: FunctionModuleToManyFunctionDeploymentModuleFilter;
+  /** `functionDeploymentModules` exist. */
+  functionDeploymentModulesExist?: boolean;
   /** Filter by the object’s `hasCron` field. */
   hasCron?: BooleanFilter;
+  /** Filter by the object’s `httpRouteModules` relation. */
+  httpRouteModules?: FunctionModuleToManyHttpRouteModuleFilter;
+  /** `httpRouteModules` exist. */
+  httpRouteModulesExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
@@ -7245,12 +7483,17 @@ export interface FunctionModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `webhookModules` relation. */
+  webhookModules?: FunctionModuleToManyWebhookModuleFilter;
+  /** `webhookModules` exist. */
+  webhookModulesExist?: boolean;
 }
 /** An input for mutations affecting `FunctionModule` */
 export interface FunctionModuleInput {
   apiName?: string;
   bindingsTableId?: string;
   bindingsTableName?: string;
+  capabilityBindingsTableId?: string;
   databaseId: string;
   defaultPermissions?: string[];
   definitionsTableId?: string;
@@ -7275,6 +7518,7 @@ export interface FunctionModulePatch {
   apiName?: string;
   bindingsTableId?: string;
   bindingsTableName?: string;
+  capabilityBindingsTableId?: string;
   databaseId?: string;
   defaultPermissions?: string[];
   definitionsTableId?: string;
@@ -7293,6 +7537,33 @@ export interface FunctionModulePatch {
   schedulesTableId?: string;
   schemaId?: string;
   scope?: string;
+}
+/** A filter to be used against many `FunctionDeploymentModule` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionModuleToManyFunctionDeploymentModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionDeploymentModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionDeploymentModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionDeploymentModuleFilter;
+}
+/** A filter to be used against many `HttpRouteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionModuleToManyHttpRouteModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: HttpRouteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: HttpRouteModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: HttpRouteModuleFilter;
+}
+/** A filter to be used against many `WebhookModule` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionModuleToManyWebhookModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebhookModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebhookModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebhookModuleFilter;
 }
 /** A filter to be used against `GraphExecutionModule` object types. All fields are combined with a logical ‘and.’ */
 export interface GraphExecutionModuleFilter {
@@ -7419,6 +7690,10 @@ export interface GraphModuleFilter {
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `graphExecutionModules` relation. */
+  graphExecutionModules?: GraphModuleToManyGraphExecutionModuleFilter;
+  /** `graphExecutionModules` exist. */
+  graphExecutionModulesExist?: boolean;
   /** Filter by the object’s `graphsTableId` field. */
   graphsTableId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -7491,6 +7766,15 @@ export interface GraphModulePatch {
   publicSchemaId?: string;
   publicSchemaName?: string;
   scope?: string;
+}
+/** A filter to be used against many `GraphExecutionModule` object types. All fields are combined with a logical ‘and.’ */
+export interface GraphModuleToManyGraphExecutionModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: GraphExecutionModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: GraphExecutionModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: GraphExecutionModuleFilter;
 }
 /** A filter to be used against `HierarchyModule` object types. All fields are combined with a logical ‘and.’ */
 export interface HierarchyModuleFilter {
@@ -8040,6 +8324,10 @@ export interface InfraSecretsModuleFilter {
   secretsTableId?: UUIDFilter;
   /** Filter by the object’s `secretsTableName` field. */
   secretsTableName?: StringFilter;
+  /** Filter by the object’s `webhookModules` relation. */
+  webhookModules?: InfraSecretsModuleToManyWebhookModuleFilter;
+  /** `webhookModules` exist. */
+  webhookModulesExist?: boolean;
 }
 /** An input for mutations affecting `InfraSecretsModule` */
 export interface InfraSecretsModuleInput {
@@ -8078,6 +8366,15 @@ export interface InfraSecretsModulePatch {
   scope?: string;
   secretsTableId?: string;
   secretsTableName?: string;
+}
+/** A filter to be used against many `WebhookModule` object types. All fields are combined with a logical ‘and.’ */
+export interface InfraSecretsModuleToManyWebhookModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebhookModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebhookModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebhookModuleFilter;
 }
 /** A filter to be used against `IntegrationProvidersModule` object types. All fields are combined with a logical ‘and.’ */
 export interface IntegrationProvidersModuleFilter {
@@ -8816,6 +9113,10 @@ export interface MerkleStoreModuleFilter {
   objectTableId?: UUIDFilter;
   /** Checks for any expressions in this list. */
   or?: MerkleStoreModuleFilter[];
+  /** Filter by the object’s `pagesModules` relation. */
+  pagesModules?: MerkleStoreModuleToManyPagesModuleFilter;
+  /** `pagesModules` exist. */
+  pagesModulesExist?: boolean;
   /** Filter by the object’s `permissionKey` field. */
   permissionKey?: StringFilter;
   /** Filter by the object’s `prefix` field. */
@@ -8830,6 +9131,10 @@ export interface MerkleStoreModuleFilter {
   publicSchemaName?: StringFilter;
   /** Filter by the object’s `refTableId` field. */
   refTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceModules` relation. */
+  resourceModules?: MerkleStoreModuleToManyResourceModuleFilter;
+  /** `resourceModules` exist. */
+  resourceModulesExist?: boolean;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
@@ -8897,6 +9202,24 @@ export interface MerkleStoreModuleToManyGraphModuleFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: GraphModuleFilter;
 }
+/** A filter to be used against many `PagesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface MerkleStoreModuleToManyPagesModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PagesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PagesModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PagesModuleFilter;
+}
+/** A filter to be used against many `ResourceModule` object types. All fields are combined with a logical ‘and.’ */
+export interface MerkleStoreModuleToManyResourceModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ResourceModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ResourceModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ResourceModuleFilter;
+}
 /** A filter to be used against `NamespaceModule` object types. All fields are combined with a logical ‘and.’ */
 export interface NamespaceModuleFilter {
   /** Checks for all expressions in this list. */
@@ -8911,6 +9234,10 @@ export interface NamespaceModuleFilter {
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `functionDeploymentModules` relation. */
+  functionDeploymentModules?: NamespaceModuleToManyFunctionDeploymentModuleFilter;
+  /** `functionDeploymentModules` exist. */
+  functionDeploymentModulesExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `namespaceEventsTableId` field. */
@@ -8939,10 +9266,18 @@ export interface NamespaceModuleFilter {
   provisions?: JSONFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
+  /** Filter by the object’s `resourceModules` relation. */
+  resourceModules?: NamespaceModuleToManyResourceModuleFilter;
+  /** `resourceModules` exist. */
+  resourceModulesExist?: boolean;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `webhookModules` relation. */
+  webhookModules?: NamespaceModuleToManyWebhookModuleFilter;
+  /** `webhookModules` exist. */
+  webhookModulesExist?: boolean;
 }
 /** An input for mutations affecting `NamespaceModule` */
 export interface NamespaceModuleInput {
@@ -8987,6 +9322,33 @@ export interface NamespaceModulePatch {
   publicSchemaName?: string;
   schemaId?: string;
   scope?: string;
+}
+/** A filter to be used against many `FunctionDeploymentModule` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceModuleToManyFunctionDeploymentModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionDeploymentModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionDeploymentModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionDeploymentModuleFilter;
+}
+/** A filter to be used against many `ResourceModule` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceModuleToManyResourceModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ResourceModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ResourceModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ResourceModuleFilter;
+}
+/** A filter to be used against many `WebhookModule` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceModuleToManyWebhookModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebhookModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebhookModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebhookModuleFilter;
 }
 /** A filter to be used against `NotificationsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface NotificationsModuleFilter {
@@ -9098,6 +9460,103 @@ export interface NotificationsModulePatch {
   schemaId?: string;
   suppressionsTableId?: string;
   userSettingsTableId?: string;
+}
+/** A filter to be used against `PagesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PagesModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: PagesModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `merkleStoreModule` relation. */
+  merkleStoreModule?: MerkleStoreModuleFilter;
+  /** Filter by the object’s `merkleStoreModuleId` field. */
+  merkleStoreModuleId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PagesModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: PagesModuleFilter[];
+  /** Filter by the object’s `pagesTableId` field. */
+  pagesTableId?: UUIDFilter;
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaId` field. */
+  publicSchemaId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `siteSurfaceModule` relation. */
+  siteSurfaceModule?: SiteSurfaceModuleFilter;
+  /** A related `siteSurfaceModule` exists. */
+  siteSurfaceModuleExists?: boolean;
+  /** Filter by the object’s `siteSurfaceModuleId` field. */
+  siteSurfaceModuleId?: UUIDFilter;
+  /** Filter by the object’s `sitesTableId` field. */
+  sitesTableId?: UUIDFilter;
+  /** Filter by the object’s `storeNamePrefix` field. */
+  storeNamePrefix?: StringFilter;
+}
+/** An input for mutations affecting `PagesModule` */
+export interface PagesModuleInput {
+  apiName?: string;
+  createdAt?: string;
+  databaseId: string;
+  entityTableId?: string;
+  id?: string;
+  merkleStoreModuleId: string;
+  pagesTableId?: string;
+  policies?: unknown;
+  prefix: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: unknown;
+  publicSchemaId?: string;
+  publicSchemaName?: string;
+  scope: string;
+  siteSurfaceModuleId?: string;
+  sitesTableId?: string;
+  storeNamePrefix?: string;
+}
+/** Represents an update to a `PagesModule`. Fields that are set will be updated. */
+export interface PagesModulePatch {
+  apiName?: string;
+  createdAt?: string;
+  databaseId?: string;
+  entityTableId?: string;
+  id?: string;
+  merkleStoreModuleId?: string;
+  pagesTableId?: string;
+  policies?: unknown;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: unknown;
+  publicSchemaId?: string;
+  publicSchemaName?: string;
+  scope?: string;
+  siteSurfaceModuleId?: string;
+  sitesTableId?: string;
+  storeNamePrefix?: string;
 }
 /** A filter to be used against `PermissionsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface PermissionsModuleFilter {
@@ -10160,6 +10619,10 @@ export interface ResourceModuleFilter {
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `httpRouteModules` relation. */
+  httpRouteModules?: ResourceModuleToManyHttpRouteModuleFilter;
+  /** `httpRouteModules` exist. */
+  httpRouteModulesExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `installationStoreName` field. */
@@ -10312,6 +10775,15 @@ export interface ResourceModulePatch {
   rollupResourceUsageSummaryFunction?: string;
   schemaId?: string;
   scope?: string;
+}
+/** A filter to be used against many `HttpRouteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceModuleToManyHttpRouteModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: HttpRouteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: HttpRouteModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: HttpRouteModuleFilter;
 }
 /** A filter to be used against `RlsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface RlsModuleFilter {
@@ -10706,12 +11178,20 @@ export interface SiteSurfaceModuleFilter {
   not?: SiteSurfaceModuleFilter;
   /** Checks for any expressions in this list. */
   or?: SiteSurfaceModuleFilter[];
+  /** Filter by the object’s `pagesModules` relation. */
+  pagesModules?: SiteSurfaceModuleToManyPagesModuleFilter;
+  /** `pagesModules` exist. */
+  pagesModulesExist?: boolean;
   /** Filter by the object’s `policies` field. */
   policies?: JSONFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `privateApiName` field. */
   privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
   /** Filter by the object’s `provisions` field. */
   provisions?: JSONFilter;
   /** Filter by the object’s `publicSchemaName` field. */
@@ -10720,6 +11200,18 @@ export interface SiteSurfaceModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `siteAppLinksTableId` field. */
+  siteAppLinksTableId?: UUIDFilter;
+  /** Filter by the object’s `siteAppLinksTableName` field. */
+  siteAppLinksTableName?: StringFilter;
+  /** Filter by the object’s `siteDeepLinksTableId` field. */
+  siteDeepLinksTableId?: UUIDFilter;
+  /** Filter by the object’s `siteDeepLinksTableName` field. */
+  siteDeepLinksTableName?: StringFilter;
+  /** Filter by the object’s `siteErrorPagesTableId` field. */
+  siteErrorPagesTableId?: UUIDFilter;
+  /** Filter by the object’s `siteErrorPagesTableName` field. */
+  siteErrorPagesTableName?: StringFilter;
   /** Filter by the object’s `siteMetadataTableId` field. */
   siteMetadataTableId?: UUIDFilter;
   /** Filter by the object’s `siteMetadataTableName` field. */
@@ -10732,6 +11224,10 @@ export interface SiteSurfaceModuleFilter {
   siteThemesTableId?: UUIDFilter;
   /** Filter by the object’s `siteThemesTableName` field. */
   siteThemesTableName?: StringFilter;
+  /** Filter by the object’s `siteWebConfigTableId` field. */
+  siteWebConfigTableId?: UUIDFilter;
+  /** Filter by the object’s `siteWebConfigTableName` field. */
+  siteWebConfigTableName?: StringFilter;
   /** Filter by the object’s `sitesTableId` field. */
   sitesTableId?: UUIDFilter;
   /** Filter by the object’s `sitesTableName` field. */
@@ -10749,16 +11245,26 @@ export interface SiteSurfaceModuleInput {
   policies?: unknown;
   prefix?: string;
   privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
   provisions?: unknown;
   publicSchemaName?: string;
   schemaId?: string;
   scope: string;
+  siteAppLinksTableId?: string;
+  siteAppLinksTableName?: string;
+  siteDeepLinksTableId?: string;
+  siteDeepLinksTableName?: string;
+  siteErrorPagesTableId?: string;
+  siteErrorPagesTableName?: string;
   siteMetadataTableId?: string;
   siteMetadataTableName?: string;
   siteModulesTableId?: string;
   siteModulesTableName?: string;
   siteThemesTableId?: string;
   siteThemesTableName?: string;
+  siteWebConfigTableId?: string;
+  siteWebConfigTableName?: string;
   sitesTableId?: string;
   sitesTableName?: string;
 }
@@ -10774,18 +11280,37 @@ export interface SiteSurfaceModulePatch {
   policies?: unknown;
   prefix?: string;
   privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
   provisions?: unknown;
   publicSchemaName?: string;
   schemaId?: string;
   scope?: string;
+  siteAppLinksTableId?: string;
+  siteAppLinksTableName?: string;
+  siteDeepLinksTableId?: string;
+  siteDeepLinksTableName?: string;
+  siteErrorPagesTableId?: string;
+  siteErrorPagesTableName?: string;
   siteMetadataTableId?: string;
   siteMetadataTableName?: string;
   siteModulesTableId?: string;
   siteModulesTableName?: string;
   siteThemesTableId?: string;
   siteThemesTableName?: string;
+  siteWebConfigTableId?: string;
+  siteWebConfigTableName?: string;
   sitesTableId?: string;
   sitesTableName?: string;
+}
+/** A filter to be used against many `PagesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteSurfaceModuleToManyPagesModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PagesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PagesModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PagesModuleFilter;
 }
 /** A filter to be used against `StorageLogModule` object types. All fields are combined with a logical ‘and.’ */
 export interface StorageLogModuleFilter {
@@ -10896,6 +11421,8 @@ export interface StorageModuleFilter {
   bucketsTableName?: StringFilter;
   /** Filter by the object’s `cacheTtlSeconds` field. */
   cacheTtlSeconds?: IntFilter;
+  /** Filter by the object’s `catalogModuleId` field. */
+  catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `confirmUploadDelay` field. */
   confirmUploadDelay?: IntervalFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -10930,6 +11457,10 @@ export interface StorageModuleFilter {
   hasPathShares?: BooleanFilter;
   /** Filter by the object’s `hasVersioning` field. */
   hasVersioning?: BooleanFilter;
+  /** Filter by the object’s `httpRouteModules` relation. */
+  httpRouteModules?: StorageModuleToManyHttpRouteModuleFilter;
+  /** `httpRouteModules` exist. */
+  httpRouteModulesExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `maxBulkFiles` field. */
@@ -10978,6 +11509,7 @@ export interface StorageModuleInput {
   bucketsTableId?: string;
   bucketsTableName?: string;
   cacheTtlSeconds?: number;
+  catalogModuleId?: string;
   confirmUploadDelay?: IntervalInput;
   databaseId: string;
   defaultMaxFileSize?: string;
@@ -11021,6 +11553,7 @@ export interface StorageModulePatch {
   bucketsTableId?: string;
   bucketsTableName?: string;
   cacheTtlSeconds?: number;
+  catalogModuleId?: string;
   confirmUploadDelay?: IntervalInput;
   databaseId?: string;
   defaultMaxFileSize?: string;
@@ -11056,6 +11589,15 @@ export interface StorageModulePatch {
   schemaId?: string;
   scope?: string;
   uploadUrlExpirySeconds?: number;
+}
+/** A filter to be used against many `HttpRouteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface StorageModuleToManyHttpRouteModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: HttpRouteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: HttpRouteModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: HttpRouteModuleFilter;
 }
 /** A filter to be used against `TransferLogModule` object types. All fields are combined with a logical ‘and.’ */
 export interface TransferLogModuleFilter {
@@ -11443,6 +11985,12 @@ export interface UpdateNotificationsModuleInput {
   id: string;
   /** An object where the defined keys will be set on the `NotificationsModule` being updated. */
   notificationsModulePatch: NotificationsModulePatch;
+}
+export interface UpdatePagesModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PagesModule` being updated. */
+  pagesModulePatch: PagesModulePatch;
 }
 export interface UpdatePermissionsModuleInput {
   clientMutationId?: string;
@@ -12506,6 +13054,13 @@ export interface NotificationsModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `PagesModule` values. */
+export interface PagesModuleConnection {
+  edges: PagesModuleEdge[];
+  nodes: PagesModule[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `PermissionsModule` values. */
 export interface PermissionsModuleConnection {
   edges: PermissionsModuleEdge[];
@@ -12991,6 +13546,12 @@ export interface CreateNotificationsModulePayload {
   notificationsModule?: NotificationsModule | null;
   notificationsModuleEdge?: NotificationsModuleEdge | null;
 }
+export interface CreatePagesModulePayload {
+  clientMutationId?: string | null;
+  /** The `PagesModule` that was created by this mutation. */
+  pagesModule?: PagesModule | null;
+  pagesModuleEdge?: PagesModuleEdge | null;
+}
 export interface CreatePermissionsModulePayload {
   clientMutationId?: string | null;
   /** The `PermissionsModule` that was created by this mutation. */
@@ -13440,6 +14001,12 @@ export interface DeleteNotificationsModulePayload {
   /** The `NotificationsModule` that was deleted by this mutation. */
   notificationsModule?: NotificationsModule | null;
   notificationsModuleEdge?: NotificationsModuleEdge | null;
+}
+export interface DeletePagesModulePayload {
+  clientMutationId?: string | null;
+  /** The `PagesModule` that was deleted by this mutation. */
+  pagesModule?: PagesModule | null;
+  pagesModuleEdge?: PagesModuleEdge | null;
 }
 export interface DeletePermissionsModulePayload {
   clientMutationId?: string | null;
@@ -13931,6 +14498,12 @@ export interface UpdateNotificationsModulePayload {
   notificationsModule?: NotificationsModule | null;
   notificationsModuleEdge?: NotificationsModuleEdge | null;
 }
+export interface UpdatePagesModulePayload {
+  clientMutationId?: string | null;
+  /** The `PagesModule` that was updated by this mutation. */
+  pagesModule?: PagesModule | null;
+  pagesModuleEdge?: PagesModuleEdge | null;
+}
 export interface UpdatePermissionsModulePayload {
   clientMutationId?: string | null;
   /** The `PermissionsModule` that was updated by this mutation. */
@@ -14102,6 +14675,7 @@ export interface MetaTable {
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
@@ -14115,6 +14689,8 @@ export interface MetaTable {
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
   storage?: MetaStorage | null;
+  /** PostgreSQL table name */
+  tableName: string;
   uniqueConstraints: MetaUniqueConstraint[];
 }
 /** A `AgentModule` edge in the connection. */
@@ -14416,6 +14992,12 @@ export interface NotificationsModuleEdge {
   /** The `NotificationsModule` at the end of the edge. */
   node?: NotificationsModule | null;
 }
+/** A `PagesModule` edge in the connection. */
+export interface PagesModuleEdge {
+  cursor?: string | null;
+  /** The `PagesModule` at the end of the edge. */
+  node?: PagesModule | null;
+}
 /** A `PermissionsModule` edge in the connection. */
 export interface PermissionsModuleEdge {
   cursor?: string | null;
@@ -14596,6 +15178,8 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** PostgreSQL column name */
+  columnName: string;
   description?: string | null;
   /** Enum metadata if this field has an enum type */
   enumValues?: MetaEnum | null;
@@ -14603,6 +15187,7 @@ export interface MetaField {
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Final GraphQL field name */
   name: string;
   type: MetaType;
 }
@@ -14652,7 +15237,7 @@ export interface MetaPrimaryKeyConstraint {
 }
 /** Table query/mutation names */
 export interface MetaQuery {
-  all: string;
+  all?: string | null;
   create?: string | null;
   delete?: string | null;
   one?: string | null;

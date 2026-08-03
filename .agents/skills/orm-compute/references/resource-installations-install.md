@@ -7,7 +7,7 @@ Execute the resourceInstallationsInstall mutation
 ## Usage
 
 ```typescript
-db.mutation.resourceInstallationsInstall({ input: { name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute()
+db.mutation.resourceInstallationsInstall({ input: { definitionIds: '<UUID>', name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.resourceInstallationsInstall({ input: { name: '<String>', namespaceI
 ### Run resourceInstallationsInstall
 
 ```typescript
-const result = await db.mutation.resourceInstallationsInstall({ input: { name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute();
+const result = await db.mutation.resourceInstallationsInstall({ input: { definitionIds: '<UUID>', name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute();
 ```

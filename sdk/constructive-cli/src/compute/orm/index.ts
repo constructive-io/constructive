@@ -7,6 +7,7 @@ import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { DbPresetModel } from './models/dbPreset';
 import { FunctionApiBindingModel } from './models/functionApiBinding';
+import { FunctionCapabilityBindingModel } from './models/functionCapabilityBinding';
 import { FunctionDefinitionModel } from './models/functionDefinition';
 import { FunctionDeploymentModel } from './models/functionDeployment';
 import { FunctionDeploymentEventModel } from './models/functionDeploymentEvent';
@@ -31,6 +32,7 @@ import { IntegrationProviderModel } from './models/integrationProvider';
 import { NamespaceModel } from './models/namespace';
 import { NamespaceEventModel } from './models/namespaceEvent';
 import { PlatformFunctionApiBindingModel } from './models/platformFunctionApiBinding';
+import { PlatformFunctionCapabilityBindingModel } from './models/platformFunctionCapabilityBinding';
 import { PlatformFunctionDefinitionModel } from './models/platformFunctionDefinition';
 import { PlatformFunctionDeploymentModel } from './models/platformFunctionDeployment';
 import { PlatformFunctionDeploymentEventModel } from './models/platformFunctionDeploymentEvent';
@@ -109,6 +111,7 @@ export function createClient(config: OrmClientConfig) {
   return {
     dbPreset: new DbPresetModel(client),
     functionApiBinding: new FunctionApiBindingModel(client),
+    functionCapabilityBinding: new FunctionCapabilityBindingModel(client),
     functionDefinition: new FunctionDefinitionModel(client),
     functionDeployment: new FunctionDeploymentModel(client),
     functionDeploymentEvent: new FunctionDeploymentEventModel(client),
@@ -133,6 +136,7 @@ export function createClient(config: OrmClientConfig) {
     namespace: new NamespaceModel(client),
     namespaceEvent: new NamespaceEventModel(client),
     platformFunctionApiBinding: new PlatformFunctionApiBindingModel(client),
+    platformFunctionCapabilityBinding: new PlatformFunctionCapabilityBindingModel(client),
     platformFunctionDefinition: new PlatformFunctionDefinitionModel(client),
     platformFunctionDeployment: new PlatformFunctionDeploymentModel(client),
     platformFunctionDeploymentEvent: new PlatformFunctionDeploymentEventModel(client),

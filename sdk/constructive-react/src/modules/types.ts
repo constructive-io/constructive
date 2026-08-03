@@ -196,6 +196,8 @@ export interface CatalogModule {
   apisTableName: string | null;
   appsTableId: string | null;
   appsTableName: string | null;
+  bucketsTableId: string | null;
+  bucketsTableName: string | null;
   databaseId: string | null;
   defaultPermissions: string[] | null;
   domainsTableId: string | null;
@@ -218,8 +220,16 @@ export interface CatalogModule {
   resourcesTableName: string | null;
   schemaId: string | null;
   scope: string | null;
+  sitesAppLinksTableId: string | null;
+  sitesAppLinksTableName: string | null;
+  sitesDeepLinksTableId: string | null;
+  sitesDeepLinksTableName: string | null;
+  sitesErrorPagesTableId: string | null;
+  sitesErrorPagesTableName: string | null;
   sitesTableId: string | null;
   sitesTableName: string | null;
+  sitesWebConfigTableId: string | null;
+  sitesWebConfigTableName: string | null;
 }
 export interface ComputeLogModule {
   actorFkTableId: string | null;
@@ -612,6 +622,7 @@ export interface FunctionModule {
   apiName: string | null;
   bindingsTableId: string | null;
   bindingsTableName: string | null;
+  capabilityBindingsTableId: string | null;
   databaseId: string | null;
   defaultPermissions: string[] | null;
   definitionsTableId: string | null;
@@ -1019,6 +1030,27 @@ export interface NotificationsModule {
   suppressionsTableId: string | null;
   userSettingsTableId: string | null;
 }
+export interface PagesModule {
+  apiName: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  entityTableId: string | null;
+  id: string | null;
+  merkleStoreModuleId: string | null;
+  pagesTableId: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  privateSchemaId: string | null;
+  privateSchemaName: string | null;
+  provisions: unknown | null;
+  publicSchemaId: string | null;
+  publicSchemaName: string | null;
+  scope: string | null;
+  siteSurfaceModuleId: string | null;
+  sitesTableId: string | null;
+  storeNamePrefix: string | null;
+}
 export interface PermissionsModule {
   actorTableId: string | null;
   apiName: string | null;
@@ -1320,16 +1352,26 @@ export interface SiteSurfaceModule {
   policies: unknown | null;
   prefix: string | null;
   privateApiName: string | null;
+  privateSchemaId: string | null;
+  privateSchemaName: string | null;
   provisions: unknown | null;
   publicSchemaName: string | null;
   schemaId: string | null;
   scope: string | null;
+  siteAppLinksTableId: string | null;
+  siteAppLinksTableName: string | null;
+  siteDeepLinksTableId: string | null;
+  siteDeepLinksTableName: string | null;
+  siteErrorPagesTableId: string | null;
+  siteErrorPagesTableName: string | null;
   siteMetadataTableId: string | null;
   siteMetadataTableName: string | null;
   siteModulesTableId: string | null;
   siteModulesTableName: string | null;
   siteThemesTableId: string | null;
   siteThemesTableName: string | null;
+  siteWebConfigTableId: string | null;
+  siteWebConfigTableName: string | null;
   sitesTableId: string | null;
   sitesTableName: string | null;
 }
@@ -1361,6 +1403,7 @@ export interface StorageModule {
   bucketsTableId: string | null;
   bucketsTableName: string | null;
   cacheTtlSeconds: number | null;
+  catalogModuleId: string | null;
   confirmUploadDelay: string | null;
   databaseId: string | null;
   defaultMaxFileSize: string | null;
