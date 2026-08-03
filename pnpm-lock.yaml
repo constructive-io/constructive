@@ -2949,6 +2949,9 @@ importers:
       genomic:
         specifier: ^5.6.2
         version: 5.6.2
+      git-changed:
+        specifier: ^0.3.0
+        version: 0.3.0
       glob:
         specifier: ^13.0.6
         version: 13.0.6
@@ -10566,6 +10569,13 @@ packages:
         integrity: sha512-mKZj9JLQrwMBtj5wxi6MH8Z5eSKaERpAwjg43dPtlGI1ZVEgH/qC7T8/6R2OBSUA+zzHBZgICsVJaEIV2tKTDA==,
       }
     engines: { node: '>=6.0' }
+
+  git-changed@0.3.0:
+    resolution:
+      {
+        integrity: sha512-tNAKg96UMf8YBlyr7nZFulqS/yEhSQ+Q/1QVFnQ4mUe4f5eIwhK+Oie11x4IixWD+SB4AmSaLR84S3qj2DTkKA==,
+      }
+    hasBin: true
 
   git-raw-commits@3.0.0:
     resolution:
@@ -20299,6 +20309,8 @@ snapshots:
   get-value@3.0.1:
     dependencies:
       isobject: 3.0.1
+
+  git-changed@0.3.0: {}
 
   git-raw-commits@3.0.0:
     dependencies:

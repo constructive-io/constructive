@@ -39,11 +39,14 @@ Change detection layers cheapest-source-first, then maps files to modules
 through the workspace graph:
 
 1. **Base ref** — explicit `--since <ref>` wins; otherwise the PR base in CI
-   (`origin/$GITHUB_BASE_REF`); otherwise working-tree only.
-2. **Changed files** — union of `git diff --name-only <base>...HEAD`
-   (three-dot, so branches/refs/tags all work) and `git status --porcelain`
-   (uncommitted + untracked). It shells out to the `git` binary — no
-   `simple-git`/Octokit dependency.
+   (`origin/$GITHUB_BASE_REF`); otherwise the repository's default branch;
+   otherwise working-tree only (a shallow or detached checkout).
+2. **Changed files** — union of the committed diff since the **merge base** with
+   that ref and `git status --porcelain -uall` (uncommitted + untracked). Both
+   come from the [`git-changed`](https://npmjs.com/package/git-changed) package,
+   shared with the `@pgsql/lint --changed` gate, so the two agree on what
+   "changed" means. Deleted paths are kept here: removing a `deploy/` file makes
+   the bundle stale exactly as much as editing one.
 3. **Files → modules** — each changed path is attributed to its owning module
    (longest-matching module directory). Only those modules are checked.
    `--all` skips detection; `--dependents` walks the reverse `requires` graph.
