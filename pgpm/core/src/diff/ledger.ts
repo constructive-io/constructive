@@ -12,6 +12,7 @@
  */
 import type {
   BackfillSelection,
+  LedgerBackfillEntry,
   LedgerChangeRecord,
   LedgerClassification,
   PlanChangeRef
@@ -107,4 +108,55 @@ export const buildLedgerReport = async (options: LedgerReportOptions): Promise<L
     coverage,
     backfillSql: selection.entries.length > 0 ? emitLedgerBackfill(selection.entries) : undefined
   };
+};
+
+/**
+ * Every plan entry of a set of modules as a backfill row, in plan order — the
+ * whole plan, not the satisfied subset. This is the "baseline" input: a
+ * database that already carries a plan's schema (e.g. one imported from a
+ * dump, or one adopted from outside pgpm) can record the entire plan as
+ * deployed without re-executing any DDL. Entries with no candidate hash
+ * (deploy script missing) are skipped, mirroring {@link selectBackfillEntries}.
+ */
+export const baselineBackfillEntries = async (
+  modules: ModuleSource[]
+): Promise<LedgerBackfillEntry[]> => {
+  const refs = await planChangeRefs(modules);
+  const entries: LedgerBackfillEntry[] = [];
+  for (const ref of refs) {
+    const scriptHash = ref.hashes[0];
+    if (!scriptHash) continue;
+    entries.push({
+      package: ref.package,
+      changeName: ref.name,
+      scriptHash,
+      requires: ref.dependencies
+    });
+  }
+  return entries;
+};
+
+/** A whole-plan baseline backfill for a plan-bearing side. */
+export interface BaselineBackfill {
+  /** Backfill rows for every plan entry, in plan order. */
+  entries: LedgerBackfillEntry[];
+  /** Idempotent log-only backfill script for {@link entries}. */
+  backfillSql: string;
+}
+
+/**
+ * Build a whole-plan baseline backfill for a workspace or module directory:
+ * record every change as already deployed, log-only, so a `pgpm deploy`
+ * afterward is a no-op and the database is adopted at the plan's head. The
+ * target database must already have the `pgpm_migrate` schema
+ * (`pgpm migrate init` or any prior deploy creates it, and applying the
+ * baseline through `PgpmMigrate.deploy({ logOnly: true })` initializes it).
+ */
+export const buildBaselineBackfill = async (
+  spec: string,
+  cwd?: string
+): Promise<BaselineBackfill> => {
+  const modules = await loadPlanSideModules(spec, cwd);
+  const entries = await baselineBackfillEntries(modules);
+  return { entries, backfillSql: emitLedgerBackfill(entries) };
 };
