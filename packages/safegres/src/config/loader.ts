@@ -185,6 +185,11 @@ function mergePreset(preset: SafegresConfig, over: SafegresConfig): SafegresConf
     rules: { ...(base.rules ?? {}), ...(over.rules ?? {}) },
     scoring: { ...(base.scoring ?? {}), ...(over.scoring ?? {}) },
     failOn: { ...(base.failOn ?? {}), ...(over.failOn ?? {}) },
+    // Per name: a project adds its own card without dropping the preset's,
+    // and redefines one by naming it.
+    ...(base.scorecards || over.scorecards
+      ? { scorecards: { ...(base.scorecards ?? {}), ...(over.scorecards ?? {}) } }
+      : {}),
     overrides: [...(base.overrides ?? []), ...(over.overrides ?? [])],
     // Merged per-key so retuning `skipOwned` doesn't silently drop the
     // preset's `ignore` list. Omitted entirely when neither side sets it.

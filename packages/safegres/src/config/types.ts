@@ -1,5 +1,5 @@
 import type { ExposureAdapter } from '../exposure/adapters';
-import type { Severity } from '../types';
+import type { Dimension, Direction, Severity } from '../types';
 
 /**
  * `'off'` disables a rule; a severity retunes it; `[severity, options]`
@@ -172,6 +172,86 @@ export interface ScoringConfig {
 }
 
 /**
+ * A named score over a slice of the findings: a selector plus the weighting
+ * to grade what it selects with. Every scoring key is available per card, so
+ * a scorecard is a full `ScoringConfig` with a question attached.
+ *
+ * The point is that "how secure is this database" is not one question. A
+ * platform team gates on what `anonymous` reaches; an application team gates
+ * on house style; a compliance reviewer wants the number that no preset
+ * softened. Collapsing those into a single grade means at least two of them
+ * are reading a number that does not answer their question — and the first
+ * time it disagrees with their judgement, they stop reading it at all.
+ *
+ * ```jsonc
+ * "scorecards": {
+ *   "anon-surface": {
+ *     "description": "What an unauthenticated caller reaches.",
+ *     "select": { "roles": ["anonymous"], "direction": "fail-open" },
+ *     "perRuleWeights": { "L19": 10 },
+ *     "floorOnCritical": "C"
+ *   },
+ *   "sql-conventions": { "select": { "rules": ["C*"], "exposure": "all" } }
+ * }
+ * ```
+ *
+ * Findings are never filtered by a scorecard — only *scored* by one. The
+ * report always carries every finding, so no configuration of this block can
+ * hide anything; it can only decide what a given number is about.
+ */
+export interface ScorecardConfig extends ScoringConfig {
+  /** Heading for reports. Defaults to the config key. */
+  title?: string;
+  /** What decision this score informs. Rendered with it. */
+  description?: string;
+  /** Which findings it grades. An empty selector grades what the headline does. */
+  select?: ScorecardSelector;
+}
+
+/**
+ * Which findings a scorecard grades. Every clause narrows; omitting one
+ * means "don't care", and an empty selector is the headline's own slice
+ * (exposed, non-acknowledged, security-dimension).
+ */
+export interface ScorecardSelector {
+  /** Rule codes or `C*` prefix wildcards to include. Default: all. */
+  rules?: string[];
+  /** Rule codes or wildcards to drop after `rules` has selected. */
+  exclude?: string[];
+  /** `security` (default), `perf`, or `all` — the two axes in one number. */
+  dimension?: Dimension | 'all';
+  /** Only findings about these roles (the finding's role, grantee, or reach context). */
+  roles?: string[];
+  /** Only findings reachable on these access planes. */
+  planes?: string[];
+  /** Only findings in these schemas. */
+  schemas?: string[];
+  /** `fail-open` leaks, `fail-closed` denials, or `any`. Default: any. */
+  direction?: Direction | 'any';
+  /** Drop findings below this severity before scoring. */
+  minSeverity?: Severity;
+  /**
+   * `exposed` (default) grades only what the API surface reaches; `all`
+   * ignores exposure entirely — the honest, database-to-database number.
+   */
+  exposure?: 'exposed' | 'all';
+  /** `include` grades acknowledged findings too. Default: skip them. */
+  acknowledged?: 'skip' | 'include';
+  /**
+   * `configured` (default) uses the severities this config resolved;
+   * `declared` uses each rule's registry default, so a preset that quiets a
+   * rule cannot quiet the score that is supposed to catch it.
+   */
+  severities?: 'configured' | 'declared';
+  /**
+   * Density denominator: `exposed` relations (default) or `all` of them.
+   * A card that ignores exposure should normalize by everything, or it
+   * divides a wider numerator by a narrower denominator.
+   */
+  denominator?: 'exposed' | 'all';
+}
+
+/**
  * The optional performance dimension: index-hygiene and policy-cost rules
  * (`X*`, plus P1/P1b), scored on their own axis against the same exposure
  * surface. Off by default — `safegres perf` / `--perf` / `enabled: true`.
@@ -317,6 +397,12 @@ export interface FailOnConfig {
    * not become an F.
    */
   planes?: Record<string, PlaneFailOnConfig>;
+  /**
+   * Per-scorecard gates, keyed by scorecard name. This is where a team's own
+   * question becomes its own build failure — `{ "anon-surface": { "grade": "A" } }`
+   * gates on that and nothing else.
+   */
+  scorecards?: Record<string, PlaneFailOnConfig>;
 }
 
 export interface PlaneFailOnConfig {
@@ -455,6 +541,11 @@ export interface SafegresConfig {
   rules?: RulesConfig;
   overrides?: OverrideEntry[];
   scoring?: ScoringConfig;
+  /**
+   * Named scores over slices of the same findings — see `ScorecardConfig`.
+   * Merged with the reserved `default` and `raw` cards, which always run.
+   */
+  scorecards?: Record<string, ScorecardConfig>;
   failOn?: FailOnConfig;
   /** Where the database to audit comes from, when it isn't a live connection. */
   source?: SourceConfig;

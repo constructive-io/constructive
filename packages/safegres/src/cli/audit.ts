@@ -490,6 +490,21 @@ export default async (
     }
   }
 
+  // Per-scorecard gates. The point of a scorecard is that a team gates on
+  // its own question, so this is the gate that matters to them and the
+  // headline is someone else's number.
+  for (const [pattern, gate] of Object.entries(config.failOn?.scorecards ?? {})) {
+    const cards = (report.scorecards ?? []).filter((c) => matchPlane(pattern, c.name));
+    for (const card of cards) {
+      if (gate.score != null && card.score.value < gate.score) {
+        fail(`scorecard ${card.name} score ${card.score.value} is below failOn.scorecards["${pattern}"].score ${gate.score}`);
+      }
+      if (gate.grade && !meetsGrade(card.score.grade, gate.grade)) {
+        fail(`scorecard ${card.name} grade ${card.score.grade} is below failOn.scorecards["${pattern}"].grade ${gate.grade}`);
+      }
+    }
+  }
+
   const failOnNewPerf = argv['fail-on-new-perf'] === true || config.perf?.failOnNew === true;
   if (failOnNewPerf && report.perf?.diff && report.perf.diff.added.length > 0) {
     const count = report.perf.diff.added.length;

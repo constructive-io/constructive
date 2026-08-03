@@ -69,6 +69,13 @@ export interface ScoreContext {
   exposedTables?: number;
   /** Whether an exposure surface was configured/resolved. */
   exposureKnown?: boolean;
+  /**
+   * The caller has already decided which findings count (a scorecard's
+   * selector). Skips the built-in exposure/acknowledgement/meta filtering,
+   * which would otherwise silently overrule a selector that asked for
+   * unexposed findings.
+   */
+  prefiltered?: boolean;
 }
 
 export const DEFAULT_WEIGHTS: Record<Severity, number> = {
@@ -141,7 +148,9 @@ function computeDensityScore(
 
   // Meta findings (e.g. W1) are advisories about the audit itself — the
   // unknown-exposure cap is their penalty, not weighted points.
-  const scorable = findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
+  const scorable = context.prefiltered
+    ? findings
+    : findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
 
   const exposedTables = Math.max(1, context.exposedTables ?? 1);
 
@@ -264,7 +273,9 @@ function computeWeightedScore(
   const bands = { ...DEFAULT_GRADE_BANDS, ...(config.gradeBands ?? {}) };
   const floor = config.floorOnCritical === undefined ? 'C' : config.floorOnCritical;
 
-  const scorable = findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
+  const scorable = context.prefiltered
+    ? findings
+    : findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
 
   const byRule = new Map<string, { count: number; points: number }>();
   for (const f of scorable) {

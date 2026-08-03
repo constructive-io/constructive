@@ -150,6 +150,30 @@ describe('audit — Script A', () => {
     expect(p5?.severity).toBe('high');
   });
 
+  it('carries scorecards without narrowing the findings they score', async () => {
+    // Over the fixtures already applied above: an `A*` card must not become
+    // the whole report just because it is the card being read.
+    const report = await audit(pg.client as never, {
+      schemas: ['fx_a2', 'fx_p5'],
+      config: {
+        scorecards: {
+          'flags-only': { select: { rules: ['A*'], exposure: 'all' } }
+        }
+      }
+    });
+
+    const names = (report.scorecards ?? []).map((c) => c.name);
+    expect(names).toEqual(['default', 'raw', 'flags-only']);
+
+    const card = report.scorecards!.find((c) => c.name === 'flags-only')!;
+    expect(card.findings).toBeGreaterThan(0);
+    expect(card.score.deductions.every((d) => d.code.startsWith('A'))).toBe(true);
+
+    // The selector grades a slice; the report still carries everything.
+    expect(report.findings.length).toBeGreaterThanOrEqual(card.findings);
+    expect(report.findings.some((f) => !f.code.startsWith('A'))).toBe(true);
+  });
+
   it('clean table produces no findings', async () => {
     await applyFixture('clean-table.sql');
     const report = await audit(pg.client as never, { schemas: ['fx_clean'] });
