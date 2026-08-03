@@ -55,6 +55,19 @@ export interface HostProvisionOverlay {
   remove?: string[];
 }
 
+/**
+ * A minted secret handed to the host for out-of-band delivery (.env write +
+ * one-time reveal). The plaintext never enters tool results or the transcript;
+ * pi forgets it after this call.
+ */
+export type SecretDelivery = {
+  databaseId: string;
+  envVar: string;
+  plaintext: string;
+  keyId: string;
+  expiresAt?: string;
+};
+
 export interface PiToolsHost {
   /** Signed-in platform account, or null/undefined when signed out. */
   account(): HostAccount | null | undefined;
@@ -83,6 +96,17 @@ export interface PiToolsHost {
     | null
     | undefined
     | Promise<HostProvisionOverlay | null | undefined>;
+  /**
+   * Complete MFA step-up for the database's app session in the host's own
+   * process (password dialog + verifyPassword). The password never passes
+   * through pi or the model. Resolve true when step-up succeeded.
+   */
+  requestStepUp?(databaseId: string): Promise<boolean>;
+  /**
+   * Deliver a minted secret to the user (.env write + one-time reveal).
+   * Required for create_api_key — without it the tool refuses to mint.
+   */
+  deliverSecret?(delivery: SecretDelivery): Promise<void>;
 }
 
 export const DEFAULT_DATA_TOKEN_SKEW_MS = 30_000;

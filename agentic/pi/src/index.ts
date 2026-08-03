@@ -6,6 +6,7 @@ import { configureHost, type PiToolsHost } from './host';
 import { addPoliciesTool } from './tools/add-policies';
 import { addRecordsTool } from './tools/add-records';
 import { addRelationTool } from './tools/add-relation';
+import { createApiKeyTool } from './tools/create-api-key';
 import { describeSchemaTool } from './tools/describe-schema';
 import { manageEntityTypesTool } from './tools/manage-entity-types';
 import { createFieldTool, deleteFieldTool, deleteTableTool, updateFieldTool } from './tools/mutations';
@@ -38,6 +39,7 @@ export const dbTools: ExtensionFactory = (pi) => {
   pi.registerTool(deleteTemplateTool);
   pi.registerTool(addRecordsTool);
   pi.registerTool(manageEntityTypesTool);
+  pi.registerTool(createApiKeyTool);
   pi.registerTool(runCodegenTool);
 
   const gate = createConfirmGate({
