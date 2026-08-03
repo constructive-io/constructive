@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.23.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.22.0...@pgpmjs/transform@0.23.0) (2026-08-03)
+
+### Bug Fixes
+
+- **pgpm:** byte-correct statement slicing in transform drivers ([e6aafe3](https://github.com/constructive-io/constructive/commit/e6aafe336ce5108a7ae719b3a45362027f6a2f13))
+
+### Features
+
+- **pgpm:** resolve cross-package tag dependencies (pkg:[@tag](https://github.com/tag)) at the workspace ingestion seam ([560d428](https://github.com/constructive-io/constructive/commit/560d4288b5ca1a53a0afd3fd1e512d0fdc7643bd))
+
 # [0.22.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.21.0...@pgpmjs/transform@0.22.0) (2026-08-03)
 
 ### Features
