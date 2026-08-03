@@ -2,6 +2,8 @@ export * from './core/boilerplate-scanner';
 export * from './core/boilerplate-types';
 export * from './core/class/pgpm';
 export * from './core/template-scaffold';
+export * from './diff';
+export * from './dump/pg-dump';
 export * from './extensions';
 export * from './modules/modules';
 export * from './packaging/check';
@@ -20,6 +22,7 @@ export * from './apply';
 export * from './bundle';
 export { PgpmInit } from './init/client';
 export { cleanSql } from './migrate/clean';
+export type { DeployedChangeRecord } from './migrate/client';
 export { PgpmMigrate } from './migrate/client';
 export {
   DeployOptions, 
@@ -31,10 +34,11 @@ export {
   StatusResult,
   VerifyOptions, 
   VerifyResult} from './migrate/types';
-export { hashFile, hashString } from './migrate/utils/hash';
+export { hashFile, hashSqlFile, hashString } from './migrate/utils/hash';
 export { executeQuery,TransactionContext, TransactionOptions, withTransaction } from './migrate/utils/transaction';
 export * from './refactor';
 export * from './roles';
+export * from './utils/database-spec';
 export { parseAuthor } from '@pgpmjs/ast';
 export * from '@pgpmjs/ast/files';
 export * from '@pgpmjs/ast/module';

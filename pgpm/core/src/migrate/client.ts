@@ -32,6 +32,18 @@ const log = new Logger('migrate');
 
 export type HashMethod = 'content' | 'ast';
 
+/**
+ * One `pgpm_migrate` ledger row: a change the database records as deployed,
+ * with the script hash it was deployed from and its recorded requires.
+ */
+export interface DeployedChangeRecord {
+  package: string;
+  changeName: string;
+  scriptHash: string;
+  deployedAt?: Date;
+  requires: string[];
+}
+
 export interface PgpmMigrateOptions {
   /**
    * Hash method for SQL files:
@@ -657,6 +669,48 @@ export class PgpmMigrate {
       if (error.code === '42P01') { // undefined_table
         return [];
       }
+      throw error;
+    }
+  }
+
+  /**
+   * Read the whole `pgpm_migrate` ledger as an ordered snapshot: every
+   * recorded change with its script hash and its recorded requires, in
+   * deploy order. This is the deployment cursor a ledger-aware diff reads —
+   * what the database believes it has executed, independent of what its
+   * catalog currently looks like.
+   *
+   * Returns an empty array when the database has no ledger (never deployed
+   * through pgpm).
+   */
+  async readDeployedState(): Promise<DeployedChangeRecord[]> {
+    try {
+      const result = await this.pool.query(`
+        SELECT
+          c.package,
+          c.change_name,
+          c.script_hash,
+          c.deployed_at,
+          COALESCE(
+            (SELECT array_agg(d.requires ORDER BY d.requires)
+             FROM pgpm_migrate.dependencies d
+             WHERE d.change_id = c.change_id),
+            ARRAY[]::TEXT[]
+          ) AS requires
+        FROM pgpm_migrate.changes c
+        ORDER BY c.deployed_at ASC, c.change_name ASC
+      `);
+
+      return result.rows.map((row: any) => ({
+        package: row.package,
+        changeName: row.change_name,
+        scriptHash: row.script_hash,
+        deployedAt: row.deployed_at ? new Date(row.deployed_at) : undefined,
+        requires: row.requires ?? []
+      }));
+    } catch (error: any) {
+      // No pgpm_migrate schema/table: nothing has been deployed through pgpm.
+      if (error.code === '42P01' || error.code === '3F000') return [];
       throw error;
     }
   }

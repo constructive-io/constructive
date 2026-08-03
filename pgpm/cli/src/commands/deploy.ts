@@ -1,9 +1,10 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { CLIOptions, Inquirerer, ParsedArgs, Question } from 'inquirerer';
 import {
+  getPgClientCommand,
   getPgEnvOptions,
   getSpawnEnvWithPg,
 } from 'pg-env';
@@ -143,7 +144,8 @@ export default async (
   if (createdb) {
     if (capabilities.createdb) {
       log.info(`Creating database ${database}...`);
-      execSync(`createdb ${database}`, {
+      const [cmd, ...prefixArgs] = getPgClientCommand('createdb');
+      execFileSync(cmd, [...prefixArgs, database], {
         env: getSpawnEnvWithPg(pgEnv)
       });
     } else {

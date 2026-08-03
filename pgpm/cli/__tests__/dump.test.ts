@@ -1,14 +1,17 @@
 
-import * as child_process from 'child_process';
 import * as fs from 'fs';
 
-// Mock child_process
-jest.mock('child_process');
 // Mock fs
 jest.mock('fs');
 // mock utils to avoid loading deep dependencies that cause issues in test environment
 jest.mock('../src/utils', () => ({
   getTargetDatabase: jest.fn().mockResolvedValue('test_db')
+}));
+
+// mock the core pg_dump helper (the command's only dump seam)
+const mockPgDump = jest.fn().mockResolvedValue('');
+jest.mock('@pgpmjs/core', () => ({
+  pgDump: (...args: unknown[]) => mockPgDump(...args)
 }));
 
 // mock quoteutils
@@ -33,21 +36,13 @@ import dumpCmd from '../src/commands/dump';
 describe('dump command', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPgDump.mockResolvedValue('');
   });
 
-  it('should call pg_dump with correct arguments', async () => {
-    const spawnMock = child_process.spawn as unknown as jest.Mock;
-    spawnMock.mockImplementation(() => ({
-      on: (event: string, cb: any) => {
-        if (event === 'close') cb(0);
-      },
-      stdout: { pipe: jest.fn() },
-      stderr: { pipe: jest.fn() },
-    }));
-
-    const fsMkdirSpy = jest.spyOn(fs, 'mkdirSync').mockImplementation(() => undefined as any);
-    const fsWriteSpy = jest.spyOn(fs, 'writeFileSync').mockImplementation(() => undefined);
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
+  it('should call pg_dump with correct options', async () => {
+    jest.spyOn(fs, 'mkdirSync').mockImplementation(() => undefined as any);
+    jest.spyOn(fs, 'writeFileSync').mockImplementation(() => undefined);
+    jest.spyOn(console, 'log').mockImplementation(() => { });
 
     const argv = {
       database: 'test_db',
@@ -59,30 +54,18 @@ describe('dump command', () => {
 
     await dumpCmd(argv, prompter, options);
 
-    expect(spawnMock).toHaveBeenCalledWith(
-      'pg_dump',
-      expect.arrayContaining([
-        '--format=plain',
-        '--no-owner',
-        '--no-privileges',
-        '--file',
-        expect.stringContaining('output.sql'),
-        'test_db'
-      ]),
+    expect(mockPgDump).toHaveBeenCalledWith(
       expect.objectContaining({
-        env: expect.anything()
+        config: expect.objectContaining({ database: 'test_db' }),
+        format: 'plain',
+        noOwner: true,
+        noPrivileges: true,
+        file: expect.stringContaining('output.sql')
       })
     );
   });
 
   it('should generate prune sql when database-id is provided', async () => {
-    const spawnMock = child_process.spawn as unknown as jest.Mock;
-    spawnMock.mockImplementation(() => ({
-      on: (event: string, cb: any) => {
-        if (event === 'close') cb(0);
-      }
-    }));
-
     jest.spyOn(fs, 'mkdirSync').mockImplementation(() => undefined as any);
     const fsWriteSpy = jest.spyOn(fs, 'writeFileSync').mockImplementation(() => undefined);
     jest.spyOn(console, 'log').mockImplementation(() => { });
