@@ -154,7 +154,7 @@ importers:
         specifier: workspace:*
         version: link:../pi/dist
       '@constructive-io/sdk':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../sdk/constructive-sdk/dist
       '@earendil-works/pi-coding-agent':
         specifier: 0.79.6
