@@ -1,5 +1,6 @@
 import { verifyBundle } from '@pgpmjs/bundle';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
+import { changedFiles as gitChangedFiles, resolveBase as resolveChangedBase } from 'git-changed';
 import { isAbsolute, relative, resolve as resolvePath } from 'path';
 
 import {
@@ -40,8 +41,9 @@ export interface PackageCheckOptions {
   cwd?: string;
   /**
    * Git ref/branch/tag to diff `HEAD` against for change detection. When
-   * omitted, the check auto-detects the base (`origin/$GITHUB_BASE_REF` in a
-   * PR, otherwise it only inspects uncommitted/untracked working-tree changes).
+   * omitted, the base is auto-detected: `origin/$GITHUB_BASE_REF` in a PR,
+   * otherwise the repository's default branch, falling back to working-tree
+   * changes only when neither is available.
    */
   since?: string;
   /** Check every module in the workspace, skipping git change detection. */
@@ -123,65 +125,40 @@ export function checkModuleArtifact(moduleDir: string, name: string): ModuleDrif
   return null;
 }
 
-function git(args: string, cwd: string): string {
-  return execSync(`git ${args}`, {
-    cwd,
-    encoding: 'utf-8',
-    stdio: ['ignore', 'pipe', 'ignore'],
-    maxBuffer: 64 * 1024 * 1024,
-  });
-}
-
 /**
- * Resolve the git ref to diff against. Explicit `--since` wins; otherwise use
- * the PR base branch when running in GitHub Actions; otherwise `undefined`
- * (working-tree changes only).
+ * Resolve the git ref to diff against. Explicit `--since` wins; otherwise the
+ * PR base branch when running in GitHub Actions; otherwise the repository's
+ * default branch. `undefined` means there is nothing to diff against — a
+ * shallow or detached checkout — and only the working tree is inspected.
  */
-export function resolveBase(since?: string): string | undefined {
-  if (since) return since;
-  const prBase = process.env.GITHUB_BASE_REF;
-  if (prBase && prBase.trim()) return `origin/${prBase.trim()}`;
-  return undefined;
+export function resolveBase(since?: string, cwd: string = process.cwd()): string | undefined {
+  return resolveChangedBase(since, cwd);
 }
 
 /**
- * Collect the set of changed files, combining committed changes since `base`
- * (three-dot diff, so it works with branches, refs, and tags) with any
- * uncommitted/untracked changes in the working tree. Returns absolute paths.
+ * Collect the set of changed files: committed changes since the **merge base**
+ * with `base`, unioned with uncommitted and untracked working-tree changes.
+ *
+ * Returns absolute paths, including paths that no longer exist — deleting a
+ * `deploy/` file makes a module's bundle stale exactly as much as editing one,
+ * so the deletion has to reach {@link mapFilesToModules}.
  */
 export function changedFiles(cwd: string, base?: string): string[] {
-  const files = new Set<string>();
+  // `base: false` when there is no base: the ref is resolved by the caller, and
+  // git-changed would otherwise resolve one of its own.
+  return gitChangedFiles({ cwd, base: base ?? false, existingOnly: false }).paths;
+}
 
-  const status = git('status --porcelain', cwd);
-  for (const rawLine of status.split('\n')) {
-    const line = rawLine.trimEnd();
-    if (!line) continue;
-    let p = line.slice(3);
-    const arrow = p.indexOf(' -> ');
-    if (arrow !== -1) p = p.slice(arrow + 4);
-    p = p.replace(/^"|"$/g, '');
-    if (p) files.add(resolvePath(cwd, p));
+function refExists(ref: string, cwd: string): boolean {
+  try {
+    execFileSync('git', ['rev-parse', '--verify', '--quiet', ref], {
+      cwd,
+      stdio: 'ignore',
+    });
+    return true;
+  } catch {
+    return false;
   }
-
-  if (base) {
-    let diff: string;
-    try {
-      diff = git(`diff --name-only ${base}...HEAD`, cwd);
-    } catch (err) {
-      throw new Error(
-        `Could not diff against '${base}'. Ensure the ref exists locally ` +
-          `(e.g. \`git fetch origin\`). Original error: ${
-            err instanceof Error ? err.message : String(err)
-          }`
-      );
-    }
-    for (const rawLine of diff.split('\n')) {
-      const p = rawLine.trim();
-      if (p) files.add(resolvePath(cwd, p));
-    }
-  }
-
-  return [...files];
 }
 
 /** Enumerate the modules to consider — the whole workspace, or the single module. */
@@ -261,9 +238,14 @@ export async function checkPackages(
   if (options.all) {
     targetNames = modules.map((m) => m.name);
   } else {
-    base = resolveBase(options.since);
-    const files = changedFiles(cwd, base);
-    changedModules = mapFilesToModules(files, modules);
+    base = resolveBase(options.since, cwd);
+    if (options.since && !refExists(options.since, cwd)) {
+      throw new Error(
+        `Could not diff against '${options.since}'. Ensure the ref exists locally ` +
+          '(e.g. `git fetch origin`).'
+      );
+    }
+    changedModules = mapFilesToModules(changedFiles(cwd, base), modules);
     const set = new Set(changedModules);
     if (options.dependents && pkg.getWorkspacePath()) addDependents(set, pkg);
     targetNames = [...set];

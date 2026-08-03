@@ -1,14 +1,25 @@
-import { readFileSync, rmSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { execFileSync } from 'child_process';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'fs';
+import { tmpdir } from 'os';
+import { dirname, join } from 'path';
 
 import { resolveBundleArtifactPath, writeBundleArtifact } from '../../src/bundle/artifact';
 import { PgpmPackage } from '../../src/core/class/pgpm';
 import {
   addDependents,
+  changedFiles,
   checkModuleArtifact,
   checkPackages,
   enumerateModules,
   mapFilesToModules,
+  ModuleRef,
 } from '../../src/packaging/check';
 import { TestFixture } from '../../test-utils';
 
@@ -92,6 +103,83 @@ describe('package check (artifact drift verification)', () => {
     const result = await checkPackages({ cwd: root, all: true, failFast: false });
     expect(new Set(result.drifted.map((d) => d.name))).toEqual(
       new Set(['my-first', 'my-second'])
+    );
+  });
+});
+
+/**
+ * Change detection, over a throwaway git repo shaped like a workspace. The two
+ * cases that used to be wrong before this moved to `git-changed`: a module whose
+ * files are all untracked (git reports the *directory* without `-uall`), and a
+ * deleted `deploy/` file (dropped as "no longer on disk", though a deletion
+ * makes the bundle just as stale as an edit).
+ */
+describe('package check (git change detection)', () => {
+  const repos: string[] = [];
+  let dir: string;
+  let modules: ModuleRef[];
+
+  const git = (...args: string[]): void => {
+    execFileSync('git', args, { cwd: dir, stdio: 'ignore' });
+  };
+
+  const write = (rel: string): void => {
+    const full = join(dir, rel);
+    mkdirSync(dirname(full), { recursive: true });
+    writeFileSync(full, '-- sql\n');
+  };
+
+  beforeEach(() => {
+    dir = realpathSync(mkdtempSync(join(tmpdir(), 'pgpm-check-git-')));
+    repos.push(dir);
+    modules = ['first', 'second'].map((name) => ({
+      name,
+      dir: join(dir, 'packages', name),
+    }));
+
+    git('init', '-q', '-b', 'main');
+    git('config', 'user.email', 'test@example.com');
+    git('config', 'user.name', 'Test');
+    write('packages/first/deploy/schema.sql');
+    git('add', '.');
+    git('commit', '-qm', 'base');
+  });
+
+  afterAll(() => {
+    for (const repo of repos) rmSync(repo, { recursive: true, force: true });
+  });
+
+  it('sees every file of an entirely untracked module', () => {
+    write('packages/second/deploy/schema.sql');
+    expect(mapFilesToModules(changedFiles(dir, 'main'), modules)).toEqual(['second']);
+  });
+
+  it('sees a deleted deploy file, which makes the bundle stale too', () => {
+    git('checkout', '-q', '-b', 'feature');
+    git('rm', '-q', 'packages/first/deploy/schema.sql');
+    git('commit', '-qm', 'drop schema');
+
+    expect(mapFilesToModules(changedFiles(dir, 'main'), modules)).toEqual(['first']);
+  });
+
+  it('does not attribute base-branch commits to the branch', () => {
+    git('checkout', '-q', '-b', 'feature');
+    write('packages/second/deploy/schema.sql');
+    git('add', '.');
+    git('commit', '-qm', 'second');
+
+    git('checkout', '-q', 'main');
+    write('packages/first/deploy/other.sql');
+    git('add', '.');
+    git('commit', '-qm', 'unrelated work on main');
+    git('checkout', '-q', 'feature');
+
+    expect(mapFilesToModules(changedFiles(dir, 'main'), modules)).toEqual(['second']);
+  });
+
+  it('rejects an explicit --since that does not resolve', async () => {
+    await expect(checkPackages({ cwd: dir, since: 'origin/nope' })).rejects.toThrow(
+      /Could not diff against 'origin\/nope'/
     );
   });
 });
