@@ -39,6 +39,7 @@ import {
 } from '@pgsql/transform';
 import { Deparser, parseSync } from 'plpgsql-parser';
 
+import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
 import { ConstraintNode, defaultConstraintName } from './constraint-names';
 import { ChangeGranularity, GranularityChange, restructureChanges } from './granularity-driver';
 
@@ -118,8 +119,10 @@ function readSide(sql: string, warnings: string[], label: string): SideProgram {
   const unitOf: (string | null)[] = new Array(facts.length).fill(null);
   const byObject = new Map<string, string>();
 
+  const sqlBytes = sqlSourceBytes(sql);
+
   facts.forEach((f, i) => {
-    const text = sql.slice(f.span.start, f.span.start + f.span.len).trim();
+    const text = sliceStatementBytes(sqlBytes, f.span.start, f.span.len).trim();
     if (!text) return;
 
     let identity = groupingIdentity(f);
