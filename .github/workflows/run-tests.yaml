@@ -241,7 +241,7 @@ jobs:
       matrix:
         include:
           - batch: pg-core
-            packages: 'pgpm/ast pgpm/traverse pgpm/bundle pgpm/core pgpm/cli pgpm/portability packages/client packages/safegres postgres/pg-codegen'
+            packages: 'pgpm/ast pgpm/traverse pgpm/bundle pgpm/core pgpm/cli pgpm/portability pgpm/export packages/client packages/safegres postgres/pg-codegen'
           - batch: pg-postgres
             packages: 'postgres/pgsql-test postgres/drizzle-orm-test postgres/introspectron graphile/graphile-test graphile/graphile-connection-filter graphile/graphile-postgis'
           - batch: pg-graphql

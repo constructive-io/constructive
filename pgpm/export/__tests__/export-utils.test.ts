@@ -71,9 +71,9 @@ describe('META_TABLE_CONFIG and META_TABLE_ORDER consistency', () => {
     const validSchemas = [
       'metaschema_public',
       'metaschema_modules_public',
-      'constructive_catalog_public',
-      'constructive_routing_public',
-      'constructive_apps_public'
+      'catalog_public',
+      'routing_public',
+      'apps_public'
     ];
 
     for (const [key, config] of Object.entries(META_TABLE_CONFIG)) {

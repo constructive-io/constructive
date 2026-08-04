@@ -31,10 +31,7 @@ const EXCLUSIONS = {
     'the filtered one — a real plugin bug, not test drift. constructive-planning#1426.',
   'graphql/react':
     'Requires an external GraphQL endpoint via $TESTING_URL and throws at ' +
-    'import time without one — a manual suite, not a CI one.',
-  'pgpm/export':
-    'Meta export emits nothing for the routing/apps tables since the schemas ' +
-    'were repointed off services_public; 7 tests fail. constructive-planning#1426.'
+    'import time without one — a manual suite, not a CI one.'
 };
 
 function claimedPackages() {

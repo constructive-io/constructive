@@ -1,8 +1,8 @@
 /**
  * GraphQL equivalent of export-meta.ts.
  * 
- * Fetches metadata from metaschema_public, constructive_routing_public,
- * constructive_apps_public, and metaschema_modules_public
+ * Fetches metadata from metaschema_public, routing_public,
+ * apps_public, and metaschema_modules_public
  * via GraphQL queries instead of direct SQL, then uses the same csv-to-pg Parser to
  * generate SQL INSERT statements.
  */
@@ -149,7 +149,7 @@ export const exportGraphQLMeta = async ({
     const tableConfig = META_TABLE_CONFIG[key];
     if (!tableConfig) return;
 
-    // Schema-qualified manifest keys (e.g. constructive_catalog_public.apis)
+    // Schema-qualified manifest keys (e.g. catalog_public.apis)
     // mark tables whose name collides with a table in another plane. GraphQL
     // type/query names are derived from the bare table name, so these cannot
     // be addressed unambiguously through the meta API — only the SQL flow
