@@ -15,6 +15,7 @@
 
 import { Logger } from '@pgpmjs/logger';
 
+import { quoteQualifiedSqlIdentifier } from './sql-identifiers';
 import type { BillingConfig, InferenceLogConfig, WithPgClient } from './types';
 
 const log = new Logger('billing-client');
@@ -48,7 +49,8 @@ export interface BillingClient {
    * Check if the entity has sufficient quota for the requested amount.
    * Returns true if allowed, false if quota is exceeded.
    *
-   * Gracefully returns true if billing is not provisioned or errors.
+   * Returns true when billing is not provisioned. Once billing is configured,
+   * lookup failures deny the request so quota enforcement cannot fail open.
    */
   checkQuota(meterSlug: string, amount?: number): Promise<boolean>;
 
@@ -79,14 +81,19 @@ export function createBillingClient(
 
       try {
         return await withPgClient(async (client) => {
-          const sql = `SELECT "${billing.privateSchema}"."${billing.checkBillingQuotaFunction}"($1, $2::uuid, $3) AS allowed`;
+          const fn = quoteQualifiedSqlIdentifier(
+            billing.privateSchema,
+            billing.checkBillingQuotaFunction,
+            'billing quota function'
+          );
+          const sql = `SELECT ${fn}($1, $2::uuid, $3) AS allowed`;
           const result = await client.query(sql, [meterSlug, entityId, amount]);
           return result.rows[0]?.allowed !== false;
         });
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
-        log.warn(`check_billing_quota failed (allowing): ${message}`);
-        return true;
+        log.warn(`check_billing_quota failed (denying): ${message}`);
+        return false;
       }
     },
 
@@ -95,7 +102,12 @@ export function createBillingClient(
 
       try {
         await withPgClient(async (client) => {
-          const sql = `SELECT "${billing.privateSchema}"."${billing.recordUsageFunction}"($1, $2::uuid, $3, $4::jsonb)`;
+          const fn = quoteQualifiedSqlIdentifier(
+            billing.privateSchema,
+            billing.recordUsageFunction,
+            'billing usage function'
+          );
+          const sql = `SELECT ${fn}($1, $2::uuid, $3, $4::jsonb)`;
           await client.query(sql, [meterSlug, entityId, amount, JSON.stringify(metadata ?? {})]);
         });
       } catch (e: unknown) {
@@ -109,8 +121,13 @@ export function createBillingClient(
 
       try {
         await withPgClient(async (client) => {
+          const table = quoteQualifiedSqlIdentifier(
+            inferenceLog.schema,
+            inferenceLog.tableName,
+            'inference log table'
+          );
           await client.query(
-            `INSERT INTO "${inferenceLog.schema}"."${inferenceLog.tableName}"
+            `INSERT INTO ${table}
              (entity_id, actor_id, model, provider, service, operation,
               input_tokens, output_tokens, total_tokens, latency_ms, status,
               cache_read_tokens, cache_write_tokens,
