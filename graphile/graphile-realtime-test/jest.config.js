@@ -14,5 +14,9 @@ module.exports = {
   transformIgnorePatterns: [`/node_modules/*`],
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  modulePathIgnorePatterns: ['dist/*']
+  modulePathIgnorePatterns: ['dist/*'],
+  // src/ uses ESM-style './foo.js' specifiers; resolve them to the .ts source.
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1'
+  }
 };
