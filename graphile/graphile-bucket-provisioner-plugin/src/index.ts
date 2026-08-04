@@ -44,6 +44,7 @@ export type {
   BucketAccessType,
   BucketNameResolver,
   BucketProvisionerPluginOptions,
+  BucketProvisionerStorageModule,
   ConnectionConfigOrGetter,
   ProvisionBucketInput,
   ProvisionBucketPayload,
