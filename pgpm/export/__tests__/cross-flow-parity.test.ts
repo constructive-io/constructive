@@ -312,7 +312,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
         // Create schemas and tables
         await pg.query(`
           CREATE SCHEMA IF NOT EXISTS metaschema_public;
-          CREATE SCHEMA IF NOT EXISTS constructive_routing_public;
+          CREATE SCHEMA IF NOT EXISTS routing_public;
           CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
 
           -- metaschema_public tables
@@ -346,8 +346,8 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             description text
           );
 
-          -- constructive_routing_public tables
-          CREATE TABLE constructive_routing_public.domains (
+          -- routing_public tables
+          CREATE TABLE routing_public.domains (
             id uuid PRIMARY KEY,
             database_id uuid,
             hostname text,
@@ -358,7 +358,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             tls_status text,
             is_published boolean
           );
-          CREATE TABLE constructive_routing_public.sites (
+          CREATE TABLE routing_public.sites (
             id uuid PRIMARY KEY,
             database_id uuid,
             name text,
@@ -367,7 +367,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             config jsonb,
             is_published boolean
           );
-          CREATE TABLE constructive_routing_public.apis (
+          CREATE TABLE routing_public.apis (
             id uuid PRIMARY KEY,
             database_id uuid,
             name text,
@@ -376,7 +376,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             anon_role text,
             config jsonb
           );
-          CREATE TABLE constructive_routing_public.api_schemas (
+          CREATE TABLE routing_public.api_schemas (
             id uuid PRIMARY KEY,
             database_id uuid,
             schema_id uuid,
@@ -408,7 +408,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             force_enabled boolean,
             priority int4
           );
-          CREATE TABLE constructive_routing_public.cors_settings (
+          CREATE TABLE routing_public.cors_settings (
             id uuid PRIMARY KEY,
             database_id uuid,
             api_id uuid,
@@ -479,22 +479,22 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
         `, [FIELD_ID_1, DATABASE_ID, TABLE_ID_USERS, FIELD_ID_2, FIELD_ID_3, TABLE_ID_POSTS]);
 
         await pg.query(`
-          INSERT INTO constructive_routing_public.apis (id, database_id, name, is_published, role_name, anon_role)
+          INSERT INTO routing_public.apis (id, database_id, name, is_published, role_name, anon_role)
           VALUES ($1, $2, 'public-api', true, 'authenticated', 'anonymous')
         `, [API_ID, DATABASE_ID]);
 
         await pg.query(`
-          INSERT INTO constructive_routing_public.sites (id, database_id, name, title, description)
+          INSERT INTO routing_public.sites (id, database_id, name, title, description)
           VALUES ($1, $2, 'test-app', 'Test App', 'A test application')
         `, [SITE_ID, DATABASE_ID]);
 
         await pg.query(`
-          INSERT INTO constructive_routing_public.domains (id, database_id, hostname, managed, is_wildcard, is_published)
+          INSERT INTO routing_public.domains (id, database_id, hostname, managed, is_wildcard, is_published)
           VALUES ($1, $2, 'app.example.com', false, false, true)
         `, [DOMAIN_ID, DATABASE_ID]);
 
         await pg.query(`
-          INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id)
+          INSERT INTO routing_public.api_schemas (id, database_id, schema_id, api_id)
           VALUES ($1, $2, $3, $4)
         `, [API_SCHEMA_ID, DATABASE_ID, SCHEMA_ID_PUB, API_ID]);
 
@@ -513,14 +513,14 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
 
         // cors_settings table — tests text[] columns
         await pg.query(`
-          INSERT INTO constructive_routing_public.cors_settings (id, database_id, api_id, allowed_origins)
+          INSERT INTO routing_public.cors_settings (id, database_id, api_id, allowed_origins)
           VALUES ($1, $2, $3, ARRAY['http://localhost:3000', 'https://example.com']::text[])
         `, [CORS_SETTINGS_ID, DATABASE_ID, API_ID]);
 
         // surface module config tables (catalog / routing planes)
         await pg.query(`
           INSERT INTO metaschema_modules_public.catalog_module (id, database_id, schema_id, public_schema_name, domains_table_name, apis_table_name, sites_table_name, apps_table_name, scope, policies)
-          VALUES ($1, $2, $3, 'constructive_catalog_public', 'domains', 'apis', 'sites', 'apps', 'platform', '{"select": "public"}'::jsonb)
+          VALUES ($1, $2, $3, 'catalog_public', 'domains', 'apis', 'sites', 'apps', 'platform', '{"select": "public"}'::jsonb)
         `, [CATALOG_MODULE_ID, DATABASE_ID, SCHEMA_ID_PUB]);
 
         await pg.query(`

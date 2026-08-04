@@ -97,8 +97,8 @@ const pgRowToCamel = (row: Record<string, unknown>): Record<string, unknown> => 
 const SCHEMA_SHIMS_SQL = `
   CREATE SCHEMA IF NOT EXISTS metaschema_public;
   CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
-  CREATE SCHEMA IF NOT EXISTS constructive_routing_public;
-  CREATE SCHEMA IF NOT EXISTS constructive_apps_public;
+  CREATE SCHEMA IF NOT EXISTS routing_public;
+  CREATE SCHEMA IF NOT EXISTS apps_public;
   CREATE SCHEMA IF NOT EXISTS db_migrate;
 
   CREATE TABLE IF NOT EXISTS metaschema_public.database (
@@ -117,46 +117,46 @@ const SCHEMA_SHIMS_SQL = `
     table_id uuid REFERENCES metaschema_public.table(id), name text, type text, description text
   );
 
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.domains (
+  CREATE TABLE IF NOT EXISTS routing_public.domains (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, hostname text, managed boolean,
     is_wildcard boolean, parent_hostname text, verification_status text, tls_status text,
     tls_secret_name text, is_published boolean,
     created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.apis (
+  CREATE TABLE IF NOT EXISTS routing_public.apis (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, name text,
     dbname text DEFAULT current_database(), role_name text, anon_role text,
     is_published boolean, config jsonb,
     created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.sites (
+  CREATE TABLE IF NOT EXISTS routing_public.sites (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, name text, title text,
     description text, config jsonb, is_published boolean,
     created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.api_schemas (
+  CREATE TABLE IF NOT EXISTS routing_public.api_schemas (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, schema_id uuid, api_id uuid,
     created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS constructive_apps_public.apps (
+  CREATE TABLE IF NOT EXISTS apps_public.apps (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, name text, title text,
     description text, status text, config jsonb, is_published boolean,
     created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_modules (
+  CREATE TABLE IF NOT EXISTS routing_public.site_modules (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, name text, data jsonb,
     created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_themes (
+  CREATE TABLE IF NOT EXISTS routing_public.site_themes (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, theme jsonb,
     created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_metadata (
+  CREATE TABLE IF NOT EXISTS routing_public.site_metadata (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, title text,
     description text, og_image text,
     created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.api_modules (
+  CREATE TABLE IF NOT EXISTS routing_public.api_modules (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, api_id uuid, name text, data jsonb,
     created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
@@ -186,16 +186,16 @@ const SEED_SQL = `
     ('cccc0002-0000-0000-0000-000000000001', '${DATABASE_ID}', 'bbbb0001-0000-0000-0000-000000000001', 'name', 'text', 'Owner name'),
     ('cccc0003-0000-0000-0000-000000000001', '${DATABASE_ID}', 'bbbb0001-0000-0000-0000-000000000001', 'email', 'text', 'Contact email');
 
-  INSERT INTO constructive_routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role) VALUES
+  INSERT INTO routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role) VALUES
     ('eeee0001-0000-0000-0000-000000000001', '${DATABASE_ID}', 'public', 'pets-db', true, 'authenticated', 'anonymous');
 
-  INSERT INTO constructive_routing_public.sites (id, database_id, name, title, description, is_published) VALUES
+  INSERT INTO routing_public.sites (id, database_id, name, title, description, is_published) VALUES
     ('ffff0001-0000-0000-0000-000000000001', '${DATABASE_ID}', 'pet-clinic', 'Pet Clinic', 'A pet management application', true);
 
-  INSERT INTO constructive_routing_public.domains (id, database_id, hostname, managed, is_wildcard, is_published) VALUES
+  INSERT INTO routing_public.domains (id, database_id, hostname, managed, is_wildcard, is_published) VALUES
     ('dddd0001-0000-0000-0000-000000000001', '${DATABASE_ID}', 'pets.localhost', false, false, true);
 
-  INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id) VALUES
+  INSERT INTO routing_public.api_schemas (id, database_id, schema_id, api_id) VALUES
     ('1111aaaa-0000-0000-0000-000000000001', '${DATABASE_ID}', 'aaaa0001-0000-0000-0000-000000000001', 'eeee0001-0000-0000-0000-000000000001');
 
   INSERT INTO db_migrate.sql_actions (name, database_id, deploy, deps, content, revert, verify) VALUES
