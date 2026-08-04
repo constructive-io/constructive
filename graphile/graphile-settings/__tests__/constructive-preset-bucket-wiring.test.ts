@@ -8,7 +8,7 @@
  * cross-tenant bucket-name collisions.
  */
 
-const captured: { bucketProvisionerOptions?: any } = {};
+const captured: { bucketProvisionerOptions?: any; presignedOptions?: any } = {};
 
 // Capture the options handed to BucketProvisionerPreset without pulling in the
 // real plugin (and its S3 machinery).
@@ -16,6 +16,17 @@ jest.mock('graphile-bucket-provisioner-plugin', () => ({
   BucketProvisionerPreset: jest.fn((options: any) => {
     captured.bucketProvisionerOptions = options;
     return { plugins: [] as any[] };
+  }),
+}));
+
+jest.mock('graphile-presigned-url-plugin', () => ({
+  PresignedUrlPreset: jest.fn((options: any) => {
+    captured.presignedOptions = options;
+    return { plugins: [] as any[] };
+  }),
+  snapshotPreloadedStorageModules: jest.fn((modules: any[] | undefined) => {
+    if (modules === undefined) return undefined;
+    return Object.freeze(modules.map((module) => Object.freeze({ ...module })));
   }),
 }));
 
@@ -42,6 +53,7 @@ const DATABASE_ID = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 describe('ConstructivePreset bucket-provisioner wiring', () => {
   beforeEach(() => {
     captured.bucketProvisionerOptions = undefined;
+    captured.presignedOptions = undefined;
   });
 
   it('passes a resolveBucketName into BucketProvisionerPreset when presigned uploads are enabled', () => {
@@ -50,6 +62,10 @@ describe('ConstructivePreset bucket-provisioner wiring', () => {
     const options = captured.bucketProvisionerOptions;
     expect(options).toBeDefined();
     expect(typeof options.resolveBucketName).toBe('function');
+    expect(options.preloadedStorageModules).toEqual([]);
+    expect(options.preloadedStorageModules).toBe(
+      captured.presignedOptions.preloadedStorageModules,
+    );
   });
 
   it('the wired resolver mints the tenant-aware {prefix}-{bucketKey}-{databaseId} name', () => {
@@ -64,6 +80,17 @@ describe('ConstructivePreset bucket-provisioner wiring', () => {
   it('disables auto-provision-on-create so buckets are minted lazily / explicitly', () => {
     createConstructivePreset();
     expect(captured.bucketProvisionerOptions.autoProvision).toBe(false);
+  });
+
+  it('passes the same immutable build snapshot to both storage plugins', () => {
+    const modules = [{ id: 'storage-module-a' }] as any[];
+    createConstructivePreset({ preloadedStorageModules: modules });
+
+    const provisionerSnapshot = captured.bucketProvisionerOptions.preloadedStorageModules;
+    expect(provisionerSnapshot).toBe(captured.presignedOptions.preloadedStorageModules);
+    expect(provisionerSnapshot).not.toBe(modules);
+    expect(Object.isFrozen(provisionerSnapshot)).toBe(true);
+    expect(Object.isFrozen(provisionerSnapshot[0])).toBe(true);
   });
 
   it('does not wire the provisioner preset when presigned uploads are disabled', () => {

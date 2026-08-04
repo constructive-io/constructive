@@ -1,0 +1,402 @@
+diff --git a/dist/index.js b/dist/index.js
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,2 +1,3 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
++exports.introspectionClientReleaseCapability = "graphile-build-pg-exact-client-destroy-v1";
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -1,2 +1,3 @@
+ import type { PgRegistry } from "@dataplan/pg";
+ import type { PartitionExpose } from "./interfaces.ts";
++export declare const introspectionClientReleaseCapability: "graphile-build-pg-exact-client-destroy-v1";
+diff --git a/dist/plugins/PgBasicsPlugin.js b/dist/plugins/PgBasicsPlugin.js
+index 97d175d650d0a2cec51932a3da004563c6815500..3766b3f998f2f128e7669765aac309dff6d09f6d 100644
+--- a/dist/plugins/PgBasicsPlugin.js
++++ b/dist/plugins/PgBasicsPlugin.js
+@@ -220,6 +220,7 @@ exports.PgBasicsPlugin = {
+                 build.pgCodecs = pgRegistry.pgCodecs;
+                 build.pgRelations = pgRegistry.pgRelations;
+                 const pgCodecMetaLookup = (0, inputUtils_ts_1.getCodecMetaLookupFromInput)(build.input);
++                build.registerBuildStateDisposer(() => pgCodecMetaLookup.clear());
+                 const getGraphQLTypeNameByPgCodec = (codec, situation) => {
+                     if (codec.arrayOfCodec) {
+                         throw new Error("Do not use getGraphQLTypeNameByPgCodec with an array type, find the underlying type instead");
+diff --git a/dist/plugins/PgCodecsPlugin.js b/dist/plugins/PgCodecsPlugin.js
+index fe7110a577eae139451d2b431b9f9a9d4e2a5337..eed17c45df4a188c5b23ffc68dd626e096f0fe96 100644
+--- a/dist/plugins/PgCodecsPlugin.js
++++ b/dist/plugins/PgCodecsPlugin.js
+@@ -421,6 +421,135 @@ exports.PgCodecsPlugin = {
+                     event.pgCodec = (0, graphile_build_1.EXPORTABLE)((codecName, innerCodec, rangeOfCodec, spec, sqlIdent) => rangeOfCodec(innerCodec, codecName, sqlIdent, spec), [codecName, innerCodec, pg_1.rangeOfCodec, spec, sqlIdent], `${codecName}Codec`);
+                     return;
+                 }
++                // Multirange types are represented in GraphQL as lists of the
++                // corresponding range type. PostgreSQL's multirange text format
++                // is deliberately not treated as an array: its range entries are
++                // not quoted, so commas inside a range are not array delimiters.
++                if (type.typtype === "m") {
++                    const range = await info.helpers.pgIntrospection.getRangeByType(serviceName, type._id);
++                    if (!range?.rngtypid) {
++                        throw new Error(`Failed to get range entry related to multirange '${type._id}'`);
++                    }
++                    const rangeCodec = (await info.helpers.pgCodecs.getCodecFromType(serviceName, range.rngtypid));
++                    if (!rangeCodec?.rangeOfCodec) {
++                        throw new Error(`Failed to build the range codec related to multirange '${type._id}'`);
++                    }
++                    const typeName = type.typname;
++                    const codecName = info.inflection.typeCodecName({
++                        pgType: type,
++                        serviceName,
++                    });
++                    const { tags, description } = type.getTagsAndDescription();
++                    const extensions = {
++                        oid: type._id,
++                        pg: {
++                            serviceName,
++                            schemaName: namespaceName,
++                            name: typeName,
++                        },
++                        listItemNonNull: true,
++                        ...(Object.keys(tags).length > 0 ? { tags } : null),
++                    };
++                    await info.process("pgCodecs_listOfCodec_extensions", {
++                        serviceName,
++                        pgType: type,
++                        innerCodec: rangeCodec,
++                        extensions,
++                    });
++                    // A PostgreSQL multirange cannot contain null ranges.
++                    extensions.listItemNonNull = true;
++                    const sqlIdent = info.helpers.pgBasics.identifier(namespaceName, typeName);
++                    (0, utils_ts_1.exportNameHint)(sqlIdent, `${codecName}Identifier`);
++                    const spec = {
++                        name: codecName,
++                        identifier: sqlIdent,
++                        extensions,
++                        ...(description ? { description } : null),
++                    };
++                    event.pgCodec = (0, graphile_build_1.EXPORTABLE)((listOfCodec, rangeCodec, spec) => {
++                        const listCodec = listOfCodec(rangeCodec, spec);
++                        const parseCastedList = listCodec.fromPg;
++                        const hasCastedRepresentation = typeof listCodec.castFromPg === "function";
++                        return {
++                            ...listCodec,
++                            fromPg(value) {
++                                if (hasCastedRepresentation) {
++                                    return parseCastedList(value);
++                                }
++                                if (typeof value !== "string" ||
++                                    value.length < 2 ||
++                                    value[0] !== "{" ||
++                                    value[value.length - 1] !== "}") {
++                                    throw new Error(`Invalid PostgreSQL multirange value '${String(value)}'`);
++                                }
++                                const body = value.slice(1, -1);
++                                if (body.length === 0) {
++                                    return [];
++                                }
++                                const encodedRanges = [];
++                                let start = 0;
++                                let depth = 0;
++                                let quoted = false;
++                                let escaped = false;
++                                for (let index = 0; index < body.length; index++) {
++                                    const character = body[index];
++                                    if (quoted) {
++                                        if (escaped) {
++                                            escaped = false;
++                                        }
++                                        else if (character === "\\") {
++                                            escaped = true;
++                                        }
++                                        else if (character === '"') {
++                                            quoted = false;
++                                        }
++                                    }
++                                    else if (character === '"') {
++                                        quoted = true;
++                                    }
++                                    else if (character === "[" || character === "(") {
++                                        depth++;
++                                    }
++                                    else if (character === "]" || character === ")") {
++                                        depth--;
++                                        if (depth < 0) {
++                                            throw new Error(`Invalid PostgreSQL multirange value '${value}'`);
++                                        }
++                                    }
++                                    else if (character === "," && depth === 0) {
++                                        const encodedRange = body.slice(start, index).trim();
++                                        if (!encodedRange) {
++                                            throw new Error(`Invalid PostgreSQL multirange value '${value}'`);
++                                        }
++                                        encodedRanges.push(encodedRange);
++                                        start = index + 1;
++                                    }
++                                }
++                                if (quoted || escaped || depth !== 0) {
++                                    throw new Error(`Invalid PostgreSQL multirange value '${value}'`);
++                                }
++                                const encodedRange = body.slice(start).trim();
++                                if (!encodedRange) {
++                                    throw new Error(`Invalid PostgreSQL multirange value '${value}'`);
++                                }
++                                encodedRanges.push(encodedRange);
++                                return encodedRanges.map((entry) => rangeCodec.fromPg(entry));
++                            },
++                            toPg(value) {
++                                if (!Array.isArray(value)) {
++                                    throw new Error("PostgreSQL multirange input must be a list of ranges");
++                                }
++                                return `{${value.map((entry) => {
++                                    if (entry == null) {
++                                        throw new Error("PostgreSQL multirange input cannot contain a null range");
++                                    }
++                                    return rangeCodec.toPg(entry);
++                                }).join(",")}}`;
++                            },
++                        };
++                    }, [pg_1.listOfCodec, rangeCodec, spec], `${codecName}Codec`);
++                    return;
++                }
+                 // Domains are wrappers under an underlying type
+                 if (type.typtype === "d") {
+                     const { typnotnull: notNull, typbasetype: baseTypeOid, typtypmod: baseTypeModifier, typndims: _numberOfArrayDimensions, typcollation: _domainCollation, typdefaultbin: _defaultValueNodeTree, } = type;
+@@ -533,7 +662,9 @@ exports.PgCodecsPlugin = {
+     schema: {
+         hooks: {
+             build(build) {
+-                build.allPgCodecs = new Set();
++                const allPgCodecs = new Set();
++                build.allPgCodecs = allPgCodecs;
++                build.registerBuildStateDisposer(() => allPgCodecs.clear());
+                 function walkCodec(codec) {
+                     if (build.allPgCodecs.has(codec)) {
+                         return;
+diff --git a/dist/plugins/PgIntrospectionPlugin.d.ts b/dist/plugins/PgIntrospectionPlugin.d.ts
+index 821629b96574c90ff58804be3aa3b98c4443c7a0..3c85017d8a765c4368febfd766e5082b0609b5a1 100644
+--- a/dist/plugins/PgIntrospectionPlugin.d.ts
++++ b/dist/plugins/PgIntrospectionPlugin.d.ts
+@@ -1,6 +1,22 @@
+ import { PgExecutor } from "@dataplan/pg";
+ import type { PromiseOrDirect } from "grafast";
+ import type { Introspection, PgAttribute, PgAuthMembers, PgClass, PgConstraint, PgDepend, PgDescription, PgEnum, PgExtension, PgIndex, PgInherits, PgLanguage, PgNamespace, PgProc, PgRange, PgRoles, PgType } from "pg-introspection";
++declare global {
++    namespace GraphileConfig {
++        interface PgServiceConfiguration<TAdaptor extends keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors> {
++            /** Selects the catalog query used during this service's gather phase. */
++            introspectionMode?: "stock" | "scoped-required";
++            /** Catalog types retained by scoped introspection; defaults to all for compatibility. */
++            introspectionScopedCatalogTypes?: "all" | "dependency-closure";
++            /** Non-root schemas that scoped dependency closure may retain. */
++            introspectionAllowedDependencySchemas?: readonly string[];
++            /** Exact installed extension names whose optional capability metadata is required. */
++            introspectionCapabilityExtensions?: readonly string[];
++            /** How to release the exact client after its catalog query. */
++            introspectionClientReleaseMode?: "reuse" | "destroy";
++        }
++    }
++}
+ export type PgEntityWithId = PgNamespace | PgClass | PgConstraint | PgProc | PgRoles | PgType | PgEnum | PgExtension | PgExtension | PgIndex | PgLanguage;
+ declare global {
+     namespace GraphileBuild {
+diff --git a/dist/plugins/PgIntrospectionPlugin.js b/dist/plugins/PgIntrospectionPlugin.js
+index a1597b1dc9a4f76d3debc80f5ef151f4e58bc2cd..e97d2aecfdbe6e94eeb2182b3f0e3f94f9a57cab 100644
+--- a/dist/plugins/PgIntrospectionPlugin.js
++++ b/dist/plugins/PgIntrospectionPlugin.js
+@@ -42,6 +42,118 @@ function makeGetEntities(loc) {
+         return list;
+     };
+ }
++function getIntrospectionQuery(pgService) {
++    const mode = pgService.introspectionMode ?? "stock";
++    const configuredCatalogTypes = pgService.introspectionScopedCatalogTypes;
++    const configuredCapabilityExtensions = pgService.introspectionCapabilityExtensions;
++    const scopedCatalogTypes = configuredCatalogTypes ?? "all";
++    if (scopedCatalogTypes !== "all" && scopedCatalogTypes !== "dependency-closure") {
++        throw new Error(`Unsupported scoped catalog type policy '${scopedCatalogTypes}' for service '${pgService.name}'`);
++    }
++    if (mode === "stock") {
++        if (configuredCatalogTypes !== undefined) {
++            throw new Error(`Scoped catalog type policy is only valid with scoped-required introspection for service '${pgService.name}'`);
++        }
++        if (configuredCapabilityExtensions !== undefined) {
++            throw new Error(`Scoped extension capabilities are only valid with scoped-required introspection for service '${pgService.name}'`);
++        }
++        return {
++            query: { text: (0, pg_introspection_1.makeIntrospectionQuery)() },
++            requiredSchemas: null,
++            allowedSchemas: null,
++            scopedCatalogTypes: null,
++        };
++    }
++    if (mode === "scoped-required") {
++        const requiredSchemas = pgService.schemas ?? [];
++        const dependencySchemas = pgService.introspectionAllowedDependencySchemas ?? [];
++        const capabilityExtensions = configuredCapabilityExtensions ?? [];
++        return {
++            query: (0, pg_introspection_1.makeSchemaScopedIntrospectionQuery)(requiredSchemas, {
++                catalogTypes: scopedCatalogTypes,
++                capabilityExtensions,
++            }),
++            requiredSchemas,
++            allowedSchemas: [...new Set([...requiredSchemas, ...dependencySchemas, "pg_catalog"])],
++            scopedCatalogTypes,
++        };
++    }
++    throw new Error(`Unsupported PostgreSQL introspection mode '${mode}' for service '${pgService.name}'`);
++}
++function assertScopedNamespaces(introspection, requiredSchemas, allowedSchemas, serviceName) {
++    if (requiredSchemas === null) {
++        return;
++    }
++    const found = new Set(introspection.namespaces.map((namespace) => namespace.nspname));
++    const missing = requiredSchemas.filter((schema) => !found.has(schema));
++    if (missing.length > 0) {
++        throw new Error(`Schema-scoped introspection for service '${serviceName}' did not find required schema(s): ${missing.join(", ")}`);
++    }
++    const allowed = new Set(allowedSchemas);
++    const unexpected = [...found].filter((schema) => !allowed.has(schema));
++    if (unexpected.length > 0) {
++        throw new Error(`Schema-scoped introspection for service '${serviceName}' crossed into unapproved dependency schema(s): ${unexpected.join(", ")}`);
++    }
++}
++function assertDependencyClosureTypes(introspection, scopedCatalogTypes, serviceName) {
++    if (scopedCatalogTypes !== "dependency-closure") {
++        return;
++    }
++    const retainedTypeOids = new Set(introspection.types.map((type) => String(type._id)));
++    const requireType = (oid, objectKind, objectContext, field) => {
++        if (oid === null || oid === undefined || String(oid) === "0") {
++            return;
++        }
++        const normalizedOid = String(oid);
++        // pg-introspection deliberately removes extension-owned composite
++        // resources from the public arrays after constructing its lookup maps.
++        // Array and user-object dependencies still resolve through that exact
++        // lookup, so validate the same runtime resolution surface instead of
++        // rejecting a coherent extension-pruned result.
++        const resolvesThroughIntrospection = retainedTypeOids.has(normalizedOid) ||
++            introspection._lookups?.typeById?.has(normalizedOid) === true;
++        if (!resolvesThroughIntrospection) {
++            throw new Error(`Dependency-closure introspection for service '${serviceName}' retained ${objectKind} '${objectContext}' field '${field}' referencing missing pg_type OID '${normalizedOid}'`);
++        }
++    };
++    const requireTypes = (oids, objectKind, objectContext, field) => {
++        for (const oid of oids ?? []) {
++            requireType(oid, objectKind, objectContext, field);
++        }
++    };
++    for (const entity of introspection.classes) {
++        const context = `${entity.relname} (${entity._id})`;
++        requireType(entity.reltype, "pg_class", context, "reltype");
++        requireType(entity.reloftype, "pg_class", context, "reloftype");
++    }
++    for (const entity of introspection.attributes) {
++        requireType(entity.atttypid, "pg_attribute", `${entity.attrelid}.${entity.attname}`, "atttypid");
++    }
++    for (const entity of introspection.constraints) {
++        requireType(entity.contypid, "pg_constraint", `${entity.conname} (${entity._id})`, "contypid");
++    }
++    for (const entity of introspection.procs) {
++        const context = `${entity.proname} (${entity._id})`;
++        requireType(entity.prorettype, "pg_proc", context, "prorettype");
++        requireTypes(entity.proargtypes, "pg_proc", context, "proargtypes");
++        requireTypes(entity.proallargtypes, "pg_proc", context, "proallargtypes");
++    }
++    for (const entity of introspection.types) {
++        const context = `${entity.typname} (${entity._id})`;
++        requireType(entity.typbasetype, "pg_type", context, "typbasetype");
++        requireType(entity.typelem, "pg_type", context, "typelem");
++        requireType(entity.typarray, "pg_type", context, "typarray");
++    }
++    for (const entity of introspection.enums) {
++        requireType(entity.enumtypid, "pg_enum", `${entity.enumlabel} (${entity._id})`, "enumtypid");
++    }
++    for (const entity of introspection.ranges) {
++        const context = `range ${entity.rngtypid ?? "unknown"}`;
++        requireType(entity.rngtypid, "pg_range", context, "rngtypid");
++        requireType(entity.rngsubtype, "pg_range", context, "rngsubtype");
++        requireType(entity.rngmultitypid, "pg_range", context, "rngmultitypid");
++    }
++}
+ exports.PgIntrospectionPlugin = {
+     name: "PgIntrospectionPlugin",
+     description: "Introspects PostgreSQL databases and makes the results available to other plugins",
+@@ -171,8 +283,8 @@ exports.PgIntrospectionPlugin = {
+                 return type?.getEnumValues() ?? [];
+             },
+             async getRangeByType(info, serviceName, typeId) {
+-                const type = await info.helpers.pgIntrospection.getType(serviceName, typeId);
+-                return type?.getRange();
++                const relevant = await getDb(info, serviceName);
++                return relevant.introspection.ranges.find((range) => range.rngtypid === typeId || range.rngmultitypid === typeId);
+             },
+             async getExtensionByName(info, serviceName, extensionName) {
+                 const relevant = await getDb(info, serviceName);
+@@ -198,11 +310,20 @@ exports.PgIntrospectionPlugin = {
+                             info.cache.introspectionResultsPromise = null;
+                         });
+                         const rawIntrospections = await introspectionPromise;
+-                        const introspections = rawIntrospections.map(({ pgService, introspectionText }) => ({
+-                            pgService,
++                        // Scoped mode keeps raw text only in this gather's async frame.
++                        // Clear only the exact promise we consumed so every later gather
++                        // re-queries, while concurrent helpers still share parsed state.
++                        if (rawIntrospections.some(({ requiredSchemas }) => requiredSchemas !== null) &&
++                            info.cache.introspectionResultsPromise === introspectionPromise) {
++                            info.cache.introspectionResultsPromise = null;
++                        }
++                        const introspections = rawIntrospections.map(({ pgService, introspectionText, requiredSchemas, allowedSchemas, scopedCatalogTypes }) => {
+                             // IMPORTANT: parseIntrospectionResults must NOT be cached, because other plugins mutate it.
+-                            introspection: (0, pg_introspection_1.parseIntrospectionResults)(introspectionText),
+-                        }));
++                            const introspection = (0, pg_introspection_1.parseIntrospectionResults)(introspectionText);
++                            assertScopedNamespaces(introspection, requiredSchemas, allowedSchemas, pgService.name);
++                            assertDependencyClosureTypes(introspection, scopedCatalogTypes, pgService.name);
++                            return { pgService, introspection };
++                        });
+                         // Store the resolved state, so access during announcements doesn't cause the system to hang
+                         info.state.getIntrospectionPromise = introspections;
+                         // Announce the introspection results.
+@@ -416,13 +537,15 @@ function introspectPgServices(pgServices) {
+             seenPgSettingsKeys.set(pgSettingsKey, i);
+         }
+         // Do the introspection
+-        const introspectionQuery = (0, pg_introspection_1.makeIntrospectionQuery)();
++        const { query, requiredSchemas, allowedSchemas, scopedCatalogTypes } = getIntrospectionQuery(pgService);
++        const clientReleaseMode = pgService.introspectionClientReleaseMode ?? "reuse";
+         const { rows: [row], } = await (0, pg_1.withPgClientFromPgService)(pgService, pgService.pgSettingsForIntrospection ?? null, (client) => client.query({
+-            text: introspectionQuery,
++            text: query.text,
++            values: query.values,
+-        }));
++        }), clientReleaseMode === "reuse" ? undefined : { clientReleaseMode });
+         if (!row) {
+             throw new Error("Introspection failed");
+         }
+-        return { pgService, introspectionText: row.introspection };
++        return { pgService, introspectionText: row.introspection, requiredSchemas, allowedSchemas, scopedCatalogTypes };
+     }));
+ }
+diff --git a/dist/plugins/PgPolymorphismPlugin.js b/dist/plugins/PgPolymorphismPlugin.js
+index b1892244aebf936cb697d9e664e6b3c2432e8c0e..6907c0d70640bebd87c93377c3e30f901b18efa9 100644
+--- a/dist/plugins/PgPolymorphismPlugin.js
++++ b/dist/plugins/PgPolymorphismPlugin.js
+@@ -554,6 +554,14 @@ exports.PgPolymorphismPlugin = {
+                     }
+                 }
+                 const pgCodecByPolymorphicUnionModeTypeName = Object.create(null);
++                build.registerBuildStateDisposer(() => {
++                    for (const key of Object.keys(pgResourcesByPolymorphicTypeName)) {
++                        delete pgResourcesByPolymorphicTypeName[key];
++                    }
++                    for (const key of Object.keys(pgCodecByPolymorphicUnionModeTypeName)) {
++                        delete pgCodecByPolymorphicUnionModeTypeName[key];
++                    }
++                });
+                 for (const codec of Object.values(pgRegistry.pgCodecs)) {
+                     if (!codec.polymorphism)
+                         continue;

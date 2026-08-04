@@ -1,0 +1,179 @@
+diff --git a/dist/adaptors/pg.js b/dist/adaptors/pg.js
+--- a/dist/adaptors/pg.js
++++ b/dist/adaptors/pg.js
+@@ -26,6 +26,15 @@ const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
+  */
+ const PREPARED_STATEMENT_CACHE_SIZE = !!cacheSizeFromEnv || cacheSizeFromEnv === 0 ? cacheSizeFromEnv : 100;
+ const $$isSetup = Symbol("isConfiguredForDataplanPg");
++const REUSABLE_CLIENT_RELEASE_MODES = Object.freeze(["reuse"]);
++const DESTROYABLE_CLIENT_RELEASE_MODES = Object.freeze(["reuse", "destroy"]);
++function getClientReleaseMode(options) {
++    const mode = options?.clientReleaseMode ?? "reuse";
++    if (mode !== "reuse" && mode !== "destroy") {
++        throw new Error(`Unsupported PostgreSQL client release mode '${mode}'`);
++    }
++    return mode;
++}
+ /**
+  * \> JIT compilation is beneficial primarily for long-running CPU-bound
+  * \> queries. Frequently these will be analytical queries. For short
+@@ -253,24 +262,37 @@ async function makeNodePostgresWithPgClient_inner(pgClient, pgSettings, callback
+  * Returns a `withPgClient` for the given `Pool` instance.
+  */
+ function makePgAdaptorWithPgClient(pool, release = () => { }) {
+-    const withPgClient = async (pgSettings, callback) => {
++    const withPgClient = async (pgSettings, callback, options) => {
++        const clientReleaseMode = getClientReleaseMode(options);
++        const supportsExactClientDestruction = typeof PgPool === "function" && pool instanceof PgPool;
++        if (clientReleaseMode === "destroy" && !supportsExactClientDestruction) {
++            throw new Error("Exact PostgreSQL client destruction requires a node-postgres Pool");
++        }
+         const pgClient = await pool.connect();
+-        if (!pgClient[$$isSetup]) {
+-            pgClient[$$isSetup] = true;
+-            if (!DONT_DISABLE_JIT) {
+-                // We don't actually disable JIT, it's the optimization that's expensive so we disable that.
+-                pgClient.query("set jit_optimize_above_cost = -1;").catch((e) => {
+-                    console.error(`Error occurred applying @dataplan/pg global Postgres settings: ${e}`);
+-                });
++        try {
++            if (!pgClient[$$isSetup]) {
++                pgClient[$$isSetup] = true;
++                if (!DONT_DISABLE_JIT) {
++                    // We don't actually disable JIT, it's the optimization that's expensive so we disable that.
++                    pgClient.query("set jit_optimize_above_cost = -1;").catch((e) => {
++                        console.error(`Error occurred applying @dataplan/pg global Postgres settings: ${e}`);
++                    });
++                }
+             }
+-        }
+-        try {
+             return await makeNodePostgresWithPgClient_inner(pgClient, pgSettings, callback, false, false);
+         }
+         finally {
+             // NOTE: have decided not to `RESET ALL` here; otherwise timezone,jit,etc will reset
+-            pgClient.release();
++            if (clientReleaseMode === "destroy") {
++                pgClient.release(true);
++            }
++            else {
++                pgClient.release();
++            }
+         }
+     };
++    withPgClient.supportedClientReleaseModes = typeof PgPool === "function" && pool instanceof PgPool
++        ? DESTROYABLE_CLIENT_RELEASE_MODES
++        : REUSABLE_CLIENT_RELEASE_MODES;
+     let released = false;
+     const releaseOnce = () => {
+@@ -292,11 +314,16 @@ function makePgAdaptorWithPgClient(pool, release = () => { }) {
+  */
+ function makeWithPgClientViaPgClientAlreadyInTransaction(pgClient, alreadyInTransaction = false) {
+     const release = () => { };
+-    const withPgClient = async (pgSettings, callback) => {
++    const withPgClient = async (pgSettings, callback, options) => {
++        const clientReleaseMode = getClientReleaseMode(options);
++        if (clientReleaseMode !== "reuse") {
++            throw new Error("Cannot destroy a caller-owned PostgreSQL client");
++        }
+         return makeNodePostgresWithPgClient_inner(pgClient, pgSettings, callback,
+         // Ensure only one withPgClient can run at a time, since we only have on pgClient.
+         true, alreadyInTransaction);
+     };
++    withPgClient.supportedClientReleaseModes = REUSABLE_CLIENT_RELEASE_MODES;
+     let released = false;
+     const releaseOnce = () => {
+         if (released) {
+diff --git a/dist/executor.d.ts b/dist/executor.d.ts
+--- a/dist/executor.d.ts
++++ b/dist/executor.d.ts
+@@ -62,8 +62,13 @@ export interface PgClient {
+     query<TData>(opts: PgClientQuery): Promise<PgClientResult<TData>>;
+     withTransaction<T>(callback: (client: this) => Promise<T>): Promise<T>;
+ }
++export type PgClientReleaseMode = "reuse" | "destroy";
++export interface WithPgClientUseOptions {
++    clientReleaseMode?: PgClientReleaseMode;
++}
+ export interface WithPgClient<TPgClient extends PgClient = PgClient> {
+-    <T>(pgSettings: Record<string, string | undefined> | null, callback: (client: TPgClient) => T | Promise<T>): Promise<T>;
++    <T>(pgSettings: Record<string, string | undefined> | null, callback: (client: TPgClient) => T | Promise<T>, options?: WithPgClientUseOptions): Promise<T>;
++    supportedClientReleaseModes?: readonly PgClientReleaseMode[];
+     release?(): PromiseOrDirect<void>;
+ }
+ export type PgExecutorContext<TSettings = any, TPgClient extends PgClient = PgClient> = {
+diff --git a/dist/index.js b/dist/index.js
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,2 +1,3 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
++exports.exactClientReleaseCapability = "dataplan-pg-exact-client-destroy-v1";
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -1,3 +1,4 @@
+ import type { GrafastSubscriber } from "grafast";
++export declare const exactClientReleaseCapability: "dataplan-pg-exact-client-destroy-v1";
+ export { sql } from "pg-sql2";
+ import type { ObjectFromPgCodecAttributes, PgCodecAttribute, PgCodecAttributeExtensions, PgCodecAttributes, PgCodecAttributeVia, PgCodecAttributeViaExplicit, PgEnumCodecSpec, PgRecordTypeCodecSpec } from "./codecs.ts";
+@@ -39,6 +39,7 @@ import type { SideEffectWithPgClientStepCallback } from "./steps/withPgClient.ts
+ import { loadManyWithPgClient, loadOneWithPgClient, sideEffectWithPgClient, SideEffectWithPgClientStep, sideEffectWithPgClientTransaction, withPgClient, withPgClientTransaction } from "./steps/withPgClient.ts";
+ import { assertPgClassSingleStep } from "./utils.ts";
+ export type { GetPgCodecAttributes, GetPgRegistryCodecRelations, GetPgRegistryCodecs, GetPgRegistrySources, GetPgResourceAttributes, GetPgResourceCodec, GetPgResourceRegistry, GetPgResourceRelations, GetPgResourceUniques, KeysOfType, MakePgServiceOptions, ObjectFromPgCodecAttributes, PgAdaptor, PgBox, PgCircle, PgClassSingleStep, PgClient, PgClientQuery, PgClientResult, PgCodec, PgCodecAnyScalar, PgCodecAttribute, PgCodecAttributeExtensions, PgCodecAttributes, PgCodecAttributeVia, PgCodecAttributeViaExplicit, PgCodecExtensions, PgCodecList, PgCodecPolymorphism, PgCodecPolymorphismRelational, PgCodecPolymorphismRelationalTypeSpec, PgCodecPolymorphismSingle, PgCodecPolymorphismSingleTypeAttributeSpec, PgCodecPolymorphismSingleTypeSpec, PgCodecPolymorphismUnion, PgCodecRef, PgCodecRefExtensions, PgCodecRefPath, PgCodecRefPathEntry, PgCodecRefs, PgCodecRelation, PgCodecRelationConfig, PgCodecRelationExtensions, PgCodecWithAttributes, PgConditionCapableParent, PgConditionLike, PgDecode, PgDeleteSingleQueryBuilder, PgEncode, PgEnumCodec, PgEnumCodecSpec, PgEnumValue, PgExecutorContext, PgExecutorContextPlans, PgExecutorInput, PgExecutorMutationOptions, PgExecutorOptions, PgFunctionResourceOptions, PgGroupDetails, PgGroupSpec, PgHavingConditionSpec, PgHStore, PgInsertSingleQueryBuilder, PgInterval, PgLine, PgLockableParameter, PgLockCallback, PgLseg, PgOrderSpec, PgPath, PgPoint, PgPolygon, PgRecordTypeCodecSpec, PgRefDefinition, PgRefDefinitionExtensions, PgRefDefinitions, PgRegistry, PgRegistryBuilder, PgResourceExtensions, PgResourceOptions, PgResourceParameter, PgResourceUnique, PgResourceUniqueExtensions, PgRootStep, PgSelectArgumentDigest, PgSelectArgumentRuntimeValue, PgSelectArgumentSpec, PgSelectIdentifierSpec, PgSelectMode, PgSelectOptions, PgSelectParsedCursorStep, PgSelectQueryBuilder, PgSelectQueryBuilderCallback, PgSelectSinglePlanOptions, PgTypedStep, PgUnionAllQueryBuilder, PgUnionAllQueryBuilderCallback, PgUnionAllStepCondition, PgUnionAllStepConfig, PgUnionAllStepConfigAttributes, PgUnionAllStepMember, PgUnionAllStepOrder, PgUpdateSingleQueryBuilder, PgWhereConditionSpec, PlanByUniques, SideEffectWithPgClientStepCallback, TuplePlanMap, WithPgClient, };
++export type { PgClientReleaseMode, WithPgClientUseOptions } from "./executor.ts";
+ export { assertPgClassSingleStep, domainOfCodec, enumCodec, generatePgParameterAnalysis, getCodecByPgCatalogTypeName, getInnerCodec, getWithPgClientFromPgService, isEnumCodec, LIST_TYPES, listOfCodec, loadManyWithPgClient, loadOneWithPgClient, pgResourceOptions as makePgResourceOptions, makeRegistry, makeRegistryBuilder, PgBooleanFilter, pgClassExpression, PgClassExpressionStep, PgClassFilter, PgCondition, PgContextPlugin, PgCursorStep, pgDeleteSingle, PgDeleteSingleStep, PgExecutor, pgFromExpression, pgFromExpressionRuntime, pgInsertSingle, PgInsertSingleStep, PgManyFilter, PgOrFilter, PgResource, pgResourceOptions, pgSelect, pgSelectFromRecord, pgSelectFromRecords, PgSelectRowsStep, pgSelectSingleFromRecord, PgSelectSingleStep, PgSelectStep, PgTempTable, pgUnionAll, PgUnionAllRowsStep, PgUnionAllSingleStep, PgUnionAllStep, pgUpdateSingle, PgUpdateSingleStep, pgValidateParsedCursor, PgValidateParsedCursorStep, pgWhereConditionSpecListToSQL, rangeOfCodec, recordCodec, sideEffectWithPgClient, SideEffectWithPgClientStep, sideEffectWithPgClientTransaction, sqlFromArgDigests, sqlValueWithCodec, toPg, ToPgStep, TYPES, withPgClient, withPgClientFromPgService, withPgClientTransaction, withSuperuserPgClientFromPgService, };
+ export { version } from "./version.ts";
+ declare global {
+diff --git a/dist/pgServices.d.ts b/dist/pgServices.d.ts
+--- a/dist/pgServices.d.ts
++++ b/dist/pgServices.d.ts
+@@ -1,4 +1,4 @@
+-import type { PgClient, WithPgClient } from "./executor.ts";
++import type { PgClient, WithPgClient, WithPgClientUseOptions } from "./executor.ts";
+ type PromiseOrDirect<T> = T | PromiseLike<T>;
+ /** @experimental */
+ export interface PgAdaptor<TAdaptor extends keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors> {
+@@ -14,6 +14,6 @@ export declare function isPromiseLike<T>(t: T | Promise<T> | PromiseLike<T>): t
+  * config, caching it to make future lookups faster.
+  */
+ export declare function getWithPgClientFromPgService<TAdaptor extends keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors>(config: GraphileConfig.PgServiceConfiguration<TAdaptor>): PromiseOrDirect<WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>>;
+-export declare function withPgClientFromPgService<T>(config: GraphileConfig.PgServiceConfiguration, pgSettings: Record<string, string | undefined> | null, callback: (client: PgClient) => T | Promise<T>): Promise<T>;
++export declare function withPgClientFromPgService<T>(config: GraphileConfig.PgServiceConfiguration, pgSettings: Record<string, string | undefined> | null, callback: (client: PgClient) => T | Promise<T>, options?: WithPgClientUseOptions): Promise<T>;
+ export declare function withSuperuserPgClientFromPgService<T>(config: GraphileConfig.PgServiceConfiguration, pgSettings: Record<string, string | undefined> | null, callback: (client: PgClient) => T | Promise<T>): Promise<T>;
+ export {};
+diff --git a/dist/pgServices.js b/dist/pgServices.js
+--- a/dist/pgServices.js
++++ b/dist/pgServices.js
+@@ -38,6 +38,7 @@ function getWithPgClientFromPgService(config) {
+             }
+             const originalWithPgClient = await factory(config.adaptorSettings);
+             const withPgClient = ((...args) => originalWithPgClient.apply(null, args));
++            withPgClient.supportedClientReleaseModes = originalWithPgClient.supportedClientReleaseModes;
+             const cachedValue = {
+                 withPgClient,
+                 retainers: 1,
+@@ -70,13 +71,21 @@ function getWithPgClientFromPgService(config) {
+         return promise.then((v) => v.withPgClient);
+     }
+ }
+-async function withPgClientFromPgService(config, pgSettings, callback) {
++async function withPgClientFromPgService(config, pgSettings, callback, options) {
+     const withPgClientFromPgService = getWithPgClientFromPgService(config);
+     const withPgClient = isPromiseLike(withPgClientFromPgService)
+         ? await withPgClientFromPgService
+         : withPgClientFromPgService;
+     try {
+-        return await withPgClient(pgSettings, callback);
++        const clientReleaseMode = options?.clientReleaseMode ?? "reuse";
++        if (clientReleaseMode !== "reuse" && clientReleaseMode !== "destroy") {
++            throw new Error(`Unsupported PostgreSQL client release mode '${clientReleaseMode}' for service '${config.name}'`);
++        }
++        if (clientReleaseMode === "destroy" &&
++            !withPgClient.supportedClientReleaseModes?.includes("destroy")) {
++            throw new Error(`PostgreSQL service '${config.name}' does not support exact client destruction`);
++        }
++        return await withPgClient(pgSettings, callback, options);
+     }
+     finally {
+         withPgClient.release();

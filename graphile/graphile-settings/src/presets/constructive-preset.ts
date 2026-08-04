@@ -8,7 +8,9 @@ import { GraphileLlmPreset } from 'graphile-llm';
 import { createFolderOperatorFactory, GraphileLtreePreset } from 'graphile-ltree';
 import { PgAggregatesPreset } from 'graphile-pg-aggregates';
 import { createPostgisOperatorFactory,GraphilePostgisPreset } from 'graphile-postgis';
-import { PresignedUrlPreset } from 'graphile-presigned-url-plugin';
+import type { StorageModuleConfig } from 'graphile-presigned-url-plugin';
+import { PresignedUrlPreset, snapshotPreloadedStorageModules } from 'graphile-presigned-url-plugin';
+import type { RealtimeSubscriptionsPluginOptions } from 'graphile-realtime-subscriptions';
 import { RealtimeSubscriptionsPreset } from 'graphile-realtime-subscriptions';
 import { createMatchesOperatorFactory, createTrgmOperatorFactories,UnifiedSearchPreset } from 'graphile-search';
 import { UploadPreset } from 'graphile-upload-plugin';
@@ -52,6 +54,14 @@ export interface ConstructivePresetOptions {
   enableBulk?: boolean;
   enableI18n?: boolean;
   enableHistory?: boolean;
+  /** Build-time and delivery settings forwarded to the realtime plugin. */
+  realtimeSubscriptions?: RealtimeSubscriptionsPluginOptions;
+  /**
+   * Control-plane-resolved metadata. Constructive treats omission and an empty
+   * list as authoritative absence; it never falls back to runtime metaschema
+   * discovery. Standalone storage-plugin consumers retain the legacy mode.
+   */
+  preloadedStorageModules?: readonly StorageModuleConfig[];
 }
 
 /**
@@ -72,7 +82,10 @@ function assertSupportedNodeVersion(): void {
   }
 }
 
-const DEFAULTS: Required<ConstructivePresetOptions> = {
+const DEFAULTS: Required<Omit<
+ConstructivePresetOptions,
+'preloadedStorageModules' | 'realtimeSubscriptions'
+>> = {
   enableAggregates: false,
   enablePostgis: true,
   enableSearch: true,
@@ -87,6 +100,31 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
   enableI18n: false,
   enableHistory: false
 };
+
+/**
+ * Extension metadata required by Constructive's enabled Graphile plugins.
+ *
+ * These are extension names, not schemas. Scoped introspection uses the exact
+ * names to retain optional capability metadata without treating every
+ * installed extension as part of the tenant's runtime surface.
+ */
+export function resolveConstructiveIntrospectionCapabilityExtensions(
+  options?: ConstructivePresetOptions
+): readonly string[] {
+  const opts = { ...DEFAULTS, ...options };
+  const extensions = new Set<string>();
+
+  if (opts.enableSearch) {
+    extensions.add('pg_trgm');
+    extensions.add('vector');
+    extensions.add('pg_textsearch');
+  }
+  if (opts.enableLlm) extensions.add('vector');
+  if (opts.enablePostgis) extensions.add('postgis');
+  if (opts.enableLtree) extensions.add('ltree');
+
+  return Object.freeze([...extensions]);
+}
 
 /**
  * Create a Constructive PostGraphile v5 Preset.
@@ -198,15 +236,24 @@ export function createConstructivePreset(
   }
 
   if (opts.enablePresignedUploads) {
+    // Freeze one authoritative control-plane snapshot and hand the exact same
+    // object to both storage plugins. Constructive always chooses the strict
+    // path: omitted metadata becomes an authoritative empty snapshot rather
+    // than enabling either plugin's legacy runtime lookup.
+    const storageModules = snapshotPreloadedStorageModules(
+      opts.preloadedStorageModules ?? [],
+    );
     presets.push(
       PresignedUrlPreset({
         s3: getPresignedUrlS3Config,
         resolveBucketName: createBucketNameResolver(),
-        ensureBucketProvisioned: createEnsureBucketProvisioned()
+        ensureBucketProvisioned: createEnsureBucketProvisioned(),
+        preloadedStorageModules: storageModules
       }),
       BucketProvisionerPreset({
         connection: getBucketProvisionerConnection,
         allowedOrigins: getAllowedOrigins(),
+        preloadedStorageModules: storageModules,
         // Same tenant-aware naming policy as the presigned (lazy) path, so the
         // eager provisionBucket mutation mints the identical physical name
         // (`{prefix}-{bucketKey}-{databaseId}`) instead of falling back to the
@@ -226,7 +273,7 @@ export function createConstructivePreset(
   }
 
   if (opts.enableRealtime) {
-    presets.push(RealtimeSubscriptionsPreset());
+    presets.push(RealtimeSubscriptionsPreset(opts.realtimeSubscriptions));
   }
 
   if (opts.enableBulk) {

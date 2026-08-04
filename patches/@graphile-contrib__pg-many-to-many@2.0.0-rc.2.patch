@@ -1,0 +1,15 @@
+diff --git a/dist/PgManyToManyRelationPlugin.js b/dist/PgManyToManyRelationPlugin.js
+index 983bc745b4707efb8e3ade5b25b88b9e2cd114e7..d362f41b307e68b28e0737559cd6c40bb95e3109 100644
+--- a/dist/PgManyToManyRelationPlugin.js
++++ b/dist/PgManyToManyRelationPlugin.js
+@@ -265,7 +265,9 @@ exports.PgManyToManyRelationPlugin = {
+         },
+         hooks: {
+             build(build) {
+-                build.pgManyToManyRealtionshipsByResource = new Map();
++                const relationshipsByResource = new Map();
++                build.pgManyToManyRealtionshipsByResource = relationshipsByResource;
++                build.registerBuildStateDisposer(() => relationshipsByResource.clear());
+                 return build;
+             },
+             init(_, build, _context) {
