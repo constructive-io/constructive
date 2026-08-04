@@ -177,14 +177,13 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
 
     unsubscribe();
 
-    const relevant = events.filter(e => e.onItemChanged.event !== 'UNKNOWN');
-    expect(relevant.length).toBe(1);
-    expect(relevant[0].onItemChanged.event).toBe('INSERT');
-    expect(relevant[0].onItemChanged.rowId).toBe(watchedId);
-
-    const filtered = events.filter(e => e.onItemChanged.event === 'UNKNOWN');
-    expect(filtered.length).toBe(1);
-    expect(filtered[0].onItemChanged.rowId).toBeNull();
+    // The change to the unwatched row must produce no event at all. This
+    // previously asserted the opposite — one event with `event: 'UNKNOWN'`
+    // and a null rowId — which told a subscriber that *something* it isn't
+    // watching changed, and when.
+    expect(events).toHaveLength(1);
+    expect(events[0].onItemChanged.event).toBe('INSERT');
+    expect(events[0].onItemChanged.rowId).toBe(watchedId);
   }, 15000);
 
   // ─── Multiple concurrent WebSocket subscribers ────────────────────────

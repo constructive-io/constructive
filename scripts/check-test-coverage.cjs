@@ -26,9 +26,6 @@ const WORKFLOW = path.join(ROOT, '.github/workflows/run-tests.yaml');
  * so this list cannot rot quietly.
  */
 const EXCLUSIONS = {
-  'graphile/graphile-realtime-test':
-    'Sparse-set filtering delivers a bogus UNKNOWN event instead of dropping ' +
-    'the filtered one — a real plugin bug, not test drift. constructive-planning#1426.',
   'graphql/react':
     'Requires an external GraphQL endpoint via $TESTING_URL and throws at ' +
     'import time without one — a manual suite, not a CI one.'
