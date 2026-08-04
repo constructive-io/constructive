@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.9.2...@agentic-kit/pi@0.10.0) (2026-08-04)
+
+### Bug Fixes
+
+- **pi:** mint reused-principal keys with the identity userId ([dc0cab8](https://github.com/constructive-io/constructive/commit/dc0cab8bd6a80555e98e66149b53989f9f612e6b))
+- **pi:** verify existing principal scope before unscoped reuse ([5f531ae](https://github.com/constructive-io/constructive/commit/5f531aec0fe1b3b5379a4c0173590de7f4effb8e))
+
+### Features
+
+- **pi:** create_api_key tool + secret-delivery host hooks ([8acfcd8](https://github.com/constructive-io/constructive/commit/8acfcd849118952929ce1a4200576d370a57d4c1))
+- **pi:** export deriveSubdomainEndpoint ([93719c1](https://github.com/constructive-io/constructive/commit/93719c1a4105512bf87bd6e7497938154279be71))
+- **pi:** host-configurable signInHint in signed-out reasons ([a8f9d67](https://github.com/constructive-io/constructive/commit/a8f9d67f9fd81721e4a3add0363de68bbdd6b793))
+- **pi:** manage_entity_types tool (list/create/delete) ([57791c2](https://github.com/constructive-io/constructive/commit/57791c2914de0698aa8b670e33ad06f56f825776))
+- **pi:** step-up request context + cwd in secret delivery ([6be011a](https://github.com/constructive-io/constructive/commit/6be011a92b04a061156a8f3b987889c85924d742))
+
 ## [0.9.2](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.9.1...@agentic-kit/pi@0.9.2) (2026-08-03)
 
 **Note:** Version bump only for package @agentic-kit/pi

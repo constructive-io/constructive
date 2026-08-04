@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.25.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.24.0...@pgpmjs/core@7.25.0) (2026-08-04)
+
+### Bug Fixes
+
+- **pgpm:** decode git-quoted paths in package --check change detection ([f90aec8](https://github.com/constructive-io/constructive/commit/f90aec821f3dd1aea9aefce2425dc1198b074dde))
+
+### Features
+
+- **cli:** one shared Constructive login store ([20cb70d](https://github.com/constructive-io/constructive/commit/20cb70ded9bc03f69613e8b5bcd0cb2174c03373))
+- **codegen:** cli.stashName so generated CLIs can share one signed-in state ([412ba27](https://github.com/constructive-io/constructive/commit/412ba27081799f44ce4ec59861e3a956727bf9bb))
+
 # [7.24.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.23.0...@pgpmjs/core@7.24.0) (2026-08-03)
 
 ### Features

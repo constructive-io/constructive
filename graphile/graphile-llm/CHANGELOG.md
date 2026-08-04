@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.3](https://github.com/constructive-io/constructive/compare/graphile-llm@1.11.2...graphile-llm@1.11.3) (2026-08-04)
+
+### Bug Fixes
+
+- **graphile-llm:** key agent discovery by database_id, and run express-context in CI ([33b4851](https://github.com/constructive-io/constructive/commit/33b485129bf9a1397813cd12de83f5c24a1bd610)), closes [#1644](https://github.com/constructive-io/constructive/issues/1644) [constructive-planning#1403](https://github.com/constructive-planning/issues/1403)
+
 ## [1.11.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.11.1...graphile-llm@1.11.2) (2026-08-03)
 
 **Note:** Version bump only for package graphile-llm

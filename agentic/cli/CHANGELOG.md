@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.8.2...@agentic-kit/cli@0.9.0) (2026-08-04)
+
+### Bug Fixes
+
+- **cli:** disable inquirerer idle timeout in interactive login ([ea21a20](https://github.com/constructive-io/constructive/commit/ea21a2040d1faf6d3649367b97eebf3973d852b4))
+- **cli:** split coalesced stdin chunks so pasted passwords survive login ([922fd84](https://github.com/constructive-io/constructive/commit/922fd84d58bb8270c0ec44a9b80e125821037a5d))
+- **cli:** use workspace:^ for sdk dependency ([254802d](https://github.com/constructive-io/constructive/commit/254802d398edb164d64aaca0038951919da85f2a))
+
+### Features
+
+- **cli:** add account session store and auth core ([46314fa](https://github.com/constructive-io/constructive/commit/46314faf2641b408a894d0f9f584c335e593bf03))
+- **cli:** add login, logout and whoami commands ([8b404b6](https://github.com/constructive-io/constructive/commit/8b404b6251dbc8c09d7d2b6d51a433f0ed3bc4a6))
+- **cli:** db tools read login session, startup key remint ([9f19ab1](https://github.com/constructive-io/constructive/commit/9f19ab177cbd9540850bcef2354cab9d5acd0946))
+- **cli:** one shared Constructive login store ([20cb70d](https://github.com/constructive-io/constructive/commit/20cb70ded9bc03f69613e8b5bcd0cb2174c03373))
+
 ## [0.8.2](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.8.1...@agentic-kit/cli@0.8.2) (2026-08-03)
 
 **Note:** Version bump only for package @agentic-kit/cli

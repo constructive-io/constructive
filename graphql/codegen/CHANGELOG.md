@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.14.2...@constructive-io/graphql-codegen@5.15.0) (2026-08-04)
+
+### Features
+
+- **codegen:** cli.stashName so generated CLIs can share one signed-in state ([412ba27](https://github.com/constructive-io/constructive/commit/412ba27081799f44ce4ec59861e3a956727bf9bb))
+
 ## [5.14.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.14.1...@constructive-io/graphql-codegen@5.14.2) (2026-08-03)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

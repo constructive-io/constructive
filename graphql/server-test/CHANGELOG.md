@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.16.2...graphql-server-test@3.17.0) (2026-08-04)
+
+### Features
+
+- **cli:** one shared Constructive login store ([20cb70d](https://github.com/constructive-io/constructive/commit/20cb70ded9bc03f69613e8b5bcd0cb2174c03373))
+
 ## [3.16.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.16.1...graphql-server-test@3.16.2) (2026-08-03)
 
 **Note:** Version bump only for package graphql-server-test

@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.9.0...@agentic-kit/harness@0.10.0) (2026-08-04)
+
+### Features
+
+- **cli:** one shared Constructive login store ([20cb70d](https://github.com/constructive-io/constructive/commit/20cb70ded9bc03f69613e8b5bcd0cb2174c03373))
+- **harness:** confirm-gate create_api_key ([69e13af](https://github.com/constructive-io/constructive/commit/69e13af1fa6e71410771a871a8154f5ee0a3823f))
+- **harness:** confirm-gate manage_entity_types mutations ([9470663](https://github.com/constructive-io/constructive/commit/9470663d094088f786fd45c556cedfa90b905d19))
+- **harness:** default constructive-skills source ([4612160](https://github.com/constructive-io/constructive/commit/46121604ce7426d9c02afa82926d40accd66ba91))
+
 # [0.9.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.8.3...@agentic-kit/harness@0.9.0) (2026-08-02)
 
 **Note:** Version bump only for package @agentic-kit/harness

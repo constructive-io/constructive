@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.24.0](https://github.com/constructive-io/constructive/compare/pgpm@5.23.1...pgpm@5.24.0) (2026-08-04)
+
+### Features
+
+- **cli:** one shared Constructive login store ([20cb70d](https://github.com/constructive-io/constructive/commit/20cb70ded9bc03f69613e8b5bcd0cb2174c03373))
+- **codegen:** cli.stashName so generated CLIs can share one signed-in state ([412ba27](https://github.com/constructive-io/constructive/commit/412ba27081799f44ce4ec59861e3a956727bf9bb))
+
 ## [5.23.1](https://github.com/constructive-io/constructive/compare/pgpm@5.23.0...pgpm@5.23.1) (2026-08-03)
 
 **Note:** Version bump only for package pgpm

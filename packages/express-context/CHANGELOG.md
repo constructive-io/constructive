@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.2](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.24.1...@constructive-io/express-context@0.24.2) (2026-08-04)
+
+### Bug Fixes
+
+- **express-context:** key tenant-DB module discovery by database_id, ship auth loaders ([7b01640](https://github.com/constructive-io/constructive/commit/7b016405acb26bc471c7600a999daa4bee5b4a5a)), closes [constructive-planning#1403](https://github.com/constructive-planning/issues/1403) [constructive-planning#1414](https://github.com/constructive-planning/issues/1414)
+
 ## [0.24.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.24.0...@constructive-io/express-context@0.24.1) (2026-08-03)
 
 **Note:** Version bump only for package @constructive-io/express-context

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.2](https://github.com/constructive-io/constructive/compare/graphile-realtime-subscriptions@1.10.1...graphile-realtime-subscriptions@1.10.2) (2026-08-04)
+
+### Bug Fixes
+
+- **realtime:** filter subscription events before they become events ([439ce22](https://github.com/constructive-io/constructive/commit/439ce221f82acb0abed98f0659d0ce136b93bea5))
+
 ## [1.10.1](https://github.com/constructive-io/constructive/compare/graphile-realtime-subscriptions@1.10.0...graphile-realtime-subscriptions@1.10.1) (2026-08-03)
 
 **Note:** Version bump only for package graphile-realtime-subscriptions

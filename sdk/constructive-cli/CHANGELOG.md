@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.11.2...@constructive-sdk/cli@1.12.0) (2026-08-04)
+
+### Features
+
+- **cli:** one shared Constructive login store ([20cb70d](https://github.com/constructive-io/constructive/commit/20cb70ded9bc03f69613e8b5bcd0cb2174c03373))
+
 ## [1.11.2](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.11.1...@constructive-sdk/cli@1.11.2) (2026-08-03)
 
 **Note:** Version bump only for package @constructive-sdk/cli
