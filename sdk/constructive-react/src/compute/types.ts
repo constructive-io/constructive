@@ -99,6 +99,7 @@ export interface FunctionDeployment {
   lastError: string | null;
   lastErrorAt: string | null;
   namespaceId: string | null;
+  realm: string | null;
   resources: unknown | null;
   revision: number | null;
   scaleMax: number | null;
@@ -431,6 +432,7 @@ export interface PlatformFunctionDeployment {
   lastError: string | null;
   lastErrorAt: string | null;
   namespaceId: string | null;
+  realm: string | null;
   resources: unknown | null;
   revision: number | null;
   scaleMax: number | null;

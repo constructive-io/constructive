@@ -2594,8 +2594,10 @@ CRUD operations for RouteModule records.
 | Field | Type |
 |-------|------|
 | `apiName` | String |
+| `appLinksFunctionName` | String |
 | `catalogModuleId` | UUID |
 | `databaseId` | UUID |
+| `deepLinkFunctionName` | String |
 | `defaultPermissions` | String |
 | `domainModuleId` | UUID |
 | `entityField` | String |
@@ -2619,7 +2621,7 @@ CRUD operations for RouteModule records.
 | `scope` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `catalogModuleId`, `defaultPermissions`, `domainModuleId`, `entityField`, `entityTableId`, `hostnameBindingsTableId`, `hostnameBindingsTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `resolverFunctionName`, `routeBindingsTableId`, `routeBindingsTableName`, `routesTableId`, `routesTableName`, `schemaId`
+**Optional create fields (backend defaults):** `apiName`, `appLinksFunctionName`, `catalogModuleId`, `deepLinkFunctionName`, `defaultPermissions`, `domainModuleId`, `entityField`, `entityTableId`, `hostnameBindingsTableId`, `hostnameBindingsTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `resolverFunctionName`, `routeBindingsTableId`, `routeBindingsTableName`, `routesTableId`, `routesTableName`, `schemaId`
 
 ### `secure-table-provision`
 

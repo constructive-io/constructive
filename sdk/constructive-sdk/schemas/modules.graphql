@@ -26568,11 +26568,13 @@ input RlsModulePatch {
 
 type RouteModule {
   apiName: String
+  appLinksFunctionName: String
 
   """Reads a single `CatalogModule` that is related to this `RouteModule`."""
   catalogModule: CatalogModule
   catalogModuleId: UUID
   databaseId: UUID!
+  deepLinkFunctionName: String
   defaultPermissions: [String]
 
   """Reads a single `DomainModule` that is related to this `RouteModule`."""
@@ -26635,6 +26637,9 @@ input RouteModuleFilter {
   """Filter by the object’s `apiName` field."""
   apiName: StringFilter
 
+  """Filter by the object’s `appLinksFunctionName` field."""
+  appLinksFunctionName: StringFilter
+
   """Filter by the object’s `catalogModule` relation."""
   catalogModule: CatalogModuleFilter
 
@@ -26646,6 +26651,9 @@ input RouteModuleFilter {
 
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
+
+  """Filter by the object’s `deepLinkFunctionName` field."""
+  deepLinkFunctionName: StringFilter
 
   """Filter by the object’s `defaultPermissions` field."""
   defaultPermissions: StringListFilter
@@ -26726,8 +26734,10 @@ input RouteModuleFilter {
 """An input for mutations affecting `RouteModule`"""
 input RouteModuleInput {
   apiName: String
+  appLinksFunctionName: String
   catalogModuleId: UUID
   databaseId: UUID!
+  deepLinkFunctionName: String
   defaultPermissions: [String]
   domainModuleId: UUID
   entityField: String
@@ -26755,10 +26765,14 @@ input RouteModuleInput {
 enum RouteModuleOrderBy {
   API_NAME_ASC
   API_NAME_DESC
+  APP_LINKS_FUNCTION_NAME_ASC
+  APP_LINKS_FUNCTION_NAME_DESC
   CATALOG_MODULE_ID_ASC
   CATALOG_MODULE_ID_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
+  DEEP_LINK_FUNCTION_NAME_ASC
+  DEEP_LINK_FUNCTION_NAME_DESC
   DEFAULT_PERMISSIONS_ASC
   DEFAULT_PERMISSIONS_DESC
   DOMAIN_MODULE_ID_ASC
@@ -26811,8 +26825,10 @@ Represents an update to a `RouteModule`. Fields that are set will be updated.
 """
 input RouteModulePatch {
   apiName: String
+  appLinksFunctionName: String
   catalogModuleId: UUID
   databaseId: UUID
+  deepLinkFunctionName: String
   defaultPermissions: [String]
   domainModuleId: UUID
   entityField: String
