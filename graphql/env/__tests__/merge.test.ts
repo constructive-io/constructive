@@ -138,6 +138,46 @@ describe('getEnvOptions', () => {
     expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
   });
 
+  it('parses the internal request secret without exposing a default', () => {
+    const secret = '0123456789abcdef0123456789abcdef';
+
+    expect(getGraphQLEnvVars({ GRAPHQL_INTERNAL_REQUEST_SECRET: secret }).api)
+      .toMatchObject({ internalRequestSecret: secret });
+    expect(getGraphQLEnvVars({}).api?.internalRequestSecret).toBeUndefined();
+  });
+
+  it('keeps the privileged metadata header disabled unless explicitly configured', () => {
+    expect(getGraphQLEnvVars({ API_ALLOW_META_SCHEMA_HEADER: 'true' }).api)
+      .toMatchObject({ allowMetaSchemaHeader: true });
+    expect(getGraphQLEnvVars({ API_ALLOW_META_SCHEMA_HEADER: 'false' }).api)
+      .toMatchObject({ allowMetaSchemaHeader: false });
+    expect(getGraphQLEnvVars({}).api?.allowMetaSchemaHeader).toBeUndefined();
+  });
+
+  it('preserves the exact static runtime route contract from trusted config', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-runtime-pg-'));
+    const identity = {
+      databaseId: 'database-a',
+      databaseName: 'tenant_a',
+      apiId: 'api-a',
+      schemas: ['tenant_a_public', 'tenant_a_auth'],
+      roles: ['tenant_a_anon', 'tenant_a_user']
+    };
+    writeConfig(tempDir, {
+      runtimePg: {
+        database: 'tenant_a',
+        user: 'tenant_a_runtime',
+        password: 'runtime-secret'
+      },
+      runtimePgStaticIdentity: identity
+    });
+
+    const result = getEnvOptions({}, tempDir, {});
+
+    expect(result.runtimePgStaticIdentity).toEqual(identity);
+    expect(result.runtimePg?.database).toBe('tenant_a');
+  });
+
   it('parses SMS environment variables into typed options', () => {
     const result = getGraphQLEnvVars({
       SMS_PROVIDER: 'devsms',
