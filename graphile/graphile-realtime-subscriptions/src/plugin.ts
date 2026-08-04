@@ -17,8 +17,10 @@
  *   1. A row is inserted/updated/deleted
  *   2. The emit_change trigger fires pg_notify with TG_OP:row_ids or INVALIDATE
  *   3. PostGraphile's pgSubscriber receives the NOTIFY
- *   4. The plugin parses the payload and fetches the specific changed row(s)
- *   5. The client receives { event, row, rowId, overflow }
+ *   4. The gate (see event-gate.ts) parses, throttles and filters it — a
+ *      payload this subscription should not see never becomes an event
+ *   5. The plugin fetches the changed row(s)
+ *   6. The client receives { event, row, rowId, overflow }
  *
  * Cursor tracking (at-least-once delivery):
  *   The CursorTracker class provides a complementary polling-based delivery
@@ -31,7 +33,7 @@
  *
  * Overflow protection:
  *   - Database-side: statements affecting > 50 rows send INVALIDATE
- *   - Plugin-side: per-subscriber throttle (default 50 events/second/table)
+ *   - Plugin-side: per-subscription throttle (default 50 events/second/table)
  *     drops individual events and sends a single INVALIDATE when exceeded
  *
  * Security / RLS enforcement:
@@ -51,6 +53,8 @@ import { constant, context as grafastContext, lambda,listen, object } from 'graf
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema } from 'graphile-utils';
 
+import type { ParsedPayload } from './event-gate';
+import { createGatedSubscriber } from './event-gate';
 import type { RealtimeSubscriptionsPluginOptions } from './types';
 
 const log = new Logger('graphile-realtime-subscriptions');
@@ -67,73 +71,6 @@ interface RealtimeTableInfo {
   notifyChannel: string;
   pgSchema: string;
   pgTable: string;
-}
-
-interface ParsedPayload {
-  event: string;
-  rowIds: string[];
-  overflow: boolean;
-}
-
-/**
- * Parse the NOTIFY payload from emit_change.
- * Format: "TG_OP:id1,id2,..." or "INVALIDATE"
- */
-function parseNotifyPayload(raw: string): ParsedPayload {
-  if (raw === 'INVALIDATE') {
-    return { event: 'INVALIDATE', rowIds: [], overflow: true };
-  }
-
-  const colonIdx = raw.indexOf(':');
-  if (colonIdx === -1) {
-    return { event: raw || 'UNKNOWN', rowIds: [], overflow: false };
-  }
-
-  const event = raw.substring(0, colonIdx);
-  const idsPart = raw.substring(colonIdx + 1);
-  const rowIds = idsPart.length > 0 ? idsPart.split(',') : [];
-
-  return { event, rowIds, overflow: false };
-}
-
-/**
- * Per-subscriber, per-table event rate tracker.
- * Counts events in a sliding 1-second window.
- */
-class EventThrottle {
-  private windowStart = 0;
-  private eventCount = 0;
-  private overflowSent = false;
-
-  constructor(private readonly threshold: number) {}
-
-  /**
-   * Record an event and return whether it should be delivered.
-   * Returns 'deliver' for normal events, 'overflow' when the threshold
-   * is first exceeded, or 'drop' for subsequent events in the same window.
-   */
-  check(): 'deliver' | 'overflow' | 'drop' {
-    const now = Date.now();
-
-    if (now - this.windowStart >= 1000) {
-      this.windowStart = now;
-      this.eventCount = 0;
-      this.overflowSent = false;
-    }
-
-    this.eventCount++;
-
-    if (this.eventCount <= this.threshold) {
-      return 'deliver';
-    }
-
-    if (!this.overflowSent) {
-      this.overflowSent = true;
-      return 'overflow';
-    }
-
-    return 'drop';
-  }
 }
 
 function discoverRealtimeTables(build: any): RealtimeTableInfo[] {
@@ -201,6 +138,30 @@ function buildTypeDefs(tables: RealtimeTableInfo[]): string {
   return `extend type Subscription {\n${subscriptionFields}\n}\n\n${payloadTypes}`;
 }
 
+/**
+ * The gate never emits a null payload, so one here means the plan graph was
+ * rewired wrongly — fail rather than invent an event for the client.
+ */
+function requirePayload(payload: unknown): ParsedPayload {
+  if (payload === null || payload === undefined) {
+    throw new Error(
+      'Realtime subscription payload is missing: the gated subscriber only ever ' +
+        'yields parsed payloads, so this event bypassed createGatedSubscriber.',
+    );
+  }
+  return payload as ParsedPayload;
+}
+
+/**
+ * The row this event reports. `rowIds` is already narrowed to the
+ * subscription's `ids`, so the first entry is the one to surface; INVALIDATE
+ * carries none, which is a genuine absence rather than a suppressed error.
+ */
+function reportedRowId(payload: ParsedPayload): string | null {
+  if (payload.overflow) return null;
+  return payload.rowIds[0] ?? null;
+}
+
 function buildPlans(
   tables: RealtimeTableInfo[],
   overflowThreshold: number,
@@ -209,47 +170,21 @@ function buildPlans(
   const allPlans: Record<string, any> = {};
 
   for (const { resource, fieldName, payloadTypeName, rowFieldName, notifyChannel } of tables) {
-    const throttle = new EventThrottle(overflowThreshold);
-
     subscriptionPlans[fieldName] = {
       subscribePlan(_$root: any, args: any) {
         const $pgSubscriber = (grafastContext() as any).get('pgSubscriber');
         const $topic = constant(notifyChannel);
         const $ids = args.getRaw('ids');
 
-        return listen($pgSubscriber, $topic, ($payload: any) => {
-          const $parsed = lambda([$payload, $ids], (pair: unknown) => {
-            const [raw, subscribedIds] = pair as readonly [unknown, string[] | null | undefined];
-            const parsed = parseNotifyPayload(String(raw));
-
-            const action = parsed.overflow ? 'deliver' : throttle.check();
-
-            if (action === 'drop') {
-              return null;
-            }
-
-            if (action === 'overflow') {
-              return {
-                event: 'INVALIDATE',
-                rowIds: [],
-                overflow: true,
-              };
-            }
-
-            // Sparse set filtering: only deliver events for subscribed row IDs
-            if (subscribedIds && subscribedIds.length > 0) {
-              const hasMatch = parsed.rowIds.some((rid: string) => subscribedIds.includes(rid));
-              if (!hasMatch) return null;
-            }
-
-            return parsed;
-          });
-
-          return object({
-            parsed: $parsed,
-            subscribedIds: $ids,
-          });
+        // Parsing, throttling and sparse-set filtering all happen in the gate,
+        // built once per subscription, so the stream below yields only events
+        // that should reach this client — every step after it is total.
+        const $subscriber = lambda([$pgSubscriber, $ids], (pair: unknown) => {
+          const [pgSubscriber, ids] = pair as readonly [any, string[] | null | undefined];
+          return createGatedSubscriber(pgSubscriber, { ids, threshold: overflowThreshold });
         });
+
+        return listen($subscriber, $topic, ($payload: any) => object({ parsed: $payload }));
       },
       plan($event: any) {
         return $event;
@@ -258,47 +193,17 @@ function buildPlans(
 
     allPlans[payloadTypeName] = {
       event($parent: any) {
-        const $parsed = $parent.get('parsed');
-        return lambda($parsed, (p: unknown) => (p as ParsedPayload | null)?.event ?? 'UNKNOWN');
+        return lambda($parent.get('parsed'), (p: unknown) => requirePayload(p).event);
       },
       rowId($parent: any) {
-        const $parsed = $parent.get('parsed');
-        const $subscribedIds = $parent.get('subscribedIds');
-        return lambda([$parsed, $subscribedIds], (pair: unknown) => {
-          const [p, subscribedIds] = pair as readonly [ParsedPayload | null, string[] | null | undefined];
-          if (!p || p.overflow || p.rowIds.length === 0) return null;
-
-          // When ids are provided, return the first matching row ID
-          if (subscribedIds && subscribedIds.length > 0) {
-            return p.rowIds.find((rid: string) => subscribedIds.includes(rid)) ?? null;
-          }
-
-          return p.rowIds[0];
-        });
+        return lambda($parent.get('parsed'), (p: unknown) => reportedRowId(requirePayload(p)));
       },
       overflow($parent: any) {
-        const $parsed = $parent.get('parsed');
-        return lambda($parsed, (p: unknown) => (p as ParsedPayload | null)?.overflow ?? false);
+        return lambda($parent.get('parsed'), (p: unknown) => requirePayload(p).overflow);
       },
       [rowFieldName]($parent: any) {
-        const $parsed = $parent.get('parsed');
-        const $subscribedIds = $parent.get('subscribedIds');
-
-        const $rowId = lambda(
-          [$parsed, $subscribedIds],
-          (tuple: unknown) => {
-            const [p, subscribedIds] = tuple as readonly [
-              ParsedPayload | null,
-              string[] | null | undefined,
-            ];
-            if (!p || p.overflow || p.rowIds.length === 0) return null;
-            // When ids are provided, return first matching row ID
-            if (subscribedIds && subscribedIds.length > 0) {
-              return p.rowIds.find((rid: string) => subscribedIds.includes(rid)) ?? null;
-            }
-            // Full collection mode: return first row ID
-            return p.rowIds[0];
-          },
+        const $rowId = lambda($parent.get('parsed'), (p: unknown) =>
+          reportedRowId(requirePayload(p)),
         );
 
         return resource.get({ id: $rowId });
@@ -340,8 +245,13 @@ export { createRealtimeSubscriptionsPlugin as RealtimeSubscriptionsPlugin };
 
 // Re-export CursorTracker and RealtimeManager for convenience
 export { CursorTracker } from './cursor-tracker';
+export type { ParsedPayload } from './event-gate';
+export {
+  createGatedSubscriber,
+  EventThrottle,
+  MalformedNotifyPayloadError,
+  parseNotifyPayload,
+} from './event-gate';
 export { RealtimeManager } from './realtime-manager';
 export type { ChangeLogEntry, CursorTrackerOptions, Queryable, RealtimeManagerOptions } from './types';
-
-// Exported for testing
-export { DEFAULT_OVERFLOW_THRESHOLD,EventThrottle, parseNotifyPayload };
+export { DEFAULT_OVERFLOW_THRESHOLD };

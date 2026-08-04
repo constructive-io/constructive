@@ -53,10 +53,13 @@ jest.mock('graphile-utils', () => ({
   gql: jest.fn((strings: TemplateStringsArray) => strings.join('')),
 }));
 
+import type { EventGateOptions } from '../src/event-gate';
 import {
+  createGatedSubscriber,
   createRealtimeSubscriptionsPlugin,
   DEFAULT_OVERFLOW_THRESHOLD,
   EventThrottle,
+  MalformedNotifyPayloadError,
   parseNotifyPayload,
   RealtimeSubscriptionsPlugin,
 } from '../src/plugin';
@@ -142,31 +145,20 @@ describe('parseNotifyPayload', () => {
     });
   });
 
-  it('handles payload with no colon as bare event', () => {
-    const result = parseNotifyPayload('INSERT');
-    expect(result).toEqual({
-      event: 'INSERT',
-      rowIds: [],
-      overflow: false,
-    });
+  // A payload this cannot read means emit_change and this plugin have
+  // diverged. Inventing an event name for it hides a deployment fault behind
+  // data the client acts on, so every unreadable shape is a hard failure.
+  it.each([
+    ['a payload with no colon', 'INSERT'],
+    ['an empty payload', ''],
+    ['an operation with no row ids', 'INSERT:'],
+    ['an unknown operation', 'TRUNCATE:abc-123'],
+  ])('throws on %s', (_label, raw) => {
+    expect(() => parseNotifyPayload(raw)).toThrow(MalformedNotifyPayloadError);
   });
 
-  it('handles empty string as UNKNOWN', () => {
-    const result = parseNotifyPayload('');
-    expect(result).toEqual({
-      event: 'UNKNOWN',
-      rowIds: [],
-      overflow: false,
-    });
-  });
-
-  it('handles operation with empty ID list', () => {
-    const result = parseNotifyPayload('INSERT:');
-    expect(result).toEqual({
-      event: 'INSERT',
-      rowIds: [],
-      overflow: false,
-    });
+  it('names the offending payload in the error', () => {
+    expect(() => parseNotifyPayload('TRUNCATE:abc')).toThrow(/"TRUNCATE:abc"/);
   });
 });
 
@@ -500,39 +492,13 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       });
 
       const result = capturedFactory!(build);
-      const mockParent = { get: jest.fn((key: string) => {
-        if (key === 'parsed') return { event: 'INSERT', rowIds: ['row-uuid'], overflow: false };
-        if (key === 'subscribedIds') return null;
-        return null;
-      }) };
+      const mockParent = { get: jest.fn(() => ({ event: 'INSERT', rowIds: ['row-uuid'], overflow: false })) };
 
       result.plans['TasksSubscriptionPayload'].tasks(mockParent);
+      // The gate already narrowed rowIds to the subscription's ids, so the
+      // resolver reads nothing but 'parsed'.
       expect(mockParent.get).toHaveBeenCalledWith('parsed');
-      expect(mockParent.get).toHaveBeenCalledWith('subscribedIds');
-      expect(mockResource.get).toHaveBeenCalled();
-    });
-
-    it('payload row resolver uses first matching ID when ids provided', () => {
-      createRealtimeSubscriptionsPlugin();
-
-      const codec = createMockCodec('tasks', { realtime: true });
-      const mockResource = {
-        ...createMockResource('tasks', codec),
-        get: jest.fn(),
-      };
-      const build = createMockBuild({
-        tasks: mockResource,
-      });
-
-      const result = capturedFactory!(build);
-      const mockParent = { get: jest.fn((key: string) => {
-        if (key === 'parsed') return { event: 'INSERT', rowIds: ['id-a', 'id-b', 'id-c'], overflow: false };
-        if (key === 'subscribedIds') return ['id-b', 'id-d'];
-        return null;
-      }) };
-
-      result.plans['TasksSubscriptionPayload'].tasks(mockParent);
-      expect(mockParent.get).toHaveBeenCalledWith('subscribedIds');
+      expect(mockParent.get).not.toHaveBeenCalledWith('subscribedIds');
       expect(mockResource.get).toHaveBeenCalled();
     });
   });
@@ -563,8 +529,105 @@ describe('createRealtimeSubscriptionsPlugin', () => {
     });
   });
 
+  // These drive a real async iterable through the gate and assert on what the
+  // stream *yields*. The previous versions re-implemented the intersection
+  // inline and asserted on `.get()` call sites, which is why a filtered event
+  // reaching the client as `event: 'UNKNOWN'` went unnoticed.
   describe('sparse set filtering (ids argument)', () => {
-    it('subscribePlan passes ids through object step', () => {
+    function subscriberEmitting(...payloads: string[]) {
+      return {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        async *subscribe() {
+          yield* payloads;
+        },
+      };
+    }
+
+    async function collect(subscriber: { subscribe(topic: string): any }) {
+      const out = [];
+      for await (const event of await subscriber.subscribe('realtime:app_public.tasks')) {
+        out.push(event);
+      }
+      return out;
+    }
+
+    it('yields nothing at all for an unsubscribed row', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('UPDATE:id-x,id-y'), {
+        ids: ['id-a', 'id-b'],
+        threshold: 50,
+      });
+
+      await expect(collect(gated)).resolves.toEqual([]);
+    });
+
+    it('narrows rowIds to the subscribed set so no consumer re-intersects', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('UPDATE:id-x,id-b,id-a'), {
+        ids: ['id-a', 'id-b'],
+        threshold: 50,
+      });
+
+      await expect(collect(gated)).resolves.toEqual([
+        { event: 'UPDATE', rowIds: ['id-b', 'id-a'], overflow: false },
+      ]);
+    });
+
+    it('passes every event through in full collection mode', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('INSERT:id-x', 'DELETE:id-y'), {
+        ids: null,
+        threshold: 50,
+      });
+
+      await expect(collect(gated)).resolves.toEqual([
+        { event: 'INSERT', rowIds: ['id-x'], overflow: false },
+        { event: 'DELETE', rowIds: ['id-y'], overflow: false },
+      ]);
+    });
+
+    it('delivers INVALIDATE regardless of the sparse set', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('INVALIDATE'), {
+        ids: ['id-a'],
+        threshold: 50,
+      });
+
+      await expect(collect(gated)).resolves.toEqual([
+        { event: 'INVALIDATE', rowIds: [], overflow: true },
+      ]);
+    });
+
+    it('collapses a burst to one INVALIDATE and then yields nothing', async () => {
+      const gated = createGatedSubscriber(
+        subscriberEmitting('INSERT:a', 'INSERT:b', 'INSERT:c', 'INSERT:d'),
+        { ids: null, threshold: 2 }
+      );
+
+      await expect(collect(gated)).resolves.toEqual([
+        { event: 'INSERT', rowIds: ['a'], overflow: false },
+        { event: 'INSERT', rowIds: ['b'], overflow: false },
+        { event: 'INVALIDATE', rowIds: [], overflow: true },
+      ]);
+    });
+
+    it('throttles each subscription independently', async () => {
+      const opts: EventGateOptions = { ids: null, threshold: 1 };
+      const noisy = createGatedSubscriber(subscriberEmitting('INSERT:a', 'INSERT:b'), opts);
+      await collect(noisy);
+
+      const quiet = createGatedSubscriber(subscriberEmitting('INSERT:c'), opts);
+      await expect(collect(quiet)).resolves.toEqual([
+        { event: 'INSERT', rowIds: ['c'], overflow: false },
+      ]);
+    });
+
+    it('surfaces a malformed payload instead of emitting an event for it', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('TRUNCATE:a'), {
+        ids: null,
+        threshold: 50,
+      });
+
+      await expect(collect(gated)).rejects.toThrow(MalformedNotifyPayloadError);
+    });
+
+    it('subscribePlan reads the ids argument and gates the subscriber', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('tasks', { realtime: true });
@@ -573,110 +636,17 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       });
 
       const result = capturedFactory!(build);
-      const mockArgs = { getRaw: jest.fn((key: string) => {
-        if (key === 'ids') return ['id-a', 'id-b'];
-        return null;
-      }) };
+      const mockArgs = { getRaw: jest.fn((key: string) => (key === 'ids' ? ['id-a'] : null)) };
 
       result.plans['Subscription']['onTasksChanged'].subscribePlan(null, mockArgs);
 
       expect(mockArgs.getRaw).toHaveBeenCalledWith('ids');
 
-      // The listen callback is captured but not invoked by the mock.
-      // Invoke it manually to verify ids are threaded through.
-      expect(mockListen).toHaveBeenCalled();
+      // 'parsed' is the whole payload now — nothing downstream needs the ids.
       const listenCallback = mockListen.mock.calls[mockListen.mock.calls.length - 1][2];
-      listenCallback('INSERT:id-a');
-
-      expect(mockObject).toHaveBeenCalled();
+      listenCallback({ event: 'INSERT', rowIds: ['id-a'], overflow: false });
       const objectArg = mockObject.mock.calls[mockObject.mock.calls.length - 1][0];
-      expect(objectArg).toHaveProperty('subscribedIds');
-    });
-
-    it('drops events with no row ID intersection in sparse set mode', () => {
-      const parsed = parseNotifyPayload('INSERT:id-x,id-y');
-      const subscribedIds = ['id-a', 'id-b'];
-
-      const hasMatch = parsed.rowIds.some((rid: string) => subscribedIds.includes(rid));
-      expect(hasMatch).toBe(false);
-    });
-
-    it('delivers events with row ID intersection in sparse set mode', () => {
-      const parsed = parseNotifyPayload('UPDATE:id-a,id-x');
-      const subscribedIds = ['id-a', 'id-b'];
-
-      const hasMatch = parsed.rowIds.some((rid: string) => subscribedIds.includes(rid));
-      expect(hasMatch).toBe(true);
-    });
-
-    it('delivers INVALIDATE events regardless of sparse set', () => {
-      const parsed = parseNotifyPayload('INVALIDATE');
-      expect(parsed.overflow).toBe(true);
-      expect(parsed.rowIds).toEqual([]);
-    });
-
-    it('rowId resolver returns first matching ID from sparse set', () => {
-      createRealtimeSubscriptionsPlugin();
-
-      const codec = createMockCodec('tasks', { realtime: true });
-      const build = createMockBuild({
-        tasks: { ...createMockResource('tasks', codec), get: jest.fn() },
-      });
-
-      const result = capturedFactory!(build);
-      const payload = result.plans['TasksSubscriptionPayload'];
-
-      const mockParent = { get: jest.fn((key: string) => {
-        if (key === 'parsed') return { event: 'UPDATE', rowIds: ['id-x', 'id-b', 'id-a'], overflow: false };
-        if (key === 'subscribedIds') return ['id-a', 'id-b'];
-        return null;
-      }) };
-
-      payload.rowId(mockParent);
-      expect(mockParent.get).toHaveBeenCalledWith('parsed');
-      expect(mockParent.get).toHaveBeenCalledWith('subscribedIds');
-    });
-
-    it('rowId resolver returns null when no sparse set match', () => {
-      createRealtimeSubscriptionsPlugin();
-
-      const codec = createMockCodec('tasks', { realtime: true });
-      const build = createMockBuild({
-        tasks: { ...createMockResource('tasks', codec), get: jest.fn() },
-      });
-
-      const result = capturedFactory!(build);
-      const payload = result.plans['TasksSubscriptionPayload'];
-
-      const mockParent = { get: jest.fn((key: string) => {
-        if (key === 'parsed') return { event: 'INSERT', rowIds: ['id-x'], overflow: false };
-        if (key === 'subscribedIds') return ['id-a', 'id-b'];
-        return null;
-      }) };
-
-      payload.rowId(mockParent);
-      expect(mockParent.get).toHaveBeenCalledWith('subscribedIds');
-    });
-
-    it('rowId resolver falls back to first rowId when no sparse set provided', () => {
-      createRealtimeSubscriptionsPlugin();
-
-      const codec = createMockCodec('tasks', { realtime: true });
-      const build = createMockBuild({
-        tasks: { ...createMockResource('tasks', codec), get: jest.fn() },
-      });
-
-      const result = capturedFactory!(build);
-      const payload = result.plans['TasksSubscriptionPayload'];
-
-      const mockParent = { get: jest.fn((key: string) => {
-        if (key === 'parsed') return { event: 'INSERT', rowIds: ['id-first', 'id-second'], overflow: false };
-        if (key === 'subscribedIds') return null;
-        return null;
-      }) };
-
-      payload.rowId(mockParent);
-      expect(mockParent.get).toHaveBeenCalledWith('subscribedIds');
+      expect(Object.keys(objectArg)).toEqual(['parsed']);
     });
   });
 
