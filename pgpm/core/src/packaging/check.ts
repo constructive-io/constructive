@@ -1,5 +1,6 @@
 import { verifyBundle } from '@pgpmjs/bundle';
 import { execFileSync } from 'child_process';
+import { existsSync } from 'fs';
 import { changedFiles as gitChangedFiles, resolveBase as resolveChangedBase } from 'git-changed';
 import { isAbsolute, relative, resolve as resolvePath } from 'path';
 
@@ -146,7 +147,68 @@ export function resolveBase(since?: string, cwd: string = process.cwd()): string
 export function changedFiles(cwd: string, base?: string): string[] {
   // `base: false` when there is no base: the ref is resolved by the caller, and
   // git-changed would otherwise resolve one of its own.
-  return gitChangedFiles({ cwd, base: base ?? false, existingOnly: false }).paths;
+  return gitChangedFiles({ cwd, base: base ?? false, existingOnly: false }).paths.map(
+    decodeGitPath
+  );
+}
+
+/**
+ * Undo git's C-escaping of a path it decided to quote.
+ *
+ * With `core.quotepath` on (the default) git renders a path holding a non-ASCII
+ * byte as `"caf\303\251 dir/x.sql"`: octal escapes, one per UTF-8 byte. A caller
+ * that only strips the surrounding quotes is left with a filename that exists
+ * nowhere on disk, so the module owning it silently drops out of the check —
+ * `pgpm package --check` passes while the module's bundle is stale.
+ *
+ * Only applied when it actually resolves something: if the escaped form exists on
+ * disk and the decoded one does not, the backslashes were part of the filename.
+ */
+function decodeGitPath(path: string): string {
+  if (!path.includes('\\')) return path;
+  const decoded = cUnescape(path);
+  if (decoded === path) return path;
+  if (existsSync(decoded)) return decoded;
+  // Neither form exists for a deleted file; the decoded name is the real one.
+  return existsSync(path) ? path : decoded;
+}
+
+const C_ESCAPES: Record<string, number> = {
+  a: 0x07,
+  b: 0x08,
+  f: 0x0c,
+  n: 0x0a,
+  r: 0x0d,
+  t: 0x09,
+  v: 0x0b,
+  '\\': 0x5c,
+  '"': 0x22,
+};
+
+/** Decode `\NNN` octal byte escapes and the single-character C escapes git emits. */
+function cUnescape(input: string): string {
+  const bytes: number[] = [];
+  for (let i = 0; i < input.length; i += 1) {
+    const ch = input[i];
+    if (ch !== '\\' || i + 1 >= input.length) {
+      bytes.push(...Buffer.from(ch, 'utf8'));
+      continue;
+    }
+    const next = input[i + 1];
+    const octal = input.slice(i + 1, i + 4);
+    if (/^[0-7]{3}$/.test(octal)) {
+      bytes.push(parseInt(octal, 8));
+      i += 3;
+      continue;
+    }
+    if (next in C_ESCAPES) {
+      bytes.push(C_ESCAPES[next]);
+      i += 1;
+      continue;
+    }
+    bytes.push(...Buffer.from(ch, 'utf8'));
+  }
+  return Buffer.from(bytes).toString('utf8');
 }
 
 function refExists(ref: string, cwd: string): boolean {
