@@ -55,6 +55,31 @@ export interface HostProvisionOverlay {
   remove?: string[];
 }
 
+/**
+ * A minted secret handed to the host for out-of-band delivery (.env write +
+ * one-time reveal). The plaintext never enters tool results or the transcript;
+ * pi forgets it after this call.
+ */
+export type SecretDelivery = {
+  databaseId: string;
+  /** Project directory whose `.env` receives the key. */
+  cwd: string;
+  envVar: string;
+  plaintext: string;
+  keyId: string;
+  expiresAt?: string;
+};
+
+/**
+ * Context for a host-side step-up: enough to derive the per-database auth
+ * endpoint and look up the app session without re-resolving the project.
+ */
+export type StepUpRequest = {
+  databaseId: string;
+  databaseName: string;
+  apiEndpoint: string;
+};
+
 export interface PiToolsHost {
   /** Signed-in platform account, or null/undefined when signed out. */
   account(): HostAccount | null | undefined;
@@ -62,6 +87,12 @@ export interface PiToolsHost {
   backendConfig(): HostBackendConfig | null | undefined;
   /** Optional data-plane token broker (see DataAuthBroker). */
   dataAuthBroker?: DataAuthBroker;
+  /**
+   * Host-specific sign-in instruction, substituted into signed-out failure
+   * reasons (e.g. the CLI's "Run `agent login` to sign in."). Absent hosts get
+   * the desktop wording.
+   */
+  signInHint?: string;
   /** Harvest an end-user token from the host's app preview, if it has one. */
   previewToken?(): Promise<PreviewToken | null>;
   /** Treat tokens expiring within this window as already expired. Default 30s. */
@@ -77,6 +108,17 @@ export interface PiToolsHost {
     | null
     | undefined
     | Promise<HostProvisionOverlay | null | undefined>;
+  /**
+   * Complete MFA step-up for the database's app session in the host's own
+   * process (password dialog + verifyPassword). The password never passes
+   * through pi or the model. Resolve true when step-up succeeded.
+   */
+  requestStepUp?(request: StepUpRequest): Promise<boolean>;
+  /**
+   * Deliver a minted secret to the user (.env write + one-time reveal).
+   * Required for create_api_key — without it the tool refuses to mint.
+   */
+  deliverSecret?(delivery: SecretDelivery): Promise<void>;
 }
 
 export const DEFAULT_DATA_TOKEN_SKEW_MS = 30_000;

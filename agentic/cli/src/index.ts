@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-import { init, skillsList, skillsUpdate, usage } from './commands';
+import { refreshApiKeyIfNeeded } from './auth';
+import { BACKEND_PRESETS, loadBackendConfig } from './backend-store';
+import { init, login, logout, skillsList, skillsUpdate, usage, whoami } from './commands';
 import { loadConfig } from './config';
 import { materializeDbTools } from './db-tools';
 import { assembleSkills } from './skills';
@@ -23,6 +25,18 @@ async function run(args: string[]): Promise<void> {
     await init(config, {});
     return;
   }
+  if (first === 'login') {
+    await login(config, {});
+    return;
+  }
+  if (first === 'logout') {
+    await logout(config);
+    return;
+  }
+  if (first === 'whoami') {
+    whoami(config);
+    return;
+  }
   if (first === 'skills') {
     if (second === 'update') await skillsUpdate(config);
     else await skillsList(config);
@@ -32,6 +46,14 @@ async function run(args: string[]): Promise<void> {
   const log = (msg: string) => console.log(`[agent] ${msg}`);
   await assembleSkills(config, log);
   materializeDbTools(config, log);
+  // Fire-and-forget: keep the stored API key fresh (<7 days to expiry re-mints)
+  // without ever blocking startup. Only an expired login session gets a line.
+  const backend = loadBackendConfig(config.store) ?? BACKEND_PRESETS.localnet;
+  void refreshApiKeyIfNeeded({ store: config.store, authEndpoint: backend.authEndpoint })
+    .then((status) => {
+      if (status === 'reauth-required') log('API key expired — run `agent login`');
+    })
+    .catch(() => {});
   // pi is ESM-only; tsc's CJS output would downlevel a plain `await import()`
   // into `require()`, which cannot load it. Indirect the import so it survives
   // transpilation in the CJS build.

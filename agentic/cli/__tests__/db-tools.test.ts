@@ -2,17 +2,32 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
+import { saveSession } from '../src/account-store';
+import { BACKEND_PRESETS, saveBackendConfig } from '../src/backend-store';
 import { loadConfig } from '../src/config';
 import { materializeDbTools } from '../src/db-tools';
 
+const CONSTRUCTIVE_VARS = [
+  'CONSTRUCTIVE_USER_ID',
+  'CONSTRUCTIVE_ACCESS_TOKEN',
+  'CONSTRUCTIVE_API_KEY',
+  'CONSTRUCTIVE_API_ENDPOINT',
+  'CONSTRUCTIVE_MODULES_ENDPOINT'
+];
+
 describe('materializeDbTools', () => {
   let home: string;
+  let prevEnv: NodeJS.ProcessEnv;
 
   beforeEach(() => {
     home = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-cli-dbtools-'));
+    prevEnv = { ...process.env };
+    process.env.AGENT_HOME = home;
+    for (const name of CONSTRUCTIVE_VARS) delete process.env[name];
   });
 
   afterEach(() => {
+    process.env = prevEnv;
     fs.rmSync(home, { recursive: true, force: true });
   });
 
@@ -34,32 +49,88 @@ describe('materializeDbTools', () => {
       on: () => {}
     });
     expect(registered).toContain('provision_database');
-    expect(registered).toHaveLength(16);
+    expect(registered).toHaveLength(18);
   });
 
-  it('signals a signed-out host until CONSTRUCTIVE_* env vars are set', () => {
+  function loadHost() {
     const config = loadConfig(home);
     const file = materializeDbTools(config, () => {});
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     require(file!);
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { getHost } = require('@agentic-kit/pi');
+    return { config, host: getHost() };
+  }
 
-    const prev = { ...process.env };
-    try {
-      delete process.env.CONSTRUCTIVE_USER_ID;
-      delete process.env.CONSTRUCTIVE_ACCESS_TOKEN;
-      expect(getHost().account()).toBeNull();
+  it('signals a signed-out host until env vars or a stored session exist', () => {
+    const { host } = loadHost();
+    expect(host.account()).toBeNull();
+    expect(host.backendConfig()).toBeUndefined();
 
-      process.env.CONSTRUCTIVE_USER_ID = 'u1';
-      process.env.CONSTRUCTIVE_ACCESS_TOKEN = 't1';
-      process.env.CONSTRUCTIVE_API_ENDPOINT = 'http://api.localhost:3000/graphql';
-      expect(getHost().account()).toMatchObject({ userId: 'u1', accessToken: 't1' });
-      expect(getHost().backendConfig()).toMatchObject({
-        apiEndpoint: 'http://api.localhost:3000/graphql'
-      });
-    } finally {
-      process.env = prev;
-    }
+    process.env.CONSTRUCTIVE_USER_ID = 'u1';
+    process.env.CONSTRUCTIVE_ACCESS_TOKEN = 't1';
+    process.env.CONSTRUCTIVE_API_ENDPOINT = 'http://api.localhost:3000/graphql';
+    expect(host.account()).toMatchObject({ userId: 'u1', accessToken: 't1' });
+    expect(host.backendConfig()).toMatchObject({
+      apiEndpoint: 'http://api.localhost:3000/graphql'
+    });
+  });
+
+  it('reads the stored session and backend per call when env vars are absent', () => {
+    const { config, host } = loadHost();
+    expect(host.account()).toBeNull();
+
+    saveBackendConfig(config.store, BACKEND_PRESETS.devnet);
+    saveSession(config.store, {
+      userId: 'stored-user',
+      email: 'dev@example.com',
+      accessToken: 'stored-token',
+      apiKey: 'stored-key',
+      signedInAt: 1
+    });
+
+    expect(host.account()).toEqual({
+      userId: 'stored-user',
+      accessToken: 'stored-token',
+      apiKey: 'stored-key'
+    });
+    expect(host.backendConfig()).toEqual({
+      apiEndpoint: BACKEND_PRESETS.devnet.apiEndpoint,
+      modulesEndpoint: BACKEND_PRESETS.devnet.modulesEndpoint
+    });
+  });
+
+  it('lets env vars beat the stored session', () => {
+    const { config, host } = loadHost();
+    saveSession(config.store, {
+      userId: 'stored-user',
+      email: 'dev@example.com',
+      accessToken: 'stored-token',
+      signedInAt: 1
+    });
+
+    process.env.CONSTRUCTIVE_USER_ID = 'env-user';
+    process.env.CONSTRUCTIVE_ACCESS_TOKEN = 'env-token';
+    expect(host.account()).toMatchObject({ userId: 'env-user', accessToken: 'env-token' });
+  });
+
+  it('bakes the sign-in hint for pi failure reasons', () => {
+    const { host } = loadHost();
+    expect(host.signInHint).toBe('Run `agent login` to sign in.');
+  });
+
+  it('surfaces `agent login` in the signed-out pi context reason', async () => {
+    loadHost();
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { resolveProjectContext } = require('@agentic-kit/pi');
+
+    const project = path.join(home, 'project');
+    fs.mkdirSync(project);
+    fs.writeFileSync(path.join(project, '.env'), 'ACCESS_TOKEN=x\nDATABASE_ID=db1\n');
+
+    const result = await resolveProjectContext(project);
+    expect(result.context).toBeNull();
+    expect(result.code).toBe('missing-credentials');
+    expect(result.reason).toContain('Run `agent login` to sign in.');
   });
 });

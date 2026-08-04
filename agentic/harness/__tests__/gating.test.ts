@@ -170,6 +170,52 @@ describe('confirm gate: declines are respected', () => {
     expect(result).toBeUndefined();
     expect(confirmCalls()).toBe(0);
   });
+
+  it('lets manage_entity_types list pass without a prompt', async () => {
+    const { gate, host, confirmCalls } = createHarness({ isProjectRunnable: async () => true });
+    const result = await gate.onToolCall(
+      call('manage_entity_types', 'tc-1', { action: 'list' }),
+      host,
+      CWD
+    );
+    expect(result).toBeUndefined();
+    expect(confirmCalls()).toBe(0);
+  });
+
+  it('gates manage_entity_types mutations', async () => {
+    const { gate, host, confirmCalls } = createHarness({ isProjectRunnable: async () => true });
+    const result = await gate.onToolCall(
+      call('manage_entity_types', 'tc-1', { action: 'create', name: 'org' }),
+      host,
+      CWD
+    );
+    expect(result?.block).toBe(true);
+    expect(confirmCalls()).toBe(1);
+  });
+
+  it('skips the confirm for tokenless create_api_key but gates it with a token', async () => {
+    const tokenless = createHarness({ isProjectRunnable: async () => true });
+    expect(
+      await tokenless.gate.onToolCall(
+        call('create_api_key', 'tc-1', { key_name: 'deploy bot' }),
+        tokenless.host,
+        CWD
+      )
+    ).toBeUndefined();
+    expect(tokenless.confirmCalls()).toBe(0);
+
+    const withToken = createHarness({
+      isProjectRunnable: async () => true,
+      hasDataToken: async () => true,
+    });
+    const result = await withToken.gate.onToolCall(
+      call('create_api_key', 'tc-1', { key_name: 'deploy bot' }),
+      withToken.host,
+      CWD
+    );
+    expect(result?.block).toBe(true);
+    expect(withToken.confirmCalls()).toBe(1);
+  });
 });
 
 describe('decline guard canonicalization', () => {
@@ -216,5 +262,34 @@ describe('buildConfirmPrompt', () => {
   it('falls back to a generic prompt for unknown tools', () => {
     const prompt = buildConfirmPrompt('mystery_tool', {});
     expect(prompt.message).toContain('mystery_tool');
+  });
+
+  it('builds action-specific prompts for manage_entity_types', () => {
+    const create = buildConfirmPrompt('manage_entity_types', { action: 'create', name: 'org' });
+    expect(create.title).toBe('Create entity type?');
+    expect(create.message).toContain('"org"');
+
+    const remove = buildConfirmPrompt('manage_entity_types', {
+      action: 'delete',
+      entity_type_id: 'etp-1',
+    });
+    expect(remove.title).toBe('Delete entity type?');
+    expect(remove.message).toMatch(/stay in the API schema/);
+  });
+
+  it('summarizes scope in the create_api_key prompt', async () => {
+    const unscoped = buildConfirmPrompt('create_api_key', { key_name: 'deploy bot' });
+    expect(unscoped.title).toBe('Create API key?');
+    expect(unscoped.message).toContain('"deploy bot"');
+    expect(unscoped.message).toContain('unscoped');
+    expect(unscoped.message).toMatch(/never to the agent/);
+
+    const scoped = buildConfirmPrompt('create_api_key', {
+      key_name: 'ci',
+      entity_ids: ['e-1', 'e-2'],
+      read_only: true,
+    });
+    expect(scoped.message).toContain('scoped to 2 entities');
+    expect(scoped.message).toContain('read-only');
   });
 });

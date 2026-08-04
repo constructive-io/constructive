@@ -48,7 +48,10 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
       ? cliConfig.toolName
       : 'app';
 
-  const executorFile = generateExecutorFile(toolName);
+  const stashName =
+    typeof cliConfig === 'object' ? cliConfig.stashName : undefined;
+
+  const executorFile = generateExecutorFile(toolName, stashName);
   files.push(executorFile);
 
   const utilsFile = generateUtilsFile();
@@ -127,6 +130,8 @@ export interface MultiTargetCliTarget {
 
 export interface GenerateMultiTargetCliOptions {
   toolName: string;
+  /** Directory identity to share signed-in state with sibling tools. */
+  stashName?: string;
   builtinNames?: BuiltinNames;
   targets: MultiTargetCliTarget[];
   /** Generate a runnable index.ts entry point */
@@ -157,7 +162,7 @@ export function resolveBuiltinNames(
 export function generateMultiTargetCli(
   options: GenerateMultiTargetCliOptions,
 ): GenerateCliResult {
-  const { toolName, targets } = options;
+  const { toolName, stashName, targets } = options;
   const files: GeneratedFile[] = [];
 
   const targetNames = targets.map((t) => t.name);
@@ -168,7 +173,7 @@ export function generateMultiTargetCli(
     endpoint: t.endpoint,
     ormImportPath: t.ormImportPath,
   }));
-  const executorFile = generateMultiTargetExecutorFile(toolName, executorInputs);
+  const executorFile = generateMultiTargetExecutorFile(toolName, executorInputs, stashName);
   files.push(executorFile);
 
   const utilsFile = generateUtilsFile();
@@ -201,7 +206,7 @@ export function generateMultiTargetCli(
     name: t.name,
     ormImportPath: t.ormImportPath,
   }));
-  const helpersFile = generateHelpersFile(toolName, helpersInputs);
+  const helpersFile = generateHelpersFile(toolName, helpersInputs, stashName);
   files.push(helpersFile);
 
   let totalTables = 0;

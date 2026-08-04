@@ -37,6 +37,7 @@ export interface HelpersGeneratorInput {
 export function generateHelpersFile(
   toolName: string,
   targets: HelpersGeneratorInput[],
+  stashName?: string,
 ): GeneratedFile {
   const statements: t.Statement[] = [];
 
@@ -61,14 +62,20 @@ export function generateHelpersFile(
     );
   }
 
-  // const store = createConfigStore('toolName');
+  // const store = createConfigStore('toolName', { stashName: 'product' });
+  const storeArgs: t.Expression[] = [t.stringLiteral(toolName)];
+  if (stashName) {
+    storeArgs.push(
+      t.objectExpression([
+        t.objectProperty(t.identifier('stashName'), t.stringLiteral(stashName)),
+      ]),
+    );
+  }
   statements.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('store'),
-        t.callExpression(t.identifier('createConfigStore'), [
-          t.stringLiteral(toolName),
-        ]),
+        t.callExpression(t.identifier('createConfigStore'), storeArgs),
       ),
     ]),
   );

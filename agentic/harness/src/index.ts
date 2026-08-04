@@ -7,6 +7,7 @@ export * from './gating/confirm-gate';
 export * from './gating/decline-guard';
 export * from './gating/preview';
 export * from './gating/prompts';
+export * from './skills/default-source';
 export * from './skills/fetch';
 export * from './skills/frontmatter';
 export * from './skills/git-fetch';

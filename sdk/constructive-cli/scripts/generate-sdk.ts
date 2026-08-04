@@ -18,6 +18,7 @@ async function main() {
     orm: true,
     cli: {
       toolName: 'csdk',
+      stashName: 'constructive',
       entryPoint: true,
     },
     reactQuery: false,

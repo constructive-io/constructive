@@ -213,6 +213,15 @@ export interface CliConfig {
   toolName?: string;
 
   /**
+   * Directory identity for the stored contexts and credentials, when several
+   * tools are one product and should share a single signed-in state (e.g. a
+   * generated CLI, an agent CLI and a desktop app all using `constructive`).
+   * `toolName` still drives env-var prefixes and help text.
+   * @default toolName
+   */
+  stashName?: string;
+
+  /**
    * Override infra command names (for collision handling)
    * Defaults: auth -> 'auth' (renamed to 'credentials' on collision),
    *           context -> 'context' (renamed to 'env' on collision)

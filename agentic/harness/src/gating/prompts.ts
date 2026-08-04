@@ -12,6 +12,8 @@ export const MUTATING_DB_TOOLS = new Set<string>([
   'update_template',
   'delete_template',
   'add_records',
+  'manage_entity_types',
+  'create_api_key',
   'run_codegen',
 ]);
 
@@ -179,6 +181,38 @@ export function buildConfirmPrompt(
       title: 'Add records?',
       message: `Insert ${count || ''} row${count === 1 ? '' : 's'} into table "${tableName}".`,
       preview: count > 0 ? { kind: 'records', tableName, rows } : undefined,
+    };
+  }
+  case 'manage_entity_types': {
+    const action = str(input, 'action');
+    const name = str(input, 'name');
+    const id = str(input, 'entity_type_id');
+    switch (action) {
+    case 'create':
+      return {
+        title: 'Create entity type?',
+        message: `Provision entity type "${name ?? '?'}" in the project database (creates its entity table and membership wiring).`,
+      };
+    case 'delete':
+      return {
+        title: 'Delete entity type?',
+        message: `Delete the registration of entity type ${id ?? '?'}. The provisioned entity table and its data stay in the API schema.`,
+      };
+    default:
+      return { title: 'Manage entity types?', message: 'Change entity types in the project database.' };
+    }
+  }
+  case 'create_api_key': {
+    const keyName = str(input, 'key_name') ?? '?';
+    const readOnly = input?.read_only === true;
+    const entityIds = Array.isArray(input?.entity_ids) ? input.entity_ids.length : 0;
+    const scope =
+      entityIds > 0
+        ? `scoped to ${entityIds} entit${entityIds === 1 ? 'y' : 'ies'}`
+        : 'unscoped — it acts as your signed-in app user';
+    return {
+      title: 'Create API key?',
+      message: `Mint API key "${keyName}" (${scope}${readOnly ? ', read-only' : ''}). You may be asked to verify your password; the key is written to .env and shown to you once — never to the agent.`,
     };
   }
   case 'run_codegen':

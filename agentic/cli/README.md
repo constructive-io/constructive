@@ -37,6 +37,9 @@ The merged tree is materialized into the appstash-owned agent dir, so the sessio
 | `agent [options...]` | Start an interactive session with the harness skills |
 | `agent -p "prompt"` | One-shot print mode |
 | `agent init` | Configure the skills source (repo + pin) interactively |
+| `agent login` | Sign in to the Constructive platform (interactive) |
+| `agent logout` | Revoke the API key and clear the stored session |
+| `agent whoami` | Show the signed-in account, backend, and masked API key |
 | `agent skills list` | Resolve and list the effective skill set per layer |
 | `agent skills update` | Re-fetch the base release and re-materialize |
 | `agent help` | Usage |
@@ -60,12 +63,22 @@ The merged tree is materialized into the appstash-owned agent dir, so the sessio
 
 Env overrides: `AGENT_SKILLS_REPO`, `AGENT_SKILLS_PIN`, `AGENT_HOME` (appstash base dir), `GITHUB_TOKEN` (private skills repos).
 
-Db-tool credentials (read per tool call; without them the tools respond "not signed in"):
+## Authentication
+
+`agent login` signs in to the Constructive platform with email and password. The flow asks for a backend first: `localnet` (a local backend on `*.localhost:3000`), `devnet` (`*.launchql.dev`), or a custom API URL. After sign-in, the CLI mints a 5-year API key for the db tools and checks it on each startup. `agent logout` revokes the key and deletes the session.
+
+Credential files (mode `0600`, plaintext):
+
+- `~/.constructive/config/agent/account.json` — the signed-in session (user, access token, API key)
+- `~/.constructive/config/agent/backend-config.json` — the selected backend endpoints
+
+The db tools read these files on each tool call, so a login mid-session is picked up without a restart. Tokens never enter the environment of child processes.
+
+Env overrides for CI and headless use (these win over the stored session; read per tool call):
 `CONSTRUCTIVE_USER_ID`, `CONSTRUCTIVE_ACCESS_TOKEN`, `CONSTRUCTIVE_API_KEY` (optional), `CONSTRUCTIVE_API_ENDPOINT`, `CONSTRUCTIVE_MODULES_ENDPOINT` (default to the local backend).
 
 ## Roadmap
 
-- `agent login` — sign in to a Constructive backend and persist credentials in appstash instead of env vars.
 - Harness system-prompt section + templates/prompts materialization, shared with constructive-desktop via a common adapter package.
 
 ## Credits

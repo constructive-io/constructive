@@ -747,6 +747,7 @@ export async function generateMulti(
       const firstTargetConfig = configs[names[0]];
       const { files } = generateMultiTargetCli({
         toolName,
+        stashName: cliConfig.stashName,
         builtinNames: cliConfig.builtinNames,
         targets: cliTargets,
         entryPoint: cliConfig.entryPoint,

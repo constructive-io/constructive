@@ -30,7 +30,23 @@ function createImportDeclaration(
   return decl;
 }
 
-export function generateExecutorFile(toolName: string): GeneratedFile {
+/**
+ * `createConfigStore(toolName)`, or `createConfigStore(toolName, { stashName })`
+ * when the CLI shares its signed-in state with other tools of the same product.
+ */
+function createStoreCall(toolName: string, stashName?: string): t.CallExpression {
+  const args: t.Expression[] = [t.stringLiteral(toolName)];
+  if (stashName) {
+    args.push(
+      t.objectExpression([
+        t.objectProperty(t.identifier('stashName'), t.stringLiteral(stashName)),
+      ]),
+    );
+  }
+  return t.callExpression(t.identifier('createConfigStore'), args);
+}
+
+export function generateExecutorFile(toolName: string, stashName?: string): GeneratedFile {
   const statements: t.Statement[] = [];
 
   statements.push(
@@ -44,9 +60,7 @@ export function generateExecutorFile(toolName: string): GeneratedFile {
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('store'),
-        t.callExpression(t.identifier('createConfigStore'), [
-          t.stringLiteral(toolName),
-        ]),
+        createStoreCall(toolName, stashName),
       ),
     ]),
   );
@@ -238,6 +252,7 @@ export function generateExecutorFile(toolName: string): GeneratedFile {
 export function generateMultiTargetExecutorFile(
   toolName: string,
   targets: MultiTargetExecutorInput[],
+  stashName?: string,
 ): GeneratedFile {
   const statements: t.Statement[] = [];
 
@@ -260,9 +275,7 @@ export function generateMultiTargetExecutorFile(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('store'),
-        t.callExpression(t.identifier('createConfigStore'), [
-          t.stringLiteral(toolName),
-        ]),
+        createStoreCall(toolName, stashName),
       ),
     ]),
   );

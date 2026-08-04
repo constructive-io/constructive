@@ -8,10 +8,17 @@
 import type { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import { extractFirst, getPackageJson } from 'inquirerer';
 
-import { getConfigStore } from './config-store';
+import { createConfigStore } from 'appstash';
+
 import { printSuccess, printError, printKeyValue, printTable } from './utils';
 
 const TOOL_NAME = 'csdk';
+
+// Every Constructive tool — this CLI, the agent CLI, the desktop app — stores its
+// contexts and credentials under the same stash, so one sign-in covers all of them.
+const STASH_NAME = 'constructive';
+
+const getConfigStore = () => createConfigStore(TOOL_NAME, { stashName: STASH_NAME });
 
 const usageText = `
 csdk <command>
@@ -46,7 +53,7 @@ async function handleContextCreate(
     { type: 'text', name: 'endpoint', message: 'GraphQL endpoint URL', required: true }
   ]);
 
-  const store = getConfigStore(TOOL_NAME);
+  const store = getConfigStore();
   store.createContext(answers.name as string, { endpoint: answers.endpoint as string });
 
   const settings = store.loadSettings();
@@ -59,7 +66,7 @@ async function handleContextCreate(
 }
 
 async function handleContextList() {
-  const store = getConfigStore(TOOL_NAME);
+  const store = getConfigStore();
   const contexts = store.listContexts();
   const settings = store.loadSettings();
 
@@ -83,7 +90,7 @@ async function handleContextUse(
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer
 ) {
-  const store = getConfigStore(TOOL_NAME);
+  const store = getConfigStore();
   const contexts = store.listContexts();
 
   if (contexts.length === 0) {
@@ -105,7 +112,7 @@ async function handleContextUse(
 }
 
 async function handleContextCurrent() {
-  const store = getConfigStore(TOOL_NAME);
+  const store = getConfigStore();
   const ctx = store.getCurrentContext();
 
   if (!ctx) {
@@ -121,7 +128,7 @@ async function handleContextDelete(
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer
 ) {
-  const store = getConfigStore(TOOL_NAME);
+  const store = getConfigStore();
   const contexts = store.listContexts();
 
   if (contexts.length === 0) {

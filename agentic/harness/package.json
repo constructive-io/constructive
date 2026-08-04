@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "appstash": "^0.7.0",
+    "appstash": "^0.8.0",
     "semver": "^7.7.2",
     "tar": "^7.4.3",
     "zod": "^4.4.3"

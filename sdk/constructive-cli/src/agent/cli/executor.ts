@@ -5,7 +5,9 @@
  */
 import { createConfigStore } from 'appstash';
 import { createClient } from '../orm';
-const store = createConfigStore('csdk');
+const store = createConfigStore('csdk', {
+  stashName: 'constructive',
+});
 export const getStore = () => store;
 export function getClient(contextName?: string) {
   let ctx = null;
