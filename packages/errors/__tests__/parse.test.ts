@@ -226,11 +226,12 @@ describe('generated registry (full constructive-db audit)', () => {
     // require_step_up() raises one code per factor so the client knows which
     // re-verification to prompt for; a humanized code would prompt for the
     // wrong one, so each needs its own copy.
+    // STEP_UP_REQUIRED_PASSWORD_OR_MFA is deliberately absent: constructive-db
+    // split it into the per-factor codes below (require_step_up.sql).
     const factors = [
       'STEP_UP_REQUIRED_PASSWORD',
       'STEP_UP_REQUIRED_MFA',
-      'STEP_UP_REQUIRED_FRESH_AUTH',
-      'STEP_UP_REQUIRED_PASSWORD_OR_MFA'
+      'STEP_UP_REQUIRED_FRESH_AUTH'
     ];
     for (const code of factors) {
       expect(classify(code)).toBe('public');

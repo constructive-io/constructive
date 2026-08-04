@@ -32,11 +32,6 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
-| `useApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useApiQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useCreateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useUpdateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useDeleteApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useCreateApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
@@ -47,6 +42,11 @@ function App() {
 | `useCreateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useUpdateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useDeleteApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `useApisesQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreateApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdateApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeleteApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useAstMigrationsQuery` | Query | List all astMigrations |
 | `useAstMigrationQuery` | Query | Get one astMigration |
 | `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
@@ -87,6 +87,11 @@ function App() {
 | `useCreateDefaultPrivilegeMutation` | Mutation | Create a defaultPrivilege |
 | `useUpdateDefaultPrivilegeMutation` | Mutation | Update a defaultPrivilege |
 | `useDeleteDefaultPrivilegeMutation` | Mutation | Delete a defaultPrivilege |
+| `useDerivesQuery` | Query | List all derives |
+| `useDeriveQuery` | Query | Get one derive |
+| `useCreateDeriveMutation` | Mutation | Create a derive |
+| `useUpdateDeriveMutation` | Mutation | Update a derive |
+| `useDeleteDeriveMutation` | Mutation | Delete a derive |
 | `useDomainsQuery` | Query | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
 | `useDomainQuery` | Query | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
 | `useCreateDomainMutation` | Mutation | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
@@ -122,11 +127,21 @@ function App() {
 | `useCreateExclusionConstraintMutation` | Mutation | Create a exclusionConstraint |
 | `useUpdateExclusionConstraintMutation` | Mutation | Update a exclusionConstraint |
 | `useDeleteExclusionConstraintMutation` | Mutation | Delete a exclusionConstraint |
+| `useFieldBehaviorsQuery` | Query | List all fieldBehaviors |
+| `useFieldBehaviorQuery` | Query | Get one fieldBehavior |
+| `useCreateFieldBehaviorMutation` | Mutation | Create a fieldBehavior |
+| `useUpdateFieldBehaviorMutation` | Mutation | Update a fieldBehavior |
+| `useDeleteFieldBehaviorMutation` | Mutation | Delete a fieldBehavior |
 | `useFieldsQuery` | Query | List all fields |
 | `useFieldQuery` | Query | Get one field |
 | `useCreateFieldMutation` | Mutation | Create a field |
 | `useUpdateFieldMutation` | Mutation | Update a field |
 | `useDeleteFieldMutation` | Mutation | Delete a field |
+| `useForeignKeyConstraintBehaviorsQuery` | Query | List all foreignKeyConstraintBehaviors |
+| `useForeignKeyConstraintBehaviorQuery` | Query | Get one foreignKeyConstraintBehavior |
+| `useCreateForeignKeyConstraintBehaviorMutation` | Mutation | Create a foreignKeyConstraintBehavior |
+| `useUpdateForeignKeyConstraintBehaviorMutation` | Mutation | Update a foreignKeyConstraintBehavior |
+| `useDeleteForeignKeyConstraintBehaviorMutation` | Mutation | Delete a foreignKeyConstraintBehavior |
 | `useForeignKeyConstraintsQuery` | Query | List all foreignKeyConstraints |
 | `useForeignKeyConstraintQuery` | Query | Get one foreignKeyConstraint |
 | `useCreateForeignKeyConstraintMutation` | Mutation | Create a foreignKeyConstraint |
@@ -167,16 +182,16 @@ function App() {
 | `useCreateNodeTypeRegistryMutation` | Mutation | Create a nodeTypeRegistry |
 | `useUpdateNodeTypeRegistryMutation` | Mutation | Update a nodeTypeRegistry |
 | `useDeleteNodeTypeRegistryMutation` | Mutation | Delete a nodeTypeRegistry |
+| `usePagesQuery` | Query | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `usePageQuery` | Query | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `useCreatePageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `useUpdatePageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `useDeletePageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
 | `usePartitionsQuery` | Query | List all partitions |
 | `usePartitionQuery` | Query | Get one partition |
 | `useCreatePartitionMutation` | Mutation | Create a partition |
 | `useUpdatePartitionMutation` | Mutation | Update a partition |
 | `useDeletePartitionMutation` | Mutation | Delete a partition |
-| `usePlatformApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `usePlatformApiQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useCreatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useUpdatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useDeletePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `usePlatformApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `usePlatformApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useCreatePlatformApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
@@ -187,6 +202,11 @@ function App() {
 | `useCreatePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useUpdatePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useDeletePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `usePlatformApisesQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `usePlatformApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreatePlatformApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdatePlatformApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeletePlatformApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `usePlatformCorsSettingsQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
 | `usePlatformCorsSettingQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
 | `useCreatePlatformCorsSettingMutation` | Mutation | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
@@ -212,11 +232,31 @@ function App() {
 | `useCreatePlatformManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
 | `useUpdatePlatformManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
 | `useDeletePlatformManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `usePlatformPagesQuery` | Query | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `usePlatformPageQuery` | Query | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `useCreatePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `useUpdatePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `useDeletePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `usePlatformSiteAppLinksQuery` | Query | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `usePlatformSiteAppLinkQuery` | Query | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `useCreatePlatformSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `useUpdatePlatformSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `useDeletePlatformSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
 | `usePlatformSitesQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `usePlatformSiteQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useCreatePlatformSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useUpdatePlatformSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useDeletePlatformSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `usePlatformSiteDeepLinksQuery` | Query | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `usePlatformSiteDeepLinkQuery` | Query | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `useCreatePlatformSiteDeepLinkMutation` | Mutation | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `useUpdatePlatformSiteDeepLinkMutation` | Mutation | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `useDeletePlatformSiteDeepLinkMutation` | Mutation | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `usePlatformSiteErrorPagesQuery` | Query | Custom error pages for a site surface, keyed by HTTP status code |
+| `usePlatformSiteErrorPageQuery` | Query | Custom error pages for a site surface, keyed by HTTP status code |
+| `useCreatePlatformSiteErrorPageMutation` | Mutation | Custom error pages for a site surface, keyed by HTTP status code |
+| `useUpdatePlatformSiteErrorPageMutation` | Mutation | Custom error pages for a site surface, keyed by HTTP status code |
+| `useDeletePlatformSiteErrorPageMutation` | Mutation | Custom error pages for a site surface, keyed by HTTP status code |
 | `usePlatformSiteMetadataQuery` | Query | SEO and social sharing metadata for a site surface |
 | `usePlatformSiteMetadatumQuery` | Query | SEO and social sharing metadata for a site surface |
 | `useCreatePlatformSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site surface |
@@ -232,6 +272,11 @@ function App() {
 | `useCreatePlatformSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
 | `useUpdatePlatformSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
 | `useDeletePlatformSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
+| `usePlatformSiteWebConfigsQuery` | Query | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
+| `usePlatformSiteWebConfigQuery` | Query | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
+| `useCreatePlatformSiteWebConfigMutation` | Mutation | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
+| `useUpdatePlatformSiteWebConfigMutation` | Mutation | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
+| `useDeletePlatformSiteWebConfigMutation` | Mutation | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
 | `usePoliciesQuery` | Query | List all policies |
 | `usePolicyQuery` | Query | Get one policy |
 | `useCreatePolicyMutation` | Mutation | Create a policy |
@@ -272,11 +317,26 @@ function App() {
 | `useCreateSchemaGrantMutation` | Mutation | Create a schemaGrant |
 | `useUpdateSchemaGrantMutation` | Mutation | Update a schemaGrant |
 | `useDeleteSchemaGrantMutation` | Mutation | Delete a schemaGrant |
+| `useSiteAppLinksQuery` | Query | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `useSiteAppLinkQuery` | Query | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `useCreateSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `useUpdateSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `useDeleteSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
 | `useSitesQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useSiteQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useCreateSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useUpdateSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useDeleteSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useSiteDeepLinksQuery` | Query | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `useSiteDeepLinkQuery` | Query | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `useCreateSiteDeepLinkMutation` | Mutation | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `useUpdateSiteDeepLinkMutation` | Mutation | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `useDeleteSiteDeepLinkMutation` | Mutation | Named, retargetable deep links owned by a site surface (served at the deep-link path prefix; app interception via site_app_links) |
+| `useSiteErrorPagesQuery` | Query | Custom error pages for a site surface, keyed by HTTP status code |
+| `useSiteErrorPageQuery` | Query | Custom error pages for a site surface, keyed by HTTP status code |
+| `useCreateSiteErrorPageMutation` | Mutation | Custom error pages for a site surface, keyed by HTTP status code |
+| `useUpdateSiteErrorPageMutation` | Mutation | Custom error pages for a site surface, keyed by HTTP status code |
+| `useDeleteSiteErrorPageMutation` | Mutation | Custom error pages for a site surface, keyed by HTTP status code |
 | `useSiteMetadataQuery` | Query | SEO and social sharing metadata for a site surface |
 | `useSiteMetadatumQuery` | Query | SEO and social sharing metadata for a site surface |
 | `useCreateSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site surface |
@@ -292,6 +352,11 @@ function App() {
 | `useCreateSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
 | `useUpdateSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
 | `useDeleteSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
+| `useSiteWebConfigsQuery` | Query | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
+| `useSiteWebConfigQuery` | Query | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
+| `useCreateSiteWebConfigMutation` | Mutation | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
+| `useUpdateSiteWebConfigMutation` | Mutation | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
+| `useDeleteSiteWebConfigMutation` | Mutation | Static-site serving configuration for a site surface (index document, clean URLs, SPA fallback) |
 | `useSpatialRelationsQuery` | Query | List all spatialRelations |
 | `useSpatialRelationQuery` | Query | Get one spatialRelation |
 | `useCreateSpatialRelationMutation` | Mutation | Create a spatialRelation |
@@ -302,6 +367,11 @@ function App() {
 | `useCreateSqlActionMutation` | Mutation | Create a sqlAction |
 | `useUpdateSqlActionMutation` | Mutation | Update a sqlAction |
 | `useDeleteSqlActionMutation` | Mutation | Delete a sqlAction |
+| `useTableBehaviorsQuery` | Query | List all tableBehaviors |
+| `useTableBehaviorQuery` | Query | Get one tableBehavior |
+| `useCreateTableBehaviorMutation` | Mutation | Create a tableBehavior |
+| `useUpdateTableBehaviorMutation` | Mutation | Update a tableBehavior |
+| `useDeleteTableBehaviorMutation` | Mutation | Delete a tableBehavior |
 | `useTablesQuery` | Query | List all tables |
 | `useTableQuery` | Query | Get one table |
 | `useCreateTableMutation` | Mutation | Create a table |
@@ -322,11 +392,21 @@ function App() {
 | `useCreateTriggerFunctionMutation` | Mutation | Create a triggerFunction |
 | `useUpdateTriggerFunctionMutation` | Mutation | Update a triggerFunction |
 | `useDeleteTriggerFunctionMutation` | Mutation | Delete a triggerFunction |
+| `useUniqueConstraintBehaviorsQuery` | Query | List all uniqueConstraintBehaviors |
+| `useUniqueConstraintBehaviorQuery` | Query | Get one uniqueConstraintBehavior |
+| `useCreateUniqueConstraintBehaviorMutation` | Mutation | Create a uniqueConstraintBehavior |
+| `useUpdateUniqueConstraintBehaviorMutation` | Mutation | Update a uniqueConstraintBehavior |
+| `useDeleteUniqueConstraintBehaviorMutation` | Mutation | Delete a uniqueConstraintBehavior |
 | `useUniqueConstraintsQuery` | Query | List all uniqueConstraints |
 | `useUniqueConstraintQuery` | Query | Get one uniqueConstraint |
 | `useCreateUniqueConstraintMutation` | Mutation | Create a uniqueConstraint |
 | `useUpdateUniqueConstraintMutation` | Mutation | Update a uniqueConstraint |
 | `useDeleteUniqueConstraintMutation` | Mutation | Delete a uniqueConstraint |
+| `useViewBehaviorsQuery` | Query | List all viewBehaviors |
+| `useViewBehaviorQuery` | Query | Get one viewBehavior |
+| `useCreateViewBehaviorMutation` | Mutation | Create a viewBehavior |
+| `useUpdateViewBehaviorMutation` | Mutation | Update a viewBehavior |
+| `useDeleteViewBehaviorMutation` | Mutation | Delete a viewBehavior |
 | `useViewsQuery` | Query | List all views |
 | `useViewQuery` | Query | Get one view |
 | `useCreateViewMutation` | Mutation | Create a view |
@@ -354,11 +434,16 @@ function App() {
 | `useDeleteWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
 | `useApiSchemaNamesQuery` | Query | apiSchemaNames |
 | `useApplyRegistryDefaultsQuery` | Query | applyRegistryDefaults |
+| `useResolveDeepLinkQuery` | Query | resolveDeepLink |
 | `useResolveHttpRouteQuery` | Query | resolveHttpRoute |
 | `useResolveRouteQuery` | Query | resolveRoute |
+| `useResolveSiteAppLinksQuery` | Query | resolveSiteAppLinks |
 | `useAcceptDatabaseTransferMutation` | Mutation | acceptDatabaseTransfer |
 | `useApplyRlsMutation` | Mutation | applyRls |
 | `useCancelDatabaseTransferMutation` | Mutation | cancelDatabaseTransfer |
+| `useDomainsAssignSubdomainMutation` | Mutation | domainsAssignSubdomain |
+| `usePlatformDomainsAssignSubdomainMutation` | Mutation | platformDomainsAssignSubdomain |
+| `usePlatformSitesProvisionStaticSiteMutation` | Mutation | platformSitesProvisionStaticSite |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -372,29 +457,9 @@ Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb); |
 | `useSetFieldOrderMutation` | Mutation | setFieldOrder |
+| `useSitesProvisionStaticSiteMutation` | Mutation | sitesProvisionStaticSite |
 
 ## Table Hooks
-
-### Api
-
-```typescript
-// List all apis
-const { data, isLoading } = useApisQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Get one api
-const { data: item } = useApiQuery({
-  id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Create a api
-const { mutate: create } = useCreateApiMutation({
-  selection: { fields: { id: true } },
-});
-create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
-```
 
 ### ApiSchema
 
@@ -422,20 +487,41 @@ create({ apiId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>' });
 ```typescript
 // List all apiSettings
 const { data, isLoading } = useApiSettingsQuery({
-  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } },
+  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Get one apiSetting
 const { data: item } = useApiSettingQuery({
   id: '<UUID>',
-  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } },
+  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Create a apiSetting
 const { mutate: create } = useCreateApiSettingMutation({
   selection: { fields: { id: true } },
 });
-create({ apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>' });
+create({ apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>', statementTimeoutMs: '<BigInt>' });
+```
+
+### Apis
+
+```typescript
+// List all apises
+const { data, isLoading } = useApisesQuery({
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Get one apis
+const { data: item } = useApisQuery({
+  id: '<UUID>',
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Create a apis
+const { mutate: create } = useCreateApisMutation({
+  selection: { fields: { id: true } },
+});
+create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### AstMigration
@@ -527,20 +613,20 @@ create({ allowedOrigins: '<String>', apiId: '<UUID>', databaseId: '<UUID>' });
 ```typescript
 // List all databases
 const { data, isLoading } = useDatabasesQuery({
-  selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, schemaHash: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, updatedAt: true } },
 });
 
 // Get one database
 const { data: item } = useDatabaseQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, schemaHash: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, hash: true, id: true, label: true, name: true, ownerId: true, platform: true, updatedAt: true } },
 });
 
 // Create a database
 const { mutate: create } = useCreateDatabaseMutation({
   selection: { fields: { id: true } },
 });
-create({ hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>', platform: '<Boolean>', schemaHash: '<String>' });
+create({ hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>', platform: '<Boolean>' });
 ```
 
 ### DatabaseSetting
@@ -548,20 +634,20 @@ create({ hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>',
 ```typescript
 // List all databaseSettings
 const { data, isLoading } = useDatabaseSettingsQuery({
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Get one databaseSetting
 const { data: item } = useDatabaseSettingQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Create a databaseSetting
 const { mutate: create } = useCreateDatabaseSettingMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', labels: '<JSON>', options: '<JSON>' });
+create({ annotations: '<JSON>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', labels: '<JSON>', options: '<JSON>', statementTimeoutMs: '<BigInt>' });
 ```
 
 ### DatabaseTransfer
@@ -604,6 +690,27 @@ const { mutate: create } = useCreateDefaultPrivilegeMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', objectType: '<String>', privilege: '<String>', schemaId: '<UUID>' });
+```
+
+### Derive
+
+```typescript
+// List all derives
+const { data, isLoading } = useDerivesQuery({
+  selection: { fields: { createdAt: true, databaseId: true, id: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
+});
+
+// Get one derive
+const { data: item } = useDeriveQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, id: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
+});
+
+// Create a derive
+const { mutate: create } = useCreateDeriveMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' });
 ```
 
 ### Domain
@@ -753,6 +860,27 @@ const { mutate: create } = useCreateExclusionConstraintMutation({
 create({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<UUID>', elementExpr: '<JSON>', fieldIds: '<UUID>', name: '<String>', operators: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', whereClause: '<JSON>' });
 ```
 
+### FieldBehavior
+
+```typescript
+// List all fieldBehaviors
+const { data, isLoading } = useFieldBehaviorsQuery({
+  selection: { fields: { createdAt: true, databaseId: true, fieldId: true, id: true, modifier: true, scope: true, sortOrder: true, updatedAt: true } },
+});
+
+// Get one fieldBehavior
+const { data: item } = useFieldBehaviorQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, fieldId: true, id: true, modifier: true, scope: true, sortOrder: true, updatedAt: true } },
+});
+
+// Create a fieldBehavior
+const { mutate: create } = useCreateFieldBehaviorMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', fieldId: '<UUID>', modifier: '<String>', scope: '<String>', sortOrder: '<Int>' });
+```
+
 ### Field
 
 ```typescript
@@ -772,6 +900,27 @@ const { mutate: create } = useCreateFieldMutation({
   selection: { fields: { id: true } },
 });
 create({ apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', chkExpr: '<JSON>', databaseId: '<UUID>', defaultValue: '<JSON>', description: '<String>', fieldOrder: '<Int>', generationExpression: '<JSON>', generationType: '<String>', identityGeneration: '<String>', identityOptions: '<JSON>', isRequired: '<Boolean>', label: '<String>', max: '<Float>', min: '<Float>', name: '<String>', regexp: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<JSON>' });
+```
+
+### ForeignKeyConstraintBehavior
+
+```typescript
+// List all foreignKeyConstraintBehaviors
+const { data, isLoading } = useForeignKeyConstraintBehaviorsQuery({
+  selection: { fields: { createdAt: true, databaseId: true, foreignKeyConstraintId: true, id: true, modifier: true, scope: true, sortOrder: true, updatedAt: true } },
+});
+
+// Get one foreignKeyConstraintBehavior
+const { data: item } = useForeignKeyConstraintBehaviorQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, foreignKeyConstraintId: true, id: true, modifier: true, scope: true, sortOrder: true, updatedAt: true } },
+});
+
+// Create a foreignKeyConstraintBehavior
+const { mutate: create } = useCreateForeignKeyConstraintBehaviorMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', foreignKeyConstraintId: '<UUID>', modifier: '<String>', scope: '<String>', sortOrder: '<Int>' });
 ```
 
 ### ForeignKeyConstraint
@@ -942,6 +1091,27 @@ const { mutate: create } = useCreateNodeTypeRegistryMutation({
 create({ category: '<String>', description: '<String>', displayName: '<String>', parameterSchema: '<JSON>', slug: '<String>', tags: '<String>' });
 ```
 
+### Page
+
+```typescript
+// List all pages
+const { data, isLoading } = usePagesQuery({
+  selection: { fields: { commitId: true, content: true, createdAt: true, databaseId: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Get one page
+const { data: item } = usePageQuery({
+  id: '<UUID>',
+  selection: { fields: { commitId: true, content: true, createdAt: true, databaseId: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Create a page
+const { mutate: create } = useCreatePageMutation({
+  selection: { fields: { id: true } },
+});
+create({ commitId: '<UUID>', content: '<JSON>', databaseId: '<UUID>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
+```
+
 ### Partition
 
 ```typescript
@@ -961,27 +1131,6 @@ const { mutate: create } = useCreatePartitionMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', interval: '<String>', isParented: '<Boolean>', namingPattern: '<String>', partitionKeyId: '<UUID>', premake: '<Int>', retention: '<String>', retentionKeepTable: '<Boolean>', strategy: '<String>', tableId: '<UUID>' });
-```
-
-### PlatformApi
-
-```typescript
-// List all platformApis
-const { data, isLoading } = usePlatformApisQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Get one platformApi
-const { data: item } = usePlatformApiQuery({
-  id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Create a platformApi
-const { mutate: create } = useCreatePlatformApiMutation({
-  selection: { fields: { id: true } },
-});
-create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### PlatformApiSchema
@@ -1010,20 +1159,41 @@ create({ apiId: '<UUID>', schemaId: '<UUID>' });
 ```typescript
 // List all platformApiSettings
 const { data, isLoading } = usePlatformApiSettingsQuery({
-  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } },
+  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Get one platformApiSetting
 const { data: item } = usePlatformApiSettingQuery({
   id: '<UUID>',
-  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } },
+  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Create a platformApiSetting
 const { mutate: create } = useCreatePlatformApiSettingMutation({
   selection: { fields: { id: true } },
 });
-create({ apiId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>' });
+create({ apiId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>', statementTimeoutMs: '<BigInt>' });
+```
+
+### PlatformApis
+
+```typescript
+// List all platformApises
+const { data, isLoading } = usePlatformApisesQuery({
+  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Get one platformApis
+const { data: item } = usePlatformApisQuery({
+  id: '<UUID>',
+  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Create a platformApis
+const { mutate: create } = useCreatePlatformApisMutation({
+  selection: { fields: { id: true } },
+});
+create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### PlatformCorsSetting
@@ -1131,25 +1301,109 @@ const { mutate: create } = useCreatePlatformManagedDomainMutation({
 create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
+### PlatformPage
+
+```typescript
+// List all platformPages
+const { data, isLoading } = usePlatformPagesQuery({
+  selection: { fields: { commitId: true, content: true, createdAt: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Get one platformPage
+const { data: item } = usePlatformPageQuery({
+  id: '<UUID>',
+  selection: { fields: { commitId: true, content: true, createdAt: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Create a platformPage
+const { mutate: create } = useCreatePlatformPageMutation({
+  selection: { fields: { id: true } },
+});
+create({ commitId: '<UUID>', content: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
+```
+
+### PlatformSiteAppLink
+
+```typescript
+// List all platformSiteAppLinks
+const { data, isLoading } = usePlatformSiteAppLinksQuery({
+  selection: { fields: { appIdentifier: true, createdAt: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } },
+});
+
+// Get one platformSiteAppLink
+const { data: item } = usePlatformSiteAppLinkQuery({
+  id: '<UUID>',
+  selection: { fields: { appIdentifier: true, createdAt: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } },
+});
+
+// Create a platformSiteAppLink
+const { mutate: create } = useCreatePlatformSiteAppLinkMutation({
+  selection: { fields: { id: true } },
+});
+create({ appIdentifier: '<String>', pathComponents: '<String>', platform: '<String>', sha256CertFingerprints: '<String>', siteId: '<UUID>', storeUrl: '<String>', teamId: '<String>', webcredentials: '<Boolean>' });
+```
+
 ### PlatformSite
 
 ```typescript
 // List all platformSites
 const { data, isLoading } = usePlatformSitesQuery({
-  selection: { fields: { config: true, createdAt: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
 });
 
 // Get one platformSite
 const { data: item } = usePlatformSiteQuery({
   id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
 });
 
 // Create a platformSite
 const { mutate: create } = useCreatePlatformSiteMutation({
   selection: { fields: { id: true } },
 });
-create({ config: '<JSON>', description: '<String>', isPublished: '<Boolean>', name: '<String>', title: '<String>' });
+create({ activeCommitId: '<UUID>', bucketId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>' });
+```
+
+### PlatformSiteDeepLink
+
+```typescript
+// List all platformSiteDeepLinks
+const { data, isLoading } = usePlatformSiteDeepLinksQuery({
+  selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+});
+
+// Get one platformSiteDeepLink
+const { data: item } = usePlatformSiteDeepLinkQuery({
+  id: '<UUID>',
+  selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+});
+
+// Create a platformSiteDeepLink
+const { mutate: create } = useCreatePlatformSiteDeepLinkMutation({
+  selection: { fields: { id: true } },
+});
+create({ appPath: '<String>', fallbackUrl: '<String>', metadata: '<JSON>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
+```
+
+### PlatformSiteErrorPage
+
+```typescript
+// List all platformSiteErrorPages
+const { data, isLoading } = usePlatformSiteErrorPagesQuery({
+  selection: { fields: { createdAt: true, id: true, objectPath: true, siteId: true, statusCode: true, updatedAt: true } },
+});
+
+// Get one platformSiteErrorPage
+const { data: item } = usePlatformSiteErrorPageQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, id: true, objectPath: true, siteId: true, statusCode: true, updatedAt: true } },
+});
+
+// Create a platformSiteErrorPage
+const { mutate: create } = useCreatePlatformSiteErrorPageMutation({
+  selection: { fields: { id: true } },
+});
+create({ objectPath: '<String>', siteId: '<UUID>', statusCode: '<Int>' });
 ```
 
 ### PlatformSiteMetadatum
@@ -1157,20 +1411,20 @@ create({ config: '<JSON>', description: '<String>', isPublished: '<Boolean>', na
 ```typescript
 // List all platformSiteMetadata
 const { data, isLoading } = usePlatformSiteMetadataQuery({
-  selection: { fields: { createdAt: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } },
+  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, siteId: true, storeId: true, title: true, updatedAt: true } },
 });
 
 // Get one platformSiteMetadatum
 const { data: item } = usePlatformSiteMetadatumQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } },
+  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, siteId: true, storeId: true, title: true, updatedAt: true } },
 });
 
 // Create a platformSiteMetadatum
 const { mutate: create } = useCreatePlatformSiteMetadatumMutation({
   selection: { fields: { id: true } },
 });
-create({ description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' });
+create({ appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' });
 ```
 
 ### PlatformSiteModule
@@ -1178,20 +1432,20 @@ create({ description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '
 ```typescript
 // List all platformSiteModules
 const { data, isLoading } = usePlatformSiteModulesQuery({
-  selection: { fields: { createdAt: true, data: true, id: true, name: true, siteId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, data: true, id: true, isEnabled: true, name: true, position: true, siteId: true, updatedAt: true } },
 });
 
 // Get one platformSiteModule
 const { data: item } = usePlatformSiteModuleQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, data: true, id: true, name: true, siteId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, data: true, id: true, isEnabled: true, name: true, position: true, siteId: true, updatedAt: true } },
 });
 
 // Create a platformSiteModule
 const { mutate: create } = useCreatePlatformSiteModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ data: '<JSON>', name: '<String>', siteId: '<UUID>' });
+create({ data: '<JSON>', isEnabled: '<Boolean>', name: '<String>', position: '<Int>', siteId: '<UUID>' });
 ```
 
 ### PlatformSiteTheme
@@ -1199,20 +1453,41 @@ create({ data: '<JSON>', name: '<String>', siteId: '<UUID>' });
 ```typescript
 // List all platformSiteThemes
 const { data, isLoading } = usePlatformSiteThemesQuery({
-  selection: { fields: { createdAt: true, id: true, siteId: true, theme: true, updatedAt: true } },
+  selection: { fields: { commitId: true, createdAt: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } },
 });
 
 // Get one platformSiteTheme
 const { data: item } = usePlatformSiteThemeQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, id: true, siteId: true, theme: true, updatedAt: true } },
+  selection: { fields: { commitId: true, createdAt: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } },
 });
 
 // Create a platformSiteTheme
 const { mutate: create } = useCreatePlatformSiteThemeMutation({
   selection: { fields: { id: true } },
 });
-create({ siteId: '<UUID>', theme: '<JSON>' });
+create({ commitId: '<UUID>', isActive: '<Boolean>', name: '<String>', siteId: '<UUID>', storeId: '<UUID>', theme: '<JSON>' });
+```
+
+### PlatformSiteWebConfig
+
+```typescript
+// List all platformSiteWebConfigs
+const { data, isLoading } = usePlatformSiteWebConfigsQuery({
+  selection: { fields: { cleanUrls: true, createdAt: true, id: true, indexDocument: true, metadata: true, siteId: true, spaFallback: true, updatedAt: true } },
+});
+
+// Get one platformSiteWebConfig
+const { data: item } = usePlatformSiteWebConfigQuery({
+  id: '<UUID>',
+  selection: { fields: { cleanUrls: true, createdAt: true, id: true, indexDocument: true, metadata: true, siteId: true, spaFallback: true, updatedAt: true } },
+});
+
+// Create a platformSiteWebConfig
+const { mutate: create } = useCreatePlatformSiteWebConfigMutation({
+  selection: { fields: { id: true } },
+});
+create({ cleanUrls: '<Boolean>', indexDocument: '<String>', metadata: '<JSON>', siteId: '<UUID>', spaFallback: '<Boolean>' });
 ```
 
 ### Policy
@@ -1220,20 +1495,20 @@ create({ siteId: '<UUID>', theme: '<JSON>' });
 ```typescript
 // List all policies
 const { data, isLoading } = usePoliciesQuery({
-  selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
+  selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
 });
 
 // Get one policy
 const { data: item } = usePolicyQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
+  selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
 });
 
 // Create a policy
 const { mutate: create } = useCreatePolicyMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' });
+create({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', derivedFromPolicyId: '<UUID>', derivedFromTableId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' });
 ```
 
 ### PrimaryKeyConstraint
@@ -1304,20 +1579,20 @@ create({ authenticateFunctionId: '<UUID>', authenticateSchemaId: '<UUID>', authe
 ```typescript
 // List all routeBindings
 const { data, isLoading } = useRouteBindingsQuery({
-  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Get one routeBinding
 const { data: item } = useRouteBindingQuery({
   id: '<UUID>',
-  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Create a routeBinding
 const { mutate: create } = useCreateRouteBindingMutation({
   selection: { fields: { id: true } },
 });
-create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetFunctionId: '<UUID>', targetSiteId: '<UUID>' });
+create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
 ```
 
 ### Route
@@ -1325,20 +1600,20 @@ create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<
 ```typescript
 // List all routes
 const { data, isLoading } = useRoutesQuery({
-  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Get one route
 const { data: item } = useRouteQuery({
   id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Create a route
 const { mutate: create } = useCreateRouteMutation({
   selection: { fields: { id: true } },
 });
-create({ config: '<JSON>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetFunctionId: '<UUID>', targetSiteId: '<UUID>' });
+create({ config: '<JSON>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
 ```
 
 ### Schema
@@ -1383,25 +1658,88 @@ const { mutate: create } = useCreateSchemaGrantMutation({
 create({ databaseId: '<UUID>', granteeName: '<String>', schemaId: '<UUID>' });
 ```
 
+### SiteAppLink
+
+```typescript
+// List all siteAppLinks
+const { data, isLoading } = useSiteAppLinksQuery({
+  selection: { fields: { appIdentifier: true, createdAt: true, databaseId: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } },
+});
+
+// Get one siteAppLink
+const { data: item } = useSiteAppLinkQuery({
+  id: '<UUID>',
+  selection: { fields: { appIdentifier: true, createdAt: true, databaseId: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } },
+});
+
+// Create a siteAppLink
+const { mutate: create } = useCreateSiteAppLinkMutation({
+  selection: { fields: { id: true } },
+});
+create({ appIdentifier: '<String>', databaseId: '<UUID>', pathComponents: '<String>', platform: '<String>', sha256CertFingerprints: '<String>', siteId: '<UUID>', storeUrl: '<String>', teamId: '<String>', webcredentials: '<Boolean>' });
+```
+
 ### Site
 
 ```typescript
 // List all sites
 const { data, isLoading } = useSitesQuery({
-  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
 });
 
 // Get one site
 const { data: item } = useSiteQuery({
   id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
 });
 
 // Create a site
 const { mutate: create } = useCreateSiteMutation({
   selection: { fields: { id: true } },
 });
-create({ config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPublished: '<Boolean>', name: '<String>', title: '<String>' });
+create({ activeCommitId: '<UUID>', bucketId: '<UUID>', databaseId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>' });
+```
+
+### SiteDeepLink
+
+```typescript
+// List all siteDeepLinks
+const { data, isLoading } = useSiteDeepLinksQuery({
+  selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+});
+
+// Get one siteDeepLink
+const { data: item } = useSiteDeepLinkQuery({
+  id: '<UUID>',
+  selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+});
+
+// Create a siteDeepLink
+const { mutate: create } = useCreateSiteDeepLinkMutation({
+  selection: { fields: { id: true } },
+});
+create({ appPath: '<String>', databaseId: '<UUID>', fallbackUrl: '<String>', metadata: '<JSON>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
+```
+
+### SiteErrorPage
+
+```typescript
+// List all siteErrorPages
+const { data, isLoading } = useSiteErrorPagesQuery({
+  selection: { fields: { createdAt: true, databaseId: true, id: true, objectPath: true, siteId: true, statusCode: true, updatedAt: true } },
+});
+
+// Get one siteErrorPage
+const { data: item } = useSiteErrorPageQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, id: true, objectPath: true, siteId: true, statusCode: true, updatedAt: true } },
+});
+
+// Create a siteErrorPage
+const { mutate: create } = useCreateSiteErrorPageMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', objectPath: '<String>', siteId: '<UUID>', statusCode: '<Int>' });
 ```
 
 ### SiteMetadatum
@@ -1409,20 +1747,20 @@ create({ config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPubl
 ```typescript
 // List all siteMetadata
 const { data, isLoading } = useSiteMetadataQuery({
-  selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } },
+  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, databaseId: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, siteId: true, storeId: true, title: true, updatedAt: true } },
 });
 
 // Get one siteMetadatum
 const { data: item } = useSiteMetadatumQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } },
+  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, databaseId: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, siteId: true, storeId: true, title: true, updatedAt: true } },
 });
 
 // Create a siteMetadatum
 const { mutate: create } = useCreateSiteMetadatumMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' });
+create({ appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', databaseId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' });
 ```
 
 ### SiteModule
@@ -1430,20 +1768,20 @@ create({ databaseId: '<UUID>', description: '<String>', ogImage: '<Image>', site
 ```typescript
 // List all siteModules
 const { data, isLoading } = useSiteModulesQuery({
-  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, name: true, siteId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, isEnabled: true, name: true, position: true, siteId: true, updatedAt: true } },
 });
 
 // Get one siteModule
 const { data: item } = useSiteModuleQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, name: true, siteId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, isEnabled: true, name: true, position: true, siteId: true, updatedAt: true } },
 });
 
 // Create a siteModule
 const { mutate: create } = useCreateSiteModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ data: '<JSON>', databaseId: '<UUID>', name: '<String>', siteId: '<UUID>' });
+create({ data: '<JSON>', databaseId: '<UUID>', isEnabled: '<Boolean>', name: '<String>', position: '<Int>', siteId: '<UUID>' });
 ```
 
 ### SiteTheme
@@ -1451,20 +1789,41 @@ create({ data: '<JSON>', databaseId: '<UUID>', name: '<String>', siteId: '<UUID>
 ```typescript
 // List all siteThemes
 const { data, isLoading } = useSiteThemesQuery({
-  selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } },
+  selection: { fields: { commitId: true, createdAt: true, databaseId: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } },
 });
 
 // Get one siteTheme
 const { data: item } = useSiteThemeQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } },
+  selection: { fields: { commitId: true, createdAt: true, databaseId: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } },
 });
 
 // Create a siteTheme
 const { mutate: create } = useCreateSiteThemeMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', siteId: '<UUID>', theme: '<JSON>' });
+create({ commitId: '<UUID>', databaseId: '<UUID>', isActive: '<Boolean>', name: '<String>', siteId: '<UUID>', storeId: '<UUID>', theme: '<JSON>' });
+```
+
+### SiteWebConfig
+
+```typescript
+// List all siteWebConfigs
+const { data, isLoading } = useSiteWebConfigsQuery({
+  selection: { fields: { cleanUrls: true, createdAt: true, databaseId: true, id: true, indexDocument: true, metadata: true, siteId: true, spaFallback: true, updatedAt: true } },
+});
+
+// Get one siteWebConfig
+const { data: item } = useSiteWebConfigQuery({
+  id: '<UUID>',
+  selection: { fields: { cleanUrls: true, createdAt: true, databaseId: true, id: true, indexDocument: true, metadata: true, siteId: true, spaFallback: true, updatedAt: true } },
+});
+
+// Create a siteWebConfig
+const { mutate: create } = useCreateSiteWebConfigMutation({
+  selection: { fields: { id: true } },
+});
+create({ cleanUrls: '<Boolean>', databaseId: '<UUID>', indexDocument: '<String>', metadata: '<JSON>', siteId: '<UUID>', spaFallback: '<Boolean>' });
 ```
 
 ### SpatialRelation
@@ -1507,6 +1866,27 @@ const { mutate: create } = useCreateSqlActionMutation({
   selection: { fields: { id: true } },
 });
 create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' });
+```
+
+### TableBehavior
+
+```typescript
+// List all tableBehaviors
+const { data, isLoading } = useTableBehaviorsQuery({
+  selection: { fields: { createdAt: true, databaseId: true, id: true, modifier: true, scope: true, sortOrder: true, tableId: true, updatedAt: true } },
+});
+
+// Get one tableBehavior
+const { data: item } = useTableBehaviorQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, id: true, modifier: true, scope: true, sortOrder: true, tableId: true, updatedAt: true } },
+});
+
+// Create a tableBehavior
+const { mutate: create } = useCreateTableBehaviorMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', modifier: '<String>', scope: '<String>', sortOrder: '<Int>', tableId: '<UUID>' });
 ```
 
 ### Table
@@ -1593,6 +1973,27 @@ const { mutate: create } = useCreateTriggerFunctionMutation({
 create({ code: '<String>', databaseId: '<UUID>', name: '<String>' });
 ```
 
+### UniqueConstraintBehavior
+
+```typescript
+// List all uniqueConstraintBehaviors
+const { data, isLoading } = useUniqueConstraintBehaviorsQuery({
+  selection: { fields: { createdAt: true, databaseId: true, id: true, modifier: true, scope: true, sortOrder: true, uniqueConstraintId: true, updatedAt: true } },
+});
+
+// Get one uniqueConstraintBehavior
+const { data: item } = useUniqueConstraintBehaviorQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, id: true, modifier: true, scope: true, sortOrder: true, uniqueConstraintId: true, updatedAt: true } },
+});
+
+// Create a uniqueConstraintBehavior
+const { mutate: create } = useCreateUniqueConstraintBehaviorMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', modifier: '<String>', scope: '<String>', sortOrder: '<Int>', uniqueConstraintId: '<UUID>' });
+```
+
 ### UniqueConstraint
 
 ```typescript
@@ -1612,6 +2013,27 @@ const { mutate: create } = useCreateUniqueConstraintMutation({
   selection: { fields: { id: true } },
 });
 create({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', withoutOverlaps: '<Boolean>' });
+```
+
+### ViewBehavior
+
+```typescript
+// List all viewBehaviors
+const { data, isLoading } = useViewBehaviorsQuery({
+  selection: { fields: { createdAt: true, databaseId: true, id: true, modifier: true, scope: true, sortOrder: true, updatedAt: true, viewId: true } },
+});
+
+// Get one viewBehavior
+const { data: item } = useViewBehaviorQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, id: true, modifier: true, scope: true, sortOrder: true, updatedAt: true, viewId: true } },
+});
+
+// Create a viewBehavior
+const { mutate: create } = useCreateViewBehaviorMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', modifier: '<String>', scope: '<String>', sortOrder: '<Int>', viewId: '<UUID>' });
 ```
 
 ### View
@@ -1744,6 +2166,18 @@ applyRegistryDefaults
   | `data` | JSON |
   | `nodeType` | String |
 
+### `useResolveDeepLinkQuery`
+
+resolveDeepLink
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `linkSlug` | String |
+  | `targetSiteId` | UUID |
+
 ### `useResolveHttpRouteQuery`
 
 resolveHttpRoute
@@ -1769,6 +2203,17 @@ resolveRoute
   | `requestHost` | String |
   | `requestMethod` | String |
   | `requestPath` | String |
+
+### `useResolveSiteAppLinksQuery`
+
+resolveSiteAppLinks
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `targetSiteId` | UUID |
 
 ### `useAcceptDatabaseTransferMutation`
 
@@ -1802,6 +2247,39 @@ cancelDatabaseTransfer
   | Argument | Type |
   |----------|------|
   | `input` | CancelDatabaseTransferInput (required) |
+
+### `useDomainsAssignSubdomainMutation`
+
+domainsAssignSubdomain
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DomainsAssignSubdomainInput (required) |
+
+### `usePlatformDomainsAssignSubdomainMutation`
+
+platformDomainsAssignSubdomain
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformDomainsAssignSubdomainInput (required) |
+
+### `usePlatformSitesProvisionStaticSiteMutation`
+
+platformSitesProvisionStaticSite
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSitesProvisionStaticSiteInput (required) |
 
 ### `useProvisionBucketMutation`
 
@@ -1855,6 +2333,17 @@ setFieldOrder
   | Argument | Type |
   |----------|------|
   | `input` | SetFieldOrderInput (required) |
+
+### `useSitesProvisionStaticSiteMutation`
+
+sitesProvisionStaticSite
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SitesProvisionStaticSiteInput (required) |
 
 ---
 

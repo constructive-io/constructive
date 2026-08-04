@@ -37,6 +37,15 @@ export const functionApiBindingKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionApiBindingKeys.details(), id] as const,
 } as const;
+export const functionCapabilityBindingKeys = {
+  /** All functionCapabilityBinding queries */ all: ['functioncapabilitybinding'] as const,
+  /** List query keys */ lists: () => [...functionCapabilityBindingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...functionCapabilityBindingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...functionCapabilityBindingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...functionCapabilityBindingKeys.details(), id] as const,
+} as const;
 export const functionDefinitionKeys = {
   /** All functionDefinition queries */ all: ['functiondefinition'] as const,
   /** List query keys */ lists: () => [...functionDefinitionKeys.all, 'list'] as const,
@@ -258,6 +267,19 @@ export const platformFunctionApiBindingKeys = {
     [...platformFunctionApiBindingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformFunctionApiBindingKeys.details(), id] as const,
+} as const;
+export const platformFunctionCapabilityBindingKeys = {
+  /** All platformFunctionCapabilityBinding queries */ all: [
+    'platformfunctioncapabilitybinding',
+  ] as const,
+  /** List query keys */ lists: () =>
+    [...platformFunctionCapabilityBindingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformFunctionCapabilityBindingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformFunctionCapabilityBindingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformFunctionCapabilityBindingKeys.details(), id] as const,
 } as const;
 export const platformFunctionDefinitionKeys = {
   /** All platformFunctionDefinition queries */ all: ['platformfunctiondefinition'] as const,
@@ -696,6 +718,7 @@ export const customQueryKeys = {
 export const queryKeys = {
   dbPreset: dbPresetKeys,
   functionApiBinding: functionApiBindingKeys,
+  functionCapabilityBinding: functionCapabilityBindingKeys,
   functionDefinition: functionDefinitionKeys,
   functionDeployment: functionDeploymentKeys,
   functionDeploymentEvent: functionDeploymentEventKeys,
@@ -720,6 +743,7 @@ export const queryKeys = {
   namespace: namespaceKeys,
   namespaceEvent: namespaceEventKeys,
   platformFunctionApiBinding: platformFunctionApiBindingKeys,
+  platformFunctionCapabilityBinding: platformFunctionCapabilityBindingKeys,
   platformFunctionDefinition: platformFunctionDefinitionKeys,
   platformFunctionDeployment: platformFunctionDeploymentKeys,
   platformFunctionDeploymentEvent: platformFunctionDeploymentEventKeys,

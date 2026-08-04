@@ -23,7 +23,6 @@ const fieldSchema: FieldSchema = {
   name: 'string',
   ownerId: 'uuid',
   platform: 'boolean',
-  schemaHash: 'string',
   updatedAt: 'string',
 };
 const usage =
@@ -84,7 +83,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       name: true,
       ownerId: true,
       platform: true,
-      schemaHash: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -113,7 +111,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       name: true,
       ownerId: true,
       platform: true,
-      schemaHash: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -154,7 +151,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           name: true,
           ownerId: true,
           platform: true,
-          schemaHash: true,
           updatedAt: true,
         },
       })
@@ -206,13 +202,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'text',
-        name: 'schemaHash',
-        message: 'schemaHash',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateDatabaseInput['database'];
@@ -225,7 +214,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           ownerId: cleanedData.ownerId,
           platform: cleanedData.platform,
-          schemaHash: cleanedData.schemaHash,
         },
         select: {
           createdAt: true,
@@ -235,7 +223,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: true,
           ownerId: true,
           platform: true,
-          schemaHash: true,
           updatedAt: true,
         },
       })
@@ -293,13 +280,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'text',
-        name: 'schemaHash',
-        message: 'schemaHash',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as DatabasePatch;
@@ -315,7 +295,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           ownerId: cleanedData.ownerId,
           platform: cleanedData.platform,
-          schemaHash: cleanedData.schemaHash,
         },
         select: {
           createdAt: true,
@@ -325,7 +304,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: true,
           ownerId: true,
           platform: true,
-          schemaHash: true,
           updatedAt: true,
         },
       })

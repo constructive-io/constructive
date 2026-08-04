@@ -7,7 +7,7 @@ Execute the platformInternalSecretsRemoveArray mutation
 ## Usage
 
 ```typescript
-db.mutation.platformInternalSecretsRemoveArray({ input: { namespaceId: '<UUID>', secretNames: '<String>' } }).execute()
+db.mutation.platformInternalSecretsRemoveArray({ input: { namespaceId: '<UUID>', realm: '<String>', secretNames: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.platformInternalSecretsRemoveArray({ input: { namespaceId: '<UUID>',
 ### Run platformInternalSecretsRemoveArray
 
 ```typescript
-const result = await db.mutation.platformInternalSecretsRemoveArray({ input: { namespaceId: '<UUID>', secretNames: '<String>' } }).execute();
+const result = await db.mutation.platformInternalSecretsRemoveArray({ input: { namespaceId: '<UUID>', realm: '<String>', secretNames: '<String>' } }).execute();
 ```

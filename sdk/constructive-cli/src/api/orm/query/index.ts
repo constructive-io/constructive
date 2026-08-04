@@ -20,6 +20,10 @@ export interface ApplyRegistryDefaultsVariables {
   data?: unknown;
   nodeType?: string;
 }
+export interface ResolveDeepLinkVariables {
+  linkSlug?: string;
+  targetSiteId?: string;
+}
 export interface ResolveHttpRouteVariables {
   requestHost?: string;
   requestMethod?: string;
@@ -29,6 +33,9 @@ export interface ResolveRouteVariables {
   requestHost?: string;
   requestMethod?: string;
   requestPath?: string;
+}
+export interface ResolveSiteAppLinksVariables {
+  targetSiteId?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
@@ -88,6 +95,39 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'nodeType',
               type: 'String',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    resolveDeepLink: (
+      args: ResolveDeepLinkVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        resolveDeepLink: unknown | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'ResolveDeepLink',
+        fieldName: 'resolveDeepLink',
+        ...buildCustomDocument(
+          'query',
+          'ResolveDeepLink',
+          'resolveDeepLink',
+          options?.select,
+          args,
+          [
+            {
+              name: 'linkSlug',
+              type: 'String',
+            },
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
             },
           ],
           connectionFieldsMap,
@@ -166,6 +206,35 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ResolveRouteRecord'
+        ),
+      }),
+    resolveSiteAppLinks: (
+      args: ResolveSiteAppLinksVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        resolveSiteAppLinks: unknown | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'ResolveSiteAppLinks',
+        fieldName: 'resolveSiteAppLinks',
+        ...buildCustomDocument(
+          'query',
+          'ResolveSiteAppLinks',
+          'resolveSiteAppLinks',
+          options?.select,
+          args,
+          [
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
         ),
       }),
   };

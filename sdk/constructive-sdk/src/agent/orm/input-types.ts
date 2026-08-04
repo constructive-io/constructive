@@ -1632,7 +1632,6 @@ export interface CreateAgentResourceInput {
     description?: string;
     embedding?: number[];
     embeddingText?: string;
-    embeddingUpdatedAt?: string;
     isActive?: boolean;
     isArchived?: boolean;
     keywords?: string[];
@@ -1651,7 +1650,6 @@ export interface AgentResourcePatch {
   description?: string | null;
   embedding?: number[] | null;
   embeddingText?: string | null;
-  embeddingUpdatedAt?: string | null;
   isActive?: boolean | null;
   isArchived?: boolean | null;
   keywords?: string[] | null;
@@ -2114,7 +2112,6 @@ export interface AgentResourceInput {
   embedding?: number[];
   /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
-  embeddingUpdatedAt?: string;
   id?: string;
   /** Whether this resource is active and retrievable */
   isActive?: boolean;

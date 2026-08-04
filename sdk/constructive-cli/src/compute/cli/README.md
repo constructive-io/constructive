@@ -28,6 +28,7 @@ csdk auth set-token <your-token>
 | `config` | Manage config key-value store (per-context) |
 | `db-preset` | dbPreset CRUD operations |
 | `function-api-binding` | functionApiBinding CRUD operations |
+| `function-capability-binding` | functionCapabilityBinding CRUD operations |
 | `function-definition` | functionDefinition CRUD operations |
 | `function-deployment` | functionDeployment CRUD operations |
 | `function-deployment-event` | functionDeploymentEvent CRUD operations |
@@ -52,6 +53,7 @@ csdk auth set-token <your-token>
 | `namespace` | namespace CRUD operations |
 | `namespace-event` | namespaceEvent CRUD operations |
 | `platform-function-api-binding` | platformFunctionApiBinding CRUD operations |
+| `platform-function-capability-binding` | platformFunctionCapabilityBinding CRUD operations |
 | `platform-function-definition` | platformFunctionDefinition CRUD operations |
 | `platform-function-deployment` | platformFunctionDeployment CRUD operations |
 | `platform-function-deployment-event` | platformFunctionDeploymentEvent CRUD operations |
@@ -226,6 +228,37 @@ CRUD operations for FunctionApiBinding records.
 
 **Required create fields:** `apiId`, `functionDefinitionId`
 **Optional create fields (backend defaults):** `alias`, `config`
+
+### `function-capability-binding`
+
+CRUD operations for FunctionCapabilityBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionCapabilityBinding records |
+| `find-first` | Find first matching functionCapabilityBinding record |
+| `get` | Get a functionCapabilityBinding by id |
+| `create` | Create a new functionCapabilityBinding |
+| `update` | Update an existing functionCapabilityBinding |
+| `delete` | Delete a functionCapabilityBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `bucketId` | UUID |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `functionId` | UUID |
+| `graphId` | UUID |
+| `id` | UUID |
+| `key` | String |
+| `lifecycle` | String |
+| `metadata` | JSON |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `lifecycle`
+**Optional create fields (backend defaults):** `bucketId`, `functionId`, `graphId`, `key`, `metadata`
 
 ### `function-definition`
 
@@ -1000,6 +1033,36 @@ CRUD operations for PlatformFunctionApiBinding records.
 **Required create fields:** `apiId`, `functionDefinitionId`
 **Optional create fields (backend defaults):** `alias`, `config`
 
+### `platform-function-capability-binding`
+
+CRUD operations for PlatformFunctionCapabilityBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformFunctionCapabilityBinding records |
+| `find-first` | Find first matching platformFunctionCapabilityBinding record |
+| `get` | Get a platformFunctionCapabilityBinding by id |
+| `create` | Create a new platformFunctionCapabilityBinding |
+| `update` | Update an existing platformFunctionCapabilityBinding |
+| `delete` | Delete a platformFunctionCapabilityBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `bucketId` | UUID |
+| `createdAt` | Datetime |
+| `functionId` | UUID |
+| `graphId` | UUID |
+| `id` | UUID |
+| `key` | String |
+| `lifecycle` | String |
+| `metadata` | JSON |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `lifecycle`
+**Optional create fields (backend defaults):** `bucketId`, `functionId`, `graphId`, `key`, `metadata`
+
 ### `platform-function-definition`
 
 CRUD operations for PlatformFunctionDefinition records.
@@ -1464,6 +1527,7 @@ CRUD operations for PlatformResource records.
 | `memoryRequestBytes` | BigInt |
 | `name` | String |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `replicas` | Int |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
@@ -1478,7 +1542,7 @@ CRUD operations for PlatformResource records.
 | `updatedBy` | UUID |
 
 **Required create fields:** `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `realm`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
 
 ### `platform-resource-declared-capacity`
 
@@ -1541,6 +1605,7 @@ CRUD operations for PlatformResourceDefinition records.
 | `labels` | JSON |
 | `name` | String |
 | `namespaceId` | UUID |
+| `paramsSchema` | JSON |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
 | `slug` | String |
@@ -1549,7 +1614,7 @@ CRUD operations for PlatformResourceDefinition records.
 | `updatedBy` | UUID |
 
 **Required create fields:** `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `defaultSpec`, `description`, `integrations`, `labels`, `requiredConfigs`, `requiredSecrets`, `stepUpMinAge`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `defaultSpec`, `description`, `integrations`, `labels`, `paramsSchema`, `requiredConfigs`, `requiredSecrets`, `stepUpMinAge`, `updatedBy`
 
 ### `platform-resource-event`
 
@@ -1774,6 +1839,7 @@ CRUD operations for PlatformResourcesHealth records.
 | `memoryRequestBytes` | BigInt |
 | `name` | String |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `replicas` | Int |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
@@ -1788,7 +1854,7 @@ CRUD operations for PlatformResourcesHealth records.
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
 
-**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `errorCount`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `updatedBy`
+**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `errorCount`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `realm`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `updatedBy`
 
 ### `platform-resources-requirements-state`
 
@@ -1839,13 +1905,14 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 | `name` | String |
 | `namespaceId` | UUID |
 | `present` | Boolean |
+| `realm` | String |
 | `required` | Boolean |
 | `requirementKind` | String |
 | `resourceId` | UUID |
 | `secretsObjectName` | String |
 | `slug` | String |
 
-**Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+**Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
 
 ### `platform-webhook-endpoint`
 
@@ -1949,6 +2016,7 @@ CRUD operations for Resource records.
 | `memoryRequestBytes` | BigInt |
 | `name` | String |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `replicas` | Int |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
@@ -1963,7 +2031,7 @@ CRUD operations for Resource records.
 | `updatedBy` | UUID |
 
 **Required create fields:** `databaseId`, `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `realm`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
 
 ### `resource-declared-capacity`
 
@@ -2027,6 +2095,7 @@ CRUD operations for ResourceDefinition records.
 | `labels` | JSON |
 | `name` | String |
 | `namespaceId` | UUID |
+| `paramsSchema` | JSON |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
 | `slug` | String |
@@ -2035,7 +2104,7 @@ CRUD operations for ResourceDefinition records.
 | `updatedBy` | UUID |
 
 **Required create fields:** `databaseId`, `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `defaultSpec`, `description`, `integrations`, `labels`, `requiredConfigs`, `requiredSecrets`, `stepUpMinAge`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `defaultSpec`, `description`, `integrations`, `labels`, `paramsSchema`, `requiredConfigs`, `requiredSecrets`, `stepUpMinAge`, `updatedBy`
 
 ### `resource-event`
 
@@ -2266,6 +2335,7 @@ CRUD operations for ResourcesHealth records.
 | `memoryRequestBytes` | BigInt |
 | `name` | String |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `replicas` | Int |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
@@ -2280,7 +2350,7 @@ CRUD operations for ResourcesHealth records.
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
 
-**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `databaseId`, `errorCount`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `updatedBy`
+**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `databaseId`, `errorCount`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `realm`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `updatedBy`
 
 ### `resources-requirements-state`
 
@@ -2331,13 +2401,14 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `name` | String |
 | `namespaceId` | UUID |
 | `present` | Boolean |
+| `realm` | String |
 | `required` | Boolean |
 | `requirementKind` | String |
 | `resourceId` | UUID |
 | `secretsObjectName` | String |
 | `slug` | String |
 
-**Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+**Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
 
 ### `webhook-endpoint`
 
@@ -2670,6 +2741,7 @@ platformResourceInstallationsInstall
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
+  | `--input.definitionIds` | UUID |
   | `--input.name` | String |
   | `--input.namespaceId` | UUID |
   | `--input.newParams` | JSON |
@@ -2738,6 +2810,7 @@ resourceInstallationsInstall
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
+  | `--input.definitionIds` | UUID |
   | `--input.name` | String |
   | `--input.namespaceId` | UUID |
   | `--input.newParams` | JSON |

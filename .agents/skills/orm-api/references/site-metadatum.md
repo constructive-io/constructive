@@ -9,8 +9,8 @@ SEO and social sharing metadata for a site surface
 ```typescript
 db.siteMetadatum.findMany({ select: { id: true } }).execute()
 db.siteMetadatum.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.siteMetadatum.create({ data: { databaseId: '<UUID>', description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' }, select: { id: true } }).execute()
-db.siteMetadatum.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.siteMetadatum.create({ data: { appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', databaseId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' }, select: { id: true } }).execute()
+db.siteMetadatum.update({ where: { id: '<UUID>' }, data: { appleTouchIcon: '<Image>' }, select: { id: true } }).execute()
 db.siteMetadatum.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.siteMetadatum.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.siteMetadatum.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, appleTouchIcon: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.siteMetadatum.findMany({
 
 ```typescript
 const item = await db.siteMetadatum.create({
-  data: { databaseId: '<UUID>', description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' },
+  data: { appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', databaseId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' },
   select: { id: true }
 }).execute();
 ```

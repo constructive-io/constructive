@@ -14,6 +14,7 @@ export interface Config {
   name: string | null;
   namespaceId: string | null;
   provider: string | null;
+  realm: string | null;
   updatedAt: string | null;
   value: string | null;
 }
@@ -27,6 +28,7 @@ export interface PlatformConfig {
   name: string | null;
   namespaceId: string | null;
   provider: string | null;
+  realm: string | null;
   updatedAt: string | null;
   value: string | null;
 }
@@ -38,6 +40,7 @@ export interface PlatformInternalSecret {
   labels: unknown | null;
   name: string | null;
   namespaceId: string | null;
+  realm: string | null;
   retiredAt: string | null;
   rotatedAt: string | null;
   updatedAt: string | null;
@@ -51,6 +54,7 @@ export interface PlatformSecret {
   name: string | null;
   namespaceId: string | null;
   provider: string | null;
+  realm: string | null;
   retiredAt: string | null;
   rotatedAt: string | null;
   updatedAt: string | null;
@@ -65,6 +69,7 @@ export interface Secret {
   name: string | null;
   namespaceId: string | null;
   provider: string | null;
+  realm: string | null;
   retiredAt: string | null;
   rotatedAt: string | null;
   updatedAt: string | null;

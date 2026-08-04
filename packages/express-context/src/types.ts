@@ -78,6 +78,62 @@ export interface AuthSettings {
   captchaSiteKey?: string | null;
 }
 
+/**
+ * Where a tenant's auth surface physically lives.
+ *
+ * Only schemas and relation names — the generated procedure names
+ * (`sign_in_identity`, `sign_up_identity`, `verify_idp`, `link_identity`) are
+ * fixed by the generators that emit them.
+ */
+export interface AuthSurface {
+  /** Schema holding `sign_in_identity` / `sign_up_identity` / `verify_idp`. */
+  privateSchema: string;
+  /** Schema holding `link_identity` (an authenticated user action). */
+  publicSchema: string;
+  /** Schema holding the user-facing identifier views (`emails`, connected accounts). */
+  identifiersPublicSchema: string;
+  /** Physical name of the emails relation in that schema. */
+  emailsTable: string;
+  /** Physical name of the connected-accounts relation the owner can read. */
+  connectedAccountsView: string;
+}
+
+/** One identity provider row, with its client secret resolved. */
+export interface IdentityProviderConfig {
+  id: string;
+  /** The `:provider` path segment. */
+  slug: string;
+  kind: string;
+  displayName: string;
+  enabled: boolean;
+  clientId: string;
+  clientSecret: string | null;
+  authorizationUrl: string | null;
+  tokenUrl: string | null;
+  userinfoUrl: string | null;
+  issuerUrl: string | null;
+  discoveryUrlOverride: string | null;
+  discoveryDoc: Record<string, unknown> | null;
+  /** Cached JWKS for id_token verification, refreshed by the callback leg. */
+  jwks: Record<string, unknown> | null;
+  jwksFetchedAt: Date | null;
+  /** Additional audiences accepted in an id_token (native app clients). */
+  acceptableClientIds: string[];
+  scopes: string[];
+  extraAuthorizationParams: Record<string, string>;
+  emailOptional: boolean;
+  allowLinkByEmail: boolean;
+  skipNonceCheck: boolean;
+  pkceEnabled: boolean;
+}
+
+export interface IdentityProvidersModule {
+  /** Keyed by slug. */
+  providers: Record<string, IdentityProviderConfig>;
+  /** Physical location the providers were read from, for error context. */
+  source: { schemaName: string; tableName: string };
+}
+
 export interface ApiStructure {
   apiId?: string;
   dbname: string;
@@ -184,6 +240,8 @@ export interface BuiltinModuleMap {
   corsOrigins: string[];
   databaseSettings: DatabaseSettings;
   authSettings: AuthSettings;
+  authSurface: AuthSurface;
+  identityProviders: IdentityProvidersModule;
   pubkeyChallengeSettings: PubkeyChallengeSettings;
   webauthnSettings: WebauthnSettings;
   billing: BillingConfig;

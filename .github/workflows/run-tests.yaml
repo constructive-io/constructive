@@ -72,6 +72,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # A package with tests that no batch below claims runs nowhere, and until
+      # this check existed nothing said so.
+      - name: Check test coverage of the CI matrix
+        run: node scripts/check-test-coverage.cjs
+
       - name: Build
         run: pnpm run build
 
@@ -97,13 +102,19 @@ jobs:
       matrix:
         include:
           - batch: uploads
-            packages: 'uploads/mime-bytes uploads/uuid-hash uploads/uuid-stream uploads/etag-hash uploads/etag-stream uploads/stream-to-etag uploads/content-type-stream uploads/upload-names'
+            packages: 'uploads/mime-bytes uploads/uuid-hash uploads/uuid-stream uploads/etag-hash uploads/etag-stream uploads/stream-to-etag uploads/content-type-stream uploads/upload-names uploads/s3-utils'
           - batch: packages-core
-            packages: 'packages/url-domains postgres/query-builder packages/csrf packages/oauth packages/12factor-env packages/orm'
+            packages: 'packages/url-domains postgres/query-builder packages/csrf packages/oauth packages/12factor-env packages/orm packages/express-context packages/errors packages/llm-env packages/node-type-registry packages/query-spec packages/server-utils postgres/pg-cache postgres/pg-env'
           - batch: packages-services
             packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli postgres/pgsql-client postgres/pg-ast'
           - batch: graphql
             packages: 'graphql/query graphql/codegen'
+          - batch: graphile-unit
+            packages: 'graphile/graphile-plugin-utils graphile/graphile-realtime-subscriptions graphile/graphile-sql-expression-validator graphile/graphile-upload-plugin'
+          - batch: agentic
+            packages: 'agentic/protocol agentic/agentic-kit agentic/agent agentic/harness agentic/chat agentic/cli agentic/pi agentic/react agentic/agentic-server agentic/anthropic agentic/openai agentic/ollama'
+          - batch: pgpm-unit
+            packages: 'pgpm/types pgpm/naming-spec pgpm/diff pgpm/import pgpm/slice pgpm/transform'
           - batch: pglite
             packages: 'postgres/pglite-adapter postgres/pglite-test examples/pglite-socket examples/pgpm-projections'
 
@@ -230,11 +241,13 @@ jobs:
       matrix:
         include:
           - batch: pg-core
-            packages: 'pgpm/ast pgpm/traverse pgpm/bundle pgpm/core pgpm/cli pgpm/portability packages/client packages/safegres postgres/pg-codegen'
+            packages: 'pgpm/ast pgpm/traverse pgpm/bundle pgpm/core pgpm/cli pgpm/portability pgpm/export packages/client packages/safegres postgres/pg-codegen'
           - batch: pg-postgres
             packages: 'postgres/pgsql-test postgres/drizzle-orm-test postgres/introspectron graphile/graphile-test graphile/graphile-connection-filter graphile/graphile-postgis'
           - batch: pg-graphql
             packages: 'graphile/graphile-search graphile/graphile-ltree graphile/graphile-bulk-mutations graphile/graphile-function-bindings graphile/graphile-history graphile/graphile-meta graphile/graphile-schema graphql/orm-test graphql/test graphql/playwright-test'
+          - batch: pg-graphile-extras
+            packages: 'graphile/graphile-i18n graphile/graphile-pg-aggregates graphile/graphile-query'
 
     env:
       PGHOST: localhost

@@ -51,6 +51,7 @@ export { MembershipsModuleModel } from './membershipsModule';
 export { MerkleStoreModuleModel } from './merkleStoreModule';
 export { NamespaceModuleModel } from './namespaceModule';
 export { NotificationsModuleModel } from './notificationsModule';
+export { PagesModuleModel } from './pagesModule';
 export { PermissionsModuleModel } from './permissionsModule';
 export { PhoneNumbersModuleModel } from './phoneNumbersModule';
 export { PlansModuleModel } from './plansModule';

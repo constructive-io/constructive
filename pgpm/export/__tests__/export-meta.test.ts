@@ -3,7 +3,7 @@
  * 
  * These tests validate that META_TABLE_CONFIG uses correct table names,
  * schema groupings, and field definitions for exporting metaschema_public,
- * constructive_routing_public, constructive_apps_public, and
+ * routing_public, apps_public, and
  * metaschema_modules_public data.
  * 
  * Uses actual imports instead of string-matching source files.
@@ -29,25 +29,25 @@ describe('Export Meta Config Validation', () => {
     });
   });
 
-  describe('constructive_routing_public tables', () => {
+  describe('routing_public tables', () => {
     const required = [
       'domains', 'sites', 'apis',
       'site_modules', 'site_themes', 'site_metadata',
-      'api_modules', 'api_schemas'
+      'api_schemas'
     ];
 
-    it('should include all required constructive_routing_public tables in config', () => {
+    it('should include all required routing_public tables in config', () => {
       for (const table of required) {
         expect(META_TABLE_CONFIG).toHaveProperty(table);
-        expect(META_TABLE_CONFIG[table].schema).toBe('constructive_routing_public');
+        expect(META_TABLE_CONFIG[table].schema).toBe('routing_public');
       }
     });
   });
 
-  describe('constructive_apps_public tables', () => {
+  describe('apps_public tables', () => {
     it('should include apps in config', () => {
       expect(META_TABLE_CONFIG).toHaveProperty('apps');
-      expect(META_TABLE_CONFIG.apps.schema).toBe('constructive_apps_public');
+      expect(META_TABLE_CONFIG.apps.schema).toBe('apps_public');
     });
   });
 

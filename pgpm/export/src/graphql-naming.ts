@@ -9,8 +9,8 @@
  * Examples:
  *   metaschema_public.database -> databases (query), Database (type)
  *   metaschema_public.foreign_key_constraint -> foreignKeyConstraints
- *   constructive_routing_public.api_schemas -> apiSchemas
- *   constructive_apps_public.apps -> apps
+ *   routing_public.api_schemas -> apiSchemas
+ *   apps_public.apps -> apps
  *   metaschema_modules_public.api_surface_module -> apiSurfaceModules
  *   db_migrate.sql_actions -> sqlActions
  *   column database_id -> databaseId

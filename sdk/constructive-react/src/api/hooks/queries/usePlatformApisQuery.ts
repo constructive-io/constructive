@@ -7,59 +7,40 @@
 import { useQuery } from '@tanstack/react-query';
 import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { platformApiKeys } from '../query-keys';
-import type {
-  PlatformApiSelect,
-  PlatformApiWithRelations,
-  PlatformApiFilter,
-  PlatformApiOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PlatformApiSelect,
-  PlatformApiWithRelations,
-  PlatformApiFilter,
-  PlatformApiOrderBy,
-} from '../../orm/input-types';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformApisKeys } from '../query-keys';
+import type { PlatformApisSelect, PlatformApisWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { PlatformApisSelect, PlatformApisWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
-export const platformApisQueryKey = platformApiKeys.list;
+export const platformApisQueryKey = platformApisKeys.detail;
 /**
  * API surfaces exposed by this scope; publication makes a surface bindable from other scopes
  *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformApisQuery({
- *   selection: {
- *     fields: { id: true, name: true },
- *     where: { name: { equalTo: "example" } },
- *     orderBy: ['CREATED_AT_DESC'],
- *     first: 10,
- *   },
+ *   id: 'some-id',
+ *   selection: { fields: { id: true, name: true } },
  * });
  * ```
  */
 export function usePlatformApisQuery<
-  S extends PlatformApiSelect,
+  S extends PlatformApisSelect,
   TData = {
-    platformApis: ConnectionResult<InferSelectResult<PlatformApiWithRelations, S>>;
+    platformApis: InferSelectResult<PlatformApisWithRelations, S> | null;
   },
 >(
   params: {
+    id: string;
     selection: {
       fields: S;
-    } & Omit<ListSelectionConfig<S, PlatformApiFilter, PlatformApiOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PlatformApiSelect>;
+    } & HookStrictSelect<NoInfer<S>, PlatformApisSelect>;
   } & Omit<
     UseQueryOptions<
       {
-        platformApis: ConnectionResult<InferSelectResult<PlatformApiWithRelations, S>>;
+        platformApis: InferSelectResult<PlatformApisWithRelations, S> | null;
       },
       Error,
       TData
@@ -69,17 +50,22 @@ export function usePlatformApisQuery<
 ): UseQueryResult<TData>;
 export function usePlatformApisQuery(
   params: {
-    selection: ListSelectionConfig<PlatformApiSelect, PlatformApiFilter, PlatformApiOrderBy>;
+    id: string;
+    selection: SelectionConfig<PlatformApisSelect>;
   } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
 ) {
-  const args = buildListSelectionArgs<PlatformApiSelect, PlatformApiFilter, PlatformApiOrderBy>(
-    params.selection
-  );
+  const args = buildSelectionArgs<PlatformApisSelect>(params.selection);
   const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
-    queryKey: platformApiKeys.list(args),
-    queryFn: () => getClient().platformApi.findMany(args).unwrap(),
+    queryKey: platformApisKeys.detail(params.id),
+    queryFn: () =>
+      getClient()
+        .platformApis.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
     ...queryOptions,
   });
 }
@@ -89,57 +75,64 @@ export function usePlatformApisQuery(
  * @example
  * ```ts
  * const data = await fetchPlatformApisQuery({
- *   selection: {
- *     fields: { id: true },
- *     first: 10,
- *   },
+ *   id: 'some-id',
+ *   selection: { fields: { id: true } },
  * });
  * ```
  */
-export async function fetchPlatformApisQuery<S extends PlatformApiSelect>(params: {
+export async function fetchPlatformApisQuery<S extends PlatformApisSelect>(params: {
+  id: string;
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformApiFilter, PlatformApiOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, PlatformApiSelect>;
+  } & HookStrictSelect<NoInfer<S>, PlatformApisSelect>;
 }): Promise<{
-  platformApis: ConnectionResult<InferSelectResult<PlatformApiWithRelations, S>>;
+  platformApis: InferSelectResult<PlatformApisWithRelations, S> | null;
 }>;
 export async function fetchPlatformApisQuery(params: {
-  selection: ListSelectionConfig<PlatformApiSelect, PlatformApiFilter, PlatformApiOrderBy>;
-}) {
-  const args = buildListSelectionArgs<PlatformApiSelect, PlatformApiFilter, PlatformApiOrderBy>(
-    params.selection
-  );
-  return getClient().platformApi.findMany(args).unwrap();
+  id: string;
+  selection: SelectionConfig<PlatformApisSelect>;
+}): Promise<any> {
+  const args = buildSelectionArgs<PlatformApisSelect>(params.selection);
+  return getClient()
+    .platformApis.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * API surfaces exposed by this scope; publication makes a surface bindable from other scopes
  *
  * @example
  * ```ts
- * await prefetchPlatformApisQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
+ * await prefetchPlatformApisQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformApisQuery<S extends PlatformApiSelect>(
+export async function prefetchPlatformApisQuery<S extends PlatformApisSelect>(
   queryClient: QueryClient,
   params: {
+    id: string;
     selection: {
       fields: S;
-    } & Omit<ListSelectionConfig<S, PlatformApiFilter, PlatformApiOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PlatformApiSelect>;
+    } & HookStrictSelect<NoInfer<S>, PlatformApisSelect>;
   }
 ): Promise<void>;
 export async function prefetchPlatformApisQuery(
   queryClient: QueryClient,
   params: {
-    selection: ListSelectionConfig<PlatformApiSelect, PlatformApiFilter, PlatformApiOrderBy>;
+    id: string;
+    selection: SelectionConfig<PlatformApisSelect>;
   }
 ): Promise<void> {
-  const args = buildListSelectionArgs<PlatformApiSelect, PlatformApiFilter, PlatformApiOrderBy>(
-    params.selection
-  );
+  const args = buildSelectionArgs<PlatformApisSelect>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: platformApiKeys.list(args),
-    queryFn: () => getClient().platformApi.findMany(args).unwrap(),
+    queryKey: platformApisKeys.detail(params.id),
+    queryFn: () =>
+      getClient()
+        .platformApis.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

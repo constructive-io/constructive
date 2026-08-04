@@ -7,7 +7,7 @@ React Query hooks for ResourcesResolvedRequirement data operations
 ## Usage
 
 ```typescript
-useResourcesResolvedRequirementsQuery({ selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } } })
+useResourcesResolvedRequirementsQuery({ selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } } })
 useCreateResourcesResolvedRequirementMutation({ selection: { fields: { id: true } } })
 ```
 
@@ -17,7 +17,7 @@ useCreateResourcesResolvedRequirementMutation({ selection: { fields: { id: true 
 
 ```typescript
 const { data, isLoading } = useResourcesResolvedRequirementsQuery({
-  selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } },
+  selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } },
 });
 ```
 
@@ -27,5 +27,5 @@ const { data, isLoading } = useResourcesResolvedRequirementsQuery({
 const { mutate } = useCreateResourcesResolvedRequirementMutation({
   selection: { fields: { id: true } },
 });
-mutate({ atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' });
+mutate({ atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', realm: '<String>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' });
 ```

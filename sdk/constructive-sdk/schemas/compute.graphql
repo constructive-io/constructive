@@ -449,6 +449,41 @@ type CreateFunctionApiBindingPayload {
   query: Query
 }
 
+"""All input for the create `FunctionCapabilityBinding` mutation."""
+input CreateFunctionCapabilityBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `FunctionCapabilityBinding` to be created by this mutation."""
+  functionCapabilityBinding: FunctionCapabilityBindingInput!
+}
+
+"""The output of our create `FunctionCapabilityBinding` mutation."""
+type CreateFunctionCapabilityBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionCapabilityBinding` that was created by this mutation."""
+  functionCapabilityBinding: FunctionCapabilityBinding
+
+  """An edge for our `FunctionCapabilityBinding`. May be used by Relay 1."""
+  functionCapabilityBindingEdge(
+    """The method to use when ordering `FunctionCapabilityBinding`."""
+    orderBy: [FunctionCapabilityBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionCapabilityBindingEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `FunctionDefinition` mutation."""
 input CreateFunctionDefinitionInput {
   """
@@ -1213,6 +1248,47 @@ type CreatePlatformFunctionApiBindingPayload {
     """The method to use when ordering `PlatformFunctionApiBinding`."""
     orderBy: [PlatformFunctionApiBindingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformFunctionApiBindingEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformFunctionCapabilityBinding` mutation."""
+input CreatePlatformFunctionCapabilityBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The `PlatformFunctionCapabilityBinding` to be created by this mutation.
+  """
+  platformFunctionCapabilityBinding: PlatformFunctionCapabilityBindingInput!
+}
+
+"""The output of our create `PlatformFunctionCapabilityBinding` mutation."""
+type CreatePlatformFunctionCapabilityBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  The `PlatformFunctionCapabilityBinding` that was created by this mutation.
+  """
+  platformFunctionCapabilityBinding: PlatformFunctionCapabilityBinding
+
+  """
+  An edge for our `PlatformFunctionCapabilityBinding`. May be used by Relay 1.
+  """
+  platformFunctionCapabilityBindingEdge(
+    """The method to use when ordering `PlatformFunctionCapabilityBinding`."""
+    orderBy: [PlatformFunctionCapabilityBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformFunctionCapabilityBindingEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2697,6 +2773,39 @@ type DeleteFunctionApiBindingPayload {
   query: Query
 }
 
+"""All input for the `deleteFunctionCapabilityBinding` mutation."""
+input DeleteFunctionCapabilityBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `FunctionCapabilityBinding` mutation."""
+type DeleteFunctionCapabilityBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionCapabilityBinding` that was deleted by this mutation."""
+  functionCapabilityBinding: FunctionCapabilityBinding
+
+  """An edge for our `FunctionCapabilityBinding`. May be used by Relay 1."""
+  functionCapabilityBindingEdge(
+    """The method to use when ordering `FunctionCapabilityBinding`."""
+    orderBy: [FunctionCapabilityBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionCapabilityBindingEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deleteFunctionDefinition` mutation."""
 input DeleteFunctionDefinitionInput {
   """
@@ -3498,6 +3607,43 @@ type DeletePlatformFunctionApiBindingPayload {
     """The method to use when ordering `PlatformFunctionApiBinding`."""
     orderBy: [PlatformFunctionApiBindingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformFunctionApiBindingEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformFunctionCapabilityBinding` mutation."""
+input DeletePlatformFunctionCapabilityBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformFunctionCapabilityBinding` mutation."""
+type DeletePlatformFunctionCapabilityBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  The `PlatformFunctionCapabilityBinding` that was deleted by this mutation.
+  """
+  platformFunctionCapabilityBinding: PlatformFunctionCapabilityBinding
+
+  """
+  An edge for our `PlatformFunctionCapabilityBinding`. May be used by Relay 1.
+  """
+  platformFunctionCapabilityBindingEdge(
+    """The method to use when ordering `PlatformFunctionCapabilityBinding`."""
+    orderBy: [PlatformFunctionCapabilityBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformFunctionCapabilityBindingEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -4785,6 +4931,225 @@ input FunctionApiBindingToManyFunctionInvocationFilter {
 }
 
 """
+Capability bindings — declarative grants of typed resource capabilities (buckets) to function/graph holders per lifecycle
+"""
+type FunctionCapabilityBinding {
+  """Bucket this capability targets (exactly one typed target is set)"""
+  bucketId: UUID
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """
+  Reads a single `FunctionDefinition` that is related to this `FunctionCapabilityBinding`.
+  """
+  function: FunctionDefinition
+
+  """
+  Function definition holding this capability (exactly one of function_id / graph_id is set)
+  """
+  functionId: UUID
+
+  """
+  Flow graph holding this capability (exactly one of function_id / graph_id is set)
+  """
+  graphId: UUID
+  id: UUID!
+
+  """
+  Runtime handle the holder addresses this capability by (e.g. default, scratch)
+  """
+  key: String!
+
+  """
+  Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree)
+  """
+  lifecycle: String!
+
+  """Per-binding annotations (no runtime semantics)"""
+  metadata: JSON
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `FunctionCapabilityBinding` values."""
+type FunctionCapabilityBindingConnection {
+  """
+  A list of edges which contains the `FunctionCapabilityBinding` and cursor to aid in pagination.
+  """
+  edges: [FunctionCapabilityBindingEdge]!
+
+  """A list of `FunctionCapabilityBinding` objects."""
+  nodes: [FunctionCapabilityBinding]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `FunctionCapabilityBinding` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `FunctionCapabilityBinding` edge in the connection."""
+type FunctionCapabilityBindingEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `FunctionCapabilityBinding` at the end of the edge."""
+  node: FunctionCapabilityBinding
+}
+
+"""
+A filter to be used against `FunctionCapabilityBinding` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionCapabilityBindingFilter {
+  """Checks for all expressions in this list."""
+  and: [FunctionCapabilityBindingFilter!]
+
+  """Filter by the object’s `bucketId` field."""
+  bucketId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `function` relation."""
+  function: FunctionDefinitionFilter
+
+  """A related `function` exists."""
+  functionExists: Boolean
+
+  """Filter by the object’s `functionId` field."""
+  functionId: UUIDFilter
+
+  """Filter by the object’s `graphId` field."""
+  graphId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `key` field."""
+  key: StringFilter
+
+  """Filter by the object’s `lifecycle` field."""
+  lifecycle: StringFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Negates the expression."""
+  not: FunctionCapabilityBindingFilter
+
+  """Checks for any expressions in this list."""
+  or: [FunctionCapabilityBindingFilter!]
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `FunctionCapabilityBinding`"""
+input FunctionCapabilityBindingInput {
+  """Bucket this capability targets (exactly one typed target is set)"""
+  bucketId: UUID
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """
+  Function definition holding this capability (exactly one of function_id / graph_id is set)
+  """
+  functionId: UUID
+
+  """
+  Flow graph holding this capability (exactly one of function_id / graph_id is set)
+  """
+  graphId: UUID
+  id: UUID
+
+  """
+  Runtime handle the holder addresses this capability by (e.g. default, scratch)
+  """
+  key: String
+
+  """
+  Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree)
+  """
+  lifecycle: String!
+
+  """Per-binding annotations (no runtime semantics)"""
+  metadata: JSON
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `FunctionCapabilityBinding`."""
+enum FunctionCapabilityBindingOrderBy {
+  BUCKET_ID_ASC
+  BUCKET_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  FUNCTION_ID_ASC
+  FUNCTION_ID_DESC
+  GRAPH_ID_ASC
+  GRAPH_ID_DESC
+  ID_ASC
+  ID_DESC
+  KEY_ASC
+  KEY_DESC
+  LIFECYCLE_ASC
+  LIFECYCLE_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `FunctionCapabilityBinding`. Fields that are set will be updated.
+"""
+input FunctionCapabilityBindingPatch {
+  """Bucket this capability targets (exactly one typed target is set)"""
+  bucketId: UUID
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """
+  Function definition holding this capability (exactly one of function_id / graph_id is set)
+  """
+  functionId: UUID
+
+  """
+  Flow graph holding this capability (exactly one of function_id / graph_id is set)
+  """
+  graphId: UUID
+  id: UUID
+
+  """
+  Runtime handle the holder addresses this capability by (e.g. default, scratch)
+  """
+  key: String
+
+  """
+  Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree)
+  """
+  lifecycle: String
+
+  """Per-binding annotations (no runtime semantics)"""
+  metadata: JSON
+  updatedAt: Datetime
+}
+
+"""
 Function definitions — registered cloud functions with routing, queue, and retry configuration
 """
 type FunctionDefinition {
@@ -4849,6 +5214,37 @@ type FunctionDefinition {
     """
     where: FunctionApiBindingFilter
   ): FunctionApiBindingConnection!
+
+  """
+  Reads and enables pagination through a set of `FunctionCapabilityBinding`.
+  """
+  functionCapabilityBindingsByFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `FunctionCapabilityBinding`."""
+    orderBy: [FunctionCapabilityBindingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FunctionCapabilityBindingFilter
+  ): FunctionCapabilityBindingConnection!
 
   """
   Ordered array of module_table column names holding the generated function names to invoke when runtime=sql (module mode). NULL for direct mode and other runtimes.
@@ -5095,6 +5491,14 @@ input FunctionDefinitionFilter {
 
   """`functionApiBindings` exist."""
   functionApiBindingsExist: Boolean
+
+  """
+  Filter by the object’s `functionCapabilityBindingsByFunctionId` relation.
+  """
+  functionCapabilityBindingsByFunctionId: FunctionDefinitionToManyFunctionCapabilityBindingFilter
+
+  """`functionCapabilityBindingsByFunctionId` exist."""
+  functionCapabilityBindingsByFunctionIdExist: Boolean
 
   """Filter by the object’s `functionColumns` field."""
   functionColumns: JSONFilter
@@ -5630,6 +6034,20 @@ input FunctionDefinitionToManyFunctionApiBindingFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: FunctionApiBindingFilter
+}
+
+"""
+A filter to be used against many `FunctionCapabilityBinding` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionDefinitionToManyFunctionCapabilityBindingFilter {
+  """Filters to entities where every related entity matches."""
+  every: FunctionCapabilityBindingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: FunctionCapabilityBindingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: FunctionCapabilityBindingFilter
 }
 
 """
@@ -10254,6 +10672,8 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """PostgreSQL column name"""
+  columnName: String!
   description: String
 
   """Enum metadata if this field has an enum type"""
@@ -10262,6 +10682,8 @@ type MetaField {
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
+
+  """Final GraphQL field name"""
   name: String!
   type: MetaType!
 }
@@ -10350,7 +10772,7 @@ type MetaPrimaryKeyConstraint {
 
 """Table query/mutation names"""
 type MetaQuery {
-  all: String!
+  all: String
   create: String
   delete: String
   one: String
@@ -10487,6 +10909,8 @@ type MetaTable {
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
@@ -10504,6 +10928,9 @@ type MetaTable {
 
   """Storage metadata (null if not a storage table)"""
   storage: MetaStorage
+
+  """PostgreSQL table name"""
+  tableName: String!
   uniqueConstraints: [MetaUniqueConstraint!]!
 }
 
@@ -10575,6 +11002,14 @@ type Mutation {
     """
     input: CreateFunctionApiBindingInput!
   ): CreateFunctionApiBindingPayload
+
+  """Creates a single `FunctionCapabilityBinding`."""
+  createFunctionCapabilityBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateFunctionCapabilityBindingInput!
+  ): CreateFunctionCapabilityBindingPayload
 
   """Creates a single `FunctionDefinition`."""
   createFunctionDefinition(
@@ -10749,6 +11184,14 @@ type Mutation {
     """
     input: CreatePlatformFunctionApiBindingInput!
   ): CreatePlatformFunctionApiBindingPayload
+
+  """Creates a single `PlatformFunctionCapabilityBinding`."""
+  createPlatformFunctionCapabilityBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformFunctionCapabilityBindingInput!
+  ): CreatePlatformFunctionCapabilityBindingPayload
 
   """Creates a single `PlatformFunctionDefinition`."""
   createPlatformFunctionDefinition(
@@ -11006,6 +11449,14 @@ type Mutation {
     input: DeleteFunctionApiBindingInput!
   ): DeleteFunctionApiBindingPayload
 
+  """Deletes a single `FunctionCapabilityBinding` using a unique key."""
+  deleteFunctionCapabilityBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFunctionCapabilityBindingInput!
+  ): DeleteFunctionCapabilityBindingPayload
+
   """Deletes a single `FunctionDefinition` using a unique key."""
   deleteFunctionDefinition(
     """
@@ -11181,6 +11632,16 @@ type Mutation {
     """
     input: DeletePlatformFunctionApiBindingInput!
   ): DeletePlatformFunctionApiBindingPayload
+
+  """
+  Deletes a single `PlatformFunctionCapabilityBinding` using a unique key.
+  """
+  deletePlatformFunctionCapabilityBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformFunctionCapabilityBindingInput!
+  ): DeletePlatformFunctionCapabilityBindingPayload
 
   """Deletes a single `PlatformFunctionDefinition` using a unique key."""
   deletePlatformFunctionDefinition(
@@ -11579,6 +12040,16 @@ type Mutation {
     input: UpdateFunctionApiBindingInput!
   ): UpdateFunctionApiBindingPayload
 
+  """
+  Updates a single `FunctionCapabilityBinding` using a unique key and a patch.
+  """
+  updateFunctionCapabilityBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFunctionCapabilityBindingInput!
+  ): UpdateFunctionCapabilityBindingPayload
+
   """Updates a single `FunctionDefinition` using a unique key and a patch."""
   updateFunctionDefinition(
     """
@@ -11768,6 +12239,16 @@ type Mutation {
     """
     input: UpdatePlatformFunctionApiBindingInput!
   ): UpdatePlatformFunctionApiBindingPayload
+
+  """
+  Updates a single `PlatformFunctionCapabilityBinding` using a unique key and a patch.
+  """
+  updatePlatformFunctionCapabilityBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformFunctionCapabilityBindingInput!
+  ): UpdatePlatformFunctionCapabilityBindingPayload
 
   """
   Updates a single `PlatformFunctionDefinition` using a unique key and a patch.
@@ -12934,6 +13415,211 @@ input PlatformFunctionApiBindingToManyPlatformFunctionInvocationFilter {
 }
 
 """
+Capability bindings — declarative grants of typed resource capabilities (buckets) to function/graph holders per lifecycle
+"""
+type PlatformFunctionCapabilityBinding {
+  """Bucket this capability targets (exactly one typed target is set)"""
+  bucketId: UUID
+  createdAt: Datetime
+
+  """
+  Reads a single `PlatformFunctionDefinition` that is related to this `PlatformFunctionCapabilityBinding`.
+  """
+  function: PlatformFunctionDefinition
+
+  """
+  Function definition holding this capability (exactly one of function_id / graph_id is set)
+  """
+  functionId: UUID
+
+  """
+  Flow graph holding this capability (exactly one of function_id / graph_id is set)
+  """
+  graphId: UUID
+  id: UUID!
+
+  """
+  Runtime handle the holder addresses this capability by (e.g. default, scratch)
+  """
+  key: String!
+
+  """
+  Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree)
+  """
+  lifecycle: String!
+
+  """Per-binding annotations (no runtime semantics)"""
+  metadata: JSON
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformFunctionCapabilityBinding` values."""
+type PlatformFunctionCapabilityBindingConnection {
+  """
+  A list of edges which contains the `PlatformFunctionCapabilityBinding` and cursor to aid in pagination.
+  """
+  edges: [PlatformFunctionCapabilityBindingEdge]!
+
+  """A list of `PlatformFunctionCapabilityBinding` objects."""
+  nodes: [PlatformFunctionCapabilityBinding]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformFunctionCapabilityBinding` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformFunctionCapabilityBinding` edge in the connection."""
+type PlatformFunctionCapabilityBindingEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformFunctionCapabilityBinding` at the end of the edge."""
+  node: PlatformFunctionCapabilityBinding
+}
+
+"""
+A filter to be used against `PlatformFunctionCapabilityBinding` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformFunctionCapabilityBindingFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformFunctionCapabilityBindingFilter!]
+
+  """Filter by the object’s `bucketId` field."""
+  bucketId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `function` relation."""
+  function: PlatformFunctionDefinitionFilter
+
+  """A related `function` exists."""
+  functionExists: Boolean
+
+  """Filter by the object’s `functionId` field."""
+  functionId: UUIDFilter
+
+  """Filter by the object’s `graphId` field."""
+  graphId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `key` field."""
+  key: StringFilter
+
+  """Filter by the object’s `lifecycle` field."""
+  lifecycle: StringFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Negates the expression."""
+  not: PlatformFunctionCapabilityBindingFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformFunctionCapabilityBindingFilter!]
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `PlatformFunctionCapabilityBinding`"""
+input PlatformFunctionCapabilityBindingInput {
+  """Bucket this capability targets (exactly one typed target is set)"""
+  bucketId: UUID
+  createdAt: Datetime
+
+  """
+  Function definition holding this capability (exactly one of function_id / graph_id is set)
+  """
+  functionId: UUID
+
+  """
+  Flow graph holding this capability (exactly one of function_id / graph_id is set)
+  """
+  graphId: UUID
+  id: UUID
+
+  """
+  Runtime handle the holder addresses this capability by (e.g. default, scratch)
+  """
+  key: String
+
+  """
+  Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree)
+  """
+  lifecycle: String!
+
+  """Per-binding annotations (no runtime semantics)"""
+  metadata: JSON
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `PlatformFunctionCapabilityBinding`."""
+enum PlatformFunctionCapabilityBindingOrderBy {
+  BUCKET_ID_ASC
+  BUCKET_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  FUNCTION_ID_ASC
+  FUNCTION_ID_DESC
+  GRAPH_ID_ASC
+  GRAPH_ID_DESC
+  ID_ASC
+  ID_DESC
+  KEY_ASC
+  KEY_DESC
+  LIFECYCLE_ASC
+  LIFECYCLE_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformFunctionCapabilityBinding`. Fields that are set will be updated.
+"""
+input PlatformFunctionCapabilityBindingPatch {
+  """Bucket this capability targets (exactly one typed target is set)"""
+  bucketId: UUID
+  createdAt: Datetime
+
+  """
+  Function definition holding this capability (exactly one of function_id / graph_id is set)
+  """
+  functionId: UUID
+
+  """
+  Flow graph holding this capability (exactly one of function_id / graph_id is set)
+  """
+  graphId: UUID
+  id: UUID
+
+  """
+  Runtime handle the holder addresses this capability by (e.g. default, scratch)
+  """
+  key: String
+
+  """
+  Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree)
+  """
+  lifecycle: String
+
+  """Per-binding annotations (no runtime semantics)"""
+  metadata: JSON
+  updatedAt: Datetime
+}
+
+"""
 Function definitions — registered cloud functions with routing, queue, and retry configuration
 """
 type PlatformFunctionDefinition {
@@ -13074,6 +13760,37 @@ type PlatformFunctionDefinition {
     """
     where: PlatformFunctionApiBindingFilter
   ): PlatformFunctionApiBindingConnection!
+
+  """
+  Reads and enables pagination through a set of `PlatformFunctionCapabilityBinding`.
+  """
+  platformFunctionCapabilityBindingsByFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformFunctionCapabilityBinding`."""
+    orderBy: [PlatformFunctionCapabilityBindingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformFunctionCapabilityBindingFilter
+  ): PlatformFunctionCapabilityBindingConnection!
 
   """
   Reads and enables pagination through a set of `PlatformWebhookEndpoint`.
@@ -13319,6 +14036,14 @@ input PlatformFunctionDefinitionFilter {
 
   """`platformFunctionApiBindingsByFunctionDefinitionId` exist."""
   platformFunctionApiBindingsByFunctionDefinitionIdExist: Boolean
+
+  """
+  Filter by the object’s `platformFunctionCapabilityBindingsByFunctionId` relation.
+  """
+  platformFunctionCapabilityBindingsByFunctionId: PlatformFunctionDefinitionToManyPlatformFunctionCapabilityBindingFilter
+
+  """`platformFunctionCapabilityBindingsByFunctionId` exist."""
+  platformFunctionCapabilityBindingsByFunctionIdExist: Boolean
 
   """
   Filter by the object’s `platformWebhookEndpointsByFunctionDefinitionId` relation.
@@ -13824,6 +14549,20 @@ input PlatformFunctionDefinitionToManyPlatformFunctionApiBindingFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: PlatformFunctionApiBindingFilter
+}
+
+"""
+A filter to be used against many `PlatformFunctionCapabilityBinding` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformFunctionDefinitionToManyPlatformFunctionCapabilityBindingFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformFunctionCapabilityBindingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformFunctionCapabilityBindingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformFunctionCapabilityBindingFilter
 }
 
 """
@@ -16685,6 +17424,11 @@ type PlatformResource {
   ): PlatformResourceStatusCheckConnection!
 
   """
+  Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane.
+  """
+  realm: String
+
+  """
   Desired pod count, derived from spec.replicas — the multiplier for total requested capacity (NULL if unset/invalid)
   """
   replicas: Int
@@ -16929,6 +17673,11 @@ type PlatformResourceDefinition {
   """
   namespaceId: UUID!
 
+  """
+  Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay.
+  """
+  paramsSchema: JSON!
+
   """Reads and enables pagination through a set of `PlatformResource`."""
   platformResourcesByResourceDefinitionId(
     """Read all values in the set after (below) this cursor."""
@@ -17056,6 +17805,9 @@ input PlatformResourceDefinitionFilter {
   """Checks for any expressions in this list."""
   or: [PlatformResourceDefinitionFilter!]
 
+  """Filter by the object’s `paramsSchema` field."""
+  paramsSchema: JSONFilter
+
   """
   Filter by the object’s `platformResourcesByResourceDefinitionId` relation.
   """
@@ -17113,6 +17865,11 @@ input PlatformResourceDefinitionInput {
   namespaceId: UUID!
 
   """
+  Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay.
+  """
+  paramsSchema: JSON
+
+  """
   Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
   """
   requiredConfigs: [ResourceRequirementInput]
@@ -17158,6 +17915,8 @@ enum PlatformResourceDefinitionOrderBy {
   NAME_ASC
   NAME_DESC
   NATURAL
+  PARAMS_SCHEMA_ASC
+  PARAMS_SCHEMA_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   REQUIRED_CONFIGS_ASC
@@ -17210,6 +17969,11 @@ input PlatformResourceDefinitionPatch {
   Namespace this definition belongs to (security boundary, maps to K8s namespace)
   """
   namespaceId: UUID
+
+  """
+  Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay.
+  """
+  paramsSchema: JSON
 
   """
   Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
@@ -17502,6 +18266,9 @@ input PlatformResourceFilter {
   """`platformResourceStatusChecksByResourceId` exist."""
   platformResourceStatusChecksByResourceIdExist: Boolean
 
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
   """Filter by the object’s `replicas` field."""
   replicas: IntFilter
 
@@ -17583,6 +18350,11 @@ input PlatformResourceInput {
   Namespace this resource belongs to (security boundary, maps to K8s namespace)
   """
   namespaceId: UUID!
+
+  """
+  Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane.
+  """
+  realm: String
 
   """
   Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any.
@@ -17928,6 +18700,7 @@ input PlatformResourceInstallationsInstallInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+  definitionIds: [UUID]
   name: String
   namespaceId: UUID
   newParams: JSON
@@ -18062,6 +18835,8 @@ enum PlatformResourceOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  REALM_ASC
+  REALM_DESC
   REPLICAS_ASC
   REPLICAS_DESC
   REQUIRED_CONFIGS_ASC
@@ -18134,6 +18909,11 @@ input PlatformResourcePatch {
   Namespace this resource belongs to (security boundary, maps to K8s namespace)
   """
   namespaceId: UUID
+
+  """
+  Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane.
+  """
+  realm: String
 
   """
   Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any.
@@ -18947,6 +19727,7 @@ type PlatformResourcesHealth {
   memoryRequestBytes: BigInt
   name: String
   namespaceId: UUID
+  realm: String
   replicas: Int
   requiredConfigs: [ResourceRequirement]
   requiredSecrets: [ResourceRequirement]
@@ -19054,6 +19835,9 @@ input PlatformResourcesHealthFilter {
   """Checks for any expressions in this list."""
   or: [PlatformResourcesHealthFilter!]
 
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
   """Filter by the object’s `replicas` field."""
   replicas: IntFilter
 
@@ -19125,6 +19909,8 @@ enum PlatformResourcesHealthOrderBy {
   NAME_ASC
   NAME_DESC
   NATURAL
+  REALM_ASC
+  REALM_DESC
   REPLICAS_ASC
   REPLICAS_DESC
   REQUIRED_CONFIGS_ASC
@@ -19251,6 +20037,7 @@ type PlatformResourcesResolvedRequirement {
   name: String
   namespaceId: UUID
   present: Boolean
+  realm: String
   required: Boolean
   requirementKind: String
   resourceId: UUID
@@ -19316,6 +20103,9 @@ input PlatformResourcesResolvedRequirementFilter {
   """Filter by the object’s `present` field."""
   present: BooleanFilter
 
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
   """Filter by the object’s `required` field."""
   required: BooleanFilter
 
@@ -19345,6 +20135,8 @@ enum PlatformResourcesResolvedRequirementOrderBy {
   NATURAL
   PRESENT_ASC
   PRESENT_DESC
+  REALM_ASC
+  REALM_DESC
   REQUIRED_ASC
   REQUIRED_DESC
   REQUIREMENT_KIND_ASC
@@ -20008,6 +20800,37 @@ type Query {
     """
     where: FunctionApiBindingFilter
   ): FunctionApiBindingConnection
+
+  """
+  Reads and enables pagination through a set of `FunctionCapabilityBinding`.
+  """
+  functionCapabilityBindings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `FunctionCapabilityBinding`."""
+    orderBy: [FunctionCapabilityBindingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FunctionCapabilityBindingFilter
+  ): FunctionCapabilityBindingConnection
 
   """Reads and enables pagination through a set of `FunctionDefinition`."""
   functionDefinitions(
@@ -20696,6 +21519,37 @@ type Query {
     """
     where: PlatformFunctionApiBindingFilter
   ): PlatformFunctionApiBindingConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformFunctionCapabilityBinding`.
+  """
+  platformFunctionCapabilityBindings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformFunctionCapabilityBinding`."""
+    orderBy: [PlatformFunctionCapabilityBindingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformFunctionCapabilityBindingFilter
+  ): PlatformFunctionCapabilityBindingConnection
 
   """
   Reads and enables pagination through a set of `PlatformFunctionDefinition`.
@@ -22002,6 +22856,11 @@ type Resource {
   namespaceId: UUID!
 
   """
+  Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane.
+  """
+  realm: String
+
+  """
   Desired pod count, derived from spec.replicas — the multiplier for total requested capacity (NULL if unset/invalid)
   """
   replicas: Int
@@ -22277,6 +23136,11 @@ type ResourceDefinition {
   namespaceId: UUID!
 
   """
+  Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay.
+  """
+  paramsSchema: JSON!
+
+  """
   Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
   """
   requiredConfigs: [ResourceRequirement]!
@@ -22406,6 +23270,9 @@ input ResourceDefinitionFilter {
   """Checks for any expressions in this list."""
   or: [ResourceDefinitionFilter!]
 
+  """Filter by the object’s `paramsSchema` field."""
+  paramsSchema: JSONFilter
+
   """Filter by the object’s `resources` relation."""
   resources: ResourceDefinitionToManyResourceFilter
 
@@ -22464,6 +23331,11 @@ input ResourceDefinitionInput {
   namespaceId: UUID!
 
   """
+  Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay.
+  """
+  paramsSchema: JSON
+
+  """
   Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
   """
   requiredConfigs: [ResourceRequirementInput]
@@ -22511,6 +23383,8 @@ enum ResourceDefinitionOrderBy {
   NAME_ASC
   NAME_DESC
   NATURAL
+  PARAMS_SCHEMA_ASC
+  PARAMS_SCHEMA_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   REQUIRED_CONFIGS_ASC
@@ -22566,6 +23440,11 @@ input ResourceDefinitionPatch {
   Namespace this definition belongs to (security boundary, maps to K8s namespace)
   """
   namespaceId: UUID
+
+  """
+  Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay.
+  """
+  paramsSchema: JSON
 
   """
   Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
@@ -22865,6 +23744,9 @@ input ResourceFilter {
   """Checks for any expressions in this list."""
   or: [ResourceFilter!]
 
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
   """Filter by the object’s `replicas` field."""
   replicas: IntFilter
 
@@ -22955,6 +23837,11 @@ input ResourceInput {
   Namespace this resource belongs to (security boundary, maps to K8s namespace)
   """
   namespaceId: UUID!
+
+  """
+  Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane.
+  """
+  realm: String
 
   """
   Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any.
@@ -23314,6 +24201,7 @@ input ResourceInstallationsInstallInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+  definitionIds: [UUID]
   name: String
   namespaceId: UUID
   newParams: JSON
@@ -23450,6 +24338,8 @@ enum ResourceOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  REALM_ASC
+  REALM_DESC
   REPLICAS_ASC
   REPLICAS_DESC
   REQUIRED_CONFIGS_ASC
@@ -23525,6 +24415,11 @@ input ResourcePatch {
   Namespace this resource belongs to (security boundary, maps to K8s namespace)
   """
   namespaceId: UUID
+
+  """
+  Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane.
+  """
+  realm: String
 
   """
   Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any.
@@ -24394,6 +25289,7 @@ type ResourcesHealth {
   memoryRequestBytes: BigInt
   name: String
   namespaceId: UUID
+  realm: String
   replicas: Int
   requiredConfigs: [ResourceRequirement]
   requiredSecrets: [ResourceRequirement]
@@ -24504,6 +25400,9 @@ input ResourcesHealthFilter {
   """Checks for any expressions in this list."""
   or: [ResourcesHealthFilter!]
 
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
   """Filter by the object’s `replicas` field."""
   replicas: IntFilter
 
@@ -24577,6 +25476,8 @@ enum ResourcesHealthOrderBy {
   NAME_ASC
   NAME_DESC
   NATURAL
+  REALM_ASC
+  REALM_DESC
   REPLICAS_ASC
   REPLICAS_DESC
   REQUIRED_CONFIGS_ASC
@@ -24703,6 +25604,7 @@ type ResourcesResolvedRequirement {
   name: String
   namespaceId: UUID
   present: Boolean
+  realm: String
   required: Boolean
   requirementKind: String
   resourceId: UUID
@@ -24766,6 +25668,9 @@ input ResourcesResolvedRequirementFilter {
   """Filter by the object’s `present` field."""
   present: BooleanFilter
 
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
   """Filter by the object’s `required` field."""
   required: BooleanFilter
 
@@ -24795,6 +25700,8 @@ enum ResourcesResolvedRequirementOrderBy {
   NATURAL
   PRESENT_ASC
   PRESENT_DESC
+  REALM_ASC
+  REALM_DESC
   REQUIRED_ASC
   REQUIRED_DESC
   REQUIREMENT_KIND_ASC
@@ -25272,6 +26179,44 @@ type UpdateFunctionApiBindingPayload {
     """The method to use when ordering `FunctionApiBinding`."""
     orderBy: [FunctionApiBindingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): FunctionApiBindingEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateFunctionCapabilityBinding` mutation."""
+input UpdateFunctionCapabilityBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `FunctionCapabilityBinding` being updated.
+  """
+  functionCapabilityBindingPatch: FunctionCapabilityBindingPatch!
+  id: UUID!
+}
+
+"""The output of our update `FunctionCapabilityBinding` mutation."""
+type UpdateFunctionCapabilityBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionCapabilityBinding` that was updated by this mutation."""
+  functionCapabilityBinding: FunctionCapabilityBinding
+
+  """An edge for our `FunctionCapabilityBinding`. May be used by Relay 1."""
+  functionCapabilityBindingEdge(
+    """The method to use when ordering `FunctionCapabilityBinding`."""
+    orderBy: [FunctionCapabilityBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionCapabilityBindingEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -26190,6 +27135,48 @@ type UpdatePlatformFunctionApiBindingPayload {
     """The method to use when ordering `PlatformFunctionApiBinding`."""
     orderBy: [PlatformFunctionApiBindingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformFunctionApiBindingEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformFunctionCapabilityBinding` mutation."""
+input UpdatePlatformFunctionCapabilityBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformFunctionCapabilityBinding` being updated.
+  """
+  platformFunctionCapabilityBindingPatch: PlatformFunctionCapabilityBindingPatch!
+}
+
+"""The output of our update `PlatformFunctionCapabilityBinding` mutation."""
+type UpdatePlatformFunctionCapabilityBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  The `PlatformFunctionCapabilityBinding` that was updated by this mutation.
+  """
+  platformFunctionCapabilityBinding: PlatformFunctionCapabilityBinding
+
+  """
+  An edge for our `PlatformFunctionCapabilityBinding`. May be used by Relay 1.
+  """
+  platformFunctionCapabilityBindingEdge(
+    """The method to use when ordering `PlatformFunctionCapabilityBinding`."""
+    orderBy: [PlatformFunctionCapabilityBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformFunctionCapabilityBindingEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

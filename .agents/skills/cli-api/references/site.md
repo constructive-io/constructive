@@ -12,8 +12,8 @@ csdk site list --where.<field>.<op> <value> --orderBy <values>
 csdk site list --limit 10 --after <cursor>
 csdk site find-first --where.<field>.<op> <value>
 csdk site get --id <UUID>
-csdk site create --databaseId <UUID> --name <String> [--config <JSON>] [--description <String>] [--isPublished <Boolean>] [--title <String>]
-csdk site update --id <UUID> [--config <JSON>] [--databaseId <UUID>] [--description <String>] [--isPublished <Boolean>] [--name <String>] [--title <String>]
+csdk site create --databaseId <UUID> --name <String> [--activeCommitId <UUID>] [--bucketId <UUID>] [--description <String>] [--installationId <UUID>] [--installationMemberSlug <String>] [--isPublished <Boolean>] [--resourceId <UUID>] [--title <String>]
+csdk site update --id <UUID> [--activeCommitId <UUID>] [--bucketId <UUID>] [--databaseId <UUID>] [--description <String>] [--installationId <UUID>] [--installationMemberSlug <String>] [--isPublished <Boolean>] [--name <String>] [--resourceId <UUID>] [--title <String>]
 csdk site delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk site list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a site
 
 ```bash
-csdk site create --databaseId <UUID> --name <String> [--config <JSON>] [--description <String>] [--isPublished <Boolean>] [--title <String>]
+csdk site create --databaseId <UUID> --name <String> [--activeCommitId <UUID>] [--bucketId <UUID>] [--description <String>] [--installationId <UUID>] [--installationMemberSlug <String>] [--isPublished <Boolean>] [--resourceId <UUID>] [--title <String>]
 ```
 
 ### Get a site by id

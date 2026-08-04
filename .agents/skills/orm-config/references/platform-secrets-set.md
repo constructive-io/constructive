@@ -7,7 +7,7 @@ Execute the platformSecretsSet mutation
 ## Usage
 
 ```typescript
-db.mutation.platformSecretsSet({ input: { algo: '<String>', provider: '<String>', secretName: '<String>', secretNamespaceId: '<UUID>', secretValue: '<String>' } }).execute()
+db.mutation.platformSecretsSet({ input: '<PlatformSecretsSetInput>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.platformSecretsSet({ input: { algo: '<String>', provider: '<String>'
 ### Run platformSecretsSet
 
 ```typescript
-const result = await db.mutation.platformSecretsSet({ input: { algo: '<String>', provider: '<String>', secretName: '<String>', secretNamespaceId: '<UUID>', secretValue: '<String>' } }).execute();
+const result = await db.mutation.platformSecretsSet({ input: '<PlatformSecretsSetInput>' }).execute();
 ```

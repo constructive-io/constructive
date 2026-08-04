@@ -353,7 +353,7 @@ CRUD operations for AgentResource records.
 | `updatedBy` | UUID |
 
 **Required create fields:** `body`, `databaseId`, `slug`, `title`
-**Optional create fields (backend defaults):** `archivedAt`, `createdBy`, `description`, `embedding`, `embeddingUpdatedAt`, `isActive`, `isArchived`, `keywords`, `kind`, `metadata`, `updatedBy`
+**Optional create fields (backend defaults):** `archivedAt`, `createdBy`, `description`, `embedding`, `isActive`, `isArchived`, `keywords`, `kind`, `metadata`, `updatedBy`
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 

@@ -177,6 +177,68 @@ describe('package check (git change detection)', () => {
     expect(mapFilesToModules(changedFiles(dir, 'main'), modules)).toEqual(['second']);
   });
 
+  it('sees a path with a space and a non-ASCII character', () => {
+    // git quotes and C-escapes such a path by default ("caf\303\251 dir/x.sql");
+    // a consumer that only strips the quotes silently loses the whole module.
+    write('packages/second/deploy/café dir/x.sql');
+    expect(mapFilesToModules(changedFiles(dir, 'main'), modules)).toEqual(['second']);
+  });
+
+  it('sees a committed path with a space and a non-ASCII character', () => {
+    git('checkout', '-q', '-b', 'feature');
+    write('packages/second/deploy/café dir/x.sql');
+    git('add', '.');
+    git('commit', '-qm', 'accented');
+
+    const changed = changedFiles(dir, 'main');
+    expect(changed).toContain(join(dir, 'packages/second/deploy/café dir/x.sql'));
+    expect(mapFilesToModules(changed, modules)).toEqual(['second']);
+  });
+
+  it('sees a deleted non-ASCII path, which no longer exists in either form', () => {
+    write('packages/second/deploy/café dir/x.sql');
+    git('add', '.');
+    git('commit', '-qm', 'accented');
+    git('checkout', '-q', '-b', 'feature');
+    git('rm', '-q', '-r', 'packages/second/deploy/café dir');
+    git('commit', '-qm', 'drop accented');
+
+    const changed = changedFiles(dir, 'main');
+    expect(changed).toContain(join(dir, 'packages/second/deploy/café dir/x.sql'));
+  });
+
+  it('reports the destination of a rename', () => {
+    git('checkout', '-q', '-b', 'feature');
+    git('mv', 'packages/first/deploy/schema.sql', 'packages/first/deploy/renamed.sql');
+    git('commit', '-qm', 'rename');
+
+    expect(changedFiles(dir, 'main')).toContain(
+      join(dir, 'packages/first/deploy/renamed.sql')
+    );
+  });
+
+  it('resolves paths against the git root when the workspace is a subdirectory', () => {
+    // `cwd` is the pgpm workspace root, nested below the git root: git reports
+    // repo-root-relative paths, so resolving them against `cwd` would be wrong.
+    const workspace = join(dir, 'workspace');
+    const nested = ['first', 'second'].map((name) => ({
+      name,
+      dir: join(workspace, 'packages', name),
+    }));
+    write('workspace/packages/first/deploy/schema.sql');
+    git('add', '.');
+    git('commit', '-qm', 'workspace');
+
+    git('checkout', '-q', '-b', 'feature');
+    write('workspace/packages/second/deploy/schema.sql');
+    git('add', '.');
+    git('commit', '-qm', 'second');
+
+    const changed = changedFiles(workspace, 'main');
+    expect(changed).toContain(join(workspace, 'packages/second/deploy/schema.sql'));
+    expect(mapFilesToModules(changed, nested)).toEqual(['second']);
+  });
+
   it('rejects an explicit --since that does not resolve', async () => {
     await expect(checkPackages({ cwd: dir, since: 'origin/nope' })).rejects.toThrow(
       /Could not diff against 'origin\/nope'/

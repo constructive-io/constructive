@@ -1,0 +1,89 @@
+import type { Pool } from 'pg';
+
+import {
+  clearAgentDiscoveryCache,
+  getAgentDiscovery
+} from '../src/plugins/agent-discovery-plugin';
+
+const DB_A = '00000000-0000-0000-0000-00000000000a';
+const DB_B = '00000000-0000-0000-0000-00000000000b';
+
+const row = (prefix: string): Record<string, string | null> => ({
+  schema_name: `${prefix}_agent_public`,
+  thread_table_name: 'agent_thread',
+  message_table_name: 'agent_message',
+  task_table_name: null
+});
+
+interface Call {
+  text: string;
+  values?: unknown[];
+}
+
+const fakePool = (respond: (values: unknown[]) => { rows: unknown[] }) => {
+  const calls: Call[] = [];
+  const pool = {
+    query: jest.fn(async (text: string, values?: unknown[]) => {
+      calls.push({ text, values });
+      return respond(values ?? []);
+    })
+  } as unknown as Pool;
+  return { pool, calls };
+};
+
+const pgError = (code: string) => Object.assign(new Error(`pg error ${code}`), { code });
+
+beforeEach(() => clearAgentDiscoveryCache());
+
+describe('getAgentDiscovery', () => {
+  it('resolves each tenant its own agent tables', async () => {
+    // The unkeyed query this replaced returned the same row to both, and the
+    // per-database cache then made the wrong answer stick for its TTL.
+    const { pool, calls } = fakePool(values => ({
+      rows: [row(values[0] === DB_A ? 'a' : 'b')]
+    }));
+
+    const a = await getAgentDiscovery(pool, DB_A);
+    const b = await getAgentDiscovery(pool, DB_B);
+
+    expect(calls.map(c => c.values)).toEqual([[DB_A], [DB_B]]);
+    expect(calls[0].text).toMatch(/WHERE acm\.database_id = \$1/);
+    expect(a?.thread?.schemaName).toBe('a_agent_public');
+    expect(b?.thread?.schemaName).toBe('b_agent_public');
+  });
+
+  it('caches per database id, not across databases', async () => {
+    const { pool, calls } = fakePool(values => ({
+      rows: [row(values[0] === DB_A ? 'a' : 'b')]
+    }));
+
+    await getAgentDiscovery(pool, DB_A);
+    await getAgentDiscovery(pool, DB_A);
+    expect(calls).toHaveLength(1);
+
+    await getAgentDiscovery(pool, DB_B);
+    expect(calls).toHaveLength(2);
+  });
+
+  it('treats an absent module as not provisioned', async () => {
+    const { pool } = fakePool(() => {
+      throw pgError('42P01');
+    });
+    await expect(getAgentDiscovery(pool, DB_A)).resolves.toBeNull();
+  });
+
+  it('rethrows anything that is not the absence it probes for', async () => {
+    // A dead pool reported as "not provisioned" is an API that silently loses
+    // its agent surface.
+    const { pool } = fakePool(() => {
+      throw pgError('57P01'); // admin_shutdown
+    });
+    await expect(getAgentDiscovery(pool, DB_A)).rejects.toThrow(/57P01/);
+  });
+
+  it('refuses a missing databaseId rather than querying unkeyed', async () => {
+    const { pool, calls } = fakePool(() => ({ rows: [] }));
+    await expect(getAgentDiscovery(pool, '')).rejects.toThrow(/databaseId is required/);
+    expect(calls).toHaveLength(0);
+  });
+});

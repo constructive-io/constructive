@@ -74,6 +74,7 @@ csdk auth set-token <your-token>
 | `merkle-store-module` | merkleStoreModule CRUD operations |
 | `namespace-module` | namespaceModule CRUD operations |
 | `notifications-module` | notificationsModule CRUD operations |
+| `pages-module` | pagesModule CRUD operations |
 | `permissions-module` | permissionsModule CRUD operations |
 | `phone-numbers-module` | phoneNumbersModule CRUD operations |
 | `plans-module` | plansModule CRUD operations |
@@ -519,6 +520,8 @@ CRUD operations for CatalogModule records.
 | `apisTableName` | String |
 | `appsTableId` | UUID |
 | `appsTableName` | String |
+| `bucketsTableId` | UUID |
+| `bucketsTableName` | String |
 | `databaseId` | UUID |
 | `defaultPermissions` | String |
 | `domainsTableId` | UUID |
@@ -541,11 +544,19 @@ CRUD operations for CatalogModule records.
 | `resourcesTableName` | String |
 | `schemaId` | UUID |
 | `scope` | String |
+| `sitesAppLinksTableId` | UUID |
+| `sitesAppLinksTableName` | String |
+| `sitesDeepLinksTableId` | UUID |
+| `sitesDeepLinksTableName` | String |
+| `sitesErrorPagesTableId` | UUID |
+| `sitesErrorPagesTableName` | String |
 | `sitesTableId` | UUID |
 | `sitesTableName` | String |
+| `sitesWebConfigTableId` | UUID |
+| `sitesWebConfigTableName` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `apisTableId`, `apisTableName`, `appsTableId`, `appsTableName`, `defaultPermissions`, `domainsTableId`, `domainsTableName`, `entityTableId`, `functionsTableId`, `functionsTableName`, `namespacesTableId`, `namespacesTableName`, `policies`, `privateApiName`, `provisions`, `publicSchemaName`, `resourceDefinitionsTableId`, `resourceDefinitionsTableName`, `resourceInstallationsTableId`, `resourceInstallationsTableName`, `resourcesTableId`, `resourcesTableName`, `schemaId`, `sitesTableId`, `sitesTableName`
+**Optional create fields (backend defaults):** `apiName`, `apisTableId`, `apisTableName`, `appsTableId`, `appsTableName`, `bucketsTableId`, `bucketsTableName`, `defaultPermissions`, `domainsTableId`, `domainsTableName`, `entityTableId`, `functionsTableId`, `functionsTableName`, `namespacesTableId`, `namespacesTableName`, `policies`, `privateApiName`, `provisions`, `publicSchemaName`, `resourceDefinitionsTableId`, `resourceDefinitionsTableName`, `resourceInstallationsTableId`, `resourceInstallationsTableName`, `resourcesTableId`, `resourcesTableName`, `schemaId`, `sitesAppLinksTableId`, `sitesAppLinksTableName`, `sitesDeepLinksTableId`, `sitesDeepLinksTableName`, `sitesErrorPagesTableId`, `sitesErrorPagesTableName`, `sitesTableId`, `sitesTableName`, `sitesWebConfigTableId`, `sitesWebConfigTableName`
 
 ### `compute-log-module`
 
@@ -1333,6 +1344,7 @@ CRUD operations for FunctionModule records.
 | `apiName` | String |
 | `bindingsTableId` | UUID |
 | `bindingsTableName` | String |
+| `capabilityBindingsTableId` | UUID |
 | `databaseId` | UUID |
 | `defaultPermissions` | String |
 | `definitionsTableId` | UUID |
@@ -1353,7 +1365,7 @@ CRUD operations for FunctionModule records.
 | `scope` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `bindingsTableId`, `bindingsTableName`, `defaultPermissions`, `definitionsTableId`, `definitionsTableName`, `entityField`, `entityTableId`, `hasCron`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schedulesTableId`, `schemaId`
+**Optional create fields (backend defaults):** `apiName`, `bindingsTableId`, `bindingsTableName`, `capabilityBindingsTableId`, `defaultPermissions`, `definitionsTableId`, `definitionsTableName`, `entityField`, `entityTableId`, `hasCron`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schedulesTableId`, `schemaId`
 
 ### `graph-execution-module`
 
@@ -2085,6 +2097,46 @@ CRUD operations for NotificationsModule records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `apiName`, `channelsTableId`, `defaultPermissions`, `deliveryLogTableId`, `entityField`, `hasChannels`, `hasDigestMetadata`, `hasPreferences`, `hasSettingsExtension`, `hasSubscriptions`, `notificationsTableId`, `organizationSettingsTableId`, `ownerTableId`, `preferencesTableId`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `readStateTableId`, `schemaId`, `suppressionsTableId`, `userSettingsTableId`
 
+### `pages-module`
+
+CRUD operations for PagesModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all pagesModule records |
+| `find-first` | Find first matching pagesModule record |
+| `get` | Get a pagesModule by id |
+| `create` | Create a new pagesModule |
+| `update` | Update an existing pagesModule |
+| `delete` | Delete a pagesModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `merkleStoreModuleId` | UUID |
+| `pagesTableId` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaId` | UUID |
+| `publicSchemaName` | String |
+| `scope` | String |
+| `siteSurfaceModuleId` | UUID |
+| `sitesTableId` | UUID |
+| `storeNamePrefix` | String |
+
+**Required create fields:** `databaseId`, `merkleStoreModuleId`, `prefix`, `scope`
+**Optional create fields (backend defaults):** `apiName`, `entityTableId`, `pagesTableId`, `policies`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaId`, `publicSchemaName`, `siteSurfaceModuleId`, `sitesTableId`, `storeNamePrefix`
+
 ### `permissions-module`
 
 CRUD operations for PermissionsModule records.
@@ -2687,21 +2739,31 @@ CRUD operations for SiteSurfaceModule records.
 | `policies` | JSON |
 | `prefix` | String |
 | `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
 | `provisions` | JSON |
 | `publicSchemaName` | String |
 | `schemaId` | UUID |
 | `scope` | String |
+| `siteAppLinksTableId` | UUID |
+| `siteAppLinksTableName` | String |
+| `siteDeepLinksTableId` | UUID |
+| `siteDeepLinksTableName` | String |
+| `siteErrorPagesTableId` | UUID |
+| `siteErrorPagesTableName` | String |
 | `siteMetadataTableId` | UUID |
 | `siteMetadataTableName` | String |
 | `siteModulesTableId` | UUID |
 | `siteModulesTableName` | String |
 | `siteThemesTableId` | UUID |
 | `siteThemesTableName` | String |
+| `siteWebConfigTableId` | UUID |
+| `siteWebConfigTableName` | String |
 | `sitesTableId` | UUID |
 | `sitesTableName` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `catalogModuleId`, `defaultPermissions`, `entityField`, `entityTableId`, `policies`, `prefix`, `privateApiName`, `provisions`, `publicSchemaName`, `schemaId`, `siteMetadataTableId`, `siteMetadataTableName`, `siteModulesTableId`, `siteModulesTableName`, `siteThemesTableId`, `siteThemesTableName`, `sitesTableId`, `sitesTableName`
+**Optional create fields (backend defaults):** `apiName`, `catalogModuleId`, `defaultPermissions`, `entityField`, `entityTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `siteAppLinksTableId`, `siteAppLinksTableName`, `siteDeepLinksTableId`, `siteDeepLinksTableName`, `siteErrorPagesTableId`, `siteErrorPagesTableName`, `siteMetadataTableId`, `siteMetadataTableName`, `siteModulesTableId`, `siteModulesTableName`, `siteThemesTableId`, `siteThemesTableName`, `siteWebConfigTableId`, `siteWebConfigTableName`, `sitesTableId`, `sitesTableName`
 
 ### `storage-log-module`
 
@@ -2766,6 +2828,7 @@ CRUD operations for StorageModule records.
 | `bucketsTableId` | UUID |
 | `bucketsTableName` | String |
 | `cacheTtlSeconds` | Int |
+| `catalogModuleId` | UUID |
 | `confirmUploadDelay` | Interval |
 | `databaseId` | UUID |
 | `defaultMaxFileSize` | BigInt |
@@ -2803,7 +2866,7 @@ CRUD operations for StorageModule records.
 | `uploadUrlExpirySeconds` | Int |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `allowedOrigins`, `apiName`, `bucketsTableId`, `bucketsTableName`, `cacheTtlSeconds`, `confirmUploadDelay`, `defaultMaxFileSize`, `defaultPermissions`, `downloadUrlExpirySeconds`, `endpoint`, `entityField`, `entityTableId`, `fileEventsTableId`, `filesTableId`, `filesTableName`, `hasAuditLog`, `hasConfirmUpload`, `hasContentHash`, `hasCustomKeys`, `hasPathShares`, `hasVersioning`, `maxBulkFiles`, `maxBulkTotalSize`, `maxFilenameLength`, `pathSharesTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provider`, `provisions`, `publicSchemaName`, `publicUrlPrefix`, `restrictReads`, `schemaId`, `uploadUrlExpirySeconds`
+**Optional create fields (backend defaults):** `allowedOrigins`, `apiName`, `bucketsTableId`, `bucketsTableName`, `cacheTtlSeconds`, `catalogModuleId`, `confirmUploadDelay`, `defaultMaxFileSize`, `defaultPermissions`, `downloadUrlExpirySeconds`, `endpoint`, `entityField`, `entityTableId`, `fileEventsTableId`, `filesTableId`, `filesTableName`, `hasAuditLog`, `hasConfirmUpload`, `hasContentHash`, `hasCustomKeys`, `hasPathShares`, `hasVersioning`, `maxBulkFiles`, `maxBulkTotalSize`, `maxFilenameLength`, `pathSharesTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provider`, `provisions`, `publicSchemaName`, `publicUrlPrefix`, `restrictReads`, `schemaId`, `uploadUrlExpirySeconds`
 
 ### `transfer-log-module`
 

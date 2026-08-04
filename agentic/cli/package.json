@@ -36,7 +36,7 @@
     "@agentic-kit/pi": "workspace:*",
     "@constructive-io/sdk": "workspace:^",
     "@earendil-works/pi-coding-agent": "0.79.6",
-    "inquirerer": "^4.9.1"
+    "inquirerer": "^4.9.3"
   },
   "keywords": [
     "agentic-kit",

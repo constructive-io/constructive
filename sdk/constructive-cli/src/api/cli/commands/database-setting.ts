@@ -34,6 +34,7 @@ const fieldSchema: FieldSchema = {
   id: 'uuid',
   labels: 'json',
   options: 'json',
+  statementTimeoutMs: 'int',
   updatedAt: 'string',
 };
 const usage =
@@ -105,6 +106,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       id: true,
       labels: true,
       options: true,
+      statementTimeoutMs: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -144,6 +146,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       id: true,
       labels: true,
       options: true,
+      statementTimeoutMs: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -195,6 +198,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           id: true,
           labels: true,
           options: true,
+          statementTimeoutMs: true,
           updatedAt: true,
         },
       })
@@ -322,6 +326,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'statementTimeoutMs',
+        message: 'statementTimeoutMs',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -348,6 +359,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           enableSearch: cleanedData.enableSearch,
           labels: cleanedData.labels,
           options: cleanedData.options,
+          statementTimeoutMs: cleanedData.statementTimeoutMs,
         },
         select: {
           annotations: true,
@@ -368,6 +380,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           id: true,
           labels: true,
           options: true,
+          statementTimeoutMs: true,
           updatedAt: true,
         },
       })
@@ -501,6 +514,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'statementTimeoutMs',
+        message: 'statementTimeoutMs',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as DatabaseSettingPatch;
@@ -527,6 +547,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           enableSearch: cleanedData.enableSearch,
           labels: cleanedData.labels,
           options: cleanedData.options,
+          statementTimeoutMs: cleanedData.statementTimeoutMs,
         },
         select: {
           annotations: true,
@@ -547,6 +568,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: true,
           labels: true,
           options: true,
+          statementTimeoutMs: true,
           updatedAt: true,
         },
       })

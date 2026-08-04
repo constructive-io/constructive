@@ -62,8 +62,8 @@ function getDirectoryStructure(dir: string, baseDir?: string): string[] {
 const SCHEMA_SHIMS_SQL = `
   CREATE SCHEMA IF NOT EXISTS metaschema_public;
   CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
-  CREATE SCHEMA IF NOT EXISTS constructive_routing_public;
-  CREATE SCHEMA IF NOT EXISTS constructive_apps_public;
+  CREATE SCHEMA IF NOT EXISTS routing_public;
+  CREATE SCHEMA IF NOT EXISTS apps_public;
   CREATE SCHEMA IF NOT EXISTS db_migrate;
 
   -- metaschema_public tables
@@ -99,8 +99,8 @@ const SCHEMA_SHIMS_SQL = `
     description text
   );
 
-  -- constructive_routing_public tables
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.domains (
+  -- routing_public tables
+  CREATE TABLE IF NOT EXISTS routing_public.domains (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     hostname text,
@@ -115,7 +115,7 @@ const SCHEMA_SHIMS_SQL = `
     updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.apis (
+  CREATE TABLE IF NOT EXISTS routing_public.apis (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     name text,
@@ -128,7 +128,7 @@ const SCHEMA_SHIMS_SQL = `
     updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.sites (
+  CREATE TABLE IF NOT EXISTS routing_public.sites (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     name text,
@@ -140,7 +140,7 @@ const SCHEMA_SHIMS_SQL = `
     updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.api_schemas (
+  CREATE TABLE IF NOT EXISTS routing_public.api_schemas (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     schema_id uuid,
@@ -150,7 +150,7 @@ const SCHEMA_SHIMS_SQL = `
   );
 
   -- Additional scoped tables required by exportMeta
-  CREATE TABLE IF NOT EXISTS constructive_apps_public.apps (
+  CREATE TABLE IF NOT EXISTS apps_public.apps (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     name text,
@@ -163,7 +163,7 @@ const SCHEMA_SHIMS_SQL = `
     updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_modules (
+  CREATE TABLE IF NOT EXISTS routing_public.site_modules (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     site_id uuid,
@@ -173,7 +173,7 @@ const SCHEMA_SHIMS_SQL = `
     updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_themes (
+  CREATE TABLE IF NOT EXISTS routing_public.site_themes (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     site_id uuid,
@@ -182,7 +182,7 @@ const SCHEMA_SHIMS_SQL = `
     updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_metadata (
+  CREATE TABLE IF NOT EXISTS routing_public.site_metadata (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     site_id uuid,
@@ -193,7 +193,7 @@ const SCHEMA_SHIMS_SQL = `
     updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS constructive_routing_public.api_modules (
+  CREATE TABLE IF NOT EXISTS routing_public.api_modules (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     api_id uuid,
@@ -581,21 +581,21 @@ INSERT INTO metaschema_public.field (id, database_id, table_id, name, type, desc
   ('cccc0021-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'bbbb0003-0000-0000-0000-000000000001', 'name', 'citext', 'Species name');
 
 -- Scoped plane data
-INSERT INTO constructive_routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role) VALUES
+INSERT INTO routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role) VALUES
   ('eeee0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'public', 'pets-db', true, 'authenticated', 'anonymous');
 
-INSERT INTO constructive_routing_public.sites (id, database_id, name, title, description, is_published) VALUES
+INSERT INTO routing_public.sites (id, database_id, name, title, description, is_published) VALUES
   ('ffff0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'pet-clinic', 'Pet Clinic', 'A pet management application', true);
 
-INSERT INTO constructive_routing_public.domains (id, database_id, hostname, managed, is_wildcard, is_published) VALUES
+INSERT INTO routing_public.domains (id, database_id, hostname, managed, is_wildcard, is_published) VALUES
   ('dddd0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'pets.localhost', false, false, true);
 
-INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id) VALUES
+INSERT INTO routing_public.api_schemas (id, database_id, schema_id, api_id) VALUES
   ('1111aaaa-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'eeee0001-0000-0000-0000-000000000001');
 
 -- Surface module configuration
 INSERT INTO metaschema_modules_public.catalog_module (id, database_id, schema_id, public_schema_name, domains_table_name, apis_table_name, sites_table_name, apps_table_name, api_name, scope) VALUES
-  ('2222aaaa-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'constructive_catalog_public', 'domains', 'apis', 'sites', 'apps', 'public', 'platform');
+  ('2222aaaa-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'catalog_public', 'domains', 'apis', 'sites', 'apps', 'public', 'platform');
 
 INSERT INTO metaschema_modules_public.domain_module (id, database_id, schema_id, catalog_module_id, domains_table_name, managed_domains_table_name, scope, prefix) VALUES
   ('2222bbbb-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', '2222aaaa-0000-0000-0000-000000000001', 'domains', 'managed_domains', 'platform', '');
@@ -638,14 +638,14 @@ INSERT INTO metaschema_modules_public.database_settings_module (id, database_id,
     expect(parseInt(fieldResult.rows[0].count)).toBeGreaterThan(0);
   });
 
-  it('should have seeded the database with constructive_routing_public data', async () => {
-    const apiResult = await pg.query('SELECT COUNT(*) as count FROM constructive_routing_public.apis');
+  it('should have seeded the database with routing_public data', async () => {
+    const apiResult = await pg.query('SELECT COUNT(*) as count FROM routing_public.apis');
     expect(parseInt(apiResult.rows[0].count)).toBeGreaterThan(0);
 
-    const siteResult = await pg.query('SELECT COUNT(*) as count FROM constructive_routing_public.sites');
+    const siteResult = await pg.query('SELECT COUNT(*) as count FROM routing_public.sites');
     expect(parseInt(siteResult.rows[0].count)).toBeGreaterThan(0);
 
-    const domainResult = await pg.query('SELECT COUNT(*) as count FROM constructive_routing_public.domains');
+    const domainResult = await pg.query('SELECT COUNT(*) as count FROM routing_public.domains');
     expect(parseInt(domainResult.rows[0].count)).toBeGreaterThan(0);
   });
 

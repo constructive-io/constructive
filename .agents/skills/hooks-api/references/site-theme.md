@@ -7,8 +7,8 @@ Theme (colors, fonts, design tokens) for a site surface
 ## Usage
 
 ```typescript
-useSiteThemesQuery({ selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } } })
-useSiteThemeQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } } })
+useSiteThemesQuery({ selection: { fields: { commitId: true, createdAt: true, databaseId: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } } })
+useSiteThemeQuery({ id: '<UUID>', selection: { fields: { commitId: true, createdAt: true, databaseId: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } } })
 useCreateSiteThemeMutation({ selection: { fields: { id: true } } })
 useUpdateSiteThemeMutation({ selection: { fields: { id: true } } })
 useDeleteSiteThemeMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteThemeMutation({})
 
 ```typescript
 const { data, isLoading } = useSiteThemesQuery({
-  selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } },
+  selection: { fields: { commitId: true, createdAt: true, databaseId: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSiteThemesQuery({
 const { mutate } = useCreateSiteThemeMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', siteId: '<UUID>', theme: '<JSON>' });
+mutate({ commitId: '<UUID>', databaseId: '<UUID>', isActive: '<Boolean>', name: '<String>', siteId: '<UUID>', storeId: '<UUID>', theme: '<JSON>' });
 ```

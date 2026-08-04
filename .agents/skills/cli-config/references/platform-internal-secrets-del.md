@@ -7,7 +7,7 @@ Execute the platformInternalSecretsDel mutation
 ## Usage
 
 ```bash
-csdk platform-internal-secrets-del --input.clientMutationId <String> --input.namespaceId <UUID> --input.secretName <String>
+csdk platform-internal-secrets-del --input.clientMutationId <String> --input.namespaceId <UUID> --input.realm <String> --input.secretName <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk platform-internal-secrets-del --input.clientMutationId <String> --input.nam
 ### Run platformInternalSecretsDel
 
 ```bash
-csdk platform-internal-secrets-del --input.clientMutationId <String> --input.namespaceId <UUID> --input.secretName <String>
+csdk platform-internal-secrets-del --input.clientMutationId <String> --input.namespaceId <UUID> --input.realm <String> --input.secretName <String>
 ```

@@ -5,18 +5,6 @@
  */
 import type { ApiExposureLevel, ObjectCategory } from './schema-types';
 export type ConstructiveInternalTypeImage = unknown;
-export interface Api {
-  anonRole: string | null;
-  config: unknown | null;
-  createdAt: string | null;
-  databaseId: string | null;
-  dbname: string | null;
-  id: string | null;
-  isPublished: boolean | null;
-  name: string | null;
-  roleName: string | null;
-  updatedAt: string | null;
-}
 export interface ApiSchema {
   apiId: string | null;
   createdAt: string | null;
@@ -43,6 +31,19 @@ export interface ApiSetting {
   enableSearch: boolean | null;
   id: string | null;
   options: unknown | null;
+  statementTimeoutMs: string | null;
+  updatedAt: string | null;
+}
+export interface Apis {
+  anonRole: string | null;
+  config: unknown | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  dbname: string | null;
+  id: string | null;
+  isPublished: boolean | null;
+  name: string | null;
+  roleName: string | null;
   updatedAt: string | null;
 }
 export interface AstMigration {
@@ -104,7 +105,6 @@ export interface Database {
   name: string | null;
   ownerId: string | null;
   platform: boolean | null;
-  schemaHash: string | null;
   updatedAt: string | null;
 }
 export interface DatabaseSetting {
@@ -126,6 +126,7 @@ export interface DatabaseSetting {
   id: string | null;
   labels: unknown | null;
   options: unknown | null;
+  statementTimeoutMs: string | null;
   updatedAt: string | null;
 }
 export interface DatabaseTransfer {
@@ -152,6 +153,17 @@ export interface DefaultPrivilege {
   objectType: string | null;
   privilege: string | null;
   schemaId: string | null;
+}
+export interface Derive {
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  includeMutations: boolean | null;
+  kind: string | null;
+  policyPrefix: string | null;
+  sourceTableId: string | null;
+  tableId: string | null;
+  updatedAt: string | null;
 }
 export interface Domain {
   config: unknown | null;
@@ -268,6 +280,16 @@ export interface ExclusionConstraint {
   updatedAt: string | null;
   whereClause: unknown | null;
 }
+export interface FieldBehavior {
+  createdAt: string | null;
+  databaseId: string | null;
+  fieldId: string | null;
+  id: string | null;
+  modifier: string | null;
+  scope: string | null;
+  sortOrder: number | null;
+  updatedAt: string | null;
+}
 export interface Field {
   apiRequired: boolean | null;
   category: ObjectCategory | null;
@@ -293,6 +315,16 @@ export interface Field {
   tableId: string | null;
   tags: string[] | null;
   type: unknown | null;
+  updatedAt: string | null;
+}
+export interface ForeignKeyConstraintBehavior {
+  createdAt: string | null;
+  databaseId: string | null;
+  foreignKeyConstraintId: string | null;
+  id: string | null;
+  modifier: string | null;
+  scope: string | null;
+  sortOrder: number | null;
   updatedAt: string | null;
 }
 export interface ForeignKeyConstraint {
@@ -405,6 +437,17 @@ export interface NodeTypeRegistry {
   slug: string | null;
   tags: string[] | null;
 }
+export interface Page {
+  commitId: string | null;
+  content: unknown | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  siteId: string | null;
+  slug: string | null;
+  storeId: string | null;
+  updatedAt: string | null;
+}
 export interface Partition {
   createdAt: string | null;
   databaseId: string | null;
@@ -418,17 +461,6 @@ export interface Partition {
   retentionKeepTable: boolean | null;
   strategy: string | null;
   tableId: string | null;
-  updatedAt: string | null;
-}
-export interface PlatformApi {
-  anonRole: string | null;
-  config: unknown | null;
-  createdAt: string | null;
-  dbname: string | null;
-  id: string | null;
-  isPublished: boolean | null;
-  name: string | null;
-  roleName: string | null;
   updatedAt: string | null;
 }
 export interface PlatformApiSchema {
@@ -455,6 +487,18 @@ export interface PlatformApiSetting {
   enableSearch: boolean | null;
   id: string | null;
   options: unknown | null;
+  statementTimeoutMs: string | null;
+  updatedAt: string | null;
+}
+export interface PlatformApis {
+  anonRole: string | null;
+  config: unknown | null;
+  createdAt: string | null;
+  dbname: string | null;
+  id: string | null;
+  isPublished: boolean | null;
+  name: string | null;
+  roleName: string | null;
   updatedAt: string | null;
 }
 export interface PlatformCorsSetting {
@@ -523,22 +567,75 @@ export interface PlatformManagedDomain {
   verificationStatus: string | null;
   verifiedAt: string | null;
 }
+export interface PlatformPage {
+  commitId: string | null;
+  content: unknown | null;
+  createdAt: string | null;
+  id: string | null;
+  siteId: string | null;
+  slug: string | null;
+  storeId: string | null;
+  updatedAt: string | null;
+}
+export interface PlatformSiteAppLink {
+  appIdentifier: string | null;
+  createdAt: string | null;
+  id: string | null;
+  pathComponents: string[] | null;
+  platform: string | null;
+  sha256CertFingerprints: string[] | null;
+  siteId: string | null;
+  storeUrl: string | null;
+  teamId: string | null;
+  updatedAt: string | null;
+  webcredentials: boolean | null;
+}
 export interface PlatformSite {
-  config: unknown | null;
+  activeCommitId: string | null;
+  bucketId: string | null;
   createdAt: string | null;
   description: string | null;
   id: string | null;
+  installationId: string | null;
+  installationMemberSlug: string | null;
   isPublished: boolean | null;
   name: string | null;
+  resourceId: string | null;
   title: string | null;
   updatedAt: string | null;
 }
+export interface PlatformSiteDeepLink {
+  appPath: string | null;
+  createdAt: string | null;
+  fallbackUrl: string | null;
+  id: string | null;
+  metadata: unknown | null;
+  siteId: string | null;
+  slug: string | null;
+  updatedAt: string | null;
+  webPath: string | null;
+}
+export interface PlatformSiteErrorPage {
+  createdAt: string | null;
+  id: string | null;
+  objectPath: string | null;
+  siteId: string | null;
+  statusCode: number | null;
+  updatedAt: string | null;
+}
 export interface PlatformSiteMetadatum {
+  appleTouchIcon: ConstructiveInternalTypeImage | null;
+  canonicalUrl: string | null;
+  commitId: string | null;
   createdAt: string | null;
   description: string | null;
+  favicon: ConstructiveInternalTypeImage | null;
   id: string | null;
+  logo: ConstructiveInternalTypeImage | null;
   ogImage: ConstructiveInternalTypeImage | null;
+  robots: string | null;
   siteId: string | null;
+  storeId: string | null;
   title: string | null;
   updatedAt: string | null;
 }
@@ -546,15 +643,31 @@ export interface PlatformSiteModule {
   createdAt: string | null;
   data: unknown | null;
   id: string | null;
+  isEnabled: boolean | null;
   name: string | null;
+  position: number | null;
   siteId: string | null;
   updatedAt: string | null;
 }
 export interface PlatformSiteTheme {
+  commitId: string | null;
   createdAt: string | null;
   id: string | null;
+  isActive: boolean | null;
+  name: string | null;
   siteId: string | null;
+  storeId: string | null;
   theme: unknown | null;
+  updatedAt: string | null;
+}
+export interface PlatformSiteWebConfig {
+  cleanUrls: boolean | null;
+  createdAt: string | null;
+  id: string | null;
+  indexDocument: string | null;
+  metadata: unknown | null;
+  siteId: string | null;
+  spaFallback: boolean | null;
   updatedAt: string | null;
 }
 export interface Policy {
@@ -562,6 +675,8 @@ export interface Policy {
   createdAt: string | null;
   data: unknown | null;
   databaseId: string | null;
+  derivedFromPolicyId: string | null;
+  derivedFromTableId: string | null;
   disabled: boolean | null;
   granteeName: string | null;
   id: string | null;
@@ -626,7 +741,9 @@ export interface RouteBinding {
   path: string | null;
   priority: number | null;
   targetApiId: string | null;
+  targetBucketId: string | null;
   targetFunctionId: string | null;
+  targetServiceId: string | null;
   targetSiteId: string | null;
   updatedAt: string | null;
 }
@@ -641,7 +758,9 @@ export interface Route {
   path: string | null;
   priority: number | null;
   targetApiId: string | null;
+  targetBucketId: string | null;
   targetFunctionId: string | null;
+  targetServiceId: string | null;
   targetSiteId: string | null;
   updatedAt: string | null;
 }
@@ -668,24 +787,70 @@ export interface SchemaGrant {
   schemaId: string | null;
   updatedAt: string | null;
 }
+export interface SiteAppLink {
+  appIdentifier: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  pathComponents: string[] | null;
+  platform: string | null;
+  sha256CertFingerprints: string[] | null;
+  siteId: string | null;
+  storeUrl: string | null;
+  teamId: string | null;
+  updatedAt: string | null;
+  webcredentials: boolean | null;
+}
 export interface Site {
-  config: unknown | null;
+  activeCommitId: string | null;
+  bucketId: string | null;
   createdAt: string | null;
   databaseId: string | null;
   description: string | null;
   id: string | null;
+  installationId: string | null;
+  installationMemberSlug: string | null;
   isPublished: boolean | null;
   name: string | null;
+  resourceId: string | null;
   title: string | null;
   updatedAt: string | null;
 }
+export interface SiteDeepLink {
+  appPath: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  fallbackUrl: string | null;
+  id: string | null;
+  metadata: unknown | null;
+  siteId: string | null;
+  slug: string | null;
+  updatedAt: string | null;
+  webPath: string | null;
+}
+export interface SiteErrorPage {
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  objectPath: string | null;
+  siteId: string | null;
+  statusCode: number | null;
+  updatedAt: string | null;
+}
 export interface SiteMetadatum {
+  appleTouchIcon: ConstructiveInternalTypeImage | null;
+  canonicalUrl: string | null;
+  commitId: string | null;
   createdAt: string | null;
   databaseId: string | null;
   description: string | null;
+  favicon: ConstructiveInternalTypeImage | null;
   id: string | null;
+  logo: ConstructiveInternalTypeImage | null;
   ogImage: ConstructiveInternalTypeImage | null;
+  robots: string | null;
   siteId: string | null;
+  storeId: string | null;
   title: string | null;
   updatedAt: string | null;
 }
@@ -694,16 +859,33 @@ export interface SiteModule {
   data: unknown | null;
   databaseId: string | null;
   id: string | null;
+  isEnabled: boolean | null;
   name: string | null;
+  position: number | null;
   siteId: string | null;
   updatedAt: string | null;
 }
 export interface SiteTheme {
+  commitId: string | null;
   createdAt: string | null;
   databaseId: string | null;
   id: string | null;
+  isActive: boolean | null;
+  name: string | null;
   siteId: string | null;
+  storeId: string | null;
   theme: unknown | null;
+  updatedAt: string | null;
+}
+export interface SiteWebConfig {
+  cleanUrls: boolean | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  indexDocument: string | null;
+  metadata: unknown | null;
+  siteId: string | null;
+  spaFallback: boolean | null;
   updatedAt: string | null;
 }
 export interface SpatialRelation {
@@ -735,6 +917,16 @@ export interface SqlAction {
   payload: unknown | null;
   revert: string | null;
   verify: string | null;
+}
+export interface TableBehavior {
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  modifier: string | null;
+  scope: string | null;
+  sortOrder: number | null;
+  tableId: string | null;
+  updatedAt: string | null;
 }
 export interface Table {
   category: ObjectCategory | null;
@@ -793,6 +985,16 @@ export interface TriggerFunction {
   name: string | null;
   updatedAt: string | null;
 }
+export interface UniqueConstraintBehavior {
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  modifier: string | null;
+  scope: string | null;
+  sortOrder: number | null;
+  uniqueConstraintId: string | null;
+  updatedAt: string | null;
+}
 export interface UniqueConstraint {
   category: ObjectCategory | null;
   createdAt: string | null;
@@ -809,6 +1011,16 @@ export interface UniqueConstraint {
   type: string | null;
   updatedAt: string | null;
   withoutOverlaps: boolean | null;
+}
+export interface ViewBehavior {
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  modifier: string | null;
+  scope: string | null;
+  sortOrder: number | null;
+  updatedAt: string | null;
+  viewId: string | null;
 }
 export interface View {
   category: ObjectCategory | null;

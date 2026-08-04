@@ -7,8 +7,8 @@ Theme (colors, fonts, design tokens) for a site surface
 ## Usage
 
 ```typescript
-usePlatformSiteThemesQuery({ selection: { fields: { createdAt: true, id: true, siteId: true, theme: true, updatedAt: true } } })
-usePlatformSiteThemeQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, siteId: true, theme: true, updatedAt: true } } })
+usePlatformSiteThemesQuery({ selection: { fields: { commitId: true, createdAt: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } } })
+usePlatformSiteThemeQuery({ id: '<UUID>', selection: { fields: { commitId: true, createdAt: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } } })
 useCreatePlatformSiteThemeMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformSiteThemeMutation({ selection: { fields: { id: true } } })
 useDeletePlatformSiteThemeMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformSiteThemeMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformSiteThemesQuery({
-  selection: { fields: { createdAt: true, id: true, siteId: true, theme: true, updatedAt: true } },
+  selection: { fields: { commitId: true, createdAt: true, id: true, isActive: true, name: true, siteId: true, storeId: true, theme: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformSiteThemesQuery({
 const { mutate } = useCreatePlatformSiteThemeMutation({
   selection: { fields: { id: true } },
 });
-mutate({ siteId: '<UUID>', theme: '<JSON>' });
+mutate({ commitId: '<UUID>', isActive: '<Boolean>', name: '<String>', siteId: '<UUID>', storeId: '<UUID>', theme: '<JSON>' });
 ```

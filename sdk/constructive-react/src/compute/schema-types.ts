@@ -7,6 +7,7 @@
 import type {
   DbPreset,
   FunctionApiBinding,
+  FunctionCapabilityBinding,
   FunctionDefinition,
   FunctionDeployment,
   FunctionDeploymentEvent,
@@ -31,6 +32,7 @@ import type {
   Namespace,
   NamespaceEvent,
   PlatformFunctionApiBinding,
+  PlatformFunctionCapabilityBinding,
   PlatformFunctionDefinition,
   PlatformFunctionDeployment,
   PlatformFunctionDeploymentEvent,
@@ -133,6 +135,31 @@ export type FunctionApiBindingOrderBy =
   | 'FUNCTION_DEFINITION_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `FunctionCapabilityBinding`. */
+export type FunctionCapabilityBindingOrderBy =
+  | 'BUCKET_ID_ASC'
+  | 'BUCKET_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'FUNCTION_ID_ASC'
+  | 'FUNCTION_ID_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KEY_ASC'
+  | 'KEY_DESC'
+  | 'LIFECYCLE_ASC'
+  | 'LIFECYCLE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -786,6 +813,29 @@ export type PlatformFunctionApiBindingOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformFunctionCapabilityBinding`. */
+export type PlatformFunctionCapabilityBindingOrderBy =
+  | 'BUCKET_ID_ASC'
+  | 'BUCKET_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'FUNCTION_ID_ASC'
+  | 'FUNCTION_ID_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KEY_ASC'
+  | 'KEY_DESC'
+  | 'LIFECYCLE_ASC'
+  | 'LIFECYCLE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformFunctionDefinition`. */
 export type PlatformFunctionDefinitionOrderBy =
   | 'ACCESS_CHANNELS_ASC'
@@ -1212,6 +1262,8 @@ export type PlatformResourceDefinitionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
+  | 'PARAMS_SCHEMA_ASC'
+  | 'PARAMS_SCHEMA_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'REQUIRED_CONFIGS_ASC'
@@ -1315,6 +1367,8 @@ export type PlatformResourceOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'REPLICAS_ASC'
   | 'REPLICAS_DESC'
   | 'REQUIRED_CONFIGS_ASC'
@@ -1482,6 +1536,8 @@ export type PlatformResourcesHealthOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'REPLICAS_ASC'
   | 'REPLICAS_DESC'
   | 'REQUIRED_CONFIGS_ASC'
@@ -1538,6 +1594,8 @@ export type PlatformResourcesResolvedRequirementOrderBy =
   | 'NATURAL'
   | 'PRESENT_ASC'
   | 'PRESENT_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'REQUIRED_ASC'
   | 'REQUIRED_DESC'
   | 'REQUIREMENT_KIND_ASC'
@@ -1664,6 +1722,8 @@ export type ResourceDefinitionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
+  | 'PARAMS_SCHEMA_ASC'
+  | 'PARAMS_SCHEMA_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'REQUIRED_CONFIGS_ASC'
@@ -1773,6 +1833,8 @@ export type ResourceOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'REPLICAS_ASC'
   | 'REPLICAS_DESC'
   | 'REQUIRED_CONFIGS_ASC'
@@ -1948,6 +2010,8 @@ export type ResourcesHealthOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'REPLICAS_ASC'
   | 'REPLICAS_DESC'
   | 'REQUIRED_CONFIGS_ASC'
@@ -2004,6 +2068,8 @@ export type ResourcesResolvedRequirementOrderBy =
   | 'NATURAL'
   | 'PRESENT_ASC'
   | 'PRESENT_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'REQUIRED_ASC'
   | 'REQUIRED_DESC'
   | 'REQUIREMENT_KIND_ASC'
@@ -2186,6 +2252,11 @@ export interface CreateFunctionApiBindingInput {
   /** The `FunctionApiBinding` to be created by this mutation. */
   functionApiBinding: FunctionApiBindingInput;
 }
+export interface CreateFunctionCapabilityBindingInput {
+  clientMutationId?: string;
+  /** The `FunctionCapabilityBinding` to be created by this mutation. */
+  functionCapabilityBinding: FunctionCapabilityBindingInput;
+}
 export interface CreateFunctionDefinitionInput {
   clientMutationId?: string;
   /** The `FunctionDefinition` to be created by this mutation. */
@@ -2299,6 +2370,11 @@ export interface CreatePlatformFunctionApiBindingInput {
   clientMutationId?: string;
   /** The `PlatformFunctionApiBinding` to be created by this mutation. */
   platformFunctionApiBinding: PlatformFunctionApiBindingInput;
+}
+export interface CreatePlatformFunctionCapabilityBindingInput {
+  clientMutationId?: string;
+  /** The `PlatformFunctionCapabilityBinding` to be created by this mutation. */
+  platformFunctionCapabilityBinding: PlatformFunctionCapabilityBindingInput;
 }
 export interface CreatePlatformFunctionDefinitionInput {
   clientMutationId?: string;
@@ -2540,6 +2616,10 @@ export interface DeleteFunctionApiBindingInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteFunctionCapabilityBindingInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteFunctionDefinitionInput {
   clientMutationId?: string;
   id: string;
@@ -2670,6 +2750,10 @@ export interface DeleteNamespaceInput {
   id: string;
 }
 export interface DeletePlatformFunctionApiBindingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformFunctionCapabilityBindingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2904,6 +2988,79 @@ export interface FunctionApiBindingToManyFunctionInvocationFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: FunctionInvocationFilter;
 }
+/** A filter to be used against `FunctionCapabilityBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionCapabilityBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: FunctionCapabilityBindingFilter[];
+  /** Filter by the object’s `bucketId` field. */
+  bucketId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `function` relation. */
+  function?: FunctionDefinitionFilter;
+  /** A related `function` exists. */
+  functionExists?: boolean;
+  /** Filter by the object’s `functionId` field. */
+  functionId?: UUIDFilter;
+  /** Filter by the object’s `graphId` field. */
+  graphId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `key` field. */
+  key?: StringFilter;
+  /** Filter by the object’s `lifecycle` field. */
+  lifecycle?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: FunctionCapabilityBindingFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionCapabilityBindingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `FunctionCapabilityBinding` */
+export interface FunctionCapabilityBindingInput {
+  /** Bucket this capability targets (exactly one typed target is set) */
+  bucketId?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Function definition holding this capability (exactly one of function_id / graph_id is set) */
+  functionId?: string;
+  /** Flow graph holding this capability (exactly one of function_id / graph_id is set) */
+  graphId?: string;
+  id?: string;
+  /** Runtime handle the holder addresses this capability by (e.g. default, scratch) */
+  key?: string;
+  /** Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree) */
+  lifecycle: string;
+  /** Per-binding annotations (no runtime semantics) */
+  metadata?: unknown;
+  updatedAt?: string;
+}
+/** Represents an update to a `FunctionCapabilityBinding`. Fields that are set will be updated. */
+export interface FunctionCapabilityBindingPatch {
+  /** Bucket this capability targets (exactly one typed target is set) */
+  bucketId?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Function definition holding this capability (exactly one of function_id / graph_id is set) */
+  functionId?: string;
+  /** Flow graph holding this capability (exactly one of function_id / graph_id is set) */
+  graphId?: string;
+  id?: string;
+  /** Runtime handle the holder addresses this capability by (e.g. default, scratch) */
+  key?: string;
+  /** Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree) */
+  lifecycle?: string;
+  /** Per-binding annotations (no runtime semantics) */
+  metadata?: unknown;
+  updatedAt?: string;
+}
 /** A filter to be used against `FunctionDefinition` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionDefinitionFilter {
   /** Filter by the object’s `accessChannels` field. */
@@ -2930,6 +3087,10 @@ export interface FunctionDefinitionFilter {
   functionApiBindings?: FunctionDefinitionToManyFunctionApiBindingFilter;
   /** `functionApiBindings` exist. */
   functionApiBindingsExist?: boolean;
+  /** Filter by the object’s `functionCapabilityBindingsByFunctionId` relation. */
+  functionCapabilityBindingsByFunctionId?: FunctionDefinitionToManyFunctionCapabilityBindingFilter;
+  /** `functionCapabilityBindingsByFunctionId` exist. */
+  functionCapabilityBindingsByFunctionIdExist?: boolean;
   /** Filter by the object’s `functionColumns` field. */
   functionColumns?: JSONFilter;
   /** Filter by the object’s `graphId` field. */
@@ -3163,6 +3324,15 @@ export interface FunctionDefinitionToManyFunctionApiBindingFilter {
   none?: FunctionApiBindingFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: FunctionApiBindingFilter;
+}
+/** A filter to be used against many `FunctionCapabilityBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionDefinitionToManyFunctionCapabilityBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionCapabilityBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionCapabilityBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionCapabilityBindingFilter;
 }
 /** A filter to be used against many `WebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionDefinitionToManyWebhookEndpointFilter {
@@ -5001,6 +5171,73 @@ export interface PlatformFunctionApiBindingToManyPlatformFunctionInvocationFilte
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformFunctionInvocationFilter;
 }
+/** A filter to be used against `PlatformFunctionCapabilityBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionCapabilityBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformFunctionCapabilityBindingFilter[];
+  /** Filter by the object’s `bucketId` field. */
+  bucketId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `function` relation. */
+  function?: PlatformFunctionDefinitionFilter;
+  /** A related `function` exists. */
+  functionExists?: boolean;
+  /** Filter by the object’s `functionId` field. */
+  functionId?: UUIDFilter;
+  /** Filter by the object’s `graphId` field. */
+  graphId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `key` field. */
+  key?: StringFilter;
+  /** Filter by the object’s `lifecycle` field. */
+  lifecycle?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformFunctionCapabilityBindingFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformFunctionCapabilityBindingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformFunctionCapabilityBinding` */
+export interface PlatformFunctionCapabilityBindingInput {
+  /** Bucket this capability targets (exactly one typed target is set) */
+  bucketId?: string;
+  createdAt?: string;
+  /** Function definition holding this capability (exactly one of function_id / graph_id is set) */
+  functionId?: string;
+  /** Flow graph holding this capability (exactly one of function_id / graph_id is set) */
+  graphId?: string;
+  id?: string;
+  /** Runtime handle the holder addresses this capability by (e.g. default, scratch) */
+  key?: string;
+  /** Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree) */
+  lifecycle: string;
+  /** Per-binding annotations (no runtime semantics) */
+  metadata?: unknown;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformFunctionCapabilityBinding`. Fields that are set will be updated. */
+export interface PlatformFunctionCapabilityBindingPatch {
+  /** Bucket this capability targets (exactly one typed target is set) */
+  bucketId?: string;
+  createdAt?: string;
+  /** Function definition holding this capability (exactly one of function_id / graph_id is set) */
+  functionId?: string;
+  /** Flow graph holding this capability (exactly one of function_id / graph_id is set) */
+  graphId?: string;
+  id?: string;
+  /** Runtime handle the holder addresses this capability by (e.g. default, scratch) */
+  key?: string;
+  /** Lifecycle the capability applies to: deployment (build/deploy time), execution (per invocation), root_execution (root of a graph execution tree) */
+  lifecycle?: string;
+  /** Per-binding annotations (no runtime semantics) */
+  metadata?: unknown;
+  updatedAt?: string;
+}
 /** A filter to be used against `PlatformFunctionDefinition` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformFunctionDefinitionFilter {
   /** Filter by the object’s `accessChannels` field. */
@@ -5065,6 +5302,10 @@ export interface PlatformFunctionDefinitionFilter {
   platformFunctionApiBindingsByFunctionDefinitionId?: PlatformFunctionDefinitionToManyPlatformFunctionApiBindingFilter;
   /** `platformFunctionApiBindingsByFunctionDefinitionId` exist. */
   platformFunctionApiBindingsByFunctionDefinitionIdExist?: boolean;
+  /** Filter by the object’s `platformFunctionCapabilityBindingsByFunctionId` relation. */
+  platformFunctionCapabilityBindingsByFunctionId?: PlatformFunctionDefinitionToManyPlatformFunctionCapabilityBindingFilter;
+  /** `platformFunctionCapabilityBindingsByFunctionId` exist. */
+  platformFunctionCapabilityBindingsByFunctionIdExist?: boolean;
   /** Filter by the object’s `platformWebhookEndpointsByFunctionDefinitionId` relation. */
   platformWebhookEndpointsByFunctionDefinitionId?: PlatformFunctionDefinitionToManyPlatformWebhookEndpointFilter;
   /** `platformWebhookEndpointsByFunctionDefinitionId` exist. */
@@ -5270,6 +5511,15 @@ export interface PlatformFunctionDefinitionToManyPlatformFunctionApiBindingFilte
   none?: PlatformFunctionApiBindingFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformFunctionApiBindingFilter;
+}
+/** A filter to be used against many `PlatformFunctionCapabilityBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionDefinitionToManyPlatformFunctionCapabilityBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformFunctionCapabilityBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformFunctionCapabilityBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformFunctionCapabilityBindingFilter;
 }
 /** A filter to be used against many `PlatformWebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformFunctionDefinitionToManyPlatformWebhookEndpointFilter {
@@ -6264,6 +6514,8 @@ export interface PlatformResourceDefinitionFilter {
   not?: PlatformResourceDefinitionFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformResourceDefinitionFilter[];
+  /** Filter by the object’s `paramsSchema` field. */
+  paramsSchema?: JSONFilter;
   /** Filter by the object’s `platformResourcesByResourceDefinitionId` relation. */
   platformResourcesByResourceDefinitionId?: PlatformResourceDefinitionToManyPlatformResourceFilter;
   /** `platformResourcesByResourceDefinitionId` exist. */
@@ -6298,6 +6550,8 @@ export interface PlatformResourceDefinitionInput {
   name: string;
   /** Namespace this definition belongs to (security boundary, maps to K8s namespace) */
   namespaceId: string;
+  /** Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay. */
+  paramsSchema?: unknown;
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
@@ -6330,6 +6584,8 @@ export interface PlatformResourceDefinitionPatch {
   name?: string;
   /** Namespace this definition belongs to (security boundary, maps to K8s namespace) */
   namespaceId?: string;
+  /** Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay. */
+  paramsSchema?: unknown;
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
@@ -6459,6 +6715,8 @@ export interface PlatformResourceFilter {
   platformResourceStatusChecksByResourceId?: PlatformResourceToManyPlatformResourceStatusCheckFilter;
   /** `platformResourceStatusChecksByResourceId` exist. */
   platformResourceStatusChecksByResourceIdExist?: boolean;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `replicas` field. */
   replicas?: IntFilter;
   /** Filter by the object’s `resourceDefinition` relation. */
@@ -6509,6 +6767,8 @@ export interface PlatformResourceInput {
   name: string;
   /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
   namespaceId: string;
+  /** Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane. */
+  realm?: string;
   /** Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Embedded secret requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
@@ -6626,6 +6886,7 @@ export interface PlatformResourceInstallationToManyPlatformResourceFilter {
 }
 export interface PlatformResourceInstallationsInstallInput {
   clientMutationId?: string;
+  definitionIds?: string[];
   name?: string;
   namespaceId?: string;
   newParams?: unknown;
@@ -6670,6 +6931,8 @@ export interface PlatformResourcePatch {
   name?: string;
   /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
   namespaceId?: string;
+  /** Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane. */
+  realm?: string;
   /** Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Embedded secret requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
@@ -6982,6 +7245,8 @@ export interface PlatformResourcesHealthFilter {
   not?: PlatformResourcesHealthFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformResourcesHealthFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `replicas` field. */
   replicas?: IntFilter;
   /** Filter by the object’s `resourceDefinitionId` field. */
@@ -7046,6 +7311,8 @@ export interface PlatformResourcesResolvedRequirementFilter {
   or?: PlatformResourcesResolvedRequirementFilter[];
   /** Filter by the object’s `present` field. */
   present?: BooleanFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `required` field. */
   required?: BooleanFilter;
   /** Filter by the object’s `requirementKind` field. */
@@ -7318,6 +7585,8 @@ export interface ResourceDefinitionFilter {
   not?: ResourceDefinitionFilter;
   /** Checks for any expressions in this list. */
   or?: ResourceDefinitionFilter[];
+  /** Filter by the object’s `paramsSchema` field. */
+  paramsSchema?: JSONFilter;
   /** Filter by the object’s `resources` relation. */
   resources?: ResourceDefinitionToManyResourceFilter;
   /** `resources` exist. */
@@ -7354,6 +7623,8 @@ export interface ResourceDefinitionInput {
   name: string;
   /** Namespace this definition belongs to (security boundary, maps to K8s namespace) */
   namespaceId: string;
+  /** Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay. */
+  paramsSchema?: unknown;
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
@@ -7388,6 +7659,8 @@ export interface ResourceDefinitionPatch {
   name?: string;
   /** Namespace this definition belongs to (security boundary, maps to K8s namespace) */
   namespaceId?: string;
+  /** Declared parameter interface: [{key,label,type,default,required,min,max,options,group,order,bindings:[{path,template,scale,round,unit}]}]. Installation params are validated and compiled through these declarations; [] keeps the legacy raw spec overlay. */
+  paramsSchema?: unknown;
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
@@ -7521,6 +7794,8 @@ export interface ResourceFilter {
   not?: ResourceFilter;
   /** Checks for any expressions in this list. */
   or?: ResourceFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `replicas` field. */
   replicas?: IntFilter;
   /** Filter by the object’s `resourceDefinition` relation. */
@@ -7577,6 +7852,8 @@ export interface ResourceInput {
   name: string;
   /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
   namespaceId: string;
+  /** Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane. */
+  realm?: string;
   /** Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Embedded secret requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
@@ -7700,6 +7977,7 @@ export interface ResourceInstallationToManyResourceFilter {
 }
 export interface ResourceInstallationsInstallInput {
   clientMutationId?: string;
+  definitionIds?: string[];
   name?: string;
   namespaceId?: string;
   newParams?: unknown;
@@ -7746,6 +8024,8 @@ export interface ResourcePatch {
   name?: string;
   /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
   namespaceId?: string;
+  /** Config/secret realm this resource resolves against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane. */
+  realm?: string;
   /** Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Embedded secret requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
@@ -8084,6 +8364,8 @@ export interface ResourcesHealthFilter {
   not?: ResourcesHealthFilter;
   /** Checks for any expressions in this list. */
   or?: ResourcesHealthFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `replicas` field. */
   replicas?: IntFilter;
   /** Filter by the object’s `resourceDefinitionId` field. */
@@ -8148,6 +8430,8 @@ export interface ResourcesResolvedRequirementFilter {
   or?: ResourcesResolvedRequirementFilter[];
   /** Filter by the object’s `present` field. */
   present?: BooleanFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `required` field. */
   required?: BooleanFilter;
   /** Filter by the object’s `requirementKind` field. */
@@ -8196,6 +8480,12 @@ export interface UpdateFunctionApiBindingInput {
   clientMutationId?: string;
   /** An object where the defined keys will be set on the `FunctionApiBinding` being updated. */
   functionApiBindingPatch: FunctionApiBindingPatch;
+  id: string;
+}
+export interface UpdateFunctionCapabilityBindingInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionCapabilityBinding` being updated. */
+  functionCapabilityBindingPatch: FunctionCapabilityBindingPatch;
   id: string;
 }
 export interface UpdateFunctionDefinitionInput {
@@ -8374,6 +8664,12 @@ export interface UpdatePlatformFunctionApiBindingInput {
   id: string;
   /** An object where the defined keys will be set on the `PlatformFunctionApiBinding` being updated. */
   platformFunctionApiBindingPatch: PlatformFunctionApiBindingPatch;
+}
+export interface UpdatePlatformFunctionCapabilityBindingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformFunctionCapabilityBinding` being updated. */
+  platformFunctionCapabilityBindingPatch: PlatformFunctionCapabilityBindingPatch;
 }
 export interface UpdatePlatformFunctionDefinitionInput {
   clientMutationId?: string;
@@ -8817,6 +9113,13 @@ export interface FunctionApiBindingConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `FunctionCapabilityBinding` values. */
+export interface FunctionCapabilityBindingConnection {
+  edges: FunctionCapabilityBindingEdge[];
+  nodes: FunctionCapabilityBinding[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `FunctionDefinition` values. */
 export interface FunctionDefinitionConnection {
   edges: FunctionDefinitionEdge[];
@@ -8982,6 +9285,13 @@ export interface NamespaceConnection {
 export interface PlatformFunctionApiBindingConnection {
   edges: PlatformFunctionApiBindingEdge[];
   nodes: PlatformFunctionApiBinding[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformFunctionCapabilityBinding` values. */
+export interface PlatformFunctionCapabilityBindingConnection {
+  edges: PlatformFunctionCapabilityBindingEdge[];
+  nodes: PlatformFunctionCapabilityBinding[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9304,6 +9614,12 @@ export interface CreateFunctionApiBindingPayload {
   functionApiBinding?: FunctionApiBinding | null;
   functionApiBindingEdge?: FunctionApiBindingEdge | null;
 }
+export interface CreateFunctionCapabilityBindingPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionCapabilityBinding` that was created by this mutation. */
+  functionCapabilityBinding?: FunctionCapabilityBinding | null;
+  functionCapabilityBindingEdge?: FunctionCapabilityBindingEdge | null;
+}
 export interface CreateFunctionDefinitionPayload {
   clientMutationId?: string | null;
   /** The `FunctionDefinition` that was created by this mutation. */
@@ -9433,6 +9749,12 @@ export interface CreatePlatformFunctionApiBindingPayload {
   /** The `PlatformFunctionApiBinding` that was created by this mutation. */
   platformFunctionApiBinding?: PlatformFunctionApiBinding | null;
   platformFunctionApiBindingEdge?: PlatformFunctionApiBindingEdge | null;
+}
+export interface CreatePlatformFunctionCapabilityBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionCapabilityBinding` that was created by this mutation. */
+  platformFunctionCapabilityBinding?: PlatformFunctionCapabilityBinding | null;
+  platformFunctionCapabilityBindingEdge?: PlatformFunctionCapabilityBindingEdge | null;
 }
 export interface CreatePlatformFunctionDefinitionPayload {
   clientMutationId?: string | null;
@@ -9626,6 +9948,12 @@ export interface DeleteFunctionApiBindingPayload {
   functionApiBinding?: FunctionApiBinding | null;
   functionApiBindingEdge?: FunctionApiBindingEdge | null;
 }
+export interface DeleteFunctionCapabilityBindingPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionCapabilityBinding` that was deleted by this mutation. */
+  functionCapabilityBinding?: FunctionCapabilityBinding | null;
+  functionCapabilityBindingEdge?: FunctionCapabilityBindingEdge | null;
+}
 export interface DeleteFunctionDefinitionPayload {
   clientMutationId?: string | null;
   /** The `FunctionDefinition` that was deleted by this mutation. */
@@ -9757,6 +10085,12 @@ export interface DeletePlatformFunctionApiBindingPayload {
   /** The `PlatformFunctionApiBinding` that was deleted by this mutation. */
   platformFunctionApiBinding?: PlatformFunctionApiBinding | null;
   platformFunctionApiBindingEdge?: PlatformFunctionApiBindingEdge | null;
+}
+export interface DeletePlatformFunctionCapabilityBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionCapabilityBinding` that was deleted by this mutation. */
+  platformFunctionCapabilityBinding?: PlatformFunctionCapabilityBinding | null;
+  platformFunctionCapabilityBindingEdge?: PlatformFunctionCapabilityBindingEdge | null;
 }
 export interface DeletePlatformFunctionDefinitionPayload {
   clientMutationId?: string | null;
@@ -10038,6 +10372,12 @@ export interface UpdateFunctionApiBindingPayload {
   functionApiBinding?: FunctionApiBinding | null;
   functionApiBindingEdge?: FunctionApiBindingEdge | null;
 }
+export interface UpdateFunctionCapabilityBindingPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionCapabilityBinding` that was updated by this mutation. */
+  functionCapabilityBinding?: FunctionCapabilityBinding | null;
+  functionCapabilityBindingEdge?: FunctionCapabilityBindingEdge | null;
+}
 export interface UpdateFunctionDefinitionPayload {
   clientMutationId?: string | null;
   /** The `FunctionDefinition` that was updated by this mutation. */
@@ -10169,6 +10509,12 @@ export interface UpdatePlatformFunctionApiBindingPayload {
   /** The `PlatformFunctionApiBinding` that was updated by this mutation. */
   platformFunctionApiBinding?: PlatformFunctionApiBinding | null;
   platformFunctionApiBindingEdge?: PlatformFunctionApiBindingEdge | null;
+}
+export interface UpdatePlatformFunctionCapabilityBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionCapabilityBinding` that was updated by this mutation. */
+  platformFunctionCapabilityBinding?: PlatformFunctionCapabilityBinding | null;
+  platformFunctionCapabilityBindingEdge?: PlatformFunctionCapabilityBindingEdge | null;
 }
 export interface UpdatePlatformFunctionDefinitionPayload {
   clientMutationId?: string | null;
@@ -10363,6 +10709,7 @@ export interface MetaTable {
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
@@ -10376,6 +10723,8 @@ export interface MetaTable {
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
   storage?: MetaStorage | null;
+  /** PostgreSQL table name */
+  tableName: string;
   uniqueConstraints: MetaUniqueConstraint[];
 }
 /** A `DbPreset` edge in the connection. */
@@ -10400,6 +10749,12 @@ export interface FunctionApiBindingEdge {
   cursor?: string | null;
   /** The `FunctionApiBinding` at the end of the edge. */
   node?: FunctionApiBinding | null;
+}
+/** A `FunctionCapabilityBinding` edge in the connection. */
+export interface FunctionCapabilityBindingEdge {
+  cursor?: string | null;
+  /** The `FunctionCapabilityBinding` at the end of the edge. */
+  node?: FunctionCapabilityBinding | null;
 }
 /** A `FunctionDefinition` edge in the connection. */
 export interface FunctionDefinitionEdge {
@@ -10544,6 +10899,12 @@ export interface PlatformFunctionApiBindingEdge {
   cursor?: string | null;
   /** The `PlatformFunctionApiBinding` at the end of the edge. */
   node?: PlatformFunctionApiBinding | null;
+}
+/** A `PlatformFunctionCapabilityBinding` edge in the connection. */
+export interface PlatformFunctionCapabilityBindingEdge {
+  cursor?: string | null;
+  /** The `PlatformFunctionCapabilityBinding` at the end of the edge. */
+  node?: PlatformFunctionCapabilityBinding | null;
 }
 /** A `PlatformFunctionDefinition` edge in the connection. */
 export interface PlatformFunctionDefinitionEdge {
@@ -10799,6 +11160,8 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** PostgreSQL column name */
+  columnName: string;
   description?: string | null;
   /** Enum metadata if this field has an enum type */
   enumValues?: MetaEnum | null;
@@ -10806,6 +11169,7 @@ export interface MetaField {
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Final GraphQL field name */
   name: string;
   type: MetaType;
 }
@@ -10855,7 +11219,7 @@ export interface MetaPrimaryKeyConstraint {
 }
 /** Table query/mutation names */
 export interface MetaQuery {
-  all: string;
+  all?: string | null;
   create?: string | null;
   delete?: string | null;
   one?: string | null;

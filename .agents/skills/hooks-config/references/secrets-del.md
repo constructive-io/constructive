@@ -7,7 +7,7 @@ React Query mutation hook for _secretsDel
 ## Usage
 
 ```typescript
-const { mutate } = use_secretsDelMutation(); mutate({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretName: '<String>' } });
+const { mutate } = use_secretsDelMutation(); mutate({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', realm: '<String>', secretName: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = use_secretsDelMutation(); mutate({ input: { databaseId: '<UUI
 
 ```typescript
 const { mutate, isLoading } = use_secretsDelMutation();
-mutate({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretName: '<String>' } });
+mutate({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', realm: '<String>', secretName: '<String>' } });
 ```

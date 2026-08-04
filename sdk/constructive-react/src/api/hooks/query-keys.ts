@@ -19,15 +19,6 @@
 // Entity Query Keys
 // ============================================================================
 
-export const apiKeys = {
-  /** All api queries */ all: ['api'] as const,
-  /** List query keys */ lists: () => [...apiKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...apiKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...apiKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...apiKeys.details(), id] as const,
-} as const;
 export const apiSchemaKeys = {
   /** All apiSchema queries */ all: ['apischema'] as const,
   /** List query keys */ lists: () => [...apiSchemaKeys.all, 'list'] as const,
@@ -45,6 +36,15 @@ export const apiSettingKeys = {
   /** Detail query keys */ details: () => [...apiSettingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...apiSettingKeys.details(), id] as const,
+} as const;
+export const apisKeys = {
+  /** All apis queries */ all: ['apis'] as const,
+  /** List query keys */ lists: () => [...apisKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...apisKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...apisKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...apisKeys.details(), id] as const,
 } as const;
 export const astMigrationKeys = {
   /** All astMigration queries */ all: ['astmigration'] as const,
@@ -118,6 +118,15 @@ export const defaultPrivilegeKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...defaultPrivilegeKeys.details(), id] as const,
 } as const;
+export const deriveKeys = {
+  /** All derive queries */ all: ['derive'] as const,
+  /** List query keys */ lists: () => [...deriveKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...deriveKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...deriveKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...deriveKeys.details(), id] as const,
+} as const;
 export const domainKeys = {
   /** All domain queries */ all: ['domain'] as const,
   /** List query keys */ lists: () => [...domainKeys.all, 'list'] as const,
@@ -181,6 +190,15 @@ export const exclusionConstraintKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...exclusionConstraintKeys.details(), id] as const,
 } as const;
+export const fieldBehaviorKeys = {
+  /** All fieldBehavior queries */ all: ['fieldbehavior'] as const,
+  /** List query keys */ lists: () => [...fieldBehaviorKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...fieldBehaviorKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...fieldBehaviorKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...fieldBehaviorKeys.details(), id] as const,
+} as const;
 export const fieldKeys = {
   /** All field queries */ all: ['field'] as const,
   /** List query keys */ lists: () => [...fieldKeys.all, 'list'] as const,
@@ -189,6 +207,16 @@ export const fieldKeys = {
   /** Detail query keys */ details: () => [...fieldKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...fieldKeys.details(), id] as const,
+} as const;
+export const foreignKeyConstraintBehaviorKeys = {
+  /** All foreignKeyConstraintBehavior queries */ all: ['foreignkeyconstraintbehavior'] as const,
+  /** List query keys */ lists: () => [...foreignKeyConstraintBehaviorKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...foreignKeyConstraintBehaviorKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...foreignKeyConstraintBehaviorKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...foreignKeyConstraintBehaviorKeys.details(), id] as const,
 } as const;
 export const foreignKeyConstraintKeys = {
   /** All foreignKeyConstraint queries */ all: ['foreignkeyconstraint'] as const,
@@ -262,6 +290,15 @@ export const nodeTypeRegistryKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...nodeTypeRegistryKeys.details(), id] as const,
 } as const;
+export const pageKeys = {
+  /** All page queries */ all: ['page'] as const,
+  /** List query keys */ lists: () => [...pageKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...pageKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...pageKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...pageKeys.details(), id] as const,
+} as const;
 export const partitionKeys = {
   /** All partition queries */ all: ['partition'] as const,
   /** List query keys */ lists: () => [...partitionKeys.all, 'list'] as const,
@@ -270,15 +307,6 @@ export const partitionKeys = {
   /** Detail query keys */ details: () => [...partitionKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...partitionKeys.details(), id] as const,
-} as const;
-export const platformApiKeys = {
-  /** All platformApi queries */ all: ['platformapi'] as const,
-  /** List query keys */ lists: () => [...platformApiKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...platformApiKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...platformApiKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...platformApiKeys.details(), id] as const,
 } as const;
 export const platformApiSchemaKeys = {
   /** All platformApiSchema queries */ all: ['platformapischema'] as const,
@@ -297,6 +325,15 @@ export const platformApiSettingKeys = {
   /** Detail query keys */ details: () => [...platformApiSettingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformApiSettingKeys.details(), id] as const,
+} as const;
+export const platformApisKeys = {
+  /** All platformApis queries */ all: ['platformapis'] as const,
+  /** List query keys */ lists: () => [...platformApisKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformApisKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformApisKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformApisKeys.details(), id] as const,
 } as const;
 export const platformCorsSettingKeys = {
   /** All platformCorsSetting queries */ all: ['platformcorssetting'] as const,
@@ -344,6 +381,24 @@ export const platformManagedDomainKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformManagedDomainKeys.details(), id] as const,
 } as const;
+export const platformPageKeys = {
+  /** All platformPage queries */ all: ['platformpage'] as const,
+  /** List query keys */ lists: () => [...platformPageKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformPageKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformPageKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformPageKeys.details(), id] as const,
+} as const;
+export const platformSiteAppLinkKeys = {
+  /** All platformSiteAppLink queries */ all: ['platformsiteapplink'] as const,
+  /** List query keys */ lists: () => [...platformSiteAppLinkKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformSiteAppLinkKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformSiteAppLinkKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformSiteAppLinkKeys.details(), id] as const,
+} as const;
 export const platformSiteKeys = {
   /** All platformSite queries */ all: ['platformsite'] as const,
   /** List query keys */ lists: () => [...platformSiteKeys.all, 'list'] as const,
@@ -352,6 +407,24 @@ export const platformSiteKeys = {
   /** Detail query keys */ details: () => [...platformSiteKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformSiteKeys.details(), id] as const,
+} as const;
+export const platformSiteDeepLinkKeys = {
+  /** All platformSiteDeepLink queries */ all: ['platformsitedeeplink'] as const,
+  /** List query keys */ lists: () => [...platformSiteDeepLinkKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformSiteDeepLinkKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformSiteDeepLinkKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformSiteDeepLinkKeys.details(), id] as const,
+} as const;
+export const platformSiteErrorPageKeys = {
+  /** All platformSiteErrorPage queries */ all: ['platformsiteerrorpage'] as const,
+  /** List query keys */ lists: () => [...platformSiteErrorPageKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformSiteErrorPageKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformSiteErrorPageKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformSiteErrorPageKeys.details(), id] as const,
 } as const;
 export const platformSiteMetadatumKeys = {
   /** All platformSiteMetadatum queries */ all: ['platformsitemetadatum'] as const,
@@ -379,6 +452,15 @@ export const platformSiteThemeKeys = {
   /** Detail query keys */ details: () => [...platformSiteThemeKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformSiteThemeKeys.details(), id] as const,
+} as const;
+export const platformSiteWebConfigKeys = {
+  /** All platformSiteWebConfig queries */ all: ['platformsitewebconfig'] as const,
+  /** List query keys */ lists: () => [...platformSiteWebConfigKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformSiteWebConfigKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformSiteWebConfigKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformSiteWebConfigKeys.details(), id] as const,
 } as const;
 export const policyKeys = {
   /** All policy queries */ all: ['policy'] as const,
@@ -452,6 +534,15 @@ export const schemaGrantKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...schemaGrantKeys.details(), id] as const,
 } as const;
+export const siteAppLinkKeys = {
+  /** All siteAppLink queries */ all: ['siteapplink'] as const,
+  /** List query keys */ lists: () => [...siteAppLinkKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...siteAppLinkKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...siteAppLinkKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...siteAppLinkKeys.details(), id] as const,
+} as const;
 export const siteKeys = {
   /** All site queries */ all: ['site'] as const,
   /** List query keys */ lists: () => [...siteKeys.all, 'list'] as const,
@@ -460,6 +551,24 @@ export const siteKeys = {
   /** Detail query keys */ details: () => [...siteKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...siteKeys.details(), id] as const,
+} as const;
+export const siteDeepLinkKeys = {
+  /** All siteDeepLink queries */ all: ['sitedeeplink'] as const,
+  /** List query keys */ lists: () => [...siteDeepLinkKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...siteDeepLinkKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...siteDeepLinkKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...siteDeepLinkKeys.details(), id] as const,
+} as const;
+export const siteErrorPageKeys = {
+  /** All siteErrorPage queries */ all: ['siteerrorpage'] as const,
+  /** List query keys */ lists: () => [...siteErrorPageKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...siteErrorPageKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...siteErrorPageKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...siteErrorPageKeys.details(), id] as const,
 } as const;
 export const siteMetadatumKeys = {
   /** All siteMetadatum queries */ all: ['sitemetadatum'] as const,
@@ -488,6 +597,15 @@ export const siteThemeKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...siteThemeKeys.details(), id] as const,
 } as const;
+export const siteWebConfigKeys = {
+  /** All siteWebConfig queries */ all: ['sitewebconfig'] as const,
+  /** List query keys */ lists: () => [...siteWebConfigKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...siteWebConfigKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...siteWebConfigKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...siteWebConfigKeys.details(), id] as const,
+} as const;
 export const spatialRelationKeys = {
   /** All spatialRelation queries */ all: ['spatialrelation'] as const,
   /** List query keys */ lists: () => [...spatialRelationKeys.all, 'list'] as const,
@@ -505,6 +623,15 @@ export const sqlActionKeys = {
   /** Detail query keys */ details: () => [...sqlActionKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...sqlActionKeys.details(), id] as const,
+} as const;
+export const tableBehaviorKeys = {
+  /** All tableBehavior queries */ all: ['tablebehavior'] as const,
+  /** List query keys */ lists: () => [...tableBehaviorKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...tableBehaviorKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...tableBehaviorKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...tableBehaviorKeys.details(), id] as const,
 } as const;
 export const tableKeys = {
   /** All table queries */ all: ['table'] as const,
@@ -542,6 +669,15 @@ export const triggerFunctionKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...triggerFunctionKeys.details(), id] as const,
 } as const;
+export const uniqueConstraintBehaviorKeys = {
+  /** All uniqueConstraintBehavior queries */ all: ['uniqueconstraintbehavior'] as const,
+  /** List query keys */ lists: () => [...uniqueConstraintBehaviorKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...uniqueConstraintBehaviorKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...uniqueConstraintBehaviorKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...uniqueConstraintBehaviorKeys.details(), id] as const,
+} as const;
 export const uniqueConstraintKeys = {
   /** All uniqueConstraint queries */ all: ['uniqueconstraint'] as const,
   /** List query keys */ lists: () => [...uniqueConstraintKeys.all, 'list'] as const,
@@ -550,6 +686,15 @@ export const uniqueConstraintKeys = {
   /** Detail query keys */ details: () => [...uniqueConstraintKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...uniqueConstraintKeys.details(), id] as const,
+} as const;
+export const viewBehaviorKeys = {
+  /** All viewBehavior queries */ all: ['viewbehavior'] as const,
+  /** List query keys */ lists: () => [...viewBehaviorKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...viewBehaviorKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...viewBehaviorKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...viewBehaviorKeys.details(), id] as const,
 } as const;
 export const viewKeys = {
   /** All view queries */ all: ['view'] as const,
@@ -606,10 +751,14 @@ export const customQueryKeys = {
     ['apiSchemaNames', variables] as const,
   /** Query key for applyRegistryDefaults */ applyRegistryDefaults: (variables?: object) =>
     ['applyRegistryDefaults', variables] as const,
+  /** Query key for resolveDeepLink */ resolveDeepLink: (variables?: object) =>
+    ['resolveDeepLink', variables] as const,
   /** Query key for resolveHttpRoute */ resolveHttpRoute: (variables?: object) =>
     ['resolveHttpRoute', variables] as const,
   /** Query key for resolveRoute */ resolveRoute: (variables?: object) =>
     ['resolveRoute', variables] as const,
+  /** Query key for resolveSiteAppLinks */ resolveSiteAppLinks: (variables?: object) =>
+    ['resolveSiteAppLinks', variables] as const,
 } as const;
 /**
 
@@ -634,9 +783,9 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
-  api: apiKeys,
   apiSchema: apiSchemaKeys,
   apiSetting: apiSettingKeys,
+  apis: apisKeys,
   astMigration: astMigrationKeys,
   checkConstraint: checkConstraintKeys,
   compositeType: compositeTypeKeys,
@@ -645,6 +794,7 @@ export const queryKeys = {
   databaseSetting: databaseSettingKeys,
   databaseTransfer: databaseTransferKeys,
   defaultPrivilege: defaultPrivilegeKeys,
+  derive: deriveKeys,
   domain: domainKeys,
   domainEvent: domainEventKeys,
   domainType: domainTypeKeys,
@@ -652,7 +802,9 @@ export const queryKeys = {
   embeddingChunk: embeddingChunkKeys,
   enum: enumKeys,
   exclusionConstraint: exclusionConstraintKeys,
+  fieldBehavior: fieldBehaviorKeys,
   field: fieldKeys,
+  foreignKeyConstraintBehavior: foreignKeyConstraintBehaviorKeys,
   foreignKeyConstraint: foreignKeyConstraintKeys,
   fullTextSearch: fullTextSearchKeys,
   function: functionKeys,
@@ -661,19 +813,25 @@ export const queryKeys = {
   index: indexKeys,
   managedDomain: managedDomainKeys,
   nodeTypeRegistry: nodeTypeRegistryKeys,
+  page: pageKeys,
   partition: partitionKeys,
-  platformApi: platformApiKeys,
   platformApiSchema: platformApiSchemaKeys,
   platformApiSetting: platformApiSettingKeys,
+  platformApis: platformApisKeys,
   platformCorsSetting: platformCorsSettingKeys,
   platformDomain: platformDomainKeys,
   platformDomainEvent: platformDomainEventKeys,
   platformDomainVerification: platformDomainVerificationKeys,
   platformManagedDomain: platformManagedDomainKeys,
+  platformPage: platformPageKeys,
+  platformSiteAppLink: platformSiteAppLinkKeys,
   platformSite: platformSiteKeys,
+  platformSiteDeepLink: platformSiteDeepLinkKeys,
+  platformSiteErrorPage: platformSiteErrorPageKeys,
   platformSiteMetadatum: platformSiteMetadatumKeys,
   platformSiteModule: platformSiteModuleKeys,
   platformSiteTheme: platformSiteThemeKeys,
+  platformSiteWebConfig: platformSiteWebConfigKeys,
   policy: policyKeys,
   primaryKeyConstraint: primaryKeyConstraintKeys,
   pubkeySetting: pubkeySettingKeys,
@@ -682,17 +840,24 @@ export const queryKeys = {
   route: routeKeys,
   schema: schemaKeys,
   schemaGrant: schemaGrantKeys,
+  siteAppLink: siteAppLinkKeys,
   site: siteKeys,
+  siteDeepLink: siteDeepLinkKeys,
+  siteErrorPage: siteErrorPageKeys,
   siteMetadatum: siteMetadatumKeys,
   siteModule: siteModuleKeys,
   siteTheme: siteThemeKeys,
+  siteWebConfig: siteWebConfigKeys,
   spatialRelation: spatialRelationKeys,
   sqlAction: sqlActionKeys,
+  tableBehavior: tableBehaviorKeys,
   table: tableKeys,
   tableGrant: tableGrantKeys,
   trigger: triggerKeys,
   triggerFunction: triggerFunctionKeys,
+  uniqueConstraintBehavior: uniqueConstraintBehaviorKeys,
   uniqueConstraint: uniqueConstraintKeys,
+  viewBehavior: viewBehaviorKeys,
   view: viewKeys,
   viewGrant: viewGrantKeys,
   viewRule: viewRuleKeys,

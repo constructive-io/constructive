@@ -116,11 +116,12 @@ CRUD operations for Config records.
 | `name` | String |
 | `namespaceId` | UUID |
 | `provider` | String |
+| `realm` | String |
 | `updatedAt` | Datetime |
 | `value` | String |
 
 **Required create fields:** `databaseId`, `name`, `namespaceId`
-**Optional create fields (backend defaults):** `annotations`, `description`, `expiresAt`, `labels`, `provider`, `value`
+**Optional create fields (backend defaults):** `annotations`, `description`, `expiresAt`, `labels`, `provider`, `realm`, `value`
 
 ### `platform-config`
 
@@ -148,11 +149,12 @@ CRUD operations for PlatformConfig records.
 | `name` | String |
 | `namespaceId` | UUID |
 | `provider` | String |
+| `realm` | String |
 | `updatedAt` | Datetime |
 | `value` | String |
 
 **Required create fields:** `name`, `namespaceId`
-**Optional create fields (backend defaults):** `annotations`, `description`, `expiresAt`, `labels`, `provider`, `value`
+**Optional create fields (backend defaults):** `annotations`, `description`, `expiresAt`, `labels`, `provider`, `realm`, `value`
 
 ### `platform-internal-secret`
 
@@ -178,11 +180,12 @@ CRUD operations for PlatformInternalSecret records.
 | `labels` | JSON |
 | `name` | String |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `retiredAt` | Datetime |
 | `rotatedAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `annotations`, `description`, `labels`, `name`, `namespaceId`, `retiredAt`, `rotatedAt`
+**Required create fields:** `annotations`, `description`, `labels`, `name`, `namespaceId`, `realm`, `retiredAt`, `rotatedAt`
 
 ### `platform-secret`
 
@@ -209,11 +212,12 @@ CRUD operations for PlatformSecret records.
 | `name` | String |
 | `namespaceId` | UUID |
 | `provider` | String |
+| `realm` | String |
 | `retiredAt` | Datetime |
 | `rotatedAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `annotations`, `description`, `labels`, `name`, `namespaceId`, `provider`, `retiredAt`, `rotatedAt`
+**Required create fields:** `annotations`, `description`, `labels`, `name`, `namespaceId`, `provider`, `realm`, `retiredAt`, `rotatedAt`
 
 ### `secret`
 
@@ -241,11 +245,12 @@ CRUD operations for Secret records.
 | `name` | String |
 | `namespaceId` | UUID |
 | `provider` | String |
+| `realm` | String |
 | `retiredAt` | Datetime |
 | `rotatedAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `annotations`, `databaseId`, `description`, `labels`, `name`, `namespaceId`, `provider`, `retiredAt`, `rotatedAt`
+**Required create fields:** `annotations`, `databaseId`, `description`, `labels`, `name`, `namespaceId`, `provider`, `realm`, `retiredAt`, `rotatedAt`
 
 ## Custom Operations
 
@@ -261,6 +266,7 @@ _secretsDel
   | `--input.clientMutationId` | String |
   | `--input.databaseId` | UUID |
   | `--input.namespaceId` | UUID |
+  | `--input.realm` | String |
   | `--input.secretName` | String |
 
 ### `secrets-remove-array`
@@ -275,6 +281,7 @@ _secretsRemoveArray
   | `--input.clientMutationId` | String |
   | `--input.databaseId` | UUID |
   | `--input.namespaceId` | UUID |
+  | `--input.realm` | String |
   | `--input.secretNames` | String |
 
 ### `secrets-rotate`
@@ -290,6 +297,7 @@ _secretsRotate
   | `--input.clientMutationId` | String |
   | `--input.databaseId` | UUID |
   | `--input.namespaceId` | UUID |
+  | `--input.realm` | String |
   | `--input.secretName` | String |
   | `--input.secretValue` | String |
 
@@ -308,6 +316,7 @@ _secretsSet
   | `--input.scopeDatabaseId` | UUID |
   | `--input.secretName` | String |
   | `--input.secretNamespaceId` | UUID |
+  | `--input.secretRealm` | String |
   | `--input.secretValue` | String |
 
 ### `platform-internal-secrets-del`
@@ -321,6 +330,7 @@ platformInternalSecretsDel
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.namespaceId` | UUID |
+  | `--input.realm` | String |
   | `--input.secretName` | String |
 
 ### `platform-internal-secrets-remove-array`
@@ -334,6 +344,7 @@ platformInternalSecretsRemoveArray
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.namespaceId` | UUID |
+  | `--input.realm` | String |
   | `--input.secretNames` | String |
 
 ### `platform-internal-secrets-rotate`
@@ -348,6 +359,7 @@ platformInternalSecretsRotate
   | `--input.algo` | String |
   | `--input.clientMutationId` | String |
   | `--input.namespaceId` | UUID |
+  | `--input.realm` | String |
   | `--input.secretName` | String |
   | `--input.secretValue` | String |
 
@@ -364,6 +376,7 @@ platformInternalSecretsSet
   | `--input.clientMutationId` | String |
   | `--input.secretName` | String |
   | `--input.secretNamespaceId` | UUID |
+  | `--input.secretRealm` | String |
   | `--input.secretValue` | String |
 
 ### `platform-secrets-del`
@@ -377,6 +390,7 @@ platformSecretsDel
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.namespaceId` | UUID |
+  | `--input.realm` | String |
   | `--input.secretName` | String |
 
 ### `platform-secrets-remove-array`
@@ -390,6 +404,7 @@ platformSecretsRemoveArray
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.namespaceId` | UUID |
+  | `--input.realm` | String |
   | `--input.secretNames` | String |
 
 ### `platform-secrets-rotate`
@@ -404,6 +419,7 @@ platformSecretsRotate
   | `--input.algo` | String |
   | `--input.clientMutationId` | String |
   | `--input.namespaceId` | UUID |
+  | `--input.realm` | String |
   | `--input.secretName` | String |
   | `--input.secretValue` | String |
 
@@ -421,6 +437,7 @@ platformSecretsSet
   | `--input.provider` | String |
   | `--input.secretName` | String |
   | `--input.secretNamespaceId` | UUID |
+  | `--input.secretRealm` | String |
   | `--input.secretValue` | String |
 
 ### `provision-bucket`

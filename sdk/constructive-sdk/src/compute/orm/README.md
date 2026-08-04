@@ -23,6 +23,7 @@ const db = createClient({
 |-------|------------|
 | `dbPreset` | findMany, findOne, create, update, delete |
 | `functionApiBinding` | findMany, findOne, create, update, delete |
+| `functionCapabilityBinding` | findMany, findOne, create, update, delete |
 | `functionDefinition` | findMany, findOne, create, update, delete |
 | `functionDeployment` | findMany, findOne, create, update, delete |
 | `functionDeploymentEvent` | findMany, findOne, create, update, delete |
@@ -47,6 +48,7 @@ const db = createClient({
 | `namespace` | findMany, findOne, create, update, delete |
 | `namespaceEvent` | findMany, findOne, create, update, delete |
 | `platformFunctionApiBinding` | findMany, findOne, create, update, delete |
+| `platformFunctionCapabilityBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionDefinition` | findMany, findOne, create, update, delete |
 | `platformFunctionDeployment` | findMany, findOne, create, update, delete |
 | `platformFunctionDeploymentEvent` | findMany, findOne, create, update, delete |
@@ -163,6 +165,44 @@ const updated = await db.functionApiBinding.update({ where: { id: '<UUID>' }, da
 
 // Delete
 const deleted = await db.functionApiBinding.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.functionCapabilityBinding`
+
+CRUD operations for FunctionCapabilityBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `bucketId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `functionId` | UUID | Yes |
+| `graphId` | UUID | Yes |
+| `id` | UUID | No |
+| `key` | String | Yes |
+| `lifecycle` | String | Yes |
+| `metadata` | JSON | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all functionCapabilityBinding records
+const items = await db.functionCapabilityBinding.findMany({ select: { bucketId: true, createdAt: true, databaseId: true, functionId: true, graphId: true, id: true, key: true, lifecycle: true, metadata: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.functionCapabilityBinding.findOne({ id: '<UUID>', select: { bucketId: true, createdAt: true, databaseId: true, functionId: true, graphId: true, id: true, key: true, lifecycle: true, metadata: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.functionCapabilityBinding.create({ data: { bucketId: '<UUID>', databaseId: '<UUID>', functionId: '<UUID>', graphId: '<UUID>', key: '<String>', lifecycle: '<String>', metadata: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.functionCapabilityBinding.update({ where: { id: '<UUID>' }, data: { bucketId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.functionCapabilityBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.functionDefinition`
@@ -1110,6 +1150,43 @@ const updated = await db.platformFunctionApiBinding.update({ where: { id: '<UUID
 const deleted = await db.platformFunctionApiBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.platformFunctionCapabilityBinding`
+
+CRUD operations for PlatformFunctionCapabilityBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `bucketId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `functionId` | UUID | Yes |
+| `graphId` | UUID | Yes |
+| `id` | UUID | No |
+| `key` | String | Yes |
+| `lifecycle` | String | Yes |
+| `metadata` | JSON | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformFunctionCapabilityBinding records
+const items = await db.platformFunctionCapabilityBinding.findMany({ select: { bucketId: true, createdAt: true, functionId: true, graphId: true, id: true, key: true, lifecycle: true, metadata: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformFunctionCapabilityBinding.findOne({ id: '<UUID>', select: { bucketId: true, createdAt: true, functionId: true, graphId: true, id: true, key: true, lifecycle: true, metadata: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformFunctionCapabilityBinding.create({ data: { bucketId: '<UUID>', functionId: '<UUID>', graphId: '<UUID>', key: '<String>', lifecycle: '<String>', metadata: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformFunctionCapabilityBinding.update({ where: { id: '<UUID>' }, data: { bucketId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformFunctionCapabilityBinding.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.platformFunctionDefinition`
 
 CRUD operations for PlatformFunctionDefinition records.
@@ -1657,6 +1734,7 @@ CRUD operations for PlatformResource records.
 | `memoryRequestBytes` | BigInt | Yes |
 | `name` | String | Yes |
 | `namespaceId` | UUID | Yes |
+| `realm` | String | Yes |
 | `replicas` | Int | Yes |
 | `requiredConfigs` | ResourceRequirement | Yes |
 | `requiredSecrets` | ResourceRequirement | Yes |
@@ -1674,13 +1752,13 @@ CRUD operations for PlatformResource records.
 
 ```typescript
 // List all platformResource records
-const items = await db.platformResource.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.platformResource.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Get one by id
-const item = await db.platformResource.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.platformResource.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Create
-const created = await db.platformResource.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformResource.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResource.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -1749,6 +1827,7 @@ CRUD operations for PlatformResourceDefinition records.
 | `labels` | JSON | Yes |
 | `name` | String | Yes |
 | `namespaceId` | UUID | Yes |
+| `paramsSchema` | JSON | Yes |
 | `requiredConfigs` | ResourceRequirement | Yes |
 | `requiredSecrets` | ResourceRequirement | Yes |
 | `slug` | String | Yes |
@@ -1760,13 +1839,13 @@ CRUD operations for PlatformResourceDefinition records.
 
 ```typescript
 // List all platformResourceDefinition records
-const items = await db.platformResourceDefinition.findMany({ select: { annotations: true, createdAt: true, createdBy: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.platformResourceDefinition.findMany({ select: { annotations: true, createdAt: true, createdBy: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Get one by id
-const item = await db.platformResourceDefinition.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, createdBy: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.platformResourceDefinition.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, createdBy: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Create
-const created = await db.platformResourceDefinition.create({ data: { annotations: '<JSON>', createdBy: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformResourceDefinition.create({ data: { annotations: '<JSON>', createdBy: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResourceDefinition.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -2032,6 +2111,7 @@ CRUD operations for PlatformResourcesHealth records.
 | `memoryRequestBytes` | BigInt | Yes |
 | `name` | String | Yes |
 | `namespaceId` | UUID | Yes |
+| `realm` | String | Yes |
 | `replicas` | Int | Yes |
 | `requiredConfigs` | ResourceRequirement | Yes |
 | `requiredSecrets` | ResourceRequirement | Yes |
@@ -2050,13 +2130,13 @@ CRUD operations for PlatformResourcesHealth records.
 
 ```typescript
 // List all platformResourcesHealth records
-const items = await db.platformResourcesHealth.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.platformResourcesHealth.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Get one by id
-const item = await db.platformResourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.platformResourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Create
-const created = await db.platformResourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformResourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResourcesHealth.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -2113,6 +2193,7 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 | `name` | String | Yes |
 | `namespaceId` | UUID | Yes |
 | `present` | Boolean | Yes |
+| `realm` | String | Yes |
 | `required` | Boolean | Yes |
 | `requirementKind` | String | Yes |
 | `resourceId` | UUID | Yes |
@@ -2123,13 +2204,13 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 
 ```typescript
 // List all platformResourcesResolvedRequirement records
-const items = await db.platformResourcesResolvedRequirement.findMany({ select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
+const items = await db.platformResourcesResolvedRequirement.findMany({ select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
 
 // Get one by id
-const item = await db.platformResourcesResolvedRequirement.findOne({ id: '<UUID>', select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
+const item = await db.platformResourcesResolvedRequirement.findOne({ id: '<UUID>', select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
 
 // Create
-const created = await db.platformResourcesResolvedRequirement.create({ data: { atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' }, select: { id: true } }).execute();
+const created = await db.platformResourcesResolvedRequirement.create({ data: { atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', realm: '<String>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResourcesResolvedRequirement.update({ where: { id: '<UUID>' }, data: { atomId: '<UUID>' }, select: { id: true } }).execute();
@@ -2245,6 +2326,7 @@ CRUD operations for Resource records.
 | `memoryRequestBytes` | BigInt | Yes |
 | `name` | String | Yes |
 | `namespaceId` | UUID | Yes |
+| `realm` | String | Yes |
 | `replicas` | Int | Yes |
 | `requiredConfigs` | ResourceRequirement | Yes |
 | `requiredSecrets` | ResourceRequirement | Yes |
@@ -2262,13 +2344,13 @@ CRUD operations for Resource records.
 
 ```typescript
 // List all resource records
-const items = await db.resource.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.resource.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Get one by id
-const item = await db.resource.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.resource.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Create
-const created = await db.resource.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.resource.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resource.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -2338,6 +2420,7 @@ CRUD operations for ResourceDefinition records.
 | `labels` | JSON | Yes |
 | `name` | String | Yes |
 | `namespaceId` | UUID | Yes |
+| `paramsSchema` | JSON | Yes |
 | `requiredConfigs` | ResourceRequirement | Yes |
 | `requiredSecrets` | ResourceRequirement | Yes |
 | `slug` | String | Yes |
@@ -2349,13 +2432,13 @@ CRUD operations for ResourceDefinition records.
 
 ```typescript
 // List all resourceDefinition records
-const items = await db.resourceDefinition.findMany({ select: { annotations: true, createdAt: true, createdBy: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.resourceDefinition.findMany({ select: { annotations: true, createdAt: true, createdBy: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Get one by id
-const item = await db.resourceDefinition.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, createdBy: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.resourceDefinition.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, createdBy: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Create
-const created = await db.resourceDefinition.create({ data: { annotations: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.resourceDefinition.create({ data: { annotations: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resourceDefinition.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -2627,6 +2710,7 @@ CRUD operations for ResourcesHealth records.
 | `memoryRequestBytes` | BigInt | Yes |
 | `name` | String | Yes |
 | `namespaceId` | UUID | Yes |
+| `realm` | String | Yes |
 | `replicas` | Int | Yes |
 | `requiredConfigs` | ResourceRequirement | Yes |
 | `requiredSecrets` | ResourceRequirement | Yes |
@@ -2645,13 +2729,13 @@ CRUD operations for ResourcesHealth records.
 
 ```typescript
 // List all resourcesHealth records
-const items = await db.resourcesHealth.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.resourcesHealth.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Get one by id
-const item = await db.resourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.resourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
 
 // Create
-const created = await db.resourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.resourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resourcesHealth.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -2708,6 +2792,7 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `name` | String | Yes |
 | `namespaceId` | UUID | Yes |
 | `present` | Boolean | Yes |
+| `realm` | String | Yes |
 | `required` | Boolean | Yes |
 | `requirementKind` | String | Yes |
 | `resourceId` | UUID | Yes |
@@ -2718,13 +2803,13 @@ CRUD operations for ResourcesResolvedRequirement records.
 
 ```typescript
 // List all resourcesResolvedRequirement records
-const items = await db.resourcesResolvedRequirement.findMany({ select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
+const items = await db.resourcesResolvedRequirement.findMany({ select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
 
 // Get one by id
-const item = await db.resourcesResolvedRequirement.findOne({ id: '<UUID>', select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
+const item = await db.resourcesResolvedRequirement.findOne({ id: '<UUID>', select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
 
 // Create
-const created = await db.resourcesResolvedRequirement.create({ data: { atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' }, select: { id: true } }).execute();
+const created = await db.resourcesResolvedRequirement.create({ data: { atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', realm: '<String>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resourcesResolvedRequirement.update({ where: { id: '<UUID>' }, data: { atomId: '<UUID>' }, select: { id: true } }).execute();
@@ -3070,7 +3155,7 @@ platformResourceInstallationsInstall
   | `input` | PlatformResourceInstallationsInstallInput (required) |
 
 ```typescript
-const result = await db.mutation.platformResourceInstallationsInstall({ input: { name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute();
+const result = await db.mutation.platformResourceInstallationsInstall({ input: { definitionIds: '<UUID>', name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute();
 ```
 
 ### `db.mutation.platformResourceInstallationsRollback`
@@ -3148,7 +3233,7 @@ resourceInstallationsInstall
   | `input` | ResourceInstallationsInstallInput (required) |
 
 ```typescript
-const result = await db.mutation.resourceInstallationsInstall({ input: { name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute();
+const result = await db.mutation.resourceInstallationsInstall({ input: { definitionIds: '<UUID>', name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute();
 ```
 
 ### `db.mutation.resourceInstallationsRollback`
