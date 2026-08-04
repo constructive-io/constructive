@@ -145,15 +145,19 @@ export default async (
   } as ConstructiveOptions);
 
   log.success('✅ Selected Configuration:');
-  for (const [key, value] of Object.entries(options)) {
-    log.debug(`${key}: ${JSON.stringify(value)}`);
-  }
+  // Never serialize the merged options object: it contains PostgreSQL
+  // passwords, provider credentials, and the internal-request secret.
+  log.debug(`database: ${options.pg?.database ?? selectedDb}`);
+  log.debug(`server: ${options.server?.host ?? 'localhost'}:${options.server?.port ?? port}`);
 
   // Debug: Log API routing configuration
   const apiOpts = (options as any).api || {};
   log.debug(`📡 API Routing: isPublic=${apiOpts.isPublic}, routingSchema=${apiOpts.routingSchema}`);
   if (apiOpts.isPublic === false) {
-    log.debug(`   Header-based routing enabled (X-Api-Name, X-Database-Id, X-Meta-Schema)`);
+    log.debug(`   Authenticated header routing available (X-Api-Name, X-Database-Id)`);
+    if (apiOpts.allowMetaSchemaHeader === true) {
+      log.warn('   Privileged X-Meta-Schema admin routing is enabled; isolate this listener from tenant ingress');
+    }
   }
   if (apiOpts.metaSchemas?.length) {
     log.debug(`   Meta schemas: ${apiOpts.metaSchemas.join(', ')}`);

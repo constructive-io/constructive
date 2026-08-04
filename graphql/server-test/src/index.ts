@@ -2,7 +2,7 @@
 export * from './types';
 
 // Export server utilities
-export { createTestServer } from './server';
+export { createTestServer, TEST_INTERNAL_REQUEST_SECRET } from './server';
 
 // Export SuperTest utilities
 export { createSuperTestAgent } from './supertest';

@@ -6,6 +6,41 @@ import type { Request, RequestHandler } from 'express';
 
 import type { ApiStructure } from '../types';
 
+export interface CorsOriginInput {
+  origin?: string;
+  fallbackOrigin?: string;
+  api?: ApiStructure;
+  requestHost?: string;
+}
+
+/** Shared HTTP/WebSocket origin policy. Missing origins are handled by the caller. */
+export const isCorsOriginAllowed = ({
+  origin,
+  fallbackOrigin,
+  api,
+  requestHost
+}: CorsOriginInput): boolean => {
+  if (!origin) return false;
+  const fallback = fallbackOrigin?.trim();
+  if (fallback === '*') return true;
+  if (fallback && origin.trim() === fallback) return true;
+
+  if ([...(api?.corsOrigins ?? []), ...(api?.domains ?? [])].includes(origin)) {
+    return true;
+  }
+
+  try {
+    const parsedOrigin = new URL(origin);
+    if (requestHost && parsedOrigin.host.toLowerCase() === requestHost.toLowerCase()) {
+      return true;
+    }
+    const parsed = parseUrl(parsedOrigin);
+    return parsed.domain === 'localhost';
+  } catch {
+    return false;
+  }
+};
+
 /**
  * Unified CORS middleware for Constructive API
  *
@@ -20,47 +55,13 @@ import type { ApiStructure } from '../types';
 export const cors = (fallbackOrigin?: string): RequestHandler => {
   // Use the cors library's dynamic origin function to decide per request
   const dynamicOrigin = (origin: string | undefined, callback: (err: Error | null, allow?: boolean | string) => void, req: Request) => {
-    // 1) Global fallback (fast path)
-    if (fallbackOrigin && fallbackOrigin.trim().length) {
-      if (fallbackOrigin.trim() === '*') {
-        // Reflect whatever Origin the caller sent
-        return callback(null, true);
-      }
-      if (origin && origin.trim() === fallbackOrigin.trim()) {
-        return callback(null, true);
-      }
-      // If a strict fallback origin is provided and does not match,
-      // continue to per-API checks below (do not immediately deny).
-    }
-
-    // 2) Per-API allowlist sourced from req.api (if available)
-    //    createApiMiddleware runs before this in server.ts, so req.api should be set
     const api = (req as any).api as ApiStructure | undefined;
-    if (api) {
-      // Typed cors_settings origins
-      const typedOrigins = api.corsOrigins || [];
-      const siteUrls = api.domains || [];
-      const listOfDomains = [...typedOrigins, ...siteUrls];
-
-      if (origin && listOfDomains.includes(origin)) {
-        return callback(null, true);
-      }
-    }
-
-    // 3) Localhost is always allowed
-    if (origin) {
-      try {
-        const parsed = parseUrl(new URL(origin));
-        if (parsed.domain === 'localhost') {
-          return callback(null, true);
-        }
-      } catch {
-        // ignore invalid origin
-      }
-    }
-
-    // Default: not allowed
-    return callback(null, false);
+    return callback(null, isCorsOriginAllowed({
+      origin,
+      fallbackOrigin,
+      api,
+      requestHost: req.get('host')
+    }));
   };
 
   // Wrap in the cors plugin with our dynamic origin resolver

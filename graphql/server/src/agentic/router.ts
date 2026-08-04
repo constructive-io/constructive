@@ -19,7 +19,11 @@
  */
 
 import { OllamaAdapter } from '@agentic-kit/ollama';
-import type { BillingClient, LlmConfig } from '@constructive-io/express-context';
+import {
+  quoteQualifiedSqlIdentifier,
+  type BillingClient,
+  type LlmConfig
+} from '@constructive-io/express-context';
 import { getEnvOptions as getLlmEnvOptions } from '@constructive-io/llm-env';
 import { Logger } from '@pgpmjs/logger';
 import express, { Request, Response,Router } from 'express';
@@ -129,10 +133,15 @@ async function handleCreateThread(
 
   const body: CreateThreadBody = req.body || {};
   const { schemaName, threadTableName } = agentChat;
+  const threadTableSql = quoteQualifiedSqlIdentifier(
+    schemaName,
+    threadTableName,
+    'agent thread table'
+  );
 
   const result = await ctx.withPgClient(async (client) => {
     const { rows } = await client.query(
-      `INSERT INTO "${schemaName}"."${threadTableName}"
+      `INSERT INTO ${threadTableSql}
        (entity_id, owner_id, mode, model, system_prompt, title)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, mode, model, system_prompt, status, created_at`,
@@ -182,6 +191,16 @@ async function handleSendMessage(
   }
 
   const { schemaName, threadTableName, messageTableName } = agentChat;
+  const threadTableSql = quoteQualifiedSqlIdentifier(
+    schemaName,
+    threadTableName,
+    'agent thread table'
+  );
+  const messageTableSql = quoteQualifiedSqlIdentifier(
+    schemaName,
+    messageTableName,
+    'agent message table'
+  );
   const threadId = req.params.thread_id;
   const userId = ctx.userId;
 
@@ -189,7 +208,7 @@ async function handleSendMessage(
   const threadRow = await ctx.withPgClient(async (client) => {
     const { rows } = await client.query(
       `SELECT id, mode, model, system_prompt, status
-       FROM "${schemaName}"."${threadTableName}"
+       FROM ${threadTableSql}
        WHERE id = $1`,
       [threadId]
     );
@@ -231,9 +250,9 @@ async function handleSendMessage(
     for (const msg of body.messages) {
       if (msg.role === 'user') {
         await client.query(
-          `INSERT INTO "${schemaName}"."${messageTableName}"
+          `INSERT INTO ${messageTableSql}
            (thread_id, owner_id, entity_id, author_role, parts)
-           VALUES ($1, $2, (SELECT entity_id FROM "${schemaName}"."${threadTableName}" WHERE id = $1), $3, $4)`,
+           VALUES ($1, $2, (SELECT entity_id FROM ${threadTableSql} WHERE id = $1), $3, $4)`,
           [threadId, userId, 'user', JSON.stringify([{ type: 'text', text: msg.content }])]
         );
       }
@@ -244,7 +263,7 @@ async function handleSendMessage(
   const history = await ctx.withPgClient(async (client) => {
     const { rows } = await client.query(
       `SELECT author_role, parts, created_at
-       FROM "${schemaName}"."${messageTableName}"
+       FROM ${messageTableSql}
        WHERE thread_id = $1
        ORDER BY created_at ASC`,
       [threadId]
@@ -277,14 +296,14 @@ async function handleSendMessage(
     await handleStreamingResponse(req, res, {
       ctx, chatAdapter, model, llmMessages, body,
       entityId, userId, threadId,
-      schemaName, threadTableName, messageTableName,
+      threadTableSql, messageTableSql,
       billing, startTime, meterSlug
     });
   } else {
     await handleBatchResponse(req, res, {
       ctx, chatAdapter, model, llmMessages, body,
       entityId, userId, threadId,
-      schemaName, threadTableName, messageTableName,
+      threadTableSql, messageTableSql,
       billing, startTime, meterSlug
     });
   }
@@ -299,9 +318,8 @@ interface MessageContext {
   entityId: string;
   userId: string;
   threadId: string;
-  schemaName: string;
-  threadTableName: string;
-  messageTableName: string;
+  threadTableSql: string;
+  messageTableSql: string;
   billing: BillingClient | null;
   startTime: number;
   meterSlug: string;
@@ -312,7 +330,7 @@ async function handleStreamingResponse(
   res: Response,
   mc: MessageContext
 ): Promise<void> {
-  const { ctx, chatAdapter, model, llmMessages, body, entityId, userId, threadId, schemaName, threadTableName, messageTableName, billing, startTime, meterSlug } = mc;
+  const { ctx, chatAdapter, model, llmMessages, body, entityId, userId, threadId, threadTableSql, messageTableSql, billing, startTime, meterSlug } = mc;
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -375,9 +393,9 @@ async function handleStreamingResponse(
     if (content) {
       ctx.withPgClient(async (client) => {
         await client.query(
-          `INSERT INTO "${schemaName}"."${messageTableName}"
+          `INSERT INTO ${messageTableSql}
            (thread_id, owner_id, entity_id, author_role, parts, model)
-           VALUES ($1, $2, (SELECT entity_id FROM "${schemaName}"."${threadTableName}" WHERE id = $1), $3, $4, $5)`,
+           VALUES ($1, $2, (SELECT entity_id FROM ${threadTableSql} WHERE id = $1), $3, $4, $5)`,
           [threadId, userId, 'assistant', JSON.stringify([{ type: 'text', text: content }]), model]
         );
       }).catch((err) => log.error('Failed to persist assistant message:', err));
@@ -416,7 +434,7 @@ async function handleBatchResponse(
   res: Response,
   mc: MessageContext
 ): Promise<void> {
-  const { ctx, chatAdapter, model, llmMessages, body, entityId, userId, threadId, schemaName, threadTableName, messageTableName, billing, startTime, meterSlug } = mc;
+  const { ctx, chatAdapter, model, llmMessages, body, entityId, userId, threadId, threadTableSql, messageTableSql, billing, startTime, meterSlug } = mc;
 
   const systemMsg = llmMessages.find(m => m.role === 'system');
   const nonSystem = llmMessages.filter(m => m.role !== 'system');
@@ -451,9 +469,9 @@ async function handleBatchResponse(
   // Persist assistant message
   await ctx.withPgClient(async (client) => {
     await client.query(
-      `INSERT INTO "${schemaName}"."${messageTableName}"
+      `INSERT INTO ${messageTableSql}
        (thread_id, owner_id, entity_id, author_role, parts, model)
-       VALUES ($1, $2, (SELECT entity_id FROM "${schemaName}"."${threadTableName}" WHERE id = $1), $3, $4, $5)`,
+       VALUES ($1, $2, (SELECT entity_id FROM ${threadTableSql} WHERE id = $1), $3, $4, $5)`,
       [threadId, userId, 'assistant', JSON.stringify([{ type: 'text', text: content }]), model]
     );
   });
