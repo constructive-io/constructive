@@ -2859,8 +2859,8 @@ importers:
         specifier: ^0.9.1
         version: 0.9.1
       genomic:
-        specifier: ^5.6.2
-        version: 5.6.2
+        specifier: ^5.6.4
+        version: 5.6.4
       inquirerer:
         specifier: ^4.9.3
         version: 4.9.3
@@ -2951,8 +2951,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.6.2
-        version: 5.6.2
+        specifier: ^5.6.4
+        version: 5.6.4
       git-changed:
         specifier: ^0.3.0
         version: 0.3.0
@@ -7943,8 +7943,8 @@ packages:
     resolution: {integrity: sha512-zV/5HKTfCeKWnxG0Dmrw51hEWFGfcF2xiXqcA3+J90WDuP0SvoiSO5ORvcBsifmx/FoIjgQN3oNOGaQ5PhLFkg==}
     engines: {node: '>=18'}
 
-  genomic@5.6.2:
-    resolution: {integrity: sha512-y2LK1KQjeZZ4WT0DEQhjTxMNs+hsoZTclIqdnU5Xo3Ie8phDB6ynw8Sk2NLtELL7H3Q26tvZBJkckIkaSa0Lag==}
+  genomic@5.6.4:
+    resolution: {integrity: sha512-k4wUPBCMn5k7UNuYfYQ0e05yYp99hgo6gG7YToS/62Kr+2Ax4bKnXs2ZWfAB4HyyjTQ36d9Kaj4gfJquuUDcbQ==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -8395,9 +8395,6 @@ packages:
   inquirer@8.2.7:
     resolution: {integrity: sha512-UjOaSel/iddGZJ5xP/Eixh6dY1XghiBw4XK13rCCIJcJfyhhoul/7KhLLUGtebEj6GDYM6Vnx/mVsjx2L/mFIA==}
     engines: {node: '>=12.0.0'}
-
-  inquirerer@4.9.1:
-    resolution: {integrity: sha512-RXgbivwNs9luseSHnjIcJ05A8VRGcdCQuLjyWWBmI1zwyorkSzCw4KyK8634a5KrbbXehSJHBE3rIrtgJJiBEQ==}
 
   inquirerer@4.9.3:
     resolution: {integrity: sha512-f3iJubKDBE5Cp9NnJ0cRGt9zngbZ78b62QvrbRjwS13VX+s+fcJvcMaEv/3Es46dIyjDtFfhvGZa9/krNJnSbw==}
@@ -15605,10 +15602,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  genomic@5.6.2:
+  genomic@5.6.4:
     dependencies:
-      appstash: 0.7.0
-      inquirerer: 4.9.1
+      appstash: 0.7.1
+      inquirerer: 4.9.3
 
   gensync@1.0.0-beta.2: {}
 
@@ -16292,13 +16289,6 @@ snapshots:
       wrap-ansi: 6.2.0
     transitivePeerDependencies:
       - '@types/node'
-
-  inquirerer@4.9.1:
-    dependencies:
-      deepmerge: 4.3.1
-      find-and-require-package-json: 0.9.1
-      minimist: 1.2.8
-      yanse: 0.2.1
 
   inquirerer@4.9.3:
     dependencies:
