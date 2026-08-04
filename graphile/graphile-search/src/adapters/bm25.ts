@@ -4,8 +4,8 @@
  * Detects text columns with BM25 indexes (via pg_textsearch) and generates
  * BM25 relevance scoring. Wraps the same SQL logic as graphile-bm25.
  *
- * Requires the Bm25CodecPlugin to be loaded first (for index discovery).
- * The adapter reads from the bm25IndexStore populated during the gather phase.
+ * Requires the Bm25CodecPlugin to be loaded first. The adapter reads index
+ * metadata attached to the exact codec attribute during the same gather.
  *
  * Supports chunk-aware querying via @hasChunks smart tag: when the parent
  * table has chunks with a BM25 index, the adapter includes a lateral
@@ -13,26 +13,20 @@
  * LEAST(parent_score, chunk_score) (lower = better for BM25).
  */
 
+import { QuoteUtils } from '@pgsql/quotes';
 import type { SQL } from 'pg-sql2';
 
-import { bm25IndexStore as moduleBm25IndexStore } from '../codecs/bm25-codec';
-import type { FilterApplyResult,SearchableColumn, SearchAdapter } from '../types';
+import type { Bm25IndexInfo } from '../codecs/bm25-codec';
+import type { FilterApplyResult, SearchableColumn, SearchAdapter } from '../types';
 import { type ChunksInfo,getChunksInfo } from './chunks';
 
-/**
- * BM25 index info discovered during gather phase.
- */
-export interface Bm25IndexInfo {
-  schemaName: string;
-  tableName: string;
-  columnName: string;
-  indexName: string;
-}
+export type { Bm25IndexInfo } from '../codecs/bm25-codec';
 
 /** Combined adapter data for a BM25-searchable column */
 interface Bm25ColumnData {
   bm25Index: Bm25IndexInfo;
   chunksInfo?: ChunksInfo;
+  chunkBm25Index?: Bm25IndexInfo;
 }
 
 function isTextCodec(codec: any): boolean {
@@ -46,42 +40,44 @@ export interface Bm25AdapterOptions {
    * @default 'bm25'
    */
   filterPrefix?: string;
-
-  /**
-   * External BM25 index store. If not provided, the adapter will attempt
-   * to read from the build object's `pgBm25IndexStore`.
-   */
-  bm25IndexStore?: Map<string, Bm25IndexInfo>;
 }
 
 export function createBm25Adapter(
   options: Bm25AdapterOptions = {}
 ): SearchAdapter {
-  const { filterPrefix = 'bm25', bm25IndexStore } = options;
-
-  function getIndexStore(build: any): Map<string, Bm25IndexInfo> | undefined {
-    if (bm25IndexStore) return bm25IndexStore;
-    // Try build.pgBm25IndexStore (set by standalone Bm25SearchPlugin's build hook)
-    const buildStore = build.pgBm25IndexStore as Map<string, Bm25IndexInfo> | undefined;
-    if (buildStore && buildStore.size > 0) return buildStore;
-    // Fall back to module-level store populated by Bm25CodecPlugin's gather phase
-    if (moduleBm25IndexStore && moduleBm25IndexStore.size > 0) return moduleBm25IndexStore;
-    return undefined;
-  }
+  const { filterPrefix = 'bm25' } = options;
 
   function getBm25IndexForAttribute(
     codec: any,
-    attributeName: string,
-    build: any,
+    attributeName: string
   ): Bm25IndexInfo | undefined {
-    const store = getIndexStore(build);
-    if (!store) return undefined;
+    const bound = codec.attributes?.[attributeName]?.extensions?.bm25Index;
+    return bound as Bm25IndexInfo | undefined;
+  }
 
-    const pg = codec?.extensions?.pg;
-    if (!pg) return undefined;
-
-    const key = `${pg.schemaName}.${pg.name}.${attributeName}`;
-    return store.get(key);
+  function findBoundBm25Index(
+    build: any,
+    serviceName: string,
+    schemaName: string,
+    tableName: string,
+    columnName: string
+  ): Bm25IndexInfo | undefined {
+    for (const codec of Object.values(
+      build?.input?.pgRegistry?.pgCodecs ?? {}
+    ) as any[]) {
+      for (const attribute of Object.values(codec?.attributes ?? {}) as any[]) {
+        const index = attribute?.extensions?.bm25Index as Bm25IndexInfo | undefined;
+        if (
+          index?.serviceName === serviceName
+          && index.schemaName === schemaName
+          && index.tableName === tableName
+          && index.columnName === columnName
+        ) {
+          return index;
+        }
+      }
+    }
+    return undefined;
   }
 
   return {
@@ -110,17 +106,45 @@ export function createBm25Adapter(
         codec.attributes as Record<string, any>
       )) {
         if (!isTextCodec(attribute.codec)) continue;
-        const bm25Index = getBm25IndexForAttribute(codec, attributeName, build);
+        const bm25Index = getBm25IndexForAttribute(codec, attributeName);
         if (!bm25Index) continue;
 
         // Check for chunk-aware BM25
-        const chunksInfo = getChunksInfo(codec);
-        const hasChunkBm25 = chunksInfo?.searchIndexes.includes('bm25');
+        const chunksInfo = getChunksInfo(codec, build);
+        const hasChunkBm25 = chunksInfo?.searchIndexes.includes('bm25') === true;
+        let chunkBm25Index: Bm25IndexInfo | undefined;
+        if (hasChunkBm25) {
+          if (!bm25Index.serviceName) {
+            throw new Error('BM25 chunk search requires a bound PostgreSQL service identity');
+          }
+          if (!chunksInfo?.chunksSchema) {
+            throw new Error(
+              `BM25 chunk search for '${chunksInfo?.chunksTableName}' requires a physical schema`
+            );
+          }
+          chunkBm25Index = findBoundBm25Index(
+            build,
+            bm25Index.serviceName,
+            chunksInfo.chunksSchema,
+            chunksInfo.chunksTableName,
+            chunksInfo.contentField
+          );
+          if (!chunkBm25Index) {
+            throw new Error(
+              'BM25 chunk search could not bind an introspected index for '
+              + `${chunksInfo.chunksSchema}.${chunksInfo.chunksTableName}.`
+              + chunksInfo.contentField
+            );
+          }
+        }
 
         const columnData: Bm25ColumnData = {
-          bm25Index,
-          chunksInfo: hasChunkBm25 ? chunksInfo : undefined,
+          bm25Index
         };
+        if (hasChunkBm25) {
+          columnData.chunksInfo = chunksInfo;
+          columnData.chunkBm25Index = chunkBm25Index;
+        }
         columns.push({ attributeName, adapterData: columnData });
       }
       return columns;
@@ -181,14 +205,25 @@ export function createBm25Adapter(
       const bm25Index = columnData.bm25Index;
       const columnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
 
-      // Use quoteQualifiedIdentifier to produce the qualified index name
-      const qualifiedIndexName = `"${bm25Index.schemaName}"."${bm25Index.indexName}"`;
-      const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(qualifiedIndexName)})`;
-      const scoreExpr = sql`(${columnExpr} <@> ${bm25queryExpr})`;
+      const qualifiedIndexName = QuoteUtils.quoteQualifiedIdentifier(
+        bm25Index.schemaName,
+        bm25Index.indexName
+      );
+      const bm25queryExpr = sql`${sql.identifier(
+        bm25Index.extensionSchema,
+        'to_bm25query'
+      )}(${sql.value(query)}, ${sql.value(qualifiedIndexName)})`;
+      const scoreExpr = sql`(${columnExpr} OPERATOR(${sql.identifier(
+        bm25Index.extensionSchema
+      )}.<@>) ${bm25queryExpr})`;
 
       // Check for chunk-aware querying
       const chunksInfo = columnData.chunksInfo;
       if (chunksInfo && chunksInfo.searchIndexes.includes('bm25') && (includeChunks !== false)) {
+        const chunkBm25Index = columnData.chunkBm25Index;
+        if (!chunkBm25Index) {
+          throw new Error('BM25 chunk search is missing its bound introspected index');
+        }
         const chunksTableRef = chunksInfo.chunksSchema
           ? sql`${sql.identifier(chunksInfo.chunksSchema)}.${sql.identifier(chunksInfo.chunksTableName)}`
           : sql`${sql.identifier(chunksInfo.chunksTableName)}`;
@@ -197,12 +232,17 @@ export function createBm25Adapter(
         const parentId = sql`${alias}.${sql.identifier(chunksInfo.parentPkField)}`;
         const chunksAlias = sql.identifier('__bm25_chunks');
 
-        // BM25 on chunks requires an index name on the chunks table.
-        // We construct it from the chunks table schema + a conventional index name.
-        // The BM25 index on chunks is named: {chunks_table}_{content_field}_bm25_idx
-        const chunksIndexName = `"${chunksInfo.chunksSchema || bm25Index.schemaName}"."${chunksInfo.chunksTableName}_${chunksInfo.contentField}_bm25_idx"`;
-        const chunkBm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(chunksIndexName)})`;
-        const chunkScoreExpr = sql`(${chunksAlias}.${chunkContentField} <@> ${chunkBm25queryExpr})`;
+        const chunksIndexName = QuoteUtils.quoteQualifiedIdentifier(
+          chunkBm25Index.schemaName,
+          chunkBm25Index.indexName
+        );
+        const chunkBm25queryExpr = sql`${sql.identifier(
+          chunkBm25Index.extensionSchema,
+          'to_bm25query'
+        )}(${sql.value(query)}, ${sql.value(chunksIndexName)})`;
+        const chunkScoreExpr = sql`(${chunksAlias}.${chunkContentField} OPERATOR(${sql.identifier(
+          chunkBm25Index.extensionSchema
+        )}.<@>) ${chunkBm25queryExpr})`;
 
         // Subquery: MIN(bm25_score) across chunks (lower = better for BM25)
         const chunkScoreSubquery = sql`(

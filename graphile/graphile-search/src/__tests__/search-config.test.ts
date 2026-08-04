@@ -13,6 +13,31 @@ import { createPgvectorAdapter } from '../adapters/pgvector';
 import { createTsvectorAdapter } from '../adapters/tsvector';
 import { createUnifiedSearchPlugin } from '../plugin';
 
+const VECTOR_ADAPTER_IDENTITY = {
+  serviceName: 'main',
+  extensionSchema: 'extension_tools',
+};
+
+const vectorAttribute = () => ({
+  codec: {
+    name: 'vector',
+    extensions: {
+      pg: {
+        serviceName: 'main',
+        schemaName: 'extension_tools',
+        name: 'vector',
+      },
+    },
+  },
+  extensions: {
+    searchExtensionSchemas: {
+      serviceName: 'main',
+      pgTrgmSchema: 'extension_tools',
+      pgvectorSchema: 'extension_tools',
+    },
+  },
+});
+
 // ─── pgvector adapter: chunk detection ────────────────────────────────────────
 
 describe('pgvector adapter — chunk querying (Phase E)', () => {
@@ -24,7 +49,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
         name: 'documents',
         attributes: {
           id: { codec: { name: 'uuid' } },
-          embedding: { codec: { name: 'vector' } },
+          embedding: vectorAttribute(),
         },
         extensions: { tags: {} },
       };
@@ -32,7 +57,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       const columns = adapter.detectColumns(codec, {});
       expect(columns).toHaveLength(1);
       expect(columns[0].attributeName).toBe('embedding');
-      expect(columns[0].adapterData).toBeUndefined();
+      expect(columns[0].adapterData).toEqual(VECTOR_ADAPTER_IDENTITY);
     });
 
     it('includes chunksInfo when @hasChunks smart tag has metadata', () => {
@@ -40,7 +65,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
         name: 'documents',
         attributes: {
           id: { codec: { name: 'uuid' } },
-          embedding: { codec: { name: 'vector' } },
+          embedding: vectorAttribute(),
         },
         extensions: {
           tags: {
@@ -58,6 +83,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       expect(columns).toHaveLength(1);
       expect(columns[0].attributeName).toBe('embedding');
       expect(columns[0].adapterData).toEqual({
+        ...VECTOR_ADAPTER_IDENTITY,
         chunksInfo: {
           chunksSchema: 'app_public',
           chunksTableName: 'documents_chunks',
@@ -75,7 +101,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       const codec = {
         name: 'documents',
         attributes: {
-          embedding: { codec: { name: 'vector' } },
+          embedding: vectorAttribute(),
         },
         extensions: {
           tags: {
@@ -93,6 +119,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       const columns = adapter.detectColumns(codec, {});
       expect(columns).toHaveLength(1);
       expect(columns[0].adapterData).toEqual({
+        ...VECTOR_ADAPTER_IDENTITY,
         chunksInfo: {
           chunksSchema: 'private_schema',
           chunksTableName: 'doc_chunks',
@@ -106,11 +133,11 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       });
     });
 
-    it('uses default parentFk, parentPk, and embeddingField when not specified', () => {
+    it('fails closed when neither the tag nor parent codec identifies a schema', () => {
       const codec = {
         name: 'documents',
         attributes: {
-          embedding: { codec: { name: 'vector' } },
+          embedding: vectorAttribute(),
         },
         extensions: {
           tags: {
@@ -119,26 +146,14 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
         },
       };
 
-      const columns = adapter.detectColumns(codec, {});
-      expect(columns[0].adapterData).toEqual({
-        chunksInfo: {
-          chunksSchema: null,
-          chunksTableName: 'my_chunks',
-          parentFkField: 'parent_id',
-          parentPkField: 'id',
-          embeddingField: 'embedding',
-          contentField: 'content',
-          searchField: null,
-          searchIndexes: [],
-        },
-      });
+      expect(() => adapter.detectColumns(codec, {})).toThrow(/chunksSchema/);
     });
 
     it('inherits schema from parent codec when not explicitly set', () => {
       const codec = {
         name: 'documents',
         attributes: {
-          embedding: { codec: { name: 'vector' } },
+          embedding: vectorAttribute(),
         },
         extensions: {
           tags: {
@@ -150,6 +165,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
 
       const columns = adapter.detectColumns(codec, {});
       expect(columns[0].adapterData).toEqual({
+        ...VECTOR_ADAPTER_IDENTITY,
         chunksInfo: {
           chunksSchema: 'my_schema',
           chunksTableName: 'my_chunks',
@@ -163,36 +179,32 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       });
     });
 
-    it('ignores boolean true @hasChunks (no metadata to resolve)', () => {
+    it('rejects boolean true @hasChunks (no metadata to resolve)', () => {
       const codec = {
         name: 'documents',
         attributes: {
-          embedding: { codec: { name: 'vector' } },
+          embedding: vectorAttribute(),
         },
         extensions: {
           tags: { hasChunks: true },
         },
       };
 
-      const columns = adapter.detectColumns(codec, {});
-      expect(columns).toHaveLength(1);
-      expect(columns[0].adapterData).toBeUndefined();
+      expect(() => adapter.detectColumns(codec, {})).toThrow(/JSON object/);
     });
 
-    it('ignores invalid JSON in @hasChunks string', () => {
+    it('rejects invalid JSON in @hasChunks string', () => {
       const codec = {
         name: 'documents',
         attributes: {
-          embedding: { codec: { name: 'vector' } },
+          embedding: vectorAttribute(),
         },
         extensions: {
           tags: { hasChunks: 'not-valid-json' },
         },
       };
 
-      const columns = adapter.detectColumns(codec, {});
-      expect(columns).toHaveLength(1);
-      expect(columns[0].adapterData).toBeUndefined();
+      expect(() => adapter.detectColumns(codec, {})).toThrow(/valid JSON/);
     });
 
     it('does not detect chunks when enableChunkQuerying is false', () => {
@@ -200,7 +212,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       const codec = {
         name: 'documents',
         attributes: {
-          embedding: { codec: { name: 'vector' } },
+          embedding: vectorAttribute(),
         },
         extensions: {
           tags: {
@@ -211,7 +223,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
 
       const columns = noChunksAdapter.detectColumns(codec, {});
       expect(columns).toHaveLength(1);
-      expect(columns[0].adapterData).toBeUndefined();
+      expect(columns[0].adapterData).toEqual(VECTOR_ADAPTER_IDENTITY);
     });
   });
 
@@ -220,7 +232,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
 
     // Mock sql object that mimics pg-sql2 behavior
     const mockSql = {
-      identifier: (name: string) => `"${name}"`,
+      identifier: (...names: string[]) => names.map((name) => `"${name}"`).join('.'),
       value: (val: any) => `'${val}'`,
       raw: (s: string) => s,
       fragment: (strings: TemplateStringsArray, ...values: any[]) => {
@@ -251,7 +263,10 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       const result = adapter.buildFilterApply(
         sql,
         'tbl' as any,
-        { attributeName: 'embedding' },
+        {
+          attributeName: 'embedding',
+          adapterData: VECTOR_ADAPTER_IDENTITY,
+        },
         { vector: [1, 0, 0], metric: 'COSINE' },
         {},
       );
@@ -269,6 +284,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
         {
           attributeName: 'embedding',
           adapterData: {
+            ...VECTOR_ADAPTER_IDENTITY,
             chunksInfo: {
               chunksSchema: null,
               chunksTableName: 'documents_chunks',
@@ -296,6 +312,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
         {
           attributeName: 'embedding',
           adapterData: {
+            ...VECTOR_ADAPTER_IDENTITY,
             chunksInfo: {
               chunksSchema: null,
               chunksTableName: 'documents_chunks',
@@ -323,6 +340,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
         {
           attributeName: 'embedding',
           adapterData: {
+            ...VECTOR_ADAPTER_IDENTITY,
             chunksInfo: {
               chunksSchema: 'app_private',
               chunksTableName: 'doc_chunks',
@@ -421,5 +439,46 @@ describe('VectorNearbyInput includeChunks field (Phase E)', () => {
     expect(fields.includeChunks).toBeDefined();
     expect(fields.includeChunks.type).toBe('Boolean');
     expect(fields.includeChunks.description).toContain('chunks');
+  });
+});
+
+describe('BM25 index qualification', () => {
+  const sql = Object.assign(
+    (strings: TemplateStringsArray, ...values: any[]) =>
+      strings.reduce((text, part, index) => text + part + (values[index] ?? ''), ''),
+    {
+      identifier: (name: string) => `"${name}"`,
+      value: (value: any) => `'${value}'`
+    }
+  );
+
+  it('passes the physical schema-qualified index name as the regclass-like value', () => {
+    const adapter = createBm25Adapter();
+    const result = adapter.buildFilterApply(
+      sql,
+      'docs' as any,
+      {
+        attributeName: 'body',
+        adapterData: {
+          bm25Index: {
+            serviceName: 'main',
+            extensionSchema: 'extension_tools',
+            schemaName: 'tenant-a-app-public',
+            tableName: 'documents',
+            columnName: 'body',
+            indexName: 'documents_body_bm25_idx'
+          }
+        }
+      },
+      { query: 'memory density' },
+      {}
+    );
+
+    expect(String(result?.scoreExpression)).toContain(
+      '"tenant-a-app-public".documents_body_bm25_idx'
+    );
+    expect(String(result?.scoreExpression)).toContain(
+      'OPERATOR("extension_tools".<@>)'
+    );
   });
 });

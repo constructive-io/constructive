@@ -1,10 +1,12 @@
 import '../augmentations';
 
-import { sideEffectWithPgClient } from '@dataplan/pg';
+import { type PgClient,sideEffectWithPgClient } from '@dataplan/pg';
+import { QuoteUtils } from '@pgsql/quotes';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType, GraphQLOutputType } from 'graphql';
 
 const version = '0.1.0';
+const qi = (name: string): string => QuoteUtils.quoteIdentifier(name);
 
 /**
  * BulkUpdatePlugin
@@ -80,7 +82,7 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
           // Extract primary key columns for RETURNING clause
           const primaryUnique = resource.uniques.find((u: any) => u.isPrimary) ?? resource.uniques[0];
           const pkColumns: string[] = primaryUnique.attributes;
-          const pkReturning = pkColumns.map((c) => `"${c}"`).join(', ');
+          const pkReturning = pkColumns.map(qi).join(', ');
 
           const compiledFrom = sql.compile(resource.from).text;
 
@@ -106,7 +108,7 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
                     const $result = sideEffectWithPgClient(
                       executor,
                       $input,
-                      async (pgClient: any, input: any) => {
+                      async (pgClient: PgClient, input: any) => {
                         if (requireWhere && (!input.where || Object.keys(input.where).length === 0)) {
                           throw new Error(
                             'Bulk update requires a non-empty where condition. Set bulkRequireWhere: false to allow unrestricted updates.'
@@ -126,7 +128,7 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
                           if (!attrName) continue;
                           const sqlType = attrToSqlType[attrName];
                           values.push(val);
-                          setClauses.push(`"${attrName}" = $${values.length}::${sqlType}`);
+                          setClauses.push(`${qi(attrName)} = $${values.length}::${sqlType}`);
                         }
 
                         if (setClauses.length === 0) {
@@ -144,11 +146,11 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
                             const sqlType = attrToSqlType[attrName];
 
                             if (spec === null) {
-                              whereClauses.push(`"${attrName}" IS NULL`);
+                              whereClauses.push(`${qi(attrName)} IS NULL`);
                             } else if (spec !== undefined && typeof spec !== 'object') {
                               // Simple equality (Condition type)
                               values.push(spec);
-                              whereClauses.push(`"${attrName}" = $${values.length}::${sqlType}`);
+                              whereClauses.push(`${qi(attrName)} = $${values.length}::${sqlType}`);
                             } else if (spec && typeof spec === 'object') {
                               // Operator-based (Filter type)
                               for (const [op, val] of Object.entries(spec) as [string, any][]) {
@@ -156,22 +158,22 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
                                 const paramRef = `$${values.length}::${sqlType}`;
                                 switch (op) {
                                 case 'equalTo':
-                                  whereClauses.push(`"${attrName}" = ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} = ${paramRef}`);
                                   break;
                                 case 'notEqualTo':
-                                  whereClauses.push(`"${attrName}" != ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} != ${paramRef}`);
                                   break;
                                 case 'greaterThan':
-                                  whereClauses.push(`"${attrName}" > ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} > ${paramRef}`);
                                   break;
                                 case 'greaterThanOrEqualTo':
-                                  whereClauses.push(`"${attrName}" >= ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} >= ${paramRef}`);
                                   break;
                                 case 'lessThan':
-                                  whereClauses.push(`"${attrName}" < ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} < ${paramRef}`);
                                   break;
                                 case 'lessThanOrEqualTo':
-                                  whereClauses.push(`"${attrName}" <= ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} <= ${paramRef}`);
                                   break;
                                 case 'in':
                                   if (Array.isArray(val)) {
@@ -180,15 +182,15 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
                                       return `$${values.length}::${sqlType}`;
                                     });
                                     values.pop();
-                                    whereClauses.push(`"${attrName}" IN (${placeholders.join(', ')})`);
+                                    whereClauses.push(`${qi(attrName)} IN (${placeholders.join(', ')})`);
                                   }
                                   break;
                                 case 'isNull':
                                   values.pop();
                                   if (val) {
-                                    whereClauses.push(`"${attrName}" IS NULL`);
+                                    whereClauses.push(`${qi(attrName)} IS NULL`);
                                   } else {
-                                    whereClauses.push(`"${attrName}" IS NOT NULL`);
+                                    whereClauses.push(`${qi(attrName)} IS NOT NULL`);
                                   }
                                   break;
                                 default:
@@ -212,28 +214,31 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
 
                         // Use RETURNING <pk_columns> instead of RETURNING *
                         const text = `UPDATE ${compiledFrom}\nSET ${setClauses.join(', ')}\nWHERE ${whereStr}\nRETURNING ${pkReturning}`;
-                        const mutationResult = await pgClient.query(text, values);
+                        const mutationResult = await pgClient.query<Record<string, unknown>>({
+                          text,
+                          values
+                        });
                         const affectedCount = mutationResult.rowCount ?? 0;
 
                         // Follow-up SELECT using PKs to respect column-level grants
                         let returning: unknown[] = [];
                         if (mutationResult.rows && mutationResult.rows.length > 0) {
-                          const pkRows: Record<string, unknown>[] = mutationResult.rows;
+                          const pkRows = mutationResult.rows;
                           const pkConditions = pkRows.map((pkRow, rowIdx) => {
                             return pkColumns.map((col, colIdx) => {
                               const paramIdx = rowIdx * pkColumns.length + colIdx + 1;
-                              return `"${col}" = $${paramIdx}`;
+                              return `${qi(col)} = $${paramIdx}`;
                             }).join(' AND ');
                           });
                           const selectWhere = pkConditions.map((c) => `(${c})`).join(' OR ');
                           const selectParams = pkRows.flatMap((pkRow) =>
                             pkColumns.map((col) => pkRow[col])
                           );
-                          const selectResult = await pgClient.query(
-                            `SELECT * FROM ${compiledFrom} WHERE ${selectWhere}`,
-                            selectParams
-                          );
-                          returning = selectResult.rows || [];
+                          const selectResult = await pgClient.query<Record<string, unknown>>({
+                            text: `SELECT * FROM ${compiledFrom} WHERE ${selectWhere}`,
+                            values: selectParams
+                          });
+                          returning = [...selectResult.rows];
                         }
 
                         return {

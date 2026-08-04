@@ -33,6 +33,14 @@
 // Core plugin
 export { createUnifiedSearchPlugin } from './plugin';
 
+// Exact per-service extension namespace binding
+export type { SearchExtensionSchemas } from './extension-metadata';
+export {
+  collectSearchExtensionSchemas,
+  requireBuildExtensionSchema,
+  resolveBuildExtensionSchema,
+} from './extension-metadata';
+
 // Preset
 export type { UnifiedSearchPresetOptions } from './preset';
 export { UnifiedSearchPreset } from './preset';
@@ -68,7 +76,6 @@ export type {
 export {
   Bm25CodecPlugin,
   Bm25CodecPreset,
-  bm25IndexStore,
   createTsvectorCodecPlugin,
   TsvectorCodecPlugin,
   TsvectorCodecPreset,

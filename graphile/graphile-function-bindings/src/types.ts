@@ -23,7 +23,7 @@ export interface JsonSchemaNode {
 
 /**
  * A graphql-enabled function_api_bindings row joined to its
- * function_definitions row, loaded at gather time.
+ * function_definitions row, either preloaded or loaded at gather time.
  */
 export interface FunctionBindingRow {
   bindingId: string;
@@ -60,6 +60,15 @@ export interface ComputeModuleNames {
   invocationsEntityField: string | null;
 }
 
+/**
+ * A control-plane-resolved binding paired with the exact physical compute
+ * module used for invocation writes. Supplying these rows lets schema builds
+ * avoid querying tenant runtime pools for binding metadata.
+ */
+export interface PreloadedFunctionBinding extends FunctionBindingRow {
+  module: ComputeModuleNames;
+}
+
 export interface FunctionBindingsPluginOptions {
   /** Only bindings for this api are exposed as mutations. */
   apiId: string;
@@ -67,5 +76,12 @@ export interface FunctionBindingsPluginOptions {
    * One entry per provisioned function-module scope. Bindings from every
    * module are exposed; RLS on the underlying tables governs access.
    */
-  modules: ComputeModuleNames[];
+  modules: readonly ComputeModuleNames[];
+  /**
+   * Authoritative control-plane-resolved bindings for this build. When this
+   * option is defined, including as an empty array, the plugin performs no
+   * gather-time binding metadata query. Omit it to retain the generic SQL
+   * loader for callers that do not have a control-plane snapshot.
+   */
+  preloadedBindings?: readonly PreloadedFunctionBinding[];
 }

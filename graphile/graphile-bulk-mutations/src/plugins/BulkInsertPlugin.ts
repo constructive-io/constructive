@@ -1,6 +1,7 @@
 import '../augmentations';
 
-import { sideEffectWithPgClient } from '@dataplan/pg';
+import { type PgClient,sideEffectWithPgClient } from '@dataplan/pg';
+import { QuoteUtils } from '@pgsql/quotes';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType, GraphQLOutputType } from 'graphql';
 
@@ -10,6 +11,7 @@ import type { ColumnSpec } from '../utils/sql-builder';
 import { buildBulkInsertSQL } from '../utils/sql-builder';
 
 const version = '0.1.0';
+const qi = (name: string): string => QuoteUtils.quoteIdentifier(name);
 
 /**
  * BulkInsertPlugin
@@ -131,7 +133,7 @@ export const BulkInsertPlugin: GraphileConfig.Plugin = {
                     const $result = sideEffectWithPgClient(
                       executor,
                       $input,
-                      async (pgClient: any, input: any) => {
+                      async (pgClient: PgClient, input: any) => {
                         const values = input.values;
                         if (!values || !Array.isArray(values) || values.length === 0) {
                           return { affectedCount: 0, returning: [] };
@@ -200,10 +202,10 @@ export const BulkInsertPlugin: GraphileConfig.Plugin = {
                         const allPkRows: Record<string, unknown>[] = [];
 
                         for (const batch of batches) {
-                          const result = await pgClient.query(
-                            batch.text,
-                            batch.values
-                          );
+                          const result = await pgClient.query<Record<string, unknown>>({
+                            text: batch.text,
+                            values: batch.values
+                          });
                           totalAffected += result.rowCount ?? 0;
                           if (result.rows) {
                             allPkRows.push(...result.rows);
@@ -259,10 +261,10 @@ export const BulkInsertPlugin: GraphileConfig.Plugin = {
                               );
 
                               for (const batch of childBatches) {
-                                const result = await pgClient.query(
-                                  batch.text,
-                                  batch.values
-                                );
+                                const result = await pgClient.query({
+                                  text: batch.text,
+                                  values: batch.values
+                                });
                                 totalAffected += result.rowCount ?? 0;
                               }
                             }
@@ -275,18 +277,18 @@ export const BulkInsertPlugin: GraphileConfig.Plugin = {
                           const pkConditions = allPkRows.map((pkRow, rowIdx) => {
                             return pkColumns.map((col, colIdx) => {
                               const paramIdx = rowIdx * pkColumns.length + colIdx + 1;
-                              return `"${col}" = $${paramIdx}`;
+                              return `${qi(col)} = $${paramIdx}`;
                             }).join(' AND ');
                           });
                           const whereClause = pkConditions.map((c) => `(${c})`).join(' OR ');
                           const selectParams = allPkRows.flatMap((pkRow) =>
                             pkColumns.map((col) => pkRow[col])
                           );
-                          const selectResult = await pgClient.query(
-                            `SELECT * FROM ${compiledFrom} WHERE ${whereClause}`,
-                            selectParams
-                          );
-                          returning = selectResult.rows || [];
+                          const selectResult = await pgClient.query<Record<string, unknown>>({
+                            text: `SELECT * FROM ${compiledFrom} WHERE ${whereClause}`,
+                            values: selectParams
+                          });
+                          returning = [...selectResult.rows];
                         }
 
                         return {

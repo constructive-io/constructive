@@ -26,6 +26,27 @@ function isBulkMutationCandidate(resource: any): boolean {
 }
 
 /**
+ * Resolve the strongest available predicate input without assuming that the
+ * built-in condition plugin is enabled. Constructive disables that plugin when
+ * graphile-connection-filter supplies the richer `${typeName}Filter` type.
+ */
+export function resolveBulkWhereType(
+  build: Pick<GraphileBuild.Build, 'getTypeByName'>,
+  inflection: { conditionType?: (typeName: string) => string },
+  typeName: string
+): GraphQLInputType | undefined {
+  const filterType = build.getTypeByName(`${typeName}Filter`) as
+    | GraphQLInputType
+    | undefined;
+  if (filterType) return filterType;
+
+  const conditionTypeName = inflection.conditionType?.(typeName);
+  return conditionTypeName
+    ? build.getTypeByName(conditionTypeName) as GraphQLInputType | undefined
+    : undefined;
+}
+
+/**
  * BulkTypesPlugin
  *
  * Registers all shared types for bulk mutations:
@@ -465,16 +486,7 @@ export const BulkTypesPlugin: GraphileConfig.Plugin = {
                   where: fieldWithHooks(
                     { fieldName: 'where' },
                     () => {
-                      // Try to use connection-filter type if available
-                      const filterTypeName = `${typeName}Filter`;
-                      const filterType = build.getTypeByName(filterTypeName) as GraphQLInputType | undefined;
-                      // Fall back to PostGraphile's built-in condition type
-                      const conditionTypeName = inflection.conditionType(
-                        typeName
-                      );
-                      const conditionType =
-                        build.getTypeByName(conditionTypeName) as GraphQLInputType | undefined;
-                      const whereType = filterType || conditionType;
+                      const whereType = resolveBulkWhereType(build, inflection, typeName);
                       return {
                         description:
                           'Condition to select which rows to update.',
@@ -511,14 +523,7 @@ export const BulkTypesPlugin: GraphileConfig.Plugin = {
                   where: fieldWithHooks(
                     { fieldName: 'where' },
                     () => {
-                      const filterTypeName = `${typeName}Filter`;
-                      const filterType = build.getTypeByName(filterTypeName) as GraphQLInputType | undefined;
-                      const conditionTypeName = inflection.conditionType(
-                        typeName
-                      );
-                      const conditionType =
-                        build.getTypeByName(conditionTypeName) as GraphQLInputType | undefined;
-                      const whereType = filterType || conditionType;
+                      const whereType = resolveBulkWhereType(build, inflection, typeName);
                       return {
                         description:
                           'Condition to select which rows to delete.',

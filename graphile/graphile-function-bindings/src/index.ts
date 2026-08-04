@@ -14,5 +14,6 @@ export type {
   FunctionBindingRow,
   FunctionBindingsPluginOptions,
   JsonSchemaNode,
-  PayloadArg
+  PayloadArg,
+  PreloadedFunctionBinding
 } from './types';
