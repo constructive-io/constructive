@@ -2655,6 +2655,52 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
+  packages/perf-harness:
+    dependencies:
+      grafast:
+        specifier: 1.0.2
+        version: 1.0.2(graphql@16.13.0)
+      graphile-build-pg:
+        specifier: 5.0.2
+        version: 5.0.2(patch_hash=869428d66480f2dba792fb7055538a827edeacf0e34631da8f16b648005cb624)(@dataplan/pg@1.0.3(patch_hash=1580ee5de9b0792b9892233f0616ea4e2801b7f387a3fb73468de1e4dfaa76cb)(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(patch_hash=f53ea77ecb2de5d2a48441d8f9ce57f161bffba9a6f6e22d0dc853dccea5fce6)(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-cache:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-cache/dist
+      graphile-settings:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-settings/dist
+      graphql:
+        specifier: 16.13.0
+        version: 16.13.0
+      graphql-ws:
+        specifier: ^6.0.8
+        version: 6.0.8(graphql@16.13.0)(ws@8.20.1)
+      pg:
+        specifier: ^8.21.0
+        version: 8.21.0
+      pg-env:
+        specifier: workspace:^
+        version: link:../../postgres/pg-env/dist
+      ws:
+        specifier: ^8.20.0
+        version: 8.20.1
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.19
+      '@types/pg':
+        specifier: ^8.20.0
+        version: 8.20.0
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.1
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@22.19.19)(typescript@5.9.3)
+
   packages/postmaster:
     dependencies:
       12factor-env:
@@ -19167,6 +19213,24 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 22.19.11
+      acorn: 8.15.0
+      acorn-walk: 8.3.4
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.9.3
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+
+  ts-node@10.9.2(@types/node@22.19.19)(typescript@5.9.3):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.12
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 22.19.19
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3

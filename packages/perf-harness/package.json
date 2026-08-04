@@ -1,0 +1,41 @@
+{
+  "name": "@constructive-io/perf-harness",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Local Graphile tenant-density and isolation validation harness",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "bin": {
+    "cperf": "index.js"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests"
+  },
+  "dependencies": {
+    "grafast": "1.0.2",
+    "graphile-build-pg": "5.0.2",
+    "graphile-cache": "workspace:^",
+    "graphile-settings": "workspace:^",
+    "graphql": "16.13.0",
+    "graphql-ws": "^6.0.8",
+    "pg": "^8.21.0",
+    "pg-env": "workspace:^",
+    "ws": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "@types/pg": "^8.20.0",
+    "@types/ws": "^8.18.1",
+    "makage": "^0.3.0",
+    "ts-node": "^10.9.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}
