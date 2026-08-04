@@ -2031,6 +2031,9 @@ importers:
       graphile-function-bindings:
         specifier: workspace:^
         version: link:../../graphile/graphile-function-bindings/dist
+      graphile-realtime-subscriptions:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-realtime-subscriptions/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist
@@ -2104,6 +2107,9 @@ importers:
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
+      pg-introspection:
+        specifier: 1.0.1
+        version: 1.0.1
       supertest:
         specifier: ^7.2.2
         version: 7.2.2

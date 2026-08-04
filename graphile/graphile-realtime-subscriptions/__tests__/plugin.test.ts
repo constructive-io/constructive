@@ -12,7 +12,7 @@
  * - NOTIFY payload parsing (TG_OP:id1,id2,... and INVALIDATE)
  * - Per-subscriber event throttling with configurable limit
  * - Sparse set subscriptions (ids: [UUID!]) with row ID intersection filtering
- * - RLS-aware rowId masking in payload resolvers
+ * - RLS-aware event suppression and rowId masking
  */
 
 jest.mock('@pgpmjs/logger', () => ({
@@ -26,17 +26,20 @@ jest.mock('@pgpmjs/logger', () => ({
 
 const mockListen = jest.fn();
 const mockConstant = jest.fn((val: any) => `constant(${val})`);
-const mockObject = jest.fn((obj: any) => obj);
 const mockLambda = jest.fn((input: any, fn: Function) => fn(input));
+const mockGet = jest.fn((parent: any, key: string) =>
+  typeof parent?.get === 'function' ? parent.get(key) : parent?.[key]
+);
+let mockPgSubscriber: any = 'mock-pgSubscriber';
 const mockContext = jest.fn(() => ({
-  get: jest.fn((key: string) => `mock-${key}`),
+  get: jest.fn((key: string) => key === 'pgSubscriber' ? mockPgSubscriber : `mock-${key}`),
 }));
 
 jest.mock('grafast', () => ({
   context: mockContext,
   listen: mockListen,
-  object: mockObject,
   constant: mockConstant,
+  get: mockGet,
   lambda: mockLambda,
 }));
 
@@ -59,6 +62,7 @@ import {
   EventThrottle,
   parseNotifyPayload,
   RealtimeSubscriptionsPlugin,
+  selectCandidateRowId,
 } from '../src/plugin';
 
 // --- Test helpers ---
@@ -82,8 +86,48 @@ function createMockCodec(
   };
 }
 
-function createMockResource(name: string, codec: any) {
-  return { codec, name };
+function createMockExecutorContext(
+  visibleIds: readonly string[] = [],
+  pgSettings: Record<string, string> = { role: 'tenant_runtime' },
+) {
+  const visible = new Set(visibleIds);
+  const query = jest.fn(async ({ values }: { text: string; values?: unknown[] }) => {
+    const requestedIds = (values?.[0] ?? []) as string[];
+    const rows = requestedIds
+      .filter((rowId) => visible.has(rowId))
+      .map((id) => ({ id }));
+    return { rows };
+  });
+  const withPgClient = jest.fn(async (_settings: unknown, callback: Function) =>
+    callback({ query })
+  );
+
+  return {
+    executorContext: { pgSettings, withPgClient },
+    query,
+    withPgClient,
+  };
+}
+
+function createMockResource(name: string, codec: any, executorContext?: any) {
+  const context = executorContext ?? createMockExecutorContext().executorContext;
+  return {
+    codec,
+    name,
+    executor: {
+      context: jest.fn(() => context),
+    },
+  };
+}
+
+async function* notifications(payloads: readonly string[]) {
+  for (const payload of payloads) yield payload;
+}
+
+async function collectNotifications(iterable: AsyncIterable<unknown>) {
+  const result: unknown[] = [];
+  for await (const payload of iterable) result.push(payload);
+  return result;
 }
 
 function createMockBuild(resources: Record<string, any>, inflectionOverrides: Record<string, any> = {}) {
@@ -227,6 +271,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     capturedFactory = null;
+    mockPgSubscriber = 'mock-pgSubscriber';
   });
 
   describe('plugin structure', () => {
@@ -243,6 +288,38 @@ describe('createRealtimeSubscriptionsPlugin', () => {
   });
 
   describe('table discovery', () => {
+    it('reports sorted credential-free physical topic descriptors during build', () => {
+      const onTopicsDiscovered = jest.fn();
+      createRealtimeSubscriptionsPlugin({ onTopicsDiscovered });
+
+      const zeta = createMockCodec('zeta', {
+        realtime: true,
+        schemaName: 'tenant_a'
+      });
+      const alpha = createMockCodec('alpha', {
+        realtime: true,
+        schemaName: 'tenant_a'
+      });
+      capturedFactory!(createMockBuild({
+        zeta: createMockResource('zeta', zeta),
+        alpha: createMockResource('alpha', alpha)
+      }));
+
+      expect(onTopicsDiscovered).toHaveBeenCalledTimes(1);
+      expect(onTopicsDiscovered).toHaveBeenCalledWith([
+        { topic: 'realtime:tenant_a.alpha', schema: 'tenant_a', table: 'alpha' },
+        { topic: 'realtime:tenant_a.zeta', schema: 'tenant_a', table: 'zeta' }
+      ]);
+    });
+
+    it('reports an explicit empty topic set', () => {
+      const onTopicsDiscovered = jest.fn();
+      createRealtimeSubscriptionsPlugin({ onTopicsDiscovered });
+      capturedFactory!(createMockBuild({}));
+
+      expect(onTopicsDiscovered).toHaveBeenCalledWith([]);
+    });
+
     it('discovers tables with @realtime tag', () => {
       createRealtimeSubscriptionsPlugin();
 
@@ -344,7 +421,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(result.typeDefs).toContain('documents: Documents');
       expect(result.typeDefs).toContain('rowId: UUID');
       expect(result.typeDefs).toContain('overflow: Boolean!');
-      expect(result.typeDefs).toContain('masked when RLS denies access');
+      expect(result.typeDefs).toContain('after RLS authorization');
     });
 
     it('extends Subscription type', () => {
@@ -379,7 +456,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(result.plans['Subscription']).toBeDefined();
       expect(result.plans['Subscription']['onProjectsChanged']).toBeDefined();
 
-      const mockArgs = { getRaw: jest.fn(() => 'test-id') };
+      const mockArgs = { getRaw: jest.fn(() => ['test-id']) };
       result.plans['Subscription']['onProjectsChanged'].subscribePlan(null, mockArgs);
 
       expect(mockConstant).toHaveBeenCalledWith('realtime:app_public.projects');
@@ -398,7 +475,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
 
       const result = capturedFactory!(build);
 
-      const mockArgs = { getRaw: jest.fn(() => 'test-id') };
+      const mockArgs = { getRaw: jest.fn(() => ['test-id']) };
       result.plans['Subscription']['onItemsChanged'].subscribePlan(null, mockArgs);
 
       expect(mockConstant).toHaveBeenCalledWith('realtime:inventory_public.items');
@@ -430,7 +507,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       });
 
       const result = capturedFactory!(build);
-      const mockArgs = { getRaw: jest.fn(() => 'some-id') };
+      const mockArgs = { getRaw: jest.fn(() => ['some-id']) };
 
       result.plans['Subscription']['onTasksChanged'].subscribePlan(null, mockArgs);
 
@@ -564,12 +641,19 @@ describe('createRealtimeSubscriptionsPlugin', () => {
   });
 
   describe('sparse set filtering (ids argument)', () => {
-    it('subscribePlan passes ids through object step', () => {
+    it('threads ids into the pre-delivery authorization filter', async () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('tasks', { realtime: true });
+      const { executorContext, query } = createMockExecutorContext(['id-a']);
+      mockPgSubscriber = {
+        subscribe: jest.fn(() => notifications([
+          'INSERT:id-other',
+          'UPDATE:id-a',
+        ])),
+      };
       const build = createMockBuild({
-        tasks: createMockResource('tasks', codec),
+        tasks: createMockResource('tasks', codec, executorContext),
       });
 
       const result = capturedFactory!(build);
@@ -581,46 +665,28 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       result.plans['Subscription']['onTasksChanged'].subscribePlan(null, mockArgs);
 
       expect(mockArgs.getRaw).toHaveBeenCalledWith('ids');
-
-      // The listen callback is captured but not invoked by the mock.
-      // Invoke it manually to verify ids are threaded through.
       expect(mockListen).toHaveBeenCalled();
-      const listenCallback = mockListen.mock.calls[mockListen.mock.calls.length - 1][2];
-      listenCallback('INSERT:id-a');
+      const authorizedSubscriber = mockListen.mock.calls[mockListen.mock.calls.length - 1][0];
+      const events = await collectNotifications(
+        authorizedSubscriber.subscribe('realtime:app_public.tasks'),
+      );
 
-      expect(mockObject).toHaveBeenCalled();
-      const objectArg = mockObject.mock.calls[mockObject.mock.calls.length - 1][0];
-      expect(objectArg).toHaveProperty('subscribedIds');
+      expect(events).toEqual([{
+        parsed: { event: 'UPDATE', rowIds: ['id-a'], overflow: false },
+        subscribedIds: ['id-a', 'id-b'],
+      }]);
+      expect(query).toHaveBeenCalledTimes(1);
+      expect(query.mock.calls[0][0].values).toEqual([['id-a']]);
     });
 
-    it('drops events with no row ID intersection in sparse set mode', () => {
-      const parsed = parseNotifyPayload('INSERT:id-x,id-y');
-      const subscribedIds = ['id-a', 'id-b'];
-
-      const hasMatch = parsed.rowIds.some((rid: string) => subscribedIds.includes(rid));
-      expect(hasMatch).toBe(false);
-    });
-
-    it('delivers events with row ID intersection in sparse set mode', () => {
-      const parsed = parseNotifyPayload('UPDATE:id-a,id-x');
-      const subscribedIds = ['id-a', 'id-b'];
-
-      const hasMatch = parsed.rowIds.some((rid: string) => subscribedIds.includes(rid));
-      expect(hasMatch).toBe(true);
-    });
-
-    it('delivers INVALIDATE events regardless of sparse set', () => {
-      const parsed = parseNotifyPayload('INVALIDATE');
-      expect(parsed.overflow).toBe(true);
-      expect(parsed.rowIds).toEqual([]);
-    });
-
-    it('rowId resolver returns first matching ID from sparse set', () => {
+    it('rowId resolver returns a sparse-set ID only when RLS exposes the row', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('tasks', { realtime: true });
+      const getAuthorizedId = jest.fn(() => 'id-b');
+      const get = jest.fn(() => ({ get: getAuthorizedId }));
       const build = createMockBuild({
-        tasks: { ...createMockResource('tasks', codec), get: jest.fn() },
+        tasks: { ...createMockResource('tasks', codec), get },
       });
 
       const result = capturedFactory!(build);
@@ -632,38 +698,46 @@ describe('createRealtimeSubscriptionsPlugin', () => {
         return null;
       }) };
 
-      payload.rowId(mockParent);
+      expect(payload.rowId(mockParent)).toBe('id-b');
       expect(mockParent.get).toHaveBeenCalledWith('parsed');
       expect(mockParent.get).toHaveBeenCalledWith('subscribedIds');
+      expect(get).toHaveBeenCalledWith({ id: 'id-b' });
+      expect(getAuthorizedId).toHaveBeenCalledWith('id');
     });
 
-    it('rowId resolver returns null when no sparse set match', () => {
+    it('rowId resolver returns null when RLS hides a sparse-set row', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('tasks', { realtime: true });
+      const getAuthorizedId = jest.fn((): null => null);
+      const get = jest.fn(() => ({ get: getAuthorizedId }));
       const build = createMockBuild({
-        tasks: { ...createMockResource('tasks', codec), get: jest.fn() },
+        tasks: { ...createMockResource('tasks', codec), get },
       });
 
       const result = capturedFactory!(build);
       const payload = result.plans['TasksSubscriptionPayload'];
 
       const mockParent = { get: jest.fn((key: string) => {
-        if (key === 'parsed') return { event: 'INSERT', rowIds: ['id-x'], overflow: false };
+        if (key === 'parsed') return { event: 'INSERT', rowIds: ['id-a'], overflow: false };
         if (key === 'subscribedIds') return ['id-a', 'id-b'];
         return null;
       }) };
 
-      payload.rowId(mockParent);
+      expect(payload.rowId(mockParent)).toBeNull();
       expect(mockParent.get).toHaveBeenCalledWith('subscribedIds');
+      expect(get).toHaveBeenCalledWith({ id: 'id-a' });
+      expect(getAuthorizedId).toHaveBeenCalledWith('id');
     });
 
-    it('rowId resolver falls back to first rowId when no sparse set provided', () => {
+    it('rowId resolver never exposes IDs in collection mode', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('tasks', { realtime: true });
+      const getAuthorizedId = jest.fn((): null => null);
+      const get = jest.fn(() => ({ get: getAuthorizedId }));
       const build = createMockBuild({
-        tasks: { ...createMockResource('tasks', codec), get: jest.fn() },
+        tasks: { ...createMockResource('tasks', codec), get },
       });
 
       const result = capturedFactory!(build);
@@ -675,13 +749,226 @@ describe('createRealtimeSubscriptionsPlugin', () => {
         return null;
       }) };
 
-      payload.rowId(mockParent);
+      expect(payload.rowId(mockParent)).toBeNull();
       expect(mockParent.get).toHaveBeenCalledWith('subscribedIds');
+      expect(get).toHaveBeenCalledWith({ id: null });
+      expect(getAuthorizedId).toHaveBeenCalledWith('id');
+    });
+
+    it.each(['DELETE', 'INVALIDATE'])('rowId resolver never exposes IDs for %s', (event) => {
+      createRealtimeSubscriptionsPlugin();
+
+      const codec = createMockCodec('tasks', { realtime: true });
+      const getAuthorizedId = jest.fn((): null => null);
+      const get = jest.fn(() => ({ get: getAuthorizedId }));
+      const build = createMockBuild({
+        tasks: { ...createMockResource('tasks', codec), get },
+      });
+
+      const result = capturedFactory!(build);
+      const payload = result.plans['TasksSubscriptionPayload'];
+      const mockParent = { get: jest.fn((key: string) => {
+        if (key === 'parsed') {
+          return {
+            event,
+            rowIds: event === 'INVALIDATE' ? [] : ['id-a'],
+            overflow: event === 'INVALIDATE',
+          };
+        }
+        if (key === 'subscribedIds') return ['id-a'];
+        return null;
+      }) };
+
+      expect(payload.rowId(mockParent)).toBeNull();
+      expect(get).toHaveBeenCalledWith({ id: null });
+      expect(getAuthorizedId).toHaveBeenCalledWith('id');
     });
   });
 
   describe('RLS-aware event delivery', () => {
-    it('rowId doc comment mentions RLS masking', () => {
+    it('suppresses an unauthorized collection event before Grafast can emit its timing or type', async () => {
+      createRealtimeSubscriptionsPlugin();
+
+      const codec = createMockCodec('items', { realtime: true });
+      const { executorContext, query, withPgClient } = createMockExecutorContext(
+        ['visible-id'],
+        { role: 'tenant_a', 'jwt.claims.tenant_id': 'tenant-a' },
+      );
+      mockPgSubscriber = {
+        subscribe: jest.fn(() => notifications([
+          'INSERT:hidden-id',
+          'UPDATE:hidden-id,visible-id',
+        ])),
+      };
+      const build = createMockBuild({
+        items: createMockResource('items', codec, executorContext),
+      });
+
+      const result = capturedFactory!(build);
+      result.plans['Subscription']['onItemsChanged'].subscribePlan(
+        null,
+        { getRaw: jest.fn((): null => null) },
+      );
+      const authorizedSubscriber = mockListen.mock.calls[mockListen.mock.calls.length - 1][0];
+      const events = await collectNotifications(
+        authorizedSubscriber.subscribe('realtime:app_public.items'),
+      );
+
+      expect(events).toEqual([{
+        parsed: { event: 'UPDATE', rowIds: ['visible-id'], overflow: false },
+        subscribedIds: null,
+      }]);
+      expect(query.mock.calls.map(([request]) => request.values)).toEqual([
+        [['hidden-id']],
+        [['hidden-id', 'visible-id']],
+      ]);
+      expect(withPgClient).toHaveBeenCalledWith(
+        { role: 'tenant_a', 'jwt.claims.tenant_id': 'tenant-a' },
+        expect.any(Function),
+      );
+    });
+
+    it('suppresses DELETE, database INVALIDATE, and malformed operations without querying', async () => {
+      createRealtimeSubscriptionsPlugin();
+
+      const codec = createMockCodec('items', { realtime: true });
+      const { executorContext, query } = createMockExecutorContext(['visible-id']);
+      mockPgSubscriber = {
+        subscribe: jest.fn(() => notifications([
+          'DELETE:visible-id',
+          'INVALIDATE',
+          'UPDATE',
+          'TRUNCATE:visible-id',
+          'INSERT:visible-id',
+        ])),
+      };
+      const build = createMockBuild({
+        items: createMockResource('items', codec, executorContext),
+      });
+
+      const result = capturedFactory!(build);
+      result.plans['Subscription']['onItemsChanged'].subscribePlan(
+        null,
+        { getRaw: jest.fn((): null => null) },
+      );
+      const authorizedSubscriber = mockListen.mock.calls[mockListen.mock.calls.length - 1][0];
+      const events = await collectNotifications(
+        authorizedSubscriber.subscribe('realtime:app_public.items'),
+      );
+
+      expect(events).toEqual([{
+        parsed: { event: 'INSERT', rowIds: ['visible-id'], overflow: false },
+        subscribedIds: null,
+      }]);
+      expect(query).toHaveBeenCalledTimes(1);
+    });
+
+    it('fails closed when the RLS visibility query errors', async () => {
+      createRealtimeSubscriptionsPlugin();
+
+      const codec = createMockCodec('items', { realtime: true });
+      const withPgClient = jest.fn(async () => {
+        throw new Error('database unavailable');
+      });
+      const executorContext = {
+        pgSettings: { role: 'tenant_runtime' },
+        withPgClient,
+      };
+      mockPgSubscriber = {
+        subscribe: jest.fn(() => notifications(['INSERT:possibly-visible-id'])),
+      };
+      const build = createMockBuild({
+        items: createMockResource('items', codec, executorContext),
+      });
+
+      const result = capturedFactory!(build);
+      result.plans['Subscription']['onItemsChanged'].subscribePlan(
+        null,
+        { getRaw: jest.fn((): null => null) },
+      );
+      const authorizedSubscriber = mockListen.mock.calls[mockListen.mock.calls.length - 1][0];
+
+      await expect(collectNotifications(
+        authorizedSubscriber.subscribe('realtime:app_public.items'),
+      )).resolves.toEqual([]);
+      expect(withPgClient).toHaveBeenCalledTimes(1);
+    });
+
+    it('quotes physical identifiers and binds hostile row IDs as values', async () => {
+      createRealtimeSubscriptionsPlugin();
+
+      const hostileId = "00000000-0000-0000-0000-000000000000' OR true --";
+      const codec = createMockCodec('tasks', {
+        realtime: true,
+        schemaName: 'tenant"; set role postgres; --',
+      });
+      codec.extensions.pg.name = 'tasks"; drop table audit; --';
+      const { executorContext, query } = createMockExecutorContext([hostileId]);
+      mockPgSubscriber = {
+        subscribe: jest.fn(() => notifications([`INSERT:${hostileId}`])),
+      };
+      const build = createMockBuild({
+        tasks: createMockResource('tasks', codec, executorContext),
+      });
+
+      const result = capturedFactory!(build);
+      result.plans['Subscription']['onTasksChanged'].subscribePlan(
+        null,
+        { getRaw: jest.fn((): null => null) },
+      );
+      const authorizedSubscriber = mockListen.mock.calls[mockListen.mock.calls.length - 1][0];
+      await collectNotifications(
+        authorizedSubscriber.subscribe('realtime:hostile'),
+      );
+
+      const request = query.mock.calls[0][0];
+      expect(request.text).toContain(
+        '"tenant""; set role postgres; --"."tasks""; drop table audit; --"',
+      );
+      expect(request.text).toContain('any($1::text[])');
+      expect(request.text).not.toContain(hostileId);
+      expect(request.values).toEqual([[hostileId]]);
+    });
+
+    it('counts only authorized events toward the subscriber throttle', async () => {
+      createRealtimeSubscriptionsPlugin({ overflowThreshold: 1 });
+
+      const codec = createMockCodec('items', { realtime: true });
+      const { executorContext } = createMockExecutorContext(['visible-a', 'visible-b']);
+      mockPgSubscriber = {
+        subscribe: jest.fn(() => notifications([
+          'INSERT:hidden-id',
+          'INSERT:visible-a',
+          'UPDATE:visible-b',
+        ])),
+      };
+      const build = createMockBuild({
+        items: createMockResource('items', codec, executorContext),
+      });
+
+      const result = capturedFactory!(build);
+      result.plans['Subscription']['onItemsChanged'].subscribePlan(
+        null,
+        { getRaw: jest.fn((): null => null) },
+      );
+      const authorizedSubscriber = mockListen.mock.calls[mockListen.mock.calls.length - 1][0];
+      const events = await collectNotifications(
+        authorizedSubscriber.subscribe('realtime:app_public.items'),
+      );
+
+      expect(events).toEqual([
+        {
+          parsed: { event: 'INSERT', rowIds: ['visible-a'], overflow: false },
+          subscribedIds: null,
+        },
+        {
+          parsed: { event: 'INVALIDATE', rowIds: [], overflow: true },
+          subscribedIds: null,
+        },
+      ]);
+    });
+
+    it('rowId doc comment states the fail-closed visibility rules', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('items', { realtime: true });
@@ -690,7 +977,8 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       });
 
       const result = capturedFactory!(build);
-      expect(result.typeDefs).toContain('masked when RLS denies access');
+      expect(result.typeDefs).toContain('after RLS authorization');
+      expect(result.typeDefs).toContain('Null for collection, INVALIDATE, or denied rows');
     });
 
     it('type defs include sparse set ids argument', () => {
@@ -717,5 +1005,27 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(result.typeDefs).toContain('specific rows');
       expect(result.typeDefs).toContain('full collection');
     });
+  });
+});
+
+describe('selectCandidateRowId', () => {
+  const insert = { event: 'INSERT', rowIds: ['id-a', 'id-b'], overflow: false };
+
+  it('allows collection row fetching without allowing collection rowId exposure', () => {
+    expect(selectCandidateRowId(insert, null, true)).toBe('id-a');
+    expect(selectCandidateRowId(insert, null, false)).toBeNull();
+  });
+
+  it('selects only a caller-supplied sparse ID', () => {
+    expect(selectCandidateRowId(insert, ['id-b'], false)).toBe('id-b');
+    expect(selectCandidateRowId(insert, ['id-x'], false)).toBeNull();
+  });
+
+  it.each(['DELETE', 'INVALIDATE', 'UNKNOWN'])('rejects %s before any row lookup', (event) => {
+    expect(selectCandidateRowId({
+      event,
+      rowIds: ['id-a'],
+      overflow: event === 'INVALIDATE',
+    }, ['id-a'], false)).toBeNull();
   });
 });

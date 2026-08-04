@@ -35,23 +35,32 @@
  *     drops individual events and sends a single INVALIDATE when exceeded
  *
  * Security / RLS enforcement:
- *   - Row data is always fetched via resource.get() which runs through the
- *     authenticated user's connection with their JWT role and pgSettings applied.
- *   - For INSERT/UPDATE events, if RLS denies access (resource.get returns null),
- *     the rowId is masked (set to null) to prevent metadata leaks.
- *   - For DELETE events, row is naturally null (the row no longer exists).
- *   - For INVALIDATE (overflow), the client should refetch via a normal query
- *     which is also RLS-gated.
+ *   - INSERT/UPDATE notifications are filtered at the AsyncIterable boundary by
+ *     a parameterized visibility query under the request role and pgSettings.
+ *     Grafast never observes an event unless at least one changed row is visible.
+ *   - Row data is fetched via resource.get() under the same request RLS context.
+ *   - Collection subscriptions never expose row IDs because merely observing
+ *     identifiers from rows hidden by RLS is a metadata leak.
+ *   - Sparse INSERT/UPDATE subscriptions expose a requested row ID only after
+ *     resource.get() confirms that the row remains visible under request RLS.
+ *   - DELETE and database-originated INVALIDATE events are suppressed because
+ *     neither carries a sound post-change audience proof. Plugin throttling may
+ *     emit INVALIDATE only after an authorized INSERT/UPDATE event.
  *   - When ids are provided, only events for those specific rows are delivered,
  *     preventing cross-tenant event leaks.
  */
 
 import { Logger } from '@pgpmjs/logger';
-import { constant, context as grafastContext, lambda,listen, object } from 'grafast';
+import { QuoteUtils } from '@pgsql/quotes';
+import type { Step } from 'grafast';
+import { constant, context as grafastContext, get, lambda, listen } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema } from 'graphile-utils';
 
-import type { RealtimeSubscriptionsPluginOptions } from './types';
+import type {
+  RealtimeSubscriptionsPluginOptions,
+  RealtimeTopicDescriptor,
+} from './types';
 
 const log = new Logger('graphile-realtime-subscriptions');
 
@@ -73,6 +82,158 @@ interface ParsedPayload {
   event: string;
   rowIds: string[];
   overflow: boolean;
+}
+
+interface RealtimeEvent {
+  parsed: ParsedPayload;
+  subscribedIds: string[] | null | undefined;
+}
+
+interface PgExecutorContextLike {
+  pgSettings: Record<string, string | undefined> | null;
+  withPgClient<T>(
+    pgSettings: Record<string, string | undefined> | null,
+    callback: (client: {
+      query<TData>(query: {
+        text: string;
+        values?: unknown[];
+      }): Promise<{ rows: readonly TData[] }>;
+    }) => Promise<T> | T,
+  ): Promise<T>;
+}
+
+interface RealtimeSubscriberLike {
+  subscribe(topic: string | number):
+    | AsyncIterableIterator<any>
+    | Promise<AsyncIterableIterator<any>>;
+}
+
+/**
+ * Select the row that may be fetched under the request's RLS context.
+ *
+ * Collection subscriptions may fetch INSERT/UPDATE rows, but their public
+ * rowId field remains hidden. Sparse subscriptions only consider IDs the
+ * caller supplied. DELETE cannot be authorized after the row is gone.
+ */
+function selectCandidateRowId(
+  parsed: ParsedPayload | null,
+  subscribedIds: string[] | null | undefined,
+  allowCollection: boolean,
+): string | null {
+  if (
+    !parsed
+    || parsed.overflow
+    || (parsed.event !== 'INSERT' && parsed.event !== 'UPDATE')
+    || parsed.rowIds.length === 0
+  ) {
+    return null;
+  }
+
+  if (subscribedIds && subscribedIds.length > 0) {
+    return parsed.rowIds.find((rowId) => subscribedIds.includes(rowId)) ?? null;
+  }
+
+  return allowCollection ? parsed.rowIds[0] : null;
+}
+
+function selectCandidateRowIds(
+  parsed: ParsedPayload,
+  subscribedIds: string[] | null | undefined,
+): string[] {
+  if (
+    parsed.overflow
+    || (parsed.event !== 'INSERT' && parsed.event !== 'UPDATE')
+  ) {
+    return [];
+  }
+
+  const candidates = subscribedIds && subscribedIds.length > 0
+    ? parsed.rowIds.filter((rowId) => subscribedIds.includes(rowId))
+    : parsed.rowIds;
+
+  return [...new Set(candidates)];
+}
+
+/**
+ * Filter the notification stream before Grafast observes a subscription event.
+ * Returning a nullable payload from an item plan would still emit an observable
+ * GraphQL result, so authorization has to happen at the AsyncIterable boundary.
+ */
+async function* authorizeNotificationStream(
+  sourceOrPromise:
+    | AsyncIterableIterator<unknown>
+    | Promise<AsyncIterableIterator<unknown>>,
+  executorContext: PgExecutorContextLike,
+  subscribedIds: string[] | null | undefined,
+  visibilitySql: string,
+  overflowThreshold: number,
+): AsyncGenerator<RealtimeEvent> {
+  const source = await sourceOrPromise;
+  const throttle = new EventThrottle(overflowThreshold);
+
+  for await (const raw of source) {
+    const parsed = parseNotifyPayload(String(raw));
+    const candidateRowIds = selectCandidateRowIds(parsed, subscribedIds);
+
+    // DELETE cannot be reauthorized after the row is gone. Database-originated
+    // INVALIDATE and malformed/unknown events carry no audience proof either.
+    if (candidateRowIds.length === 0) continue;
+
+    let visibleRowIds: Set<string>;
+    try {
+      visibleRowIds = await executorContext.withPgClient(
+        executorContext.pgSettings,
+        async (client) => {
+          const result = await client.query<{ id: string }>({
+            text: visibilitySql,
+            values: [candidateRowIds],
+          });
+          return new Set(result.rows.map((row) => String(row.id)));
+        },
+      );
+    } catch {
+      // Authorization errors must never turn into an event-existence oracle.
+      log.warn('Suppressing realtime event because RLS reauthorization failed');
+      continue;
+    }
+
+    const authorizedRowIds = candidateRowIds.filter((rowId) => visibleRowIds.has(rowId));
+    if (authorizedRowIds.length === 0) continue;
+
+    // Count only authorized events. Hidden-tenant traffic must not influence a
+    // subscriber's throttle state because that would be an observable side channel.
+    const action = throttle.check();
+    if (action === 'drop') continue;
+
+    const authorizedPayload = action === 'overflow'
+      ? { event: 'INVALIDATE', rowIds: [], overflow: true }
+      : { ...parsed, rowIds: authorizedRowIds };
+
+    yield {
+      parsed: authorizedPayload,
+      subscribedIds,
+    };
+  }
+}
+
+function createRlsAuthorizedSubscriber(
+  subscriber: RealtimeSubscriberLike,
+  executorContext: PgExecutorContextLike,
+  subscribedIds: string[] | null | undefined,
+  visibilitySql: string,
+  overflowThreshold: number,
+): RealtimeSubscriberLike {
+  return {
+    subscribe(topic: string | number) {
+      return authorizeNotificationStream(
+        subscriber.subscribe(topic),
+        executorContext,
+        subscribedIds,
+        visibilitySql,
+        overflowThreshold,
+      );
+    },
+  };
 }
 
 /**
@@ -186,11 +347,11 @@ function buildTypeDefs(tables: RealtimeTableInfo[]): string {
     .map(({ payloadTypeName, typeName, rowFieldName }) =>
       `"""Payload delivered when a ${typeName} row changes."""\n` +
       `type ${payloadTypeName} {\n` +
-      `  """The DML operation: INSERT, UPDATE, DELETE, or INVALIDATE."""\n` +
+      `  """The authorized operation: INSERT, UPDATE, or plugin-generated INVALIDATE."""\n` +
       `  event: String!\n` +
-      `  """The current state of the row (null for DELETE, INVALIDATE, or if RLS denies access)."""\n` +
+      `  """The current state of the row (null for INVALIDATE or an RLS visibility race)."""\n` +
       `  ${rowFieldName}: ${typeName}\n` +
-      `  """The ID of the changed row (null for INVALIDATE, or masked when RLS denies access)."""\n` +
+      `  """The requested row ID for a sparse INSERT/UPDATE subscription after RLS authorization. Null for collection, INVALIDATE, or denied rows."""\n` +
       `  rowId: UUID\n` +
       `  """True when too many changes occurred and the client should refetch."""\n` +
       `  overflow: Boolean!\n` +
@@ -208,48 +369,50 @@ function buildPlans(
   const subscriptionPlans: Record<string, any> = {};
   const allPlans: Record<string, any> = {};
 
-  for (const { resource, fieldName, payloadTypeName, rowFieldName, notifyChannel } of tables) {
-    const throttle = new EventThrottle(overflowThreshold);
+  for (const {
+    resource,
+    fieldName,
+    payloadTypeName,
+    rowFieldName,
+    notifyChannel,
+    pgSchema,
+    pgTable,
+  } of tables) {
+    const qualifiedTable = QuoteUtils.quoteQualifiedIdentifier(pgSchema, pgTable);
+    const idColumn = QuoteUtils.quoteIdentifier('id');
+    const visibilitySql =
+      `select ${idColumn}::text as id from ${qualifiedTable} `
+      // Notification payloads are text, and @realtime tables may use UUID,
+      // integer, bigint, or text primary keys. Comparing their canonical text
+      // form keeps the query parameterized and avoids a UUID-only cast that
+      // silently suppresses otherwise authorized events.
+      + `where ${idColumn}::text = any($1::text[])`;
 
     subscriptionPlans[fieldName] = {
       subscribePlan(_$root: any, args: any) {
         const $pgSubscriber = (grafastContext() as any).get('pgSubscriber');
+        const $executorContext = resource.executor.context();
         const $topic = constant(notifyChannel);
         const $ids = args.getRaw('ids');
+        const $authorizedSubscriber = lambda(
+          [$pgSubscriber, $executorContext, $ids],
+          (values: unknown) => {
+            const [subscriber, executorContext, subscribedIds] = values as readonly [
+              RealtimeSubscriberLike,
+              PgExecutorContextLike,
+              string[] | null | undefined,
+            ];
+            return createRlsAuthorizedSubscriber(
+              subscriber,
+              executorContext,
+              subscribedIds,
+              visibilitySql,
+              overflowThreshold,
+            );
+          },
+        );
 
-        return listen($pgSubscriber, $topic, ($payload: any) => {
-          const $parsed = lambda([$payload, $ids], (pair: unknown) => {
-            const [raw, subscribedIds] = pair as readonly [unknown, string[] | null | undefined];
-            const parsed = parseNotifyPayload(String(raw));
-
-            const action = parsed.overflow ? 'deliver' : throttle.check();
-
-            if (action === 'drop') {
-              return null;
-            }
-
-            if (action === 'overflow') {
-              return {
-                event: 'INVALIDATE',
-                rowIds: [],
-                overflow: true,
-              };
-            }
-
-            // Sparse set filtering: only deliver events for subscribed row IDs
-            if (subscribedIds && subscribedIds.length > 0) {
-              const hasMatch = parsed.rowIds.some((rid: string) => subscribedIds.includes(rid));
-              if (!hasMatch) return null;
-            }
-
-            return parsed;
-          });
-
-          return object({
-            parsed: $parsed,
-            subscribedIds: $ids,
-          });
-        });
+        return listen($authorizedSubscriber, $topic);
       },
       plan($event: any) {
         return $event;
@@ -257,47 +420,45 @@ function buildPlans(
     };
 
     allPlans[payloadTypeName] = {
-      event($parent: any) {
-        const $parsed = $parent.get('parsed');
+      event($parent: Step<RealtimeEvent>) {
+        const $parsed = get($parent, 'parsed');
         return lambda($parsed, (p: unknown) => (p as ParsedPayload | null)?.event ?? 'UNKNOWN');
       },
-      rowId($parent: any) {
-        const $parsed = $parent.get('parsed');
-        const $subscribedIds = $parent.get('subscribedIds');
-        return lambda([$parsed, $subscribedIds], (pair: unknown) => {
-          const [p, subscribedIds] = pair as readonly [ParsedPayload | null, string[] | null | undefined];
-          if (!p || p.overflow || p.rowIds.length === 0) return null;
-
-          // When ids are provided, return the first matching row ID
-          if (subscribedIds && subscribedIds.length > 0) {
-            return p.rowIds.find((rid: string) => subscribedIds.includes(rid)) ?? null;
-          }
-
-          return p.rowIds[0];
-        });
+      rowId($parent: Step<RealtimeEvent>) {
+        const $parsed = get($parent, 'parsed');
+        const $subscribedIds = get($parent, 'subscribedIds');
+        const $candidateRowId = lambda(
+          [$parsed, $subscribedIds],
+          (pair: unknown) => {
+            const [parsed, subscribedIds] = pair as readonly [
+              ParsedPayload | null,
+              string[] | null | undefined,
+            ];
+            // Collection mode deliberately cannot surface a row identifier.
+            return selectCandidateRowId(parsed, subscribedIds, false);
+          },
+        );
+        const $authorizedRow = resource.get({ id: $candidateRowId });
+        // Selecting through the PgSelectSingleStep makes the ID null whenever
+        // request RLS hides the row; the raw notification ID is never returned.
+        return $authorizedRow.get('id');
       },
-      overflow($parent: any) {
-        const $parsed = $parent.get('parsed');
+      overflow($parent: Step<RealtimeEvent>) {
+        const $parsed = get($parent, 'parsed');
         return lambda($parsed, (p: unknown) => (p as ParsedPayload | null)?.overflow ?? false);
       },
-      [rowFieldName]($parent: any) {
-        const $parsed = $parent.get('parsed');
-        const $subscribedIds = $parent.get('subscribedIds');
+      [rowFieldName]($parent: Step<RealtimeEvent>) {
+        const $parsed = get($parent, 'parsed');
+        const $subscribedIds = get($parent, 'subscribedIds');
 
         const $rowId = lambda(
           [$parsed, $subscribedIds],
           (tuple: unknown) => {
-            const [p, subscribedIds] = tuple as readonly [
+            const [parsed, subscribedIds] = tuple as readonly [
               ParsedPayload | null,
               string[] | null | undefined,
             ];
-            if (!p || p.overflow || p.rowIds.length === 0) return null;
-            // When ids are provided, return first matching row ID
-            if (subscribedIds && subscribedIds.length > 0) {
-              return p.rowIds.find((rid: string) => subscribedIds.includes(rid)) ?? null;
-            }
-            // Full collection mode: return first row ID
-            return p.rowIds[0];
+            return selectCandidateRowId(parsed, subscribedIds, true);
           },
         );
 
@@ -318,6 +479,16 @@ export function createRealtimeSubscriptionsPlugin(
   return extendSchema(
     (build) => {
       const tables = discoverRealtimeTables(build);
+      const discoveredTopics: readonly RealtimeTopicDescriptor[] = Object.freeze(
+        tables
+          .map(({ notifyChannel, pgSchema, pgTable }) => Object.freeze({
+            topic: notifyChannel,
+            schema: pgSchema,
+            table: pgTable,
+          }))
+          .sort((left, right) => left.topic.localeCompare(right.topic)),
+      );
+      options.onTopicsDiscovered?.(discoveredTopics);
 
       if (tables.length === 0) {
         log.info('No tables with @realtime tag found — skipping subscription generation');
@@ -344,4 +515,9 @@ export { RealtimeManager } from './realtime-manager';
 export type { ChangeLogEntry, CursorTrackerOptions, Queryable, RealtimeManagerOptions } from './types';
 
 // Exported for testing
-export { DEFAULT_OVERFLOW_THRESHOLD,EventThrottle, parseNotifyPayload };
+export {
+  DEFAULT_OVERFLOW_THRESHOLD,
+  EventThrottle,
+  parseNotifyPayload,
+  selectCandidateRowId,
+};

@@ -13,7 +13,8 @@
 </p>
 
 
-PostGraphile instance LRU cache with automatic cleanup when PostgreSQL pools are disposed.
+Heap-budgeted PostGraphile v5 instance cache with request draining, serialized
+build admission, and explicit PostgreSQL pool ownership.
 
 ## Installation
 
@@ -21,119 +22,134 @@ PostGraphile instance LRU cache with automatic cleanup when PostgreSQL pools are
 npm install graphile-cache pg-cache
 ```
 
-Note: This package depends on `pg-cache` for the PostgreSQL pool management.
+`graphile-cache` uses `pg-cache` leases to keep each resident instance's exact
+runtime pool alive until the instance has fully drained and shut down.
 
 ## Features
 
-- LRU cache for PostGraphile instances
-- Automatic cleanup when associated PostgreSQL pools are disposed
-- Integrates seamlessly with `pg-cache`
-- Service cache re-exported for convenience
-- TypeScript support
+- Heap-derived residency limits plus an optional process-RSS admission ceiling
+- Request-aware eviction that never tears down an instance in use
+- Awaited HTTP, realtime, PostGraphile, and pool-lease teardown
+- Memory-pressure refusal and eviction counters
+- Exact pool identities protected by reference-counted `pg-cache` leases
 
 ## How It Works
 
-When you import this package, it automatically registers a cleanup callback with `pg-cache`. When a PostgreSQL pool is disposed, any PostGraphile instances using that pool are automatically removed from the cache.
+Long-lived callers acquire a `PgPoolLease`, configure PostGraphile with the
+lease's pool, and pass the same lease to `createGraphileInstance()`. Ownership
+transfers to the returned entry only when that promise resolves. If creation
+rejects, the caller still owns the lease and must release it.
+
+Eviction marks the entry as disposing, waits for its requests to drain, closes
+the HTTP server, stops realtime delivery, attempts `pgl.release()`, and finally
+releases the pool lease. Every teardown stage is attempted even when an earlier
+stage fails, and duplicate disposal calls share one promise.
 
 ## Usage
 
-### Basic Usage
+### Creating a leased instance
 
 ```typescript
-import { graphileCache, GraphileCache } from 'graphile-cache';
-import { getPgPool } from 'pg-cache';
-import { postgraphile } from 'postgraphile';
+import {
+  createGraphileInstance,
+  disposeUncachedEntry,
+  graphileCache
+} from 'graphile-cache';
+import { acquirePgPool } from 'pg-cache';
 
-// Create a PostGraphile instance
-const pgPool = getPgPool({ database: 'mydb' });
-const handler = postgraphile(pgPool, 'public', {
-  // PostGraphile options
-});
+const cacheKey = 'tenant-id:api-id:build-contract-hash';
+const lease = acquirePgPool(
+  { database: 'tenant_database' },
+  { purpose: 'runtime', sanitizeOnCheckout: true }
+);
 
-// Cache it
-const cacheEntry: GraphileCache = {
-  pgPool,
-  pgPoolKey: 'mydb',
-  handler
-};
-
-graphileCache.set('mydb.public', cacheEntry);
-
-// Retrieve it later
-const cached = graphileCache.get('mydb.public');
-if (cached) {
-  // Use cached.handler
-}
-```
-
-### Automatic Cleanup
-
-The cleanup happens automatically:
-
-```typescript
-import { pgCache } from 'pg-cache';
-import { graphileCache } from 'graphile-cache';
-
-// Add entries
-graphileCache.set('mydb.public', { pgPoolKey: 'mydb', ... });
-graphileCache.set('mydb.private', { pgPoolKey: 'mydb', ... });
-
-// When the pool is removed...
-pgCache.delete('mydb');
-
-// Both graphile entries are automatically cleaned up!
-console.log(graphileCache.has('mydb.public')); // false
-console.log(graphileCache.has('mydb.private')); // false
-```
-
-### Complete Example
-
-```typescript
-import { graphileCache, GraphileCache } from 'graphile-cache';
-import { getPgPool } from 'pg-cache';
-import { postgraphile } from 'postgraphile';
-
-function getGraphileInstance(database: string, schema: string): GraphileCache {
-  const key = `${database}.${schema}`;
-  
-  // Check cache first
-  const cached = graphileCache.get(key);
-  if (cached) {
-    return cached;
-  }
-  
-  // Create new instance
-  const pgPool = getPgPool({ database });
-  const handler = postgraphile(pgPool, schema, {
-    graphqlRoute: '/graphql',
-    graphiqlRoute: '/graphiql',
-    // other options...
+// Application code builds this preset with makePgService({ pool: lease.pool,
+// schemas: ['tenant_api'] }) and its exact plugin/settings contract.
+const preset = makePreset(lease.pool);
+let entry;
+try {
+  entry = await createGraphileInstance({
+    preset,
+    cacheKey,
+    poolLease: lease,
+    poolIdentity: lease.identity,
+    enableRealtime: true,
+    realtimeSchema: 'tenant_a_realtime',
+    realtimeSourceSchemas: ['tenant_api']
   });
-  
-  const entry: GraphileCache = {
-    pgPool,
-    pgPoolKey: database,
-    handler
-  };
-  
-  // Cache it
-  graphileCache.set(key, entry);
-  return entry;
+} catch (error) {
+  // Creation rejected before ownership transfer.
+  lease.release();
+  throw error;
 }
 
-// Use in Express
-app.use((req, res, next) => {
-  const { handler } = getGraphileInstance('mydb', 'public');
-  handler(req, res, next);
-});
+// Creation resolved, so disposal must now release the entry-owned lease if
+// admission or publication fails.
+try {
+  graphileCache.set(cacheKey, entry);
+} catch (error) {
+  await disposeUncachedEntry(entry, cacheKey);
+  throw error;
+}
 ```
+
+`poolIdentity` is optional when `poolLease` is present because the lease identity
+becomes the entry's authoritative identity. Supplying both with different values
+fails before ownership transfers.
+
+### Serving and eviction
+
+```typescript
+import {
+  deleteGraphileCacheEntry,
+  graphileCache,
+  invokeEntryHandler
+} from 'graphile-cache';
+
+const entry = graphileCache.get(cacheKey);
+if (entry && invokeEntryHandler(entry, req, res, next)) {
+  return;
+}
+
+// Resolves only after teardown and pool-lease release complete.
+await deleteGraphileCacheEntry(cacheKey, 'manual');
+```
+
+Use `invokeEntryHandler()` for resident traffic so disposal can observe in-flight
+requests. A false return means the entry has started draining; route the request
+through normal cache-miss/build admission instead.
+
+### Shared exact-topic realtime
+
+`sharedRealtime` is an opt-in build-time seam. The caller installs one
+`ActivatableGenerationScopedRealtimeSubscriber` in the PostGraphile service,
+collects the exact physical `@realtime` topics during schema construction, and
+supplies a dedicated least-privilege listener login. Instance creation audits
+that login on the broker's pinned client, acquires only those topics, and
+activates the subscriber before the entry can be published. Audit and LISTEN
+therefore remain safe when the notification pool has `max: 1`.
+
+One canonical host/port/database target may have only one active opaque listener
+identity and role. TLS remains part of that listener identity, so a TLS,
+credential, or pool-contract change fails closed while the old generation is
+resident instead of opening a second listener and silently reducing density;
+rotate by invalidating and draining the old generations first. Resolver output
+must use stable canonical connection target values, because two DNS aliases for
+the same server cannot be proven to name one physical database in-process.
+
+Successful role audits have an explicit TTL. One unref'ed timer per exact
+listener identity proactively re-audits idle subscriptions, while HTTP and
+WebSocket operation boundaries use the same coalesced refresh as an immediate
+gate. Broker termination and privilege drift latch every affected generation
+unavailable. The timer is cancelled after the last generation releases. The
+default realtime mode remains the dedicated PostGraphile subscriber.
 
 ### Graceful Shutdown
 
 ```typescript
 import { closeAllCaches } from 'graphile-cache';
 
-// This closes all caches including pg pools
+// Drains Graphile entries first, then closes the remaining pg-cache pools.
 process.on('SIGTERM', async () => {
   await closeAllCaches();
   process.exit(0);
@@ -142,39 +158,64 @@ process.on('SIGTERM', async () => {
 
 ## API Reference
 
-### graphileCache
+### Main lifecycle APIs
 
-The main PostGraphile instance cache.
+- `createGraphileInstance(options)` creates a ready PostGraphile entry and
+  accepts an optional retained `PgPoolLease`. Realtime callers may provide the
+  exact cursor-function schema through `realtimeSchema`; omission preserves the
+  `realtime_public` compatibility default. Realtime also requires exact
+  `realtimeSourceSchemas`; a foreign cursor row stops delivery before any row
+  in that batch is emitted. Cursor node IDs combine a process-unique replica
+  identity with the exact cache contract so replicas cannot share cursor state.
+  A fatal delivery-integrity failure latches that exact generation unhealthy;
+  the next request receives `503 GRAPHILE_REALTIME_UNAVAILABLE`, never enters
+  its Graphile handler, and identity-checks the generation before retiring it
+  so a later request can rebuild without risking a healthy replacement.
+- `invokeEntryHandler(entry, req, res, next)` tracks a request against an exact
+  resident entry.
+- `deleteGraphileCacheEntry(key, reason)` evicts and awaits teardown.
+- `clearGraphileCache()` evicts and awaits every resident entry.
+- `closeAllCaches()` drains Graphile entries, then closes `pg-cache`.
 
-- `get(key: string): GraphileCache | undefined` - Get a cached instance
-- `set(key: string, value: GraphileCache): void` - Cache an instance
-- `has(key: string): boolean` - Check if an instance is cached
-- `delete(key: string): void` - Remove an instance
-- `clear(): void` - Remove all instances
+### Capacity and observability
 
-### GraphileCache Interface
+- `prepareCacheForBuild()` serializes admission with awaited eviction.
+- `getCacheConfig()` reports the heap-derived capacity and calibration sources.
+- `getCacheStats()` reports residency, realtime-unhealthy generations,
+  aggregate credential-free listener-role attestation health, unique active
+  broker identities, and monotonic catalog-audit attempts/failures. Generation
+  references are reported separately, so three API surfaces sharing one role
+  audit don't triple-count its database QPS.
+- `getCacheCounters()` reports monotonic admitted/completed HTTP and WebSocket
+  lifecycles alongside evictions, disposal failures, and build refusals. The
+  lifecycle counters make short-lived work observable even when both ends fall
+  between two state snapshots.
+- `startMemoryGovernor()` starts pressure-driven idle eviction and returns an
+  idempotent stop callback.
 
-```typescript
-interface GraphileCache {
-  pgPool: pg.Pool;
-  pgPoolKey: string;
-  handler: HttpRequestHandler;
-}
-```
+`GRAPHILE_CACHE_MAX` caps Graphile build contracts by heap budget.
+`GRAPHILE_CACHE_ADMISSION_MODE=preserve-resident` makes that ceiling a strict
+admission boundary: a new contract receives `resident_capacity` without
+evicting an existing resident. The default, `evict-idle`, retains the ordinary
+LRU replacement behavior.
+`GRAPHILE_CACHE_RSS_LIMIT_BYTES` adds a fail-closed process-RSS ceiling, and
+admission reserves `GRAPHILE_CACHE_RSS_BUILD_RESERVE_BYTES` (768 MiB by
+default) above current RSS before starting a build. When the RSS ceiling is not
+set, RSS remains present in cache pressure telemetry but does not constrain
+admission. `PG_CACHE_MAX`
+caps PostgreSQL connection identities, which may include runtime, control-plane,
+listener, and diagnostic pools. They are independent limits: a resident entry's
+lease prevents ordinary pool LRU or TTL eviction, and acquiring a new identity
+fails closed when every registry slot is leased.
 
-### closeAllCaches()
+The LRU's internal ceiling scales with the configured V8 heap (one sparse slot
+per 256 KiB, bounded from 1,024 to 65,536). It is only a backing-structure
+limit; measured instance cost, server/build reserves, and live pressure still
+decide how many entries may become resident.
 
-Closes all caches including the service cache, graphile cache, and all PostgreSQL pools.
+## Pool disposal integration
 
-### svcCache
-
-Re-exported from `pg-cache` for convenience.
-
-## Integration Details
-
-The integration with `pg-cache` happens automatically when this module is imported. The cleanup callback is registered immediately, ensuring that PostGraphile instances are cleaned up whenever their associated PostgreSQL pools are disposed.
-
-This design ensures:
-- No memory leaks from orphaned PostGraphile instances
-- Automatic cleanup without manual intervention
-- Loose coupling between packages
+The package still registers a `pg-cache` cleanup callback as a fail-safe for
+legacy unleased entries and explicit process-wide shutdown. Normal resident
+lifetime is lease-driven: Graphile disposal releases the lease, after which
+`pg-cache` may evict or expire the now-idle pool identity.
