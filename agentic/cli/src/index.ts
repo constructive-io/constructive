@@ -48,8 +48,8 @@ async function run(args: string[]): Promise<void> {
   materializeDbTools(config, log);
   // Fire-and-forget: keep the stored API key fresh (<7 days to expiry re-mints)
   // without ever blocking startup. Only an expired login session gets a line.
-  const backend = loadBackendConfig(config.backendFile) ?? BACKEND_PRESETS.localnet;
-  void refreshApiKeyIfNeeded({ accountFile: config.accountFile, authEndpoint: backend.authEndpoint })
+  const backend = loadBackendConfig(config.store) ?? BACKEND_PRESETS.localnet;
+  void refreshApiKeyIfNeeded({ store: config.store, authEndpoint: backend.authEndpoint })
     .then((status) => {
       if (status === 'reauth-required') log('API key expired — run `agent login`');
     })

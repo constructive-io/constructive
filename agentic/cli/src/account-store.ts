@@ -1,19 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { ConfigStore } from 'appstash';
 
-/** On-disk shape, kept identical to airpage's StoredSession for parity. */
-export interface StoredSession {
-  userId: string;
-  email: string;
-  token: string;
-  /** Always false in the CLI: the token is stored plaintext, protected by file mode 0600. */
-  encrypted: boolean;
-  accessTokenExpiresAt?: string;
-  apiKey?: string;
-  keyId?: string;
-  apiKeyExpiresAt?: string;
-  signedInAt: number;
-}
+import { BACKEND_PRESETS, saveBackendConfig } from './backend-store';
 
 export interface AccountSession {
   userId: string;
@@ -26,71 +13,57 @@ export interface AccountSession {
   signedInAt: number;
 }
 
-function toSession(stored: StoredSession): AccountSession {
+/**
+ * Sessions live in the shared Constructive stash, as the credentials of the
+ * active context (the chosen backend). The store owns the file layout, the
+ * atomic 0600 writes and the at-rest encoding; this module only maps between
+ * its `ContextCredentials` and the session shape the CLI passes around.
+ */
+function currentContextName(store: ConfigStore): string | null {
+  return store.getCurrentContext()?.name ?? null;
+}
+
+/** The active context, defaulting to localnet the first time one is needed. */
+function ensureContextName(store: ConfigStore): string {
+  return currentContextName(store) ?? saveBackendConfig(store, BACKEND_PRESETS.localnet);
+}
+
+export function loadSession(store: ConfigStore, context?: string): AccountSession | null {
+  const contextName = context ?? currentContextName(store);
+  if (!contextName) return null;
+  const creds = store.getCredentials(contextName);
+  if (!creds?.token || !creds.userId) return null;
   return {
-    userId: stored.userId,
-    email: stored.email,
-    accessToken: stored.token,
-    accessTokenExpiresAt: stored.accessTokenExpiresAt,
-    apiKey: stored.apiKey,
-    keyId: stored.keyId,
-    apiKeyExpiresAt: stored.apiKeyExpiresAt,
-    signedInAt: stored.signedInAt
+    userId: creds.userId,
+    email: creds.email ?? '',
+    accessToken: creds.token,
+    accessTokenExpiresAt: creds.expiresAt,
+    apiKey: creds.apiKey,
+    keyId: creds.keyId,
+    apiKeyExpiresAt: creds.apiKeyExpiresAt,
+    signedInAt: creds.signedInAt ?? 0
   };
 }
 
-function toStored(session: AccountSession): StoredSession {
-  return {
+/**
+ * `context` names the backend the session belongs to; it does not have to exist
+ * as a context yet, so a sign-in can be filed before the backend is committed
+ * and a failed sign-in leaves nothing behind.
+ */
+export function saveSession(store: ConfigStore, session: AccountSession, context?: string): void {
+  store.setCredentials(context ?? ensureContextName(store), {
+    token: session.accessToken,
+    expiresAt: session.accessTokenExpiresAt,
     userId: session.userId,
     email: session.email,
-    token: session.accessToken,
-    encrypted: false,
-    accessTokenExpiresAt: session.accessTokenExpiresAt,
     apiKey: session.apiKey,
     keyId: session.keyId,
     apiKeyExpiresAt: session.apiKeyExpiresAt,
     signedInAt: session.signedInAt
-  };
+  });
 }
 
-export function loadSession(file: string): AccountSession | null {
-  let raw: string;
-  try {
-    raw = fs.readFileSync(file, 'utf8');
-  } catch (err: any) {
-    if (err?.code === 'ENOENT') return null;
-    throw err;
-  }
-  let stored: StoredSession;
-  try {
-    stored = JSON.parse(raw) as StoredSession;
-  } catch {
-    try {
-      fs.renameSync(file, `${file}.bak`);
-    } catch {
-      /* best effort */
-    }
-    return null;
-  }
-  if (!stored || typeof stored.token !== 'string' || typeof stored.userId !== 'string') {
-    return null;
-  }
-  return toSession(stored);
-}
-
-export function saveSession(file: string, session: AccountSession): void {
-  const dir = path.dirname(file);
-  fs.mkdirSync(dir, { recursive: true });
-  const tmp = path.join(dir, `.${path.basename(file)}.tmp`);
-  fs.writeFileSync(tmp, JSON.stringify(toStored(session), null, 2) + '\n', { mode: 0o600 });
-  fs.renameSync(tmp, file);
-  fs.chmodSync(file, 0o600);
-}
-
-export function clearSession(file: string): void {
-  try {
-    fs.unlinkSync(file);
-  } catch (err: any) {
-    if (err?.code !== 'ENOENT') throw err;
-  }
+export function clearSession(store: ConfigStore, context?: string): void {
+  const contextName = context ?? currentContextName(store);
+  if (contextName) store.removeCredentials(contextName);
 }

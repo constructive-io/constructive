@@ -59,12 +59,13 @@ describe('login', () => {
     await login(config, { backend: 'localnet', email: 'dev@example.com', password: 'pw' });
 
     expect(signInMock).toHaveBeenCalledWith({
-      accountFile: config.accountFile,
+      store: config.store,
+      context: 'localnet',
       authEndpoint: BACKEND_PRESETS.localnet.authEndpoint,
       email: 'dev@example.com',
       password: 'pw'
     });
-    expect(loadBackendConfig(config.backendFile)).toEqual(BACKEND_PRESETS.localnet);
+    expect(loadBackendConfig(config.store)).toEqual(BACKEND_PRESETS.localnet);
     expect(output()).toContain('signed in as dev@example.com');
     expect(output()).toContain('cnc_li...abcd');
   });
@@ -82,7 +83,7 @@ describe('login', () => {
     expect(signInMock).toHaveBeenCalledWith(
       expect.objectContaining({ authEndpoint: 'https://auth.example.com/graphql' })
     );
-    expect(loadBackendConfig(config.backendFile)).toEqual({
+    expect(loadBackendConfig(config.store)).toEqual({
       apiEndpoint: 'https://api.example.com/graphql',
       authEndpoint: 'https://auth.example.com/graphql',
       modulesEndpoint: 'https://modules.example.com/graphql'
@@ -110,19 +111,19 @@ describe('login', () => {
     await expect(
       login(config, { backend: 'devnet', email: 'dev@example.com', password: 'bad' })
     ).rejects.toThrow('Invalid credentials');
-    expect(loadBackendConfig(config.backendFile)).toBeNull();
+    expect(loadBackendConfig(config.store)).toBeNull();
   });
 });
 
 describe('logout', () => {
   it('signs out against the stored backend', async () => {
-    saveBackendConfig(config.backendFile, BACKEND_PRESETS.devnet);
+    saveBackendConfig(config.store, BACKEND_PRESETS.devnet);
     signOutMock.mockResolvedValue(true);
 
     await logout(config);
 
     expect(signOutMock).toHaveBeenCalledWith({
-      accountFile: config.accountFile,
+      store: config.store,
       authEndpoint: BACKEND_PRESETS.devnet.authEndpoint
     });
     expect(output()).toContain('signed out');
@@ -137,8 +138,8 @@ describe('logout', () => {
 
 describe('whoami', () => {
   it('prints the session details with a masked API key', () => {
-    saveSession(config.accountFile, session);
-    saveBackendConfig(config.backendFile, BACKEND_PRESETS.localnet);
+    saveSession(config.store, session);
+    saveBackendConfig(config.store, BACKEND_PRESETS.localnet);
 
     whoami(config);
 

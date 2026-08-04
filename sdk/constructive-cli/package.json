@@ -48,7 +48,7 @@
     "@agentic-kit/ollama": "workspace:*",
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "appstash": "^0.7.0",
+    "appstash": "^0.8.0",
     "gql-ast": "workspace:^",
     "graphql": "16.13.0",
     "inquirerer": "^4.9.3",

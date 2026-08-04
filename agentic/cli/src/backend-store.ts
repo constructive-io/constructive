@@ -1,5 +1,4 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { ConfigStore } from 'appstash';
 
 export interface BackendConfig {
   apiEndpoint: string;
@@ -20,30 +19,53 @@ export const BACKEND_PRESETS: Record<string, BackendConfig> = {
   }
 };
 
-export function loadBackendConfig(file: string): BackendConfig | null {
-  let raw: string;
-  try {
-    raw = fs.readFileSync(file, 'utf8');
-  } catch (err: any) {
-    if (err?.code === 'ENOENT') return null;
-    throw err;
+/** Context name used for endpoints that match no preset. */
+export const CUSTOM_CONTEXT = 'custom';
+
+/**
+ * A chosen backend is a named context in the shared store: the preset name when
+ * the endpoints match one, `custom` otherwise. Credentials hang off the context,
+ * so signing in against localnet and devnet keeps two independent sessions.
+ */
+export function contextNameFor(config: BackendConfig): string {
+  for (const [name, preset] of Object.entries(BACKEND_PRESETS)) {
+    if (
+      preset.apiEndpoint === config.apiEndpoint &&
+      preset.authEndpoint === config.authEndpoint &&
+      preset.modulesEndpoint === config.modulesEndpoint
+    ) {
+      return name;
+    }
   }
-  let parsed: BackendConfig;
-  try {
-    parsed = JSON.parse(raw) as BackendConfig;
-  } catch {
-    return null;
-  }
-  if (!parsed?.apiEndpoint || !parsed?.authEndpoint || !parsed?.modulesEndpoint) {
-    return null;
-  }
-  return parsed;
+  return CUSTOM_CONTEXT;
 }
 
-export function saveBackendConfig(file: string, config: BackendConfig): void {
-  const dir = path.dirname(file);
-  fs.mkdirSync(dir, { recursive: true });
-  const tmp = path.join(dir, `.${path.basename(file)}.tmp`);
-  fs.writeFileSync(tmp, JSON.stringify(config, null, 2) + '\n');
-  fs.renameSync(tmp, file);
+function toBackendConfig(targets: Record<string, { endpoint: string }> | undefined): BackendConfig | null {
+  const apiEndpoint = targets?.api?.endpoint;
+  const authEndpoint = targets?.auth?.endpoint;
+  const modulesEndpoint = targets?.modules?.endpoint;
+  if (!apiEndpoint || !authEndpoint || !modulesEndpoint) return null;
+  return { apiEndpoint, authEndpoint, modulesEndpoint };
+}
+
+/** Endpoints of the active context, or null when no backend has been chosen. */
+export function loadBackendConfig(store: ConfigStore): BackendConfig | null {
+  const ctx = store.getCurrentContext();
+  if (!ctx) return null;
+  return toBackendConfig(ctx.targets);
+}
+
+/** Persist the endpoints as a context and make it active. */
+export function saveBackendConfig(store: ConfigStore, config: BackendConfig): string {
+  const name = contextNameFor(config);
+  store.createContext(name, {
+    endpoint: config.apiEndpoint,
+    targets: {
+      api: { endpoint: config.apiEndpoint },
+      auth: { endpoint: config.authEndpoint },
+      modules: { endpoint: config.modulesEndpoint }
+    }
+  });
+  store.setCurrentContext(name);
+  return name;
 }

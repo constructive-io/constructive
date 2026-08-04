@@ -36,7 +36,7 @@
     "@types/express": "^5.0.6",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",
-    "appstash": "^0.7.0",
+    "appstash": "^0.8.0",
     "gql-ast": "workspace:^",
     "inquirerer": "^4.9.3",
     "makage": "^0.3.0",

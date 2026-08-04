@@ -1,3 +1,4 @@
+import { ConfigStore } from 'appstash';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -18,11 +19,11 @@ const unwrappable = (value: unknown) => ({ unwrap: () => Promise.resolve(value) 
 const failing = (err: unknown) => ({ unwrap: () => Promise.reject(err) });
 
 let home: string;
-let accountFile: string;
+let store: ConfigStore;
 
 beforeEach(() => {
   home = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-cli-auth-'));
-  accountFile = loadConfig(home).accountFile;
+  store = loadConfig(home).store;
   createClient.mockReset();
 });
 
@@ -60,7 +61,7 @@ describe('signIn', () => {
     });
 
     const session = await signIn({
-      accountFile,
+      store,
       authEndpoint: AUTH_ENDPOINT,
       email: '  dev@example.com ',
       password: 'pw'
@@ -73,7 +74,7 @@ describe('signIn', () => {
     expect(session.userId).toBe('user-1');
     expect(session.apiKey).toBe('cnc_live_sk_new');
     expect(session.keyId).toBe('key-new');
-    expect(loadSession(accountFile)).toEqual(session);
+    expect(loadSession(store)).toEqual(session);
     expect(createClient).toHaveBeenCalledWith({ endpoint: AUTH_ENDPOINT });
     expect(createClient).toHaveBeenCalledWith({
       endpoint: AUTH_ENDPOINT,
@@ -89,23 +90,23 @@ describe('signIn', () => {
       revokeApiKey: jest.fn()
     });
 
-    const session = await signIn({ accountFile, authEndpoint: AUTH_ENDPOINT, email: 'dev@example.com', password: 'pw' });
+    const session = await signIn({ store, authEndpoint: AUTH_ENDPOINT, email: 'dev@example.com', password: 'pw' });
     expect(session.apiKey).toBeUndefined();
-    expect(loadSession(accountFile)?.accessToken).toBe('access-token');
+    expect(loadSession(store)?.accessToken).toBe('access-token');
     warn.mockRestore();
   });
 
   it('rejects when no access token comes back (MFA)', async () => {
     mockClient({ signIn: jest.fn(() => unwrappable({ signIn: { result: {} } })) });
     await expect(
-      signIn({ accountFile, authEndpoint: AUTH_ENDPOINT, email: 'dev@example.com', password: 'pw' })
+      signIn({ store, authEndpoint: AUTH_ENDPOINT, email: 'dev@example.com', password: 'pw' })
     ).rejects.toThrow('Authentication returned no access token (MFA may be required).');
-    expect(loadSession(accountFile)).toBeNull();
+    expect(loadSession(store)).toBeNull();
   });
 
   it('rejects empty credentials without a network call', async () => {
     await expect(
-      signIn({ accountFile, authEndpoint: AUTH_ENDPOINT, email: '  ', password: 'pw' })
+      signIn({ store, authEndpoint: AUTH_ENDPOINT, email: '  ', password: 'pw' })
     ).rejects.toThrow('Email and password are required.');
     expect(createClient).not.toHaveBeenCalled();
   });
@@ -116,7 +117,7 @@ describe('signIn', () => {
     });
     mockClient({ signIn: jest.fn(() => failing(gqlError)) });
     await expect(
-      signIn({ accountFile, authEndpoint: AUTH_ENDPOINT, email: 'dev@example.com', password: 'nope' })
+      signIn({ store, authEndpoint: AUTH_ENDPOINT, email: 'dev@example.com', password: 'nope' })
     ).rejects.toThrow('Invalid credentials');
   });
 });
@@ -130,22 +131,22 @@ describe('refreshApiKeyIfNeeded', () => {
   };
 
   it('returns signed-out without a session', async () => {
-    await expect(refreshApiKeyIfNeeded({ accountFile, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('signed-out');
+    await expect(refreshApiKeyIfNeeded({ store, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('signed-out');
   });
 
   it('returns ok for a fresh key without a network call', async () => {
-    saveSession(accountFile, {
+    saveSession(store, {
       ...baseSession,
       apiKey: 'k',
       keyId: 'id',
       apiKeyExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365).toISOString()
     });
-    await expect(refreshApiKeyIfNeeded({ accountFile, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('ok');
+    await expect(refreshApiKeyIfNeeded({ store, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('ok');
     expect(createClient).not.toHaveBeenCalled();
   });
 
   it('re-mints an expiring key and persists it', async () => {
-    saveSession(accountFile, {
+    saveSession(store, {
       ...baseSession,
       apiKey: 'old',
       keyId: 'old-id',
@@ -156,35 +157,35 @@ describe('refreshApiKeyIfNeeded', () => {
       revokeApiKey: jest.fn(() => unwrappable({ revokeApiKey: { result: true } }))
     });
 
-    await expect(refreshApiKeyIfNeeded({ accountFile, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('reminted');
+    await expect(refreshApiKeyIfNeeded({ store, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('reminted');
     expect(mutation.revokeApiKey).toHaveBeenCalledWith({ input: { keyId: 'old-id' } }, expect.anything());
-    expect(loadSession(accountFile)?.apiKey).toBe('cnc_live_sk_new');
+    expect(loadSession(store)?.apiKey).toBe('cnc_live_sk_new');
   });
 
   it('returns reauth-required on a step-up error', async () => {
-    saveSession(accountFile, baseSession);
+    saveSession(store, baseSession);
     mockClient({
       createApiKey: jest.fn(() => failing({ errors: [{ extensions: { code: 'STEP_UP_REQUIRED' } }] })),
       revokeApiKey: jest.fn()
     });
-    await expect(refreshApiKeyIfNeeded({ accountFile, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('reauth-required');
+    await expect(refreshApiKeyIfNeeded({ store, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('reauth-required');
   });
 
   it('returns unavailable on other errors', async () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
-    saveSession(accountFile, baseSession);
+    saveSession(store, baseSession);
     mockClient({
       createApiKey: jest.fn(() => failing(new Error('boom'))),
       revokeApiKey: jest.fn()
     });
-    await expect(refreshApiKeyIfNeeded({ accountFile, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('unavailable');
+    await expect(refreshApiKeyIfNeeded({ store, authEndpoint: AUTH_ENDPOINT })).resolves.toBe('unavailable');
     warn.mockRestore();
   });
 });
 
 describe('signOut', () => {
   it('revokes the key and clears the session', async () => {
-    saveSession(accountFile, {
+    saveSession(store, {
       userId: 'user-1',
       email: 'dev@example.com',
       accessToken: 'access-token',
@@ -196,14 +197,14 @@ describe('signOut', () => {
       revokeApiKey: jest.fn(() => unwrappable({ revokeApiKey: { result: true } }))
     });
 
-    await expect(signOut({ accountFile, authEndpoint: AUTH_ENDPOINT })).resolves.toBe(true);
+    await expect(signOut({ store, authEndpoint: AUTH_ENDPOINT })).resolves.toBe(true);
     expect(mutation.revokeApiKey).toHaveBeenCalledWith({ input: { keyId: 'key-1' } }, expect.anything());
-    expect(loadSession(accountFile)).toBeNull();
+    expect(loadSession(store)).toBeNull();
   });
 
   it('clears the session even when the revoke fails', async () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
-    saveSession(accountFile, {
+    saveSession(store, {
       userId: 'user-1',
       email: 'dev@example.com',
       accessToken: 'access-token',
@@ -212,13 +213,13 @@ describe('signOut', () => {
     });
     mockClient({ revokeApiKey: jest.fn(() => failing(new Error('offline'))) });
 
-    await expect(signOut({ accountFile, authEndpoint: AUTH_ENDPOINT })).resolves.toBe(true);
-    expect(loadSession(accountFile)).toBeNull();
+    await expect(signOut({ store, authEndpoint: AUTH_ENDPOINT })).resolves.toBe(true);
+    expect(loadSession(store)).toBeNull();
     warn.mockRestore();
   });
 
   it('is a no-op when signed out', async () => {
-    await expect(signOut({ accountFile, authEndpoint: AUTH_ENDPOINT })).resolves.toBe(false);
+    await expect(signOut({ store, authEndpoint: AUTH_ENDPOINT })).resolves.toBe(false);
     expect(createClient).not.toHaveBeenCalled();
   });
 });

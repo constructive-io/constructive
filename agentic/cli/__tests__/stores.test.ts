@@ -1,3 +1,4 @@
+import { ConfigStore } from 'appstash';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -27,50 +28,86 @@ const session: AccountSession = {
   signedInAt: 1754000000000
 };
 
+const store = (): ConfigStore => loadConfig(home).store;
+
 describe('config', () => {
-  it('exposes account and backend file paths under <config>/agent', () => {
+  it('shares the constructive stash rather than an agent-specific directory', () => {
     const config = loadConfig(home);
-    expect(config.accountFile).toBe(path.join(config.dirs.stash.config, 'agent', 'account.json'));
-    expect(config.backendFile).toBe(path.join(config.dirs.stash.config, 'agent', 'backend-config.json'));
-    expect(fs.existsSync(path.dirname(config.accountFile))).toBe(true);
+    expect(fs.existsSync(path.join(config.dirs.stash.config, 'agent', 'account.json'))).toBe(false);
+    saveSession(config.store, session);
+    // credentials land in the shared stash root, not an agent-only subdirectory
+    expect(fs.existsSync(path.join(config.dirs.stash.config, 'credentials.json'))).toBe(true);
+  });
+
+  it('imports a legacy account.json + backend-config.json once, then moves them aside', () => {
+    const config = loadConfig(home);
+    const legacyDir = path.join(config.dirs.stash.config, 'agent');
+    fs.mkdirSync(legacyDir, { recursive: true });
+    const accountFile = path.join(legacyDir, 'account.json');
+    const backendFile = path.join(legacyDir, 'backend-config.json');
+    fs.writeFileSync(
+      accountFile,
+      JSON.stringify({
+        userId: 'user-1',
+        email: 'dev@example.com',
+        token: 'access-token',
+        encrypted: false,
+        apiKey: 'cnc_live_sk_abc',
+        keyId: 'key-1',
+        signedInAt: 1754000000000
+      })
+    );
+    fs.writeFileSync(backendFile, JSON.stringify(BACKEND_PRESETS.devnet));
+
+    const migrated = loadConfig(home);
+    expect(loadBackendConfig(migrated.store)).toEqual(BACKEND_PRESETS.devnet);
+    expect(loadSession(migrated.store)).toMatchObject({ userId: 'user-1', accessToken: 'access-token' });
+    expect(fs.existsSync(accountFile)).toBe(false);
+    expect(fs.existsSync(`${accountFile}.migrated`)).toBe(true);
+    expect(fs.existsSync(`${backendFile}.migrated`)).toBe(true);
   });
 });
 
 describe('account-store', () => {
-  it('round-trips a session and keeps the airpage StoredSession shape on disk', () => {
-    const file = loadConfig(home).accountFile;
-    saveSession(file, session);
-    expect(loadSession(file)).toEqual(session);
-    const stored = JSON.parse(fs.readFileSync(file, 'utf8'));
-    expect(stored.token).toBe('access-token');
-    expect(stored.encrypted).toBe(false);
-    expect(stored.accessToken).toBeUndefined();
+  it('round-trips a session through the shared store', () => {
+    const s = store();
+    saveSession(s, session);
+    expect(loadSession(s)).toEqual(session);
   });
 
-  it('writes the session file with mode 0600', () => {
-    const file = loadConfig(home).accountFile;
-    saveSession(file, session);
+  it('files the session under the active backend context, keeping backends independent', () => {
+    const s = store();
+    saveBackendConfig(s, BACKEND_PRESETS.devnet);
+    saveSession(s, session);
+    saveBackendConfig(s, BACKEND_PRESETS.localnet);
+    expect(loadSession(s)).toBeNull();
+    saveBackendConfig(s, BACKEND_PRESETS.devnet);
+    expect(loadSession(s)).toEqual(session);
+  });
+
+  it('defaults to the localnet context when no backend was chosen yet', () => {
+    const s = store();
+    saveSession(s, session);
+    expect(s.getCurrentContext()?.name).toBe('localnet');
+  });
+
+  it('writes credentials with mode 0600', () => {
+    const s = store();
+    saveSession(s, session);
+    const file = path.join(loadConfig(home).dirs.stash.config, 'credentials.json');
     expect(fs.statSync(file).mode & 0o777).toBe(0o600);
   });
 
-  it('returns null when no session file exists', () => {
-    expect(loadSession(loadConfig(home).accountFile)).toBeNull();
+  it('returns null when nothing is stored', () => {
+    expect(loadSession(store())).toBeNull();
   });
 
-  it('moves a corrupt session file aside and returns null', () => {
-    const file = loadConfig(home).accountFile;
-    fs.writeFileSync(file, 'not json');
-    expect(loadSession(file)).toBeNull();
-    expect(fs.existsSync(`${file}.bak`)).toBe(true);
-    expect(fs.existsSync(file)).toBe(false);
-  });
-
-  it('clearSession removes the file and tolerates a missing one', () => {
-    const file = loadConfig(home).accountFile;
-    saveSession(file, session);
-    clearSession(file);
-    expect(fs.existsSync(file)).toBe(false);
-    expect(() => clearSession(file)).not.toThrow();
+  it('clearSession removes the credentials and tolerates a signed-out store', () => {
+    const s = store();
+    saveSession(s, session);
+    clearSession(s);
+    expect(loadSession(s)).toBeNull();
+    expect(() => clearSession(s)).not.toThrow();
   });
 });
 
@@ -85,12 +122,21 @@ describe('backend-store', () => {
     expect(BACKEND_PRESETS.devnet.authEndpoint).toBe('https://auth.launchql.dev/graphql');
   });
 
-  it('round-trips a backend config and returns null for missing or invalid files', () => {
-    const file = loadConfig(home).backendFile;
-    expect(loadBackendConfig(file)).toBeNull();
-    saveBackendConfig(file, BACKEND_PRESETS.devnet);
-    expect(loadBackendConfig(file)).toEqual(BACKEND_PRESETS.devnet);
-    fs.writeFileSync(file, '{"apiEndpoint":"x"}');
-    expect(loadBackendConfig(file)).toBeNull();
+  it('round-trips a backend config and returns null before one is chosen', () => {
+    const s = store();
+    expect(loadBackendConfig(s)).toBeNull();
+    expect(saveBackendConfig(s, BACKEND_PRESETS.devnet)).toBe('devnet');
+    expect(loadBackendConfig(s)).toEqual(BACKEND_PRESETS.devnet);
+  });
+
+  it('files endpoints matching no preset under the custom context', () => {
+    const s = store();
+    const custom = {
+      apiEndpoint: 'https://api.example.com/graphql',
+      authEndpoint: 'https://auth.example.com/graphql',
+      modulesEndpoint: 'https://modules.example.com/graphql'
+    };
+    expect(saveBackendConfig(s, custom)).toBe('custom');
+    expect(loadBackendConfig(s)).toEqual(custom);
   });
 });

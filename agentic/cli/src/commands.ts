@@ -3,9 +3,14 @@ import { Inquirerer } from 'inquirerer';
 
 import { loadSession } from './account-store';
 import { signIn, signOut } from './auth';
-import { BACKEND_PRESETS, BackendConfig, loadBackendConfig, saveBackendConfig } from './backend-store';
+import {
+  BACKEND_PRESETS,
+  BackendConfig,
+  contextNameFor,
+  loadBackendConfig,
+  saveBackendConfig
+} from './backend-store';
 import { AgentCliConfig, defaultManifest, saveManifestFile } from './config';
-import { splitCoalescedKeypresses } from './keypress-chunks';
 import { assembleSkills } from './skills';
 
 const log = (msg: string) => console.log(`[agent] ${msg}`);
@@ -55,14 +60,6 @@ function maskKey(token: string): string {
   return `${token.slice(0, 6)}...${token.slice(-4)}`;
 }
 
-function presetNameFor(config: BackendConfig | null): string | undefined {
-  if (!config) return undefined;
-  for (const [name, preset] of Object.entries(BACKEND_PRESETS)) {
-    if (preset.apiEndpoint === config.apiEndpoint) return name;
-  }
-  return 'custom';
-}
-
 export async function login(config: AgentCliConfig, argv: Record<string, unknown>): Promise<void> {
   if (!process.stdin.isTTY && !(argv.email && argv.password)) {
     throw new Error(
@@ -70,11 +67,8 @@ export async function login(config: AgentCliConfig, argv: Record<string, unknown
     );
   }
 
-  const saved = loadBackendConfig(config.backendFile);
-  // inquirerer applies its 15s inactivity timeout in TTY mode; a person pausing
-  // at the password prompt must not get killed, so push it to setTimeout's max.
-  const prompter = new Inquirerer({ noTty: !process.stdin.isTTY, timeout: 0x7fffffff });
-  splitCoalescedKeypresses(prompter);
+  const saved = loadBackendConfig(config.store);
+  const prompter = new Inquirerer({ noTty: !process.stdin.isTTY });
   try {
     const answers = await prompter.prompt(argv, [
       {
@@ -82,7 +76,7 @@ export async function login(config: AgentCliConfig, argv: Record<string, unknown
         name: 'backend',
         message: 'Backend',
         options: [...Object.keys(BACKEND_PRESETS), 'custom'],
-        default: presetNameFor(saved) ?? 'localnet'
+        default: saved ? contextNameFor(saved) : 'localnet'
       },
       {
         type: 'text',
@@ -109,13 +103,17 @@ export async function login(config: AgentCliConfig, argv: Record<string, unknown
       if (!backend) throw new Error(`Unknown backend preset: ${answers.backend}`);
     }
 
+    // File the session under the backend's context name, then commit the backend
+    // itself: a failed sign-in must leave neither behind.
+    const contextName = contextNameFor(backend);
     const session = await signIn({
-      accountFile: config.accountFile,
+      store: config.store,
+      context: contextName,
       authEndpoint: backend.authEndpoint,
       email: String(answers.email ?? ''),
       password: String(answers.password ?? '')
     });
-    saveBackendConfig(config.backendFile, backend);
+    saveBackendConfig(config.store, backend);
 
     log(`signed in as ${session.email}`);
     log(`backend: ${backend.apiEndpoint}`);
@@ -124,16 +122,16 @@ export async function login(config: AgentCliConfig, argv: Record<string, unknown
     } else {
       log('warning: API key mint failed — db tools stay signed out. Run `agent login` again to retry.');
     }
-    log(`session stored at ${config.accountFile}`);
+    log(`session stored in context ${contextName}`);
   } finally {
     prompter.close();
   }
 }
 
 export async function logout(config: AgentCliConfig): Promise<void> {
-  const backend = loadBackendConfig(config.backendFile) ?? BACKEND_PRESETS.localnet;
+  const backend = loadBackendConfig(config.store) ?? BACKEND_PRESETS.localnet;
   const wasSignedIn = await signOut({
-    accountFile: config.accountFile,
+    store: config.store,
     authEndpoint: backend.authEndpoint
   });
   if (wasSignedIn) log('signed out — API key revoked and session cleared.');
@@ -141,13 +139,13 @@ export async function logout(config: AgentCliConfig): Promise<void> {
 }
 
 export function whoami(config: AgentCliConfig): void {
-  const session = loadSession(config.accountFile);
+  const session = loadSession(config.store);
   if (!session) {
     log('not signed in — run `agent login`');
     process.exitCode = 1;
     return;
   }
-  const backend = loadBackendConfig(config.backendFile);
+  const backend = loadBackendConfig(config.store);
   log(`signed in as ${session.email}`);
   log(`user id: ${session.userId}`);
   log(`backend: ${backend?.apiEndpoint ?? 'unknown'}`);
@@ -157,7 +155,7 @@ export function whoami(config: AgentCliConfig): void {
     log('API key: none — db tools stay signed out. Run `agent login` to mint one.');
   }
   if (session.accessTokenExpiresAt) log(`access token expires: ${session.accessTokenExpiresAt}`);
-  log(`session file: ${config.accountFile}`);
+  log(`context: ${config.store.getCurrentContext()?.name ?? 'none'}`);
 }
 
 export function usage(): void {

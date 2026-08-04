@@ -23,7 +23,7 @@ export function resolveAccount(): ResolvedAccount | null {
   if (userId && accessToken) {
     return { userId, accessToken, apiKey: process.env.CONSTRUCTIVE_API_KEY };
   }
-  const session = loadSession(loadConfig(process.env.AGENT_HOME).accountFile);
+  const session = loadSession(loadConfig(process.env.AGENT_HOME).store);
   if (!session) return null;
   return { userId: session.userId, accessToken: session.accessToken, apiKey: session.apiKey };
 }
@@ -32,7 +32,7 @@ export function resolveBackendConfig(): ResolvedBackendConfig | undefined {
   const apiEndpoint = process.env.CONSTRUCTIVE_API_ENDPOINT;
   const modulesEndpoint = process.env.CONSTRUCTIVE_MODULES_ENDPOINT;
   if (apiEndpoint || modulesEndpoint) return { apiEndpoint, modulesEndpoint };
-  const stored = loadBackendConfig(loadConfig(process.env.AGENT_HOME).backendFile);
+  const stored = loadBackendConfig(loadConfig(process.env.AGENT_HOME).store);
   if (!stored) return undefined;
   return { apiEndpoint: stored.apiEndpoint, modulesEndpoint: stored.modulesEndpoint };
 }

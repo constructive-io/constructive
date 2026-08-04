@@ -1,4 +1,5 @@
 import { auth } from '@constructive-io/sdk';
+import { ConfigStore } from 'appstash';
 
 import { AccountSession, clearSession, loadSession, saveSession } from './account-store';
 import {
@@ -23,7 +24,9 @@ interface AuthRecord {
 export type ApiKeyRefreshStatus = 'ok' | 'reminted' | 'reauth-required' | 'unavailable' | 'signed-out';
 
 const SELECT = {
-  result: { select: { userId: true, accessToken: true, accessTokenExpiresAt: true } }
+  result: {
+    select: { userId: true, accessToken: true, accessTokenExpiresAt: true }
+  }
 } as const;
 
 const CREATE_KEY_SELECT = {
@@ -33,7 +36,10 @@ const CREATE_KEY_SELECT = {
 const REVOKE_KEY_SELECT = { result: true } as const;
 
 function authedClient(endpoint: string, bearer: string): AuthClient {
-  return auth.createClient({ endpoint, headers: { Authorization: `Bearer ${bearer}` } });
+  return auth.createClient({
+    endpoint,
+    headers: { Authorization: `Bearer ${bearer}` }
+  });
 }
 
 async function mint(client: AuthClient): Promise<MintedApiKey> {
@@ -54,31 +60,41 @@ async function revoke(client: AuthClient, keyId: string): Promise<void> {
  * degrades to 'reauth-required' when attempted cold.
  */
 export async function refreshApiKeyIfNeeded({
-  accountFile,
+  store,
+  context,
   authEndpoint
 }: {
-  accountFile: string;
+  store: ConfigStore;
+  /** Backend context the session is filed under; defaults to the active one. */
+  context?: string;
   authEndpoint: string;
 }): Promise<ApiKeyRefreshStatus> {
-  const session = loadSession(accountFile);
+  const session = loadSession(store, context);
   if (!session) return 'signed-out';
   const hasKey = !!session.apiKey;
-  const due = needsRemint({ apiKeyExpiresAt: session.apiKeyExpiresAt, now: Date.now() });
+  const due = needsRemint({
+    apiKeyExpiresAt: session.apiKeyExpiresAt,
+    now: Date.now()
+  });
   if (hasKey && !due) return 'ok';
 
   const client = authedClient(authEndpoint, session.accessToken);
   try {
     const minted = await remintApiKey({
       currentKeyId: session.keyId,
-      revoke: keyId => revoke(client, keyId),
+      revoke: (keyId) => revoke(client, keyId),
       mint: () => mint(client)
     });
-    saveSession(accountFile, {
-      ...session,
-      apiKey: minted.apiKey,
-      keyId: minted.keyId,
-      apiKeyExpiresAt: minted.apiKeyExpiresAt
-    });
+    saveSession(
+      store,
+      {
+        ...session,
+        apiKey: minted.apiKey,
+        keyId: minted.keyId,
+        apiKeyExpiresAt: minted.apiKeyExpiresAt
+      },
+      context
+    );
     return 'reminted';
   } catch (err) {
     const kind = classifyApiKeyError(err);
@@ -89,12 +105,14 @@ export async function refreshApiKeyIfNeeded({
 }
 
 export async function signIn({
-  accountFile,
+  store,
+  context,
   authEndpoint,
   email,
   password
 }: {
-  accountFile: string;
+  store: ConfigStore;
+  context?: string;
   authEndpoint: string;
   email: string;
   password: string;
@@ -119,27 +137,34 @@ export async function signIn({
     throw new Error('Authentication returned no access token (MFA may be required).');
   }
 
-  saveSession(accountFile, {
-    userId: record.userId,
-    email: trimmedEmail,
-    accessToken: record.accessToken,
-    ...(record.accessTokenExpiresAt ? { accessTokenExpiresAt: record.accessTokenExpiresAt } : {}),
-    signedInAt: Date.now()
-  });
+  saveSession(
+    store,
+    {
+      userId: record.userId,
+      email: trimmedEmail,
+      accessToken: record.accessToken,
+      ...(record.accessTokenExpiresAt ? { accessTokenExpiresAt: record.accessTokenExpiresAt } : {}),
+      signedInAt: Date.now()
+    },
+    context
+  );
   // Mint the long-lived API key inside the fresh step-up window. Best-effort: a
   // mint failure leaves a valid signed-in session that lacks a key until re-auth.
-  await refreshApiKeyIfNeeded({ accountFile, authEndpoint });
-  return loadSession(accountFile);
+  await refreshApiKeyIfNeeded({ store, context, authEndpoint });
+  return loadSession(store, context);
 }
 
 export async function signOut({
-  accountFile,
+  store,
+  context,
   authEndpoint
 }: {
-  accountFile: string;
+  store: ConfigStore;
+  /** Backend context the session is filed under; defaults to the active one. */
+  context?: string;
   authEndpoint: string;
 }): Promise<boolean> {
-  const session = loadSession(accountFile);
+  const session = loadSession(store, context);
   if (!session) return false;
   if (session.keyId) {
     try {
@@ -148,6 +173,6 @@ export async function signOut({
       console.warn(`[agent] API key revoke on sign-out failed: ${describeAuthError(err, authEndpoint)}`);
     }
   }
-  clearSession(accountFile);
+  clearSession(store, context);
   return true;
 }

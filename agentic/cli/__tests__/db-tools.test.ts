@@ -80,14 +80,14 @@ describe('materializeDbTools', () => {
     const { config, host } = loadHost();
     expect(host.account()).toBeNull();
 
-    saveSession(config.accountFile, {
+    saveBackendConfig(config.store, BACKEND_PRESETS.devnet);
+    saveSession(config.store, {
       userId: 'stored-user',
       email: 'dev@example.com',
       accessToken: 'stored-token',
       apiKey: 'stored-key',
       signedInAt: 1
     });
-    saveBackendConfig(config.backendFile, BACKEND_PRESETS.devnet);
 
     expect(host.account()).toEqual({
       userId: 'stored-user',
@@ -102,7 +102,7 @@ describe('materializeDbTools', () => {
 
   it('lets env vars beat the stored session', () => {
     const { config, host } = loadHost();
-    saveSession(config.accountFile, {
+    saveSession(config.store, {
       userId: 'stored-user',
       email: 'dev@example.com',
       accessToken: 'stored-token',

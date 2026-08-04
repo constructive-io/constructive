@@ -58,7 +58,7 @@
     "@pgpmjs/transform": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "csv-to-pg": "workspace:^",
-    "genomic": "^5.6.4",
+    "genomic": "^5.6.5",
     "git-changed": "^0.3.0",
     "glob": "^13.0.6",
     "parse-package-name": "^1.0.0",

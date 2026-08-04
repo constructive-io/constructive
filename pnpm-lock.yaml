@@ -160,6 +160,9 @@ importers:
       '@earendil-works/pi-coding-agent':
         specifier: 0.79.6
         version: 0.79.6(ws@8.20.1)(zod@4.4.3)
+      appstash:
+        specifier: ^0.8.0
+        version: 0.8.0
       inquirerer:
         specifier: ^4.9.3
         version: 4.9.3
@@ -168,8 +171,8 @@ importers:
   agentic/harness:
     dependencies:
       appstash:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.8.0
+        version: 0.8.0
       semver:
         specifier: ^7.7.2
         version: 7.8.1
@@ -2167,8 +2170,8 @@ importers:
         specifier: ^7.2.0
         version: 7.2.0
       appstash:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.8.0
+        version: 0.8.0
       gql-ast:
         specifier: workspace:^
         version: link:../gql-ast/dist
@@ -2384,8 +2387,8 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       appstash:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.8.0
+        version: 0.8.0
       find-and-require-package-json:
         specifier: ^0.9.1
         version: 0.9.1
@@ -2853,14 +2856,14 @@ importers:
         specifier: ^18.2.1
         version: 18.2.1
       appstash:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.8.0
+        version: 0.8.0
       find-and-require-package-json:
         specifier: ^0.9.1
         version: 0.9.1
       genomic:
-        specifier: ^5.6.4
-        version: 5.6.4
+        specifier: ^5.6.5
+        version: 5.6.5
       inquirerer:
         specifier: ^4.9.3
         version: 4.9.3
@@ -2951,8 +2954,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.6.4
-        version: 5.6.4
+        specifier: ^5.6.5
+        version: 5.6.5
       git-changed:
         specifier: ^0.3.0
         version: 0.3.0
@@ -3650,8 +3653,8 @@ importers:
         specifier: workspace:^
         version: link:../../graphql/types/dist
       appstash:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.8.0
+        version: 0.8.0
       gql-ast:
         specifier: workspace:^
         version: link:../../graphql/gql-ast/dist
@@ -6812,6 +6815,9 @@ packages:
   appstash@0.7.1:
     resolution: {integrity: sha512-q/7IMKVRGOEfiycXUxiJlK/TbunN1LTMs+I9etSVfsX7kNOWU3/VQhkAO/Fh39jAVCZhm9cK/OjBFMM4kh78Ng==}
 
+  appstash@0.8.0:
+    resolution: {integrity: sha512-BGt/TxAwPO6c30df8FnGwy0w3UvH4MBYQza+nDTxbektw6eBFzyCGt7qzBWRiml2YNNW8ebzoKpK2XfXNQkyrw==}
+
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
 
@@ -7943,8 +7949,8 @@ packages:
     resolution: {integrity: sha512-zV/5HKTfCeKWnxG0Dmrw51hEWFGfcF2xiXqcA3+J90WDuP0SvoiSO5ORvcBsifmx/FoIjgQN3oNOGaQ5PhLFkg==}
     engines: {node: '>=18'}
 
-  genomic@5.6.4:
-    resolution: {integrity: sha512-k4wUPBCMn5k7UNuYfYQ0e05yYp99hgo6gG7YToS/62Kr+2Ax4bKnXs2ZWfAB4HyyjTQ36d9Kaj4gfJquuUDcbQ==}
+  genomic@5.6.5:
+    resolution: {integrity: sha512-gmCNjYH+nS/moerbcXZiREN9vbK8E4nETlQzLuIuaH0kG7WYV8nKR8ckb1vw/WBXvo1Z8XIBCFvxnPsssiRA6Q==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -14481,6 +14487,8 @@ snapshots:
 
   appstash@0.7.1: {}
 
+  appstash@0.8.0: {}
+
   aproba@2.0.0: {}
 
   arg@4.1.3: {}
@@ -15602,9 +15610,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  genomic@5.6.4:
+  genomic@5.6.5:
     dependencies:
-      appstash: 0.7.1
+      appstash: 0.8.0
       inquirerer: 4.9.3
 
   gensync@1.0.0-beta.2: {}
