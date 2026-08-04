@@ -719,3 +719,46 @@ describe('multi-target cli with custom builtinNames', () => {
     expect(fileNames).not.toContain('commands/context.ts');
   });
 });
+
+describe('cli stashName', () => {
+  it('omits stashName from the store call when not configured', () => {
+    const single = generateCli({
+      tables: [carTable],
+      customOperations: { queries: [], mutations: [] },
+      config: { cli: { toolName: 'myapp' } },
+    });
+    const executor = single.files.find((f) => f.fileName === 'executor.ts');
+    expect(executor!.content).toContain('createConfigStore("myapp")');
+  });
+
+  it('passes stashName to the store while keeping toolName', () => {
+    const single = generateCli({
+      tables: [carTable],
+      customOperations: { queries: [], mutations: [] },
+      config: { cli: { toolName: 'myapp', stashName: 'shared' } },
+    });
+    const executor = single.files.find((f) => f.fileName === 'executor.ts');
+    expect(executor!.content).toContain('createConfigStore("myapp", {');
+    expect(executor!.content).toContain('stashName: "shared"');
+  });
+
+  it('passes stashName to multi-target executor and helpers', () => {
+    const multi = generateMultiTargetCli({
+      toolName: 'myapp',
+      stashName: 'shared',
+      targets: [
+        {
+          name: 'app',
+          endpoint: 'http://app.localhost/graphql',
+          ormImportPath: '../../generated/app/orm',
+          tables: [carTable],
+          customOperations: { queries: [], mutations: [] },
+        },
+      ],
+    });
+    for (const fileName of ['executor.ts', 'helpers.ts']) {
+      const file = multi.files.find((f) => f.fileName === fileName);
+      expect(file!.content).toContain('stashName: "shared"');
+    }
+  });
+});
