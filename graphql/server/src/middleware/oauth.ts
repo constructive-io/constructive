@@ -779,7 +779,8 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         access_token: result.access_token ?? '',
         access_token_expires_at: expiresAt,
         user_id: result.user_id ?? '',
-        id: result.id ?? result.user_id ?? ''
+        id: result.id ?? result.user_id ?? '',
+        email: profile.email ?? ''
       });
       const baseUri = redirectUri.split('#')[0];
       return res.redirect(`${baseUri}#${fragment.toString()}`);
