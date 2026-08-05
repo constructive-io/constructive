@@ -1,7 +1,7 @@
 import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { generateChangeLineContent, generateTagLineContent } from '@pgpmjs/ast/files/plan/writer';
 import { Change, ExtendedPlanFile,Tag } from '@pgpmjs/ast/files/types';
-import { minimatch } from 'minimatch';
+import { Minimatch } from 'minimatch';
 
 import { buildAstEdges, expandClosures } from './closure';
 import {
@@ -117,6 +117,23 @@ export function extractPackageFromPath(
 }
 
 /**
+ * Compiling a glob costs far more than matching one, and assigning a plan
+ * evaluates every (change x pattern) pair — hundreds of thousands of pairs on
+ * a large plan over the same handful of patterns — so each pattern is
+ * compiled once and reused. `Minimatch` instances are stateless.
+ */
+const patternMatchers = new Map<string, Minimatch>();
+
+function patternMatcher(pattern: string): Minimatch {
+  let matcher = patternMatchers.get(pattern);
+  if (!matcher) {
+    matcher = new Minimatch(pattern, { dot: true });
+    patternMatchers.set(pattern, matcher);
+  }
+  return matcher;
+}
+
+/**
  * Find the matching package for a change using pattern-based strategy.
  * Returns the first matching slice's package name, or undefined if no match.
  */
@@ -126,7 +143,7 @@ export function findMatchingPattern(
 ): string | undefined {
   for (const slice of strategy.slices) {
     for (const pattern of slice.patterns) {
-      if (minimatch(changeName, pattern, { dot: true })) {
+      if (patternMatcher(pattern).match(changeName)) {
         return slice.packageName;
       }
     }
