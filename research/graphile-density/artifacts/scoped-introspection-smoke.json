@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-07-31T17:21:37Z",
+  "classification": "small disposable-fixture smoke; not a density benchmark or production acceptance run",
+  "environment": {
+    "postgresVersion": "18.4",
+    "database": "codex_graphile_density_20260731_rerun",
+    "databaseDroppedAfterRun": true,
+    "constructiveDbUsed": false
+  },
+  "catalogFixture": {
+    "requestedSchemas": ["density_a"],
+    "features": [
+      "cross-schema foreign key",
+      "shared enum",
+      "shared domain",
+      "identity sequences",
+      "SQL function"
+    ],
+    "stockQuery": {
+      "bytes": 7332,
+      "sha256": "c0ed817b912f78e1ea68c70d89ff4b7f9cb4c02d88112a69ac4109d5b996e4c5"
+    },
+    "stockIntrospection": {
+      "bytes": 404110,
+      "namespaces": 6,
+      "classes": 8,
+      "procedures": 1,
+      "types": 481
+    },
+    "scopedIntrospection": {
+      "bytes": 403639,
+      "namespaces": 4,
+      "classes": 8,
+      "procedures": 1,
+      "types": 481,
+      "bindValues": [["density_a"]]
+    },
+    "stockSdl": {
+      "bytes": 22538,
+      "sha256": "2d899a6f9abcea107987a0aa932f18dd8d1466bca3f4ddd340199316aea1f238"
+    },
+    "scopedSdl": {
+      "bytes": 22538,
+      "sha256": "2d899a6f9abcea107987a0aa932f18dd8d1466bca3f4ddd340199316aea1f238"
+    },
+    "sdlByteEquivalent": true,
+    "missingSchemaError": "Schema-scoped introspection for service 'main' did not find required schema(s): density_missing"
+  },
+  "partitionFixture": {
+    "database": "codex_graphile_density_partition_20260731",
+    "databaseDroppedAfterRun": true,
+    "requestedSchema": "density_shared",
+    "hiddenChildSchemas": ["density_a", "density_b"],
+    "scopedNamespaces": ["density_shared", "pg_catalog"],
+    "scopedClasses": ["events", "events_pkey"],
+    "stockSdl": {
+      "bytes": 20201,
+      "sha256": "8f32cab18fa54c8d4c6afa7ab05bed73be770f98c29aa9b1bcd4f29e6f54d532"
+    },
+    "scopedSdl": {
+      "bytes": 20201,
+      "sha256": "8f32cab18fa54c8d4c6afa7ab05bed73be770f98c29aa9b1bcd4f29e6f54d532"
+    },
+    "sdlByteEquivalent": true,
+    "finding": "child-to-parent inheritance closure is required; parent-to-child closure over-expands into unrelated tenant partitions and was removed"
+  },
+  "limitations": [
+    "The catalog is tiny, so the byte reduction is not representative of the 61k-pg_class target.",
+    "This does not exercise RLS, runtime credentials, hostile tenants, every plugin, throughput, RSS density, or soak behavior.",
+    "The first fixture's forced database cleanup emitted expected 57P01 messages from adaptor clients after schema release; the database was confirmed absent afterward. The partition rerun used explicit pools and drained cleanly."
+  ]
+}
