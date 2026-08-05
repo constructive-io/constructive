@@ -1,7 +1,7 @@
 /**
  * config-cache — Per-database LLM billing configuration cache
  *
- * Caches resolved billing function names per database_id.
+ * Caches resolved billing function names per exact Graphile build and database_id.
  * Uses an LRU cache with TTL so config changes propagate within a bounded window
  * without requiring a server restart.
  *
@@ -103,6 +103,21 @@ const billingCache = new ModuleConfigCache<LlmBillingCacheEntry>({
   max: 50
 });
 
+const billingScopeIds = new WeakMap<object, number>();
+let nextBillingScopeId = 1;
+
+function scopedCacheKey(cacheScope: object, databaseId: string): string {
+  if ((typeof cacheScope !== 'object' && typeof cacheScope !== 'function') || cacheScope === null) {
+    throw new Error('LLM_CONFIG_CACHE_SCOPE_UNAVAILABLE');
+  }
+  let scopeId = billingScopeIds.get(cacheScope);
+  if (scopeId === undefined) {
+    scopeId = nextBillingScopeId++;
+    billingScopeIds.set(cacheScope, scopeId);
+  }
+  return `${scopeId}\0${databaseId}`;
+}
+
 // ─── Resolution Functions ───────────────────────────────────────────────────
 
 /**
@@ -117,49 +132,46 @@ async function resolveInferenceLogConfig(
   pgClient: PgClient,
   databaseId: string
 ): Promise<InferenceLogConfig | null> {
-  try {
-    const schemaCheck = await pgClient.query(SCHEMA_EXISTS_SQL, ['metaschema_modules_public']);
-    if (schemaCheck.rows.length === 0) return null;
+  const schemaCheck = await pgClient.query(SCHEMA_EXISTS_SQL, ['metaschema_modules_public']);
+  if (schemaCheck.rows.length === 0) return null;
 
-    const result = await pgClient.query(INFERENCE_LOG_MODULE_SQL, [databaseId]);
-    const row = result.rows[0];
-    if (!row?.schema || !row?.table_name) return null;
-
-    return {
-      schema: row.schema as string,
-      tableName: row.table_name as string
-    };
-  } catch {
-    return null;
+  const result = await pgClient.query(INFERENCE_LOG_MODULE_SQL, [databaseId]);
+  const row = result.rows[0];
+  if (!row) return null;
+  if (!row.schema || !row.table_name) {
+    throw new Error('LLM_INFERENCE_LOG_CONFIG_INCOMPLETE');
   }
+
+  return {
+    schema: row.schema as string,
+    tableName: row.table_name as string
+  };
 }
 
 async function resolveBillingConfig(
   pgClient: PgClient,
   databaseId: string
 ): Promise<BillingConfig | null> {
-  try {
-    // Guard: check if the metaschema_modules_public schema exists.
-    // If the database doesn't have the billing module provisioned,
-    // this schema (or the billing_module table) won't exist.
-    const schemaCheck = await pgClient.query(SCHEMA_EXISTS_SQL, ['metaschema_modules_public']);
-    if (schemaCheck.rows.length === 0) return null;
+  // Guard: check if the metaschema_modules_public schema exists.
+  // If the database doesn't have the billing module provisioned,
+  // this schema (or the billing_module table) won't exist.
+  const schemaCheck = await pgClient.query(SCHEMA_EXISTS_SQL, ['metaschema_modules_public']);
+  if (schemaCheck.rows.length === 0) return null;
 
-    const result = await pgClient.query(BILLING_MODULE_SQL, [databaseId]);
-    const row = result.rows[0];
-    if (!row?.record_usage_function) return null;
-
-    return {
-      publicSchema: row.public_schema as string,
-      privateSchema: row.private_schema as string,
-      recordUsageFunction: row.record_usage_function as string,
-      // The check_billing_quota function name follows the inflection pattern
-      checkBillingQuotaFunction: 'check_billing_quota'
-    };
-  } catch {
-    // Schema/table doesn't exist or query failed — billing not available
-    return null;
+  const result = await pgClient.query(BILLING_MODULE_SQL, [databaseId]);
+  const row = result.rows[0];
+  if (!row) return null;
+  if (!row.public_schema || !row.private_schema || !row.record_usage_function) {
+    throw new Error('LLM_BILLING_CONFIG_INCOMPLETE');
   }
+
+  return {
+    publicSchema: row.public_schema as string,
+    privateSchema: row.private_schema as string,
+    recordUsageFunction: row.record_usage_function as string,
+    // The check_billing_quota function name follows the inflection pattern
+    checkBillingQuotaFunction: 'check_billing_quota'
+  };
 }
 
 // ─── Public API ─────────────────────────────────────────────────────────────
@@ -170,12 +182,16 @@ async function resolveBillingConfig(
  *
  * @param pgClient - A client connected to the tenant database (from withPgClient)
  * @param databaseId - The database UUID
+ * @param cacheScope - Opaque identity of the exact Graphile build/pool contract
  */
 export async function getLlmBillingConfig(
   pgClient: PgClient,
-  databaseId: string
+  databaseId: string,
+  cacheScope: object
 ): Promise<LlmBillingCacheEntry> {
-  const cached = billingCache.get(databaseId);
+  if (!databaseId) throw new Error('LLM_DATABASE_ID_UNAVAILABLE');
+  const cacheKey = scopedCacheKey(cacheScope, databaseId);
+  const cached = billingCache.get(cacheKey);
   if (cached) return cached;
 
   const [billing, inferenceLog] = await Promise.all([
@@ -184,19 +200,21 @@ export async function getLlmBillingConfig(
   ]);
 
   const entry: LlmBillingCacheEntry = { billing, inferenceLog };
-  billingCache.set(databaseId, entry);
+  billingCache.set(cacheKey, entry);
   return entry;
 }
 
 /**
  * Invalidate the cached config for a specific database (or all).
  */
-export function invalidateLlmBillingConfig(databaseId?: string): void {
-  if (databaseId) {
-    billingCache.delete(databaseId);
-  } else {
-    billingCache.clear();
+export function invalidateLlmBillingConfig(databaseId?: string, cacheScope?: object): void {
+  if (databaseId && cacheScope) {
+    billingCache.delete(scopedCacheKey(cacheScope, databaseId));
+    return;
   }
+  // A database UUID alone is not a safe cache identity. Conservatively clear
+  // every exact-build entry when the caller cannot provide the matching scope.
+  billingCache.clear();
 }
 
 /**

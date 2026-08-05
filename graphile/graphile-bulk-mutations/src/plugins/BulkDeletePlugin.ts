@@ -1,10 +1,12 @@
 import '../augmentations';
 
-import { sideEffectWithPgClient } from '@dataplan/pg';
+import { type PgClient,sideEffectWithPgClient } from '@dataplan/pg';
+import { QuoteUtils } from '@pgsql/quotes';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType,GraphQLOutputType } from 'graphql';
 
 const version = '0.1.0';
+const qi = (name: string): string => QuoteUtils.quoteIdentifier(name);
 
 /**
  * BulkDeletePlugin
@@ -79,7 +81,7 @@ export const BulkDeletePlugin: GraphileConfig.Plugin = {
           // Extract primary key columns for RETURNING clause
           const primaryUnique = resource.uniques.find((u: any) => u.isPrimary) ?? resource.uniques[0];
           const pkColumns: string[] = primaryUnique.attributes;
-          const pkReturning = pkColumns.map((c) => `"${c}"`).join(', ');
+          const pkReturning = pkColumns.map(qi).join(', ');
 
           const compiledFrom = sql.compile(resource.from).text;
 
@@ -105,7 +107,7 @@ export const BulkDeletePlugin: GraphileConfig.Plugin = {
                     const $result = sideEffectWithPgClient(
                       executor,
                       $input,
-                      async (pgClient: any, input: any) => {
+                      async (pgClient: PgClient, input: any) => {
                         if (requireWhere && (!input.where || Object.keys(input.where).length === 0)) {
                           throw new Error(
                             'Bulk delete requires a non-empty where condition. Set bulkRequireWhere: false to allow unrestricted deletes.'
@@ -125,11 +127,11 @@ export const BulkDeletePlugin: GraphileConfig.Plugin = {
                             const sqlType = attrToSqlType[attrName];
 
                             if (spec === null) {
-                              whereClauses.push(`"${attrName}" IS NULL`);
+                              whereClauses.push(`${qi(attrName)} IS NULL`);
                             } else if (spec !== undefined && typeof spec !== 'object') {
                               // Simple equality (Condition type)
                               values.push(spec);
-                              whereClauses.push(`"${attrName}" = $${values.length}::${sqlType}`);
+                              whereClauses.push(`${qi(attrName)} = $${values.length}::${sqlType}`);
                             } else if (spec && typeof spec === 'object') {
                               // Operator-based (Filter type)
                               for (const [op, val] of Object.entries(spec) as [string, any][]) {
@@ -137,22 +139,22 @@ export const BulkDeletePlugin: GraphileConfig.Plugin = {
                                 const paramRef = `$${values.length}::${sqlType}`;
                                 switch (op) {
                                 case 'equalTo':
-                                  whereClauses.push(`"${attrName}" = ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} = ${paramRef}`);
                                   break;
                                 case 'notEqualTo':
-                                  whereClauses.push(`"${attrName}" != ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} != ${paramRef}`);
                                   break;
                                 case 'greaterThan':
-                                  whereClauses.push(`"${attrName}" > ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} > ${paramRef}`);
                                   break;
                                 case 'greaterThanOrEqualTo':
-                                  whereClauses.push(`"${attrName}" >= ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} >= ${paramRef}`);
                                   break;
                                 case 'lessThan':
-                                  whereClauses.push(`"${attrName}" < ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} < ${paramRef}`);
                                   break;
                                 case 'lessThanOrEqualTo':
-                                  whereClauses.push(`"${attrName}" <= ${paramRef}`);
+                                  whereClauses.push(`${qi(attrName)} <= ${paramRef}`);
                                   break;
                                 case 'in':
                                   if (Array.isArray(val)) {
@@ -161,15 +163,15 @@ export const BulkDeletePlugin: GraphileConfig.Plugin = {
                                       return `$${values.length}::${sqlType}`;
                                     });
                                     values.pop();
-                                    whereClauses.push(`"${attrName}" IN (${placeholders.join(', ')})`);
+                                    whereClauses.push(`${qi(attrName)} IN (${placeholders.join(', ')})`);
                                   }
                                   break;
                                 case 'isNull':
                                   values.pop();
                                   if (val) {
-                                    whereClauses.push(`"${attrName}" IS NULL`);
+                                    whereClauses.push(`${qi(attrName)} IS NULL`);
                                   } else {
-                                    whereClauses.push(`"${attrName}" IS NOT NULL`);
+                                    whereClauses.push(`${qi(attrName)} IS NOT NULL`);
                                   }
                                   break;
                                 default:
@@ -194,7 +196,7 @@ export const BulkDeletePlugin: GraphileConfig.Plugin = {
                         // Use RETURNING <pk_columns> instead of RETURNING *
                         // For delete, we capture PKs before rows are gone
                         const text = `DELETE FROM ${compiledFrom}\nWHERE ${whereStr}\nRETURNING ${pkReturning}`;
-                        const mutationResult = await pgClient.query(text, values);
+                        const mutationResult = await pgClient.query({ text, values });
                         const affectedCount = mutationResult.rowCount ?? 0;
 
                         // For delete, rows no longer exist so we can't do a

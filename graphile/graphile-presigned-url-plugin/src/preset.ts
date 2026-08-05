@@ -10,6 +10,7 @@ import type { GraphileConfig } from 'graphile-config';
 
 import { createDownloadUrlPlugin } from './download-url-field';
 import { createPresignedUrlPlugin } from './plugin';
+import { snapshotPreloadedStorageModules } from './storage-module-source';
 import type { PresignedUrlPluginOptions } from './types';
 
 /**
@@ -38,10 +39,17 @@ import type { PresignedUrlPluginOptions } from './types';
 export function PresignedUrlPreset(
   options: PresignedUrlPluginOptions,
 ): GraphileConfig.Preset {
+  const preloadedStorageModules = snapshotPreloadedStorageModules(
+    options.preloadedStorageModules,
+  );
+  const buildOptions = preloadedStorageModules === undefined
+    ? options
+    : { ...options, preloadedStorageModules };
+
   return {
     plugins: [
-      createPresignedUrlPlugin(options),
-      createDownloadUrlPlugin(options),
+      createPresignedUrlPlugin(buildOptions),
+      createDownloadUrlPlugin(buildOptions),
     ],
   };
 }

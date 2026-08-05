@@ -34,14 +34,23 @@ export interface AgentDiscovery {
 
 // ─── Cache ──────────────────────────────────────────────────────────────────
 
-const agentDiscoveryCache = new ModuleConfigCache<AgentDiscovery | null>({
-  name: 'agent-discovery',
-  ttlMs: 60_000
-});
+let agentDiscoveryCaches = new WeakMap<object, ModuleConfigCache<AgentDiscovery | null>>();
+
+function cacheForPool(pool: object): ModuleConfigCache<AgentDiscovery | null> {
+  let cache = agentDiscoveryCaches.get(pool);
+  if (!cache) {
+    cache = new ModuleConfigCache<AgentDiscovery | null>({
+      name: 'agent-discovery',
+      ttlMs: 60_000
+    });
+    agentDiscoveryCaches.set(pool, cache);
+  }
+  return cache;
+}
 
 /** Clear all cached discovery results (for testing) */
 export function clearAgentDiscoveryCache(): void {
-  agentDiscoveryCache.clear();
+  agentDiscoveryCaches = new WeakMap<object, ModuleConfigCache<AgentDiscovery | null>>();
 }
 
 // ─── Discovery Query ────────────────────────────────────────────────────────
@@ -53,7 +62,9 @@ const DISCOVERY_SQL = `
     acm.message_table_name,
     acm.task_table_name
   FROM metaschema_modules_public.agent_chat_module acm
-  JOIN metaschema_public.schema s ON s.id = acm.schema_id
+  JOIN metaschema_public.schema s
+    ON s.id = acm.schema_id
+   AND s.database_id = acm.database_id
   WHERE acm.database_id = $1
   LIMIT 1
 `;
@@ -83,6 +94,7 @@ export async function getAgentDiscovery(
     throw new Error('getAgentDiscovery: databaseId is required');
   }
 
+  const agentDiscoveryCache = cacheForPool(pool);
   const cached = agentDiscoveryCache.get(databaseId);
   if (cached !== undefined) {
     return cached;

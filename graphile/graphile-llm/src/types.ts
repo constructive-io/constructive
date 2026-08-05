@@ -174,6 +174,8 @@ export interface ChunkTableInfo {
   parentCodecName: string;
   /** Schema of the chunks table (or null for public/default) */
   chunksSchema: string | null;
+  /** Exact schema containing the pgvector `vector` type for this service */
+  vectorSchema: string;
   /** Name of the chunks table */
   chunksTableName: string;
   /** FK column on chunks table pointing to parent */

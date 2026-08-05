@@ -26,6 +26,10 @@ import { TYPES } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import { getQueryBuilder } from 'graphile-plugin-utils';
 
+import {
+  extensionSchemasByService,
+  SearchExtensionMetadataGather,
+} from './extension-metadata';
 import type { SearchableColumn, SearchAdapter, UnifiedSearchOptions } from './types';
 
 // ─── TypeScript Namespace Augmentations ──────────────────────────────────────
@@ -171,8 +175,14 @@ export function createUnifiedSearchPlugin(
 ): GraphileConfig.Plugin {
   const { adapters, enableSearchScore = true, enableUnifiedSearch = true, rrfK = 60 } = options;
 
-  // Per-codec cache of discovered columns, keyed by codec name
-  const codecCache = new Map<string, AdapterColumnCache[]>();
+  // Adapter discovery may depend on both the codec and the surrounding build
+  // registry. Object-identity keys prevent a long-lived preset from reusing
+  // tenant A's result for tenant B, even if a caller reuses a codec object.
+  // Weak keys also allow disposed builds and codecs to be collected.
+  const buildCodecCache = new WeakMap<
+    object,
+    WeakMap<PgCodecWithAttributes, AdapterColumnCache[]>
+  >();
 
   // Bridge between orderBy enum apply and filter apply.
   // The orderBy enum runs on the PgSelectStep while the filter runs on
@@ -195,9 +205,14 @@ export function createUnifiedSearchPlugin(
    * count as intentional search.
    */
   function getAdapterColumns(codec: PgCodecWithAttributes, build: any): AdapterColumnCache[] {
-    const cacheKey = codec.name;
-    if (codecCache.has(cacheKey)) {
-      return codecCache.get(cacheKey)!;
+    let codecCache = buildCodecCache.get(build);
+    if (!codecCache) {
+      codecCache = new WeakMap<PgCodecWithAttributes, AdapterColumnCache[]>();
+      buildCodecCache.set(build, codecCache);
+    }
+    const cached = codecCache.get(codec);
+    if (cached) {
+      return cached;
     }
 
     const primaryAdapters = adapters.filter((a) => !a.isSupplementary);
@@ -238,7 +253,7 @@ export function createUnifiedSearchPlugin(
       }
     }
 
-    codecCache.set(cacheKey, results);
+    codecCache.set(codec, results);
     return results;
   }
 
@@ -259,6 +274,8 @@ export function createUnifiedSearchPlugin(
       'Bm25CodecPlugin',
       'VectorCodecPlugin',
     ],
+
+    gather: SearchExtensionMetadataGather,
 
     // ─── Custom Inflection Methods ─────────────────────────────────────
     inflection: {
@@ -328,6 +345,17 @@ export function createUnifiedSearchPlugin(
       },
 
       hooks: {
+        /** Publish only this build's consistency-checked extension bindings. */
+        build(build) {
+          return build.extend(
+            build,
+            {
+              pgSearchExtensionSchemasByService: extensionSchemasByService(build),
+            },
+            'UnifiedSearchPlugin adding per-service extension schemas'
+          );
+        },
+
         /**
          * Register all adapter-specific GraphQL types during init.
          */
@@ -375,7 +403,7 @@ export function createUnifiedSearchPlugin(
             inflection,
             sql,
             graphql: { GraphQLFloat },
-            grafast: { lambda },
+            grafast: { constant, lambda },
           } = build;
           const {
             scope: { isPgClassType, pgCodec: rawPgCodec },
@@ -424,7 +452,7 @@ export function createUnifiedSearchPlugin(
                         const $select = typeof $row.getClassStep === 'function'
                           ? $row.getClassStep()
                           : null;
-                        if (!$select) return build.grafast.constant(null);
+                        if (!$select) return constant(null);
 
                         if (typeof $select.setInliningForbidden === 'function') {
                           $select.setInliningForbidden();
@@ -522,7 +550,7 @@ export function createUnifiedSearchPlugin(
                       const $select = typeof $row.getClassStep === 'function'
                         ? $row.getClassStep()
                         : null;
-                      if (!$select) return build.grafast.constant(null);
+                      if (!$select) return constant(null);
 
                       if (typeof $select.setInliningForbidden === 'function') {
                         $select.setInliningForbidden();

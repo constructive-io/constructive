@@ -23,10 +23,32 @@ import { Logger } from '@pgpmjs/logger';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 
-import { type WithPgClient,withRequestPgClient } from './request-pg-client';
-import { deleteS3Object,generatePresignedPutUrl } from './s3-signer';
-import { getBucketConfig, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, storedPhysicalName } from './storage-module-cache';
-import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
+import {
+  type RequestPgClient,
+  type WithPgClient,
+  withRequestPgClient,
+} from './request-pg-client';
+import {
+  mintPhysicalBucketName,
+  resolveS3ConfigForPhysicalBucket,
+} from './s3-config';
+import { deleteS3Object, generatePresignedPutUrl } from './s3-signer';
+import {
+  getBucketConfig,
+  getStorageModuleCacheScope,
+  isS3BucketProvisioned,
+  markS3BucketProvisioned,
+  resolveStorageConfigFromCodec,
+  type StorageModuleCacheScope,
+  storedPhysicalName,
+} from './storage-module-cache';
+import {
+  assertStorageRequestContext,
+  loadStorageModulesForBuild,
+  snapshotPreloadedStorageModules,
+  type StorageWithPgClient,
+} from './storage-module-source';
+import type { BucketConfig, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:plugin');
 
@@ -37,6 +59,49 @@ const MAX_CONTENT_TYPE_LENGTH = 255;
 const MAX_CUSTOM_KEY_LENGTH = 1024;
 const SHA256_HEX_REGEX = /^[a-f0-9]{64}$/;
 const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9_.\-/]*$/;
+
+type TaggedStorageCodec = {
+  name: string;
+  attributes?: Record<string, { codec?: unknown }>;
+  extensions?: { pg?: { schemaName?: string; name?: string } };
+};
+
+/**
+ * Resolve the upload input's owner scope at schema-build time.
+ *
+ * Exact-build preloaded metadata is authoritative: app-scoped modules must
+ * not expose a required ownerId merely because their canonical bucket table
+ * retains a nullable owner_id column. Generic consumers without a preloaded
+ * snapshot retain the legacy column-based inference because their module
+ * scope is available only at request time.
+ */
+export function resolveUploadOwnerScope(
+  filesCodec: TaggedStorageCodec,
+  bucketCodec: TaggedStorageCodec,
+  preloadedStorageModules: readonly StorageModuleConfig[] | undefined,
+): { hasOwnerId: boolean; ownerIdCodec: unknown | null } | null {
+  const ownerIdCodec = bucketCodec.attributes?.owner_id?.codec ?? null;
+  if (preloadedStorageModules === undefined) {
+    return {
+      hasOwnerId: ownerIdCodec !== null,
+      ownerIdCodec,
+    };
+  }
+
+  const storageConfig = resolveStorageConfigFromCodec(
+    filesCodec,
+    preloadedStorageModules,
+  );
+  if (!storageConfig) return null;
+
+  const hasOwnerId = storageConfig.scope !== 'app';
+  if (hasOwnerId && ownerIdCodec === null) {
+    throw new Error(
+      `STORAGE_OWNER_COLUMN_REQUIRED:${storageConfig.schemaName}.${storageConfig.bucketsTableName}`,
+    );
+  }
+  return { hasOwnerId, ownerIdCodec };
+}
 
 // --- Helpers ---
 
@@ -81,58 +146,39 @@ async function resolveDatabaseId(pgClient: any): Promise<string | null> {
   return result.rows[0]?.id ?? null;
 }
 
-function resolveS3(options: PresignedUrlPluginOptions): S3Config {
-  if (typeof options.s3 === 'function') {
-    const resolved = options.s3();
-    options.s3 = resolved;
-    return resolved;
-  }
-  return options.s3;
+type RequestStorageWithPgClient = WithPgClient & StorageWithPgClient;
+
+function withCurrentRequestPgClient(
+  pgClient: RequestPgClient,
+): StorageWithPgClient {
+  return async (_pgSettings, callback) => callback(pgClient);
 }
 
-/**
- * Mint the physical S3 bucket name for a logical bucket's first provision.
- *
- * This is a naming *policy*, consulted exactly once per bucket — before the
- * physical bucket exists. Once provisioned, the recorded `physical_name` on
- * the row is authoritative and this function must not be consulted again.
- */
-function mintPhysicalBucketName(
-  options: PresignedUrlPluginOptions,
-  databaseId: string,
-  bucketKey: string,
-): string {
-  if (options.resolveBucketName) {
-    return options.resolveBucketName(databaseId, bucketKey);
-  }
-  // Single-bucket deployment: the globally configured bucket is the physical bucket.
-  return resolveS3(options).bucket;
-}
+async function resolveRequestStorageModules(
+  preloadedStorageModules: readonly StorageModuleConfig[] | undefined,
+  cacheScope: StorageModuleCacheScope,
+  withPgClient: RequestStorageWithPgClient | null | undefined,
+  pgSettings: unknown,
+): Promise<{
+  databaseId: string;
+  allConfigs: readonly StorageModuleConfig[];
+}> {
+  assertStorageRequestContext(withPgClient, pgSettings);
+  const requestSettings = pgSettings as Record<string, string>;
 
-/**
- * Build the S3 config for a *known* physical bucket. `physicalName` is
- * required — callers must resolve the coordinate (stored row value, or a
- * freshly provisioned name) before getting here. No name is ever recomputed.
- */
-function resolveS3ForDatabase(
-  options: PresignedUrlPluginOptions,
-  storageConfig: StorageModuleConfig,
-  physicalName: string,
-): S3Config {
-  const globalS3 = resolveS3(options);
-  const publicUrlPrefix = storageConfig.publicUrlPrefix != null
-    ? storageConfig.publicUrlPrefix
-    : globalS3.publicUrlPrefix;
+  return withRequestPgClient(withPgClient, requestSettings, async (pgClient) => {
+    const databaseId = await resolveDatabaseId(pgClient);
+    if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
 
-  if (physicalName === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
-    return globalS3;
-  }
-
-  return {
-    ...globalS3,
-    bucket: physicalName,
-    ...(publicUrlPrefix != null ? { publicUrlPrefix } : {}),
-  };
+    const allConfigs = await loadStorageModulesForBuild(
+      preloadedStorageModules,
+      withCurrentRequestPgClient(pgClient),
+      requestSettings,
+      databaseId,
+      cacheScope,
+    );
+    return { databaseId, allConfigs };
+  });
 }
 
 /**
@@ -144,48 +190,71 @@ function resolveS3ForDatabase(
  * value is the durable coordinate: route resolution and every later read use
  * it verbatim; nothing is recomputed.
  *
- * The record write runs in the system lane (privileged role, so it bypasses the
- * RLS that stops request roles from UPDATE-ing bucket rows) — it is server
- * bookkeeping, not request data. It still carries the tenant `database_id`
- * claim, because the buckets table's catalog-sync trigger calls
- * `jwt_private.current_database_id()` and would otherwise raise
- * DATABASE_CLAIM_REQUIRED; `withRequestPgClient` applies that claim inside the
- * write's transaction without switching off the privileged role.
- * `bucket` (the cached config) is mutated in place so subsequent reads observe
- * the recorded name without a DB round-trip.
+ * The record write reuses the complete request settings. It must satisfy the
+ * same role, claims, and RLS policies as the bucket read that authorized the
+ * upload; a policy denial fails closed. `bucket` (the cached config) is mutated
+ * in place so subsequent reads observe the recorded name without a DB round-trip.
  */
 async function provisionAndRecordPhysicalBucket(
   options: PresignedUrlPluginOptions,
   withPgClient: WithPgClient,
+  pgSettings: Record<string, string>,
   storageConfig: StorageModuleConfig,
   databaseId: string,
   bucket: BucketConfig,
   allowedOrigins: string[] | null,
+  cacheScope: StorageModuleCacheScope,
 ): Promise<string> {
-  const s3BucketName = mintPhysicalBucketName(options, databaseId, bucket.key);
+  const s3BucketName = mintPhysicalBucketName(
+    options,
+    bucket.key,
+    databaseId,
+    cacheScope,
+  );
 
-  if (options.ensureBucketProvisioned && !isS3BucketProvisioned(s3BucketName)) {
+  if (options.ensureBucketProvisioned && !isS3BucketProvisioned(s3BucketName, cacheScope)) {
     log.info(`Lazy-provisioning S3 bucket "${s3BucketName}" for database ${databaseId}`);
     await options.ensureBucketProvisioned(s3BucketName, bucket.type, databaseId, allowedOrigins);
-    markS3BucketProvisioned(s3BucketName);
+    markS3BucketProvisioned(s3BucketName, cacheScope);
     log.info(`Lazy-provisioned S3 bucket "${s3BucketName}" successfully`);
   }
 
-  // Record the physical coordinate on the source row. The `physical_name IS NULL`
-  // guard keeps this idempotent and race-safe across concurrent first uploads.
-  // The catalog-sync trigger on this UPDATE needs `jwt.claims.database_id`, so the
-  // write runs under the resolved database claim (privileged role preserved).
-  await withRequestPgClient(withPgClient, { 'jwt.claims.database_id': databaseId }, (client) =>
-    client.query({
-      text: `UPDATE ${storageConfig.bucketsQualifiedName}
+  // Record the physical coordinate on the source row. If another process won
+  // the race, read its value and route to that authoritative coordinate rather
+  // than signing against this process's losing candidate.
+  // Keep the complete request role and claims active for both race-resolution
+  // statements; a policy denial must fail closed rather than use a system lane.
+  const recordedPhysicalName = await withRequestPgClient(
+    withPgClient,
+    pgSettings,
+    async (client) => {
+      const updated = await client.query({
+        text: `UPDATE ${storageConfig.bucketsQualifiedName}
              SET physical_name = $1
-             WHERE id = $2 AND physical_name IS NULL`,
-      values: [s3BucketName, bucket.id],
-    }),
+             WHERE id = $2 AND physical_name IS NULL
+             RETURNING physical_name`,
+        values: [s3BucketName, bucket.id],
+      });
+      const updatedName = storedPhysicalName(updated.rows[0] ?? {});
+      if (updatedName !== null) return updatedName;
+
+      const existing = await client.query({
+        text: `SELECT physical_name
+             FROM ${storageConfig.bucketsQualifiedName}
+             WHERE id = $1
+             LIMIT 1`,
+        values: [bucket.id],
+      });
+      return storedPhysicalName(existing.rows[0] ?? {});
+    },
   );
-  bucket.physical_name = s3BucketName;
-  log.info(`Recorded physical_name="${s3BucketName}" on bucket ${bucket.id}`);
-  return s3BucketName;
+  if (recordedPhysicalName === null) {
+    throw new Error('BUCKET_PHYSICAL_NAME_NOT_RECORDED');
+  }
+
+  bucket.physical_name = recordedPhysicalName;
+  log.info(`Using physical_name="${recordedPhysicalName}" for bucket ${bucket.id}`);
+  return recordedPhysicalName;
 }
 
 // --- Plugin factory ---
@@ -193,6 +262,9 @@ async function provisionAndRecordPhysicalBucket(
 export function createPresignedUrlPlugin(
   options: PresignedUrlPluginOptions,
 ): GraphileConfig.Plugin {
+  const preloadedStorageModules = snapshotPreloadedStorageModules(
+    options.preloadedStorageModules,
+  );
 
   return {
     name: 'PresignedUrlPlugin',
@@ -259,11 +331,22 @@ export function createPresignedUrlPlugin(
               continue;
             }
 
-            const hasOwnerId = !!matchingBucketCodec.attributes.owner_id;
+            const ownerScope = resolveUploadOwnerScope(
+              filesCodec,
+              matchingBucketCodec,
+              preloadedStorageModules,
+            );
+            if (!ownerScope) {
+              log.debug(
+                `Skipping upload mutation for ${filesCodec.name}: no authoritative preloaded storage module`,
+              );
+              continue;
+            }
+            const { hasOwnerId, ownerIdCodec } = ownerScope;
             const mutationName = `upload${filesTypeName}`;
 
             const ownerIdGqlType = hasOwnerId
-              ? (build as any).getGraphQLTypeByPgCodec(matchingBucketCodec.attributes.owner_id.codec, 'input')
+              ? (build as any).getGraphQLTypeByPgCodec(ownerIdCodec, 'input')
               : null;
 
             const InputType = new GraphQLInputObjectType({
@@ -294,6 +377,7 @@ export function createPresignedUrlPlugin(
             });
 
             const capturedFilesCodec = filesCodec;
+            const cacheScope = getStorageModuleCacheScope(build);
 
             log.debug(`Adding file upload mutation "${mutationName}" for ${filesTypeName} (entity-scoped=${hasOwnerId})`);
 
@@ -330,34 +414,50 @@ export function createPresignedUrlPlugin(
                     });
 
                     return lambda($combined, async (vals: any) => {
-                      // Request-lane reads/writes run under the request role's pgSettings
-                      // inside an explicit transaction so the jwt claims stay applied
-                      // across every statement (see withRequestPgClient).
-                      const databaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        resolveDatabaseId(pgClient),
-                      );
-                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
-
-                      // Module registration is server config, not user data:
-                      // resolve it without the request role's pgSettings.
-                      const allConfigs = await vals.withPgClient(null, (pgClient: any) =>
-                        loadAllStorageModules(pgClient, databaseId),
+                      // Resolve the request tenant and exact build-scoped module
+                      // metadata inside one transaction carrying every request GUC.
+                      const { databaseId, allConfigs } = await resolveRequestStorageModules(
+                        preloadedStorageModules,
+                        cacheScope,
+                        vals.withPgClient,
+                        vals.pgSettings,
                       );
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
 
                       // Bucket config read under the request role (RLS-gated visibility).
                       const bucket = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        getBucketConfig(pgClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined),
+                        getBucketConfig(
+                          pgClient,
+                          storageConfig,
+                          databaseId,
+                          vals.bucketKey,
+                          vals.ownerId || undefined,
+                          cacheScope,
+                        ),
                       );
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
                       // First provision mints + records the coordinate; afterwards the
                       // stored physical_name is authoritative and nothing is recomputed.
                       const physicalName = bucket.physical_name === null
-                        ? await provisionAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, storageConfig.allowedOrigins)
+                        ? await provisionAndRecordPhysicalBucket(
+                          options,
+                          vals.withPgClient,
+                          vals.pgSettings,
+                          storageConfig,
+                          databaseId,
+                          bucket,
+                          storageConfig.allowedOrigins,
+                          cacheScope,
+                        )
                         : bucket.physical_name;
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
+                      const s3ForDb = resolveS3ConfigForPhysicalBucket(
+                        options,
+                        storageConfig,
+                        physicalName,
+                        cacheScope,
+                      );
 
                       // File row INSERT under the request role (RLS enforced).
                       return withRequestPgClient(vals.withPgClient, vals.pgSettings, (txClient) =>
@@ -444,25 +544,27 @@ export function createPresignedUrlPlugin(
                     });
 
                     return lambda($combined, async (vals: any) => {
-                      // Request-lane reads/writes run under the request role's pgSettings
-                      // inside an explicit transaction so the jwt claims stay applied
-                      // across every statement (see withRequestPgClient).
-                      const databaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        resolveDatabaseId(pgClient),
-                      );
-                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
-
-                      // Module registration is server config, not user data:
-                      // resolve it without the request role's pgSettings.
-                      const allConfigs = await vals.withPgClient(null, (pgClient: any) =>
-                        loadAllStorageModules(pgClient, databaseId),
+                      // Resolve the request tenant and exact build-scoped module
+                      // metadata inside one transaction carrying every request GUC.
+                      const { databaseId, allConfigs } = await resolveRequestStorageModules(
+                        preloadedStorageModules,
+                        cacheScope,
+                        vals.withPgClient,
+                        vals.pgSettings,
                       );
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
 
                       // Bucket config read under the request role (RLS-gated visibility).
                       const bucket = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        getBucketConfig(pgClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined),
+                        getBucketConfig(
+                          pgClient,
+                          storageConfig,
+                          databaseId,
+                          vals.bucketKey,
+                          vals.ownerId || undefined,
+                          cacheScope,
+                        ),
                       );
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
@@ -483,9 +585,23 @@ export function createPresignedUrlPlugin(
                       // First provision mints + records the coordinate; afterwards the
                       // stored physical_name is authoritative and nothing is recomputed.
                       const physicalName = bucket.physical_name === null
-                        ? await provisionAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, storageConfig.allowedOrigins)
+                        ? await provisionAndRecordPhysicalBucket(
+                          options,
+                          vals.withPgClient,
+                          vals.pgSettings,
+                          storageConfig,
+                          databaseId,
+                          bucket,
+                          storageConfig.allowedOrigins,
+                          cacheScope,
+                        )
                         : bucket.physical_name;
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
+                      const s3ForDb = resolveS3ConfigForPhysicalBucket(
+                        options,
+                        storageConfig,
+                        physicalName,
+                        cacheScope,
+                      );
 
                       // File row INSERTs under the request role (RLS enforced).
                       return withRequestPgClient(vals.withPgClient, vals.pgSettings, async (txClient) => {
@@ -548,6 +664,7 @@ export function createPresignedUrlPlugin(
           const defaultResolver = (obj: any) => obj[fieldName];
           const { resolve: oldResolve = defaultResolver, ...rest } = field;
           const capturedCodec = pgCodec;
+          const cacheScope = getStorageModuleCacheScope(build);
 
           return {
             ...rest,
@@ -567,12 +684,14 @@ export function createPresignedUrlPlugin(
 
                 if (withPgClient) {
                   try {
-                    const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
-                    // Module registration is server config, not user data:
-                    // resolve it without the request role's pgSettings.
-                    const allConfigs = databaseId
-                      ? await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId))
-                      : [];
+                    // Prefer the exact-build control-plane snapshot; the SQL
+                    // fallback exists only for generic package consumers.
+                    const { allConfigs } = await resolveRequestStorageModules(
+                      preloadedStorageModules,
+                      cacheScope,
+                      withPgClient,
+                      pgSettings,
+                    );
                     const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
 
                     if (storageConfig) {
@@ -603,12 +722,14 @@ export function createPresignedUrlPlugin(
 
                 if (withPgClient) {
                   try {
-                    const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
-                    // Module registration is server config, not user data:
-                    // resolve it without the request role's pgSettings.
-                    const allConfigs = databaseId
-                      ? await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId))
-                      : [];
+                    // Prefer the exact-build control-plane snapshot; the SQL
+                    // fallback exists only for generic package consumers.
+                    const { allConfigs } = await resolveRequestStorageModules(
+                      preloadedStorageModules,
+                      cacheScope,
+                      withPgClient,
+                      pgSettings,
+                    );
                     const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
 
                     if (storageConfig) await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
@@ -642,7 +763,12 @@ export function createPresignedUrlPlugin(
                         log.warn(`Bucket ${fileRow!.bucket_id} has no physical_name; skipping S3 delete`);
                         return;
                       }
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
+                      const s3ForDb = resolveS3ConfigForPhysicalBucket(
+                        options,
+                        storageConfig,
+                        physicalName,
+                        cacheScope,
+                      );
                       await deleteS3Object(s3ForDb, fileRow!.key);
                       log.info(`Sync S3 delete succeeded for key=${fileRow!.key}`);
                     });
