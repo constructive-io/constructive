@@ -1,11 +1,14 @@
 import os from 'node:os';
 import v8 from 'node:v8';
 
-import { SVC_CACHE_TTL_MS,svcCache } from '@pgpmjs/server-utils';
-import { getCacheStats } from 'graphile-cache';
+import { getSvcCacheStats } from '@pgpmjs/server-utils';
+import { getCacheCounters, getCacheStats } from 'graphile-cache';
+import { getPgCacheStats, getPgCheckoutSanitizerStats } from 'pg-cache';
 
 import { getInFlightCount, getInFlightKeys } from '../middleware/graphile';
+import { getGraphileGovernorCounters } from '../middleware/graphile-build-governor';
 import { getGraphileBuildStats } from '../middleware/observability/graphile-build-stats';
+import { getRuntimeRoleSafetyStats } from '../middleware/runtime-role-safety';
 
 const toMB = (bytes: number): string => `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 
@@ -43,13 +46,12 @@ export interface DebugMemorySnapshot {
     }>;
   };
   graphileCache: ReturnType<typeof getCacheStats>;
-  svcCache: {
-    size: number;
-    max: number;
-    ttlMs: number;
-    oldestKeyAgeMs: number | null;
-    keys: string[];
-  };
+  graphileCacheCounters: ReturnType<typeof getCacheCounters>;
+  graphileGovernor: ReturnType<typeof getGraphileGovernorCounters>;
+  pgCache: ReturnType<typeof getPgCacheStats>;
+  pgCheckoutSanitizer: ReturnType<typeof getPgCheckoutSanitizerStats>;
+  runtimeRoleSafety: ReturnType<typeof getRuntimeRoleSafetyStats>;
+  svcCache: ReturnType<typeof getSvcCacheStats>;
   inFlight: {
     count: number;
     keys: string[];
@@ -97,23 +99,12 @@ export const getDebugMemorySnapshot = (): DebugMemorySnapshot => {
       heapSpaces,
     },
     graphileCache: getCacheStats(),
-    svcCache: {
-      size: svcCache.size,
-      max: svcCache.max,
-      ttlMs: SVC_CACHE_TTL_MS,
-      // Note: with updateAgeOnGet: true, this is "time since last access" not "time since creation"
-      oldestKeyAgeMs: (() => {
-        let minRemaining = Infinity;
-        for (const key of svcCache.keys()) {
-          const remaining = svcCache.getRemainingTTL(key);
-          if (remaining < minRemaining) {
-            minRemaining = remaining;
-          }
-        }
-        return Number.isFinite(minRemaining) ? SVC_CACHE_TTL_MS - minRemaining : null;
-      })(),
-      keys: [...svcCache.keys()].slice(0, 200),
-    },
+    graphileCacheCounters: getCacheCounters(),
+    graphileGovernor: getGraphileGovernorCounters(),
+    pgCache: getPgCacheStats(),
+    pgCheckoutSanitizer: getPgCheckoutSanitizerStats(),
+    runtimeRoleSafety: getRuntimeRoleSafetyStats(),
+    svcCache: getSvcCacheStats(),
     inFlight: {
       count: getInFlightCount(),
       keys: getInFlightKeys(),

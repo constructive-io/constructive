@@ -3,7 +3,11 @@ import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { getConnections as getPgConnections } from 'pgsql-test';
 import type { SeedAdapter } from 'pgsql-test/seed/types';
 
-import { createDevTestServer, createTestServer } from './server';
+import {
+  createDevTestServer,
+  createTestServer,
+  TEST_INTERNAL_REQUEST_SECRET
+} from './server';
 import { createQueryFn,createSuperTestAgent } from './supertest';
 import type { GetConnectionsInput, GetConnectionsResult } from './types';
 
@@ -51,6 +55,12 @@ export const getConnections = async (
     api: {
       // Start with user-provided api options from server.api
       ...input.server?.api,
+      // Production routing/identity headers fail closed unless the ingress is
+      // authenticated. Tests use one fixture-only credential and send it only
+      // on cases that intentionally exercise the reserved header boundary.
+      internalRequestSecret:
+        input.server?.api?.internalRequestSecret
+        ?? TEST_INTERNAL_REQUEST_SECRET,
       // Apply convenience properties (these take precedence)
       exposedSchemas: input.schemas,
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })

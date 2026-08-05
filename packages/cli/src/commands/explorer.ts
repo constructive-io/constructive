@@ -104,9 +104,10 @@ export default async (
   });
 
   log.success('✅ Selected Configuration:');
-  for (const [key, value] of Object.entries(options)) {
-    log.debug(`${key}: ${JSON.stringify(value)}`);
-  }
+  // The merged options object contains database and provider credentials.
+  // Keep startup diagnostics explicitly credential-free.
+  log.debug(`database: ${options.pg?.database ?? 'default'}`);
+  log.debug(`server: ${options.server?.host ?? 'localhost'}:${options.server?.port ?? port}`);
 
   log.success('🚀 Launching Explorer...\n');
   explorer(options);

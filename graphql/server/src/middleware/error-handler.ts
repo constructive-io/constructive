@@ -3,6 +3,7 @@ import './types';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import { PG_POOL_CAPACITY_ERROR_CODE } from 'pg-cache';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
@@ -38,7 +39,18 @@ const isCsrfError = (err: Error): boolean => {
   return typeof code === 'string' && code.startsWith('CSRF_');
 };
 
+const isPgPoolCapacityError = (err: Error): boolean =>
+  (err as Error & { code?: string }).code === PG_POOL_CAPACITY_ERROR_CODE;
+
 const categorizeError = (err: Error): ErrorResponse => {
+  if (isPgPoolCapacityError(err)) {
+    return {
+      statusCode: 503,
+      code: PG_POOL_CAPACITY_ERROR_CODE,
+      message: 'Service temporarily unavailable',
+      logLevel: 'warn'
+    };
+  }
   if (isApiError(err)) {
     return {
       statusCode: err.statusCode,
@@ -61,6 +73,11 @@ const categorizeError = (err: Error): ErrorResponse => {
 };
 
 const sendResponse = (req: Request, res: Response, { statusCode, code, message }: ErrorResponse): void => {
+  if (code === PG_POOL_CAPACITY_ERROR_CODE) {
+    res.set('Retry-After', '15');
+    res.status(statusCode).json({ error: { code, message, requestId: req.requestId } });
+    return;
+  }
   if (wantsJson(req)) {
     res.status(statusCode).json({ error: { code, message, requestId: req.requestId } });
   } else {
@@ -79,7 +96,9 @@ const logError = (err: Error, req: Request, level: 'warn' | 'error'): void => {
     clientIp: req.clientIp,
   };
 
-  if (isApiError(err)) {
+  if (isPgPoolCapacityError(err)) {
+    log.warn({ event: 'pg_pool_capacity', code: PG_POOL_CAPACITY_ERROR_CODE, ...context });
+  } else if (isApiError(err)) {
     log[level]({ event: 'api_error', code: err.code, statusCode: err.statusCode, message: err.message, ...context });
   } else {
     log[level]({ event: 'unexpected_error', name: err.name, message: err.message, stack: isDevelopment() ? err.stack : undefined, ...context });

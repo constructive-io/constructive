@@ -15,6 +15,10 @@ declare global {
     interface Request {
       api?: ApiStructure;
       svc_key?: string;
+      /** Opaque physical routing-cache identity; never used as a service label. */
+      svc_cache_key?: string;
+      /** True only after constant-time authentication of the internal request token. */
+      internalTrusted?: boolean;
       clientIp?: string;
       databaseId?: string;
       requestId?: string;

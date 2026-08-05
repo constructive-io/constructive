@@ -54,6 +54,17 @@ export const isValidSchemaName = (name: string): boolean =>
   /^[a-z_][a-z0-9_]*$/.test(name);
 
 /**
+ * Constructive physical schemas may contain the generated dash separators used
+ * by tenant prefixes. They are always passed as data or quoted identifiers, but
+ * keep the accepted alphabet deliberately narrow and reject system namespaces.
+ */
+export const isValidPhysicalSchemaName = (name: string): boolean =>
+  /^[a-z_][a-z0-9_-]*$/.test(name)
+  && name.length <= 63
+  && name !== 'information_schema'
+  && !name.startsWith('pg_');
+
+/**
  * Resolve a hostname through the compiled scoped-routing plane (host-only:
  * path/method routing belongs to Traefik/Ingress, not the server).
  * Returns null when there is no match (route_binding_id IS NULL) or when the
@@ -75,6 +86,13 @@ export const resolveRoute = async (
       `SELECT * FROM "${schema}".${RESOLVER_FUNCTION}($1, '/', NULL)`,
       [host]
     );
+    if (result.rows.length !== 1) {
+      log.warn(
+        `[resolve-route] expected exactly one resolver row for host=${host}; `
+          + `received ${result.rows.length}`
+      );
+      return null;
+    }
     const row = result.rows[0];
     if (!row || row.route_binding_id === null) {
       log.debug(`[resolve-route] no match for host=${host}`);
@@ -121,21 +139,47 @@ export const routeToApiStructure = (
   }
 
   const config = (route.resolved_config ?? {}) as ApiSurfaceConfig;
-  if (!config.schemas?.length) {
-    log.debug('[resolve-route] api target missing schemas in resolved_config; no match');
+  const expectedPublic = opts.api?.isPublic ?? false;
+  if (typeof config.is_public !== 'boolean' || config.is_public !== expectedPublic) {
+    log.warn('[resolve-route] api visibility does not match this server ingress; no match');
+    return null;
+  }
+
+  if (
+    !config.api_id
+    || !config.database_id
+    || route.target_source_id !== config.api_id
+    || route.target_owner_scope !== 'database'
+    || route.target_owner_key !== config.database_id
+  ) {
+    log.warn('[resolve-route] api target missing exact api/database identity; no match');
+    return null;
+  }
+
+  if (
+    !config.schemas?.length
+    || config.schemas.some((schema) => !isValidPhysicalSchemaName(schema))
+    || new Set(config.schemas).size !== config.schemas.length
+  ) {
+    log.warn('[resolve-route] api target has an invalid physical schema contract; no match');
+    return null;
+  }
+
+  if (!config.role_name || !config.anon_role) {
+    log.warn('[resolve-route] api target missing exact request roles; no match');
     return null;
   }
 
   return {
-    apiId: config.api_id ?? route.target_source_id ?? undefined,
+    apiId: config.api_id,
     // Scoped APIs leave dbname NULL when their schemas live in the serving
     // database; fall back to the server's own database in that case.
     dbname: config.dbname || opts.pg?.database || '',
-    anonRole: config.anon_role || 'anon',
-    roleName: config.role_name || 'authenticated',
+    anonRole: config.anon_role,
+    roleName: config.role_name,
     schema: config.schemas,
     domains: [],
     databaseId: config.database_id,
-    isPublic: config.is_public ?? (opts.api?.isPublic ?? false)
+    isPublic: config.is_public
   };
 };

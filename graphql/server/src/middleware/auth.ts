@@ -1,11 +1,19 @@
 import './types'; // for Request type
 
 import { errors } from '@constructive-io/errors';
+import {
+  quoteQualifiedSqlIdentifier,
+  SECURITY_GUC_KEYS
+} from '@constructive-io/express-context';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { getPgPool } from 'pg-cache';
+import {
+  acquirePgPool,
+  PG_POOL_CAPACITY_ERROR_CODE,
+  type PgPoolLease
+} from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
@@ -18,6 +26,23 @@ const SESSION_COOKIE_NAME = 'constructive_session';
 
 /** Cookie name for trusted device tracking. */
 const DEVICE_TOKEN_COOKIE_NAME = 'constructive_device_token';
+
+/** Complete transaction-local context for the sanitized authentication lane. */
+export const buildAuthenticationContext = (
+  req: Request,
+  api: NonNullable<Request['api']>
+): Record<string, string> => ({
+  ...Object.fromEntries(SECURITY_GUC_KEYS.map((key) => [key, ''])),
+  'jwt.claims.api_id': api.apiId ?? '',
+  'jwt.claims.database_id': api.databaseId ?? '',
+  'jwt.claims.ip_address': req.clientIp ?? '',
+  'jwt.claims.origin': req.get('origin') ?? '',
+  'jwt.claims.user_agent': req.get('User-Agent') ?? '',
+  'request.id': req.requestId ?? '',
+  'row_security': 'on',
+  'search_path': 'pg_catalog',
+  'transaction_read_only': 'on'
+});
 
 /**
  * Extract a named cookie value from the raw Cookie header.
@@ -45,10 +70,6 @@ export const createAuthenticateMiddleware = (
       return;
     }
 
-    const pool = getPgPool({
-      ...opts.pg,
-      database: api.dbname,
-    });
     const rlsModule = api.rlsModule;
 
     log.info(
@@ -59,6 +80,18 @@ export const createAuthenticateMiddleware = (
     );
 
     if (!rlsModule) {
+      if (opts.server?.strictAuth) {
+        log.error('[auth] Strict authentication requires an RLS module');
+        respondWithGraphQLError(
+          res,
+          errors.INTERNAL_FAILURE({
+            details: isDev()
+              ? 'Strict authentication requires an RLS module'
+              : 'authentication failed'
+          })
+        );
+        return;
+      }
       log.info('[auth] No RLS module configured, skipping auth');
       return next();
     }
@@ -70,6 +103,19 @@ export const createAuthenticateMiddleware = (
     log.info(
       `[auth] strictAuth=${opts.server?.strictAuth ?? false}, authFn=${authFn ?? 'none'}`
     );
+
+    if (!authFn || !rlsModule.privateSchema.schemaName) {
+      log.error('[auth] RLS authentication configuration is incomplete');
+      respondWithGraphQLError(
+        res,
+        errors.INTERNAL_FAILURE({
+          details: isDev()
+            ? 'RLS authentication configuration is incomplete'
+            : 'authentication failed'
+        })
+      );
+      return;
+    }
 
     if (authFn && rlsModule.privateSchema.schemaName) {
       const { authorization = '' } = req.headers;
@@ -90,23 +136,38 @@ export const createAuthenticateMiddleware = (
 
       if (effectiveToken) {
         log.info(`[auth] Processing ${tokenSource} authentication`);
-        const context: Record<string, any> = {
-          'jwt.claims.ip_address': req.clientIp,
-        };
+        const context = buildAuthenticationContext(req, api);
 
-        if (req.get('origin')) {
-          context['jwt.claims.origin'] = req.get('origin');
+        let authQuery: string;
+        try {
+          authQuery = `SELECT * FROM ${quoteQualifiedSqlIdentifier(
+            rlsModule.privateSchema.schemaName,
+            authFn,
+            'authentication function'
+          )}($1)`;
+        } catch (e: unknown) {
+          const message = e instanceof Error
+            ? e.message
+            : 'invalid authentication function';
+          log.error('[auth] Invalid authentication function metadata:', message);
+          respondWithGraphQLError(
+            res,
+            errors.INTERNAL_FAILURE({
+              details: isDev() ? message : 'authentication failed'
+            })
+          );
+          return;
         }
-        if (req.get('User-Agent')) {
-          context['jwt.claims.user_agent'] = req.get('User-Agent');
-        }
-
-        const authQuery = `SELECT * FROM "${rlsModule.privateSchema.schemaName}"."${authFn}"($1)`;
         log.info(`[auth] Executing auth query: ${authQuery}`);
 
+        let poolLease: PgPoolLease | undefined;
         try {
+          poolLease = acquirePgPool({
+            ...opts.pg,
+            database: api.dbname,
+          }, { purpose: 'tenant-request-control', sanitizeOnCheckout: true });
           const result = await pgQueryContext({
-            client: pool,
+            client: poolLease.pool,
             context,
             query: authQuery,
             variables: [effectiveToken],
@@ -123,6 +184,10 @@ export const createAuthenticateMiddleware = (
           token = result.rows[0];
           log.info(`[auth] Auth success: role=${token.role}, user_id=${token.user_id}`);
         } catch (e: any) {
+          if (e?.code === PG_POOL_CAPACITY_ERROR_CODE) {
+            next(e);
+            return;
+          }
           log.error('[auth] Auth error:', e.message);
           respondWithGraphQLError(
             res,
@@ -131,17 +196,14 @@ export const createAuthenticateMiddleware = (
             })
           );
           return;
+        } finally {
+          poolLease?.release();
         }
       } else {
         log.info('[auth] No credential provided (no bearer token or session cookie), using anonymous auth');
       }
 
       req.token = token;
-    } else {
-      log.info(
-        `[auth] Skipping auth: authFn=${authFn ?? 'none'}, ` +
-          `privateSchema=${rlsModule.privateSchema?.schemaName ?? 'none'}`
-      );
     }
 
     // Read device token cookie for trusted device tracking

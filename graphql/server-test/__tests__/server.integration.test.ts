@@ -14,7 +14,11 @@
 import path from 'path';
 import type supertest from 'supertest';
 
-import { getConnections, seed } from '../src';
+import {
+  getConnections,
+  seed,
+  TEST_INTERNAL_REQUEST_SECRET
+} from '../src';
 import type { ServerInfo } from '../src/types';
 
 jest.setTimeout(60000);
@@ -51,6 +55,7 @@ type Scenario = {
     isPublic: boolean;
     metaSchemas?: string[];
     routingSchema?: string;
+    allowMetaSchemaHeader?: boolean;
   };
   headers?: Record<string, string>;
 };
@@ -87,17 +92,8 @@ const scenarios: Scenario[] = [
     api: { isPublic: false, metaSchemas: scopedMetaSchemas },
     headers: {
       'X-Database-Id': scopedDatabaseId,
-      'X-Api-Name': 'private'
-    }
-  },
-  {
-    name: 'scoped private via X-Schemata',
-    seedDir: 'simple-seed-scoped',
-    useRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
-    headers: {
-      'X-Database-Id': scopedDatabaseId,
-      'X-Schemata': schemas.join(',')
+      'X-Api-Name': 'private',
+      'X-Constructive-Internal-Token': TEST_INTERNAL_REQUEST_SECRET
     }
   }
 ];
@@ -267,6 +263,7 @@ describe('scoped private via X-Meta-Schema', () => {
     const headers: Record<string, string> = {
       'X-Database-Id': scopedDatabaseId,
       'X-Meta-Schema': 'true',
+      'X-Constructive-Internal-Token': TEST_INTERNAL_REQUEST_SECRET,
       ...extraHeaders
     };
     for (const [header, value] of Object.entries(headers)) {
@@ -284,7 +281,8 @@ describe('scoped private via X-Meta-Schema', () => {
           useRouting: true,
           api: {
             isPublic: false,
-            metaSchemas: metaApiSchemas
+            metaSchemas: metaApiSchemas,
+            allowMetaSchemaHeader: true
           }
         }
       },
@@ -342,7 +340,7 @@ describe('scoped private via X-Meta-Schema', () => {
  * Error path tests
  *
  * Exercise the api middleware error conditions under scoped routing:
- * - Invalid X-Schemata (ApiError with errorHtml → 404)
+ * - Raw X-Schemata is rejected before database routing (→ 403)
  * - Host that resolves to no route (→ 404, no legacy fallback)
  * - NO_VALID_SCHEMAS (configured metaSchemas absent → 404)
  */
@@ -368,16 +366,40 @@ describe('Error paths', () => {
     teardowns.push(teardown);
   });
 
-  describe('Invalid X-Schemata (returns 404)', () => {
-    it('should return 404 when X-Schemata contains schemas not in the DB', async () => {
+  describe('Raw X-Schemata (returns 403)', () => {
+    it('rejects physical schema selection even from an authenticated internal caller', async () => {
       const res = await request
         .post('/graphql')
         .set('X-Database-Id', scopedDatabaseId)
         .set('X-Schemata', 'nonexistent_schema_abc,another_fake_schema')
+        .set('X-Constructive-Internal-Token', TEST_INTERNAL_REQUEST_SECRET)
         .send({ query: '{ __typename }' });
 
-      expect(res.status).toBe(404);
-      expect(res.text).toContain('No valid schemas found for the supplied X-Schemata header');
+      expect(res.status).toBe(403);
+      expect(res.text).toBe('Forbidden');
+    });
+  });
+
+  describe('Unauthenticated internal selectors (returns 403)', () => {
+    it('rejects API/database selectors before any routing query', async () => {
+      const res = await request
+        .post('/graphql')
+        .set('X-Database-Id', scopedDatabaseId)
+        .set('X-Api-Name', 'private')
+        .send({ query: '{ __typename }' });
+
+      expect(res.status).toBe(403);
+      expect(res.text).toBe('Forbidden');
+    });
+
+    it('rejects actor claims before any routing query', async () => {
+      const res = await request
+        .post('/graphql')
+        .set('X-Actor-Id', 'attacker-controlled-actor')
+        .send({ query: '{ __typename }' });
+
+      expect(res.status).toBe(403);
+      expect(res.text).toBe('Forbidden');
     });
   });
 
@@ -408,7 +430,8 @@ describe('Error paths', () => {
             useRouting: true,
             api: {
               isPublic: false,
-              metaSchemas: scopedMetaSchemas
+              metaSchemas: scopedMetaSchemas,
+              allowMetaSchemaHeader: true
             }
           }
         },
@@ -422,6 +445,7 @@ describe('Error paths', () => {
         .post('/graphql')
         .set('X-Database-Id', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
         .set('X-Meta-Schema', 'true')
+        .set('X-Constructive-Internal-Token', TEST_INTERNAL_REQUEST_SECRET)
         .send({ query: '{ __typename }' });
 
       expect(res.status).toBe(404);

@@ -33,7 +33,11 @@ import path from 'path';
 import type { PgTestClient } from 'pgsql-test';
 import type supertest from 'supertest';
 
-import { getConnections, seed } from '../src';
+import {
+  getConnections,
+  seed,
+  TEST_INTERNAL_REQUEST_SECRET
+} from '../src';
 
 jest.setTimeout(120000);
 
@@ -288,7 +292,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     return request
       .post('/graphql')
       .set('X-Database-Id', aliceDatabaseId)
-      .set('X-Schemata', aliceSchemas.join(','))
+      .set('X-Api-Name', 'app')
+      .set('X-Constructive-Internal-Token', TEST_INTERNAL_REQUEST_SECRET)
       .send(payload);
   };
 
@@ -304,6 +309,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       .post('/graphql')
       .set('X-Database-Id', databaseId)
       .set('X-Api-Name', apiName)
+      .set('X-Constructive-Internal-Token', TEST_INTERNAL_REQUEST_SECRET)
       .send(payload);
   };
 
@@ -319,6 +325,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       .post('/graphql')
       .set('X-Database-Id', databaseId)
       .set('X-Schemata', schemas.join(','))
+      .set('X-Constructive-Internal-Token', TEST_INTERNAL_REQUEST_SECRET)
       .send(payload);
   };
 
@@ -1050,27 +1057,16 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       expect(res.status).toBe(404);
     });
 
-    it('X-Schemata with Bob schema + Alice database_id does NOT leak Alice data', async () => {
+    it('rejects Bob physical schemas paired with Alice database_id', async () => {
       const res = await postGraphQLViaSchemata(aliceDatabaseId, bobSchemas, { query: APP_FILES });
-      if (res.status === 200 && res.body.data) {
-        const names = (res.body.data.appFiles?.nodes ?? []).map(
-          (f: { filename: string }) => f.filename
-        );
-        expect(names).not.toContain('hello-public.txt');
-        expect(names).not.toContain('hello-private.txt');
-      }
+      expect(res.status).toBe(403);
+      expect(res.text).toBe('Forbidden');
     });
 
-    it('X-Schemata with Mallory schema + Bob database_id does NOT leak Bob data', async () => {
+    it('rejects Mallory physical schemas paired with Bob database_id', async () => {
       const res = await postGraphQLViaSchemata(bobDatabaseId, mallorySchemas, { query: APP_FILES });
-      if (res.status === 200 && res.body.data) {
-        const names = (res.body.data.appFiles?.nodes ?? []).map(
-          (f: { filename: string }) => f.filename
-        );
-        expect(names).not.toContain('bob-file.txt');
-        expect(names).not.toContain('bob-seeded-public.txt');
-        expect(names).not.toContain('bob-seeded-private.txt');
-      }
+      expect(res.status).toBe(403);
+      expect(res.text).toBe('Forbidden');
     });
   });
 
@@ -1106,4 +1102,3 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     });
   });
 });
-
