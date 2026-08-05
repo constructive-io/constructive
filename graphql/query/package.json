@@ -31,7 +31,7 @@
   "dependencies": {
     "@0no-co/graphql.web": "^1.3.3",
     "@constructive-io/errors": "workspace:^",
-    "@constructive-io/fetch": "^1.1.1",
+    "@constructive-io/fetch": "^1.1.2",
     "@constructive-io/graphql-types": "workspace:^",
     "ajv": "^8.20.0",
     "gql-ast": "workspace:^",
@@ -41,7 +41,7 @@
     "graphile-settings": "workspace:^",
     "graphql": "16.13.0",
     "inflection": "^3.0.0",
-    "inflekt": "^0.7.1",
+    "inflekt": "^0.7.2",
     "lru-cache": "^11.2.7",
     "postgraphile": "5.1.3"
   },

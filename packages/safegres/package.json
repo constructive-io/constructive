@@ -57,19 +57,19 @@
     "safegres"
   ],
   "dependencies": {
-    "@inquirerer/utils": "^3.3.11",
+    "@inquirerer/utils": "^3.3.12",
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/lint": "^18.1.2",
+    "@pgsql/lint": "^18.2.1",
     "@pgsql/traverse": "^18.7.3",
     "@pgsql/types": "^18.0.0",
-    "confstash": "^0.1.0",
+    "confstash": "^0.1.2",
     "inquirerer": "^4.9.3",
     "libpg-query": "^18.1.4",
     "pg": "^8.21.0",
     "pg-env": "workspace:^",
     "pgsql-deparser": "^18.3.3",
     "pgsql-parser": "^18.2.3",
-    "yanse": "^0.2.1"
+    "yanse": "^0.2.2"
   },
   "peerDependencies": {
     "pgsql-test": "*"

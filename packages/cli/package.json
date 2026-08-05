@@ -50,7 +50,7 @@
     "@constructive-io/graphql-explorer": "workspace:^",
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "@inquirerer/utils": "^3.3.11",
+    "@inquirerer/utils": "^3.3.12",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
@@ -63,7 +63,7 @@
     "pg-env": "workspace:^",
     "pgpm": "workspace:^",
     "shelljs": "^0.10.0",
-    "yanse": "^0.2.1"
+    "yanse": "^0.2.2"
   },
   "keywords": [
     "cli",

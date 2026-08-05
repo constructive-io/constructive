@@ -45,7 +45,7 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "@inquirerer/utils": "^3.3.11",
+    "@inquirerer/utils": "^3.3.12",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/diff": "workspace:^",
     "@pgpmjs/env": "workspace:^",
@@ -66,7 +66,7 @@
     "pgsql-deparser": "^18.3.3",
     "semver": "^7.8.5",
     "shelljs": "^0.10.0",
-    "yanse": "^0.2.1"
+    "yanse": "^0.2.2"
   },
   "keywords": [
     "cli",
