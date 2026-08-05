@@ -2,7 +2,7 @@
   "name": "graphile-cache",
   "version": "4.10.2",
   "author": "Constructive <developers@constructive.io>",
-  "description": "PostGraphile v5 LRU cache with automatic pool cleanup integration",
+  "description": "Heap-aware PostGraphile v5 cache with leased PostgreSQL pool lifecycle",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
