@@ -9,18 +9,18 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@0no-co/graphql.web": "^1.1.2",
+    "@0no-co/graphql.web": "^1.3.3",
     "@constructive-io/graphql-codegen": "workspace:^",
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/graphql-test": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "gql-ast": "workspace:^",
     "graphile-settings": "workspace:^",
     "graphile-test": "workspace:^",
     "graphql": "16.13.0",
     "pgsql-test": "workspace:^",
-    "ts-jest": "^29.4.11",
+    "ts-jest": "^29.4.12",
     "typescript": "^5.0.0"
   }
 }

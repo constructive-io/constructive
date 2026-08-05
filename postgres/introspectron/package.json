@@ -31,7 +31,7 @@
   "devDependencies": {
     "@constructive-io/graphql-test": "workspace:^",
     "@jest/test-sequencer": "^30.4.1",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "makage": "^0.3.0",
     "pgsql-test": "workspace:^"
   },

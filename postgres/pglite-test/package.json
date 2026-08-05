@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.4",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "makage": "^0.3.0"
   },
   "dependencies": {

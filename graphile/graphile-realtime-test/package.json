@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "@types/ws": "^8.18.1",
     "express": "^5.2.1",
     "grafserv": "1.0.1",

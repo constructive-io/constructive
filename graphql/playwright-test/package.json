@@ -29,9 +29,9 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "^1.62.1",
     "@types/express": "^5.0.6",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "makage": "^0.3.0"
   },
   "dependencies": {
