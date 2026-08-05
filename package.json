@@ -52,7 +52,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@dataplan/json": "1.0.0",
+      "@dataplan/json": "1.0.1",
       "graphql": "16.13.0",
       "@smithy/node-http-handler": "<4.5.0"
     },

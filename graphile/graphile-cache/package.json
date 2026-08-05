@@ -32,11 +32,11 @@
     "12factor-env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "express": "^5.2.1",
-    "grafserv": "1.0.0",
+    "grafserv": "1.0.1",
     "graphile-realtime-subscriptions": "workspace:^",
     "lru-cache": "^11.2.7",
     "pg-cache": "workspace:^",
-    "postgraphile": "5.0.3"
+    "postgraphile": "5.1.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
