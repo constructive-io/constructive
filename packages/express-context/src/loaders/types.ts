@@ -1,9 +1,8 @@
 /**
  * Module Loader Types
  *
- * A ModuleLoader is a per-database cached lookup that resolves config
- * from the routing DB or tenant DB. Each loader owns its own LRU cache
- * keyed by databaseId, with independent TTL and eviction.
+ * A ModuleLoader resolves per-database config from the routing DB or tenant
+ * DB. Each loader chooses authoritative reads or an independent hard-TTL LRU.
  *
  * Loaders are registered in a LoaderRegistry and resolved in parallel
  * during context building. The result is a typed modules map on
@@ -56,10 +55,14 @@ export function requireDatabaseId(
 export interface LoaderContext {
   /** Routing/configuration database pool (for routing-plane lookups) */
   routingPool: Pool;
+  /** Opaque identity of the exact routing-pool connection contract. */
+  routingPoolIdentity?: string;
   /** Routing-plane schema to query (defaults to the published routing_public) */
   routingSchema?: string;
   /** Tenant database pool (for metaschema_modules_public.* lookups) */
   tenantPool: Pool;
+  /** Opaque identity of the exact tenant control-pool connection contract. */
+  tenantPoolIdentity?: string;
   /** UUID of the database being resolved */
   databaseId: string;
   /** UUID of the API (if resolved from domain/api-name lookup) */
@@ -69,16 +72,19 @@ export interface LoaderContext {
 }
 
 /**
- * A single module loader. Encapsulates the SQL query, type transform,
- * and per-databaseId LRU cache for one piece of per-database config.
+ * A single module loader. Encapsulates the SQL query, type transform, and
+ * freshness policy for one piece of per-database config.
  */
 export interface ModuleLoader<T = unknown> {
   /** Unique name (used in log prefix and as the key in the modules map) */
   readonly name: string;
   /** Resolve the module config for a given database. Returns undefined if not provisioned. */
   resolve(ctx: LoaderContext): Promise<T | undefined>;
-  /** Invalidate the cache for one database (or all databases if omitted) */
-  invalidate(databaseId?: string): void;
+  /**
+   * Invalidate one logical database across all physical pools, or only the
+   * exact pool pair represented by `context`. Omitting both clears everything.
+   */
+  invalidate(databaseId?: string, context?: LoaderContext): void;
   /** Current number of cached entries */
   readonly cacheSize: number;
 }

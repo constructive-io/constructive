@@ -55,6 +55,7 @@ export { inferenceLogLoader } from './inference-log';
 export { llmLoader } from './llm';
 export { pubkeyLoader } from './pubkey';
 export { rlsLoader } from './rls';
+export { storageLoader } from './storage';
 export { webauthnLoader } from './webauthn';
 
 /**
@@ -72,6 +73,7 @@ import { llmLoader } from './llm';
 import { pubkeyLoader } from './pubkey';
 import { createLoaderRegistry } from './registry';
 import { rlsLoader } from './rls';
+import { storageLoader } from './storage';
 import { webauthnLoader } from './webauthn';
 
 export function createDefaultRegistry() {
@@ -88,5 +90,6 @@ export function createDefaultRegistry() {
   registry.register(agentChatLoader);
   registry.register(llmLoader);
   registry.register(computeLoader);
+  registry.register(storageLoader);
   return registry;
 }
