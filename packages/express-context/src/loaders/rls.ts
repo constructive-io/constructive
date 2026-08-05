@@ -24,16 +24,37 @@ const rlsSettingsSql = (schema: string): string => `
     ua_fn.name AS current_user_agent,
     ip_fn.name AS current_ip_address
   FROM "${schema}".rls_settings rs
-  LEFT JOIN metaschema_public.schema auth_schema ON rs.authenticate_schema_id = auth_schema.id
-  LEFT JOIN metaschema_public.schema role_schema ON rs.role_schema_id = role_schema.id
-  LEFT JOIN metaschema_public.function auth_fn ON rs.authenticate_function_id = auth_fn.id
-  LEFT JOIN metaschema_public.function auth_strict_fn ON rs.authenticate_strict_function_id = auth_strict_fn.id
-  LEFT JOIN metaschema_public.function role_fn ON rs.current_role_function_id = role_fn.id
-  LEFT JOIN metaschema_public.function role_id_fn ON rs.current_role_id_function_id = role_id_fn.id
-  LEFT JOIN metaschema_public.function ua_fn ON rs.current_user_agent_function_id = ua_fn.id
-  LEFT JOIN metaschema_public.function ip_fn ON rs.current_ip_address_function_id = ip_fn.id
+  LEFT JOIN metaschema_public.schema auth_schema
+    ON rs.authenticate_schema_id = auth_schema.id
+   AND auth_schema.database_id = rs.database_id
+  LEFT JOIN metaschema_public.schema role_schema
+    ON rs.role_schema_id = role_schema.id
+   AND role_schema.database_id = rs.database_id
+  LEFT JOIN metaschema_public.function auth_fn
+    ON rs.authenticate_function_id = auth_fn.id
+   AND auth_fn.database_id = rs.database_id
+   AND auth_fn.schema_id = rs.authenticate_schema_id
+  LEFT JOIN metaschema_public.function auth_strict_fn
+    ON rs.authenticate_strict_function_id = auth_strict_fn.id
+   AND auth_strict_fn.database_id = rs.database_id
+   AND auth_strict_fn.schema_id = rs.authenticate_schema_id
+  LEFT JOIN metaschema_public.function role_fn
+    ON rs.current_role_function_id = role_fn.id
+   AND role_fn.database_id = rs.database_id
+   AND role_fn.schema_id = rs.role_schema_id
+  LEFT JOIN metaschema_public.function role_id_fn
+    ON rs.current_role_id_function_id = role_id_fn.id
+   AND role_id_fn.database_id = rs.database_id
+   AND role_id_fn.schema_id = rs.role_schema_id
+  LEFT JOIN metaschema_public.function ua_fn
+    ON rs.current_user_agent_function_id = ua_fn.id
+   AND ua_fn.database_id = rs.database_id
+   AND ua_fn.schema_id = rs.role_schema_id
+  LEFT JOIN metaschema_public.function ip_fn
+    ON rs.current_ip_address_function_id = ip_fn.id
+   AND ip_fn.database_id = rs.database_id
+   AND ip_fn.schema_id = rs.role_schema_id
   WHERE rs.database_id = $1
-  LIMIT 1
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -53,7 +74,18 @@ interface RlsSettingsRow {
 
 function fromSettings(row: RlsSettingsRow | null): RlsModule | undefined {
   if (!row) return undefined;
-  if (!row.authenticate || !row.authenticate_schema) return undefined;
+  const required = [
+    row.authenticate,
+    row.authenticate_schema,
+    row.role_schema,
+    row.current_role,
+    row.current_role_id,
+    row.current_ip_address,
+    row.current_user_agent
+  ];
+  if (required.some((value) => typeof value !== 'string' || value.length === 0)) {
+    throw new Error('Incomplete or cross-database RLS module configuration');
+  }
   return {
     authenticate: row.authenticate,
     authenticateStrict: row.authenticate_strict,
@@ -70,10 +102,16 @@ function fromSettings(row: RlsSettingsRow | null): RlsModule | undefined {
 
 export const rlsLoader: ModuleLoader<RlsModule> = createModuleLoader<RlsModule>({
   name: 'rlsModule',
-  ttlMs: 5 * 60_000,
+  // Authentication routing is an authorization boundary. Resolve it from the
+  // routing plane on every request; LISTEN notifications and TTLs are not an
+  // acceptable revocation mechanism because notifications can be missed.
+  cache: false,
   async resolve(ctx: LoaderContext) {
     const { routingPool, databaseId } = ctx;
     const result = await routingPool.query<RlsSettingsRow>(rlsSettingsSql(routingSchemaOf(ctx)), [databaseId]);
+    if (result.rows.length > 1) {
+      throw new Error('Ambiguous RLS module configuration');
+    }
     return fromSettings(result.rows[0] ?? null);
   }
 });

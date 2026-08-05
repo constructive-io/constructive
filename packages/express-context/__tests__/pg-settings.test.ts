@@ -29,14 +29,14 @@ describe('buildPgSettings — jwt.claims.api_id provenance', () => {
     expect(settings['jwt.claims.user_id']).toBe('u1');
   });
 
-  it('omits jwt.claims.api_id when the api has no apiId (non-API surface)', () => {
+  it('clears jwt.claims.api_id when the api has no apiId (non-API surface)', () => {
     const settings = buildPgSettings({
       api: { ...api, apiId: undefined },
       token: null,
       requestId: 'r1'
     });
 
-    expect(settings['jwt.claims.api_id']).toBeUndefined();
+    expect(settings['jwt.claims.api_id']).toBe('');
   });
 
   it('is derived only from the resolved api, never from the token', () => {

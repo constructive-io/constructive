@@ -17,7 +17,13 @@
 import type { PgpmOptions } from '@pgpmjs/types';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { Pool } from 'pg';
-import { getPgPool } from 'pg-cache';
+import {
+  acquirePgPool,
+  getPgPool,
+  getPgPoolIdentity,
+  type GetPgPoolOptions,
+  type PgPoolLease
+} from 'pg-cache';
 
 import type { BillingClient } from './billing-client';
 import { createBillingClient } from './billing-client';
@@ -25,23 +31,69 @@ import type { LoaderRegistry } from './loaders/registry';
 import type { LoaderContext } from './loaders/types';
 import { withPgClient as withPgClientFn } from './pg-client';
 import { buildPgSettings } from './pg-settings';
-import type { BillingConfig, BuiltinModuleMap, ConstructiveContext, InferenceLogConfig, LlmConfig } from './types';
+import type { ApiStructure, BillingConfig, BuiltinModuleMap, ConstructiveContext, InferenceLogConfig, LlmConfig } from './types';
+
+type PoolConfig = Parameters<typeof acquirePgPool>[0];
+
+/**
+ * Secret-bearing connection config resolved by the owning server, paired with
+ * the opaque identity that both request context and Graphile must consume.
+ */
+export interface RuntimePgPoolResolution {
+  pgConfig: PoolConfig;
+  poolIdentity: string;
+}
 
 export interface ContextMiddlewareOptions {
   /** Base PG options for pool creation (host, port, user, password) */
   pg?: PgpmOptions['pg'];
+  /** Least-privilege tenant execution login; inherits unspecified pg fields. */
+  runtimePg?: PgpmOptions['pg'];
+  /**
+   * Read the server-owned request resolution. Implementations should keep raw
+   * credentials outside the Express request object (for example in a WeakMap).
+   */
+  getRuntimePgResolution?: (
+    req: Request,
+    api: ApiStructure
+  ) => Readonly<RuntimePgPoolResolution>;
+  /** Optional fail-closed admission check for the tenant execution pool. */
+  validateRuntimePool?: (pool: Pool, api: ApiStructure) => Promise<void>;
+  /** Ordered, audited extension/shared schemas used by request SQL. */
+  dependencySchemas?: readonly string[];
   /** Module loader registry for per-database cached lookups */
   loaders?: LoaderRegistry;
   /** Routing-plane schema loaders query (defaults to routing_public) */
   routingSchema?: string;
 }
 
+interface ResolvedPool {
+  pool: Pool;
+  identity: string;
+}
+
+const resolvePool = (
+  config: PoolConfig,
+  options: GetPgPoolOptions,
+  leases?: PgPoolLease[]
+): ResolvedPool => {
+  if (!leases) {
+    return {
+      pool: getPgPool(config, options),
+      identity: getPgPoolIdentity(config, options)
+    };
+  }
+  const lease = acquirePgPool(config, options);
+  leases.push(lease);
+  return { pool: lease.pool, identity: lease.identity };
+};
+
 /**
  * Create a `useModule` function bound to the given loader context.
  *
- * Calling `useModule('rlsModule')` lazily resolves the RLS loader,
- * hitting the DB only on cache miss. The function is a no-op (returns
- * undefined) when no registry is configured.
+ * Calling `useModule('rlsModule')` lazily resolves the RLS loader according to
+ * that loader's freshness policy. The function is a no-op (returns undefined)
+ * when no registry is configured.
  */
 function createUseModule(
   registry: LoaderRegistry | undefined,
@@ -65,7 +117,9 @@ function createUseModule(
  */
 export function buildContext(
   req: Request,
-  opts: ContextMiddlewareOptions = {}
+  opts: ContextMiddlewareOptions = {},
+  /** Internal request lifetime. Omit for backwards-compatible direct use. */
+  poolLeases?: PgPoolLease[]
 ): ConstructiveContext | null {
   const api = req.api;
   if (!api) return null;
@@ -77,30 +131,75 @@ export function buildContext(
     api,
     token,
     requestId,
-    clientIp: req.clientIp
+    clientIp: req.clientIp,
+    origin: req.get('origin'),
+    userAgent: req.get('User-Agent'),
+    deviceToken: req.deviceToken,
+    dependencySchemas: opts.dependencySchemas
   });
 
-  const tenantPool: Pool = getPgPool({
+  const suppliedRuntimeResolution = opts.getRuntimePgResolution
+    ? opts.getRuntimePgResolution(req, api)
+    : undefined;
+  if (opts.getRuntimePgResolution && !suppliedRuntimeResolution) {
+    throw new Error(
+      'Runtime PostgreSQL resolution provider returned no exact identity'
+    );
+  }
+  const runtimeConfig = suppliedRuntimeResolution?.pgConfig ?? {
     ...opts.pg,
+    ...opts.runtimePg,
     database: api.dbname
-  });
+  };
+  const runtimePool = resolvePool(
+    runtimeConfig,
+    { purpose: 'runtime', sanitizeOnCheckout: true },
+    poolLeases
+  );
+  if (
+    suppliedRuntimeResolution
+    && runtimePool.identity !== suppliedRuntimeResolution.poolIdentity
+  ) {
+    throw new Error(
+      'Resolved runtime PostgreSQL pool identity changed before context acquisition'
+    );
+  }
+  const tenantPool = runtimePool.pool;
 
   // Build loader context (if registry provided and databaseId known)
   let loaderCtx: LoaderContext | null = null;
   if (opts.loaders && api.databaseId) {
-    const routingPool: Pool = getPgPool(opts.pg);
+    const routingPool = resolvePool(opts.pg ?? {}, {
+      purpose: 'routing-request-control',
+      sanitizeOnCheckout: true
+    }, poolLeases);
+    const controlTenantPool = resolvePool({
+      ...opts.pg,
+      database: api.dbname
+    }, {
+      purpose: 'tenant-request-control',
+      sanitizeOnCheckout: true
+    }, poolLeases);
     loaderCtx = {
-      routingPool,
+      routingPool: routingPool.pool,
+      routingPoolIdentity: routingPool.identity,
       routingSchema: opts.routingSchema,
-      tenantPool,
+      tenantPool: controlTenantPool.pool,
+      tenantPoolIdentity: controlTenantPool.identity,
       databaseId: api.databaseId,
       apiId: api.apiId,
       dbname: api.dbname
     };
   }
 
+  let runtimeSafetyPromise: Promise<void> | null = null;
+  const ensureRuntimePoolIsSafe = (): Promise<void> => {
+    if (!opts.validateRuntimePool) return Promise.resolve();
+    runtimeSafetyPromise ??= opts.validateRuntimePool(tenantPool, api);
+    return runtimeSafetyPromise;
+  };
   const withPgClient = <T>(fn: (client: any) => Promise<T>) =>
-    withPgClientFn(tenantPool, pgSettings, fn);
+    ensureRuntimePoolIsSafe().then(() => withPgClientFn(tenantPool, pgSettings, fn));
   const useModule = createUseModule(opts.loaders, loaderCtx);
 
   // Lazy-initialized billing client (cached per request)
@@ -116,6 +215,7 @@ export function buildContext(
     userId: token?.user_id ?? null,
     requestId,
     pool: tenantPool,
+    runtimePoolIdentity: runtimePool.identity,
     withPgClient,
     useModule,
     async useBilling() {
@@ -172,8 +272,8 @@ export function buildContext(
  * // Downstream middleware/routes call useModule on demand:
  * app.post('/v1/chat', async (req, res) => {
  *   const ctx = req.constructive;
- *   const rls = await ctx.useModule('rlsModule');       // only fires if not cached
- *   const auth = await ctx.useModule('authSettings');    // only fires if not cached
+ *   const rls = await ctx.useModule('rlsModule');        // authoritative read
+ *   const auth = await ctx.useModule('authSettings');    // authoritative read
  *   // webauthnSettings loader never fires if nobody asks for it
  * });
  * ```
@@ -181,11 +281,48 @@ export function buildContext(
 export function createContextMiddleware(
   opts: ContextMiddlewareOptions = {}
 ): RequestHandler {
-  return (req: Request, _res: Response, next: NextFunction): void => {
-    const ctx = buildContext(req, opts);
-    if (ctx) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const requestEnded = (): boolean =>
+      Boolean(
+        req.aborted
+        || req.socket?.destroyed
+        || res.destroyed
+        || res.writableEnded
+      );
+    if (requestEnded()) return;
+
+    const leases: PgPoolLease[] = [];
+    let released = false;
+    const releaseLeases = (): void => {
+      if (released) return;
+      released = true;
+      req.removeListener('aborted', releaseLeases);
+      res.removeListener('finish', releaseLeases);
+      res.removeListener('close', releaseLeases);
+      for (const lease of leases.reverse()) lease.release();
+    };
+
+    try {
+      const ctx = buildContext(req, opts, leases);
+      if (!ctx) {
+        releaseLeases();
+        next();
+        return;
+      }
       req.constructive = ctx;
+      req.once('aborted', releaseLeases);
+      res.once('finish', releaseLeases);
+      res.once('close', releaseLeases);
+      // The response may have ended while the synchronous context builder was
+      // acquiring its pool leases, before these listeners could be attached.
+      if (requestEnded()) {
+        releaseLeases();
+        return;
+      }
+      next();
+    } catch (error) {
+      releaseLeases();
+      next(error);
     }
-    next();
   };
 }

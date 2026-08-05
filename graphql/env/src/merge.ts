@@ -44,6 +44,11 @@ export const getEnvOptions = (
       ...(configOptions.graphile && { graphile: configOptions.graphile }),
       ...(configOptions.features && { features: configOptions.features }),
       ...(configOptions.api && { api: configOptions.api }),
+      ...(configOptions.routingCache && { routingCache: configOptions.routingCache }),
+      ...(configOptions.runtimePg && { runtimePg: configOptions.runtimePg }),
+      ...(configOptions.runtimePgStaticIdentity && {
+        runtimePgStaticIdentity: configOptions.runtimePgStaticIdentity
+      }),
       ...(configOptions.sms && { sms: configOptions.sms }),
     },
     graphqlEnvOptions,
