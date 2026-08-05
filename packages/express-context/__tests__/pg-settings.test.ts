@@ -29,14 +29,14 @@ describe('buildPgSettings — jwt.claims.api_id provenance', () => {
     expect(settings['jwt.claims.user_id']).toBe('u1');
   });
 
-  it('omits jwt.claims.api_id when the api has no apiId (non-API surface)', () => {
+  it('clears jwt.claims.api_id when the api has no apiId (non-API surface)', () => {
     const settings = buildPgSettings({
       api: { ...api, apiId: undefined },
       token: null,
       requestId: 'r1'
     });
 
-    expect(settings['jwt.claims.api_id']).toBeUndefined();
+    expect(settings['jwt.claims.api_id']).toBe('');
   });
 
   it('is derived only from the resolved api, never from the token', () => {
@@ -67,20 +67,20 @@ describe('buildPgSettings — agent-auth claims (intent, session lineage)', () =
     expect(settings['jwt.claims.intent']).toBe('deploy:preview');
   });
 
-  it('omits the lineage/intent GUCs when the token does not carry them', () => {
+  it('clears the lineage/intent GUCs when the token does not carry them', () => {
     const token: ConstructiveAPIToken = { user_id: 'u1', session_id: 's1' };
     const settings = buildPgSettings({ api, token, requestId: 'r1' });
 
-    expect(settings).not.toHaveProperty('jwt.claims.root_session_id');
-    expect(settings).not.toHaveProperty('jwt.claims.parent_session_id');
-    expect(settings).not.toHaveProperty('jwt.claims.intent');
+    expect(settings['jwt.claims.root_session_id']).toBe('');
+    expect(settings['jwt.claims.parent_session_id']).toBe('');
+    expect(settings['jwt.claims.intent']).toBe('');
   });
 
-  it('omits them for anonymous requests', () => {
+  it('clears them for anonymous requests', () => {
     const settings = buildPgSettings({ api, token: null, requestId: 'r1' });
 
-    expect(settings).not.toHaveProperty('jwt.claims.root_session_id');
-    expect(settings).not.toHaveProperty('jwt.claims.parent_session_id');
-    expect(settings).not.toHaveProperty('jwt.claims.intent');
+    expect(settings['jwt.claims.root_session_id']).toBe('');
+    expect(settings['jwt.claims.parent_session_id']).toBe('');
+    expect(settings['jwt.claims.intent']).toBe('');
   });
 });

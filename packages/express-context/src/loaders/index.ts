@@ -59,6 +59,7 @@ export { llmLoader } from './llm';
 export { pubkeyLoader } from './pubkey';
 export { requestProtectionLoader } from './request-protection';
 export { rlsLoader } from './rls';
+export { storageLoader } from './storage';
 export { webauthnLoader } from './webauthn';
 
 /**
@@ -78,6 +79,7 @@ import { pubkeyLoader } from './pubkey';
 import { createLoaderRegistry } from './registry';
 import { requestProtectionLoader } from './request-protection';
 import { rlsLoader } from './rls';
+import { storageLoader } from './storage';
 import { webauthnLoader } from './webauthn';
 
 export function createDefaultRegistry() {
@@ -96,5 +98,6 @@ export function createDefaultRegistry() {
   registry.register(computeLoader);
   registry.register(eventsLoader);
   registry.register(requestProtectionLoader);
+  registry.register(storageLoader);
   return registry;
 }

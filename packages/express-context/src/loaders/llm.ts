@@ -28,7 +28,6 @@ const LLM_MODULE_SQL = `
     lm.rag_context_limit
   FROM metaschema_modules_public.llm_module lm
   WHERE lm.database_id = $1
-  LIMIT 1
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -58,6 +57,9 @@ export const llmLoader: ModuleLoader<LlmConfig> = createModuleLoader<LlmConfig>(
       LLM_MODULE_SQL,
       [databaseId],
     );
+    if (result.rows.length > 1) {
+      throw new Error('Ambiguous LLM module configuration');
+    }
     const row = result.rows[0];
     if (!row) return undefined;
 

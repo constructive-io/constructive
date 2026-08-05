@@ -26,12 +26,19 @@ const webauthnSettingsSql = (schema: string): string => `
     ws.resident_key,
     ws.challenge_expiry_seconds
   FROM "${schema}".webauthn_settings ws
-  LEFT JOIN metaschema_public.schema s ON ws.schema_id = s.id
-  LEFT JOIN metaschema_public.schema cred_s ON ws.credentials_schema_id = cred_s.id
-  LEFT JOIN metaschema_public.schema sess_s ON ws.sessions_schema_id = sess_s.id
-  LEFT JOIN metaschema_public.schema sec_s ON ws.session_secrets_schema_id = sec_s.id
+  LEFT JOIN metaschema_public.schema s
+    ON ws.schema_id = s.id
+   AND s.database_id = ws.database_id
+  LEFT JOIN metaschema_public.schema cred_s
+    ON ws.credentials_schema_id = cred_s.id
+   AND cred_s.database_id = ws.database_id
+  LEFT JOIN metaschema_public.schema sess_s
+    ON ws.sessions_schema_id = sess_s.id
+   AND sess_s.database_id = ws.database_id
+  LEFT JOIN metaschema_public.schema sec_s
+    ON ws.session_secrets_schema_id = sec_s.id
+   AND sec_s.database_id = ws.database_id
   WHERE ws.database_id = $1
-  LIMIT 1
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -54,13 +61,36 @@ interface WebauthnSettingsRow {
 
 export const webauthnLoader: ModuleLoader<WebauthnSettings> = createModuleLoader<WebauthnSettings>({
   name: 'webauthnSettings',
-  ttlMs: 5 * 60_000,
+  // RP/origin/verification policy revocation must take effect immediately.
+  cache: false,
   async resolve(ctx: LoaderContext) {
     const { routingPool, databaseId } = ctx;
 
     const result = await routingPool.query<WebauthnSettingsRow>(webauthnSettingsSql(routingSchemaOf(ctx)), [databaseId]);
+    if (result.rows.length > 1) {
+      throw new Error('Ambiguous WebAuthn configuration');
+    }
     const row = result.rows[0];
-    if (!row?.schema) return undefined;
+    if (!row) return undefined;
+    const required = [
+      row.schema,
+      row.credentials_schema,
+      row.sessions_schema,
+      row.session_secrets_schema,
+      row.rp_id,
+      row.rp_name,
+      row.attestation_type,
+      row.resident_key
+    ];
+    if (
+      required.some((value) => typeof value !== 'string' || value.length === 0)
+      || !Array.isArray(row.origin_allowlist)
+      || typeof row.require_user_verification !== 'boolean'
+      || !Number.isSafeInteger(row.challenge_expiry_seconds)
+      || row.challenge_expiry_seconds <= 0
+    ) {
+      throw new Error('Incomplete or cross-database WebAuthn configuration');
+    }
 
     return {
       schema: row.schema,

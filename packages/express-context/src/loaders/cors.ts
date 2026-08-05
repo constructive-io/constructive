@@ -36,7 +36,8 @@ interface CorsSettingsRow {
 
 export const corsLoader: ModuleLoader<string[]> = createModuleLoader<string[]>({
   name: 'corsOrigins',
-  ttlMs: 5 * 60_000,
+  // Revoking an allowed browser/WebSocket origin is a security policy change.
+  cache: false,
   async resolve(ctx: LoaderContext) {
     const { routingPool, databaseId, apiId } = ctx;
     const schema = routingSchemaOf(ctx);

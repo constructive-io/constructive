@@ -16,9 +16,10 @@ const INFERENCE_LOG_MODULE_SQL = `
     s.schema_name AS schema,
     ilm.inference_log_table_name AS table_name
   FROM metaschema_modules_public.inference_log_module ilm
-  JOIN metaschema_public.schema s ON ilm.schema_id = s.id
+  JOIN metaschema_public.schema s
+    ON ilm.schema_id = s.id
+   AND s.database_id = ilm.database_id
   WHERE ilm.database_id = $1
-  LIMIT 1
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -40,8 +41,14 @@ export const inferenceLogLoader: ModuleLoader<InferenceLogConfig> = createModule
       INFERENCE_LOG_MODULE_SQL,
       [databaseId],
     );
+    if (result.rows.length > 1) {
+      throw new Error('Ambiguous inference-log module configuration');
+    }
     const row = result.rows[0];
-    if (!row?.schema || !row?.table_name) return undefined;
+    if (!row) return undefined;
+    if (!row.schema || !row.table_name) {
+      throw new Error('Incomplete or cross-database inference-log configuration');
+    }
 
     return {
       schema: row.schema,

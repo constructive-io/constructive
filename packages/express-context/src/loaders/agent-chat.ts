@@ -23,9 +23,10 @@ const AGENT_CHAT_MODULE_SQL = `
     acm.message_table_name,
     acm.task_table_name
   FROM metaschema_modules_public.agent_chat_module acm
-  JOIN metaschema_public.schema s ON s.id = acm.schema_id
+  JOIN metaschema_public.schema s
+    ON s.id = acm.schema_id
+   AND s.database_id = acm.database_id
   WHERE acm.database_id = $1
-  LIMIT 1
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -50,6 +51,9 @@ export const agentChatLoader: ModuleLoader<AgentChatConfig> = createModuleLoader
       AGENT_CHAT_MODULE_SQL,
       [databaseId],
     );
+    if (result.rows.length > 1) {
+      throw new Error('Ambiguous agent chat module configuration');
+    }
     const row = result.rows[0];
     if (!row) return undefined;
 

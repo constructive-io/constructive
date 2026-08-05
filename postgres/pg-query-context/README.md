@@ -24,7 +24,8 @@ npm install pg-query-context
 
 ## Features
 
-* Sets session-level context (e.g., role, user ID) using `set_config`.
+* Sets the complete transaction-local context (e.g., role, user ID) with one
+  parameterized `set_config` batch.
 * Automatically wraps execution in a transaction (`BEGIN`/`COMMIT`).
 * Automatically rolls back on error.
 * Supports both `Pool` and `Client` from `pg`.
@@ -91,7 +92,12 @@ const user = await withPgClient(
 | `pool`    | `Pool`                        | ✅        | The PostgreSQL pool to acquire a client from           |
 | `context` | `Record<string, string>`      | ✅        | Session variables set via `set_config`                 |
 | `fn`      | `(client: PoolClient) => T`   | ✅        | Callback receiving the connected client                |
-| `opts`    | `{ skipTransaction?: boolean }` | ❌      | Skip BEGIN/COMMIT wrapping (e.g., inside existing txn) |
+| `opts`    | `{ skipTransaction?: boolean }` | ❌      | Skip BEGIN/COMMIT only when no context is supplied; pooled transaction-local context fails closed |
+
+`set_config(..., true)` is transaction-local. A checked-out PostgreSQL client may
+use the one-query API with `skipTransaction` inside a transaction managed by its
+caller, but a pool cannot prove that transaction ownership. Both pooled APIs
+therefore reject `skipTransaction` when the context is non-empty.
 
 ## Example with `express`
 
