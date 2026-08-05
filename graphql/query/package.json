@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@0no-co/graphql.web": "^1.1.2",
+    "@0no-co/graphql.web": "^1.3.3",
     "@constructive-io/errors": "workspace:^",
     "@constructive-io/fetch": "^1.1.1",
     "@constructive-io/graphql-types": "workspace:^",

@@ -42,7 +42,7 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "makage": "^0.3.0"
   },
   "dependencies": {

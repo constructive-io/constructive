@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "graphile-connection-filter": "workspace:^",
     "graphile-test": "workspace:^",
     "makage": "^0.3.0",

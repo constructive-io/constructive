@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "envalid": "^8.1.1"
+    "envalid": "^8.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",

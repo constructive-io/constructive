@@ -42,7 +42,7 @@
   ],
   "devDependencies": {
     "@pgsql/types": "^18.0.0",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "copyfiles": "^2.4.1",
     "inquirerer": "^4.9.3",
     "makage": "^0.3.0"

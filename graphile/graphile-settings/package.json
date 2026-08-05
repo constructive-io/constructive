@@ -77,7 +77,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "@types/request-ip": "^0.0.41",
     "graphile-test": "workspace:^",
     "makage": "^0.3.0",

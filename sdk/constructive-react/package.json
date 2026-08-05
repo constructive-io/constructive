@@ -40,7 +40,7 @@
     "schema-dir"
   ],
   "dependencies": {
-    "@0no-co/graphql.web": "^1.1.2",
+    "@0no-co/graphql.web": "^1.3.3",
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@tanstack/react-query": "^5.90.21",
@@ -53,9 +53,9 @@
   "devDependencies": {
     "@constructive-io/graphql-codegen": "workspace:^",
     "@types/node": "^22.19.11",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.18",
     "makage": "^0.3.0",
-    "react": "^19.2.4",
+    "react": "^19.2.8",
     "tsx": "^4.19.0",
     "typescript": "^5.9.3"
   }

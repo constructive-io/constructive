@@ -81,7 +81,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "makage": "^0.3.0",
     "pgsql-test": "workspace:^"
   }

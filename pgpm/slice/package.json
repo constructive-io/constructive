@@ -44,7 +44,7 @@
   "dependencies": {
     "@pgpmjs/ast": "workspace:^",
     "@pgpmjs/transform": "workspace:^",
-    "minimatch": "^10.2.5",
+    "minimatch": "^10.2.6",
     "plpgsql-parser": "^18.5.3"
   }
 }

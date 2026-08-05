@@ -44,7 +44,7 @@
   "devDependencies": {
     "@types/accept-language-parser": "^1.5.4",
     "@types/node": "^22.19.11",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.20.4",
     "graphile-test": "workspace:^",
     "makage": "^0.3.0",
     "pg": "^8.21.0",
