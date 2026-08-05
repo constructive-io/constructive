@@ -1,8 +1,6 @@
 # OAuth/SSO Latest-Baseline Rebuild
 
-**Status:** Planning decision record; no implementation has started. Update this document as baselines and ownership decisions are frozen.
-
-Working research and item-by-item confirmation queue: [OAuth/SSO reference capability inventory](./oauth-sso-reference-inventory-working-draft.md).
+**Status:** Authoritative planning decision and implementation-audit record; no implementation has started. Update this document as baselines and ownership decisions are frozen.
 
 ## Goal
 
@@ -196,6 +194,20 @@ No further high-level product or security decision is open for the currently doc
 - Verify the owning loaders, database procedures, MFA continuation contract, environment parsers, cookie helper behavior, and final registered error-code taxonomy against that baseline.
 - Define the exact parent-domain/sibling-host matrix, HTTPS and local-test behavior, route reassignment handling, and cross-host logout/cleanup when the phase-two SSO work begins.
 - Record the test and CI evidence required to close the baseline, OAuth, and SSO gates without carrying forward unproven legacy compatibility or workflow changes.
+
+## Implementation Audit Checklist
+
+Use this checklist after the component SHAs are frozen. It retains the actionable implementation checks without treating unverified legacy details as current facts:
+
+- **Request lifecycle:** Map the frozen host/API resolution, request-context construction, authentication, CSRF, `/auth/*`, GraphQL, and final error-handling order before adding middleware. Preserve the established behavior for a stale existing session and do not bypass unrelated security middleware.
+- **Database and privilege boundary:** Use `withPgClient` and its transaction/RLS model for tenant authentication procedures wherever the frozen contract applies. Any privileged pre-auth operation requires an explicit reviewed reason; do not copy legacy lookup SQL around the public auth surface.
+- **Public loaders:** Verify and reuse the database-keyed provider, auth-settings, and auth-surface loaders together with their cache, invalidation, refresh, and rotation lifecycles. Do not add an OAuth-local cache, unkeyed metadata lookup, or parallel tenant discovery path.
+- **Google and GitHub adapters:** Verify the supported token-endpoint authentication methods, request encodings, endpoint metadata, and normalized claims against the frozen `packages/oauth` API. Keep those differences behind provider adapters while state, PKCE, callback, identity, session, and error handling remain one common flow.
+- **Identity and MFA contracts:** Identify the owning identity-linking/session procedures, minimal persisted identity shape, canonical failures, atomic retry behavior, and existing MFA continuation transport before implementation. Do not infer a new schema or challenge protocol from legacy code.
+- **Environment and cookie details:** Follow the frozen house boolean parser and `withDefault`/`devDefault`/`required` conventions for OAuth options, including any development-only state secret. Resolve cookie names, lifetime, path, domain, `SameSite`, secure behavior, and local-HTTP exceptions through the existing helpers rather than route-local defaults.
+- **Error transports:** Reuse existing identity, session, account, email-verification, step-up, and SSO policy errors whenever their business meaning matches. Browser redirects, GraphQL, HTTP responses, and logs must derive from the same registered error; unknown codes remain internal and fail loudly.
+- **Tests and helper extensions:** Add any missing public capability and its test in the owning package first. Keep `graphql-server-test` OAuth option forwarding small and typed from the new validated `graphql/env` contract, then cover each scenario at the narrowest already-confirmed test layer.
+- **Pins, evidence, and legacy disposition:** Record each component SHA and the evidence for the baseline, OAuth, and SSO gates independently. For every legacy item, record whether it is reused, added to its public owner, kept locally with reason, or rejected; re-prove Dashboard/Functions pin or CI-workflow changes instead of inheriting them.
 
 ## Next Steps
 
