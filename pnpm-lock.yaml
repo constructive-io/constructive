@@ -530,8 +530,8 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       inflekt:
-        specifier: ^0.7.2
-        version: 0.7.2
+        specifier: ^0.8.0
+        version: 0.8.0
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -1292,8 +1292,8 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       inflekt:
-        specifier: ^0.7.2
-        version: 0.7.2
+        specifier: ^0.8.0
+        version: 0.8.0
       lru-cache:
         specifier: ^11.2.7
         version: 11.2.7
@@ -1492,8 +1492,8 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       inflekt:
-        specifier: ^0.7.2
-        version: 0.7.2
+        specifier: ^0.8.0
+        version: 0.8.0
       inquirerer:
         specifier: ^4.9.3
         version: 4.9.3
@@ -1843,8 +1843,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.2
       inflekt:
-        specifier: ^0.7.2
-        version: 0.7.2
+        specifier: ^0.8.0
+        version: 0.8.0
       lru-cache:
         specifier: ^11.2.7
         version: 11.2.7
@@ -3030,8 +3030,8 @@ importers:
         specifier: ^13.0.6
         version: 13.0.6
       inflekt:
-        specifier: ^0.7.2
-        version: 0.7.2
+        specifier: ^0.8.0
+        version: 0.8.0
       inquirerer:
         specifier: ^4.9.3
         version: 4.9.3
@@ -3338,8 +3338,8 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       inflekt:
-        specifier: ^0.7.2
-        version: 0.7.2
+        specifier: ^0.8.0
+        version: 0.8.0
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -8252,8 +8252,8 @@ packages:
     resolution: {integrity: sha512-+Bg3+kg+J6JUWn8J6bzFmOWkTQ6L/NHfDRSYU+EVvuKHDxUDHAXgqixHfVlzuBQaPOTac8hn43aPhMNk6rMe3g==}
     engines: {node: '>=18.0.0'}
 
-  inflekt@0.7.2:
-    resolution: {integrity: sha512-csXH1tW9nvYmj3WMYCqPenF74l1PNzQG9SyQkpbRw60gC9f6GRSAxtUjepkBMb7m8NpVN+nOHtxHSqf4eh0uLA==}
+  inflekt@0.8.0:
+    resolution: {integrity: sha512-Inc2K7CJZvUHJvn9Tj9YKoHu4eK4gFEvtQXz7cpL8ZFzB8vaxNVkUHWBrqR/00wLcp9xdhD/fmE6DJgN4E1oRw==}
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
@@ -15955,7 +15955,7 @@ snapshots:
 
   inflection@3.0.2: {}
 
-  inflekt@0.7.2:
+  inflekt@0.8.0:
     dependencies:
       inflection: 3.0.2
       komoji: 0.9.1
