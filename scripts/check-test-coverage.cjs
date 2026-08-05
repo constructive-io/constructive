@@ -25,11 +25,7 @@ const WORKFLOW = path.join(ROOT, '.github/workflows/run-tests.yaml');
  * exclusion (the package no longer exists, or has no tests) is also an error,
  * so this list cannot rot quietly.
  */
-const EXCLUSIONS = {
-  'graphql/react':
-    'Requires an external GraphQL endpoint via $TESTING_URL and throws at ' +
-    'import time without one — a manual suite, not a CI one.'
-};
+const EXCLUSIONS = {};
 
 function claimedPackages() {
   const workflow = fs.readFileSync(WORKFLOW, 'utf8');
