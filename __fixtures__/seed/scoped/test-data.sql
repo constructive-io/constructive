@@ -2,7 +2,7 @@
 --
 -- Scoped routing plane test data: models the "simple-pets" tenant as rows in
 -- the published modules
---   - @constructive-db/catalog -> catalog_public
+--   - @constructive-db/catalog -> catalog_private
 --   - @constructive-db/routing -> routing_public (incl. resolve_route())
 --   - @constructive-db/apps    -> apps_public
 --
@@ -72,7 +72,7 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
--- CATALOG DATA (catalog_public)
+-- CATALOG DATA (catalog_private)
 -- =====================================================
 --
 -- `apis.config` carries the api surface projection the server folds into
@@ -80,7 +80,7 @@ VALUES (
 -- is_public, schemas); name/dbname/role_name/anon_role are merged in by the
 -- resolver from the columns below.
 
-INSERT INTO catalog_public.apis
+INSERT INTO catalog_private.apis
   (id, owner_scope, owner_key, is_visible, database_id, name, dbname, role_name, anon_role, config)
 VALUES
   (
@@ -136,7 +136,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Catalog domains: globally-claimed hostnames (same ids as services domains)
-INSERT INTO catalog_public.domains
+INSERT INTO catalog_private.domains
   (id, owner_scope, owner_key, is_visible, database_id, hostname, is_wildcard, parent_hostname, managed, verification_status, tls_status)
 VALUES
   (
@@ -178,7 +178,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Routing-side domains (source rows for the compiled hostname index).
 -- Triggers are re-enabled here: the published modules attach only the
--- catalog-sync propagation triggers, whose upserts into catalog_public are
+-- catalog-sync propagation triggers, whose upserts into catalog_private are
 -- idempotent with the direct catalog seeds above. Binding-sync triggers are
 -- NOT published, so the compiled hostname_bindings/route_bindings rows are
 -- still seeded directly below.

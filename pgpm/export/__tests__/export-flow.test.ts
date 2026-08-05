@@ -595,7 +595,7 @@ INSERT INTO routing_public.api_schemas (id, database_id, schema_id, api_id) VALU
 
 -- Surface module configuration
 INSERT INTO metaschema_modules_public.catalog_module (id, database_id, schema_id, public_schema_name, domains_table_name, apis_table_name, sites_table_name, apps_table_name, api_name, scope) VALUES
-  ('2222aaaa-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'catalog_public', 'domains', 'apis', 'sites', 'apps', 'public', 'platform');
+  ('2222aaaa-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'catalog_private', 'domains', 'apis', 'sites', 'apps', 'public', 'platform');
 
 INSERT INTO metaschema_modules_public.domain_module (id, database_id, schema_id, catalog_module_id, domains_table_name, managed_domains_table_name, scope, prefix) VALUES
   ('2222bbbb-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', '2222aaaa-0000-0000-0000-000000000001', 'domains', 'managed_domains', 'platform', '');

@@ -520,7 +520,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
         // surface module config tables (catalog / routing planes)
         await pg.query(`
           INSERT INTO metaschema_modules_public.catalog_module (id, database_id, schema_id, public_schema_name, domains_table_name, apis_table_name, sites_table_name, apps_table_name, scope, policies)
-          VALUES ($1, $2, $3, 'catalog_public', 'domains', 'apis', 'sites', 'apps', 'platform', '{"select": "public"}'::jsonb)
+          VALUES ($1, $2, $3, 'catalog_private', 'domains', 'apis', 'sites', 'apps', 'platform', '{"select": "public"}'::jsonb)
         `, [CATALOG_MODULE_ID, DATABASE_ID, SCHEMA_ID_PUB]);
 
         await pg.query(`

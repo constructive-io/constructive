@@ -26,7 +26,7 @@ const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const scopedDatabaseId = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 const scopedMetaSchemas = [
-  'catalog_public',
+  'catalog_private',
   'routing_public',
   'apps_public',
   'metaschema_public',

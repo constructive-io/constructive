@@ -65,7 +65,7 @@ const malloryPublicFileId = 'fa99fa99-0000-0000-0000-000000000001';
 const malloryPublicBucketId = 'fa77fa77-0000-0000-0000-000000000001';
 
 const metaSchemas = [
-  'catalog_public',
+  'catalog_private',
   'routing_public',
   'apps_public',
   'metaschema_public',

@@ -71,7 +71,7 @@ describe('META_TABLE_CONFIG and META_TABLE_ORDER consistency', () => {
     const validSchemas = [
       'metaschema_public',
       'metaschema_modules_public',
-      'catalog_public',
+      'catalog_private',
       'routing_public',
       'apps_public'
     ];

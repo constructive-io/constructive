@@ -30,7 +30,7 @@ const shared = (...segments: string[]) =>
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const metaSchemas = [
-  'catalog_public',
+  'catalog_private',
   'routing_public',
   'apps_public',
   'metaschema_public',
