@@ -1,9 +1,10 @@
 /**
  * OAuth route integration on the production scoped-routing server.
  *
- * The shared fixture deliberately does not provision OAuth modules. These
- * assertions prove the explicitly enabled route receives a database/API scope
- * from routing_public and can start a flow with validated OAuth options.
+ * The shared fixture proves the explicitly enabled route receives a
+ * database/API scope from routing_public. The SSO-specific assertion stays at
+ * this HTTP seam: a second registered API in the same database is accepted as
+ * a redirect target. Browser cookie/session behavior belongs in CNC Hub.
  */
 
 import path from 'path';
@@ -33,6 +34,7 @@ const metaSchemas = [
   'metaschema_modules_public'
 ];
 const API_HOST = 'app.test.constructive.io';
+const SAME_DATABASE_TARGET_HOST = 'private.test.constructive.io';
 
 const seedAdapters = [
   seed.pgpm(pgpmWorkspace),
@@ -96,6 +98,19 @@ describe('OAuth routes over scoped routing', () => {
         : [];
     expect(setCookies.join('\n')).toContain('oauth_state=');
     expect(setCookies.join('\n')).toContain('oauth_pkce=');
+  });
+
+  it('accepts a registered cross-origin API in the same database', async () => {
+    const target = `http://${SAME_DATABASE_TARGET_HOST}/after-login`;
+    const response = await request
+      .get('/auth/github')
+      .query({ redirect_uri: target })
+      .set('Host', API_HOST);
+
+    expect(response.status).toBe(302);
+    const redirect = new URL(response.headers.location);
+    expect(redirect.origin).toBe('https://github.example.test');
+    expect(redirect.searchParams.get('state')).toBeTruthy();
   });
 
   it('does not fall back to a default database for an unknown host', async () => {

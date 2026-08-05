@@ -1,5 +1,6 @@
 import { Logger } from '@pgpmjs/logger';
 import { Pool } from 'pg';
+import { getPgPool } from 'pg-cache';
 
 import { ApiOptions, ApiStructure } from '../types';
 
@@ -138,4 +139,20 @@ export const routeToApiStructure = (
     databaseId: config.database_id,
     isPublic: config.is_public ?? (opts.api?.isPublic ?? false)
   };
+};
+
+/**
+ * Resolve a hostname to the minimal API surface needed by callers that must
+ * validate a route without loading the target API's tenant settings.
+ *
+ * `getPgPool()` returns the shared cached routing pool for `opts.pg`; this does
+ * not create a per-validation pool or fall back to a tenant/default database.
+ */
+export const resolveApiHost = async (
+  opts: ApiOptions,
+  host: string
+): Promise<ApiStructure | null> => {
+  const pool = getPgPool(opts.pg);
+  const route = await resolveRoute(pool, getRoutingSchema(opts), host);
+  return route ? routeToApiStructure(route, opts) : null;
 };

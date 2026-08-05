@@ -204,7 +204,12 @@ const buildPreset = (
       graphiqlPath: '/graphiql',
       graphiql: true,
       graphiqlOnGraphQLGET: false,
-      maskError
+      maskError,
+      // The metaschema (modules.localhost) schema build takes ~13s on a
+      // cold/slow machine; grafserv's default (15s) can be exceeded under
+      // load, causing spurious 'Schema isn't ready' HTTP 500s during
+      // create-db provisioning. Give builds a generous 60s window.
+      schemaWaitTime: 60000
     },
     grafast: {
       explain: process.env.NODE_ENV === 'development',

@@ -46,6 +46,7 @@ import {
   setDeviceTokenCookie,
   setSessionCookie
 } from './cookie';
+import { resolveApiHost } from './routing';
 
 const log = new Logger('oauth');
 
@@ -61,6 +62,9 @@ interface OAuthStatePayload {
   database_id: string;
   api_id: string | null;
   origin: string;
+  redirect_target_database_id: string;
+  redirect_target_api_id: string | null;
+  redirect_target_origin: string;
 }
 
 interface OAuthPkcePayload {
@@ -168,22 +172,84 @@ interface SignInIdentityResult {
 function getBaseUrl(req: Request): string {
   const protocol = req.protocol || 'http';
   const host = req.get('host') || 'localhost:3000';
-  return `${protocol}://${host}`;
+  return new URL(`${protocol}://${host}`).origin;
 }
 
-function normalizeRedirectUri(
+interface OAuthRedirectTarget {
+  uri: string;
+  origin: string;
+  databaseId: string;
+  apiId: string | null;
+}
+
+async function resolveRedirectTarget(
   redirectUri: string | undefined,
-  baseUrl: string
-): string | null {
-  const requestedRedirectUri = redirectUri || '/';
+  baseUrl: string,
+  ctx: ConstructiveContext,
+  opts: ConstructiveOptions,
+  isProduction: boolean
+): Promise<OAuthRedirectTarget | null> {
+  const requestedRedirectUri = redirectUri?.trim() || '/';
+
+  // WHATWG URL parsing treats //host/path as an authority-relative URL. Reject
+  // it explicitly so a path-looking input cannot select another host.
+  if (requestedRedirectUri.startsWith('//')) return null;
 
   try {
     const url = new URL(requestedRedirectUri, baseUrl);
-    if (url.origin !== new URL(baseUrl).origin) return null;
-    return `${url.pathname}${url.search}${url.hash}`;
+    const authOrigin = new URL(baseUrl).origin;
+
+    if (
+      (url.protocol !== 'http:' && url.protocol !== 'https:') ||
+      url.username ||
+      url.password
+    ) {
+      return null;
+    }
+
+    if (!ctx.databaseId) return null;
+
+    if (url.origin === authOrigin) {
+      return {
+        uri: `${url.pathname}${url.search}${url.hash}`,
+        origin: authOrigin,
+        databaseId: ctx.databaseId,
+        apiId: ctx.api.apiId ?? null
+      };
+    }
+
+    if (isProduction && url.protocol !== 'https:') return null;
+
+    const targetApi = await resolveApiHost(opts, url.host);
+    if (
+      !targetApi?.databaseId ||
+      !targetApi.apiId ||
+      targetApi.databaseId !== ctx.databaseId
+    ) {
+      return null;
+    }
+
+    return {
+      uri: url.toString(),
+      origin: url.origin,
+      databaseId: targetApi.databaseId,
+      apiId: targetApi.apiId ?? null
+    };
   } catch {
     return null;
   }
+}
+
+function redirectTargetMatchesState(
+  target: OAuthRedirectTarget,
+  state: OAuthStatePayload
+): boolean {
+  return (
+    target.uri === state.redirect_uri &&
+    target.databaseId === state.redirect_target_database_id &&
+    target.apiId === state.redirect_target_api_id &&
+    target.origin === state.redirect_target_origin
+  );
 }
 
 /**
@@ -306,9 +372,15 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       const errorRedirectPath =
         authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
 
-      const redirectUri = normalizeRedirectUri(requestedRedirectUri, baseUrl);
-      if (!redirectUri) {
-        log.warn(`[oauth] Rejected cross-origin redirect_uri for ${provider}`);
+      const redirectTarget = await resolveRedirectTarget(
+        requestedRedirectUri,
+        baseUrl,
+        ctx,
+        opts,
+        isProduction
+      );
+      if (!redirectTarget) {
+        log.warn(`[oauth] Rejected untrusted redirect_uri for ${provider}`);
         return redirectToError(
           res,
           baseUrl,
@@ -346,11 +418,14 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       }
       const state = createSignedState(
         {
-          redirect_uri: redirectUri,
+          redirect_uri: redirectTarget.uri,
           provider,
           database_id: ctx.databaseId,
           api_id: ctx.api.apiId ?? null,
-          origin: baseUrl
+          origin: baseUrl,
+          redirect_target_database_id: redirectTarget.databaseId,
+          redirect_target_api_id: redirectTarget.apiId,
+          redirect_target_origin: redirectTarget.origin
         },
         {
           secret: requireStateSecret(opts),
@@ -513,17 +588,27 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       const requireVerifiedEmail =
         authSettings?.oauthRequireVerifiedEmail ?? true;
 
-      const redirectUri = normalizeRedirectUri(redirectUriFromState, baseUrl);
-      if (!redirectUri) {
-        log.warn(`[oauth] Rejected cross-origin redirect_uri for ${provider}`);
+      const redirectTarget = await resolveRedirectTarget(
+        redirectUriFromState,
+        baseUrl,
+        ctx,
+        opts,
+        isProduction
+      );
+      if (
+        !redirectTarget ||
+        !redirectTargetMatchesState(redirectTarget, statePayload)
+      ) {
+        log.warn(`[oauth] Redirect target scope changed for ${provider}`);
         return redirectToError(
           res,
           baseUrl,
           errorRedirectPath,
-          errors.OAUTH_INVALID_REDIRECT_URI(),
+          errors.OAUTH_INVALID_STATE(),
           provider
         );
       }
+      const redirectUri = redirectTarget.uri;
 
       // Get provider config from cached map
       const providerConfig = identityProviders.providers.get(provider);
@@ -680,7 +765,25 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       }
 
       log.info(`[oauth] OAuth success for ${profile.email}`);
-      return res.redirect(redirectUri);
+
+      // Deliver the access token to the client via the redirect fragment so
+      // the app can authenticate to EVERY API host with a Bearer header
+      // (session cookies are host-only and only reach the auth host) — the
+      // same credential shape as email/password login. Fragments are never
+      // sent to servers, so the token is not exposed to the OAuth provider.
+      // pg returns timestamptz as a Date object; normalize to ISO for the client.
+      const rawExpiresAt = result.access_token_expires_at as string | Date | undefined;
+      const expiresAt =
+        rawExpiresAt instanceof Date ? rawExpiresAt.toISOString() : (rawExpiresAt ?? '');
+      const fragment = new URLSearchParams({
+        access_token: result.access_token ?? '',
+        access_token_expires_at: expiresAt,
+        user_id: result.user_id ?? '',
+        id: result.id ?? result.user_id ?? '',
+        email: profile.email ?? ''
+      });
+      const baseUri = redirectUri.split('#')[0];
+      return res.redirect(`${baseUri}#${fragment.toString()}`);
     } catch (error: unknown) {
       const fallbackPath =
         modules?.authSettings?.oauthErrorRedirectPath ||

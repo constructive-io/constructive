@@ -38,6 +38,14 @@ export const createAuthenticateMiddleware = (
     res: Response,
     next: NextFunction
   ): Promise<void> => {
+    // OAuth / SSO routes manage their own auth (signed state + session cookie
+    // set by the callback). Skipping them here prevents a stale/invalid
+    // constructive_session cookie from 401ing /auth/* before the OAuth router
+    // ever runs — the router is mounted AFTER this middleware.
+    if (req.path.startsWith('/auth/')) {
+      return next();
+    }
+
     const api = req.api;
     log.info(`[auth] middleware called, api=${api ? 'present' : 'missing'}`);
     if (!api) {
