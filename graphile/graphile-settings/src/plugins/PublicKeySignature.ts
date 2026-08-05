@@ -4,10 +4,11 @@ import { QuoteUtils } from '@pgsql/quotes';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
-import pgQueryWithContext from 'pg-query-context';
 
 export interface PublicKeyChallengeConfig {
   schema: string;
+  /** Exact anonymous role configured for this Graphile API surface. */
+  anonymousRole: string;
   crypto_network: string;
   // crypto_network: keyof typeof Networks;
   sign_up_with_key: string;
@@ -38,9 +39,54 @@ const MAX_MESSAGE_LENGTH = 4096;
 const MAX_SIGNATURE_LENGTH = 1024;
 const ENABLE_SIGNATURE_VERIFICATION = process.env.ENABLE_SIGNATURE_VERIFICATION === 'true';
 
+type PublicKeyPgSettings = Record<string, string | undefined>;
+
+export type PublicKeyPgClient = {
+  query<TData = Record<string, unknown>>(opts: {
+    text: string;
+    values?: unknown[];
+  }): Promise<{ rows: TData[] }>;
+};
+
+export type PublicKeyWithPgClient = <T>(
+  pgSettings: PublicKeyPgSettings,
+  callback: (pgClient: PublicKeyPgClient) => Promise<T> | T,
+) => Promise<T>;
+
+/**
+ * Run a public-key authentication operation in the request's complete GUC
+ * context while retaining the plugin's deliberately anonymous database role.
+ *
+ * The copy is important: Grafast's request context remains immutable, and the
+ * role override cannot leak back into other plans sharing that context.
+ */
+export async function withAnonymousPublicKeyClient<T>(
+  withPgClient: PublicKeyWithPgClient | null | undefined,
+  pgSettings: unknown,
+  anonymousRole: string,
+  callback: (pgClient: PublicKeyPgClient) => Promise<T> | T,
+): Promise<T> {
+  if (typeof withPgClient !== 'function') {
+    throw new Error('PG_CLIENT_CONTEXT_UNAVAILABLE');
+  }
+  if (typeof pgSettings !== 'object' || pgSettings === null || Array.isArray(pgSettings)) {
+    throw new Error('PG_SETTINGS_UNAVAILABLE');
+  }
+  validateIdentifier(anonymousRole, 'anonymousRole');
+
+  return withPgClient(
+    {
+      ...(pgSettings as PublicKeyPgSettings),
+      role: anonymousRole,
+    },
+    callback,
+  );
+}
+
 export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): GraphileConfig.Plugin => {
   const {
     schema,
+    anonymousRole,
     crypto_network,
     sign_up_with_key,
     sign_in_request_challenge,
@@ -49,6 +95,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
   } = pubkey_challenge;
 
   validateIdentifier(schema, 'schema');
+  validateIdentifier(anonymousRole, 'anonymousRole');
   validateIdentifier(sign_up_with_key, 'sign_up_with_key');
   validateIdentifier(sign_in_request_challenge, 'sign_in_request_challenge');
   validateIdentifier(sign_in_record_failure, 'sign_in_record_failure');
@@ -103,40 +150,32 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
         createUserAccountWithPublicKey(_$mutation: any, fieldArgs: any) {
           const $input = fieldArgs.getRaw('input');
           const $withPgClient = (grafastContext() as any).get('withPgClient');
-          const $combined = object({ input: $input, withPgClient: $withPgClient });
+          const $pgSettings = (grafastContext() as any).get('pgSettings');
+          const $combined = object({
+            input: $input,
+            withPgClient: $withPgClient,
+            pgSettings: $pgSettings,
+          });
 
-          return lambda($combined, async ({ input, withPgClient }: any) => {
+          return lambda($combined, async ({ input, withPgClient, pgSettings }: any) => {
             if (!input.publicKey || typeof input.publicKey !== 'string' || input.publicKey.length > MAX_PUBLIC_KEY_LENGTH) {
               throw new Error('INVALID_PUBLIC_KEY');
             }
 
-            return withPgClient(null, async (pgClient: any) => {
-              await pgClient.query('BEGIN');
-              try {
-                await pgQueryWithContext({
-                  client: pgClient,
-                  context: { role: 'anonymous' },
-                  query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_up_with_key)}($1)`,
-                  variables: [input.publicKey],
-                  skipTransaction: true
-                });
+            return withAnonymousPublicKeyClient(withPgClient, pgSettings, anonymousRole, async (pgClient) => {
+              await pgClient.query({
+                text: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_up_with_key)}($1)`,
+                values: [input.publicKey],
+              });
 
-                const {
-                  rows: [{ [sign_in_request_challenge]: message }]
-                } = await pgQueryWithContext({
-                  client: pgClient,
-                  context: { role: 'anonymous' },
-                  query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
-                  variables: [input.publicKey],
-                  skipTransaction: true
-                });
+              const {
+                rows: [{ [sign_in_request_challenge]: message }]
+              } = await pgClient.query<Record<string, unknown>>({
+                text: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
+                values: [input.publicKey],
+              });
 
-                await pgClient.query('COMMIT');
-                return { message };
-              } catch (err) {
-                await pgClient.query('ROLLBACK');
-                throw err;
-              }
+              return { message };
             });
           });
         },
@@ -144,21 +183,24 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
         getMessageForSigning(_$mutation: any, fieldArgs: any) {
           const $input = fieldArgs.getRaw('input');
           const $withPgClient = (grafastContext() as any).get('withPgClient');
-          const $combined = object({ input: $input, withPgClient: $withPgClient });
+          const $pgSettings = (grafastContext() as any).get('pgSettings');
+          const $combined = object({
+            input: $input,
+            withPgClient: $withPgClient,
+            pgSettings: $pgSettings,
+          });
 
-          return lambda($combined, async ({ input, withPgClient }: any) => {
+          return lambda($combined, async ({ input, withPgClient, pgSettings }: any) => {
             if (!input.publicKey || typeof input.publicKey !== 'string' || input.publicKey.length > MAX_PUBLIC_KEY_LENGTH) {
               throw new Error('INVALID_PUBLIC_KEY');
             }
 
-            return withPgClient(null, async (pgClient: any) => {
+            return withAnonymousPublicKeyClient(withPgClient, pgSettings, anonymousRole, async (pgClient) => {
               const {
                 rows: [{ [sign_in_request_challenge]: message }]
-              } = await pgQueryWithContext({
-                client: pgClient,
-                context: { role: 'anonymous' },
-                query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
-                variables: [input.publicKey]
+              } = await pgClient.query<Record<string, unknown>>({
+                text: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
+                values: [input.publicKey],
               });
 
               if (!message) throw new Error('NO_ACCOUNT_EXISTS');
@@ -173,9 +215,14 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
         verifyMessageForSigning(_$mutation: any, fieldArgs: any) {
           const $input = fieldArgs.getRaw('input');
           const $withPgClient = (grafastContext() as any).get('withPgClient');
-          const $combined = object({ input: $input, withPgClient: $withPgClient });
+          const $pgSettings = (grafastContext() as any).get('pgSettings');
+          const $combined = object({
+            input: $input,
+            withPgClient: $withPgClient,
+            pgSettings: $pgSettings,
+          });
 
-          return lambda($combined, async ({ input, withPgClient }: any) => {
+          return lambda($combined, async ({ input, withPgClient, pgSettings }: any) => {
             const { publicKey, message, signature: _signature } = input;
 
             if (!publicKey || typeof publicKey !== 'string' || publicKey.length > MAX_PUBLIC_KEY_LENGTH) {
@@ -194,31 +241,20 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
               throw new Error('FEATURE_DISABLED');
             }
 
-            return withPgClient(null, async (pgClient: any) => {
-              // Only the success path needs a transaction (multi-step)
-              await pgClient.query('BEGIN');
-              try {
-                const {
-                  rows: [token]
-                } = await pgQueryWithContext({
-                  client: pgClient,
-                  context: { role: 'anonymous' },
-                  query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_with_challenge)}($1, $2)`,
-                  variables: [publicKey, message],
-                  skipTransaction: true
-                });
+            return withAnonymousPublicKeyClient(withPgClient, pgSettings, anonymousRole, async (pgClient) => {
+              const {
+                rows: [token]
+              } = await pgClient.query<Record<string, unknown>>({
+                text: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_with_challenge)}($1, $2)`,
+                values: [publicKey, message],
+              });
 
-                if (!token?.access_token) throw new Error('BAD_SIGNIN');
+              if (!token?.access_token) throw new Error('BAD_SIGNIN');
 
-                await pgClient.query('COMMIT');
-                return {
-                  access_token: token.access_token,
-                  access_token_expires_at: token.access_token_expires_at
-                };
-              } catch (err) {
-                await pgClient.query('ROLLBACK');
-                throw err;
-              }
+              return {
+                access_token: token.access_token,
+                access_token_expires_at: token.access_token_expires_at
+              };
             });
           });
         }

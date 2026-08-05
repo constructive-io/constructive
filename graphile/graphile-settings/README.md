@@ -40,6 +40,10 @@ const preset = {
     makePgService({
       connectionString: 'postgres://user:pass@localhost/mydb',
       schemas: ['app_public'],
+      // Optional density optimization: retire the exact connection that ran
+      // catalog introspection instead of returning its enlarged backend to
+      // the request pool. The default is 'reuse'.
+      introspectionClientReleaseMode: 'destroy',
     }),
   ],
 };
@@ -51,6 +55,12 @@ const httpServer = require('http').createServer(app);
 serv.addTo(app, httpServer);
 httpServer.listen(5000);
 ```
+
+`introspectionClientReleaseMode: 'destroy'` applies only to the connection
+checked out by Graphile for the catalog gather query. It fails closed when the
+configured adaptor cannot prove that it owns and can destroy that exact
+connection; caller-owned clients are never destroyed. Runtime requests still
+use a dedicated tenant/API service and its normal pool.
 
 ## Features
 
