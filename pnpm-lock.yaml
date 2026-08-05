@@ -2036,6 +2036,9 @@ importers:
       graphile-function-bindings:
         specifier: workspace:^
         version: link:../../graphile/graphile-function-bindings/dist
+      graphile-realtime-subscriptions:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-realtime-subscriptions/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist
