@@ -75,9 +75,31 @@ jest.mock('graphile-utils', () => ({
 }));
 
 import { createBucketProvisionerPlugin } from '../src/plugin';
-import type { BucketProvisionerPluginOptions } from '../src/types';
+import type {
+  BucketProvisionerPluginOptions,
+  BucketProvisionerStorageModule,
+} from '../src/types';
 
 // --- Test helpers ---
+
+function storageModule(
+  overrides: Partial<BucketProvisionerStorageModule> = {},
+): BucketProvisionerStorageModule {
+  return {
+    id: 'sm-uuid-456',
+    bucketsQualifiedName: 'app_public.buckets',
+    schemaName: 'app_public',
+    bucketsTableName: 'buckets',
+    scope: 'app',
+    entityTableId: null,
+    entityQualifiedName: null,
+    endpoint: null,
+    publicUrlPrefix: null,
+    provider: null,
+    allowedOrigins: null,
+    ...overrides,
+  };
+}
 
 function createDefaultOptions(
   overrides: Partial<BucketProvisionerPluginOptions> = {},
@@ -91,6 +113,7 @@ function createDefaultOptions(
       secretAccessKey: 'minioadmin',
     },
     allowedOrigins: ['https://app.example.com'],
+    preloadedStorageModules: [storageModule()],
     ...overrides,
   };
 }
@@ -99,17 +122,6 @@ function createMockPgClient(overrides: Record<string, any> = {}) {
   const defaultQueries: Record<string, any> = {
     'jwt_private.current_database_id': {
       rows: [{ id: 'db-uuid-123' }],
-    },
-    'metaschema_modules_public.storage_module': {
-      rows: [{
-        id: 'sm-uuid-456',
-        buckets_schema: 'app_public',
-        buckets_table: 'buckets',
-        endpoint: null,
-        public_url_prefix: null,
-        provider: null,
-        allowed_origins: null,
-      }],
     },
     app_public: {
       rows: [{
@@ -127,6 +139,9 @@ function createMockPgClient(overrides: Record<string, any> = {}) {
   return {
     query: jest.fn((arg: any) => {
       const sql: string = typeof arg === 'string' ? arg : arg.text;
+      if (sql.includes('UPDATE') && sql.includes('SET physical_name')) {
+        return Promise.resolve({ rows: [{ physical_name: arg.values[0] }] });
+      }
       for (const [key, value] of Object.entries({ ...defaultQueries, ...overrides })) {
         if (sql.includes(key)) {
           return Promise.resolve(value);
@@ -369,11 +384,11 @@ describe('createBucketProvisionerPlugin', () => {
     });
 
     it('throws STORAGE_MODULE_NOT_PROVISIONED when no storage module exists', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
+      createBucketProvisionerPlugin(createDefaultOptions({
+        preloadedStorageModules: [],
+      }));
 
-      const pgClient = createMockPgClient({
-        'metaschema_modules_public.storage_module': { rows: [] },
-      });
+      const pgClient = createMockPgClient();
       const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
         callback(pgClient),
       );
@@ -423,7 +438,7 @@ describe('createBucketProvisionerPlugin', () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('S3 connection refused');
+      expect(result.error).toBe('BUCKET_PROVISIONING_FAILED');
       expect(result.bucketName).toBe('public');
     });
 
@@ -451,6 +466,8 @@ describe('createBucketProvisionerPlugin', () => {
       expect(update![0].text).toContain('physical_name IS NULL');
       // Records the exact name returned by the provisioner against the row id.
       expect(update![0].values).toEqual(['public', 'bucket-uuid-789']);
+      expect(mockWithPgClient).toHaveBeenCalledTimes(1);
+      expect(mockWithPgClient.mock.calls[0][0]).toEqual({ role: 'admin' });
     });
 
     it('provisions the stored physical_name verbatim when already recorded', async () => {
@@ -521,20 +538,15 @@ describe('createBucketProvisionerPlugin', () => {
     });
 
     it('applies per-database endpoint override from storage module', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
+      createBucketProvisionerPlugin(createDefaultOptions({
+        preloadedStorageModules: [storageModule({
+          endpoint: 'http://custom-minio:9000',
+          publicUrlPrefix: 'https://cdn.example.com',
+          provider: 'minio',
+        })],
+      }));
 
-      const pgClient = createMockPgClient({
-        'metaschema_modules_public.storage_module': {
-          rows: [{
-            id: 'sm-uuid-456',
-            buckets_schema: 'app_public',
-            buckets_table: 'buckets',
-            endpoint: 'http://custom-minio:9000',
-            public_url_prefix: 'https://cdn.example.com',
-            provider: 'minio',
-          }],
-        },
-      });
+      const pgClient = createMockPgClient();
       const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
         callback(pgClient),
       );
@@ -578,20 +590,13 @@ describe('createBucketProvisionerPlugin', () => {
     });
 
     it('passes publicUrlPrefix from storage module to provision call', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
+      createBucketProvisionerPlugin(createDefaultOptions({
+        preloadedStorageModules: [storageModule({
+          publicUrlPrefix: 'https://cdn.example.com',
+        })],
+      }));
 
-      const pgClient = createMockPgClient({
-        'metaschema_modules_public.storage_module': {
-          rows: [{
-            id: 'sm-uuid-456',
-            buckets_schema: 'app_public',
-            buckets_table: 'buckets',
-            endpoint: null,
-            public_url_prefix: 'https://cdn.example.com',
-            provider: null,
-          }],
-        },
-      });
+      const pgClient = createMockPgClient();
       const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
         callback(pgClient),
       );
@@ -607,6 +612,108 @@ describe('createBucketProvisionerPlugin', () => {
           publicUrlPrefix: 'https://cdn.example.com',
         }),
       );
+    });
+  });
+
+  describe('storage snapshot isolation', () => {
+    it('rejects missing request settings before acquiring a PostgreSQL client', async () => {
+      createBucketProvisionerPlugin(createDefaultOptions());
+      const withPgClient = jest.fn();
+
+      await expect(capturedLambdaCallback!({
+        input: { bucketKey: 'public' },
+        withPgClient,
+        pgSettings: null,
+      })).rejects.toThrow('STORAGE_REQUEST_SETTINGS_UNAVAILABLE');
+      expect(withPgClient).not.toHaveBeenCalled();
+      expect(mockProvision).not.toHaveBeenCalled();
+    });
+
+    it('fails closed without a snapshot and never queries metaschema or calls S3', async () => {
+      createBucketProvisionerPlugin(createDefaultOptions({
+        preloadedStorageModules: undefined,
+      }));
+      const pgClient = createMockPgClient();
+      const withPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+      await expect(capturedLambdaCallback!({
+        input: { bucketKey: 'public' },
+        withPgClient,
+        pgSettings: { role: 'tenant_member' },
+      })).rejects.toThrow('STORAGE_MODULE_SNAPSHOT_REQUIRED');
+
+      expect(pgClient.query.mock.calls.map((call: any[]) => call[0].text).join('\n'))
+        .not.toContain('metaschema_');
+      expect(mockProvision).not.toHaveBeenCalled();
+    });
+
+    it('rejects duplicate app modules before reading a bucket or calling S3', async () => {
+      createBucketProvisionerPlugin(createDefaultOptions({
+        preloadedStorageModules: [
+          storageModule({ id: 'app-a' }),
+          storageModule({ id: 'app-b', bucketsTableName: 'other_buckets' }),
+        ],
+      }));
+      const pgClient = createMockPgClient();
+      const withPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+      await expect(capturedLambdaCallback!({
+        input: { bucketKey: 'public' },
+        withPgClient,
+        pgSettings: { role: 'tenant_member' },
+      })).rejects.toThrow('STORAGE_MODULE_AMBIGUOUS:app');
+      expect(mockProvision).not.toHaveBeenCalled();
+    });
+
+    it('probes only safely quoted preloaded entity tables and rejects ambiguous owners', async () => {
+      createBucketProvisionerPlugin(createDefaultOptions({
+        preloadedStorageModules: [
+          storageModule({
+            id: 'team-a',
+            scope: 'team-a',
+            schemaName: 'team_a_public',
+            bucketsTableName: 'buckets',
+            entityTableId: 'entity-a',
+            entityQualifiedName: '"tenant-a"."teams"',
+          }),
+          storageModule({
+            id: 'team-b',
+            scope: 'team-b',
+            schemaName: 'team_b_public',
+            bucketsTableName: 'buckets',
+            entityTableId: 'entity-b',
+            entityQualifiedName: '"tenant-b"."teams"',
+          }),
+        ],
+      }));
+      const pgClient = createMockPgClient({
+        '"tenant-a".teams': { rows: [{ '?column?': 1 }] },
+        '"tenant-b".teams': { rows: [{ '?column?': 1 }] },
+      });
+      const withPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+      await expect(capturedLambdaCallback!({
+        input: { bucketKey: 'private', ownerId: 'owner-a' },
+        withPgClient,
+        pgSettings: { role: 'tenant_member' },
+      })).rejects.toThrow('STORAGE_MODULE_AMBIGUOUS:owner');
+
+      const sql = pgClient.query.mock.calls.map((call: any[]) => call[0].text).join('\n');
+      expect(sql).toContain('FROM "tenant-a".teams');
+      expect(sql).toContain('FROM "tenant-b".teams');
+      expect(sql).not.toContain('metaschema_');
+      expect(mockProvision).not.toHaveBeenCalled();
+    });
+
+    it('rejects an expression masquerading as an entity table at build time', () => {
+      expect(() => createBucketProvisionerPlugin(createDefaultOptions({
+        preloadedStorageModules: [storageModule({
+          id: 'malicious',
+          scope: 'team',
+          entityTableId: 'entity-a',
+          entityQualifiedName: 'safe.teams; SELECT pg_sleep(10)',
+        })],
+      }))).toThrow('STORAGE_MODULE_METADATA_INVALID:entity:malicious');
     });
   });
 
@@ -1110,7 +1217,11 @@ describe('CORS resolution hierarchy', () => {
       lifecycleRules: [],
     });
 
-    createBucketProvisionerPlugin(createDefaultOptions());
+    createBucketProvisionerPlugin(createDefaultOptions({
+      preloadedStorageModules: [storageModule({
+        allowedOrigins: ['https://db-default.example.com'],
+      })],
+    }));
 
     const pgClient = createMockPgClient({
       app_public: {
@@ -1120,17 +1231,6 @@ describe('CORS resolution hierarchy', () => {
           type: 'public',
           is_public: true,
           allowed_origins: ['*'],
-        }],
-      },
-      'metaschema_modules_public.storage_module': {
-        rows: [{
-          id: 'sm-uuid-456',
-          buckets_schema: 'app_public',
-          buckets_table: 'buckets',
-          endpoint: null,
-          public_url_prefix: null,
-          provider: null,
-          allowed_origins: ['https://db-default.example.com'],
         }],
       },
     });
@@ -1167,7 +1267,11 @@ describe('CORS resolution hierarchy', () => {
       lifecycleRules: [],
     });
 
-    createBucketProvisionerPlugin(createDefaultOptions());
+    createBucketProvisionerPlugin(createDefaultOptions({
+      preloadedStorageModules: [storageModule({
+        allowedOrigins: ['https://db-default.example.com'],
+      })],
+    }));
 
     const pgClient = createMockPgClient({
       app_public: {
@@ -1177,17 +1281,6 @@ describe('CORS resolution hierarchy', () => {
           type: 'public',
           is_public: true,
           allowed_origins: null, // No bucket-level override
-        }],
-      },
-      'metaschema_modules_public.storage_module': {
-        rows: [{
-          id: 'sm-uuid-456',
-          buckets_schema: 'app_public',
-          buckets_table: 'buckets',
-          endpoint: null,
-          public_url_prefix: null,
-          provider: null,
-          allowed_origins: ['https://db-default.example.com'],
         }],
       },
     });
@@ -1235,17 +1328,6 @@ describe('CORS resolution hierarchy', () => {
           key: 'docs',
           type: 'private',
           is_public: false,
-          allowed_origins: null,
-        }],
-      },
-      'metaschema_modules_public.storage_module': {
-        rows: [{
-          id: 'sm-uuid-456',
-          buckets_schema: 'app_public',
-          buckets_table: 'buckets',
-          endpoint: null,
-          public_url_prefix: null,
-          provider: null,
           allowed_origins: null,
         }],
       },
@@ -1346,6 +1428,7 @@ describe('bucket name resolution', () => {
         secretAccessKey: 'test',
       },
       allowedOrigins: ['https://app.example.com'],
+      preloadedStorageModules: [storageModule()],
     });
 
     const pgClient = createMockPgClient({
@@ -1400,6 +1483,7 @@ describe('bucket name resolution', () => {
         secretAccessKey: 'test',
       },
       allowedOrigins: ['https://app.example.com'],
+      preloadedStorageModules: [storageModule()],
       bucketNamePrefix: 'should-be-ignored',
       resolveBucketName: customResolver,
     });

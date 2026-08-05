@@ -18,21 +18,62 @@ const DEFAULT_MAX_BULK_TOTAL_SIZE = 1073741824; // 1GB
 const FIVE_MINUTES_MS = 1000 * 60 * 5;
 const ONE_HOUR_MS = 1000 * 60 * 60;
 
+type StorageCacheEntry =
+  | { kind: 'config'; value: StorageModuleConfig | null }
+  | { kind: 'list'; value: StorageModuleConfig[] };
+
+const CACHE_TTL_MS = process.env.NODE_ENV === 'development'
+  ? FIVE_MINUTES_MS
+  : ONE_HOUR_MS;
+
 /**
- * LRU cache for per-database StorageModuleConfig.
+ * Metadata owned by one exact Graphile build.
  *
- * Each PostGraphile instance serves a single database, but the presigned URL
- * plugin needs to know the generated table names (buckets, files)
- * and their schemas. This cache avoids re-querying metaschema
- * on every request.
- *
- * Pattern: same as graphile-cache's LRU with TTL-based eviction.
+ * Logical database/module identifiers are deliberately only keys inside this
+ * scope. They never select the scope itself, because separate physical pools
+ * may legitimately expose identical identifiers.
  */
-const storageModuleCache = new LRUCache<string, StorageModuleConfig>({
-  max: 50,
-  ttl: process.env.NODE_ENV === 'development' ? FIVE_MINUTES_MS : ONE_HOUR_MS,
-  updateAgeOnGet: true,
-});
+export class StorageModuleCacheScope {
+  readonly storageModuleCache = new LRUCache<string, StorageCacheEntry>({
+    max: 100,
+    ttl: CACHE_TTL_MS,
+    updateAgeOnGet: false,
+  });
+
+  readonly bucketCache = new LRUCache<string, BucketConfig | null>({
+    max: 500,
+    ttl: CACHE_TTL_MS,
+    updateAgeOnGet: false,
+  });
+
+  readonly provisionedBuckets = new Set<string>();
+
+  clear(): void {
+    this.storageModuleCache.clear();
+    this.bucketCache.clear();
+    this.provisionedBuckets.clear();
+  }
+}
+
+/**
+ * Weak ownership ties cached metadata to the exact Graphile build object.
+ * Reusing a preset/plugin object for another build therefore cannot reuse the
+ * first build's tenant metadata, and releasing the build releases its cache.
+ */
+const cacheScopesByBuild = new WeakMap<object, StorageModuleCacheScope>();
+
+export function getStorageModuleCacheScope(build: object): StorageModuleCacheScope {
+  if ((typeof build !== 'object' || build === null) && typeof build !== 'function') {
+    throw new TypeError('A Graphile build object is required for storage cache isolation');
+  }
+
+  let scope = cacheScopesByBuild.get(build);
+  if (!scope) {
+    scope = new StorageModuleCacheScope();
+    cacheScopesByBuild.set(build, scope);
+  }
+  return scope;
+}
 
 /**
  * SQL query to resolve the app-level storage module config for a database.
@@ -45,11 +86,16 @@ const storageModuleCache = new LRUCache<string, StorageModuleConfig>({
 const APP_STORAGE_MODULE_QUERY = `
   SELECT
     sm.id,
+    sm.database_id,
     sm.scope,
     sm.entity_table_id,
+    bt.database_id AS buckets_database_id,
     bs.schema_name AS buckets_schema,
+    bs.database_id AS buckets_schema_database_id,
     bt.name AS buckets_table,
+    ft.database_id AS files_database_id,
     fs.schema_name AS files_schema,
+    fs.database_id AS files_schema_database_id,
     ft.name AS files_table,
     sm.endpoint,
     sm.public_url_prefix,
@@ -63,16 +109,26 @@ const APP_STORAGE_MODULE_QUERY = `
     sm.max_bulk_files,
     sm.max_bulk_total_size,
     sm.has_path_shares,
+    NULL AS entity_database_id,
+    NULL AS entity_schema_database_id,
     NULL AS entity_schema,
     NULL AS entity_table
   FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
-  JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
+  JOIN metaschema_public.table bt
+    ON bt.id = sm.buckets_table_id
+   AND bt.database_id = sm.database_id
+  JOIN metaschema_public.schema bs
+    ON bs.id = bt.schema_id
+   AND bs.database_id = sm.database_id
+  JOIN metaschema_public.table ft
+    ON ft.id = sm.files_table_id
+   AND ft.database_id = sm.database_id
+  JOIN metaschema_public.schema fs
+    ON fs.id = ft.schema_id
+   AND fs.database_id = sm.database_id
   WHERE sm.database_id = $1
     AND sm.scope = 'app'
-  LIMIT 1
+  ORDER BY sm.id
 `;
 
 /**
@@ -84,11 +140,16 @@ const APP_STORAGE_MODULE_QUERY = `
 const ALL_STORAGE_MODULES_QUERY = `
   SELECT
     sm.id,
+    sm.database_id,
     sm.scope,
     sm.entity_table_id,
+    bt.database_id AS buckets_database_id,
     bs.schema_name AS buckets_schema,
+    bs.database_id AS buckets_schema_database_id,
     bt.name AS buckets_table,
+    ft.database_id AS files_database_id,
     fs.schema_name AS files_schema,
+    fs.database_id AS files_schema_database_id,
     ft.name AS files_table,
     sm.endpoint,
     sm.public_url_prefix,
@@ -102,25 +163,45 @@ const ALL_STORAGE_MODULES_QUERY = `
     sm.max_bulk_files,
     sm.max_bulk_total_size,
     sm.has_path_shares,
+    et.database_id AS entity_database_id,
+    es.database_id AS entity_schema_database_id,
     es.schema_name AS entity_schema,
     et.name AS entity_table
   FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
-  JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
-  LEFT JOIN metaschema_public.table et ON et.id = sm.entity_table_id
-  LEFT JOIN metaschema_public.schema es ON es.id = et.schema_id
+  JOIN metaschema_public.table bt
+    ON bt.id = sm.buckets_table_id
+   AND bt.database_id = sm.database_id
+  JOIN metaschema_public.schema bs
+    ON bs.id = bt.schema_id
+   AND bs.database_id = sm.database_id
+  JOIN metaschema_public.table ft
+    ON ft.id = sm.files_table_id
+   AND ft.database_id = sm.database_id
+  JOIN metaschema_public.schema fs
+    ON fs.id = ft.schema_id
+   AND fs.database_id = sm.database_id
+  LEFT JOIN metaschema_public.table et
+    ON et.id = sm.entity_table_id
+   AND et.database_id = sm.database_id
+  LEFT JOIN metaschema_public.schema es
+    ON es.id = et.schema_id
+   AND es.database_id = sm.database_id
   WHERE sm.database_id = $1
+  ORDER BY sm.scope, sm.id
 `;
 
 interface StorageModuleRow {
   id: string;
+  database_id: string;
   scope: string;
   entity_table_id: string | null;
+  buckets_database_id: string;
   buckets_schema: string;
+  buckets_schema_database_id: string;
   buckets_table: string;
+  files_database_id: string;
   files_schema: string;
+  files_schema_database_id: string;
   files_table: string;
   endpoint: string | null;
   public_url_prefix: string | null;
@@ -134,6 +215,8 @@ interface StorageModuleRow {
   max_bulk_files: number | null;
   max_bulk_total_size: number | null;
   has_path_shares: boolean;
+  entity_database_id: string | null;
+  entity_schema_database_id: string | null;
   entity_schema: string | null;
   entity_table: string | null;
 }
@@ -141,19 +224,82 @@ interface StorageModuleRow {
 /**
  * Build a StorageModuleConfig from a raw DB row.
  */
-function buildConfig(row: StorageModuleRow): StorageModuleConfig {
+function quoteMetadataIdentifier(schema: string, objectName: string, label: string): string {
+  if (
+    typeof schema !== 'string' ||
+    schema.length === 0 ||
+    schema.includes('\0') ||
+    Buffer.byteLength(schema, 'utf8') > 63 ||
+    typeof objectName !== 'string' ||
+    objectName.length === 0 ||
+    objectName.includes('\0') ||
+    Buffer.byteLength(objectName, 'utf8') > 63
+  ) {
+    throw new Error(`STORAGE_MODULE_METADATA_INVALID:${label}`);
+  }
+  return QuoteUtils.quoteQualifiedIdentifier(schema, objectName);
+}
+
+function buildConfig(row: StorageModuleRow, databaseId: string): StorageModuleConfig {
+  const objectDatabaseIds = [
+    row.database_id,
+    row.buckets_database_id,
+    row.buckets_schema_database_id,
+    row.files_database_id,
+    row.files_schema_database_id,
+  ];
+  if (objectDatabaseIds.some((id) => id !== databaseId)) {
+    throw new Error(`STORAGE_MODULE_CROSS_DATABASE_METADATA:${row.id}`);
+  }
+  if (
+    typeof row.id !== 'string' ||
+    row.id.length === 0 ||
+    typeof row.scope !== 'string' ||
+    row.scope.length === 0
+  ) {
+    throw new Error('STORAGE_MODULE_METADATA_INVALID');
+  }
+
+  if (row.entity_table_id === null) {
+    if (
+      row.scope !== 'app' ||
+      row.entity_database_id !== null ||
+      row.entity_schema_database_id !== null ||
+      row.entity_schema !== null ||
+      row.entity_table !== null
+    ) {
+      throw new Error(`STORAGE_MODULE_METADATA_INVALID:${row.id}`);
+    }
+  } else if (
+    row.scope === 'app' ||
+    row.entity_database_id !== databaseId ||
+    row.entity_schema_database_id !== databaseId ||
+    !row.entity_schema ||
+    !row.entity_table
+  ) {
+    throw new Error(`STORAGE_MODULE_CROSS_DATABASE_METADATA:${row.id}`);
+  }
+
   const cacheTtlSeconds = row.cache_ttl_seconds ?? DEFAULT_CACHE_TTL_SECONDS;
   return {
     id: row.id,
-    bucketsQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.buckets_schema, row.buckets_table),
-    filesQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.files_schema, row.files_table),
+    bucketsQualifiedName: quoteMetadataIdentifier(
+      row.buckets_schema,
+      row.buckets_table,
+      `buckets:${row.id}`,
+    ),
+    filesQualifiedName: quoteMetadataIdentifier(
+      row.files_schema,
+      row.files_table,
+      `files:${row.id}`,
+    ),
     schemaName: row.buckets_schema,
     bucketsTableName: row.buckets_table,
     filesTableName: row.files_table,
     scope: row.scope,
     entityTableId: row.entity_table_id,
     entityQualifiedName: row.entity_schema && row.entity_table
-      ? QuoteUtils.quoteQualifiedIdentifier(row.entity_schema, row.entity_table)
+      ? quoteMetadataIdentifier(row.entity_schema, row.entity_table, `entity:${row.id}`)
       : null,
     endpoint: row.endpoint,
     publicUrlPrefix: row.public_url_prefix,
@@ -170,6 +316,28 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
   };
 }
 
+function assertUnambiguousModules(configs: readonly StorageModuleConfig[]): void {
+  const ids = new Set<string>();
+  const scopes = new Set<string>();
+  const buckets = new Set<string>();
+  const files = new Set<string>();
+
+  for (const config of configs) {
+    if (
+      ids.has(config.id) ||
+      scopes.has(config.scope) ||
+      buckets.has(config.bucketsQualifiedName) ||
+      files.has(config.filesQualifiedName)
+    ) {
+      throw new Error('STORAGE_MODULE_METADATA_AMBIGUOUS');
+    }
+    ids.add(config.id);
+    scopes.add(config.scope);
+    buckets.add(config.bucketsQualifiedName);
+    files.add(config.filesQualifiedName);
+  }
+}
+
 /**
  * Resolve the app-level storage module config for a database, using the LRU cache.
  *
@@ -183,11 +351,16 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
 export async function getStorageModuleConfig(
   pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
   databaseId: string,
+  cacheScope: StorageModuleCacheScope,
 ): Promise<StorageModuleConfig | null> {
+  const { storageModuleCache } = cacheScope;
   const cacheKey = `storage:${databaseId}:app`;
-  const cached = storageModuleCache.get(cacheKey);
-  if (cached) {
-    return cached;
+  if (storageModuleCache.has(cacheKey)) {
+    const cached = storageModuleCache.get(cacheKey);
+    if (cached?.kind !== 'config') {
+      throw new Error('STORAGE_CACHE_INTEGRITY_ERROR');
+    }
+    return cached.value;
   }
 
   log.debug(`Cache miss for app-level storage in database ${databaseId}, querying metaschema...`);
@@ -196,11 +369,15 @@ export async function getStorageModuleConfig(
 
   if (result.rows.length === 0) {
     log.warn(`No app-level storage module found for database ${databaseId}`);
+    storageModuleCache.set(cacheKey, { kind: 'config', value: null });
     return null;
   }
+  if (result.rows.length !== 1) {
+    throw new Error('STORAGE_MODULE_METADATA_AMBIGUOUS:app');
+  }
 
-  const config = buildConfig(result.rows[0] as StorageModuleRow);
-  storageModuleCache.set(cacheKey, config);
+  const config = buildConfig(result.rows[0] as StorageModuleRow, databaseId);
+  storageModuleCache.set(cacheKey, { kind: 'config', value: config });
   log.debug(`Cached app-level storage config for database ${databaseId}: ${config.bucketsQualifiedName}`);
 
   return config;
@@ -225,56 +402,34 @@ export async function getStorageModuleConfigForOwner(
   pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
   databaseId: string,
   ownerId: string,
+  cacheScope: StorageModuleCacheScope,
 ): Promise<StorageModuleConfig | null> {
-  // Check if we already have a cached mapping for this ownerId
-  const ownerCacheKey = `storage:${databaseId}:owner:${ownerId}`;
-  const cachedOwner = storageModuleCache.get(ownerCacheKey);
-  if (cachedOwner) {
-    return cachedOwner;
-  }
+  const allConfigs = await loadAllStorageModules(pgClient, databaseId, cacheScope);
 
-  // Load all storage modules for this database
-  const allModulesCacheKey = `storage:${databaseId}:all`;
-  let allConfigs: StorageModuleConfig[];
-  const cachedAll = storageModuleCache.get(allModulesCacheKey);
-  if (cachedAll) {
-    // We stored a sentinel; re-derive from individual caches
-    // Actually, let's just query fresh — this is the cache-miss path
-    allConfigs = [];
-  } else {
-    allConfigs = [];
-  }
-
-  if (allConfigs.length === 0) {
-    log.debug(`Loading all storage modules for database ${databaseId} to resolve ownerId ${ownerId}`);
-    const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
-    allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
-
-    // Cache each individual config by its scope
-    for (const config of allConfigs) {
-      const key = `storage:${databaseId}:scope:${config.scope}`;
-      storageModuleCache.set(key, config);
-    }
-  }
-
-  // Find entity-scoped modules and probe their entity tables for the ownerId
+  // The module list is build-local configuration, but owner visibility is
+  // request/RLS-specific. Always probe it under the current pgClient instead
+  // of caching one principal's authorization decision for another principal.
   const entityModules = allConfigs.filter((c) => c.entityQualifiedName !== null);
 
+  const matches: StorageModuleConfig[] = [];
   for (const mod of entityModules) {
     const probeResult = await pgClient.query({
       text: `SELECT 1 FROM ${mod.entityQualifiedName} WHERE id = $1 LIMIT 1`,
       values: [ownerId],
     });
     if (probeResult.rows.length > 0) {
-      // Found the matching module — cache the ownerId→module mapping
-      storageModuleCache.set(ownerCacheKey, mod);
       log.debug(
         `Resolved ownerId ${ownerId} to storage module ${mod.id} ` +
         `(scope=${mod.scope}, table=${mod.bucketsQualifiedName})`,
       );
-      return mod;
+      matches.push(mod);
     }
   }
+
+  if (matches.length > 1) {
+    throw new Error('STORAGE_MODULE_AMBIGUOUS:owner');
+  }
+  if (matches.length === 1) return matches[0];
 
   log.warn(`No entity-scoped storage module found for ownerId ${ownerId} in database ${databaseId}`);
   return null;
@@ -299,10 +454,15 @@ export async function resolveStorageModuleByFileId(
   log.debug(`Resolving file ${fileId} across all storage modules for database ${databaseId}`);
 
   const allConfigs = (await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] })).rows.map(
-    (row: unknown) => buildConfig(row as StorageModuleRow),
+    (row: unknown) => buildConfig(row as StorageModuleRow, databaseId),
   );
+  assertUnambiguousModules(allConfigs);
 
   // Probe each module's files table for the fileId
+  const matches: Array<{
+    storageConfig: StorageModuleConfig;
+    file: { id: string; key: string; mime_type: string; bucket_id: string };
+  }> = [];
   for (const config of allConfigs) {
     const fileResult = await pgClient.query({
       text: `SELECT id, key, mime_type, bucket_id
@@ -313,9 +473,14 @@ export async function resolveStorageModuleByFileId(
     });
     if (fileResult.rows.length > 0) {
       const file = fileResult.rows[0] as { id: string; key: string; mime_type: string; bucket_id: string };
-      return { storageConfig: config, file };
+      matches.push({ storageConfig: config, file });
     }
   }
+
+  if (matches.length > 1) {
+    throw new Error('STORAGE_MODULE_AMBIGUOUS:file');
+  }
+  if (matches.length === 1) return matches[0];
 
   return null;
 }
@@ -329,28 +494,27 @@ export async function resolveStorageModuleByFileId(
 export async function loadAllStorageModules(
   pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
   databaseId: string,
+  cacheScope: StorageModuleCacheScope,
 ): Promise<StorageModuleConfig[]> {
+  const { storageModuleCache } = cacheScope;
   const cacheKey = `storage:${databaseId}:all-list`;
-  const cached = storageModuleCache.get(cacheKey);
-  if (cached) {
-    return (cached as any)._allConfigs as StorageModuleConfig[];
+  if (storageModuleCache.has(cacheKey)) {
+    const cached = storageModuleCache.get(cacheKey);
+    if (cached?.kind !== 'list') {
+      throw new Error('STORAGE_CACHE_INTEGRITY_ERROR');
+    }
+    return cached.value;
   }
 
   log.debug(`Loading all storage modules for database ${databaseId}`);
   const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
-  const configs = (result.rows as StorageModuleRow[]).map(buildConfig);
-
-  // Cache each individual config by its scope
-  for (const config of configs) {
-    const key = `storage:${databaseId}:scope:${config.scope}`;
-    storageModuleCache.set(key, config);
-  }
-
-  // Store the full list under a sentinel key (only if non-empty to avoid caching failed lookups)
-  if (configs.length > 0) {
-    const sentinel = { ...configs[0], _allConfigs: configs } as any;
-    storageModuleCache.set(cacheKey, sentinel);
-  }
+  const configs = (result.rows as StorageModuleRow[]).map((row) =>
+    buildConfig(row, databaseId),
+  );
+  assertUnambiguousModules(configs);
+  // Empty results are intentional negative cache entries. Query failures are
+  // never cached, so a transient control-plane error cannot become a miss.
+  storageModuleCache.set(cacheKey, { kind: 'list', value: configs });
 
   return configs;
 }
@@ -367,17 +531,21 @@ export async function loadAllStorageModules(
  */
 export function resolveStorageConfigFromCodec(
   pgCodec: { name: string; extensions?: { pg?: { schemaName?: string; name?: string } }; sqlType?: string },
-  allConfigs: StorageModuleConfig[],
+  allConfigs: readonly StorageModuleConfig[],
 ): StorageModuleConfig | null {
   const schemaName = pgCodec.extensions?.pg?.schemaName;
   const tableName = pgCodec.extensions?.pg?.name ?? pgCodec.name;
 
   if (!schemaName || !tableName) return null;
 
-  return allConfigs.find((c) =>
+  const matches = allConfigs.filter((c) =>
     (c.filesTableName === tableName && c.schemaName === schemaName) ||
     (c.bucketsTableName === tableName && c.schemaName === schemaName),
-  ) || null;
+  );
+  if (matches.length > 1) {
+    throw new Error('STORAGE_MODULE_AMBIGUOUS:codec');
+  }
+  return matches[0] ?? null;
 }
 
 // --- Bucket metadata cache ---
@@ -386,21 +554,13 @@ export function resolveStorageConfigFromCodec(
  * LRU cache for per-database bucket metadata.
  *
  * Buckets are essentially static config — created once and rarely changed.
- * Caching avoids a DB query on every requestUploadUrl call. The bucket
- * lookup in the plugin runs under RLS, but since AuthzEntityMembership
- * grants all org members access to all org buckets, and the cached data
- * is just config (mime types, size limits), bypassing RLS on cache hits
- * is safe. The important RLS is on the files table (INSERT/UPDATE),
- * which is never cached.
+ * Cache hits still execute an exact ID lookup through the request's RLS
+ * context. The cached metadata is returned only when that authorized ID
+ * matches, so cached data never substitutes for row authorization.
  *
- * Keys: `bucket:${databaseId}:${storageModuleId}:${bucketKey}`
- * TTL: same as storage module cache (5min dev / 1hr prod)
+ * Keys are local to the exact build scope; database/module identifiers never
+ * select cache entries belonging to another physical Graphile build.
  */
-const bucketCache = new LRUCache<string, BucketConfig>({
-  max: 500, // many buckets across many databases
-  ttl: process.env.NODE_ENV === 'development' ? FIVE_MINUTES_MS : ONE_HOUR_MS,
-  updateAgeOnGet: true,
-});
 
 /**
  * Normalize the recorded physical coordinate at the DB boundary.
@@ -432,35 +592,70 @@ export async function getBucketConfig(
   storageConfig: StorageModuleConfig,
   databaseId: string,
   bucketKey: string,
-  ownerId?: string,
+  ownerId: string | undefined,
+  cacheScope: StorageModuleCacheScope,
 ): Promise<BucketConfig | null> {
+  const { bucketCache } = cacheScope;
   const cacheKey = `bucket:${databaseId}:${storageConfig.id}:${bucketKey}${ownerId ? `:${ownerId}` : ''}`;
-  const cached = bucketCache.get(cacheKey);
-  if (cached) {
-    return cached;
+  // Entity-scoped buckets use (owner_id, key) composite lookup;
+  // app-level buckets just use key.
+  const isEntityScoped = storageConfig.scope !== 'app';
+  if (isEntityScoped && !ownerId) {
+    throw new Error('STORAGE_OWNER_REQUIRED');
+  }
+  const hasOwner = Boolean(ownerId && isEntityScoped);
+  const whereSql = hasOwner
+    ? 'key = $1 AND owner_id = $2'
+    : 'key = $1';
+  const values = hasOwner ? [bucketKey, ownerId] : [bucketKey];
+
+  if (bucketCache.has(cacheKey)) {
+    // This query runs with the current request's pgSettings/RLS context. Do
+    // not return even immutable cached metadata without reauthorizing it.
+    const authorized = await pgClient.query({
+      text: `SELECT id
+         FROM ${storageConfig.bucketsQualifiedName}
+         WHERE ${whereSql}
+         LIMIT 2`,
+      values,
+    });
+    const authorizedId = (authorized.rows[0] as { id?: string } | undefined)?.id;
+    if (authorized.rows.length > 1) {
+      throw new Error('STORAGE_BUCKET_AMBIGUOUS');
+    }
+    if (!authorizedId) {
+      return null;
+    }
+
+    const cached = bucketCache.get(cacheKey);
+    if (cached?.id === authorizedId) {
+      return cached;
+    }
+    // A formerly missing bucket may now exist, or a bucket may have been
+    // replaced under the same key. Reload its immutable metadata below.
   }
 
   log.debug(`Bucket cache miss for ${databaseId}:${bucketKey}${ownerId ? ` (owner=${ownerId})` : ''}, querying DB...`);
 
-  // Entity-scoped buckets use (owner_id, key) composite lookup;
-  // app-level buckets just use key.
-  const isEntityScoped = storageConfig.scope !== 'app';
-  const hasOwner = ownerId && isEntityScoped;
   const result = await pgClient.query({
     text: hasOwner
       ? `SELECT id, key, type, is_public, owner_id, allowed_mime_types, max_file_size, allow_custom_keys, physical_name
          FROM ${storageConfig.bucketsQualifiedName}
-         WHERE key = $1 AND owner_id = $2
-         LIMIT 1`
+         WHERE ${whereSql}
+         LIMIT 2`
       : `SELECT id, key, type, is_public, ${isEntityScoped ? 'owner_id,' : ''} allowed_mime_types, max_file_size, allow_custom_keys, physical_name
          FROM ${storageConfig.bucketsQualifiedName}
-         WHERE key = $1
-         LIMIT 1`,
-    values: hasOwner ? [bucketKey, ownerId] : [bucketKey],
+         WHERE ${whereSql}
+         LIMIT 2`,
+    values,
   });
 
   if (result.rows.length === 0) {
+    bucketCache.set(cacheKey, null);
     return null;
+  }
+  if (result.rows.length > 1) {
+    throw new Error('STORAGE_BUCKET_AMBIGUOUS');
   }
 
   const row = result.rows[0] as {
@@ -508,20 +703,24 @@ export async function getBucketConfig(
  * The set resets on server restart, which is fine because the
  * provisioner's createBucket is idempotent (handles "already exists").
  */
-const provisionedBuckets = new Set<string>();
-
 /**
  * Check whether an S3 bucket has already been provisioned (cached).
  */
-export function isS3BucketProvisioned(s3BucketName: string): boolean {
-  return provisionedBuckets.has(s3BucketName);
+export function isS3BucketProvisioned(
+  s3BucketName: string,
+  cacheScope: StorageModuleCacheScope,
+): boolean {
+  return cacheScope.provisionedBuckets.has(s3BucketName);
 }
 
 /**
  * Mark an S3 bucket as provisioned in the in-memory cache.
  */
-export function markS3BucketProvisioned(s3BucketName: string): void {
-  provisionedBuckets.add(s3BucketName);
+export function markS3BucketProvisioned(
+  s3BucketName: string,
+  cacheScope: StorageModuleCacheScope,
+): void {
+  cacheScope.provisionedBuckets.add(s3BucketName);
   log.debug(`Marked S3 bucket "${s3BucketName}" as provisioned`);
 }
 
@@ -529,17 +728,19 @@ export function markS3BucketProvisioned(s3BucketName: string): void {
  * Clear the storage module cache AND bucket cache.
  * Useful for testing or schema changes.
  */
-export function clearStorageModuleCache(): void {
-  storageModuleCache.clear();
-  bucketCache.clear();
-  provisionedBuckets.clear();
+export function clearStorageModuleCache(cacheScope: StorageModuleCacheScope): void {
+  cacheScope.clear();
 }
 
 /**
  * Clear cached bucket entries for a specific database.
  * Useful when bucket config changes are detected.
  */
-export function clearBucketCache(databaseId?: string): void {
+export function clearBucketCache(
+  databaseId: string | undefined,
+  cacheScope: StorageModuleCacheScope,
+): void {
+  const { bucketCache } = cacheScope;
   if (!databaseId) {
     bucketCache.clear();
     return;

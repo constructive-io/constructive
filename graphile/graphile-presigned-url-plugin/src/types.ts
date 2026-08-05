@@ -149,24 +149,25 @@ export interface S3Config {
 
 /**
  * S3 configuration or a lazy getter that returns it on first use.
- * When a function is provided, it will only be called when the first
- * mutation or resolver actually needs the S3 client — avoiding eager
- * env-var reads and S3Client creation at module import time.
+ * When a function is provided, it is called lazily once per exact Graphile
+ * build — avoiding eager env-var reads while keeping credentials isolated
+ * when a shared preset is used for multiple physical pools.
  */
 export type S3ConfigOrGetter = S3Config | (() => S3Config);
 
 /**
- * Function to derive the actual S3 bucket name for a given database and bucket key.
+ * Function to derive the actual S3 bucket name for a logical bucket on its
+ * first provision. The returned name is persisted as physical_name and is not
+ * recomputed for later operations.
  *
- * When provided, the presigned URL plugin calls this on every request
- * to determine which S3 bucket to use — enabling per-(database, bucketKey)
- * isolation. If not provided, falls back to `s3Config.bucket` (global).
+ * When provided, the presigned URL plugin calls this only when physical_name
+ * is absent. If not provided, first provision uses `s3Config.bucket`.
  *
- * @param databaseId - The metaschema database UUID
  * @param bucketKey - The logical bucket key (e.g., "public", "private")
+ * @param databaseId - The metaschema database UUID
  * @returns The S3 bucket name for this database + bucket key
  */
-export type BucketNameResolver = (databaseId: string, bucketKey: string) => string;
+export type BucketNameResolver = (bucketKey: string, databaseId: string) => string;
 
 /**
  * Callback to lazily provision an S3 bucket on first use.
@@ -195,6 +196,16 @@ export type EnsureBucketProvisioned = (
 export interface PresignedUrlPluginOptions {
   /** S3 configuration (concrete or lazy getter) */
   s3: S3ConfigOrGetter;
+
+  /**
+   * Storage-module configuration resolved by the control plane for this exact
+   * Graphile build. Supplying this option, including an empty array, disables
+   * runtime metaschema SQL; the plugin treats an immutable snapshot of this
+   * list as authoritative for the build.
+   *
+   * Omit only for generic integrations that need the legacy database lookup.
+   */
+  preloadedStorageModules?: readonly StorageModuleConfig[];
 
   /**
    * Optional function to resolve S3 bucket name per-database.

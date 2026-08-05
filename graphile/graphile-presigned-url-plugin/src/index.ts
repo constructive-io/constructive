@@ -28,10 +28,25 @@
  */
 
 export { createDownloadUrlPlugin } from './download-url-field';
-export { createPresignedUrlPlugin,PresignedUrlPlugin } from './plugin';
+export { createPresignedUrlPlugin, PresignedUrlPlugin } from './plugin';
 export { PresignedUrlPreset } from './preset';
+export { snapshotPreloadedStorageModules } from './storage-module-source';
 export { deleteS3Object, generatePresignedGetUrl, generatePresignedPutUrl, headObject } from './s3-signer';
-export { clearBucketCache, clearStorageModuleCache, getBucketConfig, getStorageModuleConfig, getStorageModuleConfigForOwner, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
+export {
+  getStorageModuleConfig,
+  getStorageModuleConfigForOwner,
+  getBucketConfig,
+  resolveStorageModuleByFileId,
+  loadAllStorageModules,
+  resolveStorageConfigFromCodec,
+  clearStorageModuleCache,
+  clearBucketCache,
+  isS3BucketProvisioned,
+  markS3BucketProvisioned,
+  StorageModuleCacheScope,
+  getStorageModuleCacheScope,
+  storedPhysicalName,
+} from './storage-module-cache';
 export type {
   BucketConfig,
   BucketNameResolver,

@@ -26,7 +26,7 @@
  * **Graceful behavior:**
  * - billing_module not provisioned → embedder passes through unmetered
  * - entity_id not available → embedder passes through unmetered
- * - check_billing_quota throws → call is allowed (billing is opt-in)
+ * - check_billing_quota fails after billing is configured → call is denied
  * - record_usage throws → call succeeds, recording silently skipped
  * - quota exceeded → embedder returns null
  */
@@ -63,7 +63,8 @@ function defaultResolveEntityId(pgSettings: Record<string, string>): string | nu
 
 async function buildMeteringContext(
   graphqlContext: any,
-  resolveEntityId: (pgSettings: Record<string, string>) => string | null
+  resolveEntityId: (pgSettings: Record<string, string>) => string | null,
+  cacheScope: object
 ): Promise<MeteringContext | null> {
   const pgSettings: Record<string, string> = graphqlContext?.pgSettings ?? {};
   const entityId = resolveEntityId(pgSettings);
@@ -73,19 +74,15 @@ async function buildMeteringContext(
   if (!entityId || !databaseId) return null;
 
   const withPgClient: WithPgClient | undefined = graphqlContext?.withPgClient;
-  if (!withPgClient) return null;
+  if (!withPgClient) throw new Error('LLM_METERING_PG_CONTEXT_UNAVAILABLE');
 
   let billingConfig = null;
   let inferenceLogConfig = null;
-  try {
-    await withPgClient(pgSettings, async (pgClient: PgClient) => {
-      const entry = await getLlmBillingConfig(pgClient, databaseId);
-      billingConfig = entry.billing;
-      inferenceLogConfig = entry.inferenceLog;
-    });
-  } catch {
-    return null;
-  }
+  await withPgClient(pgSettings, async (pgClient: PgClient) => {
+    const entry = await getLlmBillingConfig(pgClient, databaseId, cacheScope);
+    billingConfig = entry.billing;
+    inferenceLogConfig = entry.inferenceLog;
+  });
 
   if (!billingConfig) return null;
 
@@ -210,12 +207,17 @@ export function createLlmMeteringPlugin(
 
           const defaultResolver = (obj: any) => obj[(context as any).scope.fieldName];
           const { resolve: oldResolve = defaultResolver, ...rest } = field;
+          const exactBuildCacheScope = build as object;
 
           return {
             ...rest,
             async resolve(source: any, args: any, graphqlContext: any, info: any) {
               // Build the metering context for this request
-              const ctx = await buildMeteringContext(graphqlContext, resolveEntityId);
+              const ctx = await buildMeteringContext(
+                graphqlContext,
+                resolveEntityId,
+                exactBuildCacheScope
+              );
 
               // Run the original resolver within the AsyncLocalStorage scope
               // so any embedder calls made by downstream plugins pick up the ctx

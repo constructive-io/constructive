@@ -63,7 +63,7 @@ export function createTsvectorAdapter(
       return text;
     },
 
-    detectColumns(codec: any, _build: any): SearchableColumn[] {
+    detectColumns(codec: any, build: any): SearchableColumn[] {
       if (!codec?.attributes) return [];
 
       const columns: SearchableColumn[] = [];
@@ -72,7 +72,7 @@ export function createTsvectorAdapter(
       )) {
         if (isTsvectorCodec(attribute.codec)) {
           // Store chunks info if available and chunks have fulltext search
-          const chunksInfo = getChunksInfo(codec);
+          const chunksInfo = getChunksInfo(codec, build);
           const hasChunkFulltext = chunksInfo?.searchField &&
             chunksInfo.searchIndexes.includes('fulltext');
           columns.push({

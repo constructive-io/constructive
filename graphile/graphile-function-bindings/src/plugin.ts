@@ -1,12 +1,12 @@
 /**
  * PostGraphile v5 Function Bindings Plugin
  *
- * Exposes API-bound compute functions as GraphQL mutations. At gather time
- * the plugin queries the bindings table joined to the definitions table
- * (schema/table names resolved from the constructive metaschema via the
- * express-context compute module loader — never guessed or hard-coded)
- * for the configured api_id and emits one mutation per graphql-enabled
- * binding:
+ * Exposes API-bound compute functions as GraphQL mutations. A Constructive
+ * server can preload an authoritative control-plane snapshot, avoiding tenant
+ * runtime-pool metadata queries during gather. Generic callers may omit that
+ * snapshot and retain the bindings/definitions table query (schema/table names
+ * resolved from the constructive metaschema — never guessed or hard-coded).
+ * The plugin emits one mutation per graphql-enabled binding:
  *
  *   <alias>(input: <Alias>Input!): <Alias>Payload
  *
@@ -40,7 +40,12 @@ import { toCamelCase, toConstantCase, toPascalCase } from 'inflekt';
 
 import type { DerivedField, DerivedInput } from './derive';
 import { buildInvocationPayload, deriveInputFields, isGraphqlEnabled } from './derive';
-import type { ComputeModuleNames, FunctionBindingRow, FunctionBindingsPluginOptions } from './types';
+import type {
+  ComputeModuleNames,
+  FunctionBindingRow,
+  FunctionBindingsPluginOptions,
+  PreloadedFunctionBinding
+} from './types';
 
 const log = new Logger('graphile-function-bindings');
 
@@ -56,21 +61,63 @@ declare global {
   }
 }
 
-/** A binding together with the module (scope) it was loaded from. */
-interface LoadedBinding extends FunctionBindingRow {
-  module: ComputeModuleNames;
+interface FunctionBindingsBuildInput {
+  bindings: readonly PreloadedFunctionBinding[];
 }
 
-interface FunctionBindingsBuildInput {
-  bindings: LoadedBinding[];
+interface FunctionBindingsPluginOptionsSnapshot {
+  apiId: string;
+  modules: readonly ComputeModuleNames[];
+  preloadedBindings: readonly PreloadedFunctionBinding[] | undefined;
+}
+
+function deepFreeze<T>(value: T): T {
+  if (value === null || typeof value !== 'object' || Object.isFrozen(value)) {
+    return value;
+  }
+  Object.freeze(value);
+  for (const child of Object.values(value as Record<string, unknown>)) {
+    deepFreeze(child);
+  }
+  return value;
+}
+
+function snapshotBinding(binding: PreloadedFunctionBinding): PreloadedFunctionBinding {
+  return deepFreeze({
+    bindingId: binding.bindingId,
+    alias: binding.alias,
+    config: binding.config === null ? null : structuredClone(binding.config),
+    functionDefinitionId: binding.functionDefinitionId,
+    taskIdentifier: binding.taskIdentifier,
+    description: binding.description,
+    payloadArgs: binding.payloadArgs === null
+      ? null
+      : binding.payloadArgs.map((argument) => ({ ...argument })),
+    module: { ...binding.module }
+  });
+}
+
+function snapshotOptions(
+  options: FunctionBindingsPluginOptions
+): FunctionBindingsPluginOptionsSnapshot {
+  const preloadedBindings = options.preloadedBindings === undefined
+    ? undefined
+    : options.preloadedBindings
+      .map(snapshotBinding)
+      .filter((binding) => isGraphqlEnabled(binding.config));
+  return deepFreeze({
+    apiId: options.apiId,
+    modules: options.modules.map((module) => ({ ...module })),
+    preloadedBindings
+  });
 }
 
 async function loadBindings(
   pgService: GraphileConfig.PgServiceConfiguration,
-  options: FunctionBindingsPluginOptions
+  options: FunctionBindingsPluginOptionsSnapshot
 ): Promise<FunctionBindingsBuildInput> {
   return withPgClientFromPgService(pgService, null, async (client) => {
-    const bindings: LoadedBinding[] = [];
+    const bindings: PreloadedFunctionBinding[] = [];
     for (const module of options.modules) {
       const { computeSchema, bindingsTable, definitionsTable } = module;
       const { text, values } = new QueryBuilder()
@@ -124,6 +171,7 @@ async function loadBindings(
 export function createFunctionBindingsPlugin(
   options: FunctionBindingsPluginOptions
 ): GraphileConfig.Plugin {
+  const optionsSnapshot = snapshotOptions(options);
   return {
     name: 'FunctionBindingsPlugin',
     version: '0.1.0',
@@ -136,20 +184,25 @@ export function createFunctionBindingsPlugin(
       namespace: 'functionBindings',
       helpers: {},
       async main(output, info) {
-        const pgService = info.resolvedPreset.pgServices?.[0];
-        if (!pgService) {
-          throw new Error('FunctionBindingsPlugin: no pgService configured');
-        }
-        if (!options.apiId) {
+        if (!optionsSnapshot.apiId) {
           throw new Error('FunctionBindingsPlugin: apiId is required');
         }
-        if (!options.modules?.length) {
-          throw new Error('FunctionBindingsPlugin: at least one compute module is required');
+        let result: FunctionBindingsBuildInput;
+        if (optionsSnapshot.preloadedBindings !== undefined) {
+          result = { bindings: optionsSnapshot.preloadedBindings };
+        } else {
+          const pgService = info.resolvedPreset.pgServices?.[0];
+          if (!pgService) {
+            throw new Error('FunctionBindingsPlugin: no pgService configured');
+          }
+          if (optionsSnapshot.modules.length === 0) {
+            throw new Error('FunctionBindingsPlugin: at least one compute module is required');
+          }
+          result = await loadBindings(pgService, optionsSnapshot);
         }
-        const result = await loadBindings(pgService, options);
         (output as Record<string, unknown>).functionApiBindings = result;
         log.debug(
-          `Loaded ${result.bindings.length} graphql-enabled function binding(s) for api ${options.apiId}`
+          `Loaded ${result.bindings.length} graphql-enabled function binding(s) for api ${optionsSnapshot.apiId}`
         );
       }
     },

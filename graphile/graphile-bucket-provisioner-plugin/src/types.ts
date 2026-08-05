@@ -37,6 +37,25 @@ export type ConnectionConfigOrGetter =
 export type BucketNameResolver = (bucketKey: string, databaseId: string) => string;
 
 /**
+ * Immutable storage routing metadata resolved by the control plane for one
+ * exact Graphile build. This intentionally mirrors the subset consumed by the
+ * provisioner without making the provisioner depend on the presigned plugin.
+ */
+export interface BucketProvisionerStorageModule {
+  id: string;
+  bucketsQualifiedName: string;
+  schemaName: string;
+  bucketsTableName: string;
+  scope: string;
+  entityTableId: string | null;
+  entityQualifiedName: string | null;
+  endpoint: string | null;
+  publicUrlPrefix: string | null;
+  provider: string | null;
+  allowedOrigins: readonly string[] | null;
+}
+
+/**
  * Plugin options for the bucket provisioner plugin.
  */
 export interface BucketProvisionerPluginOptions {
@@ -52,6 +71,14 @@ export interface BucketProvisionerPluginOptions {
    * Required for browser-based presigned URL uploads.
    */
   allowedOrigins: string[];
+
+  /**
+   * Exact-build storage metadata supplied by the control plane. An empty list
+   * is authoritative. If this is omitted, provisioning fails closed; the
+   * plugin never discovers tenant routing metadata from a request-time SQL
+   * query.
+   */
+  preloadedStorageModules?: readonly BucketProvisionerStorageModule[];
 
   /**
    * Optional prefix for S3 bucket names.

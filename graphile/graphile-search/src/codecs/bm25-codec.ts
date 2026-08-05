@@ -2,25 +2,37 @@
  * Bm25CodecPlugin
  *
  * Teaches PostGraphile v5 how to handle the pg_textsearch `bm25query` type
- * and discovers all BM25 indexes in the database.
+ * and discovers BM25 indexes from Graphile's scoped introspection payload.
  *
  * This plugin:
  * 1. Creates a codec for bm25query via gather.hooks.pgCodecs_findPgCodec
- * 2. Discovers all BM25 indexes via gather.hooks.pgIntrospection_introspection
- *    by querying pg_index + pg_am + pg_class + pg_attribute
- * 3. Stores discovered BM25 index info in a module-level Map for use by
- *    the BM25 adapter during the schema build phase
+ * 2. Discovers requested-schema BM25 indexes without issuing side-channel SQL
+ * 3. Attaches index metadata to the exact codec attribute for this build
  */
 
 import 'graphile-build-pg';
 
 import type { GraphileConfig } from 'graphile-config';
+import { gatherConfig } from 'graphile-build';
 import sql from 'pg-sql2';
+
+type Introspection = Parameters<
+  GraphileConfig.GatherHooks['pgIntrospection_introspection']
+>[0]['introspection'];
+
+interface ScopedPgService {
+  name?: string;
+  schemas?: readonly string[];
+}
 
 /**
  * Represents a discovered BM25 index in the database.
  */
 export interface Bm25IndexInfo {
+  /** Graphile PostgreSQL service that owns this index. */
+  serviceName: string;
+  /** Schema containing pg_textsearch's functions and operators. */
+  extensionSchema: string;
   /** Schema name (e.g. 'public') */
   schemaName: string;
   /** Table name (e.g. 'documents') */
@@ -31,46 +43,105 @@ export interface Bm25IndexInfo {
   indexName: string;
 }
 
-/**
- * Module-level store for discovered BM25 indexes.
- * Populated during the gather phase, read during the schema build phase.
- *
- * Key: "schemaName.tableName.columnName"
- * Value: Bm25IndexInfo
- */
-export const bm25IndexStore = new Map<string, Bm25IndexInfo>();
+declare global {
+  namespace GraphileConfig {
+    interface GatherHelpers {
+      bm25Codec: Record<string, never>;
+    }
+  }
 
-/**
- * Whether pg_textsearch extension was detected in the database.
- */
-export let bm25ExtensionDetected = false;
+  namespace DataplanPg {
+    interface PgCodecAttributeExtensions {
+      /** Exact physical BM25 index bound during this gather generation. */
+      bm25Index?: Bm25IndexInfo;
+    }
+  }
+}
 
-/**
- * The SQL query that discovers BM25 indexes in the database.
- * Joins pg_index -> pg_class -> pg_am to find all indexes using the 'bm25'
- * access method, then resolves the schema, table, column, and index names.
- */
-const BM25_DISCOVERY_SQL = `
-  SELECT
-    n.nspname  AS schema_name,
-    c.relname  AS table_name,
-    a.attname  AS column_name,
-    i.relname  AS index_name
-  FROM pg_index ix
-  JOIN pg_class i ON i.oid = ix.indexrelid
-  JOIN pg_am am ON am.oid = i.relam
-  JOIN pg_class c ON c.oid = ix.indrelid
-  JOIN pg_namespace n ON n.oid = c.relnamespace
-  JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = ANY(ix.indkey)
-  WHERE am.amname = 'bm25'
-`;
+const attributeKey = (classId: string, attributeNumber: number): string =>
+  `${classId}:${attributeNumber}`;
+
+/** Collect exact requested-schema indexes from this build's own introspection. */
+export const collectBm25Indexes = (
+  introspection: Introspection,
+  schemas: readonly string[],
+  serviceName: string
+): Map<string, Bm25IndexInfo> => {
+  const allowedSchemas = new Set(schemas);
+  const discovered = new Map<string, Bm25IndexInfo>();
+  const extension = introspection.extensions.find(
+    (candidate) => candidate.extname === 'pg_textsearch'
+  );
+  const extensionNamespace = extension?.extnamespace
+    ? introspection.getNamespace({ id: extension.extnamespace })
+    : undefined;
+  const indexes = [...introspection.indexes].sort((left, right) => {
+    const leftName = left.getIndexClass()?.relname ?? '';
+    const rightName = right.getIndexClass()?.relname ?? '';
+    return leftName.localeCompare(rightName);
+  });
+
+  for (const index of indexes) {
+    if (index.indisvalid !== true || index.indisready !== true || index.indislive !== true) {
+      continue;
+    }
+    const indexClass = index.getIndexClass();
+    const tableClass = index.getClass();
+    const namespace = tableClass
+      ? introspection.getNamespace({ id: tableClass.relnamespace })
+      : undefined;
+    if (
+      !indexClass
+      || indexClass.getAccessMethod()?.amname !== 'bm25'
+      || !tableClass
+      || !namespace
+      || !allowedSchemas.has(namespace.nspname)
+    ) {
+      continue;
+    }
+
+    const keyCount = index.indnkeyatts ?? index.indkey.length;
+    for (const attribute of index.getKeys().slice(0, keyCount)) {
+      if (!attribute) continue;
+      const key = attributeKey(tableClass._id, attribute.attnum);
+      if (!extensionNamespace) {
+        throw new Error(
+          `BM25 index ${namespace.nspname}.${indexClass.relname} has no `
+          + 'introspected pg_textsearch extension schema'
+        );
+      }
+      const indexInfo: Bm25IndexInfo = {
+        serviceName,
+        extensionSchema: extensionNamespace.nspname,
+        schemaName: namespace.nspname,
+        tableName: tableClass.relname,
+        columnName: attribute.attname,
+        indexName: indexClass.relname
+      };
+      const existing = discovered.get(key);
+      if (existing && existing.indexName !== indexInfo.indexName) {
+        throw new Error(
+          `Multiple BM25 indexes target ${indexInfo.schemaName}.${indexInfo.tableName}.` +
+          `${indexInfo.columnName}: ${existing.indexName}, ${indexInfo.indexName}`
+        );
+      }
+      discovered.set(key, indexInfo);
+    }
+  }
+  return discovered;
+};
 
 export const Bm25CodecPlugin: GraphileConfig.Plugin = {
   name: 'Bm25CodecPlugin',
   version: '1.0.0',
   description: 'Registers a codec for the pg_textsearch bm25query type and discovers BM25 indexes',
 
-  gather: {
+  gather: gatherConfig({
+    namespace: 'bm25Codec',
+    initialState: () => ({
+      indexesByService: new Map<string, Map<string, Bm25IndexInfo>>()
+    }),
+    helpers: {},
     hooks: {
       /**
        * Register the bm25query codec when detected during type introspection.
@@ -112,65 +183,34 @@ export const Bm25CodecPlugin: GraphileConfig.Plugin = {
         };
       },
 
-      /**
-       * After introspection completes, query for all BM25 indexes.
-       * Uses the pgService's adaptorSettings to create a direct pg.Pool
-       * connection and runs the BM25 discovery query.
-       */
-      async pgIntrospection_introspection(info, event) {
-        const { serviceName } = event;
-
-        // Get the pgService from the resolved preset
-        const pgService = info.resolvedPreset?.pgServices?.find(
-          (s: { name?: string }) => (s.name ?? 'main') === serviceName
+      pgIntrospection_introspection(info, event) {
+        const { introspection, serviceName } = event;
+        const pgServices = info.resolvedPreset.pgServices as
+          | readonly ScopedPgService[]
+          | undefined;
+        const pgService = pgServices?.find(
+          (service) => (service.name ?? 'main') === serviceName
         );
-        if (!pgService) return;
-
-        // Clear previous entries for this introspection run
-        bm25IndexStore.clear();
-
-        try {
-          const adaptorSettings = (pgService as any).adaptorSettings;
-          if (!adaptorSettings?.connectionString && !adaptorSettings?.pool) {
-            return;
-          }
-
-          // Import pg dynamically for the discovery query
-          const { Pool } = await import('pg');
-          const existingPool = adaptorSettings.pool;
-          const pool = existingPool ?? new Pool({
-            connectionString: adaptorSettings.connectionString,
-            max: 1,
-          });
-          const isOwnPool = !existingPool;
-
-          try {
-            const result = await pool.query(BM25_DISCOVERY_SQL);
-
-            if (result.rows && result.rows.length > 0) {
-              bm25ExtensionDetected = true;
-              for (const row of result.rows) {
-                const key = `${row.schema_name}.${row.table_name}.${row.column_name}`;
-                bm25IndexStore.set(key, {
-                  schemaName: row.schema_name,
-                  tableName: row.table_name,
-                  columnName: row.column_name,
-                  indexName: row.index_name,
-                });
-              }
-            }
-          } finally {
-            if (isOwnPool) {
-              await pool.end();
-            }
-          }
-        } catch {
-          // pg_textsearch not installed or query failed — gracefully skip
-          bm25ExtensionDetected = false;
+        if (!pgService) throw new Error(`BM25 gather could not find service '${serviceName}'`);
+        if (!pgService.schemas?.length) {
+          throw new Error(`BM25 gather requires configured schemas for service '${serviceName}'`);
         }
+        info.state.indexesByService.set(
+          serviceName,
+          collectBm25Indexes(introspection, pgService.schemas, serviceName)
+        );
+      },
+
+      pgCodecs_attribute(info, event) {
+        const indexInfo = info.state.indexesByService
+          .get(event.serviceName)
+          ?.get(attributeKey(event.pgClass._id, event.pgAttribute.attnum));
+        if (!indexInfo) return;
+        event.attribute.extensions ??= Object.create(null);
+        event.attribute.extensions.bm25Index = indexInfo;
       },
     },
-  },
+  }),
 
   schema: {
     hooks: {

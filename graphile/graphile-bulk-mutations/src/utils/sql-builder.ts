@@ -12,7 +12,11 @@
  * See: https://github.com/pyramation/graphile-column-privileges-mutations
  */
 
+import { QuoteUtils } from '@pgsql/quotes';
+
 import { PG_MAX_PARAMS } from '../types';
+
+const qi = (name: string): string => QuoteUtils.quoteIdentifier(name);
 
 export interface ColumnSpec {
   name: string;
@@ -45,12 +49,12 @@ export function buildBulkInsertSQL(
     updateColumns?: string[];
   }
 ): InsertBatch[] {
-  const colNames = columns.map((c) => `"${c.name}"`);
+  const colNames = columns.map((c) => qi(c.name));
   const colsPerRow = columns.length;
   const maxRowsPerBatch = Math.floor(PG_MAX_PARAMS / colsPerRow);
 
   const returningClause = returningColumns.length > 0
-    ? returningColumns.map((c) => `"${c}"`).join(', ')
+    ? returningColumns.map(qi).join(', ')
     : '*';
 
   const batches: InsertBatch[] = [];
@@ -79,7 +83,7 @@ export function buildBulkInsertSQL(
 
     if (onConflict) {
       if (onConflict.conflictColumns && onConflict.conflictColumns.length > 0) {
-        const colList = onConflict.conflictColumns.map((c) => `"${c}"`).join(', ');
+        const colList = onConflict.conflictColumns.map(qi).join(', ');
         text += `\nON CONFLICT (${colList})`;
       } else {
         text += '\nON CONFLICT';
@@ -93,7 +97,7 @@ export function buildBulkInsertSQL(
             ? onConflict.updateColumns
             : columns.map((c) => c.name);
         const setClause = setCols
-          .map((c) => `"${c}" = EXCLUDED."${c}"`)
+          .map((c) => `${qi(c)} = EXCLUDED.${qi(c)}`)
           .join(', ');
         text += ` DO UPDATE SET ${setClause}`;
       }
@@ -130,7 +134,7 @@ export function buildBulkUpdateSQL(
     if (value === undefined) continue;
 
     values.push(value);
-    setClauses.push(`"${col.name}" = $${values.length}::${col.sqlType}`);
+    setClauses.push(`${qi(col.name)} = $${values.length}::${col.sqlType}`);
   }
 
   if (setClauses.length === 0) {
@@ -146,7 +150,7 @@ export function buildBulkUpdateSQL(
   values.push(...whereParams);
 
   const returningClause = returningColumns.length > 0
-    ? returningColumns.map((c) => `"${c}"`).join(', ')
+    ? returningColumns.map(qi).join(', ')
     : '*';
 
   const text = `UPDATE ${tableName}\nSET ${setClauses.join(', ')}\nWHERE ${renumberedWhere}\nRETURNING ${returningClause}`;
@@ -167,7 +171,7 @@ export function buildBulkDeleteSQL(
   whereParams: unknown[]
 ): { text: string; values: unknown[] } {
   const returningClause = returningColumns.length > 0
-    ? returningColumns.map((c) => `"${c}"`).join(', ')
+    ? returningColumns.map(qi).join(', ')
     : '*';
 
   const text = `DELETE FROM ${tableName}\nWHERE ${whereClause}\nRETURNING ${returningClause}`;
