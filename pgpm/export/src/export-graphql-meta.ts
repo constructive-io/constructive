@@ -149,7 +149,7 @@ export const exportGraphQLMeta = async ({
     const tableConfig = META_TABLE_CONFIG[key];
     if (!tableConfig) return;
 
-    // Schema-qualified manifest keys (e.g. catalog_public.apis)
+    // Schema-qualified manifest keys (e.g. catalog_private.apis)
     // mark tables whose name collides with a table in another plane. GraphQL
     // type/query names are derived from the bare table name, so these cannot
     // be addressed unambiguously through the meta API — only the SQL flow

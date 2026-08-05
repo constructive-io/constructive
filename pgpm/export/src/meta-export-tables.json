@@ -332,6 +332,11 @@
       "table": "rls_module"
     },
     {
+      "key": "scope_types_module",
+      "schema": "metaschema_modules_public",
+      "table": "scope_types_module"
+    },
+    {
       "key": "secure_table_provision",
       "schema": "metaschema_modules_public",
       "table": "secure_table_provision"
@@ -642,73 +647,78 @@
       "table": "apps"
     },
     {
-      "key": "catalog_public.apis",
-      "schema": "catalog_public",
+      "key": "catalog_private.apis",
+      "schema": "catalog_private",
       "table": "apis"
     },
     {
-      "key": "catalog_public.apps",
-      "schema": "catalog_public",
+      "key": "catalog_private.apps",
+      "schema": "catalog_private",
       "table": "apps"
     },
     {
+      "key": "bindings",
+      "schema": "catalog_private",
+      "table": "bindings"
+    },
+    {
       "key": "buckets",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "buckets"
     },
     {
-      "key": "catalog_public.domains",
-      "schema": "catalog_public",
+      "key": "catalog_private.domains",
+      "schema": "catalog_private",
       "table": "domains"
     },
     {
       "key": "functions",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "functions"
     },
     {
       "key": "namespaces",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "namespaces"
     },
     {
       "key": "resource_definitions",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "resource_definitions"
     },
     {
       "key": "resource_installations",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "resource_installations"
     },
     {
       "key": "resources",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "resources"
     },
     {
-      "key": "catalog_public.sites",
-      "schema": "catalog_public",
+      "key": "catalog_private.sites",
+      "schema": "catalog_private",
       "table": "sites"
     },
     {
       "key": "sites_app_links",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "sites_app_links"
     },
     {
       "key": "sites_deep_links",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "sites_deep_links"
     },
     {
       "key": "sites_error_pages",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "sites_error_pages"
     },
     {
       "key": "sites_web_config",
-      "schema": "catalog_public",
+      "schema": "catalog_private",
       "table": "sites_web_config"
     }
   ],
@@ -721,59 +731,63 @@
       "created_at",
       "updated_at"
     ],
-    "catalog_public.apis": [
+    "catalog_private.apis": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.apps": [
+    "catalog_private.apps": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.buckets": [
+    "catalog_private.bindings": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.domains": [
+    "catalog_private.buckets": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.functions": [
+    "catalog_private.domains": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.namespaces": [
+    "catalog_private.functions": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.resource_definitions": [
+    "catalog_private.namespaces": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.resource_installations": [
+    "catalog_private.resource_definitions": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.resources": [
+    "catalog_private.resource_installations": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.sites": [
+    "catalog_private.resources": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.sites_app_links": [
+    "catalog_private.sites": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.sites_deep_links": [
+    "catalog_private.sites_app_links": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.sites_error_pages": [
+    "catalog_private.sites_deep_links": [
       "created_at",
       "updated_at"
     ],
-    "catalog_public.sites_web_config": [
+    "catalog_private.sites_error_pages": [
+      "created_at",
+      "updated_at"
+    ],
+    "catalog_private.sites_web_config": [
       "created_at",
       "updated_at"
     ],

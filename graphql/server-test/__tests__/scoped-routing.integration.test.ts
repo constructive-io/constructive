@@ -2,7 +2,7 @@
  * Scoped Routing Integration Tests (simple-seed-scoped)
  *
  * Exercises the new schema-only pgpm modules
- *   @constructive-db/catalog → catalog_public
+ *   @constructive-db/catalog → catalog_private
  *   @constructive-db/routing → routing_public
  *   @constructive-db/apps    → apps_public
  * seeded from `__fixtures__/seed/scoped/*` for the same "simple-pets" tenant
@@ -29,7 +29,7 @@ const scopedDatabaseId = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 const appApiId = '6c9997a4-591b-4cb3-9313-4ef45d6f134e';
 const privateApiId = 'e257c53d-6ba6-40de-b679-61b37188a316';
 const scopedMetaSchemas = [
-  'catalog_public',
+  'catalog_private',
   'routing_public',
   'apps_public',
   'metaschema_public',
@@ -88,12 +88,12 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
   it('deploys the scoped catalog/routing/apps schemas', async () => {
     const rows = await pg.any<{ nspname: string }>(
       `SELECT nspname FROM pg_namespace
-       WHERE nspname IN ('apps_public', 'catalog_public', 'routing_public', 'routing_private')
+       WHERE nspname IN ('apps_public', 'catalog_private', 'routing_public', 'routing_private')
        ORDER BY nspname`
     );
     expect(rows.map((r) => r.nspname)).toEqual([
       'apps_public',
-      'catalog_public',
+      'catalog_private',
       'routing_private',
       'routing_public'
     ]);
