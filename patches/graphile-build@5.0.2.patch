@@ -1,0 +1,423 @@
+diff --git a/dist/SchemaBuilder.js b/dist/SchemaBuilder.js
+index 551b884b615a094c50dec2a2c4acec5a4b303bcf..2b199700aa366e5f36c2bdc33ce8dbfc1e09998b 100644
+--- a/dist/SchemaBuilder.js
++++ b/dist/SchemaBuilder.js
+@@ -182,6 +182,9 @@ class SchemaBuilder extends events_1.EventEmitter {
+         if (validationErrors.length) {
+             throw new AggregateError(validationErrors, `Schema construction failed due to ${validationErrors.length} validation failure(s). First failure was: ${String(validationErrors[0])}`);
+         }
++        if (this.options.releaseBuildStateAfterValidation === true) {
++            (0, makeNewBuild_ts_1.releaseBuildState)(build);
++        }
+         return schema;
+     }
+ }
+diff --git a/dist/behavior.d.ts b/dist/behavior.d.ts
+index ad1c639575544039b66298af8f63f9202a5d775d..54a8862e576da6046fe84583ef9e946f3644e3d1 100644
+--- a/dist/behavior.d.ts
++++ b/dist/behavior.d.ts
+@@ -9,6 +9,7 @@ export type BehaviorDynamicMethods = {
+     [entityType in keyof GraphileBuild.BehaviorEntities as `${entityType}Behavior`]: (entity: GraphileBuild.BehaviorEntities[entityType]) => string;
+ };
+ export declare class Behavior {
++    private _retirementState;
+     private behaviorEntities;
+     private behaviorRegistry;
+     behaviorEntityTypes: (keyof GraphileBuild.BehaviorEntities)[];
+@@ -55,6 +56,9 @@ export declare class Behavior {
+     private validateBehavior;
+     _defaultBehaviorByEntityTypeCache: Map<"string", string>;
+     getDefaultBehaviorFor(entityType: keyof GraphileBuild.BehaviorEntities): string;
++    /** @internal */
++    releaseBuildState(): boolean;
++    private assertBuildStateLive;
+ }
+ export declare function joinBehaviors(strings: ReadonlyArray<string | null | undefined>): GraphileBuild.BehaviorString;
+ export declare function joinResolvedBehaviors(behaviors: ReadonlyArray<ResolvedBehavior>): ResolvedBehavior;
+diff --git a/dist/behavior.js b/dist/behavior.js
+index 80d7ef5543ac45e3922ff9d16413d3372e4d0f1d..42e7f46ae9057924ebb9e42619ee7c97913c4ebd 100644
+--- a/dist/behavior.js
++++ b/dist/behavior.js
+@@ -10,6 +10,12 @@ const NULL_BEHAVIOR = Object.freeze({
+     behaviorString: "",
+     stack: Object.freeze([]),
+ });
++const BUILD_STATE_RELEASED_ERROR_CODE = "GRAPHILE_BUILD_STATE_RELEASED";
++function buildStateReleasedError(api) {
++    const error = new Error(`Cannot use ${api} after Graphile build state has been released`);
++    error.code = BUILD_STATE_RELEASED_ERROR_CODE;
++    return error;
++}
+ const getEntityBehaviorHooks = (plugin, type) => {
+     const val = plugin.schema?.entityBehavior;
+     if (!val)
+@@ -87,6 +93,7 @@ const getEntityBehaviorOverrideHooks = (plugin) => {
+ };
+ class Behavior {
+     constructor(resolvedPreset, build) {
++        this._retirementState = { released: false };
+         this.behaviorEntityTypes = [];
+         this._defaultBehaviorByEntityTypeCache = new Map();
+         this.resolvedPreset = resolvedPreset;
+@@ -202,6 +209,7 @@ class Behavior {
+         this[`${entityType}Behavior`] = (entity) => this.getBehaviorForEntity(entityType, entity).behaviorString;
+     }
+     assertEntity(entityType) {
++        this.assertBuildStateLive("build.behavior");
+         if (entityType === "string") {
+             throw new Error(`Runtime behaviors cannot be attached to strings, please use 'behavior.stringMatches' directly.`);
+         }
+@@ -216,6 +224,7 @@ class Behavior {
+      * @param filter - the behavior the plugin specifies
+      */
+     entityMatches(entityType, entity, filter) {
++        this.assertBuildStateLive("build.behavior.entityMatches");
+         if (!this.behaviorRegistry[filter]) {
+             // DIAGNOSTIC: enable for all filters
+             /*
+@@ -317,6 +326,7 @@ class Behavior {
+         return behavior;
+     }
+     getPreferencesAppliedBehaviors(entityType, inferredBehavior, overrideBehavior) {
++        this.assertBuildStateLive("build.behavior.getPreferencesAppliedBehaviors");
+         const defaultBehavior = this.getDefaultBehaviorFor(entityType);
+         const inferredBehaviorWithPreferencesApplied = multiplyBehavior(defaultBehavior, inferredBehavior.behaviorString, entityType);
+         const behaviorString = joinBehaviors([
+@@ -342,6 +352,7 @@ class Behavior {
+     }
+     /** @deprecated Please use entityMatches or stringMatches instead */
+     matches(localBehaviorSpecsString, filter, defaultBehavior = "") {
++        this.assertBuildStateLive("build.behavior.matches");
+         let err;
+         try {
+             throw new Error("Deprecated call happened here");
+@@ -369,6 +380,7 @@ class Behavior {
+     resolveBehavior(entityType, initialBehavior,
+     // Misnomer; also allows strings or nothings
+     callbacks, ...args) {
++        this.assertBuildStateLive("build.behavior.resolveBehavior");
+         let behaviorString = initialBehavior.behaviorString;
+         const stack = [...initialBehavior.stack];
+         for (const [source, rawG] of callbacks) {
+@@ -425,6 +437,7 @@ class Behavior {
+         }
+     }
+     getDefaultBehaviorFor(entityType) {
++        this.assertBuildStateLive("build.behavior.getDefaultBehaviorFor");
+         if (!this._defaultBehaviorByEntityTypeCache.has(entityType)) {
+             const supportedBehaviors = new Set();
+             for (const [behaviorString, spec] of Object.entries(this.behaviorRegistry)) {
+@@ -455,6 +468,38 @@ class Behavior {
+         }
+         return this._defaultBehaviorByEntityTypeCache.get(entityType);
+     }
++    assertBuildStateLive(api) {
++        if (this._retirementState.released) {
++            throw buildStateReleasedError(api);
++        }
++    }
++    releaseBuildState() {
++        if (this._retirementState.released) {
++            return false;
++        }
++        this._retirementState.released = true;
++        this._defaultBehaviorByEntityTypeCache.clear();
++        this.behaviorEntityTypes.length = 0;
++        for (const key of Object.keys(this.behaviorEntities)) {
++            const behaviorEntity = this.behaviorEntities[key];
++            behaviorEntity.listCache.clear();
++            behaviorEntity.inferredCache.clear();
++            behaviorEntity.overrideCache.clear();
++            behaviorEntity.fullCache.clear();
++            behaviorEntity.inferredBehaviorCallbacks.length = 0;
++            behaviorEntity.overrideBehaviorCallbacks.length = 0;
++            for (const behaviorString of Object.keys(behaviorEntity.behaviorStrings)) {
++                delete behaviorEntity.behaviorStrings[behaviorString];
++            }
++        }
++        for (const key of Object.keys(this.behaviorRegistry)) {
++            delete this.behaviorRegistry[key];
++        }
++        if (Array.isArray(this.globalDefaultBehavior.stack)) {
++            this.globalDefaultBehavior.stack.length = 0;
++        }
++        return true;
++    }
+ }
+ exports.Behavior = Behavior;
+ /**
+diff --git a/dist/global.d.ts b/dist/global.d.ts
+index d53e2d8648fe42b5e9811dc83455061a8d75e1a8..ace058ae10a3f4c5a9861a19431ab0fc44d520d0 100644
+--- a/dist/global.d.ts
++++ b/dist/global.d.ts
+@@ -67,6 +67,14 @@ declare global {
+             muteWarnings?: boolean;
+         }
+         interface SchemaOptions {
++            /**
++             * Release schema-construction-only state after successful schema
++             * validation. Materialized schema execution remains available, but
++             * late plugin access to retired build APIs fails closed.
++             *
++             * @experimental
++             */
++            releaseBuildStateAfterValidation?: boolean;
+             /**
+              * A behavior string to prepend to all behavior checks, can be overriden
+              * but is a great way to disable things by default and then re-enable
+@@ -211,6 +219,18 @@ declare global {
+              * influence what types/fields/etc are added to the GraphQL schema.
+              */
+             input: BuildInput;
++            /**
++             * Register synchronous cleanup for plugin-owned state that is used
++             * only while constructing the schema. Disposers run once, in reverse
++             * registration order, after successful schema validation when
++             * `releaseBuildStateAfterValidation` is enabled.
++             *
++             * Disposers must capture the exact state they own and must not call
++             * other build APIs, which fail closed while disposal is in progress.
++             *
++             * @experimental
++             */
++            registerBuildStateDisposer(disposer: () => void): void;
+             /**
+              * Returns true if `Build.versions` contains an entry for `packageName`
+              * compatible with the version range `range`, false otherwise.
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index f6d0d7fd6d772f8433b3890f25b79369b565963f..57992c592558a61d231f5a92bced97d40b2ea246 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -1,6 +1,7 @@
+ import "./global.ts";
+ import "./interfaces.ts";
+ export { isValidBehaviorString } from "./behavior.ts";
++export { BUILD_STATE_RELEASED_ERROR_CODE, isBuildStateReleased, releaseBuildState } from "./makeNewBuild.ts";
+ import { AddNodeInterfaceToSuitableTypesPlugin, BuiltinScalarConnectionsPlugin, ClientMutationIdDescriptionPlugin, CommonBehaviorsPlugin, CommonTypesPlugin, CursorTypePlugin, MinifySchemaPlugin, MutationPayloadQueryPlugin, MutationPlugin, NodeAccessorPlugin, NodeIdCodecBase64JSONPlugin, NodeIdCodecPipeStringPlugin, NodePlugin, PageInfoStartEndCursorPlugin, QueryPlugin, QueryQueryPlugin, RegisterQueryNodePlugin, StreamDeferPlugin, SubscriptionPlugin, SwallowErrorsPlugin, TrimEmptyDescriptionsPlugin } from "./plugins/index.ts";
+ import SchemaBuilder from "./SchemaBuilder.ts";
+ export { camelCase, constantCase, constantCaseAll, EXPORTABLE, EXPORTABLE_ARRAY_CLONE, EXPORTABLE_OBJECT_CLONE, formatInsideUnderscores, gatherConfig, pluralize, singularize, upperCamelCase, upperFirst, } from "./utils.ts";
+diff --git a/dist/index.js b/dist/index.js
+index 544e9961824999d10f191510c05a0bd1edb02349..6015ec06aff2ed5ec802f1e57bd082afdebbe3ab 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,6 +1,6 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+-exports.version = exports.defaultPreset = exports.TrimEmptyDescriptionsPlugin = exports.SwallowErrorsPlugin = exports.SubscriptionPlugin = exports.StreamDeferPlugin = exports.RegisterQueryNodePlugin = exports.QueryQueryPlugin = exports.QueryPlugin = exports.PageInfoStartEndCursorPlugin = exports.NodePlugin = exports.NodeIdCodecPipeStringPlugin = exports.NodeIdCodecBase64JSONPlugin = exports.NodeAccessorPlugin = exports.MutationPlugin = exports.MutationPayloadQueryPlugin = exports.MinifySchemaPlugin = exports.CursorTypePlugin = exports.CommonTypesPlugin = exports.CommonBehaviorsPlugin = exports.ClientMutationIdDescriptionPlugin = exports.BuiltinScalarConnectionsPlugin = exports.AddNodeInterfaceToSuitableTypesPlugin = exports.buildSchema = exports.getBuilder = exports.watchGather = exports.gather = exports.buildInflection = exports.SchemaBuilder = exports.upperFirst = exports.upperCamelCase = exports.singularize = exports.pluralize = exports.gatherConfig = exports.formatInsideUnderscores = exports.EXPORTABLE_OBJECT_CLONE = exports.EXPORTABLE_ARRAY_CLONE = exports.EXPORTABLE = exports.constantCaseAll = exports.constantCase = exports.camelCase = exports.isValidBehaviorString = void 0;
++exports.version = exports.defaultPreset = exports.TrimEmptyDescriptionsPlugin = exports.SwallowErrorsPlugin = exports.SubscriptionPlugin = exports.StreamDeferPlugin = exports.RegisterQueryNodePlugin = exports.QueryQueryPlugin = exports.QueryPlugin = exports.PageInfoStartEndCursorPlugin = exports.NodePlugin = exports.NodeIdCodecPipeStringPlugin = exports.NodeIdCodecBase64JSONPlugin = exports.NodeAccessorPlugin = exports.MutationPlugin = exports.MutationPayloadQueryPlugin = exports.MinifySchemaPlugin = exports.CursorTypePlugin = exports.CommonTypesPlugin = exports.CommonBehaviorsPlugin = exports.ClientMutationIdDescriptionPlugin = exports.BuiltinScalarConnectionsPlugin = exports.AddNodeInterfaceToSuitableTypesPlugin = exports.buildSchema = exports.getBuilder = exports.watchGather = exports.gather = exports.buildInflection = exports.SchemaBuilder = exports.upperFirst = exports.upperCamelCase = exports.singularize = exports.pluralize = exports.gatherConfig = exports.formatInsideUnderscores = exports.EXPORTABLE_OBJECT_CLONE = exports.EXPORTABLE_ARRAY_CLONE = exports.EXPORTABLE = exports.constantCaseAll = exports.constantCase = exports.camelCase = exports.releaseBuildState = exports.isBuildStateReleased = exports.BUILD_STATE_RELEASED_ERROR_CODE = exports.isValidBehaviorString = void 0;
+ exports.makeSchema = makeSchema;
+ exports.watchSchema = watchSchema;
+ const tslib_1 = require("tslib");
+@@ -11,6 +11,10 @@ const graphql_1 = require("grafast/graphql");
+ const graphile_config_1 = require("graphile-config");
+ var behavior_ts_1 = require("./behavior.js");
+ Object.defineProperty(exports, "isValidBehaviorString", { enumerable: true, get: function () { return behavior_ts_1.isValidBehaviorString; } });
++var makeNewBuild_ts_1 = require("./makeNewBuild.js");
++Object.defineProperty(exports, "BUILD_STATE_RELEASED_ERROR_CODE", { enumerable: true, get: function () { return makeNewBuild_ts_1.BUILD_STATE_RELEASED_ERROR_CODE; } });
++Object.defineProperty(exports, "isBuildStateReleased", { enumerable: true, get: function () { return makeNewBuild_ts_1.isBuildStateReleased; } });
++Object.defineProperty(exports, "releaseBuildState", { enumerable: true, get: function () { return makeNewBuild_ts_1.releaseBuildState; } });
+ const extend_ts_1 = tslib_1.__importDefault(require("./extend.js"));
+ const inflection_ts_1 = require("./inflection.js");
+ const index_ts_1 = require("./plugins/index.js");
+diff --git a/dist/makeNewBuild.d.ts b/dist/makeNewBuild.d.ts
+index c294c17ab5486a4a8c7b7d448d5b921f4af5c2ff..5665d2b4a0173a24ec88694ff9be1c69fbed9d02 100644
+--- a/dist/makeNewBuild.d.ts
++++ b/dist/makeNewBuild.d.ts
+@@ -1,5 +1,8 @@
+ import "./global.ts";
+ import type SchemaBuilder from "./SchemaBuilder.ts";
++export declare const BUILD_STATE_RELEASED_ERROR_CODE: "GRAPHILE_BUILD_STATE_RELEASED";
++export declare function isBuildStateReleased(build: GraphileBuild.Build): boolean;
++export declare function releaseBuildState(build: GraphileBuild.Build): boolean;
+ /**
+  * Makes a new 'Build' object suitable to be passed through the 'build' hook.
+  */
+diff --git a/dist/makeNewBuild.js b/dist/makeNewBuild.js
+index 5a873bb569247840eeb110a754095236849fc35a..00b098b4c38b1e2dc36b9457c3af3e11ad887a8c 100644
+--- a/dist/makeNewBuild.js
++++ b/dist/makeNewBuild.js
+@@ -1,5 +1,8 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
++exports.BUILD_STATE_RELEASED_ERROR_CODE = void 0;
++exports.isBuildStateReleased = isBuildStateReleased;
++exports.releaseBuildState = releaseBuildState;
+ exports.default = makeNewBuild;
+ const tslib_1 = require("tslib");
+ require("./global.js");
+@@ -11,6 +14,57 @@ const extend_ts_1 = tslib_1.__importStar(require("./extend.js"));
+ const utils_ts_1 = require("./utils.js");
+ const version_ts_1 = require("./version.js");
+ const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
++exports.BUILD_STATE_RELEASED_ERROR_CODE = "GRAPHILE_BUILD_STATE_RELEASED";
++const buildRetirementStates = new WeakMap();
++function buildStateReleasedError(api) {
++    const error = new Error(`Cannot use ${api} after Graphile build state has been released`);
++    error.code = exports.BUILD_STATE_RELEASED_ERROR_CODE;
++    return error;
++}
++function assertBuildStateLive(build, api) {
++    if (isBuildStateReleased(build)) {
++        throw buildStateReleasedError(api);
++    }
++}
++function isBuildStateReleased(build) {
++    const state = buildRetirementStates.get(build);
++    return state !== undefined && state.status !== "live";
++}
++function releaseBuildState(build) {
++    const state = buildRetirementStates.get(build);
++    if (state === undefined || state.status !== "live") {
++        return false;
++    }
++    state.status = "releasing";
++    const errors = [];
++    const disposers = state.disposers.splice(0).reverse();
++    for (const disposer of disposers) {
++        try {
++            disposer();
++        }
++        catch (error) {
++            errors.push(error);
++        }
++    }
++    try {
++        state.releaseCore();
++    }
++    catch (error) {
++        errors.push(error);
++    }
++    try {
++        build.behavior.releaseBuildState();
++    }
++    catch (error) {
++        errors.push(error);
++    }
++    state.status = "released";
++    state.releaseCore = null;
++    if (errors.length > 0) {
++        throw new AggregateError(errors, `Failed to release Graphile build state (${errors.length} disposal error${errors.length === 1 ? "" : "s"})`);
++    }
++    return true;
++}
+ /** Have we warned the user they're using the 5-arg deprecated registerObjectType call? */
+ let registerObjectType5argsDeprecatedWarned = false;
+ /**
+@@ -18,15 +72,16 @@ let registerObjectType5argsDeprecatedWarned = false;
+  */
+ function makeNewBuild(builder, input, inflection) {
+     const lib = builder.resolvedPreset.lib ?? {};
+-    const building = new Set();
+-    const allTypes = {
++    let inputState = input;
++    let building = new Set();
++    let allTypes = {
+         Int: graphql_1.GraphQLInt,
+         Float: graphql_1.GraphQLFloat,
+         String: graphql_1.GraphQLString,
+         Boolean: graphql_1.GraphQLBoolean,
+         ID: graphql_1.GraphQLID,
+     };
+-    const allTypesSources = {
++    let allTypesSources = {
+         Int: "GraphQL Built-in",
+         Float: "GraphQL Built-in",
+         String: "GraphQL Built-in",
+@@ -36,10 +91,11 @@ function makeNewBuild(builder, input, inflection) {
+     /**
+      * Where the type factories are; so we don't construct types until they're needed.
+      */
+-    const typeRegistry = Object.create(null);
+-    const scopeByType = new Map();
++    let typeRegistry = Object.create(null);
++    let scopeByType = new Map();
+     // TODO: allow registering a previously constructed type.
+     function register(klass, typeName, scope, specGenerator, origin) {
++        assertBuildStateLive(build, "build.register*");
+         if (!this.status.isBuildPhaseComplete || this.status.isInitPhaseComplete) {
+             throw new Error("Types may only be registered in the 'init' phase");
+         }
+@@ -83,7 +139,17 @@ function makeNewBuild(builder, input, inflection) {
+             graphql: lib.graphql.version,
+             "graphile-build": version_ts_1.version,
+         },
+-        input,
++        get input() {
++            assertBuildStateLive(build, "build.input");
++            return inputState;
++        },
++        registerBuildStateDisposer(disposer) {
++            assertBuildStateLive(build, "build.registerBuildStateDisposer");
++            if (typeof disposer !== "function") {
++                throw new TypeError("build.registerBuildStateDisposer requires a function");
++            }
++            retirementState.disposers.push(disposer);
++        },
+         hasVersion(packageName, range, options = { includePrerelease: true }) {
+             const packageVersion = this.versions[packageName];
+             if (!packageVersion)
+@@ -119,9 +185,13 @@ function makeNewBuild(builder, input, inflection) {
+             }
+         },
+         getAllTypes() {
++            assertBuildStateLive(build, "build.getAllTypes");
+             return allTypes;
+         },
+-        scopeByType,
++        get scopeByType() {
++            assertBuildStateLive(build, "build.scopeByType");
++            return scopeByType;
++        },
+         inflection,
+         handleRecoverableError(e) {
+             e["recoverable"] = true;
+@@ -186,6 +256,7 @@ function makeNewBuild(builder, input, inflection) {
+         },
+         __postInitAssertions: [],
+         assertTypeName(typeName, deferrable = false) {
++            assertBuildStateLive(build, "build.assertTypeName");
+             if (!this.status.isBuildPhaseComplete) {
+                 throw new Error("Must not call build.assertTypeName before 'build' phase is complete; use 'init' phase instead");
+             }
+@@ -207,6 +278,7 @@ function makeNewBuild(builder, input, inflection) {
+             }
+         },
+         getTypeMetaByName(typeName) {
++            assertBuildStateLive(build, "build.getTypeMetaByName");
+             if (!this.status.isBuildPhaseComplete) {
+                 throw new Error("Must not call build.getTypeMetaByName before 'build' phase is complete; use 'init' phase instead");
+             }
+@@ -253,6 +325,7 @@ function makeNewBuild(builder, input, inflection) {
+             return null;
+         },
+         getTypeByName(typeName) {
++            assertBuildStateLive(build, "build.getTypeByName");
+             if (currentTypeDetails && !BUILTINS.includes(typeName)) {
+                 throw new Error(`Error in spec callback for ${currentTypeDetails.klass.name} '${currentTypeDetails.typeName}'; the callback made a call to \`build.getTypeByName(${JSON.stringify(typeName)})\` (directly or indirectly) - this is the wrong time for such a call \
+ to occur since it can lead to circular dependence. To fix this, ensure that any \
+@@ -377,6 +450,25 @@ style for these configuration options (e.g. change \`interfaces: \
+         },
+         _pluginMeta: Object.create(null),
+     };
++    const retirementState = {
++        status: "live",
++        disposers: [],
++        releaseCore() {
++            inputState = undefined;
++            building.clear();
++            building = undefined;
++            allTypes = undefined;
++            allTypesSources = undefined;
++            typeRegistry = undefined;
++            scopeByType.clear();
++            scopeByType = undefined;
++            build.__postInitAssertions.length = 0;
++            for (const key of Object.keys(build._pluginMeta)) {
++                delete build._pluginMeta[key];
++            }
++        },
++    };
++    buildRetirementStates.set(build, retirementState);
+     return build;
+ }
+ let currentTypeDetails = null;

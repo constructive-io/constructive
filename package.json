@@ -69,6 +69,13 @@
     "onlyBuiltDependencies": [
       "@launchql/protobufjs",
       "core-js-pure"
-    ]
+    ],
+    "patchedDependencies": {
+      "@dataplan/pg@1.0.3": "patches/@dataplan__pg@1.0.3.patch",
+      "pg-introspection@1.0.1": "patches/pg-introspection@1.0.1.patch",
+      "graphile-build-pg@5.0.2": "patches/graphile-build-pg.patch",
+      "graphile-build@5.0.2": "patches/graphile-build@5.0.2.patch",
+      "@graphile-contrib/pg-many-to-many@2.0.0-rc.2": "patches/@graphile-contrib__pg-many-to-many@2.0.0-rc.2.patch"
+    }
   }
 }
