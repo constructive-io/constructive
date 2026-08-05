@@ -765,7 +765,24 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       }
 
       log.info(`[oauth] OAuth success for ${profile.email}`);
-      return res.redirect(redirectUri);
+
+      // Deliver the access token to the client via the redirect fragment so
+      // the app can authenticate to EVERY API host with a Bearer header
+      // (session cookies are host-only and only reach the auth host) — the
+      // same credential shape as email/password login. Fragments are never
+      // sent to servers, so the token is not exposed to the OAuth provider.
+      // pg returns timestamptz as a Date object; normalize to ISO for the client.
+      const rawExpiresAt = result.access_token_expires_at as string | Date | undefined;
+      const expiresAt =
+        rawExpiresAt instanceof Date ? rawExpiresAt.toISOString() : (rawExpiresAt ?? '');
+      const fragment = new URLSearchParams({
+        access_token: result.access_token ?? '',
+        access_token_expires_at: expiresAt,
+        user_id: result.user_id ?? '',
+        id: result.id ?? result.user_id ?? ''
+      });
+      const baseUri = redirectUri.split('#')[0];
+      return res.redirect(`${baseUri}#${fragment.toString()}`);
     } catch (error: unknown) {
       const fallbackPath =
         modules?.authSettings?.oauthErrorRedirectPath ||
