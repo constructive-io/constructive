@@ -21,7 +21,7 @@ This guide helps AI agents quickly navigate the Constructive monorepo. Construct
 
 - **`packages/*`** – Constructive CLI + misc packages (`client`, `orm`, `query-builder`, `url-domains`, `server-utils`, etc.)
 - **`pgpm/*`** – PGPM engine + CLI + shared types/logger/env
-- **`graphql/*`** – GraphQL server, explorer, codegen, types/env, query/react utilities
+- **`graphql/*`** – GraphQL server, explorer, codegen, types/env, and query utilities
 - **`postgres/*`** – PostgreSQL tooling and tests (`pg-ast`, `pg-codegen`, `introspectron`, `pgsql-test`, etc.)
 - **`streaming/*`** – S3 helpers and stream hashing utilities
 - **`extensions/*`** – PGPM extension modules (Postgres extensions packaged as PGPM modules)
