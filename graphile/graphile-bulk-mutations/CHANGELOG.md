@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.4](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.11.3...graphile-bulk-mutations@1.11.4) (2026-08-05)
+
+### Bug Fixes
+
+- **deps:** widen graphile peer ranges and resolve connection-filter from the workspace ([a5f5b63](https://github.com/constructive-io/constructive/commit/a5f5b63580f91bdfc669a00cfe7f401ff3336d3e))
+
 ## [1.11.3](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.11.2...graphile-bulk-mutations@1.11.3) (2026-08-04)
 
 **Note:** Version bump only for package graphile-bulk-mutations

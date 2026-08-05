@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.14.3...@pgpmjs/slice@0.14.4) (2026-08-05)
+
+### Performance Improvements
+
+- **slice:** compile each glob pattern once in findMatchingPattern ([f164c90](https://github.com/constructive-io/constructive/commit/f164c9082c05ad7ae2b48b0e8bd0825cd2f2b903))
+
 ## [0.14.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.14.2...@pgpmjs/slice@0.14.3) (2026-08-04)
 
 **Note:** Version bump only for package @pgpmjs/slice

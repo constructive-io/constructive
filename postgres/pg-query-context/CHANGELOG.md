@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.29.1](https://github.com/constructive-io/constructive/compare/pg-query-context@2.29.0...pg-query-context@2.29.1) (2026-08-05)
+
+**Note:** Version bump only for package pg-query-context
+
 # [2.29.0](https://github.com/constructive-io/constructive/compare/pg-query-context@2.28.2...pg-query-context@2.29.0) (2026-08-02)
 
 **Note:** Version bump only for package pg-query-context

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.12.2](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.12.1...graphile-bucket-provisioner-plugin@1.12.2) (2026-08-05)
+
+### Bug Fixes
+
+- **deps:** widen graphile peer ranges and resolve connection-filter from the workspace ([a5f5b63](https://github.com/constructive-io/constructive/commit/a5f5b63580f91bdfc669a00cfe7f401ff3336d3e))
+
 ## [1.12.1](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.12.0...graphile-bucket-provisioner-plugin@1.12.1) (2026-08-03)
 
 **Note:** Version bump only for package graphile-bucket-provisioner-plugin
