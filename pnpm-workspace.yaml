@@ -8,3 +8,47 @@ packages:
   - 'postgres/*'
   - 'graphile/*'
   - 'agentic/*'
+
+# Managed by pnpm-policy — run `pnpm-policy generate` after editing pnpm-policy.yaml.
+
+# A third-party release must be 2w old before it can be installed.
+# Most malicious releases are found and yanked well inside that window.
+minimumReleaseAge: 20160
+
+# Exempt from the wait: 6 scope glob(s), 25 first-party package(s).
+# First-party membership comes from what pyramation publishes on npm — waiting on your own release protects nothing.
+minimumReleaseAgeExclude:
+  - "@constructive-db/*"
+  - "@constructive-io/*"
+  - "@launchql/*"
+  - "@pgpm/*"
+  - "@pgpmjs/*"
+  - "@pgsql/*"
+  - "@decryption/hashes"
+  - "@inquirerer/test"
+  - "@inquirerer/utils"
+  - appstash
+  - clean-ansi
+  - confstash
+  - find-and-require-package-json
+  - genomic
+  - git-changed
+  - inflekt
+  - inquirerer
+  - komoji
+  - libpg-query
+  - makage
+  - nested-obj
+  - pg-proto-parser
+  - pgsql-deparser
+  - pgsql-parser
+  - plpgsql-deparser
+  - plpgsql-parser
+  - pnpm-policy
+  - schema-typescript
+  - strfy-js
+  - yamlize
+  - yanse
+
+# Off: transitive dependencies may resolve from git or a URL.
+blockExoticSubdeps: false

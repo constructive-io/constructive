@@ -72,6 +72,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # Fails when pnpm-workspace.yaml no longer matches pnpm-policy.yaml, or when
+      # a third-party waiver has passed its expiry date.
+      - name: Check supply-chain policy
+        run: pnpm run policy:check
+
       # A package with tests that no batch below claims runs nowhere, and until
       # this check existed nothing said so.
       - name: Check test coverage of the CI matrix

@@ -1,0 +1,63 @@
+# Supply-chain policy for this workspace. The pnpm settings it produces live in
+# pnpm-workspace.yaml under the `Managed by pnpm-policy` marker — edit this file,
+# then run:
+#
+#   pnpm run policy
+#
+# `pnpm run policy:check` fails CI when the two drift apart.
+
+# Third-party releases wait two weeks before we can install them. Most malicious
+# releases are found and yanked well inside that window. Our own packages are
+# exempt (see `maintainers` below), so publishing does not lock us out of our own
+# workspace the way a blanket cooldown would.
+minimumReleaseAge: 14d
+
+# Off for now: turning it on rejects any transitive dependency resolved from git
+# or a URL, which is a separate re-resolution to make deliberately rather than
+# inside a policy rollout.
+blockExoticSubdeps: false
+
+# The npm accounts we publish under. Everything they publish skips the wait, so
+# this lists accounts we control — nobody else's.
+maintainers:
+  - pyramation
+
+# Scopes we own outright, emitted as `@scope/*`.
+scopes:
+  - "@constructive-io"
+  - "@constructive-db"
+  - "@launchql"
+  - "@pgpm"
+  - "@pgpmjs"
+  - "@pgsql"
+
+# Our published inventory, pinned as a dependency. Every unscoped and
+# other-scoped package we publish is listed there by name.
+inventory: "@constructive-io/pnpm-policy/inventory.json"
+
+# Exempt only the inventory names this workspace's lockfile actually resolves —
+# the list should describe this repo, not the whole npm account. Scope globs are
+# never intersected.
+#
+# The cost: adding one of our own packages this repo has never used is not in the
+# lockfile, so it is not exempt, so the wait blocks the install that would add
+# it. Run `pnpm run policy` and install again.
+intersect: true
+
+# Dependencies permitted to run install scripts. Empty is the status quo here:
+# nothing in this workspace has ever been approved, so @google/genai, esbuild,
+# nx, protobufjs and unrs-resolver install without their scripts and the build
+# works. An install script is arbitrary code at install time, so each addition is
+# a deliberate decision and the value is the reason.
+allowBuilds: []
+
+# Escape hatch for third-party packages that cannot wait — an urgent security
+# release, typically. A reason is required, and `until` makes the waiver expire
+# so `check` forces a re-justification instead of letting it become permanent:
+#
+#   exceptions:
+#     - package: lodash
+#       versions: ["4.17.21"]
+#       reason: CVE-2021-23337 fix, published today
+#       until: 2026-09-01
+exceptions: []
