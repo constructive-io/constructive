@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "fixture": "complete-tenant-abc-v1",
+  "qualificationClass": "offline-research-candidate",
+  "tenants": ["a", "b", "c"],
+  "surfacesPerTenant": ["api"],
+  "performanceClaimsAllowed": false,
+  "productionQualificationImplemented": false,
+  "runtimeIsolation": {
+    "model": "dedicated-login-and-pool-per-tenant",
+    "sharedRuntimePool": false,
+    "runtimeSchemaDriftControl": false,
+    "checkoutSanitationRequired": true
+  },
+  "localCapabilities": [
+    { "id": "graphile-generated", "status": "candidate-runtime-required", "evidence": "candidate connection and primary-key operations must compile and execute for A/B/C" },
+    { "id": "i18n", "status": "candidate-runtime-required", "evidence": "candidate localeStrings operation must execute the parameterized i18n SQL path" },
+    { "id": "llm-deterministic", "status": "offline-only", "evidence": "candidate embedText operation uses an injected deterministic 3-D provider" },
+    { "id": "rag-deterministic", "status": "offline-only", "evidence": "candidate ragQuery operation uses deterministic embedding/chat plus pgvector chunk SQL" },
+    { "id": "bm25", "status": "candidate-runtime-required", "evidence": "candidate BM25 filter and score operation; BM25 remains enabled" },
+    { "id": "tsvector", "status": "candidate-runtime-required", "evidence": "candidate tsvector filter and rank operation" },
+    { "id": "trigram", "status": "candidate-runtime-required", "evidence": "candidate pg_trgm filter and similarity operation" },
+    { "id": "vector", "status": "candidate-runtime-required", "evidence": "candidate pgvector cosine filter and distance operation" },
+    { "id": "postgis", "status": "candidate-runtime-required", "evidence": "candidate PostGIS codec operation using schema-qualified extension SQL" },
+    { "id": "ltree", "status": "candidate-runtime-required", "evidence": "candidate ltree filter using schema-qualified operator and cast SQL" },
+    { "id": "uploads-storage-presign-only", "status": "offline-only", "evidence": "candidate metadata insert and offline SigV4 signing path; no object bytes are transferred" },
+    { "id": "bulk-mutations", "status": "candidate-runtime-required", "evidence": "candidate bulk upsert operation" },
+    { "id": "realtime-tagged-write", "status": "candidate-runtime-required", "evidence": "candidate generated update must fire the fixture NOTIFY trigger; delivery is a separate mandatory suite" },
+    { "id": "function-bindings", "status": "candidate-runtime-required", "evidence": "candidate preloaded binding must insert an RLS-visible invocation" },
+    { "id": "security-session", "status": "candidate-runtime-required", "evidence": "protected controls poison and roll back state; the next exact-tenant checkout must sanitize and initialize every request GUC" }
+  ],
+  "hostileCanaries": [
+    "cross-schema-identifiers",
+    "metadata",
+    "functions",
+    "sequences",
+    "prepared-statement-reuse",
+    "poisoned-gucs",
+    "rollback-savepoints",
+    "plugin-raw-sql",
+    "owner-bypass-role",
+    "schema-drift",
+    "cache-invalidation",
+    "concurrent-builds",
+    "connection-reuse"
+  ],
+  "metadataBoundary": "GraphQL schema/introspection isolation only; PostgreSQL system catalogs may reveal object names to any connected login",
+  "mandatoryRepositorySuites": [
+    {
+      "id": "realtime-websocket-delivery",
+      "cwd": "graphile/graphile-realtime-test",
+      "command": ["pnpm", "exec", "jest", "--runInBand", "__tests__/realtime-websocket.integration.test.ts"]
+    },
+    {
+      "id": "plugin-capability-closure",
+      "cwd": "graphile/graphile-settings",
+      "command": ["pnpm", "exec", "jest", "--runInBand", "__tests__/scoped-introspection-capability-closure.integration.test.ts"]
+    }
+  ],
+  "externalProviderGates": [
+    {
+      "id": "ollama-real-semantic",
+      "status": "blocking",
+      "requiredArguments": ["ollama-url", "embedding-model", "chat-model"],
+      "offlineSurrogate": ["llm-deterministic", "rag-deterministic"]
+    },
+    {
+      "id": "object-storage-byte-roundtrip",
+      "status": "blocking",
+      "requiredArguments": ["s3-endpoint", "s3-bucket"],
+      "offlineSurrogate": ["uploads-storage-presign-only"],
+      "repositorySuite": {
+        "cwd": "graphql/server-test",
+        "command": ["pnpm", "exec", "jest", "--runInBand", "__tests__/upload.integration.test.ts"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "tenants": [
+    {
+      "id": "replace-with-tenant-a",
+      "databases": [
+        {
+          "id": "replace-with-tenant-a-database-id",
+          "physicalDatabase": "replace-with-tenant-a-physical-database",
+          "apis": [
+            {
+              "id": "replace-with-tenant-a-api-id",
+              "runtimePoolIdentity": "replace-with-tenant-a-runtime-pool-identity",
+              "runtimePoolIdentities": {
+                "origin-main": "replace-with-origin-main-tenant-a-pool-identity",
+                "runtime-boundary-stock": "replace-with-runtime-stock-tenant-a-pool-identity",
+                "cache-governor-stock": "replace-with-governor-stock-tenant-a-pool-identity",
+                "scoped-introspection": "replace-with-scoped-tenant-a-pool-identity"
+              },
+              "physicalSchemas": [
+                "replace-with-tenant-a-api-schema"
+              ],
+              "routingLabels": [
+                "replace-with-tenant-a-api-host-or-service-label"
+              ],
+              "realtime": false,
+              "surfaces": [
+                "api"
+              ]
+            }
+          ]
+        }
+      ],
+      "surfaces": [
+        {
+          "name": "api",
+          "buildContract": "",
+          "buildContracts": {
+            "origin-main": "replace-with-origin-main-tenant-a-api-build-contract",
+            "runtime-boundary-stock": "replace-with-runtime-stock-tenant-a-api-build-contract",
+            "cache-governor-stock": "replace-with-governor-stock-tenant-a-api-build-contract",
+            "scoped-introspection": "replace-with-scoped-tenant-a-api-build-contract"
+          },
+          "url": "http://127.0.0.1:{port}/graphql",
+          "headers": {
+            "host": "replace-with-tenant-a-api-host"
+          },
+          "warmup": {
+            "name": "warm-schema",
+            "capability": "graphile-generated",
+            "query": "query { __typename }"
+          },
+          "operations": [
+            {
+              "name": "replace-with-a-real-generated-plan",
+              "capability": "graphile-generated",
+              "query": "query { __typename }"
+            }
+          ],
+          "canaries": [
+            {
+              "name": "cross-schema-identifiers",
+              "query": "query { __typename }",
+              "forbiddenMatches": [
+                {
+                  "path": "/data/tenantToken",
+                  "value": "replace-with-tenant-b-token"
+                }
+              ],
+              "requiredMatches": [
+                {
+                  "path": "/data/tenantToken",
+                  "value": "replace-with-tenant-a-token"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

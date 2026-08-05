@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "fleetFile": "fleet.example.json",
+  "artifactDir": "../../graphile-density-artifacts",
+  "arms": [
+    {
+      "name": "origin-main",
+      "commit": "a10ea246fcc45b025713024e131fafb908171149",
+      "cwd": "/ABSOLUTE/PATH/TO/origin-main-worktree",
+      "command": ["node", "packages/cli/dist/index.js", "server", "--port", "{port}", "--origin", "*", "--servicesApi"],
+      "port": 3341,
+      "readinessUrl": "http://127.0.0.1:{port}/healthz",
+      "memoryUrl": "http://127.0.0.1:{port}/debug/memory",
+      "postgresContainer": "REPLACE_WITH_DISPOSABLE_POSTGRES_CONTAINER",
+      "introspectionMode": "stock"
+    },
+    {
+      "name": "runtime-boundary-stock",
+      "commit": "de92be5a9",
+      "cwd": "/ABSOLUTE/PATH/TO/runtime-boundary-worktree",
+      "command": ["node", "packages/cli/dist/index.js", "server", "--port", "{port}", "--origin", "*", "--servicesApi"],
+      "port": 3342,
+      "readinessUrl": "http://127.0.0.1:{port}/healthz",
+      "memoryUrl": "http://127.0.0.1:{port}/debug/memory",
+      "postgresContainer": "REPLACE_WITH_DISPOSABLE_POSTGRES_CONTAINER",
+      "introspectionMode": "stock"
+    },
+    {
+      "name": "cache-governor-stock",
+      "commit": "5fd90ee2b",
+      "cwd": "/ABSOLUTE/PATH/TO/cache-governor-worktree",
+      "command": ["node", "packages/cli/dist/index.js", "server", "--port", "{port}", "--origin", "*", "--servicesApi"],
+      "port": 3343,
+      "readinessUrl": "http://127.0.0.1:{port}/healthz",
+      "memoryUrl": "http://127.0.0.1:{port}/debug/memory",
+      "postgresContainer": "REPLACE_WITH_DISPOSABLE_POSTGRES_CONTAINER",
+      "introspectionMode": "stock"
+    },
+    {
+      "name": "scoped-introspection",
+      "commit": "f41e480d5",
+      "cwd": "/ABSOLUTE/PATH/TO/scoped-introspection-worktree",
+      "command": ["node", "packages/cli/dist/index.js", "server", "--port", "{port}", "--origin", "*", "--servicesApi"],
+      "port": 3344,
+      "readinessUrl": "http://127.0.0.1:{port}/healthz",
+      "memoryUrl": "http://127.0.0.1:{port}/debug/memory",
+      "postgresContainer": "REPLACE_WITH_DISPOSABLE_POSTGRES_CONTAINER",
+      "introspectionMode": "scoped-required"
+    }
+  ],
+  "heapMiB": [1024, 2048, 4096],
+  "tenantCountsByHeapMiB": {
+    "1024": [1, 2, 4, 8, 16, 32, 48, 64],
+    "2048": [1, 4, 8, 16, 32, 64, 96, 128],
+    "4096": [1, 8, 16, 32, 64, 128, 192, 256]
+  },
+  "repetitions": 3,
+  "runOrderSeed": "graphile-density-qualification-v1",
+  "requiredCapabilities": [
+    "graphile-generated",
+    "i18n",
+    "llm",
+    "rag",
+    "bm25",
+    "tsvector",
+    "trigram",
+    "vector",
+    "postgis",
+    "ltree",
+    "uploads-storage",
+    "bulk-mutations",
+    "realtime",
+    "function-bindings"
+  ],
+  "requiredCanaries": [
+    "cross-schema-identifiers",
+    "metadata",
+    "functions",
+    "sequences",
+    "prepared-statement-reuse",
+    "poisoned-gucs",
+    "rollback-savepoints",
+    "plugin-raw-sql",
+    "owner-bypass-role",
+    "schema-drift",
+    "cache-invalidation",
+    "concurrent-builds",
+    "connection-reuse"
+  ],
+  "workload": {
+    "durationSec": 900,
+    "rpsPerTenant": 0.2,
+    "minWorkloadRequestsPerSurface": 10,
+    "requestTimeoutMs": 30000,
+    "maxInFlight": 128,
+    "canaryIntervalSec": 60,
+    "warmupTimeoutMs": 180000,
+    "warmupTimeoutPerSurfaceMs": 2000,
+    "warmupConcurrency": 1
+  },
+  "gates": {
+    "maxErrorRate": 0.005,
+    "maxP99Ms": 150,
+    "maxPostWarmupHeapGrowthMiBPerHour": 5,
+    "minMedianDensityImprovement": 0.15,
+    "minAdditionalTenantsEveryRun": 1,
+    "requireZeroBleed": true,
+    "requireNoPostWarmupEvictions": true,
+    "requireNoPostWarmupBuildRefusals": true,
+    "requireNoPostWarmupBuilds": true,
+    "requirePostgresMemoryTelemetry": true,
+    "requireConclusiveCanaries": true,
+    "requireExplicitCustomerTopology": true
+  },
+  "soak": {
+    "enabled": true,
+    "durationSec": 7200,
+    "tenantCount": 48,
+    "heapMiB": 2048
+  }
+}
