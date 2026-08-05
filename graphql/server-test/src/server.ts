@@ -5,6 +5,10 @@ import { Server as HttpServer } from 'http';
 
 import type { ServerInfo, ServerOptions } from './types';
 
+/** Credential used only by in-process integration fixtures. */
+export const TEST_INTERNAL_REQUEST_SECRET =
+  'graphql-server-test-internal-secret-32-bytes';
+
 /**
  * Create a single-tenant dev test server (no scoped routing, no database id).
  *

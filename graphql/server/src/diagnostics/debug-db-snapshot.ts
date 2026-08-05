@@ -203,7 +203,7 @@ export interface DebugDatabaseSnapshot {
 export const getDebugDatabaseSnapshot = async (
   opts: ConstructiveOptions,
 ): Promise<DebugDatabaseSnapshot> => {
-  const appPool = getPgPool(opts.pg);
+  const appPool = getPgPool(opts.pg, { purpose: 'diagnostics' });
   const {
     activity,
     blocked,

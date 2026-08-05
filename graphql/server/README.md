@@ -65,7 +65,7 @@ Runs an Express server that wires CORS, uploads, domain parsing, auth, and PostG
 - Meta-schema routing by domain + subdomain
 - File uploads via `graphql-upload`
 - GraphiQL and health check endpoints
-- Schema cache flush via `/flush` or database notifications
+- Schema cache flush via authenticated `/flush` or database notifications
 - Opt-in observability for memory, DB activity, and Graphile build debugging
 
 ## Observability
@@ -95,7 +95,7 @@ For the operational workflow, sampler output, and heap snapshot usage, see [docs
 - `GET /graphiql` -> GraphiQL UI
 - `GET /graphql` / `POST /graphql` -> GraphQL endpoint
 - `POST /graphql` (multipart) -> file uploads
-- `POST /flush` -> clears cached Graphile schema for the current API
+- `POST /flush` -> clears the current API's cached Graphile schema; requires `X-Constructive-Internal-Token`
 - `GET /debug/memory` -> memory/process/Graphile debug snapshot when observability is enabled
 - `GET /debug/db` -> PostgreSQL activity/locks/pool debug snapshot when observability is enabled
 
@@ -103,13 +103,60 @@ For the operational workflow, sampler output, and heap snapshot usage, see [docs
 
 This is a production-only server: every request is resolved through the scoped-routing plane. There is no static single-tenant mode and no flag to disable routing. For single-database local development without route resolution or a database id, use [`@constructive-io/graphql-dev-server`](../dev-server/README.md).
 
-- The server resolves the request host with a single `resolve_route()` call against the compiled route bindings in the scoped routing schema (`API_ROUTING_SCHEMA`, default `routing_public`), mapping host → tenant/api/database/role.
+- The server resolves every request host with a fresh `resolve_route()` call against the compiled route bindings in the scoped routing schema (`API_ROUTING_SCHEMA`, default `routing_public`), mapping host → tenant/api/database/role. Routing metadata is not served from the process cache because a missed notification must never retain an old hostname-to-tenant assignment.
 - Only APIs where `api.is_public` matches `API_IS_PUBLIC` are served.
-- In private mode (`API_IS_PUBLIC=false`), you can override with headers:
+- In private mode (`API_IS_PUBLIC=false`), an internal caller can select an authoritative surface with these headers only when it also supplies the exact `X-Constructive-Internal-Token` configured by `GRAPHQL_INTERNAL_REQUEST_SECRET`:
   - `X-Api-Name` + `X-Database-Id`
-  - `X-Schemata` + `X-Database-Id`
-  - `X-Meta-Schema` + `X-Database-Id`
+- `X-Meta-Schema` is a privileged, potentially cross-tenant control-plane API. It is rejected by default and can only be enabled with `API_ALLOW_META_SCHEMA_HEADER=true` on a separate private admin ingress; it is never a tenant-routing mechanism.
+- `X-Schemata` is rejected even from an authenticated internal caller because an unchecked physical schema list is not a tenant-safe routing contract. Provision an API record and select it by name instead.
+- The ingress must remove any caller-supplied reserved headers before injecting its own token and selectors, and the hop to this server must use an authenticated encrypted channel.
 - A resolved database id is always required. There is no default database, so a request that resolves without a database id is rejected (`NO_DATABASE_ID` → HTTP 500).
+
+Production multi-tenant execution requires `runtimePgResolver`. The server calls
+it once per request with the credential-free exact route contract: database id,
+physical database name, API id, ordered physical schemas, and roles in
+`[anonymous, authenticated]` order. The result must contain an explicit user,
+password, and matching database; `connectionString` and control-plane credential
+fallbacks are rejected. The secret-bearing result remains in a server-owned
+`WeakMap`, while Express context and Graphile consume the same frozen resolution
+and independently verify its opaque pool identity.
+
+```typescript
+GraphQLServer({
+  pg: controlPlanePg,
+  graphile: { introspectionMode: 'scoped-required' },
+  runtimePgResolver: async ({ databaseId, databaseName, apiId, schemas, roles }) => {
+    const login = await credentialStore.get({
+      databaseId,
+      databaseName,
+      apiId,
+      schemas,
+      roles
+    });
+    return {
+      database: databaseName,
+      user: login.user,
+      password: login.password
+    };
+  }
+});
+```
+
+`runtimePg` remains a compatibility path for one statically configured route.
+In production or `scoped-required` mode it must include an explicit database and
+be paired with an exact credential-free `runtimePgStaticIdentity`; any request
+whose database/API/schema/role contract differs fails closed. A dynamic server
+must use the resolver even when several databases happen to share a login.
+
+The resolver is part of the trusted routing boundary and must key its lookup by
+immutable `databaseId`. The server requires its normalized host, port, database,
+and TLS policy to match the control-plane tenant connection exactly, then binds
+the complete target/login/pool contract into an opaque identity and rechecks the
+route before every consumer reads it. A deployment where tenant databases live
+on different network endpoints needs one future per-route resolver shared by
+both control and runtime lanes; this implementation rejects that topology
+rather than authenticating/configuring against one server and executing against
+another.
 
 ## Configuration
 
@@ -123,6 +170,13 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `PGPASSWORD`                   | Postgres password                     | `password`                                                    |
 | `PGDATABASE`                   | Postgres database                     | `postgres`                                                    |
 | `GRAPHILE_SCHEMA`              | Comma-separated schemas to expose     | empty                                                         |
+| `GRAPHILE_INTROSPECTION_CLIENT_RELEASE_MODE` | Reuse or destroy the exact catalog-introspection client after gather | `reuse` |
+| `GRAPHILE_REALTIME_SCHEMA`     | Exact schema containing realtime cursor functions | `realtime_public`                                  |
+| `GRAPHILE_REALTIME_NOTIFICATION_MODE` | Dedicated subscriber or opt-in exact-topic broker | `dedicated` |
+| `GRAPHILE_REALTIME_NOTIFICATION_ROLE_REVALIDATION_MS` | Maximum age of shared-listener role audit | `60000` |
+| `GRAPHILE_REALTIME_CURSOR_POLL_INTERVAL_MS` | Cursor recovery poll interval | `5000` |
+| `GRAPHILE_REALTIME_CURSOR_HEARTBEAT_INTERVAL_MS` | Cursor listener heartbeat interval | `30000` |
+| `GRAPHILE_RELEASE_BUILD_STATE_AFTER_VALIDATION` | Release schema-construction-only state after successful validation | `false` |
 | `FEATURES_SIMPLE_INFLECTION`   | Enable simple inflection              | `true`                                                        |
 | `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
 | `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |
@@ -130,12 +184,64 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `API_IS_PUBLIC`                | Serve public APIs only                | `true`                                                        |
 | `API_EXPOSED_SCHEMAS`          | Additional schemas to expose          | empty                                                         |
 | `API_META_SCHEMAS`             | Meta schemas to query                 | `routing_public,metaschema_public,metaschema_modules_public` |
+| `API_ALLOW_META_SCHEMA_HEADER` | Enable the privileged metadata admin surface on an isolated private ingress | `false` |
 | `API_ANON_ROLE`                | Anonymous role name                   | `administrator`                                               |
 | `API_ROLE_NAME`                | Authenticated role name               | `administrator`                                               |
+| `GRAPHQL_INTERNAL_REQUEST_SECRET` | Minimum-32-byte token for reserved routing, actor-identity, and cache-administration headers | empty; reserved headers fail closed |
+| `GRAPHQL_ROUTING_CACHE_MAX_ENTRIES` | Resolved routing/service labels retained per process; must be at least the effective Graphile resident capacity | `max(1024, effective Graphile capacity)` |
 | `GRAPHQL_OBSERVABILITY_ENABLED` | Master switch for debug routes and sampler | `false`                                                  |
+| `GRAPHQL_OBSERVABILITY_TOKEN` | Bearer token (minimum 32 bytes) required for loopback-only production observability | empty |
 | `GRAPHQL_DEBUG_SAMPLER_ENABLED` | Enables periodic NDJSON sampling when observability is on | `true`                                   |
 | `GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS` | Sampler interval in milliseconds | `10000`                                                       |
 | `GRAPHQL_DEBUG_SAMPLER_DIR`    | Override output directory for sampler logs | `graphql/server/logs`                                     |
+| `GRAPHILE_BUILD_WATCHDOG_MS`   | Latch schema-build admission unhealthy after one admitted build exceeds this duration; recovery requires a process restart | `300000` |
+
+The build watchdog never cancels or releases an overdue build, because JavaScript
+and plugin work cannot be canceled safely. It rejects queued and subsequent
+builds with `GRAPHILE_BUILD_STUCK_RESTART_REQUIRED`, prevents late publication,
+and leaves resident handlers available while the process is restarted.
+
+Programmatic `graphile.extends` and `graphile.preset` values are applied after
+Constructive's feature preset, so trusted caller plugins and ordinary Graphile
+schema/runtime settings take effect. They cannot replace the exact tenant
+`pgServices`, security-GUC context, GraphQL/WebSocket transport policy, error
+masking, or server-owned auth/admission plugins; explicit attempts fail startup
+with `GRAPHILE_PROTECTED_PRESET_OVERRIDE`. Graphile plugins execute trusted
+server-side code, so this boundary prevents structural misconfiguration rather
+than sandboxing a hostile plugin implementation.
+
+The routing cache stores host/header labels and their resolved API metadata. Its
+capacity is independent from Graphile build identity: evicting a routing label
+causes the next request to resolve that label again, but it never disposes a
+valid resident Graphile instance. `/debug/memory` reports its size, capacity,
+hits, misses, and capacity/TTL evictions.
+
+`GRAPHILE_REALTIME_SCHEMA` changes only the exact cursor-function schema for an
+API whose database settings enable realtime. Cursor events are accepted only
+from that API's exposed physical schemas. A foreign cursor row or lost
+subscriber emitter latches that exact generation unavailable, and the next HTTP
+request receives `503 GRAPHILE_REALTIME_UNAVAILABLE` instead of entering its
+Graphile handler. The failed generation is identity-checked and retired so the
+following request can build a fresh one without a stale callback evicting a
+healthy replacement. Realtime-enabled cached instances expose a no-server
+Grafserv upgrade handler. The shared server routes `/graphql` upgrades through
+the same API resolution, origin, authentication, request-context, build
+contract, runtime-role, listener-attestation, and cache-admission path as HTTP;
+other paths and failed admission close with stable metadata-free errors.
+Accepted sockets retain their exact cache generation until close and are
+destroyed before that generation is disposed.
+
+`GRAPHILE_REALTIME_NOTIFICATION_MODE=shared-exact` is an experimental,
+default-off transport seam and additionally requires a
+`notificationPgResolver` in `ConstructiveOptions`. It must return explicit
+credentials for a dedicated listener login and the exact routed physical
+database; runtime or control-plane credentials are never a fallback. The
+listener identity in a Graphile build contract is an opaque digest, and raw
+connection configuration is neither serialized into the contract nor exposed
+through cache statistics. The transport remains experimental until the hostile
+cross-tenant subscription suite and loaded churn qualification pass on the
+production-shaped fixture; the upgrade router itself is now production-wired
+and fail-closed.
 
 ## Testing
 

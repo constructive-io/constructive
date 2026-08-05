@@ -1,23 +1,38 @@
 jest.mock('pg-cache', () => ({
-  getPgPool: jest.fn()
+  acquirePgPool: jest.fn(),
+  getPgPoolIdentity: jest.fn().mockReturnValue('pg:test'),
+  PG_POOL_CAPACITY_ERROR_CODE: 'PG_POOL_CAPACITY'
 }));
 
 jest.mock('@constructive-io/express-context', () => ({
   createDefaultRegistry: jest.fn(() => ({
-    resolve: jest.fn().mockResolvedValue(undefined)
+    resolve: jest.fn(async (name: string) => name === 'databaseSettings' ? {
+      enableAggregates: false,
+      enablePostgis: false,
+      enableSearch: false,
+      enableDirectUploads: false,
+      enablePresignedUploads: false,
+      enableManyToMany: false,
+      enableConnectionFilter: false,
+      enableLtree: false,
+      enableLlm: false,
+      enableRealtime: false,
+      enableBulk: false,
+      enableI18n: false
+    } : undefined)
   }))
 }));
 
 import { svcCache } from '@pgpmjs/server-utils';
 import type { Request } from 'express';
 import type { Pool } from 'pg';
-import { getPgPool } from 'pg-cache';
+import { acquirePgPool } from 'pg-cache';
 
 import type { ApiOptions } from '../../types';
 import { getApiConfig } from '../api';
 import { ResolvedRoute, resolveRoute, routeToApiStructure } from '../routing';
 
-const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
+const mockAcquirePgPool = acquirePgPool as jest.MockedFunction<typeof acquirePgPool>;
 
 const matchedRoute = (overrides: Partial<ResolvedRoute> = {}): ResolvedRoute => ({
   route_binding_id: 'rb-1',
@@ -29,7 +44,7 @@ const matchedRoute = (overrides: Partial<ResolvedRoute> = {}): ResolvedRoute => 
   domain_id: 'dom-1',
   target_catalog_id: 'cat-1',
   target_module: 'apis',
-  target_source_id: 'api-src-1',
+  target_source_id: 'api-1',
   target_owner_scope: 'database',
   target_owner_key: 'db-1',
   resolved_config: {
@@ -51,6 +66,11 @@ const noMatchRoute = (): ResolvedRoute =>
   matchedRoute({ route_binding_id: null, target_module: null, resolved_config: null });
 
 const createPool = (query: jest.Mock): Pool => ({ query } as unknown as Pool);
+const leasePool = (pool: Pool) => ({
+  pool,
+  identity: 'pg:test',
+  release: jest.fn()
+});
 
 describe('resolveRoute', () => {
   it('returns the row when a route matches', async () => {
@@ -67,6 +87,22 @@ describe('resolveRoute', () => {
     const query = jest.fn().mockResolvedValue({ rows: [noMatchRoute()] });
     const row = await resolveRoute(createPool(query), 'constructive_routing_public', 'nope.example.com');
     expect(row).toBeNull();
+  });
+
+  it('fails closed when the resolver violates its exactly-one-row contract', async () => {
+    const zeroRows = await resolveRoute(
+      createPool(jest.fn().mockResolvedValue({ rows: [] })),
+      'constructive_routing_public',
+      'api.example.com'
+    );
+    const duplicateRows = await resolveRoute(
+      createPool(jest.fn().mockResolvedValue({ rows: [matchedRoute(), matchedRoute()] })),
+      'constructive_routing_public',
+      'api.example.com'
+    );
+
+    expect(zeroRows).toBeNull();
+    expect(duplicateRows).toBeNull();
   });
 
   it('returns null when the resolver function is not installed', async () => {
@@ -121,6 +157,55 @@ describe('routeToApiStructure', () => {
   it('returns null when resolved_config lacks api essentials', () => {
     expect(routeToApiStructure(matchedRoute({ resolved_config: {} }), opts)).toBeNull();
   });
+
+  it('fails closed when route visibility does not match the server ingress', () => {
+    const privateRoute = matchedRoute({
+      resolved_config: {
+        ...(matchedRoute().resolved_config as Record<string, unknown>),
+        is_public: false
+      }
+    });
+
+    expect(routeToApiStructure(privateRoute, opts)).toBeNull();
+  });
+
+  it('fails closed when exact roles or physical schemas are absent', () => {
+    expect(routeToApiStructure(matchedRoute({
+      resolved_config: {
+        ...(matchedRoute().resolved_config as Record<string, unknown>),
+        anon_role: undefined
+      }
+    }), opts)).toBeNull();
+    expect(routeToApiStructure(matchedRoute({
+      resolved_config: {
+        ...(matchedRoute().resolved_config as Record<string, unknown>),
+        schemas: ['app_public', 'app_public']
+      }
+    }), opts)).toBeNull();
+  });
+
+  it('accepts Constructive dash-prefixed physical schemas', () => {
+    expect(routeToApiStructure(matchedRoute({
+      resolved_config: {
+        ...(matchedRoute().resolved_config as Record<string, unknown>),
+        schemas: ['customer-db-a1b2c3d4-app-public']
+      }
+    }), opts)).toMatchObject({
+      schema: ['customer-db-a1b2c3d4-app-public']
+    });
+  });
+
+  it('fails closed when route and resolved-config identities disagree', () => {
+    expect(routeToApiStructure(matchedRoute({
+      target_source_id: 'another-api'
+    }), opts)).toBeNull();
+    expect(routeToApiStructure(matchedRoute({
+      target_owner_key: 'another-database'
+    }), opts)).toBeNull();
+    expect(routeToApiStructure(matchedRoute({
+      target_owner_scope: 'organization'
+    }), opts)).toBeNull();
+  });
 });
 
 describe('getApiConfig with scoped routing enabled', () => {
@@ -164,7 +249,7 @@ describe('getApiConfig with scoped routing enabled', () => {
       if (sql.includes('resolve_route')) return { rows: [matchedRoute()] };
       throw new Error(`unexpected query: ${sql}`);
     });
-    mockGetPgPool.mockReturnValue(createPool(query) as never);
+    mockAcquirePgPool.mockImplementation(() => leasePool(createPool(query)));
 
     const result = await getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }));
 
@@ -181,7 +266,7 @@ describe('getApiConfig with scoped routing enabled', () => {
       if (sql.includes('resolve_route')) return { rows: [noMatchRoute()] };
       throw new Error(`unexpected query (no legacy fallback): ${sql}`);
     });
-    mockGetPgPool.mockReturnValue(createPool(query) as never);
+    mockAcquirePgPool.mockImplementation(() => leasePool(createPool(query)));
 
     const result = await getApiConfig(createOptions(), createRequest({ host: 'nomatch.example.com' }));
 
@@ -189,7 +274,43 @@ describe('getApiConfig with scoped routing enabled', () => {
     expect(query.mock.calls.some(([sql]) => String(sql).includes('services_public'))).toBe(false);
   });
 
-  it('throws NO_DATABASE_ID when a route resolves without a database id (no default database)', async () => {
+  it('re-resolves a hot hostname so a reassignment cannot use stale tenant metadata', async () => {
+    let route = matchedRoute();
+    const query = jest.fn(async (sql: string, params: unknown[]) => {
+      if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
+      if (sql.includes('resolve_route')) return { rows: [route] };
+      throw new Error(`unexpected query: ${sql}`);
+    });
+    mockAcquirePgPool.mockImplementation(() => leasePool(createPool(query)));
+
+    const first = await getApiConfig(
+      createOptions(),
+      createRequest({ host: 'api.example.com' })
+    );
+    route = matchedRoute({
+      target_source_id: 'api-2',
+      target_owner_key: 'db-2',
+      resolved_config: {
+        api_id: 'api-2',
+        database_id: 'db-2',
+        dbname: 'tenant_db_2',
+        role_name: 'api_role_2',
+        anon_role: 'api_anon_2',
+        is_public: true,
+        schemas: ['app_two_public']
+      }
+    });
+    const second = await getApiConfig(
+      createOptions(),
+      createRequest({ host: 'api.example.com' })
+    );
+
+    expect(first).toMatchObject({ databaseId: 'db-1' });
+    expect(second).toMatchObject({ databaseId: 'db-2', dbname: 'tenant_db_2' });
+    expect(query.mock.calls.filter(([sql]) => String(sql).includes('resolve_route'))).toHaveLength(2);
+  });
+
+  it('fails closed when a route resolves without a database id', async () => {
     const routeWithoutDbId = matchedRoute({
       resolved_config: {
         api_id: 'api-1',
@@ -205,10 +326,10 @@ describe('getApiConfig with scoped routing enabled', () => {
       if (sql.includes('resolve_route')) return { rows: [routeWithoutDbId] };
       throw new Error(`unexpected query: ${sql}`);
     });
-    mockGetPgPool.mockReturnValue(createPool(query) as never);
+    mockAcquirePgPool.mockImplementation(() => leasePool(createPool(query)));
 
     await expect(
       getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }))
-    ).rejects.toMatchObject({ code: 'NO_DATABASE_ID' });
+    ).resolves.toBeNull();
   });
 });
