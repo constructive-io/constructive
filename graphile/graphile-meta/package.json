@@ -33,11 +33,11 @@
     "makage": "^0.3.0"
   },
   "peerDependencies": {
-    "graphile-build": "5.1.1",
-    "graphile-build-pg": "5.1.3",
-    "graphile-config": "1.1.0",
-    "graphql": "16.13.0",
-    "postgraphile": "5.1.3"
+    "graphile-build": "^5.1.1",
+    "graphile-build-pg": "^5.1.3",
+    "graphile-config": "^1.1.0",
+    "graphql": "^16.9.0",
+    "postgraphile": "^5.1.3"
   },
   "keywords": [
     "postgraphile",

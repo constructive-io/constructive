@@ -46,12 +46,12 @@
     "pg": "^8.21.0"
   },
   "peerDependencies": {
-    "@dataplan/pg": "1.1.1",
-    "grafast": "1.1.1",
-    "graphile-build": "5.1.1",
-    "graphile-build-pg": "5.1.3",
-    "graphile-config": "1.1.0",
-    "graphql": "16.13.0"
+    "@dataplan/pg": "^1.1.1",
+    "grafast": "^1.1.1",
+    "graphile-build": "^5.1.1",
+    "graphile-build-pg": "^5.1.3",
+    "graphile-config": "^1.1.0",
+    "graphql": "^16.9.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
