@@ -17,10 +17,17 @@ minimumReleaseAge: 14d
 # inside a policy rollout.
 blockExoticSubdeps: false
 
-# The npm accounts we publish under. Everything they publish skips the wait, so
-# this lists accounts we control — nobody else's.
+# The npm accounts whose releases skip the wait: the ones we publish under, plus
+# any upstream account we trust as if it were ours. Adding an account here
+# exempts everything it publishes, so each addition is a trust decision.
 maintainers:
   - pyramation
+  # Trusted upstream, not ours: the graphile v5 stack (grafast, graphile-build*,
+  # postgraphile, grafserv, @dataplan/*, graphile-config, pg-sql2) is all one
+  # maintainer, we pin his exact versions, and we run his code in-process. A
+  # two-week wait on that stack only ever blocks us from the versions we
+  # deliberately upgraded to.
+  - benjie
 
 # Scopes we own outright, emitted as `@scope/*`.
 scopes:
@@ -31,9 +38,14 @@ scopes:
   - "@pgpmjs"
   - "@pgsql"
 
-# Our published inventory, pinned as a dependency. Every unscoped and
-# other-scoped package we publish is listed there by name.
-inventory: "@constructive-io/pnpm-policy/inventory.json"
+# The generated inventory: every unscoped and other-scoped package our
+# maintainers publish, listed by name. Rebuild it with `pnpm run policy:refresh`
+# after adding a maintainer, and review the diff.
+#
+# Local rather than the shared `@constructive-io/pnpm-policy/inventory.json`
+# because that package is built from pyramation alone, and this workspace also
+# trusts benjie (see `maintainers`).
+inventory: ./pnpm-policy.inventory.json
 
 # Exempt only the inventory names this workspace's lockfile actually resolves —
 # the list should describe this repo, not the whole npm account. Scope globs are
@@ -60,4 +72,52 @@ allowBuilds: []
 #       versions: ["4.17.21"]
 #       reason: CVE-2021-23337 fix, published today
 #       until: 2026-09-01
-exceptions: []
+#
+# Every entry below has one shape: the spec has no satisfying release old enough
+# to install, so any re-resolution — `pnpm up`, or `pnpm install` after a
+# package.json edit — fails with ERR_PNPM_NO_MATURE_MATCHING_VERSION even though
+# the version is already in the lockfile. `until` is the day that version turns
+# two weeks old, so `check` expires the waiver the moment it stops mattering.
+#
+# The graphile v5 stack is deliberately absent: `benjie` is a maintainer, so the
+# whole family is exempt by inventory instead of by waivers that would need
+# rewriting on every upgrade.
+exceptions:
+  # Toolchain floors caught up with the newest release, so the floor itself is
+  # the only satisfying version.
+  - package: "@typescript-eslint/eslint-plugin"
+    versions: ["8.66.0"]
+    reason: ^8.66.0 floor matches the newest release; nothing older satisfies it
+    until: 2026-08-17
+  - package: "@typescript-eslint/parser"
+    versions: ["8.66.0"]
+    reason: ^8.66.0 floor matches the newest release; nothing older satisfies it
+    until: 2026-08-17
+  - package: "@playwright/test"
+    versions: ["1.62.1"]
+    reason: ^1.62.1 floor matches the newest release; nothing older satisfies it
+    until: 2026-08-13
+  - package: "@types/pg"
+    versions: ["8.20.4"]
+    reason: ^8.20.4 floor matches the newest release; nothing older satisfies it
+    until: 2026-08-18
+  - package: "@types/react"
+    versions: ["19.2.18"]
+    reason: ^19.2.18 floor matches the newest release; nothing older satisfies it
+    until: 2026-08-13
+  - package: "@types/react-dom"
+    versions: ["19.2.4"]
+    reason: ^19.2.4 floor matches the newest release; nothing older satisfies it
+    until: 2026-08-13
+  - package: "@types/semver"
+    versions: ["7.8.0"]
+    reason: ^7.8.0 floor matches the newest release; nothing older satisfies it
+    until: 2026-08-16
+  - package: minimatch
+    versions: ["10.2.6"]
+    reason: ^10.2.6 floor matches the newest release; nothing older satisfies it
+    until: 2026-08-10
+  - package: "@0no-co/graphql.web"
+    versions: ["1.3.3"]
+    reason: ^1.3.3 floor matches the newest release; nothing older satisfies it
+    until: 2026-08-10
