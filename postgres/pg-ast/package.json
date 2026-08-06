@@ -43,6 +43,6 @@
   },
   "dependencies": {
     "@pgsql/types": "^18.0.0",
-    "nested-obj": "0.2.2"
+    "nested-obj": "0.2.3"
   }
 }

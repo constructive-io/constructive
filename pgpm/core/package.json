@@ -59,7 +59,7 @@
     "@pgpmjs/types": "workspace:^",
     "csv-to-pg": "workspace:^",
     "genomic": "^5.6.5",
-    "git-changed": "^0.3.0",
+    "git-changed": "^0.4.0",
     "glob": "^13.0.6",
     "parse-package-name": "^1.0.0",
     "pg": "^8.21.0",
@@ -67,6 +67,6 @@
     "pg-env": "workspace:^",
     "pgsql-deparser": "^18.3.3",
     "pgsql-parser": "^18.2.3",
-    "yanse": "^0.2.1"
+    "yanse": "^0.2.2"
   }
 }

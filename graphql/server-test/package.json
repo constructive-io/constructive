@@ -40,7 +40,7 @@
     "gql-ast": "workspace:^",
     "inquirerer": "^4.9.3",
     "makage": "^0.3.0",
-    "nested-obj": "^0.2.2"
+    "nested-obj": "^0.2.3"
   },
   "dependencies": {
     "@constructive-io/graphql-dev-server": "workspace:^",
