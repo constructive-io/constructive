@@ -30,6 +30,12 @@ importers:
       '@constructive-io/eslint-config':
         specifier: ^0.2.0
         version: 0.2.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+      '@constructive-io/pnpm-policy':
+        specifier: 0.3.1
+        version: 0.3.1
+      '@constructive-io/pnpm-policy-graphile':
+        specifier: 0.2.0
+        version: 0.2.0
       '@jest/test-sequencer':
         specifier: ^30.4.1
         version: 30.4.1
@@ -76,8 +82,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0
       pnpm-policy:
-        specifier: ^0.2.2
-        version: 0.2.2
+        specifier: ^0.4.0
+        version: 0.4.0
       prettier:
         specifier: ^3.9.6
         version: 3.9.6
@@ -4574,6 +4580,18 @@ packages:
       }
     peerDependencies:
       eslint: ^9
+
+  '@constructive-io/pnpm-policy-graphile@0.2.0':
+    resolution:
+      {
+        integrity: sha512-1V2VlZxBPDyK8HD7c0uq1Vo6Hmh7YQCqESQSA9sYKut+aXHgQ+RcS+J+AZn+zDIJxsogDCVCdv8nC+7hhOw78g==,
+      }
+
+  '@constructive-io/pnpm-policy@0.3.1':
+    resolution:
+      {
+        integrity: sha512-v2nimFniinTq2HGMn6QQehXAYRihd+csUefXCocXLqMAKuypqfxjzVVd3I94dTuexrjPghNt7hTxSeoflZkcYg==,
+      }
 
   '@constructive-io/fetch@1.1.2':
     resolution:
@@ -13321,10 +13339,10 @@ packages:
       }
     engines: { node: '>=4' }
 
-  pnpm-policy@0.2.2:
+  pnpm-policy@0.4.0:
     resolution:
       {
-        integrity: sha512-Fj5/ACIZG/AGynTvhT8/7fJTf8ya3jG/Mkq/OMNVZhfTTJ1oniRTsKBHlXGF4sSecvIFqkmeHpn8CsQFwGcENA==,
+        integrity: sha512-ZtywuzjErUZ7PZzuZJ0FMSJ5wFmKRZaZT7onF6GbYB2gUkgczCtLzqy6P6s8regOi1dAXgs7PyIVrkuMPRJtNw==,
       }
     hasBin: true
 
@@ -16079,6 +16097,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - typescript
+
+  '@constructive-io/pnpm-policy-graphile@0.2.0': {}
+
+  '@constructive-io/pnpm-policy@0.3.1': {}
 
   '@constructive-io/fetch@1.1.2': {}
 
@@ -22295,7 +22317,7 @@ snapshots:
 
   pluralize@7.0.0: {}
 
-  pnpm-policy@0.2.2:
+  pnpm-policy@0.4.0:
     dependencies:
       yaml: 2.9.0
       yamlize: 0.12.1
