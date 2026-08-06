@@ -10,8 +10,12 @@ import type { ErrorClass, ErrorContext, ErrorDefinition } from './types';
  * The `[keyof C]` tuple wrapper prevents `never` from distributing.
  */
 export type ErrorFactory<C extends ErrorContext> = [keyof C] extends [never]
-  ? (context?: Record<string, never>, overrideMessage?: string) => ConstructiveError
-  : (context: C, overrideMessage?: string) => ConstructiveError;
+  ? (context?: Record<string, never>, overrideMessage?: string,
+      cause?: unknown
+    ) => ConstructiveError
+  : (context: C, overrideMessage?: string,
+      cause?: unknown
+    ) => ConstructiveError;
 
 export type ErrorsApi<R> = {
   [K in keyof R]: R[K] extends { __context: (context: infer C) => void }
@@ -25,19 +29,23 @@ export type ErrorsApi<R> = {
 export function makeErrorFromDefinition<C extends ErrorContext>(
   def: ErrorDefinition<C>
 ): ErrorFactory<C> {
-  const factory = (context?: ErrorContext, overrideMessage?: string): ConstructiveError =>
+  const factory = (context?: ErrorContext, overrideMessage?: string,
+    cause?: unknown
+  ): ConstructiveError =>
     new ConstructiveError({
       code: def.code,
       message: overrideMessage ?? format(def.code, context ?? {}),
       errorClass: def.class,
       http: def.http,
-      context
+      context,
+      cause,
     });
   return factory as ErrorFactory<C>;
 }
 
 /** Build the `errors.*` factory object from a registry. */
-export function buildErrors<R extends Record<string, { __context: (context: never) => void }>>(
+export function buildErrors<R extends Record<string, { __context: (context: never) => void }>,
+>(
   reg: R
 ): ErrorsApi<R> {
   const out: Record<string, unknown> = {};
@@ -59,14 +67,17 @@ export function makeError<C extends ErrorContext>(
   messageFn: (context: C) => string,
   httpCode = 500,
   errorClass: ErrorClass = 'internal'
-): (context: C, overrideMessage?: string) => ConstructiveError {
-  return (context: C, overrideMessage?: string) =>
+): (context: C, overrideMessage?: string,
+  cause?: unknown
+) => ConstructiveError {
+  return (context: C, overrideMessage?: string, cause?: unknown) =>
     new ConstructiveError({
       code,
       message: overrideMessage ?? messageFn(context),
       errorClass,
       http: httpCode,
-      context
+      context,
+      cause,
     });
 }
 

@@ -1,267 +1,268 @@
-import { createOAuthClient } from '../src/oauth-client';
-import { getProvider, getProviderIds } from '../src/providers';
-import { generateState, verifyState } from '../src/utils/state';
+import { ConstructiveError } from '@constructive-io/errors';
+
+import {
+  createOAuthClient,
+  createSignedState,
+  deriveCodeChallenge,
+  generateCodeVerifier,
+  getProvider,
+  resolveSameOriginReturnPath,
+  verifyCodeChallenge,
+  verifySignedState,
+} from '../src';
+
+const config = {
+  providers: {
+    google: {
+      clientId: 'google-client-id',
+      clientSecret: 'google-client-secret',
+      pkceEnabled: true,
+    },
+    github: {
+      clientId: 'github-client-id',
+      clientSecret: 'github-client-secret',
+      pkceEnabled: true,
+    },
+  },
+  baseUrl: 'https://api.example.com',
+};
 
 describe('OAuthClient', () => {
-  const config = {
-    providers: {
-      google: {
-        clientId: 'test-google-client-id',
-        clientSecret: 'test-google-client-secret',
+  afterEach(() => jest.restoreAllMocks());
+
+  it.each(['google', 'github'])(
+    'uses S256 PKCE for %s authorization',
+    (provider) => {
+      const client = createOAuthClient(config);
+      const result = client.getAuthorizationUrl({ provider,
+        state: 'signed-state',
+      });
+      const url = new URL(result.url);
+
+      expect(url.searchParams.get('state')).toBe('signed-state');
+      expect(url.searchParams.get('code_challenge_method')).toBe('S256');
+      expect(url.searchParams.get('code_challenge')).toBe(result.codeChallenge);
+      expect(result.codeChallenge).toBe(
+        deriveCodeChallenge(result.codeVerifier)
+      );
+      expect(url.searchParams.has('code_verifier')).toBe(false);
+    }
+  );
+
+  it('rejects providers that disable PKCE', () => {
+    const client = createOAuthClient({
+      ...config,
+      providers: { google: { ...config.providers.google, pkceEnabled: false } },
+    });
+
+    expect(() => client.getAuthorizationUrl({ provider: 'google' })).toThrow(
+      expect.objectContaining({ code: 'INVALID_OAUTH_PKCE' })
+    );
+  });
+
+  it('rejects an unsupported provider with a stable domain error', () => {
+    const client = createOAuthClient({
+      ...config,
+      providers: {
+        custom: {
+          clientId: 'custom',
+          clientSecret: 'secret',
+          pkceEnabled: true,
+        },
       },
-      github: {
-        clientId: 'test-github-client-id',
-        clientSecret: 'test-github-client-secret',
+    });
+
+    expect(() => client.getAuthorizationUrl({ provider: 'custom' })).toThrow(
+      expect.objectContaining({ code: 'IDENTITY_PROVIDER_NOT_SUPPORTED' })
+    );
+  });
+
+  it('sends the verifier only to the token endpoint', async () => {
+    const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ access_token: 'access-token' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+    const client = createOAuthClient(config);
+    const codeVerifier = generateCodeVerifier();
+
+    await client.exchangeCode({
+      provider: 'google',
+      code: 'code',
+      codeVerifier,
+    });
+
+    const request = fetchMock.mock.calls[0];
+    expect(request[0]).toBe('https://oauth2.googleapis.com/token');
+    expect(String(request[1]?.body)).toContain(`code_verifier=${codeVerifier}`);
+    expect(request[1]).toEqual(
+      expect.objectContaining({
+        redirect: 'error',
+        signal: expect.any(AbortSignal),
+      })
+    );
+  });
+
+  it.each([
+    'http://localhost/token',
+    'https://127.0.0.1/token',
+    'https://169.254.169.254/latest/meta-data',
+    'https://[::1]/token',
+  ])('rejects non-public provider endpoints: %s', (tokenUrl) => {
+    const client = createOAuthClient({
+      ...config,
+      providers: {
+        google: { ...config.providers.google, tokenUrl },
       },
-    },
-    baseUrl: 'https://api.example.com',
-  };
-
-  describe('getAuthorizationUrl', () => {
-    it('should generate authorization URL for Google', () => {
-      const client = createOAuthClient(config);
-      const { url, state } = client.getAuthorizationUrl({ provider: 'google' });
-
-      expect(url).toContain('https://accounts.google.com/o/oauth2/v2/auth');
-      expect(url).toContain('client_id=test-google-client-id');
-      expect(url).toContain('redirect_uri=');
-      expect(url).toContain('response_type=code');
-      expect(url).toContain('scope=openid+email+profile');
-      expect(url).toContain(`state=${state}`);
-      expect(state).toHaveLength(64);
     });
 
-    it('should generate authorization URL for GitHub', () => {
-      const client = createOAuthClient(config);
-      const { url, state } = client.getAuthorizationUrl({ provider: 'github' });
-
-      expect(url).toContain('https://github.com/login/oauth/authorize');
-      expect(url).toContain('client_id=test-github-client-id');
-      expect(url).toContain('scope=user%3Aemail+read%3Auser');
-      expect(state).toHaveLength(64);
-    });
-
-    it('should use custom state when provided', () => {
-      const client = createOAuthClient(config);
-      const customState = 'my-custom-state-123';
-      const { url, state } = client.getAuthorizationUrl({
-        provider: 'google',
-        state: customState,
-      });
-
-      expect(state).toBe(customState);
-      expect(url).toContain(`state=${customState}`);
-    });
-
-    it('should use custom redirect URI when provided', () => {
-      const client = createOAuthClient(config);
-      const customRedirectUri = 'https://custom.example.com/callback';
-      const { url } = client.getAuthorizationUrl({
-        provider: 'google',
-        redirectUri: customRedirectUri,
-      });
-
-      expect(url).toContain(`redirect_uri=${encodeURIComponent(customRedirectUri)}`);
-    });
-
-    it('should use custom scopes when provided', () => {
-      const client = createOAuthClient(config);
-      const { url } = client.getAuthorizationUrl({
-        provider: 'google',
-        scopes: ['email'],
-      });
-
-      expect(url).toContain('scope=email');
-      expect(url).not.toContain('profile');
-    });
-
-    it('should throw error for unknown provider', () => {
-      const client = createOAuthClient(config);
-
-      expect(() => {
-        client.getAuthorizationUrl({ provider: 'unknown' });
-      }).toThrow('Unknown provider: unknown');
-    });
-
-    it('should throw error for unconfigured provider', () => {
-      const client = createOAuthClient(config);
-
-      expect(() => {
-        client.getAuthorizationUrl({ provider: 'facebook' });
-      }).toThrow('No credentials configured for provider: facebook');
-    });
+    expect(() => client.getAuthorizationUrl({ provider: 'google' })).toThrow(
+      expect.objectContaining({ code: 'IDENTITY_PROVIDER_NOT_CONFIGURED' })
+    );
   });
 
-  describe('getConfig', () => {
-    it('should return config with defaults', () => {
-      const client = createOAuthClient(config);
-      const returnedConfig = client.getConfig();
+  it('bounds provider requests with the configured timeout', async () => {
+    jest.spyOn(globalThis, 'fetch').mockImplementation(
+      (_input, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () =>
+            reject(new Error('request aborted'))
+          );
+        })
+    );
+    const client = createOAuthClient({ ...config, requestTimeoutMs: 5 });
 
-      expect(returnedConfig.callbackPath).toBe('/auth/{provider}/callback');
-      expect(returnedConfig.stateCookieName).toBe('oauth_state');
-      expect(returnedConfig.stateCookieMaxAge).toBe(600);
-    });
+    await expect(
+      client.exchangeCode({
+        provider: 'google',
+        code: 'code',
+        codeVerifier: generateCodeVerifier(),
+      })
+    ).rejects.toMatchObject({ code: 'OAUTH_TOKEN_EXCHANGE_FAILED' });
+  });
 
-    it('should allow overriding defaults', () => {
-      const client = createOAuthClient({
-        ...config,
-        callbackPath: '/custom/callback/{provider}',
-        stateCookieName: 'custom_state',
-        stateCookieMaxAge: 300,
-      });
-      const returnedConfig = client.getConfig();
+  it('does not copy a provider response body into token errors', async () => {
+    jest
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(
+        new Response('secret provider diagnostic', { status: 401 })
+      );
+    const client = createOAuthClient(config);
 
-      expect(returnedConfig.callbackPath).toBe('/custom/callback/{provider}');
-      expect(returnedConfig.stateCookieName).toBe('custom_state');
-      expect(returnedConfig.stateCookieMaxAge).toBe(300);
-    });
+    await expect(
+      client.exchangeCode({
+        provider: 'google',
+        code: 'bad-code',
+        codeVerifier: generateCodeVerifier(),
+      })
+    ).rejects.toEqual(
+      expect.objectContaining({
+        code: 'OAUTH_TOKEN_EXCHANGE_FAILED',
+        message: 'The identity provider token exchange failed.',
+      })
+    );
+  });
+
+  it('retains fetch failures as an internal cause', async () => {
+    const cause = new Error('network unavailable');
+    jest.spyOn(globalThis, 'fetch').mockRejectedValue(cause);
+    const client = createOAuthClient(config);
+
+    await expect(
+      client.exchangeCode({
+        provider: 'google',
+        code: 'code',
+        codeVerifier: generateCodeVerifier(),
+      })
+    ).rejects.toMatchObject({ code: 'OAUTH_TOKEN_EXCHANGE_FAILED', cause });
   });
 });
 
-describe('providers', () => {
-  it('should have all expected providers', () => {
-    const ids = getProviderIds();
-    expect(ids).toContain('google');
-    expect(ids).toContain('github');
-    expect(ids).toContain('facebook');
-    expect(ids).toContain('linkedin');
+describe('PKCE and signed state primitives', () => {
+  it('generates RFC 7636 verifiers and verifies their challenge', () => {
+    const verifier = generateCodeVerifier();
+    const challenge = deriveCodeChallenge(verifier);
+    expect(verifier).toMatch(/^[A-Za-z0-9._~-]{43,128}$/);
+    expect(verifyCodeChallenge(verifier, challenge)).toBe(true);
   });
 
-  it('should return provider config by id', () => {
-    const google = getProvider('google');
-    expect(google).toBeDefined();
-    expect(google!.id).toBe('google');
-    expect(google!.name).toBe('Google');
-    expect(google!.authorizationUrl).toBe('https://accounts.google.com/o/oauth2/v2/auth');
-  });
-
-  it('should return undefined for unknown provider', () => {
-    const unknown = getProvider('unknown');
-    expect(unknown).toBeUndefined();
-  });
-});
-
-describe('state utilities', () => {
-  describe('generateState', () => {
-    it('should generate random state of default length', () => {
-      const state = generateState();
-      expect(state).toHaveLength(64);
+  it('signs, expires, and detects tampering of state', () => {
+    const secret = 'a'.repeat(32);
+    const state = createSignedState(
+      { provider: 'google', databaseId: 'db-1', pkceChallenge: 'challenge' },
+      { secret, maxAgeMs: 1_000, now: 1_000 }
+    );
+    expect(verifySignedState(state, { secret, now: 1_500 })).toMatchObject({
+      provider: 'google',
+      databaseId: 'db-1',
+      pkceChallenge: 'challenge',
     });
-
-    it('should generate random state of custom length', () => {
-      const state = generateState(16);
-      expect(state).toHaveLength(32);
-    });
-
-    it('should generate unique states', () => {
-      const state1 = generateState();
-      const state2 = generateState();
-      expect(state1).not.toBe(state2);
-    });
-  });
-
-  describe('verifyState', () => {
-    it('should return true for matching states', () => {
-      const state = generateState();
-      expect(verifyState(state, state)).toBe(true);
-    });
-
-    it('should return false for non-matching states', () => {
-      const state1 = generateState();
-      const state2 = generateState();
-      expect(verifyState(state1, state2)).toBe(false);
-    });
-
-    it('should return false for undefined expected state', () => {
-      expect(verifyState(undefined, 'some-state')).toBe(false);
-    });
-
-    it('should return false for undefined actual state', () => {
-      expect(verifyState('some-state', undefined)).toBe(false);
-    });
-
-    it('should return false for different length states', () => {
-      expect(verifyState('short', 'much-longer-state')).toBe(false);
-    });
+    expect(verifySignedState(`${state}x`, { secret, now: 1_500 })).toBeNull();
+    expect(verifySignedState(state, { secret, now: 2_001 })).toBeNull();
   });
 });
 
-describe('provider profile mapping', () => {
-  it('should map Google profile correctly', () => {
-    const google = getProvider('google')!;
-    const profile = google.mapProfile({
-      sub: '123456789',
-      email: 'test@gmail.com',
-      name: 'Test User',
-      picture: 'https://example.com/photo.jpg',
-    });
-
-    expect(profile.provider).toBe('google');
-    expect(profile.providerId).toBe('123456789');
-    expect(profile.email).toBe('test@gmail.com');
-    expect(profile.name).toBe('Test User');
-    expect(profile.picture).toBe('https://example.com/photo.jpg');
+describe('same-origin redirect validation', () => {
+  it('normalizes relative and same-origin targets to a relative path', () => {
+    expect(
+      resolveSameOriginReturnPath(
+        '/dashboard?tab=auth',
+        'https://api.example.com'
+      )
+    ).toBe('/dashboard?tab=auth');
+    expect(
+      resolveSameOriginReturnPath(
+        'https://api.example.com/settings#identity',
+        'https://api.example.com'
+      )
+    ).toBe('/settings#identity');
   });
 
-  it('should map GitHub profile correctly', () => {
-    const github = getProvider('github')!;
-    const profile = github.mapProfile({
-      id: 12345,
-      login: 'testuser',
-      name: 'Test User',
-      email: 'test@github.com',
-      avatar_url: 'https://avatars.githubusercontent.com/u/12345',
+  it('rejects cross-host targets', () => {
+    expect(() =>
+      resolveSameOriginReturnPath(
+        'https://other.example.com/',
+        'https://api.example.com'
+      )
+    ).toThrow(expect.objectContaining({ code: 'INVALID_OAUTH_REDIRECT' }));
+  });
+});
+
+describe('profile normalization', () => {
+  it('keeps only normalized Google metadata', () => {
+    const profile = getProvider('google')!.mapProfile({
+      sub: 'subject',
+      email: 'user@example.com',
+      email_verified: false,
+      name: 'User',
+      access_token: 'must-not-survive',
     });
 
-    expect(profile.provider).toBe('github');
-    expect(profile.providerId).toBe('12345');
-    expect(profile.email).toBe('test@github.com');
-    expect(profile.name).toBe('Test User');
-    expect(profile.picture).toBe('https://avatars.githubusercontent.com/u/12345');
+    expect(profile).toEqual({
+      provider: 'google',
+      providerId: 'subject',
+      email: 'user@example.com',
+      emailVerified: false,
+      name: 'User',
+      picture: null,
+    });
+    expect(profile).not.toHaveProperty('raw');
   });
 
-  it('should map Facebook profile correctly', () => {
-    const facebook = getProvider('facebook')!;
-    const profile = facebook.mapProfile({
-      id: '987654321',
-      name: 'Test User',
-      email: 'test@facebook.com',
-      picture: { data: { url: 'https://example.com/fb-photo.jpg' } },
-    });
-
-    expect(profile.provider).toBe('facebook');
-    expect(profile.providerId).toBe('987654321');
-    expect(profile.email).toBe('test@facebook.com');
-    expect(profile.name).toBe('Test User');
-    expect(profile.picture).toBe('https://example.com/fb-photo.jpg');
+  it.each([
+    ['google', { email: 'missing-subject@example.com' }],
+    ['google', { sub: 123, email_verified: 'yes' }],
+    ['github', { id: '42', login: 'octo-user' }],
+    ['github', { id: 42, login: null }],
+  ])('rejects malformed %s identity payloads', (provider, payload) => {
+    expect(() => getProvider(provider)!.mapProfile(payload)).toThrow(TypeError);
   });
 
-  it('should map LinkedIn profile correctly', () => {
-    const linkedin = getProvider('linkedin')!;
-    const profile = linkedin.mapProfile({
-      sub: 'linkedin-123',
-      email: 'test@linkedin.com',
-      name: 'Test User',
-      picture: 'https://example.com/li-photo.jpg',
-    });
-
-    expect(profile.provider).toBe('linkedin');
-    expect(profile.providerId).toBe('linkedin-123');
-    expect(profile.email).toBe('test@linkedin.com');
-    expect(profile.name).toBe('Test User');
-    expect(profile.picture).toBe('https://example.com/li-photo.jpg');
-  });
-
-  it('should handle missing optional fields', () => {
-    const google = getProvider('google')!;
-    const profile = google.mapProfile({
-      sub: '123456789',
-    });
-
-    expect(profile.provider).toBe('google');
-    expect(profile.providerId).toBe('123456789');
-    expect(profile.email).toBeNull();
-    expect(profile.name).toBeNull();
-    expect(profile.picture).toBeNull();
+  it('uses ConstructiveError as the protocol error type', () => {
+    const client = createOAuthClient({ ...config, providers: {} });
+    expect(() => client.getAuthorizationUrl({ provider: 'google' })).toThrow(
+      ConstructiveError
+    );
   });
 });

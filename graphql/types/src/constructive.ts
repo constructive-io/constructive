@@ -17,6 +17,7 @@ import {
   GraphileFeatureOptions,
   GraphileOptions} from './graphile';
 import { LlmOptions } from './llm';
+import { oauthServerDefaults,OAuthServerOptions } from './oauth';
 import { SmsOptions } from './sms';
 
 /**
@@ -29,6 +30,8 @@ export interface ConstructiveGraphQLOptions {
   features?: GraphileFeatureOptions;
   /** API configuration options */
   api?: ApiOptions;
+  /** OAuth browser-server behavior; tenant providers remain request-scoped data. */
+  oauth?: OAuthServerOptions;
 }
 
 /**
@@ -58,6 +61,8 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   llm?: LlmOptions;
   /** SMS provider configuration */
   sms?: SmsOptions;
+  /** OAuth browser-server configuration */
+  oauth?: OAuthServerOptions;
 }
 
 /**
@@ -66,7 +71,8 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
 export const constructiveGraphqlDefaults: ConstructiveGraphQLOptions = {
   graphile: graphileDefaults,
   features: graphileFeatureDefaults,
-  api: apiDefaults
+  api: apiDefaults,
+  oauth: oauthServerDefaults,
 };
 
 /**

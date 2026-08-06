@@ -80,6 +80,13 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
       "useTx": false,
     },
   },
+  "oauth": {
+    "cookieSecure": false,
+    "enabled": false,
+    "failurePath": "/",
+    "stateMaxAgeMs": 600000,
+    "successPath": "/",
+  },
   "pg": {
     "database": "config-db",
     "host": "override-host",

@@ -21,6 +21,10 @@ export interface PgSettingsInput {
   requestId: string;
   /** Client IP address (from request-ip middleware) */
   clientIp?: string;
+  /** Server-derived exact request origin */
+  origin?: string;
+  /** User agent for session/audit attribution */
+  userAgent?: string;
 }
 
 /**
@@ -30,7 +34,7 @@ export interface PgSettingsInput {
  * making them available to RLS policies and SQL functions.
  */
 export function buildPgSettings(input: PgSettingsInput): Record<string, string> {
-  const { api, token, requestId, clientIp } = input;
+  const { api, token, requestId, clientIp, origin, userAgent } = input;
   const settings: Record<string, string> = {};
 
   // Role: from token (authenticated) or api (anonymous fallback)
@@ -70,6 +74,12 @@ export function buildPgSettings(input: PgSettingsInput): Record<string, string> 
   // Client metadata (for audit functions)
   if (clientIp) {
     settings['jwt.claims.ip_address'] = clientIp;
+  }
+  if (origin) {
+    settings['jwt.claims.origin'] = origin;
+  }
+  if (userAgent) {
+    settings['jwt.claims.user_agent'] = userAgent;
   }
 
   return settings;

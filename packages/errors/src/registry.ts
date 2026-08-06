@@ -148,6 +148,63 @@ export const registry = {
     http: 404,
     message: 'No single sign-on account was found.'
   }),
+  IDENTITY_PROVIDER_DISABLED: defineError({
+    code: 'IDENTITY_PROVIDER_DISABLED',
+    class: 'public',
+    http: 403,
+    message: 'This identity provider is disabled.',
+  }),
+  IDENTITY_PROVIDER_NOT_SUPPORTED: defineError({
+    code: 'IDENTITY_PROVIDER_NOT_SUPPORTED',
+    class: 'public',
+    http: 400,
+    message: 'This identity provider is not supported.',
+  }),
+  INVALID_OAUTH_STATE: defineError({
+    code: 'INVALID_OAUTH_STATE',
+    class: 'public',
+    http: 400,
+    message: 'The OAuth authorization state is invalid or has expired.',
+  }),
+  INVALID_OAUTH_PKCE: defineError({
+    code: 'INVALID_OAUTH_PKCE',
+    class: 'public',
+    http: 400,
+    message: 'The OAuth PKCE verification failed.',
+  }),
+  INVALID_OAUTH_REDIRECT: defineError({
+    code: 'INVALID_OAUTH_REDIRECT',
+    class: 'public',
+    http: 400,
+    message: 'The OAuth return location is invalid.',
+  }),
+  OAUTH_AUTHORIZATION_FAILED: defineError({
+    code: 'OAUTH_AUTHORIZATION_FAILED',
+    class: 'public',
+    http: 400,
+    message: 'OAuth authorization could not be completed.',
+  }),
+
+  // Protocol failures remain internal. Browser callbacks map them to the
+  // stable public failure above while retaining the original error as `cause`.
+  OAUTH_TOKEN_EXCHANGE_FAILED: defineError({
+    code: 'OAUTH_TOKEN_EXCHANGE_FAILED',
+    class: 'internal',
+    http: 502,
+    message: 'The identity provider token exchange failed.',
+  }),
+  OAUTH_PROFILE_FAILED: defineError({
+    code: 'OAUTH_PROFILE_FAILED',
+    class: 'internal',
+    http: 502,
+    message: 'The identity provider profile request failed.',
+  }),
+  OAUTH_STATE_SECRET_NOT_CONFIGURED: defineError({
+    code: 'OAUTH_STATE_SECRET_NOT_CONFIGURED',
+    class: 'internal',
+    http: 500,
+    message: 'The OAuth state secret is not configured.',
+  }),
   MAGIC_LINK_SIGN_IN_DISABLED: defineError({
     code: 'MAGIC_LINK_SIGN_IN_DISABLED',
     class: 'public',
@@ -398,7 +455,8 @@ export const registry = {
     http: 400,
     message: 'Error: You must be inside one of the workspace packages.'
   }),
-  DEPLOYMENT_FAILED: defineError<{ type: 'Deployment' | 'Revert' | 'Verify'; module: string }>({
+  DEPLOYMENT_FAILED: defineError<{ type: 'Deployment' | 'Revert' | 'Verify'; module: string;
+  }>({
     code: 'DEPLOYMENT_FAILED',
     class: 'internal',
     http: 500,
@@ -427,22 +485,27 @@ export const registry = {
     class: 'internal',
     http: 404,
     message: ({ change, plan }) =>
-      `Change '${change}' not found in plan${plan ? ` file: ${plan}` : ''}`
+      `Change '${change}' not found in plan${plan ? ` file: ${plan}` : ''}`,
   }),
   TAG_NOT_FOUND: defineError<{ tag: string; project?: string }>({
     code: 'TAG_NOT_FOUND',
     class: 'internal',
     http: 404,
     message: ({ tag, project }) =>
-      `Tag '${tag}' not found${project ? ` in project ${project}` : ' in plan'}`
+      `Tag '${tag}' not found${project ? ` in project ${project}` : ' in plan'}`,
   }),
-  PATH_NOT_FOUND: defineError<{ path: string; type: 'module' | 'workspace' | 'file' }>({
+  PATH_NOT_FOUND: defineError<{ path: string; type: 'module' | 'workspace' | 'file';
+  }>({
     code: 'PATH_NOT_FOUND',
     class: 'internal',
     http: 404,
-    message: ({ path, type }) => `${type} path not found: ${path}`
+    message: ({ path, type }) => `${type} path not found: ${path}`,
   }),
-  OPERATION_FAILED: defineError<{ operation: string; target?: string; reason?: string }>({
+  OPERATION_FAILED: defineError<{
+    operation: string;
+    target?: string;
+    reason?: string;
+  }>({
     code: 'OPERATION_FAILED',
     class: 'internal',
     http: 500,
@@ -453,33 +516,40 @@ export const registry = {
     code: 'PLAN_PARSE_ERROR',
     class: 'internal',
     http: 400,
-    message: ({ planPath, errors }) => `Failed to parse plan file ${planPath}: ${errors}`
+    message: ({ planPath, errors }) => `Failed to parse plan file ${planPath}: ${errors}`,
   }),
   CIRCULAR_DEPENDENCY: defineError<{ module: string; dependency: string }>({
     code: 'CIRCULAR_DEPENDENCY',
     class: 'internal',
     http: 400,
-    message: ({ module, dependency }) => `Circular reference detected: ${module} → ${dependency}`
+    message: ({ module, dependency }) =>
+      `Circular reference detected: ${module} → ${dependency}`,
   }),
-  INVALID_NAME: defineError<{ name: string; type: 'tag' | 'change' | 'module'; rules?: string }>({
+  INVALID_NAME: defineError<{
+    name: string;
+    type: 'tag' | 'change' | 'module';
+    rules?: string;
+  }>({
     code: 'INVALID_NAME',
     class: 'internal',
     http: 400,
-    message: ({ name, type, rules }) => `Invalid ${type} name: ${name}${rules ? `. ${rules}` : ''}`
+    message: ({ name, type, rules }) =>
+      `Invalid ${type} name: ${name}${rules ? `. ${rules}` : ''}`
   }),
   WORKSPACE_OPERATION_ERROR: defineError<{ operation: string }>({
     code: 'WORKSPACE_OPERATION_ERROR',
     class: 'internal',
     http: 400,
     message: ({ operation }) =>
-      `Cannot perform non-recursive ${operation} on workspace. Use recursive=true or specify a target module.`
+      `Cannot perform non-recursive ${operation} on workspace. Use recursive=true or specify a target module.`,
   }),
   FILE_NOT_FOUND: defineError<{ filePath: string; type?: string }>({
     code: 'FILE_NOT_FOUND',
     class: 'internal',
     http: 404,
-    message: ({ filePath, type }) => `${type ? `${type} file` : 'File'} not found: ${filePath}`
-  })
+    message: ({ filePath, type }) =>
+      `${type ? `${type} file` : 'File'} not found: ${filePath}`,
+  }),
 } as const;
 
 export type Registry = typeof registry;
@@ -491,11 +561,13 @@ export type RegistryCode = keyof Registry;
  */
 const allDefinitions: Record<string, ErrorDefinition<ErrorContext>> = {
   ...generatedRegistry,
-  ...(registry as unknown as Record<string, ErrorDefinition<ErrorContext>>)
+  ...(registry as unknown as Record<string, ErrorDefinition<ErrorContext>>),
 };
 
 /** Look up a definition by code (from anywhere, not just typed keys). */
-export function getDefinition(code: string): ErrorDefinition<ErrorContext> | undefined {
+export function getDefinition(
+  code: string
+): ErrorDefinition<ErrorContext> | undefined {
   return allDefinitions[code];
 }
 

@@ -49,6 +49,13 @@ describe('cookie utilities', () => {
       });
     });
 
+    it('does not let tenant settings weaken a secure server policy', () => {
+      expect(
+        getSessionCookieConfig({ cookieSecure: false }, false, true).secure
+      ).toBe(true);
+      expect(getSessionCookieConfig(undefined, false, true).secure).toBe(true);
+    });
+
     it('uses rememberMeDuration when rememberMe is true', () => {
       const authSettings: AuthSettings = {
         cookieMaxAge: '3600',
@@ -91,6 +98,12 @@ describe('cookie utilities', () => {
       const config = getDeviceTokenCookieConfig(authSettings);
       expect(config.secure).toBe(true);
       expect(config.domain).toBe('.example.com');
+    });
+
+    it('does not let tenant settings weaken a secure server policy', () => {
+      expect(getDeviceTokenCookieConfig({ cookieSecure: false }, true).secure).toBe(
+        true
+      );
     });
   });
 

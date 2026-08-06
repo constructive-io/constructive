@@ -9,6 +9,12 @@ interface RequestLoggerOptions {
   observabilityEnabled: boolean;
 }
 
+/** OAuth callback queries carry authorization codes, state and provider errors. */
+export const getSafeRequestTarget = (originalUrl: string): string => {
+  const path = originalUrl.split('?', 1)[0] || '/';
+  return path === '/auth' || path.startsWith('/auth/') ? path : originalUrl;
+};
+
 export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptions): RequestHandler => {
   return (req, res, next) => {
     const headerRequestId = req.header('x-request-id');
@@ -22,8 +28,9 @@ export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptio
 
     const host = req.hostname || req.headers.host || 'unknown';
     const ip = req.clientIp ?? req.ip ?? 'unknown';
+    const requestTarget = getSafeRequestTarget(req.originalUrl);
 
-    log.debug(`[${reqId}] -> ${req.method} ${req.originalUrl} host=${host} ip=${ip}`);
+    log.debug(`[${reqId}] -> ${req.method} ${requestTarget} host=${host} ip=${ip}`);
 
     res.on('finish', () => {
       finished = true;
@@ -35,7 +42,7 @@ export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptio
       const svcInfo = req.svc_key ? `svc=${req.svc_key}` : 'svc=unset';
 
       log.debug(
-        `[${reqId}] <- ${res.statusCode} ${req.method} ${req.originalUrl} (${durationMs.toFixed(
+        `[${reqId}] <- ${res.statusCode} ${req.method} ${requestTarget} (${durationMs.toFixed(
           1,
         )} ms) ${apiInfo} ${svcInfo} ${authInfo}`,
       );
@@ -54,7 +61,7 @@ export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptio
 
         log.warn(
           `[${reqId}] connection closed before response completed ` +
-            `${req.method} ${req.originalUrl} (${durationMs.toFixed(1)} ms) ${apiInfo}`,
+            `${req.method} ${requestTarget} (${durationMs.toFixed(1)} ms) ${apiInfo}`,
         );
       });
     }

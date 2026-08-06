@@ -16,9 +16,13 @@
   </a>
 </p>
 
-> Minimal OAuth 2.0 client for social authentication
+> Provider-neutral OAuth 2.0 Authorization Code primitives with mandatory S256 PKCE
 
-A lightweight OAuth 2.0 client for social authentication with Google, GitHub, Facebook, and LinkedIn. Uses [`@constructive-io/csrf`](../csrf) for secure state management. No external auth library dependencies - uses native fetch for HTTP requests.
+This package owns reusable provider resolution, authorization URL creation,
+token exchange, PKCE, signed-state, redirect validation, and minimal profile
+normalization. It deliberately does not own Express routes, tenant lookup,
+cookies, sessions, or environment variables; the consuming server supplies
+already-resolved, validated runtime configuration.
 
 ## Installation
 
@@ -28,86 +32,83 @@ pnpm add @constructive-io/oauth
 
 ## Usage
 
-### Basic Setup
+### Authorization and callback
 
 ```typescript
-import { createOAuthClient } from '@constructive-io/oauth';
+import {
+  createOAuthClient,
+  createSignedState,
+  generateCodeVerifier,
+} from '@constructive-io/oauth';
 
 const client = createOAuthClient({
   providers: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    },
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      clientId: tenantProvider.clientId,
+      clientSecret: tenantProvider.clientSecret,
+      pkceEnabled: true,
     },
   },
   baseUrl: 'https://api.example.com',
 });
 
-// Generate authorization URL
-const { url, state } = client.getAuthorizationUrl({ provider: 'google' });
+const codeVerifier = generateCodeVerifier();
+const state = createSignedState(
+  { provider: 'google', databaseId, returnPath: '/account' },
+  { secret: oauthStateSecret, maxAgeMs: 10 * 60 * 1000 }
+);
 
-// After user authorizes, exchange code for profile
-const profile = await client.handleCallback({ provider: 'google', code });
-```
-
-### Express Middleware
-
-```typescript
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import { createOAuthMiddleware } from '@constructive-io/oauth';
-
-const app = express();
-app.use(cookieParser());
-
-const oauth = createOAuthMiddleware({
-  providers: {
-    google: { clientId: '...', clientSecret: '...' },
-    github: { clientId: '...', clientSecret: '...' },
-    facebook: { clientId: '...', clientSecret: '...' },
-    linkedin: { clientId: '...', clientSecret: '...' },
-  },
-  baseUrl: 'https://api.example.com',
-  onSuccess: async (profile, context) => {
-    // Handle successful authentication
-    // Create/update user in database, generate session token, etc.
-    return { user: profile };
-  },
-  onError: (error, context) => {
-    console.error('OAuth error:', error);
-  },
-  successRedirect: 'https://app.example.com/dashboard',
-  errorRedirect: 'https://app.example.com/login?error=auth_failed',
+const { url } = client.getAuthorizationUrl({
+  provider: 'google',
+  state,
+  codeVerifier,
 });
 
-// Mount routes
-app.get('/auth/:provider', oauth.initiateAuth);
-app.get('/auth/:provider/callback', oauth.handleCallback);
-app.get('/auth/providers', oauth.getProviders);
+// After the caller verifies state and restores the same-flow verifier:
+const profile = await client.handleCallback({
+  provider: 'google',
+  code,
+  codeVerifier,
+});
 ```
+
+The caller is responsible for keeping the verifier out of the authorization
+URL, binding it to the signed state, clearing transient state after callback,
+and issuing a session only after identity persistence succeeds.
+
+### Migration from the legacy Express middleware
+
+The package no longer exports `createOAuthMiddleware` or owns Express routes.
+Server applications should use the provider-neutral primitives above and keep
+tenant routing, request context, cookies, redirects, identity persistence, and
+sessions in their server integration. This is an intentional breaking API
+change; do not copy the removed middleware into an application as a fallback.
 
 ## Supported Providers
 
-| Provider | Scopes |
-|----------|--------|
-| Google | `openid`, `email`, `profile` |
-| GitHub | `user:email`, `read:user` |
-| Facebook | `email`, `public_profile` |
+| Provider | Default scopes               |
+| -------- | ---------------------------- |
+| Google   | `openid`, `email`, `profile` |
+| GitHub   | `user:email`, `read:user`    |
+| Facebook | `email`, `public_profile`    |
 | LinkedIn | `openid`, `profile`, `email` |
+
+The Constructive GraphQL server's initial browser-flow scope enables Google
+and GitHub. Other adapters remain protocol primitives and are not implicitly
+enabled for a tenant.
 
 ## API
 
 ### `createOAuthClient(config)`
 
-Creates an OAuth client instance.
+Creates a client from resolved runtime provider configuration. Authorization
+Code exchanges always require a valid PKCE verifier.
 
-### `createOAuthMiddleware(config)`
+### State and redirect primitives
 
-Creates Express route handlers for OAuth flows.
+`createSignedState`/`verifySignedState` provide short-lived authenticated
+receipts. `resolveSameOriginReturnPath` rejects cross-origin return targets and
+normalizes valid targets to relative paths.
 
 ### `OAuthProfile`
 
@@ -115,14 +116,18 @@ The normalized user profile returned after authentication:
 
 ```typescript
 interface OAuthProfile {
-  provider: string;      // 'google', 'github', etc.
-  providerId: string;    // Provider's unique user ID
+  provider: string;
+  providerId: string;
   email: string | null;
+  emailVerified: boolean | null;
   name: string | null;
   picture: string | null;
-  raw: unknown;          // Original provider response
 }
 ```
+
+Raw provider responses and tokens are intentionally excluded from the profile.
+All failures use registered `@constructive-io/errors` codes; provider response
+bodies are not copied into public errors.
 
 ## License
 

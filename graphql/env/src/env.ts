@@ -30,8 +30,23 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     SMS_SENDER_ID,
     SMS_REQUEST_TIMEOUT_MS,
     SEND_SMS_DRY_RUN,
-    DEVSMS_BASE_URL
+    DEVSMS_BASE_URL,
+    OAUTH_ENABLED,
+    OAUTH_STATE_SECRET,
+    OAUTH_STATE_MAX_AGE_MS,
+    OAUTH_SUCCESS_PATH,
+    OAUTH_FAILURE_PATH,
   } = env;
+
+  const oauthEnabled = parseEnvBoolean(OAUTH_ENABLED);
+  const oauthStateMaxAgeMs = parseEnvNumber(OAUTH_STATE_MAX_AGE_MS);
+  const hasOAuthEnvOverrides = Boolean(
+    oauthEnabled !== undefined ||
+    OAUTH_STATE_SECRET ||
+    oauthStateMaxAgeMs !== undefined ||
+    OAUTH_SUCCESS_PATH ||
+    OAUTH_FAILURE_PATH
+  );
 
   // Keep this function as a partial env-override parser. SMS runtime defaults
   // belong to the consuming application; injecting them here would incorrectly
@@ -50,7 +65,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     graphile: {
       ...(GRAPHILE_SCHEMA && {
         schema: GRAPHILE_SCHEMA.includes(',')
-          ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
+          ? GRAPHILE_SCHEMA.split(',').map((s) => s.trim())
           : GRAPHILE_SCHEMA
       })
     },
@@ -62,8 +77,8 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     api: {
       ...(API_ROUTING_SCHEMA && { routingSchema: API_ROUTING_SCHEMA }),
       ...(API_IS_PUBLIC && { isPublic: parseEnvBoolean(API_IS_PUBLIC) }),
-      ...(API_EXPOSED_SCHEMAS && { exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map(s => s.trim()) }),
-      ...(API_META_SCHEMAS && { metaSchemas: API_META_SCHEMAS.split(',').map(s => s.trim()) }),
+      ...(API_EXPOSED_SCHEMAS && { exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map((s) => s.trim()) }),
+      ...(API_META_SCHEMAS && { metaSchemas: API_META_SCHEMAS.split(',').map((s) => s.trim()) }),
       ...(API_ANON_ROLE && { anonRole: API_ANON_ROLE }),
       ...(API_ROLE_NAME && { roleName: API_ROLE_NAME })
     },
@@ -99,6 +114,17 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
           }
         })
       }
-    })
+    }),
+    ...(hasOAuthEnvOverrides && {
+      oauth: {
+        ...(oauthEnabled !== undefined && { enabled: oauthEnabled }),
+        ...(OAUTH_STATE_SECRET && { stateSecret: OAUTH_STATE_SECRET }),
+        ...(oauthStateMaxAgeMs !== undefined && {
+          stateMaxAgeMs: oauthStateMaxAgeMs,
+        }),
+        ...(OAUTH_SUCCESS_PATH && { successPath: OAUTH_SUCCESS_PATH }),
+        ...(OAUTH_FAILURE_PATH && { failurePath: OAUTH_FAILURE_PATH }),
+      },
+    }),
   };
 };

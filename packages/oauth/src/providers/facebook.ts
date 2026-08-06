@@ -20,6 +20,7 @@ export const facebookProvider: OAuthProviderConfig = {
   tokenUrl: `https://graph.facebook.com/${FACEBOOK_API_VERSION}/oauth/access_token`,
   userInfoUrl: `https://graph.facebook.com/me?fields=id,name,email,picture`,
   scopes: ['email', 'public_profile'],
+  tokenEndpointAuthMethod: 'client_secret_post',
   tokenRequestContentType: 'form',
   mapProfile: (data: unknown): OAuthProfile => {
     const profile = data as FacebookProfile;
@@ -27,9 +28,9 @@ export const facebookProvider: OAuthProviderConfig = {
       provider: 'facebook',
       providerId: profile.id,
       email: profile.email || null,
+      emailVerified: null,
       name: profile.name || null,
       picture: profile.picture?.data?.url || null,
-      raw: data,
     };
   },
 };

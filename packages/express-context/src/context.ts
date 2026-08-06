@@ -73,11 +73,16 @@ export function buildContext(
   const token = req.token ?? null;
   const requestId = req.requestId || '';
 
+  const host = req.get('host') ?? '';
+  const origin = host ? `${req.protocol}://${host}` : '';
+
   const pgSettings = buildPgSettings({
     api,
     token,
     requestId,
-    clientIp: req.clientIp
+    clientIp: req.clientIp,
+    origin,
+    userAgent: req.get('user-agent'),
   });
 
   const tenantPool: Pool = getPgPool({
@@ -114,7 +119,10 @@ export function buildContext(
     pgSettings,
     databaseId: api.databaseId ?? null,
     userId: token?.user_id ?? null,
+    sessionId: token?.session_id ?? null,
     requestId,
+    host,
+    origin,
     pool: tenantPool,
     withPgClient,
     useModule,
@@ -147,7 +155,7 @@ export function buildContext(
     },
     async useLlm() {
       if (llmConfig !== undefined) return llmConfig;
-      const resolved = await useModule('llm') as LlmConfig | undefined;
+      const resolved = (await useModule('llm')) as LlmConfig | undefined;
       llmConfig = resolved ?? null;
       return llmConfig;
     }

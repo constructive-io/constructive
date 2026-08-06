@@ -1,12 +1,12 @@
 # OAuth/SSO Latest-Baseline Rebuild
 
-**Status:** Authoritative planning decision and implementation-audit record; no implementation has started. Update this document as baselines and ownership decisions are frozen.
+**Status:** Authoritative decision and implementation-audit record. CNC phase-one OAuth is implemented and locally validated against the frozen baseline below; Hub and cross-host SSO are deferred.
 
 ## Goal
 
 Rebuild the Hub OAuth/SSO work as a semantic port onto the latest, explicitly frozen CNC and CNC DB baselines. Do not continue a hard rebase on the stacked legacy OAuth/SSO branches. Those branches remain useful only as references for intended behavior, security boundaries, and tests.
 
-This planning branch does not migrate, rewrite, rebase, or cherry-pick OAuth/SSO feature code.
+The implementation is a semantic rewrite on the frozen mainline APIs. It does not migrate, rebase, cherry-pick, or preserve the legacy OAuth/SSO commit topology.
 
 ## Baseline Context
 
@@ -14,7 +14,16 @@ This planning branch does not migrate, rewrite, rebase, or cherry-pick OAuth/SSO
 - Hub contains four independent gitlinks: CNC, CNC DB, Dashboard, and Functions. Their changes must be pinned, reviewed, and validated separately rather than explained as one combined upgrade.
 - “Latest baseline” means a set of commit SHAs re-verified and frozen at the start of actual development, not SHAs remembered from an earlier session.
 
+### Current CNC-only implementation scope
+
+- The user explicitly prioritized the CNC branch before Hub work. The current change therefore implements phase-one same-origin OAuth in CNC only; it does not modify Hub, Hub gitlinks, CNC DB, Dashboard, or Functions.
+- CNC `upstream/main` was refreshed and frozen at `914a8146932f8aaeb14f4177d2cf4e7f1552aec0` on 2026-08-05 before implementation. The feature branch was rebased onto that commit.
+- CNC DB procedures and loaders are consumed only through the public contracts already exposed to CNC. No database schema, procedure, RLS, compatibility fallback, or Hub pin is added in this phase.
+- Cross-host session sharing, parent-domain cookie behavior, Hub browser E2E, and Hub pinning remain the next independent phase after CNC OAuth is stable.
+
 ## Delivery Sequence and Gates
+
+The overall gates remain valid, but the active delivery order is temporarily CNC phase-one OAuth first, followed by a separately frozen Hub baseline and later cross-host SSO. CNC completion does not claim that the Hub baseline or SSO gates have passed.
 
 ### 1. Establish the Hub latest baseline
 
@@ -185,6 +194,30 @@ Acceptance requires that:
 ## Commit Freeze Rule
 
 All CNC, CNC DB, Hub, Dashboard, and Functions commit SHAs must be re-checked against their intended refs and frozen when actual development begins. No SHA from a previous discussion or stale session is current fact until that verification is recorded. The implementation record should capture component, source ref, frozen SHA, verification time, and owner.
+
+## CNC Phase-One Implementation Record
+
+| Component | Source ref | Frozen SHA | Verified | Current owner |
+| --- | --- | --- | --- | --- |
+| CNC | `upstream/main` | `914a8146932f8aaeb14f4177d2cf4e7f1552aec0` | 2026-08-05 | This feature branch |
+
+The current CNC-only implementation:
+
+- Adds provider-neutral Authorization Code + mandatory S256 PKCE primitives, signed short-lived state, same-origin return validation, minimal profile normalization, and registered error mapping to `packages/oauth` and `packages/errors`.
+- Defines explicit default-off OAuth server options in `graphql/types` and parses, merges, and validates them in `graphql/env`; middleware consumes validated options rather than reading environment variables.
+- Reuses the complete Express request context plus the existing database-keyed provider, internal-secret, auth-surface, and auth-settings loaders. No tenant, database, provider, or secret fallback was added.
+- Adds GraphQL `oauthProviders` discovery and mounts only provider authorization initiation and callback browser routes when OAuth is enabled; the legacy HTTP provider-discovery endpoint is absent.
+- Uses one Google/GitHub route and callback lifecycle, existing identity procedures, and existing session-cookie helpers. Transient state/PKCE cookies are exact-host, short-lived, `HttpOnly`, `SameSite=Lax`, and cleared on success or failure.
+- Redacts all `/auth/*` query strings from the shared request logger so authorization codes, state, and provider errors are not logged.
+
+Current deferred boundaries remain explicit: Hub pins and browser E2E, cross-host SSO, parent-domain cookies, complete OIDC verification, real-provider staging smoke checks, and a future established local-MFA continuation transport. If the current identity procedure reports `mfa_required`, the CNC handler fails closed and does not issue a session; the present frozen CNC-facing contract does not justify inventing a new challenge transport.
+
+Local validation completed on 2026-08-05 and must be repeated by CI after the change is committed:
+
+- Changed owner packages build successfully: errors, OAuth, GraphQL types/env/server, Express context, and `graphql-server-test`.
+- Unit suites pass: errors 40/40, OAuth 13/13, Express context 28/28, GraphQL env 13/13, and GraphQL server 145/145.
+- Real server/database integration passes: OAuth Google/GitHub and security lifecycle 11/11; scoped-routing and disabled-feature regression 9/9.
+- ESLint passes for every changed or new TypeScript file, and `git diff --check` reports no whitespace errors.
 
 ## Deferred Implementation Confirmations
 

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## Unreleased
+
+- **BREAKING:** remove the legacy `createOAuthMiddleware` Express API. Use the
+  provider-neutral client, PKCE, signed-state, redirect, and profile primitives;
+  Express request context and session ownership now remain in the consuming
+  server.
+
 # [0.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/oauth@0.26.3...@constructive-io/oauth@0.27.0) (2026-08-02)
 
 **Note:** Version bump only for package @constructive-io/oauth

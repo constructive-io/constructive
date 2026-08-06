@@ -48,6 +48,7 @@
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@constructive-io/llm-env": "workspace:^",
+    "@constructive-io/oauth": "workspace:^",
     "@constructive-io/query-builder": "workspace:^",
     "@constructive-io/s3-utils": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",

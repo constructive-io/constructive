@@ -1,13 +1,32 @@
 import { OAuthProfile,OAuthProviderConfig } from '../types';
 
-interface GoogleProfile {
-  sub: string;
-  email?: string;
-  email_verified?: boolean;
-  name?: string;
-  given_name?: string;
-  family_name?: string;
-  picture?: string;
+function requireRecord(value: unknown): Record<string, unknown> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value))
+    throw new TypeError('Invalid Google profile');
+  return value as Record<string, unknown>;
+}
+
+function requireString(value: unknown): string {
+  if (
+    typeof value !== 'string' ||
+    !value.trim() ||
+    value.trim() !== value
+  )
+    throw new TypeError('Invalid Google profile');
+  return value;
+}
+
+function optionalString(value: unknown): string | null {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== 'string' || (value && value.trim() !== value))
+    throw new TypeError('Invalid Google profile');
+  return value || null;
+}
+
+function optionalBoolean(value: unknown): boolean | null {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== 'boolean') throw new TypeError('Invalid Google profile');
+  return value;
 }
 
 export const googleProvider: OAuthProviderConfig = {
@@ -17,16 +36,17 @@ export const googleProvider: OAuthProviderConfig = {
   tokenUrl: 'https://oauth2.googleapis.com/token',
   userInfoUrl: 'https://openidconnect.googleapis.com/v1/userinfo',
   scopes: ['openid', 'email', 'profile'],
+  tokenEndpointAuthMethod: 'client_secret_post',
   tokenRequestContentType: 'form',
   mapProfile: (data: unknown): OAuthProfile => {
-    const profile = data as GoogleProfile;
+    const profile = requireRecord(data);
     return {
       provider: 'google',
-      providerId: profile.sub,
-      email: profile.email || null,
-      name: profile.name || null,
-      picture: profile.picture || null,
-      raw: data,
+      providerId: requireString(profile.sub),
+      email: optionalString(profile.email),
+      emailVerified: optionalBoolean(profile.email_verified),
+      name: optionalString(profile.name),
+      picture: optionalString(profile.picture),
     };
   },
 };

@@ -1,5 +1,7 @@
 import { createCsrfMiddleware } from '@constructive-io/csrf';
-import { createContextMiddleware, createDefaultRegistry, requestIdMiddleware } from '@constructive-io/express-context';
+import { createContextMiddleware, createDefaultRegistry,
+  identityProvidersLoader,
+  requestIdMiddleware } from '@constructive-io/express-context';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
@@ -37,6 +39,7 @@ import { flush, flushService } from './middleware/flush';
 import { createFnRouter } from './middleware/fn';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
+import { createOAuthRoutes } from './middleware/oauth';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
@@ -93,6 +96,10 @@ class Server {
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
     const requestLogger = createRequestLogger({ observabilityEnabled });
+    const loaders = createDefaultRegistry();
+    if (effectiveOpts.oauth?.enabled) {
+      loaders.register(identityProvidersLoader);
+    }
 
     // Log startup configuration (non-sensitive values only)
     const apiOpts = (effectiveOpts as any).api || {};
@@ -105,6 +112,7 @@ class Server {
       apiIsPublic: apiOpts.isPublic,
       routingSchema: apiOpts.routingSchema,
       metaSchemas: apiOpts.metaSchemas?.join(',') || 'default',
+      oauthEnabled: effectiveOpts.oauth?.enabled === true,
       observabilityEnabled
     });
 
@@ -143,17 +151,21 @@ class Server {
           'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.'
         );
       } else {
-        log.warn(`CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`);
+        log.warn(`CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`
+        );
       }
     }
 
     app.use(poweredBy('constructive'));
     app.use(cookieParser());
     app.use(cors(fallbackOrigin));
-    app.use('/graphql', graphqlUpload.graphqlUploadExpress({
-      maxFileSize: 10 * 1024 * 1024, // 10 MB
-      maxFiles: 10
-    }));
+    app.use(
+      '/graphql',
+      graphqlUpload.graphqlUploadExpress({
+        maxFileSize: 10 * 1024 * 1024, // 10 MB
+        maxFiles: 10,
+      })
+    );
 
     // Rewrite Content-Type after graphql-upload so grafserv accepts the request
     app.use('/graphql', multipartBridge);
@@ -162,12 +174,23 @@ class Server {
     app.use(requestIdMiddleware());
     app.use(requestLogger);
     app.use(api);
-    app.use(authenticate);
-    app.use(createContextMiddleware({
+    const context = createContextMiddleware({
       pg: effectiveOpts.pg,
-      loaders: createDefaultRegistry(),
-      routingSchema: getRoutingSchema(effectiveOpts)
-    }));
+      loaders,
+      routingSchema: getRoutingSchema(effectiveOpts),
+    });
+
+    // OAuth browser routes are intentionally pre-authentication. They still
+    // receive the complete resolved request context, but identity procedures
+    // execute as the anonymous role and a stale session cookie cannot prevent
+    // a new authorization flow from starting.
+    if (effectiveOpts.oauth?.enabled) {
+      app.use('/auth', context, createOAuthRoutes(effectiveOpts));
+      app.use('/auth', (_req, res) => res.status(404).send('Not found'));
+    }
+
+    app.use(authenticate);
+    app.use(context);
     app.use(createCaptchaMiddleware());
 
     // CSRF protection for cookie-authenticated requests
@@ -176,10 +199,14 @@ class Server {
       cookieOptions: {
         httpOnly: false, // SPA clients need to read this via document.cookie
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-      }
+        sameSite: 'lax',
+      },
     });
-    const csrfProtect: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+    const csrfProtect: RequestHandler = (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => {
       // Skip CSRF for Bearer token auth
       const auth = req.headers.authorization;
       if (auth?.toLowerCase().startsWith('bearer ')) {
@@ -193,7 +220,11 @@ class Server {
       // Apply CSRF protection for cookie-authenticated requests
       csrf.protect(req as any, res as any, next);
     };
-    const csrfSetToken: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+    const csrfSetToken: RequestHandler = (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => {
       csrf.setToken(req as any, res as any, next);
     };
     app.use(csrfSetToken); // Set CSRF token cookie on all requests
@@ -214,7 +245,9 @@ class Server {
     app.use(errorHandler); // Catches all thrown errors
 
     this.app = app;
-    this.debugSampler = observabilityEnabled ? startDebugSampler(effectiveOpts) : null;
+    this.debugSampler = observabilityEnabled
+      ? startDebugSampler(effectiveOpts)
+      : null;
   }
 
   listen(): HttpServer {
@@ -250,7 +283,11 @@ class Server {
     pgPool.connect(this.listenForChanges.bind(this));
   }
 
-  listenForChanges(err: Error | null, client: PoolClient, release: () => void): void {
+  listenForChanges(
+    err: Error | null,
+    client: PoolClient,
+    release: () => void
+  ): void {
     if (err) {
       this.error('Error connecting with notify listener', err);
       if (!this.shuttingDown) {
@@ -327,7 +364,9 @@ class Server {
       this.debugSampler = null;
     }
     if (this.httpServer?.listening) {
-      await new Promise<void>((resolve) => this.httpServer!.close(() => resolve()));
+      await new Promise<void>((resolve) =>
+        this.httpServer!.close(() => resolve())
+      );
     }
     await closeDebugDatabasePools();
     if (closeCaches) {

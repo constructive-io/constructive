@@ -17,6 +17,7 @@ export const linkedinProvider: OAuthProviderConfig = {
   tokenUrl: 'https://www.linkedin.com/oauth/v2/accessToken',
   userInfoUrl: 'https://api.linkedin.com/v2/userinfo',
   scopes: ['openid', 'profile', 'email'],
+  tokenEndpointAuthMethod: 'client_secret_post',
   tokenRequestContentType: 'form',
   mapProfile: (data: unknown): OAuthProfile => {
     const profile = data as LinkedInProfile;
@@ -24,9 +25,9 @@ export const linkedinProvider: OAuthProviderConfig = {
       provider: 'linkedin',
       providerId: profile.sub,
       email: profile.email || null,
+      emailVerified: profile.email_verified ?? null,
       name: profile.name || null,
       picture: profile.picture || null,
-      raw: data,
     };
   },
 };

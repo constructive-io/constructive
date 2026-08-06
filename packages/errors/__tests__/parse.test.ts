@@ -1,4 +1,18 @@
 import { allCodes, classify, ConstructiveError, errors, format, parse, registerCatalog, toError } from '../src';
+
+describe('ConstructiveError causes', () => {
+  it('preserves the original exception without serializing it to clients', () => {
+    const cause = new Error('private diagnostic');
+    const error = errors.OAUTH_TOKEN_EXCHANGE_FAILED(
+      undefined,
+      undefined,
+      cause
+    );
+
+    expect(error.cause).toBe(cause);
+    expect(error.toExtensions()).not.toHaveProperty('cause');
+  });
+});
 import {
   GENERATED_CODE_COUNT,
   GENERATED_CODE_META,

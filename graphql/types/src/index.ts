@@ -28,6 +28,6 @@ export {
   LlmOptions} from './llm';
 
 // Export SMS types
-export {
-  DevSmsOptions,
+export { oauthServerDefaults, OAuthServerOptions } from './oauth';
+export { DevSmsOptions,
   SmsOptions} from './sms';

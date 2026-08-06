@@ -220,4 +220,22 @@ describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
       expect.arrayContaining(['Buddy', 'Max', 'Whiskers', 'Mittens', 'Tweety'])
     );
   });
+
+  it('returns an empty OAuth provider list when the server feature is disabled', async () => {
+    const res = await postGraphQL({
+      query: '{ oauthProviders { slug displayName } }',
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ data: { oauthProviders: [] } });
+  });
+
+  it('does not mount OAuth browser routes when the server feature is disabled', async () => {
+    const res = await request
+      .get('/auth/google')
+      .set('Host', 'app.test.constructive.io')
+      .redirects(0);
+
+    expect(res.status).toBe(404);
+  });
 });

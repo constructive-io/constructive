@@ -158,6 +158,64 @@ describe('getEnvOptions', () => {
     });
   });
 
+  it('keeps OAuth disabled without requiring a state secret', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-oauth-disabled-')
+    );
+    const result = getEnvOptions({}, tempDir, { NODE_ENV: 'production' });
+
+    expect(result.oauth).toMatchObject({ enabled: false });
+    expect(result.oauth?.stateSecret).toBeUndefined();
+  });
+
+  it('uses the house devDefault only when OAuth is enabled outside production', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-oauth-development-')
+    );
+    const result = getEnvOptions({ oauth: { enabled: true } }, tempDir, {
+      NODE_ENV: 'development',
+    });
+
+    expect(result.oauth?.stateSecret).toBe(
+      'development-only-oauth-state-secret-change-me'
+    );
+  });
+
+  it('requires an explicit state secret when OAuth is enabled in production', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-oauth-production-')
+    );
+
+    expect(() =>
+      getEnvOptions({ oauth: { enabled: true } }, tempDir, {
+        NODE_ENV: 'production',
+      })
+    ).toThrow();
+  });
+
+  it('merges and validates OAuth environment overrides', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-oauth-overrides-')
+    );
+    const result = getEnvOptions({}, tempDir, {
+      NODE_ENV: 'production',
+      OAUTH_ENABLED: 'yes',
+      OAUTH_STATE_SECRET: 'x'.repeat(32),
+      OAUTH_STATE_MAX_AGE_MS: '300000',
+      OAUTH_SUCCESS_PATH: '/signed-in',
+      OAUTH_FAILURE_PATH: '/sign-in',
+    });
+
+    expect(result.oauth).toEqual({
+      enabled: true,
+      stateSecret: 'x'.repeat(32),
+      stateMaxAgeMs: 300000,
+      successPath: '/signed-in',
+      failurePath: '/sign-in',
+      cookieSecure: true,
+    });
+  });
+
   it('accepts custom SMS provider names', () => {
     const result = getGraphQLEnvVars({
       SMS_PROVIDER: 'custom-sms-gateway'

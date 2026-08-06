@@ -1,5 +1,6 @@
 import '../middleware/types';
 
+import { errors } from '@constructive-io/errors';
 import { Logger } from '@pgpmjs/logger';
 import type { Request } from 'express';
 import type { BufferResult } from 'grafserv';
@@ -199,7 +200,9 @@ const getExpressRequest = (requestContext: Partial<Grafast.RequestContext>): Req
  * - Clears session cookies on sign-out mutations
  * - Handles device token cookies for trusted device tracking
  */
-export const AuthCookiePlugin: GraphileConfig.Plugin = {
+export const createAuthCookiePlugin = (
+  secureFallback = false
+): GraphileConfig.Plugin => ({
   name: 'AuthCookiePlugin',
   version: '1.0.0',
   grafserv: {
@@ -231,8 +234,12 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
                 const jsonStr = rawBody.buffer.toString('utf8');
                 body = JSON.parse(jsonStr) as GraphQLRequestBody;
               }
-            } catch (e) {
-              log.debug('[auth-cookie] Failed to parse body from requestDigest');
+            } catch (cause) {
+              throw errors.INTERNAL_FAILURE(
+                { details: 'Failed to parse authentication request body' },
+                undefined,
+                cause
+              );
             }
           }
           body = body || (req.body as GraphQLRequestBody);
@@ -273,10 +280,17 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
             // Handle sign-out mutations
             if (signOutMutation && data[signOutMutation]) {
               log.info('[auth-cookie] Sign-out mutation succeeded, clearing session cookie');
-              const config = getSessionCookieConfig(authSettings);
+              const config = getSessionCookieConfig(
+                authSettings,
+                false,
+                secureFallback
+              );
               cookiesToSet.push(serializeClearCookie(SESSION_COOKIE_NAME, config));
               // Also clear device token on sign-out
-              const deviceConfig = getDeviceTokenCookieConfig(authSettings);
+              const deviceConfig = getDeviceTokenCookieConfig(
+                authSettings,
+                secureFallback
+              );
               cookiesToSet.push(serializeClearCookie(DEVICE_TOKEN_COOKIE_NAME, deviceConfig));
             }
 
@@ -285,14 +299,21 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
               const accessToken = extractAccessToken(data, signInMutation);
               if (accessToken) {
                 const rememberMe = hasRememberMe(body.variables);
-                const config = getSessionCookieConfig(authSettings, rememberMe);
+                const config = getSessionCookieConfig(
+                  authSettings,
+                  rememberMe,
+                  secureFallback
+                );
                 log.info(`[auth-cookie] Sign-in mutation succeeded, setting session cookie (rememberMe=${rememberMe})`);
                 cookiesToSet.push(serializeCookie(SESSION_COOKIE_NAME, accessToken, config));
 
                 const deviceId = extractDeviceId(data, signInMutation);
                 if (deviceId) {
                   log.info('[auth-cookie] Device ID returned, setting device token cookie');
-                  const deviceConfig = getDeviceTokenCookieConfig(authSettings);
+                  const deviceConfig = getDeviceTokenCookieConfig(
+                    authSettings,
+                    secureFallback
+                  );
                   cookiesToSet.push(serializeCookie(DEVICE_TOKEN_COOKIE_NAME, deviceId, deviceConfig));
                 }
               }
@@ -321,7 +342,6 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
               }
 
               // Also update the BufferResult headers for grafserv to pass through
-              const existingBufferCookie = bufferResult.headers['set-cookie'];
               const updatedHeaders = { ...bufferResult.headers };
 
               // Remove set-cookie from grafserv headers since we set it on Express
@@ -332,8 +352,12 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
                 headers: updatedHeaders,
               };
             }
-          } catch (err) {
-            log.error('[auth-cookie] Error processing auth response:', err);
+          } catch (cause) {
+            throw errors.INTERNAL_FAILURE(
+              { details: 'Failed to process authentication cookie response' },
+              undefined,
+              cause
+            );
           }
 
           return result;
@@ -341,4 +365,10 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
       },
     },
   },
-};
+});
+
+/**
+ * Backwards-compatible default for consumers that do not have a validated
+ * server-level cookie policy. The GraphQL server uses the factory above.
+ */
+export const AuthCookiePlugin = createAuthCookiePlugin();

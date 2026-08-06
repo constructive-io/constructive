@@ -1,13 +1,5 @@
-export {
-  createOAuthMiddleware,
-  generateState,
-  OAuthCallbackContext,
-  OAuthErrorContext,
-  OAuthMiddlewareConfig,
-  OAuthRouteHandlers,
-  verifyState,
-} from './middleware/express';
-export { createOAuthClient,OAuthClient } from './oauth-client';
+export { createOAuthClient, OAuthClient } from './oauth-client';
+export { resolveOAuthProvider } from './provider-resolver';
 export {
   facebookProvider,
   getProvider,
@@ -16,15 +8,24 @@ export {
   googleProvider,
   linkedinProvider,
   providers,
+  selectGitHubEmail,
 } from './providers';
+export * from './types';
 export {
-  AuthorizationUrlParams,
-  CallbackParams,
-  createOAuthError,
-  OAuthClientConfig,
-  OAuthCredentials,
-  OAuthError,
-  OAuthProfile,
-  OAuthProviderConfig,
-  TokenResponse,
-} from './types';
+  assertSafeOAuthEndpoint,
+  assertSafeOAuthFetchEndpoint,
+} from './utils/endpoint';
+export {
+  deriveCodeChallenge,
+  generateCodeVerifier,
+  verifyCodeChallenge,
+} from './utils/pkce';
+export { resolveSameOriginReturnPath } from './utils/redirect';
+export {
+  createSignedState,
+  CreateSignedStateOptions,
+  SignedStatePayload,
+  verifySignedState,
+  VerifySignedStateOptions,
+} from './utils/signed-state';
+export { generateState, verifyState } from './utils/state';

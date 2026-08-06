@@ -258,7 +258,7 @@ export interface BuiltinModuleMap {
  * with proper pgSettings (role, claims, request_id).
  */
 export type WithPgClient = <T>(
-  fn: (client: PoolClient) => Promise<T>,
+  fn: (client: PoolClient) => Promise<T>
 ) => Promise<T>;
 
 /**
@@ -276,8 +276,14 @@ export interface ConstructiveContext {
   databaseId: string | null;
   /** Authenticated user ID from the JWT token */
   userId: string | null;
+  /** Authenticated session ID from the JWT token */
+  sessionId: string | null;
   /** Per-request correlation ID for distributed tracing */
   requestId: string;
+  /** Exact request Host header, including a non-default port */
+  host: string;
+  /** Server-derived request origin used by redirect and session policy */
+  origin: string;
   /** Tenant database connection pool */
   pool: Pool;
   /** Execute a function within a tenant-scoped RLS transaction */
@@ -300,7 +306,7 @@ export interface ConstructiveContext {
    *   - No loader registry was provided to the middleware
    *   - The named loader isn't registered
    *   - The module isn't provisioned for this database
-   */
+  */
   useModule: {
     <K extends keyof BuiltinModuleMap>(name: K): Promise<BuiltinModuleMap[K] | undefined>;
     (name: string): Promise<unknown>;

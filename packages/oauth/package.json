@@ -2,7 +2,7 @@
   "name": "@constructive-io/oauth",
   "version": "0.27.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "OAuth 2.0 client for social authentication (Google, GitHub, Facebook, LinkedIn)",
+  "description": "Provider-neutral OAuth 2.0 Authorization Code primitives with mandatory S256 PKCE",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@constructive-io/csrf": "workspace:^"
+    "@constructive-io/errors": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",

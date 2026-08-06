@@ -27,7 +27,7 @@ export const createDevTestServer = async (
 
 /**
  * Create a test server for SuperTest testing
- * 
+ *
  * This uses the Server class from @constructive-io/graphql-server directly,
  * which includes all the standard middleware (CORS, authentication, GraphQL, etc.)
  */
@@ -45,6 +45,10 @@ export const createTestServer = async (
   // Merge server options into the ConstructiveOptions
   const serverConfig: ConstructiveOptions = {
     ...opts,
+    oauth: {
+      ...opts.oauth,
+      ...serverOpts.oauth,
+    },
     server: {
       ...opts.server,
       host,

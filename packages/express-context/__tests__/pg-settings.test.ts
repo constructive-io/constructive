@@ -48,4 +48,17 @@ describe('buildPgSettings — jwt.claims.api_id provenance', () => {
 
     expect(settings['jwt.claims.api_id']).toBe(api.apiId);
   });
+
+  it('carries server-derived request facts for session attribution', () => {
+    const settings = buildPgSettings({
+      api,
+      token: null,
+      requestId: 'r1',
+      origin: 'https://app.example.com',
+      userAgent: 'test-browser',
+    });
+
+    expect(settings['jwt.claims.origin']).toBe('https://app.example.com');
+    expect(settings['jwt.claims.user_agent']).toBe('test-browser');
+  });
 });
