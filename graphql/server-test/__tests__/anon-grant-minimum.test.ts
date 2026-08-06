@@ -16,7 +16,7 @@
  * blanket `GRANT ALL ON FUNCTIONS TO anonymous` buys no Graphile functionality
  * whatsoever — it only widens what anon may execute.
  */
-import { PgTestClient } from 'pgsql-test';
+import { PgTestClient, seed } from 'pgsql-test';
 
 import { getConnections as getServerConnections } from '../src';
 
@@ -58,14 +58,21 @@ describe('minimum anonymous grants for Graphile', () => {
   let teardown: () => Promise<void>;
 
   beforeAll(async () => {
-    ({ pg, query, teardown } = await getServerConnections({
-      schemas: ['app_public'],
-      authRole: 'anonymous',
-      server: { useRouting: false }
-    }));
-
-    await pg.query(SETUP);
-    await pg.query(RESET_GRANTS);
+    // Seeded rather than created afterwards: the server can build its schema as
+    // soon as it starts, and would then introspect an empty database.
+    ({ pg, query, teardown } = await getServerConnections(
+      {
+        schemas: ['app_public'],
+        authRole: 'anonymous',
+        server: { useRouting: false }
+      },
+      [
+        seed.fn(async ({ pg: seedClient }) => {
+          await seedClient.query(SETUP);
+          await seedClient.query(RESET_GRANTS);
+        })
+      ]
+    ));
   });
 
   afterAll(async () => {

@@ -36,6 +36,7 @@ exports[`cmds:init initializes module with no extensions by default: module-no-e
 [
   "tsconfig.json",
   "pnpm-workspace.yaml",
+  "pnpm-policy.yaml",
   "pgpm.json",
   "package.json",
   "lerna.json",
@@ -118,6 +119,7 @@ exports[`cmds:init initializes module: module-only - files 1`] = `
 [
   "tsconfig.json",
   "pnpm-workspace.yaml",
+  "pnpm-policy.yaml",
   "pgpm.json",
   "package.json",
   "lerna.json",
@@ -194,6 +196,7 @@ exports[`cmds:init initializes workspace: workspace - files 1`] = `
 [
   "my-workspace/tsconfig.json",
   "my-workspace/pnpm-workspace.yaml",
+  "my-workspace/pnpm-policy.yaml",
   "my-workspace/pgpm.json",
   "my-workspace/package.json",
   "my-workspace/lerna.json",

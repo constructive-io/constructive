@@ -42,7 +42,7 @@
     "@constructive-io/query-builder": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "graphile-plugin-utils": "workspace:^",
-    "inflekt": "^0.8.0",
+    "inflekt": "^0.8.1",
     "pg": "^8.21.0"
   },
   "peerDependencies": {

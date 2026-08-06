@@ -41,7 +41,7 @@
     "graphile-settings": "workspace:^",
     "graphql": "16.13.0",
     "inflection": "^3.0.0",
-    "inflekt": "^0.8.0",
+    "inflekt": "^0.8.1",
     "lru-cache": "^11.2.7",
     "postgraphile": "5.1.3"
   },
