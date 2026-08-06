@@ -15,8 +15,8 @@ packages:
 # Most malicious releases are found and yanked well inside that window.
 minimumReleaseAge: 2880
 
-# Exempt from the wait: 6 scope glob(s), 49 first-party package(s), 9 exception(s).
-# First-party membership comes from what pyramation, benjie publish on npm — waiting on your own release protects nothing.
+# Exempt from the wait: 6 scope glob(s), 41 first-party package(s), 9 exception(s).
+# First-party membership comes from the inventory.
 minimumReleaseAgeExclude:
   - "@constructive-db/*"
   - "@constructive-io/*"
@@ -29,10 +29,6 @@ minimumReleaseAgeExclude:
   - "@decryption/hashes"
   - "@graphile-contrib/pg-many-to-many"
   - "@graphile/lru"
-  - "@graphiql/plugin-doc-explorer"
-  - "@graphiql/plugin-history"
-  - "@graphiql/react"
-  - "@graphiql/toolkit"
   - "@inquirerer/test"
   - "@inquirerer/utils"
   - appstash
@@ -47,15 +43,11 @@ minimumReleaseAgeExclude:
   - graphile-build-pg
   - graphile-config
   - graphile-utils
-  - graphiql
-  - graphql
-  - graphql-language-service
   - inflekt
   - inquirerer
   - komoji
   - libpg-query
   - makage
-  - monaco-graphql
   - nested-obj
   - pg-introspection
   - pg-proto-parser

@@ -24,11 +24,12 @@
     "fixtures:install": "node pgpm/cli/dist/index.js install -W",
     "fixtures:install:force": "node pgpm/cli/dist/index.js install -W --force",
     "policy": "pnpm-policy generate",
-    "policy:check": "pnpm-policy check",
-    "policy:refresh": "pnpm-policy inventory"
+    "policy:check": "pnpm-policy check"
   },
   "devDependencies": {
     "@constructive-io/eslint-config": "^0.2.0",
+    "@constructive-io/pnpm-policy": "0.3.1",
+    "@constructive-io/pnpm-policy-graphile": "0.2.0",
     "@jest/test-sequencer": "^30.4.1",
     "@types/jest": "^30.0.0",
     "@types/jest-in-case": "^1.0.9",
@@ -44,7 +45,7 @@
     "jest-in-case": "^1.0.2",
     "lerna": "^8.2.3",
     "makage": "^0.3.0",
-    "pnpm-policy": "^0.2.2",
+    "pnpm-policy": "^0.4.0",
     "prettier": "^3.9.6",
     "rimraf": "^6.1.3",
     "ts-jest": "^29.4.12",

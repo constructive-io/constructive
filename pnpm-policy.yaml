@@ -8,7 +8,7 @@
 
 # Third-party releases wait two days before we can install them. A compromised
 # release is normally reported and yanked within hours, so a short wait catches it
-# without stalling upgrades. Our own packages are exempt (see `maintainers` below),
+# without stalling upgrades. Our own packages are exempt (see `inventory` below),
 # so publishing does not lock us out of our own workspace.
 minimumReleaseAge: 2d
 
@@ -17,17 +17,11 @@ minimumReleaseAge: 2d
 # inside a policy rollout.
 blockExoticSubdeps: false
 
-# The npm accounts whose releases skip the wait: the ones we publish under, plus
-# any upstream account we trust as if it were ours. Adding an account here
-# exempts everything it publishes, so each addition is a trust decision.
-maintainers:
-  - pyramation
-  # Trusted upstream, not ours: the graphile v5 stack (grafast, graphile-build*,
-  # postgraphile, grafserv, @dataplan/*, graphile-config, pg-sql2) is all one
-  # maintainer, we pin his exact versions, and we run his code in-process. A
-  # two-week wait on that stack only ever blocks us from the versions we
-  # deliberately upgraded to.
-  - benjie
+# No `maintainers` here. That key exists to BUILD an inventory by querying npm,
+# and this workspace consumes published ones instead (see `inventory`). Listing
+# an account would also exempt everything that account will ever publish, which
+# is how `graphql` ended up exempt: the account behind the graphile stack
+# co-maintains it, along with graphiql and monaco-graphql.
 
 # Scopes we own outright, emitted as `@scope/*`.
 scopes:
@@ -38,14 +32,19 @@ scopes:
   - "@pgpmjs"
   - "@pgsql"
 
-# The generated inventory: every unscoped and other-scoped package our
-# maintainers publish, listed by name. Rebuild it with `pnpm run policy:refresh`
-# after adding a maintainer, and review the diff.
+# Two published inventories, merged. Neither is checked in here: they are pinned
+# packages, so a change to what skips the wait arrives as a version bump you can
+# review, not as an edit to a 1000-line file in this repo.
 #
-# Local rather than the shared `@constructive-io/pnpm-policy/inventory.json`
-# because that package is built from pyramation alone, and this workspace also
-# trusts benjie (see `maintainers`).
-inventory: ./pnpm-policy.inventory.json
+#   pnpm-policy          our own packages, derived from what we publish
+#   pnpm-policy-graphile the graphile packages we run, a reviewed allowlist
+#
+# The graphile list enumerates names on purpose. It was an account entry until it
+# turned out to exempt `graphql` itself, which now waits like any other
+# third-party dependency — we upgrade it rarely, so the wait costs nothing.
+inventory:
+  - "@constructive-io/pnpm-policy/inventory.json"
+  - "@constructive-io/pnpm-policy-graphile/inventory.json"
 
 # Exempt only the inventory names this workspace's lockfile actually resolves —
 # the list should describe this repo, not the whole npm account. Scope globs are
@@ -79,9 +78,9 @@ allowBuilds: []
 # the version is already in the lockfile. `until` is the day that version turns
 # two weeks old, so `check` expires the waiver the moment it stops mattering.
 #
-# The graphile v5 stack is deliberately absent: `benjie` is a maintainer, so the
-# whole family is exempt by inventory instead of by waivers that would need
-# rewriting on every upgrade.
+# The graphile v5 stack is deliberately absent: it is exempt via the
+# pnpm-policy-graphile inventory instead of by waivers that would need rewriting
+# on every upgrade.
 exceptions:
   # Toolchain floors caught up with the newest release, so the floor itself is
   # the only satisfying version.
