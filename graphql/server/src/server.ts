@@ -1,7 +1,5 @@
 import { createCsrfMiddleware } from '@constructive-io/csrf';
-import { createContextMiddleware, createDefaultRegistry,
-  identityProvidersLoader,
-  requestIdMiddleware } from '@constructive-io/express-context';
+import { createContextMiddleware, createDefaultRegistry, identityProvidersLoader, requestIdMiddleware } from '@constructive-io/express-context';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
@@ -151,21 +149,17 @@ class Server {
           'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.'
         );
       } else {
-        log.warn(`CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`
-        );
+        log.warn(`CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`);
       }
     }
 
     app.use(poweredBy('constructive'));
     app.use(cookieParser());
     app.use(cors(fallbackOrigin));
-    app.use(
-      '/graphql',
-      graphqlUpload.graphqlUploadExpress({
-        maxFileSize: 10 * 1024 * 1024, // 10 MB
-        maxFiles: 10,
-      })
-    );
+    app.use('/graphql', graphqlUpload.graphqlUploadExpress({
+      maxFileSize: 10 * 1024 * 1024, // 10 MB
+      maxFiles: 10
+    }));
 
     // Rewrite Content-Type after graphql-upload so grafserv accepts the request
     app.use('/graphql', multipartBridge);
@@ -177,7 +171,7 @@ class Server {
     const context = createContextMiddleware({
       pg: effectiveOpts.pg,
       loaders,
-      routingSchema: getRoutingSchema(effectiveOpts),
+      routingSchema: getRoutingSchema(effectiveOpts)
     });
 
     // OAuth browser routes are intentionally pre-authentication. They still
@@ -199,14 +193,10 @@ class Server {
       cookieOptions: {
         httpOnly: false, // SPA clients need to read this via document.cookie
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-      },
+        sameSite: 'lax'
+      }
     });
-    const csrfProtect: RequestHandler = (
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ) => {
+    const csrfProtect: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
       // Skip CSRF for Bearer token auth
       const auth = req.headers.authorization;
       if (auth?.toLowerCase().startsWith('bearer ')) {
@@ -220,11 +210,7 @@ class Server {
       // Apply CSRF protection for cookie-authenticated requests
       csrf.protect(req as any, res as any, next);
     };
-    const csrfSetToken: RequestHandler = (
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ) => {
+    const csrfSetToken: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
       csrf.setToken(req as any, res as any, next);
     };
     app.use(csrfSetToken); // Set CSRF token cookie on all requests
@@ -245,9 +231,7 @@ class Server {
     app.use(errorHandler); // Catches all thrown errors
 
     this.app = app;
-    this.debugSampler = observabilityEnabled
-      ? startDebugSampler(effectiveOpts)
-      : null;
+    this.debugSampler = observabilityEnabled ? startDebugSampler(effectiveOpts) : null;
   }
 
   listen(): HttpServer {
@@ -283,11 +267,7 @@ class Server {
     pgPool.connect(this.listenForChanges.bind(this));
   }
 
-  listenForChanges(
-    err: Error | null,
-    client: PoolClient,
-    release: () => void
-  ): void {
+  listenForChanges(err: Error | null, client: PoolClient, release: () => void): void {
     if (err) {
       this.error('Error connecting with notify listener', err);
       if (!this.shuttingDown) {
@@ -364,9 +344,7 @@ class Server {
       this.debugSampler = null;
     }
     if (this.httpServer?.listening) {
-      await new Promise<void>((resolve) =>
-        this.httpServer!.close(() => resolve())
-      );
+      await new Promise<void>((resolve) => this.httpServer!.close(() => resolve()));
     }
     await closeDebugDatabasePools();
     if (closeCaches) {

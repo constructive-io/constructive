@@ -23,9 +23,7 @@ export class ConstructiveError extends Error {
   readonly context?: ErrorContext;
 
   constructor(args: ConstructiveErrorArgs) {
-    super(args.message,
-      args.cause === undefined ? undefined : { cause: args.cause }
-    );
+    super(args.message, args.cause === undefined ? undefined : { cause: args.cause });
     this.name = 'ConstructiveError';
     this.code = args.code;
     this.errorClass = args.errorClass;
@@ -43,10 +41,8 @@ export class ConstructiveError extends Error {
   }
 
   /** GraphQL `extensions` payload for this error. */
-  toExtensions(): { code: string; class: ErrorClass; http: number; context?: ErrorContext;
-  } {
-    const ext: { code: string; class: ErrorClass; http: number; context?: ErrorContext;
-    } = {
+  toExtensions(): { code: string; class: ErrorClass; http: number; context?: ErrorContext } {
+    const ext: { code: string; class: ErrorClass; http: number; context?: ErrorContext } = {
       code: this.code,
       class: this.errorClass,
       http: this.http

@@ -65,8 +65,7 @@ function parseDetailJson(
   const trimmed = detail.trim();
   if (!trimmed.startsWith('{')) return null;
   try {
-    const obj = JSON.parse(trimmed) as { code?: unknown; context?: unknown; class?: unknown;
-    };
+    const obj = JSON.parse(trimmed) as { code?: unknown; context?: unknown; class?: unknown };
     if (obj && typeof obj.code === 'string') {
       const context = obj.context && typeof obj.context === 'object' ? (obj.context as ErrorContext) : {};
       return { code: obj.code, context, class: toErrorClass(obj.class) };
@@ -209,6 +208,6 @@ export function toError(error: unknown, locale?: string): ConstructiveError {
     errorClass: parsed.class,
     http: def ? def.http : httpStatusFor(code).status,
     context: parsed.context,
-    cause: parsed.originalError,
+    cause: parsed.originalError
   });
 }

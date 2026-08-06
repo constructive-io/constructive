@@ -29,5 +29,6 @@ export {
 
 // Export SMS types
 export { oauthServerDefaults, OAuthServerOptions } from './oauth';
-export { DevSmsOptions,
+export {
+  DevSmsOptions,
   SmsOptions} from './sms';

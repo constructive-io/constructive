@@ -1,4 +1,4 @@
-export { createOAuthClient, OAuthClient } from './oauth-client';
+export { createOAuthClient,OAuthClient } from './oauth-client';
 export { resolveOAuthProvider } from './provider-resolver';
 export {
   facebookProvider,

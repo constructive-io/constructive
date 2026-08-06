@@ -155,10 +155,7 @@ export class OAuthClient {
     return data;
   }
 
-  async getUserProfile(
-    providerId: string,
-    accessToken: string
-  ): Promise<OAuthProfile> {
+  async getUserProfile(providerId: string, accessToken: string): Promise<OAuthProfile> {
     const { config, provider } = this.resolveProvider(providerId);
     const headers: Record<string, string> = {
       Authorization: `Bearer ${accessToken}`,
@@ -257,10 +254,7 @@ export class OAuthClient {
       : profile;
   }
 
-  private getCallbackUrl(
-    providerId: string,
-    customRedirectUri?: string
-  ): string {
+  private getCallbackUrl(providerId: string, customRedirectUri?: string): string {
     if (customRedirectUri) return customRedirectUri;
     const path = this.config.callbackPath!.replace('{provider}', providerId);
     return new URL(path, this.config.baseUrl).toString();

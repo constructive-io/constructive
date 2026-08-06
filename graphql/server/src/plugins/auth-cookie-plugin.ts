@@ -200,9 +200,7 @@ const getExpressRequest = (requestContext: Partial<Grafast.RequestContext>): Req
  * - Clears session cookies on sign-out mutations
  * - Handles device token cookies for trusted device tracking
  */
-export const createAuthCookiePlugin = (
-  secureFallback = false
-): GraphileConfig.Plugin => ({
+export const createAuthCookiePlugin = (secureFallback = false): GraphileConfig.Plugin => ({
   name: 'AuthCookiePlugin',
   version: '1.0.0',
   grafserv: {
@@ -280,17 +278,10 @@ export const createAuthCookiePlugin = (
             // Handle sign-out mutations
             if (signOutMutation && data[signOutMutation]) {
               log.info('[auth-cookie] Sign-out mutation succeeded, clearing session cookie');
-              const config = getSessionCookieConfig(
-                authSettings,
-                false,
-                secureFallback
-              );
+              const config = getSessionCookieConfig(authSettings, false, secureFallback);
               cookiesToSet.push(serializeClearCookie(SESSION_COOKIE_NAME, config));
               // Also clear device token on sign-out
-              const deviceConfig = getDeviceTokenCookieConfig(
-                authSettings,
-                secureFallback
-              );
+              const deviceConfig = getDeviceTokenCookieConfig(authSettings, secureFallback);
               cookiesToSet.push(serializeClearCookie(DEVICE_TOKEN_COOKIE_NAME, deviceConfig));
             }
 
@@ -299,21 +290,14 @@ export const createAuthCookiePlugin = (
               const accessToken = extractAccessToken(data, signInMutation);
               if (accessToken) {
                 const rememberMe = hasRememberMe(body.variables);
-                const config = getSessionCookieConfig(
-                  authSettings,
-                  rememberMe,
-                  secureFallback
-                );
+                const config = getSessionCookieConfig(authSettings, rememberMe, secureFallback);
                 log.info(`[auth-cookie] Sign-in mutation succeeded, setting session cookie (rememberMe=${rememberMe})`);
                 cookiesToSet.push(serializeCookie(SESSION_COOKIE_NAME, accessToken, config));
 
                 const deviceId = extractDeviceId(data, signInMutation);
                 if (deviceId) {
                   log.info('[auth-cookie] Device ID returned, setting device token cookie');
-                  const deviceConfig = getDeviceTokenCookieConfig(
-                    authSettings,
-                    secureFallback
-                  );
+                  const deviceConfig = getDeviceTokenCookieConfig(authSettings, secureFallback);
                   cookiesToSet.push(serializeCookie(DEVICE_TOKEN_COOKIE_NAME, deviceId, deviceConfig));
                 }
               }

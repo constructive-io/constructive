@@ -155,7 +155,7 @@ export function buildContext(
     },
     async useLlm() {
       if (llmConfig !== undefined) return llmConfig;
-      const resolved = (await useModule('llm')) as LlmConfig | undefined;
+      const resolved = await useModule('llm') as LlmConfig | undefined;
       llmConfig = resolved ?? null;
       return llmConfig;
     }

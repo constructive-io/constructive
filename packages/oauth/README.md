@@ -86,11 +86,11 @@ change; do not copy the removed middleware into an application as a fallback.
 
 ## Supported Providers
 
-| Provider | Default scopes               |
-| -------- | ---------------------------- |
-| Google   | `openid`, `email`, `profile` |
-| GitHub   | `user:email`, `read:user`    |
-| Facebook | `email`, `public_profile`    |
+| Provider | Default scopes |
+|----------|--------|
+| Google | `openid`, `email`, `profile` |
+| GitHub | `user:email`, `read:user` |
+| Facebook | `email`, `public_profile` |
 | LinkedIn | `openid`, `profile`, `email` |
 
 The Constructive GraphQL server's initial browser-flow scope enables Google

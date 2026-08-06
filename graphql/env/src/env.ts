@@ -65,7 +65,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     graphile: {
       ...(GRAPHILE_SCHEMA && {
         schema: GRAPHILE_SCHEMA.includes(',')
-          ? GRAPHILE_SCHEMA.split(',').map((s) => s.trim())
+          ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
           : GRAPHILE_SCHEMA
       })
     },
@@ -77,8 +77,8 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     api: {
       ...(API_ROUTING_SCHEMA && { routingSchema: API_ROUTING_SCHEMA }),
       ...(API_IS_PUBLIC && { isPublic: parseEnvBoolean(API_IS_PUBLIC) }),
-      ...(API_EXPOSED_SCHEMAS && { exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map((s) => s.trim()) }),
-      ...(API_META_SCHEMAS && { metaSchemas: API_META_SCHEMAS.split(',').map((s) => s.trim()) }),
+      ...(API_EXPOSED_SCHEMAS && { exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map(s => s.trim()) }),
+      ...(API_META_SCHEMAS && { metaSchemas: API_META_SCHEMAS.split(',').map(s => s.trim()) }),
       ...(API_ANON_ROLE && { anonRole: API_ANON_ROLE }),
       ...(API_ROLE_NAME && { roleName: API_ROLE_NAME })
     },

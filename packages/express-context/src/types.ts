@@ -258,7 +258,7 @@ export interface BuiltinModuleMap {
  * with proper pgSettings (role, claims, request_id).
  */
 export type WithPgClient = <T>(
-  fn: (client: PoolClient) => Promise<T>
+  fn: (client: PoolClient) => Promise<T>,
 ) => Promise<T>;
 
 /**
@@ -306,7 +306,7 @@ export interface ConstructiveContext {
    *   - No loader registry was provided to the middleware
    *   - The named loader isn't registered
    *   - The module isn't provisioned for this database
-  */
+   */
   useModule: {
     <K extends keyof BuiltinModuleMap>(name: K): Promise<BuiltinModuleMap[K] | undefined>;
     (name: string): Promise<unknown>;

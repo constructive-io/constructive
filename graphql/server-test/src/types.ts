@@ -1,6 +1,5 @@
-import type { ApiOptions,GraphileOptions,
-  OAuthServerOptions,
-} from '@constructive-io/graphql-types';
+import type { ApiOptions,GraphileOptions } from '@constructive-io/graphql-types';
+import type { OAuthServerOptions } from '@constructive-io/graphql-types';
 import type { DocumentNode, GraphQLError } from 'graphql';
 import type { Server } from 'http';
 import type { PgTestClient } from 'pgsql-test/test-client';

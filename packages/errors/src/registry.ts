@@ -455,8 +455,7 @@ export const registry = {
     http: 400,
     message: 'Error: You must be inside one of the workspace packages.'
   }),
-  DEPLOYMENT_FAILED: defineError<{ type: 'Deployment' | 'Revert' | 'Verify'; module: string;
-  }>({
+  DEPLOYMENT_FAILED: defineError<{ type: 'Deployment' | 'Revert' | 'Verify'; module: string }>({
     code: 'DEPLOYMENT_FAILED',
     class: 'internal',
     http: 500,
@@ -485,27 +484,22 @@ export const registry = {
     class: 'internal',
     http: 404,
     message: ({ change, plan }) =>
-      `Change '${change}' not found in plan${plan ? ` file: ${plan}` : ''}`,
+      `Change '${change}' not found in plan${plan ? ` file: ${plan}` : ''}`
   }),
   TAG_NOT_FOUND: defineError<{ tag: string; project?: string }>({
     code: 'TAG_NOT_FOUND',
     class: 'internal',
     http: 404,
     message: ({ tag, project }) =>
-      `Tag '${tag}' not found${project ? ` in project ${project}` : ' in plan'}`,
+      `Tag '${tag}' not found${project ? ` in project ${project}` : ' in plan'}`
   }),
-  PATH_NOT_FOUND: defineError<{ path: string; type: 'module' | 'workspace' | 'file';
-  }>({
+  PATH_NOT_FOUND: defineError<{ path: string; type: 'module' | 'workspace' | 'file' }>({
     code: 'PATH_NOT_FOUND',
     class: 'internal',
     http: 404,
-    message: ({ path, type }) => `${type} path not found: ${path}`,
+    message: ({ path, type }) => `${type} path not found: ${path}`
   }),
-  OPERATION_FAILED: defineError<{
-    operation: string;
-    target?: string;
-    reason?: string;
-  }>({
+  OPERATION_FAILED: defineError<{ operation: string; target?: string; reason?: string }>({
     code: 'OPERATION_FAILED',
     class: 'internal',
     http: 500,
@@ -516,40 +510,33 @@ export const registry = {
     code: 'PLAN_PARSE_ERROR',
     class: 'internal',
     http: 400,
-    message: ({ planPath, errors }) => `Failed to parse plan file ${planPath}: ${errors}`,
+    message: ({ planPath, errors }) => `Failed to parse plan file ${planPath}: ${errors}`
   }),
   CIRCULAR_DEPENDENCY: defineError<{ module: string; dependency: string }>({
     code: 'CIRCULAR_DEPENDENCY',
     class: 'internal',
     http: 400,
-    message: ({ module, dependency }) =>
-      `Circular reference detected: ${module} → ${dependency}`,
+    message: ({ module, dependency }) => `Circular reference detected: ${module} → ${dependency}`
   }),
-  INVALID_NAME: defineError<{
-    name: string;
-    type: 'tag' | 'change' | 'module';
-    rules?: string;
-  }>({
+  INVALID_NAME: defineError<{ name: string; type: 'tag' | 'change' | 'module'; rules?: string }>({
     code: 'INVALID_NAME',
     class: 'internal',
     http: 400,
-    message: ({ name, type, rules }) =>
-      `Invalid ${type} name: ${name}${rules ? `. ${rules}` : ''}`
+    message: ({ name, type, rules }) => `Invalid ${type} name: ${name}${rules ? `. ${rules}` : ''}`
   }),
   WORKSPACE_OPERATION_ERROR: defineError<{ operation: string }>({
     code: 'WORKSPACE_OPERATION_ERROR',
     class: 'internal',
     http: 400,
     message: ({ operation }) =>
-      `Cannot perform non-recursive ${operation} on workspace. Use recursive=true or specify a target module.`,
+      `Cannot perform non-recursive ${operation} on workspace. Use recursive=true or specify a target module.`
   }),
   FILE_NOT_FOUND: defineError<{ filePath: string; type?: string }>({
     code: 'FILE_NOT_FOUND',
     class: 'internal',
     http: 404,
-    message: ({ filePath, type }) =>
-      `${type ? `${type} file` : 'File'} not found: ${filePath}`,
-  }),
+    message: ({ filePath, type }) => `${type ? `${type} file` : 'File'} not found: ${filePath}`
+  })
 } as const;
 
 export type Registry = typeof registry;
@@ -561,13 +548,11 @@ export type RegistryCode = keyof Registry;
  */
 const allDefinitions: Record<string, ErrorDefinition<ErrorContext>> = {
   ...generatedRegistry,
-  ...(registry as unknown as Record<string, ErrorDefinition<ErrorContext>>),
+  ...(registry as unknown as Record<string, ErrorDefinition<ErrorContext>>)
 };
 
 /** Look up a definition by code (from anywhere, not just typed keys). */
-export function getDefinition(
-  code: string
-): ErrorDefinition<ErrorContext> | undefined {
+export function getDefinition(code: string): ErrorDefinition<ErrorContext> | undefined {
   return allDefinitions[code];
 }
 

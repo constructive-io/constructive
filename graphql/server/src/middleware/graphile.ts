@@ -57,9 +57,8 @@ const isPublicCode = (code: string | null | undefined): boolean =>
  * can recover the structured code, then fall back to the GraphQL error itself.
  */
 const normalizeError = (
-  error: GraphQLError
-): { code: string | null; context: ErrorContext; class: 'public' | 'internal';
-} => {
+  error: GraphQLError,
+): { code: string | null; context: ErrorContext; class: 'public' | 'internal' } => {
   const original = (error as { originalError?: unknown }).originalError;
   const fromOriginal = original ? parse(original) : null;
   const parsed = fromOriginal?.code ? fromOriginal : parse(error);
@@ -112,8 +111,8 @@ const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedError =>
     message: `An unexpected error occurred. Reference: ${errorId}`,
     extensions: {
       code: 'INTERNAL_SERVER_ERROR',
-      errorId,
-    },
+      errorId
+    }
   } as GraphQLFormattedError;
 };
 
@@ -152,8 +151,7 @@ export function clearInFlightMap(): void {
 }
 
 const log = new Logger('graphile');
-const reqLabel = (req: Request): string =>
-  req.requestId ? `[${req.requestId}]` : '[req]';
+const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
 
 /**
  * Build a PostGraphile v5 preset for a tenant.
@@ -193,35 +191,34 @@ const buildPreset = (
               definitionsTable: m.definitionsTableName,
               invocationsSchema: m.invocationsSchemaName,
               invocationsTable: m.invocationsTableName,
-              invocationsEntityField: m.invocationsEntityField,
-            })),
-          }),
+              invocationsEntityField: m.invocationsEntityField
+            }))
+          })
         ]
-        : []),
+        : [])
     ],
     pgServices: [
       makePgService({
         pool,
-        schemas,
-      }),
+        schemas
+      })
     ],
     grafserv: {
       graphqlPath: '/graphql',
       graphiqlPath: '/graphiql',
       graphiql: true,
       graphiqlOnGraphQLGET: false,
-      maskError,
+      maskError
     },
     grafast: {
       explain: process.env.NODE_ENV === 'development',
       context: (requestContext: Partial<Grafast.RequestContext>) => {
-        // In grafserv/express/v4, the request is available at requestContext.expressv4.req
-        const req = (requestContext as { expressv4?: { req?: Request } })
-          ?.expressv4?.req;
+      // In grafserv/express/v4, the request is available at requestContext.expressv4.req
+        const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
         const context: Record<string, string> = {};
         const withRequestContext = (pgSettings: Record<string, string>) => ({
           pgSettings,
-          constructive: req?.constructive,
+          constructive: req?.constructive
         });
 
         if (req) {
@@ -253,7 +250,7 @@ const buildPreset = (
               role: roleName,
               'jwt.claims.token_id': req.token.id,
               'jwt.claims.user_id': req.token.user_id,
-              ...context,
+              ...context
             };
 
             if (req.token.session_id) {
@@ -270,8 +267,7 @@ const buildPreset = (
             }
 
             // Principal identity — always set; equals user_id for human sessions
-            pgSettings['jwt.claims.principal_id'] =
-              req.token.principal_id || req.token.user_id;
+            pgSettings['jwt.claims.principal_id'] = req.token.principal_id || req.token.user_id;
 
             // Enforce read-only transactions for read_only credentials
             if (req.token.access_level === 'read_only') {
@@ -298,7 +294,7 @@ const buildPreset = (
               role: roleName,
               'jwt.claims.user_id': headerActorId,
               'jwt.claims.principal_id': headerActorId,
-              ...context,
+              ...context
             };
             const headerEntityId = req.get('X-Entity-Id');
             if (headerEntityId) {
@@ -317,15 +313,15 @@ const buildPreset = (
 
         const anonSettings: Record<string, string> = {
           role: anonRole,
-          ...context,
+          ...context
         };
         if (req?.requestId) {
           anonSettings['request.id'] = req.requestId;
         }
 
         return withRequestContext(anonSettings);
-      },
-    },
+      }
+    }
   };
 };
 
@@ -338,10 +334,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const api = req.api;
       if (!api) {
         log.error(`${label} Missing API info`);
-        respondWithGraphQLError(
-          res,
-          errors.INTERNAL_FAILURE({ details: 'Missing API info' })
-        );
+        respondWithGraphQLError(res, errors.INTERNAL_FAILURE({ details: 'Missing API info' }));
         return;
       }
       const key = req.svc_key;
@@ -361,31 +354,23 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // =========================================================================
       const cached = graphileCache.get(key);
       if (cached) {
-        log.debug(
-          `${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`
-        );
+        log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
         return cached.handler(req, res, next);
       }
 
-      log.debug(
-        `${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`
-      );
+      log.debug(`${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`);
 
       // =========================================================================
       // Phase B: In-Flight Check (single-flight coalescing)
       // =========================================================================
       const inFlight = creating.get(key);
       if (inFlight) {
-        log.debug(
-          `${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`
-        );
+        log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
         try {
           const instance = await inFlight;
           return instance.handler(req, res, next);
         } catch {
-          log.warn(
-            `${label} Coalesced request failed for PostGraphile[${key}], retrying`
-          );
+          log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`);
           // Fall through to Phase C to retry creation
         }
       }
@@ -415,7 +400,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       const pgConfig = getPgEnvOptions({
         ...opts.pg,
-        database: dbname,
+        database: dbname
       });
 
       // Route through pg-cache so the pool is tracked and can be cleaned up
@@ -423,9 +408,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const pool = getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const compute = api.apiId
-        ? await req.constructive?.useModule('compute')
-        : undefined;
+      const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
       const preset = buildPreset(
         pool,
         schema || [],
@@ -441,14 +424,13 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         {
           cacheKey: key,
           serviceKey: key,
-          databaseId: api.databaseId ?? null,
+          databaseId: api.databaseId ?? null
         },
-        () =>
-          createGraphileInstance({
-            preset,
-            cacheKey: key,
-            enableRealtime: api.databaseSettings?.enableRealtime,
-          }),
+        () => createGraphileInstance({
+          preset,
+          cacheKey: key,
+          enableRealtime: api.databaseSettings?.enableRealtime
+        }),
         { enabled: observabilityEnabled }
       );
       creating.set(key, creationPromise);
@@ -456,9 +438,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       try {
         const instance = await creationPromise;
         graphileCache.set(key, instance);
-        log.info(
-          `${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`
-        );
+        log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
         return instance.handler(req, res, next);
       } catch (error) {
         log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
@@ -466,7 +446,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           `Failed to create handler for ${key}: ${error instanceof Error ? error.message : String(error)}`,
           {
             cacheKey: key,
-            cause: error instanceof Error ? error.message : String(error),
+            cause: error instanceof Error ? error.message : String(error)
           }
         );
       } finally {
@@ -479,9 +459,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         respondWithGraphQLError(
           res,
           errors.INTERNAL_FAILURE({
-            details: isDev()
-              ? (e?.message ?? String(e))
-              : 'An unexpected error occurred',
+            details: isDev() ? e?.message ?? String(e) : 'An unexpected error occurred'
           })
         );
         return;
