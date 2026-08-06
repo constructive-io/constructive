@@ -6,11 +6,11 @@
 #
 # `pnpm run policy:check` fails CI when the two drift apart.
 
-# Third-party releases wait two weeks before we can install them. Most malicious
-# releases are found and yanked well inside that window. Our own packages are
-# exempt (see `maintainers` below), so publishing does not lock us out of our own
-# workspace the way a blanket cooldown would.
-minimumReleaseAge: 14d
+# Third-party releases wait two days before we can install them. A compromised
+# release is normally reported and yanked within hours, so a short wait catches it
+# without stalling upgrades. Our own packages are exempt (see `maintainers` below),
+# so publishing does not lock us out of our own workspace.
+minimumReleaseAge: 2d
 
 # Off for now: turning it on rejects any transitive dependency resolved from git
 # or a URL, which is a separate re-resolution to make deliberately rather than
