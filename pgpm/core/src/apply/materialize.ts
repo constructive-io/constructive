@@ -26,11 +26,10 @@ export interface MaterializeApplyOptions {
   outDir?: string;
 }
 
-// Functions that take a bare schema name as a string-literal first argument.
-// The AST pass only remaps dotted literals ('schema.object'); these helpers
-// (ubiquitous in verify scripts) name the schema alone, so a string-level
-// pre-pass remaps them.
-const SCHEMA_NAME_LITERAL_FUNCS = ['verify_schema', 'has_schema_privilege'];
+// has_schema_privilege takes a bare schema name as a string literal. The AST
+// pass only remaps dotted literals ('schema.object') and identity casts
+// ('schema'::regnamespace), so this one is remapped by a string pre-pass.
+const SCHEMA_NAME_LITERAL_FUNCS = ['has_schema_privilege'];
 
 const schemaNameLiteralPass: SchemaTransformPass = (content, schemaMapping) => {
   const pattern = new RegExp(
