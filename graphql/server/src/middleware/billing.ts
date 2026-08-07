@@ -1,7 +1,7 @@
-import express, { Router, Request, Response } from 'express';
 import { Logger } from '@pgpmjs/logger';
-import { getPgPool } from 'pg-cache';
+import express, { Request, Response, Router } from 'express';
 import { Pool } from 'pg';
+import { getPgPool } from 'pg-cache';
 import Stripe from 'stripe';
 
 const log = new Logger('billing');
@@ -161,8 +161,8 @@ export function createBillingRouter(opts: BillingRouterOptions = {}): Router {
 
   router.use('/api/billing', express.json());
 
-  // POST /api/billing/checkout - 创建 Stripe Checkout Session
-  // 支持 app-level (个人) 和 org-level (组织) 订阅
+  // POST /api/billing/checkout — creates a Stripe Checkout Session for either
+  // the caller or an organization the caller owns.
   router.post('/api/billing/checkout', async (req: Request, res: Response) => {
     try {
       const databaseId = req.api?.databaseId;
@@ -183,8 +183,7 @@ export function createBillingRouter(opts: BillingRouterOptions = {}): Router {
         priceId,
         successUrl,
         cancelUrl,
-        entityId: reqEntityId,
-        entityType = 'user'
+        entityId: reqEntityId
       } = req.body;
 
       if (!priceId || !successUrl || !cancelUrl) {
@@ -199,11 +198,14 @@ export function createBillingRouter(opts: BillingRouterOptions = {}): Router {
         return res.status(500).json({ error: 'Billing not configured' });
       }
 
-      // 确定 entity_id: 如果指定了组织则用组织 ID，否则用当前用户
+      // The entity being billed is whoever the caller nominated, defaulting to
+      // the caller. Anything other than the caller has to be an organization
+      // they own, so authorization is decided by the id itself rather than by
+      // the caller's own claim about what kind of entity it is.
       const entityId = reqEntityId || userId;
+      const isOrgPurchase = entityId !== userId;
 
-      // 如果是 org-level，验证用户是组织 owner
-      if (entityType === 'org' && reqEntityId) {
+      if (isOrgPurchase) {
         const schemaResult = await pool.query(`
           SELECT metaschema.schema_name(mm.schema_id) as memberships_schema
           FROM metaschema_modules_public.memberships_module mm
@@ -211,18 +213,28 @@ export function createBillingRouter(opts: BillingRouterOptions = {}): Router {
           LIMIT 1
         `, [databaseId]);
 
-        if (schemaResult.rows.length > 0 && schemaResult.rows[0].memberships_schema) {
-          const membershipsSchema = schemaResult.rows[0].memberships_schema;
-          const ownerCheck = await pool.query(`
-            SELECT 1 FROM "${membershipsSchema}".org_memberships
-            WHERE actor_id = $1 AND entity_id = $2 AND is_owner = true
-            LIMIT 1
-          `, [userId, reqEntityId]);
+        const membershipsSchema = schemaResult.rows[0]?.memberships_schema;
 
-          if (ownerCheck.rows.length === 0) {
-            log.warn('User is not org owner', { userId, orgId: reqEntityId });
-            return res.status(403).json({ error: 'Only organization owner can subscribe' });
-          }
+        // Without the memberships module there is nowhere to check ownership.
+        // Refuse rather than fall through: skipping the check would let any
+        // caller bill any entity id they can guess.
+        if (!membershipsSchema) {
+          log.error('Cannot verify org ownership: memberships module not provisioned', {
+            databaseId,
+            orgId: entityId,
+          });
+          return res.status(403).json({ error: 'Cannot verify organization ownership' });
+        }
+
+        const ownerCheck = await pool.query(`
+          SELECT 1 FROM "${membershipsSchema}".org_memberships
+          WHERE actor_id = $1 AND entity_id = $2 AND is_owner = true
+          LIMIT 1
+        `, [userId, entityId]);
+
+        if (ownerCheck.rows.length === 0) {
+          log.warn('User is not org owner', { userId, orgId: entityId });
+          return res.status(403).json({ error: 'Only organization owner can subscribe' });
         }
       }
 
@@ -236,10 +248,12 @@ export function createBillingRouter(opts: BillingRouterOptions = {}): Router {
 
       const isOneTime = priceInfo.billingInterval === 'one_time';
 
-      // Metadata 包含 entity_type 以区分个人/组织订阅
+      // entity_type is derived from the ownership decision above, not taken
+      // from the request, so it always describes the entity that was actually
+      // authorized.
       const metadata = {
         entity_id: entityId,
-        entity_type: entityType,
+        entity_type: isOrgPurchase ? 'org' : 'user',
         plan_id: priceInfo.planId,
         database_id: databaseId,
         user_id: userId,
@@ -247,23 +261,23 @@ export function createBillingRouter(opts: BillingRouterOptions = {}): Router {
 
       const session = isOneTime
         ? await stripe.checkout.sessions.create({
-            mode: 'payment',
-            line_items: [{ price: priceInfo.stripePriceId, quantity: 1 }],
-            success_url: successUrl,
-            cancel_url: cancelUrl,
-            payment_intent_data: {
-              metadata: { ...metadata, type: 'credit_purchase' },
-            },
+          mode: 'payment',
+          line_items: [{ price: priceInfo.stripePriceId, quantity: 1 }],
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+          payment_intent_data: {
             metadata: { ...metadata, type: 'credit_purchase' },
-          })
+          },
+          metadata: { ...metadata, type: 'credit_purchase' },
+        })
         : await stripe.checkout.sessions.create({
-            mode: 'subscription',
-            line_items: [{ price: priceInfo.stripePriceId, quantity: 1 }],
-            success_url: successUrl,
-            cancel_url: cancelUrl,
-            metadata,
-            subscription_data: { metadata },
-          });
+          mode: 'subscription',
+          line_items: [{ price: priceInfo.stripePriceId, quantity: 1 }],
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+          metadata,
+          subscription_data: { metadata },
+        });
 
       log.info('Created checkout session', {
         sessionId: session.id,

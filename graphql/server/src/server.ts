@@ -27,6 +27,7 @@ import {
 } from './diagnostics/observability';
 import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware } from './middleware/auth';
+import { createBillingRouter } from './middleware/billing';
 // Auth cookie handling is done via AuthCookiePlugin in grafserv
 import { createCaptchaMiddleware } from './middleware/captcha';
 import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
@@ -42,7 +43,6 @@ import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { getRoutingSchema } from './middleware/routing';
-import { createBillingRouter } from './middleware/billing';
 
 const log = new Logger('server');
 
@@ -207,7 +207,7 @@ class Server {
     // REST function invocation routes (POST /fn/:alias, GET /fn/invocations/:id)
     app.use(createFnRouter());
 
-    // Billing REST API — Stripe checkout, portal, etc.
+    // Billing REST API — Stripe checkout
     app.use(createBillingRouter({ pg: effectiveOpts.pg }));
 
     app.use(graphile(effectiveOpts));
