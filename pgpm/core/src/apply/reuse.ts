@@ -38,9 +38,11 @@ const FOLDER_KIND: Record<string, SchemaObjectRoute['kind']> = {
   types: 'type'
 };
 
-// Mirrors materialize.ts: bare-schema-name literal helpers the AST pass can't
-// reach are remapped by a narrow string pre-pass.
-const SCHEMA_NAME_LITERAL_FUNCS = ['verify_schema', 'has_schema_privilege'];
+// Mirrors materialize.ts.
+// has_schema_privilege takes a bare schema name as a string literal. The AST
+// pass only remaps dotted literals ('schema.object') and identity casts
+// ('schema'::regnamespace), so this one is remapped by a string pre-pass.
+const SCHEMA_NAME_LITERAL_FUNCS = ['has_schema_privilege'];
 const schemaNameLiteralPass: SchemaTransformPass = (content, schemaMapping) => {
   const pattern = new RegExp(
     `\\b(${SCHEMA_NAME_LITERAL_FUNCS.join('|')})\\s*\\(\\s*'([^']+)'`,
