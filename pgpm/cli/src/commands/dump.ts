@@ -1,4 +1,4 @@
-import { pgDump } from '@pgpmjs/core';
+import { applyExtensionSearchPathToFile, pgDump } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { QuoteUtils } from '@pgsql/quotes';
 import fs from 'fs';
@@ -150,6 +150,13 @@ export default async (
     noPrivileges: true,
     file: outPath
   });
+
+  // pg_dump's empty search_path leaves extension operators unresolvable on
+  // restore (e.g. a trigger's `IS DISTINCT FROM` on a vector column).
+  const extensionSchemas = await applyExtensionSearchPathToFile(pgEnv, outPath);
+  if (extensionSchemas.length) {
+    log.info(`restore search_path set to ${extensionSchemas.join(', ')}`);
+  }
 
   if (databaseIdInfo) {
     const pruneSql = await buildPruneSql(dbname, databaseIdInfo.id);

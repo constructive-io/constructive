@@ -146,6 +146,24 @@ describe('parsePsqlMajor', () => {
 });
 
 describe('checkPsql', () => {
+  // checkPsql resolves the client through getPgClientCommand, so an ambient
+  // alias (CI points psql at the server container) would change the command
+  // the fake runner is keyed on.
+  const aliasEnv = ['PGPM_PSQL', 'PGPM_PG_CLIENT_PREFIX'];
+  let saved: Record<string, string | undefined>;
+
+  beforeEach(() => {
+    saved = Object.fromEntries(aliasEnv.map(key => [key, process.env[key]]));
+    for (const key of aliasEnv) delete process.env[key];
+  });
+
+  afterEach(() => {
+    for (const key of aliasEnv) {
+      if (saved[key] === undefined) delete process.env[key];
+      else process.env[key] = saved[key];
+    }
+  });
+
   it('fails with OS guidance when psql is missing', async () => {
     const result = await checkPsql({ platform: 'macos' }, makeRunner({}));
     expect(result.status).toBe('fail');
