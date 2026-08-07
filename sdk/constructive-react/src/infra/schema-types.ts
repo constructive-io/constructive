@@ -642,6 +642,15 @@ export interface PlatformInfraInsertNodeAtPathInput {
   root?: string;
   sId?: string;
 }
+export interface PlatformInfraInsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: unknown[];
+  kidsList?: unknown;
+  ktreeList?: unknown;
+  paths?: unknown;
+  root?: string;
+  sId?: string;
+}
 /** A filter to be used against `PlatformInfraObject` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformInfraObjectFilter {
   /** Checks for all expressions in this list. */
@@ -738,12 +747,31 @@ export interface PlatformInfraRefPatch {
   /** Store this ref belongs to */
   storeId?: string;
 }
+export interface PlatformInfraSetAndCommitInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
 export interface PlatformInfraSetDataAtPathInput {
   clientMutationId?: string;
   data?: unknown;
   path?: string[];
   root?: string;
   sId?: string;
+}
+export interface PlatformInfraSetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: unknown;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
 }
 /** A filter to be used against `PlatformInfraStore` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformInfraStoreFilter {
@@ -1197,9 +1225,23 @@ export interface PlatformInfraInsertNodeAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface PlatformInfraInsertNodesAtPathsPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface PlatformInfraSetAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
+}
 export interface PlatformInfraSetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface PlatformInfraSetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
 }
 export interface ProvisionBucketPayload {
   /** The access type applied */

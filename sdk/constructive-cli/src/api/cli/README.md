@@ -26,9 +26,9 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
+| `api` | api CRUD operations |
 | `api-schema` | apiSchema CRUD operations |
 | `api-setting` | apiSetting CRUD operations |
-| `apis` | apis CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
 | `check-constraint` | checkConstraint CRUD operations |
 | `composite-type` | compositeType CRUD operations |
@@ -58,9 +58,9 @@ csdk auth set-token <your-token>
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `page` | page CRUD operations |
 | `partition` | partition CRUD operations |
+| `platform-api` | platformApi CRUD operations |
 | `platform-api-schema` | platformApiSchema CRUD operations |
 | `platform-api-setting` | platformApiSetting CRUD operations |
-| `platform-apis` | platformApis CRUD operations |
 | `platform-cors-setting` | platformCorsSetting CRUD operations |
 | `platform-domain` | platformDomain CRUD operations |
 | `platform-domain-event` | platformDomainEvent CRUD operations |
@@ -174,6 +174,37 @@ Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
+### `api`
+
+CRUD operations for Api records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all api records |
+| `find-first` | Find first matching api record |
+| `get` | Get a api by id |
+| `create` | Create a new api |
+| `update` | Update an existing api |
+| `delete` | Delete a api |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `anonRole` | String |
+| `config` | JSON |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `dbname` | String |
+| `id` | UUID |
+| `isPublished` | Boolean |
+| `name` | String |
+| `roleName` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `name`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
+
 ### `api-schema`
 
 CRUD operations for ApiSchema records.
@@ -239,37 +270,6 @@ CRUD operations for ApiSetting records.
 
 **Required create fields:** `apiId`, `databaseId`
 **Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableDirectUploads`, `enableI18N`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `options`, `statementTimeoutMs`
-
-### `apis`
-
-CRUD operations for Apis records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all apis records |
-| `find-first` | Find first matching apis record |
-| `get` | Get a apis by id |
-| `create` | Create a new apis |
-| `update` | Update an existing apis |
-| `delete` | Delete a apis |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `anonRole` | String |
-| `config` | JSON |
-| `createdAt` | Datetime |
-| `databaseId` | UUID |
-| `dbname` | String |
-| `id` | UUID |
-| `isPublished` | Boolean |
-| `name` | String |
-| `roleName` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `databaseId`, `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
 
 ### `ast-migration`
 
@@ -1236,6 +1236,36 @@ CRUD operations for Partition records.
 **Required create fields:** `databaseId`, `partitionKeyId`, `strategy`, `tableId`
 **Optional create fields (backend defaults):** `interval`, `isParented`, `namingPattern`, `premake`, `retention`, `retentionKeepTable`
 
+### `platform-api`
+
+CRUD operations for PlatformApi records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformApi records |
+| `find-first` | Find first matching platformApi record |
+| `get` | Get a platformApi by id |
+| `create` | Create a new platformApi |
+| `update` | Update an existing platformApi |
+| `delete` | Delete a platformApi |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `anonRole` | String |
+| `config` | JSON |
+| `createdAt` | Datetime |
+| `dbname` | String |
+| `id` | UUID |
+| `isPublished` | Boolean |
+| `name` | String |
+| `roleName` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
+
 ### `platform-api-schema`
 
 CRUD operations for PlatformApiSchema records.
@@ -1299,36 +1329,6 @@ CRUD operations for PlatformApiSetting records.
 
 **Required create fields:** `apiId`
 **Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableDirectUploads`, `enableI18N`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `options`, `statementTimeoutMs`
-
-### `platform-apis`
-
-CRUD operations for PlatformApis records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformApis records |
-| `find-first` | Find first matching platformApis record |
-| `get` | Get a platformApis by id |
-| `create` | Create a new platformApis |
-| `update` | Update an existing platformApis |
-| `delete` | Delete a platformApis |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `anonRole` | String |
-| `config` | JSON |
-| `createdAt` | Datetime |
-| `dbname` | String |
-| `id` | UUID |
-| `isPublished` | Boolean |
-| `name` | String |
-| `roleName` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
 
 ### `platform-cors-setting`
 

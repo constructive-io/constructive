@@ -19,6 +19,15 @@
 // Entity Query Keys
 // ============================================================================
 
+export const apiKeys = {
+  /** All api queries */ all: ['api'] as const,
+  /** List query keys */ lists: () => [...apiKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...apiKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...apiKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...apiKeys.details(), id] as const,
+} as const;
 export const apiSchemaKeys = {
   /** All apiSchema queries */ all: ['apischema'] as const,
   /** List query keys */ lists: () => [...apiSchemaKeys.all, 'list'] as const,
@@ -36,15 +45,6 @@ export const apiSettingKeys = {
   /** Detail query keys */ details: () => [...apiSettingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...apiSettingKeys.details(), id] as const,
-} as const;
-export const apisKeys = {
-  /** All apis queries */ all: ['apis'] as const,
-  /** List query keys */ lists: () => [...apisKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...apisKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...apisKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...apisKeys.details(), id] as const,
 } as const;
 export const astMigrationKeys = {
   /** All astMigration queries */ all: ['astmigration'] as const,
@@ -308,6 +308,15 @@ export const partitionKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...partitionKeys.details(), id] as const,
 } as const;
+export const platformApiKeys = {
+  /** All platformApi queries */ all: ['platformapi'] as const,
+  /** List query keys */ lists: () => [...platformApiKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformApiKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformApiKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformApiKeys.details(), id] as const,
+} as const;
 export const platformApiSchemaKeys = {
   /** All platformApiSchema queries */ all: ['platformapischema'] as const,
   /** List query keys */ lists: () => [...platformApiSchemaKeys.all, 'list'] as const,
@@ -325,15 +334,6 @@ export const platformApiSettingKeys = {
   /** Detail query keys */ details: () => [...platformApiSettingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformApiSettingKeys.details(), id] as const,
-} as const;
-export const platformApisKeys = {
-  /** All platformApis queries */ all: ['platformapis'] as const,
-  /** List query keys */ lists: () => [...platformApisKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...platformApisKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...platformApisKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...platformApisKeys.details(), id] as const,
 } as const;
 export const platformCorsSettingKeys = {
   /** All platformCorsSetting queries */ all: ['platformcorssetting'] as const,
@@ -783,9 +783,9 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
+  api: apiKeys,
   apiSchema: apiSchemaKeys,
   apiSetting: apiSettingKeys,
-  apis: apisKeys,
   astMigration: astMigrationKeys,
   checkConstraint: checkConstraintKeys,
   compositeType: compositeTypeKeys,
@@ -815,9 +815,9 @@ export const queryKeys = {
   nodeTypeRegistry: nodeTypeRegistryKeys,
   page: pageKeys,
   partition: partitionKeys,
+  platformApi: platformApiKeys,
   platformApiSchema: platformApiSchemaKeys,
   platformApiSetting: platformApiSettingKeys,
-  platformApis: platformApisKeys,
   platformCorsSetting: platformCorsSettingKeys,
   platformDomain: platformDomainKeys,
   platformDomainEvent: platformDomainEventKeys,

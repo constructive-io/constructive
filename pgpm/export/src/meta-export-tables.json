@@ -382,6 +382,11 @@
       "table": "user_settings_module"
     },
     {
+      "key": "user_settings_security_module",
+      "schema": "metaschema_modules_public",
+      "table": "user_settings_security_module"
+    },
+    {
       "key": "user_state_module",
       "schema": "metaschema_modules_public",
       "table": "user_state_module"

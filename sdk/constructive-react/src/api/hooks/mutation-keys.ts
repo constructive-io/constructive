@@ -18,6 +18,14 @@
 // Entity Mutation Keys
 // ============================================================================
 
+export const apiMutationKeys = {
+  /** All api mutation keys */ all: ['mutation', 'api'] as const,
+  /** Create api mutation key */ create: () => ['mutation', 'api', 'create'] as const,
+  /** Update api mutation key */ update: (id: string | number) =>
+    ['mutation', 'api', 'update', id] as const,
+  /** Delete api mutation key */ delete: (id: string | number) =>
+    ['mutation', 'api', 'delete', id] as const,
+} as const;
 export const apiSchemaMutationKeys = {
   /** All apiSchema mutation keys */ all: ['mutation', 'apischema'] as const,
   /** Create apiSchema mutation key */ create: () => ['mutation', 'apischema', 'create'] as const,
@@ -33,14 +41,6 @@ export const apiSettingMutationKeys = {
     ['mutation', 'apisetting', 'update', id] as const,
   /** Delete apiSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'apisetting', 'delete', id] as const,
-} as const;
-export const apisMutationKeys = {
-  /** All apis mutation keys */ all: ['mutation', 'apis'] as const,
-  /** Create apis mutation key */ create: () => ['mutation', 'apis', 'create'] as const,
-  /** Update apis mutation key */ update: (id: string | number) =>
-    ['mutation', 'apis', 'update', id] as const,
-  /** Delete apis mutation key */ delete: (id: string | number) =>
-    ['mutation', 'apis', 'delete', id] as const,
 } as const;
 export const astMigrationMutationKeys = {
   /** All astMigration mutation keys */ all: ['mutation', 'astmigration'] as const,
@@ -295,6 +295,15 @@ export const partitionMutationKeys = {
   /** Delete partition mutation key */ delete: (id: string | number) =>
     ['mutation', 'partition', 'delete', id] as const,
 } as const;
+export const platformApiMutationKeys = {
+  /** All platformApi mutation keys */ all: ['mutation', 'platformapi'] as const,
+  /** Create platformApi mutation key */ create: () =>
+    ['mutation', 'platformapi', 'create'] as const,
+  /** Update platformApi mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformapi', 'update', id] as const,
+  /** Delete platformApi mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformapi', 'delete', id] as const,
+} as const;
 export const platformApiSchemaMutationKeys = {
   /** All platformApiSchema mutation keys */ all: ['mutation', 'platformapischema'] as const,
   /** Create platformApiSchema mutation key */ create: () =>
@@ -312,15 +321,6 @@ export const platformApiSettingMutationKeys = {
     ['mutation', 'platformapisetting', 'update', id] as const,
   /** Delete platformApiSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformapisetting', 'delete', id] as const,
-} as const;
-export const platformApisMutationKeys = {
-  /** All platformApis mutation keys */ all: ['mutation', 'platformapis'] as const,
-  /** Create platformApis mutation key */ create: () =>
-    ['mutation', 'platformapis', 'create'] as const,
-  /** Update platformApis mutation key */ update: (id: string | number) =>
-    ['mutation', 'platformapis', 'update', id] as const,
-  /** Delete platformApis mutation key */ delete: (id: string | number) =>
-    ['mutation', 'platformapis', 'delete', id] as const,
 } as const;
 export const platformCorsSettingMutationKeys = {
   /** All platformCorsSetting mutation keys */ all: ['mutation', 'platformcorssetting'] as const,
@@ -810,9 +810,9 @@ export const customMutationKeys = {
  * ```
  */
 export const mutationKeys = {
+  api: apiMutationKeys,
   apiSchema: apiSchemaMutationKeys,
   apiSetting: apiSettingMutationKeys,
-  apis: apisMutationKeys,
   astMigration: astMigrationMutationKeys,
   checkConstraint: checkConstraintMutationKeys,
   compositeType: compositeTypeMutationKeys,
@@ -842,9 +842,9 @@ export const mutationKeys = {
   nodeTypeRegistry: nodeTypeRegistryMutationKeys,
   page: pageMutationKeys,
   partition: partitionMutationKeys,
+  platformApi: platformApiMutationKeys,
   platformApiSchema: platformApiSchemaMutationKeys,
   platformApiSetting: platformApiSettingMutationKeys,
-  platformApis: platformApisMutationKeys,
   platformCorsSetting: platformCorsSettingMutationKeys,
   platformDomain: platformDomainMutationKeys,
   platformDomainEvent: platformDomainEventMutationKeys,

@@ -38,7 +38,10 @@ csdk auth set-token <your-token>
 | `platform-namespace-event` | platformNamespaceEvent CRUD operations |
 | `platform-infra-init-empty-repo` | platformInfraInitEmptyRepo |
 | `platform-infra-insert-node-at-path` | platformInfraInsertNodeAtPath |
+| `platform-infra-insert-nodes-at-paths` | platformInfraInsertNodesAtPaths |
+| `platform-infra-set-and-commit` | platformInfraSetAndCommit |
 | `platform-infra-set-data-at-path` | platformInfraSetDataAtPath |
+| `platform-infra-set-many-and-commit` | platformInfraSetManyAndCommit |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -404,6 +407,42 @@ platformInfraInsertNodeAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
+### `platform-infra-insert-nodes-at-paths`
+
+platformInfraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `platform-infra-set-and-commit`
+
+platformInfraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `platform-infra-set-data-at-path`
 
 platformInfraSetDataAtPath
@@ -418,6 +457,22 @@ platformInfraSetDataAtPath
   | `--input.path` | String |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
+
+### `platform-infra-set-many-and-commit`
+
+platformInfraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `provision-bucket`
 

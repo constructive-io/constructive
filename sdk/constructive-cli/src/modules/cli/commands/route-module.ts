@@ -17,8 +17,10 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   apiName: 'string',
+  appLinksFunctionName: 'string',
   catalogModuleId: 'uuid',
   databaseId: 'uuid',
+  deepLinkFunctionName: 'string',
   defaultPermissions: 'string',
   domainModuleId: 'uuid',
   entityField: 'string',
@@ -93,8 +95,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       apiName: true,
+      appLinksFunctionName: true,
       catalogModuleId: true,
       databaseId: true,
+      deepLinkFunctionName: true,
       defaultPermissions: true,
       domainModuleId: true,
       entityField: true,
@@ -137,8 +141,10 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       apiName: true,
+      appLinksFunctionName: true,
       catalogModuleId: true,
       databaseId: true,
+      deepLinkFunctionName: true,
       defaultPermissions: true,
       domainModuleId: true,
       entityField: true,
@@ -193,8 +199,10 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           apiName: true,
+          appLinksFunctionName: true,
           catalogModuleId: true,
           databaseId: true,
+          deepLinkFunctionName: true,
           defaultPermissions: true,
           domainModuleId: true,
           entityField: true,
@@ -240,6 +248,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'appLinksFunctionName',
+        message: 'appLinksFunctionName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'catalogModuleId',
         message: 'catalogModuleId',
         required: false,
@@ -250,6 +265,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'deepLinkFunctionName',
+        message: 'deepLinkFunctionName',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -401,8 +423,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           apiName: cleanedData.apiName,
+          appLinksFunctionName: cleanedData.appLinksFunctionName,
           catalogModuleId: cleanedData.catalogModuleId,
           databaseId: cleanedData.databaseId,
+          deepLinkFunctionName: cleanedData.deepLinkFunctionName,
           defaultPermissions: cleanedData.defaultPermissions,
           domainModuleId: cleanedData.domainModuleId,
           entityField: cleanedData.entityField,
@@ -426,8 +450,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           apiName: true,
+          appLinksFunctionName: true,
           catalogModuleId: true,
           databaseId: true,
+          deepLinkFunctionName: true,
           defaultPermissions: true,
           domainModuleId: true,
           entityField: true,
@@ -479,6 +505,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'appLinksFunctionName',
+        message: 'appLinksFunctionName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'catalogModuleId',
         message: 'catalogModuleId',
         required: false,
@@ -489,6 +522,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+      },
+      {
+        type: 'text',
+        name: 'deepLinkFunctionName',
+        message: 'deepLinkFunctionName',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -640,8 +680,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           apiName: cleanedData.apiName,
+          appLinksFunctionName: cleanedData.appLinksFunctionName,
           catalogModuleId: cleanedData.catalogModuleId,
           databaseId: cleanedData.databaseId,
+          deepLinkFunctionName: cleanedData.deepLinkFunctionName,
           defaultPermissions: cleanedData.defaultPermissions,
           domainModuleId: cleanedData.domainModuleId,
           entityField: cleanedData.entityField,
@@ -665,8 +707,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           apiName: true,
+          appLinksFunctionName: true,
           catalogModuleId: true,
           databaseId: true,
+          deepLinkFunctionName: true,
           defaultPermissions: true,
           domainModuleId: true,
           entityField: true,

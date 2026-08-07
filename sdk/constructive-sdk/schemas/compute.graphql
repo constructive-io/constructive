@@ -5154,7 +5154,7 @@ Function definitions — registered cloud functions with routing, queue, and ret
 """
 type FunctionDefinition {
   """
-  Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
+  Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
   """
   accessChannels: [String]!
 
@@ -5335,7 +5335,7 @@ type FunctionDefinition {
   queueName: String!
 
   """
-  Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements.
+  Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements.
   """
   requiredBuckets: [String]!
 
@@ -5348,6 +5348,11 @@ type FunctionDefinition {
   Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements.
   """
   requiredModels: [String]!
+
+  """
+  Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements.
+  """
+  requiredModules: [String]!
 
   """
   Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
@@ -5572,6 +5577,9 @@ input FunctionDefinitionFilter {
   """Filter by the object’s `requiredModels` field."""
   requiredModels: StringListFilter
 
+  """Filter by the object’s `requiredModules` field."""
+  requiredModules: StringListFilter
+
   """Filter by the object’s `resources` field."""
   resources: JSONFilter
 
@@ -5612,7 +5620,7 @@ input FunctionDefinitionFilter {
 """An input for mutations affecting `FunctionDefinition`"""
 input FunctionDefinitionInput {
   """
-  Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
+  Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
   """
   accessChannels: [String]
 
@@ -5713,7 +5721,7 @@ input FunctionDefinitionInput {
   queueName: String
 
   """
-  Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements.
+  Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements.
   """
   requiredBuckets: [String]
 
@@ -5726,6 +5734,11 @@ input FunctionDefinitionInput {
   Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements.
   """
   requiredModels: [String]
+
+  """
+  Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements.
+  """
+  requiredModules: [String]
 
   """
   Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
@@ -5837,6 +5850,8 @@ enum FunctionDefinitionOrderBy {
   REQUIRED_CONFIGS_DESC
   REQUIRED_MODELS_ASC
   REQUIRED_MODELS_DESC
+  REQUIRED_MODULES_ASC
+  REQUIRED_MODULES_DESC
   REQUIRED_SECRETS_ASC
   REQUIRED_SECRETS_DESC
   RESOURCES_ASC
@@ -5866,7 +5881,7 @@ Represents an update to a `FunctionDefinition`. Fields that are set will be upda
 """
 input FunctionDefinitionPatch {
   """
-  Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
+  Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
   """
   accessChannels: [String]
 
@@ -5967,7 +5982,7 @@ input FunctionDefinitionPatch {
   queueName: String
 
   """
-  Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements.
+  Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements.
   """
   requiredBuckets: [String]
 
@@ -5980,6 +5995,11 @@ input FunctionDefinitionPatch {
   Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements.
   """
   requiredModels: [String]
+
+  """
+  Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements.
+  """
+  requiredModules: [String]
 
   """
   Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
@@ -6111,6 +6131,11 @@ type FunctionDeployment {
 
   """Target namespace for this deployment (maps to a K8s namespace)"""
   namespaceId: UUID!
+
+  """
+  Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand).
+  """
+  realm: String
 
   """
   K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}}
@@ -6413,6 +6438,9 @@ input FunctionDeploymentFilter {
   """Checks for any expressions in this list."""
   or: [FunctionDeploymentFilter!]
 
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
   """Filter by the object’s `resources` field."""
   resources: JSONFilter
 
@@ -6483,6 +6511,11 @@ input FunctionDeploymentInput {
   namespaceId: UUID!
 
   """
+  Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand).
+  """
+  realm: String
+
+  """
   K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}}
   """
   resources: JSON
@@ -6551,6 +6584,8 @@ enum FunctionDeploymentOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  REALM_ASC
+  REALM_DESC
   RESOURCES_ASC
   RESOURCES_DESC
   REVISION_ASC
@@ -6613,6 +6648,11 @@ input FunctionDeploymentPatch {
 
   """Target namespace for this deployment (maps to a K8s namespace)"""
   namespaceId: UUID
+
+  """
+  Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand).
+  """
+  realm: String
 
   """
   K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}}
@@ -9719,6 +9759,36 @@ type InfraInsertNodeAtPathPayload {
   result: UUID
 }
 
+"""All input for the `infraInsertNodesAtPaths` mutation."""
+input InfraInsertNodesAtPathsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  datas: [JSON]
+  kidsList: JSON
+  ktreeList: JSON
+  paths: JSON
+  root: UUID
+  sId: UUID
+}
+
+"""The output of our `infraInsertNodesAtPaths` mutation."""
+type InfraInsertNodesAtPathsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: UUID
+}
+
 """
 Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
 """
@@ -9991,6 +10061,44 @@ input InfraRefPatch {
   storeId: UUID
 }
 
+"""All input for the `infraSetAndCommit` mutation."""
+input InfraSetAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  data: JSON
+  kids: [UUID]
+  ktree: [String]
+  message: String
+  path: [String]
+  refname: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `infraSetAndCommit` mutation."""
+type InfraSetAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `InfraCommit`. May be used by Relay 1."""
+  infraCommitEdge(
+    """The method to use when ordering `InfraCommit`."""
+    orderBy: [InfraCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InfraCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: InfraCommit
+}
+
 """All input for the `infraSetDataAtPath` mutation."""
 input InfraSetDataAtPathInput {
   """
@@ -10017,6 +10125,41 @@ type InfraSetDataAtPathPayload {
   """
   query: Query
   result: UUID
+}
+
+"""All input for the `infraSetManyAndCommit` mutation."""
+input InfraSetManyAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entries: JSON
+  message: String
+  refname: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `infraSetManyAndCommit` mutation."""
+type InfraSetManyAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `InfraCommit`. May be used by Relay 1."""
+  infraCommitEdge(
+    """The method to use when ordering `InfraCommit`."""
+    orderBy: [InfraCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InfraCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: InfraCommit
 }
 
 """
@@ -10191,6 +10334,36 @@ input InsertNodeAtPathInput {
 
 """The output of our `insertNodeAtPath` mutation."""
 type InsertNodeAtPathPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: UUID
+}
+
+"""All input for the `insertNodesAtPaths` mutation."""
+input InsertNodesAtPathsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  datas: [JSON]
+  kidsList: JSON
+  ktreeList: JSON
+  paths: JSON
+  root: UUID
+  sId: UUID
+}
+
+"""The output of our `insertNodesAtPaths` mutation."""
+type InsertNodesAtPathsPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -11908,12 +12081,30 @@ type Mutation {
     """
     input: InfraInsertNodeAtPathInput!
   ): InfraInsertNodeAtPathPayload
+  infraInsertNodesAtPaths(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: InfraInsertNodesAtPathsInput!
+  ): InfraInsertNodesAtPathsPayload
+  infraSetAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: InfraSetAndCommitInput!
+  ): InfraSetAndCommitPayload
   infraSetDataAtPath(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: InfraSetDataAtPathInput!
   ): InfraSetDataAtPathPayload
+  infraSetManyAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: InfraSetManyAndCommitInput!
+  ): InfraSetManyAndCommitPayload
   initEmptyRepo(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -11926,6 +12117,12 @@ type Mutation {
     """
     input: InsertNodeAtPathInput!
   ): InsertNodeAtPathPayload
+  insertNodesAtPaths(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: InsertNodesAtPathsInput!
+  ): InsertNodesAtPathsPayload
   platformInfraInitEmptyRepo(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -11938,12 +12135,30 @@ type Mutation {
     """
     input: PlatformInfraInsertNodeAtPathInput!
   ): PlatformInfraInsertNodeAtPathPayload
+  platformInfraInsertNodesAtPaths(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInfraInsertNodesAtPathsInput!
+  ): PlatformInfraInsertNodesAtPathsPayload
+  platformInfraSetAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInfraSetAndCommitInput!
+  ): PlatformInfraSetAndCommitPayload
   platformInfraSetDataAtPath(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: PlatformInfraSetDataAtPathInput!
   ): PlatformInfraSetDataAtPathPayload
+  platformInfraSetManyAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInfraSetManyAndCommitInput!
+  ): PlatformInfraSetManyAndCommitPayload
   platformResourceInstallationsInstall(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -12011,12 +12226,24 @@ type Mutation {
     """
     input: SaveGraphInput!
   ): SaveGraphPayload
+  setAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetAndCommitInput!
+  ): SetAndCommitPayload
   setDataAtPath(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: SetDataAtPathInput!
   ): SetDataAtPathPayload
+  setManyAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetManyAndCommitInput!
+  ): SetManyAndCommitPayload
   startExecution(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -13624,7 +13851,7 @@ Function definitions — registered cloud functions with routing, queue, and ret
 """
 type PlatformFunctionDefinition {
   """
-  Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
+  Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
   """
   accessChannels: [String]!
 
@@ -13845,7 +14072,7 @@ type PlatformFunctionDefinition {
   queueName: String!
 
   """
-  Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements.
+  Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements.
   """
   requiredBuckets: [String]!
 
@@ -13858,6 +14085,11 @@ type PlatformFunctionDefinition {
   Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements.
   """
   requiredModels: [String]!
+
+  """
+  Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements.
+  """
+  requiredModules: [String]!
 
   """
   Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
@@ -14074,6 +14306,9 @@ input PlatformFunctionDefinitionFilter {
   """Filter by the object’s `requiredModels` field."""
   requiredModels: StringListFilter
 
+  """Filter by the object’s `requiredModules` field."""
+  requiredModules: StringListFilter
+
   """Filter by the object’s `resources` field."""
   resources: JSONFilter
 
@@ -14111,7 +14346,7 @@ input PlatformFunctionDefinitionFilter {
 """An input for mutations affecting `PlatformFunctionDefinition`"""
 input PlatformFunctionDefinitionInput {
   """
-  Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
+  Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
   """
   accessChannels: [String]
 
@@ -14214,7 +14449,7 @@ input PlatformFunctionDefinitionInput {
   queueName: String
 
   """
-  Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements.
+  Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements.
   """
   requiredBuckets: [String]
 
@@ -14227,6 +14462,11 @@ input PlatformFunctionDefinitionInput {
   Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements.
   """
   requiredModels: [String]
+
+  """
+  Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements.
+  """
+  requiredModules: [String]
 
   """
   Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
@@ -14343,6 +14583,8 @@ enum PlatformFunctionDefinitionOrderBy {
   REQUIRED_CONFIGS_DESC
   REQUIRED_MODELS_ASC
   REQUIRED_MODELS_DESC
+  REQUIRED_MODULES_ASC
+  REQUIRED_MODULES_DESC
   REQUIRED_SECRETS_ASC
   REQUIRED_SECRETS_DESC
   RESOURCES_ASC
@@ -14374,7 +14616,7 @@ Represents an update to a `PlatformFunctionDefinition`. Fields that are set will
 """
 input PlatformFunctionDefinitionPatch {
   """
-  Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
+  Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only.
   """
   accessChannels: [String]
 
@@ -14477,7 +14719,7 @@ input PlatformFunctionDefinitionPatch {
   queueName: String
 
   """
-  Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements.
+  Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements.
   """
   requiredBuckets: [String]
 
@@ -14490,6 +14732,11 @@ input PlatformFunctionDefinitionPatch {
   Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements.
   """
   requiredModels: [String]
+
+  """
+  Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements.
+  """
+  requiredModules: [String]
 
   """
   Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any.
@@ -14623,6 +14870,11 @@ type PlatformFunctionDeployment {
 
   """Target namespace for this deployment (maps to a K8s namespace)"""
   namespaceId: UUID!
+
+  """
+  Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand).
+  """
+  realm: String
 
   """
   K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}}
@@ -14908,6 +15160,9 @@ input PlatformFunctionDeploymentFilter {
   """Checks for any expressions in this list."""
   or: [PlatformFunctionDeploymentFilter!]
 
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
   """Filter by the object’s `resources` field."""
   resources: JSONFilter
 
@@ -14973,6 +15228,11 @@ input PlatformFunctionDeploymentInput {
 
   """Target namespace for this deployment (maps to a K8s namespace)"""
   namespaceId: UUID!
+
+  """
+  Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand).
+  """
+  realm: String
 
   """
   K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}}
@@ -15041,6 +15301,8 @@ enum PlatformFunctionDeploymentOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  REALM_ASC
+  REALM_DESC
   RESOURCES_ASC
   RESOURCES_DESC
   REVISION_ASC
@@ -15100,6 +15362,11 @@ input PlatformFunctionDeploymentPatch {
 
   """Target namespace for this deployment (maps to a K8s namespace)"""
   namespaceId: UUID
+
+  """
+  Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand).
+  """
+  realm: String
 
   """
   K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}}
@@ -16222,6 +16489,36 @@ type PlatformInfraInsertNodeAtPathPayload {
   result: UUID
 }
 
+"""All input for the `platformInfraInsertNodesAtPaths` mutation."""
+input PlatformInfraInsertNodesAtPathsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  datas: [JSON]
+  kidsList: JSON
+  ktreeList: JSON
+  paths: JSON
+  root: UUID
+  sId: UUID
+}
+
+"""The output of our `platformInfraInsertNodesAtPaths` mutation."""
+type PlatformInfraInsertNodesAtPathsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: UUID
+}
+
 """
 Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
 """
@@ -16498,6 +16795,44 @@ input PlatformInfraRefPatch {
   storeId: UUID
 }
 
+"""All input for the `platformInfraSetAndCommit` mutation."""
+input PlatformInfraSetAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  data: JSON
+  kids: [UUID]
+  ktree: [String]
+  message: String
+  path: [String]
+  refname: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `platformInfraSetAndCommit` mutation."""
+type PlatformInfraSetAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `PlatformInfraCommit`. May be used by Relay 1."""
+  platformInfraCommitEdge(
+    """The method to use when ordering `PlatformInfraCommit`."""
+    orderBy: [PlatformInfraCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: PlatformInfraCommit
+}
+
 """All input for the `platformInfraSetDataAtPath` mutation."""
 input PlatformInfraSetDataAtPathInput {
   """
@@ -16524,6 +16859,41 @@ type PlatformInfraSetDataAtPathPayload {
   """
   query: Query
   result: UUID
+}
+
+"""All input for the `platformInfraSetManyAndCommit` mutation."""
+input PlatformInfraSetManyAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entries: JSON
+  message: String
+  refname: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `platformInfraSetManyAndCommit` mutation."""
+type PlatformInfraSetManyAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `PlatformInfraCommit`. May be used by Relay 1."""
+  platformInfraCommitEdge(
+    """The method to use when ordering `PlatformInfraCommit`."""
+    orderBy: [PlatformInfraCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: PlatformInfraCommit
 }
 
 """
@@ -25741,6 +26111,44 @@ type SaveGraphPayload {
   result: UUID
 }
 
+"""All input for the `setAndCommit` mutation."""
+input SetAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  data: JSON
+  kids: [UUID]
+  ktree: [String]
+  message: String
+  path: [String]
+  refname: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `setAndCommit` mutation."""
+type SetAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `FunctionGraphCommit`. May be used by Relay 1."""
+  functionGraphCommitEdge(
+    """The method to use when ordering `FunctionGraphCommit`."""
+    orderBy: [FunctionGraphCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionGraphCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: FunctionGraphCommit
+}
+
 """All input for the `setDataAtPath` mutation."""
 input SetDataAtPathInput {
   """
@@ -25767,6 +26175,41 @@ type SetDataAtPathPayload {
   """
   query: Query
   result: UUID
+}
+
+"""All input for the `setManyAndCommit` mutation."""
+input SetManyAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entries: JSON
+  message: String
+  refname: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `setManyAndCommit` mutation."""
+type SetManyAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `FunctionGraphCommit`. May be used by Relay 1."""
+  functionGraphCommitEdge(
+    """The method to use when ordering `FunctionGraphCommit`."""
+    orderBy: [FunctionGraphCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionGraphCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: FunctionGraphCommit
 }
 
 """All input for the `startExecution` mutation."""

@@ -5,9 +5,9 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { ApiModel } from './models/api';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiSettingModel } from './models/apiSetting';
-import { ApisModel } from './models/apis';
 import { AstMigrationModel } from './models/astMigration';
 import { CheckConstraintModel } from './models/checkConstraint';
 import { CompositeTypeModel } from './models/compositeType';
@@ -37,9 +37,9 @@ import { ManagedDomainModel } from './models/managedDomain';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { PageModel } from './models/page';
 import { PartitionModel } from './models/partition';
+import { PlatformApiModel } from './models/platformApi';
 import { PlatformApiSchemaModel } from './models/platformApiSchema';
 import { PlatformApiSettingModel } from './models/platformApiSetting';
-import { PlatformApisModel } from './models/platformApis';
 import { PlatformCorsSettingModel } from './models/platformCorsSetting';
 import { PlatformDomainModel } from './models/platformDomain';
 import { PlatformDomainEventModel } from './models/platformDomainEvent';
@@ -120,9 +120,9 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    api: new ApiModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiSetting: new ApiSettingModel(client),
-    apis: new ApisModel(client),
     astMigration: new AstMigrationModel(client),
     checkConstraint: new CheckConstraintModel(client),
     compositeType: new CompositeTypeModel(client),
@@ -152,9 +152,9 @@ export function createClient(config: OrmClientConfig) {
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
     page: new PageModel(client),
     partition: new PartitionModel(client),
+    platformApi: new PlatformApiModel(client),
     platformApiSchema: new PlatformApiSchemaModel(client),
     platformApiSetting: new PlatformApiSettingModel(client),
-    platformApis: new PlatformApisModel(client),
     platformCorsSetting: new PlatformCorsSettingModel(client),
     platformDomain: new PlatformDomainModel(client),
     platformDomainEvent: new PlatformDomainEventModel(client),

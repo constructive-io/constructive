@@ -130,12 +130,30 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'platformInfraInsertNodeAtPath', identifier] as const)
       : (['mutation', 'platformInfraInsertNodeAtPath'] as const),
+  /** Mutation key for platformInfraInsertNodesAtPaths */ platformInfraInsertNodesAtPaths: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraInsertNodesAtPaths', identifier] as const)
+      : (['mutation', 'platformInfraInsertNodesAtPaths'] as const),
+  /** Mutation key for platformInfraSetAndCommit */ platformInfraSetAndCommit: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraSetAndCommit', identifier] as const)
+      : (['mutation', 'platformInfraSetAndCommit'] as const),
   /** Mutation key for platformInfraSetDataAtPath */ platformInfraSetDataAtPath: (
     identifier?: string
   ) =>
     identifier
       ? (['mutation', 'platformInfraSetDataAtPath', identifier] as const)
       : (['mutation', 'platformInfraSetDataAtPath'] as const),
+  /** Mutation key for platformInfraSetManyAndCommit */ platformInfraSetManyAndCommit: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraSetManyAndCommit', identifier] as const)
+      : (['mutation', 'platformInfraSetManyAndCommit'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)

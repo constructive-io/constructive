@@ -81,7 +81,10 @@ function App() {
 | `useDeletePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `usePlatformInfraInitEmptyRepoMutation` | Mutation | platformInfraInitEmptyRepo |
 | `usePlatformInfraInsertNodeAtPathMutation` | Mutation | platformInfraInsertNodeAtPath |
+| `usePlatformInfraInsertNodesAtPathsMutation` | Mutation | platformInfraInsertNodesAtPaths |
+| `usePlatformInfraSetAndCommitMutation` | Mutation | platformInfraSetAndCommit |
 | `usePlatformInfraSetDataAtPathMutation` | Mutation | platformInfraSetDataAtPath |
+| `usePlatformInfraSetManyAndCommitMutation` | Mutation | platformInfraSetManyAndCommit |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -317,6 +320,28 @@ platformInfraInsertNodeAtPath
   |----------|------|
   | `input` | PlatformInfraInsertNodeAtPathInput (required) |
 
+### `usePlatformInfraInsertNodesAtPathsMutation`
+
+platformInfraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraInsertNodesAtPathsInput (required) |
+
+### `usePlatformInfraSetAndCommitMutation`
+
+platformInfraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraSetAndCommitInput (required) |
+
 ### `usePlatformInfraSetDataAtPathMutation`
 
 platformInfraSetDataAtPath
@@ -327,6 +352,17 @@ platformInfraSetDataAtPath
   | Argument | Type |
   |----------|------|
   | `input` | PlatformInfraSetDataAtPathInput (required) |
+
+### `usePlatformInfraSetManyAndCommitMutation`
+
+platformInfraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraSetManyAndCommitInput (required) |
 
 ### `useProvisionBucketMutation`
 

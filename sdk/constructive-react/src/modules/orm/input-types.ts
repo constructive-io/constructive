@@ -349,16 +349,22 @@ export interface BillingProviderModule {
   apiName?: string | null;
   billingCustomersTableId?: string | null;
   billingCustomersTableName?: string | null;
+  billingInvoicesTableId?: string | null;
+  billingInvoicesTableName?: string | null;
   billingPricesTableId?: string | null;
   billingPricesTableName?: string | null;
   billingProductsTableId?: string | null;
   billingProductsTableName?: string | null;
+  billingRefundsTableId?: string | null;
+  billingRefundsTableName?: string | null;
   billingSubscriptionsTableId?: string | null;
   billingSubscriptionsTableName?: string | null;
   billingWebhookEventsTableId?: string | null;
   billingWebhookEventsTableName?: string | null;
   databaseId?: string | null;
   id: string;
+  listPendingUsageSyncFunction?: string | null;
+  markUsageSyncedFunction?: string | null;
   prefix?: string | null;
   pricesTableId?: string | null;
   privateApiName?: string | null;
@@ -366,8 +372,10 @@ export interface BillingProviderModule {
   processBillingEventFunction?: string | null;
   productsTableId?: string | null;
   provider?: string | null;
+  recordRefundFunction?: string | null;
   schemaId?: string | null;
   subscriptionsTableId?: string | null;
+  upsertInvoiceFunction?: string | null;
 }
 /** An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build. */
 export interface Blueprint {
@@ -470,6 +478,8 @@ export interface CatalogModule {
   apisTableName?: string | null;
   appsTableId?: string | null;
   appsTableName?: string | null;
+  bindingsTableId?: string | null;
+  bindingsTableName?: string | null;
   bucketsTableId?: string | null;
   bucketsTableName?: string | null;
   databaseId?: string | null;
@@ -1019,7 +1029,7 @@ export interface EntityTypeProvision {
   tableName?: string | null;
   /**
    * Single jsonb object describing the full security setup to apply to the entity table.
-   *      Uses the same vocabulary as metaschema_modules_public.provision_table() and blueprint tables[]
+   *      Uses the same vocabulary as metaschema_modules_private.provision_table() and blueprint tables[]
    *      entries, so an entity table is configured the same way an ordinary blueprint table is.
    *      Defaults to NULL; when non-NULL, the five default policies are implicitly replaced by
    *      table_provision.policies[] (is_visible becomes a no-op on this path).
@@ -1937,8 +1947,10 @@ export interface RlsModule {
 }
 export interface RouteModule {
   apiName?: string | null;
+  appLinksFunctionName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
+  deepLinkFunctionName?: string | null;
   defaultPermissions?: string[] | null;
   domainModuleId?: string | null;
   entityField?: string | null;
@@ -1960,6 +1972,13 @@ export interface RouteModule {
   routesTableName?: string | null;
   schemaId?: string | null;
   scope?: string | null;
+}
+export interface ScopeTypesModule {
+  databaseId?: string | null;
+  id: string;
+  privateSchemaName?: string | null;
+  schemaId?: string | null;
+  scopeTypesTableId?: string | null;
 }
 /** Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. */
 export interface SecureTableProvision {
@@ -2183,6 +2202,15 @@ export interface UserSettingsModule {
   tableId?: string | null;
   tableName?: string | null;
 }
+export interface UserSettingsSecurityModule {
+  apiName?: string | null;
+  databaseId?: string | null;
+  id: string;
+  ownerTableId?: string | null;
+  schemaId?: string | null;
+  tableId?: string | null;
+  tableName?: string | null;
+}
 export interface UserStateModule {
   databaseId?: string | null;
   entityField?: string | null;
@@ -2395,6 +2423,7 @@ export interface RouteModuleRelations {
   catalogModule?: CatalogModule | null;
   domainModule?: DomainModule | null;
 }
+export interface ScopeTypesModuleRelations {}
 export interface SecureTableProvisionRelations {}
 export interface SessionSecretsModuleRelations {}
 export interface SessionsModuleRelations {}
@@ -2410,6 +2439,7 @@ export interface TransferLogModuleRelations {}
 export interface UserAuthModuleRelations {}
 export interface UserCredentialsModuleRelations {}
 export interface UserSettingsModuleRelations {}
+export interface UserSettingsSecurityModuleRelations {}
 export interface UserStateModuleRelations {}
 export interface UsersModuleRelations {}
 export interface WebauthnAuthModuleRelations {}
@@ -2498,6 +2528,7 @@ export type RelationProvisionWithRelations = RelationProvision & RelationProvisi
 export type ResourceModuleWithRelations = ResourceModule & ResourceModuleRelations;
 export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
 export type RouteModuleWithRelations = RouteModule & RouteModuleRelations;
+export type ScopeTypesModuleWithRelations = ScopeTypesModule & ScopeTypesModuleRelations;
 export type SecureTableProvisionWithRelations = SecureTableProvision &
   SecureTableProvisionRelations;
 export type SessionSecretsModuleWithRelations = SessionSecretsModule &
@@ -2511,6 +2542,8 @@ export type UserAuthModuleWithRelations = UserAuthModule & UserAuthModuleRelatio
 export type UserCredentialsModuleWithRelations = UserCredentialsModule &
   UserCredentialsModuleRelations;
 export type UserSettingsModuleWithRelations = UserSettingsModule & UserSettingsModuleRelations;
+export type UserSettingsSecurityModuleWithRelations = UserSettingsSecurityModule &
+  UserSettingsSecurityModuleRelations;
 export type UserStateModuleWithRelations = UserStateModule & UserStateModuleRelations;
 export type UsersModuleWithRelations = UsersModule & UsersModuleRelations;
 export type WebauthnAuthModuleWithRelations = WebauthnAuthModule & WebauthnAuthModuleRelations;
@@ -2642,16 +2675,22 @@ export type BillingProviderModuleSelect = {
   apiName?: boolean;
   billingCustomersTableId?: boolean;
   billingCustomersTableName?: boolean;
+  billingInvoicesTableId?: boolean;
+  billingInvoicesTableName?: boolean;
   billingPricesTableId?: boolean;
   billingPricesTableName?: boolean;
   billingProductsTableId?: boolean;
   billingProductsTableName?: boolean;
+  billingRefundsTableId?: boolean;
+  billingRefundsTableName?: boolean;
   billingSubscriptionsTableId?: boolean;
   billingSubscriptionsTableName?: boolean;
   billingWebhookEventsTableId?: boolean;
   billingWebhookEventsTableName?: boolean;
   databaseId?: boolean;
   id?: boolean;
+  listPendingUsageSyncFunction?: boolean;
+  markUsageSyncedFunction?: boolean;
   prefix?: boolean;
   pricesTableId?: boolean;
   privateApiName?: boolean;
@@ -2659,8 +2698,10 @@ export type BillingProviderModuleSelect = {
   processBillingEventFunction?: boolean;
   productsTableId?: boolean;
   provider?: boolean;
+  recordRefundFunction?: boolean;
   schemaId?: boolean;
   subscriptionsTableId?: boolean;
+  upsertInvoiceFunction?: boolean;
 };
 export type BlueprintSelect = {
   createdAt?: boolean;
@@ -2744,6 +2785,8 @@ export type CatalogModuleSelect = {
   apisTableName?: boolean;
   appsTableId?: boolean;
   appsTableName?: boolean;
+  bindingsTableId?: boolean;
+  bindingsTableName?: boolean;
   bucketsTableId?: boolean;
   bucketsTableName?: boolean;
   databaseId?: boolean;
@@ -3990,8 +4033,10 @@ export type RlsModuleSelect = {
 };
 export type RouteModuleSelect = {
   apiName?: boolean;
+  appLinksFunctionName?: boolean;
   catalogModuleId?: boolean;
   databaseId?: boolean;
+  deepLinkFunctionName?: boolean;
   defaultPermissions?: boolean;
   domainModuleId?: boolean;
   entityField?: boolean;
@@ -4019,6 +4064,13 @@ export type RouteModuleSelect = {
   domainModule?: {
     select: DomainModuleSelect;
   };
+};
+export type ScopeTypesModuleSelect = {
+  databaseId?: boolean;
+  id?: boolean;
+  privateSchemaName?: boolean;
+  schemaId?: boolean;
+  scopeTypesTableId?: boolean;
 };
 export type SecureTableProvisionSelect = {
   databaseId?: boolean;
@@ -4230,6 +4282,15 @@ export type UserCredentialsModuleSelect = {
   tableName?: boolean;
 };
 export type UserSettingsModuleSelect = {
+  apiName?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  ownerTableId?: boolean;
+  schemaId?: boolean;
+  tableId?: boolean;
+  tableName?: boolean;
+};
+export type UserSettingsSecurityModuleSelect = {
   apiName?: boolean;
   databaseId?: boolean;
   id?: boolean;
@@ -4585,6 +4646,10 @@ export interface BillingProviderModuleFilter {
   billingCustomersTableId?: UUIDFilter;
   /** Filter by the object’s `billingCustomersTableName` field. */
   billingCustomersTableName?: StringFilter;
+  /** Filter by the object’s `billingInvoicesTableId` field. */
+  billingInvoicesTableId?: UUIDFilter;
+  /** Filter by the object’s `billingInvoicesTableName` field. */
+  billingInvoicesTableName?: StringFilter;
   /** Filter by the object’s `billingPricesTableId` field. */
   billingPricesTableId?: UUIDFilter;
   /** Filter by the object’s `billingPricesTableName` field. */
@@ -4593,6 +4658,10 @@ export interface BillingProviderModuleFilter {
   billingProductsTableId?: UUIDFilter;
   /** Filter by the object’s `billingProductsTableName` field. */
   billingProductsTableName?: StringFilter;
+  /** Filter by the object’s `billingRefundsTableId` field. */
+  billingRefundsTableId?: UUIDFilter;
+  /** Filter by the object’s `billingRefundsTableName` field. */
+  billingRefundsTableName?: StringFilter;
   /** Filter by the object’s `billingSubscriptionsTableId` field. */
   billingSubscriptionsTableId?: UUIDFilter;
   /** Filter by the object’s `billingSubscriptionsTableName` field. */
@@ -4605,6 +4674,10 @@ export interface BillingProviderModuleFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `listPendingUsageSyncFunction` field. */
+  listPendingUsageSyncFunction?: StringFilter;
+  /** Filter by the object’s `markUsageSyncedFunction` field. */
+  markUsageSyncedFunction?: StringFilter;
   /** Negates the expression. */
   not?: BillingProviderModuleFilter;
   /** Checks for any expressions in this list. */
@@ -4623,10 +4696,14 @@ export interface BillingProviderModuleFilter {
   productsTableId?: UUIDFilter;
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `recordRefundFunction` field. */
+  recordRefundFunction?: StringFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `subscriptionsTableId` field. */
   subscriptionsTableId?: UUIDFilter;
+  /** Filter by the object’s `upsertInvoiceFunction` field. */
+  upsertInvoiceFunction?: StringFilter;
 }
 export interface BlueprintFilter {
   /** Checks for all expressions in this list. */
@@ -4781,6 +4858,10 @@ export interface CatalogModuleFilter {
   appsTableId?: UUIDFilter;
   /** Filter by the object’s `appsTableName` field. */
   appsTableName?: StringFilter;
+  /** Filter by the object’s `bindingsTableId` field. */
+  bindingsTableId?: UUIDFilter;
+  /** Filter by the object’s `bindingsTableName` field. */
+  bindingsTableName?: StringFilter;
   /** Filter by the object’s `bucketsTableId` field. */
   bucketsTableId?: UUIDFilter;
   /** Filter by the object’s `bucketsTableName` field. */
@@ -7279,6 +7360,8 @@ export interface RouteModuleFilter {
   and?: RouteModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `appLinksFunctionName` field. */
+  appLinksFunctionName?: StringFilter;
   /** Filter by the object’s `catalogModule` relation. */
   catalogModule?: CatalogModuleFilter;
   /** A related `catalogModule` exists. */
@@ -7287,6 +7370,8 @@ export interface RouteModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `deepLinkFunctionName` field. */
+  deepLinkFunctionName?: StringFilter;
   /** Filter by the object’s `defaultPermissions` field. */
   defaultPermissions?: StringListFilter;
   /** Filter by the object’s `domainModule` relation. */
@@ -7337,6 +7422,24 @@ export interface RouteModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+}
+export interface ScopeTypesModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: ScopeTypesModuleFilter[];
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ScopeTypesModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: ScopeTypesModuleFilter[];
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scopeTypesTableId` field. */
+  scopeTypesTableId?: UUIDFilter;
 }
 export interface SecureTableProvisionFilter {
   /** Checks for all expressions in this list. */
@@ -7796,6 +7899,28 @@ export interface UserSettingsModuleFilter {
   /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
 }
+export interface UserSettingsSecurityModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: UserSettingsSecurityModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: UserSettingsSecurityModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: UserSettingsSecurityModuleFilter[];
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+}
 export interface UserStateModuleFilter {
   /** Checks for all expressions in this list. */
   and?: UserStateModuleFilter[];
@@ -8214,6 +8339,10 @@ export type BillingProviderModuleOrderBy =
   | 'BILLING_CUSTOMERS_TABLE_ID_DESC'
   | 'BILLING_CUSTOMERS_TABLE_NAME_ASC'
   | 'BILLING_CUSTOMERS_TABLE_NAME_DESC'
+  | 'BILLING_INVOICES_TABLE_ID_ASC'
+  | 'BILLING_INVOICES_TABLE_ID_DESC'
+  | 'BILLING_INVOICES_TABLE_NAME_ASC'
+  | 'BILLING_INVOICES_TABLE_NAME_DESC'
   | 'BILLING_PRICES_TABLE_ID_ASC'
   | 'BILLING_PRICES_TABLE_ID_DESC'
   | 'BILLING_PRICES_TABLE_NAME_ASC'
@@ -8222,6 +8351,10 @@ export type BillingProviderModuleOrderBy =
   | 'BILLING_PRODUCTS_TABLE_ID_DESC'
   | 'BILLING_PRODUCTS_TABLE_NAME_ASC'
   | 'BILLING_PRODUCTS_TABLE_NAME_DESC'
+  | 'BILLING_REFUNDS_TABLE_ID_ASC'
+  | 'BILLING_REFUNDS_TABLE_ID_DESC'
+  | 'BILLING_REFUNDS_TABLE_NAME_ASC'
+  | 'BILLING_REFUNDS_TABLE_NAME_DESC'
   | 'BILLING_SUBSCRIPTIONS_TABLE_ID_ASC'
   | 'BILLING_SUBSCRIPTIONS_TABLE_ID_DESC'
   | 'BILLING_SUBSCRIPTIONS_TABLE_NAME_ASC'
@@ -8234,6 +8367,10 @@ export type BillingProviderModuleOrderBy =
   | 'DATABASE_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'LIST_PENDING_USAGE_SYNC_FUNCTION_ASC'
+  | 'LIST_PENDING_USAGE_SYNC_FUNCTION_DESC'
+  | 'MARK_USAGE_SYNCED_FUNCTION_ASC'
+  | 'MARK_USAGE_SYNCED_FUNCTION_DESC'
   | 'NATURAL'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC'
@@ -8251,10 +8388,14 @@ export type BillingProviderModuleOrderBy =
   | 'PRODUCTS_TABLE_ID_DESC'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'RECORD_REFUND_FUNCTION_ASC'
+  | 'RECORD_REFUND_FUNCTION_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SUBSCRIPTIONS_TABLE_ID_ASC'
-  | 'SUBSCRIPTIONS_TABLE_ID_DESC';
+  | 'SUBSCRIPTIONS_TABLE_ID_DESC'
+  | 'UPSERT_INVOICE_FUNCTION_ASC'
+  | 'UPSERT_INVOICE_FUNCTION_DESC';
 export type BlueprintOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
@@ -8364,6 +8505,10 @@ export type CatalogModuleOrderBy =
   | 'APPS_TABLE_ID_DESC'
   | 'APPS_TABLE_NAME_ASC'
   | 'APPS_TABLE_NAME_DESC'
+  | 'BINDINGS_TABLE_ID_ASC'
+  | 'BINDINGS_TABLE_ID_DESC'
+  | 'BINDINGS_TABLE_NAME_ASC'
+  | 'BINDINGS_TABLE_NAME_DESC'
   | 'BUCKETS_TABLE_ID_ASC'
   | 'BUCKETS_TABLE_ID_DESC'
   | 'BUCKETS_TABLE_NAME_ASC'
@@ -10538,10 +10683,14 @@ export type RlsModuleOrderBy =
 export type RouteModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
+  | 'APP_LINKS_FUNCTION_NAME_ASC'
+  | 'APP_LINKS_FUNCTION_NAME_DESC'
   | 'CATALOG_MODULE_ID_ASC'
   | 'CATALOG_MODULE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DEEP_LINK_FUNCTION_NAME_ASC'
+  | 'DEEP_LINK_FUNCTION_NAME_DESC'
   | 'DEFAULT_PERMISSIONS_ASC'
   | 'DEFAULT_PERMISSIONS_DESC'
   | 'DOMAIN_MODULE_ID_ASC'
@@ -10587,6 +10736,20 @@ export type RouteModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC';
+export type ScopeTypesModuleOrderBy =
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'SCOPE_TYPES_TABLE_ID_ASC'
+  | 'SCOPE_TYPES_TABLE_ID_DESC';
 export type SecureTableProvisionOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
@@ -10976,6 +11139,24 @@ export type UserCredentialsModuleOrderBy =
   | 'TABLE_NAME_ASC'
   | 'TABLE_NAME_DESC';
 export type UserSettingsModuleOrderBy =
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'OWNER_TABLE_ID_ASC'
+  | 'OWNER_TABLE_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'TABLE_ID_ASC'
+  | 'TABLE_ID_DESC'
+  | 'TABLE_NAME_ASC'
+  | 'TABLE_NAME_DESC';
+export type UserSettingsSecurityModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
   | 'DATABASE_ID_ASC'
@@ -11414,15 +11595,21 @@ export interface CreateBillingProviderModuleInput {
     apiName?: string;
     billingCustomersTableId?: string;
     billingCustomersTableName?: string;
+    billingInvoicesTableId?: string;
+    billingInvoicesTableName?: string;
     billingPricesTableId?: string;
     billingPricesTableName?: string;
     billingProductsTableId?: string;
     billingProductsTableName?: string;
+    billingRefundsTableId?: string;
+    billingRefundsTableName?: string;
     billingSubscriptionsTableId?: string;
     billingSubscriptionsTableName?: string;
     billingWebhookEventsTableId?: string;
     billingWebhookEventsTableName?: string;
     databaseId: string;
+    listPendingUsageSyncFunction?: string;
+    markUsageSyncedFunction?: string;
     prefix?: string;
     pricesTableId?: string;
     privateApiName?: string;
@@ -11430,23 +11617,31 @@ export interface CreateBillingProviderModuleInput {
     processBillingEventFunction?: string;
     productsTableId?: string;
     provider?: string;
+    recordRefundFunction?: string;
     schemaId?: string;
     subscriptionsTableId?: string;
+    upsertInvoiceFunction?: string;
   };
 }
 export interface BillingProviderModulePatch {
   apiName?: string | null;
   billingCustomersTableId?: string | null;
   billingCustomersTableName?: string | null;
+  billingInvoicesTableId?: string | null;
+  billingInvoicesTableName?: string | null;
   billingPricesTableId?: string | null;
   billingPricesTableName?: string | null;
   billingProductsTableId?: string | null;
   billingProductsTableName?: string | null;
+  billingRefundsTableId?: string | null;
+  billingRefundsTableName?: string | null;
   billingSubscriptionsTableId?: string | null;
   billingSubscriptionsTableName?: string | null;
   billingWebhookEventsTableId?: string | null;
   billingWebhookEventsTableName?: string | null;
   databaseId?: string | null;
+  listPendingUsageSyncFunction?: string | null;
+  markUsageSyncedFunction?: string | null;
   prefix?: string | null;
   pricesTableId?: string | null;
   privateApiName?: string | null;
@@ -11454,8 +11649,10 @@ export interface BillingProviderModulePatch {
   processBillingEventFunction?: string | null;
   productsTableId?: string | null;
   provider?: string | null;
+  recordRefundFunction?: string | null;
   schemaId?: string | null;
   subscriptionsTableId?: string | null;
+  upsertInvoiceFunction?: string | null;
 }
 export interface UpdateBillingProviderModuleInput {
   clientMutationId?: string;
@@ -11590,6 +11787,8 @@ export interface CreateCatalogModuleInput {
     apisTableName?: string;
     appsTableId?: string;
     appsTableName?: string;
+    bindingsTableId?: string;
+    bindingsTableName?: string;
     bucketsTableId?: string;
     bucketsTableName?: string;
     databaseId: string;
@@ -11631,6 +11830,8 @@ export interface CatalogModulePatch {
   apisTableName?: string | null;
   appsTableId?: string | null;
   appsTableName?: string | null;
+  bindingsTableId?: string | null;
+  bindingsTableName?: string | null;
   bucketsTableId?: string | null;
   bucketsTableName?: string | null;
   databaseId?: string | null;
@@ -14264,8 +14465,10 @@ export interface CreateRouteModuleInput {
   clientMutationId?: string;
   routeModule: {
     apiName?: string;
+    appLinksFunctionName?: string;
     catalogModuleId?: string;
     databaseId: string;
+    deepLinkFunctionName?: string;
     defaultPermissions?: string[];
     domainModuleId?: string;
     entityField?: string;
@@ -14290,8 +14493,10 @@ export interface CreateRouteModuleInput {
 }
 export interface RouteModulePatch {
   apiName?: string | null;
+  appLinksFunctionName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
+  deepLinkFunctionName?: string | null;
   defaultPermissions?: string[] | null;
   domainModuleId?: string | null;
   entityField?: string | null;
@@ -14319,6 +14524,30 @@ export interface UpdateRouteModuleInput {
   routeModulePatch: RouteModulePatch;
 }
 export interface DeleteRouteModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateScopeTypesModuleInput {
+  clientMutationId?: string;
+  scopeTypesModule: {
+    databaseId: string;
+    privateSchemaName?: string;
+    schemaId?: string;
+    scopeTypesTableId?: string;
+  };
+}
+export interface ScopeTypesModulePatch {
+  databaseId?: string | null;
+  privateSchemaName?: string | null;
+  schemaId?: string | null;
+  scopeTypesTableId?: string | null;
+}
+export interface UpdateScopeTypesModuleInput {
+  clientMutationId?: string;
+  id: string;
+  scopeTypesModulePatch: ScopeTypesModulePatch;
+}
+export interface DeleteScopeTypesModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -14828,6 +15057,34 @@ export interface DeleteUserSettingsModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateUserSettingsSecurityModuleInput {
+  clientMutationId?: string;
+  userSettingsSecurityModule: {
+    apiName?: string;
+    databaseId: string;
+    ownerTableId?: string;
+    schemaId?: string;
+    tableId?: string;
+    tableName?: string;
+  };
+}
+export interface UserSettingsSecurityModulePatch {
+  apiName?: string | null;
+  databaseId?: string | null;
+  ownerTableId?: string | null;
+  schemaId?: string | null;
+  tableId?: string | null;
+  tableName?: string | null;
+}
+export interface UpdateUserSettingsSecurityModuleInput {
+  clientMutationId?: string;
+  id: string;
+  userSettingsSecurityModulePatch: UserSettingsSecurityModulePatch;
+}
+export interface DeleteUserSettingsSecurityModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateUserStateModuleInput {
   clientMutationId?: string;
   userStateModule: {
@@ -15100,79 +15357,6 @@ export interface ProvisionBucketInput {
    * Omit for app-level (database-wide) storage.
    */
   ownerId?: string;
-}
-export interface ProvisionCheckConstraintInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  definition?: Record<string, unknown>;
-  tableId?: string;
-}
-export interface ProvisionFullTextSearchInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  definition?: Record<string, unknown>;
-  tableId?: string;
-}
-export interface ProvisionIndexInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  definition?: Record<string, unknown>;
-  tableId?: string;
-}
-export interface ProvisionRelationInput {
-  apiRequired?: boolean;
-  clientMutationId?: string;
-  createIndex?: boolean;
-  databaseId?: string;
-  deleteAction?: string;
-  exposeInApi?: boolean;
-  fieldName?: string;
-  grants?: Record<string, unknown>;
-  isRequired?: boolean;
-  junctionSchemaId?: string;
-  junctionTableId?: string;
-  junctionTableName?: string;
-  nodes?: Record<string, unknown>;
-  policies?: Record<string, unknown>;
-  relationType?: string;
-  sourceFieldName?: string;
-  sourceTableId?: string;
-  targetFieldName?: string;
-  targetTableId?: string;
-  useCompositeKey?: boolean;
-}
-export interface ProvisionSpatialRelationInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  name?: string;
-  operator?: string;
-  paramName?: string;
-  sourceFieldId?: string;
-  sourceTableId?: string;
-  targetFieldId?: string;
-  targetTableId?: string;
-}
-export interface ProvisionTableInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  description?: string;
-  fields?: Record<string, unknown>;
-  fullTextSearches?: Record<string, unknown>;
-  grants?: Record<string, unknown>;
-  indexes?: Record<string, unknown>;
-  nodes?: Record<string, unknown>;
-  policies?: Record<string, unknown>;
-  schemaId?: string;
-  tableId?: string;
-  tableName?: string;
-  uniqueConstraints?: Record<string, unknown>;
-  useRls?: boolean;
-}
-export interface ProvisionUniqueConstraintInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  definition?: Record<string, unknown>;
-  tableId?: string;
 }
 /** A filter to be used against many `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
 export interface BlueprintToManyBlueprintConstructionFilter {
@@ -15586,16 +15770,22 @@ export interface BillingProviderModuleInput {
   apiName?: string;
   billingCustomersTableId?: string;
   billingCustomersTableName?: string;
+  billingInvoicesTableId?: string;
+  billingInvoicesTableName?: string;
   billingPricesTableId?: string;
   billingPricesTableName?: string;
   billingProductsTableId?: string;
   billingProductsTableName?: string;
+  billingRefundsTableId?: string;
+  billingRefundsTableName?: string;
   billingSubscriptionsTableId?: string;
   billingSubscriptionsTableName?: string;
   billingWebhookEventsTableId?: string;
   billingWebhookEventsTableName?: string;
   databaseId: string;
   id?: string;
+  listPendingUsageSyncFunction?: string;
+  markUsageSyncedFunction?: string;
   prefix?: string;
   pricesTableId?: string;
   privateApiName?: string;
@@ -15603,8 +15793,10 @@ export interface BillingProviderModuleInput {
   processBillingEventFunction?: string;
   productsTableId?: string;
   provider?: string;
+  recordRefundFunction?: string;
   schemaId?: string;
   subscriptionsTableId?: string;
+  upsertInvoiceFunction?: string;
 }
 /** An input for mutations affecting `Blueprint` */
 export interface BlueprintInput {
@@ -15708,6 +15900,8 @@ export interface CatalogModuleInput {
   apisTableName?: string;
   appsTableId?: string;
   appsTableName?: string;
+  bindingsTableId?: string;
+  bindingsTableName?: string;
   bucketsTableId?: string;
   bucketsTableName?: string;
   databaseId: string;
@@ -16280,7 +16474,7 @@ export interface EntityTypeProvisionInput {
   tableName?: string;
   /**
    * Single jsonb object describing the full security setup to apply to the entity table.
-   *      Uses the same vocabulary as metaschema_modules_public.provision_table() and blueprint tables[]
+   *      Uses the same vocabulary as metaschema_modules_private.provision_table() and blueprint tables[]
    *      entries, so an entity table is configured the same way an ordinary blueprint table is.
    *      Defaults to NULL; when non-NULL, the five default policies are implicitly replaced by
    *      table_provision.policies[] (is_visible becomes a no-op on this path).
@@ -17201,8 +17395,10 @@ export interface RlsModuleInput {
 /** An input for mutations affecting `RouteModule` */
 export interface RouteModuleInput {
   apiName?: string;
+  appLinksFunctionName?: string;
   catalogModuleId?: string;
   databaseId: string;
+  deepLinkFunctionName?: string;
   defaultPermissions?: string[];
   domainModuleId?: string;
   entityField?: string;
@@ -17224,6 +17420,14 @@ export interface RouteModuleInput {
   routesTableName?: string;
   schemaId?: string;
   scope: string;
+}
+/** An input for mutations affecting `ScopeTypesModule` */
+export interface ScopeTypesModuleInput {
+  databaseId: string;
+  id?: string;
+  privateSchemaName?: string;
+  schemaId?: string;
+  scopeTypesTableId?: string;
 }
 /** An input for mutations affecting `SecureTableProvision` */
 export interface SecureTableProvisionInput {
@@ -17442,6 +17646,16 @@ export interface UserCredentialsModuleInput {
 }
 /** An input for mutations affecting `UserSettingsModule` */
 export interface UserSettingsModuleInput {
+  apiName?: string;
+  databaseId: string;
+  id?: string;
+  ownerTableId?: string;
+  schemaId?: string;
+  tableId?: string;
+  tableName?: string;
+}
+/** An input for mutations affecting `UserSettingsSecurityModule` */
+export interface UserSettingsSecurityModuleInput {
   apiName?: string;
   databaseId: string;
   id?: string;
@@ -17845,6 +18059,8 @@ export interface RouteModuleFilter {
   and?: RouteModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `appLinksFunctionName` field. */
+  appLinksFunctionName?: StringFilter;
   /** Filter by the object’s `catalogModule` relation. */
   catalogModule?: CatalogModuleFilter;
   /** A related `catalogModule` exists. */
@@ -17853,6 +18069,8 @@ export interface RouteModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `deepLinkFunctionName` field. */
+  deepLinkFunctionName?: StringFilter;
   /** Filter by the object’s `defaultPermissions` field. */
   defaultPermissions?: StringListFilter;
   /** Filter by the object’s `domainModule` relation. */
@@ -18725,6 +18943,10 @@ export interface CatalogModuleFilter {
   appsTableId?: UUIDFilter;
   /** Filter by the object’s `appsTableName` field. */
   appsTableName?: StringFilter;
+  /** Filter by the object’s `bindingsTableId` field. */
+  bindingsTableId?: UUIDFilter;
+  /** Filter by the object’s `bindingsTableName` field. */
+  bindingsTableName?: StringFilter;
   /** Filter by the object’s `bucketsTableId` field. */
   bucketsTableId?: UUIDFilter;
   /** Filter by the object’s `bucketsTableName` field. */
@@ -19278,62 +19500,6 @@ export type ProvisionBucketPayloadSelect = {
   error?: boolean;
   provider?: boolean;
   success?: boolean;
-};
-export interface ProvisionCheckConstraintPayload {
-  clientMutationId?: string | null;
-}
-export type ProvisionCheckConstraintPayloadSelect = {
-  clientMutationId?: boolean;
-};
-export interface ProvisionFullTextSearchPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type ProvisionFullTextSearchPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface ProvisionIndexPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type ProvisionIndexPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface ProvisionRelationPayload {
-  clientMutationId?: string | null;
-  result?: ProvisionRelationRecord[] | null;
-}
-export type ProvisionRelationPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: ProvisionRelationRecordSelect;
-  };
-};
-export interface ProvisionSpatialRelationPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type ProvisionSpatialRelationPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface ProvisionTablePayload {
-  clientMutationId?: string | null;
-  result?: ProvisionTableRecord[] | null;
-}
-export type ProvisionTablePayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: ProvisionTableRecordSelect;
-  };
-};
-export interface ProvisionUniqueConstraintPayload {
-  clientMutationId?: string | null;
-}
-export type ProvisionUniqueConstraintPayloadSelect = {
-  clientMutationId?: boolean;
 };
 export interface CreateAgentModulePayload {
   /** The `AgentModule` that was created by this mutation. */
@@ -22080,6 +22246,51 @@ export type DeleteRouteModulePayloadSelect = {
     select: RouteModuleEdgeSelect;
   };
 };
+export interface CreateScopeTypesModulePayload {
+  clientMutationId?: string | null;
+  /** The `ScopeTypesModule` that was created by this mutation. */
+  scopeTypesModule?: ScopeTypesModule | null;
+  scopeTypesModuleEdge?: ScopeTypesModuleEdge | null;
+}
+export type CreateScopeTypesModulePayloadSelect = {
+  clientMutationId?: boolean;
+  scopeTypesModule?: {
+    select: ScopeTypesModuleSelect;
+  };
+  scopeTypesModuleEdge?: {
+    select: ScopeTypesModuleEdgeSelect;
+  };
+};
+export interface UpdateScopeTypesModulePayload {
+  clientMutationId?: string | null;
+  /** The `ScopeTypesModule` that was updated by this mutation. */
+  scopeTypesModule?: ScopeTypesModule | null;
+  scopeTypesModuleEdge?: ScopeTypesModuleEdge | null;
+}
+export type UpdateScopeTypesModulePayloadSelect = {
+  clientMutationId?: boolean;
+  scopeTypesModule?: {
+    select: ScopeTypesModuleSelect;
+  };
+  scopeTypesModuleEdge?: {
+    select: ScopeTypesModuleEdgeSelect;
+  };
+};
+export interface DeleteScopeTypesModulePayload {
+  clientMutationId?: string | null;
+  /** The `ScopeTypesModule` that was deleted by this mutation. */
+  scopeTypesModule?: ScopeTypesModule | null;
+  scopeTypesModuleEdge?: ScopeTypesModuleEdge | null;
+}
+export type DeleteScopeTypesModulePayloadSelect = {
+  clientMutationId?: boolean;
+  scopeTypesModule?: {
+    select: ScopeTypesModuleSelect;
+  };
+  scopeTypesModuleEdge?: {
+    select: ScopeTypesModuleEdgeSelect;
+  };
+};
 export interface CreateSecureTableProvisionPayload {
   clientMutationId?: string | null;
   /** The `SecureTableProvision` that was created by this mutation. */
@@ -22530,6 +22741,51 @@ export type DeleteUserSettingsModulePayloadSelect = {
     select: UserSettingsModuleEdgeSelect;
   };
 };
+export interface CreateUserSettingsSecurityModulePayload {
+  clientMutationId?: string | null;
+  /** The `UserSettingsSecurityModule` that was created by this mutation. */
+  userSettingsSecurityModule?: UserSettingsSecurityModule | null;
+  userSettingsSecurityModuleEdge?: UserSettingsSecurityModuleEdge | null;
+}
+export type CreateUserSettingsSecurityModulePayloadSelect = {
+  clientMutationId?: boolean;
+  userSettingsSecurityModule?: {
+    select: UserSettingsSecurityModuleSelect;
+  };
+  userSettingsSecurityModuleEdge?: {
+    select: UserSettingsSecurityModuleEdgeSelect;
+  };
+};
+export interface UpdateUserSettingsSecurityModulePayload {
+  clientMutationId?: string | null;
+  /** The `UserSettingsSecurityModule` that was updated by this mutation. */
+  userSettingsSecurityModule?: UserSettingsSecurityModule | null;
+  userSettingsSecurityModuleEdge?: UserSettingsSecurityModuleEdge | null;
+}
+export type UpdateUserSettingsSecurityModulePayloadSelect = {
+  clientMutationId?: boolean;
+  userSettingsSecurityModule?: {
+    select: UserSettingsSecurityModuleSelect;
+  };
+  userSettingsSecurityModuleEdge?: {
+    select: UserSettingsSecurityModuleEdgeSelect;
+  };
+};
+export interface DeleteUserSettingsSecurityModulePayload {
+  clientMutationId?: string | null;
+  /** The `UserSettingsSecurityModule` that was deleted by this mutation. */
+  userSettingsSecurityModule?: UserSettingsSecurityModule | null;
+  userSettingsSecurityModuleEdge?: UserSettingsSecurityModuleEdge | null;
+}
+export type DeleteUserSettingsSecurityModulePayloadSelect = {
+  clientMutationId?: boolean;
+  userSettingsSecurityModule?: {
+    select: UserSettingsSecurityModuleSelect;
+  };
+  userSettingsSecurityModuleEdge?: {
+    select: UserSettingsSecurityModuleEdgeSelect;
+  };
+};
 export interface CreateUserStateModulePayload {
   clientMutationId?: string | null;
   /** The `UserStateModule` that was created by this mutation. */
@@ -22754,26 +23010,6 @@ export type DeleteWebhookModulePayloadSelect = {
   webhookModuleEdge?: {
     select: WebhookModuleEdgeSelect;
   };
-};
-export interface ProvisionRelationRecord {
-  outFieldId?: string | null;
-  outJunctionTableId?: string | null;
-  outSourceFieldId?: string | null;
-  outTargetFieldId?: string | null;
-}
-export type ProvisionRelationRecordSelect = {
-  outFieldId?: boolean;
-  outJunctionTableId?: boolean;
-  outSourceFieldId?: boolean;
-  outTargetFieldId?: boolean;
-};
-export interface ProvisionTableRecord {
-  outFields?: string[] | null;
-  outTableId?: string | null;
-}
-export type ProvisionTableRecordSelect = {
-  outFields?: boolean;
-  outTableId?: boolean;
 };
 /** A `AgentModule` edge in the connection. */
 export interface AgentModuleEdge {
@@ -23507,6 +23743,18 @@ export type RouteModuleEdgeSelect = {
     select: RouteModuleSelect;
   };
 };
+/** A `ScopeTypesModule` edge in the connection. */
+export interface ScopeTypesModuleEdge {
+  cursor?: string | null;
+  /** The `ScopeTypesModule` at the end of the edge. */
+  node?: ScopeTypesModule | null;
+}
+export type ScopeTypesModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ScopeTypesModuleSelect;
+  };
+};
 /** A `SecureTableProvision` edge in the connection. */
 export interface SecureTableProvisionEdge {
   cursor?: string | null;
@@ -23625,6 +23873,18 @@ export type UserSettingsModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: UserSettingsModuleSelect;
+  };
+};
+/** A `UserSettingsSecurityModule` edge in the connection. */
+export interface UserSettingsSecurityModuleEdge {
+  cursor?: string | null;
+  /** The `UserSettingsSecurityModule` at the end of the edge. */
+  node?: UserSettingsSecurityModule | null;
+}
+export type UserSettingsSecurityModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: UserSettingsSecurityModuleSelect;
   };
 };
 /** A `UserStateModule` edge in the connection. */

@@ -23,6 +23,122 @@ type AcceptDatabaseTransferPayload {
   result: Boolean
 }
 
+"""
+API surfaces exposed by this scope; publication makes a surface bindable from other scopes
+"""
+type Api {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Reads and enables pagination through a set of `ApiSchema`."""
+  apiSchemas(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ApiSchema`."""
+    orderBy: [ApiSchemaOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ApiSchemaFilter
+  ): ApiSchemaConnection!
+
+  """Reads a single `ApiSetting` that is related to this `Api`."""
+  apiSetting: ApiSetting
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+
+  """Reads and enables pagination through a set of `CorsSetting`."""
+  corsSettings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `CorsSetting`."""
+    orderBy: [CorsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CorsSettingFilter
+  ): CorsSettingConnection!
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID!
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean!
+
+  """Owner-local API surface name"""
+  name: String!
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `Api` values."""
+type ApiConnection {
+  """
+  A list of edges which contains the `Api` and cursor to aid in pagination.
+  """
+  edges: [ApiEdge]!
+
+  """A list of `Api` objects."""
+  nodes: [Api]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Api` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Api` edge in the connection."""
+type ApiEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Api` at the end of the edge."""
+  node: Api
+}
+
 enum ApiExposureLevel {
   EXPOSABLE
   INTERNAL_ONLY
@@ -71,10 +187,153 @@ input ApiExposureLevelFilter {
   notIn: [ApiExposureLevel!]
 }
 
+"""
+A filter to be used against `Api` object types. All fields are combined with a logical ‘and.’
+"""
+input ApiFilter {
+  """Checks for all expressions in this list."""
+  and: [ApiFilter!]
+
+  """Filter by the object’s `anonRole` field."""
+  anonRole: StringFilter
+
+  """Filter by the object’s `apiSchemas` relation."""
+  apiSchemas: ApiToManyApiSchemaFilter
+
+  """`apiSchemas` exist."""
+  apiSchemasExist: Boolean
+
+  """Filter by the object’s `apiSetting` relation."""
+  apiSetting: ApiSettingFilter
+
+  """A related `apiSetting` exists."""
+  apiSettingExists: Boolean
+
+  """Filter by the object’s `config` field."""
+  config: JSONFilter
+
+  """Filter by the object’s `corsSettings` relation."""
+  corsSettings: ApiToManyCorsSettingFilter
+
+  """`corsSettings` exist."""
+  corsSettingsExist: Boolean
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `dbname` field."""
+  dbname: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isPublished` field."""
+  isPublished: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: ApiFilter
+
+  """Checks for any expressions in this list."""
+  or: [ApiFilter!]
+
+  """Filter by the object’s `roleName` field."""
+  roleName: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `Api`"""
+input ApiInput {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean
+
+  """Owner-local API surface name"""
+  name: String!
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `Api`."""
+enum ApiOrderBy {
+  ANON_ROLE_ASC
+  ANON_ROLE_DESC
+  CONFIG_ASC
+  CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DBNAME_ASC
+  DBNAME_DESC
+  ID_ASC
+  ID_DESC
+  IS_PUBLISHED_ASC
+  IS_PUBLISHED_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROLE_NAME_ASC
+  ROLE_NAME_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""Represents an update to a `Api`. Fields that are set will be updated."""
+input ApiPatch {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean
+
+  """Owner-local API surface name"""
+  name: String
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
 """Join table linking API surfaces to the metaschema schemas they expose"""
 type ApiSchema {
-  """Reads a single `Apis` that is related to this `ApiSchema`."""
-  api: Apis
+  """Reads a single `Api` that is related to this `ApiSchema`."""
+  api: Api
 
   """API surface that exposes this schema"""
   apiId: UUID!
@@ -126,7 +385,7 @@ input ApiSchemaFilter {
   and: [ApiSchemaFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: ApisFilter
+  api: ApiFilter
 
   """Filter by the object’s `apiId` field."""
   apiId: UUIDFilter
@@ -211,8 +470,8 @@ input ApiSchemaPatch {
 Per-API feature flag overrides; NULL columns inherit from database_settings
 """
 type ApiSetting {
-  """Reads a single `Apis` that is related to this `ApiSetting`."""
-  api: Apis
+  """Reads a single `Api` that is related to this `ApiSetting`."""
+  api: Api
 
   """API surface these settings override for"""
   apiId: UUID!
@@ -328,7 +587,7 @@ input ApiSettingFilter {
   and: [ApiSettingFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: ApisFilter
+  api: ApiFilter
 
   """Filter by the object’s `apiId` field."""
   apiId: UUIDFilter
@@ -606,268 +865,9 @@ input ApiSettingPatch {
 }
 
 """
-API surfaces exposed by this scope; publication makes a surface bindable from other scopes
-"""
-type Apis {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Reads and enables pagination through a set of `ApiSchema`."""
-  apiSchemasByApiId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `ApiSchema`."""
-    orderBy: [ApiSchemaOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ApiSchemaFilter
-  ): ApiSchemaConnection!
-
-  """Reads a single `ApiSetting` that is related to this `Apis`."""
-  apiSettingByApiId: ApiSetting
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-
-  """Reads and enables pagination through a set of `CorsSetting`."""
-  corsSettingsByApiId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `CorsSetting`."""
-    orderBy: [CorsSettingOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: CorsSettingFilter
-  ): CorsSettingConnection!
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID!
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean!
-
-  """Owner-local API surface name"""
-  name: String!
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""A connection to a list of `Apis` values."""
-type ApisConnection {
-  """
-  A list of edges which contains the `Apis` and cursor to aid in pagination.
-  """
-  edges: [ApisEdge]!
-
-  """A list of `Apis` objects."""
-  nodes: [Apis]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Apis` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Apis` edge in the connection."""
-type ApisEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Apis` at the end of the edge."""
-  node: Apis
-}
-
-"""
-A filter to be used against `Apis` object types. All fields are combined with a logical ‘and.’
-"""
-input ApisFilter {
-  """Checks for all expressions in this list."""
-  and: [ApisFilter!]
-
-  """Filter by the object’s `anonRole` field."""
-  anonRole: StringFilter
-
-  """Filter by the object’s `apiSchemasByApiId` relation."""
-  apiSchemasByApiId: ApisToManyApiSchemaFilter
-
-  """`apiSchemasByApiId` exist."""
-  apiSchemasByApiIdExist: Boolean
-
-  """Filter by the object’s `apiSettingByApiId` relation."""
-  apiSettingByApiId: ApiSettingFilter
-
-  """A related `apiSettingByApiId` exists."""
-  apiSettingByApiIdExists: Boolean
-
-  """Filter by the object’s `config` field."""
-  config: JSONFilter
-
-  """Filter by the object’s `corsSettingsByApiId` relation."""
-  corsSettingsByApiId: ApisToManyCorsSettingFilter
-
-  """`corsSettingsByApiId` exist."""
-  corsSettingsByApiIdExist: Boolean
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `dbname` field."""
-  dbname: StringFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isPublished` field."""
-  isPublished: BooleanFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Negates the expression."""
-  not: ApisFilter
-
-  """Checks for any expressions in this list."""
-  or: [ApisFilter!]
-
-  """Filter by the object’s `roleName` field."""
-  roleName: StringFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `Apis`"""
-input ApisInput {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean
-
-  """Owner-local API surface name"""
-  name: String!
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""Methods to use when ordering `Apis`."""
-enum ApisOrderBy {
-  ANON_ROLE_ASC
-  ANON_ROLE_DESC
-  CONFIG_ASC
-  CONFIG_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  DBNAME_ASC
-  DBNAME_DESC
-  ID_ASC
-  ID_DESC
-  IS_PUBLISHED_ASC
-  IS_PUBLISHED_DESC
-  NAME_ASC
-  NAME_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ROLE_NAME_ASC
-  ROLE_NAME_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""Represents an update to a `Apis`. Fields that are set will be updated."""
-input ApisPatch {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean
-
-  """Owner-local API surface name"""
-  name: String
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’
 """
-input ApisToManyApiSchemaFilter {
+input ApiToManyApiSchemaFilter {
   """Filters to entities where every related entity matches."""
   every: ApiSchemaFilter
 
@@ -881,7 +881,7 @@ input ApisToManyApiSchemaFilter {
 """
 A filter to be used against many `CorsSetting` object types. All fields are combined with a logical ‘and.’
 """
-input ApisToManyCorsSettingFilter {
+input ApiToManyCorsSettingFilter {
   """Filters to entities where every related entity matches."""
   every: CorsSettingFilter
 
@@ -1568,8 +1568,8 @@ type CorsSetting {
   """Array of allowed CORS origins (e.g. https://example.com)"""
   allowedOrigins: [String]!
 
-  """Reads a single `Apis` that is related to this `CorsSetting`."""
-  api: Apis
+  """Reads a single `Api` that is related to this `CorsSetting`."""
+  api: Api
 
   """
   Optional API surface for per-API override; NULL means scope-wide default
@@ -1620,7 +1620,7 @@ input CorsSettingFilter {
   and: [CorsSettingFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: ApisFilter
+  api: ApiFilter
 
   """A related `api` exists."""
   apiExists: Boolean
@@ -1702,6 +1702,41 @@ input CorsSettingPatch {
   updatedAt: Datetime
 }
 
+"""All input for the create `Api` mutation."""
+input CreateApiInput {
+  """The `Api` to be created by this mutation."""
+  api: ApiInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `Api` mutation."""
+type CreateApiPayload {
+  """The `Api` that was created by this mutation."""
+  api: Api
+
+  """An edge for our `Api`. May be used by Relay 1."""
+  apiEdge(
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `ApiSchema` mutation."""
 input CreateApiSchemaInput {
   """The `ApiSchema` to be created by this mutation."""
@@ -1759,41 +1794,6 @@ type CreateApiSettingPayload {
     """The method to use when ordering `ApiSetting`."""
     orderBy: [ApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ApiSettingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `Apis` mutation."""
-input CreateApisInput {
-  """The `Apis` to be created by this mutation."""
-  apis: ApisInput!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our create `Apis` mutation."""
-type CreateApisPayload {
-  """The `Apis` that was created by this mutation."""
-  apis: Apis
-
-  """An edge for our `Apis`. May be used by Relay 1."""
-  apisEdge(
-    """The method to use when ordering `Apis`."""
-    orderBy: [ApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApisEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -2789,6 +2789,41 @@ type CreatePartitionPayload {
   query: Query
 }
 
+"""All input for the create `PlatformApi` mutation."""
+input CreatePlatformApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformApi` to be created by this mutation."""
+  platformApi: PlatformApiInput!
+}
+
+"""The output of our create `PlatformApi` mutation."""
+type CreatePlatformApiPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformApi` that was created by this mutation."""
+  platformApi: PlatformApi
+
+  """An edge for our `PlatformApi`. May be used by Relay 1."""
+  platformApiEdge(
+    """The method to use when ordering `PlatformApi`."""
+    orderBy: [PlatformApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformApiEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `PlatformApiSchema` mutation."""
 input CreatePlatformApiSchemaInput {
   """
@@ -2852,41 +2887,6 @@ type CreatePlatformApiSettingPayload {
     """The method to use when ordering `PlatformApiSetting`."""
     orderBy: [PlatformApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformApiSettingEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `PlatformApis` mutation."""
-input CreatePlatformApisInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `PlatformApis` to be created by this mutation."""
-  platformApis: PlatformApisInput!
-}
-
-"""The output of our create `PlatformApis` mutation."""
-type CreatePlatformApisPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformApis` that was created by this mutation."""
-  platformApis: PlatformApis
-
-  """An edge for our `PlatformApis`. May be used by Relay 1."""
-  platformApisEdge(
-    """The method to use when ordering `PlatformApis`."""
-    orderBy: [PlatformApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformApisEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -7016,6 +7016,39 @@ input DefaultPrivilegePatch {
   schemaId: UUID
 }
 
+"""All input for the `deleteApi` mutation."""
+input DeleteApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Api` mutation."""
+type DeleteApiPayload {
+  """The `Api` that was deleted by this mutation."""
+  api: Api
+
+  """An edge for our `Api`. May be used by Relay 1."""
+  apiEdge(
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deleteApiSchema` mutation."""
 input DeleteApiSchemaInput {
   """
@@ -7069,39 +7102,6 @@ type DeleteApiSettingPayload {
     """The method to use when ordering `ApiSetting`."""
     orderBy: [ApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ApiSettingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `deleteApis` mutation."""
-input DeleteApisInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `Apis` mutation."""
-type DeleteApisPayload {
-  """The `Apis` that was deleted by this mutation."""
-  apis: Apis
-
-  """An edge for our `Apis`. May be used by Relay 1."""
-  apisEdge(
-    """The method to use when ordering `Apis`."""
-    orderBy: [ApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApisEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -8043,6 +8043,39 @@ type DeletePartitionPayload {
   query: Query
 }
 
+"""All input for the `deletePlatformApi` mutation."""
+input DeletePlatformApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformApi` mutation."""
+type DeletePlatformApiPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformApi` that was deleted by this mutation."""
+  platformApi: PlatformApi
+
+  """An edge for our `PlatformApi`. May be used by Relay 1."""
+  platformApiEdge(
+    """The method to use when ordering `PlatformApi`."""
+    orderBy: [PlatformApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformApiEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deletePlatformApiSchema` mutation."""
 input DeletePlatformApiSchemaInput {
   """
@@ -8102,39 +8135,6 @@ type DeletePlatformApiSettingPayload {
     """The method to use when ordering `PlatformApiSetting`."""
     orderBy: [PlatformApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformApiSettingEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `deletePlatformApis` mutation."""
-input DeletePlatformApisInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `PlatformApis` mutation."""
-type DeletePlatformApisPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformApis` that was deleted by this mutation."""
-  platformApis: PlatformApis
-
-  """An edge for our `PlatformApis`. May be used by Relay 1."""
-  platformApisEdge(
-    """The method to use when ordering `PlatformApis`."""
-    orderBy: [PlatformApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformApisEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -14337,6 +14337,14 @@ type Mutation {
     input: CancelDatabaseTransferInput!
   ): CancelDatabaseTransferPayload
 
+  """Creates a single `Api`."""
+  createApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateApiInput!
+  ): CreateApiPayload
+
   """Creates a single `ApiSchema`."""
   createApiSchema(
     """
@@ -14352,14 +14360,6 @@ type Mutation {
     """
     input: CreateApiSettingInput!
   ): CreateApiSettingPayload
-
-  """Creates a single `Apis`."""
-  createApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateApisInput!
-  ): CreateApisPayload
 
   """Creates a single `CheckConstraint`."""
   createCheckConstraint(
@@ -14585,6 +14585,14 @@ type Mutation {
     input: CreatePartitionInput!
   ): CreatePartitionPayload
 
+  """Creates a single `PlatformApi`."""
+  createPlatformApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformApiInput!
+  ): CreatePlatformApiPayload
+
   """Creates a single `PlatformApiSchema`."""
   createPlatformApiSchema(
     """
@@ -14600,14 +14608,6 @@ type Mutation {
     """
     input: CreatePlatformApiSettingInput!
   ): CreatePlatformApiSettingPayload
-
-  """Creates a single `PlatformApis`."""
-  createPlatformApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePlatformApisInput!
-  ): CreatePlatformApisPayload
 
   """Creates a single `PlatformCorsSetting`."""
   createPlatformCorsSetting(
@@ -14961,6 +14961,14 @@ type Mutation {
     input: CreateWebauthnSettingInput!
   ): CreateWebauthnSettingPayload
 
+  """Deletes a single `Api` using a unique key."""
+  deleteApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteApiInput!
+  ): DeleteApiPayload
+
   """Deletes a single `ApiSchema` using a unique key."""
   deleteApiSchema(
     """
@@ -14976,14 +14984,6 @@ type Mutation {
     """
     input: DeleteApiSettingInput!
   ): DeleteApiSettingPayload
-
-  """Deletes a single `Apis` using a unique key."""
-  deleteApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteApisInput!
-  ): DeleteApisPayload
 
   """Deletes a single `CheckConstraint` using a unique key."""
   deleteCheckConstraint(
@@ -15209,6 +15209,14 @@ type Mutation {
     input: DeletePartitionInput!
   ): DeletePartitionPayload
 
+  """Deletes a single `PlatformApi` using a unique key."""
+  deletePlatformApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformApiInput!
+  ): DeletePlatformApiPayload
+
   """Deletes a single `PlatformApiSchema` using a unique key."""
   deletePlatformApiSchema(
     """
@@ -15224,14 +15232,6 @@ type Mutation {
     """
     input: DeletePlatformApiSettingInput!
   ): DeletePlatformApiSettingPayload
-
-  """Deletes a single `PlatformApis` using a unique key."""
-  deletePlatformApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePlatformApisInput!
-  ): DeletePlatformApisPayload
 
   """Deletes a single `PlatformCorsSetting` using a unique key."""
   deletePlatformCorsSetting(
@@ -15650,6 +15650,14 @@ type Mutation {
     input: SitesProvisionStaticSiteInput!
   ): SitesProvisionStaticSitePayload
 
+  """Updates a single `Api` using a unique key and a patch."""
+  updateApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateApiInput!
+  ): UpdateApiPayload
+
   """Updates a single `ApiSchema` using a unique key and a patch."""
   updateApiSchema(
     """
@@ -15665,14 +15673,6 @@ type Mutation {
     """
     input: UpdateApiSettingInput!
   ): UpdateApiSettingPayload
-
-  """Updates a single `Apis` using a unique key and a patch."""
-  updateApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateApisInput!
-  ): UpdateApisPayload
 
   """Updates a single `CheckConstraint` using a unique key and a patch."""
   updateCheckConstraint(
@@ -15902,6 +15902,14 @@ type Mutation {
     input: UpdatePartitionInput!
   ): UpdatePartitionPayload
 
+  """Updates a single `PlatformApi` using a unique key and a patch."""
+  updatePlatformApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformApiInput!
+  ): UpdatePlatformApiPayload
+
   """Updates a single `PlatformApiSchema` using a unique key and a patch."""
   updatePlatformApiSchema(
     """
@@ -15917,14 +15925,6 @@ type Mutation {
     """
     input: UpdatePlatformApiSettingInput!
   ): UpdatePlatformApiSettingPayload
-
-  """Updates a single `PlatformApis` using a unique key and a patch."""
-  updatePlatformApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePlatformApisInput!
-  ): UpdatePlatformApisPayload
 
   """Updates a single `PlatformCorsSetting` using a unique key and a patch."""
   updatePlatformCorsSetting(
@@ -16875,12 +16875,237 @@ input PartitionPatch {
   updatedAt: Datetime
 }
 
+"""
+API surfaces exposed by this scope; publication makes a surface bindable from other scopes
+"""
+type PlatformApi {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID!
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean!
+
+  """Owner-local API surface name"""
+  name: String!
+
+  """Reads and enables pagination through a set of `PlatformApiSchema`."""
+  platformApiSchemasByApiId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformApiSchema`."""
+    orderBy: [PlatformApiSchemaOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformApiSchemaFilter
+  ): PlatformApiSchemaConnection!
+
+  """
+  Reads a single `PlatformApiSetting` that is related to this `PlatformApi`.
+  """
+  platformApiSettingByApiId: PlatformApiSetting
+
+  """
+  Reads a single `PlatformCorsSetting` that is related to this `PlatformApi`.
+  """
+  platformCorsSettingByApiId: PlatformCorsSetting
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformApi` values."""
+type PlatformApiConnection {
+  """
+  A list of edges which contains the `PlatformApi` and cursor to aid in pagination.
+  """
+  edges: [PlatformApiEdge]!
+
+  """A list of `PlatformApi` objects."""
+  nodes: [PlatformApi]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PlatformApi` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PlatformApi` edge in the connection."""
+type PlatformApiEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformApi` at the end of the edge."""
+  node: PlatformApi
+}
+
+"""
+A filter to be used against `PlatformApi` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformApiFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformApiFilter!]
+
+  """Filter by the object’s `anonRole` field."""
+  anonRole: StringFilter
+
+  """Filter by the object’s `config` field."""
+  config: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `dbname` field."""
+  dbname: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isPublished` field."""
+  isPublished: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformApiFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformApiFilter!]
+
+  """Filter by the object’s `platformApiSchemasByApiId` relation."""
+  platformApiSchemasByApiId: PlatformApiToManyPlatformApiSchemaFilter
+
+  """`platformApiSchemasByApiId` exist."""
+  platformApiSchemasByApiIdExist: Boolean
+
+  """Filter by the object’s `platformApiSettingByApiId` relation."""
+  platformApiSettingByApiId: PlatformApiSettingFilter
+
+  """A related `platformApiSettingByApiId` exists."""
+  platformApiSettingByApiIdExists: Boolean
+
+  """Filter by the object’s `platformCorsSettingByApiId` relation."""
+  platformCorsSettingByApiId: PlatformCorsSettingFilter
+
+  """A related `platformCorsSettingByApiId` exists."""
+  platformCorsSettingByApiIdExists: Boolean
+
+  """Filter by the object’s `roleName` field."""
+  roleName: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `PlatformApi`"""
+input PlatformApiInput {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean
+
+  """Owner-local API surface name"""
+  name: String!
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `PlatformApi`."""
+enum PlatformApiOrderBy {
+  ANON_ROLE_ASC
+  ANON_ROLE_DESC
+  CONFIG_ASC
+  CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DBNAME_ASC
+  DBNAME_DESC
+  ID_ASC
+  ID_DESC
+  IS_PUBLISHED_ASC
+  IS_PUBLISHED_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROLE_NAME_ASC
+  ROLE_NAME_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformApi`. Fields that are set will be updated.
+"""
+input PlatformApiPatch {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean
+
+  """Owner-local API surface name"""
+  name: String
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
 """Join table linking API surfaces to the metaschema schemas they expose"""
 type PlatformApiSchema {
   """
-  Reads a single `PlatformApis` that is related to this `PlatformApiSchema`.
+  Reads a single `PlatformApi` that is related to this `PlatformApiSchema`.
   """
-  api: PlatformApis
+  api: PlatformApi
 
   """API surface that exposes this schema"""
   apiId: UUID!
@@ -16931,7 +17156,7 @@ input PlatformApiSchemaFilter {
   and: [PlatformApiSchemaFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: PlatformApisFilter
+  api: PlatformApiFilter
 
   """Filter by the object’s `apiId` field."""
   apiId: UUIDFilter
@@ -17006,9 +17231,9 @@ Per-API feature flag overrides; NULL columns inherit from database_settings
 """
 type PlatformApiSetting {
   """
-  Reads a single `PlatformApis` that is related to this `PlatformApiSetting`.
+  Reads a single `PlatformApi` that is related to this `PlatformApiSetting`.
   """
-  api: PlatformApis
+  api: PlatformApi
 
   """API surface these settings override for"""
   apiId: UUID!
@@ -17123,7 +17348,7 @@ input PlatformApiSettingFilter {
   and: [PlatformApiSettingFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: PlatformApisFilter
+  api: PlatformApiFilter
 
   """Filter by the object’s `apiId` field."""
   apiId: UUIDFilter
@@ -17390,234 +17615,9 @@ input PlatformApiSettingPatch {
 }
 
 """
-API surfaces exposed by this scope; publication makes a surface bindable from other scopes
-"""
-type PlatformApis {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID!
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean!
-
-  """Owner-local API surface name"""
-  name: String!
-
-  """Reads and enables pagination through a set of `PlatformApiSchema`."""
-  platformApiSchemasByApiId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PlatformApiSchema`."""
-    orderBy: [PlatformApiSchemaOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PlatformApiSchemaFilter
-  ): PlatformApiSchemaConnection!
-
-  """
-  Reads a single `PlatformApiSetting` that is related to this `PlatformApis`.
-  """
-  platformApiSettingByApiId: PlatformApiSetting
-
-  """
-  Reads a single `PlatformCorsSetting` that is related to this `PlatformApis`.
-  """
-  platformCorsSettingByApiId: PlatformCorsSetting
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""A connection to a list of `PlatformApis` values."""
-type PlatformApisConnection {
-  """
-  A list of edges which contains the `PlatformApis` and cursor to aid in pagination.
-  """
-  edges: [PlatformApisEdge]!
-
-  """A list of `PlatformApis` objects."""
-  nodes: [PlatformApis]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `PlatformApis` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `PlatformApis` edge in the connection."""
-type PlatformApisEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `PlatformApis` at the end of the edge."""
-  node: PlatformApis
-}
-
-"""
-A filter to be used against `PlatformApis` object types. All fields are combined with a logical ‘and.’
-"""
-input PlatformApisFilter {
-  """Checks for all expressions in this list."""
-  and: [PlatformApisFilter!]
-
-  """Filter by the object’s `anonRole` field."""
-  anonRole: StringFilter
-
-  """Filter by the object’s `config` field."""
-  config: JSONFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `dbname` field."""
-  dbname: StringFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isPublished` field."""
-  isPublished: BooleanFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Negates the expression."""
-  not: PlatformApisFilter
-
-  """Checks for any expressions in this list."""
-  or: [PlatformApisFilter!]
-
-  """Filter by the object’s `platformApiSchemasByApiId` relation."""
-  platformApiSchemasByApiId: PlatformApisToManyPlatformApiSchemaFilter
-
-  """`platformApiSchemasByApiId` exist."""
-  platformApiSchemasByApiIdExist: Boolean
-
-  """Filter by the object’s `platformApiSettingByApiId` relation."""
-  platformApiSettingByApiId: PlatformApiSettingFilter
-
-  """A related `platformApiSettingByApiId` exists."""
-  platformApiSettingByApiIdExists: Boolean
-
-  """Filter by the object’s `platformCorsSettingByApiId` relation."""
-  platformCorsSettingByApiId: PlatformCorsSettingFilter
-
-  """A related `platformCorsSettingByApiId` exists."""
-  platformCorsSettingByApiIdExists: Boolean
-
-  """Filter by the object’s `roleName` field."""
-  roleName: StringFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `PlatformApis`"""
-input PlatformApisInput {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean
-
-  """Owner-local API surface name"""
-  name: String!
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""Methods to use when ordering `PlatformApis`."""
-enum PlatformApisOrderBy {
-  ANON_ROLE_ASC
-  ANON_ROLE_DESC
-  CONFIG_ASC
-  CONFIG_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  DBNAME_ASC
-  DBNAME_DESC
-  ID_ASC
-  ID_DESC
-  IS_PUBLISHED_ASC
-  IS_PUBLISHED_DESC
-  NAME_ASC
-  NAME_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ROLE_NAME_ASC
-  ROLE_NAME_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""
-Represents an update to a `PlatformApis`. Fields that are set will be updated.
-"""
-input PlatformApisPatch {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean
-
-  """Owner-local API surface name"""
-  name: String
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against many `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’
 """
-input PlatformApisToManyPlatformApiSchemaFilter {
+input PlatformApiToManyPlatformApiSchemaFilter {
   """Filters to entities where every related entity matches."""
   every: PlatformApiSchemaFilter
 
@@ -17636,9 +17636,9 @@ type PlatformCorsSetting {
   allowedOrigins: [String]!
 
   """
-  Reads a single `PlatformApis` that is related to this `PlatformCorsSetting`.
+  Reads a single `PlatformApi` that is related to this `PlatformCorsSetting`.
   """
-  api: PlatformApis
+  api: PlatformApi
 
   """
   Optional API surface for per-API override; NULL means scope-wide default
@@ -17688,7 +17688,7 @@ input PlatformCorsSettingFilter {
   and: [PlatformCorsSettingFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: PlatformApisFilter
+  api: PlatformApiFilter
 
   """A related `api` exists."""
   apiExists: Boolean
@@ -21976,8 +21976,8 @@ type Query {
     where: ApiSettingFilter
   ): ApiSettingConnection
 
-  """Reads and enables pagination through a set of `Apis`."""
-  apises(
+  """Reads and enables pagination through a set of `Api`."""
+  apis(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -21996,14 +21996,14 @@ type Query {
     """
     offset: Int
 
-    """The method to use when ordering `Apis`."""
-    orderBy: [ApisOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: ApisFilter
-  ): ApisConnection
+    where: ApiFilter
+  ): ApiConnection
   applyRegistryDefaults(data: JSON, nodeType: String): JSON
 
   """Reads and enables pagination through a set of `AstMigration`."""
@@ -22907,8 +22907,8 @@ type Query {
     where: PlatformApiSettingFilter
   ): PlatformApiSettingConnection
 
-  """Reads and enables pagination through a set of `PlatformApis`."""
-  platformApises(
+  """Reads and enables pagination through a set of `PlatformApi`."""
+  platformApis(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -22927,14 +22927,14 @@ type Query {
     """
     offset: Int
 
-    """The method to use when ordering `PlatformApis`."""
-    orderBy: [PlatformApisOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `PlatformApi`."""
+    orderBy: [PlatformApiOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: PlatformApisFilter
-  ): PlatformApisConnection
+    where: PlatformApiFilter
+  ): PlatformApiConnection
 
   """Reads and enables pagination through a set of `PlatformCorsSetting`."""
   platformCorsSettings(
@@ -30902,6 +30902,44 @@ input UniqueConstraintToManyUniqueConstraintBehaviorFilter {
   some: UniqueConstraintBehaviorFilter
 }
 
+"""All input for the `updateApi` mutation."""
+input UpdateApiInput {
+  """
+  An object where the defined keys will be set on the `Api` being updated.
+  """
+  apiPatch: ApiPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our update `Api` mutation."""
+type UpdateApiPayload {
+  """The `Api` that was updated by this mutation."""
+  api: Api
+
+  """An edge for our `Api`. May be used by Relay 1."""
+  apiEdge(
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updateApiSchema` mutation."""
 input UpdateApiSchemaInput {
   """
@@ -30965,44 +31003,6 @@ type UpdateApiSettingPayload {
     """The method to use when ordering `ApiSetting`."""
     orderBy: [ApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ApiSettingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updateApis` mutation."""
-input UpdateApisInput {
-  """
-  An object where the defined keys will be set on the `Apis` being updated.
-  """
-  apisPatch: ApisPatch!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our update `Apis` mutation."""
-type UpdateApisPayload {
-  """The `Apis` that was updated by this mutation."""
-  apis: Apis
-
-  """An edge for our `Apis`. May be used by Relay 1."""
-  apisEdge(
-    """The method to use when ordering `Apis`."""
-    orderBy: [ApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApisEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -32084,6 +32084,44 @@ type UpdatePartitionPayload {
   query: Query
 }
 
+"""All input for the `updatePlatformApi` mutation."""
+input UpdatePlatformApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformApi` being updated.
+  """
+  platformApiPatch: PlatformApiPatch!
+}
+
+"""The output of our update `PlatformApi` mutation."""
+type UpdatePlatformApiPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformApi` that was updated by this mutation."""
+  platformApi: PlatformApi
+
+  """An edge for our `PlatformApi`. May be used by Relay 1."""
+  platformApiEdge(
+    """The method to use when ordering `PlatformApi`."""
+    orderBy: [PlatformApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformApiEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updatePlatformApiSchema` mutation."""
 input UpdatePlatformApiSchemaInput {
   """
@@ -32153,44 +32191,6 @@ type UpdatePlatformApiSettingPayload {
     """The method to use when ordering `PlatformApiSetting`."""
     orderBy: [PlatformApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformApiSettingEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updatePlatformApis` mutation."""
-input UpdatePlatformApisInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `PlatformApis` being updated.
-  """
-  platformApisPatch: PlatformApisPatch!
-}
-
-"""The output of our update `PlatformApis` mutation."""
-type UpdatePlatformApisPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformApis` that was updated by this mutation."""
-  platformApis: PlatformApis
-
-  """An edge for our `PlatformApis`. May be used by Relay 1."""
-  platformApisEdge(
-    """The method to use when ordering `PlatformApis`."""
-    orderBy: [PlatformApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformApisEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

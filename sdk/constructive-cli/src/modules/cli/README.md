@@ -87,6 +87,7 @@ csdk auth set-token <your-token>
 | `resource-module` | resourceModule CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
 | `route-module` | routeModule CRUD operations |
+| `scope-types-module` | scopeTypesModule CRUD operations |
 | `secure-table-provision` | secureTableProvision CRUD operations |
 | `session-secrets-module` | sessionSecretsModule CRUD operations |
 | `sessions-module` | sessionsModule CRUD operations |
@@ -97,26 +98,18 @@ csdk auth set-token <your-token>
 | `user-auth-module` | userAuthModule CRUD operations |
 | `user-credentials-module` | userCredentialsModule CRUD operations |
 | `user-settings-module` | userSettingsModule CRUD operations |
+| `user-settings-security-module` | userSettingsSecurityModule CRUD operations |
 | `user-state-module` | userStateModule CRUD operations |
 | `users-module` | usersModule CRUD operations |
 | `webauthn-auth-module` | webauthnAuthModule CRUD operations |
 | `webauthn-credentials-module` | webauthnCredentialsModule CRUD operations |
 | `webhook-module` | webhookModule CRUD operations |
-| `resolve-blueprint-field` | Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this. |
-| `resolve-blueprint-table` | Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error. |
 | `construct-blueprint` | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
 | `copy-template-to-blueprint` | Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID. |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
-| `provision-check-constraint` | Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists. |
-| `provision-full-text-search` | Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id. |
-| `provision-index` | Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id. |
-| `provision-relation` | Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id). |
-| `provision-spatial-relation` | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
-| `provision-table` | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
-| `provision-unique-constraint` | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
 
 ## Infrastructure Commands
 
@@ -369,16 +362,22 @@ CRUD operations for BillingProviderModule records.
 | `apiName` | String |
 | `billingCustomersTableId` | UUID |
 | `billingCustomersTableName` | String |
+| `billingInvoicesTableId` | UUID |
+| `billingInvoicesTableName` | String |
 | `billingPricesTableId` | UUID |
 | `billingPricesTableName` | String |
 | `billingProductsTableId` | UUID |
 | `billingProductsTableName` | String |
+| `billingRefundsTableId` | UUID |
+| `billingRefundsTableName` | String |
 | `billingSubscriptionsTableId` | UUID |
 | `billingSubscriptionsTableName` | String |
 | `billingWebhookEventsTableId` | UUID |
 | `billingWebhookEventsTableName` | String |
 | `databaseId` | UUID |
 | `id` | UUID |
+| `listPendingUsageSyncFunction` | String |
+| `markUsageSyncedFunction` | String |
 | `prefix` | String |
 | `pricesTableId` | UUID |
 | `privateApiName` | String |
@@ -386,11 +385,13 @@ CRUD operations for BillingProviderModule records.
 | `processBillingEventFunction` | String |
 | `productsTableId` | UUID |
 | `provider` | String |
+| `recordRefundFunction` | String |
 | `schemaId` | UUID |
 | `subscriptionsTableId` | UUID |
+| `upsertInvoiceFunction` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `apiName`, `billingCustomersTableId`, `billingCustomersTableName`, `billingPricesTableId`, `billingPricesTableName`, `billingProductsTableId`, `billingProductsTableName`, `billingSubscriptionsTableId`, `billingSubscriptionsTableName`, `billingWebhookEventsTableId`, `billingWebhookEventsTableName`, `prefix`, `pricesTableId`, `privateApiName`, `privateSchemaId`, `processBillingEventFunction`, `productsTableId`, `provider`, `schemaId`, `subscriptionsTableId`
+**Optional create fields (backend defaults):** `apiName`, `billingCustomersTableId`, `billingCustomersTableName`, `billingInvoicesTableId`, `billingInvoicesTableName`, `billingPricesTableId`, `billingPricesTableName`, `billingProductsTableId`, `billingProductsTableName`, `billingRefundsTableId`, `billingRefundsTableName`, `billingSubscriptionsTableId`, `billingSubscriptionsTableName`, `billingWebhookEventsTableId`, `billingWebhookEventsTableName`, `listPendingUsageSyncFunction`, `markUsageSyncedFunction`, `prefix`, `pricesTableId`, `privateApiName`, `privateSchemaId`, `processBillingEventFunction`, `productsTableId`, `provider`, `recordRefundFunction`, `schemaId`, `subscriptionsTableId`, `upsertInvoiceFunction`
 
 ### `blueprint`
 
@@ -520,6 +521,8 @@ CRUD operations for CatalogModule records.
 | `apisTableName` | String |
 | `appsTableId` | UUID |
 | `appsTableName` | String |
+| `bindingsTableId` | UUID |
+| `bindingsTableName` | String |
 | `bucketsTableId` | UUID |
 | `bucketsTableName` | String |
 | `databaseId` | UUID |
@@ -556,7 +559,7 @@ CRUD operations for CatalogModule records.
 | `sitesWebConfigTableName` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `apisTableId`, `apisTableName`, `appsTableId`, `appsTableName`, `bucketsTableId`, `bucketsTableName`, `defaultPermissions`, `domainsTableId`, `domainsTableName`, `entityTableId`, `functionsTableId`, `functionsTableName`, `namespacesTableId`, `namespacesTableName`, `policies`, `privateApiName`, `provisions`, `publicSchemaName`, `resourceDefinitionsTableId`, `resourceDefinitionsTableName`, `resourceInstallationsTableId`, `resourceInstallationsTableName`, `resourcesTableId`, `resourcesTableName`, `schemaId`, `sitesAppLinksTableId`, `sitesAppLinksTableName`, `sitesDeepLinksTableId`, `sitesDeepLinksTableName`, `sitesErrorPagesTableId`, `sitesErrorPagesTableName`, `sitesTableId`, `sitesTableName`, `sitesWebConfigTableId`, `sitesWebConfigTableName`
+**Optional create fields (backend defaults):** `apiName`, `apisTableId`, `apisTableName`, `appsTableId`, `appsTableName`, `bindingsTableId`, `bindingsTableName`, `bucketsTableId`, `bucketsTableName`, `defaultPermissions`, `domainsTableId`, `domainsTableName`, `entityTableId`, `functionsTableId`, `functionsTableName`, `namespacesTableId`, `namespacesTableName`, `policies`, `privateApiName`, `provisions`, `publicSchemaName`, `resourceDefinitionsTableId`, `resourceDefinitionsTableName`, `resourceInstallationsTableId`, `resourceInstallationsTableName`, `resourcesTableId`, `resourcesTableName`, `schemaId`, `sitesAppLinksTableId`, `sitesAppLinksTableName`, `sitesDeepLinksTableId`, `sitesDeepLinksTableName`, `sitesErrorPagesTableId`, `sitesErrorPagesTableName`, `sitesTableId`, `sitesTableName`, `sitesWebConfigTableId`, `sitesWebConfigTableName`
 
 ### `compute-log-module`
 
@@ -2594,8 +2597,10 @@ CRUD operations for RouteModule records.
 | Field | Type |
 |-------|------|
 | `apiName` | String |
+| `appLinksFunctionName` | String |
 | `catalogModuleId` | UUID |
 | `databaseId` | UUID |
+| `deepLinkFunctionName` | String |
 | `defaultPermissions` | String |
 | `domainModuleId` | UUID |
 | `entityField` | String |
@@ -2619,7 +2624,33 @@ CRUD operations for RouteModule records.
 | `scope` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `catalogModuleId`, `defaultPermissions`, `domainModuleId`, `entityField`, `entityTableId`, `hostnameBindingsTableId`, `hostnameBindingsTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `resolverFunctionName`, `routeBindingsTableId`, `routeBindingsTableName`, `routesTableId`, `routesTableName`, `schemaId`
+**Optional create fields (backend defaults):** `apiName`, `appLinksFunctionName`, `catalogModuleId`, `deepLinkFunctionName`, `defaultPermissions`, `domainModuleId`, `entityField`, `entityTableId`, `hostnameBindingsTableId`, `hostnameBindingsTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `resolverFunctionName`, `routeBindingsTableId`, `routeBindingsTableName`, `routesTableId`, `routesTableName`, `schemaId`
+
+### `scope-types-module`
+
+CRUD operations for ScopeTypesModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all scopeTypesModule records |
+| `find-first` | Find first matching scopeTypesModule record |
+| `get` | Get a scopeTypesModule by id |
+| `create` | Create a new scopeTypesModule |
+| `update` | Update an existing scopeTypesModule |
+| `delete` | Delete a scopeTypesModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `id` | UUID |
+| `privateSchemaName` | String |
+| `schemaId` | UUID |
+| `scopeTypesTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `privateSchemaName`, `schemaId`, `scopeTypesTableId`
 
 ### `secure-table-provision`
 
@@ -3014,6 +3045,34 @@ CRUD operations for UserSettingsModule records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `apiName`, `ownerTableId`, `schemaId`, `tableId`, `tableName`
 
+### `user-settings-security-module`
+
+CRUD operations for UserSettingsSecurityModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all userSettingsSecurityModule records |
+| `find-first` | Find first matching userSettingsSecurityModule record |
+| `get` | Get a userSettingsSecurityModule by id |
+| `create` | Create a new userSettingsSecurityModule |
+| `update` | Update an existing userSettingsSecurityModule |
+| `delete` | Delete a userSettingsSecurityModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `ownerTableId` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `ownerTableId`, `schemaId`, `tableId`, `tableName`
+
 ### `user-state-module`
 
 CRUD operations for UserStateModule records.
@@ -3184,34 +3243,6 @@ CRUD operations for WebhookModule records.
 
 ## Custom Operations
 
-### `resolve-blueprint-field`
-
-Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--databaseId` | UUID |
-  | `--fieldName` | String |
-  | `--tableId` | UUID |
-
-### `resolve-blueprint-table`
-
-Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--databaseId` | UUID |
-  | `--defaultSchemaId` | UUID |
-  | `--schemaName` | String |
-  | `--tableMap` | JSON |
-  | `--tableName` | String |
-
 ### `construct-blueprint`
 
 Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
@@ -3255,135 +3286,6 @@ and lifecycle settings.
   |----------|------|
   | `--input.bucketKey` | String (required) |
   | `--input.ownerId` | UUID |
-
-### `provision-check-constraint`
-
-Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.definition` | JSON |
-  | `--input.tableId` | UUID |
-
-### `provision-full-text-search`
-
-Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.definition` | JSON |
-  | `--input.tableId` | UUID |
-
-### `provision-index`
-
-Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.definition` | JSON |
-  | `--input.tableId` | UUID |
-
-### `provision-relation`
-
-Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.apiRequired` | Boolean |
-  | `--input.clientMutationId` | String |
-  | `--input.createIndex` | Boolean |
-  | `--input.databaseId` | UUID |
-  | `--input.deleteAction` | String |
-  | `--input.exposeInApi` | Boolean |
-  | `--input.fieldName` | String |
-  | `--input.grants` | JSON |
-  | `--input.isRequired` | Boolean |
-  | `--input.junctionSchemaId` | UUID |
-  | `--input.junctionTableId` | UUID |
-  | `--input.junctionTableName` | String |
-  | `--input.nodes` | JSON |
-  | `--input.policies` | JSON |
-  | `--input.relationType` | String |
-  | `--input.sourceFieldName` | String |
-  | `--input.sourceTableId` | UUID |
-  | `--input.targetFieldName` | String |
-  | `--input.targetTableId` | UUID |
-  | `--input.useCompositeKey` | Boolean |
-
-### `provision-spatial-relation`
-
-Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.name` | String |
-  | `--input.operator` | String |
-  | `--input.paramName` | String |
-  | `--input.sourceFieldId` | UUID |
-  | `--input.sourceTableId` | UUID |
-  | `--input.targetFieldId` | UUID |
-  | `--input.targetTableId` | UUID |
-
-### `provision-table`
-
-Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.description` | String |
-  | `--input.fields` | JSON |
-  | `--input.fullTextSearches` | JSON |
-  | `--input.grants` | JSON |
-  | `--input.indexes` | JSON |
-  | `--input.nodes` | JSON |
-  | `--input.policies` | JSON |
-  | `--input.schemaId` | UUID |
-  | `--input.tableId` | UUID |
-  | `--input.tableName` | String |
-  | `--input.uniqueConstraints` | JSON |
-  | `--input.useRls` | Boolean |
-
-### `provision-unique-constraint`
-
-Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.definition` | JSON |
-  | `--input.tableId` | UUID |
 
 ## Output
 

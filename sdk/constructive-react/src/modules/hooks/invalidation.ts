@@ -76,6 +76,7 @@ import {
   resourceModuleKeys,
   rlsModuleKeys,
   routeModuleKeys,
+  scopeTypesModuleKeys,
   secureTableProvisionKeys,
   sessionSecretsModuleKeys,
   sessionsModuleKeys,
@@ -86,6 +87,7 @@ import {
   userAuthModuleKeys,
   userCredentialsModuleKeys,
   userSettingsModuleKeys,
+  userSettingsSecurityModuleKeys,
   userStateModuleKeys,
   usersModuleKeys,
   webauthnAuthModuleKeys,
@@ -1146,6 +1148,23 @@ export const invalidate = {
         queryKey: routeModuleKeys.detail(id),
       }),
   },
+  /** Invalidate scopeTypesModule queries */ scopeTypesModule: {
+    /** Invalidate all scopeTypesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: scopeTypesModuleKeys.all,
+      }),
+    /** Invalidate scopeTypesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: scopeTypesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific scopeTypesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: scopeTypesModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate secureTableProvision queries */ secureTableProvision: {
     /** Invalidate all secureTableProvision queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1314,6 +1333,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: userSettingsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate userSettingsSecurityModule queries */ userSettingsSecurityModule: {
+    /** Invalidate all userSettingsSecurityModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingsSecurityModuleKeys.all,
+      }),
+    /** Invalidate userSettingsSecurityModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingsSecurityModuleKeys.lists(),
+      }),
+    /** Invalidate a specific userSettingsSecurityModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingsSecurityModuleKeys.detail(id),
       }),
   },
   /** Invalidate userStateModule queries */ userStateModule: {
@@ -1890,6 +1926,14 @@ export const remove = {
       queryKey: routeModuleKeys.detail(id),
     });
   },
+  /** Remove scopeTypesModule from cache */ scopeTypesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: scopeTypesModuleKeys.detail(id),
+    });
+  },
   /** Remove secureTableProvision from cache */ secureTableProvision: (
     queryClient: QueryClient,
     id: string | number
@@ -1968,6 +2012,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: userSettingsModuleKeys.detail(id),
+    });
+  },
+  /** Remove userSettingsSecurityModule from cache */ userSettingsSecurityModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userSettingsSecurityModuleKeys.detail(id),
     });
   },
   /** Remove userStateModule from cache */ userStateModule: (
