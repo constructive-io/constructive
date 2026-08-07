@@ -1283,8 +1283,10 @@ export interface RlsModule {
 }
 export interface RouteModule {
   apiName: string | null;
+  appLinksFunctionName: string | null;
   catalogModuleId: string | null;
   databaseId: string | null;
+  deepLinkFunctionName: string | null;
   defaultPermissions: string[] | null;
   domainModuleId: string | null;
   entityField: string | null;

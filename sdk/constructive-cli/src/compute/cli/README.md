@@ -354,6 +354,7 @@ CRUD operations for FunctionDeployment records.
 | `lastError` | String |
 | `lastErrorAt` | Datetime |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `resources` | JSON |
 | `revision` | Int |
 | `scaleMax` | Int |
@@ -365,7 +366,7 @@ CRUD operations for FunctionDeployment records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `image`, `namespaceId`
-**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
+**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `realm`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
 
 ### `function-deployment-event`
 
@@ -1157,6 +1158,7 @@ CRUD operations for PlatformFunctionDeployment records.
 | `lastError` | String |
 | `lastErrorAt` | Datetime |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `resources` | JSON |
 | `revision` | Int |
 | `scaleMax` | Int |
@@ -1168,7 +1170,7 @@ CRUD operations for PlatformFunctionDeployment records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `image`, `namespaceId`
-**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
+**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `realm`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
 
 ### `platform-function-deployment-event`
 

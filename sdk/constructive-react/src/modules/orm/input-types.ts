@@ -1937,8 +1937,10 @@ export interface RlsModule {
 }
 export interface RouteModule {
   apiName?: string | null;
+  appLinksFunctionName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
+  deepLinkFunctionName?: string | null;
   defaultPermissions?: string[] | null;
   domainModuleId?: string | null;
   entityField?: string | null;
@@ -3990,8 +3992,10 @@ export type RlsModuleSelect = {
 };
 export type RouteModuleSelect = {
   apiName?: boolean;
+  appLinksFunctionName?: boolean;
   catalogModuleId?: boolean;
   databaseId?: boolean;
+  deepLinkFunctionName?: boolean;
   defaultPermissions?: boolean;
   domainModuleId?: boolean;
   entityField?: boolean;
@@ -7279,6 +7283,8 @@ export interface RouteModuleFilter {
   and?: RouteModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `appLinksFunctionName` field. */
+  appLinksFunctionName?: StringFilter;
   /** Filter by the object’s `catalogModule` relation. */
   catalogModule?: CatalogModuleFilter;
   /** A related `catalogModule` exists. */
@@ -7287,6 +7293,8 @@ export interface RouteModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `deepLinkFunctionName` field. */
+  deepLinkFunctionName?: StringFilter;
   /** Filter by the object’s `defaultPermissions` field. */
   defaultPermissions?: StringListFilter;
   /** Filter by the object’s `domainModule` relation. */
@@ -10538,10 +10546,14 @@ export type RlsModuleOrderBy =
 export type RouteModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
+  | 'APP_LINKS_FUNCTION_NAME_ASC'
+  | 'APP_LINKS_FUNCTION_NAME_DESC'
   | 'CATALOG_MODULE_ID_ASC'
   | 'CATALOG_MODULE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DEEP_LINK_FUNCTION_NAME_ASC'
+  | 'DEEP_LINK_FUNCTION_NAME_DESC'
   | 'DEFAULT_PERMISSIONS_ASC'
   | 'DEFAULT_PERMISSIONS_DESC'
   | 'DOMAIN_MODULE_ID_ASC'
@@ -14264,8 +14276,10 @@ export interface CreateRouteModuleInput {
   clientMutationId?: string;
   routeModule: {
     apiName?: string;
+    appLinksFunctionName?: string;
     catalogModuleId?: string;
     databaseId: string;
+    deepLinkFunctionName?: string;
     defaultPermissions?: string[];
     domainModuleId?: string;
     entityField?: string;
@@ -14290,8 +14304,10 @@ export interface CreateRouteModuleInput {
 }
 export interface RouteModulePatch {
   apiName?: string | null;
+  appLinksFunctionName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
+  deepLinkFunctionName?: string | null;
   defaultPermissions?: string[] | null;
   domainModuleId?: string | null;
   entityField?: string | null;
@@ -17201,8 +17217,10 @@ export interface RlsModuleInput {
 /** An input for mutations affecting `RouteModule` */
 export interface RouteModuleInput {
   apiName?: string;
+  appLinksFunctionName?: string;
   catalogModuleId?: string;
   databaseId: string;
+  deepLinkFunctionName?: string;
   defaultPermissions?: string[];
   domainModuleId?: string;
   entityField?: string;
@@ -17845,6 +17863,8 @@ export interface RouteModuleFilter {
   and?: RouteModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `appLinksFunctionName` field. */
+  appLinksFunctionName?: StringFilter;
   /** Filter by the object’s `catalogModule` relation. */
   catalogModule?: CatalogModuleFilter;
   /** A related `catalogModule` exists. */
@@ -17853,6 +17873,8 @@ export interface RouteModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `deepLinkFunctionName` field. */
+  deepLinkFunctionName?: StringFilter;
   /** Filter by the object’s `defaultPermissions` field. */
   defaultPermissions?: StringListFilter;
   /** Filter by the object’s `domainModule` relation. */

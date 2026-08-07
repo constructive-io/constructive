@@ -296,7 +296,7 @@ export interface FunctionCapabilityBinding {
 }
 /** Function definitions — registered cloud functions with routing, queue, and retry configuration */
 export interface FunctionDefinition {
-  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[] | null;
   /** Function task category (e.g. email, embed, chunk, custom) */
   category?: string | null;
@@ -406,6 +406,8 @@ export interface FunctionDeployment {
   lastErrorAt?: string | null;
   /** Target namespace for this deployment (maps to a K8s namespace) */
   namespaceId?: string | null;
+  /** Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand). */
+  realm?: string | null;
   /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
   resources?: Record<string, unknown> | null;
   /** Deployment revision number (incremented on each redeployment) */
@@ -911,7 +913,7 @@ export interface PlatformFunctionCapabilityBinding {
 }
 /** Function definitions — registered cloud functions with routing, queue, and retry configuration */
 export interface PlatformFunctionDefinition {
-  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[] | null;
   /** Whether executions are metered through the invocation ledger and billing quota gate */
   billable?: boolean | null;
@@ -1021,6 +1023,8 @@ export interface PlatformFunctionDeployment {
   lastErrorAt?: string | null;
   /** Target namespace for this deployment (maps to a K8s namespace) */
   namespaceId?: string | null;
+  /** Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand). */
+  realm?: string | null;
   /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
   resources?: Record<string, unknown> | null;
   /** Deployment revision number (incremented on each redeployment) */
@@ -2328,6 +2332,7 @@ export type FunctionDeploymentSelect = {
   lastError?: boolean;
   lastErrorAt?: boolean;
   namespaceId?: boolean;
+  realm?: boolean;
   resources?: boolean;
   revision?: boolean;
   scaleMax?: boolean;
@@ -2744,6 +2749,7 @@ export type PlatformFunctionDeploymentSelect = {
   lastError?: boolean;
   lastErrorAt?: boolean;
   namespaceId?: boolean;
+  realm?: boolean;
   resources?: boolean;
   revision?: boolean;
   scaleMax?: boolean;
@@ -3699,6 +3705,8 @@ export interface FunctionDeploymentFilter {
   not?: FunctionDeploymentFilter;
   /** Checks for any expressions in this list. */
   or?: FunctionDeploymentFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `resources` field. */
   resources?: JSONFilter;
   /** Filter by the object’s `revision` field. */
@@ -4507,6 +4515,8 @@ export interface PlatformFunctionDeploymentFilter {
   not?: PlatformFunctionDeploymentFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformFunctionDeploymentFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `resources` field. */
   resources?: JSONFilter;
   /** Filter by the object’s `revision` field. */
@@ -6100,6 +6110,8 @@ export type FunctionDeploymentOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RESOURCES_ASC'
   | 'RESOURCES_DESC'
   | 'REVISION_ASC'
@@ -6764,6 +6776,8 @@ export type PlatformFunctionDeploymentOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RESOURCES_ASC'
   | 'RESOURCES_DESC'
   | 'REVISION_ASC'
@@ -8107,6 +8121,7 @@ export interface CreateFunctionDeploymentInput {
     lastError?: string;
     lastErrorAt?: string;
     namespaceId: string;
+    realm?: string;
     resources?: Record<string, unknown>;
     revision?: number;
     scaleMax?: number;
@@ -8129,6 +8144,7 @@ export interface FunctionDeploymentPatch {
   lastError?: string | null;
   lastErrorAt?: string | null;
   namespaceId?: string | null;
+  realm?: string | null;
   resources?: Record<string, unknown> | null;
   revision?: number | null;
   scaleMax?: number | null;
@@ -8967,6 +8983,7 @@ export interface CreatePlatformFunctionDeploymentInput {
     lastError?: string;
     lastErrorAt?: string;
     namespaceId: string;
+    realm?: string;
     resources?: Record<string, unknown>;
     revision?: number;
     scaleMax?: number;
@@ -8988,6 +9005,7 @@ export interface PlatformFunctionDeploymentPatch {
   lastError?: string | null;
   lastErrorAt?: string | null;
   namespaceId?: string | null;
+  realm?: string | null;
   resources?: Record<string, unknown> | null;
   revision?: number | null;
   scaleMax?: number | null;
@@ -11128,7 +11146,7 @@ export interface FunctionCapabilityBindingInput {
 }
 /** An input for mutations affecting `FunctionDefinition` */
 export interface FunctionDefinitionInput {
-  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
   /** Function task category (e.g. email, embed, chunk, custom) */
   category: string;
@@ -11234,6 +11252,8 @@ export interface FunctionDeploymentInput {
   lastErrorAt?: string;
   /** Target namespace for this deployment (maps to a K8s namespace) */
   namespaceId: string;
+  /** Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand). */
+  realm?: string;
   /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
   resources?: Record<string, unknown>;
   /** Deployment revision number (incremented on each redeployment) */
@@ -11704,7 +11724,7 @@ export interface PlatformFunctionCapabilityBindingInput {
 }
 /** An input for mutations affecting `PlatformFunctionDefinition` */
 export interface PlatformFunctionDefinitionInput {
-  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
   /** Whether executions are metered through the invocation ledger and billing quota gate */
   billable?: boolean;
@@ -11804,6 +11824,8 @@ export interface PlatformFunctionDeploymentInput {
   lastErrorAt?: string;
   /** Target namespace for this deployment (maps to a K8s namespace) */
   namespaceId: string;
+  /** Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand). */
+  realm?: string;
   /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
   resources?: Record<string, unknown>;
   /** Deployment revision number (incremented on each redeployment) */
@@ -12900,6 +12922,8 @@ export interface FunctionDeploymentFilter {
   not?: FunctionDeploymentFilter;
   /** Checks for any expressions in this list. */
   or?: FunctionDeploymentFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `resources` field. */
   resources?: JSONFilter;
   /** Filter by the object’s `revision` field. */
@@ -13282,6 +13306,8 @@ export interface PlatformFunctionDeploymentFilter {
   not?: PlatformFunctionDeploymentFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformFunctionDeploymentFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `resources` field. */
   resources?: JSONFilter;
   /** Filter by the object’s `revision` field. */
