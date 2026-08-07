@@ -14,12 +14,14 @@ import { Inquirerer } from 'inquirerer';
 
 import { exportGraphQLMeta } from './export-graphql-meta';
 import {
+  buildMetaRevertScript,
   DB_REQUIRED_EXTENSIONS,
   detectMissingModules,
   installMissingModules,
   makeReplacer,
   META_COMMON_FOOTER,
   META_COMMON_HEADER,
+  META_TABLE_CONFIG,
   META_TABLE_ORDER,
   normalizeOutdir,
   preparePackage,
@@ -336,7 +338,8 @@ export const exportGraphQL = async ({
 ${replacedSql}
 
 ${META_COMMON_FOOTER}
-`
+`,
+          revert: buildMetaRevertScript(tableName, META_TABLE_CONFIG[tableName], databaseId)
         });
 
         tablesWithContent.push(tableName);
