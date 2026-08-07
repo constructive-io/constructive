@@ -7,7 +7,7 @@
  * that goes through `search_path` and cannot be schema-qualified in the DDL.
  */
 import { spawn } from 'child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { teardownPgPools } from 'pg-cache';
@@ -15,7 +15,11 @@ import type { PgConfig } from 'pg-env';
 import { getPgClientCommand, getSpawnEnvWithPg } from 'pg-env';
 
 import { LEDGER_SCHEMAS, pgDump } from '../../src/dump/pg-dump';
-import { applyExtensionSearchPathToFile, getExtensionSchemas } from '../../src/dump/search-path';
+import {
+  applyExtensionSearchPath,
+  applyExtensionSearchPathToFile,
+  getExtensionSchemas
+} from '../../src/dump/search-path';
 import { MigrateTestFixture } from '../../test-utils/MigrateTestFixture';
 import { TestDatabase } from '../../test-utils/TestDatabase';
 
@@ -81,23 +85,23 @@ describe('a dump of a database with extension-typed triggers', () => {
     await teardownPgPools();
   });
 
-  const dumpToFile = async (name: string): Promise<string> => {
-    const file = join(tempDir, name);
-    await pgDump({
+  /**
+   * Captured rather than written with `--file`: the version-matched pg_dump
+   * may run inside the server's container, where a host path does not exist.
+   */
+  const dumpSource = (): Promise<string> =>
+    pgDump({
       config: source.config,
       format: 'plain',
       noOwner: true,
       noPrivileges: true,
       // Targets come from the same fixture, so they already carry the
       // migration ledger; it is not what is under test here.
-      excludeSchemas: [...LEDGER_SCHEMAS],
-      file
+      excludeSchemas: [...LEDGER_SCHEMAS]
     });
-    return file;
-  };
 
   it('does not restore as pg_dump emits it (the bug this guards)', async () => {
-    const dump = readFileSync(await dumpToFile('unpatched.sql'), 'utf8');
+    const dump = await dumpSource();
     const target = await fixture.setupTestDatabase();
     const { code, stderr } = await psqlRestore(target.config, dump);
     expect(code).not.toBe(0);
@@ -105,7 +109,8 @@ describe('a dump of a database with extension-typed triggers', () => {
   });
 
   it('restores with zero errors once the extension search_path is applied', async () => {
-    const file = await dumpToFile('patched.sql');
+    const file = join(tempDir, 'patched.sql');
+    writeFileSync(file, await dumpSource(), 'utf8');
     const schemas = await applyExtensionSearchPathToFile(source.config, file);
     expect(schemas).toEqual([...schemas].sort());
     expect(schemas).toContain('extensions');
@@ -126,5 +131,12 @@ describe('a dump of a database with extension-typed triggers', () => {
 
   it('reports the schemas its extensions actually live in', async () => {
     expect(await getExtensionSchemas(source.config)).toEqual(['extensions', 'pg_catalog']);
+  });
+
+  it('patches captured output as well as a file', async () => {
+    const patched = await applyExtensionSearchPath(source.config, await dumpSource());
+    expect(patched).toContain(
+      'SELECT pg_catalog.set_config(\'search_path\', \'"extensions", "pg_catalog"\', false);'
+    );
   });
 });
