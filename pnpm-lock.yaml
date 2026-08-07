@@ -1832,8 +1832,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/errors/dist
       '@constructive-io/fetch':
-        specifier: ^1.1.2
-        version: 1.1.2
+        specifier: ^1.2.0
+        version: 1.2.0
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
@@ -2754,8 +2754,8 @@ importers:
   packages/upload-client:
     dependencies:
       '@constructive-io/fetch':
-        specifier: ^1.1.2
-        version: 1.1.2
+        specifier: ^1.2.0
+        version: 1.2.0
       '@decryption/hashes':
         specifier: ^0.4.0
         version: 0.4.0
@@ -4316,8 +4316,8 @@ packages:
     peerDependencies:
       eslint: ^9
 
-  '@constructive-io/fetch@1.1.2':
-    resolution: {integrity: sha512-Iryvvf51JupNXMhIT8FYbO0zSgkECcEQAn2fiAZCqxg0qLyYIbDVshn5fVf4jlQW126Jo9FHCSWT0Uiw9+kQ3Q==}
+  '@constructive-io/fetch@1.2.0':
+    resolution: {integrity: sha512-Np5D2MONxZDgTULEX4vGxe2Ap4hZsd8ss9+GzkvED02eV71uPAswQzG6a0g3ppxQhqguKJvS5lGnUWtQ/u4y4g==}
 
   '@constructive-io/pnpm-policy-graphile@0.2.0':
     resolution: {integrity: sha512-1V2VlZxBPDyK8HD7c0uq1Vo6Hmh7YQCqESQSA9sYKut+aXHgQ+RcS+J+AZn+zDIJxsogDCVCdv8nC+7hhOw78g==}
@@ -11511,7 +11511,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@constructive-io/fetch@1.1.2': {}
+  '@constructive-io/fetch@1.2.0': {}
 
   '@constructive-io/pnpm-policy-graphile@0.2.0': {}
 

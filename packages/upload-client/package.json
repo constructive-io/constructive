@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@constructive-io/fetch": "^1.1.2",
+    "@constructive-io/fetch": "^1.2.0",
     "@decryption/hashes": "^0.4.0"
   },
   "devDependencies": {
