@@ -42,7 +42,7 @@
   "dependencies": {
     "@constructive-io/bucket-provisioner": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/quotes": "^18.2.1"
+    "@pgsql/quotes": "^18.2.4"
   },
   "peerDependencies": {
     "grafast": "^1.1.1",
