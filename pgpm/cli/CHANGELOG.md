@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.24.4](https://github.com/constructive-io/constructive/compare/pgpm@5.24.3...pgpm@5.24.4) (2026-08-07)
+
+### Bug Fixes
+
+- **pgpm dump:** restore extension schemas to the dump's search_path ([031807c](https://github.com/constructive-io/constructive/commit/031807c4d78fa6c1fa79b666e6e5e59999e5851d))
+
 ## [5.24.3](https://github.com/constructive-io/constructive/compare/pgpm@5.24.2...pgpm@5.24.3) (2026-08-06)
 
 **Note:** Version bump only for package pgpm

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.25.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.25.2...@pgpmjs/core@7.25.3) (2026-08-07)
+
+### Bug Fixes
+
+- **pgpm dump:** restore extension schemas to the dump's search_path ([031807c](https://github.com/constructive-io/constructive/commit/031807c4d78fa6c1fa79b666e6e5e59999e5851d))
+
 ## [7.25.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.25.1...@pgpmjs/core@7.25.2) (2026-08-06)
 
 **Note:** Version bump only for package @pgpmjs/core

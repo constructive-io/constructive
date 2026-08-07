@@ -4581,6 +4581,12 @@ packages:
     peerDependencies:
       eslint: ^9
 
+  '@constructive-io/fetch@1.1.2':
+    resolution:
+      {
+        integrity: sha512-Iryvvf51JupNXMhIT8FYbO0zSgkECcEQAn2fiAZCqxg0qLyYIbDVshn5fVf4jlQW126Jo9FHCSWT0Uiw9+kQ3Q==,
+      }
+
   '@constructive-io/pnpm-policy-graphile@0.2.0':
     resolution:
       {
@@ -4591,12 +4597,6 @@ packages:
     resolution:
       {
         integrity: sha512-v2nimFniinTq2HGMn6QQehXAYRihd+csUefXCocXLqMAKuypqfxjzVVd3I94dTuexrjPghNt7hTxSeoflZkcYg==,
-      }
-
-  '@constructive-io/fetch@1.1.2':
-    resolution:
-      {
-        integrity: sha512-Iryvvf51JupNXMhIT8FYbO0zSgkECcEQAn2fiAZCqxg0qLyYIbDVshn5fVf4jlQW126Jo9FHCSWT0Uiw9+kQ3Q==,
       }
 
   '@cspotcode/source-map-support@0.8.1':
@@ -16098,11 +16098,11 @@ snapshots:
       - supports-color
       - typescript
 
+  '@constructive-io/fetch@1.1.2': {}
+
   '@constructive-io/pnpm-policy-graphile@0.2.0': {}
 
   '@constructive-io/pnpm-policy@0.3.1': {}
-
-  '@constructive-io/fetch@1.1.2': {}
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.16.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.16.6...@pgpmjs/export@1.16.7) (2026-08-07)
+
+### Bug Fixes
+
+- **export:** revert metaschema snapshot changes ([41f6ce4](https://github.com/constructive-io/constructive/commit/41f6ce408e04374aee0d601a9b6848cf0ebd85f9))
+
 ## [1.16.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.16.5...@pgpmjs/export@1.16.6) (2026-08-06)
 
 **Note:** Version bump only for package @pgpmjs/export
