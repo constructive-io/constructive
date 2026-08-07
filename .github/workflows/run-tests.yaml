@@ -321,13 +321,18 @@ jobs:
         run: pnpm fixtures:install
 
       - name: Test ${{ matrix.batch }}
-        # `pgpm diff db:<name>` shells out to pg_dump, which must match the
-        # Postgres 18 server. Rather than install client tools on the runner,
-        # run pg_dump straight from the postgres-plus:18 service container.
+        # `pgpm diff db:<name>` shells out to pg_dump, and the dump restore
+        # test pipes an 18-format dump (`\restrict`) into psql; both clients
+        # must match the Postgres 18 server. Rather than install client tools
+        # on the runner, run them straight from the postgres-plus:18 service
+        # container.
         env:
           # -e PGUSER: docker exec does not inherit the runner env, and pg_dump
           # would otherwise default to the container's OS user (no such role).
           PGPM_PG_DUMP: docker exec -e PGUSER=postgres ${{ job.services.pg_db.id }} pg_dump
+          # -i: the dump arrives on stdin, since the runner's filesystem is not
+          # visible inside the container.
+          PGPM_PSQL: docker exec -i -e PGUSER=postgres ${{ job.services.pg_db.id }} psql
         run: |
           for pkg in ${{ matrix.packages }}; do
             echo "::group::Testing $pkg"

@@ -4,6 +4,7 @@ export * from './core/class/pgpm';
 export * from './core/template-scaffold';
 export * from './diff';
 export * from './dump/pg-dump';
+export * from './dump/search-path';
 export * from './extensions';
 export * from './modules/modules';
 export * from './packaging/check';

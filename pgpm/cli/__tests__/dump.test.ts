@@ -10,8 +10,10 @@ jest.mock('../src/utils', () => ({
 
 // mock the core pg_dump helper (the command's only dump seam)
 const mockPgDump = jest.fn().mockResolvedValue('');
+const mockApplySearchPath = jest.fn().mockResolvedValue(['extensions']);
 jest.mock('@pgpmjs/core', () => ({
-  pgDump: (...args: unknown[]) => mockPgDump(...args)
+  pgDump: (...args: unknown[]) => mockPgDump(...args),
+  applyExtensionSearchPathToFile: (...args: unknown[]) => mockApplySearchPath(...args)
 }));
 
 // mock quoteutils
@@ -62,6 +64,19 @@ describe('dump command', () => {
         noPrivileges: true,
         file: expect.stringContaining('output.sql')
       })
+    );
+  });
+
+  it('makes the written dump restorable before anything is appended to it', async () => {
+    jest.spyOn(fs, 'mkdirSync').mockImplementation(() => undefined as any);
+    jest.spyOn(fs, 'writeFileSync').mockImplementation(() => undefined);
+    jest.spyOn(console, 'log').mockImplementation(() => { });
+
+    await dumpCmd({ database: 'test_db', out: 'output.sql', cwd: '/tmp' }, {} as any, {} as any);
+
+    expect(mockApplySearchPath).toHaveBeenCalledWith(
+      expect.objectContaining({ database: 'test_db' }),
+      expect.stringContaining('output.sql')
     );
   });
 
