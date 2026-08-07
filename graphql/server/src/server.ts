@@ -42,6 +42,7 @@ import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { getRoutingSchema } from './middleware/routing';
+import { createBillingRouter } from './middleware/billing';
 
 const log = new Logger('server');
 
@@ -205,6 +206,9 @@ class Server {
 
     // REST function invocation routes (POST /fn/:alias, GET /fn/invocations/:id)
     app.use(createFnRouter());
+
+    // Billing REST API — Stripe checkout, portal, etc.
+    app.use(createBillingRouter({ pg: effectiveOpts.pg }));
 
     app.use(graphile(effectiveOpts));
     app.use(flush);
