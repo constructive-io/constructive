@@ -140,6 +140,32 @@ $LQLMIGRATION$;`;
 export const META_COMMON_FOOTER = `
 SET session_replication_role TO DEFAULT;`;
 
+/**
+ * Revert body for a `migrate/<table>` metaschema snapshot change: delete the
+ * exported database's rows from that table.
+ *
+ * The snapshot INSERTs every row belonging to `database_id` (keyed by `id` for
+ * `metaschema_public.database` itself), so the inverse is a database-scoped
+ * DELETE. Without it the change reverts to a no-op and a redeploy fails on the
+ * snapshot's own primary keys.
+ *
+ * Runs with `session_replication_role = replica` like the deploy body: FKs are
+ * unenforced, so the plan's reverse order is sufficient and no cascade fires.
+ */
+export const buildMetaRevertScript = (
+  key: string,
+  tableConfig: Pick<TableConfig, 'schema' | 'table'>,
+  database_id: string
+): string => {
+  const column = key === 'database' ? 'id' : 'database_id';
+  return `SET session_replication_role TO replica;
+
+DELETE FROM "${tableConfig.schema}"."${tableConfig.table}" WHERE "${column}" = '${database_id}';
+
+SET session_replication_role TO DEFAULT;
+`;
+};
+
 // =============================================================================
 // Shared types for table config
 // =============================================================================

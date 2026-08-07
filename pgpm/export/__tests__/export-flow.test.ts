@@ -835,6 +835,22 @@ relocatable = false
       expect(databaseContent).toContain('session_replication_role');
     });
 
+    it('should have created revert/migrate/*.sql files that delete the snapshot rows', () => {
+      const revertPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'revert', 'migrate', 'database.sql');
+      expect(existsSync(revertPath)).toBe(true);
+
+      // metaschema_public.database is keyed by id; every other snapshot table
+      // is scoped by database_id. Without these DELETEs the change reverts to a
+      // no-op and a redeploy fails on the snapshot's own primary keys.
+      const revertContent = readFileSync(revertPath, 'utf-8');
+      expect(revertContent).toContain(`DELETE FROM "metaschema_public"."database" WHERE "id" = '${DATABASE_ID}'`);
+      expect(revertContent).toContain('session_replication_role');
+
+      const schemaRevertPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'revert', 'migrate', 'schema.sql');
+      expect(readFileSync(schemaRevertPath, 'utf-8'))
+        .toContain(`DELETE FROM "metaschema_public"."schema" WHERE "database_id" = '${DATABASE_ID}'`);
+    });
+
     it('should have created control files for both modules', () => {
       const dbControlPath = join(exportWorkspaceDir, 'packages', EXTENSION_NAME, EXTENSION_NAME + '.control');
       const svcControlPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, META_EXTENSION_NAME + '.control');
