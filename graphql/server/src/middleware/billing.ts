@@ -6,6 +6,11 @@ import Stripe from 'stripe';
 
 const log = new Logger('billing');
 
+// The webhook receiver in constructive-db reads objects this endpoint creates,
+// so both sides pin the same API version. Pinning it here also keeps a
+// dependency bump from silently changing the shape of what Stripe returns.
+const STRIPE_API_VERSION = '2025-02-24.acacia';
+
 interface BillingProviderConfig {
   apiKey: string | null;
   webhookSecret: string | null;
@@ -244,7 +249,7 @@ export function createBillingRouter(opts: BillingRouterOptions = {}): Router {
         return res.status(404).json({ error: 'Price not found' });
       }
 
-      const stripe = new Stripe(config.apiKey);
+      const stripe = new Stripe(config.apiKey, { apiVersion: STRIPE_API_VERSION });
 
       const isOneTime = priceInfo.billingInterval === 'one_time';
 
