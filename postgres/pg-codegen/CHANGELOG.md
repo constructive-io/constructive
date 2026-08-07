@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.10.8](https://github.com/constructive-io/constructive/compare/pg-codegen@5.10.7...pg-codegen@5.10.8) (2026-08-07)
+
+**Note:** Version bump only for package pg-codegen
+
 ## [5.10.7](https://github.com/constructive-io/constructive/compare/pg-codegen@5.10.6...pg-codegen@5.10.7) (2026-08-07)
 
 **Note:** Version bump only for package pg-codegen
