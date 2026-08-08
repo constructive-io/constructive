@@ -1,13 +1,13 @@
 ---
 name: hooks-modules
-description: React Query hooks for the modules API — provides typed query and mutation hooks for 76 tables and 12 custom operations
+description: React Query hooks for the modules API — provides typed query and mutation hooks for 78 tables and 3 custom operations
 ---
 
 # hooks-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the modules API — provides typed query and mutation hooks for 76 tables and 12 custom operations
+React Query hooks for the modules API — provides typed query and mutation hooks for 78 tables and 3 custom operations
 
 ## Usage
 
@@ -99,6 +99,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [resource-module](references/resource-module.md)
 - [rls-module](references/rls-module.md)
 - [route-module](references/route-module.md)
+- [scope-types-module](references/scope-types-module.md)
 - [secure-table-provision](references/secure-table-provision.md)
 - [session-secrets-module](references/session-secrets-module.md)
 - [sessions-module](references/sessions-module.md)
@@ -109,20 +110,12 @@ See the `references/` directory for detailed per-entity API documentation:
 - [user-auth-module](references/user-auth-module.md)
 - [user-credentials-module](references/user-credentials-module.md)
 - [user-settings-module](references/user-settings-module.md)
+- [user-settings-security-module](references/user-settings-security-module.md)
 - [user-state-module](references/user-state-module.md)
 - [users-module](references/users-module.md)
 - [webauthn-auth-module](references/webauthn-auth-module.md)
 - [webauthn-credentials-module](references/webauthn-credentials-module.md)
 - [webhook-module](references/webhook-module.md)
-- [resolve-blueprint-field](references/resolve-blueprint-field.md)
-- [resolve-blueprint-table](references/resolve-blueprint-table.md)
 - [construct-blueprint](references/construct-blueprint.md)
 - [copy-template-to-blueprint](references/copy-template-to-blueprint.md)
 - [provision-bucket](references/provision-bucket.md)
-- [provision-check-constraint](references/provision-check-constraint.md)
-- [provision-full-text-search](references/provision-full-text-search.md)
-- [provision-index](references/provision-index.md)
-- [provision-relation](references/provision-relation.md)
-- [provision-spatial-relation](references/provision-spatial-relation.md)
-- [provision-table](references/provision-table.md)
-- [provision-unique-constraint](references/provision-unique-constraint.md)

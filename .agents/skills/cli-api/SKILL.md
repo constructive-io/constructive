@@ -23,13 +23,13 @@ csdk auth set-token <token>
 csdk config set <key> <value>
 csdk config get <key>
 
-# CRUD for any table (e.g. api-schema)
-csdk api-schema list
-csdk api-schema get --id <value>
-csdk api-schema create --<field> <value>
+# CRUD for any table (e.g. api)
+csdk api list
+csdk api get --id <value>
+csdk api create --<field> <value>
 
 # Non-interactive mode (skip all prompts, use flags only)
-csdk --no-tty api-schema list
+csdk --no-tty api list
 ```
 
 ## Examples
@@ -40,13 +40,13 @@ csdk --no-tty api-schema list
 csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
-csdk api-schema list
+csdk api list
 ```
 
 ### Non-interactive mode (for scripts and CI)
 
 ```bash
-csdk --no-tty api-schema create --<field> <value>
+csdk --no-tty api create --<field> <value>
 ```
 
 ## References
@@ -56,9 +56,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [context](references/context.md)
 - [auth](references/auth.md)
 - [config](references/config.md)
+- [api](references/api.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
-- [apis](references/apis.md)
 - [ast-migration](references/ast-migration.md)
 - [check-constraint](references/check-constraint.md)
 - [composite-type](references/composite-type.md)
@@ -88,9 +88,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [node-type-registry](references/node-type-registry.md)
 - [page](references/page.md)
 - [partition](references/partition.md)
+- [platform-api](references/platform-api.md)
 - [platform-api-schema](references/platform-api-schema.md)
 - [platform-api-setting](references/platform-api-setting.md)
-- [platform-apis](references/platform-apis.md)
 - [platform-cors-setting](references/platform-cors-setting.md)
 - [platform-domain](references/platform-domain.md)
 - [platform-domain-event](references/platform-domain-event.md)

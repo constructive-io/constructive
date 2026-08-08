@@ -5,6 +5,18 @@
  */
 import type { ApiExposureLevel, ObjectCategory } from './schema-types';
 export type ConstructiveInternalTypeImage = unknown;
+export interface Api {
+  anonRole: string | null;
+  config: unknown | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  dbname: string | null;
+  id: string | null;
+  isPublished: boolean | null;
+  name: string | null;
+  roleName: string | null;
+  updatedAt: string | null;
+}
 export interface ApiSchema {
   apiId: string | null;
   createdAt: string | null;
@@ -32,18 +44,6 @@ export interface ApiSetting {
   id: string | null;
   options: unknown | null;
   statementTimeoutMs: string | null;
-  updatedAt: string | null;
-}
-export interface Apis {
-  anonRole: string | null;
-  config: unknown | null;
-  createdAt: string | null;
-  databaseId: string | null;
-  dbname: string | null;
-  id: string | null;
-  isPublished: boolean | null;
-  name: string | null;
-  roleName: string | null;
   updatedAt: string | null;
 }
 export interface AstMigration {
@@ -463,6 +463,17 @@ export interface Partition {
   tableId: string | null;
   updatedAt: string | null;
 }
+export interface PlatformApi {
+  anonRole: string | null;
+  config: unknown | null;
+  createdAt: string | null;
+  dbname: string | null;
+  id: string | null;
+  isPublished: boolean | null;
+  name: string | null;
+  roleName: string | null;
+  updatedAt: string | null;
+}
 export interface PlatformApiSchema {
   apiId: string | null;
   createdAt: string | null;
@@ -488,17 +499,6 @@ export interface PlatformApiSetting {
   id: string | null;
   options: unknown | null;
   statementTimeoutMs: string | null;
-  updatedAt: string | null;
-}
-export interface PlatformApis {
-  anonRole: string | null;
-  config: unknown | null;
-  createdAt: string | null;
-  dbname: string | null;
-  id: string | null;
-  isPublished: boolean | null;
-  name: string | null;
-  roleName: string | null;
   updatedAt: string | null;
 }
 export interface PlatformCorsSetting {

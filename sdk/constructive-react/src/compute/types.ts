@@ -73,6 +73,7 @@ export interface FunctionDefinition {
   requiredBuckets: string[] | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredModels: string[] | null;
+  requiredModules: string[] | null;
   requiredSecrets: ResourceRequirement[] | null;
   resources: unknown | null;
   runtime: string | null;
@@ -99,6 +100,7 @@ export interface FunctionDeployment {
   lastError: string | null;
   lastErrorAt: string | null;
   namespaceId: string | null;
+  realm: string | null;
   resources: unknown | null;
   revision: number | null;
   scaleMax: number | null;
@@ -405,6 +407,7 @@ export interface PlatformFunctionDefinition {
   requiredBuckets: string[] | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredModels: string[] | null;
+  requiredModules: string[] | null;
   requiredSecrets: ResourceRequirement[] | null;
   resources: unknown | null;
   runtime: string | null;
@@ -431,6 +434,7 @@ export interface PlatformFunctionDeployment {
   lastError: string | null;
   lastErrorAt: string | null;
   namespaceId: string | null;
+  realm: string | null;
   resources: unknown | null;
   revision: number | null;
   scaleMax: number | null;

@@ -1507,12 +1507,30 @@ type Mutation {
     """
     input: PlatformInfraInsertNodeAtPathInput!
   ): PlatformInfraInsertNodeAtPathPayload
+  platformInfraInsertNodesAtPaths(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInfraInsertNodesAtPathsInput!
+  ): PlatformInfraInsertNodesAtPathsPayload
+  platformInfraSetAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInfraSetAndCommitInput!
+  ): PlatformInfraSetAndCommitPayload
   platformInfraSetDataAtPath(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: PlatformInfraSetDataAtPathInput!
   ): PlatformInfraSetDataAtPathPayload
+  platformInfraSetManyAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInfraSetManyAndCommitInput!
+  ): PlatformInfraSetManyAndCommitPayload
 
   """
   Provision an S3 bucket for a logical bucket in the database.
@@ -2311,6 +2329,36 @@ type PlatformInfraInsertNodeAtPathPayload {
   result: UUID
 }
 
+"""All input for the `platformInfraInsertNodesAtPaths` mutation."""
+input PlatformInfraInsertNodesAtPathsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  datas: [JSON]
+  kidsList: JSON
+  ktreeList: JSON
+  paths: JSON
+  root: UUID
+  sId: UUID
+}
+
+"""The output of our `platformInfraInsertNodesAtPaths` mutation."""
+type PlatformInfraInsertNodesAtPathsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: UUID
+}
+
 """
 Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
 """
@@ -2587,6 +2635,44 @@ input PlatformInfraRefPatch {
   storeId: UUID
 }
 
+"""All input for the `platformInfraSetAndCommit` mutation."""
+input PlatformInfraSetAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  data: JSON
+  kids: [UUID]
+  ktree: [String]
+  message: String
+  path: [String]
+  refname: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `platformInfraSetAndCommit` mutation."""
+type PlatformInfraSetAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `PlatformInfraCommit`. May be used by Relay 1."""
+  platformInfraCommitEdge(
+    """The method to use when ordering `PlatformInfraCommit`."""
+    orderBy: [PlatformInfraCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: PlatformInfraCommit
+}
+
 """All input for the `platformInfraSetDataAtPath` mutation."""
 input PlatformInfraSetDataAtPathInput {
   """
@@ -2613,6 +2699,41 @@ type PlatformInfraSetDataAtPathPayload {
   """
   query: Query
   result: UUID
+}
+
+"""All input for the `platformInfraSetManyAndCommit` mutation."""
+input PlatformInfraSetManyAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entries: JSON
+  message: String
+  refname: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `platformInfraSetManyAndCommit` mutation."""
+type PlatformInfraSetManyAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `PlatformInfraCommit`. May be used by Relay 1."""
+  platformInfraCommitEdge(
+    """The method to use when ordering `PlatformInfraCommit`."""
+    orderBy: [PlatformInfraCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: PlatformInfraCommit
 }
 
 """

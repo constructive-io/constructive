@@ -56,11 +56,14 @@ function App() {
 | `useDeleteStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `useInitEmptyRepoMutation` | Mutation | initEmptyRepo |
 | `useInsertNodeAtPathMutation` | Mutation | insertNodeAtPath |
+| `useInsertNodesAtPathsMutation` | Mutation | insertNodesAtPaths |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
+| `useSetAndCommitMutation` | Mutation | setAndCommit |
 | `useSetDataAtPathMutation` | Mutation | setDataAtPath |
+| `useSetManyAndCommitMutation` | Mutation | setManyAndCommit |
 
 ## Table Hooks
 
@@ -187,6 +190,17 @@ insertNodeAtPath
   |----------|------|
   | `input` | InsertNodeAtPathInput (required) |
 
+### `useInsertNodesAtPathsMutation`
+
+insertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | InsertNodesAtPathsInput (required) |
+
 ### `useProvisionBucketMutation`
 
 Provision an S3 bucket for a logical bucket in the database.
@@ -201,6 +215,17 @@ and lifecycle settings.
   |----------|------|
   | `input` | ProvisionBucketInput (required) |
 
+### `useSetAndCommitMutation`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetAndCommitInput (required) |
+
 ### `useSetDataAtPathMutation`
 
 setDataAtPath
@@ -211,6 +236,17 @@ setDataAtPath
   | Argument | Type |
   |----------|------|
   | `input` | SetDataAtPathInput (required) |
+
+### `useSetManyAndCommitMutation`
+
+setManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetManyAndCommitInput (required) |
 
 ---
 

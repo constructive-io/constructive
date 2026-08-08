@@ -66,6 +66,7 @@ import { RelationProvisionModel } from './models/relationProvision';
 import { ResourceModuleModel } from './models/resourceModule';
 import { RlsModuleModel } from './models/rlsModule';
 import { RouteModuleModel } from './models/routeModule';
+import { ScopeTypesModuleModel } from './models/scopeTypesModule';
 import { SecureTableProvisionModel } from './models/secureTableProvision';
 import { SessionSecretsModuleModel } from './models/sessionSecretsModule';
 import { SessionsModuleModel } from './models/sessionsModule';
@@ -76,19 +77,18 @@ import { TransferLogModuleModel } from './models/transferLogModule';
 import { UserAuthModuleModel } from './models/userAuthModule';
 import { UserCredentialsModuleModel } from './models/userCredentialsModule';
 import { UserSettingsModuleModel } from './models/userSettingsModule';
+import { UserSettingsSecurityModuleModel } from './models/userSettingsSecurityModule';
 import { UserStateModuleModel } from './models/userStateModule';
 import { UsersModuleModel } from './models/usersModule';
 import { WebauthnAuthModuleModel } from './models/webauthnAuthModule';
 import { WebauthnCredentialsModuleModel } from './models/webauthnCredentialsModule';
 import { WebhookModuleModel } from './models/webhookModule';
-import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';
-export { createQueryOperations } from './query';
 export { createMutationOperations } from './mutation';
 /**
  * Create an ORM client instance
@@ -177,6 +177,7 @@ export function createClient(config: OrmClientConfig) {
     resourceModule: new ResourceModuleModel(client),
     rlsModule: new RlsModuleModel(client),
     routeModule: new RouteModuleModel(client),
+    scopeTypesModule: new ScopeTypesModuleModel(client),
     secureTableProvision: new SecureTableProvisionModel(client),
     sessionSecretsModule: new SessionSecretsModuleModel(client),
     sessionsModule: new SessionsModuleModel(client),
@@ -187,12 +188,12 @@ export function createClient(config: OrmClientConfig) {
     userAuthModule: new UserAuthModuleModel(client),
     userCredentialsModule: new UserCredentialsModuleModel(client),
     userSettingsModule: new UserSettingsModuleModel(client),
+    userSettingsSecurityModule: new UserSettingsSecurityModuleModel(client),
     userStateModule: new UserStateModuleModel(client),
     usersModule: new UsersModuleModel(client),
     webauthnAuthModule: new WebauthnAuthModuleModel(client),
     webauthnCredentialsModule: new WebauthnCredentialsModuleModel(client),
     webhookModule: new WebhookModuleModel(client),
-    query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };
 }

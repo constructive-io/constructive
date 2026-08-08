@@ -1,13 +1,13 @@
 ---
 name: cli-infra
-description: CLI tool (csdk) for the infra API — provides CRUD commands for 10 tables and 4 custom operations
+description: CLI tool (csdk) for the infra API — provides CRUD commands for 10 tables and 7 custom operations
 ---
 
 # cli-infra
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the infra API — provides CRUD commands for 10 tables and 4 custom operations
+CLI tool (csdk) for the infra API — provides CRUD commands for 10 tables and 7 custom operations
 
 ## Usage
 
@@ -68,5 +68,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [platform-namespace-event](references/platform-namespace-event.md)
 - [platform-infra-init-empty-repo](references/platform-infra-init-empty-repo.md)
 - [platform-infra-insert-node-at-path](references/platform-infra-insert-node-at-path.md)
+- [platform-infra-insert-nodes-at-paths](references/platform-infra-insert-nodes-at-paths.md)
+- [platform-infra-set-and-commit](references/platform-infra-set-and-commit.md)
 - [platform-infra-set-data-at-path](references/platform-infra-set-data-at-path.md)
+- [platform-infra-set-many-and-commit](references/platform-infra-set-many-and-commit.md)
 - [provision-bucket](references/provision-bucket.md)

@@ -121,16 +121,22 @@ export interface BillingProviderModule {
   apiName: string | null;
   billingCustomersTableId: string | null;
   billingCustomersTableName: string | null;
+  billingInvoicesTableId: string | null;
+  billingInvoicesTableName: string | null;
   billingPricesTableId: string | null;
   billingPricesTableName: string | null;
   billingProductsTableId: string | null;
   billingProductsTableName: string | null;
+  billingRefundsTableId: string | null;
+  billingRefundsTableName: string | null;
   billingSubscriptionsTableId: string | null;
   billingSubscriptionsTableName: string | null;
   billingWebhookEventsTableId: string | null;
   billingWebhookEventsTableName: string | null;
   databaseId: string | null;
   id: string | null;
+  listPendingUsageSyncFunction: string | null;
+  markUsageSyncedFunction: string | null;
   prefix: string | null;
   pricesTableId: string | null;
   privateApiName: string | null;
@@ -138,8 +144,10 @@ export interface BillingProviderModule {
   processBillingEventFunction: string | null;
   productsTableId: string | null;
   provider: string | null;
+  recordRefundFunction: string | null;
   schemaId: string | null;
   subscriptionsTableId: string | null;
+  upsertInvoiceFunction: string | null;
 }
 export interface Blueprint {
   createdAt: string | null;
@@ -196,6 +204,8 @@ export interface CatalogModule {
   apisTableName: string | null;
   appsTableId: string | null;
   appsTableName: string | null;
+  bindingsTableId: string | null;
+  bindingsTableName: string | null;
   bucketsTableId: string | null;
   bucketsTableName: string | null;
   databaseId: string | null;
@@ -1283,8 +1293,10 @@ export interface RlsModule {
 }
 export interface RouteModule {
   apiName: string | null;
+  appLinksFunctionName: string | null;
   catalogModuleId: string | null;
   databaseId: string | null;
+  deepLinkFunctionName: string | null;
   defaultPermissions: string[] | null;
   domainModuleId: string | null;
   entityField: string | null;
@@ -1306,6 +1318,13 @@ export interface RouteModule {
   routesTableName: string | null;
   schemaId: string | null;
   scope: string | null;
+}
+export interface ScopeTypesModule {
+  databaseId: string | null;
+  id: string | null;
+  privateSchemaName: string | null;
+  schemaId: string | null;
+  scopeTypesTableId: string | null;
 }
 export interface SecureTableProvision {
   databaseId: string | null;
@@ -1502,6 +1521,15 @@ export interface UserCredentialsModule {
   tableName: string | null;
 }
 export interface UserSettingsModule {
+  apiName: string | null;
+  databaseId: string | null;
+  id: string | null;
+  ownerTableId: string | null;
+  schemaId: string | null;
+  tableId: string | null;
+  tableName: string | null;
+}
+export interface UserSettingsSecurityModule {
   apiName: string | null;
   databaseId: string | null;
   id: string | null;

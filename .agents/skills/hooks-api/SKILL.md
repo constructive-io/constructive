@@ -13,13 +13,13 @@ React Query hooks for the api API — provides typed query and mutation hooks fo
 
 ```typescript
 // Import hooks
-import { useApiSchemasQuery } from './hooks';
+import { useApisQuery } from './hooks';
 
 // Query hooks: use<Model>Query, use<Model>sQuery
 // Mutation hooks: useCreate<Model>Mutation, useUpdate<Model>Mutation, useDelete<Model>Mutation
 // Bulk mutation hooks (when enabled): useBulkCreate<Model>Mutation, useBulkUpsert<Model>Mutation, etc.
 
-const { data, isLoading } = useApiSchemasQuery({
+const { data, isLoading } = useApisQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -29,7 +29,7 @@ const { data, isLoading } = useApiSchemasQuery({
 ### Query records
 
 ```typescript
-const { data, isLoading } = useApiSchemasQuery({
+const { data, isLoading } = useApisQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -38,9 +38,9 @@ const { data, isLoading } = useApiSchemasQuery({
 
 See the `references/` directory for detailed per-entity API documentation:
 
+- [api](references/api.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
-- [apis](references/apis.md)
 - [ast-migration](references/ast-migration.md)
 - [check-constraint](references/check-constraint.md)
 - [composite-type](references/composite-type.md)
@@ -70,9 +70,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [node-type-registry](references/node-type-registry.md)
 - [page](references/page.md)
 - [partition](references/partition.md)
+- [platform-api](references/platform-api.md)
 - [platform-api-schema](references/platform-api-schema.md)
 - [platform-api-setting](references/platform-api-setting.md)
-- [platform-apis](references/platform-apis.md)
 - [platform-cors-setting](references/platform-cors-setting.md)
 - [platform-domain](references/platform-domain.md)
 - [platform-domain-event](references/platform-domain-event.md)

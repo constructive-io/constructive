@@ -21,9 +21,9 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
+| `api` | findMany, findOne, create, update, delete |
 | `apiSchema` | findMany, findOne, create, update, delete |
 | `apiSetting` | findMany, findOne, create, update, delete |
-| `apis` | findMany, findOne, create, update, delete |
 | `astMigration` | findMany, findOne, create, update, delete |
 | `checkConstraint` | findMany, findOne, create, update, delete |
 | `compositeType` | findMany, findOne, create, update, delete |
@@ -53,9 +53,9 @@ const db = createClient({
 | `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `page` | findMany, findOne, create, update, delete |
 | `partition` | findMany, findOne, create, update, delete |
+| `platformApi` | findMany, findOne, create, update, delete |
 | `platformApiSchema` | findMany, findOne, create, update, delete |
 | `platformApiSetting` | findMany, findOne, create, update, delete |
-| `platformApis` | findMany, findOne, create, update, delete |
 | `platformCorsSetting` | findMany, findOne, create, update, delete |
 | `platformDomain` | findMany, findOne, create, update, delete |
 | `platformDomainEvent` | findMany, findOne, create, update, delete |
@@ -103,6 +103,44 @@ const db = createClient({
 | `webauthnSetting` | findMany, findOne, create, update, delete |
 
 ## Table Operations
+
+### `db.api`
+
+CRUD operations for Api records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `anonRole` | String | Yes |
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `dbname` | String | Yes |
+| `id` | UUID | No |
+| `isPublished` | Boolean | Yes |
+| `name` | String | Yes |
+| `roleName` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all api records
+const items = await db.api.findMany({ select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.api.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.api.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.api.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.api.delete({ where: { id: '<UUID>' } }).execute();
+```
 
 ### `db.apiSchema`
 
@@ -183,44 +221,6 @@ const updated = await db.apiSetting.update({ where: { id: '<UUID>' }, data: { ap
 
 // Delete
 const deleted = await db.apiSetting.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.apis`
-
-CRUD operations for Apis records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `anonRole` | String | Yes |
-| `config` | JSON | Yes |
-| `createdAt` | Datetime | No |
-| `databaseId` | UUID | Yes |
-| `dbname` | String | Yes |
-| `id` | UUID | No |
-| `isPublished` | Boolean | Yes |
-| `name` | String | Yes |
-| `roleName` | String | Yes |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all apis records
-const items = await db.apis.findMany({ select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.apis.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.apis.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.apis.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.apis.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.astMigration`
@@ -1394,6 +1394,43 @@ const updated = await db.partition.update({ where: { id: '<UUID>' }, data: { dat
 const deleted = await db.partition.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.platformApi`
+
+CRUD operations for PlatformApi records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `anonRole` | String | Yes |
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `dbname` | String | Yes |
+| `id` | UUID | No |
+| `isPublished` | Boolean | Yes |
+| `name` | String | Yes |
+| `roleName` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformApi records
+const items = await db.platformApi.findMany({ select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformApi.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformApi.create({ data: { anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformApi.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformApi.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.platformApiSchema`
 
 CRUD operations for PlatformApiSchema records.
@@ -1471,43 +1508,6 @@ const updated = await db.platformApiSetting.update({ where: { id: '<UUID>' }, da
 
 // Delete
 const deleted = await db.platformApiSetting.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.platformApis`
-
-CRUD operations for PlatformApis records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `anonRole` | String | Yes |
-| `config` | JSON | Yes |
-| `createdAt` | Datetime | No |
-| `dbname` | String | Yes |
-| `id` | UUID | No |
-| `isPublished` | Boolean | Yes |
-| `name` | String | Yes |
-| `roleName` | String | Yes |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all platformApis records
-const items = await db.platformApis.findMany({ select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.platformApis.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.platformApis.create({ data: { anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.platformApis.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.platformApis.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformCorsSetting`

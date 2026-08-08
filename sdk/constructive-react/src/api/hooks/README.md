@@ -32,6 +32,11 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
+| `useApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useApiQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeleteApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useCreateApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
@@ -42,11 +47,6 @@ function App() {
 | `useCreateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useUpdateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useDeleteApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
-| `useApisesQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useCreateApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useUpdateApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useDeleteApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useAstMigrationsQuery` | Query | List all astMigrations |
 | `useAstMigrationQuery` | Query | Get one astMigration |
 | `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
@@ -192,6 +192,11 @@ function App() {
 | `useCreatePartitionMutation` | Mutation | Create a partition |
 | `useUpdatePartitionMutation` | Mutation | Update a partition |
 | `useDeletePartitionMutation` | Mutation | Delete a partition |
+| `usePlatformApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `usePlatformApiQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeletePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `usePlatformApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `usePlatformApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useCreatePlatformApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
@@ -202,11 +207,6 @@ function App() {
 | `useCreatePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useUpdatePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useDeletePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
-| `usePlatformApisesQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `usePlatformApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useCreatePlatformApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useUpdatePlatformApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useDeletePlatformApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `usePlatformCorsSettingsQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
 | `usePlatformCorsSettingQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
 | `useCreatePlatformCorsSettingMutation` | Mutation | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
@@ -461,6 +461,27 @@ Example usage:
 
 ## Table Hooks
 
+### Api
+
+```typescript
+// List all apis
+const { data, isLoading } = useApisQuery({
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Get one api
+const { data: item } = useApiQuery({
+  id: '<UUID>',
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Create a api
+const { mutate: create } = useCreateApiMutation({
+  selection: { fields: { id: true } },
+});
+create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+```
+
 ### ApiSchema
 
 ```typescript
@@ -501,27 +522,6 @@ const { mutate: create } = useCreateApiSettingMutation({
   selection: { fields: { id: true } },
 });
 create({ apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>', statementTimeoutMs: '<BigInt>' });
-```
-
-### Apis
-
-```typescript
-// List all apises
-const { data, isLoading } = useApisesQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Get one apis
-const { data: item } = useApisQuery({
-  id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Create a apis
-const { mutate: create } = useCreateApisMutation({
-  selection: { fields: { id: true } },
-});
-create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### AstMigration
@@ -1133,6 +1133,27 @@ const { mutate: create } = useCreatePartitionMutation({
 create({ databaseId: '<UUID>', interval: '<String>', isParented: '<Boolean>', namingPattern: '<String>', partitionKeyId: '<UUID>', premake: '<Int>', retention: '<String>', retentionKeepTable: '<Boolean>', strategy: '<String>', tableId: '<UUID>' });
 ```
 
+### PlatformApi
+
+```typescript
+// List all platformApis
+const { data, isLoading } = usePlatformApisQuery({
+  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Get one platformApi
+const { data: item } = usePlatformApiQuery({
+  id: '<UUID>',
+  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Create a platformApi
+const { mutate: create } = useCreatePlatformApiMutation({
+  selection: { fields: { id: true } },
+});
+create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+```
+
 ### PlatformApiSchema
 
 ```typescript
@@ -1173,27 +1194,6 @@ const { mutate: create } = useCreatePlatformApiSettingMutation({
   selection: { fields: { id: true } },
 });
 create({ apiId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>', statementTimeoutMs: '<BigInt>' });
-```
-
-### PlatformApis
-
-```typescript
-// List all platformApises
-const { data, isLoading } = usePlatformApisesQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Get one platformApis
-const { data: item } = usePlatformApisQuery({
-  id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Create a platformApis
-const { mutate: create } = useCreatePlatformApisMutation({
-  selection: { fields: { id: true } },
-});
-create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### PlatformCorsSetting

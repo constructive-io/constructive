@@ -1161,16 +1161,22 @@ type BillingProviderModule {
   apiName: String
   billingCustomersTableId: UUID!
   billingCustomersTableName: String!
+  billingInvoicesTableId: UUID!
+  billingInvoicesTableName: String!
   billingPricesTableId: UUID!
   billingPricesTableName: String!
   billingProductsTableId: UUID!
   billingProductsTableName: String!
+  billingRefundsTableId: UUID!
+  billingRefundsTableName: String!
   billingSubscriptionsTableId: UUID!
   billingSubscriptionsTableName: String!
   billingWebhookEventsTableId: UUID!
   billingWebhookEventsTableName: String!
   databaseId: UUID!
   id: UUID!
+  listPendingUsageSyncFunction: String!
+  markUsageSyncedFunction: String!
   prefix: String
   pricesTableId: UUID
   privateApiName: String
@@ -1178,8 +1184,10 @@ type BillingProviderModule {
   processBillingEventFunction: String!
   productsTableId: UUID
   provider: String!
+  recordRefundFunction: String!
   schemaId: UUID!
   subscriptionsTableId: UUID
+  upsertInvoiceFunction: String!
 }
 
 """A connection to a list of `BillingProviderModule` values."""
@@ -1226,6 +1234,12 @@ input BillingProviderModuleFilter {
   """Filter by the object’s `billingCustomersTableName` field."""
   billingCustomersTableName: StringFilter
 
+  """Filter by the object’s `billingInvoicesTableId` field."""
+  billingInvoicesTableId: UUIDFilter
+
+  """Filter by the object’s `billingInvoicesTableName` field."""
+  billingInvoicesTableName: StringFilter
+
   """Filter by the object’s `billingPricesTableId` field."""
   billingPricesTableId: UUIDFilter
 
@@ -1237,6 +1251,12 @@ input BillingProviderModuleFilter {
 
   """Filter by the object’s `billingProductsTableName` field."""
   billingProductsTableName: StringFilter
+
+  """Filter by the object’s `billingRefundsTableId` field."""
+  billingRefundsTableId: UUIDFilter
+
+  """Filter by the object’s `billingRefundsTableName` field."""
+  billingRefundsTableName: StringFilter
 
   """Filter by the object’s `billingSubscriptionsTableId` field."""
   billingSubscriptionsTableId: UUIDFilter
@@ -1255,6 +1275,12 @@ input BillingProviderModuleFilter {
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
+
+  """Filter by the object’s `listPendingUsageSyncFunction` field."""
+  listPendingUsageSyncFunction: StringFilter
+
+  """Filter by the object’s `markUsageSyncedFunction` field."""
+  markUsageSyncedFunction: StringFilter
 
   """Negates the expression."""
   not: BillingProviderModuleFilter
@@ -1283,11 +1309,17 @@ input BillingProviderModuleFilter {
   """Filter by the object’s `provider` field."""
   provider: StringFilter
 
+  """Filter by the object’s `recordRefundFunction` field."""
+  recordRefundFunction: StringFilter
+
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
 
   """Filter by the object’s `subscriptionsTableId` field."""
   subscriptionsTableId: UUIDFilter
+
+  """Filter by the object’s `upsertInvoiceFunction` field."""
+  upsertInvoiceFunction: StringFilter
 }
 
 """An input for mutations affecting `BillingProviderModule`"""
@@ -1295,16 +1327,22 @@ input BillingProviderModuleInput {
   apiName: String
   billingCustomersTableId: UUID
   billingCustomersTableName: String
+  billingInvoicesTableId: UUID
+  billingInvoicesTableName: String
   billingPricesTableId: UUID
   billingPricesTableName: String
   billingProductsTableId: UUID
   billingProductsTableName: String
+  billingRefundsTableId: UUID
+  billingRefundsTableName: String
   billingSubscriptionsTableId: UUID
   billingSubscriptionsTableName: String
   billingWebhookEventsTableId: UUID
   billingWebhookEventsTableName: String
   databaseId: UUID!
   id: UUID
+  listPendingUsageSyncFunction: String
+  markUsageSyncedFunction: String
   prefix: String
   pricesTableId: UUID
   privateApiName: String
@@ -1312,8 +1350,10 @@ input BillingProviderModuleInput {
   processBillingEventFunction: String
   productsTableId: UUID
   provider: String
+  recordRefundFunction: String
   schemaId: UUID
   subscriptionsTableId: UUID
+  upsertInvoiceFunction: String
 }
 
 """Methods to use when ordering `BillingProviderModule`."""
@@ -1324,6 +1364,10 @@ enum BillingProviderModuleOrderBy {
   BILLING_CUSTOMERS_TABLE_ID_DESC
   BILLING_CUSTOMERS_TABLE_NAME_ASC
   BILLING_CUSTOMERS_TABLE_NAME_DESC
+  BILLING_INVOICES_TABLE_ID_ASC
+  BILLING_INVOICES_TABLE_ID_DESC
+  BILLING_INVOICES_TABLE_NAME_ASC
+  BILLING_INVOICES_TABLE_NAME_DESC
   BILLING_PRICES_TABLE_ID_ASC
   BILLING_PRICES_TABLE_ID_DESC
   BILLING_PRICES_TABLE_NAME_ASC
@@ -1332,6 +1376,10 @@ enum BillingProviderModuleOrderBy {
   BILLING_PRODUCTS_TABLE_ID_DESC
   BILLING_PRODUCTS_TABLE_NAME_ASC
   BILLING_PRODUCTS_TABLE_NAME_DESC
+  BILLING_REFUNDS_TABLE_ID_ASC
+  BILLING_REFUNDS_TABLE_ID_DESC
+  BILLING_REFUNDS_TABLE_NAME_ASC
+  BILLING_REFUNDS_TABLE_NAME_DESC
   BILLING_SUBSCRIPTIONS_TABLE_ID_ASC
   BILLING_SUBSCRIPTIONS_TABLE_ID_DESC
   BILLING_SUBSCRIPTIONS_TABLE_NAME_ASC
@@ -1344,6 +1392,10 @@ enum BillingProviderModuleOrderBy {
   DATABASE_ID_DESC
   ID_ASC
   ID_DESC
+  LIST_PENDING_USAGE_SYNC_FUNCTION_ASC
+  LIST_PENDING_USAGE_SYNC_FUNCTION_DESC
+  MARK_USAGE_SYNCED_FUNCTION_ASC
+  MARK_USAGE_SYNCED_FUNCTION_DESC
   NATURAL
   PREFIX_ASC
   PREFIX_DESC
@@ -1361,10 +1413,14 @@ enum BillingProviderModuleOrderBy {
   PRODUCTS_TABLE_ID_DESC
   PROVIDER_ASC
   PROVIDER_DESC
+  RECORD_REFUND_FUNCTION_ASC
+  RECORD_REFUND_FUNCTION_DESC
   SCHEMA_ID_ASC
   SCHEMA_ID_DESC
   SUBSCRIPTIONS_TABLE_ID_ASC
   SUBSCRIPTIONS_TABLE_ID_DESC
+  UPSERT_INVOICE_FUNCTION_ASC
+  UPSERT_INVOICE_FUNCTION_DESC
 }
 
 """
@@ -1374,16 +1430,22 @@ input BillingProviderModulePatch {
   apiName: String
   billingCustomersTableId: UUID
   billingCustomersTableName: String
+  billingInvoicesTableId: UUID
+  billingInvoicesTableName: String
   billingPricesTableId: UUID
   billingPricesTableName: String
   billingProductsTableId: UUID
   billingProductsTableName: String
+  billingRefundsTableId: UUID
+  billingRefundsTableName: String
   billingSubscriptionsTableId: UUID
   billingSubscriptionsTableName: String
   billingWebhookEventsTableId: UUID
   billingWebhookEventsTableName: String
   databaseId: UUID
   id: UUID
+  listPendingUsageSyncFunction: String
+  markUsageSyncedFunction: String
   prefix: String
   pricesTableId: UUID
   privateApiName: String
@@ -1391,8 +1453,10 @@ input BillingProviderModulePatch {
   processBillingEventFunction: String
   productsTableId: UUID
   provider: String
+  recordRefundFunction: String
   schemaId: UUID
   subscriptionsTableId: UUID
+  upsertInvoiceFunction: String
 }
 
 """
@@ -2608,6 +2672,8 @@ type CatalogModule {
   ): AppModuleConnection!
   appsTableId: UUID!
   appsTableName: String!
+  bindingsTableId: UUID!
+  bindingsTableName: String!
   bucketsTableId: UUID!
   bucketsTableName: String!
   databaseId: UUID!
@@ -2791,6 +2857,12 @@ input CatalogModuleFilter {
   """Filter by the object’s `appsTableName` field."""
   appsTableName: StringFilter
 
+  """Filter by the object’s `bindingsTableId` field."""
+  bindingsTableId: UUIDFilter
+
+  """Filter by the object’s `bindingsTableName` field."""
+  bindingsTableName: StringFilter
+
   """Filter by the object’s `bucketsTableId` field."""
   bucketsTableId: UUIDFilter
 
@@ -2925,6 +2997,8 @@ input CatalogModuleInput {
   apisTableName: String
   appsTableId: UUID
   appsTableName: String
+  bindingsTableId: UUID
+  bindingsTableName: String
   bucketsTableId: UUID
   bucketsTableName: String
   databaseId: UUID!
@@ -2973,6 +3047,10 @@ enum CatalogModuleOrderBy {
   APPS_TABLE_ID_DESC
   APPS_TABLE_NAME_ASC
   APPS_TABLE_NAME_DESC
+  BINDINGS_TABLE_ID_ASC
+  BINDINGS_TABLE_ID_DESC
+  BINDINGS_TABLE_NAME_ASC
+  BINDINGS_TABLE_NAME_DESC
   BUCKETS_TABLE_ID_ASC
   BUCKETS_TABLE_ID_DESC
   BUCKETS_TABLE_NAME_ASC
@@ -3055,6 +3133,8 @@ input CatalogModulePatch {
   apisTableName: String
   appsTableId: UUID
   appsTableName: String
+  bindingsTableId: UUID
+  bindingsTableName: String
   bucketsTableId: UUID
   bucketsTableName: String
   databaseId: UUID
@@ -5834,6 +5914,41 @@ type CreateRouteModulePayload {
   ): RouteModuleEdge
 }
 
+"""All input for the create `ScopeTypesModule` mutation."""
+input CreateScopeTypesModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ScopeTypesModule` to be created by this mutation."""
+  scopeTypesModule: ScopeTypesModuleInput!
+}
+
+"""The output of our create `ScopeTypesModule` mutation."""
+type CreateScopeTypesModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ScopeTypesModule` that was created by this mutation."""
+  scopeTypesModule: ScopeTypesModule
+
+  """An edge for our `ScopeTypesModule`. May be used by Relay 1."""
+  scopeTypesModuleEdge(
+    """The method to use when ordering `ScopeTypesModule`."""
+    orderBy: [ScopeTypesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ScopeTypesModuleEdge
+}
+
 """All input for the create `SecureTableProvision` mutation."""
 input CreateSecureTableProvisionInput {
   """
@@ -6182,6 +6297,41 @@ type CreateUserSettingsModulePayload {
     """The method to use when ordering `UserSettingsModule`."""
     orderBy: [UserSettingsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): UserSettingsModuleEdge
+}
+
+"""All input for the create `UserSettingsSecurityModule` mutation."""
+input CreateUserSettingsSecurityModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `UserSettingsSecurityModule` to be created by this mutation."""
+  userSettingsSecurityModule: UserSettingsSecurityModuleInput!
+}
+
+"""The output of our create `UserSettingsSecurityModule` mutation."""
+type CreateUserSettingsSecurityModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `UserSettingsSecurityModule` that was created by this mutation."""
+  userSettingsSecurityModule: UserSettingsSecurityModule
+
+  """An edge for our `UserSettingsSecurityModule`. May be used by Relay 1."""
+  userSettingsSecurityModuleEdge(
+    """The method to use when ordering `UserSettingsSecurityModule`."""
+    orderBy: [UserSettingsSecurityModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserSettingsSecurityModuleEdge
 }
 
 """All input for the create `UserStateModule` mutation."""
@@ -10298,6 +10448,39 @@ type DeleteRouteModulePayload {
   ): RouteModuleEdge
 }
 
+"""All input for the `deleteScopeTypesModule` mutation."""
+input DeleteScopeTypesModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `ScopeTypesModule` mutation."""
+type DeleteScopeTypesModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ScopeTypesModule` that was deleted by this mutation."""
+  scopeTypesModule: ScopeTypesModule
+
+  """An edge for our `ScopeTypesModule`. May be used by Relay 1."""
+  scopeTypesModuleEdge(
+    """The method to use when ordering `ScopeTypesModule`."""
+    orderBy: [ScopeTypesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ScopeTypesModuleEdge
+}
+
 """All input for the `deleteSecureTableProvision` mutation."""
 input DeleteSecureTableProvisionInput {
   """
@@ -10628,6 +10811,39 @@ type DeleteUserSettingsModulePayload {
     """The method to use when ordering `UserSettingsModule`."""
     orderBy: [UserSettingsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): UserSettingsModuleEdge
+}
+
+"""All input for the `deleteUserSettingsSecurityModule` mutation."""
+input DeleteUserSettingsSecurityModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `UserSettingsSecurityModule` mutation."""
+type DeleteUserSettingsSecurityModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `UserSettingsSecurityModule` that was deleted by this mutation."""
+  userSettingsSecurityModule: UserSettingsSecurityModule
+
+  """An edge for our `UserSettingsSecurityModule`. May be used by Relay 1."""
+  userSettingsSecurityModuleEdge(
+    """The method to use when ordering `UserSettingsSecurityModule`."""
+    orderBy: [UserSettingsSecurityModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserSettingsSecurityModuleEdge
 }
 
 """All input for the `deleteUserStateModule` mutation."""
@@ -11781,7 +11997,7 @@ type EntityTypeProvision {
 
   """
   Single jsonb object describing the full security setup to apply to the entity table.
-       Uses the same vocabulary as metaschema_modules_public.provision_table() and blueprint tables[]
+       Uses the same vocabulary as metaschema_modules_private.provision_table() and blueprint tables[]
        entries, so an entity table is configured the same way an ordinary blueprint table is.
        Defaults to NULL; when non-NULL, the five default policies are implicitly replaced by
        table_provision.policies[] (is_visible becomes a no-op on this path).
@@ -12233,7 +12449,7 @@ input EntityTypeProvisionInput {
 
   """
   Single jsonb object describing the full security setup to apply to the entity table.
-       Uses the same vocabulary as metaschema_modules_public.provision_table() and blueprint tables[]
+       Uses the same vocabulary as metaschema_modules_private.provision_table() and blueprint tables[]
        entries, so an entity table is configured the same way an ordinary blueprint table is.
        Defaults to NULL; when non-NULL, the five default policies are implicitly replaced by
        table_provision.policies[] (is_visible becomes a no-op on this path).
@@ -12613,7 +12829,7 @@ input EntityTypeProvisionPatch {
 
   """
   Single jsonb object describing the full security setup to apply to the entity table.
-       Uses the same vocabulary as metaschema_modules_public.provision_table() and blueprint tables[]
+       Uses the same vocabulary as metaschema_modules_private.provision_table() and blueprint tables[]
        entries, so an entity table is configured the same way an ordinary blueprint table is.
        Defaults to NULL; when non-NULL, the five default policies are implicitly replaced by
        table_provision.policies[] (is_visible becomes a no-op on this path).
@@ -18893,6 +19109,14 @@ type Mutation {
     input: CreateRouteModuleInput!
   ): CreateRouteModulePayload
 
+  """Creates a single `ScopeTypesModule`."""
+  createScopeTypesModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateScopeTypesModuleInput!
+  ): CreateScopeTypesModulePayload
+
   """Creates a single `SecureTableProvision`."""
   createSecureTableProvision(
     """
@@ -18972,6 +19196,14 @@ type Mutation {
     """
     input: CreateUserSettingsModuleInput!
   ): CreateUserSettingsModulePayload
+
+  """Creates a single `UserSettingsSecurityModule`."""
+  createUserSettingsSecurityModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserSettingsSecurityModuleInput!
+  ): CreateUserSettingsSecurityModulePayload
 
   """Creates a single `UserStateModule`."""
   createUserStateModule(
@@ -19501,6 +19733,14 @@ type Mutation {
     input: DeleteRouteModuleInput!
   ): DeleteRouteModulePayload
 
+  """Deletes a single `ScopeTypesModule` using a unique key."""
+  deleteScopeTypesModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteScopeTypesModuleInput!
+  ): DeleteScopeTypesModulePayload
+
   """Deletes a single `SecureTableProvision` using a unique key."""
   deleteSecureTableProvision(
     """
@@ -19581,6 +19821,14 @@ type Mutation {
     input: DeleteUserSettingsModuleInput!
   ): DeleteUserSettingsModulePayload
 
+  """Deletes a single `UserSettingsSecurityModule` using a unique key."""
+  deleteUserSettingsSecurityModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserSettingsSecurityModuleInput!
+  ): DeleteUserSettingsSecurityModulePayload
+
   """Deletes a single `UserStateModule` using a unique key."""
   deleteUserStateModule(
     """
@@ -19633,76 +19881,6 @@ type Mutation {
     """
     input: ProvisionBucketInput!
   ): ProvisionBucketPayload
-
-  """
-  Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.
-  """
-  provisionCheckConstraint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionCheckConstraintInput!
-  ): ProvisionCheckConstraintPayload
-
-  """
-  Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
-  """
-  provisionFullTextSearch(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionFullTextSearchInput!
-  ): ProvisionFullTextSearchPayload
-
-  """
-  Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
-  """
-  provisionIndex(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionIndexInput!
-  ): ProvisionIndexPayload
-
-  """
-  Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
-  """
-  provisionRelation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionRelationInput!
-  ): ProvisionRelationPayload
-
-  """
-  Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert.
-  """
-  provisionSpatialRelation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionSpatialRelationInput!
-  ): ProvisionSpatialRelationPayload
-
-  """
-  Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
-  """
-  provisionTable(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionTableInput!
-  ): ProvisionTablePayload
-
-  """
-  Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
-  """
-  provisionUniqueConstraint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionUniqueConstraintInput!
-  ): ProvisionUniqueConstraintPayload
 
   """Updates a single `AgentModule` using a unique key and a patch."""
   updateAgentModule(
@@ -20224,6 +20402,14 @@ type Mutation {
     input: UpdateRouteModuleInput!
   ): UpdateRouteModulePayload
 
+  """Updates a single `ScopeTypesModule` using a unique key and a patch."""
+  updateScopeTypesModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateScopeTypesModuleInput!
+  ): UpdateScopeTypesModulePayload
+
   """
   Updates a single `SecureTableProvision` using a unique key and a patch.
   """
@@ -20309,6 +20495,16 @@ type Mutation {
     """
     input: UpdateUserSettingsModuleInput!
   ): UpdateUserSettingsModulePayload
+
+  """
+  Updates a single `UserSettingsSecurityModule` using a unique key and a patch.
+  """
+  updateUserSettingsSecurityModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserSettingsSecurityModuleInput!
+  ): UpdateUserSettingsSecurityModulePayload
 
   """Updates a single `UserStateModule` using a unique key and a patch."""
   updateUserStateModule(
@@ -22316,237 +22512,6 @@ type ProvisionBucketPayload {
   success: Boolean!
 }
 
-"""All input for the `provisionCheckConstraint` mutation."""
-input ProvisionCheckConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  definition: JSON
-  tableId: UUID
-}
-
-"""The output of our `provisionCheckConstraint` mutation."""
-type ProvisionCheckConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `provisionFullTextSearch` mutation."""
-input ProvisionFullTextSearchInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  definition: JSON
-  tableId: UUID
-}
-
-"""The output of our `provisionFullTextSearch` mutation."""
-type ProvisionFullTextSearchPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-  result: UUID
-}
-
-"""All input for the `provisionIndex` mutation."""
-input ProvisionIndexInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  definition: JSON
-  tableId: UUID
-}
-
-"""The output of our `provisionIndex` mutation."""
-type ProvisionIndexPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-  result: UUID
-}
-
-"""All input for the `provisionRelation` mutation."""
-input ProvisionRelationInput {
-  apiRequired: Boolean
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  createIndex: Boolean
-  databaseId: UUID
-  deleteAction: String
-  exposeInApi: Boolean
-  fieldName: String
-  grants: JSON
-  isRequired: Boolean
-  junctionSchemaId: UUID
-  junctionTableId: UUID
-  junctionTableName: String
-  nodes: JSON
-  policies: JSON
-  relationType: String
-  sourceFieldName: String
-  sourceTableId: UUID
-  targetFieldName: String
-  targetTableId: UUID
-  useCompositeKey: Boolean
-}
-
-"""The output of our `provisionRelation` mutation."""
-type ProvisionRelationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-  result: [ProvisionRelationRecord]
-}
-
-type ProvisionRelationRecord {
-  outFieldId: UUID
-  outJunctionTableId: UUID
-  outSourceFieldId: UUID
-  outTargetFieldId: UUID
-}
-
-"""All input for the `provisionSpatialRelation` mutation."""
-input ProvisionSpatialRelationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  name: String
-  operator: String
-  paramName: String
-  sourceFieldId: UUID
-  sourceTableId: UUID
-  targetFieldId: UUID
-  targetTableId: UUID
-}
-
-"""The output of our `provisionSpatialRelation` mutation."""
-type ProvisionSpatialRelationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-  result: UUID
-}
-
-"""All input for the `provisionTable` mutation."""
-input ProvisionTableInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  description: String
-  fields: JSON
-  fullTextSearches: JSON
-  grants: JSON
-  indexes: JSON
-  nodes: JSON
-  policies: JSON
-  schemaId: UUID
-  tableId: UUID
-  tableName: String
-  uniqueConstraints: JSON
-  useRls: Boolean
-}
-
-"""The output of our `provisionTable` mutation."""
-type ProvisionTablePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-  result: [ProvisionTableRecord]
-}
-
-type ProvisionTableRecord {
-  outFields: [UUID]
-  outTableId: UUID
-}
-
-"""All input for the `provisionUniqueConstraint` mutation."""
-input ProvisionUniqueConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  definition: JSON
-  tableId: UUID
-}
-
-"""The output of our `provisionUniqueConstraint` mutation."""
-type ProvisionUniqueConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """The root query type which gives access points into the data universe."""
 type Query {
   """
@@ -24254,16 +24219,6 @@ type Query {
     where: RelationProvisionFilter
   ): RelationProvisionConnection
 
-  """
-  Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this.
-  """
-  resolveBlueprintField(databaseId: UUID, fieldName: String, tableId: UUID): UUID
-
-  """
-  Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
-  """
-  resolveBlueprintTable(databaseId: UUID, defaultSchemaId: UUID, schemaName: String, tableMap: JSON, tableName: String): UUID
-
   """Reads and enables pagination through a set of `ResourceModule`."""
   resourceModules(
     """Read all values in the set after (below) this cursor."""
@@ -24350,6 +24305,35 @@ type Query {
     """
     where: RouteModuleFilter
   ): RouteModuleConnection
+
+  """Reads and enables pagination through a set of `ScopeTypesModule`."""
+  scopeTypesModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ScopeTypesModule`."""
+    orderBy: [ScopeTypesModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ScopeTypesModuleFilter
+  ): ScopeTypesModuleConnection
 
   """Reads and enables pagination through a set of `SecureTableProvision`."""
   secureTableProvisions(
@@ -24640,6 +24624,37 @@ type Query {
     """
     where: UserSettingsModuleFilter
   ): UserSettingsModuleConnection
+
+  """
+  Reads and enables pagination through a set of `UserSettingsSecurityModule`.
+  """
+  userSettingsSecurityModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `UserSettingsSecurityModule`."""
+    orderBy: [UserSettingsSecurityModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: UserSettingsSecurityModuleFilter
+  ): UserSettingsSecurityModuleConnection
 
   """Reads and enables pagination through a set of `UserStateModule`."""
   userStateModules(
@@ -26568,11 +26583,13 @@ input RlsModulePatch {
 
 type RouteModule {
   apiName: String
+  appLinksFunctionName: String
 
   """Reads a single `CatalogModule` that is related to this `RouteModule`."""
   catalogModule: CatalogModule
   catalogModuleId: UUID
   databaseId: UUID!
+  deepLinkFunctionName: String
   defaultPermissions: [String]
 
   """Reads a single `DomainModule` that is related to this `RouteModule`."""
@@ -26635,6 +26652,9 @@ input RouteModuleFilter {
   """Filter by the object’s `apiName` field."""
   apiName: StringFilter
 
+  """Filter by the object’s `appLinksFunctionName` field."""
+  appLinksFunctionName: StringFilter
+
   """Filter by the object’s `catalogModule` relation."""
   catalogModule: CatalogModuleFilter
 
@@ -26646,6 +26666,9 @@ input RouteModuleFilter {
 
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
+
+  """Filter by the object’s `deepLinkFunctionName` field."""
+  deepLinkFunctionName: StringFilter
 
   """Filter by the object’s `defaultPermissions` field."""
   defaultPermissions: StringListFilter
@@ -26726,8 +26749,10 @@ input RouteModuleFilter {
 """An input for mutations affecting `RouteModule`"""
 input RouteModuleInput {
   apiName: String
+  appLinksFunctionName: String
   catalogModuleId: UUID
   databaseId: UUID!
+  deepLinkFunctionName: String
   defaultPermissions: [String]
   domainModuleId: UUID
   entityField: String
@@ -26755,10 +26780,14 @@ input RouteModuleInput {
 enum RouteModuleOrderBy {
   API_NAME_ASC
   API_NAME_DESC
+  APP_LINKS_FUNCTION_NAME_ASC
+  APP_LINKS_FUNCTION_NAME_DESC
   CATALOG_MODULE_ID_ASC
   CATALOG_MODULE_ID_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
+  DEEP_LINK_FUNCTION_NAME_ASC
+  DEEP_LINK_FUNCTION_NAME_DESC
   DEFAULT_PERMISSIONS_ASC
   DEFAULT_PERMISSIONS_DESC
   DOMAIN_MODULE_ID_ASC
@@ -26811,8 +26840,10 @@ Represents an update to a `RouteModule`. Fields that are set will be updated.
 """
 input RouteModulePatch {
   apiName: String
+  appLinksFunctionName: String
   catalogModuleId: UUID
   databaseId: UUID
+  deepLinkFunctionName: String
   defaultPermissions: [String]
   domainModuleId: UUID
   entityField: String
@@ -26834,6 +26865,108 @@ input RouteModulePatch {
   routesTableName: String
   schemaId: UUID
   scope: String
+}
+
+type ScopeTypesModule {
+  databaseId: UUID!
+  id: UUID!
+  privateSchemaName: String
+  schemaId: UUID!
+  scopeTypesTableId: UUID!
+}
+
+"""A connection to a list of `ScopeTypesModule` values."""
+type ScopeTypesModuleConnection {
+  """
+  A list of edges which contains the `ScopeTypesModule` and cursor to aid in pagination.
+  """
+  edges: [ScopeTypesModuleEdge]!
+
+  """A list of `ScopeTypesModule` objects."""
+  nodes: [ScopeTypesModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ScopeTypesModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ScopeTypesModule` edge in the connection."""
+type ScopeTypesModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ScopeTypesModule` at the end of the edge."""
+  node: ScopeTypesModule
+}
+
+"""
+A filter to be used against `ScopeTypesModule` object types. All fields are combined with a logical ‘and.’
+"""
+input ScopeTypesModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [ScopeTypesModuleFilter!]
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: ScopeTypesModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [ScopeTypesModuleFilter!]
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scopeTypesTableId` field."""
+  scopeTypesTableId: UUIDFilter
+}
+
+"""An input for mutations affecting `ScopeTypesModule`"""
+input ScopeTypesModuleInput {
+  databaseId: UUID!
+  id: UUID
+  privateSchemaName: String
+  schemaId: UUID
+  scopeTypesTableId: UUID
+}
+
+"""Methods to use when ordering `ScopeTypesModule`."""
+enum ScopeTypesModuleOrderBy {
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_TYPES_TABLE_ID_ASC
+  SCOPE_TYPES_TABLE_ID_DESC
+}
+
+"""
+Represents an update to a `ScopeTypesModule`. Fields that are set will be updated.
+"""
+input ScopeTypesModulePatch {
+  databaseId: UUID
+  id: UUID
+  privateSchemaName: String
+  schemaId: UUID
+  scopeTypesTableId: UUID
 }
 
 """
@@ -31271,6 +31404,44 @@ type UpdateRouteModulePayload {
   ): RouteModuleEdge
 }
 
+"""All input for the `updateScopeTypesModule` mutation."""
+input UpdateScopeTypesModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `ScopeTypesModule` being updated.
+  """
+  scopeTypesModulePatch: ScopeTypesModulePatch!
+}
+
+"""The output of our update `ScopeTypesModule` mutation."""
+type UpdateScopeTypesModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ScopeTypesModule` that was updated by this mutation."""
+  scopeTypesModule: ScopeTypesModule
+
+  """An edge for our `ScopeTypesModule`. May be used by Relay 1."""
+  scopeTypesModuleEdge(
+    """The method to use when ordering `ScopeTypesModule`."""
+    orderBy: [ScopeTypesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ScopeTypesModuleEdge
+}
+
 """All input for the `updateSecureTableProvision` mutation."""
 input UpdateSecureTableProvisionInput {
   """
@@ -31651,6 +31822,44 @@ type UpdateUserSettingsModulePayload {
     """The method to use when ordering `UserSettingsModule`."""
     orderBy: [UserSettingsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): UserSettingsModuleEdge
+}
+
+"""All input for the `updateUserSettingsSecurityModule` mutation."""
+input UpdateUserSettingsSecurityModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `UserSettingsSecurityModule` being updated.
+  """
+  userSettingsSecurityModulePatch: UserSettingsSecurityModulePatch!
+}
+
+"""The output of our update `UserSettingsSecurityModule` mutation."""
+type UpdateUserSettingsSecurityModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `UserSettingsSecurityModule` that was updated by this mutation."""
+  userSettingsSecurityModule: UserSettingsSecurityModule
+
+  """An edge for our `UserSettingsSecurityModule`. May be used by Relay 1."""
+  userSettingsSecurityModuleEdge(
+    """The method to use when ordering `UserSettingsSecurityModule`."""
+    orderBy: [UserSettingsSecurityModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserSettingsSecurityModuleEdge
 }
 
 """All input for the `updateUserStateModule` mutation."""
@@ -32359,6 +32568,124 @@ enum UserSettingsModuleOrderBy {
 Represents an update to a `UserSettingsModule`. Fields that are set will be updated.
 """
 input UserSettingsModulePatch {
+  apiName: String
+  databaseId: UUID
+  id: UUID
+  ownerTableId: UUID
+  schemaId: UUID
+  tableId: UUID
+  tableName: String
+}
+
+type UserSettingsSecurityModule {
+  apiName: String
+  databaseId: UUID!
+  id: UUID!
+  ownerTableId: UUID!
+  schemaId: UUID!
+  tableId: UUID!
+  tableName: String!
+}
+
+"""A connection to a list of `UserSettingsSecurityModule` values."""
+type UserSettingsSecurityModuleConnection {
+  """
+  A list of edges which contains the `UserSettingsSecurityModule` and cursor to aid in pagination.
+  """
+  edges: [UserSettingsSecurityModuleEdge]!
+
+  """A list of `UserSettingsSecurityModule` objects."""
+  nodes: [UserSettingsSecurityModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `UserSettingsSecurityModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `UserSettingsSecurityModule` edge in the connection."""
+type UserSettingsSecurityModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `UserSettingsSecurityModule` at the end of the edge."""
+  node: UserSettingsSecurityModule
+}
+
+"""
+A filter to be used against `UserSettingsSecurityModule` object types. All fields are combined with a logical ‘and.’
+"""
+input UserSettingsSecurityModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [UserSettingsSecurityModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: UserSettingsSecurityModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [UserSettingsSecurityModuleFilter!]
+
+  """Filter by the object’s `ownerTableId` field."""
+  ownerTableId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `tableId` field."""
+  tableId: UUIDFilter
+
+  """Filter by the object’s `tableName` field."""
+  tableName: StringFilter
+}
+
+"""An input for mutations affecting `UserSettingsSecurityModule`"""
+input UserSettingsSecurityModuleInput {
+  apiName: String
+  databaseId: UUID!
+  id: UUID
+  ownerTableId: UUID
+  schemaId: UUID
+  tableId: UUID
+  tableName: String
+}
+
+"""Methods to use when ordering `UserSettingsSecurityModule`."""
+enum UserSettingsSecurityModuleOrderBy {
+  API_NAME_ASC
+  API_NAME_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  OWNER_TABLE_ID_ASC
+  OWNER_TABLE_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  TABLE_ID_ASC
+  TABLE_ID_DESC
+  TABLE_NAME_ASC
+  TABLE_NAME_DESC
+}
+
+"""
+Represents an update to a `UserSettingsSecurityModule`. Fields that are set will be updated.
+"""
+input UserSettingsSecurityModulePatch {
   apiName: String
   databaseId: UUID
   id: UUID

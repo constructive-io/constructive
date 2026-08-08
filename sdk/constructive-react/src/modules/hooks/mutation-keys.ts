@@ -607,6 +607,15 @@ export const routeModuleMutationKeys = {
   /** Delete routeModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'routemodule', 'delete', id] as const,
 } as const;
+export const scopeTypesModuleMutationKeys = {
+  /** All scopeTypesModule mutation keys */ all: ['mutation', 'scopetypesmodule'] as const,
+  /** Create scopeTypesModule mutation key */ create: () =>
+    ['mutation', 'scopetypesmodule', 'create'] as const,
+  /** Update scopeTypesModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'scopetypesmodule', 'update', id] as const,
+  /** Delete scopeTypesModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'scopetypesmodule', 'delete', id] as const,
+} as const;
 export const secureTableProvisionMutationKeys = {
   /** All secureTableProvision mutation keys */ all: ['mutation', 'securetableprovision'] as const,
   /** Create secureTableProvision mutation key */ create: () =>
@@ -700,6 +709,18 @@ export const userSettingsModuleMutationKeys = {
   /** Delete userSettingsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'usersettingsmodule', 'delete', id] as const,
 } as const;
+export const userSettingsSecurityModuleMutationKeys = {
+  /** All userSettingsSecurityModule mutation keys */ all: [
+    'mutation',
+    'usersettingssecuritymodule',
+  ] as const,
+  /** Create userSettingsSecurityModule mutation key */ create: () =>
+    ['mutation', 'usersettingssecuritymodule', 'create'] as const,
+  /** Update userSettingsSecurityModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'usersettingssecuritymodule', 'update', id] as const,
+  /** Delete userSettingsSecurityModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'usersettingssecuritymodule', 'delete', id] as const,
+} as const;
 export const userStateModuleMutationKeys = {
   /** All userStateModule mutation keys */ all: ['mutation', 'userstatemodule'] as const,
   /** Create userStateModule mutation key */ create: () =>
@@ -766,40 +787,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
       : (['mutation', 'provisionBucket'] as const),
-  /** Mutation key for provisionCheckConstraint */ provisionCheckConstraint: (
-    identifier?: string
-  ) =>
-    identifier
-      ? (['mutation', 'provisionCheckConstraint', identifier] as const)
-      : (['mutation', 'provisionCheckConstraint'] as const),
-  /** Mutation key for provisionFullTextSearch */ provisionFullTextSearch: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'provisionFullTextSearch', identifier] as const)
-      : (['mutation', 'provisionFullTextSearch'] as const),
-  /** Mutation key for provisionIndex */ provisionIndex: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'provisionIndex', identifier] as const)
-      : (['mutation', 'provisionIndex'] as const),
-  /** Mutation key for provisionRelation */ provisionRelation: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'provisionRelation', identifier] as const)
-      : (['mutation', 'provisionRelation'] as const),
-  /** Mutation key for provisionSpatialRelation */ provisionSpatialRelation: (
-    identifier?: string
-  ) =>
-    identifier
-      ? (['mutation', 'provisionSpatialRelation', identifier] as const)
-      : (['mutation', 'provisionSpatialRelation'] as const),
-  /** Mutation key for provisionTable */ provisionTable: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'provisionTable', identifier] as const)
-      : (['mutation', 'provisionTable'] as const),
-  /** Mutation key for provisionUniqueConstraint */ provisionUniqueConstraint: (
-    identifier?: string
-  ) =>
-    identifier
-      ? (['mutation', 'provisionUniqueConstraint', identifier] as const)
-      : (['mutation', 'provisionUniqueConstraint'] as const),
 } as const;
 /**
 
@@ -885,6 +872,7 @@ export const mutationKeys = {
   resourceModule: resourceModuleMutationKeys,
   rlsModule: rlsModuleMutationKeys,
   routeModule: routeModuleMutationKeys,
+  scopeTypesModule: scopeTypesModuleMutationKeys,
   secureTableProvision: secureTableProvisionMutationKeys,
   sessionSecretsModule: sessionSecretsModuleMutationKeys,
   sessionsModule: sessionsModuleMutationKeys,
@@ -895,6 +883,7 @@ export const mutationKeys = {
   userAuthModule: userAuthModuleMutationKeys,
   userCredentialsModule: userCredentialsModuleMutationKeys,
   userSettingsModule: userSettingsModuleMutationKeys,
+  userSettingsSecurityModule: userSettingsSecurityModuleMutationKeys,
   userStateModule: userStateModuleMutationKeys,
   usersModule: usersModuleMutationKeys,
   webauthnAuthModule: webauthnAuthModuleMutationKeys,

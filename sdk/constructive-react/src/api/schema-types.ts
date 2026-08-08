@@ -5,9 +5,9 @@
  */
 
 import type {
+  Api,
   ApiSchema,
   ApiSetting,
-  Apis,
   AstMigration,
   CheckConstraint,
   CompositeType,
@@ -37,9 +37,9 @@ import type {
   NodeTypeRegistry,
   Page,
   Partition,
+  PlatformApi,
   PlatformApiSchema,
   PlatformApiSetting,
-  PlatformApis,
   PlatformCorsSetting,
   PlatformDomain,
   PlatformDomainEvent,
@@ -105,6 +105,31 @@ import type {
 } from './types';
 export type ConstructiveInternalTypeImage = unknown;
 export type ApiExposureLevel = 'EXPOSABLE' | 'INTERNAL_ONLY' | 'NEVER_EXPOSE';
+/** Methods to use when ordering `Api`. */
+export type ApiOrderBy =
+  | 'ANON_ROLE_ASC'
+  | 'ANON_ROLE_DESC'
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DBNAME_ASC'
+  | 'DBNAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ROLE_NAME_ASC'
+  | 'ROLE_NAME_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `ApiSchema`. */
 export type ApiSchemaOrderBy =
   | 'API_ID_ASC'
@@ -163,31 +188,6 @@ export type ApiSettingOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'STATEMENT_TIMEOUT_MS_ASC'
   | 'STATEMENT_TIMEOUT_MS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `Apis`. */
-export type ApisOrderBy =
-  | 'ANON_ROLE_ASC'
-  | 'ANON_ROLE_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_PUBLISHED_ASC'
-  | 'IS_PUBLISHED_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ROLE_NAME_ASC'
-  | 'ROLE_NAME_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `AstMigration`. */
@@ -1052,6 +1052,29 @@ export type PartitionOrderBy =
   | 'TABLE_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformApi`. */
+export type PlatformApiOrderBy =
+  | 'ANON_ROLE_ASC'
+  | 'ANON_ROLE_DESC'
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DBNAME_ASC'
+  | 'DBNAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ROLE_NAME_ASC'
+  | 'ROLE_NAME_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformApiSchema`. */
 export type PlatformApiSchemaOrderBy =
   | 'API_ID_ASC'
@@ -1106,29 +1129,6 @@ export type PlatformApiSettingOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'STATEMENT_TIMEOUT_MS_ASC'
   | 'STATEMENT_TIMEOUT_MS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `PlatformApis`. */
-export type PlatformApisOrderBy =
-  | 'ANON_ROLE_ASC'
-  | 'ANON_ROLE_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_PUBLISHED_ASC'
-  | 'IS_PUBLISHED_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ROLE_NAME_ASC'
-  | 'ROLE_NAME_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformCorsSetting`. */
@@ -2373,12 +2373,93 @@ export interface ApiExposureLevelFilter {
   /** Not included in the specified list. */
   notIn?: ApiExposureLevel[];
 }
+/** A filter to be used against `Api` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiFilter {
+  /** Checks for all expressions in this list. */
+  and?: ApiFilter[];
+  /** Filter by the object’s `anonRole` field. */
+  anonRole?: StringFilter;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: ApiToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `apiSetting` relation. */
+  apiSetting?: ApiSettingFilter;
+  /** A related `apiSetting` exists. */
+  apiSettingExists?: boolean;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `corsSettings` relation. */
+  corsSettings?: ApiToManyCorsSettingFilter;
+  /** `corsSettings` exist. */
+  corsSettingsExist?: boolean;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: ApiFilter;
+  /** Checks for any expressions in this list. */
+  or?: ApiFilter[];
+  /** Filter by the object’s `roleName` field. */
+  roleName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `Api` */
+export interface ApiInput {
+  /** Anonymous role the API executes as */
+  anonRole?: string;
+  /** Module-specific configuration for this API surface */
+  config?: unknown;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Database this API surface serves */
+  dbname?: string;
+  id?: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean;
+  /** Owner-local API surface name */
+  name: string;
+  /** Authenticated role the API executes as */
+  roleName?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `Api`. Fields that are set will be updated. */
+export interface ApiPatch {
+  /** Anonymous role the API executes as */
+  anonRole?: string;
+  /** Module-specific configuration for this API surface */
+  config?: unknown;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Database this API surface serves */
+  dbname?: string;
+  id?: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean;
+  /** Owner-local API surface name */
+  name?: string;
+  /** Authenticated role the API executes as */
+  roleName?: string;
+  updatedAt?: string;
+}
 /** A filter to be used against `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface ApiSchemaFilter {
   /** Checks for all expressions in this list. */
   and?: ApiSchemaFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: ApisFilter;
+  api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2427,7 +2508,7 @@ export interface ApiSettingFilter {
   /** Checks for all expressions in this list. */
   and?: ApiSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: ApisFilter;
+  api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2547,89 +2628,8 @@ export interface ApiSettingPatch {
   statementTimeoutMs?: string;
   updatedAt?: string;
 }
-/** A filter to be used against `Apis` object types. All fields are combined with a logical ‘and.’ */
-export interface ApisFilter {
-  /** Checks for all expressions in this list. */
-  and?: ApisFilter[];
-  /** Filter by the object’s `anonRole` field. */
-  anonRole?: StringFilter;
-  /** Filter by the object’s `apiSchemasByApiId` relation. */
-  apiSchemasByApiId?: ApisToManyApiSchemaFilter;
-  /** `apiSchemasByApiId` exist. */
-  apiSchemasByApiIdExist?: boolean;
-  /** Filter by the object’s `apiSettingByApiId` relation. */
-  apiSettingByApiId?: ApiSettingFilter;
-  /** A related `apiSettingByApiId` exists. */
-  apiSettingByApiIdExists?: boolean;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `corsSettingsByApiId` relation. */
-  corsSettingsByApiId?: ApisToManyCorsSettingFilter;
-  /** `corsSettingsByApiId` exist. */
-  corsSettingsByApiIdExist?: boolean;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `dbname` field. */
-  dbname?: StringFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isPublished` field. */
-  isPublished?: BooleanFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: ApisFilter;
-  /** Checks for any expressions in this list. */
-  or?: ApisFilter[];
-  /** Filter by the object’s `roleName` field. */
-  roleName?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-/** An input for mutations affecting `Apis` */
-export interface ApisInput {
-  /** Anonymous role the API executes as */
-  anonRole?: string;
-  /** Module-specific configuration for this API surface */
-  config?: unknown;
-  createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  /** Database this API surface serves */
-  dbname?: string;
-  id?: string;
-  /** Whether other scopes may see and route to this API surface */
-  isPublished?: boolean;
-  /** Owner-local API surface name */
-  name: string;
-  /** Authenticated role the API executes as */
-  roleName?: string;
-  updatedAt?: string;
-}
-/** Represents an update to a `Apis`. Fields that are set will be updated. */
-export interface ApisPatch {
-  /** Anonymous role the API executes as */
-  anonRole?: string;
-  /** Module-specific configuration for this API surface */
-  config?: unknown;
-  createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-  /** Database this API surface serves */
-  dbname?: string;
-  id?: string;
-  /** Whether other scopes may see and route to this API surface */
-  isPublished?: boolean;
-  /** Owner-local API surface name */
-  name?: string;
-  /** Authenticated role the API executes as */
-  roleName?: string;
-  updatedAt?: string;
-}
 /** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
-export interface ApisToManyApiSchemaFilter {
+export interface ApiToManyApiSchemaFilter {
   /** Filters to entities where every related entity matches. */
   every?: ApiSchemaFilter;
   /** Filters to entities where no related entity matches. */
@@ -2638,7 +2638,7 @@ export interface ApisToManyApiSchemaFilter {
   some?: ApiSchemaFilter;
 }
 /** A filter to be used against many `CorsSetting` object types. All fields are combined with a logical ‘and.’ */
-export interface ApisToManyCorsSettingFilter {
+export interface ApiToManyCorsSettingFilter {
   /** Filters to entities where every related entity matches. */
   every?: CorsSettingFilter;
   /** Filters to entities where no related entity matches. */
@@ -2871,7 +2871,7 @@ export interface CorsSettingFilter {
   /** Checks for all expressions in this list. */
   and?: CorsSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: ApisFilter;
+  api?: ApiFilter;
   /** A related `api` exists. */
   apiExists?: boolean;
   /** Filter by the object’s `apiId` field. */
@@ -2913,6 +2913,11 @@ export interface CorsSettingPatch {
   id?: string;
   updatedAt?: string;
 }
+export interface CreateApiInput {
+  /** The `Api` to be created by this mutation. */
+  api: ApiInput;
+  clientMutationId?: string;
+}
 export interface CreateApiSchemaInput {
   /** The `ApiSchema` to be created by this mutation. */
   apiSchema: ApiSchemaInput;
@@ -2921,11 +2926,6 @@ export interface CreateApiSchemaInput {
 export interface CreateApiSettingInput {
   /** The `ApiSetting` to be created by this mutation. */
   apiSetting: ApiSettingInput;
-  clientMutationId?: string;
-}
-export interface CreateApisInput {
-  /** The `Apis` to be created by this mutation. */
-  apis: ApisInput;
   clientMutationId?: string;
 }
 export interface CreateCheckConstraintInput {
@@ -3068,6 +3068,11 @@ export interface CreatePartitionInput {
   /** The `Partition` to be created by this mutation. */
   partition: PartitionInput;
 }
+export interface CreatePlatformApiInput {
+  clientMutationId?: string;
+  /** The `PlatformApi` to be created by this mutation. */
+  platformApi: PlatformApiInput;
+}
 export interface CreatePlatformApiSchemaInput {
   clientMutationId?: string;
   /** The `PlatformApiSchema` to be created by this mutation. */
@@ -3077,11 +3082,6 @@ export interface CreatePlatformApiSettingInput {
   clientMutationId?: string;
   /** The `PlatformApiSetting` to be created by this mutation. */
   platformApiSetting: PlatformApiSettingInput;
-}
-export interface CreatePlatformApisInput {
-  clientMutationId?: string;
-  /** The `PlatformApis` to be created by this mutation. */
-  platformApis: PlatformApisInput;
 }
 export interface CreatePlatformCorsSettingInput {
   clientMutationId?: string;
@@ -4041,15 +4041,15 @@ export interface DefaultPrivilegePatch {
   privilege?: string;
   schemaId?: string;
 }
+export interface DeleteApiInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteApiSchemaInput {
   clientMutationId?: string;
   id: string;
 }
 export interface DeleteApiSettingInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteApisInput {
   clientMutationId?: string;
   id: string;
 }
@@ -4166,15 +4166,15 @@ export interface DeletePartitionInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeletePlatformApiInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeletePlatformApiSchemaInput {
   clientMutationId?: string;
   id: string;
 }
 export interface DeletePlatformApiSettingInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeletePlatformApisInput {
   clientMutationId?: string;
   id: string;
 }
@@ -6152,12 +6152,87 @@ export interface PartitionPatch {
   tableId?: string;
   updatedAt?: string;
 }
+/** A filter to be used against `PlatformApi` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformApiFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiFilter[];
+  /** Filter by the object’s `anonRole` field. */
+  anonRole?: StringFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformApiFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformApiFilter[];
+  /** Filter by the object’s `platformApiSchemasByApiId` relation. */
+  platformApiSchemasByApiId?: PlatformApiToManyPlatformApiSchemaFilter;
+  /** `platformApiSchemasByApiId` exist. */
+  platformApiSchemasByApiIdExist?: boolean;
+  /** Filter by the object’s `platformApiSettingByApiId` relation. */
+  platformApiSettingByApiId?: PlatformApiSettingFilter;
+  /** A related `platformApiSettingByApiId` exists. */
+  platformApiSettingByApiIdExists?: boolean;
+  /** Filter by the object’s `platformCorsSettingByApiId` relation. */
+  platformCorsSettingByApiId?: PlatformCorsSettingFilter;
+  /** A related `platformCorsSettingByApiId` exists. */
+  platformCorsSettingByApiIdExists?: boolean;
+  /** Filter by the object’s `roleName` field. */
+  roleName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformApi` */
+export interface PlatformApiInput {
+  /** Anonymous role the API executes as */
+  anonRole?: string;
+  /** Module-specific configuration for this API surface */
+  config?: unknown;
+  createdAt?: string;
+  /** Database this API surface serves */
+  dbname?: string;
+  id?: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean;
+  /** Owner-local API surface name */
+  name: string;
+  /** Authenticated role the API executes as */
+  roleName?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformApi`. Fields that are set will be updated. */
+export interface PlatformApiPatch {
+  /** Anonymous role the API executes as */
+  anonRole?: string;
+  /** Module-specific configuration for this API surface */
+  config?: unknown;
+  createdAt?: string;
+  /** Database this API surface serves */
+  dbname?: string;
+  id?: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean;
+  /** Owner-local API surface name */
+  name?: string;
+  /** Authenticated role the API executes as */
+  roleName?: string;
+  updatedAt?: string;
+}
 /** A filter to be used against `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformApiSchemaFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformApiSchemaFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: PlatformApisFilter;
+  api?: PlatformApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -6200,7 +6275,7 @@ export interface PlatformApiSettingFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformApiSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: PlatformApisFilter;
+  api?: PlatformApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -6314,83 +6389,8 @@ export interface PlatformApiSettingPatch {
   statementTimeoutMs?: string;
   updatedAt?: string;
 }
-/** A filter to be used against `PlatformApis` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformApisFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformApisFilter[];
-  /** Filter by the object’s `anonRole` field. */
-  anonRole?: StringFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `dbname` field. */
-  dbname?: StringFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isPublished` field. */
-  isPublished?: BooleanFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: PlatformApisFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformApisFilter[];
-  /** Filter by the object’s `platformApiSchemasByApiId` relation. */
-  platformApiSchemasByApiId?: PlatformApisToManyPlatformApiSchemaFilter;
-  /** `platformApiSchemasByApiId` exist. */
-  platformApiSchemasByApiIdExist?: boolean;
-  /** Filter by the object’s `platformApiSettingByApiId` relation. */
-  platformApiSettingByApiId?: PlatformApiSettingFilter;
-  /** A related `platformApiSettingByApiId` exists. */
-  platformApiSettingByApiIdExists?: boolean;
-  /** Filter by the object’s `platformCorsSettingByApiId` relation. */
-  platformCorsSettingByApiId?: PlatformCorsSettingFilter;
-  /** A related `platformCorsSettingByApiId` exists. */
-  platformCorsSettingByApiIdExists?: boolean;
-  /** Filter by the object’s `roleName` field. */
-  roleName?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-/** An input for mutations affecting `PlatformApis` */
-export interface PlatformApisInput {
-  /** Anonymous role the API executes as */
-  anonRole?: string;
-  /** Module-specific configuration for this API surface */
-  config?: unknown;
-  createdAt?: string;
-  /** Database this API surface serves */
-  dbname?: string;
-  id?: string;
-  /** Whether other scopes may see and route to this API surface */
-  isPublished?: boolean;
-  /** Owner-local API surface name */
-  name: string;
-  /** Authenticated role the API executes as */
-  roleName?: string;
-  updatedAt?: string;
-}
-/** Represents an update to a `PlatformApis`. Fields that are set will be updated. */
-export interface PlatformApisPatch {
-  /** Anonymous role the API executes as */
-  anonRole?: string;
-  /** Module-specific configuration for this API surface */
-  config?: unknown;
-  createdAt?: string;
-  /** Database this API surface serves */
-  dbname?: string;
-  id?: string;
-  /** Whether other scopes may see and route to this API surface */
-  isPublished?: boolean;
-  /** Owner-local API surface name */
-  name?: string;
-  /** Authenticated role the API executes as */
-  roleName?: string;
-  updatedAt?: string;
-}
 /** A filter to be used against many `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformApisToManyPlatformApiSchemaFilter {
+export interface PlatformApiToManyPlatformApiSchemaFilter {
   /** Filters to entities where every related entity matches. */
   every?: PlatformApiSchemaFilter;
   /** Filters to entities where no related entity matches. */
@@ -6405,7 +6405,7 @@ export interface PlatformCorsSettingFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformCorsSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: PlatformApisFilter;
+  api?: PlatformApiFilter;
   /** A related `api` exists. */
   apiExists?: boolean;
   /** Filter by the object’s `apiId` field. */
@@ -9944,6 +9944,12 @@ export interface UniqueConstraintToManyUniqueConstraintBehaviorFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: UniqueConstraintBehaviorFilter;
 }
+export interface UpdateApiInput {
+  /** An object where the defined keys will be set on the `Api` being updated. */
+  apiPatch: ApiPatch;
+  clientMutationId?: string;
+  id: string;
+}
 export interface UpdateApiSchemaInput {
   /** An object where the defined keys will be set on the `ApiSchema` being updated. */
   apiSchemaPatch: ApiSchemaPatch;
@@ -9953,12 +9959,6 @@ export interface UpdateApiSchemaInput {
 export interface UpdateApiSettingInput {
   /** An object where the defined keys will be set on the `ApiSetting` being updated. */
   apiSettingPatch: ApiSettingPatch;
-  clientMutationId?: string;
-  id: string;
-}
-export interface UpdateApisInput {
-  /** An object where the defined keys will be set on the `Apis` being updated. */
-  apisPatch: ApisPatch;
   clientMutationId?: string;
   id: string;
 }
@@ -10131,6 +10131,12 @@ export interface UpdatePartitionInput {
   /** An object where the defined keys will be set on the `Partition` being updated. */
   partitionPatch: PartitionPatch;
 }
+export interface UpdatePlatformApiInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformApi` being updated. */
+  platformApiPatch: PlatformApiPatch;
+}
 export interface UpdatePlatformApiSchemaInput {
   clientMutationId?: string;
   id: string;
@@ -10142,12 +10148,6 @@ export interface UpdatePlatformApiSettingInput {
   id: string;
   /** An object where the defined keys will be set on the `PlatformApiSetting` being updated. */
   platformApiSettingPatch: PlatformApiSettingPatch;
-}
-export interface UpdatePlatformApisInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `PlatformApis` being updated. */
-  platformApisPatch: PlatformApisPatch;
 }
 export interface UpdatePlatformCorsSettingInput {
   clientMutationId?: string;
@@ -10922,10 +10922,10 @@ export interface ApiSettingConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Apis` values. */
-export interface ApisConnection {
-  edges: ApisEdge[];
-  nodes: Apis[];
+/** A connection to a list of `Api` values. */
+export interface ApiConnection {
+  edges: ApiEdge[];
+  nodes: Api[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -11146,10 +11146,10 @@ export interface PlatformApiSettingConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `PlatformApis` values. */
-export interface PlatformApisConnection {
-  edges: PlatformApisEdge[];
-  nodes: PlatformApis[];
+/** A connection to a list of `PlatformApi` values. */
+export interface PlatformApiConnection {
+  edges: PlatformApiEdge[];
+  nodes: PlatformApi[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -11507,6 +11507,12 @@ export interface CancelDatabaseTransferPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
+export interface CreateApiPayload {
+  /** The `Api` that was created by this mutation. */
+  api?: Api | null;
+  apiEdge?: ApiEdge | null;
+  clientMutationId?: string | null;
+}
 export interface CreateApiSchemaPayload {
   /** The `ApiSchema` that was created by this mutation. */
   apiSchema?: ApiSchema | null;
@@ -11517,12 +11523,6 @@ export interface CreateApiSettingPayload {
   /** The `ApiSetting` that was created by this mutation. */
   apiSetting?: ApiSetting | null;
   apiSettingEdge?: ApiSettingEdge | null;
-  clientMutationId?: string | null;
-}
-export interface CreateApisPayload {
-  /** The `Apis` that was created by this mutation. */
-  apis?: Apis | null;
-  apisEdge?: ApisEdge | null;
   clientMutationId?: string | null;
 }
 export interface CreateCheckConstraintPayload {
@@ -11693,6 +11693,12 @@ export interface CreatePartitionPayload {
   partition?: Partition | null;
   partitionEdge?: PartitionEdge | null;
 }
+export interface CreatePlatformApiPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApi` that was created by this mutation. */
+  platformApi?: PlatformApi | null;
+  platformApiEdge?: PlatformApiEdge | null;
+}
 export interface CreatePlatformApiSchemaPayload {
   clientMutationId?: string | null;
   /** The `PlatformApiSchema` that was created by this mutation. */
@@ -11704,12 +11710,6 @@ export interface CreatePlatformApiSettingPayload {
   /** The `PlatformApiSetting` that was created by this mutation. */
   platformApiSetting?: PlatformApiSetting | null;
   platformApiSettingEdge?: PlatformApiSettingEdge | null;
-}
-export interface CreatePlatformApisPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApis` that was created by this mutation. */
-  platformApis?: PlatformApis | null;
-  platformApisEdge?: PlatformApisEdge | null;
 }
 export interface CreatePlatformCorsSettingPayload {
   clientMutationId?: string | null;
@@ -11975,6 +11975,12 @@ export interface CreateWebauthnSettingPayload {
   webauthnSetting?: WebauthnSetting | null;
   webauthnSettingEdge?: WebauthnSettingEdge | null;
 }
+export interface DeleteApiPayload {
+  /** The `Api` that was deleted by this mutation. */
+  api?: Api | null;
+  apiEdge?: ApiEdge | null;
+  clientMutationId?: string | null;
+}
 export interface DeleteApiSchemaPayload {
   /** The `ApiSchema` that was deleted by this mutation. */
   apiSchema?: ApiSchema | null;
@@ -11985,12 +11991,6 @@ export interface DeleteApiSettingPayload {
   /** The `ApiSetting` that was deleted by this mutation. */
   apiSetting?: ApiSetting | null;
   apiSettingEdge?: ApiSettingEdge | null;
-  clientMutationId?: string | null;
-}
-export interface DeleteApisPayload {
-  /** The `Apis` that was deleted by this mutation. */
-  apis?: Apis | null;
-  apisEdge?: ApisEdge | null;
   clientMutationId?: string | null;
 }
 export interface DeleteCheckConstraintPayload {
@@ -12161,6 +12161,12 @@ export interface DeletePartitionPayload {
   partition?: Partition | null;
   partitionEdge?: PartitionEdge | null;
 }
+export interface DeletePlatformApiPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApi` that was deleted by this mutation. */
+  platformApi?: PlatformApi | null;
+  platformApiEdge?: PlatformApiEdge | null;
+}
 export interface DeletePlatformApiSchemaPayload {
   clientMutationId?: string | null;
   /** The `PlatformApiSchema` that was deleted by this mutation. */
@@ -12172,12 +12178,6 @@ export interface DeletePlatformApiSettingPayload {
   /** The `PlatformApiSetting` that was deleted by this mutation. */
   platformApiSetting?: PlatformApiSetting | null;
   platformApiSettingEdge?: PlatformApiSettingEdge | null;
-}
-export interface DeletePlatformApisPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApis` that was deleted by this mutation. */
-  platformApis?: PlatformApis | null;
-  platformApisEdge?: PlatformApisEdge | null;
 }
 export interface DeletePlatformCorsSettingPayload {
   clientMutationId?: string | null;
@@ -12486,6 +12486,12 @@ export interface SitesProvisionStaticSitePayload {
   clientMutationId?: string | null;
   result?: PlatformRoute | null;
 }
+export interface UpdateApiPayload {
+  /** The `Api` that was updated by this mutation. */
+  api?: Api | null;
+  apiEdge?: ApiEdge | null;
+  clientMutationId?: string | null;
+}
 export interface UpdateApiSchemaPayload {
   /** The `ApiSchema` that was updated by this mutation. */
   apiSchema?: ApiSchema | null;
@@ -12496,12 +12502,6 @@ export interface UpdateApiSettingPayload {
   /** The `ApiSetting` that was updated by this mutation. */
   apiSetting?: ApiSetting | null;
   apiSettingEdge?: ApiSettingEdge | null;
-  clientMutationId?: string | null;
-}
-export interface UpdateApisPayload {
-  /** The `Apis` that was updated by this mutation. */
-  apis?: Apis | null;
-  apisEdge?: ApisEdge | null;
   clientMutationId?: string | null;
 }
 export interface UpdateCheckConstraintPayload {
@@ -12672,6 +12672,12 @@ export interface UpdatePartitionPayload {
   partition?: Partition | null;
   partitionEdge?: PartitionEdge | null;
 }
+export interface UpdatePlatformApiPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApi` that was updated by this mutation. */
+  platformApi?: PlatformApi | null;
+  platformApiEdge?: PlatformApiEdge | null;
+}
 export interface UpdatePlatformApiSchemaPayload {
   clientMutationId?: string | null;
   /** The `PlatformApiSchema` that was updated by this mutation. */
@@ -12683,12 +12689,6 @@ export interface UpdatePlatformApiSettingPayload {
   /** The `PlatformApiSetting` that was updated by this mutation. */
   platformApiSetting?: PlatformApiSetting | null;
   platformApiSettingEdge?: PlatformApiSettingEdge | null;
-}
-export interface UpdatePlatformApisPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApis` that was updated by this mutation. */
-  platformApis?: PlatformApis | null;
-  platformApisEdge?: PlatformApisEdge | null;
 }
 export interface UpdatePlatformCorsSettingPayload {
   clientMutationId?: string | null;
@@ -13004,11 +13004,11 @@ export interface ApiSettingEdge {
   /** The `ApiSetting` at the end of the edge. */
   node?: ApiSetting | null;
 }
-/** A `Apis` edge in the connection. */
-export interface ApisEdge {
+/** A `Api` edge in the connection. */
+export interface ApiEdge {
   cursor?: string | null;
-  /** The `Apis` at the end of the edge. */
-  node?: Apis | null;
+  /** The `Api` at the end of the edge. */
+  node?: Api | null;
 }
 /** A `AstMigration` edge in the connection. */
 export interface AstMigrationEdge {
@@ -13196,11 +13196,11 @@ export interface PlatformApiSettingEdge {
   /** The `PlatformApiSetting` at the end of the edge. */
   node?: PlatformApiSetting | null;
 }
-/** A `PlatformApis` edge in the connection. */
-export interface PlatformApisEdge {
+/** A `PlatformApi` edge in the connection. */
+export interface PlatformApiEdge {
   cursor?: string | null;
-  /** The `PlatformApis` at the end of the edge. */
-  node?: PlatformApis | null;
+  /** The `PlatformApi` at the end of the edge. */
+  node?: PlatformApi | null;
 }
 /** A `PlatformCorsSetting` edge in the connection. */
 export interface PlatformCorsSettingEdge {

@@ -33,5 +33,8 @@ export * from './useUpdatePlatformNamespaceEventMutation';
 export * from './useDeletePlatformNamespaceEventMutation';
 export * from './usePlatformInfraInitEmptyRepoMutation';
 export * from './usePlatformInfraInsertNodeAtPathMutation';
+export * from './usePlatformInfraInsertNodesAtPathsMutation';
+export * from './usePlatformInfraSetAndCommitMutation';
 export * from './usePlatformInfraSetDataAtPathMutation';
+export * from './usePlatformInfraSetManyAndCommitMutation';
 export * from './useProvisionBucketMutation';

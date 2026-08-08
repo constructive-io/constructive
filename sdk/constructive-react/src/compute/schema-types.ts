@@ -234,6 +234,8 @@ export type FunctionDefinitionOrderBy =
   | 'REQUIRED_CONFIGS_DESC'
   | 'REQUIRED_MODELS_ASC'
   | 'REQUIRED_MODELS_DESC'
+  | 'REQUIRED_MODULES_ASC'
+  | 'REQUIRED_MODULES_DESC'
   | 'REQUIRED_SECRETS_ASC'
   | 'REQUIRED_SECRETS_DESC'
   | 'RESOURCES_ASC'
@@ -308,6 +310,8 @@ export type FunctionDeploymentOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RESOURCES_ASC'
   | 'RESOURCES_DESC'
   | 'REVISION_ASC'
@@ -905,6 +909,8 @@ export type PlatformFunctionDefinitionOrderBy =
   | 'REQUIRED_CONFIGS_DESC'
   | 'REQUIRED_MODELS_ASC'
   | 'REQUIRED_MODELS_DESC'
+  | 'REQUIRED_MODULES_ASC'
+  | 'REQUIRED_MODULES_DESC'
   | 'REQUIRED_SECRETS_ASC'
   | 'REQUIRED_SECRETS_DESC'
   | 'RESOURCES_ASC'
@@ -977,6 +983,8 @@ export type PlatformFunctionDeploymentOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
   | 'RESOURCES_ASC'
   | 'RESOURCES_DESC'
   | 'REVISION_ASC'
@@ -3139,6 +3147,8 @@ export interface FunctionDefinitionFilter {
   requiredBuckets?: StringListFilter;
   /** Filter by the object’s `requiredModels` field. */
   requiredModels?: StringListFilter;
+  /** Filter by the object’s `requiredModules` field. */
+  requiredModules?: StringListFilter;
   /** Filter by the object’s `resources` field. */
   resources?: JSONFilter;
   /** Filter by the object’s `runtime` field. */
@@ -3166,7 +3176,7 @@ export interface FunctionDefinitionFilter {
 }
 /** An input for mutations affecting `FunctionDefinition` */
 export interface FunctionDefinitionInput {
-  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
   /** Function task category (e.g. email, embed, chunk, custom) */
   category: string;
@@ -3214,12 +3224,14 @@ export interface FunctionDefinitionInput {
   publishedAt?: string;
   /** Job queue name for serialization (e.g. email, ai, default) */
   queueName?: string;
-  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
+  /** Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements. */
   requiredBuckets?: string[];
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
   requiredModels?: string[];
+  /** Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements. */
+  requiredModules?: string[];
   /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredSecrets?: ResourceRequirementInput[];
   /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
@@ -3242,7 +3254,7 @@ export interface FunctionDefinitionInput {
 }
 /** Represents an update to a `FunctionDefinition`. Fields that are set will be updated. */
 export interface FunctionDefinitionPatch {
-  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
   /** Function task category (e.g. email, embed, chunk, custom) */
   category?: string;
@@ -3290,12 +3302,14 @@ export interface FunctionDefinitionPatch {
   publishedAt?: string;
   /** Job queue name for serialization (e.g. email, ai, default) */
   queueName?: string;
-  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
+  /** Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements. */
   requiredBuckets?: string[];
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
   requiredModels?: string[];
+  /** Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements. */
+  requiredModules?: string[];
   /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredSecrets?: ResourceRequirementInput[];
   /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
@@ -3442,6 +3456,8 @@ export interface FunctionDeploymentFilter {
   not?: FunctionDeploymentFilter;
   /** Checks for any expressions in this list. */
   or?: FunctionDeploymentFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `resources` field. */
   resources?: JSONFilter;
   /** Filter by the object’s `revision` field. */
@@ -3487,6 +3503,8 @@ export interface FunctionDeploymentInput {
   lastErrorAt?: string;
   /** Target namespace for this deployment (maps to a K8s namespace) */
   namespaceId: string;
+  /** Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand). */
+  realm?: string;
   /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
   resources?: unknown;
   /** Deployment revision number (incremented on each redeployment) */
@@ -3531,6 +3549,8 @@ export interface FunctionDeploymentPatch {
   lastErrorAt?: string;
   /** Target namespace for this deployment (maps to a K8s namespace) */
   namespaceId?: string;
+  /** Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand). */
+  realm?: string;
   /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
   resources?: unknown;
   /** Deployment revision number (incremented on each redeployment) */
@@ -4605,6 +4625,15 @@ export interface InfraInsertNodeAtPathInput {
   root?: string;
   sId?: string;
 }
+export interface InfraInsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: unknown[];
+  kidsList?: unknown;
+  ktreeList?: unknown;
+  paths?: unknown;
+  root?: string;
+  sId?: string;
+}
 /** A filter to be used against `InfraObject` object types. All fields are combined with a logical ‘and.’ */
 export interface InfraObjectFilter {
   /** Checks for all expressions in this list. */
@@ -4701,12 +4730,31 @@ export interface InfraRefPatch {
   /** Store this ref belongs to */
   storeId?: string;
 }
+export interface InfraSetAndCommitInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
 export interface InfraSetDataAtPathInput {
   clientMutationId?: string;
   data?: unknown;
   path?: string[];
   root?: string;
   sId?: string;
+}
+export interface InfraSetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: unknown;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
 }
 /** A filter to be used against `InfraStore` object types. All fields are combined with a logical ‘and.’ */
 export interface InfraStoreFilter {
@@ -4764,6 +4812,15 @@ export interface InsertNodeAtPathInput {
   kids?: string[];
   ktree?: string[];
   path?: string[];
+  root?: string;
+  sId?: string;
+}
+export interface InsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: unknown[];
+  kidsList?: unknown;
+  ktreeList?: unknown;
+  paths?: unknown;
   root?: string;
   sId?: string;
 }
@@ -5324,6 +5381,8 @@ export interface PlatformFunctionDefinitionFilter {
   requiredBuckets?: StringListFilter;
   /** Filter by the object’s `requiredModels` field. */
   requiredModels?: StringListFilter;
+  /** Filter by the object’s `requiredModules` field. */
+  requiredModules?: StringListFilter;
   /** Filter by the object’s `resources` field. */
   resources?: JSONFilter;
   /** Filter by the object’s `runtime` field. */
@@ -5349,7 +5408,7 @@ export interface PlatformFunctionDefinitionFilter {
 }
 /** An input for mutations affecting `PlatformFunctionDefinition` */
 export interface PlatformFunctionDefinitionInput {
-  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
   /** Whether executions are metered through the invocation ledger and billing quota gate */
   billable?: boolean;
@@ -5397,12 +5456,14 @@ export interface PlatformFunctionDefinitionInput {
   publishedAt?: string;
   /** Job queue name for serialization (e.g. email, ai, default) */
   queueName?: string;
-  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
+  /** Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements. */
   requiredBuckets?: string[];
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
   requiredModels?: string[];
+  /** Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements. */
+  requiredModules?: string[];
   /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredSecrets?: ResourceRequirementInput[];
   /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
@@ -5427,7 +5488,7 @@ export interface PlatformFunctionDefinitionInput {
 }
 /** Represents an update to a `PlatformFunctionDefinition`. Fields that are set will be updated. */
 export interface PlatformFunctionDefinitionPatch {
-  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
   /** Whether executions are metered through the invocation ledger and billing quota gate */
   billable?: boolean;
@@ -5475,12 +5536,14 @@ export interface PlatformFunctionDefinitionPatch {
   publishedAt?: string;
   /** Job queue name for serialization (e.g. email, ai, default) */
   queueName?: string;
-  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
+  /** Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements. */
   requiredBuckets?: string[];
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
   requiredModels?: string[];
+  /** Modules whose api surfaces this function calls, e.g. notifications_module. Suffix .<api_name> to name which surface when a module's schemas are attached to several (permissions_module.admin), and @<scope> to pin the registration when a module is registered at more than one scope (limits_module@org) — usually unnecessary, since resolution walks the execution's scope chain. A value that is not a module name is read as an api name. Resolved per invocation; empty = no api requirements. */
+  requiredModules?: string[];
   /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredSecrets?: ResourceRequirementInput[];
   /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
@@ -5621,6 +5684,8 @@ export interface PlatformFunctionDeploymentFilter {
   not?: PlatformFunctionDeploymentFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformFunctionDeploymentFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
   /** Filter by the object’s `resources` field. */
   resources?: JSONFilter;
   /** Filter by the object’s `revision` field. */
@@ -5664,6 +5729,8 @@ export interface PlatformFunctionDeploymentInput {
   lastErrorAt?: string;
   /** Target namespace for this deployment (maps to a K8s namespace) */
   namespaceId: string;
+  /** Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand). */
+  realm?: string;
   /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
   resources?: unknown;
   /** Deployment revision number (incremented on each redeployment) */
@@ -5706,6 +5773,8 @@ export interface PlatformFunctionDeploymentPatch {
   lastErrorAt?: string;
   /** Target namespace for this deployment (maps to a K8s namespace) */
   namespaceId?: string;
+  /** Config/secret realm this deployment resolves required keys against. Per key, the realm-specific atom wins over the NULL-realm default. NULL = the default lane (or a runtime-query worker that fetches per-item realms on demand). */
+  realm?: string;
   /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
   resources?: unknown;
   /** Deployment revision number (incremented on each redeployment) */
@@ -6096,6 +6165,15 @@ export interface PlatformInfraInsertNodeAtPathInput {
   root?: string;
   sId?: string;
 }
+export interface PlatformInfraInsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: unknown[];
+  kidsList?: unknown;
+  ktreeList?: unknown;
+  paths?: unknown;
+  root?: string;
+  sId?: string;
+}
 /** A filter to be used against `PlatformInfraObject` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformInfraObjectFilter {
   /** Checks for all expressions in this list. */
@@ -6192,12 +6270,31 @@ export interface PlatformInfraRefPatch {
   /** Store this ref belongs to */
   storeId?: string;
 }
+export interface PlatformInfraSetAndCommitInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
 export interface PlatformInfraSetDataAtPathInput {
   clientMutationId?: string;
   data?: unknown;
   path?: string[];
   root?: string;
   sId?: string;
+}
+export interface PlatformInfraSetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: unknown;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
 }
 /** A filter to be used against `PlatformInfraStore` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformInfraStoreFilter {
@@ -8449,12 +8546,31 @@ export interface SaveGraphInput {
   message?: string;
   rootHash?: string;
 }
+export interface SetAndCommitInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
 export interface SetDataAtPathInput {
   clientMutationId?: string;
   data?: unknown;
   path?: string[];
   root?: string;
   sId?: string;
+}
+export interface SetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: unknown;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
 }
 export interface StartExecutionInput {
   clientMutationId?: string;
@@ -10286,14 +10402,32 @@ export interface InfraInsertNodeAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface InfraInsertNodesAtPathsPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface InfraSetAndCommitPayload {
+  clientMutationId?: string | null;
+  infraCommitEdge?: InfraCommitEdge | null;
+  result?: InfraCommit | null;
+}
 export interface InfraSetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface InfraSetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  infraCommitEdge?: InfraCommitEdge | null;
+  result?: InfraCommit | null;
 }
 export interface InitEmptyRepoPayload {
   clientMutationId?: string | null;
 }
 export interface InsertNodeAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface InsertNodesAtPathsPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -10304,9 +10438,23 @@ export interface PlatformInfraInsertNodeAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface PlatformInfraInsertNodesAtPathsPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface PlatformInfraSetAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
+}
 export interface PlatformInfraSetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface PlatformInfraSetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
 }
 export interface PlatformResourceInstallationsInstallPayload {
   clientMutationId?: string | null;
@@ -10352,9 +10500,19 @@ export interface SaveGraphPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface SetAndCommitPayload {
+  clientMutationId?: string | null;
+  functionGraphCommitEdge?: FunctionGraphCommitEdge | null;
+  result?: FunctionGraphCommit | null;
+}
 export interface SetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface SetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  functionGraphCommitEdge?: FunctionGraphCommitEdge | null;
+  result?: FunctionGraphCommit | null;
 }
 export interface StartExecutionPayload {
   clientMutationId?: string | null;

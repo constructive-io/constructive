@@ -15,9 +15,9 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
+  apiKeys,
   apiSchemaKeys,
   apiSettingKeys,
-  apisKeys,
   astMigrationKeys,
   checkConstraintKeys,
   compositeTypeKeys,
@@ -47,9 +47,9 @@ import {
   nodeTypeRegistryKeys,
   pageKeys,
   partitionKeys,
+  platformApiKeys,
   platformApiSchemaKeys,
   platformApiSettingKeys,
-  platformApisKeys,
   platformCorsSettingKeys,
   platformDomainKeys,
   platformDomainEventKeys,
@@ -116,6 +116,20 @@ import {
  * ```
  */
 export const invalidate = {
+  /** Invalidate api queries */ api: {
+    /** Invalidate all api queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: apiKeys.all,
+      }),
+    /** Invalidate api list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: apiKeys.lists(),
+      }),
+    /** Invalidate a specific api */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: apiKeys.detail(id),
+      }),
+  },
   /** Invalidate apiSchema queries */ apiSchema: {
     /** Invalidate all apiSchema queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -148,20 +162,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: apiSettingKeys.detail(id),
-      }),
-  },
-  /** Invalidate apis queries */ apis: {
-    /** Invalidate all apis queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apisKeys.all,
-      }),
-    /** Invalidate apis list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apisKeys.lists(),
-      }),
-    /** Invalidate a specific apis */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: apisKeys.detail(id),
       }),
   },
   /** Invalidate astMigration queries */ astMigration: {
@@ -633,6 +633,23 @@ export const invalidate = {
         queryKey: partitionKeys.detail(id),
       }),
   },
+  /** Invalidate platformApi queries */ platformApi: {
+    /** Invalidate all platformApi queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformApiKeys.all,
+      }),
+    /** Invalidate platformApi list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformApiKeys.lists(),
+      }),
+    /** Invalidate a specific platformApi */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformApiKeys.detail(id),
+      }),
+  },
   /** Invalidate platformApiSchema queries */ platformApiSchema: {
     /** Invalidate all platformApiSchema queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -665,23 +682,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: platformApiSettingKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformApis queries */ platformApis: {
-    /** Invalidate all platformApis queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformApisKeys.all,
-      }),
-    /** Invalidate platformApis list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformApisKeys.lists(),
-      }),
-    /** Invalidate a specific platformApis */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformApisKeys.detail(id),
       }),
   },
   /** Invalidate platformCorsSetting queries */ platformCorsSetting: {
@@ -1438,6 +1438,11 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
+  /** Remove api from cache */ api: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: apiKeys.detail(id),
+    });
+  },
   /** Remove apiSchema from cache */ apiSchema: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: apiSchemaKeys.detail(id),
@@ -1449,11 +1454,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: apiSettingKeys.detail(id),
-    });
-  },
-  /** Remove apis from cache */ apis: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: apisKeys.detail(id),
     });
   },
   /** Remove astMigration from cache */ astMigration: (
@@ -1658,6 +1658,14 @@ export const remove = {
       queryKey: partitionKeys.detail(id),
     });
   },
+  /** Remove platformApi from cache */ platformApi: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformApiKeys.detail(id),
+    });
+  },
   /** Remove platformApiSchema from cache */ platformApiSchema: (
     queryClient: QueryClient,
     id: string | number
@@ -1672,14 +1680,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: platformApiSettingKeys.detail(id),
-    });
-  },
-  /** Remove platformApis from cache */ platformApis: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformApisKeys.detail(id),
     });
   },
   /** Remove platformCorsSetting from cache */ platformCorsSetting: (

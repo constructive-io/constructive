@@ -15,7 +15,7 @@ ORM client for the api API — provides typed CRUD operations for 80 tables and 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: apiSchema, apiSetting, apis, astMigration, checkConstraint, compositeType, corsSetting, database, ...
+// Available models: api, apiSchema, apiSetting, astMigration, checkConstraint, compositeType, corsSetting, database, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -28,7 +28,7 @@ db.<model>.delete({ where: { id: '<UUID>' } }).execute()
 ### Query records
 
 ```typescript
-const items = await db.apiSchema.findMany({
+const items = await db.api.findMany({
   select: { id: true }
 }).execute();
 ```
@@ -37,9 +37,9 @@ const items = await db.apiSchema.findMany({
 
 See the `references/` directory for detailed per-entity API documentation:
 
+- [api](references/api.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
-- [apis](references/apis.md)
 - [ast-migration](references/ast-migration.md)
 - [check-constraint](references/check-constraint.md)
 - [composite-type](references/composite-type.md)
@@ -69,9 +69,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [node-type-registry](references/node-type-registry.md)
 - [page](references/page.md)
 - [partition](references/partition.md)
+- [platform-api](references/platform-api.md)
 - [platform-api-schema](references/platform-api-schema.md)
 - [platform-api-setting](references/platform-api-setting.md)
-- [platform-apis](references/platform-apis.md)
 - [platform-cors-setting](references/platform-cors-setting.md)
 - [platform-domain](references/platform-domain.md)
 - [platform-domain-event](references/platform-domain-event.md)

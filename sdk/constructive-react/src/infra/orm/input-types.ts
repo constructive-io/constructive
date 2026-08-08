@@ -1268,12 +1268,40 @@ export interface PlatformInfraInsertNodeAtPathInput {
   root?: string;
   sId?: string;
 }
+export interface PlatformInfraInsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: Record<string, unknown>[];
+  kidsList?: Record<string, unknown>;
+  ktreeList?: Record<string, unknown>;
+  paths?: Record<string, unknown>;
+  root?: string;
+  sId?: string;
+}
+export interface PlatformInfraSetAndCommitInput {
+  clientMutationId?: string;
+  data?: Record<string, unknown>;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
 export interface PlatformInfraSetDataAtPathInput {
   clientMutationId?: string;
   data?: Record<string, unknown>;
   path?: string[];
   root?: string;
   sId?: string;
+}
+export interface PlatformInfraSetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: Record<string, unknown>;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
@@ -1472,6 +1500,28 @@ export type PlatformInfraInsertNodeAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface PlatformInfraInsertNodesAtPathsPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type PlatformInfraInsertNodesAtPathsPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface PlatformInfraSetAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
+}
+export type PlatformInfraSetAndCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  platformInfraCommitEdge?: {
+    select: PlatformInfraCommitEdgeSelect;
+  };
+  result?: {
+    select: PlatformInfraCommitSelect;
+  };
+};
 export interface PlatformInfraSetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
@@ -1479,6 +1529,20 @@ export interface PlatformInfraSetDataAtPathPayload {
 export type PlatformInfraSetDataAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface PlatformInfraSetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
+}
+export type PlatformInfraSetManyAndCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  platformInfraCommitEdge?: {
+    select: PlatformInfraCommitEdgeSelect;
+  };
+  result?: {
+    select: PlatformInfraCommitSelect;
+  };
 };
 export interface ProvisionBucketPayload {
   /** The access type applied */
@@ -1907,6 +1971,18 @@ export type DeletePlatformNamespaceEventPayloadSelect = {
     select: PlatformNamespaceEventEdgeSelect;
   };
 };
+/** A `PlatformInfraCommit` edge in the connection. */
+export interface PlatformInfraCommitEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraCommit` at the end of the edge. */
+  node?: PlatformInfraCommit | null;
+}
+export type PlatformInfraCommitEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformInfraCommitSelect;
+  };
+};
 /** A `DbPreset` edge in the connection. */
 export interface DbPresetEdge {
   cursor?: string | null;
@@ -1941,18 +2017,6 @@ export type NamespaceEventEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: NamespaceEventSelect;
-  };
-};
-/** A `PlatformInfraCommit` edge in the connection. */
-export interface PlatformInfraCommitEdge {
-  cursor?: string | null;
-  /** The `PlatformInfraCommit` at the end of the edge. */
-  node?: PlatformInfraCommit | null;
-}
-export type PlatformInfraCommitEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: PlatformInfraCommitSelect;
   };
 };
 /** A `PlatformInfraObject` edge in the connection. */

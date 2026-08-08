@@ -228,6 +228,21 @@ insertNodeAtPath
 const result = await db.mutation.insertNodeAtPath({ input: '<InsertNodeAtPathInput>' }).execute();
 ```
 
+### `db.mutation.insertNodesAtPaths`
+
+insertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | InsertNodesAtPathsInput (required) |
+
+```typescript
+const result = await db.mutation.insertNodesAtPaths({ input: '<InsertNodesAtPathsInput>' }).execute();
+```
+
 ### `db.mutation.provisionBucket`
 
 Provision an S3 bucket for a logical bucket in the database.
@@ -246,6 +261,21 @@ and lifecycle settings.
 const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>', ownerId: '<UUID>' } }).execute();
 ```
 
+### `db.mutation.setAndCommit`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.setAndCommit({ input: '<SetAndCommitInput>' }).execute();
+```
+
 ### `db.mutation.setDataAtPath`
 
 setDataAtPath
@@ -259,6 +289,21 @@ setDataAtPath
 
 ```typescript
 const result = await db.mutation.setDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.setManyAndCommit`
+
+setManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetManyAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.setManyAndCommit({ input: { entries: '<JSON>', message: '<String>', refname: '<String>', sId: '<UUID>', storeId: '<UUID>' } }).execute();
 ```
 
 ---

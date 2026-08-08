@@ -569,6 +569,15 @@ export const routeModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...routeModuleKeys.details(), id] as const,
 } as const;
+export const scopeTypesModuleKeys = {
+  /** All scopeTypesModule queries */ all: ['scopetypesmodule'] as const,
+  /** List query keys */ lists: () => [...scopeTypesModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...scopeTypesModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...scopeTypesModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...scopeTypesModuleKeys.details(), id] as const,
+} as const;
 export const secureTableProvisionKeys = {
   /** All secureTableProvision queries */ all: ['securetableprovision'] as const,
   /** List query keys */ lists: () => [...secureTableProvisionKeys.all, 'list'] as const,
@@ -659,6 +668,16 @@ export const userSettingsModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...userSettingsModuleKeys.details(), id] as const,
 } as const;
+export const userSettingsSecurityModuleKeys = {
+  /** All userSettingsSecurityModule queries */ all: ['usersettingssecuritymodule'] as const,
+  /** List query keys */ lists: () => [...userSettingsSecurityModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...userSettingsSecurityModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...userSettingsSecurityModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...userSettingsSecurityModuleKeys.details(), id] as const,
+} as const;
 export const userStateModuleKeys = {
   /** All userStateModule queries */ all: ['userstatemodule'] as const,
   /** List query keys */ lists: () => [...userStateModuleKeys.all, 'list'] as const,
@@ -703,17 +722,6 @@ export const webhookModuleKeys = {
   /** Detail query keys */ details: () => [...webhookModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...webhookModuleKeys.details(), id] as const,
-} as const;
-
-// ============================================================================
-// Custom Query Keys
-// ============================================================================
-
-export const customQueryKeys = {
-  /** Query key for resolveBlueprintField */ resolveBlueprintField: (variables?: object) =>
-    ['resolveBlueprintField', variables] as const,
-  /** Query key for resolveBlueprintTable */ resolveBlueprintTable: (variables?: object) =>
-    ['resolveBlueprintTable', variables] as const,
 } as const;
 /**
 
@@ -799,6 +807,7 @@ export const queryKeys = {
   resourceModule: resourceModuleKeys,
   rlsModule: rlsModuleKeys,
   routeModule: routeModuleKeys,
+  scopeTypesModule: scopeTypesModuleKeys,
   secureTableProvision: secureTableProvisionKeys,
   sessionSecretsModule: sessionSecretsModuleKeys,
   sessionsModule: sessionsModuleKeys,
@@ -809,12 +818,12 @@ export const queryKeys = {
   userAuthModule: userAuthModuleKeys,
   userCredentialsModule: userCredentialsModuleKeys,
   userSettingsModule: userSettingsModuleKeys,
+  userSettingsSecurityModule: userSettingsSecurityModuleKeys,
   userStateModule: userStateModuleKeys,
   usersModule: usersModuleKeys,
   webauthnAuthModule: webauthnAuthModuleKeys,
   webauthnCredentialsModule: webauthnCredentialsModuleKeys,
   webhookModule: webhookModuleKeys,
-  custom: customQueryKeys,
 } as const;
 /** Type representing all available query key scopes */
 export type QueryKeyScope = keyof typeof queryKeys;

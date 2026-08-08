@@ -775,10 +775,22 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'infraInsertNodeAtPath', identifier] as const)
       : (['mutation', 'infraInsertNodeAtPath'] as const),
+  /** Mutation key for infraInsertNodesAtPaths */ infraInsertNodesAtPaths: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'infraInsertNodesAtPaths', identifier] as const)
+      : (['mutation', 'infraInsertNodesAtPaths'] as const),
+  /** Mutation key for infraSetAndCommit */ infraSetAndCommit: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'infraSetAndCommit', identifier] as const)
+      : (['mutation', 'infraSetAndCommit'] as const),
   /** Mutation key for infraSetDataAtPath */ infraSetDataAtPath: (identifier?: string) =>
     identifier
       ? (['mutation', 'infraSetDataAtPath', identifier] as const)
       : (['mutation', 'infraSetDataAtPath'] as const),
+  /** Mutation key for infraSetManyAndCommit */ infraSetManyAndCommit: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'infraSetManyAndCommit', identifier] as const)
+      : (['mutation', 'infraSetManyAndCommit'] as const),
   /** Mutation key for initEmptyRepo */ initEmptyRepo: (identifier?: string) =>
     identifier
       ? (['mutation', 'initEmptyRepo', identifier] as const)
@@ -787,6 +799,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'insertNodeAtPath', identifier] as const)
       : (['mutation', 'insertNodeAtPath'] as const),
+  /** Mutation key for insertNodesAtPaths */ insertNodesAtPaths: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'insertNodesAtPaths', identifier] as const)
+      : (['mutation', 'insertNodesAtPaths'] as const),
   /** Mutation key for platformInfraInitEmptyRepo */ platformInfraInitEmptyRepo: (
     identifier?: string
   ) =>
@@ -799,12 +815,30 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'platformInfraInsertNodeAtPath', identifier] as const)
       : (['mutation', 'platformInfraInsertNodeAtPath'] as const),
+  /** Mutation key for platformInfraInsertNodesAtPaths */ platformInfraInsertNodesAtPaths: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraInsertNodesAtPaths', identifier] as const)
+      : (['mutation', 'platformInfraInsertNodesAtPaths'] as const),
+  /** Mutation key for platformInfraSetAndCommit */ platformInfraSetAndCommit: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraSetAndCommit', identifier] as const)
+      : (['mutation', 'platformInfraSetAndCommit'] as const),
   /** Mutation key for platformInfraSetDataAtPath */ platformInfraSetDataAtPath: (
     identifier?: string
   ) =>
     identifier
       ? (['mutation', 'platformInfraSetDataAtPath', identifier] as const)
       : (['mutation', 'platformInfraSetDataAtPath'] as const),
+  /** Mutation key for platformInfraSetManyAndCommit */ platformInfraSetManyAndCommit: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraSetManyAndCommit', identifier] as const)
+      : (['mutation', 'platformInfraSetManyAndCommit'] as const),
   /** Mutation key for platformResourceInstallationsInstall */ platformResourceInstallationsInstall:
     (identifier?: string) =>
       identifier
@@ -857,10 +891,18 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'saveGraph', identifier] as const)
       : (['mutation', 'saveGraph'] as const),
+  /** Mutation key for setAndCommit */ setAndCommit: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'setAndCommit', identifier] as const)
+      : (['mutation', 'setAndCommit'] as const),
   /** Mutation key for setDataAtPath */ setDataAtPath: (identifier?: string) =>
     identifier
       ? (['mutation', 'setDataAtPath', identifier] as const)
       : (['mutation', 'setDataAtPath'] as const),
+  /** Mutation key for setManyAndCommit */ setManyAndCommit: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'setManyAndCommit', identifier] as const)
+      : (['mutation', 'setManyAndCommit'] as const),
   /** Mutation key for startExecution */ startExecution: (identifier?: string) =>
     identifier
       ? (['mutation', 'startExecution', identifier] as const)
