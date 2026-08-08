@@ -22,6 +22,7 @@ import 'graphile-build';
 import { Logger } from '@pgpmjs/logger';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { checkTypeAgreement } from 'mime-bytes';
 
 import { resolveDefaultBucket } from './default-bucket';
 import { buildFileProjection, type FileProjection } from './managed-upload';
@@ -651,6 +652,17 @@ async function processSingleFile(
     if (typeof filename !== 'string' || filename.length > storageConfig.maxFilenameLength) {
       throw new Error('INVALID_FILENAME');
     }
+  }
+
+  // The bytes are not here to be examined — the client PUTs them straight to S3 —
+  // so this checks the two claims that *are* here against each other. It is the
+  // cheap half of the rule: an upload declaring `image/jpeg` under the name
+  // `payload.html` is refused before a row exists, without reading a byte. The
+  // bytes themselves are checked on confirmation, before the row leaves
+  // `requested`.
+  const agreement = checkTypeAgreement({ filename, declaredMime: contentType });
+  if (!agreement.ok) {
+    throw new Error(`UPLOAD_TYPE_MISMATCH: ${agreement.violation.message}`);
   }
 
   // Validate content type against bucket's allowed_mime_types

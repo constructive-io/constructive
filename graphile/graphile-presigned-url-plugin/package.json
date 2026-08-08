@@ -44,7 +44,8 @@
     "@aws-sdk/s3-request-presigner": "^3.1052.0",
     "@pgpmjs/logger": "workspace:^",
     "@pgsql/quotes": "^18.2.4",
-    "lru-cache": "^11.2.7"
+    "lru-cache": "^11.2.7",
+    "mime-bytes": "workspace:^"
   },
   "peerDependencies": {
     "grafast": "^1.1.1",

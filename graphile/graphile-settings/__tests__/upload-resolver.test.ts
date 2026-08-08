@@ -318,4 +318,58 @@ describe('multipart upload resolver', () => {
       ),
     ).rejects.toThrow('UPLOAD_FIELD_UNKNOWN');
   });
+
+  it('rejects an extension that disagrees with the bytes, before anything is written', async () => {
+    // The html-as-jpg attack: a browser fetching this as an image would execute
+    // the script in it.
+    const { constructiveUploadFieldDefinitions, mockUploadWithContentType } =
+      await loadUploadResolverModule({ detectedContentType: 'text/html' });
+    const { context, queries } = fakeContext();
+
+    await expect(
+      definitionFor(constructiveUploadFieldDefinitions, 'image').resolve(
+        makeFakeUpload('avatar.jpg') as any,
+        {},
+        context,
+        { uploadPlugin: { tags: {}, type: 'image', field: FIELD } },
+      ),
+    ).rejects.toThrow('UPLOAD_TYPE_MISMATCH');
+
+    expect(mockUploadWithContentType).not.toHaveBeenCalled();
+    expect(queries.some((q) => /INSERT/.test(q.text))).toBe(false);
+  });
+
+  it('rejects a declared MIME type that disagrees with the bytes', async () => {
+    const { constructiveUploadFieldDefinitions, mockUploadWithContentType } =
+      await loadUploadResolverModule({ detectedContentType: 'application/pdf' });
+    const { context } = fakeContext();
+
+    await expect(
+      definitionFor(constructiveUploadFieldDefinitions, 'upload').resolve(
+        { ...makeFakeUpload('report.pdf'), mimetype: 'image/png' } as any,
+        {},
+        context,
+        { uploadPlugin: { tags: {}, type: 'upload', field: FIELD } },
+      ),
+    ).rejects.toThrow('UPLOAD_TYPE_MISMATCH');
+
+    expect(mockUploadWithContentType).not.toHaveBeenCalled();
+  });
+
+  it('accepts a text file whose extension the bytes cannot confirm in detail', async () => {
+    // Leading bytes can tell text from binary, not CSV from plain text; treating
+    // that as a mismatch would reject every legitimate text upload.
+    const { constructiveUploadFieldDefinitions } =
+      await loadUploadResolverModule({ detectedContentType: 'text/plain' });
+    const { context } = fakeContext();
+
+    const result: any = await definitionFor(constructiveUploadFieldDefinitions, 'upload').resolve(
+      { ...makeFakeUpload('rows.csv'), mimetype: 'text/csv' } as any,
+      {},
+      context,
+      { uploadPlugin: { tags: {}, type: 'upload', field: FIELD } },
+    );
+
+    expect(result.id).toBe(FILE_ID);
+  });
 });
