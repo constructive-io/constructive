@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.40.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-streamer@2.39.3...@constructive-io/s3-streamer@2.40.0) (2026-08-08)
+
+### Features
+
+- **storage:** route uploads through managed files rows and tenant-resolved buckets ([a965f3a](https://github.com/constructive-io/constructive/commit/a965f3abe1f8e72d58ad042054fb98e28c4f4a19)), closes [constructive-planning#1476](https://github.com/constructive-planning/issues/1476)
+
 ## [2.39.3](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-streamer@2.39.2...@constructive-io/s3-streamer@2.39.3) (2026-08-05)
 
 **Note:** Version bump only for package @constructive-io/s3-streamer

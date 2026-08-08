@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.11.4...graphile-presigned-url-plugin@1.12.0) (2026-08-08)
+
+### Features
+
+- **storage:** refuse multipart writes into path-keyed buckets ([d2b5438](https://github.com/constructive-io/constructive/commit/d2b54389cf7832a91509ca86b46d56f43ba148b0))
+- **storage:** route uploads through managed files rows and tenant-resolved buckets ([a965f3a](https://github.com/constructive-io/constructive/commit/a965f3abe1f8e72d58ad042054fb98e28c4f4a19)), closes [constructive-planning#1476](https://github.com/constructive-planning/issues/1476)
+
 ## [1.11.4](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.11.3...graphile-presigned-url-plugin@1.11.4) (2026-08-07)
 
 **Note:** Version bump only for package graphile-presigned-url-plugin

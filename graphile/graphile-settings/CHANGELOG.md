@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.14.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.13.8...graphile-settings@6.14.0) (2026-08-08)
+
+### Features
+
+- **storage:** route uploads through managed files rows and tenant-resolved buckets ([a965f3a](https://github.com/constructive-io/constructive/commit/a965f3abe1f8e72d58ad042054fb98e28c4f4a19)), closes [constructive-planning#1476](https://github.com/constructive-planning/issues/1476)
+
 ## [6.13.8](https://github.com/constructive-io/constructive/compare/graphile-settings@6.13.7...graphile-settings@6.13.8) (2026-08-07)
 
 **Note:** Version bump only for package graphile-settings

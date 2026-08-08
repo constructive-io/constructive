@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.25.0](https://github.com/constructive-io/constructive/compare/pgpm@5.24.5...pgpm@5.25.0) (2026-08-08)
+
+### Features
+
+- **cli:** test only the minimal covering set of modules by default ([5a80bde](https://github.com/constructive-io/constructive/commit/5a80bdeb5fd0358a07c9915d7b8b4d5c7cad8918))
+
 ## [5.24.5](https://github.com/constructive-io/constructive/compare/pgpm@5.24.4...pgpm@5.24.5) (2026-08-07)
 
 **Note:** Version bump only for package pgpm
