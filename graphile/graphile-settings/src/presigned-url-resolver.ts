@@ -31,9 +31,10 @@ let s3Config: S3Config | null = null;
  * pgpmDefaults → config file → env vars), creates an S3Client, and caches
  * the result. Same CDN config as upload-resolver.ts.
  *
- * NOTE: The `bucket` field here is the global fallback bucket name
- * (from BUCKET_NAME env var). When `resolveBucketName` is provided,
- * per-database bucket names take precedence for all S3 operations.
+ * NOTE: The `bucket` field here is only the connection's default and is never
+ * uploaded to. Every managed upload names its bucket explicitly, resolved from
+ * the tenant's logical bucket row via `resolveBucketName`; there is no
+ * environment-global upload bucket.
  */
 export function getPresignedUrlS3Config(): S3Config {
   if (s3Config) return s3Config;

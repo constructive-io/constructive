@@ -1,4 +1,5 @@
 import {
+  CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
@@ -97,6 +98,36 @@ export async function deleteS3Object(
     }),
   );
   log.debug(`Deleted S3 object: bucket=${s3Config.bucket}, key=${key}`);
+}
+
+/**
+ * Copy an object within the same physical bucket, preserving its content type.
+ *
+ * Used to promote a staged upload to its content-addressed key: the bytes are
+ * hashed as they stream in, so the final key is only known once the stream ends.
+ * Server-side copy keeps that promotion off the application's wire.
+ *
+ * @param s3Config - S3 client and bucket configuration
+ * @param sourceKey - The staged key the bytes were written to
+ * @param destinationKey - The final key (the content hash)
+ * @param contentType - MIME type to record on the destination object
+ */
+export async function copyS3Object(
+  s3Config: S3Config,
+  sourceKey: string,
+  destinationKey: string,
+  contentType: string,
+): Promise<void> {
+  await s3Config.client.send(
+    new CopyObjectCommand({
+      Bucket: s3Config.bucket,
+      Key: destinationKey,
+      CopySource: `${s3Config.bucket}/${sourceKey}`,
+      ContentType: contentType,
+      MetadataDirective: 'REPLACE',
+    }),
+  );
+  log.debug(`Copied S3 object: bucket=${s3Config.bucket}, ${sourceKey} → ${destinationKey}`);
 }
 
 /**

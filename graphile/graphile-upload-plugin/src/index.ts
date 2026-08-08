@@ -32,6 +32,7 @@ export { UploadPreset } from './preset';
 export type {
   FileUpload,
   UploadFieldDefinition,
+  UploadFieldIdentity,
   UploadPluginInfo,
   UploadPluginOptions,
   UploadResolver
