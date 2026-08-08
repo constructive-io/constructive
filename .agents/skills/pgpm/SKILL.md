@@ -139,7 +139,7 @@ pgpm handles extension creation during deploy. Declare extensions in your `.cont
 | `pgpm tag <version>` | Tag current state for targeted deploys |
 | `pgpm install <module>` | Install a pgpm module dependency |
 | `pgpm extension [--add/--remove/--set a,b]` | Manage module dependencies (flags are non-interactive; no flags = interactive picker) |
-| `pgpm test-packages` | Test all packages |
+| `pgpm test-packages` | Test the minimal covering set (`--force-all` for every module) |
 | `pgpm test-packages --full-cycle` | Test deploy → verify → revert → redeploy |
 | `pgpm docker start` | Start PostgreSQL container |
 | `pgpm docker stop` | Stop PostgreSQL container |

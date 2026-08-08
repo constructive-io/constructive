@@ -376,11 +376,23 @@ pgpm kill --no-drop
 
 #### `pgpm test-packages`
 
-Run integration tests on all modules in a workspace. Creates a temporary database for each module, deploys, and optionally runs verify/revert/deploy cycles.
+Run integration tests on the modules in a workspace. Creates a temporary database per tested module, deploys, and optionally runs verify/revert/deploy cycles.
+
+By default only the **minimal covering set** is tested: the modules nothing else in the
+workspace requires. Testing one of those deploys its whole dependency closure in
+dependency order, so every module is still exercised — once per covering module instead
+of once per module. Excluding a covering module promotes whatever it alone covered.
+
+The property the default trades away is standalone deployability — that a module's own
+`requires` is complete rather than satisfied by a sibling in the same database. Use
+`--force-all` to get it back.
 
 ```bash
-# Test all modules in workspace (deploy only)
+# Test the minimal covering set (deploy only)
 pgpm test-packages
+
+# Test every module in its own database
+pgpm test-packages --force-all
 
 # Run full deploy/verify/revert/deploy cycle
 pgpm test-packages --full-cycle
@@ -397,6 +409,7 @@ pgpm test-packages --full-cycle --continue-on-fail --exclude legacy-module
 
 **Options:**
 
+- `--force-all` - Test every module in its own database instead of the minimal covering set
 - `--full-cycle` - Run full deploy/verify/revert/deploy cycle (default: deploy only)
 - `--continue-on-fail` - Continue testing all packages even after failures (default: stop on first failure)
 - `--exclude <modules>` - Comma-separated module names to exclude

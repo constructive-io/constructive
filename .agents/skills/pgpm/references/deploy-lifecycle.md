@@ -180,6 +180,10 @@ pgpm test-packages --full-cycle
 pgpm test-packages --full-cycle --workspace --all
 ```
 
+By default it tests the minimal covering set (the modules nothing else requires),
+which still deploys every module through those closures; `--force-all` gives every
+module its own database.
+
 This is the gold standard for validating migrations — it proves:
 1. Deploy scripts apply correctly
 2. Verify scripts confirm the deployed state
