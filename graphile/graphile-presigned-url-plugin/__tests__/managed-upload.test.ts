@@ -238,6 +238,29 @@ describe('resolveManagedUploadTarget', () => {
     expect(target.bucket.key).toBe('avatars');
   });
 
+  it('refuses a path-keyed bucket, whose keys are chosen by its publisher', async () => {
+    const { resolveManagedUploadTarget } = await import('../src/managed-upload');
+    // A static site's bucket: public, custom keys allowed, addressed by path.
+    const db = fakeDb([
+      SET_CONFIG,
+      NO_REGISTRY_ROW,
+      STORAGE_MODULES,
+      { match: /resolve_default_bucket/, rows: () => [{ bucket_id: BUCKET_ID, resolved_key: 'site', bucket_type: 'public', physical_name: 'myapp-site-db' }] },
+      { match: /FROM storage_public\.app_buckets/, rows: () => [bucketRow({ key: 'site', allow_custom_keys: true, physical_name: 'myapp-site-db' })] },
+    ]);
+
+    await expect(
+      resolveManagedUploadTarget({
+        options: options(),
+        withPgClient: db.withPgClient,
+        pgSettings: null,
+        databaseId: DATABASE_ID,
+        field: FIELD,
+        defaultPublicAccess: true,
+      }),
+    ).rejects.toThrow('BUCKET_PATH_KEYED');
+  });
+
   it('records the physical name on first provision instead of re-minting it', async () => {
     const { resolveManagedUploadTarget } = await import('../src/managed-upload');
     const ensureBucketProvisioned = jest.fn().mockResolvedValue(undefined);

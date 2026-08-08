@@ -177,6 +177,18 @@ export async function resolveManagedUploadTarget(args: {
     );
   }
 
+  if (bucket.allow_custom_keys) {
+    // A path-keyed bucket (e.g. a static site's) is addressed by the keys its
+    // publisher chose; this lane can only mint content-hash keys, which would
+    // pollute it with unreachable objects. Path-keyed uploads go through the
+    // presigned lane, which accepts an explicit `key`.
+    throw new Error(
+      `BUCKET_PATH_KEYED: bucket "${bucket.key}" allows custom keys and is addressed by path; ` +
+      'the multipart upload lane only writes content-addressed keys. Use the presigned upload ' +
+      'mutation with an explicit key.',
+    );
+  }
+
   const physicalName = bucket.physical_name === null
     ? await provisionAndRecordPhysicalBucket(
       options, withPgClient, storageConfig, databaseId, bucket, storageConfig.allowedOrigins,
