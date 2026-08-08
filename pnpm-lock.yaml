@@ -2053,6 +2053,9 @@ importers:
       request-ip:
         specifier: ^3.3.0
         version: 3.3.0
+      stripe:
+        specifier: ^17.7.0
+        version: 17.7.0
     devDependencies:
       '@aws-sdk/client-s3':
         specifier: ^3.1052.0
@@ -10824,13 +10827,6 @@ packages:
         integrity: sha512-8Rf9Y83NBReMnx0gFzA8JImQACstCYWUplepDa9xprwwtmgEZUF0h/i5xSA625zB/I37EtrswSST6OXxwaaIJQ==,
       }
 
-  hasown@2.0.2:
-    resolution:
-      {
-        integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==,
-      }
-    engines: { node: '>= 0.4' }
-
   hasown@2.0.4:
     resolution:
       {
@@ -14467,6 +14463,13 @@ packages:
         integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==,
       }
     engines: { node: '>=8' }
+
+  stripe@17.7.0:
+    resolution:
+      {
+        integrity: sha512-aT2BU9KkizY9SATf14WhhYVv2uOapBWX0OFWF4xvcj1mPaNotlSc2CsxpS4DS46ZueSppmCF5BX1sNYBtwBvfw==,
+      }
+    engines: { node: '>=12.*' }
 
   strnum@2.3.0:
     resolution:
@@ -20464,10 +20467,6 @@ snapshots:
 
   has-unicode@2.0.1: {}
 
-  hasown@2.0.2:
-    dependencies:
-      function-bind: 1.1.2
-
   hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
@@ -20652,7 +20651,7 @@ snapshots:
 
   is-core-module@2.16.1:
     dependencies:
-      hasown: 2.0.2
+      hasown: 2.0.4
 
   is-docker@2.2.1: {}
 
@@ -23241,6 +23240,11 @@ snapshots:
       min-indent: 1.0.1
 
   strip-json-comments@3.1.1: {}
+
+  stripe@17.7.0:
+    dependencies:
+      '@types/node': 22.19.19
+      qs: 6.14.1
 
   strnum@2.3.0: {}
 
