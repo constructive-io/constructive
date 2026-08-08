@@ -241,11 +241,20 @@ pgpm package --check --no-fail-fast       # list all drift instead of stopping
 
 ### Testing
 
-**pgpm test-packages** — Run integration tests on all modules in workspace
+**pgpm test-packages** — Run integration tests on the workspace's modules
+
+Defaults to the minimal covering set: the modules nothing else in the workspace
+requires. Testing one deploys its whole dependency closure, so every module is
+still exercised — once per covering module rather than once per module.
+`--force-all` restores a database per module, which is the only way to assert a
+module's own `requires` is complete rather than satisfied by a sibling.
 
 ```bash
-# Deploy only
+# Deploy only, minimal covering set
 pgpm test-packages
+
+# Every module in its own database
+pgpm test-packages --force-all
 
 # Full deploy/verify/revert/deploy cycle
 pgpm test-packages --full-cycle

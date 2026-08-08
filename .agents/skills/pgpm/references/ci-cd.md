@@ -224,7 +224,9 @@ For running pgpm's built-in integration tests:
   run: pgpm test-packages
 ```
 
-This runs all package tests defined in the pgpm workspace.
+This tests the minimal covering set — the modules nothing else in the workspace
+requires — which deploys every module through those dependency closures. Add
+`--force-all` to give every module its own database instead.
 
 ## SDK Generation Workflow
 
