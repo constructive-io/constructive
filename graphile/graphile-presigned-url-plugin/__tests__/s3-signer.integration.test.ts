@@ -17,6 +17,7 @@ import {
   generatePresignedGetUrl,
   generatePresignedPutUrl,
   headObject,
+  readObjectPrefix,
 } from '../src/s3-signer';
 import type { S3Config } from '../src/types';
 
@@ -180,6 +181,42 @@ describe('s3-signer integration (MinIO)', () => {
       // headObject still returns metadata even on mismatch — it just logs a warning
       expect(result).not.toBeNull();
       expect(result!.contentType).toBe(HEAD_CONTENT_TYPE); // actual type, not expected
+    });
+  });
+
+  describe('readObjectPrefix', () => {
+    const PREFIX_KEY = 'test-read-prefix.bin';
+    // Longer than the range this reads, so a truncated response proves the range
+    // was honoured rather than the whole object downloaded.
+    const PREFIX_CONTENT = 'ABCDEFGHIJ'.repeat(100);
+
+    beforeAll(async () => {
+      const putUrl = await generatePresignedPutUrl(
+        s3Config,
+        PREFIX_KEY,
+        'application/octet-stream',
+        Buffer.byteLength(PREFIX_CONTENT),
+      );
+      const res = await uploadToPresignedUrl(putUrl, PREFIX_CONTENT, 'application/octet-stream');
+      if (res.status !== 200) throw new Error(`Setup upload failed: ${res.status}`);
+    });
+
+    it('should read only the requested leading bytes', async () => {
+      const prefix = await readObjectPrefix(s3Config, PREFIX_KEY, 10);
+
+      expect(prefix).not.toBeNull();
+      expect(prefix!.length).toBe(10);
+      expect(prefix!.toString()).toBe('ABCDEFGHIJ');
+    });
+
+    it('should return the whole object when it is shorter than the range', async () => {
+      const prefix = await readObjectPrefix(s3Config, PREFIX_KEY, 100000);
+      expect(prefix!.length).toBe(Buffer.byteLength(PREFIX_CONTENT));
+    });
+
+    it('should return null for a non-existent object', async () => {
+      const prefix = await readObjectPrefix(s3Config, 'does-not-exist-' + Date.now(), 32);
+      expect(prefix).toBeNull();
     });
   });
 

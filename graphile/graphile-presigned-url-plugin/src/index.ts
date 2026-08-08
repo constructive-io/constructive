@@ -27,6 +27,12 @@
  * ```
  */
 
+export {
+  CONFIRM_PREFIX_BYTES,
+  confirmUploadedBytes,
+  type ConfirmUploadInput,
+  type ConfirmUploadVerdict,
+} from './confirm-upload';
 export type { ResolvedBucketCoordinate } from './default-bucket';
 export { resolveDefaultBucket } from './default-bucket';
 export { createDownloadUrlPlugin } from './download-url-field';
@@ -44,7 +50,7 @@ export { mintPhysicalBucketName, provisionAndRecordPhysicalBucket, resolveS3, re
 export { createPresignedUrlPlugin,PresignedUrlPlugin } from './plugin';
 export { PresignedUrlPreset } from './preset';
 export { type WithPgClient, withRequestPgClient } from './request-pg-client';
-export { copyS3Object, deleteS3Object, generatePresignedGetUrl, generatePresignedPutUrl, headObject } from './s3-signer';
+export { copyS3Object, deleteS3Object, generatePresignedGetUrl, generatePresignedPutUrl, headObject, readObjectPrefix } from './s3-signer';
 export { clearBucketCache, clearStorageModuleCache, getBucketConfig, getStorageModuleConfig, getStorageModuleConfigForOwner, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
 export type {
   BucketConfig,

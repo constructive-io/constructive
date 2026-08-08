@@ -30,6 +30,15 @@ export {
   PeekPromise,
   PeekStreamOptions} from './peak';
 
+// Export declared-type / extension / magic-byte agreement checking
+export {
+  checkTypeAgreement,
+  mimeTypeForFilename,
+  mimeTypesAgree,
+  TypeAgreementInput,
+  TypeAgreementResult,
+  TypeAgreementViolation} from './type-agreement';
+
 // Export utility functions
 export * from './utils/extensions';
 export * from './utils/magic-bytes';

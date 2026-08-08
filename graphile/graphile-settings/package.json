@@ -67,6 +67,7 @@
     "graphql": "16.13.0",
     "inflekt": "^0.8.1",
     "lru-cache": "^11.2.7",
+    "mime-bytes": "workspace:^",
     "pg": "^8.21.0",
     "pg-query-context": "workspace:^",
     "pg-sql2": "5.0.1",

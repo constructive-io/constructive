@@ -41,6 +41,7 @@ import type {
   UploadFieldIdentity,
   UploadPluginInfo,
 } from 'graphile-upload-plugin';
+import { checkTypeAgreement } from 'mime-bytes';
 import { Transform } from 'stream';
 
 import {
@@ -228,6 +229,25 @@ async function uploadResolver(
     readStream: upload.createReadStream(),
     filename,
   });
+
+  // The three claims must agree, and disagreement is rejection rather than
+  // relabelling: an `.jpg` carrying HTML is served to a browser as an image and
+  // executed as a script. Compared against `magic.type` — what the bytes say —
+  // not `contentType`, which the detector may have refined using the very
+  // extension under suspicion.
+  const agreement = checkTypeAgreement({
+    filename,
+    declaredMime: upload.mimetype,
+    detectedMime: detected.magic?.type,
+  });
+  if (!agreement.ok) {
+    detected.stream.destroy();
+    throw new Error(
+      `UPLOAD_TYPE_MISMATCH: ${agreement.violation.message}. The upload was rejected rather than ` +
+      'stored under a type it is not.',
+    );
+  }
+
   const allowed = allowedMimeTypes(tags, typ);
   if (allowed.length && !allowed.includes(detected.contentType)) {
     detected.stream.destroy();

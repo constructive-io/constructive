@@ -131,6 +131,51 @@ export async function copyS3Object(
 }
 
 /**
+ * Read the leading bytes of an object.
+ *
+ * A ranged GET, because the only reason to touch bytes the client uploaded
+ * directly is to see what they actually are: a magic-byte signature lives in the
+ * first few dozen bytes, so validating a 2GB video costs the same as validating
+ * an icon.
+ *
+ * Returns null when the object is not there — the presigned lane's ordinary
+ * "client never PUT it" case, which is an expiry rather than a failure.
+ *
+ * @param s3Config - S3 client and bucket configuration
+ * @param key - S3 object key
+ * @param byteCount - How many leading bytes to read
+ */
+export async function readObjectPrefix(
+  s3Config: S3Config,
+  key: string,
+  byteCount: number,
+): Promise<Buffer | null> {
+  try {
+    const response = await s3Config.client.send(
+      new GetObjectCommand({
+        Bucket: s3Config.bucket,
+        Key: key,
+        Range: `bytes=0-${byteCount - 1}`,
+      }),
+    );
+
+    const body = response.Body as unknown as AsyncIterable<Uint8Array> | undefined;
+    if (!body) return Buffer.alloc(0);
+
+    const chunks: Buffer[] = [];
+    for await (const chunk of body) {
+      chunks.push(Buffer.from(chunk));
+    }
+    return Buffer.concat(chunks);
+  } catch (e: any) {
+    if (e.name === 'NoSuchKey' || e.name === 'NotFound' || e.$metadata?.httpStatusCode === 404) {
+      return null;
+    }
+    throw e;
+  }
+}
+
+/**
  * Check if an object exists in S3 and optionally verify its content-type.
  *
  * @param s3Config - S3 client and bucket configuration
