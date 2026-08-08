@@ -1,15 +1,24 @@
 /**
- * Upload resolver for the Constructive upload plugin.
+ * Upload resolver for the Constructive upload plugin (multipart `Upload` scalar).
  *
- * Reads CDN/S3/MinIO configuration from environment variables (via getEnvOptions)
- * and streams uploaded files to the configured storage backend.
+ * This is the streaming transport into the *managed* storage lane: bytes arrive
+ * on the mutation, and the file they carry gets the same treatment a presigned
+ * upload gets — a bucket resolved inside the tenant, a content-addressed key, a
+ * files row, and a projection document naming that row.
  *
- * Lazily initializes the S3 streamer on first upload to avoid requiring
- * env vars at module load time.
+ * It used to be a second storage model: stream to `BUCKET_NAME` under a random
+ * key, hand back a URL, record nothing. Objects written that way belonged to no
+ * database, could not be deduplicated, listed, or access-controlled, and storage
+ * GC could not see that a document still pointed at them. There is no
+ * environment bucket in this path any more; `cdn.*` supplies S3 credentials and
+ * an endpoint only.
  *
- * ENV VARS:
+ * Compatibility: `image`/`upload` columns still receive `url` alongside the new
+ * `id`/`key`/`bucket_id`/`size` fields, so existing readers of `photo.url` keep
+ * working while they migrate to `id` + the files row's late-bound `downloadUrl`.
+ *
+ * ENV VARS (S3 connection only):
  *   BUCKET_PROVIDER  - 'minio' | 's3' (default: 'minio')
- *   BUCKET_NAME      - bucket name (default: 'test-bucket')
  *   AWS_REGION       - AWS region (default: 'us-east-1')
  *   AWS_ACCESS_KEY   - access key (default: 'minioadmin')
  *   AWS_SECRET_KEY   - secret key (default: 'minioadmin')
@@ -18,128 +27,253 @@
 
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import Streamer from '@constructive-io/s3-streamer';
-import uploadNames from '@constructive-io/upload-names';
 import { Logger } from '@pgpmjs/logger';
-import { randomBytes } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
+import {
+  finalizeStagedUpload,
+  type PresignedUrlPluginOptions,
+  resolveManagedUploadTarget,
+  withRequestPgClient,
+} from 'graphile-presigned-url-plugin';
 import type {
   FileUpload,
   UploadFieldDefinition,
+  UploadFieldIdentity,
   UploadPluginInfo,
 } from 'graphile-upload-plugin';
+import { Transform } from 'stream';
+
+import {
+  createBucketNameResolver,
+  createEnsureBucketProvisioned,
+  getPresignedUrlS3Config,
+} from './presigned-url-resolver';
 
 const log = new Logger('upload-resolver');
 const DEFAULT_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml'];
 
 let streamer: Streamer | null = null;
-let bucketName: string;
 
+/**
+ * The S3 streamer, built from the CDN connection settings.
+ *
+ * Deliberately constructed with no `defaultBucket`: every upload names the
+ * bucket it resolved, and a default here would be an environment-owned bucket
+ * standing in for a tenant's.
+ */
 function getStreamer(): Streamer {
   if (streamer) return streamer;
 
-  const opts = getEnvOptions();
-  const cdn = opts.cdn || {};
+  const { cdn = {} } = getEnvOptions();
 
-  const provider = cdn.provider || 'minio';
-  bucketName = cdn.bucketName || 'test-bucket';
-  const awsRegion = cdn.awsRegion || 'us-east-1';
-  const awsAccessKey = cdn.awsAccessKey || 'minioadmin';
-  const awsSecretKey = cdn.awsSecretKey || 'minioadmin';
-  const endpoint = cdn.endpoint || 'http://localhost:9000';
-
-  if (process.env.NODE_ENV === 'production') {
-    if (!cdn.awsAccessKey || !cdn.awsSecretKey) {
-      log.warn('[upload-resolver] WARNING: Using default credentials in production.');
-    }
+  if (process.env.NODE_ENV === 'production' && (!cdn.awsAccessKey || !cdn.awsSecretKey)) {
+    log.warn('[upload-resolver] WARNING: Using default credentials in production.');
   }
 
-  log.info(
-    `[upload-resolver] Initializing: provider=${provider} bucket=${bucketName}`,
-  );
+  const provider = cdn.provider || 'minio';
+  log.info(`[upload-resolver] Initializing: provider=${provider}`);
 
   streamer = new Streamer({
-    defaultBucket: bucketName,
-    awsRegion,
-    awsSecretKey,
-    awsAccessKey,
-    endpoint,
     provider,
+    awsRegion: cdn.awsRegion || 'us-east-1',
+    awsAccessKey: cdn.awsAccessKey || 'minioadmin',
+    awsSecretKey: cdn.awsSecretKey || 'minioadmin',
+    endpoint: cdn.endpoint || 'http://localhost:9000',
   });
 
   return streamer;
 }
 
 /**
- * Generates a randomized storage key from a filename.
- * Format: {random10chars}-{sanitized-filename}
+ * The upload lane's view of the presigned plugin's options: the same S3
+ * connection, physical-name policy, and provisioning hook the presigned lane
+ * uses, so both transports resolve identical coordinates for a bucket.
+ *
+ * Built on first upload rather than at import time — `createBucketNameResolver`
+ * throws on a missing name prefix, and that must surface as a failed upload, not
+ * as a server that will not boot.
  */
-function generateKey(filename: string): string {
-  const rand = randomBytes(12).toString('hex');
-  return `${rand}-${uploadNames(filename)}`;
+let managedOptions: PresignedUrlPluginOptions | null = null;
+
+function getManagedOptions(): PresignedUrlPluginOptions {
+  if (!managedOptions) {
+    managedOptions = {
+      s3: getPresignedUrlS3Config,
+      resolveBucketName: createBucketNameResolver(),
+      ensureBucketProvisioned: createEnsureBucketProvisioned(),
+    };
+  }
+  return managedOptions;
+}
+
+/** A staging key: transient, and never what the object ends up under. */
+function stagingKey(): string {
+  return `.staging/${randomUUID()}`;
+}
+
+async function resolveDatabaseId(pgClient: any): Promise<string | null> {
+  const result = await pgClient.query({ text: `SELECT jwt_private.current_database_id() AS id` });
+  return result.rows[0]?.id ?? null;
 }
 
 /**
- * Upload resolver that streams files to S3/MinIO.
+ * Which default bucket an *unregistered* column resolves to.
  *
- * Returns different shapes based on the column's type hint:
- * - 'image' / 'upload' → { filename, mime, url } (for jsonb domain columns)
- * - 'attachment' / default → url string (for text domain columns)
+ * Columns written by the pre-managed resolver held a directly-embedded URL, so
+ * their readers assume a publicly addressable object; resolving them to the
+ * private default would break every page rendering one. A registered column
+ * states its own intent and this is not consulted.
+ */
+const LEGACY_DEFAULT_PUBLIC_ACCESS = true;
+
+/** The mime allowlist for a column, from its smart tags or its type. */
+function allowedMimeTypes(tags: Record<string, any> | undefined, typ: string | undefined): string[] {
+  const VALID_MIME = /^[a-z]+\/[a-z0-9][a-z0-9!#$&\-.^_+]*$/i;
+  if (tags?.mime) {
+    return String(tags.mime)
+      .trim()
+      .split(',')
+      .map((a: string) => a.trim())
+      .filter((m: string) => VALID_MIME.test(m));
+  }
+  return typ === 'image' ? DEFAULT_IMAGE_MIME_TYPES : [];
+}
+
+/**
+ * Hash and measure bytes as they stream past, without buffering them.
  *
- * MIME validation happens before persistence: content type is detected from
- * stream bytes, validated against smart-tag/type rules, and only then uploaded.
+ * The final key is the content hash, which is only known once the last byte has
+ * gone by — so the object is staged first and promoted after. Nothing is held in
+ * memory: a 2GB upload streams through this the same as a 2KB one.
+ */
+function hashingPassThrough(): Transform & { digest: () => string; bytes: () => number } {
+  const hash = createHash('sha256');
+  let bytes = 0;
+  const stream = new Transform({
+    transform(chunk, _encoding, callback) {
+      hash.update(chunk);
+      bytes += chunk.length;
+      callback(null, chunk);
+    },
+  });
+  return Object.assign(stream, {
+    digest: () => hash.digest('hex'),
+    bytes: () => bytes,
+  });
+}
+
+/**
+ * Stream an upload into managed storage and return the value the column stores.
+ *
+ * Shape by column type hint:
+ *   * `image` / `upload` (jsonb domains) → the projection document, including a
+ *     compatibility `url` for public buckets.
+ *   * `attachment` (text domain) → the object's public URL. A text column cannot
+ *     hold a projection, so the files row is still authoritative but the column
+ *     itself carries no id; the row keeps the object alive. A private bucket
+ *     raises rather than storing an expiring presigned URL in a column.
  */
 async function uploadResolver(
   upload: FileUpload,
   _args: unknown,
-  _context: unknown,
+  context: any,
   info: { uploadPlugin: UploadPluginInfo },
 ): Promise<unknown> {
-  const { tags, type } = info.uploadPlugin;
+  const { tags, type, field } = info.uploadPlugin;
+  const typ = type || tags?.type;
+
+  const withPgClient = context?.withPgClient;
+  const pgSettings = context?.pgSettings ?? null;
+  if (!withPgClient) {
+    throw new Error(
+      'UPLOAD_NO_PG_CLIENT: a managed upload resolves its bucket in the database, so the ' +
+      'GraphQL context must carry withPgClient',
+    );
+  }
+  if (!field) {
+    throw new Error(
+      'UPLOAD_FIELD_UNKNOWN: the upload plugin did not report which column is being written, ' +
+      'so the storage module and bucket backing it cannot be resolved',
+    );
+  }
+
+  const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient: any) =>
+    resolveDatabaseId(pgClient),
+  );
+  if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+
+  const target = await resolveManagedUploadTarget({
+    options: getManagedOptions(),
+    withPgClient,
+    pgSettings,
+    databaseId,
+    field: field as UploadFieldIdentity,
+    defaultPublicAccess: LEGACY_DEFAULT_PUBLIC_ACCESS,
+  });
+
+  if (typ === 'attachment' && !target.bucket.is_public) {
+    throw new Error(
+      'ATTACHMENT_BUCKET_NOT_PUBLIC: an attachment column stores a plain URL, and the resolved ' +
+      `bucket "${target.bucket.key}" is private, whose only URLs expire. Use an upload column, ` +
+      'which stores the file id and resolves a fresh download URL on read.',
+    );
+  }
+
   const s3 = getStreamer();
   const { filename } = upload;
-  const key = generateKey(filename);
 
-  // MIME type validation from smart tags
-  const typ = type || tags?.type;
-  const VALID_MIME = /^[a-z]+\/[a-z0-9][a-z0-9!#$&\-.^_+]*$/i;
-  const mim: string[] = tags?.mime
-    ? String(tags.mime)
-      .trim()
-      .split(',')
-      .map((a: string) => a.trim())
-      .filter((m: string) => VALID_MIME.test(m))
-    : typ === 'image'
-      ? DEFAULT_IMAGE_MIME_TYPES
-      : [];
-
+  // Validate before persisting: content type comes from the leading bytes, not
+  // from the client's claim about them.
   const detected = await s3.detectContentType({
     readStream: upload.createReadStream(),
     filename,
   });
-  const detectedContentType = detected.contentType;
-
-  if (mim.length && !mim.includes(detectedContentType)) {
+  const allowed = allowedMimeTypes(tags, typ);
+  if (allowed.length && !allowed.includes(detected.contentType)) {
     detected.stream.destroy();
     throw new Error('UPLOAD_MIMETYPE');
   }
 
-  const result = await s3.uploadWithContentType({
-    readStream: detected.stream,
-    contentType: detectedContentType,
+  const staged = stagingKey();
+  const hashing = hashingPassThrough();
+  const uploadResult = await s3.uploadWithContentType({
+    readStream: detected.stream.pipe(hashing),
+    contentType: detected.contentType,
     magic: detected.magic,
-    key,
-    bucket: bucketName,
+    key: staged,
+    bucket: target.physicalName,
   });
 
-  const url = result.upload.Location;
-  const { contentType } = result;
+  // Owns the staged key from here: it either promotes it into a files row or
+  // removes it, so a failed upload leaves nothing behind in S3.
+  const { projection } = await finalizeStagedUpload({
+    target,
+    withPgClient,
+    pgSettings,
+    staged: {
+      stagingKey: staged,
+      contentHash: hashing.digest(),
+      contentType: uploadResult.contentType,
+      size: hashing.bytes(),
+      filename,
+    },
+  });
 
   switch (typ) {
   case 'image':
   case 'upload':
-    return { filename, mime: contentType, url };
+    // `filename` and `mime` were in the pre-managed shape and stay in it;
+    // `url` is populated for public buckets and deprecated in favour of `id`.
+    return { ...projection, filename, mime: uploadResult.contentType };
   case 'attachment':
   default:
-    return url;
+    if (!projection.url) {
+      throw new Error(
+        `ATTACHMENT_NO_PUBLIC_URL: bucket "${target.bucket.key}" has no public URL prefix ` +
+        'configured, so there is no durable URL to store in a text column',
+      );
+    }
+    return projection.url;
   }
 }
 

@@ -11,11 +11,34 @@ export interface FileUpload {
 }
 
 /**
+ * Identifies the column an upload is being written into.
+ *
+ * A resolver that persists through managed storage needs the column's identity,
+ * not just its type: which bucket the bytes land in is a property of the field
+ * declaration, recorded per (table, column), so a resolver given only
+ * `{tags, type}` can do no better than a server-global bucket.
+ */
+export interface UploadFieldIdentity {
+  /** PostgreSQL schema of the table being mutated (e.g. 'app_public') */
+  schemaName: string;
+  /** PostgreSQL table name being mutated (e.g. 'products') */
+  tableName: string;
+  /** PostgreSQL column name receiving the upload (e.g. 'photo') */
+  columnName: string;
+}
+
+/**
  * Additional metadata passed to the upload resolver via the info parameter.
  */
 export interface UploadPluginInfo {
   tags: Record<string, any>;
   type?: string;
+  /**
+   * The column being written. Absent only when the codec carries no PG
+   * identity, which a managed resolver must treat as an error rather than
+   * falling back to a default bucket.
+   */
+  field?: UploadFieldIdentity;
 }
 
 /**

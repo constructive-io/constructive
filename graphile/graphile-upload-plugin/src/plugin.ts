@@ -28,7 +28,24 @@ import type { GraphileConfig } from 'graphile-config';
 import { isInputType } from 'graphql';
 import { Readable, Transform } from 'stream';
 
-import type { UploadFieldDefinition, UploadPluginOptions } from './types';
+import type { UploadFieldDefinition, UploadFieldIdentity, UploadPluginOptions } from './types';
+
+/**
+ * Read the mutated column's PG identity off the codec.
+ *
+ * Returns null when the codec is not table-backed (no `extensions.pg`), so a
+ * resolver that needs the identity can refuse rather than guess.
+ */
+function uploadFieldIdentity(
+  pgCodec: any,
+  attributeName: string,
+): UploadFieldIdentity | null {
+  const pgExt = pgCodec?.extensions?.pg;
+  const schemaName = pgExt?.schemaName;
+  const tableName = pgExt?.name;
+  if (!schemaName || !tableName) return null;
+  return { schemaName, tableName, columnName: attributeName };
+}
 
 /**
  * Determines whether a codec attribute matches an upload field definition.
@@ -264,6 +281,7 @@ export function createUploadPlugin(
           const tags: Record<string, any> = {};
           const types: Record<string, string> = {};
           const originals: Record<string, string> = {};
+          const identities: Record<string, UploadFieldIdentity | null> = {};
 
           for (const [attributeName, attribute] of Object.entries(
             pgCodec.attributes as Record<string, any>
@@ -281,6 +299,7 @@ export function createUploadPlugin(
             tags[uploadFieldName] = attribute.extensions?.tags || {};
             types[uploadFieldName] = matchedDef.type || '';
             originals[uploadFieldName] = baseFieldName;
+            identities[uploadFieldName] = uploadFieldIdentity(pgCodec, attributeName);
           }
 
           // If no upload fields match this mutation's codec, skip wrapping
@@ -316,7 +335,8 @@ export function createUploadPlugin(
                           ...info,
                           uploadPlugin: {
                             tags: tags[key],
-                            type: types[key]
+                            type: types[key],
+                            ...(identities[key] ? { field: identities[key] } : {})
                           }
                         }
                       );

@@ -16,7 +16,13 @@ interface StreamerOptions {
   awsAccessKey: string;
   endpoint?: string;
   provider?: BucketProvider;
-  defaultBucket: string;
+  /**
+   * Bucket used when a call does not name one. Optional: a caller that resolves
+   * the bucket per upload (tenant-resolved storage) has no deployment-wide
+   * default to give, and passing a placeholder would let a missing `bucket`
+   * argument write somewhere plausible instead of failing.
+   */
+  defaultBucket?: string;
 }
 
 interface UploadParams {

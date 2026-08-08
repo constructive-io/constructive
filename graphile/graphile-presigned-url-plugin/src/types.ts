@@ -85,8 +85,19 @@ export interface StorageModuleConfig {
  * Input for the requestUploadUrl mutation.
  */
 export interface RequestUploadUrlInput {
-  /** Bucket key (e.g., "public", "private") */
-  bucketKey: string;
+  /**
+   * Logical bucket key (e.g., "public", "private").
+   *
+   * Optional: when omitted the database resolves its own default bucket for the
+   * requested access (see `isPublic`), so a client never has to know a tenant's
+   * bucket naming to upload.
+   */
+  bucketKey?: string;
+  /**
+   * Which default bucket to resolve when `bucketKey` is omitted: the public one
+   * (true) or the private one (default false). Ignored when `bucketKey` is given.
+   */
+  isPublic?: boolean;
   /**
    * Owner entity ID for entity-scoped uploads.
    * Omit for app-level (database-wide) storage.
@@ -127,6 +138,28 @@ export interface RequestUploadUrlPayload {
   expiresAt: string | null;
   /** ID of the previous version (set when re-uploading to an existing custom key) */
   previousVersionId: string | null;
+  /**
+   * The projection document to store in an `image`/`upload` column.
+   *
+   * Its `id` is the files row, which is what makes the column a reference the
+   * server can count — storage GC will not collect an object while a registered
+   * document column still names its file.
+   */
+  file: FileProjection;
+}
+
+/**
+ * The document a managed `image`/`upload` column stores. See `./managed-upload`.
+ */
+export interface FileProjection {
+  id: string;
+  key: string;
+  bucket_id: string;
+  mime: string;
+  size: number;
+  filename?: string;
+  /** @deprecated Read the files row's `downloadUrl` via `id` instead. */
+  url?: string;
 }
 
 /**

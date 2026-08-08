@@ -23,9 +23,12 @@ import { Logger } from '@pgpmjs/logger';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 
-import { type WithPgClient,withRequestPgClient } from './request-pg-client';
+import { resolveDefaultBucket } from './default-bucket';
+import { buildFileProjection, type FileProjection } from './managed-upload';
+import { provisionAndRecordPhysicalBucket, resolveS3ForDatabase } from './physical-bucket';
+import { withRequestPgClient } from './request-pg-client';
 import { deleteS3Object,generatePresignedPutUrl } from './s3-signer';
-import { getBucketConfig, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, storedPhysicalName } from './storage-module-cache';
+import { getBucketConfig, loadAllStorageModules, resolveStorageConfigFromCodec, storedPhysicalName } from './storage-module-cache';
 import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:plugin');
@@ -81,111 +84,35 @@ async function resolveDatabaseId(pgClient: any): Promise<string | null> {
   return result.rows[0]?.id ?? null;
 }
 
-function resolveS3(options: PresignedUrlPluginOptions): S3Config {
-  if (typeof options.s3 === 'function') {
-    const resolved = options.s3();
-    options.s3 = resolved;
-    return resolved;
-  }
-  return options.s3;
-}
-
 /**
- * Mint the physical S3 bucket name for a logical bucket's first provision.
+ * Resolve the bucket an upload mutation writes into.
  *
- * This is a naming *policy*, consulted exactly once per bucket — before the
- * physical bucket exists. Once provisioned, the recorded `physical_name` on
- * the row is authoritative and this function must not be consulted again.
+ * A named `bucketKey` is the caller's override and is read directly, as before.
+ * An omitted one asks the database for the tenant's reserved default tag for the
+ * requested access, so a missing or ambiguous default raises in SQL rather than
+ * falling back to a server-global bucket name here.
  */
-function mintPhysicalBucketName(
-  options: PresignedUrlPluginOptions,
-  databaseId: string,
-  bucketKey: string,
-): string {
-  if (options.resolveBucketName) {
-    return options.resolveBucketName(databaseId, bucketKey);
-  }
-  // Single-bucket deployment: the globally configured bucket is the physical bucket.
-  return resolveS3(options).bucket;
-}
-
-/**
- * Build the S3 config for a *known* physical bucket. `physicalName` is
- * required — callers must resolve the coordinate (stored row value, or a
- * freshly provisioned name) before getting here. No name is ever recomputed.
- */
-function resolveS3ForDatabase(
-  options: PresignedUrlPluginOptions,
-  storageConfig: StorageModuleConfig,
-  physicalName: string,
-): S3Config {
-  const globalS3 = resolveS3(options);
-  const publicUrlPrefix = storageConfig.publicUrlPrefix != null
-    ? storageConfig.publicUrlPrefix
-    : globalS3.publicUrlPrefix;
-
-  if (physicalName === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
-    return globalS3;
-  }
-
-  return {
-    ...globalS3,
-    bucket: physicalName,
-    ...(publicUrlPrefix != null ? { publicUrlPrefix } : {}),
-  };
-}
-
-/**
- * First provision of a logical bucket: mint a name, create the physical S3
- * bucket, and record the exact name on the source row. Returns the recorded
- * physical name.
- *
- * Only called when the row has no `physical_name` yet. Afterwards the stored
- * value is the durable coordinate: route resolution and every later read use
- * it verbatim; nothing is recomputed.
- *
- * The record write runs in the system lane (privileged role, so it bypasses the
- * RLS that stops request roles from UPDATE-ing bucket rows) — it is server
- * bookkeeping, not request data. It still carries the tenant `database_id`
- * claim, because the buckets table's catalog-sync trigger calls
- * `jwt_private.current_database_id()` and would otherwise raise
- * DATABASE_CLAIM_REQUIRED; `withRequestPgClient` applies that claim inside the
- * write's transaction without switching off the privileged role.
- * `bucket` (the cached config) is mutated in place so subsequent reads observe
- * the recorded name without a DB round-trip.
- */
-async function provisionAndRecordPhysicalBucket(
-  options: PresignedUrlPluginOptions,
-  withPgClient: WithPgClient,
+async function resolveUploadBucket(
+  pgClient: any,
   storageConfig: StorageModuleConfig,
   databaseId: string,
-  bucket: BucketConfig,
-  allowedOrigins: string[] | null,
-): Promise<string> {
-  const s3BucketName = mintPhysicalBucketName(options, databaseId, bucket.key);
-
-  if (options.ensureBucketProvisioned && !isS3BucketProvisioned(s3BucketName)) {
-    log.info(`Lazy-provisioning S3 bucket "${s3BucketName}" for database ${databaseId}`);
-    await options.ensureBucketProvisioned(s3BucketName, bucket.type, databaseId, allowedOrigins);
-    markS3BucketProvisioned(s3BucketName);
-    log.info(`Lazy-provisioned S3 bucket "${s3BucketName}" successfully`);
+  bucketKey: string | null,
+  ownerId: string | null,
+  isPublic: boolean,
+): Promise<BucketConfig | null> {
+  if (bucketKey) {
+    return getBucketConfig(pgClient, storageConfig, databaseId, bucketKey, ownerId || undefined);
   }
 
-  // Record the physical coordinate on the source row. The `physical_name IS NULL`
-  // guard keeps this idempotent and race-safe across concurrent first uploads.
-  // The catalog-sync trigger on this UPDATE needs `jwt.claims.database_id`, so the
-  // write runs under the resolved database claim (privileged role preserved).
-  await withRequestPgClient(withPgClient, { 'jwt.claims.database_id': databaseId }, (client) =>
-    client.query({
-      text: `UPDATE ${storageConfig.bucketsQualifiedName}
-             SET physical_name = $1
-             WHERE id = $2 AND physical_name IS NULL`,
-      values: [s3BucketName, bucket.id],
-    }),
+  const coordinate = await resolveDefaultBucket(
+    pgClient,
+    databaseId,
+    storageConfig.scope,
+    ownerId,
+    isPublic,
+    null,
   );
-  bucket.physical_name = s3BucketName;
-  log.info(`Recorded physical_name="${s3BucketName}" on bucket ${bucket.id}`);
-  return s3BucketName;
+  return getBucketConfig(pgClient, storageConfig, databaseId, coordinate.resolvedKey, ownerId || undefined);
 }
 
 // --- Plugin factory ---
@@ -224,6 +151,15 @@ export function createPresignedUrlPlugin(
               GraphQLList,
             },
           } = build;
+
+          // The projection document is jsonb-shaped. PostGraphile registers a JSON
+          // scalar whenever the schema has a jsonb column, which any storage-equipped
+          // database does; if it is absent the payload simply omits the field rather
+          // than failing schema build over a field nothing can have asked for yet.
+          const jsonType = build.getTypeByName('JSON') ?? null;
+          if (!jsonType) {
+            log.warn('No JSON scalar in this schema; upload payloads will omit the `file` projection');
+          }
 
           const bucketCodecs = Object.values((build.input as any).pgRegistry.pgCodecs).filter(
             (codec: any) => codec.attributes && (codec.extensions as any)?.tags?.storageBuckets,
@@ -269,7 +205,8 @@ export function createPresignedUrlPlugin(
             const InputType = new GraphQLInputObjectType({
               name: `Upload${filesTypeName}Input`,
               fields: {
-                bucketKey: { type: new GraphQLNonNull(GraphQLString), description: 'Bucket key (e.g., "public", "private")' },
+                bucketKey: { type: GraphQLString, description: 'Bucket key (e.g., "public", "private"). Omit to use the database\'s default bucket for the requested access.' },
+                isPublic: { type: GraphQLBoolean, description: 'Which default bucket to resolve when bucketKey is omitted: the public one (true) or the private one (default false). Ignored when bucketKey is given.' },
                 ...(hasOwnerId
                   ? { ownerId: { type: new GraphQLNonNull(ownerIdGqlType || GraphQLString), description: 'Owner entity ID (required for entity-scoped buckets)' } }
                   : {}),
@@ -290,6 +227,17 @@ export function createPresignedUrlPlugin(
                 deduplicated: { type: new GraphQLNonNull(GraphQLBoolean), description: 'Whether this file was deduplicated (content already exists)' },
                 expiresAt: { type: GraphQLString, description: 'Presigned URL expiry time (null if deduplicated)' },
                 previousVersionId: { type: GraphQLString, description: 'ID of the previous version (when using custom keys)' },
+                ...(jsonType
+                  ? {
+                    file: {
+                      type: jsonType,
+                      description:
+                          'The projection document for the created file: {id, key, bucket_id, mime, size, filename, url?}. ' +
+                          'Store this verbatim in an image/upload column — its `id` is what keeps the object from being ' +
+                          'garbage collected while the column still references it.',
+                    },
+                  }
+                  : {}),
               },
             });
 
@@ -308,6 +256,7 @@ export function createPresignedUrlPlugin(
                   plan(_$mutation: any, fieldArgs: any) {
                     const $input = fieldArgs.getRaw('input');
                     const $bucketKey = access($input, 'bucketKey');
+                    const $isPublic = access($input, 'isPublic');
                     const $contentHash = access($input, 'contentHash');
                     const $contentType = access($input, 'contentType');
                     const $size = access($input, 'size');
@@ -319,6 +268,7 @@ export function createPresignedUrlPlugin(
 
                     const $combined = object({
                       bucketKey: $bucketKey,
+                      isPublic: $isPublic,
                       ownerId: $ownerId,
                       contentHash: $contentHash,
                       contentType: $contentType,
@@ -346,9 +296,12 @@ export function createPresignedUrlPlugin(
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
 
-                      // Bucket config read under the request role (RLS-gated visibility).
+                      // Bucket resolution + read under the request role (RLS-gated visibility).
                       const bucket = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        getBucketConfig(pgClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined),
+                        resolveUploadBucket(
+                          pgClient, storageConfig, databaseId,
+                          vals.bucketKey ?? null, vals.ownerId ?? null, vals.isPublic === true,
+                        ),
                       );
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
@@ -395,13 +348,15 @@ export function createPresignedUrlPlugin(
                 deduplicated: { type: new GraphQLNonNull(GraphQLBoolean) },
                 expiresAt: { type: GraphQLString },
                 previousVersionId: { type: GraphQLString },
+                ...(jsonType ? { file: { type: jsonType, description: 'The projection document for the created file.' } } : {}),
               },
             });
 
             const BulkInputType = new GraphQLInputObjectType({
               name: `Upload${filesTypeName}BulkInput`,
               fields: {
-                bucketKey: { type: new GraphQLNonNull(GraphQLString), description: 'Bucket key (e.g., "public", "private")' },
+                bucketKey: { type: GraphQLString, description: 'Bucket key (e.g., "public", "private"). Omit to use the database\'s default bucket for the requested access.' },
+                isPublic: { type: GraphQLBoolean, description: 'Which default bucket to resolve when bucketKey is omitted. Ignored when bucketKey is given.' },
                 ...(hasOwnerId
                   ? { ownerId: { type: new GraphQLNonNull(ownerIdGqlType || GraphQLString), description: 'Owner entity ID (required for entity-scoped buckets)' } }
                   : {}),
@@ -430,6 +385,7 @@ export function createPresignedUrlPlugin(
                   plan(_$mutation: any, fieldArgs: any) {
                     const $input = fieldArgs.getRaw('input');
                     const $bucketKey = access($input, 'bucketKey');
+                    const $isPublic = access($input, 'isPublic');
                     const $ownerId = hasOwnerId ? access($input, 'ownerId') : lambda(null, (): null => null);
                     const $files = access($input, 'files');
                     const $withPgClient = (grafastContext() as any).get('withPgClient');
@@ -437,6 +393,7 @@ export function createPresignedUrlPlugin(
 
                     const $combined = object({
                       bucketKey: $bucketKey,
+                      isPublic: $isPublic,
                       ownerId: $ownerId,
                       files: $files,
                       withPgClient: $withPgClient,
@@ -460,9 +417,12 @@ export function createPresignedUrlPlugin(
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
 
-                      // Bucket config read under the request role (RLS-gated visibility).
+                      // Bucket resolution + read under the request role (RLS-gated visibility).
                       const bucket = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        getBucketConfig(pgClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined),
+                        resolveUploadBucket(
+                          pgClient, storageConfig, databaseId,
+                          vals.bucketKey ?? null, vals.ownerId ?? null, vals.isPublic === true,
+                        ),
                       );
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
@@ -714,6 +674,17 @@ async function processSingleFile(
     throw new Error(`FILE_TOO_LARGE: exceeds bucket max of ${bucket.max_file_size} bytes`);
   }
 
+  // The projection document the caller stores in an image/upload column. Built
+  // from the same values the files row carries, so the column and the row cannot
+  // disagree, and it names the files row by id — which is what stops GC from
+  // collecting an object a document still points at.
+  const projectFile = (fileId: string, key: string): FileProjection =>
+    buildFileProjection(
+      { id: fileId, key, bucketId: bucket.id, mime: contentType, size, filename },
+      bucket,
+      s3ForDb,
+    );
+
   // Determine S3 key
   let s3Key: string;
   let isCustomKey = false;
@@ -756,6 +727,7 @@ async function processSingleFile(
           deduplicated: true,
           expiresAt: null as string | null,
           previousVersionId: null as string | null,
+          file: projectFile(existing.id as string, s3Key),
         };
       }
       previousVersionId = existing.id;
@@ -782,6 +754,7 @@ async function processSingleFile(
         deduplicated: true,
         expiresAt: null as string | null,
         previousVersionId: null as string | null,
+        file: projectFile(existingFile.id as string, s3Key),
       };
     }
   }
@@ -836,6 +809,7 @@ async function processSingleFile(
     deduplicated: false,
     expiresAt,
     previousVersionId,
+    file: projectFile(fileId, s3Key),
   };
 }
 

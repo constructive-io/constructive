@@ -27,10 +27,24 @@
  * ```
  */
 
+export type { ResolvedBucketCoordinate } from './default-bucket';
+export { resolveDefaultBucket } from './default-bucket';
 export { createDownloadUrlPlugin } from './download-url-field';
+export type { FileRefFieldBinding } from './file-ref-registry';
+export { clearFileRefFieldCache, FileRefFieldNotRegisteredError, getFileRefFieldBinding } from './file-ref-registry';
+export {
+  assertUploadAllowedByBucket,
+  buildFileProjection,
+  type FileProjection,
+  finalizeStagedUpload,
+  type ManagedUploadTarget,
+  resolveManagedUploadTarget,
+} from './managed-upload';
+export { mintPhysicalBucketName, provisionAndRecordPhysicalBucket, resolveS3, resolveS3ForDatabase } from './physical-bucket';
 export { createPresignedUrlPlugin,PresignedUrlPlugin } from './plugin';
 export { PresignedUrlPreset } from './preset';
-export { deleteS3Object, generatePresignedGetUrl, generatePresignedPutUrl, headObject } from './s3-signer';
+export { type WithPgClient, withRequestPgClient } from './request-pg-client';
+export { copyS3Object, deleteS3Object, generatePresignedGetUrl, generatePresignedPutUrl, headObject } from './s3-signer';
 export { clearBucketCache, clearStorageModuleCache, getBucketConfig, getStorageModuleConfig, getStorageModuleConfigForOwner, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
 export type {
   BucketConfig,
