@@ -9,7 +9,7 @@ const log = new Logger('billing');
 // The webhook receiver in constructive-db reads objects this endpoint creates,
 // so both sides pin the same API version. Pinning it here also keeps a
 // dependency bump from silently changing the shape of what Stripe returns.
-const STRIPE_API_VERSION = '2025-02-24.acacia';
+const STRIPE_API_VERSION = '2026-07-29.dahlia';
 
 interface BillingProviderConfig {
   apiKey: string | null;
