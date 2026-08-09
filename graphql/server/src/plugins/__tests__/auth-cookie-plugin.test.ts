@@ -321,7 +321,7 @@ describe('AuthCookiePlugin unified-auth cookie boundary', () => {
       { callback: jest.fn() }
     );
 
-    await callback!(
+    const result = await callback!(
       next,
       {
         requestDigest: {
@@ -353,11 +353,59 @@ describe('AuthCookiePlugin unified-auth cookie boundary', () => {
       } as never
     );
 
-    const cookie = (setHeader.mock.calls[0][1] as string[])[0];
+    const setCookieCall = setHeader.mock.calls.find(([name]) => name === 'Set-Cookie');
+    const cookie = (setCookieCall?.[1] as string[])[0];
     expect(cookie).toContain('constructive_session=cnc_live_bt_secret');
     expect(cookie).toContain('Secure');
     expect(cookie).toContain('HttpOnly');
     expect(cookie).not.toContain('Domain=');
+    expect((result as { headers: Record<string, string> }).headers['cache-control'])
+      .toBe('no-store');
+    expect(setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
+  });
+
+  it('marks handoff redemption no-store without writing a Constructive cookie', async () => {
+    const setHeader = jest.fn();
+    const getHeader = jest.fn();
+    const processRequest = AuthCookiePlugin.grafserv?.middleware?.processRequest;
+    const callback = typeof processRequest === 'function'
+      ? processRequest
+      : processRequest?.callback;
+
+    const result = await callback!(
+      Object.assign(async () => ({
+        type: 'buffer' as const,
+        statusCode: 200,
+        headers: { 'content-type': 'application/json' },
+        buffer: Buffer.from(JSON.stringify({
+          data: { redeemUnifiedLoginHandoff: { accessToken: 'site-token' } }
+        }))
+      }), { callback: jest.fn() }),
+      {
+        requestDigest: {
+          method: 'POST',
+          getBody: async () => ({
+            type: 'buffer',
+            buffer: Buffer.from(JSON.stringify({
+              query: `mutation Redeem($input: RedeemUnifiedLoginHandoffInput!) {
+                redeemUnifiedLoginHandoff(input: $input) { accessToken }
+              }`,
+              operationName: 'Redeem'
+            }))
+          }),
+          requestContext: {
+            expressv4: {
+              req: {},
+              res: { setHeader, getHeader }
+            }
+          }
+        }
+      } as never
+    );
+
+    expect((result as { headers: Record<string, string> }).headers['cache-control'])
+      .toBe('no-store');
+    expect(setHeader.mock.calls.some(([name]) => name === 'Set-Cookie')).toBe(false);
   });
 });
 

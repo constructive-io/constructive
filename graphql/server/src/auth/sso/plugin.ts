@@ -4,6 +4,7 @@ import { extendSchema, gql } from 'graphile-utils';
 import { createUnifiedAuthService } from './service';
 import type {
   ContinueUnifiedLoginInput,
+  RedeemUnifiedLoginHandoffInput,
   StartProviderAuthenticationInput,
   StartUnifiedLoginInput,
   UnifiedAuthGraphQLContext,
@@ -60,7 +61,7 @@ export const createUnifiedAuthPlugin = (
       type UnifiedLoginContinuationPayload {
         transactionId: String!
         authenticated: Boolean!
-        continuationUrl: String
+        continuationUrl: String!
       }
 
       type UnifiedLoginCredentialPayload {
@@ -72,7 +73,17 @@ export const createUnifiedAuthPlugin = (
         accessTokenExpiresAt: Datetime!
         isVerified: Boolean!
         totpEnabled: Boolean!
-        continuationUrl: String
+        continuationUrl: String!
+      }
+
+      type RedeemUnifiedLoginHandoffPayload {
+        credentialId: UUID!
+        userId: UUID!
+        accessToken: String!
+        accessTokenExpiresAt: Datetime!
+        isVerified: Boolean!
+        totpEnabled: Boolean!
+        returnTo: String!
       }
 
       input StartUnifiedLoginInput {
@@ -99,6 +110,10 @@ export const createUnifiedAuthPlugin = (
         providerKey: String!
       }
 
+      input RedeemUnifiedLoginHandoffInput {
+        handoffCode: String!
+      }
+
       extend type Query {
         unifiedAuthProviders: [UnifiedAuthProvider!]!
       }
@@ -109,6 +124,7 @@ export const createUnifiedAuthPlugin = (
         signInUnifiedLogin(input: UnifiedPasswordInput!): UnifiedLoginCredentialPayload!
         signUpUnifiedLogin(input: UnifiedPasswordInput!): UnifiedLoginCredentialPayload!
         startProviderAuthentication(input: StartProviderAuthenticationInput!): StartProviderAuthenticationPayload!
+        redeemUnifiedLoginHandoff(input: RedeemUnifiedLoginHandoffInput!): RedeemUnifiedLoginHandoffPayload!
       }
     `,
     resolvers: {
@@ -144,7 +160,12 @@ export const createUnifiedAuthPlugin = (
           _source: unknown,
           args: InputArguments<StartProviderAuthenticationInput>,
           context: UnifiedAuthGraphQLContext
-        ) => service.startProvider(context, args.input)
+        ) => service.startProvider(context, args.input),
+        redeemUnifiedLoginHandoff: (
+          _source: unknown,
+          args: InputArguments<RedeemUnifiedLoginHandoffInput>,
+          context: UnifiedAuthGraphQLContext
+        ) => service.redeem(context, args.input)
       }
     }
   }, 'UnifiedAuthPlugin');

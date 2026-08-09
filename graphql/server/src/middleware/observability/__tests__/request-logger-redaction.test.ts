@@ -11,7 +11,7 @@ describe('redactSensitiveRequestUrl', () => {
       '/callback?error=%5BREDACTED%5D'
     );
     expect(redactSensitiveRequestUrl('/callback?handoff=secret&site_state=public')).toBe(
-      '/callback?handoff=%5BREDACTED%5D&site_state=public'
+      '/callback?handoff=%5BREDACTED%5D&site_state=%5BREDACTED%5D'
     );
   });
 

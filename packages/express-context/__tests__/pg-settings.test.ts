@@ -31,6 +31,38 @@ describe('buildPgSettings — jwt.claims.api_id provenance', () => {
     expect(settings['jwt.claims.user_id']).toBe('u1');
   });
 
+  it('forwards existing credential and principal claims to direct DB calls', () => {
+    const token = {
+      id: 'credential-1',
+      user_id: 'user-1',
+      session_id: 'session-1',
+      principal_id: 'principal-1',
+      kind: 'api_key',
+      access_level: 'full_access'
+    } as ConstructiveAPIToken;
+
+    const settings = buildPgSettings({ api, token, requestId: 'r1' });
+
+    expect(settings).toMatchObject({
+      'jwt.claims.token_id': 'credential-1',
+      'jwt.claims.user_id': 'user-1',
+      'jwt.claims.session_id': 'session-1',
+      'jwt.claims.principal_id': 'principal-1',
+      'jwt.claims.kind': 'api_key',
+      'jwt.claims.access_level': 'full_access'
+    });
+  });
+
+  it('uses the human user as principal when a credential has no service principal', () => {
+    const settings = buildPgSettings({
+      api,
+      token: { user_id: 'user-1' },
+      requestId: 'r1'
+    });
+
+    expect(settings['jwt.claims.principal_id']).toBe('user-1');
+  });
+
   it('omits jwt.claims.api_id when the api has no apiId (non-API surface)', () => {
     const settings = buildPgSettings({
       api: { ...api, apiId: undefined },
