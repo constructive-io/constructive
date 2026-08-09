@@ -39,7 +39,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "express": "^5.2.1",
-    "grafast": "1.1.1",
+    "grafast": "1.1.2",
     "grafserv": "1.0.1",
     "graphile-build": "5.1.1",
     "graphile-build-pg": "5.1.3",
@@ -52,7 +52,7 @@
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pg-sql2": "5.0.1",
-    "postgraphile": "5.1.3"
+    "postgraphile": "5.1.4"
   },
   "keywords": [
     "graphql",

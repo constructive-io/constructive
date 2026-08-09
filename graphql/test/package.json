@@ -39,7 +39,7 @@
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "grafast": "1.1.1",
+    "grafast": "1.1.2",
     "graphile-build": "5.1.1",
     "graphile-build-pg": "5.1.3",
     "graphile-config": "1.1.0",
@@ -49,7 +49,7 @@
     "mock-req": "^0.2.0",
     "pg": "^8.21.0",
     "pgsql-test": "workspace:^",
-    "postgraphile": "5.1.3",
+    "postgraphile": "5.1.4",
     "typescript": "^5.0.0"
   },
   "keywords": [
