@@ -30,6 +30,9 @@ if (parsed.class === 'public') {
 
 // Throw a structured error
 throw errors.ACCOUNT_EXISTS();
+
+// Preserve an internal cause without exposing it in transport extensions
+throw errors.INVALID_OAUTH_STATE(undefined, undefined, { cause: caught });
 ```
 
 ## Design notes

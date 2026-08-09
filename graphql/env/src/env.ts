@@ -1,6 +1,8 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 
+import { getOAuthEnvVars } from './oauth';
+
 /**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
@@ -38,6 +40,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   // let an absent env var overwrite pgpm.json or consumer-specific values.
   const smsRequestTimeoutMs = parseEnvNumber(SMS_REQUEST_TIMEOUT_MS);
   const smsDryRun = parseEnvBoolean(SEND_SMS_DRY_RUN);
+  const oauth = getOAuthEnvVars(env);
   const hasSmsEnvOverrides = Boolean(
     SMS_PROVIDER ||
     SMS_SENDER_ID ||
@@ -67,6 +70,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
       ...(API_ANON_ROLE && { anonRole: API_ANON_ROLE }),
       ...(API_ROLE_NAME && { roleName: API_ROLE_NAME })
     },
+    ...(oauth && { oauth }),
     ...((EMBEDDER_PROVIDER || CHAT_PROVIDER) && {
       llm: {
         ...((EMBEDDER_PROVIDER || EMBEDDER_MODEL || EMBEDDER_BASE_URL) && {

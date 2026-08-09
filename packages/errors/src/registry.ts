@@ -148,6 +148,90 @@ export const registry = {
     http: 404,
     message: 'No single sign-on account was found.'
   }),
+  OAUTH_SIGN_IN_DISABLED: defineError({
+    code: 'OAUTH_SIGN_IN_DISABLED',
+    class: 'public',
+    http: 403,
+    message: 'OAuth sign in is not enabled.'
+  }),
+  INVALID_SSO_SITE_STATE: defineError({
+    code: 'INVALID_SSO_SITE_STATE',
+    class: 'public',
+    http: 400,
+    message: 'The sign-in request is invalid or has expired. Please restart sign in.'
+  }),
+  INVALID_SSO_CALLBACK: defineError({
+    code: 'INVALID_SSO_CALLBACK',
+    class: 'public',
+    http: 400,
+    message: 'The requested sign-in callback is not registered for this Site.'
+  }),
+  INVALID_SSO_RETURN_TARGET: defineError({
+    code: 'INVALID_SSO_RETURN_TARGET',
+    class: 'public',
+    http: 400,
+    message: 'The requested return location is invalid.'
+  }),
+  SSO_LOGIN_TRANSACTION_EXPIRED: defineError({
+    code: 'SSO_LOGIN_TRANSACTION_EXPIRED',
+    class: 'public',
+    http: 410,
+    message: 'The sign-in request has expired. Please restart sign in.'
+  }),
+  SSO_LOGIN_TRANSACTION_ALREADY_USED: defineError({
+    code: 'SSO_LOGIN_TRANSACTION_ALREADY_USED',
+    class: 'public',
+    http: 409,
+    message: 'The sign-in request has already been completed. Please restart sign in.'
+  }),
+  INVALID_OAUTH_STATE: defineError({
+    code: 'INVALID_OAUTH_STATE',
+    class: 'public',
+    http: 400,
+    message: 'The external sign-in state is invalid or has expired. Please restart sign in.'
+  }),
+  INVALID_OAUTH_PKCE: defineError({
+    code: 'INVALID_OAUTH_PKCE',
+    class: 'public',
+    http: 400,
+    message: 'The external sign-in verification failed. Please restart sign in.'
+  }),
+  IDENTITY_PROVIDER_NOT_CONFIGURED: defineError({
+    code: 'IDENTITY_PROVIDER_NOT_CONFIGURED',
+    class: 'public',
+    http: 400,
+    message: 'This identity provider is not configured.'
+  }),
+  IDENTITY_PROVIDER_UNSUPPORTED: defineError({
+    code: 'IDENTITY_PROVIDER_UNSUPPORTED',
+    class: 'public',
+    http: 400,
+    message: 'This identity provider is not supported.'
+  }),
+  SSO_ACCOUNT_CONFLICT: defineError({
+    code: 'SSO_ACCOUNT_CONFLICT',
+    class: 'public',
+    http: 409,
+    message: 'An account already uses this email. Sign in with its existing method.'
+  }),
+  INVALID_SSO_HANDOFF: defineError({
+    code: 'INVALID_SSO_HANDOFF',
+    class: 'public',
+    http: 400,
+    message: 'The Site sign-in handoff is invalid.'
+  }),
+  SSO_HANDOFF_EXPIRED: defineError({
+    code: 'SSO_HANDOFF_EXPIRED',
+    class: 'public',
+    http: 410,
+    message: 'The Site sign-in handoff has expired. Please restart sign in.'
+  }),
+  SSO_HANDOFF_ALREADY_USED: defineError({
+    code: 'SSO_HANDOFF_ALREADY_USED',
+    class: 'public',
+    http: 409,
+    message: 'The Site sign-in handoff has already been used.'
+  }),
   MAGIC_LINK_SIGN_IN_DISABLED: defineError({
     code: 'MAGIC_LINK_SIGN_IN_DISABLED',
     class: 'public',
