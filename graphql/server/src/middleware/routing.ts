@@ -37,6 +37,8 @@ export interface ResolvedRoute {
   verification_status: string | null;
   tls_status: string | null;
   tls_secret_name: string | null;
+  /** Optional Site security context bound to this route independently of API. */
+  runtime_site_id: string | null;
 }
 
 const RESOLVER_FUNCTION = 'resolve_route';
@@ -128,6 +130,7 @@ export const routeToApiStructure = (
 
   return {
     apiId: config.api_id ?? route.target_source_id ?? undefined,
+    siteId: route.runtime_site_id ?? undefined,
     // Scoped APIs leave dbname NULL when their schemas live in the serving
     // database; fall back to the server's own database in that case.
     dbname: config.dbname || opts.pg?.database || '',

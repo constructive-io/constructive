@@ -16,6 +16,7 @@
  *
  * Opt-in (not in the default registry, register it explicitly):
  *   - identityProviders (three round trips, decrypts client secrets)
+ *   - ssoSurface (current Tenant's provisioned unified-auth private schema)
  *
  * To add a new per-db lookup, implement a ModuleLoader and register it:
  *
@@ -55,6 +56,7 @@ export { inferenceLogLoader } from './inference-log';
 export { llmLoader } from './llm';
 export { pubkeyLoader } from './pubkey';
 export { rlsLoader } from './rls';
+export { ssoSurfaceLoader } from './sso-surface';
 export { webauthnLoader } from './webauthn';
 
 /**
