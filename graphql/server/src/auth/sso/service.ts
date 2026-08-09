@@ -16,6 +16,8 @@ import {
   signUpUnifiedLogin,
   startUnifiedLogin
 } from './db-contract';
+import { createHandoffMaterial } from './handoff';
+import { redeemUnifiedLoginHandoff } from './handoff-db-contract';
 import {
   loadProviderDisplayOptions,
   resolveConfiguredProvider
@@ -24,6 +26,8 @@ import { startProviderOAuthRequest } from './provider-db-contract';
 import type {
   ContinueUnifiedLoginInput,
   ProviderDisplayOption,
+  RedeemUnifiedLoginHandoffInput,
+  RedeemUnifiedLoginHandoffPayload,
   StartProviderAuthenticationInput,
   StartProviderAuthenticationPayload,
   StartUnifiedLoginInput,
@@ -120,6 +124,10 @@ export interface UnifiedAuthService {
     context: UnifiedAuthGraphQLContext,
     input: StartProviderAuthenticationInput
   ): Promise<StartProviderAuthenticationPayload>;
+  redeem(
+    context: UnifiedAuthGraphQLContext,
+    input: RedeemUnifiedLoginHandoffInput
+  ): Promise<RedeemUnifiedLoginHandoffPayload>;
 }
 
 export const createUnifiedAuthService = (oauthEnabled: boolean): UnifiedAuthService => ({
@@ -149,7 +157,13 @@ export const createUnifiedAuthService = (oauthEnabled: boolean): UnifiedAuthServ
     const browserBinding = requireBrowserBinding(graphQLContext);
     const surface = await resolveSsoSurface(context);
     if (!context.userId) throw errors.UNAUTHENTICATED();
-    return confirmUnifiedLogin(context, surface, input, browserBinding);
+    return confirmUnifiedLogin(
+      context,
+      surface,
+      input,
+      browserBinding,
+      createHandoffMaterial()
+    );
   },
 
   async signIn(graphQLContext, input) {
@@ -157,7 +171,13 @@ export const createUnifiedAuthService = (oauthEnabled: boolean): UnifiedAuthServ
     const context = requireContext(graphQLContext);
     const browserBinding = requireBrowserBinding(graphQLContext);
     const surface = await resolveSsoSurface(context);
-    return signInUnifiedLogin(context, surface, input, browserBinding);
+    return signInUnifiedLogin(
+      context,
+      surface,
+      input,
+      browserBinding,
+      createHandoffMaterial()
+    );
   },
 
   async signUp(graphQLContext, input) {
@@ -165,7 +185,13 @@ export const createUnifiedAuthService = (oauthEnabled: boolean): UnifiedAuthServ
     const context = requireContext(graphQLContext);
     const browserBinding = requireBrowserBinding(graphQLContext);
     const surface = await resolveSsoSurface(context);
-    return signUpUnifiedLogin(context, surface, input, browserBinding);
+    return signUpUnifiedLogin(
+      context,
+      surface,
+      input,
+      browserBinding,
+      createHandoffMaterial()
+    );
   },
 
   async startProvider(graphQLContext, input) {
@@ -207,5 +233,25 @@ export const createUnifiedAuthService = (oauthEnabled: boolean): UnifiedAuthServ
     return {
       authorizationUrl: `/auth/oauth/authorize?state=${encodeURIComponent(state)}`
     };
+  },
+
+  async redeem(graphQLContext, input) {
+    const context = requireContext(graphQLContext);
+    const token = context.token;
+    if (!token?.user_id) throw errors.UNAUTHENTICATED();
+    if (
+      token.kind !== 'api_key' ||
+      typeof token.principal_id !== 'string' ||
+      !context.api.apiId ||
+      token.access_level === 'read_only'
+    ) {
+      throw errors.FORBIDDEN();
+    }
+    const surface = await resolveSsoSurface(context);
+    return redeemUnifiedLoginHandoff(
+      context,
+      surface,
+      input.handoffCode
+    );
   }
 });

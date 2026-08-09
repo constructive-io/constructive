@@ -70,18 +70,22 @@ describe('OAuth HTTP routes', () => {
       accessTokenExpiresAt: '2026-08-10T12:00:00.000Z',
       isVerified: true,
       totpEnabled: false,
-      continuationUrl: null
+      continuationUrl:
+        'https://portal.example.com/auth/complete?handoff=handoff-code&site_state=site-state'
     });
 
     const response = await supertest(makeApp())
       .get(`/auth/oauth/callback?state=${opaqueState}&code=provider-code`)
-      .expect(200);
+      .expect(303);
 
     const cookie = response.headers['set-cookie'][0] as string;
     expect(cookie).toContain('constructive_session=cnc_auth_center_token');
     expect(cookie).toContain('Secure');
     expect(cookie).toContain('HttpOnly');
     expect(cookie).not.toContain('Domain=');
+    expect(response.headers.location).toBe(
+      'https://portal.example.com/auth/complete?handoff=handoff-code&site_state=site-state'
+    );
     expect(response.text).not.toContain('cnc_auth_center_token');
   });
 

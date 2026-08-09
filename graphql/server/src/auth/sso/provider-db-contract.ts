@@ -8,10 +8,12 @@ import sql from 'pg-sql2';
 
 import {
   callFunction,
+  continuationFromDatabaseResult,
   optionalString,
   requiredBoolean,
   requiredString
 } from './db-contract';
+import type { HandoffMaterial } from './handoff';
 
 export const PROVIDER_DB_FUNCTIONS = {
   start: 'start_provider_oauth_request',
@@ -31,9 +33,10 @@ export const PROVIDER_DB_FUNCTIONS = {
  *   binding and return the request fields parsed below. Consume atomically
  *   marks the state used before Provider callback handling.
  * - `complete_provider_unified_login(uuid, text, text, text, jsonb, text,
- *   boolean, text)` accepts request ID plus normalized identity, existing
- *   credential options, and browser binding; it returns the unchanged
- *   identity-auth credential result and optional shared continuation.
+ *   boolean, text, bytea)` accepts request ID plus normalized identity,
+ *   existing credential options, browser binding, and the server-generated
+ *   handoff digest; it returns the unchanged identity-auth credential result
+ *   and transaction-bound callback continuation.
  */
 
 export interface ProviderOAuthRequest {
@@ -51,7 +54,7 @@ export interface ProviderCredentialResult {
   accessTokenExpiresAt: string;
   isVerified: boolean;
   totpEnabled: boolean;
-  continuationUrl: string | null;
+  continuationUrl: string;
 }
 
 /**
@@ -161,6 +164,7 @@ export const completeProviderUnifiedLogin = async (
     requestId: string;
     identity: NormalizedExternalIdentity;
     browserBinding: string;
+    handoff: HandoffMaterial;
   }
 ): Promise<ProviderCredentialResult> => {
   const operation = PROVIDER_DB_FUNCTIONS.complete;
@@ -176,9 +180,10 @@ export const completeProviderUnifiedLogin = async (
       sql.value(JSON.stringify(input.identity.profile)),
       sql.value('bearer'),
       sql.value(false),
-      sql.value(input.browserBinding)
+      sql.value(input.browserBinding),
+      sql.value(input.handoff.hash)
     ],
-    ['uuid', 'text', 'text', 'text', 'jsonb', 'text', 'boolean', 'text']
+    ['uuid', 'text', 'text', 'text', 'jsonb', 'text', 'boolean', 'text', 'bytea']
   );
 
   const mfaRequired = requiredBoolean(
@@ -202,6 +207,10 @@ export const completeProviderUnifiedLogin = async (
     ),
     isVerified: requiredBoolean(row, 'is_verified', operation),
     totpEnabled: requiredBoolean(row, 'totp_enabled', operation),
-    continuationUrl: optionalString(row, 'continuation_url', operation)
+    continuationUrl: continuationFromDatabaseResult(
+      row,
+      operation,
+      input.handoff
+    )
   };
 };

@@ -26,9 +26,3 @@ const page = (title: string, body: string): string => `<!doctype html>
 
 export const renderOAuthFailurePage = (error: ConstructiveError): string =>
   page('External sign in failed', `${error.message} (${error.code})`);
-
-export const renderOAuthSuccessPage = (): string =>
-  page(
-    'External sign in completed',
-    'Authentication succeeded. You may close this page.'
-  );

@@ -2,6 +2,10 @@ import { errors } from '@constructive-io/errors';
 import type { ConstructiveContext, SsoSurface } from '@constructive-io/express-context';
 import sql from 'pg-sql2';
 
+import {
+  buildHandoffContinuationUrl,
+  type HandoffMaterial
+} from './handoff';
 import type {
   ContinueUnifiedLoginInput,
   StartUnifiedLoginInput,
@@ -25,9 +29,11 @@ import type {
  * - `start_unified_login(uuid, text, text, text, text)` returns
  *   `transaction_id`, safe Site display fields, `sign_in_mode`,
  *   `reusable_authentication`, and optional safe current-user display fields.
- * - `confirm_unified_login(text, text)` returns the associated `user_id`.
- * - `sign_in_unified_login(text, text, text, boolean, text, text, text)` and
- *   `sign_up_unified_login(...)` return the unchanged local credential columns.
+ * - `confirm_unified_login(text, text, bytea)` returns the associated `user_id`
+ *   and the transaction-bound Site callback continuation fields.
+ * - `sign_in_unified_login(text, text, text, boolean, text, text, text, bytea)`
+ *   and `sign_up_unified_login(...)` return the unchanged local credential
+ *   columns and the same continuation fields.
  *
  * The final `text` arguments are the server-read authentication-center browser
  * binding and device-token values. The transaction identifier is an opaque
@@ -98,7 +104,7 @@ export const requiredBoolean = (
   return value;
 };
 
-export type SqlCast = 'boolean' | 'jsonb' | 'text' | 'uuid';
+export type SqlCast = 'boolean' | 'bytea' | 'jsonb' | 'text' | 'uuid';
 
 const castValue = (
   value: ReturnType<typeof sql.value>,
@@ -107,6 +113,8 @@ const castValue = (
   switch (cast) {
   case 'boolean':
     return sql.fragment`${value}::boolean`;
+  case 'bytea':
+    return sql.fragment`${value}::bytea`;
   case 'jsonb':
     return sql.fragment`${value}::jsonb`;
   case 'text':
@@ -114,6 +122,22 @@ const castValue = (
   case 'uuid':
     return sql.fragment`${value}::uuid`;
   }
+};
+
+export const continuationFromDatabaseResult = (
+  row: DatabaseRecord,
+  operation: string,
+  handoff: HandoffMaterial
+): string => {
+  const expiresAt = requiredString(row, 'handoff_expires_at', operation);
+  if (!Number.isFinite(Date.parse(expiresAt))) {
+    throw invalidDatabaseResult(operation);
+  }
+  return buildHandoffContinuationUrl(
+    requiredString(row, 'callback_url', operation),
+    requiredString(row, 'site_state', operation),
+    handoff.code
+  );
 };
 
 export const callFunction = async (
@@ -200,22 +224,26 @@ export const confirmUnifiedLogin = async (
   context: ConstructiveContext,
   surface: SsoSurface,
   input: ContinueUnifiedLoginInput,
-  browserBinding: string
+  browserBinding: string,
+  handoff: HandoffMaterial
 ): Promise<UnifiedLoginContinuationPayload> => {
   const operation = SSO_DB_FUNCTIONS.confirm;
   const row = await callFunction(
     context,
     surface,
     operation,
-    [sql.value(input.transactionId), sql.value(browserBinding)],
-    ['text', 'text']
+    [
+      sql.value(input.transactionId),
+      sql.value(browserBinding),
+      sql.value(handoff.hash)
+    ],
+    ['text', 'text', 'bytea']
   );
   requiredString(row, 'user_id', operation);
   return {
     transactionId: input.transactionId,
     authenticated: true,
-    // PR 6 adds the shared one-time handoff continuation.
-    continuationUrl: null
+    continuationUrl: continuationFromDatabaseResult(row, operation, handoff)
   };
 };
 
@@ -224,7 +252,8 @@ const authenticateWithPassword = async (
   context: ConstructiveContext,
   surface: SsoSurface,
   input: UnifiedPasswordInput,
-  browserBinding: string
+  browserBinding: string,
+  handoff: HandoffMaterial
 ): Promise<UnifiedLoginCredentialPayload> => {
   const row = await callFunction(
     context,
@@ -237,9 +266,10 @@ const authenticateWithPassword = async (
       sql.value(input.rememberMe ?? false),
       sql.value('bearer'),
       sql.value(browserBinding),
-      sql.value(input.deviceToken ?? null)
+      sql.value(input.deviceToken ?? null),
+      sql.value(handoff.hash)
     ],
-    ['text', 'text', 'text', 'boolean', 'text', 'text', 'text']
+    ['text', 'text', 'text', 'boolean', 'text', 'text', 'text', 'bytea']
   );
 
   // Strict-auth/MFA/step-up integration is explicitly outside v1. The DB
@@ -263,8 +293,7 @@ const authenticateWithPassword = async (
     ),
     isVerified: requiredBoolean(row, 'is_verified', functionName),
     totpEnabled: requiredBoolean(row, 'totp_enabled', functionName),
-    // PR 6 adds the shared one-time handoff continuation.
-    continuationUrl: null
+    continuationUrl: continuationFromDatabaseResult(row, functionName, handoff)
   };
 };
 
@@ -272,26 +301,30 @@ export const signInUnifiedLogin = (
   context: ConstructiveContext,
   surface: SsoSurface,
   input: UnifiedPasswordInput,
-  browserBinding: string
+  browserBinding: string,
+  handoff: HandoffMaterial
 ): Promise<UnifiedLoginCredentialPayload> =>
   authenticateWithPassword(
     SSO_DB_FUNCTIONS.signIn,
     context,
     surface,
     input,
-    browserBinding
+    browserBinding,
+    handoff
   );
 
 export const signUpUnifiedLogin = (
   context: ConstructiveContext,
   surface: SsoSurface,
   input: UnifiedPasswordInput,
-  browserBinding: string
+  browserBinding: string,
+  handoff: HandoffMaterial
 ): Promise<UnifiedLoginCredentialPayload> =>
   authenticateWithPassword(
     SSO_DB_FUNCTIONS.signUp,
     context,
     surface,
     input,
-    browserBinding
+    browserBinding,
+    handoff
   );

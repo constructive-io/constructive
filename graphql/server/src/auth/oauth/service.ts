@@ -9,6 +9,7 @@ import {
   ProviderAdapterError
 } from '@constructive-io/oauth';
 
+import { createHandoffMaterial } from '../sso/handoff';
 import { resolveConfiguredProvider } from '../sso/provider-config';
 import {
   completeProviderUnifiedLogin,
@@ -123,6 +124,7 @@ export const completeProviderAuthentication = async (
   return completeProviderUnifiedLogin(context, surface, {
     requestId: request.requestId,
     identity,
-    browserBinding: input.browserBinding
+    browserBinding: input.browserBinding,
+    handoff: createHandoffMaterial()
   });
 };

@@ -12,10 +12,7 @@ import {
   getSessionCookieConfig,
   setSessionCookie
 } from '../../middleware/cookie';
-import {
-  renderOAuthFailurePage,
-  renderOAuthSuccessPage
-} from './page';
+import { renderOAuthFailurePage } from './page';
 import {
   completeProviderAuthentication,
   createProviderAuthorizationUrl
@@ -124,11 +121,7 @@ export const createOAuthRouter = (options: OAuthRouterOptions): Router => {
         secure: true
       };
       setSessionCookie(res, result.accessToken, cookieConfig);
-      if (result.continuationUrl) {
-        res.redirect(303, result.continuationUrl);
-        return;
-      }
-      res.status(200).type('html').send(renderOAuthSuccessPage());
+      res.redirect(303, result.continuationUrl);
     } catch (cause) {
       sendFailure(req, res, cause);
     }
