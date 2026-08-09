@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { prewarmAppWorkspace } from '../app-workspace';
 import { probeDatabase } from '../db-probe';
 import { getHost } from '../host';
-import { createDatabaseProvision } from '../provision-database/create-database-provision';
 import { selectProvisionCredential } from '../provision-database/credential';
 import {
   archiveBindingKeys,
@@ -18,6 +17,8 @@ import {
 } from '../provision-database/env-file';
 import { loadProvisionManifest } from '../provision-database/manifest';
 import { applySqlFixups } from '../provision-database/pg-fixups';
+import { selectProvisionRequest } from '../provision-database/preset-match';
+import { requestDatabaseProvision } from '../provision-database/request-database';
 import { type ProvisionOverlay, resolveProvisionModules } from '../provision-database/resolve';
 import { toolSchema } from '../tool-schema';
 
@@ -87,20 +88,6 @@ function parseEnvKeys(source: string): Record<string, string> {
   return env;
 }
 
-async function withRetry<T>(fn: () => Promise<T>, maxRetries = 5, delayMs = 2000): Promise<T> {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes('already exists') || msg.includes('exists')) throw err;
-      if (attempt === maxRetries) throw err;
-      await new Promise((r) => setTimeout(r, delayMs));
-    }
-  }
-  throw new Error('unreachable');
-}
-
 export const provisionDatabaseTool: ToolDefinition<
   typeof ProvisionDatabaseSchema,
   ProvisionDatabaseDetails
@@ -134,9 +121,10 @@ export const provisionDatabaseTool: ToolDefinition<
     const modulesEndpoint =
       process.env.MODULES_ENDPOINT || backend?.modulesEndpoint || DEFAULT_MODULES_ENDPOINT;
 
-    // Every new project provisions UNDER the account (owner_id = the account user),
-    // so the database is account-owned and enumerable. The account bearer is the
-    // single credential: it authenticates the provision mutation, the idempotency
+    // Every new project provisions UNDER the account (requestDatabase owns the
+    // database to the JWT user), so it is account-owned and enumerable. The
+    // account bearer is the single credential: it authenticates the provision
+    // mutation, the idempotency
     // probe below, and is the ACCESS_TOKEN written to .env for project-local
     // scripts. It expires with the login session — a relogin plus any provision
     // run (including the skip path) refreshes the .env copy. A signed-in session
@@ -223,7 +211,8 @@ export const provisionDatabaseTool: ToolDefinition<
     }
 
     // The packages/app scaffold + pnpm install are database-INDEPENDENT, so kick
-    // them off now to run concurrently with the ~90s provisioning mutation below.
+    // them off now to run concurrently with the provisioning request below
+    // (near-instant on a warm-pool hit, up to minutes on the cold path).
     // This keeps clone + install off run_codegen's critical path. Best-effort:
     // run_codegen re-runs the same idempotent steps, so a prewarm failure is
     // harmless. Never let it reject (we await it before returning).
@@ -254,23 +243,25 @@ export const provisionDatabaseTool: ToolDefinition<
 
     const physicalDb = process.env.CONSTRUCTIVE_DB || 'constructive';
 
-    // Provision on the MODULES endpoint: createDatabaseProvisionModule creates
-    // the database owned by ownerId, provisions the module set, and bootstraps
-    // the owner into it before the row returns. The domain still derives from
-    // the api endpoint's host (per-DB endpoints live under it), and an explicit
-    // subdomain (= databaseName) keeps them deterministic (SUBDOMAIN-001).
+    // Provision on the API endpoint: requestDatabase claims a warm-pool
+    // database when the resolved module set matches a cataloged preset
+    // (near-instant) and cold-provisions asynchronously otherwise; the ticket
+    // is polled on the modules endpoint until the database AND its deferred
+    // owner bootstrap complete. No retry wrapper: a pending ticket is the
+    // normal first response, and transient poll failures are absorbed inside
+    // the poll loop. The domain still derives from the api endpoint's host
+    // (per-DB endpoints live under it), and an explicit subdomain
+    // (= databaseName) keeps them deterministic (SUBDOMAIN-001).
     let databaseId: string;
     try {
-      ({ databaseId } = await withRetry(() =>
-        createDatabaseProvision({
-          endpoint: modulesEndpoint,
-          bearer: credential.bearer,
-          databaseName,
-          domain: provisionDomain(apiEndpoint),
-          ownerId,
-          modules,
-        }),
-      ));
+      ({ databaseId } = await requestDatabaseProvision({
+        apiEndpoint,
+        modulesEndpoint,
+        bearer: credential.bearer,
+        databaseName,
+        domain: provisionDomain(apiEndpoint),
+        request: selectProvisionRequest(modules),
+      }));
     } catch (err) {
       const detail = err instanceof Error ? err.message : String(err);
       const nameTakenHint = /already exists|already taken|already in use|duplicate/i.test(detail)
