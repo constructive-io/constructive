@@ -4,6 +4,33 @@ import type { RequestHandler } from 'express';
 
 const log = new Logger('server');
 const SAFE_REQUEST_ID = /^[a-zA-Z0-9\-_]{1,128}$/;
+const SENSITIVE_QUERY_PARAMETERS = new Set([
+  'access_token',
+  'code',
+  'error',
+  'error_description',
+  'handoff',
+  'id_token',
+  'state',
+  'token'
+]);
+
+export const redactSensitiveRequestUrl = (originalUrl: string): string => {
+  try {
+    const parsed = new URL(originalUrl, 'http://constructive.invalid');
+    for (const name of [...parsed.searchParams.keys()]) {
+      if (SENSITIVE_QUERY_PARAMETERS.has(name.toLowerCase())) {
+        parsed.searchParams.set(name, '[REDACTED]');
+      }
+    }
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    const queryStart = originalUrl.indexOf('?');
+    return queryStart === -1
+      ? originalUrl
+      : `${originalUrl.slice(0, queryStart)}?[REDACTED]`;
+  }
+};
 
 interface RequestLoggerOptions {
   observabilityEnabled: boolean;
@@ -22,8 +49,9 @@ export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptio
 
     const host = req.hostname || req.headers.host || 'unknown';
     const ip = req.clientIp ?? req.ip ?? 'unknown';
+    const safeUrl = redactSensitiveRequestUrl(req.originalUrl);
 
-    log.debug(`[${reqId}] -> ${req.method} ${req.originalUrl} host=${host} ip=${ip}`);
+    log.debug(`[${reqId}] -> ${req.method} ${safeUrl} host=${host} ip=${ip}`);
 
     res.on('finish', () => {
       finished = true;
@@ -35,7 +63,7 @@ export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptio
       const svcInfo = req.svc_key ? `svc=${req.svc_key}` : 'svc=unset';
 
       log.debug(
-        `[${reqId}] <- ${res.statusCode} ${req.method} ${req.originalUrl} (${durationMs.toFixed(
+        `[${reqId}] <- ${res.statusCode} ${req.method} ${safeUrl} (${durationMs.toFixed(
           1,
         )} ms) ${apiInfo} ${svcInfo} ${authInfo}`,
       );
@@ -54,7 +82,7 @@ export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptio
 
         log.warn(
           `[${reqId}] connection closed before response completed ` +
-            `${req.method} ${req.originalUrl} (${durationMs.toFixed(1)} ms) ${apiInfo}`,
+            `${req.method} ${safeUrl} (${durationMs.toFixed(1)} ms) ${apiInfo}`,
         );
       });
     }

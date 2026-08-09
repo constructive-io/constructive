@@ -4,6 +4,7 @@ import { extendSchema, gql } from 'graphile-utils';
 import { createUnifiedAuthService } from './service';
 import type {
   ContinueUnifiedLoginInput,
+  StartProviderAuthenticationInput,
   StartUnifiedLoginInput,
   UnifiedAuthGraphQLContext,
   UnifiedPasswordInput
@@ -41,6 +42,10 @@ export const createUnifiedAuthPlugin = (
         id: UUID!
         displayName: String!
         avatarUrl: String
+      }
+
+      type StartProviderAuthenticationPayload {
+        authorizationUrl: String!
       }
 
       type StartUnifiedLoginPayload {
@@ -89,6 +94,11 @@ export const createUnifiedAuthPlugin = (
         deviceToken: String
       }
 
+      input StartProviderAuthenticationInput {
+        transactionId: String!
+        providerKey: String!
+      }
+
       extend type Query {
         unifiedAuthProviders: [UnifiedAuthProvider!]!
       }
@@ -98,6 +108,7 @@ export const createUnifiedAuthPlugin = (
         confirmUnifiedLogin(input: ContinueUnifiedLoginInput!): UnifiedLoginContinuationPayload!
         signInUnifiedLogin(input: UnifiedPasswordInput!): UnifiedLoginCredentialPayload!
         signUpUnifiedLogin(input: UnifiedPasswordInput!): UnifiedLoginCredentialPayload!
+        startProviderAuthentication(input: StartProviderAuthenticationInput!): StartProviderAuthenticationPayload!
       }
     `,
     resolvers: {
@@ -128,7 +139,12 @@ export const createUnifiedAuthPlugin = (
           _source: unknown,
           args: InputArguments<UnifiedPasswordInput>,
           context: UnifiedAuthGraphQLContext
-        ) => service.signUp(context, args.input)
+        ) => service.signUp(context, args.input),
+        startProviderAuthentication: (
+          _source: unknown,
+          args: InputArguments<StartProviderAuthenticationInput>,
+          context: UnifiedAuthGraphQLContext
+        ) => service.startProvider(context, args.input)
       }
     }
   }, 'UnifiedAuthPlugin');
