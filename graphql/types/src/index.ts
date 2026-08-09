@@ -27,6 +27,11 @@ export {
   LlmEmbedderOptions,
   LlmOptions} from './llm';
 
+// Export GraphQL-server OAuth options
+export {
+  oauthServerDefaults,
+  type OAuthServerOptions} from './oauth';
+
 // Export SMS types
 export {
   DevSmsOptions,
