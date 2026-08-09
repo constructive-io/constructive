@@ -61,6 +61,6 @@
     "grafserv": "1.0.1",
     "makage": "^0.3.0",
     "pgsql-test": "workspace:^",
-    "postgraphile": "5.1.3"
+    "postgraphile": "5.1.4"
   }
 }
