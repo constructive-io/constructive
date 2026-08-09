@@ -98,6 +98,11 @@ export interface AuthSurface {
   connectedAccountsView: string;
 }
 
+/** Current Tenant's provisioned private unified-auth module surface. */
+export interface SsoSurface {
+  privateSchema: string;
+}
+
 /** One identity provider row, with its client secret resolved. */
 export interface IdentityProviderConfig {
   id: string;
@@ -136,6 +141,8 @@ export interface IdentityProvidersModule {
 
 export interface ApiStructure {
   apiId?: string;
+  /** Trusted Site runtime identity emitted by scoped routing, when present. */
+  siteId?: string;
   dbname: string;
   anonRole: string;
   roleName: string;
@@ -241,6 +248,7 @@ export interface BuiltinModuleMap {
   databaseSettings: DatabaseSettings;
   authSettings: AuthSettings;
   authSurface: AuthSurface;
+  ssoSurface: SsoSurface;
   identityProviders: IdentityProvidersModule;
   pubkeyChallengeSettings: PubkeyChallengeSettings;
   webauthnSettings: WebauthnSettings;
@@ -274,6 +282,8 @@ export interface ConstructiveContext {
   pgSettings: Record<string, string>;
   /** Database UUID from the API resolver */
   databaseId: string | null;
+  /** Trusted Site UUID from the resolved route; never inferred from Origin. */
+  siteId: string | null;
   /** Authenticated user ID from the JWT token */
   userId: string | null;
   /** Per-request correlation ID for distributed tracing */

@@ -70,6 +70,24 @@ Each loader encapsulates a SQL query + type transform + per-databaseId LRU cache
 | `webauthnLoader` | `routing_public.webauthn_settings` | WebAuthn/passkey configuration |
 | `authSettingsLoader` | `metaschema_modules_public.sessions_module` | Cookie/captcha settings (two-step tenant DB discovery) |
 
+### Opt-in authentication loaders
+
+`identityProvidersLoader` resolves enabled Tenant Provider configuration and
+secrets. `ssoSurfaceLoader` resolves only the current database's provisioned
+unified-auth private schema. Both are intentionally excluded from
+`createDefaultRegistry()` and must be registered by the authentication service
+that owns their cost and secret boundary:
+
+```typescript
+const registry = createDefaultRegistry();
+registry.register(identityProvidersLoader);
+registry.register(ssoSurfaceLoader);
+```
+
+`ssoSurfaceLoader` returns `undefined` when the current Tenant has no provisioned
+unified-auth module. It never guesses a global `sso_private` schema or searches
+another database.
+
 ### Custom loaders
 
 ```typescript

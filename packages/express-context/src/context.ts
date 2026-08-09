@@ -7,7 +7,7 @@
  *   - pgSettings (role, claims, request_id, database_id)
  *   - Tenant database pool (via pg-cache)
  *   - withPgClient (transaction-scoped RLS helper)
- *   - Convenience fields (userId, databaseId, requestId)
+ *   - Convenience fields (userId, databaseId, siteId, requestId)
  *   - useModule (lazy, on-demand per-database module resolution)
  *
  * The result is a single `req.constructive` object that any downstream
@@ -113,6 +113,7 @@ export function buildContext(
     token,
     pgSettings,
     databaseId: api.databaseId ?? null,
+    siteId: api.siteId ?? null,
     userId: token?.user_id ?? null,
     requestId,
     pool: tenantPool,

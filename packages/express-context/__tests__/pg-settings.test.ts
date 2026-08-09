@@ -3,6 +3,7 @@ import type { ApiStructure, ConstructiveAPIToken } from '../src/types';
 
 const api: ApiStructure = {
   apiId: '6c9997a4-591b-4cb3-9313-4ef45d6f134e',
+  siteId: '87763e7e-8aeb-4e5c-98ce-95e16b6f62ac',
   dbname: 'testdb',
   anonRole: 'anonymous',
   roleName: 'authenticated',
@@ -17,6 +18,7 @@ describe('buildPgSettings — jwt.claims.api_id provenance', () => {
     const settings = buildPgSettings({ api, token: null, requestId: 'r1' });
 
     expect(settings['jwt.claims.api_id']).toBe(api.apiId);
+    expect(settings['jwt.claims.site_id']).toBe(api.siteId);
     expect(settings['role']).toBe('anonymous');
   });
 
@@ -42,10 +44,22 @@ describe('buildPgSettings — jwt.claims.api_id provenance', () => {
   it('is derived only from the resolved api, never from the token', () => {
     const token = {
       user_id: 'u1',
-      api_id: 'attacker-controlled'
+      api_id: 'attacker-controlled',
+      site_id: 'attacker-controlled'
     } as unknown as ConstructiveAPIToken;
     const settings = buildPgSettings({ api, token, requestId: 'r1' });
 
     expect(settings['jwt.claims.api_id']).toBe(api.apiId);
+    expect(settings['jwt.claims.site_id']).toBe(api.siteId);
+  });
+
+  it('omits jwt.claims.site_id when the route has no Site context', () => {
+    const settings = buildPgSettings({
+      api: { ...api, siteId: undefined },
+      token: null,
+      requestId: 'r1'
+    });
+
+    expect(settings['jwt.claims.site_id']).toBeUndefined();
   });
 });
