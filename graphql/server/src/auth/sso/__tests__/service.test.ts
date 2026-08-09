@@ -1,0 +1,184 @@
+import type {
+  ConstructiveContext,
+  IdentityProviderConfig,
+  SsoSurface
+} from '@constructive-io/express-context';
+import type { PoolClient, QueryResult } from 'pg';
+
+import { createUnifiedAuthService } from '../service';
+
+const opaque = 'a'.repeat(43);
+const surface: SsoSurface = { privateSchema: 'tenant_acme_sso_private' };
+
+const googleProvider: IdentityProviderConfig = {
+  id: 'provider-id',
+  slug: 'google-workspace',
+  kind: 'google',
+  displayName: 'Google Workspace',
+  enabled: true,
+  clientId: 'client-id',
+  clientSecret: 'client-secret',
+  authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+  tokenUrl: 'https://oauth2.googleapis.com/token',
+  userinfoUrl: null,
+  issuerUrl: 'https://accounts.google.com',
+  discoveryUrlOverride: null,
+  discoveryDoc: null,
+  jwks: { keys: [] },
+  jwksFetchedAt: null,
+  acceptableClientIds: [],
+  scopes: ['openid', 'email', 'profile'],
+  extraAuthorizationParams: {},
+  emailOptional: false,
+  allowLinkByEmail: false,
+  skipNonceCheck: false,
+  pkceEnabled: true
+};
+
+const makeContext = (
+  databaseResult?: Record<string, unknown>,
+  options: {
+    userId?: string | null;
+    providers?: Record<string, IdentityProviderConfig>;
+  } = {}
+): { context: ConstructiveContext; query: jest.Mock } => {
+  const query = jest.fn(async () => ({
+    rows: databaseResult === undefined ? [] : [{ result: databaseResult }]
+  } as unknown as QueryResult));
+  const client = { query } as unknown as PoolClient;
+  const context = {
+    userId: options.userId ?? null,
+    useModule: jest.fn(async (name: string) => {
+      if (name === 'ssoSurface') return surface;
+      if (name === 'identityProviders') {
+        return options.providers
+          ? { providers: options.providers, source: { schemaName: 'p', tableName: 'p' } }
+          : undefined;
+      }
+      return undefined;
+    }),
+    withPgClient: jest.fn(async (callback: (pg: PoolClient) => Promise<unknown>) =>
+      callback(client)
+    )
+  } as unknown as ConstructiveContext;
+  return { context, query };
+};
+
+describe('unified authentication GraphQL service', () => {
+  it('returns no Provider options without resolving secrets when OAuth is disabled', async () => {
+    const { context } = makeContext(undefined, { providers: { google: googleProvider } });
+    const service = createUnifiedAuthService(false);
+
+    await expect(service.providers({ constructive: context })).resolves.toEqual([]);
+    expect(context.useModule).not.toHaveBeenCalledWith('identityProviders');
+  });
+
+  it('returns only safe dynamic Provider display fields', async () => {
+    const { context } = makeContext(undefined, {
+      providers: {
+        google: googleProvider,
+        custom: { ...googleProvider, slug: 'custom', kind: 'custom' }
+      }
+    });
+    const service = createUnifiedAuthService(true);
+
+    await expect(service.providers({ constructive: context })).resolves.toEqual([
+      { key: 'google-workspace', displayName: 'Google Workspace' }
+    ]);
+  });
+
+  it('starts through the current Tenant SSO function and merges Provider options', async () => {
+    const { context, query } = makeContext({
+      transaction_id: opaque,
+      site_id: '00000000-0000-0000-0000-000000000001',
+      site_display_name: 'Customer Portal',
+      site_icon_url: null,
+      site_theme_color: '#112233',
+      sign_in_mode: 'confirm',
+      reusable_authentication: false,
+      current_user_id: null
+    }, { providers: { google: googleProvider } });
+    const service = createUnifiedAuthService(true);
+
+    const result = await service.start(
+      { constructive: context },
+      {
+        siteId: '00000000-0000-0000-0000-000000000001',
+        returnTo: '/approvals/42',
+        siteState: opaque,
+        csrfToken: opaque
+      }
+    );
+
+    expect(result.providers).toEqual([
+      { key: 'google-workspace', displayName: 'Google Workspace' }
+    ]);
+    expect(result.site.displayName).toBe('Customer Portal');
+    expect(query.mock.calls[0][0]).toContain(
+      '"tenant_acme_sso_private"."start_unified_login"'
+    );
+    expect(query.mock.calls[0][1]).toEqual([
+      '00000000-0000-0000-0000-000000000001',
+      null,
+      '/approvals/42',
+      opaque,
+      opaque
+    ]);
+  });
+
+  it('uses the fixed local-password wrapper contract once', async () => {
+    const { context, query } = makeContext({
+      id: '00000000-0000-0000-0000-000000000010',
+      user_id: '00000000-0000-0000-0000-000000000011',
+      access_token: 'cnc_live_bt_secret',
+      access_token_expires_at: '2026-08-10T00:00:00.000Z',
+      is_verified: false,
+      totp_enabled: false,
+      mfa_required: false
+    });
+    const service = createUnifiedAuthService(false);
+
+    const result = await service.signIn(
+      { constructive: context },
+      {
+        transactionId: opaque,
+        email: 'user@example.com',
+        password: 'correct horse battery staple',
+        rememberMe: true,
+        csrfToken: opaque
+      }
+    );
+
+    expect(result.accessToken).toBe('cnc_live_bt_secret');
+    expect(result.continuationUrl).toBeNull();
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(query.mock.calls[0][0]).toContain(
+      '"tenant_acme_sso_private"."sign_in_unified_login"'
+    );
+    expect(query.mock.calls[0][1]).toEqual([
+      opaque,
+      'user@example.com',
+      'correct horse battery staple',
+      true,
+      'bearer',
+      opaque,
+      null
+    ]);
+  });
+
+  it('rejects a cross-origin return target before database access', async () => {
+    const { context, query } = makeContext();
+    const service = createUnifiedAuthService(false);
+
+    await expect(service.start(
+      { constructive: context },
+      {
+        siteId: '00000000-0000-0000-0000-000000000001',
+        returnTo: 'https://evil.example/steal',
+        siteState: opaque,
+        csrfToken: opaque
+      }
+    )).rejects.toMatchObject({ code: 'INVALID_SSO_RETURN_TARGET' });
+    expect(query).not.toHaveBeenCalled();
+  });
+});
