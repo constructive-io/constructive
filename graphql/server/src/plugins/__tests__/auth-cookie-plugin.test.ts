@@ -340,8 +340,8 @@ describe('AuthCookiePlugin unified-auth cookie boundary', () => {
                 api: {
                   authSettings: {
                     cookieDomain: '.example.com',
-                    cookieSecure: true,
-                    cookieHttponly: true,
+                    cookieSecure: false,
+                    cookieHttponly: false,
                     cookieSamesite: 'lax'
                   }
                 }

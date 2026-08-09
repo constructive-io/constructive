@@ -349,7 +349,12 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
               // The Tenant auth-center credential is first party and host only.
               // A Site receives its own credential during handoff redemption.
               const config = UNIFIED_AUTH_SIGN_IN_MUTATIONS.has(signInMutation.fieldName)
-                ? { ...baseConfig, domain: undefined }
+                ? {
+                  ...baseConfig,
+                  domain: undefined,
+                  httpOnly: true,
+                  secure: true
+                }
                 : baseConfig;
               log.info(`[auth-cookie] Sign-in mutation succeeded, setting session cookie (rememberMe=${rememberMe})`);
               cookiesToSet.push(serializeCookie(SESSION_COOKIE_NAME, accessToken, config));
