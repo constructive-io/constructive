@@ -22,6 +22,7 @@ import { getPgPool } from 'pg-cache';
 import requestIp from 'request-ip';
 
 import { createAgenticRouter } from './agentic';
+import { createOAuthRouter } from './auth/oauth';
 import { closeDebugDatabasePools } from './diagnostics/debug-db-snapshot';
 import type { DebugSamplerHandle } from './diagnostics/debug-sampler';
 import { startDebugSampler } from './diagnostics/debug-sampler';
@@ -209,6 +210,11 @@ class Server {
     };
     app.use(csrfSetToken); // Set CSRF token cookie on all requests
     app.use('/graphql', csrfProtect); // Enforce CSRF on GraphQL mutations
+    if (effectiveOpts.oauth?.enabled) {
+      app.use('/auth/oauth', createOAuthRouter({
+        requestTimeoutMs: effectiveOpts.oauth.providerRequestTimeoutMs
+      }));
+    }
 
     // LLM Agent REST API — mounted before graphile so SSE streaming
     // routes are handled without going through PostGraphile

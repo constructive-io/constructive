@@ -154,6 +154,12 @@ export const registry = {
     http: 403,
     message: 'OAuth sign in is not enabled.'
   }),
+  OAUTH_AUTHORIZATION_CANCELLED: defineError({
+    code: 'OAUTH_AUTHORIZATION_CANCELLED',
+    class: 'public',
+    http: 400,
+    message: 'External sign in was cancelled. Please restart sign in.'
+  }),
   INVALID_SSO_SITE_STATE: defineError({
     code: 'INVALID_SSO_SITE_STATE',
     class: 'public',
@@ -207,6 +213,12 @@ export const registry = {
     class: 'public',
     http: 400,
     message: 'This identity provider is not supported.'
+  }),
+  IDENTITY_PROVIDER_AUTHENTICATION_FAILED: defineError({
+    code: 'IDENTITY_PROVIDER_AUTHENTICATION_FAILED',
+    class: 'public',
+    http: 401,
+    message: 'External sign in failed. Please restart sign in.'
   }),
   SSO_ACCOUNT_CONFLICT: defineError({
     code: 'SSO_ACCOUNT_CONFLICT',

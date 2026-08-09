@@ -47,6 +47,7 @@ const makeContext = (
   } as unknown as QueryResult));
   const client = { query } as unknown as PoolClient;
   const context = {
+    requestOrigin: 'https://auth.example.com',
     userId: options.userId ?? null,
     useModule: jest.fn(async (name: string) => {
       if (name === 'ssoSurface') return surface;
@@ -96,7 +97,7 @@ describe('unified authentication GraphQL service', () => {
       sign_in_mode: 'confirm',
       reusable_authentication: false,
       current_user_id: null
-    }, { providers: { google: googleProvider } });
+    }, { providers: { [googleProvider.slug]: googleProvider } });
     const service = createUnifiedAuthService(true);
 
     const result = await service.start(
@@ -164,6 +165,48 @@ describe('unified authentication GraphQL service', () => {
       null,
       null
     ]);
+  });
+
+  it('starts Provider authentication without exposing transaction or PKCE secrets', async () => {
+    const { context, query } = makeContext({
+      oauth_request_id: '00000000-0000-0000-0000-000000000099'
+    }, { providers: { [googleProvider.slug]: googleProvider } });
+    const service = createUnifiedAuthService(true);
+
+    const result = await service.startProvider(
+      {
+        constructive: context,
+        browserBinding: opaque
+      },
+      { transactionId: opaque, providerKey: googleProvider.slug }
+    );
+
+    expect(result.authorizationUrl).toMatch(
+      /^\/auth\/oauth\/authorize\?state=[A-Za-z0-9_-]{43}$/
+    );
+    expect(result.authorizationUrl).not.toContain(opaque);
+    expect(query.mock.calls[0][0]).toContain(
+      '"tenant_acme_sso_private"."start_provider_oauth_request"'
+    );
+    expect(query.mock.calls[0][1]).toEqual([
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
+      googleProvider.slug,
+      expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
+      expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
+      expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
+      'https://auth.example.com/auth/oauth/callback',
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/)
+    ]);
+  });
+
+  it('keeps the Provider-start field stable but fails while OAuth is disabled', async () => {
+    const { context, query } = makeContext();
+    const service = createUnifiedAuthService(false);
+    await expect(service.startProvider(
+      { constructive: context, browserBinding: opaque },
+      { transactionId: opaque, providerKey: googleProvider.slug }
+    )).rejects.toMatchObject({ code: 'OAUTH_SIGN_IN_DISABLED' });
+    expect(query).not.toHaveBeenCalled();
   });
 
   it('rejects a cross-origin return target before database access', async () => {
