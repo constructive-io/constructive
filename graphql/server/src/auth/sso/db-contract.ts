@@ -41,7 +41,7 @@ export const SSO_DB_FUNCTIONS = {
   signUp: 'sign_up_unified_login'
 } as const;
 
-type DatabaseRecord = Record<string, unknown>;
+export type DatabaseRecord = Record<string, unknown>;
 
 interface StartDatabaseResult {
   transactionId: string;
@@ -58,14 +58,14 @@ const invalidDatabaseResult = (operation: string, cause?: unknown): Error =>
     cause === undefined ? undefined : { cause }
   );
 
-const asRecord = (value: unknown, operation: string): DatabaseRecord => {
+export const asRecord = (value: unknown, operation: string): DatabaseRecord => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw invalidDatabaseResult(operation);
   }
   return value as DatabaseRecord;
 };
 
-const requiredString = (
+export const requiredString = (
   row: DatabaseRecord,
   field: string,
   operation: string
@@ -77,7 +77,7 @@ const requiredString = (
   return value;
 };
 
-const optionalString = (
+export const optionalString = (
   row: DatabaseRecord,
   field: string,
   operation: string
@@ -88,7 +88,7 @@ const optionalString = (
   return value;
 };
 
-const requiredBoolean = (
+export const requiredBoolean = (
   row: DatabaseRecord,
   field: string,
   operation: string
@@ -98,7 +98,7 @@ const requiredBoolean = (
   return value;
 };
 
-type SqlCast = 'boolean' | 'text' | 'uuid';
+export type SqlCast = 'boolean' | 'jsonb' | 'text' | 'uuid';
 
 const castValue = (
   value: ReturnType<typeof sql.value>,
@@ -107,6 +107,8 @@ const castValue = (
   switch (cast) {
   case 'boolean':
     return sql.fragment`${value}::boolean`;
+  case 'jsonb':
+    return sql.fragment`${value}::jsonb`;
   case 'text':
     return sql.fragment`${value}::text`;
   case 'uuid':
@@ -114,7 +116,7 @@ const castValue = (
   }
 };
 
-const callFunction = async (
+export const callFunction = async (
   context: ConstructiveContext,
   surface: SsoSurface,
   functionName: string,
@@ -243,7 +245,8 @@ const authenticateWithPassword = async (
   // Strict-auth/MFA/step-up integration is explicitly outside v1. The DB
   // wrapper must fail closed; this guard prevents an accidental partial result
   // from being treated as a completed unified login.
-  if (row.mfa_required === true) {
+  const mfaRequired = requiredBoolean(row, 'mfa_required', functionName);
+  if (mfaRequired) {
     throw errors.AUTH_METHOD_NOT_ALLOWED({});
   }
 

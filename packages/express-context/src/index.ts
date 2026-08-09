@@ -77,7 +77,11 @@ export { requestIdMiddleware } from './request-id';
 
 // Context middleware
 export type { ContextMiddlewareOptions } from './context';
-export { buildContext, createContextMiddleware } from './context';
+export {
+  buildContext,
+  createContextMiddleware,
+  resolveRequestOrigin
+} from './context';
 
 // Module loaders
 export type {

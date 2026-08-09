@@ -7,7 +7,7 @@
  *   - pgSettings (role, claims, request_id, database_id)
  *   - Tenant database pool (via pg-cache)
  *   - withPgClient (transaction-scoped RLS helper)
- *   - Convenience fields (userId, databaseId, requestId)
+ *   - Convenience/request fact fields (userId, databaseId, requestId, origin)
  *   - useModule (lazy, on-demand per-database module resolution)
  *
  * The result is a single `req.constructive` object that any downstream
@@ -34,6 +34,24 @@ export interface ContextMiddlewareOptions {
   loaders?: LoaderRegistry;
   /** Routing-plane schema loaders query (defaults to routing_public) */
   routingSchema?: string;
+}
+
+/** Derive an origin from the already-routed Express request. */
+export function resolveRequestOrigin(req: Request): string | null {
+  const host = req.get('host');
+  if (!host || (req.protocol !== 'http' && req.protocol !== 'https')) return null;
+  try {
+    const url = new URL(`${req.protocol}://${host}`);
+    return url.username ||
+      url.password ||
+      url.pathname !== '/' ||
+      url.search ||
+      url.hash
+      ? null
+      : url.origin;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -115,6 +133,7 @@ export function buildContext(
     databaseId: api.databaseId ?? null,
     userId: token?.user_id ?? null,
     requestId,
+    requestOrigin: resolveRequestOrigin(req),
     pool: tenantPool,
     withPgClient,
     useModule,

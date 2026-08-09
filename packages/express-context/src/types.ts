@@ -284,6 +284,8 @@ export interface ConstructiveContext {
   userId: string | null;
   /** Per-request correlation ID for distributed tracing */
   requestId: string;
+  /** Server-derived origin of the routed HTTP request. */
+  requestOrigin: string | null;
   /** Tenant database connection pool */
   pool: Pool;
   /** Execute a function within a tenant-scoped RLS transaction */

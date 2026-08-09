@@ -11,6 +11,15 @@ export interface ProviderDisplayOption {
   displayName: string;
 }
 
+export interface StartProviderAuthenticationInput {
+  transactionId: string;
+  providerKey: string;
+}
+
+export interface StartProviderAuthenticationPayload {
+  authorizationUrl: string;
+}
+
 export interface StartUnifiedLoginInput {
   siteId: string;
   callbackUrl?: string | null;
