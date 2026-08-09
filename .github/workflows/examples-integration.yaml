@@ -18,9 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 10
+      - uses: pnpm/action-setup@v4
       - run: pnpm install
       - name: Build codegen and dependencies
         run: pnpm run build
