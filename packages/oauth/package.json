@@ -2,7 +2,7 @@
   "name": "@constructive-io/oauth",
   "version": "0.27.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "OAuth 2.0 client for social authentication (Google, GitHub, Facebook, LinkedIn)",
+  "description": "OAuth/OIDC protocol primitives and Provider adapters for Constructive authentication",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@constructive-io/csrf": "workspace:^"
+    "jose": "^5.10.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
@@ -42,9 +42,9 @@
     "authentication",
     "google",
     "github",
-    "facebook",
-    "linkedin",
-    "social-login",
+    "oidc",
+    "pkce",
+    "provider-adapter",
     "constructive"
   ]
 }

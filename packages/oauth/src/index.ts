@@ -1,30 +1,39 @@
+export type { ProviderAdapter } from './adapter';
 export {
-  createOAuthMiddleware,
-  generateState,
-  OAuthCallbackContext,
-  OAuthErrorContext,
-  OAuthMiddlewareConfig,
-  OAuthRouteHandlers,
-  verifyState,
-} from './middleware/express';
-export { createOAuthClient,OAuthClient } from './oauth-client';
+  type AuthorizationUrlInput,
+  createAuthorizationUrl,
+  validateProviderCallbackUri} from './authorization';
+export { validateProviderEndpoint } from './endpoint';
 export {
-  facebookProvider,
-  getProvider,
-  getProviderIds,
-  githubProvider,
-  googleProvider,
-  linkedinProvider,
-  providers,
+  type ProviderJsonRequestOptions,
+  requestProviderJson} from './http';
+export {
+  constantTimeEqual,
+  deriveS256CodeChallenge,
+  generateCodeVerifier,
+  generateOidcNonce,
+  generateOpaqueState,
+  isOpaqueOAuthValue
+} from './primitives';
+export type {
+  ValidatedGitHubConfiguration,
+  ValidatedGoogleConfiguration
 } from './providers';
 export {
-  AuthorizationUrlParams,
-  CallbackParams,
-  createOAuthError,
-  OAuthClientConfig,
-  OAuthCredentials,
-  OAuthError,
-  OAuthProfile,
-  OAuthProviderConfig,
-  TokenResponse,
+  getProviderAdapter,
+  getProviderAdapterKinds,
+  githubAdapter,
+  googleAdapter
+} from './providers';
+export {
+  type IdentityProviderConfiguration,
+  type NormalizedExternalIdentity,
+  ProviderAdapterError,
+  type ProviderAuthorizationInput,
+  type ProviderAuthorizationResult,
+  type ProviderCallbackInput,
+  type ProviderFailureReason,
+  type SafeExternalProfile,
+  type ValidatedEndpoint,
+  type ValidatedProviderConfiguration
 } from './types';

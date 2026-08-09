@@ -2586,9 +2586,9 @@ importers:
 
   packages/oauth:
     dependencies:
-      '@constructive-io/csrf':
-        specifier: workspace:^
-        version: link:../csrf/dist
+      jose:
+        specifier: ^5.10.0
+        version: 5.10.0
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -11644,6 +11644,12 @@ packages:
         integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==,
       }
     hasBin: true
+
+  jose@5.10.0:
+    resolution:
+      {
+        integrity: sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==,
+      }
 
   js-tokens@4.0.0:
     resolution:
@@ -21172,6 +21178,8 @@ snapshots:
       - ts-node
 
   jiti@2.7.0: {}
+
+  jose@5.10.0: {}
 
   js-tokens@4.0.0: {}
 
