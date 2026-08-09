@@ -4,6 +4,12 @@ import { Logger } from '@pgpmjs/logger';
 import type { Request } from 'express';
 import type { BufferResult } from 'grafserv';
 import type { GraphileConfig } from 'graphile-config';
+import {
+  type FragmentDefinitionNode,
+  Kind,
+  parse,
+  type SelectionSetNode
+} from 'graphql';
 
 import {
   CookieConfig,
@@ -73,6 +79,8 @@ const serializeClearCookie = (name: string, config: CookieConfig): string => {
 const SIGN_IN_MUTATIONS = new Set([
   'signIn',
   'signUp',
+  'signInUnifiedLogin',
+  'signUpUnifiedLogin',
   'signInSso',
   'signUpSso',
   'signInMagicLink',
@@ -83,6 +91,11 @@ const SIGN_IN_MUTATIONS = new Set([
   'completeMfaChallenge',
   'signInOneTimeToken',
   'signInCrossOrigin',
+]);
+
+const UNIFIED_AUTH_SIGN_IN_MUTATIONS = new Set([
+  'signInUnifiedLogin',
+  'signUpUnifiedLogin'
 ]);
 
 /**
@@ -105,30 +118,65 @@ interface GraphQLResponse {
   errors?: Array<{ message: string; extensions?: { code?: string } }>;
 }
 
-/**
- * Extract mutation names from a GraphQL query string.
- */
-const extractMutationNames = (query: string): string[] => {
-  const mutations: string[] = [];
+export interface MutationField {
+  fieldName: string;
+  responseKey: string;
+}
 
-  if (!/^\s*mutation\b/i.test(query)) {
-    return mutations;
-  }
-
-  const bodyStart = query.indexOf('{');
-  if (bodyStart === -1) return mutations;
-
-  const bodyContent = query.slice(bodyStart + 1);
-  const fieldPattern = /(\w+)\s*(?:\(|{)/g;
-  let match;
-  while ((match = fieldPattern.exec(bodyContent)) !== null) {
-    const name = match[1];
-    if (name !== 'mutation' && name !== 'query' && name !== 'fragment') {
-      mutations.push(name);
+const collectMutationFields = (
+  selectionSet: SelectionSetNode,
+  fragments: ReadonlyMap<string, FragmentDefinitionNode>,
+  visited: Set<string>
+): MutationField[] => {
+  const fields: MutationField[] = [];
+  for (const selection of selectionSet.selections) {
+    if (selection.kind === Kind.FIELD) {
+      fields.push({
+        fieldName: selection.name.value,
+        responseKey: selection.alias?.value ?? selection.name.value
+      });
+      continue;
+    }
+    if (selection.kind === Kind.INLINE_FRAGMENT) {
+      fields.push(...collectMutationFields(selection.selectionSet, fragments, visited));
+      continue;
+    }
+    if (!visited.has(selection.name.value)) {
+      const fragment = fragments.get(selection.name.value);
+      if (fragment) {
+        visited.add(selection.name.value);
+        fields.push(...collectMutationFields(fragment.selectionSet, fragments, visited));
+      }
     }
   }
+  return fields;
+};
 
-  return mutations;
+/** Parse the selected operation and preserve aliases used as response keys. */
+export const extractMutationFields = (
+  query: string,
+  operationName?: string
+): MutationField[] => {
+  const document = parse(query);
+  const operations = document.definitions.filter(
+    definition => definition.kind === Kind.OPERATION_DEFINITION
+  );
+  const operation = operationName
+    ? operations.find(definition => definition.name?.value === operationName)
+    : operations.length === 1
+      ? operations[0]
+      : undefined;
+  if (!operation || operation.operation !== 'mutation') return [];
+
+  const fragments = new Map(
+    document.definitions
+      .filter(
+        (definition): definition is FragmentDefinitionNode =>
+          definition.kind === Kind.FRAGMENT_DEFINITION
+      )
+      .map(fragment => [fragment.name.value, fragment])
+  );
+  return collectMutationFields(operation.selectionSet, fragments, new Set());
 };
 
 /**
@@ -179,9 +227,17 @@ const extractDeviceId = (
 /**
  * Check if request includes remember_me flag.
  */
-const hasRememberMe = (variables?: Record<string, unknown>): boolean => {
+export const hasRememberMe = (variables?: Record<string, unknown>): boolean => {
   if (!variables) return false;
-  return variables.rememberMe === true || variables.remember_me === true;
+  if (variables.rememberMe === true || variables.remember_me === true) return true;
+  const input = variables.input;
+  return Boolean(
+    input &&
+    typeof input === 'object' &&
+    !Array.isArray(input) &&
+    ((input as Record<string, unknown>).rememberMe === true ||
+      (input as Record<string, unknown>).remember_me === true)
+  );
 };
 
 /**
@@ -225,14 +281,10 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
           // grafserv provides getBody() which returns { type: 'buffer', buffer: Buffer }
           let body: GraphQLRequestBody | undefined;
           if (typeof event.requestDigest.getBody === 'function') {
-            try {
-              const rawBody = await event.requestDigest.getBody() as { type?: string; buffer?: Buffer };
-              if (rawBody?.type === 'buffer' && rawBody.buffer) {
-                const jsonStr = rawBody.buffer.toString('utf8');
-                body = JSON.parse(jsonStr) as GraphQLRequestBody;
-              }
-            } catch (e) {
-              log.debug('[auth-cookie] Failed to parse body from requestDigest');
+            const rawBody = await event.requestDigest.getBody() as { type?: string; buffer?: Buffer };
+            if (rawBody?.type === 'buffer' && rawBody.buffer) {
+              const jsonStr = rawBody.buffer.toString('utf8');
+              body = JSON.parse(jsonStr) as GraphQLRequestBody;
             }
           }
           body = body || (req.body as GraphQLRequestBody);
@@ -241,99 +293,124 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
           }
 
           // Extract mutation names
-          const mutationNames = extractMutationNames(body.query);
-          if (mutationNames.length === 0) {
+          const mutationFields = extractMutationFields(body.query, body.operationName);
+          if (mutationFields.length === 0) {
             return result;
           }
 
           // Check for auth mutations
-          const signInMutation = mutationNames.find((m) => SIGN_IN_MUTATIONS.has(m));
-          const signOutMutation = mutationNames.find((m) => SIGN_OUT_MUTATIONS.has(m));
+          const signInMutation = mutationFields.find(field =>
+            SIGN_IN_MUTATIONS.has(field.fieldName)
+          );
+          const signOutMutation = mutationFields.find(field =>
+            SIGN_OUT_MUTATIONS.has(field.fieldName)
+          );
 
           if (!signInMutation && !signOutMutation) {
             return result;
           }
 
-          log.debug(`[auth-cookie] Detected auth mutation: ${signInMutation || signOutMutation}`);
+          log.debug(
+            `[auth-cookie] Detected auth mutation: ${
+              signInMutation?.fieldName ?? signOutMutation?.fieldName
+            }`
+          );
 
-          try {
-            // Parse response body
-            const payload = bufferResult.buffer.toString('utf8');
-            const graphqlResponse = JSON.parse(payload) as GraphQLResponse;
+          // Parse response body. Failures deliberately propagate; a logging or
+          // cookie fallback cannot replace the authentication result semantics.
+          const payload = bufferResult.buffer.toString('utf8');
+          const graphqlResponse = JSON.parse(payload) as GraphQLResponse;
 
-            // Skip if there are GraphQL errors
-            if (graphqlResponse.errors?.length || !graphqlResponse.data) {
-              return result;
-            }
+          // Skip if there are GraphQL errors
+          if (graphqlResponse.errors?.length || !graphqlResponse.data) {
+            return result;
+          }
 
-            const data = graphqlResponse.data;
-            const authSettings = req.api?.authSettings;
-            const cookiesToSet: string[] = [];
+          const data = graphqlResponse.data;
+          const authSettings = req.api?.authSettings;
+          const cookiesToSet: string[] = [];
 
-            // Handle sign-out mutations
-            if (signOutMutation && data[signOutMutation]) {
-              log.info('[auth-cookie] Sign-out mutation succeeded, clearing session cookie');
-              const config = getSessionCookieConfig(authSettings);
-              cookiesToSet.push(serializeClearCookie(SESSION_COOKIE_NAME, config));
-              // Also clear device token on sign-out
-              const deviceConfig = getDeviceTokenCookieConfig(authSettings);
-              cookiesToSet.push(serializeClearCookie(DEVICE_TOKEN_COOKIE_NAME, deviceConfig));
-            }
+          // Handle sign-out mutations
+          if (signOutMutation && data[signOutMutation.responseKey]) {
+            log.info('[auth-cookie] Sign-out mutation succeeded, clearing session cookie');
+            const config = getSessionCookieConfig(authSettings);
+            cookiesToSet.push(serializeClearCookie(SESSION_COOKIE_NAME, config));
+            // Also clear device token on sign-out
+            const deviceConfig = getDeviceTokenCookieConfig(authSettings);
+            cookiesToSet.push(serializeClearCookie(DEVICE_TOKEN_COOKIE_NAME, deviceConfig));
+          }
 
-            // Handle sign-in mutations
-            if (signInMutation) {
-              const accessToken = extractAccessToken(data, signInMutation);
-              if (accessToken) {
-                const rememberMe = hasRememberMe(body.variables);
-                const config = getSessionCookieConfig(authSettings, rememberMe);
-                log.info(`[auth-cookie] Sign-in mutation succeeded, setting session cookie (rememberMe=${rememberMe})`);
-                cookiesToSet.push(serializeCookie(SESSION_COOKIE_NAME, accessToken, config));
-
-                const deviceId = extractDeviceId(data, signInMutation);
-                if (deviceId) {
-                  log.info('[auth-cookie] Device ID returned, setting device token cookie');
-                  const deviceConfig = getDeviceTokenCookieConfig(authSettings);
-                  cookiesToSet.push(serializeCookie(DEVICE_TOKEN_COOKIE_NAME, deviceId, deviceConfig));
+          // Handle sign-in mutations
+          if (signInMutation) {
+            const accessToken = extractAccessToken(data, signInMutation.responseKey);
+            if (accessToken) {
+              const rememberMe = hasRememberMe(body.variables);
+              const baseConfig = getSessionCookieConfig(authSettings, rememberMe);
+              // The Tenant auth-center credential is first party and host only.
+              // A Site receives its own credential during handoff redemption.
+              const config = UNIFIED_AUTH_SIGN_IN_MUTATIONS.has(signInMutation.fieldName)
+                ? {
+                  ...baseConfig,
+                  domain: undefined,
+                  httpOnly: true,
+                  secure: true
                 }
+                : baseConfig;
+              log.info(`[auth-cookie] Sign-in mutation succeeded, setting session cookie (rememberMe=${rememberMe})`);
+              cookiesToSet.push(serializeCookie(SESSION_COOKIE_NAME, accessToken, config));
+
+              const deviceId = extractDeviceId(data, signInMutation.responseKey);
+              if (deviceId) {
+                log.info('[auth-cookie] Device ID returned, setting device token cookie');
+                const deviceConfig = getDeviceTokenCookieConfig(authSettings);
+                cookiesToSet.push(serializeCookie(DEVICE_TOKEN_COOKIE_NAME, deviceId, deviceConfig));
               }
             }
+          }
 
-            // Set cookies directly on Express response and return modified headers
-            if (cookiesToSet.length > 0) {
-              const res = (event.requestDigest.requestContext as { expressv4?: { res?: { setHeader: (name: string, value: string[]) => void; getHeader: (name: string) => string | string[] | undefined } } })?.expressv4?.res;
-
-              if (res?.setHeader) {
-                // Get existing Set-Cookie headers from Express response
-                const existingCookies = res.getHeader('Set-Cookie');
-                const allCookies: string[] = [];
-
-                if (existingCookies) {
-                  if (Array.isArray(existingCookies)) {
-                    allCookies.push(...existingCookies);
-                  } else {
-                    allCookies.push(existingCookies);
-                  }
-                }
-                allCookies.push(...cookiesToSet);
-
-                // Set as array to get multiple Set-Cookie headers
-                res.setHeader('Set-Cookie', allCookies);
-              }
-
-              // Also update the BufferResult headers for grafserv to pass through
-              const existingBufferCookie = bufferResult.headers['set-cookie'];
-              const updatedHeaders = { ...bufferResult.headers };
-
-              // Remove set-cookie from grafserv headers since we set it on Express
-              delete updatedHeaders['set-cookie'];
-
-              return {
-                ...bufferResult,
-                headers: updatedHeaders,
+          // Set cookies directly on Express response and return modified headers
+          if (cookiesToSet.length > 0) {
+            const grafservResponse = (event.requestDigest.requestContext as {
+              expressv4?: {
+                res?: {
+                  setHeader: (name: string, value: string | string[]) => void;
+                  getHeader: (name: string) => string | string[] | undefined;
+                };
               };
+            })?.expressv4?.res;
+            // Grafserv's Express adapter always exposes the request, but some
+            // versions do not copy the response onto requestContext. Express
+            // itself links the authoritative response as req.res.
+            const res = grafservResponse ?? req.res;
+
+            if (res?.setHeader) {
+              // Get existing Set-Cookie headers from Express response
+              const existingCookies = res.getHeader('Set-Cookie');
+              const allCookies: string[] = [];
+
+              if (existingCookies) {
+                if (Array.isArray(existingCookies)) {
+                  allCookies.push(...existingCookies);
+                } else if (typeof existingCookies === 'string') {
+                  allCookies.push(existingCookies);
+                }
+              }
+              allCookies.push(...cookiesToSet);
+
+              // Set as array to get multiple Set-Cookie headers
+              res.setHeader('Set-Cookie', allCookies);
             }
-          } catch (err) {
-            log.error('[auth-cookie] Error processing auth response:', err);
+
+            // Also update the BufferResult headers for grafserv to pass through
+            const updatedHeaders = { ...bufferResult.headers };
+
+            // Remove set-cookie from grafserv headers since we set it on Express
+            delete updatedHeaders['set-cookie'];
+
+            return {
+              ...bufferResult,
+              headers: updatedHeaders,
+            };
           }
 
           return result;
