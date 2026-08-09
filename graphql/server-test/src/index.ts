@@ -1,3 +1,5 @@
+export { getConstructiveDbApplicationPath } from './constructive-db-runtime';
+
 // Export types
 export * from './types';
 
