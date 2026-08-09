@@ -1,36 +1,15 @@
 import { DEVICE_TOKEN_COOKIE_NAME,SESSION_COOKIE_NAME } from '../../middleware/cookie';
+import {
+  AuthCookiePlugin,
+  extractMutationFields,
+  hasRememberMe
+} from '../auth-cookie-plugin';
 
 /**
  * Since the AuthCookiePlugin is a grafserv middleware plugin, we test
  * the core logic by importing and testing the utility functions.
  * Full integration tests would require a running PostGraphile instance.
  */
-
-// Re-implement the testable functions here for unit testing
-// (In a real codebase, these would be exported from a shared module)
-
-const extractMutationNames = (query: string): string[] => {
-  const mutations: string[] = [];
-
-  if (!/^\s*mutation\b/i.test(query)) {
-    return mutations;
-  }
-
-  const bodyStart = query.indexOf('{');
-  if (bodyStart === -1) return mutations;
-
-  const bodyContent = query.slice(bodyStart + 1);
-  const fieldPattern = /(\w+)\s*(?:\(|{)/g;
-  let match;
-  while ((match = fieldPattern.exec(bodyContent)) !== null) {
-    const name = match[1];
-    if (name !== 'mutation' && name !== 'query' && name !== 'fragment') {
-      mutations.push(name);
-    }
-  }
-
-  return mutations;
-};
 
 const extractAccessToken = (
   data: Record<string, unknown>,
@@ -68,11 +47,6 @@ const extractDeviceId = (
   }
 
   return undefined;
-};
-
-const hasRememberMe = (variables?: Record<string, unknown>): boolean => {
-  if (!variables) return false;
-  return variables.rememberMe === true || variables.remember_me === true;
 };
 
 interface CookieConfig {
@@ -131,25 +105,42 @@ const serializeClearCookie = (name: string, config: CookieConfig): string => {
 };
 
 describe('AuthCookiePlugin utilities', () => {
-  describe('extractMutationNames', () => {
+  describe('extractMutationFields', () => {
     it('extracts mutation names from query', () => {
       const query = 'mutation { signIn(email: "test@example.com") { accessToken } }';
-      expect(extractMutationNames(query)).toEqual(['signIn']);
+      expect(extractMutationFields(query)).toEqual([
+        { fieldName: 'signIn', responseKey: 'signIn' }
+      ]);
     });
 
     it('extracts multiple mutation names', () => {
       const query = 'mutation { signIn(email: "test") { token } signUp(email: "new") { token } }';
-      expect(extractMutationNames(query)).toEqual(['signIn', 'signUp']);
+      expect(extractMutationFields(query)).toEqual([
+        { fieldName: 'signIn', responseKey: 'signIn' },
+        { fieldName: 'signUp', responseKey: 'signUp' }
+      ]);
     });
 
     it('returns empty array for non-mutation queries', () => {
       const query = 'query { users { id } }';
-      expect(extractMutationNames(query)).toEqual([]);
+      expect(extractMutationFields(query)).toEqual([]);
     });
 
     it('handles mutations with no arguments', () => {
       const query = 'mutation { signOut { success } }';
-      expect(extractMutationNames(query)).toEqual(['signOut']);
+      expect(extractMutationFields(query)).toEqual([
+        { fieldName: 'signOut', responseKey: 'signOut' }
+      ]);
+    });
+
+    it('selects a named operation and preserves aliases', () => {
+      const query = `
+        mutation Ignore { signOut { success } }
+        mutation Unified { auth: signInUnifiedLogin(input: $input) { accessToken } }
+      `;
+      expect(extractMutationFields(query, 'Unified')).toEqual([
+        { fieldName: 'signInUnifiedLogin', responseKey: 'auth' }
+      ]);
     });
   });
 
@@ -209,6 +200,10 @@ describe('AuthCookiePlugin utilities', () => {
 
     it('detects remember_me in snake_case', () => {
       expect(hasRememberMe({ remember_me: true })).toBe(true);
+    });
+
+    it('detects rememberMe inside an input object', () => {
+      expect(hasRememberMe({ input: { rememberMe: true } })).toBe(true);
     });
 
     it('returns false when not present', () => {
@@ -296,6 +291,73 @@ describe('AuthCookiePlugin utilities', () => {
     it('uses correct device token cookie name', () => {
       expect(DEVICE_TOKEN_COOKIE_NAME).toBe('constructive_device_token');
     });
+  });
+});
+
+describe('AuthCookiePlugin unified-auth cookie boundary', () => {
+  it('sets an aliased unified-login result as a host-only first-party cookie', async () => {
+    const setHeader = jest.fn();
+    const getHeader = jest.fn();
+    const query = `
+      mutation Unified($input: UnifiedPasswordInput!) {
+        auth: signInUnifiedLogin(input: $input) { accessToken }
+      }
+    `;
+    const processRequest = AuthCookiePlugin.grafserv?.middleware?.processRequest;
+    const callback = typeof processRequest === 'function'
+      ? processRequest
+      : processRequest?.callback;
+    expect(callback).toBeDefined();
+
+    const next = Object.assign(
+      async () => ({
+        type: 'buffer' as const,
+        statusCode: 200,
+        headers: { 'content-type': 'application/json' },
+        buffer: Buffer.from(JSON.stringify({
+          data: { auth: { accessToken: 'cnc_live_bt_secret' } }
+        }))
+      }),
+      { callback: jest.fn() }
+    );
+
+    await callback!(
+      next,
+      {
+        requestDigest: {
+          method: 'POST',
+          getBody: async () => ({
+            type: 'buffer',
+            buffer: Buffer.from(JSON.stringify({
+              query,
+              operationName: 'Unified',
+              variables: { input: { rememberMe: true } }
+            }))
+          }),
+          requestContext: {
+            expressv4: {
+              req: {
+                api: {
+                  authSettings: {
+                    cookieDomain: '.example.com',
+                    cookieSecure: false,
+                    cookieHttponly: false,
+                    cookieSamesite: 'lax'
+                  }
+                },
+                res: { setHeader, getHeader }
+              }
+            }
+          }
+        }
+      } as never
+    );
+
+    const cookie = (setHeader.mock.calls[0][1] as string[])[0];
+    expect(cookie).toContain('constructive_session=cnc_live_bt_secret');
+    expect(cookie).toContain('Secure');
+    expect(cookie).toContain('HttpOnly');
+    expect(cookie).not.toContain('Domain=');
   });
 });
 

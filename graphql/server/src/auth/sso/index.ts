@@ -1,0 +1,1 @@
+export { createUnifiedAuthPlugin } from './plugin';
