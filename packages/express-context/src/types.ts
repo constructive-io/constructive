@@ -98,6 +98,11 @@ export interface AuthSurface {
   connectedAccountsView: string;
 }
 
+/** Current Tenant's provisioned private unified-auth module surface. */
+export interface SsoSurface {
+  privateSchema: string;
+}
+
 /** One identity provider row, with its client secret resolved. */
 export interface IdentityProviderConfig {
   id: string;
@@ -241,6 +246,7 @@ export interface BuiltinModuleMap {
   databaseSettings: DatabaseSettings;
   authSettings: AuthSettings;
   authSurface: AuthSurface;
+  ssoSurface: SsoSurface;
   identityProviders: IdentityProvidersModule;
   pubkeyChallengeSettings: PubkeyChallengeSettings;
   webauthnSettings: WebauthnSettings;
