@@ -37,18 +37,21 @@ export function buildPgSettings(input: PgSettingsInput): Record<string, string> 
   if (token?.user_id) {
     settings['role'] = api.roleName || 'authenticated';
     settings['jwt.claims.user_id'] = token.user_id;
+    if (token.id) {
+      settings['jwt.claims.token_id'] = token.id;
+    }
+    if (token.session_id) {
+      settings['jwt.claims.session_id'] = token.session_id;
+    }
+    if (token.kind) {
+      settings['jwt.claims.kind'] = token.kind;
+    }
+    if (token.access_level) {
+      settings['jwt.claims.access_level'] = token.access_level;
+    }
+    settings['jwt.claims.principal_id'] = token.principal_id || token.user_id;
   } else {
     settings['role'] = api.anonRole || 'anonymous';
-  }
-
-  // Session claims
-  if (token?.session_id) {
-    settings['jwt.claims.session_id'] = token.session_id;
-  }
-
-  // Principal identity (service accounts / bots)
-  if (token?.principal_id) {
-    settings['jwt.claims.principal_id'] = token.principal_id;
   }
 
   // Database context

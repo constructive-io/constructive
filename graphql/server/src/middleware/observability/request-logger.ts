@@ -11,6 +11,7 @@ const SENSITIVE_QUERY_PARAMETERS = new Set([
   'error_description',
   'handoff',
   'id_token',
+  'site_state',
   'state',
   'token'
 ]);

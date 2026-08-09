@@ -2,6 +2,10 @@ import { errors } from '@constructive-io/errors';
 import type { ConstructiveContext, SsoSurface } from '@constructive-io/express-context';
 import sql from 'pg-sql2';
 
+import {
+  buildHandoffContinuationUrl,
+  type HandoffMaterial
+} from './handoff';
 import { createOpaqueMaterial, hashOpaqueValue } from './opaque';
 import type {
   ContinueUnifiedLoginInput,
@@ -27,10 +31,11 @@ import type {
  *   server-generated transaction digest and returns safe Site display fields,
  *   `sign_in_mode`,
  *   `reusable_authentication`, and optional safe current-user display fields.
- * - `confirm_unified_login(bytea, bytea)` returns the associated `user_id`.
+ * - `confirm_unified_login(bytea, bytea, bytea)` returns the associated `user_id`
+ *   and the transaction-bound Site callback continuation fields.
  * - `sign_in_unified_login(bytea, text, text, boolean, text, bytea, text,
- *   text)` and
- *   `sign_up_unified_login(...)` return the unchanged local credential columns.
+ *   text, bytea)` and `sign_up_unified_login(...)` return the unchanged local
+ *   credential columns and the same continuation fields.
  *
  * Browser-held transaction and binding values are always digested before they
  * cross the DB boundary. The SSO browser binding is not an anonymous-session
@@ -122,6 +127,22 @@ const castValue = (
   }
 };
 
+export const continuationFromDatabaseResult = (
+  row: DatabaseRecord,
+  operation: string,
+  handoff: HandoffMaterial
+): string => {
+  const expiresAt = requiredString(row, 'handoff_expires_at', operation);
+  if (!Number.isFinite(Date.parse(expiresAt))) {
+    throw invalidDatabaseResult(operation);
+  }
+  return buildHandoffContinuationUrl(
+    requiredString(row, 'callback_url', operation),
+    requiredString(row, 'site_state', operation),
+    handoff.code
+  );
+};
+
 export const callFunction = async (
   context: ConstructiveContext,
   surface: SsoSurface,
@@ -208,7 +229,8 @@ export const confirmUnifiedLogin = async (
   context: ConstructiveContext,
   surface: SsoSurface,
   input: ContinueUnifiedLoginInput,
-  browserBinding: string
+  browserBinding: string,
+  handoff: HandoffMaterial
 ): Promise<UnifiedLoginContinuationPayload> => {
   const operation = SSO_DB_FUNCTIONS.confirm;
   const row = await callFunction(
@@ -217,16 +239,16 @@ export const confirmUnifiedLogin = async (
     operation,
     [
       sql.value(hashOpaqueValue(input.transactionId)),
-      sql.value(hashOpaqueValue(browserBinding))
+      sql.value(hashOpaqueValue(browserBinding)),
+      sql.value(handoff.hash)
     ],
-    ['bytea', 'bytea']
+    ['bytea', 'bytea', 'bytea']
   );
   requiredString(row, 'user_id', operation);
   return {
     transactionId: input.transactionId,
     authenticated: true,
-    // PR 6 adds the shared one-time handoff continuation.
-    continuationUrl: null
+    continuationUrl: continuationFromDatabaseResult(row, operation, handoff)
   };
 };
 
@@ -235,7 +257,8 @@ const authenticateWithPassword = async (
   context: ConstructiveContext,
   surface: SsoSurface,
   input: UnifiedPasswordInput,
-  browserBinding: string
+  browserBinding: string,
+  handoff: HandoffMaterial
 ): Promise<UnifiedLoginCredentialPayload> => {
   const row = await callFunction(
     context,
@@ -249,9 +272,20 @@ const authenticateWithPassword = async (
       sql.value('bearer'),
       sql.value(hashOpaqueValue(browserBinding)),
       sql.value(null),
-      sql.value(input.deviceToken ?? null)
+      sql.value(input.deviceToken ?? null),
+      sql.value(handoff.hash)
     ],
-    ['bytea', 'text', 'text', 'boolean', 'text', 'bytea', 'text', 'text']
+    [
+      'bytea',
+      'text',
+      'text',
+      'boolean',
+      'text',
+      'bytea',
+      'text',
+      'text',
+      'bytea'
+    ]
   );
 
   // Strict-auth/MFA/step-up integration is explicitly outside v1. The DB
@@ -275,8 +309,7 @@ const authenticateWithPassword = async (
     ),
     isVerified: requiredBoolean(row, 'is_verified', functionName),
     totpEnabled: requiredBoolean(row, 'totp_enabled', functionName),
-    // PR 6 adds the shared one-time handoff continuation.
-    continuationUrl: null
+    continuationUrl: continuationFromDatabaseResult(row, functionName, handoff)
   };
 };
 
@@ -284,26 +317,30 @@ export const signInUnifiedLogin = (
   context: ConstructiveContext,
   surface: SsoSurface,
   input: UnifiedPasswordInput,
-  browserBinding: string
+  browserBinding: string,
+  handoff: HandoffMaterial
 ): Promise<UnifiedLoginCredentialPayload> =>
   authenticateWithPassword(
     SSO_DB_FUNCTIONS.signIn,
     context,
     surface,
     input,
-    browserBinding
+    browserBinding,
+    handoff
   );
 
 export const signUpUnifiedLogin = (
   context: ConstructiveContext,
   surface: SsoSurface,
   input: UnifiedPasswordInput,
-  browserBinding: string
+  browserBinding: string,
+  handoff: HandoffMaterial
 ): Promise<UnifiedLoginCredentialPayload> =>
   authenticateWithPassword(
     SSO_DB_FUNCTIONS.signUp,
     context,
     surface,
     input,
-    browserBinding
+    browserBinding,
+    handoff
   );

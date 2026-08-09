@@ -63,7 +63,21 @@ export interface StartUnifiedLoginPayload {
 export interface UnifiedLoginContinuationPayload {
   transactionId: string;
   authenticated: true;
-  continuationUrl: string | null;
+  continuationUrl: string;
+}
+
+export interface RedeemUnifiedLoginHandoffInput {
+  handoffCode: string;
+}
+
+export interface RedeemUnifiedLoginHandoffPayload {
+  credentialId: string;
+  userId: string;
+  accessToken: string;
+  accessTokenExpiresAt: string;
+  isVerified: boolean;
+  totpEnabled: boolean;
+  returnTo: string;
 }
 
 export interface UnifiedLoginCredentialPayload

@@ -23,6 +23,7 @@ import requestIp from 'request-ip';
 
 import { createAgenticRouter } from './agentic';
 import { createOAuthRouter } from './auth/oauth';
+import { createSiteSessionValidationMiddleware } from './auth/sso/site-session';
 import { closeDebugDatabasePools } from './diagnostics/debug-db-snapshot';
 import type { DebugSamplerHandle } from './diagnostics/debug-sampler';
 import { startDebugSampler } from './diagnostics/debug-sampler';
@@ -180,6 +181,7 @@ class Server {
       loaders: contextLoaders,
       routingSchema: getRoutingSchema(effectiveOpts)
     }));
+    app.use(createSiteSessionValidationMiddleware());
     app.use(createCaptchaMiddleware());
 
     // CSRF protection for cookie-authenticated requests
