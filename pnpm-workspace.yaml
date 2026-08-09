@@ -77,3 +77,40 @@ minimumReleaseAgeExclude:
 
 # Off: transitive dependencies may resolve from git or a URL.
 blockExoticSubdeps: false
+
+# Moved from package.json `pnpm.*` — pnpm 11 no longer reads that field, and
+# pnpm 10 already honours these keys here, so this works on both majors.
+
+# The Graphile v5 stack is resolved as a set: grafast, graphile-build* and
+# @dataplan/* must agree, and a second copy of graphql produces
+# "Cannot use GraphQLSchema from another module or realm" at runtime.
+overrides:
+  grafast: 1.1.1
+  grafserv: 1.0.1
+  graphile-build: 5.1.1
+  graphile-build-pg: 5.1.3
+  graphile-config: 1.1.0
+  graphile-utils: 5.0.3
+  postgraphile: 5.1.3
+  pg-sql2: 5.0.1
+  pg-introspection: 1.0.1
+  tamedevil: 0.1.1
+  '@dataplan/pg': 1.1.1
+  '@dataplan/json': 1.0.1
+  '@graphile/lru': 5.0.0
+  '@graphile-contrib/pg-many-to-many': 2.0.0-rc.2
+  graphql: 16.13.0
+  '@smithy/node-http-handler': <4.5.0
+
+publicHoistPattern:
+  - '@jest/test-sequencer'
+
+packageExtensions:
+  'jest-config@*':
+    dependencies:
+      '@jest/test-sequencer': ^29.7.0
+
+# The only dependencies permitted to run install scripts.
+allowBuilds:
+  "@launchql/protobufjs": true
+  core-js-pure: true

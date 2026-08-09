@@ -60,7 +60,9 @@ intersect: true
 # nx, protobufjs and unrs-resolver install without their scripts and the build
 # works. An install script is arbitrary code at install time, so each addition is
 # a deliberate decision and the value is the reason.
-allowBuilds: []
+allowBuilds:
+  '@launchql/protobufjs': true
+  core-js-pure: true
 
 # Escape hatch for third-party packages that cannot wait — an urgent security
 # release, typically. A reason is required, and `until` makes the waiver expire
