@@ -75,12 +75,10 @@ export const createUnifiedAuthPlugin = (
         callbackUrl: String
         returnTo: String
         siteState: String!
-        csrfToken: String!
       }
 
       input ContinueUnifiedLoginInput {
         transactionId: String!
-        csrfToken: String!
       }
 
       input UnifiedPasswordInput {
@@ -88,7 +86,6 @@ export const createUnifiedAuthPlugin = (
         email: String!
         password: String!
         rememberMe: Boolean = false
-        csrfToken: String!
         deviceToken: String
       }
 

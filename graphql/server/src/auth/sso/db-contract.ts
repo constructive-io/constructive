@@ -29,9 +29,10 @@ import type {
  * - `sign_in_unified_login(text, text, text, boolean, text, text, text)` and
  *   `sign_up_unified_login(...)` return the unchanged local credential columns.
  *
- * The final `text` arguments are the existing CSRF/browser binding and device
- * token values. The transaction identifier is an opaque token whose digest is
- * stored by DB; it is deliberately not modelled as a row UUID.
+ * The final `text` arguments are the server-read authentication-center browser
+ * binding and device-token values. The transaction identifier is an opaque
+ * token whose digest is stored by DB; it is deliberately not modelled as a row
+ * UUID.
  */
 export const SSO_DB_FUNCTIONS = {
   start: 'start_unified_login',
@@ -104,12 +105,12 @@ const castValue = (
   cast: SqlCast
 ): ReturnType<typeof sql.fragment> => {
   switch (cast) {
-    case 'boolean':
-      return sql.fragment`${value}::boolean`;
-    case 'text':
-      return sql.fragment`${value}::text`;
-    case 'uuid':
-      return sql.fragment`${value}::uuid`;
+  case 'boolean':
+    return sql.fragment`${value}::boolean`;
+  case 'text':
+    return sql.fragment`${value}::text`;
+  case 'uuid':
+    return sql.fragment`${value}::uuid`;
   }
 };
 
@@ -144,7 +145,8 @@ const callFunction = async (
 export const startUnifiedLogin = async (
   context: ConstructiveContext,
   surface: SsoSurface,
-  input: StartUnifiedLoginInput
+  input: StartUnifiedLoginInput,
+  browserBinding: string
 ): Promise<StartDatabaseResult> => {
   const operation = SSO_DB_FUNCTIONS.start;
   const row = await callFunction(
@@ -156,7 +158,7 @@ export const startUnifiedLogin = async (
       sql.value(input.callbackUrl ?? null),
       sql.value(input.returnTo ?? '/'),
       sql.value(input.siteState),
-      sql.value(input.csrfToken)
+      sql.value(browserBinding)
     ],
     ['uuid', 'text', 'text', 'text', 'text']
   );
@@ -195,14 +197,15 @@ export const startUnifiedLogin = async (
 export const confirmUnifiedLogin = async (
   context: ConstructiveContext,
   surface: SsoSurface,
-  input: ContinueUnifiedLoginInput
+  input: ContinueUnifiedLoginInput,
+  browserBinding: string
 ): Promise<UnifiedLoginContinuationPayload> => {
   const operation = SSO_DB_FUNCTIONS.confirm;
   const row = await callFunction(
     context,
     surface,
     operation,
-    [sql.value(input.transactionId), sql.value(input.csrfToken)],
+    [sql.value(input.transactionId), sql.value(browserBinding)],
     ['text', 'text']
   );
   requiredString(row, 'user_id', operation);
@@ -218,7 +221,8 @@ const authenticateWithPassword = async (
   functionName: typeof SSO_DB_FUNCTIONS.signIn | typeof SSO_DB_FUNCTIONS.signUp,
   context: ConstructiveContext,
   surface: SsoSurface,
-  input: UnifiedPasswordInput
+  input: UnifiedPasswordInput,
+  browserBinding: string
 ): Promise<UnifiedLoginCredentialPayload> => {
   const row = await callFunction(
     context,
@@ -230,7 +234,7 @@ const authenticateWithPassword = async (
       sql.value(input.password),
       sql.value(input.rememberMe ?? false),
       sql.value('bearer'),
-      sql.value(input.csrfToken),
+      sql.value(browserBinding),
       sql.value(input.deviceToken ?? null)
     ],
     ['text', 'text', 'text', 'boolean', 'text', 'text', 'text']
@@ -264,13 +268,27 @@ const authenticateWithPassword = async (
 export const signInUnifiedLogin = (
   context: ConstructiveContext,
   surface: SsoSurface,
-  input: UnifiedPasswordInput
+  input: UnifiedPasswordInput,
+  browserBinding: string
 ): Promise<UnifiedLoginCredentialPayload> =>
-  authenticateWithPassword(SSO_DB_FUNCTIONS.signIn, context, surface, input);
+  authenticateWithPassword(
+    SSO_DB_FUNCTIONS.signIn,
+    context,
+    surface,
+    input,
+    browserBinding
+  );
 
 export const signUpUnifiedLogin = (
   context: ConstructiveContext,
   surface: SsoSurface,
-  input: UnifiedPasswordInput
+  input: UnifiedPasswordInput,
+  browserBinding: string
 ): Promise<UnifiedLoginCredentialPayload> =>
-  authenticateWithPassword(SSO_DB_FUNCTIONS.signUp, context, surface, input);
+  authenticateWithPassword(
+    SSO_DB_FUNCTIONS.signUp,
+    context,
+    surface,
+    input,
+    browserBinding
+  );

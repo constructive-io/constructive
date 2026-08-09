@@ -101,12 +101,11 @@ describe('unified authentication GraphQL service', () => {
     const service = createUnifiedAuthService(true);
 
     const result = await service.start(
-      { constructive: context },
+      { constructive: context, browserBinding: opaque },
       {
         siteId: '00000000-0000-0000-0000-000000000001',
         returnTo: '/approvals/42',
-        siteState: opaque,
-        csrfToken: opaque
+        siteState: opaque
       }
     );
 
@@ -139,13 +138,12 @@ describe('unified authentication GraphQL service', () => {
     const service = createUnifiedAuthService(false);
 
     const result = await service.signIn(
-      { constructive: context },
+      { constructive: context, browserBinding: opaque },
       {
         transactionId: opaque,
         email: 'user@example.com',
         password: 'correct horse battery staple',
-        rememberMe: true,
-        csrfToken: opaque
+        rememberMe: true
       }
     );
 
@@ -171,14 +169,27 @@ describe('unified authentication GraphQL service', () => {
     const service = createUnifiedAuthService(false);
 
     await expect(service.start(
-      { constructive: context },
+      { constructive: context, browserBinding: opaque },
       {
         siteId: '00000000-0000-0000-0000-000000000001',
         returnTo: 'https://evil.example/steal',
-        siteState: opaque,
-        csrfToken: opaque
+        siteState: opaque
       }
     )).rejects.toMatchObject({ code: 'INVALID_SSO_RETURN_TARGET' });
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('requires the server-read first-party browser binding', async () => {
+    const { context, query } = makeContext();
+    const service = createUnifiedAuthService(false);
+
+    await expect(service.start(
+      { constructive: context },
+      {
+        siteId: '00000000-0000-0000-0000-000000000001',
+        siteState: opaque
+      }
+    )).rejects.toMatchObject({ code: 'INVALID_SSO_SITE_STATE' });
     expect(query).not.toHaveBeenCalled();
   });
 });

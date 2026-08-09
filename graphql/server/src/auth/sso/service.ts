@@ -51,16 +51,22 @@ const resolveSsoSurface = async (
 };
 
 const validateTransactionInput = (input: ContinueUnifiedLoginInput): void => {
-  if (!OPAQUE_VALUE.test(input.transactionId) || !OPAQUE_VALUE.test(input.csrfToken)) {
+  if (!OPAQUE_VALUE.test(input.transactionId)) {
     throw errors.SSO_LOGIN_TRANSACTION_EXPIRED();
   }
 };
 
-const validateStartInput = (input: StartUnifiedLoginInput): void => {
-  if (!SITE_STATE.test(input.siteState)) {
+const requireBrowserBinding = (
+  graphQLContext: UnifiedAuthGraphQLContext
+): string => {
+  if (!graphQLContext.browserBinding || !OPAQUE_VALUE.test(graphQLContext.browserBinding)) {
     throw errors.INVALID_SSO_SITE_STATE();
   }
-  if (!OPAQUE_VALUE.test(input.csrfToken)) {
+  return graphQLContext.browserBinding;
+};
+
+const validateStartInput = (input: StartUnifiedLoginInput): void => {
+  if (!SITE_STATE.test(input.siteState)) {
     throw errors.INVALID_SSO_SITE_STATE();
   }
   const returnTo = input.returnTo ?? '/';
@@ -169,34 +175,38 @@ export const createUnifiedAuthService = (oauthEnabled: boolean): UnifiedAuthServ
   async start(graphQLContext, input) {
     validateStartInput(input);
     const context = requireContext(graphQLContext);
+    const browserBinding = requireBrowserBinding(graphQLContext);
     const surface = await resolveSsoSurface(context);
     // Resolve and validate public Provider options before creating transient
     // state so a malformed Tenant Provider cannot leave an unusable login
     // transaction behind.
     const providers = await loadProviderDisplayOptions(context, oauthEnabled);
-    const result = await startUnifiedLogin(context, surface, input);
+    const result = await startUnifiedLogin(context, surface, input, browserBinding);
     return { ...result, providers };
   },
 
   async confirm(graphQLContext, input) {
     validateTransactionInput(input);
     const context = requireContext(graphQLContext);
+    const browserBinding = requireBrowserBinding(graphQLContext);
     const surface = await resolveSsoSurface(context);
     if (!context.userId) throw errors.UNAUTHENTICATED();
-    return confirmUnifiedLogin(context, surface, input);
+    return confirmUnifiedLogin(context, surface, input, browserBinding);
   },
 
   async signIn(graphQLContext, input) {
     validateTransactionInput(input);
     const context = requireContext(graphQLContext);
+    const browserBinding = requireBrowserBinding(graphQLContext);
     const surface = await resolveSsoSurface(context);
-    return signInUnifiedLogin(context, surface, input);
+    return signInUnifiedLogin(context, surface, input, browserBinding);
   },
 
   async signUp(graphQLContext, input) {
     validateTransactionInput(input);
     const context = requireContext(graphQLContext);
+    const browserBinding = requireBrowserBinding(graphQLContext);
     const surface = await resolveSsoSurface(context);
-    return signUpUnifiedLogin(context, surface, input);
+    return signUpUnifiedLogin(context, surface, input, browserBinding);
   }
 });

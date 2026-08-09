@@ -2,6 +2,8 @@ import type { ConstructiveContext } from '@constructive-io/express-context';
 
 export interface UnifiedAuthGraphQLContext {
   constructive?: ConstructiveContext;
+  /** Server-read authentication-center first-party browser binding. */
+  browserBinding?: string;
 }
 
 export interface ProviderDisplayOption {
@@ -14,12 +16,10 @@ export interface StartUnifiedLoginInput {
   callbackUrl?: string | null;
   returnTo?: string | null;
   siteState: string;
-  csrfToken: string;
 }
 
 export interface ContinueUnifiedLoginInput {
   transactionId: string;
-  csrfToken: string;
 }
 
 export interface UnifiedPasswordInput extends ContinueUnifiedLoginInput {

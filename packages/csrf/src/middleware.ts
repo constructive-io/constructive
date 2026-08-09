@@ -1,8 +1,10 @@
 import { generateToken, verifyToken } from './token';
 import { CookieOptions, createCsrfError,CsrfConfig } from './types';
 
+export const DEFAULT_CSRF_COOKIE_NAME = 'csrf_token';
+
 const DEFAULT_CONFIG: Required<CsrfConfig> = {
-  cookieName: 'csrf_token',
+  cookieName: DEFAULT_CSRF_COOKIE_NAME,
   headerName: 'x-csrf-token',
   fieldName: '_csrf',
   cookieOptions: {
