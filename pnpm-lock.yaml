@@ -2143,6 +2143,9 @@ importers:
         specifier: ^7.0.0
         version: 7.2.2
     devDependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@0no-co/graphql.web':
         specifier: ^1.3.3
         version: 1.3.3(graphql@16.13.0)
