@@ -6,6 +6,19 @@
 export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ResourceRequirement = unknown;
+export interface ContentPreset {
+  active: boolean | null;
+  commitId: string | null;
+  createdAt: string | null;
+  definition: unknown | null;
+  description: string | null;
+  id: string | null;
+  kind: string | null;
+  label: string | null;
+  slug: string | null;
+  storeId: string | null;
+  updatedAt: string | null;
+}
 export interface DbPreset {
   active: boolean | null;
   commitId: string | null;
@@ -73,6 +86,7 @@ export interface FunctionDefinition {
   requiredBuckets: string[] | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredModels: string[] | null;
+  requiredModules: string[] | null;
   requiredSecrets: ResourceRequirement[] | null;
   resources: unknown | null;
   runtime: string | null;
@@ -99,6 +113,7 @@ export interface FunctionDeployment {
   lastError: string | null;
   lastErrorAt: string | null;
   namespaceId: string | null;
+  realm: string | null;
   resources: unknown | null;
   revision: number | null;
   scaleMax: number | null;
@@ -405,6 +420,7 @@ export interface PlatformFunctionDefinition {
   requiredBuckets: string[] | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredModels: string[] | null;
+  requiredModules: string[] | null;
   requiredSecrets: ResourceRequirement[] | null;
   resources: unknown | null;
   runtime: string | null;
@@ -431,6 +447,7 @@ export interface PlatformFunctionDeployment {
   lastError: string | null;
   lastErrorAt: string | null;
   namespaceId: string | null;
+  realm: string | null;
   resources: unknown | null;
   revision: number | null;
   scaleMax: number | null;

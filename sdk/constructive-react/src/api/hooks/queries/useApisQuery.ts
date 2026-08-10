@@ -7,40 +7,49 @@
 import { useQuery } from '@tanstack/react-query';
 import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { apisKeys } from '../query-keys';
-import type { ApisSelect, ApisWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { ApisSelect, ApisWithRelations } from '../../orm/input-types';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { apiKeys } from '../query-keys';
+import type { ApiSelect, ApiWithRelations, ApiFilter, ApiOrderBy } from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type { ApiSelect, ApiWithRelations, ApiFilter, ApiOrderBy } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
-export const apisQueryKey = apisKeys.detail;
+export const apisQueryKey = apiKeys.list;
 /**
  * API surfaces exposed by this scope; publication makes a surface bindable from other scopes
  *
  * @example
  * ```tsx
  * const { data, isLoading } = useApisQuery({
- *   id: 'some-id',
- *   selection: { fields: { id: true, name: true } },
+ *   selection: {
+ *     fields: { id: true, name: true },
+ *     where: { name: { equalTo: "example" } },
+ *     orderBy: ['CREATED_AT_DESC'],
+ *     first: 10,
+ *   },
  * });
  * ```
  */
 export function useApisQuery<
-  S extends ApisSelect,
+  S extends ApiSelect,
   TData = {
-    apis: InferSelectResult<ApisWithRelations, S> | null;
+    apis: ConnectionResult<InferSelectResult<ApiWithRelations, S>>;
   },
 >(
   params: {
-    id: string;
     selection: {
       fields: S;
-    } & HookStrictSelect<NoInfer<S>, ApisSelect>;
+    } & Omit<ListSelectionConfig<S, ApiFilter, ApiOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ApiSelect>;
   } & Omit<
     UseQueryOptions<
       {
-        apis: InferSelectResult<ApisWithRelations, S> | null;
+        apis: ConnectionResult<InferSelectResult<ApiWithRelations, S>>;
       },
       Error,
       TData
@@ -50,22 +59,15 @@ export function useApisQuery<
 ): UseQueryResult<TData>;
 export function useApisQuery(
   params: {
-    id: string;
-    selection: SelectionConfig<ApisSelect>;
+    selection: ListSelectionConfig<ApiSelect, ApiFilter, ApiOrderBy>;
   } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
 ) {
-  const args = buildSelectionArgs<ApisSelect>(params.selection);
+  const args = buildListSelectionArgs<ApiSelect, ApiFilter, ApiOrderBy>(params.selection);
   const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
-    queryKey: apisKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .apis.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryKey: apiKeys.list(args),
+    queryFn: () => getClient().api.findMany(args).unwrap(),
     ...queryOptions,
   });
 }
@@ -75,64 +77,53 @@ export function useApisQuery(
  * @example
  * ```ts
  * const data = await fetchApisQuery({
- *   id: 'some-id',
- *   selection: { fields: { id: true } },
+ *   selection: {
+ *     fields: { id: true },
+ *     first: 10,
+ *   },
  * });
  * ```
  */
-export async function fetchApisQuery<S extends ApisSelect>(params: {
-  id: string;
+export async function fetchApisQuery<S extends ApiSelect>(params: {
   selection: {
     fields: S;
-  } & HookStrictSelect<NoInfer<S>, ApisSelect>;
+  } & Omit<ListSelectionConfig<S, ApiFilter, ApiOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, ApiSelect>;
 }): Promise<{
-  apis: InferSelectResult<ApisWithRelations, S> | null;
+  apis: ConnectionResult<InferSelectResult<ApiWithRelations, S>>;
 }>;
 export async function fetchApisQuery(params: {
-  id: string;
-  selection: SelectionConfig<ApisSelect>;
-}): Promise<any> {
-  const args = buildSelectionArgs<ApisSelect>(params.selection);
-  return getClient()
-    .apis.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  selection: ListSelectionConfig<ApiSelect, ApiFilter, ApiOrderBy>;
+}) {
+  const args = buildListSelectionArgs<ApiSelect, ApiFilter, ApiOrderBy>(params.selection);
+  return getClient().api.findMany(args).unwrap();
 }
 /**
  * API surfaces exposed by this scope; publication makes a surface bindable from other scopes
  *
  * @example
  * ```ts
- * await prefetchApisQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
+ * await prefetchApisQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchApisQuery<S extends ApisSelect>(
+export async function prefetchApisQuery<S extends ApiSelect>(
   queryClient: QueryClient,
   params: {
-    id: string;
     selection: {
       fields: S;
-    } & HookStrictSelect<NoInfer<S>, ApisSelect>;
+    } & Omit<ListSelectionConfig<S, ApiFilter, ApiOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ApiSelect>;
   }
 ): Promise<void>;
 export async function prefetchApisQuery(
   queryClient: QueryClient,
   params: {
-    id: string;
-    selection: SelectionConfig<ApisSelect>;
+    selection: ListSelectionConfig<ApiSelect, ApiFilter, ApiOrderBy>;
   }
 ): Promise<void> {
-  const args = buildSelectionArgs<ApisSelect>(params.selection);
+  const args = buildListSelectionArgs<ApiSelect, ApiFilter, ApiOrderBy>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: apisKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .apis.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryKey: apiKeys.list(args),
+    queryFn: () => getClient().api.findMany(args).unwrap(),
   });
 }

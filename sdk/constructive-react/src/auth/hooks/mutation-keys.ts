@@ -232,6 +232,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'signInCrossOrigin', identifier] as const)
       : (['mutation', 'signInCrossOrigin'] as const),
+  /** Mutation key for signInMagicLink */ signInMagicLink: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'signInMagicLink', identifier] as const)
+      : (['mutation', 'signInMagicLink'] as const),
   /** Mutation key for signInSmsOtp */ signInSmsOtp: (identifier?: string) =>
     identifier
       ? (['mutation', 'signInSmsOtp', identifier] as const)
@@ -242,6 +246,10 @@ export const customMutationKeys = {
       : (['mutation', 'signOut'] as const),
   /** Mutation key for signUp */ signUp: (identifier?: string) =>
     identifier ? (['mutation', 'signUp', identifier] as const) : (['mutation', 'signUp'] as const),
+  /** Mutation key for signUpMagicLink */ signUpMagicLink: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'signUpMagicLink', identifier] as const)
+      : (['mutation', 'signUpMagicLink'] as const),
   /** Mutation key for signUpSms */ signUpSms: (identifier?: string) =>
     identifier
       ? (['mutation', 'signUpSms', identifier] as const)

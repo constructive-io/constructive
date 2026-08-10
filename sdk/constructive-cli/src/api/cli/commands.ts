@@ -6,9 +6,9 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
+import apiCmd from './commands/api';
 import apiSchemaCmd from './commands/api-schema';
 import apiSettingCmd from './commands/api-setting';
-import apisCmd from './commands/apis';
 import astMigrationCmd from './commands/ast-migration';
 import checkConstraintCmd from './commands/check-constraint';
 import compositeTypeCmd from './commands/composite-type';
@@ -22,6 +22,9 @@ import domainCmd from './commands/domain';
 import domainEventCmd from './commands/domain-event';
 import domainTypeCmd from './commands/domain-type';
 import domainVerificationCmd from './commands/domain-verification';
+import emailIdentityCmd from './commands/email-identity';
+import emailProviderAccountCmd from './commands/email-provider-account';
+import emailSiteIdentityCmd from './commands/email-site-identity';
 import embeddingChunkCmd from './commands/embedding-chunk';
 import enumCmd from './commands/enum';
 import exclusionConstraintCmd from './commands/exclusion-constraint';
@@ -38,13 +41,16 @@ import managedDomainCmd from './commands/managed-domain';
 import nodeTypeRegistryCmd from './commands/node-type-registry';
 import pageCmd from './commands/page';
 import partitionCmd from './commands/partition';
+import platformApiCmd from './commands/platform-api';
 import platformApiSchemaCmd from './commands/platform-api-schema';
 import platformApiSettingCmd from './commands/platform-api-setting';
-import platformApisCmd from './commands/platform-apis';
 import platformCorsSettingCmd from './commands/platform-cors-setting';
 import platformDomainCmd from './commands/platform-domain';
 import platformDomainEventCmd from './commands/platform-domain-event';
 import platformDomainVerificationCmd from './commands/platform-domain-verification';
+import platformEmailIdentityCmd from './commands/platform-email-identity';
+import platformEmailProviderAccountCmd from './commands/platform-email-provider-account';
+import platformEmailSiteIdentityCmd from './commands/platform-email-site-identity';
 import platformManagedDomainCmd from './commands/platform-managed-domain';
 import platformPageCmd from './commands/platform-page';
 import platformSiteAppLinkCmd from './commands/platform-site-app-link';
@@ -113,9 +119,9 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
+  api: apiCmd,
   'api-schema': apiSchemaCmd,
   'api-setting': apiSettingCmd,
-  apis: apisCmd,
   'ast-migration': astMigrationCmd,
   'check-constraint': checkConstraintCmd,
   'composite-type': compositeTypeCmd,
@@ -129,6 +135,9 @@ const createCommandMap: () => Record<
   'domain-event': domainEventCmd,
   'domain-type': domainTypeCmd,
   'domain-verification': domainVerificationCmd,
+  'email-identity': emailIdentityCmd,
+  'email-provider-account': emailProviderAccountCmd,
+  'email-site-identity': emailSiteIdentityCmd,
   'embedding-chunk': embeddingChunkCmd,
   enum: enumCmd,
   'exclusion-constraint': exclusionConstraintCmd,
@@ -145,13 +154,16 @@ const createCommandMap: () => Record<
   'node-type-registry': nodeTypeRegistryCmd,
   page: pageCmd,
   partition: partitionCmd,
+  'platform-api': platformApiCmd,
   'platform-api-schema': platformApiSchemaCmd,
   'platform-api-setting': platformApiSettingCmd,
-  'platform-apis': platformApisCmd,
   'platform-cors-setting': platformCorsSettingCmd,
   'platform-domain': platformDomainCmd,
   'platform-domain-event': platformDomainEventCmd,
   'platform-domain-verification': platformDomainVerificationCmd,
+  'platform-email-identity': platformEmailIdentityCmd,
+  'platform-email-provider-account': platformEmailProviderAccountCmd,
+  'platform-email-site-identity': platformEmailSiteIdentityCmd,
   'platform-managed-domain': platformManagedDomainCmd,
   'platform-page': platformPageCmd,
   'platform-site-app-link': platformSiteAppLinkCmd,
@@ -212,7 +224,7 @@ const createCommandMap: () => Record<
   'sites-provision-static-site': sitesProvisionStaticSiteCmd,
 });
 const usage =
-  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  api-schema           apiSchema CRUD operations\n  api-setting          apiSetting CRUD operations\n  apis                 apis CRUD operations\n  ast-migration        astMigration CRUD operations\n  check-constraint     checkConstraint CRUD operations\n  composite-type       compositeType CRUD operations\n  cors-setting         corsSetting CRUD operations\n  database             database CRUD operations\n  database-setting     databaseSetting CRUD operations\n  database-transfer    databaseTransfer CRUD operations\n  default-privilege    defaultPrivilege CRUD operations\n  derive               derive CRUD operations\n  domain               domain CRUD operations\n  domain-event         domainEvent CRUD operations\n  domain-type          domainType CRUD operations\n  domain-verification  domainVerification CRUD operations\n  embedding-chunk      embeddingChunk CRUD operations\n  enum                 enum CRUD operations\n  exclusion-constraint exclusionConstraint CRUD operations\n  field-behavior       fieldBehavior CRUD operations\n  field                field CRUD operations\n  foreign-key-constraint-behavior foreignKeyConstraintBehavior CRUD operations\n  foreign-key-constraint foreignKeyConstraint CRUD operations\n  full-text-search     fullTextSearch CRUD operations\n  function             function CRUD operations\n  hostname-binding     hostnameBinding CRUD operations\n  http-route           httpRoute CRUD operations\n  index                index CRUD operations\n  managed-domain       managedDomain CRUD operations\n  node-type-registry   nodeTypeRegistry CRUD operations\n  page                 page CRUD operations\n  partition            partition CRUD operations\n  platform-api-schema  platformApiSchema CRUD operations\n  platform-api-setting platformApiSetting CRUD operations\n  platform-apis        platformApis CRUD operations\n  platform-cors-setting platformCorsSetting CRUD operations\n  platform-domain      platformDomain CRUD operations\n  platform-domain-event platformDomainEvent CRUD operations\n  platform-domain-verification platformDomainVerification CRUD operations\n  platform-managed-domain platformManagedDomain CRUD operations\n  platform-page        platformPage CRUD operations\n  platform-site-app-link platformSiteAppLink CRUD operations\n  platform-site        platformSite CRUD operations\n  platform-site-deep-link platformSiteDeepLink CRUD operations\n  platform-site-error-page platformSiteErrorPage CRUD operations\n  platform-site-metadatum platformSiteMetadatum CRUD operations\n  platform-site-module platformSiteModule CRUD operations\n  platform-site-theme  platformSiteTheme CRUD operations\n  platform-site-web-config platformSiteWebConfig CRUD operations\n  policy               policy CRUD operations\n  primary-key-constraint primaryKeyConstraint CRUD operations\n  pubkey-setting       pubkeySetting CRUD operations\n  rls-setting          rlsSetting CRUD operations\n  route-binding        routeBinding CRUD operations\n  route                route CRUD operations\n  schema               schema CRUD operations\n  schema-grant         schemaGrant CRUD operations\n  site-app-link        siteAppLink CRUD operations\n  site                 site CRUD operations\n  site-deep-link       siteDeepLink CRUD operations\n  site-error-page      siteErrorPage CRUD operations\n  site-metadatum       siteMetadatum CRUD operations\n  site-module          siteModule CRUD operations\n  site-theme           siteTheme CRUD operations\n  site-web-config      siteWebConfig CRUD operations\n  spatial-relation     spatialRelation CRUD operations\n  sql-action           sqlAction CRUD operations\n  table-behavior       tableBehavior CRUD operations\n  table                table CRUD operations\n  table-grant          tableGrant CRUD operations\n  trigger              trigger CRUD operations\n  trigger-function     triggerFunction CRUD operations\n  unique-constraint-behavior uniqueConstraintBehavior CRUD operations\n  unique-constraint    uniqueConstraint CRUD operations\n  view-behavior        viewBehavior CRUD operations\n  view                 view CRUD operations\n  view-grant           viewGrant CRUD operations\n  view-rule            viewRule CRUD operations\n  view-table           viewTable CRUD operations\n  webauthn-setting     webauthnSetting CRUD operations\n  api-schema-names     apiSchemaNames\n  apply-registry-defaults applyRegistryDefaults\n  resolve-deep-link    resolveDeepLink\n  resolve-http-route   resolveHttpRoute\n  resolve-route        resolveRoute\n  resolve-site-app-links resolveSiteAppLinks\n  accept-database-transfer acceptDatabaseTransfer\n  apply-rls            applyRls\n  cancel-database-transfer cancelDatabaseTransfer\n  domains-assign-subdomain domainsAssignSubdomain\n  platform-domains-assign-subdomain platformDomainsAssignSubdomain\n  platform-sites-provision-static-site platformSitesProvisionStaticSite\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  reject-database-transfer rejectDatabaseTransfer\n  request-database     Requests a database and returns a ticket (database_provision_module row) to poll.\n\nPass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.\n\nExample usage:\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '[\"users_module\", \"emails_module\"]'::jsonb);\n  set-field-order      setFieldOrder\n  sites-provision-static-site sitesProvisionStaticSite\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
+  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  api                  api CRUD operations\n  api-schema           apiSchema CRUD operations\n  api-setting          apiSetting CRUD operations\n  ast-migration        astMigration CRUD operations\n  check-constraint     checkConstraint CRUD operations\n  composite-type       compositeType CRUD operations\n  cors-setting         corsSetting CRUD operations\n  database             database CRUD operations\n  database-setting     databaseSetting CRUD operations\n  database-transfer    databaseTransfer CRUD operations\n  default-privilege    defaultPrivilege CRUD operations\n  derive               derive CRUD operations\n  domain               domain CRUD operations\n  domain-event         domainEvent CRUD operations\n  domain-type          domainType CRUD operations\n  domain-verification  domainVerification CRUD operations\n  email-identity       emailIdentity CRUD operations\n  email-provider-account emailProviderAccount CRUD operations\n  email-site-identity  emailSiteIdentity CRUD operations\n  embedding-chunk      embeddingChunk CRUD operations\n  enum                 enum CRUD operations\n  exclusion-constraint exclusionConstraint CRUD operations\n  field-behavior       fieldBehavior CRUD operations\n  field                field CRUD operations\n  foreign-key-constraint-behavior foreignKeyConstraintBehavior CRUD operations\n  foreign-key-constraint foreignKeyConstraint CRUD operations\n  full-text-search     fullTextSearch CRUD operations\n  function             function CRUD operations\n  hostname-binding     hostnameBinding CRUD operations\n  http-route           httpRoute CRUD operations\n  index                index CRUD operations\n  managed-domain       managedDomain CRUD operations\n  node-type-registry   nodeTypeRegistry CRUD operations\n  page                 page CRUD operations\n  partition            partition CRUD operations\n  platform-api         platformApi CRUD operations\n  platform-api-schema  platformApiSchema CRUD operations\n  platform-api-setting platformApiSetting CRUD operations\n  platform-cors-setting platformCorsSetting CRUD operations\n  platform-domain      platformDomain CRUD operations\n  platform-domain-event platformDomainEvent CRUD operations\n  platform-domain-verification platformDomainVerification CRUD operations\n  platform-email-identity platformEmailIdentity CRUD operations\n  platform-email-provider-account platformEmailProviderAccount CRUD operations\n  platform-email-site-identity platformEmailSiteIdentity CRUD operations\n  platform-managed-domain platformManagedDomain CRUD operations\n  platform-page        platformPage CRUD operations\n  platform-site-app-link platformSiteAppLink CRUD operations\n  platform-site        platformSite CRUD operations\n  platform-site-deep-link platformSiteDeepLink CRUD operations\n  platform-site-error-page platformSiteErrorPage CRUD operations\n  platform-site-metadatum platformSiteMetadatum CRUD operations\n  platform-site-module platformSiteModule CRUD operations\n  platform-site-theme  platformSiteTheme CRUD operations\n  platform-site-web-config platformSiteWebConfig CRUD operations\n  policy               policy CRUD operations\n  primary-key-constraint primaryKeyConstraint CRUD operations\n  pubkey-setting       pubkeySetting CRUD operations\n  rls-setting          rlsSetting CRUD operations\n  route-binding        routeBinding CRUD operations\n  route                route CRUD operations\n  schema               schema CRUD operations\n  schema-grant         schemaGrant CRUD operations\n  site-app-link        siteAppLink CRUD operations\n  site                 site CRUD operations\n  site-deep-link       siteDeepLink CRUD operations\n  site-error-page      siteErrorPage CRUD operations\n  site-metadatum       siteMetadatum CRUD operations\n  site-module          siteModule CRUD operations\n  site-theme           siteTheme CRUD operations\n  site-web-config      siteWebConfig CRUD operations\n  spatial-relation     spatialRelation CRUD operations\n  sql-action           sqlAction CRUD operations\n  table-behavior       tableBehavior CRUD operations\n  table                table CRUD operations\n  table-grant          tableGrant CRUD operations\n  trigger              trigger CRUD operations\n  trigger-function     triggerFunction CRUD operations\n  unique-constraint-behavior uniqueConstraintBehavior CRUD operations\n  unique-constraint    uniqueConstraint CRUD operations\n  view-behavior        viewBehavior CRUD operations\n  view                 view CRUD operations\n  view-grant           viewGrant CRUD operations\n  view-rule            viewRule CRUD operations\n  view-table           viewTable CRUD operations\n  webauthn-setting     webauthnSetting CRUD operations\n  api-schema-names     apiSchemaNames\n  apply-registry-defaults applyRegistryDefaults\n  resolve-deep-link    resolveDeepLink\n  resolve-http-route   resolveHttpRoute\n  resolve-route        resolveRoute\n  resolve-site-app-links resolveSiteAppLinks\n  accept-database-transfer acceptDatabaseTransfer\n  apply-rls            applyRls\n  cancel-database-transfer cancelDatabaseTransfer\n  domains-assign-subdomain domainsAssignSubdomain\n  platform-domains-assign-subdomain platformDomainsAssignSubdomain\n  platform-sites-provision-static-site platformSitesProvisionStaticSite\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  reject-database-transfer rejectDatabaseTransfer\n  request-database     Requests a database and returns a ticket (database_provision_module row) to poll.\n\nPass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.\n\nExample usage:\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '[\"users_module\", \"emails_module\"]'::jsonb);\n  set-field-order      setFieldOrder\n  sites-provision-static-site sitesProvisionStaticSite\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

@@ -232,11 +232,31 @@ export interface UUIDListFilter {
 }
 // ============ Enum Types ============
 export type ApiExposureLevel = 'EXPOSABLE' | 'INTERNAL_ONLY' | 'NEVER_EXPOSE';
-export type ObjectCategory = 'APP' | 'AUTH' | 'CORE' | 'MEMBERSHIPS' | 'MODULE' | 'PERMISSIONS';
+export type ObjectCategory = 'APP' | 'AUTH' | 'CAPABILITIES' | 'CORE' | 'MEMBERSHIPS' | 'MODULE';
 // ============ Custom Scalar Types ============
 export type ConstructiveInternalTypeImage = unknown;
-/** Join table linking API surfaces to the metaschema schemas they expose */
+/** API surfaces exposed by this scope; publication makes a surface bindable from other scopes */
 // ============ Entity Types ============
+export interface Api {
+  /** Anonymous role the API executes as */
+  anonRole?: string | null;
+  /** Module-specific configuration for this API surface */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Database this API surface serves */
+  dbname?: string | null;
+  id: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean | null;
+  /** Owner-local API surface name */
+  name?: string | null;
+  /** Authenticated role the API executes as */
+  roleName?: string | null;
+  updatedAt?: string | null;
+}
+/** Join table linking API surfaces to the metaschema schemas they expose */
 export interface ApiSchema {
   /** API surface that exposes this schema */
   apiId?: string | null;
@@ -284,26 +304,6 @@ export interface ApiSetting {
   options?: Record<string, unknown> | null;
   /** Override: GraphQL statement timeout in milliseconds (NULL = inherit from database_settings). Clamped by the plan cap at read time. */
   statementTimeoutMs?: string | null;
-  updatedAt?: string | null;
-}
-/** API surfaces exposed by this scope; publication makes a surface bindable from other scopes */
-export interface Apis {
-  /** Anonymous role the API executes as */
-  anonRole?: string | null;
-  /** Module-specific configuration for this API surface */
-  config?: Record<string, unknown> | null;
-  createdAt?: string | null;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string | null;
-  /** Database this API surface serves */
-  dbname?: string | null;
-  id: string;
-  /** Whether other scopes may see and route to this API surface */
-  isPublished?: boolean | null;
-  /** Owner-local API surface name */
-  name?: string | null;
-  /** Authenticated role the API executes as */
-  roleName?: string | null;
   updatedAt?: string | null;
 }
 export interface AstMigration {
@@ -545,6 +545,76 @@ export interface DomainVerification {
   updatedAt?: string | null;
   /** When this challenge succeeded */
   verifiedAt?: string | null;
+}
+/** Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through */
+export interface EmailIdentity {
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Envelope/header From address, lower-case. Must be accepted by the sending account at the provider. */
+  fromAddress?: string | null;
+  /** Display name shown beside the from address */
+  fromName?: string | null;
+  id: string;
+  /** Whether this identity may be resolved for a send */
+  isActive?: boolean | null;
+  /** The scope default identity, used when no site binding resolves. At most one per scope key. */
+  isDefault?: boolean | null;
+  /** Operator-facing name for this identity (e.g. transactional, support) */
+  name?: string | null;
+  /** Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared. */
+  providerAccountId?: string | null;
+  /** Reply-To address when replies should not go to the from address */
+  replyToAddress?: string | null;
+  /** Support address rendered in message bodies and footers */
+  supportAddress?: string | null;
+  /** own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback */
+  transportMode?: string | null;
+  updatedAt?: string | null;
+}
+/** A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) */
+export interface EmailProviderAccount {
+  /** Provider API base URL when it is not the provider default (e.g. Mailgun EU) */
+  apiBaseUrl?: string | null;
+  createdAt?: string | null;
+  /** Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here. */
+  credentialsSecretName?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  id: string;
+  /** Whether identities may send through this account. Disabling one row stops every identity that references it. */
+  isActive?: boolean | null;
+  /** Operator-facing name for this account (e.g. transactional, marketing) */
+  name?: string | null;
+  /** integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK */
+  provider?: string | null;
+  /** Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name */
+  providerAccountName?: string | null;
+  /** Provider region for region-addressed providers (e.g. SES us-east-1) */
+  region?: string | null;
+  /** SMTP host (provider = smtp, or a provider addressed over SMTP) */
+  smtpHost?: string | null;
+  /** SMTP port */
+  smtpPort?: number | null;
+  /** Whether the SMTP connection uses implicit TLS */
+  smtpSecure?: boolean | null;
+  /** SMTP username; the password is a secret, addressed by credentials_secret_name */
+  smtpUser?: string | null;
+  updatedAt?: string | null;
+  /** Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store. */
+  webhookSigningSecretName?: string | null;
+}
+/** Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. */
+export interface EmailSiteIdentity {
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Identity this site sends as */
+  emailIdentityId?: string | null;
+  id: string;
+  /** Site whose mail is sent as the bound identity */
+  siteId?: string | null;
+  updatedAt?: string | null;
 }
 export interface EmbeddingChunk {
   chunkOverlap?: number | null;
@@ -821,6 +891,24 @@ export interface Partition {
   tableId?: string | null;
   updatedAt?: string | null;
 }
+/** API surfaces exposed by this scope; publication makes a surface bindable from other scopes */
+export interface PlatformApi {
+  /** Anonymous role the API executes as */
+  anonRole?: string | null;
+  /** Module-specific configuration for this API surface */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Database this API surface serves */
+  dbname?: string | null;
+  id: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean | null;
+  /** Owner-local API surface name */
+  name?: string | null;
+  /** Authenticated role the API executes as */
+  roleName?: string | null;
+  updatedAt?: string | null;
+}
 /** Join table linking API surfaces to the metaschema schemas they expose */
 export interface PlatformApiSchema {
   /** API surface that exposes this schema */
@@ -865,24 +953,6 @@ export interface PlatformApiSetting {
   options?: Record<string, unknown> | null;
   /** Override: GraphQL statement timeout in milliseconds (NULL = inherit from database_settings). Clamped by the plan cap at read time. */
   statementTimeoutMs?: string | null;
-  updatedAt?: string | null;
-}
-/** API surfaces exposed by this scope; publication makes a surface bindable from other scopes */
-export interface PlatformApis {
-  /** Anonymous role the API executes as */
-  anonRole?: string | null;
-  /** Module-specific configuration for this API surface */
-  config?: Record<string, unknown> | null;
-  createdAt?: string | null;
-  /** Database this API surface serves */
-  dbname?: string | null;
-  id: string;
-  /** Whether other scopes may see and route to this API surface */
-  isPublished?: boolean | null;
-  /** Owner-local API surface name */
-  name?: string | null;
-  /** Authenticated role the API executes as */
-  roleName?: string | null;
   updatedAt?: string | null;
 }
 /** Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default */
@@ -972,6 +1042,70 @@ export interface PlatformDomainVerification {
   updatedAt?: string | null;
   /** When this challenge succeeded */
   verifiedAt?: string | null;
+}
+/** Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through */
+export interface PlatformEmailIdentity {
+  createdAt?: string | null;
+  /** Envelope/header From address, lower-case. Must be accepted by the sending account at the provider. */
+  fromAddress?: string | null;
+  /** Display name shown beside the from address */
+  fromName?: string | null;
+  id: string;
+  /** Whether this identity may be resolved for a send */
+  isActive?: boolean | null;
+  /** The scope default identity, used when no site binding resolves. At most one per scope key. */
+  isDefault?: boolean | null;
+  /** Operator-facing name for this identity (e.g. transactional, support) */
+  name?: string | null;
+  /** Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared. */
+  providerAccountId?: string | null;
+  /** Reply-To address when replies should not go to the from address */
+  replyToAddress?: string | null;
+  /** Support address rendered in message bodies and footers */
+  supportAddress?: string | null;
+  /** own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback */
+  transportMode?: string | null;
+  updatedAt?: string | null;
+}
+/** A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) */
+export interface PlatformEmailProviderAccount {
+  /** Provider API base URL when it is not the provider default (e.g. Mailgun EU) */
+  apiBaseUrl?: string | null;
+  createdAt?: string | null;
+  /** Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here. */
+  credentialsSecretName?: string | null;
+  id: string;
+  /** Whether identities may send through this account. Disabling one row stops every identity that references it. */
+  isActive?: boolean | null;
+  /** Operator-facing name for this account (e.g. transactional, marketing) */
+  name?: string | null;
+  /** integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK */
+  provider?: string | null;
+  /** Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name */
+  providerAccountName?: string | null;
+  /** Provider region for region-addressed providers (e.g. SES us-east-1) */
+  region?: string | null;
+  /** SMTP host (provider = smtp, or a provider addressed over SMTP) */
+  smtpHost?: string | null;
+  /** SMTP port */
+  smtpPort?: number | null;
+  /** Whether the SMTP connection uses implicit TLS */
+  smtpSecure?: boolean | null;
+  /** SMTP username; the password is a secret, addressed by credentials_secret_name */
+  smtpUser?: string | null;
+  updatedAt?: string | null;
+  /** Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store. */
+  webhookSigningSecretName?: string | null;
+}
+/** Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. */
+export interface PlatformEmailSiteIdentity {
+  createdAt?: string | null;
+  /** Identity this site sends as */
+  emailIdentityId?: string | null;
+  id: string;
+  /** Site whose mail is sent as the bound identity */
+  siteId?: string | null;
+  updatedAt?: string | null;
 }
 /** Platform-operated hostnames whose DNS and certificate lifecycle the platform drives */
 export interface PlatformManagedDomain {
@@ -1736,17 +1870,17 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
+export interface ApiRelations {
+  apiSetting?: ApiSetting | null;
+  apiSchemas?: ConnectionResult<ApiSchema>;
+  corsSettings?: ConnectionResult<CorsSetting>;
+}
 export interface ApiSchemaRelations {
-  api?: Apis | null;
+  api?: Api | null;
   schema?: Schema | null;
 }
 export interface ApiSettingRelations {
-  api?: Apis | null;
-}
-export interface ApisRelations {
-  apiSettingByApiId?: ApiSetting | null;
-  apiSchemasByApiId?: ConnectionResult<ApiSchema>;
-  corsSettingsByApiId?: ConnectionResult<CorsSetting>;
+  api?: Api | null;
 }
 export interface AstMigrationRelations {}
 export interface CheckConstraintRelations {
@@ -1758,7 +1892,7 @@ export interface CompositeTypeRelations {
   schema?: Schema | null;
 }
 export interface CorsSettingRelations {
-  api?: Apis | null;
+  api?: Api | null;
 }
 export interface DatabaseRelations {
   checkConstraints?: ConnectionResult<CheckConstraint>;
@@ -1828,6 +1962,17 @@ export interface DomainVerificationRelations {
   domain?: Domain | null;
   managedDomain?: ManagedDomain | null;
 }
+export interface EmailIdentityRelations {
+  providerAccount?: EmailProviderAccount | null;
+  emailSiteIdentities?: ConnectionResult<EmailSiteIdentity>;
+}
+export interface EmailProviderAccountRelations {
+  emailIdentitiesByProviderAccountId?: ConnectionResult<EmailIdentity>;
+}
+export interface EmailSiteIdentityRelations {
+  emailIdentity?: EmailIdentity | null;
+  site?: Site | null;
+}
 export interface EmbeddingChunkRelations {
   chunksTable?: Table | null;
   database?: Database | null;
@@ -1896,20 +2041,20 @@ export interface PartitionRelations {
   partitionKey?: Field | null;
   table?: Table | null;
 }
-export interface PlatformApiSchemaRelations {
-  api?: PlatformApis | null;
-  schema?: Schema | null;
-}
-export interface PlatformApiSettingRelations {
-  api?: PlatformApis | null;
-}
-export interface PlatformApisRelations {
+export interface PlatformApiRelations {
   platformApiSettingByApiId?: PlatformApiSetting | null;
   platformCorsSettingByApiId?: PlatformCorsSetting | null;
   platformApiSchemasByApiId?: ConnectionResult<PlatformApiSchema>;
 }
+export interface PlatformApiSchemaRelations {
+  api?: PlatformApi | null;
+  schema?: Schema | null;
+}
+export interface PlatformApiSettingRelations {
+  api?: PlatformApi | null;
+}
 export interface PlatformCorsSettingRelations {
-  api?: PlatformApis | null;
+  api?: PlatformApi | null;
 }
 export interface PlatformDomainRelations {
   platformDomainEventsByDomainId?: ConnectionResult<PlatformDomainEvent>;
@@ -1924,6 +2069,17 @@ export interface PlatformDomainVerificationRelations {
   domain?: PlatformDomain | null;
   managedDomain?: PlatformManagedDomain | null;
 }
+export interface PlatformEmailIdentityRelations {
+  providerAccount?: PlatformEmailProviderAccount | null;
+  platformEmailSiteIdentitiesByEmailIdentityId?: ConnectionResult<PlatformEmailSiteIdentity>;
+}
+export interface PlatformEmailProviderAccountRelations {
+  platformEmailIdentitiesByProviderAccountId?: ConnectionResult<PlatformEmailIdentity>;
+}
+export interface PlatformEmailSiteIdentityRelations {
+  emailIdentity?: PlatformEmailIdentity | null;
+  site?: PlatformSite | null;
+}
 export interface PlatformManagedDomainRelations {
   platformDomainEventsByManagedDomainId?: ConnectionResult<PlatformDomainEvent>;
   platformDomainVerificationsByManagedDomainId?: ConnectionResult<PlatformDomainVerification>;
@@ -1935,6 +2091,7 @@ export interface PlatformSiteAppLinkRelations {
   site?: PlatformSite | null;
 }
 export interface PlatformSiteRelations {
+  platformEmailSiteIdentityBySiteId?: PlatformEmailSiteIdentity | null;
   platformSiteMetadatumBySiteId?: PlatformSiteMetadatum | null;
   platformSiteWebConfigBySiteId?: PlatformSiteWebConfig | null;
   platformPagesBySiteId?: ConnectionResult<PlatformPage>;
@@ -2014,6 +2171,7 @@ export interface SiteAppLinkRelations {
   site?: Site | null;
 }
 export interface SiteRelations {
+  emailSiteIdentity?: EmailSiteIdentity | null;
   siteMetadatum?: SiteMetadatum | null;
   siteWebConfig?: SiteWebConfig | null;
   pages?: ConnectionResult<Page>;
@@ -2139,9 +2297,9 @@ export interface WebauthnSettingRelations {
   userField?: Field | null;
 }
 // ============ Entity Types With Relations ============
+export type ApiWithRelations = Api & ApiRelations;
 export type ApiSchemaWithRelations = ApiSchema & ApiSchemaRelations;
 export type ApiSettingWithRelations = ApiSetting & ApiSettingRelations;
-export type ApisWithRelations = Apis & ApisRelations;
 export type AstMigrationWithRelations = AstMigration & AstMigrationRelations;
 export type CheckConstraintWithRelations = CheckConstraint & CheckConstraintRelations;
 export type CompositeTypeWithRelations = CompositeType & CompositeTypeRelations;
@@ -2155,6 +2313,10 @@ export type DomainWithRelations = Domain & DomainRelations;
 export type DomainEventWithRelations = DomainEvent & DomainEventRelations;
 export type DomainTypeWithRelations = DomainType & DomainTypeRelations;
 export type DomainVerificationWithRelations = DomainVerification & DomainVerificationRelations;
+export type EmailIdentityWithRelations = EmailIdentity & EmailIdentityRelations;
+export type EmailProviderAccountWithRelations = EmailProviderAccount &
+  EmailProviderAccountRelations;
+export type EmailSiteIdentityWithRelations = EmailSiteIdentity & EmailSiteIdentityRelations;
 export type EmbeddingChunkWithRelations = EmbeddingChunk & EmbeddingChunkRelations;
 export type EnumWithRelations = Enum & EnumRelations;
 export type ExclusionConstraintWithRelations = ExclusionConstraint & ExclusionConstraintRelations;
@@ -2173,14 +2335,20 @@ export type ManagedDomainWithRelations = ManagedDomain & ManagedDomainRelations;
 export type NodeTypeRegistryWithRelations = NodeTypeRegistry & NodeTypeRegistryRelations;
 export type PageWithRelations = Page & PageRelations;
 export type PartitionWithRelations = Partition & PartitionRelations;
+export type PlatformApiWithRelations = PlatformApi & PlatformApiRelations;
 export type PlatformApiSchemaWithRelations = PlatformApiSchema & PlatformApiSchemaRelations;
 export type PlatformApiSettingWithRelations = PlatformApiSetting & PlatformApiSettingRelations;
-export type PlatformApisWithRelations = PlatformApis & PlatformApisRelations;
 export type PlatformCorsSettingWithRelations = PlatformCorsSetting & PlatformCorsSettingRelations;
 export type PlatformDomainWithRelations = PlatformDomain & PlatformDomainRelations;
 export type PlatformDomainEventWithRelations = PlatformDomainEvent & PlatformDomainEventRelations;
 export type PlatformDomainVerificationWithRelations = PlatformDomainVerification &
   PlatformDomainVerificationRelations;
+export type PlatformEmailIdentityWithRelations = PlatformEmailIdentity &
+  PlatformEmailIdentityRelations;
+export type PlatformEmailProviderAccountWithRelations = PlatformEmailProviderAccount &
+  PlatformEmailProviderAccountRelations;
+export type PlatformEmailSiteIdentityWithRelations = PlatformEmailSiteIdentity &
+  PlatformEmailSiteIdentityRelations;
 export type PlatformManagedDomainWithRelations = PlatformManagedDomain &
   PlatformManagedDomainRelations;
 export type PlatformPageWithRelations = PlatformPage & PlatformPageRelations;
@@ -2230,6 +2398,33 @@ export type ViewRuleWithRelations = ViewRule & ViewRuleRelations;
 export type ViewTableWithRelations = ViewTable & ViewTableRelations;
 export type WebauthnSettingWithRelations = WebauthnSetting & WebauthnSettingRelations;
 // ============ Entity Select Types ============
+export type ApiSelect = {
+  anonRole?: boolean;
+  config?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  dbname?: boolean;
+  id?: boolean;
+  isPublished?: boolean;
+  name?: boolean;
+  roleName?: boolean;
+  updatedAt?: boolean;
+  apiSetting?: {
+    select: ApiSettingSelect;
+  };
+  apiSchemas?: {
+    select: ApiSchemaSelect;
+    first?: number;
+    filter?: ApiSchemaFilter;
+    orderBy?: ApiSchemaOrderBy[];
+  };
+  corsSettings?: {
+    select: CorsSettingSelect;
+    first?: number;
+    filter?: CorsSettingFilter;
+    orderBy?: CorsSettingOrderBy[];
+  };
+};
 export type ApiSchemaSelect = {
   apiId?: boolean;
   createdAt?: boolean;
@@ -2238,7 +2433,7 @@ export type ApiSchemaSelect = {
   schemaId?: boolean;
   updatedAt?: boolean;
   api?: {
-    select: ApisSelect;
+    select: ApiSelect;
   };
   schema?: {
     select: SchemaSelect;
@@ -2265,34 +2460,7 @@ export type ApiSettingSelect = {
   statementTimeoutMs?: boolean;
   updatedAt?: boolean;
   api?: {
-    select: ApisSelect;
-  };
-};
-export type ApisSelect = {
-  anonRole?: boolean;
-  config?: boolean;
-  createdAt?: boolean;
-  databaseId?: boolean;
-  dbname?: boolean;
-  id?: boolean;
-  isPublished?: boolean;
-  name?: boolean;
-  roleName?: boolean;
-  updatedAt?: boolean;
-  apiSettingByApiId?: {
-    select: ApiSettingSelect;
-  };
-  apiSchemasByApiId?: {
-    select: ApiSchemaSelect;
-    first?: number;
-    filter?: ApiSchemaFilter;
-    orderBy?: ApiSchemaOrderBy[];
-  };
-  corsSettingsByApiId?: {
-    select: CorsSettingSelect;
-    first?: number;
-    filter?: CorsSettingFilter;
-    orderBy?: CorsSettingOrderBy[];
+    select: ApiSelect;
   };
 };
 export type AstMigrationSelect = {
@@ -2358,7 +2526,7 @@ export type CorsSettingSelect = {
   id?: boolean;
   updatedAt?: boolean;
   api?: {
-    select: ApisSelect;
+    select: ApiSelect;
   };
 };
 export type DatabaseSelect = {
@@ -2759,6 +2927,68 @@ export type DomainVerificationSelect = {
     select: ManagedDomainSelect;
   };
 };
+export type EmailIdentitySelect = {
+  createdAt?: boolean;
+  databaseId?: boolean;
+  fromAddress?: boolean;
+  fromName?: boolean;
+  id?: boolean;
+  isActive?: boolean;
+  isDefault?: boolean;
+  name?: boolean;
+  providerAccountId?: boolean;
+  replyToAddress?: boolean;
+  supportAddress?: boolean;
+  transportMode?: boolean;
+  updatedAt?: boolean;
+  providerAccount?: {
+    select: EmailProviderAccountSelect;
+  };
+  emailSiteIdentities?: {
+    select: EmailSiteIdentitySelect;
+    first?: number;
+    filter?: EmailSiteIdentityFilter;
+    orderBy?: EmailSiteIdentityOrderBy[];
+  };
+};
+export type EmailProviderAccountSelect = {
+  apiBaseUrl?: boolean;
+  createdAt?: boolean;
+  credentialsSecretName?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  isActive?: boolean;
+  name?: boolean;
+  provider?: boolean;
+  providerAccountName?: boolean;
+  region?: boolean;
+  smtpHost?: boolean;
+  smtpPort?: boolean;
+  smtpSecure?: boolean;
+  smtpUser?: boolean;
+  updatedAt?: boolean;
+  webhookSigningSecretName?: boolean;
+  emailIdentitiesByProviderAccountId?: {
+    select: EmailIdentitySelect;
+    first?: number;
+    filter?: EmailIdentityFilter;
+    orderBy?: EmailIdentityOrderBy[];
+  };
+};
+export type EmailSiteIdentitySelect = {
+  createdAt?: boolean;
+  databaseId?: boolean;
+  emailIdentityId?: boolean;
+  id?: boolean;
+  siteId?: boolean;
+  updatedAt?: boolean;
+  emailIdentity?: {
+    select: EmailIdentitySelect;
+  };
+  site?: {
+    select: SiteSelect;
+  };
+};
 export type EmbeddingChunkSelect = {
   chunkOverlap?: boolean;
   chunkSize?: boolean;
@@ -3135,6 +3365,29 @@ export type PartitionSelect = {
     select: TableSelect;
   };
 };
+export type PlatformApiSelect = {
+  anonRole?: boolean;
+  config?: boolean;
+  createdAt?: boolean;
+  dbname?: boolean;
+  id?: boolean;
+  isPublished?: boolean;
+  name?: boolean;
+  roleName?: boolean;
+  updatedAt?: boolean;
+  platformApiSettingByApiId?: {
+    select: PlatformApiSettingSelect;
+  };
+  platformCorsSettingByApiId?: {
+    select: PlatformCorsSettingSelect;
+  };
+  platformApiSchemasByApiId?: {
+    select: PlatformApiSchemaSelect;
+    first?: number;
+    filter?: PlatformApiSchemaFilter;
+    orderBy?: PlatformApiSchemaOrderBy[];
+  };
+};
 export type PlatformApiSchemaSelect = {
   apiId?: boolean;
   createdAt?: boolean;
@@ -3142,7 +3395,7 @@ export type PlatformApiSchemaSelect = {
   schemaId?: boolean;
   updatedAt?: boolean;
   api?: {
-    select: PlatformApisSelect;
+    select: PlatformApiSelect;
   };
   schema?: {
     select: SchemaSelect;
@@ -3168,30 +3421,7 @@ export type PlatformApiSettingSelect = {
   statementTimeoutMs?: boolean;
   updatedAt?: boolean;
   api?: {
-    select: PlatformApisSelect;
-  };
-};
-export type PlatformApisSelect = {
-  anonRole?: boolean;
-  config?: boolean;
-  createdAt?: boolean;
-  dbname?: boolean;
-  id?: boolean;
-  isPublished?: boolean;
-  name?: boolean;
-  roleName?: boolean;
-  updatedAt?: boolean;
-  platformApiSettingByApiId?: {
-    select: PlatformApiSettingSelect;
-  };
-  platformCorsSettingByApiId?: {
-    select: PlatformCorsSettingSelect;
-  };
-  platformApiSchemasByApiId?: {
-    select: PlatformApiSchemaSelect;
-    first?: number;
-    filter?: PlatformApiSchemaFilter;
-    orderBy?: PlatformApiSchemaOrderBy[];
+    select: PlatformApiSelect;
   };
 };
 export type PlatformCorsSettingSelect = {
@@ -3201,7 +3431,7 @@ export type PlatformCorsSettingSelect = {
   id?: boolean;
   updatedAt?: boolean;
   api?: {
-    select: PlatformApisSelect;
+    select: PlatformApiSelect;
   };
 };
 export type PlatformDomainSelect = {
@@ -3276,6 +3506,65 @@ export type PlatformDomainVerificationSelect = {
     select: PlatformManagedDomainSelect;
   };
 };
+export type PlatformEmailIdentitySelect = {
+  createdAt?: boolean;
+  fromAddress?: boolean;
+  fromName?: boolean;
+  id?: boolean;
+  isActive?: boolean;
+  isDefault?: boolean;
+  name?: boolean;
+  providerAccountId?: boolean;
+  replyToAddress?: boolean;
+  supportAddress?: boolean;
+  transportMode?: boolean;
+  updatedAt?: boolean;
+  providerAccount?: {
+    select: PlatformEmailProviderAccountSelect;
+  };
+  platformEmailSiteIdentitiesByEmailIdentityId?: {
+    select: PlatformEmailSiteIdentitySelect;
+    first?: number;
+    filter?: PlatformEmailSiteIdentityFilter;
+    orderBy?: PlatformEmailSiteIdentityOrderBy[];
+  };
+};
+export type PlatformEmailProviderAccountSelect = {
+  apiBaseUrl?: boolean;
+  createdAt?: boolean;
+  credentialsSecretName?: boolean;
+  id?: boolean;
+  isActive?: boolean;
+  name?: boolean;
+  provider?: boolean;
+  providerAccountName?: boolean;
+  region?: boolean;
+  smtpHost?: boolean;
+  smtpPort?: boolean;
+  smtpSecure?: boolean;
+  smtpUser?: boolean;
+  updatedAt?: boolean;
+  webhookSigningSecretName?: boolean;
+  platformEmailIdentitiesByProviderAccountId?: {
+    select: PlatformEmailIdentitySelect;
+    first?: number;
+    filter?: PlatformEmailIdentityFilter;
+    orderBy?: PlatformEmailIdentityOrderBy[];
+  };
+};
+export type PlatformEmailSiteIdentitySelect = {
+  createdAt?: boolean;
+  emailIdentityId?: boolean;
+  id?: boolean;
+  siteId?: boolean;
+  updatedAt?: boolean;
+  emailIdentity?: {
+    select: PlatformEmailIdentitySelect;
+  };
+  site?: {
+    select: PlatformSiteSelect;
+  };
+};
 export type PlatformManagedDomainSelect = {
   allowPublicUsage?: boolean;
   annotations?: boolean;
@@ -3344,6 +3633,9 @@ export type PlatformSiteSelect = {
   resourceId?: boolean;
   title?: boolean;
   updatedAt?: boolean;
+  platformEmailSiteIdentityBySiteId?: {
+    select: PlatformEmailSiteIdentitySelect;
+  };
   platformSiteMetadatumBySiteId?: {
     select: PlatformSiteMetadatumSelect;
   };
@@ -3748,6 +4040,9 @@ export type SiteSelect = {
   resourceId?: boolean;
   title?: boolean;
   updatedAt?: boolean;
+  emailSiteIdentity?: {
+    select: EmailSiteIdentitySelect;
+  };
   siteMetadatum?: {
     select: SiteMetadatumSelect;
   };
@@ -4365,11 +4660,51 @@ export type WebauthnSettingSelect = {
   };
 };
 // ============ Table Filter Types ============
+export interface ApiFilter {
+  /** Checks for all expressions in this list. */
+  and?: ApiFilter[];
+  /** Filter by the object’s `anonRole` field. */
+  anonRole?: StringFilter;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: ApiToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `apiSetting` relation. */
+  apiSetting?: ApiSettingFilter;
+  /** A related `apiSetting` exists. */
+  apiSettingExists?: boolean;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `corsSettings` relation. */
+  corsSettings?: ApiToManyCorsSettingFilter;
+  /** `corsSettings` exist. */
+  corsSettingsExist?: boolean;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: ApiFilter;
+  /** Checks for any expressions in this list. */
+  or?: ApiFilter[];
+  /** Filter by the object’s `roleName` field. */
+  roleName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 export interface ApiSchemaFilter {
   /** Checks for all expressions in this list. */
   and?: ApiSchemaFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: ApisFilter;
+  api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -4393,7 +4728,7 @@ export interface ApiSettingFilter {
   /** Checks for all expressions in this list. */
   and?: ApiSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: ApisFilter;
+  api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -4434,46 +4769,6 @@ export interface ApiSettingFilter {
   or?: ApiSettingFilter[];
   /** Filter by the object’s `statementTimeoutMs` field. */
   statementTimeoutMs?: BigIntFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-export interface ApisFilter {
-  /** Checks for all expressions in this list. */
-  and?: ApisFilter[];
-  /** Filter by the object’s `anonRole` field. */
-  anonRole?: StringFilter;
-  /** Filter by the object’s `apiSchemasByApiId` relation. */
-  apiSchemasByApiId?: ApisToManyApiSchemaFilter;
-  /** `apiSchemasByApiId` exist. */
-  apiSchemasByApiIdExist?: boolean;
-  /** Filter by the object’s `apiSettingByApiId` relation. */
-  apiSettingByApiId?: ApiSettingFilter;
-  /** A related `apiSettingByApiId` exists. */
-  apiSettingByApiIdExists?: boolean;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `corsSettingsByApiId` relation. */
-  corsSettingsByApiId?: ApisToManyCorsSettingFilter;
-  /** `corsSettingsByApiId` exist. */
-  corsSettingsByApiIdExist?: boolean;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `dbname` field. */
-  dbname?: StringFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isPublished` field. */
-  isPublished?: BooleanFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: ApisFilter;
-  /** Checks for any expressions in this list. */
-  or?: ApisFilter[];
-  /** Filter by the object’s `roleName` field. */
-  roleName?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
@@ -4589,7 +4884,7 @@ export interface CorsSettingFilter {
   /** Checks for all expressions in this list. */
   and?: CorsSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: ApisFilter;
+  api?: ApiFilter;
   /** A related `api` exists. */
   apiExists?: boolean;
   /** Filter by the object’s `apiId` field. */
@@ -5092,6 +5387,116 @@ export interface DomainVerificationFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `verifiedAt` field. */
   verifiedAt?: DatetimeFilter;
+}
+export interface EmailIdentityFilter {
+  /** Checks for all expressions in this list. */
+  and?: EmailIdentityFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `emailSiteIdentities` relation. */
+  emailSiteIdentities?: EmailIdentityToManyEmailSiteIdentityFilter;
+  /** `emailSiteIdentities` exist. */
+  emailSiteIdentitiesExist?: boolean;
+  /** Filter by the object’s `fromAddress` field. */
+  fromAddress?: StringFilter;
+  /** Filter by the object’s `fromName` field. */
+  fromName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isDefault` field. */
+  isDefault?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: EmailIdentityFilter;
+  /** Checks for any expressions in this list. */
+  or?: EmailIdentityFilter[];
+  /** Filter by the object’s `providerAccount` relation. */
+  providerAccount?: EmailProviderAccountFilter;
+  /** A related `providerAccount` exists. */
+  providerAccountExists?: boolean;
+  /** Filter by the object’s `providerAccountId` field. */
+  providerAccountId?: UUIDFilter;
+  /** Filter by the object’s `replyToAddress` field. */
+  replyToAddress?: StringFilter;
+  /** Filter by the object’s `supportAddress` field. */
+  supportAddress?: StringFilter;
+  /** Filter by the object’s `transportMode` field. */
+  transportMode?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface EmailProviderAccountFilter {
+  /** Checks for all expressions in this list. */
+  and?: EmailProviderAccountFilter[];
+  /** Filter by the object’s `apiBaseUrl` field. */
+  apiBaseUrl?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `credentialsSecretName` field. */
+  credentialsSecretName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `emailIdentitiesByProviderAccountId` relation. */
+  emailIdentitiesByProviderAccountId?: EmailProviderAccountToManyEmailIdentityFilter;
+  /** `emailIdentitiesByProviderAccountId` exist. */
+  emailIdentitiesByProviderAccountIdExist?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: EmailProviderAccountFilter;
+  /** Checks for any expressions in this list. */
+  or?: EmailProviderAccountFilter[];
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `providerAccountName` field. */
+  providerAccountName?: StringFilter;
+  /** Filter by the object’s `region` field. */
+  region?: StringFilter;
+  /** Filter by the object’s `smtpHost` field. */
+  smtpHost?: StringFilter;
+  /** Filter by the object’s `smtpPort` field. */
+  smtpPort?: IntFilter;
+  /** Filter by the object’s `smtpSecure` field. */
+  smtpSecure?: BooleanFilter;
+  /** Filter by the object’s `smtpUser` field. */
+  smtpUser?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `webhookSigningSecretName` field. */
+  webhookSigningSecretName?: StringFilter;
+}
+export interface EmailSiteIdentityFilter {
+  /** Checks for all expressions in this list. */
+  and?: EmailSiteIdentityFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `emailIdentity` relation. */
+  emailIdentity?: EmailIdentityFilter;
+  /** Filter by the object’s `emailIdentityId` field. */
+  emailIdentityId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: EmailSiteIdentityFilter;
+  /** Checks for any expressions in this list. */
+  or?: EmailSiteIdentityFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface EmbeddingChunkFilter {
   /** Checks for all expressions in this list. */
@@ -5727,11 +6132,49 @@ export interface PartitionFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
+export interface PlatformApiFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiFilter[];
+  /** Filter by the object’s `anonRole` field. */
+  anonRole?: StringFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformApiFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformApiFilter[];
+  /** Filter by the object’s `platformApiSchemasByApiId` relation. */
+  platformApiSchemasByApiId?: PlatformApiToManyPlatformApiSchemaFilter;
+  /** `platformApiSchemasByApiId` exist. */
+  platformApiSchemasByApiIdExist?: boolean;
+  /** Filter by the object’s `platformApiSettingByApiId` relation. */
+  platformApiSettingByApiId?: PlatformApiSettingFilter;
+  /** A related `platformApiSettingByApiId` exists. */
+  platformApiSettingByApiIdExists?: boolean;
+  /** Filter by the object’s `platformCorsSettingByApiId` relation. */
+  platformCorsSettingByApiId?: PlatformCorsSettingFilter;
+  /** A related `platformCorsSettingByApiId` exists. */
+  platformCorsSettingByApiIdExists?: boolean;
+  /** Filter by the object’s `roleName` field. */
+  roleName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 export interface PlatformApiSchemaFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformApiSchemaFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: PlatformApisFilter;
+  api?: PlatformApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -5753,7 +6196,7 @@ export interface PlatformApiSettingFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformApiSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: PlatformApisFilter;
+  api?: PlatformApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -5795,51 +6238,13 @@ export interface PlatformApiSettingFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
-export interface PlatformApisFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformApisFilter[];
-  /** Filter by the object’s `anonRole` field. */
-  anonRole?: StringFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `dbname` field. */
-  dbname?: StringFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isPublished` field. */
-  isPublished?: BooleanFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: PlatformApisFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformApisFilter[];
-  /** Filter by the object’s `platformApiSchemasByApiId` relation. */
-  platformApiSchemasByApiId?: PlatformApisToManyPlatformApiSchemaFilter;
-  /** `platformApiSchemasByApiId` exist. */
-  platformApiSchemasByApiIdExist?: boolean;
-  /** Filter by the object’s `platformApiSettingByApiId` relation. */
-  platformApiSettingByApiId?: PlatformApiSettingFilter;
-  /** A related `platformApiSettingByApiId` exists. */
-  platformApiSettingByApiIdExists?: boolean;
-  /** Filter by the object’s `platformCorsSettingByApiId` relation. */
-  platformCorsSettingByApiId?: PlatformCorsSettingFilter;
-  /** A related `platformCorsSettingByApiId` exists. */
-  platformCorsSettingByApiIdExists?: boolean;
-  /** Filter by the object’s `roleName` field. */
-  roleName?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
 export interface PlatformCorsSettingFilter {
   /** Filter by the object’s `allowedOrigins` field. */
   allowedOrigins?: StringListFilter;
   /** Checks for all expressions in this list. */
   and?: PlatformCorsSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: PlatformApisFilter;
+  api?: PlatformApiFilter;
   /** A related `api` exists. */
   apiExists?: boolean;
   /** Filter by the object’s `apiId` field. */
@@ -5985,6 +6390,110 @@ export interface PlatformDomainVerificationFilter {
   /** Filter by the object’s `verifiedAt` field. */
   verifiedAt?: DatetimeFilter;
 }
+export interface PlatformEmailIdentityFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformEmailIdentityFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `fromAddress` field. */
+  fromAddress?: StringFilter;
+  /** Filter by the object’s `fromName` field. */
+  fromName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isDefault` field. */
+  isDefault?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformEmailIdentityFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformEmailIdentityFilter[];
+  /** Filter by the object’s `platformEmailSiteIdentitiesByEmailIdentityId` relation. */
+  platformEmailSiteIdentitiesByEmailIdentityId?: PlatformEmailIdentityToManyPlatformEmailSiteIdentityFilter;
+  /** `platformEmailSiteIdentitiesByEmailIdentityId` exist. */
+  platformEmailSiteIdentitiesByEmailIdentityIdExist?: boolean;
+  /** Filter by the object’s `providerAccount` relation. */
+  providerAccount?: PlatformEmailProviderAccountFilter;
+  /** A related `providerAccount` exists. */
+  providerAccountExists?: boolean;
+  /** Filter by the object’s `providerAccountId` field. */
+  providerAccountId?: UUIDFilter;
+  /** Filter by the object’s `replyToAddress` field. */
+  replyToAddress?: StringFilter;
+  /** Filter by the object’s `supportAddress` field. */
+  supportAddress?: StringFilter;
+  /** Filter by the object’s `transportMode` field. */
+  transportMode?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformEmailProviderAccountFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformEmailProviderAccountFilter[];
+  /** Filter by the object’s `apiBaseUrl` field. */
+  apiBaseUrl?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `credentialsSecretName` field. */
+  credentialsSecretName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformEmailProviderAccountFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformEmailProviderAccountFilter[];
+  /** Filter by the object’s `platformEmailIdentitiesByProviderAccountId` relation. */
+  platformEmailIdentitiesByProviderAccountId?: PlatformEmailProviderAccountToManyPlatformEmailIdentityFilter;
+  /** `platformEmailIdentitiesByProviderAccountId` exist. */
+  platformEmailIdentitiesByProviderAccountIdExist?: boolean;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `providerAccountName` field. */
+  providerAccountName?: StringFilter;
+  /** Filter by the object’s `region` field. */
+  region?: StringFilter;
+  /** Filter by the object’s `smtpHost` field. */
+  smtpHost?: StringFilter;
+  /** Filter by the object’s `smtpPort` field. */
+  smtpPort?: IntFilter;
+  /** Filter by the object’s `smtpSecure` field. */
+  smtpSecure?: BooleanFilter;
+  /** Filter by the object’s `smtpUser` field. */
+  smtpUser?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `webhookSigningSecretName` field. */
+  webhookSigningSecretName?: StringFilter;
+}
+export interface PlatformEmailSiteIdentityFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformEmailSiteIdentityFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `emailIdentity` relation. */
+  emailIdentity?: PlatformEmailIdentityFilter;
+  /** Filter by the object’s `emailIdentityId` field. */
+  emailIdentityId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformEmailSiteIdentityFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformEmailSiteIdentityFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: PlatformSiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 export interface PlatformManagedDomainFilter {
   /** Filter by the object’s `allowPublicUsage` field. */
   allowPublicUsage?: BooleanFilter;
@@ -6108,6 +6617,10 @@ export interface PlatformSiteFilter {
   not?: PlatformSiteFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformSiteFilter[];
+  /** Filter by the object’s `platformEmailSiteIdentityBySiteId` relation. */
+  platformEmailSiteIdentityBySiteId?: PlatformEmailSiteIdentityFilter;
+  /** A related `platformEmailSiteIdentityBySiteId` exists. */
+  platformEmailSiteIdentityBySiteIdExists?: boolean;
   /** Filter by the object’s `platformPagesBySiteId` relation. */
   platformPagesBySiteId?: PlatformSiteToManyPlatformPageFilter;
   /** `platformPagesBySiteId` exist. */
@@ -6742,6 +7255,10 @@ export interface SiteFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `emailSiteIdentity` relation. */
+  emailSiteIdentity?: EmailSiteIdentityFilter;
+  /** A related `emailSiteIdentity` exists. */
+  emailSiteIdentityExists?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `installationId` field. */
@@ -7642,6 +8159,30 @@ export interface WebauthnSettingFilter {
   userFieldId?: UUIDFilter;
 }
 // ============ OrderBy Types ============
+export type ApiOrderBy =
+  | 'ANON_ROLE_ASC'
+  | 'ANON_ROLE_DESC'
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DBNAME_ASC'
+  | 'DBNAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ROLE_NAME_ASC'
+  | 'ROLE_NAME_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type ApiSchemaOrderBy =
   | 'API_ID_ASC'
   | 'API_ID_DESC'
@@ -7698,30 +8239,6 @@ export type ApiSettingOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'STATEMENT_TIMEOUT_MS_ASC'
   | 'STATEMENT_TIMEOUT_MS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type ApisOrderBy =
-  | 'ANON_ROLE_ASC'
-  | 'ANON_ROLE_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_PUBLISHED_ASC'
-  | 'IS_PUBLISHED_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ROLE_NAME_ASC'
-  | 'ROLE_NAME_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type AstMigrationOrderBy =
@@ -8086,6 +8603,88 @@ export type DomainVerificationOrderBy =
   | 'UPDATED_AT_DESC'
   | 'VERIFIED_AT_ASC'
   | 'VERIFIED_AT_DESC';
+export type EmailIdentityOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'FROM_ADDRESS_ASC'
+  | 'FROM_ADDRESS_DESC'
+  | 'FROM_NAME_ASC'
+  | 'FROM_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_DEFAULT_ASC'
+  | 'IS_DEFAULT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ACCOUNT_ID_ASC'
+  | 'PROVIDER_ACCOUNT_ID_DESC'
+  | 'REPLY_TO_ADDRESS_ASC'
+  | 'REPLY_TO_ADDRESS_DESC'
+  | 'SUPPORT_ADDRESS_ASC'
+  | 'SUPPORT_ADDRESS_DESC'
+  | 'TRANSPORT_MODE_ASC'
+  | 'TRANSPORT_MODE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type EmailProviderAccountOrderBy =
+  | 'API_BASE_URL_ASC'
+  | 'API_BASE_URL_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREDENTIALS_SECRET_NAME_ASC'
+  | 'CREDENTIALS_SECRET_NAME_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ACCOUNT_NAME_ASC'
+  | 'PROVIDER_ACCOUNT_NAME_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'REGION_ASC'
+  | 'REGION_DESC'
+  | 'SMTP_HOST_ASC'
+  | 'SMTP_HOST_DESC'
+  | 'SMTP_PORT_ASC'
+  | 'SMTP_PORT_DESC'
+  | 'SMTP_SECURE_ASC'
+  | 'SMTP_SECURE_DESC'
+  | 'SMTP_USER_ASC'
+  | 'SMTP_USER_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'WEBHOOK_SIGNING_SECRET_NAME_ASC'
+  | 'WEBHOOK_SIGNING_SECRET_NAME_DESC';
+export type EmailSiteIdentityOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EMAIL_IDENTITY_ID_ASC'
+  | 'EMAIL_IDENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SITE_ID_ASC'
+  | 'SITE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type EmbeddingChunkOrderBy =
   | 'CHUNKING_TASK_NAME_ASC'
   | 'CHUNKING_TASK_NAME_DESC'
@@ -8556,6 +9155,28 @@ export type PartitionOrderBy =
   | 'TABLE_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+export type PlatformApiOrderBy =
+  | 'ANON_ROLE_ASC'
+  | 'ANON_ROLE_DESC'
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DBNAME_ASC'
+  | 'DBNAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ROLE_NAME_ASC'
+  | 'ROLE_NAME_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type PlatformApiSchemaOrderBy =
   | 'API_ID_ASC'
   | 'API_ID_DESC'
@@ -8608,28 +9229,6 @@ export type PlatformApiSettingOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'STATEMENT_TIMEOUT_MS_ASC'
   | 'STATEMENT_TIMEOUT_MS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type PlatformApisOrderBy =
-  | 'ANON_ROLE_ASC'
-  | 'ANON_ROLE_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_PUBLISHED_ASC'
-  | 'IS_PUBLISHED_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ROLE_NAME_ASC'
-  | 'ROLE_NAME_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type PlatformCorsSettingOrderBy =
@@ -8736,6 +9335,82 @@ export type PlatformDomainVerificationOrderBy =
   | 'UPDATED_AT_DESC'
   | 'VERIFIED_AT_ASC'
   | 'VERIFIED_AT_DESC';
+export type PlatformEmailIdentityOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'FROM_ADDRESS_ASC'
+  | 'FROM_ADDRESS_DESC'
+  | 'FROM_NAME_ASC'
+  | 'FROM_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_DEFAULT_ASC'
+  | 'IS_DEFAULT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ACCOUNT_ID_ASC'
+  | 'PROVIDER_ACCOUNT_ID_DESC'
+  | 'REPLY_TO_ADDRESS_ASC'
+  | 'REPLY_TO_ADDRESS_DESC'
+  | 'SUPPORT_ADDRESS_ASC'
+  | 'SUPPORT_ADDRESS_DESC'
+  | 'TRANSPORT_MODE_ASC'
+  | 'TRANSPORT_MODE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type PlatformEmailProviderAccountOrderBy =
+  | 'API_BASE_URL_ASC'
+  | 'API_BASE_URL_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREDENTIALS_SECRET_NAME_ASC'
+  | 'CREDENTIALS_SECRET_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ACCOUNT_NAME_ASC'
+  | 'PROVIDER_ACCOUNT_NAME_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'REGION_ASC'
+  | 'REGION_DESC'
+  | 'SMTP_HOST_ASC'
+  | 'SMTP_HOST_DESC'
+  | 'SMTP_PORT_ASC'
+  | 'SMTP_PORT_DESC'
+  | 'SMTP_SECURE_ASC'
+  | 'SMTP_SECURE_DESC'
+  | 'SMTP_USER_ASC'
+  | 'SMTP_USER_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'WEBHOOK_SIGNING_SECRET_NAME_ASC'
+  | 'WEBHOOK_SIGNING_SECRET_NAME_DESC';
+export type PlatformEmailSiteIdentityOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EMAIL_IDENTITY_ID_ASC'
+  | 'EMAIL_IDENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SITE_ID_ASC'
+  | 'SITE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type PlatformManagedDomainOrderBy =
   | 'ALLOW_PUBLIC_USAGE_ASC'
   | 'ALLOW_PUBLIC_USAGE_DESC'
@@ -9801,6 +10476,36 @@ export type WebauthnSettingOrderBy =
   | 'USER_FIELD_ID_ASC'
   | 'USER_FIELD_ID_DESC';
 // ============ CRUD Input Types ============
+export interface CreateApiInput {
+  clientMutationId?: string;
+  api: {
+    anonRole?: string;
+    config?: Record<string, unknown>;
+    databaseId: string;
+    dbname?: string;
+    isPublished?: boolean;
+    name: string;
+    roleName?: string;
+  };
+}
+export interface ApiPatch {
+  anonRole?: string | null;
+  config?: Record<string, unknown> | null;
+  databaseId?: string | null;
+  dbname?: string | null;
+  isPublished?: boolean | null;
+  name?: string | null;
+  roleName?: string | null;
+}
+export interface UpdateApiInput {
+  clientMutationId?: string;
+  id: string;
+  apiPatch: ApiPatch;
+}
+export interface DeleteApiInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateApiSchemaInput {
   clientMutationId?: string;
   apiSchema: {
@@ -9868,36 +10573,6 @@ export interface UpdateApiSettingInput {
   apiSettingPatch: ApiSettingPatch;
 }
 export interface DeleteApiSettingInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateApisInput {
-  clientMutationId?: string;
-  apis: {
-    anonRole?: string;
-    config?: Record<string, unknown>;
-    databaseId: string;
-    dbname?: string;
-    isPublished?: boolean;
-    name: string;
-    roleName?: string;
-  };
-}
-export interface ApisPatch {
-  anonRole?: string | null;
-  config?: Record<string, unknown> | null;
-  databaseId?: string | null;
-  dbname?: string | null;
-  isPublished?: boolean | null;
-  name?: string | null;
-  roleName?: string | null;
-}
-export interface UpdateApisInput {
-  clientMutationId?: string;
-  id: string;
-  apisPatch: ApisPatch;
-}
-export interface DeleteApisInput {
   clientMutationId?: string;
   id: string;
 }
@@ -10354,6 +11029,106 @@ export interface UpdateDomainVerificationInput {
   domainVerificationPatch: DomainVerificationPatch;
 }
 export interface DeleteDomainVerificationInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEmailIdentityInput {
+  clientMutationId?: string;
+  emailIdentity: {
+    databaseId: string;
+    fromAddress: string;
+    fromName?: string;
+    isActive?: boolean;
+    isDefault?: boolean;
+    name: string;
+    providerAccountId?: string;
+    replyToAddress?: string;
+    supportAddress?: string;
+    transportMode?: string;
+  };
+}
+export interface EmailIdentityPatch {
+  databaseId?: string | null;
+  fromAddress?: string | null;
+  fromName?: string | null;
+  isActive?: boolean | null;
+  isDefault?: boolean | null;
+  name?: string | null;
+  providerAccountId?: string | null;
+  replyToAddress?: string | null;
+  supportAddress?: string | null;
+  transportMode?: string | null;
+}
+export interface UpdateEmailIdentityInput {
+  clientMutationId?: string;
+  id: string;
+  emailIdentityPatch: EmailIdentityPatch;
+}
+export interface DeleteEmailIdentityInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEmailProviderAccountInput {
+  clientMutationId?: string;
+  emailProviderAccount: {
+    apiBaseUrl?: string;
+    credentialsSecretName: string;
+    databaseId: string;
+    isActive?: boolean;
+    name: string;
+    provider: string;
+    providerAccountName?: string;
+    region?: string;
+    smtpHost?: string;
+    smtpPort?: number;
+    smtpSecure?: boolean;
+    smtpUser?: string;
+    webhookSigningSecretName?: string;
+  };
+}
+export interface EmailProviderAccountPatch {
+  apiBaseUrl?: string | null;
+  credentialsSecretName?: string | null;
+  databaseId?: string | null;
+  isActive?: boolean | null;
+  name?: string | null;
+  provider?: string | null;
+  providerAccountName?: string | null;
+  region?: string | null;
+  smtpHost?: string | null;
+  smtpPort?: number | null;
+  smtpSecure?: boolean | null;
+  smtpUser?: string | null;
+  webhookSigningSecretName?: string | null;
+}
+export interface UpdateEmailProviderAccountInput {
+  clientMutationId?: string;
+  id: string;
+  emailProviderAccountPatch: EmailProviderAccountPatch;
+}
+export interface DeleteEmailProviderAccountInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEmailSiteIdentityInput {
+  clientMutationId?: string;
+  emailSiteIdentity: {
+    databaseId: string;
+    emailIdentityId: string;
+    siteId: string;
+  };
+}
+export interface EmailSiteIdentityPatch {
+  databaseId?: string | null;
+  emailIdentityId?: string | null;
+  siteId?: string | null;
+}
+export interface UpdateEmailSiteIdentityInput {
+  clientMutationId?: string;
+  id: string;
+  emailSiteIdentityPatch: EmailSiteIdentityPatch;
+}
+export interface DeleteEmailSiteIdentityInput {
   clientMutationId?: string;
   id: string;
 }
@@ -10939,6 +11714,34 @@ export interface DeletePartitionInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreatePlatformApiInput {
+  clientMutationId?: string;
+  platformApi: {
+    anonRole?: string;
+    config?: Record<string, unknown>;
+    dbname?: string;
+    isPublished?: boolean;
+    name: string;
+    roleName?: string;
+  };
+}
+export interface PlatformApiPatch {
+  anonRole?: string | null;
+  config?: Record<string, unknown> | null;
+  dbname?: string | null;
+  isPublished?: boolean | null;
+  name?: string | null;
+  roleName?: string | null;
+}
+export interface UpdatePlatformApiInput {
+  clientMutationId?: string;
+  id: string;
+  platformApiPatch: PlatformApiPatch;
+}
+export interface DeletePlatformApiInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreatePlatformApiSchemaInput {
   clientMutationId?: string;
   platformApiSchema: {
@@ -11002,34 +11805,6 @@ export interface UpdatePlatformApiSettingInput {
   platformApiSettingPatch: PlatformApiSettingPatch;
 }
 export interface DeletePlatformApiSettingInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreatePlatformApisInput {
-  clientMutationId?: string;
-  platformApis: {
-    anonRole?: string;
-    config?: Record<string, unknown>;
-    dbname?: string;
-    isPublished?: boolean;
-    name: string;
-    roleName?: string;
-  };
-}
-export interface PlatformApisPatch {
-  anonRole?: string | null;
-  config?: Record<string, unknown> | null;
-  dbname?: string | null;
-  isPublished?: boolean | null;
-  name?: string | null;
-  roleName?: string | null;
-}
-export interface UpdatePlatformApisInput {
-  clientMutationId?: string;
-  id: string;
-  platformApisPatch: PlatformApisPatch;
-}
-export interface DeletePlatformApisInput {
   clientMutationId?: string;
   id: string;
 }
@@ -11158,6 +11933,100 @@ export interface UpdatePlatformDomainVerificationInput {
   platformDomainVerificationPatch: PlatformDomainVerificationPatch;
 }
 export interface DeletePlatformDomainVerificationInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformEmailIdentityInput {
+  clientMutationId?: string;
+  platformEmailIdentity: {
+    fromAddress: string;
+    fromName?: string;
+    isActive?: boolean;
+    isDefault?: boolean;
+    name: string;
+    providerAccountId?: string;
+    replyToAddress?: string;
+    supportAddress?: string;
+    transportMode?: string;
+  };
+}
+export interface PlatformEmailIdentityPatch {
+  fromAddress?: string | null;
+  fromName?: string | null;
+  isActive?: boolean | null;
+  isDefault?: boolean | null;
+  name?: string | null;
+  providerAccountId?: string | null;
+  replyToAddress?: string | null;
+  supportAddress?: string | null;
+  transportMode?: string | null;
+}
+export interface UpdatePlatformEmailIdentityInput {
+  clientMutationId?: string;
+  id: string;
+  platformEmailIdentityPatch: PlatformEmailIdentityPatch;
+}
+export interface DeletePlatformEmailIdentityInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformEmailProviderAccountInput {
+  clientMutationId?: string;
+  platformEmailProviderAccount: {
+    apiBaseUrl?: string;
+    credentialsSecretName: string;
+    isActive?: boolean;
+    name: string;
+    provider: string;
+    providerAccountName?: string;
+    region?: string;
+    smtpHost?: string;
+    smtpPort?: number;
+    smtpSecure?: boolean;
+    smtpUser?: string;
+    webhookSigningSecretName?: string;
+  };
+}
+export interface PlatformEmailProviderAccountPatch {
+  apiBaseUrl?: string | null;
+  credentialsSecretName?: string | null;
+  isActive?: boolean | null;
+  name?: string | null;
+  provider?: string | null;
+  providerAccountName?: string | null;
+  region?: string | null;
+  smtpHost?: string | null;
+  smtpPort?: number | null;
+  smtpSecure?: boolean | null;
+  smtpUser?: string | null;
+  webhookSigningSecretName?: string | null;
+}
+export interface UpdatePlatformEmailProviderAccountInput {
+  clientMutationId?: string;
+  id: string;
+  platformEmailProviderAccountPatch: PlatformEmailProviderAccountPatch;
+}
+export interface DeletePlatformEmailProviderAccountInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformEmailSiteIdentityInput {
+  clientMutationId?: string;
+  platformEmailSiteIdentity: {
+    emailIdentityId: string;
+    siteId: string;
+  };
+}
+export interface PlatformEmailSiteIdentityPatch {
+  emailIdentityId?: string | null;
+  siteId?: string | null;
+}
+export interface UpdatePlatformEmailSiteIdentityInput {
+  clientMutationId?: string;
+  id: string;
+  platformEmailSiteIdentityPatch: PlatformEmailSiteIdentityPatch;
+}
+export interface DeletePlatformEmailSiteIdentityInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12503,9 +13372,9 @@ export interface DeleteWebauthnSettingInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
-  Apis: {
-    apiSchemasByApiId: 'ApiSchema',
-    corsSettingsByApiId: 'CorsSetting',
+  Api: {
+    apiSchemas: 'ApiSchema',
+    corsSettings: 'CorsSetting',
   },
   Database: {
     checkConstraints: 'CheckConstraint',
@@ -12549,6 +13418,12 @@ export const connectionFieldsMap = {
     httpRoutes: 'HttpRoute',
     routes: 'Route',
   },
+  EmailIdentity: {
+    emailSiteIdentities: 'EmailSiteIdentity',
+  },
+  EmailProviderAccount: {
+    emailIdentitiesByProviderAccountId: 'EmailIdentity',
+  },
   Field: {
     embeddingChunksByEmbeddingFieldId: 'EmbeddingChunk',
     embeddingChunksByParentFkFieldId: 'EmbeddingChunk',
@@ -12564,12 +13439,18 @@ export const connectionFieldsMap = {
     domainEvents: 'DomainEvent',
     domainVerifications: 'DomainVerification',
   },
-  PlatformApis: {
+  PlatformApi: {
     platformApiSchemasByApiId: 'PlatformApiSchema',
   },
   PlatformDomain: {
     platformDomainEventsByDomainId: 'PlatformDomainEvent',
     platformDomainVerificationsByDomainId: 'PlatformDomainVerification',
+  },
+  PlatformEmailIdentity: {
+    platformEmailSiteIdentitiesByEmailIdentityId: 'PlatformEmailSiteIdentity',
+  },
+  PlatformEmailProviderAccount: {
+    platformEmailIdentitiesByProviderAccountId: 'PlatformEmailIdentity',
   },
   PlatformManagedDomain: {
     platformDomainEventsByManagedDomainId: 'PlatformDomainEvent',
@@ -12713,7 +13594,7 @@ export interface SitesProvisionStaticSiteInput {
   siteConfig?: Record<string, unknown>;
 }
 /** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
-export interface ApisToManyApiSchemaFilter {
+export interface ApiToManyApiSchemaFilter {
   /** Filters to entities where every related entity matches. */
   every?: ApiSchemaFilter;
   /** Filters to entities where no related entity matches. */
@@ -12722,7 +13603,7 @@ export interface ApisToManyApiSchemaFilter {
   some?: ApiSchemaFilter;
 }
 /** A filter to be used against many `CorsSetting` object types. All fields are combined with a logical ‘and.’ */
-export interface ApisToManyCorsSettingFilter {
+export interface ApiToManyCorsSettingFilter {
   /** Filters to entities where every related entity matches. */
   every?: CorsSettingFilter;
   /** Filters to entities where no related entity matches. */
@@ -13097,6 +13978,24 @@ export interface DomainToManyRouteFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: RouteFilter;
 }
+/** A filter to be used against many `EmailSiteIdentity` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailIdentityToManyEmailSiteIdentityFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: EmailSiteIdentityFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmailSiteIdentityFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmailSiteIdentityFilter;
+}
+/** A filter to be used against many `EmailIdentity` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailProviderAccountToManyEmailIdentityFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: EmailIdentityFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmailIdentityFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmailIdentityFilter;
+}
 /** A filter to be used against many `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface FieldToManyEmbeddingChunkFilter {
   /** Filters to entities where every related entity matches. */
@@ -13161,7 +14060,7 @@ export interface ManagedDomainToManyDomainVerificationFilter {
   some?: DomainVerificationFilter;
 }
 /** A filter to be used against many `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformApisToManyPlatformApiSchemaFilter {
+export interface PlatformApiToManyPlatformApiSchemaFilter {
   /** Filters to entities where every related entity matches. */
   every?: PlatformApiSchemaFilter;
   /** Filters to entities where no related entity matches. */
@@ -13186,6 +14085,24 @@ export interface PlatformDomainToManyPlatformDomainVerificationFilter {
   none?: PlatformDomainVerificationFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformDomainVerificationFilter;
+}
+/** A filter to be used against many `PlatformEmailSiteIdentity` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformEmailIdentityToManyPlatformEmailSiteIdentityFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformEmailSiteIdentityFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformEmailSiteIdentityFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformEmailSiteIdentityFilter;
+}
+/** A filter to be used against many `PlatformEmailIdentity` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformEmailProviderAccountToManyPlatformEmailIdentityFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformEmailIdentityFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformEmailIdentityFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformEmailIdentityFilter;
 }
 /** A filter to be used against many `PlatformDomainEvent` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformManagedDomainToManyPlatformDomainEventFilter {
@@ -13670,6 +14587,26 @@ export interface ViewToManyViewTableFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: ViewTableFilter;
 }
+/** An input for mutations affecting `Api` */
+export interface ApiInput {
+  /** Anonymous role the API executes as */
+  anonRole?: string;
+  /** Module-specific configuration for this API surface */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Database this API surface serves */
+  dbname?: string;
+  id?: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean;
+  /** Owner-local API surface name */
+  name: string;
+  /** Authenticated role the API executes as */
+  roleName?: string;
+  updatedAt?: string;
+}
 /** An input for mutations affecting `ApiSchema` */
 export interface ApiSchemaInput {
   /** API surface that exposes this schema */
@@ -13718,26 +14655,6 @@ export interface ApiSettingInput {
   options?: Record<string, unknown>;
   /** Override: GraphQL statement timeout in milliseconds (NULL = inherit from database_settings). Clamped by the plan cap at read time. */
   statementTimeoutMs?: string;
-  updatedAt?: string;
-}
-/** An input for mutations affecting `Apis` */
-export interface ApisInput {
-  /** Anonymous role the API executes as */
-  anonRole?: string;
-  /** Module-specific configuration for this API surface */
-  config?: Record<string, unknown>;
-  createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  /** Database this API surface serves */
-  dbname?: string;
-  id?: string;
-  /** Whether other scopes may see and route to this API surface */
-  isPublished?: boolean;
-  /** Owner-local API surface name */
-  name: string;
-  /** Authenticated role the API executes as */
-  roleName?: string;
   updatedAt?: string;
 }
 /** An input for mutations affecting `CheckConstraint` */
@@ -13971,6 +14888,76 @@ export interface DomainVerificationInput {
   updatedAt?: string;
   /** When this challenge succeeded */
   verifiedAt?: string;
+}
+/** An input for mutations affecting `EmailIdentity` */
+export interface EmailIdentityInput {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Envelope/header From address, lower-case. Must be accepted by the sending account at the provider. */
+  fromAddress: string;
+  /** Display name shown beside the from address */
+  fromName?: string;
+  id?: string;
+  /** Whether this identity may be resolved for a send */
+  isActive?: boolean;
+  /** The scope default identity, used when no site binding resolves. At most one per scope key. */
+  isDefault?: boolean;
+  /** Operator-facing name for this identity (e.g. transactional, support) */
+  name: string;
+  /** Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared. */
+  providerAccountId?: string;
+  /** Reply-To address when replies should not go to the from address */
+  replyToAddress?: string;
+  /** Support address rendered in message bodies and footers */
+  supportAddress?: string;
+  /** own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback */
+  transportMode?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `EmailProviderAccount` */
+export interface EmailProviderAccountInput {
+  /** Provider API base URL when it is not the provider default (e.g. Mailgun EU) */
+  apiBaseUrl?: string;
+  createdAt?: string;
+  /** Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here. */
+  credentialsSecretName: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Whether identities may send through this account. Disabling one row stops every identity that references it. */
+  isActive?: boolean;
+  /** Operator-facing name for this account (e.g. transactional, marketing) */
+  name: string;
+  /** integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK */
+  provider: string;
+  /** Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name */
+  providerAccountName?: string;
+  /** Provider region for region-addressed providers (e.g. SES us-east-1) */
+  region?: string;
+  /** SMTP host (provider = smtp, or a provider addressed over SMTP) */
+  smtpHost?: string;
+  /** SMTP port */
+  smtpPort?: number;
+  /** Whether the SMTP connection uses implicit TLS */
+  smtpSecure?: boolean;
+  /** SMTP username; the password is a secret, addressed by credentials_secret_name */
+  smtpUser?: string;
+  updatedAt?: string;
+  /** Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store. */
+  webhookSigningSecretName?: string;
+}
+/** An input for mutations affecting `EmailSiteIdentity` */
+export interface EmailSiteIdentityInput {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Identity this site sends as */
+  emailIdentityId: string;
+  id?: string;
+  /** Site whose mail is sent as the bound identity */
+  siteId: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `EmbeddingChunk` */
 export interface EmbeddingChunkInput {
@@ -14259,6 +15246,24 @@ export interface PartitionInput {
   tableId: string;
   updatedAt?: string;
 }
+/** An input for mutations affecting `PlatformApi` */
+export interface PlatformApiInput {
+  /** Anonymous role the API executes as */
+  anonRole?: string;
+  /** Module-specific configuration for this API surface */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  /** Database this API surface serves */
+  dbname?: string;
+  id?: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean;
+  /** Owner-local API surface name */
+  name: string;
+  /** Authenticated role the API executes as */
+  roleName?: string;
+  updatedAt?: string;
+}
 /** An input for mutations affecting `PlatformApiSchema` */
 export interface PlatformApiSchemaInput {
   /** API surface that exposes this schema */
@@ -14303,24 +15308,6 @@ export interface PlatformApiSettingInput {
   options?: Record<string, unknown>;
   /** Override: GraphQL statement timeout in milliseconds (NULL = inherit from database_settings). Clamped by the plan cap at read time. */
   statementTimeoutMs?: string;
-  updatedAt?: string;
-}
-/** An input for mutations affecting `PlatformApis` */
-export interface PlatformApisInput {
-  /** Anonymous role the API executes as */
-  anonRole?: string;
-  /** Module-specific configuration for this API surface */
-  config?: Record<string, unknown>;
-  createdAt?: string;
-  /** Database this API surface serves */
-  dbname?: string;
-  id?: string;
-  /** Whether other scopes may see and route to this API surface */
-  isPublished?: boolean;
-  /** Owner-local API surface name */
-  name: string;
-  /** Authenticated role the API executes as */
-  roleName?: string;
   updatedAt?: string;
 }
 /** An input for mutations affecting `PlatformCorsSetting` */
@@ -14410,6 +15397,70 @@ export interface PlatformDomainVerificationInput {
   updatedAt?: string;
   /** When this challenge succeeded */
   verifiedAt?: string;
+}
+/** An input for mutations affecting `PlatformEmailIdentity` */
+export interface PlatformEmailIdentityInput {
+  createdAt?: string;
+  /** Envelope/header From address, lower-case. Must be accepted by the sending account at the provider. */
+  fromAddress: string;
+  /** Display name shown beside the from address */
+  fromName?: string;
+  id?: string;
+  /** Whether this identity may be resolved for a send */
+  isActive?: boolean;
+  /** The scope default identity, used when no site binding resolves. At most one per scope key. */
+  isDefault?: boolean;
+  /** Operator-facing name for this identity (e.g. transactional, support) */
+  name: string;
+  /** Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared. */
+  providerAccountId?: string;
+  /** Reply-To address when replies should not go to the from address */
+  replyToAddress?: string;
+  /** Support address rendered in message bodies and footers */
+  supportAddress?: string;
+  /** own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback */
+  transportMode?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformEmailProviderAccount` */
+export interface PlatformEmailProviderAccountInput {
+  /** Provider API base URL when it is not the provider default (e.g. Mailgun EU) */
+  apiBaseUrl?: string;
+  createdAt?: string;
+  /** Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here. */
+  credentialsSecretName: string;
+  id?: string;
+  /** Whether identities may send through this account. Disabling one row stops every identity that references it. */
+  isActive?: boolean;
+  /** Operator-facing name for this account (e.g. transactional, marketing) */
+  name: string;
+  /** integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK */
+  provider: string;
+  /** Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name */
+  providerAccountName?: string;
+  /** Provider region for region-addressed providers (e.g. SES us-east-1) */
+  region?: string;
+  /** SMTP host (provider = smtp, or a provider addressed over SMTP) */
+  smtpHost?: string;
+  /** SMTP port */
+  smtpPort?: number;
+  /** Whether the SMTP connection uses implicit TLS */
+  smtpSecure?: boolean;
+  /** SMTP username; the password is a secret, addressed by credentials_secret_name */
+  smtpUser?: string;
+  updatedAt?: string;
+  /** Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store. */
+  webhookSigningSecretName?: string;
+}
+/** An input for mutations affecting `PlatformEmailSiteIdentity` */
+export interface PlatformEmailSiteIdentityInput {
+  createdAt?: string;
+  /** Identity this site sends as */
+  emailIdentityId: string;
+  id?: string;
+  /** Site whose mail is sent as the bound identity */
+  siteId: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `PlatformManagedDomain` */
 export interface PlatformManagedDomainInput {
@@ -15166,7 +16217,7 @@ export interface ApiSchemaFilter {
   /** Checks for all expressions in this list. */
   and?: ApiSchemaFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: ApisFilter;
+  api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -15193,7 +16244,7 @@ export interface CorsSettingFilter {
   /** Checks for all expressions in this list. */
   and?: CorsSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: ApisFilter;
+  api?: ApiFilter;
   /** A related `api` exists. */
   apiExists?: boolean;
   /** Filter by the object’s `apiId` field. */
@@ -16847,12 +17898,80 @@ export interface RouteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
+/** A filter to be used against `EmailSiteIdentity` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailSiteIdentityFilter {
+  /** Checks for all expressions in this list. */
+  and?: EmailSiteIdentityFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `emailIdentity` relation. */
+  emailIdentity?: EmailIdentityFilter;
+  /** Filter by the object’s `emailIdentityId` field. */
+  emailIdentityId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: EmailSiteIdentityFilter;
+  /** Checks for any expressions in this list. */
+  or?: EmailSiteIdentityFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `EmailIdentity` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailIdentityFilter {
+  /** Checks for all expressions in this list. */
+  and?: EmailIdentityFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `emailSiteIdentities` relation. */
+  emailSiteIdentities?: EmailIdentityToManyEmailSiteIdentityFilter;
+  /** `emailSiteIdentities` exist. */
+  emailSiteIdentitiesExist?: boolean;
+  /** Filter by the object’s `fromAddress` field. */
+  fromAddress?: StringFilter;
+  /** Filter by the object’s `fromName` field. */
+  fromName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isDefault` field. */
+  isDefault?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: EmailIdentityFilter;
+  /** Checks for any expressions in this list. */
+  or?: EmailIdentityFilter[];
+  /** Filter by the object’s `providerAccount` relation. */
+  providerAccount?: EmailProviderAccountFilter;
+  /** A related `providerAccount` exists. */
+  providerAccountExists?: boolean;
+  /** Filter by the object’s `providerAccountId` field. */
+  providerAccountId?: UUIDFilter;
+  /** Filter by the object’s `replyToAddress` field. */
+  replyToAddress?: StringFilter;
+  /** Filter by the object’s `supportAddress` field. */
+  supportAddress?: StringFilter;
+  /** Filter by the object’s `transportMode` field. */
+  transportMode?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 /** A filter to be used against `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformApiSchemaFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformApiSchemaFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: PlatformApisFilter;
+  api?: PlatformApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -16957,6 +18076,70 @@ export interface PlatformDomainVerificationFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `verifiedAt` field. */
   verifiedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformEmailSiteIdentity` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformEmailSiteIdentityFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformEmailSiteIdentityFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `emailIdentity` relation. */
+  emailIdentity?: PlatformEmailIdentityFilter;
+  /** Filter by the object’s `emailIdentityId` field. */
+  emailIdentityId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformEmailSiteIdentityFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformEmailSiteIdentityFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: PlatformSiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformEmailIdentity` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformEmailIdentityFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformEmailIdentityFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `fromAddress` field. */
+  fromAddress?: StringFilter;
+  /** Filter by the object’s `fromName` field. */
+  fromName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isDefault` field. */
+  isDefault?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformEmailIdentityFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformEmailIdentityFilter[];
+  /** Filter by the object’s `platformEmailSiteIdentitiesByEmailIdentityId` relation. */
+  platformEmailSiteIdentitiesByEmailIdentityId?: PlatformEmailIdentityToManyPlatformEmailSiteIdentityFilter;
+  /** `platformEmailSiteIdentitiesByEmailIdentityId` exist. */
+  platformEmailSiteIdentitiesByEmailIdentityIdExist?: boolean;
+  /** Filter by the object’s `providerAccount` relation. */
+  providerAccount?: PlatformEmailProviderAccountFilter;
+  /** A related `providerAccount` exists. */
+  providerAccountExists?: boolean;
+  /** Filter by the object’s `providerAccountId` field. */
+  providerAccountId?: UUIDFilter;
+  /** Filter by the object’s `replyToAddress` field. */
+  replyToAddress?: StringFilter;
+  /** Filter by the object’s `supportAddress` field. */
+  supportAddress?: StringFilter;
+  /** Filter by the object’s `transportMode` field. */
+  transportMode?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 /** A filter to be used against `PlatformPage` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformPageFilter {
@@ -17302,26 +18485,26 @@ export interface SiteThemeFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
-/** A filter to be used against `Apis` object types. All fields are combined with a logical ‘and.’ */
-export interface ApisFilter {
+/** A filter to be used against `Api` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiFilter {
   /** Checks for all expressions in this list. */
-  and?: ApisFilter[];
+  and?: ApiFilter[];
   /** Filter by the object’s `anonRole` field. */
   anonRole?: StringFilter;
-  /** Filter by the object’s `apiSchemasByApiId` relation. */
-  apiSchemasByApiId?: ApisToManyApiSchemaFilter;
-  /** `apiSchemasByApiId` exist. */
-  apiSchemasByApiIdExist?: boolean;
-  /** Filter by the object’s `apiSettingByApiId` relation. */
-  apiSettingByApiId?: ApiSettingFilter;
-  /** A related `apiSettingByApiId` exists. */
-  apiSettingByApiIdExists?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: ApiToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `apiSetting` relation. */
+  apiSetting?: ApiSettingFilter;
+  /** A related `apiSetting` exists. */
+  apiSettingExists?: boolean;
   /** Filter by the object’s `config` field. */
   config?: JSONFilter;
-  /** Filter by the object’s `corsSettingsByApiId` relation. */
-  corsSettingsByApiId?: ApisToManyCorsSettingFilter;
-  /** `corsSettingsByApiId` exist. */
-  corsSettingsByApiIdExist?: boolean;
+  /** Filter by the object’s `corsSettings` relation. */
+  corsSettings?: ApiToManyCorsSettingFilter;
+  /** `corsSettings` exist. */
+  corsSettingsExist?: boolean;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -17335,9 +18518,9 @@ export interface ApisFilter {
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
-  not?: ApisFilter;
+  not?: ApiFilter;
   /** Checks for any expressions in this list. */
-  or?: ApisFilter[];
+  or?: ApiFilter[];
   /** Filter by the object’s `roleName` field. */
   roleName?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -17917,10 +19100,126 @@ export interface ManagedDomainFilter {
   /** Filter by the object’s `verifiedAt` field. */
   verifiedAt?: DatetimeFilter;
 }
-/** A filter to be used against `PlatformApis` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformApisFilter {
+/** A filter to be used against `Site` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteFilter {
+  /** Filter by the object’s `activeCommitId` field. */
+  activeCommitId?: UUIDFilter;
   /** Checks for all expressions in this list. */
-  and?: PlatformApisFilter[];
+  and?: SiteFilter[];
+  /** Filter by the object’s `bucketId` field. */
+  bucketId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `emailSiteIdentity` relation. */
+  emailSiteIdentity?: EmailSiteIdentityFilter;
+  /** A related `emailSiteIdentity` exists. */
+  emailSiteIdentityExists?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `installationMemberSlug` field. */
+  installationMemberSlug?: StringFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: SiteFilter;
+  /** Checks for any expressions in this list. */
+  or?: SiteFilter[];
+  /** Filter by the object’s `pages` relation. */
+  pages?: SiteToManyPageFilter;
+  /** `pages` exist. */
+  pagesExist?: boolean;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `siteAppLinks` relation. */
+  siteAppLinks?: SiteToManySiteAppLinkFilter;
+  /** `siteAppLinks` exist. */
+  siteAppLinksExist?: boolean;
+  /** Filter by the object’s `siteDeepLinks` relation. */
+  siteDeepLinks?: SiteToManySiteDeepLinkFilter;
+  /** `siteDeepLinks` exist. */
+  siteDeepLinksExist?: boolean;
+  /** Filter by the object’s `siteErrorPages` relation. */
+  siteErrorPages?: SiteToManySiteErrorPageFilter;
+  /** `siteErrorPages` exist. */
+  siteErrorPagesExist?: boolean;
+  /** Filter by the object’s `siteMetadatum` relation. */
+  siteMetadatum?: SiteMetadatumFilter;
+  /** A related `siteMetadatum` exists. */
+  siteMetadatumExists?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: SiteToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: SiteToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
+  /** Filter by the object’s `siteWebConfig` relation. */
+  siteWebConfig?: SiteWebConfigFilter;
+  /** A related `siteWebConfig` exists. */
+  siteWebConfigExists?: boolean;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `EmailProviderAccount` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailProviderAccountFilter {
+  /** Checks for all expressions in this list. */
+  and?: EmailProviderAccountFilter[];
+  /** Filter by the object’s `apiBaseUrl` field. */
+  apiBaseUrl?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `credentialsSecretName` field. */
+  credentialsSecretName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `emailIdentitiesByProviderAccountId` relation. */
+  emailIdentitiesByProviderAccountId?: EmailProviderAccountToManyEmailIdentityFilter;
+  /** `emailIdentitiesByProviderAccountId` exist. */
+  emailIdentitiesByProviderAccountIdExist?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: EmailProviderAccountFilter;
+  /** Checks for any expressions in this list. */
+  or?: EmailProviderAccountFilter[];
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `providerAccountName` field. */
+  providerAccountName?: StringFilter;
+  /** Filter by the object’s `region` field. */
+  region?: StringFilter;
+  /** Filter by the object’s `smtpHost` field. */
+  smtpHost?: StringFilter;
+  /** Filter by the object’s `smtpPort` field. */
+  smtpPort?: IntFilter;
+  /** Filter by the object’s `smtpSecure` field. */
+  smtpSecure?: BooleanFilter;
+  /** Filter by the object’s `smtpUser` field. */
+  smtpUser?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `webhookSigningSecretName` field. */
+  webhookSigningSecretName?: StringFilter;
+}
+/** A filter to be used against `PlatformApi` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformApiFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiFilter[];
   /** Filter by the object’s `anonRole` field. */
   anonRole?: StringFilter;
   /** Filter by the object’s `config` field. */
@@ -17936,11 +19235,11 @@ export interface PlatformApisFilter {
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
-  not?: PlatformApisFilter;
+  not?: PlatformApiFilter;
   /** Checks for any expressions in this list. */
-  or?: PlatformApisFilter[];
+  or?: PlatformApiFilter[];
   /** Filter by the object’s `platformApiSchemasByApiId` relation. */
-  platformApiSchemasByApiId?: PlatformApisToManyPlatformApiSchemaFilter;
+  platformApiSchemasByApiId?: PlatformApiToManyPlatformApiSchemaFilter;
   /** `platformApiSchemasByApiId` exist. */
   platformApiSchemasByApiIdExist?: boolean;
   /** Filter by the object’s `platformApiSettingByApiId` relation. */
@@ -18068,6 +19367,10 @@ export interface PlatformSiteFilter {
   not?: PlatformSiteFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformSiteFilter[];
+  /** Filter by the object’s `platformEmailSiteIdentityBySiteId` relation. */
+  platformEmailSiteIdentityBySiteId?: PlatformEmailSiteIdentityFilter;
+  /** A related `platformEmailSiteIdentityBySiteId` exists. */
+  platformEmailSiteIdentityBySiteIdExists?: boolean;
   /** Filter by the object’s `platformPagesBySiteId` relation. */
   platformPagesBySiteId?: PlatformSiteToManyPlatformPageFilter;
   /** `platformPagesBySiteId` exist. */
@@ -18107,79 +19410,55 @@ export interface PlatformSiteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
-/** A filter to be used against `Site` object types. All fields are combined with a logical ‘and.’ */
-export interface SiteFilter {
-  /** Filter by the object’s `activeCommitId` field. */
-  activeCommitId?: UUIDFilter;
+/** A filter to be used against `PlatformEmailProviderAccount` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformEmailProviderAccountFilter {
   /** Checks for all expressions in this list. */
-  and?: SiteFilter[];
-  /** Filter by the object’s `bucketId` field. */
-  bucketId?: UUIDFilter;
+  and?: PlatformEmailProviderAccountFilter[];
+  /** Filter by the object’s `apiBaseUrl` field. */
+  apiBaseUrl?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
+  /** Filter by the object’s `credentialsSecretName` field. */
+  credentialsSecretName?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `installationMemberSlug` field. */
-  installationMemberSlug?: StringFilter;
-  /** Filter by the object’s `isPublished` field. */
-  isPublished?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
-  not?: SiteFilter;
+  not?: PlatformEmailProviderAccountFilter;
   /** Checks for any expressions in this list. */
-  or?: SiteFilter[];
-  /** Filter by the object’s `pages` relation. */
-  pages?: SiteToManyPageFilter;
-  /** `pages` exist. */
-  pagesExist?: boolean;
-  /** Filter by the object’s `resourceId` field. */
-  resourceId?: UUIDFilter;
-  /** Filter by the object’s `siteAppLinks` relation. */
-  siteAppLinks?: SiteToManySiteAppLinkFilter;
-  /** `siteAppLinks` exist. */
-  siteAppLinksExist?: boolean;
-  /** Filter by the object’s `siteDeepLinks` relation. */
-  siteDeepLinks?: SiteToManySiteDeepLinkFilter;
-  /** `siteDeepLinks` exist. */
-  siteDeepLinksExist?: boolean;
-  /** Filter by the object’s `siteErrorPages` relation. */
-  siteErrorPages?: SiteToManySiteErrorPageFilter;
-  /** `siteErrorPages` exist. */
-  siteErrorPagesExist?: boolean;
-  /** Filter by the object’s `siteMetadatum` relation. */
-  siteMetadatum?: SiteMetadatumFilter;
-  /** A related `siteMetadatum` exists. */
-  siteMetadatumExists?: boolean;
-  /** Filter by the object’s `siteModules` relation. */
-  siteModules?: SiteToManySiteModuleFilter;
-  /** `siteModules` exist. */
-  siteModulesExist?: boolean;
-  /** Filter by the object’s `siteThemes` relation. */
-  siteThemes?: SiteToManySiteThemeFilter;
-  /** `siteThemes` exist. */
-  siteThemesExist?: boolean;
-  /** Filter by the object’s `siteWebConfig` relation. */
-  siteWebConfig?: SiteWebConfigFilter;
-  /** A related `siteWebConfig` exists. */
-  siteWebConfigExists?: boolean;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
+  or?: PlatformEmailProviderAccountFilter[];
+  /** Filter by the object’s `platformEmailIdentitiesByProviderAccountId` relation. */
+  platformEmailIdentitiesByProviderAccountId?: PlatformEmailProviderAccountToManyPlatformEmailIdentityFilter;
+  /** `platformEmailIdentitiesByProviderAccountId` exist. */
+  platformEmailIdentitiesByProviderAccountIdExist?: boolean;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `providerAccountName` field. */
+  providerAccountName?: StringFilter;
+  /** Filter by the object’s `region` field. */
+  region?: StringFilter;
+  /** Filter by the object’s `smtpHost` field. */
+  smtpHost?: StringFilter;
+  /** Filter by the object’s `smtpPort` field. */
+  smtpPort?: IntFilter;
+  /** Filter by the object’s `smtpSecure` field. */
+  smtpSecure?: BooleanFilter;
+  /** Filter by the object’s `smtpUser` field. */
+  smtpUser?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `webhookSigningSecretName` field. */
+  webhookSigningSecretName?: StringFilter;
 }
 /** A filter to be used against `ApiSetting` object types. All fields are combined with a logical ‘and.’ */
 export interface ApiSettingFilter {
   /** Checks for all expressions in this list. */
   and?: ApiSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: ApisFilter;
+  api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -18223,12 +19502,82 @@ export interface ApiSettingFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
+/** A filter to be used against `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteMetadatumFilter {
+  /** Checks for all expressions in this list. */
+  and?: SiteMetadatumFilter[];
+  /** Filter by the object’s `appleTouchIcon` field. */
+  appleTouchIcon?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `canonicalUrl` field. */
+  canonicalUrl?: StringFilter;
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `favicon` field. */
+  favicon?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `logo` field. */
+  logo?: ConstructiveInternalTypeImageFilter;
+  /** Negates the expression. */
+  not?: SiteMetadatumFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Checks for any expressions in this list. */
+  or?: SiteMetadatumFilter[];
+  /** Filter by the object’s `robots` field. */
+  robots?: StringFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `SiteWebConfig` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteWebConfigFilter {
+  /** Checks for all expressions in this list. */
+  and?: SiteWebConfigFilter[];
+  /** Filter by the object’s `cleanUrls` field. */
+  cleanUrls?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `indexDocument` field. */
+  indexDocument?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: SiteWebConfigFilter;
+  /** Checks for any expressions in this list. */
+  or?: SiteWebConfigFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `spaFallback` field. */
+  spaFallback?: BooleanFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 /** A filter to be used against `PlatformApiSetting` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformApiSettingFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformApiSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: PlatformApisFilter;
+  api?: PlatformApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -18277,7 +19626,7 @@ export interface PlatformCorsSettingFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformCorsSettingFilter[];
   /** Filter by the object’s `api` relation. */
-  api?: PlatformApisFilter;
+  api?: PlatformApiFilter;
   /** A related `api` exists. */
   apiExists?: boolean;
   /** Filter by the object’s `apiId` field. */
@@ -18352,76 +19701,6 @@ export interface PlatformSiteWebConfigFilter {
   or?: PlatformSiteWebConfigFilter[];
   /** Filter by the object’s `site` relation. */
   site?: PlatformSiteFilter;
-  /** Filter by the object’s `siteId` field. */
-  siteId?: UUIDFilter;
-  /** Filter by the object’s `spaFallback` field. */
-  spaFallback?: BooleanFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-/** A filter to be used against `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
-export interface SiteMetadatumFilter {
-  /** Checks for all expressions in this list. */
-  and?: SiteMetadatumFilter[];
-  /** Filter by the object’s `appleTouchIcon` field. */
-  appleTouchIcon?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `canonicalUrl` field. */
-  canonicalUrl?: StringFilter;
-  /** Filter by the object’s `commitId` field. */
-  commitId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `favicon` field. */
-  favicon?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `logo` field. */
-  logo?: ConstructiveInternalTypeImageFilter;
-  /** Negates the expression. */
-  not?: SiteMetadatumFilter;
-  /** Filter by the object’s `ogImage` field. */
-  ogImage?: ConstructiveInternalTypeImageFilter;
-  /** Checks for any expressions in this list. */
-  or?: SiteMetadatumFilter[];
-  /** Filter by the object’s `robots` field. */
-  robots?: StringFilter;
-  /** Filter by the object’s `site` relation. */
-  site?: SiteFilter;
-  /** Filter by the object’s `siteId` field. */
-  siteId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-/** A filter to be used against `SiteWebConfig` object types. All fields are combined with a logical ‘and.’ */
-export interface SiteWebConfigFilter {
-  /** Checks for all expressions in this list. */
-  and?: SiteWebConfigFilter[];
-  /** Filter by the object’s `cleanUrls` field. */
-  cleanUrls?: BooleanFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `indexDocument` field. */
-  indexDocument?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Negates the expression. */
-  not?: SiteWebConfigFilter;
-  /** Checks for any expressions in this list. */
-  or?: SiteWebConfigFilter[];
-  /** Filter by the object’s `site` relation. */
-  site?: SiteFilter;
   /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
   /** Filter by the object’s `spaFallback` field. */
@@ -18627,6 +19906,51 @@ export type SitesProvisionStaticSitePayloadSelect = {
     select: PlatformRouteSelect;
   };
 };
+export interface CreateApiPayload {
+  /** The `Api` that was created by this mutation. */
+  api?: Api | null;
+  apiEdge?: ApiEdge | null;
+  clientMutationId?: string | null;
+}
+export type CreateApiPayloadSelect = {
+  api?: {
+    select: ApiSelect;
+  };
+  apiEdge?: {
+    select: ApiEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateApiPayload {
+  /** The `Api` that was updated by this mutation. */
+  api?: Api | null;
+  apiEdge?: ApiEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateApiPayloadSelect = {
+  api?: {
+    select: ApiSelect;
+  };
+  apiEdge?: {
+    select: ApiEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteApiPayload {
+  /** The `Api` that was deleted by this mutation. */
+  api?: Api | null;
+  apiEdge?: ApiEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteApiPayloadSelect = {
+  api?: {
+    select: ApiSelect;
+  };
+  apiEdge?: {
+    select: ApiEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
 export interface CreateApiSchemaPayload {
   /** The `ApiSchema` that was created by this mutation. */
   apiSchema?: ApiSchema | null;
@@ -18714,51 +20038,6 @@ export type DeleteApiSettingPayloadSelect = {
   };
   apiSettingEdge?: {
     select: ApiSettingEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface CreateApisPayload {
-  /** The `Apis` that was created by this mutation. */
-  apis?: Apis | null;
-  apisEdge?: ApisEdge | null;
-  clientMutationId?: string | null;
-}
-export type CreateApisPayloadSelect = {
-  apis?: {
-    select: ApisSelect;
-  };
-  apisEdge?: {
-    select: ApisEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface UpdateApisPayload {
-  /** The `Apis` that was updated by this mutation. */
-  apis?: Apis | null;
-  apisEdge?: ApisEdge | null;
-  clientMutationId?: string | null;
-}
-export type UpdateApisPayloadSelect = {
-  apis?: {
-    select: ApisSelect;
-  };
-  apisEdge?: {
-    select: ApisEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface DeleteApisPayload {
-  /** The `Apis` that was deleted by this mutation. */
-  apis?: Apis | null;
-  apisEdge?: ApisEdge | null;
-  clientMutationId?: string | null;
-}
-export type DeleteApisPayloadSelect = {
-  apis?: {
-    select: ApisSelect;
-  };
-  apisEdge?: {
-    select: ApisEdgeSelect;
   };
   clientMutationId?: boolean;
 };
@@ -19300,6 +20579,141 @@ export type DeleteDomainVerificationPayloadSelect = {
   };
   domainVerificationEdge?: {
     select: DomainVerificationEdgeSelect;
+  };
+};
+export interface CreateEmailIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `EmailIdentity` that was created by this mutation. */
+  emailIdentity?: EmailIdentity | null;
+  emailIdentityEdge?: EmailIdentityEdge | null;
+}
+export type CreateEmailIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  emailIdentity?: {
+    select: EmailIdentitySelect;
+  };
+  emailIdentityEdge?: {
+    select: EmailIdentityEdgeSelect;
+  };
+};
+export interface UpdateEmailIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `EmailIdentity` that was updated by this mutation. */
+  emailIdentity?: EmailIdentity | null;
+  emailIdentityEdge?: EmailIdentityEdge | null;
+}
+export type UpdateEmailIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  emailIdentity?: {
+    select: EmailIdentitySelect;
+  };
+  emailIdentityEdge?: {
+    select: EmailIdentityEdgeSelect;
+  };
+};
+export interface DeleteEmailIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `EmailIdentity` that was deleted by this mutation. */
+  emailIdentity?: EmailIdentity | null;
+  emailIdentityEdge?: EmailIdentityEdge | null;
+}
+export type DeleteEmailIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  emailIdentity?: {
+    select: EmailIdentitySelect;
+  };
+  emailIdentityEdge?: {
+    select: EmailIdentityEdgeSelect;
+  };
+};
+export interface CreateEmailProviderAccountPayload {
+  clientMutationId?: string | null;
+  /** The `EmailProviderAccount` that was created by this mutation. */
+  emailProviderAccount?: EmailProviderAccount | null;
+  emailProviderAccountEdge?: EmailProviderAccountEdge | null;
+}
+export type CreateEmailProviderAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  emailProviderAccount?: {
+    select: EmailProviderAccountSelect;
+  };
+  emailProviderAccountEdge?: {
+    select: EmailProviderAccountEdgeSelect;
+  };
+};
+export interface UpdateEmailProviderAccountPayload {
+  clientMutationId?: string | null;
+  /** The `EmailProviderAccount` that was updated by this mutation. */
+  emailProviderAccount?: EmailProviderAccount | null;
+  emailProviderAccountEdge?: EmailProviderAccountEdge | null;
+}
+export type UpdateEmailProviderAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  emailProviderAccount?: {
+    select: EmailProviderAccountSelect;
+  };
+  emailProviderAccountEdge?: {
+    select: EmailProviderAccountEdgeSelect;
+  };
+};
+export interface DeleteEmailProviderAccountPayload {
+  clientMutationId?: string | null;
+  /** The `EmailProviderAccount` that was deleted by this mutation. */
+  emailProviderAccount?: EmailProviderAccount | null;
+  emailProviderAccountEdge?: EmailProviderAccountEdge | null;
+}
+export type DeleteEmailProviderAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  emailProviderAccount?: {
+    select: EmailProviderAccountSelect;
+  };
+  emailProviderAccountEdge?: {
+    select: EmailProviderAccountEdgeSelect;
+  };
+};
+export interface CreateEmailSiteIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `EmailSiteIdentity` that was created by this mutation. */
+  emailSiteIdentity?: EmailSiteIdentity | null;
+  emailSiteIdentityEdge?: EmailSiteIdentityEdge | null;
+}
+export type CreateEmailSiteIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  emailSiteIdentity?: {
+    select: EmailSiteIdentitySelect;
+  };
+  emailSiteIdentityEdge?: {
+    select: EmailSiteIdentityEdgeSelect;
+  };
+};
+export interface UpdateEmailSiteIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `EmailSiteIdentity` that was updated by this mutation. */
+  emailSiteIdentity?: EmailSiteIdentity | null;
+  emailSiteIdentityEdge?: EmailSiteIdentityEdge | null;
+}
+export type UpdateEmailSiteIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  emailSiteIdentity?: {
+    select: EmailSiteIdentitySelect;
+  };
+  emailSiteIdentityEdge?: {
+    select: EmailSiteIdentityEdgeSelect;
+  };
+};
+export interface DeleteEmailSiteIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `EmailSiteIdentity` that was deleted by this mutation. */
+  emailSiteIdentity?: EmailSiteIdentity | null;
+  emailSiteIdentityEdge?: EmailSiteIdentityEdge | null;
+}
+export type DeleteEmailSiteIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  emailSiteIdentity?: {
+    select: EmailSiteIdentitySelect;
+  };
+  emailSiteIdentityEdge?: {
+    select: EmailSiteIdentityEdgeSelect;
   };
 };
 export interface CreateEmbeddingChunkPayload {
@@ -20022,6 +21436,51 @@ export type DeletePartitionPayloadSelect = {
     select: PartitionEdgeSelect;
   };
 };
+export interface CreatePlatformApiPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApi` that was created by this mutation. */
+  platformApi?: PlatformApi | null;
+  platformApiEdge?: PlatformApiEdge | null;
+}
+export type CreatePlatformApiPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApi?: {
+    select: PlatformApiSelect;
+  };
+  platformApiEdge?: {
+    select: PlatformApiEdgeSelect;
+  };
+};
+export interface UpdatePlatformApiPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApi` that was updated by this mutation. */
+  platformApi?: PlatformApi | null;
+  platformApiEdge?: PlatformApiEdge | null;
+}
+export type UpdatePlatformApiPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApi?: {
+    select: PlatformApiSelect;
+  };
+  platformApiEdge?: {
+    select: PlatformApiEdgeSelect;
+  };
+};
+export interface DeletePlatformApiPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApi` that was deleted by this mutation. */
+  platformApi?: PlatformApi | null;
+  platformApiEdge?: PlatformApiEdge | null;
+}
+export type DeletePlatformApiPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApi?: {
+    select: PlatformApiSelect;
+  };
+  platformApiEdge?: {
+    select: PlatformApiEdgeSelect;
+  };
+};
 export interface CreatePlatformApiSchemaPayload {
   clientMutationId?: string | null;
   /** The `PlatformApiSchema` that was created by this mutation. */
@@ -20110,51 +21569,6 @@ export type DeletePlatformApiSettingPayloadSelect = {
   };
   platformApiSettingEdge?: {
     select: PlatformApiSettingEdgeSelect;
-  };
-};
-export interface CreatePlatformApisPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApis` that was created by this mutation. */
-  platformApis?: PlatformApis | null;
-  platformApisEdge?: PlatformApisEdge | null;
-}
-export type CreatePlatformApisPayloadSelect = {
-  clientMutationId?: boolean;
-  platformApis?: {
-    select: PlatformApisSelect;
-  };
-  platformApisEdge?: {
-    select: PlatformApisEdgeSelect;
-  };
-};
-export interface UpdatePlatformApisPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApis` that was updated by this mutation. */
-  platformApis?: PlatformApis | null;
-  platformApisEdge?: PlatformApisEdge | null;
-}
-export type UpdatePlatformApisPayloadSelect = {
-  clientMutationId?: boolean;
-  platformApis?: {
-    select: PlatformApisSelect;
-  };
-  platformApisEdge?: {
-    select: PlatformApisEdgeSelect;
-  };
-};
-export interface DeletePlatformApisPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApis` that was deleted by this mutation. */
-  platformApis?: PlatformApis | null;
-  platformApisEdge?: PlatformApisEdge | null;
-}
-export type DeletePlatformApisPayloadSelect = {
-  clientMutationId?: boolean;
-  platformApis?: {
-    select: PlatformApisSelect;
-  };
-  platformApisEdge?: {
-    select: PlatformApisEdgeSelect;
   };
 };
 export interface CreatePlatformCorsSettingPayload {
@@ -20335,6 +21749,141 @@ export type DeletePlatformDomainVerificationPayloadSelect = {
   };
   platformDomainVerificationEdge?: {
     select: PlatformDomainVerificationEdgeSelect;
+  };
+};
+export interface CreatePlatformEmailIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformEmailIdentity` that was created by this mutation. */
+  platformEmailIdentity?: PlatformEmailIdentity | null;
+  platformEmailIdentityEdge?: PlatformEmailIdentityEdge | null;
+}
+export type CreatePlatformEmailIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  platformEmailIdentity?: {
+    select: PlatformEmailIdentitySelect;
+  };
+  platformEmailIdentityEdge?: {
+    select: PlatformEmailIdentityEdgeSelect;
+  };
+};
+export interface UpdatePlatformEmailIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformEmailIdentity` that was updated by this mutation. */
+  platformEmailIdentity?: PlatformEmailIdentity | null;
+  platformEmailIdentityEdge?: PlatformEmailIdentityEdge | null;
+}
+export type UpdatePlatformEmailIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  platformEmailIdentity?: {
+    select: PlatformEmailIdentitySelect;
+  };
+  platformEmailIdentityEdge?: {
+    select: PlatformEmailIdentityEdgeSelect;
+  };
+};
+export interface DeletePlatformEmailIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformEmailIdentity` that was deleted by this mutation. */
+  platformEmailIdentity?: PlatformEmailIdentity | null;
+  platformEmailIdentityEdge?: PlatformEmailIdentityEdge | null;
+}
+export type DeletePlatformEmailIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  platformEmailIdentity?: {
+    select: PlatformEmailIdentitySelect;
+  };
+  platformEmailIdentityEdge?: {
+    select: PlatformEmailIdentityEdgeSelect;
+  };
+};
+export interface CreatePlatformEmailProviderAccountPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformEmailProviderAccount` that was created by this mutation. */
+  platformEmailProviderAccount?: PlatformEmailProviderAccount | null;
+  platformEmailProviderAccountEdge?: PlatformEmailProviderAccountEdge | null;
+}
+export type CreatePlatformEmailProviderAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  platformEmailProviderAccount?: {
+    select: PlatformEmailProviderAccountSelect;
+  };
+  platformEmailProviderAccountEdge?: {
+    select: PlatformEmailProviderAccountEdgeSelect;
+  };
+};
+export interface UpdatePlatformEmailProviderAccountPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformEmailProviderAccount` that was updated by this mutation. */
+  platformEmailProviderAccount?: PlatformEmailProviderAccount | null;
+  platformEmailProviderAccountEdge?: PlatformEmailProviderAccountEdge | null;
+}
+export type UpdatePlatformEmailProviderAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  platformEmailProviderAccount?: {
+    select: PlatformEmailProviderAccountSelect;
+  };
+  platformEmailProviderAccountEdge?: {
+    select: PlatformEmailProviderAccountEdgeSelect;
+  };
+};
+export interface DeletePlatformEmailProviderAccountPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformEmailProviderAccount` that was deleted by this mutation. */
+  platformEmailProviderAccount?: PlatformEmailProviderAccount | null;
+  platformEmailProviderAccountEdge?: PlatformEmailProviderAccountEdge | null;
+}
+export type DeletePlatformEmailProviderAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  platformEmailProviderAccount?: {
+    select: PlatformEmailProviderAccountSelect;
+  };
+  platformEmailProviderAccountEdge?: {
+    select: PlatformEmailProviderAccountEdgeSelect;
+  };
+};
+export interface CreatePlatformEmailSiteIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformEmailSiteIdentity` that was created by this mutation. */
+  platformEmailSiteIdentity?: PlatformEmailSiteIdentity | null;
+  platformEmailSiteIdentityEdge?: PlatformEmailSiteIdentityEdge | null;
+}
+export type CreatePlatformEmailSiteIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  platformEmailSiteIdentity?: {
+    select: PlatformEmailSiteIdentitySelect;
+  };
+  platformEmailSiteIdentityEdge?: {
+    select: PlatformEmailSiteIdentityEdgeSelect;
+  };
+};
+export interface UpdatePlatformEmailSiteIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformEmailSiteIdentity` that was updated by this mutation. */
+  platformEmailSiteIdentity?: PlatformEmailSiteIdentity | null;
+  platformEmailSiteIdentityEdge?: PlatformEmailSiteIdentityEdge | null;
+}
+export type UpdatePlatformEmailSiteIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  platformEmailSiteIdentity?: {
+    select: PlatformEmailSiteIdentitySelect;
+  };
+  platformEmailSiteIdentityEdge?: {
+    select: PlatformEmailSiteIdentityEdgeSelect;
+  };
+};
+export interface DeletePlatformEmailSiteIdentityPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformEmailSiteIdentity` that was deleted by this mutation. */
+  platformEmailSiteIdentity?: PlatformEmailSiteIdentity | null;
+  platformEmailSiteIdentityEdge?: PlatformEmailSiteIdentityEdge | null;
+}
+export type DeletePlatformEmailSiteIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  platformEmailSiteIdentity?: {
+    select: PlatformEmailSiteIdentitySelect;
+  };
+  platformEmailSiteIdentityEdge?: {
+    select: PlatformEmailSiteIdentityEdgeSelect;
   };
 };
 export interface CreatePlatformManagedDomainPayload {
@@ -22227,7 +23776,7 @@ export interface DatabaseProvisionModule {
   /** Uniform billing anchor: when the request was fulfilled with a usable database (cold provision completion or warm pool claim). Platform absorbs all provisioning compute before this point */
   fulfilledAt?: string | null;
   id: string;
-  /** JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["permissions_module", {"scope": "app"}]) */
+  /** JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["capabilities_module", {"scope": "app"}]) */
   modules: Record<string, unknown>;
   /** Additional configuration options for provisioning */
   options: Record<string, unknown>;
@@ -22262,6 +23811,18 @@ export type DatabaseProvisionModuleSelect = {
   subdomain?: boolean;
   updatedAt?: boolean;
 };
+/** A `Api` edge in the connection. */
+export interface ApiEdge {
+  cursor?: string | null;
+  /** The `Api` at the end of the edge. */
+  node?: Api | null;
+}
+export type ApiEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ApiSelect;
+  };
+};
 /** A `ApiSchema` edge in the connection. */
 export interface ApiSchemaEdge {
   cursor?: string | null;
@@ -22284,18 +23845,6 @@ export type ApiSettingEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: ApiSettingSelect;
-  };
-};
-/** A `Apis` edge in the connection. */
-export interface ApisEdge {
-  cursor?: string | null;
-  /** The `Apis` at the end of the edge. */
-  node?: Apis | null;
-}
-export type ApisEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: ApisSelect;
   };
 };
 /** A `CheckConstraint` edge in the connection. */
@@ -22428,6 +23977,42 @@ export type DomainVerificationEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: DomainVerificationSelect;
+  };
+};
+/** A `EmailIdentity` edge in the connection. */
+export interface EmailIdentityEdge {
+  cursor?: string | null;
+  /** The `EmailIdentity` at the end of the edge. */
+  node?: EmailIdentity | null;
+}
+export type EmailIdentityEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EmailIdentitySelect;
+  };
+};
+/** A `EmailProviderAccount` edge in the connection. */
+export interface EmailProviderAccountEdge {
+  cursor?: string | null;
+  /** The `EmailProviderAccount` at the end of the edge. */
+  node?: EmailProviderAccount | null;
+}
+export type EmailProviderAccountEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EmailProviderAccountSelect;
+  };
+};
+/** A `EmailSiteIdentity` edge in the connection. */
+export interface EmailSiteIdentityEdge {
+  cursor?: string | null;
+  /** The `EmailSiteIdentity` at the end of the edge. */
+  node?: EmailSiteIdentity | null;
+}
+export type EmailSiteIdentityEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EmailSiteIdentitySelect;
   };
 };
 /** A `EmbeddingChunk` edge in the connection. */
@@ -22622,6 +24207,18 @@ export type PartitionEdgeSelect = {
     select: PartitionSelect;
   };
 };
+/** A `PlatformApi` edge in the connection. */
+export interface PlatformApiEdge {
+  cursor?: string | null;
+  /** The `PlatformApi` at the end of the edge. */
+  node?: PlatformApi | null;
+}
+export type PlatformApiEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformApiSelect;
+  };
+};
 /** A `PlatformApiSchema` edge in the connection. */
 export interface PlatformApiSchemaEdge {
   cursor?: string | null;
@@ -22644,18 +24241,6 @@ export type PlatformApiSettingEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PlatformApiSettingSelect;
-  };
-};
-/** A `PlatformApis` edge in the connection. */
-export interface PlatformApisEdge {
-  cursor?: string | null;
-  /** The `PlatformApis` at the end of the edge. */
-  node?: PlatformApis | null;
-}
-export type PlatformApisEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: PlatformApisSelect;
   };
 };
 /** A `PlatformCorsSetting` edge in the connection. */
@@ -22692,6 +24277,42 @@ export type PlatformDomainVerificationEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PlatformDomainVerificationSelect;
+  };
+};
+/** A `PlatformEmailIdentity` edge in the connection. */
+export interface PlatformEmailIdentityEdge {
+  cursor?: string | null;
+  /** The `PlatformEmailIdentity` at the end of the edge. */
+  node?: PlatformEmailIdentity | null;
+}
+export type PlatformEmailIdentityEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformEmailIdentitySelect;
+  };
+};
+/** A `PlatformEmailProviderAccount` edge in the connection. */
+export interface PlatformEmailProviderAccountEdge {
+  cursor?: string | null;
+  /** The `PlatformEmailProviderAccount` at the end of the edge. */
+  node?: PlatformEmailProviderAccount | null;
+}
+export type PlatformEmailProviderAccountEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformEmailProviderAccountSelect;
+  };
+};
+/** A `PlatformEmailSiteIdentity` edge in the connection. */
+export interface PlatformEmailSiteIdentityEdge {
+  cursor?: string | null;
+  /** The `PlatformEmailSiteIdentity` at the end of the edge. */
+  node?: PlatformEmailSiteIdentity | null;
+}
+export type PlatformEmailSiteIdentityEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformEmailSiteIdentitySelect;
   };
 };
 /** A `PlatformManagedDomain` edge in the connection. */

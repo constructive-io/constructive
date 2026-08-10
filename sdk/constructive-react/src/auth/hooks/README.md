@@ -69,11 +69,11 @@ function App() {
 | `useCreatePrincipalEntityMutation` | Mutation | Association table scoping principals to specific organizations |
 | `useUpdatePrincipalEntityMutation` | Mutation | Association table scoping principals to specific organizations |
 | `useDeletePrincipalEntityMutation` | Mutation | Association table scoping principals to specific organizations |
-| `usePrincipalScopeOverridesQuery` | Query | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
-| `usePrincipalScopeOverrideQuery` | Query | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
-| `useCreatePrincipalScopeOverrideMutation` | Mutation | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
-| `useUpdatePrincipalScopeOverrideMutation` | Mutation | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
-| `useDeletePrincipalScopeOverrideMutation` | Mutation | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
+| `usePrincipalScopeOverridesQuery` | Query | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
+| `usePrincipalScopeOverrideQuery` | Query | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
+| `useCreatePrincipalScopeOverrideMutation` | Mutation | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
+| `useUpdatePrincipalScopeOverrideMutation` | Mutation | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
+| `useDeletePrincipalScopeOverrideMutation` | Mutation | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
 | `useRoleTypesQuery` | Query | List all roleTypes |
 | `useRoleTypeQuery` | Query | Get one roleType |
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
@@ -125,9 +125,11 @@ and lifecycle settings. |
 | `useSetPasswordMutation` | Mutation | setPassword |
 | `useSignInMutation` | Mutation | signIn |
 | `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
+| `useSignInMagicLinkMutation` | Mutation | signInMagicLink |
 | `useSignInSmsOtpMutation` | Mutation | signInSmsOtp |
 | `useSignOutMutation` | Mutation | signOut |
 | `useSignUpMutation` | Mutation | signUp |
+| `useSignUpMagicLinkMutation` | Mutation | signUpMagicLink |
 | `useSignUpSmsMutation` | Mutation | signUpSms |
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
 | `useVerifyPasswordMutation` | Mutation | verifyPassword |
@@ -699,6 +701,17 @@ signInCrossOrigin
   |----------|------|
   | `input` | SignInCrossOriginInput (required) |
 
+### `useSignInMagicLinkMutation`
+
+signInMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInMagicLinkInput (required) |
+
 ### `useSignInSmsOtpMutation`
 
 signInSmsOtp
@@ -731,6 +744,17 @@ signUp
   | Argument | Type |
   |----------|------|
   | `input` | SignUpInput (required) |
+
+### `useSignUpMagicLinkMutation`
+
+signUpMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignUpMagicLinkInput (required) |
 
 ### `useSignUpSmsMutation`
 

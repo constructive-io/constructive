@@ -147,6 +147,11 @@
       "table": "billing_provider_module"
     },
     {
+      "key": "capabilities_module",
+      "schema": "metaschema_modules_public",
+      "table": "capabilities_module"
+    },
+    {
       "key": "catalog_module",
       "schema": "metaschema_modules_public",
       "table": "catalog_module"
@@ -282,9 +287,9 @@
       "table": "notifications_module"
     },
     {
-      "key": "permissions_module",
+      "key": "oauth_requests_module",
       "schema": "metaschema_modules_public",
-      "table": "permissions_module"
+      "table": "oauth_requests_module"
     },
     {
       "key": "phone_numbers_module",
@@ -382,6 +387,11 @@
       "table": "user_settings_module"
     },
     {
+      "key": "user_settings_security_module",
+      "schema": "metaschema_modules_public",
+      "table": "user_settings_security_module"
+    },
+    {
       "key": "user_state_module",
       "schema": "metaschema_modules_public",
       "table": "user_state_module"
@@ -457,6 +467,16 @@
       "table": "app_module"
     },
     {
+      "key": "content_preset_module",
+      "schema": "metaschema_modules_public",
+      "table": "content_preset_module"
+    },
+    {
+      "key": "data_capabilities_field",
+      "schema": "metaschema_modules_public",
+      "table": "data_capabilities_field"
+    },
+    {
       "key": "db_preset_module",
       "schema": "metaschema_modules_public",
       "table": "db_preset_module"
@@ -470,6 +490,11 @@
       "key": "domain_module",
       "schema": "metaschema_modules_public",
       "table": "domain_module"
+    },
+    {
+      "key": "file_ref_field",
+      "schema": "metaschema_modules_public",
+      "table": "file_ref_field"
     },
     {
       "key": "function_deployment_module",
@@ -500,6 +525,11 @@
       "key": "webhook_module",
       "schema": "metaschema_modules_public",
       "table": "webhook_module"
+    },
+    {
+      "key": "email_sender_module",
+      "schema": "metaschema_modules_public",
+      "table": "email_sender_module"
     },
     {
       "key": "graph_execution_module",
@@ -560,6 +590,21 @@
       "key": "domains",
       "schema": "routing_public",
       "table": "domains"
+    },
+    {
+      "key": "email_identities",
+      "schema": "routing_public",
+      "table": "email_identities"
+    },
+    {
+      "key": "email_provider_accounts",
+      "schema": "routing_public",
+      "table": "email_provider_accounts"
+    },
+    {
+      "key": "email_site_identities",
+      "schema": "routing_public",
+      "table": "email_site_identities"
     },
     {
       "key": "http_routes",
@@ -791,6 +836,9 @@
       "created_at",
       "updated_at"
     ],
+    "metaschema_modules_public.content_preset_module": [
+      "created_at"
+    ],
     "metaschema_modules_public.db_preset_module": [
       "created_at"
     ],
@@ -934,6 +982,18 @@
       "updated_at"
     ],
     "routing_public.domains": [
+      "created_at",
+      "updated_at"
+    ],
+    "routing_public.email_identities": [
+      "created_at",
+      "updated_at"
+    ],
+    "routing_public.email_provider_accounts": [
+      "created_at",
+      "updated_at"
+    ],
+    "routing_public.email_site_identities": [
       "created_at",
       "updated_at"
     ],

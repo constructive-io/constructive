@@ -47,11 +47,11 @@ function App() {
 | `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useUpdateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useDeleteAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
-| `useAppLimitCreditCodesQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
-| `useAppLimitCreditCodeQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
-| `useCreateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
-| `useUpdateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
-| `useDeleteAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useAppLimitCreditCodesQuery` | Query | Redeemable credit codes managed by admins with the add_credits capability |
+| `useAppLimitCreditCodeQuery` | Query | Redeemable credit codes managed by admins with the add_credits capability |
+| `useCreateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits capability |
+| `useUpdateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits capability |
+| `useDeleteAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits capability |
 | `useAppLimitCreditCodeItemsQuery` | Query | Items within a credit code — each row grants credits for a specific limit definition |
 | `useAppLimitCreditCodeItemQuery` | Query | Items within a credit code — each row grants credits for a specific limit definition |
 | `useCreateAppLimitCreditCodeItemMutation` | Mutation | Items within a credit code — each row grants credits for a specific limit definition |
@@ -122,6 +122,8 @@ function App() {
 | `useCreateOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useUpdateOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useDeleteOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useCaptureAppLimitDefaultsQuery` | Query | captureAppLimitDefaults |
+| `useCaptureOrgLimitDefaultsQuery` | Query | captureOrgLimitDefaults |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -512,6 +514,20 @@ create({ entityId: '<UUID>', name: '<String>', taskIdentifier: '<String>', thres
 ```
 
 ## Custom Operation Hooks
+
+### `useCaptureAppLimitDefaultsQuery`
+
+captureAppLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
+
+### `useCaptureOrgLimitDefaultsQuery`
+
+captureOrgLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
 
 ### `useProvisionBucketMutation`
 

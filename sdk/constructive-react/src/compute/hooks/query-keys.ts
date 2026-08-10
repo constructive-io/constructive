@@ -19,6 +19,15 @@
 // Entity Query Keys
 // ============================================================================
 
+export const contentPresetKeys = {
+  /** All contentPreset queries */ all: ['contentpreset'] as const,
+  /** List query keys */ lists: () => [...contentPresetKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...contentPresetKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...contentPresetKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...contentPresetKeys.details(), id] as const,
+} as const;
 export const dbPresetKeys = {
   /** All dbPreset queries */ all: ['dbpreset'] as const,
   /** List query keys */ lists: () => [...dbPresetKeys.all, 'list'] as const,
@@ -716,6 +725,7 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
+  contentPreset: contentPresetKeys,
   dbPreset: dbPresetKeys,
   functionApiBinding: functionApiBindingKeys,
   functionCapabilityBinding: functionCapabilityBindingKeys,

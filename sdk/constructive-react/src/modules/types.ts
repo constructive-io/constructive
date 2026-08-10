@@ -8,7 +8,7 @@ export interface AgentModule {
   agentTableName: string | null;
   apiName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   hasAgents: boolean | null;
@@ -53,7 +53,7 @@ export interface ApiSurfaceModule {
   corsSettingsTableId: string | null;
   corsSettingsTableName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   id: string | null;
@@ -73,7 +73,7 @@ export interface AppModule {
   appsTableName: string | null;
   catalogModuleId: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   id: string | null;
@@ -92,8 +92,8 @@ export interface BillingModule {
   balancesTableId: string | null;
   balancesTableName: string | null;
   databaseId: string | null;
+  defaultCapabilities: string[] | null;
   defaultMeterCatalog: unknown | null;
-  defaultPermissions: string[] | null;
   id: string | null;
   ledgerTableId: string | null;
   ledgerTableName: string | null;
@@ -121,16 +121,22 @@ export interface BillingProviderModule {
   apiName: string | null;
   billingCustomersTableId: string | null;
   billingCustomersTableName: string | null;
+  billingInvoicesTableId: string | null;
+  billingInvoicesTableName: string | null;
   billingPricesTableId: string | null;
   billingPricesTableName: string | null;
   billingProductsTableId: string | null;
   billingProductsTableName: string | null;
+  billingRefundsTableId: string | null;
+  billingRefundsTableName: string | null;
   billingSubscriptionsTableId: string | null;
   billingSubscriptionsTableName: string | null;
   billingWebhookEventsTableId: string | null;
   billingWebhookEventsTableName: string | null;
   databaseId: string | null;
   id: string | null;
+  listPendingUsageSyncFunction: string | null;
+  markUsageSyncedFunction: string | null;
   prefix: string | null;
   pricesTableId: string | null;
   privateApiName: string | null;
@@ -138,8 +144,10 @@ export interface BillingProviderModule {
   processBillingEventFunction: string | null;
   productsTableId: string | null;
   provider: string | null;
+  recordRefundFunction: string | null;
   schemaId: string | null;
   subscriptionsTableId: string | null;
+  upsertInvoiceFunction: string | null;
 }
 export interface Blueprint {
   createdAt: string | null;
@@ -190,16 +198,42 @@ export interface BlueprintTemplate {
   version: string | null;
   visibility: string | null;
 }
+export interface CapabilitiesModule {
+  actorTableId: string | null;
+  apiName: string | null;
+  bitlen: number | null;
+  databaseId: string | null;
+  defaultTableId: string | null;
+  defaultTableName: string | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  getByMask: string | null;
+  getMask: string | null;
+  getMaskByName: string | null;
+  getPaddedMask: string | null;
+  id: string | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  privateSchemaId: string | null;
+  privateSchemaName: string | null;
+  publicSchemaName: string | null;
+  schemaId: string | null;
+  scope: string | null;
+  tableId: string | null;
+  tableName: string | null;
+}
 export interface CatalogModule {
   apiName: string | null;
   apisTableId: string | null;
   apisTableName: string | null;
   appsTableId: string | null;
   appsTableName: string | null;
+  bindingsTableId: string | null;
+  bindingsTableName: string | null;
   bucketsTableId: string | null;
   bucketsTableName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   domainsTableId: string | null;
   domainsTableName: string | null;
   entityTableId: string | null;
@@ -274,6 +308,25 @@ export interface ConnectedAccountsModule {
   tableId: string | null;
   tableName: string | null;
 }
+export interface ContentPresetModule {
+  apiName: string | null;
+  contentPresetsTableId: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  entityTableId: string | null;
+  id: string | null;
+  merkleStoreModuleId: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  privateSchemaId: string | null;
+  privateSchemaName: string | null;
+  provisions: unknown | null;
+  publicSchemaId: string | null;
+  publicSchemaName: string | null;
+  scope: string | null;
+  storeName: string | null;
+}
 export interface CryptoAddressesModule {
   apiName: string | null;
   cryptoNetwork: string | null;
@@ -302,6 +355,19 @@ export interface CryptoAuthModule {
   userField: string | null;
   usersTableId: string | null;
 }
+export interface DataCapabilitiesField {
+  capabilitiesModuleId: string | null;
+  databaseId: string | null;
+  fieldId: string | null;
+  fromFieldId: string | null;
+  id: string | null;
+  mappingFieldId: string | null;
+  mappingKeyFieldId: string | null;
+  mappingTableId: string | null;
+  mode: string | null;
+  subsetGuard: boolean | null;
+  tableId: string | null;
+}
 export interface DatabaseProvisionModule {
   async: boolean | null;
   bootstrapError: string | null;
@@ -328,7 +394,7 @@ export interface DatabaseSettingsModule {
   databaseId: string | null;
   databaseSettingsTableId: string | null;
   databaseSettingsTableName: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   id: string | null;
@@ -397,7 +463,7 @@ export interface DbUsageModule {
   collectDbQueryStatsFunction: string | null;
   collectDbTableStatsFunction: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   id: string | null;
   interval: string | null;
@@ -452,7 +518,7 @@ export interface DomainModule {
   apiName: string | null;
   catalogModuleId: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   domainEventsTableId: string | null;
   domainEventsTableName: string | null;
   domainVerificationsTableId: string | null;
@@ -473,6 +539,28 @@ export interface DomainModule {
   publicSchemaName: string | null;
   schemaId: string | null;
   scope: string | null;
+}
+export interface EmailSenderModule {
+  apiName: string | null;
+  databaseId: string | null;
+  defaultCapabilities: string[] | null;
+  emailIdentitiesTableId: string | null;
+  emailIdentitiesTableName: string | null;
+  emailProviderAccountsTableId: string | null;
+  emailProviderAccountsTableName: string | null;
+  emailSiteIdentitiesTableId: string | null;
+  emailSiteIdentitiesTableName: string | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  id: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  provisions: unknown | null;
+  publicSchemaName: string | null;
+  schemaId: string | null;
+  scope: string | null;
+  siteSurfaceModuleId: string | null;
 }
 export interface EmailsModule {
   apiName: string | null;
@@ -532,7 +620,7 @@ export interface EventsModule {
   actorTableId: string | null;
   apiName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   eventAggregatesTableId: string | null;
@@ -541,6 +629,7 @@ export interface EventsModule {
   eventTypesTableName: string | null;
   eventsTableId: string | null;
   eventsTableName: string | null;
+  expireGrants: string | null;
   grantAchievement: string | null;
   id: string | null;
   interval: string | null;
@@ -557,9 +646,11 @@ export interface EventsModule {
   privateSchemaId: string | null;
   privateSchemaName: string | null;
   publicSchemaName: string | null;
+  recomputeCapabilities: string | null;
   recordEvent: string | null;
   removeEvent: string | null;
   retention: string | null;
+  revokeAchievement: string | null;
   schemaId: string | null;
   scope: string | null;
   stepsRequired: string | null;
@@ -569,13 +660,26 @@ export interface EventsModule {
   tgEventBool: string | null;
   tgEventToggle: string | null;
   tgEventToggleBool: string | null;
+  tgLevelGrantSync: string | null;
   tgUpdateAggregates: string | null;
+  trustLadder: unknown | null;
   upsertAggregate: string | null;
+}
+export interface FileRefField {
+  bucketKey: string | null;
+  bucketTags: string[] | null;
+  databaseId: string | null;
+  enforceFk: boolean | null;
+  fieldId: string | null;
+  id: string | null;
+  isPublic: boolean | null;
+  storageModuleId: string | null;
+  tableId: string | null;
 }
 export interface FunctionDeploymentModule {
   apiName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   deploymentEventsTableId: string | null;
   deploymentEventsTableName: string | null;
   deploymentsTableId: string | null;
@@ -600,7 +704,7 @@ export interface FunctionInvocationModule {
   attemptsTableId: string | null;
   attemptsTableName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   executionLogsTableId: string | null;
@@ -624,7 +728,7 @@ export interface FunctionModule {
   bindingsTableName: string | null;
   capabilityBindingsTableId: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   definitionsTableId: string | null;
   definitionsTableName: string | null;
   entityField: string | null;
@@ -646,7 +750,7 @@ export interface GraphExecutionModule {
   apiName: string | null;
   createdAt: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   executionsTableId: string | null;
@@ -671,7 +775,7 @@ export interface GraphModule {
   apiName: string | null;
   createdAt: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   graphsTableId: string | null;
@@ -694,7 +798,7 @@ export interface HierarchyModule {
   chartEdgesTableName: string | null;
   createdAt: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   getManagersFunction: string | null;
@@ -715,7 +819,7 @@ export interface HierarchyModule {
 export interface HttpRouteModule {
   apiName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   functionModuleId: string | null;
@@ -896,6 +1000,7 @@ export interface LimitsModule {
   limitCreditsTableId: string | null;
   limitDecrementFunction: string | null;
   limitDecrementTrigger: string | null;
+  limitDefaults: unknown | null;
   limitIncrementFunction: string | null;
   limitIncrementTrigger: string | null;
   limitUpdateTrigger: string | null;
@@ -926,9 +1031,12 @@ export interface MembershipsModule {
   adminGrantsTableId: string | null;
   adminGrantsTableName: string | null;
   apiName: string | null;
+  capabilitiesTableId: string | null;
+  capabilityDefaultCapabilitiesTableId: string | null;
+  capabilityDefaultGrantsTableId: string | null;
   databaseId: string | null;
+  defaultCapabilitiesTableId: string | null;
   defaultLimitsTableId: string | null;
-  defaultPermissionsTableId: string | null;
   entityField: string | null;
   entityIdsByMask: string | null;
   entityIdsByPerm: string | null;
@@ -951,9 +1059,6 @@ export interface MembershipsModule {
   membershipsTableName: string | null;
   ownerGrantsTableId: string | null;
   ownerGrantsTableName: string | null;
-  permissionDefaultGrantsTableId: string | null;
-  permissionDefaultPermissionsTableId: string | null;
-  permissionsTableId: string | null;
   prefix: string | null;
   privateApiName: string | null;
   privateSchemaId: string | null;
@@ -965,6 +1070,7 @@ export interface MembershipsModule {
 }
 export interface MerkleStoreModule {
   apiName: string | null;
+  capabilityKey: string | null;
   commitTableId: string | null;
   createdAt: string | null;
   databaseId: string | null;
@@ -972,7 +1078,6 @@ export interface MerkleStoreModule {
   functionPrefix: string | null;
   id: string | null;
   objectTableId: string | null;
-  permissionKey: string | null;
   prefix: string | null;
   privateApiName: string | null;
   privateSchemaId: string | null;
@@ -986,7 +1091,7 @@ export interface MerkleStoreModule {
 export interface NamespaceModule {
   apiName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   id: string | null;
@@ -1008,7 +1113,7 @@ export interface NotificationsModule {
   apiName: string | null;
   channelsTableId: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   deliveryLogTableId: string | null;
   entityField: string | null;
   hasChannels: boolean | null;
@@ -1030,6 +1135,20 @@ export interface NotificationsModule {
   suppressionsTableId: string | null;
   userSettingsTableId: string | null;
 }
+export interface OauthRequestsModule {
+  databaseId: string | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  id: string | null;
+  oauthAuthorizationRequestsTableId: string | null;
+  oauthAuthorizationRequestsTableName: string | null;
+  pendingIdentityLinksTableId: string | null;
+  pendingIdentityLinksTableName: string | null;
+  prefix: string | null;
+  privateSchemaId: string | null;
+  privateSchemaName: string | null;
+  scope: string | null;
+}
 export interface PagesModule {
   apiName: string | null;
   createdAt: string | null;
@@ -1050,30 +1169,6 @@ export interface PagesModule {
   siteSurfaceModuleId: string | null;
   sitesTableId: string | null;
   storeNamePrefix: string | null;
-}
-export interface PermissionsModule {
-  actorTableId: string | null;
-  apiName: string | null;
-  bitlen: number | null;
-  databaseId: string | null;
-  defaultTableId: string | null;
-  defaultTableName: string | null;
-  entityField: string | null;
-  entityTableId: string | null;
-  getByMask: string | null;
-  getMask: string | null;
-  getMaskByName: string | null;
-  getPaddedMask: string | null;
-  id: string | null;
-  prefix: string | null;
-  privateApiName: string | null;
-  privateSchemaId: string | null;
-  privateSchemaName: string | null;
-  publicSchemaName: string | null;
-  schemaId: string | null;
-  scope: string | null;
-  tableId: string | null;
-  tableName: string | null;
 }
 export interface PhoneNumbersModule {
   apiName: string | null;
@@ -1132,22 +1227,24 @@ export interface PrincipalAuthModule {
 export interface ProfilesModule {
   actorTableId: string | null;
   apiName: string | null;
+  capabilitiesTableId: string | null;
   databaseId: string | null;
   entityField: string | null;
   entityTableId: string | null;
   id: string | null;
+  membershipProfilesTableId: string | null;
+  membershipProfilesTableName: string | null;
   membershipsTableId: string | null;
-  permissionsTableId: string | null;
   prefix: string | null;
   privateApiName: string | null;
   privateSchemaId: string | null;
   privateSchemaName: string | null;
+  profileCapabilitiesTableId: string | null;
+  profileCapabilitiesTableName: string | null;
   profileDefinitionGrantsTableId: string | null;
   profileDefinitionGrantsTableName: string | null;
   profileGrantsTableId: string | null;
   profileGrantsTableName: string | null;
-  profilePermissionsTableId: string | null;
-  profilePermissionsTableName: string | null;
   profileTemplatesTableId: string | null;
   profileTemplatesTableName: string | null;
   publicSchemaName: string | null;
@@ -1160,7 +1257,7 @@ export interface RateLimitMetersModule {
   apiName: string | null;
   checkRateLimitFunction: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   id: string | null;
   prefix: string | null;
   privateApiName: string | null;
@@ -1231,7 +1328,7 @@ export interface RelationProvision {
 export interface ResourceModule {
   apiName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   id: string | null;
@@ -1283,9 +1380,11 @@ export interface RlsModule {
 }
 export interface RouteModule {
   apiName: string | null;
+  appLinksFunctionName: string | null;
   catalogModuleId: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  deepLinkFunctionName: string | null;
+  defaultCapabilities: string[] | null;
   domainModuleId: string | null;
   entityField: string | null;
   entityTableId: string | null;
@@ -1306,6 +1405,13 @@ export interface RouteModule {
   routesTableName: string | null;
   schemaId: string | null;
   scope: string | null;
+}
+export interface ScopeTypesModule {
+  databaseId: string | null;
+  id: string | null;
+  privateSchemaName: string | null;
+  schemaId: string | null;
+  scopeTypesTableId: string | null;
 }
 export interface SecureTableProvision {
   databaseId: string | null;
@@ -1345,7 +1451,7 @@ export interface SiteSurfaceModule {
   apiName: string | null;
   catalogModuleId: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   id: string | null;
@@ -1406,8 +1512,8 @@ export interface StorageModule {
   catalogModuleId: string | null;
   confirmUploadDelay: string | null;
   databaseId: string | null;
+  defaultCapabilities: string[] | null;
   defaultMaxFileSize: string | null;
-  defaultPermissions: string[] | null;
   downloadUrlExpirySeconds: number | null;
   endpoint: string | null;
   entityField: string | null;
@@ -1510,6 +1616,15 @@ export interface UserSettingsModule {
   tableId: string | null;
   tableName: string | null;
 }
+export interface UserSettingsSecurityModule {
+  apiName: string | null;
+  databaseId: string | null;
+  id: string | null;
+  ownerTableId: string | null;
+  schemaId: string | null;
+  tableId: string | null;
+  tableName: string | null;
+}
 export interface UserStateModule {
   databaseId: string | null;
   entityField: string | null;
@@ -1561,7 +1676,7 @@ export interface WebauthnCredentialsModule {
 export interface WebhookModule {
   apiName: string | null;
   databaseId: string | null;
-  defaultPermissions: string[] | null;
+  defaultCapabilities: string[] | null;
   entityField: string | null;
   entityTableId: string | null;
   functionInvocationModuleId: string | null;

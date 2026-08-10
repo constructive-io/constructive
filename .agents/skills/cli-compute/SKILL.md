@@ -1,13 +1,13 @@
 ---
 name: cli-compute
-description: CLI tool (csdk) for the compute API — provides CRUD commands for 69 tables and 29 custom operations
+description: CLI tool (csdk) for the compute API — provides CRUD commands for 70 tables and 38 custom operations
 ---
 
 # cli-compute
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the compute API — provides CRUD commands for 69 tables and 29 custom operations
+CLI tool (csdk) for the compute API — provides CRUD commands for 70 tables and 38 custom operations
 
 ## Usage
 
@@ -23,13 +23,13 @@ csdk auth set-token <token>
 csdk config set <key> <value>
 csdk config get <key>
 
-# CRUD for any table (e.g. db-preset)
-csdk db-preset list
-csdk db-preset get --id <value>
-csdk db-preset create --<field> <value>
+# CRUD for any table (e.g. content-preset)
+csdk content-preset list
+csdk content-preset get --id <value>
+csdk content-preset create --<field> <value>
 
 # Non-interactive mode (skip all prompts, use flags only)
-csdk --no-tty db-preset list
+csdk --no-tty content-preset list
 ```
 
 ## Examples
@@ -40,13 +40,13 @@ csdk --no-tty db-preset list
 csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
-csdk db-preset list
+csdk content-preset list
 ```
 
 ### Non-interactive mode (for scripts and CI)
 
 ```bash
-csdk --no-tty db-preset create --<field> <value>
+csdk --no-tty content-preset create --<field> <value>
 ```
 
 ## References
@@ -56,6 +56,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [context](references/context.md)
 - [auth](references/auth.md)
 - [config](references/config.md)
+- [content-preset](references/content-preset.md)
 - [db-preset](references/db-preset.md)
 - [function-api-binding](references/function-api-binding.md)
 - [function-capability-binding](references/function-capability-binding.md)
@@ -135,12 +136,19 @@ See the `references/` directory for detailed per-entity API documentation:
 - [import-graph-json](references/import-graph-json.md)
 - [infra-init-empty-repo](references/infra-init-empty-repo.md)
 - [infra-insert-node-at-path](references/infra-insert-node-at-path.md)
+- [infra-insert-nodes-at-paths](references/infra-insert-nodes-at-paths.md)
+- [infra-set-and-commit](references/infra-set-and-commit.md)
 - [infra-set-data-at-path](references/infra-set-data-at-path.md)
+- [infra-set-many-and-commit](references/infra-set-many-and-commit.md)
 - [init-empty-repo](references/init-empty-repo.md)
 - [insert-node-at-path](references/insert-node-at-path.md)
+- [insert-nodes-at-paths](references/insert-nodes-at-paths.md)
 - [platform-infra-init-empty-repo](references/platform-infra-init-empty-repo.md)
 - [platform-infra-insert-node-at-path](references/platform-infra-insert-node-at-path.md)
+- [platform-infra-insert-nodes-at-paths](references/platform-infra-insert-nodes-at-paths.md)
+- [platform-infra-set-and-commit](references/platform-infra-set-and-commit.md)
 - [platform-infra-set-data-at-path](references/platform-infra-set-data-at-path.md)
+- [platform-infra-set-many-and-commit](references/platform-infra-set-many-and-commit.md)
 - [platform-resource-installations-install](references/platform-resource-installations-install.md)
 - [platform-resource-installations-rollback](references/platform-resource-installations-rollback.md)
 - [platform-resource-installations-uninstall](references/platform-resource-installations-uninstall.md)
@@ -151,6 +159,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [resource-installations-uninstall](references/resource-installations-uninstall.md)
 - [resource-installations-upgrade](references/resource-installations-upgrade.md)
 - [save-graph](references/save-graph.md)
+- [set-and-commit](references/set-and-commit.md)
 - [set-data-at-path](references/set-data-at-path.md)
+- [set-many-and-commit](references/set-many-and-commit.md)
 - [start-execution](references/start-execution.md)
 - [validate-function-graph](references/validate-function-graph.md)

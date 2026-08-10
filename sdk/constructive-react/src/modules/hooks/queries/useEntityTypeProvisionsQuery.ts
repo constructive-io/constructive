@@ -1,6 +1,6 @@
 /**
  * Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
-     and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+     and installs the required modules (capabilities, memberships, limits) plus optional modules (profiles, levels, invites).
      Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
      via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
      Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).
@@ -39,7 +39,7 @@ export type {
 export const entityTypeProvisionsQueryKey = entityTypeProvisionKeys.list;
 /**
  * Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
-     and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+     and installs the required modules (capabilities, memberships, limits) plus optional modules (profiles, levels, invites).
      Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
      via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
      Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).
@@ -110,7 +110,7 @@ export function useEntityTypeProvisionsQuery(
 }
 /**
  * Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
-     and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+     and installs the required modules (capabilities, memberships, limits) plus optional modules (profiles, levels, invites).
      Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
      via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
      Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).
@@ -155,7 +155,7 @@ export async function fetchEntityTypeProvisionsQuery(params: {
 }
 /**
  * Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
-     and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+     and installs the required modules (capabilities, memberships, limits) plus optional modules (profiles, levels, invites).
      Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
      via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
      Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).

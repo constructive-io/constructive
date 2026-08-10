@@ -29,12 +29,15 @@ const db = createClient({
 | `blueprint` | findMany, findOne, create, update, delete |
 | `blueprintConstruction` | findMany, findOne, create, update, delete |
 | `blueprintTemplate` | findMany, findOne, create, update, delete |
+| `capabilitiesModule` | findMany, findOne, create, update, delete |
 | `catalogModule` | findMany, findOne, create, update, delete |
 | `computeLogModule` | findMany, findOne, create, update, delete |
 | `configSecretsUserModule` | findMany, findOne, create, update, delete |
 | `connectedAccountsModule` | findMany, findOne, create, update, delete |
+| `contentPresetModule` | findMany, findOne, create, update, delete |
 | `cryptoAddressesModule` | findMany, findOne, create, update, delete |
 | `cryptoAuthModule` | findMany, findOne, create, update, delete |
+| `dataCapabilitiesField` | findMany, findOne, create, update, delete |
 | `databaseProvisionModule` | findMany, findOne, create, update, delete |
 | `databaseSettingsModule` | findMany, findOne, create, update, delete |
 | `dbPoolConfig` | findMany, findOne, create, update, delete |
@@ -45,9 +48,11 @@ const db = createClient({
 | `denormalizedTableField` | findMany, findOne, create, update, delete |
 | `devicesModule` | findMany, findOne, create, update, delete |
 | `domainModule` | findMany, findOne, create, update, delete |
+| `emailSenderModule` | findMany, findOne, create, update, delete |
 | `emailsModule` | findMany, findOne, create, update, delete |
 | `entityTypeProvision` | findMany, findOne, create, update, delete |
 | `eventsModule` | findMany, findOne, create, update, delete |
+| `fileRefField` | findMany, findOne, create, update, delete |
 | `functionDeploymentModule` | findMany, findOne, create, update, delete |
 | `functionInvocationModule` | findMany, findOne, create, update, delete |
 | `functionModule` | findMany, findOne, create, update, delete |
@@ -69,8 +74,8 @@ const db = createClient({
 | `merkleStoreModule` | findMany, findOne, create, update, delete |
 | `namespaceModule` | findMany, findOne, create, update, delete |
 | `notificationsModule` | findMany, findOne, create, update, delete |
+| `oauthRequestsModule` | findMany, findOne, create, update, delete |
 | `pagesModule` | findMany, findOne, create, update, delete |
-| `permissionsModule` | findMany, findOne, create, update, delete |
 | `phoneNumbersModule` | findMany, findOne, create, update, delete |
 | `plansModule` | findMany, findOne, create, update, delete |
 | `principalAuthModule` | findMany, findOne, create, update, delete |
@@ -82,6 +87,7 @@ const db = createClient({
 | `resourceModule` | findMany, findOne, create, update, delete |
 | `rlsModule` | findMany, findOne, create, update, delete |
 | `routeModule` | findMany, findOne, create, update, delete |
+| `scopeTypesModule` | findMany, findOne, create, update, delete |
 | `secureTableProvision` | findMany, findOne, create, update, delete |
 | `sessionSecretsModule` | findMany, findOne, create, update, delete |
 | `sessionsModule` | findMany, findOne, create, update, delete |
@@ -92,6 +98,7 @@ const db = createClient({
 | `userAuthModule` | findMany, findOne, create, update, delete |
 | `userCredentialsModule` | findMany, findOne, create, update, delete |
 | `userSettingsModule` | findMany, findOne, create, update, delete |
+| `userSettingsSecurityModule` | findMany, findOne, create, update, delete |
 | `userStateModule` | findMany, findOne, create, update, delete |
 | `usersModule` | findMany, findOne, create, update, delete |
 | `webauthnAuthModule` | findMany, findOne, create, update, delete |
@@ -112,7 +119,7 @@ CRUD operations for AgentModule records.
 | `agentTableName` | String | Yes |
 | `apiName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `hasAgents` | Boolean | Yes |
@@ -149,13 +156,13 @@ CRUD operations for AgentModule records.
 
 ```typescript
 // List all agentModule records
-const items = await db.agentModule.findMany({ select: { agentTableId: true, agentTableName: true, apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, hasAgents: true, hasPlans: true, hasResources: true, id: true, messageTableId: true, messageTableName: true, personaTableId: true, personaTableName: true, planTableId: true, planTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, promptsTableId: true, promptsTableName: true, provisions: true, publicSchemaName: true, resourceTableId: true, resourceTableName: true, resources: true, schemaId: true, scope: true, shared: true, taskTableId: true, taskTableName: true, threadTableId: true, threadTableName: true } }).execute();
+const items = await db.agentModule.findMany({ select: { agentTableId: true, agentTableName: true, apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, hasAgents: true, hasPlans: true, hasResources: true, id: true, messageTableId: true, messageTableName: true, personaTableId: true, personaTableName: true, planTableId: true, planTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, promptsTableId: true, promptsTableName: true, provisions: true, publicSchemaName: true, resourceTableId: true, resourceTableName: true, resources: true, schemaId: true, scope: true, shared: true, taskTableId: true, taskTableName: true, threadTableId: true, threadTableName: true } }).execute();
 
 // Get one by id
-const item = await db.agentModule.findOne({ id: '<UUID>', select: { agentTableId: true, agentTableName: true, apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, hasAgents: true, hasPlans: true, hasResources: true, id: true, messageTableId: true, messageTableName: true, personaTableId: true, personaTableName: true, planTableId: true, planTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, promptsTableId: true, promptsTableName: true, provisions: true, publicSchemaName: true, resourceTableId: true, resourceTableName: true, resources: true, schemaId: true, scope: true, shared: true, taskTableId: true, taskTableName: true, threadTableId: true, threadTableName: true } }).execute();
+const item = await db.agentModule.findOne({ id: '<UUID>', select: { agentTableId: true, agentTableName: true, apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, hasAgents: true, hasPlans: true, hasResources: true, id: true, messageTableId: true, messageTableName: true, personaTableId: true, personaTableName: true, planTableId: true, planTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, promptsTableId: true, promptsTableName: true, provisions: true, publicSchemaName: true, resourceTableId: true, resourceTableName: true, resources: true, schemaId: true, scope: true, shared: true, taskTableId: true, taskTableName: true, threadTableId: true, threadTableName: true } }).execute();
 
 // Create
-const created = await db.agentModule.create({ data: { agentTableId: '<UUID>', agentTableName: '<String>', apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', hasAgents: '<Boolean>', hasPlans: '<Boolean>', hasResources: '<Boolean>', messageTableId: '<UUID>', messageTableName: '<String>', personaTableId: '<UUID>', personaTableName: '<String>', planTableId: '<UUID>', planTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', promptsTableId: '<UUID>', promptsTableName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', resourceTableId: '<UUID>', resourceTableName: '<String>', resources: '<JSON>', schemaId: '<UUID>', scope: '<String>', shared: '<Boolean>', taskTableId: '<UUID>', taskTableName: '<String>', threadTableId: '<UUID>', threadTableName: '<String>' }, select: { id: true } }).execute();
+const created = await db.agentModule.create({ data: { agentTableId: '<UUID>', agentTableName: '<String>', apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', hasAgents: '<Boolean>', hasPlans: '<Boolean>', hasResources: '<Boolean>', messageTableId: '<UUID>', messageTableName: '<String>', personaTableId: '<UUID>', personaTableName: '<String>', planTableId: '<UUID>', planTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', promptsTableId: '<UUID>', promptsTableName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', resourceTableId: '<UUID>', resourceTableName: '<String>', resources: '<JSON>', schemaId: '<UUID>', scope: '<String>', shared: '<Boolean>', taskTableId: '<UUID>', taskTableName: '<String>', threadTableId: '<UUID>', threadTableName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentModule.update({ where: { id: '<UUID>' }, data: { agentTableId: '<UUID>' }, select: { id: true } }).execute();
@@ -183,7 +190,7 @@ CRUD operations for ApiSurfaceModule records.
 | `corsSettingsTableId` | UUID | Yes |
 | `corsSettingsTableName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `id` | UUID | No |
@@ -199,13 +206,13 @@ CRUD operations for ApiSurfaceModule records.
 
 ```typescript
 // List all apiSurfaceModule records
-const items = await db.apiSurfaceModule.findMany({ select: { apiName: true, apiSchemasTableId: true, apiSchemasTableName: true, apiSettingsTableId: true, apiSettingsTableName: true, apisTableId: true, apisTableName: true, catalogModuleId: true, corsSettingsTableId: true, corsSettingsTableName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const items = await db.apiSurfaceModule.findMany({ select: { apiName: true, apiSchemasTableId: true, apiSchemasTableName: true, apiSettingsTableId: true, apiSettingsTableName: true, apisTableId: true, apisTableName: true, catalogModuleId: true, corsSettingsTableId: true, corsSettingsTableName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.apiSurfaceModule.findOne({ id: '<UUID>', select: { apiName: true, apiSchemasTableId: true, apiSchemasTableName: true, apiSettingsTableId: true, apiSettingsTableName: true, apisTableId: true, apisTableName: true, catalogModuleId: true, corsSettingsTableId: true, corsSettingsTableName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const item = await db.apiSurfaceModule.findOne({ id: '<UUID>', select: { apiName: true, apiSchemasTableId: true, apiSchemasTableName: true, apiSettingsTableId: true, apiSettingsTableName: true, apisTableId: true, apisTableName: true, catalogModuleId: true, corsSettingsTableId: true, corsSettingsTableName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.apiSurfaceModule.create({ data: { apiName: '<String>', apiSchemasTableId: '<UUID>', apiSchemasTableName: '<String>', apiSettingsTableId: '<UUID>', apiSettingsTableName: '<String>', apisTableId: '<UUID>', apisTableName: '<String>', catalogModuleId: '<UUID>', corsSettingsTableId: '<UUID>', corsSettingsTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.apiSurfaceModule.create({ data: { apiName: '<String>', apiSchemasTableId: '<UUID>', apiSchemasTableName: '<String>', apiSettingsTableId: '<UUID>', apiSettingsTableName: '<String>', apisTableId: '<UUID>', apisTableName: '<String>', catalogModuleId: '<UUID>', corsSettingsTableId: '<UUID>', corsSettingsTableName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.apiSurfaceModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -229,7 +236,7 @@ CRUD operations for AppModule records.
 | `appsTableName` | String | Yes |
 | `catalogModuleId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `id` | UUID | No |
@@ -247,13 +254,13 @@ CRUD operations for AppModule records.
 
 ```typescript
 // List all appModule records
-const items = await db.appModule.findMany({ select: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const items = await db.appModule.findMany({ select: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.appModule.findOne({ id: '<UUID>', select: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const item = await db.appModule.findOne({ id: '<UUID>', select: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.appModule.create({ data: { apiName: '<String>', appComponentsTableId: '<UUID>', appComponentsTableName: '<String>', appsTableId: '<UUID>', appsTableName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.appModule.create({ data: { apiName: '<String>', appComponentsTableId: '<UUID>', appComponentsTableName: '<String>', appsTableId: '<UUID>', appsTableName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.appModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -274,8 +281,8 @@ CRUD operations for BillingModule records.
 | `balancesTableId` | UUID | Yes |
 | `balancesTableName` | String | Yes |
 | `databaseId` | UUID | Yes |
+| `defaultCapabilities` | String | Yes |
 | `defaultMeterCatalog` | JSON | Yes |
-| `defaultPermissions` | String | Yes |
 | `id` | UUID | No |
 | `ledgerTableId` | UUID | Yes |
 | `ledgerTableName` | String | Yes |
@@ -303,13 +310,13 @@ CRUD operations for BillingModule records.
 
 ```typescript
 // List all billingModule records
-const items = await db.billingModule.findMany({ select: { apiName: true, balancesTableId: true, balancesTableName: true, databaseId: true, defaultMeterCatalog: true, defaultPermissions: true, id: true, ledgerTableId: true, ledgerTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordUsageFunction: true, rollupUsageSummaryFunction: true, schemaId: true, sweepExpiredSubscriptionsFunction: true } }).execute();
+const items = await db.billingModule.findMany({ select: { apiName: true, balancesTableId: true, balancesTableName: true, databaseId: true, defaultCapabilities: true, defaultMeterCatalog: true, id: true, ledgerTableId: true, ledgerTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordUsageFunction: true, rollupUsageSummaryFunction: true, schemaId: true, sweepExpiredSubscriptionsFunction: true } }).execute();
 
 // Get one by id
-const item = await db.billingModule.findOne({ id: '<UUID>', select: { apiName: true, balancesTableId: true, balancesTableName: true, databaseId: true, defaultMeterCatalog: true, defaultPermissions: true, id: true, ledgerTableId: true, ledgerTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordUsageFunction: true, rollupUsageSummaryFunction: true, schemaId: true, sweepExpiredSubscriptionsFunction: true } }).execute();
+const item = await db.billingModule.findOne({ id: '<UUID>', select: { apiName: true, balancesTableId: true, balancesTableName: true, databaseId: true, defaultCapabilities: true, defaultMeterCatalog: true, id: true, ledgerTableId: true, ledgerTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordUsageFunction: true, rollupUsageSummaryFunction: true, schemaId: true, sweepExpiredSubscriptionsFunction: true } }).execute();
 
 // Create
-const created = await db.billingModule.create({ data: { apiName: '<String>', balancesTableId: '<UUID>', balancesTableName: '<String>', databaseId: '<UUID>', defaultMeterCatalog: '<JSON>', defaultPermissions: '<String>', ledgerTableId: '<UUID>', ledgerTableName: '<String>', meterCreditsTableId: '<UUID>', meterCreditsTableName: '<String>', meterDefaultsTableId: '<UUID>', meterDefaultsTableName: '<String>', meterSourcesTableId: '<UUID>', meterSourcesTableName: '<String>', metersTableId: '<UUID>', metersTableName: '<String>', planSubscriptionsTableId: '<UUID>', planSubscriptionsTableName: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', recordUsageFunction: '<String>', rollupUsageSummaryFunction: '<String>', schemaId: '<UUID>', sweepExpiredSubscriptionsFunction: '<String>' }, select: { id: true } }).execute();
+const created = await db.billingModule.create({ data: { apiName: '<String>', balancesTableId: '<UUID>', balancesTableName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', defaultMeterCatalog: '<JSON>', ledgerTableId: '<UUID>', ledgerTableName: '<String>', meterCreditsTableId: '<UUID>', meterCreditsTableName: '<String>', meterDefaultsTableId: '<UUID>', meterDefaultsTableName: '<String>', meterSourcesTableId: '<UUID>', meterSourcesTableName: '<String>', metersTableId: '<UUID>', metersTableName: '<String>', planSubscriptionsTableId: '<UUID>', planSubscriptionsTableName: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', recordUsageFunction: '<String>', rollupUsageSummaryFunction: '<String>', schemaId: '<UUID>', sweepExpiredSubscriptionsFunction: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.billingModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -329,16 +336,22 @@ CRUD operations for BillingProviderModule records.
 | `apiName` | String | Yes |
 | `billingCustomersTableId` | UUID | Yes |
 | `billingCustomersTableName` | String | Yes |
+| `billingInvoicesTableId` | UUID | Yes |
+| `billingInvoicesTableName` | String | Yes |
 | `billingPricesTableId` | UUID | Yes |
 | `billingPricesTableName` | String | Yes |
 | `billingProductsTableId` | UUID | Yes |
 | `billingProductsTableName` | String | Yes |
+| `billingRefundsTableId` | UUID | Yes |
+| `billingRefundsTableName` | String | Yes |
 | `billingSubscriptionsTableId` | UUID | Yes |
 | `billingSubscriptionsTableName` | String | Yes |
 | `billingWebhookEventsTableId` | UUID | Yes |
 | `billingWebhookEventsTableName` | String | Yes |
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
+| `listPendingUsageSyncFunction` | String | Yes |
+| `markUsageSyncedFunction` | String | Yes |
 | `prefix` | String | Yes |
 | `pricesTableId` | UUID | Yes |
 | `privateApiName` | String | Yes |
@@ -346,20 +359,22 @@ CRUD operations for BillingProviderModule records.
 | `processBillingEventFunction` | String | Yes |
 | `productsTableId` | UUID | Yes |
 | `provider` | String | Yes |
+| `recordRefundFunction` | String | Yes |
 | `schemaId` | UUID | Yes |
 | `subscriptionsTableId` | UUID | Yes |
+| `upsertInvoiceFunction` | String | Yes |
 
 **Operations:**
 
 ```typescript
 // List all billingProviderModule records
-const items = await db.billingProviderModule.findMany({ select: { apiName: true, billingCustomersTableId: true, billingCustomersTableName: true, billingPricesTableId: true, billingPricesTableName: true, billingProductsTableId: true, billingProductsTableName: true, billingSubscriptionsTableId: true, billingSubscriptionsTableName: true, billingWebhookEventsTableId: true, billingWebhookEventsTableName: true, databaseId: true, id: true, prefix: true, pricesTableId: true, privateApiName: true, privateSchemaId: true, processBillingEventFunction: true, productsTableId: true, provider: true, schemaId: true, subscriptionsTableId: true } }).execute();
+const items = await db.billingProviderModule.findMany({ select: { apiName: true, billingCustomersTableId: true, billingCustomersTableName: true, billingInvoicesTableId: true, billingInvoicesTableName: true, billingPricesTableId: true, billingPricesTableName: true, billingProductsTableId: true, billingProductsTableName: true, billingRefundsTableId: true, billingRefundsTableName: true, billingSubscriptionsTableId: true, billingSubscriptionsTableName: true, billingWebhookEventsTableId: true, billingWebhookEventsTableName: true, databaseId: true, id: true, listPendingUsageSyncFunction: true, markUsageSyncedFunction: true, prefix: true, pricesTableId: true, privateApiName: true, privateSchemaId: true, processBillingEventFunction: true, productsTableId: true, provider: true, recordRefundFunction: true, schemaId: true, subscriptionsTableId: true, upsertInvoiceFunction: true } }).execute();
 
 // Get one by id
-const item = await db.billingProviderModule.findOne({ id: '<UUID>', select: { apiName: true, billingCustomersTableId: true, billingCustomersTableName: true, billingPricesTableId: true, billingPricesTableName: true, billingProductsTableId: true, billingProductsTableName: true, billingSubscriptionsTableId: true, billingSubscriptionsTableName: true, billingWebhookEventsTableId: true, billingWebhookEventsTableName: true, databaseId: true, id: true, prefix: true, pricesTableId: true, privateApiName: true, privateSchemaId: true, processBillingEventFunction: true, productsTableId: true, provider: true, schemaId: true, subscriptionsTableId: true } }).execute();
+const item = await db.billingProviderModule.findOne({ id: '<UUID>', select: { apiName: true, billingCustomersTableId: true, billingCustomersTableName: true, billingInvoicesTableId: true, billingInvoicesTableName: true, billingPricesTableId: true, billingPricesTableName: true, billingProductsTableId: true, billingProductsTableName: true, billingRefundsTableId: true, billingRefundsTableName: true, billingSubscriptionsTableId: true, billingSubscriptionsTableName: true, billingWebhookEventsTableId: true, billingWebhookEventsTableName: true, databaseId: true, id: true, listPendingUsageSyncFunction: true, markUsageSyncedFunction: true, prefix: true, pricesTableId: true, privateApiName: true, privateSchemaId: true, processBillingEventFunction: true, productsTableId: true, provider: true, recordRefundFunction: true, schemaId: true, subscriptionsTableId: true, upsertInvoiceFunction: true } }).execute();
 
 // Create
-const created = await db.billingProviderModule.create({ data: { apiName: '<String>', billingCustomersTableId: '<UUID>', billingCustomersTableName: '<String>', billingPricesTableId: '<UUID>', billingPricesTableName: '<String>', billingProductsTableId: '<UUID>', billingProductsTableName: '<String>', billingSubscriptionsTableId: '<UUID>', billingSubscriptionsTableName: '<String>', billingWebhookEventsTableId: '<UUID>', billingWebhookEventsTableName: '<String>', databaseId: '<UUID>', prefix: '<String>', pricesTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', processBillingEventFunction: '<String>', productsTableId: '<UUID>', provider: '<String>', schemaId: '<UUID>', subscriptionsTableId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.billingProviderModule.create({ data: { apiName: '<String>', billingCustomersTableId: '<UUID>', billingCustomersTableName: '<String>', billingInvoicesTableId: '<UUID>', billingInvoicesTableName: '<String>', billingPricesTableId: '<UUID>', billingPricesTableName: '<String>', billingProductsTableId: '<UUID>', billingProductsTableName: '<String>', billingRefundsTableId: '<UUID>', billingRefundsTableName: '<String>', billingSubscriptionsTableId: '<UUID>', billingSubscriptionsTableName: '<String>', billingWebhookEventsTableId: '<UUID>', billingWebhookEventsTableName: '<String>', databaseId: '<UUID>', listPendingUsageSyncFunction: '<String>', markUsageSyncedFunction: '<String>', prefix: '<String>', pricesTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', processBillingEventFunction: '<String>', productsTableId: '<UUID>', provider: '<String>', recordRefundFunction: '<String>', schemaId: '<UUID>', subscriptionsTableId: '<UUID>', upsertInvoiceFunction: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.billingProviderModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -495,6 +510,56 @@ const updated = await db.blueprintTemplate.update({ where: { id: '<UUID>' }, dat
 const deleted = await db.blueprintTemplate.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.capabilitiesModule`
+
+CRUD operations for CapabilitiesModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorTableId` | UUID | Yes |
+| `apiName` | String | Yes |
+| `bitlen` | Int | Yes |
+| `databaseId` | UUID | Yes |
+| `defaultTableId` | UUID | Yes |
+| `defaultTableName` | String | Yes |
+| `entityField` | String | Yes |
+| `entityTableId` | UUID | Yes |
+| `getByMask` | String | Yes |
+| `getMask` | String | Yes |
+| `getMaskByName` | String | Yes |
+| `getPaddedMask` | String | Yes |
+| `id` | UUID | No |
+| `prefix` | String | Yes |
+| `privateApiName` | String | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `privateSchemaName` | String | Yes |
+| `publicSchemaName` | String | Yes |
+| `schemaId` | UUID | Yes |
+| `scope` | String | Yes |
+| `tableId` | UUID | Yes |
+| `tableName` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all capabilitiesModule records
+const items = await db.capabilitiesModule.findMany({ select: { actorTableId: true, apiName: true, bitlen: true, databaseId: true, defaultTableId: true, defaultTableName: true, entityField: true, entityTableId: true, getByMask: true, getMask: true, getMaskByName: true, getPaddedMask: true, id: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
+
+// Get one by id
+const item = await db.capabilitiesModule.findOne({ id: '<UUID>', select: { actorTableId: true, apiName: true, bitlen: true, databaseId: true, defaultTableId: true, defaultTableName: true, entityField: true, entityTableId: true, getByMask: true, getMask: true, getMaskByName: true, getPaddedMask: true, id: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
+
+// Create
+const created = await db.capabilitiesModule.create({ data: { actorTableId: '<UUID>', apiName: '<String>', bitlen: '<Int>', databaseId: '<UUID>', defaultTableId: '<UUID>', defaultTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', getByMask: '<String>', getMask: '<String>', getMaskByName: '<String>', getPaddedMask: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.capabilitiesModule.update({ where: { id: '<UUID>' }, data: { actorTableId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.capabilitiesModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.catalogModule`
 
 CRUD operations for CatalogModule records.
@@ -508,10 +573,12 @@ CRUD operations for CatalogModule records.
 | `apisTableName` | String | Yes |
 | `appsTableId` | UUID | Yes |
 | `appsTableName` | String | Yes |
+| `bindingsTableId` | UUID | Yes |
+| `bindingsTableName` | String | Yes |
 | `bucketsTableId` | UUID | Yes |
 | `bucketsTableName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `domainsTableId` | UUID | Yes |
 | `domainsTableName` | String | Yes |
 | `entityTableId` | UUID | Yes |
@@ -547,13 +614,13 @@ CRUD operations for CatalogModule records.
 
 ```typescript
 // List all catalogModule records
-const items = await db.catalogModule.findMany({ select: { apiName: true, apisTableId: true, apisTableName: true, appsTableId: true, appsTableName: true, bucketsTableId: true, bucketsTableName: true, databaseId: true, defaultPermissions: true, domainsTableId: true, domainsTableName: true, entityTableId: true, functionsTableId: true, functionsTableName: true, id: true, namespacesTableId: true, namespacesTableName: true, policies: true, privateApiName: true, provisions: true, publicSchemaName: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourcesTableId: true, resourcesTableName: true, schemaId: true, scope: true, sitesAppLinksTableId: true, sitesAppLinksTableName: true, sitesDeepLinksTableId: true, sitesDeepLinksTableName: true, sitesErrorPagesTableId: true, sitesErrorPagesTableName: true, sitesTableId: true, sitesTableName: true, sitesWebConfigTableId: true, sitesWebConfigTableName: true } }).execute();
+const items = await db.catalogModule.findMany({ select: { apiName: true, apisTableId: true, apisTableName: true, appsTableId: true, appsTableName: true, bindingsTableId: true, bindingsTableName: true, bucketsTableId: true, bucketsTableName: true, databaseId: true, defaultCapabilities: true, domainsTableId: true, domainsTableName: true, entityTableId: true, functionsTableId: true, functionsTableName: true, id: true, namespacesTableId: true, namespacesTableName: true, policies: true, privateApiName: true, provisions: true, publicSchemaName: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourcesTableId: true, resourcesTableName: true, schemaId: true, scope: true, sitesAppLinksTableId: true, sitesAppLinksTableName: true, sitesDeepLinksTableId: true, sitesDeepLinksTableName: true, sitesErrorPagesTableId: true, sitesErrorPagesTableName: true, sitesTableId: true, sitesTableName: true, sitesWebConfigTableId: true, sitesWebConfigTableName: true } }).execute();
 
 // Get one by id
-const item = await db.catalogModule.findOne({ id: '<UUID>', select: { apiName: true, apisTableId: true, apisTableName: true, appsTableId: true, appsTableName: true, bucketsTableId: true, bucketsTableName: true, databaseId: true, defaultPermissions: true, domainsTableId: true, domainsTableName: true, entityTableId: true, functionsTableId: true, functionsTableName: true, id: true, namespacesTableId: true, namespacesTableName: true, policies: true, privateApiName: true, provisions: true, publicSchemaName: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourcesTableId: true, resourcesTableName: true, schemaId: true, scope: true, sitesAppLinksTableId: true, sitesAppLinksTableName: true, sitesDeepLinksTableId: true, sitesDeepLinksTableName: true, sitesErrorPagesTableId: true, sitesErrorPagesTableName: true, sitesTableId: true, sitesTableName: true, sitesWebConfigTableId: true, sitesWebConfigTableName: true } }).execute();
+const item = await db.catalogModule.findOne({ id: '<UUID>', select: { apiName: true, apisTableId: true, apisTableName: true, appsTableId: true, appsTableName: true, bindingsTableId: true, bindingsTableName: true, bucketsTableId: true, bucketsTableName: true, databaseId: true, defaultCapabilities: true, domainsTableId: true, domainsTableName: true, entityTableId: true, functionsTableId: true, functionsTableName: true, id: true, namespacesTableId: true, namespacesTableName: true, policies: true, privateApiName: true, provisions: true, publicSchemaName: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourcesTableId: true, resourcesTableName: true, schemaId: true, scope: true, sitesAppLinksTableId: true, sitesAppLinksTableName: true, sitesDeepLinksTableId: true, sitesDeepLinksTableName: true, sitesErrorPagesTableId: true, sitesErrorPagesTableName: true, sitesTableId: true, sitesTableName: true, sitesWebConfigTableId: true, sitesWebConfigTableName: true } }).execute();
 
 // Create
-const created = await db.catalogModule.create({ data: { apiName: '<String>', apisTableId: '<UUID>', apisTableName: '<String>', appsTableId: '<UUID>', appsTableName: '<String>', bucketsTableId: '<UUID>', bucketsTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', domainsTableId: '<UUID>', domainsTableName: '<String>', entityTableId: '<UUID>', functionsTableId: '<UUID>', functionsTableName: '<String>', namespacesTableId: '<UUID>', namespacesTableName: '<String>', policies: '<JSON>', privateApiName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', resourceDefinitionsTableId: '<UUID>', resourceDefinitionsTableName: '<String>', resourceInstallationsTableId: '<UUID>', resourceInstallationsTableName: '<String>', resourcesTableId: '<UUID>', resourcesTableName: '<String>', schemaId: '<UUID>', scope: '<String>', sitesAppLinksTableId: '<UUID>', sitesAppLinksTableName: '<String>', sitesDeepLinksTableId: '<UUID>', sitesDeepLinksTableName: '<String>', sitesErrorPagesTableId: '<UUID>', sitesErrorPagesTableName: '<String>', sitesTableId: '<UUID>', sitesTableName: '<String>', sitesWebConfigTableId: '<UUID>', sitesWebConfigTableName: '<String>' }, select: { id: true } }).execute();
+const created = await db.catalogModule.create({ data: { apiName: '<String>', apisTableId: '<UUID>', apisTableName: '<String>', appsTableId: '<UUID>', appsTableName: '<String>', bindingsTableId: '<UUID>', bindingsTableName: '<String>', bucketsTableId: '<UUID>', bucketsTableName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', domainsTableId: '<UUID>', domainsTableName: '<String>', entityTableId: '<UUID>', functionsTableId: '<UUID>', functionsTableName: '<String>', namespacesTableId: '<UUID>', namespacesTableName: '<String>', policies: '<JSON>', privateApiName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', resourceDefinitionsTableId: '<UUID>', resourceDefinitionsTableName: '<String>', resourceInstallationsTableId: '<UUID>', resourceInstallationsTableName: '<String>', resourcesTableId: '<UUID>', resourcesTableName: '<String>', schemaId: '<UUID>', scope: '<String>', sitesAppLinksTableId: '<UUID>', sitesAppLinksTableName: '<String>', sitesDeepLinksTableId: '<UUID>', sitesDeepLinksTableName: '<String>', sitesErrorPagesTableId: '<UUID>', sitesErrorPagesTableName: '<String>', sitesTableId: '<UUID>', sitesTableName: '<String>', sitesWebConfigTableId: '<UUID>', sitesWebConfigTableName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.catalogModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -683,6 +750,51 @@ const updated = await db.connectedAccountsModule.update({ where: { id: '<UUID>' 
 const deleted = await db.connectedAccountsModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.contentPresetModule`
+
+CRUD operations for ContentPresetModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `apiName` | String | Yes |
+| `contentPresetsTableId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `entityTableId` | UUID | Yes |
+| `id` | UUID | No |
+| `merkleStoreModuleId` | UUID | Yes |
+| `policies` | JSON | Yes |
+| `prefix` | String | Yes |
+| `privateApiName` | String | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `privateSchemaName` | String | Yes |
+| `provisions` | JSON | Yes |
+| `publicSchemaId` | UUID | Yes |
+| `publicSchemaName` | String | Yes |
+| `scope` | String | Yes |
+| `storeName` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all contentPresetModule records
+const items = await db.contentPresetModule.findMany({ select: { apiName: true, contentPresetsTableId: true, createdAt: true, databaseId: true, entityTableId: true, id: true, merkleStoreModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaId: true, publicSchemaName: true, scope: true, storeName: true } }).execute();
+
+// Get one by id
+const item = await db.contentPresetModule.findOne({ id: '<UUID>', select: { apiName: true, contentPresetsTableId: true, createdAt: true, databaseId: true, entityTableId: true, id: true, merkleStoreModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaId: true, publicSchemaName: true, scope: true, storeName: true } }).execute();
+
+// Create
+const created = await db.contentPresetModule.create({ data: { apiName: '<String>', contentPresetsTableId: '<UUID>', databaseId: '<UUID>', entityTableId: '<UUID>', merkleStoreModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaId: '<UUID>', publicSchemaName: '<String>', scope: '<String>', storeName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.contentPresetModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.contentPresetModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.cryptoAddressesModule`
 
 CRUD operations for CryptoAddressesModule records.
@@ -763,6 +875,45 @@ const updated = await db.cryptoAuthModule.update({ where: { id: '<UUID>' }, data
 const deleted = await db.cryptoAuthModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.dataCapabilitiesField`
+
+CRUD operations for DataCapabilitiesField records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `capabilitiesModuleId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `fieldId` | UUID | Yes |
+| `fromFieldId` | UUID | Yes |
+| `id` | UUID | No |
+| `mappingFieldId` | UUID | Yes |
+| `mappingKeyFieldId` | UUID | Yes |
+| `mappingTableId` | UUID | Yes |
+| `mode` | String | Yes |
+| `subsetGuard` | Boolean | Yes |
+| `tableId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all dataCapabilitiesField records
+const items = await db.dataCapabilitiesField.findMany({ select: { capabilitiesModuleId: true, databaseId: true, fieldId: true, fromFieldId: true, id: true, mappingFieldId: true, mappingKeyFieldId: true, mappingTableId: true, mode: true, subsetGuard: true, tableId: true } }).execute();
+
+// Get one by id
+const item = await db.dataCapabilitiesField.findOne({ id: '<UUID>', select: { capabilitiesModuleId: true, databaseId: true, fieldId: true, fromFieldId: true, id: true, mappingFieldId: true, mappingKeyFieldId: true, mappingTableId: true, mode: true, subsetGuard: true, tableId: true } }).execute();
+
+// Create
+const created = await db.dataCapabilitiesField.create({ data: { capabilitiesModuleId: '<UUID>', databaseId: '<UUID>', fieldId: '<UUID>', fromFieldId: '<UUID>', mappingFieldId: '<UUID>', mappingKeyFieldId: '<UUID>', mappingTableId: '<UUID>', mode: '<String>', subsetGuard: '<Boolean>', tableId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.dataCapabilitiesField.update({ where: { id: '<UUID>' }, data: { capabilitiesModuleId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.dataCapabilitiesField.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.databaseProvisionModule`
 
 CRUD operations for DatabaseProvisionModule records.
@@ -822,7 +973,7 @@ CRUD operations for DatabaseSettingsModule records.
 | `databaseId` | UUID | Yes |
 | `databaseSettingsTableId` | UUID | Yes |
 | `databaseSettingsTableName` | String | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `id` | UUID | No |
@@ -844,13 +995,13 @@ CRUD operations for DatabaseSettingsModule records.
 
 ```typescript
 // List all databaseSettingsModule records
-const items = await db.databaseSettingsModule.findMany({ select: { apiName: true, databaseId: true, databaseSettingsTableId: true, databaseSettingsTableName: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, pubkeySettingsTableId: true, pubkeySettingsTableName: true, publicSchemaName: true, rlsSettingsTableId: true, rlsSettingsTableName: true, schemaId: true, scope: true, webauthnSettingsTableId: true, webauthnSettingsTableName: true } }).execute();
+const items = await db.databaseSettingsModule.findMany({ select: { apiName: true, databaseId: true, databaseSettingsTableId: true, databaseSettingsTableName: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, pubkeySettingsTableId: true, pubkeySettingsTableName: true, publicSchemaName: true, rlsSettingsTableId: true, rlsSettingsTableName: true, schemaId: true, scope: true, webauthnSettingsTableId: true, webauthnSettingsTableName: true } }).execute();
 
 // Get one by id
-const item = await db.databaseSettingsModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, databaseSettingsTableId: true, databaseSettingsTableName: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, pubkeySettingsTableId: true, pubkeySettingsTableName: true, publicSchemaName: true, rlsSettingsTableId: true, rlsSettingsTableName: true, schemaId: true, scope: true, webauthnSettingsTableId: true, webauthnSettingsTableName: true } }).execute();
+const item = await db.databaseSettingsModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, databaseSettingsTableId: true, databaseSettingsTableName: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, pubkeySettingsTableId: true, pubkeySettingsTableName: true, publicSchemaName: true, rlsSettingsTableId: true, rlsSettingsTableName: true, schemaId: true, scope: true, webauthnSettingsTableId: true, webauthnSettingsTableName: true } }).execute();
 
 // Create
-const created = await db.databaseSettingsModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', databaseSettingsTableId: '<UUID>', databaseSettingsTableName: '<String>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', provisions: '<JSON>', pubkeySettingsTableId: '<UUID>', pubkeySettingsTableName: '<String>', publicSchemaName: '<String>', rlsSettingsTableId: '<UUID>', rlsSettingsTableName: '<String>', schemaId: '<UUID>', scope: '<String>', webauthnSettingsTableId: '<UUID>', webauthnSettingsTableName: '<String>' }, select: { id: true } }).execute();
+const created = await db.databaseSettingsModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', databaseSettingsTableId: '<UUID>', databaseSettingsTableName: '<String>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', provisions: '<JSON>', pubkeySettingsTableId: '<UUID>', pubkeySettingsTableName: '<String>', publicSchemaName: '<String>', rlsSettingsTableId: '<UUID>', rlsSettingsTableName: '<String>', schemaId: '<UUID>', scope: '<String>', webauthnSettingsTableId: '<UUID>', webauthnSettingsTableName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.databaseSettingsModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -995,7 +1146,7 @@ CRUD operations for DbUsageModule records.
 | `collectDbQueryStatsFunction` | String | Yes |
 | `collectDbTableStatsFunction` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `id` | UUID | No |
 | `interval` | String | Yes |
@@ -1023,13 +1174,13 @@ CRUD operations for DbUsageModule records.
 
 ```typescript
 // List all dbUsageModule records
-const items = await db.dbUsageModule.findMany({ select: { apiName: true, collectDbQueryStatsFunction: true, collectDbTableStatsFunction: true, databaseId: true, defaultPermissions: true, entityField: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, queryStatsLogTableId: true, queryStatsLogTableName: true, queryStatsSummaryTableId: true, queryStatsSummaryTableName: true, retention: true, rollupDbQueryStatsUsageSummaryFunction: true, rollupDbTableStatsUsageSummaryFunction: true, schemaId: true, scope: true, tableStatsLogTableId: true, tableStatsLogTableName: true, tableStatsSummaryTableId: true, tableStatsSummaryTableName: true } }).execute();
+const items = await db.dbUsageModule.findMany({ select: { apiName: true, collectDbQueryStatsFunction: true, collectDbTableStatsFunction: true, databaseId: true, defaultCapabilities: true, entityField: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, queryStatsLogTableId: true, queryStatsLogTableName: true, queryStatsSummaryTableId: true, queryStatsSummaryTableName: true, retention: true, rollupDbQueryStatsUsageSummaryFunction: true, rollupDbTableStatsUsageSummaryFunction: true, schemaId: true, scope: true, tableStatsLogTableId: true, tableStatsLogTableName: true, tableStatsSummaryTableId: true, tableStatsSummaryTableName: true } }).execute();
 
 // Get one by id
-const item = await db.dbUsageModule.findOne({ id: '<UUID>', select: { apiName: true, collectDbQueryStatsFunction: true, collectDbTableStatsFunction: true, databaseId: true, defaultPermissions: true, entityField: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, queryStatsLogTableId: true, queryStatsLogTableName: true, queryStatsSummaryTableId: true, queryStatsSummaryTableName: true, retention: true, rollupDbQueryStatsUsageSummaryFunction: true, rollupDbTableStatsUsageSummaryFunction: true, schemaId: true, scope: true, tableStatsLogTableId: true, tableStatsLogTableName: true, tableStatsSummaryTableId: true, tableStatsSummaryTableName: true } }).execute();
+const item = await db.dbUsageModule.findOne({ id: '<UUID>', select: { apiName: true, collectDbQueryStatsFunction: true, collectDbTableStatsFunction: true, databaseId: true, defaultCapabilities: true, entityField: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, queryStatsLogTableId: true, queryStatsLogTableName: true, queryStatsSummaryTableId: true, queryStatsSummaryTableName: true, retention: true, rollupDbQueryStatsUsageSummaryFunction: true, rollupDbTableStatsUsageSummaryFunction: true, schemaId: true, scope: true, tableStatsLogTableId: true, tableStatsLogTableName: true, tableStatsSummaryTableId: true, tableStatsSummaryTableName: true } }).execute();
 
 // Create
-const created = await db.dbUsageModule.create({ data: { apiName: '<String>', collectDbQueryStatsFunction: '<String>', collectDbTableStatsFunction: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', queryStatsLogTableId: '<UUID>', queryStatsLogTableName: '<String>', queryStatsSummaryTableId: '<UUID>', queryStatsSummaryTableName: '<String>', retention: '<String>', rollupDbQueryStatsUsageSummaryFunction: '<String>', rollupDbTableStatsUsageSummaryFunction: '<String>', schemaId: '<UUID>', scope: '<String>', tableStatsLogTableId: '<UUID>', tableStatsLogTableName: '<String>', tableStatsSummaryTableId: '<UUID>', tableStatsSummaryTableName: '<String>' }, select: { id: true } }).execute();
+const created = await db.dbUsageModule.create({ data: { apiName: '<String>', collectDbQueryStatsFunction: '<String>', collectDbTableStatsFunction: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', queryStatsLogTableId: '<UUID>', queryStatsLogTableName: '<String>', queryStatsSummaryTableId: '<UUID>', queryStatsSummaryTableName: '<String>', retention: '<String>', rollupDbQueryStatsUsageSummaryFunction: '<String>', rollupDbTableStatsUsageSummaryFunction: '<String>', schemaId: '<UUID>', scope: '<String>', tableStatsLogTableId: '<UUID>', tableStatsLogTableName: '<String>', tableStatsSummaryTableId: '<UUID>', tableStatsSummaryTableName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.dbUsageModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -1154,7 +1305,7 @@ CRUD operations for DomainModule records.
 | `apiName` | String | Yes |
 | `catalogModuleId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `domainEventsTableId` | UUID | Yes |
 | `domainEventsTableName` | String | Yes |
 | `domainVerificationsTableId` | UUID | Yes |
@@ -1180,19 +1331,67 @@ CRUD operations for DomainModule records.
 
 ```typescript
 // List all domainModule records
-const items = await db.domainModule.findMany({ select: { apiName: true, catalogModuleId: true, databaseId: true, defaultPermissions: true, domainEventsTableId: true, domainEventsTableName: true, domainVerificationsTableId: true, domainVerificationsTableName: true, domainsTableId: true, domainsTableName: true, entityField: true, entityTableId: true, id: true, managedDomainsTableId: true, managedDomainsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const items = await db.domainModule.findMany({ select: { apiName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, domainEventsTableId: true, domainEventsTableName: true, domainVerificationsTableId: true, domainVerificationsTableName: true, domainsTableId: true, domainsTableName: true, entityField: true, entityTableId: true, id: true, managedDomainsTableId: true, managedDomainsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.domainModule.findOne({ id: '<UUID>', select: { apiName: true, catalogModuleId: true, databaseId: true, defaultPermissions: true, domainEventsTableId: true, domainEventsTableName: true, domainVerificationsTableId: true, domainVerificationsTableName: true, domainsTableId: true, domainsTableName: true, entityField: true, entityTableId: true, id: true, managedDomainsTableId: true, managedDomainsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const item = await db.domainModule.findOne({ id: '<UUID>', select: { apiName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, domainEventsTableId: true, domainEventsTableName: true, domainVerificationsTableId: true, domainVerificationsTableName: true, domainsTableId: true, domainsTableName: true, entityField: true, entityTableId: true, id: true, managedDomainsTableId: true, managedDomainsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.domainModule.create({ data: { apiName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', defaultPermissions: '<String>', domainEventsTableId: '<UUID>', domainEventsTableName: '<String>', domainVerificationsTableId: '<UUID>', domainVerificationsTableName: '<String>', domainsTableId: '<UUID>', domainsTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', managedDomainsTableId: '<UUID>', managedDomainsTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.domainModule.create({ data: { apiName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', defaultCapabilities: '<String>', domainEventsTableId: '<UUID>', domainEventsTableName: '<String>', domainVerificationsTableId: '<UUID>', domainVerificationsTableName: '<String>', domainsTableId: '<UUID>', domainsTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', managedDomainsTableId: '<UUID>', managedDomainsTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.domainModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.domainModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.emailSenderModule`
+
+CRUD operations for EmailSenderModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `apiName` | String | Yes |
+| `databaseId` | UUID | Yes |
+| `defaultCapabilities` | String | Yes |
+| `emailIdentitiesTableId` | UUID | Yes |
+| `emailIdentitiesTableName` | String | Yes |
+| `emailProviderAccountsTableId` | UUID | Yes |
+| `emailProviderAccountsTableName` | String | Yes |
+| `emailSiteIdentitiesTableId` | UUID | Yes |
+| `emailSiteIdentitiesTableName` | String | Yes |
+| `entityField` | String | Yes |
+| `entityTableId` | UUID | Yes |
+| `id` | UUID | No |
+| `policies` | JSON | Yes |
+| `prefix` | String | Yes |
+| `privateApiName` | String | Yes |
+| `provisions` | JSON | Yes |
+| `publicSchemaName` | String | Yes |
+| `schemaId` | UUID | Yes |
+| `scope` | String | Yes |
+| `siteSurfaceModuleId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all emailSenderModule records
+const items = await db.emailSenderModule.findMany({ select: { apiName: true, databaseId: true, defaultCapabilities: true, emailIdentitiesTableId: true, emailIdentitiesTableName: true, emailProviderAccountsTableId: true, emailProviderAccountsTableName: true, emailSiteIdentitiesTableId: true, emailSiteIdentitiesTableName: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, siteSurfaceModuleId: true } }).execute();
+
+// Get one by id
+const item = await db.emailSenderModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultCapabilities: true, emailIdentitiesTableId: true, emailIdentitiesTableName: true, emailProviderAccountsTableId: true, emailProviderAccountsTableName: true, emailSiteIdentitiesTableId: true, emailSiteIdentitiesTableName: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, siteSurfaceModuleId: true } }).execute();
+
+// Create
+const created = await db.emailSenderModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', emailIdentitiesTableId: '<UUID>', emailIdentitiesTableName: '<String>', emailProviderAccountsTableId: '<UUID>', emailProviderAccountsTableName: '<String>', emailSiteIdentitiesTableId: '<UUID>', emailSiteIdentitiesTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', siteSurfaceModuleId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.emailSenderModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.emailSenderModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.emailsModule`
@@ -1312,7 +1511,7 @@ CRUD operations for EventsModule records.
 | `actorTableId` | UUID | Yes |
 | `apiName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `eventAggregatesTableId` | UUID | Yes |
@@ -1321,6 +1520,7 @@ CRUD operations for EventsModule records.
 | `eventTypesTableName` | String | Yes |
 | `eventsTableId` | UUID | Yes |
 | `eventsTableName` | String | Yes |
+| `expireGrants` | String | Yes |
 | `grantAchievement` | String | Yes |
 | `id` | UUID | No |
 | `interval` | String | Yes |
@@ -1337,9 +1537,11 @@ CRUD operations for EventsModule records.
 | `privateSchemaId` | UUID | Yes |
 | `privateSchemaName` | String | Yes |
 | `publicSchemaName` | String | Yes |
+| `recomputeCapabilities` | String | Yes |
 | `recordEvent` | String | Yes |
 | `removeEvent` | String | Yes |
 | `retention` | String | Yes |
+| `revokeAchievement` | String | Yes |
 | `schemaId` | UUID | Yes |
 | `scope` | String | Yes |
 | `stepsRequired` | String | Yes |
@@ -1349,26 +1551,65 @@ CRUD operations for EventsModule records.
 | `tgEventBool` | String | Yes |
 | `tgEventToggle` | String | Yes |
 | `tgEventToggleBool` | String | Yes |
+| `tgLevelGrantSync` | String | Yes |
 | `tgUpdateAggregates` | String | Yes |
+| `trustLadder` | JSON | Yes |
 | `upsertAggregate` | String | Yes |
 
 **Operations:**
 
 ```typescript
 // List all eventsModule records
-const items = await db.eventsModule.findMany({ select: { achievementRewardsTableId: true, achievementRewardsTableName: true, actorTableId: true, apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, eventAggregatesTableId: true, eventAggregatesTableName: true, eventTypesTableId: true, eventTypesTableName: true, eventsTableId: true, eventsTableName: true, grantAchievement: true, id: true, interval: true, levelAchieved: true, levelGrantsTableId: true, levelGrantsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, levelsTableId: true, levelsTableName: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordEvent: true, removeEvent: true, retention: true, schemaId: true, scope: true, stepsRequired: true, tgAchievementReward: true, tgCheckAchievements: true, tgEvent: true, tgEventBool: true, tgEventToggle: true, tgEventToggleBool: true, tgUpdateAggregates: true, upsertAggregate: true } }).execute();
+const items = await db.eventsModule.findMany({ select: { achievementRewardsTableId: true, achievementRewardsTableName: true, actorTableId: true, apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, eventAggregatesTableId: true, eventAggregatesTableName: true, eventTypesTableId: true, eventTypesTableName: true, eventsTableId: true, eventsTableName: true, expireGrants: true, grantAchievement: true, id: true, interval: true, levelAchieved: true, levelGrantsTableId: true, levelGrantsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, levelsTableId: true, levelsTableName: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recomputeCapabilities: true, recordEvent: true, removeEvent: true, retention: true, revokeAchievement: true, schemaId: true, scope: true, stepsRequired: true, tgAchievementReward: true, tgCheckAchievements: true, tgEvent: true, tgEventBool: true, tgEventToggle: true, tgEventToggleBool: true, tgLevelGrantSync: true, tgUpdateAggregates: true, trustLadder: true, upsertAggregate: true } }).execute();
 
 // Get one by id
-const item = await db.eventsModule.findOne({ id: '<UUID>', select: { achievementRewardsTableId: true, achievementRewardsTableName: true, actorTableId: true, apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, eventAggregatesTableId: true, eventAggregatesTableName: true, eventTypesTableId: true, eventTypesTableName: true, eventsTableId: true, eventsTableName: true, grantAchievement: true, id: true, interval: true, levelAchieved: true, levelGrantsTableId: true, levelGrantsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, levelsTableId: true, levelsTableName: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordEvent: true, removeEvent: true, retention: true, schemaId: true, scope: true, stepsRequired: true, tgAchievementReward: true, tgCheckAchievements: true, tgEvent: true, tgEventBool: true, tgEventToggle: true, tgEventToggleBool: true, tgUpdateAggregates: true, upsertAggregate: true } }).execute();
+const item = await db.eventsModule.findOne({ id: '<UUID>', select: { achievementRewardsTableId: true, achievementRewardsTableName: true, actorTableId: true, apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, eventAggregatesTableId: true, eventAggregatesTableName: true, eventTypesTableId: true, eventTypesTableName: true, eventsTableId: true, eventsTableName: true, expireGrants: true, grantAchievement: true, id: true, interval: true, levelAchieved: true, levelGrantsTableId: true, levelGrantsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, levelsTableId: true, levelsTableName: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recomputeCapabilities: true, recordEvent: true, removeEvent: true, retention: true, revokeAchievement: true, schemaId: true, scope: true, stepsRequired: true, tgAchievementReward: true, tgCheckAchievements: true, tgEvent: true, tgEventBool: true, tgEventToggle: true, tgEventToggleBool: true, tgLevelGrantSync: true, tgUpdateAggregates: true, trustLadder: true, upsertAggregate: true } }).execute();
 
 // Create
-const created = await db.eventsModule.create({ data: { achievementRewardsTableId: '<UUID>', achievementRewardsTableName: '<String>', actorTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', eventAggregatesTableId: '<UUID>', eventAggregatesTableName: '<String>', eventTypesTableId: '<UUID>', eventTypesTableName: '<String>', eventsTableId: '<UUID>', eventsTableName: '<String>', grantAchievement: '<String>', interval: '<String>', levelAchieved: '<String>', levelGrantsTableId: '<UUID>', levelGrantsTableName: '<String>', levelRequirementsTableId: '<UUID>', levelRequirementsTableName: '<String>', levelsTableId: '<UUID>', levelsTableName: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', recordEvent: '<String>', removeEvent: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', stepsRequired: '<String>', tgAchievementReward: '<String>', tgCheckAchievements: '<String>', tgEvent: '<String>', tgEventBool: '<String>', tgEventToggle: '<String>', tgEventToggleBool: '<String>', tgUpdateAggregates: '<String>', upsertAggregate: '<String>' }, select: { id: true } }).execute();
+const created = await db.eventsModule.create({ data: { achievementRewardsTableId: '<UUID>', achievementRewardsTableName: '<String>', actorTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', eventAggregatesTableId: '<UUID>', eventAggregatesTableName: '<String>', eventTypesTableId: '<UUID>', eventTypesTableName: '<String>', eventsTableId: '<UUID>', eventsTableName: '<String>', expireGrants: '<String>', grantAchievement: '<String>', interval: '<String>', levelAchieved: '<String>', levelGrantsTableId: '<UUID>', levelGrantsTableName: '<String>', levelRequirementsTableId: '<UUID>', levelRequirementsTableName: '<String>', levelsTableId: '<UUID>', levelsTableName: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', recomputeCapabilities: '<String>', recordEvent: '<String>', removeEvent: '<String>', retention: '<String>', revokeAchievement: '<String>', schemaId: '<UUID>', scope: '<String>', stepsRequired: '<String>', tgAchievementReward: '<String>', tgCheckAchievements: '<String>', tgEvent: '<String>', tgEventBool: '<String>', tgEventToggle: '<String>', tgEventToggleBool: '<String>', tgLevelGrantSync: '<String>', tgUpdateAggregates: '<String>', trustLadder: '<JSON>', upsertAggregate: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.eventsModule.update({ where: { id: '<UUID>' }, data: { achievementRewardsTableId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.eventsModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.fileRefField`
+
+CRUD operations for FileRefField records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `bucketKey` | String | Yes |
+| `bucketTags` | String | Yes |
+| `databaseId` | UUID | Yes |
+| `enforceFk` | Boolean | Yes |
+| `fieldId` | UUID | Yes |
+| `id` | UUID | No |
+| `isPublic` | Boolean | Yes |
+| `storageModuleId` | UUID | Yes |
+| `tableId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all fileRefField records
+const items = await db.fileRefField.findMany({ select: { bucketKey: true, bucketTags: true, databaseId: true, enforceFk: true, fieldId: true, id: true, isPublic: true, storageModuleId: true, tableId: true } }).execute();
+
+// Get one by id
+const item = await db.fileRefField.findOne({ id: '<UUID>', select: { bucketKey: true, bucketTags: true, databaseId: true, enforceFk: true, fieldId: true, id: true, isPublic: true, storageModuleId: true, tableId: true } }).execute();
+
+// Create
+const created = await db.fileRefField.create({ data: { bucketKey: '<String>', bucketTags: '<String>', databaseId: '<UUID>', enforceFk: '<Boolean>', fieldId: '<UUID>', isPublic: '<Boolean>', storageModuleId: '<UUID>', tableId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.fileRefField.update({ where: { id: '<UUID>' }, data: { bucketKey: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.fileRefField.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.functionDeploymentModule`
@@ -1381,7 +1622,7 @@ CRUD operations for FunctionDeploymentModule records.
 |-------|------|----------|
 | `apiName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `deploymentEventsTableId` | UUID | Yes |
 | `deploymentEventsTableName` | String | Yes |
 | `deploymentsTableId` | UUID | Yes |
@@ -1405,13 +1646,13 @@ CRUD operations for FunctionDeploymentModule records.
 
 ```typescript
 // List all functionDeploymentModule records
-const items = await db.functionDeploymentModule.findMany({ select: { apiName: true, databaseId: true, defaultPermissions: true, deploymentEventsTableId: true, deploymentEventsTableName: true, deploymentsTableId: true, deploymentsTableName: true, entityField: true, entityTableId: true, functionModuleId: true, id: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const items = await db.functionDeploymentModule.findMany({ select: { apiName: true, databaseId: true, defaultCapabilities: true, deploymentEventsTableId: true, deploymentEventsTableName: true, deploymentsTableId: true, deploymentsTableName: true, entityField: true, entityTableId: true, functionModuleId: true, id: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.functionDeploymentModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultPermissions: true, deploymentEventsTableId: true, deploymentEventsTableName: true, deploymentsTableId: true, deploymentsTableName: true, entityField: true, entityTableId: true, functionModuleId: true, id: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const item = await db.functionDeploymentModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultCapabilities: true, deploymentEventsTableId: true, deploymentEventsTableName: true, deploymentsTableId: true, deploymentsTableName: true, entityField: true, entityTableId: true, functionModuleId: true, id: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.functionDeploymentModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', deploymentEventsTableId: '<UUID>', deploymentEventsTableName: '<String>', deploymentsTableId: '<UUID>', deploymentsTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', functionModuleId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.functionDeploymentModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', deploymentEventsTableId: '<UUID>', deploymentEventsTableName: '<String>', deploymentsTableId: '<UUID>', deploymentsTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', functionModuleId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.functionDeploymentModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -1432,7 +1673,7 @@ CRUD operations for FunctionInvocationModule records.
 | `attemptsTableId` | UUID | Yes |
 | `attemptsTableName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `executionLogsTableId` | UUID | Yes |
@@ -1454,13 +1695,13 @@ CRUD operations for FunctionInvocationModule records.
 
 ```typescript
 // List all functionInvocationModule records
-const items = await db.functionInvocationModule.findMany({ select: { apiName: true, attemptsTableId: true, attemptsTableName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, executionLogsTableId: true, executionLogsTableName: true, id: true, invocationsTableId: true, invocationsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const items = await db.functionInvocationModule.findMany({ select: { apiName: true, attemptsTableId: true, attemptsTableName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, executionLogsTableId: true, executionLogsTableName: true, id: true, invocationsTableId: true, invocationsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.functionInvocationModule.findOne({ id: '<UUID>', select: { apiName: true, attemptsTableId: true, attemptsTableName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, executionLogsTableId: true, executionLogsTableName: true, id: true, invocationsTableId: true, invocationsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const item = await db.functionInvocationModule.findOne({ id: '<UUID>', select: { apiName: true, attemptsTableId: true, attemptsTableName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, executionLogsTableId: true, executionLogsTableName: true, id: true, invocationsTableId: true, invocationsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.functionInvocationModule.create({ data: { apiName: '<String>', attemptsTableId: '<UUID>', attemptsTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', executionLogsTableId: '<UUID>', executionLogsTableName: '<String>', invocationsTableId: '<UUID>', invocationsTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.functionInvocationModule.create({ data: { apiName: '<String>', attemptsTableId: '<UUID>', attemptsTableName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', executionLogsTableId: '<UUID>', executionLogsTableName: '<String>', invocationsTableId: '<UUID>', invocationsTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.functionInvocationModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -1482,7 +1723,7 @@ CRUD operations for FunctionModule records.
 | `bindingsTableName` | String | Yes |
 | `capabilityBindingsTableId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `definitionsTableId` | UUID | Yes |
 | `definitionsTableName` | String | Yes |
 | `entityField` | String | Yes |
@@ -1504,13 +1745,13 @@ CRUD operations for FunctionModule records.
 
 ```typescript
 // List all functionModule records
-const items = await db.functionModule.findMany({ select: { apiName: true, bindingsTableId: true, bindingsTableName: true, capabilityBindingsTableId: true, databaseId: true, defaultPermissions: true, definitionsTableId: true, definitionsTableName: true, entityField: true, entityTableId: true, hasCron: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schedulesTableId: true, schemaId: true, scope: true } }).execute();
+const items = await db.functionModule.findMany({ select: { apiName: true, bindingsTableId: true, bindingsTableName: true, capabilityBindingsTableId: true, databaseId: true, defaultCapabilities: true, definitionsTableId: true, definitionsTableName: true, entityField: true, entityTableId: true, hasCron: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schedulesTableId: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.functionModule.findOne({ id: '<UUID>', select: { apiName: true, bindingsTableId: true, bindingsTableName: true, capabilityBindingsTableId: true, databaseId: true, defaultPermissions: true, definitionsTableId: true, definitionsTableName: true, entityField: true, entityTableId: true, hasCron: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schedulesTableId: true, schemaId: true, scope: true } }).execute();
+const item = await db.functionModule.findOne({ id: '<UUID>', select: { apiName: true, bindingsTableId: true, bindingsTableName: true, capabilityBindingsTableId: true, databaseId: true, defaultCapabilities: true, definitionsTableId: true, definitionsTableName: true, entityField: true, entityTableId: true, hasCron: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schedulesTableId: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.functionModule.create({ data: { apiName: '<String>', bindingsTableId: '<UUID>', bindingsTableName: '<String>', capabilityBindingsTableId: '<UUID>', databaseId: '<UUID>', defaultPermissions: '<String>', definitionsTableId: '<UUID>', definitionsTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', hasCron: '<Boolean>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schedulesTableId: '<UUID>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.functionModule.create({ data: { apiName: '<String>', bindingsTableId: '<UUID>', bindingsTableName: '<String>', capabilityBindingsTableId: '<UUID>', databaseId: '<UUID>', defaultCapabilities: '<String>', definitionsTableId: '<UUID>', definitionsTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', hasCron: '<Boolean>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schedulesTableId: '<UUID>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.functionModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -1530,7 +1771,7 @@ CRUD operations for GraphExecutionModule records.
 | `apiName` | String | Yes |
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `executionsTableId` | UUID | Yes |
@@ -1555,13 +1796,13 @@ CRUD operations for GraphExecutionModule records.
 
 ```typescript
 // List all graphExecutionModule records
-const items = await db.graphExecutionModule.findMany({ select: { apiName: true, createdAt: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, executionsTableId: true, executionsTableName: true, graphModuleId: true, id: true, nodeStatesTableId: true, nodeStatesTableName: true, outputsTableId: true, outputsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const items = await db.graphExecutionModule.findMany({ select: { apiName: true, createdAt: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, executionsTableId: true, executionsTableName: true, graphModuleId: true, id: true, nodeStatesTableId: true, nodeStatesTableName: true, outputsTableId: true, outputsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.graphExecutionModule.findOne({ id: '<UUID>', select: { apiName: true, createdAt: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, executionsTableId: true, executionsTableName: true, graphModuleId: true, id: true, nodeStatesTableId: true, nodeStatesTableName: true, outputsTableId: true, outputsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const item = await db.graphExecutionModule.findOne({ id: '<UUID>', select: { apiName: true, createdAt: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, executionsTableId: true, executionsTableName: true, graphModuleId: true, id: true, nodeStatesTableId: true, nodeStatesTableName: true, outputsTableId: true, outputsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.graphExecutionModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', executionsTableId: '<UUID>', executionsTableName: '<String>', graphModuleId: '<UUID>', nodeStatesTableId: '<UUID>', nodeStatesTableName: '<String>', outputsTableId: '<UUID>', outputsTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.graphExecutionModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', executionsTableId: '<UUID>', executionsTableName: '<String>', graphModuleId: '<UUID>', nodeStatesTableId: '<UUID>', nodeStatesTableName: '<String>', outputsTableId: '<UUID>', outputsTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.graphExecutionModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -1581,7 +1822,7 @@ CRUD operations for GraphModule records.
 | `apiName` | String | Yes |
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `graphsTableId` | UUID | Yes |
@@ -1601,13 +1842,13 @@ CRUD operations for GraphModule records.
 
 ```typescript
 // List all graphModule records
-const items = await db.graphModule.findMany({ select: { apiName: true, createdAt: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, graphsTableId: true, id: true, merkleStoreModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaId: true, publicSchemaName: true, scope: true } }).execute();
+const items = await db.graphModule.findMany({ select: { apiName: true, createdAt: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, graphsTableId: true, id: true, merkleStoreModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaId: true, publicSchemaName: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.graphModule.findOne({ id: '<UUID>', select: { apiName: true, createdAt: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, graphsTableId: true, id: true, merkleStoreModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaId: true, publicSchemaName: true, scope: true } }).execute();
+const item = await db.graphModule.findOne({ id: '<UUID>', select: { apiName: true, createdAt: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, graphsTableId: true, id: true, merkleStoreModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaId: true, publicSchemaName: true, scope: true } }).execute();
 
 // Create
-const created = await db.graphModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', graphsTableId: '<UUID>', merkleStoreModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaId: '<UUID>', publicSchemaName: '<String>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.graphModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', graphsTableId: '<UUID>', merkleStoreModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaId: '<UUID>', publicSchemaName: '<String>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.graphModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -1630,7 +1871,7 @@ CRUD operations for HierarchyModule records.
 | `chartEdgesTableName` | String | Yes |
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `getManagersFunction` | String | Yes |
@@ -1652,13 +1893,13 @@ CRUD operations for HierarchyModule records.
 
 ```typescript
 // List all hierarchyModule records
-const items = await db.hierarchyModule.findMany({ select: { chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, chartEdgesTableId: true, chartEdgesTableName: true, createdAt: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, getManagersFunction: true, getSubordinatesFunction: true, hierarchySprtTableId: true, hierarchySprtTableName: true, id: true, isManagerOfFunction: true, prefix: true, privateSchemaId: true, privateSchemaName: true, rebuildHierarchyFunction: true, schemaId: true, scope: true, sprtTableName: true, usersTableId: true } }).execute();
+const items = await db.hierarchyModule.findMany({ select: { chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, chartEdgesTableId: true, chartEdgesTableName: true, createdAt: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, getManagersFunction: true, getSubordinatesFunction: true, hierarchySprtTableId: true, hierarchySprtTableName: true, id: true, isManagerOfFunction: true, prefix: true, privateSchemaId: true, privateSchemaName: true, rebuildHierarchyFunction: true, schemaId: true, scope: true, sprtTableName: true, usersTableId: true } }).execute();
 
 // Get one by id
-const item = await db.hierarchyModule.findOne({ id: '<UUID>', select: { chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, chartEdgesTableId: true, chartEdgesTableName: true, createdAt: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, getManagersFunction: true, getSubordinatesFunction: true, hierarchySprtTableId: true, hierarchySprtTableName: true, id: true, isManagerOfFunction: true, prefix: true, privateSchemaId: true, privateSchemaName: true, rebuildHierarchyFunction: true, schemaId: true, scope: true, sprtTableName: true, usersTableId: true } }).execute();
+const item = await db.hierarchyModule.findOne({ id: '<UUID>', select: { chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, chartEdgesTableId: true, chartEdgesTableName: true, createdAt: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, getManagersFunction: true, getSubordinatesFunction: true, hierarchySprtTableId: true, hierarchySprtTableName: true, id: true, isManagerOfFunction: true, prefix: true, privateSchemaId: true, privateSchemaName: true, rebuildHierarchyFunction: true, schemaId: true, scope: true, sprtTableName: true, usersTableId: true } }).execute();
 
 // Create
-const created = await db.hierarchyModule.create({ data: { chartEdgeGrantsTableId: '<UUID>', chartEdgeGrantsTableName: '<String>', chartEdgesTableId: '<UUID>', chartEdgesTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', getManagersFunction: '<String>', getSubordinatesFunction: '<String>', hierarchySprtTableId: '<UUID>', hierarchySprtTableName: '<String>', isManagerOfFunction: '<String>', prefix: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', rebuildHierarchyFunction: '<String>', schemaId: '<UUID>', scope: '<String>', sprtTableName: '<String>', usersTableId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.hierarchyModule.create({ data: { chartEdgeGrantsTableId: '<UUID>', chartEdgeGrantsTableName: '<String>', chartEdgesTableId: '<UUID>', chartEdgesTableName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', getManagersFunction: '<String>', getSubordinatesFunction: '<String>', hierarchySprtTableId: '<UUID>', hierarchySprtTableName: '<String>', isManagerOfFunction: '<String>', prefix: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', rebuildHierarchyFunction: '<String>', schemaId: '<UUID>', scope: '<String>', sprtTableName: '<String>', usersTableId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.hierarchyModule.update({ where: { id: '<UUID>' }, data: { chartEdgeGrantsTableId: '<UUID>' }, select: { id: true } }).execute();
@@ -1677,7 +1918,7 @@ CRUD operations for HttpRouteModule records.
 |-------|------|----------|
 | `apiName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `functionModuleId` | UUID | Yes |
@@ -1701,13 +1942,13 @@ CRUD operations for HttpRouteModule records.
 
 ```typescript
 // List all httpRouteModule records
-const items = await db.httpRouteModule.findMany({ select: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, functionModuleId: true, httpRoutesTableId: true, httpRoutesTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, resourceModuleId: true, schemaId: true, scope: true, storageModuleId: true } }).execute();
+const items = await db.httpRouteModule.findMany({ select: { apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, functionModuleId: true, httpRoutesTableId: true, httpRoutesTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, resourceModuleId: true, schemaId: true, scope: true, storageModuleId: true } }).execute();
 
 // Get one by id
-const item = await db.httpRouteModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, functionModuleId: true, httpRoutesTableId: true, httpRoutesTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, resourceModuleId: true, schemaId: true, scope: true, storageModuleId: true } }).execute();
+const item = await db.httpRouteModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, functionModuleId: true, httpRoutesTableId: true, httpRoutesTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, resourceModuleId: true, schemaId: true, scope: true, storageModuleId: true } }).execute();
 
 // Create
-const created = await db.httpRouteModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', functionModuleId: '<UUID>', httpRoutesTableId: '<UUID>', httpRoutesTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', resolverFunctionName: '<String>', resourceModuleId: '<UUID>', schemaId: '<UUID>', scope: '<String>', storageModuleId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.httpRouteModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', functionModuleId: '<UUID>', httpRoutesTableId: '<UUID>', httpRoutesTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', resolverFunctionName: '<String>', resourceModuleId: '<UUID>', schemaId: '<UUID>', scope: '<String>', storageModuleId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.httpRouteModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -2092,6 +2333,7 @@ CRUD operations for LimitsModule records.
 | `limitCreditsTableId` | UUID | Yes |
 | `limitDecrementFunction` | String | Yes |
 | `limitDecrementTrigger` | String | Yes |
+| `limitDefaults` | JSON | Yes |
 | `limitIncrementFunction` | String | Yes |
 | `limitIncrementTrigger` | String | Yes |
 | `limitUpdateTrigger` | String | Yes |
@@ -2112,13 +2354,13 @@ CRUD operations for LimitsModule records.
 
 ```typescript
 // List all limitsModule records
-const items = await db.limitsModule.findMany({ select: { actorTableId: true, aggregateTableId: true, apiName: true, capCheckTrigger: true, creditCodeItemsTableId: true, creditCodesTableId: true, creditRedemptionsTableId: true, databaseId: true, defaultTableId: true, defaultTableName: true, entityField: true, entityTableId: true, eventsTableId: true, id: true, limitAggregateCheckSoftFunction: true, limitCapsDefaultsTableId: true, limitCapsTableId: true, limitCheckFunction: true, limitCheckSoftFunction: true, limitCreditsTableId: true, limitDecrementFunction: true, limitDecrementTrigger: true, limitIncrementFunction: true, limitIncrementTrigger: true, limitUpdateTrigger: true, limitWarningStateTableId: true, limitWarningsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, resolveCapFunction: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
+const items = await db.limitsModule.findMany({ select: { actorTableId: true, aggregateTableId: true, apiName: true, capCheckTrigger: true, creditCodeItemsTableId: true, creditCodesTableId: true, creditRedemptionsTableId: true, databaseId: true, defaultTableId: true, defaultTableName: true, entityField: true, entityTableId: true, eventsTableId: true, id: true, limitAggregateCheckSoftFunction: true, limitCapsDefaultsTableId: true, limitCapsTableId: true, limitCheckFunction: true, limitCheckSoftFunction: true, limitCreditsTableId: true, limitDecrementFunction: true, limitDecrementTrigger: true, limitDefaults: true, limitIncrementFunction: true, limitIncrementTrigger: true, limitUpdateTrigger: true, limitWarningStateTableId: true, limitWarningsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, resolveCapFunction: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
 
 // Get one by id
-const item = await db.limitsModule.findOne({ id: '<UUID>', select: { actorTableId: true, aggregateTableId: true, apiName: true, capCheckTrigger: true, creditCodeItemsTableId: true, creditCodesTableId: true, creditRedemptionsTableId: true, databaseId: true, defaultTableId: true, defaultTableName: true, entityField: true, entityTableId: true, eventsTableId: true, id: true, limitAggregateCheckSoftFunction: true, limitCapsDefaultsTableId: true, limitCapsTableId: true, limitCheckFunction: true, limitCheckSoftFunction: true, limitCreditsTableId: true, limitDecrementFunction: true, limitDecrementTrigger: true, limitIncrementFunction: true, limitIncrementTrigger: true, limitUpdateTrigger: true, limitWarningStateTableId: true, limitWarningsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, resolveCapFunction: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
+const item = await db.limitsModule.findOne({ id: '<UUID>', select: { actorTableId: true, aggregateTableId: true, apiName: true, capCheckTrigger: true, creditCodeItemsTableId: true, creditCodesTableId: true, creditRedemptionsTableId: true, databaseId: true, defaultTableId: true, defaultTableName: true, entityField: true, entityTableId: true, eventsTableId: true, id: true, limitAggregateCheckSoftFunction: true, limitCapsDefaultsTableId: true, limitCapsTableId: true, limitCheckFunction: true, limitCheckSoftFunction: true, limitCreditsTableId: true, limitDecrementFunction: true, limitDecrementTrigger: true, limitDefaults: true, limitIncrementFunction: true, limitIncrementTrigger: true, limitUpdateTrigger: true, limitWarningStateTableId: true, limitWarningsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, resolveCapFunction: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
 
 // Create
-const created = await db.limitsModule.create({ data: { actorTableId: '<UUID>', aggregateTableId: '<UUID>', apiName: '<String>', capCheckTrigger: '<String>', creditCodeItemsTableId: '<UUID>', creditCodesTableId: '<UUID>', creditRedemptionsTableId: '<UUID>', databaseId: '<UUID>', defaultTableId: '<UUID>', defaultTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', eventsTableId: '<UUID>', limitAggregateCheckSoftFunction: '<String>', limitCapsDefaultsTableId: '<UUID>', limitCapsTableId: '<UUID>', limitCheckFunction: '<String>', limitCheckSoftFunction: '<String>', limitCreditsTableId: '<UUID>', limitDecrementFunction: '<String>', limitDecrementTrigger: '<String>', limitIncrementFunction: '<String>', limitIncrementTrigger: '<String>', limitUpdateTrigger: '<String>', limitWarningStateTableId: '<UUID>', limitWarningsTableId: '<UUID>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', resolveCapFunction: '<String>', schemaId: '<UUID>', scope: '<String>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute();
+const created = await db.limitsModule.create({ data: { actorTableId: '<UUID>', aggregateTableId: '<UUID>', apiName: '<String>', capCheckTrigger: '<String>', creditCodeItemsTableId: '<UUID>', creditCodesTableId: '<UUID>', creditRedemptionsTableId: '<UUID>', databaseId: '<UUID>', defaultTableId: '<UUID>', defaultTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', eventsTableId: '<UUID>', limitAggregateCheckSoftFunction: '<String>', limitCapsDefaultsTableId: '<UUID>', limitCapsTableId: '<UUID>', limitCheckFunction: '<String>', limitCheckSoftFunction: '<String>', limitCreditsTableId: '<UUID>', limitDecrementFunction: '<String>', limitDecrementTrigger: '<String>', limitDefaults: '<JSON>', limitIncrementFunction: '<String>', limitIncrementTrigger: '<String>', limitUpdateTrigger: '<String>', limitWarningStateTableId: '<UUID>', limitWarningsTableId: '<UUID>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', resolveCapFunction: '<String>', schemaId: '<UUID>', scope: '<String>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.limitsModule.update({ where: { id: '<UUID>' }, data: { actorTableId: '<UUID>' }, select: { id: true } }).execute();
@@ -2174,9 +2416,12 @@ CRUD operations for MembershipsModule records.
 | `adminGrantsTableId` | UUID | Yes |
 | `adminGrantsTableName` | String | Yes |
 | `apiName` | String | Yes |
+| `capabilitiesTableId` | UUID | Yes |
+| `capabilityDefaultCapabilitiesTableId` | UUID | Yes |
+| `capabilityDefaultGrantsTableId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
+| `defaultCapabilitiesTableId` | UUID | Yes |
 | `defaultLimitsTableId` | UUID | Yes |
-| `defaultPermissionsTableId` | UUID | Yes |
 | `entityField` | String | Yes |
 | `entityIdsByMask` | String | Yes |
 | `entityIdsByPerm` | String | Yes |
@@ -2199,9 +2444,6 @@ CRUD operations for MembershipsModule records.
 | `membershipsTableName` | String | Yes |
 | `ownerGrantsTableId` | UUID | Yes |
 | `ownerGrantsTableName` | String | Yes |
-| `permissionDefaultGrantsTableId` | UUID | Yes |
-| `permissionDefaultPermissionsTableId` | UUID | Yes |
-| `permissionsTableId` | UUID | Yes |
 | `prefix` | String | Yes |
 | `privateApiName` | String | Yes |
 | `privateSchemaId` | UUID | Yes |
@@ -2215,13 +2457,13 @@ CRUD operations for MembershipsModule records.
 
 ```typescript
 // List all membershipsModule records
-const items = await db.membershipsModule.findMany({ select: { actorMaskCheck: true, actorPermCheck: true, actorTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, apiName: true, databaseId: true, defaultLimitsTableId: true, defaultPermissionsTableId: true, entityField: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, entityTableId: true, entityTableOwnerId: true, getOrgFn: true, grantsTableId: true, grantsTableName: true, id: true, limitsTableId: true, memberProfilesTableId: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, membershipSettingsTableId: true, membershipSettingsTableName: true, membershipsTableId: true, membershipsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, permissionDefaultGrantsTableId: true, permissionDefaultPermissionsTableId: true, permissionsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, schemaId: true, scope: true, sprtTableId: true } }).execute();
+const items = await db.membershipsModule.findMany({ select: { actorMaskCheck: true, actorPermCheck: true, actorTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, apiName: true, capabilitiesTableId: true, capabilityDefaultCapabilitiesTableId: true, capabilityDefaultGrantsTableId: true, databaseId: true, defaultCapabilitiesTableId: true, defaultLimitsTableId: true, entityField: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, entityTableId: true, entityTableOwnerId: true, getOrgFn: true, grantsTableId: true, grantsTableName: true, id: true, limitsTableId: true, memberProfilesTableId: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, membershipSettingsTableId: true, membershipSettingsTableName: true, membershipsTableId: true, membershipsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, schemaId: true, scope: true, sprtTableId: true } }).execute();
 
 // Get one by id
-const item = await db.membershipsModule.findOne({ id: '<UUID>', select: { actorMaskCheck: true, actorPermCheck: true, actorTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, apiName: true, databaseId: true, defaultLimitsTableId: true, defaultPermissionsTableId: true, entityField: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, entityTableId: true, entityTableOwnerId: true, getOrgFn: true, grantsTableId: true, grantsTableName: true, id: true, limitsTableId: true, memberProfilesTableId: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, membershipSettingsTableId: true, membershipSettingsTableName: true, membershipsTableId: true, membershipsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, permissionDefaultGrantsTableId: true, permissionDefaultPermissionsTableId: true, permissionsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, schemaId: true, scope: true, sprtTableId: true } }).execute();
+const item = await db.membershipsModule.findOne({ id: '<UUID>', select: { actorMaskCheck: true, actorPermCheck: true, actorTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, apiName: true, capabilitiesTableId: true, capabilityDefaultCapabilitiesTableId: true, capabilityDefaultGrantsTableId: true, databaseId: true, defaultCapabilitiesTableId: true, defaultLimitsTableId: true, entityField: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, entityTableId: true, entityTableOwnerId: true, getOrgFn: true, grantsTableId: true, grantsTableName: true, id: true, limitsTableId: true, memberProfilesTableId: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, membershipSettingsTableId: true, membershipSettingsTableName: true, membershipsTableId: true, membershipsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, schemaId: true, scope: true, sprtTableId: true } }).execute();
 
 // Create
-const created = await db.membershipsModule.create({ data: { actorMaskCheck: '<String>', actorPermCheck: '<String>', actorTableId: '<UUID>', adminGrantsTableId: '<UUID>', adminGrantsTableName: '<String>', apiName: '<String>', databaseId: '<UUID>', defaultLimitsTableId: '<UUID>', defaultPermissionsTableId: '<UUID>', entityField: '<String>', entityIdsByMask: '<String>', entityIdsByPerm: '<String>', entityIdsFunction: '<String>', entityTableId: '<UUID>', entityTableOwnerId: '<UUID>', getOrgFn: '<String>', grantsTableId: '<UUID>', grantsTableName: '<String>', limitsTableId: '<UUID>', memberProfilesTableId: '<UUID>', membersTableId: '<UUID>', membersTableName: '<String>', membershipDefaultsTableId: '<UUID>', membershipDefaultsTableName: '<String>', membershipSettingsTableId: '<UUID>', membershipSettingsTableName: '<String>', membershipsTableId: '<UUID>', membershipsTableName: '<String>', ownerGrantsTableId: '<UUID>', ownerGrantsTableName: '<String>', permissionDefaultGrantsTableId: '<UUID>', permissionDefaultPermissionsTableId: '<UUID>', permissionsTableId: '<UUID>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', sprtTableId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.membershipsModule.create({ data: { actorMaskCheck: '<String>', actorPermCheck: '<String>', actorTableId: '<UUID>', adminGrantsTableId: '<UUID>', adminGrantsTableName: '<String>', apiName: '<String>', capabilitiesTableId: '<UUID>', capabilityDefaultCapabilitiesTableId: '<UUID>', capabilityDefaultGrantsTableId: '<UUID>', databaseId: '<UUID>', defaultCapabilitiesTableId: '<UUID>', defaultLimitsTableId: '<UUID>', entityField: '<String>', entityIdsByMask: '<String>', entityIdsByPerm: '<String>', entityIdsFunction: '<String>', entityTableId: '<UUID>', entityTableOwnerId: '<UUID>', getOrgFn: '<String>', grantsTableId: '<UUID>', grantsTableName: '<String>', limitsTableId: '<UUID>', memberProfilesTableId: '<UUID>', membersTableId: '<UUID>', membersTableName: '<String>', membershipDefaultsTableId: '<UUID>', membershipDefaultsTableName: '<String>', membershipSettingsTableId: '<UUID>', membershipSettingsTableName: '<String>', membershipsTableId: '<UUID>', membershipsTableName: '<String>', ownerGrantsTableId: '<UUID>', ownerGrantsTableName: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', sprtTableId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.membershipsModule.update({ where: { id: '<UUID>' }, data: { actorMaskCheck: '<String>' }, select: { id: true } }).execute();
@@ -2239,6 +2481,7 @@ CRUD operations for MerkleStoreModule records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `apiName` | String | Yes |
+| `capabilityKey` | String | Yes |
 | `commitTableId` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
@@ -2246,7 +2489,6 @@ CRUD operations for MerkleStoreModule records.
 | `functionPrefix` | String | Yes |
 | `id` | UUID | No |
 | `objectTableId` | UUID | Yes |
-| `permissionKey` | String | Yes |
 | `prefix` | String | Yes |
 | `privateApiName` | String | Yes |
 | `privateSchemaId` | UUID | Yes |
@@ -2261,13 +2503,13 @@ CRUD operations for MerkleStoreModule records.
 
 ```typescript
 // List all merkleStoreModule records
-const items = await db.merkleStoreModule.findMany({ select: { apiName: true, commitTableId: true, createdAt: true, databaseId: true, entityField: true, functionPrefix: true, id: true, objectTableId: true, permissionKey: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, refTableId: true, schemaId: true, scope: true, storeTableId: true } }).execute();
+const items = await db.merkleStoreModule.findMany({ select: { apiName: true, capabilityKey: true, commitTableId: true, createdAt: true, databaseId: true, entityField: true, functionPrefix: true, id: true, objectTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, refTableId: true, schemaId: true, scope: true, storeTableId: true } }).execute();
 
 // Get one by id
-const item = await db.merkleStoreModule.findOne({ id: '<UUID>', select: { apiName: true, commitTableId: true, createdAt: true, databaseId: true, entityField: true, functionPrefix: true, id: true, objectTableId: true, permissionKey: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, refTableId: true, schemaId: true, scope: true, storeTableId: true } }).execute();
+const item = await db.merkleStoreModule.findOne({ id: '<UUID>', select: { apiName: true, capabilityKey: true, commitTableId: true, createdAt: true, databaseId: true, entityField: true, functionPrefix: true, id: true, objectTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, refTableId: true, schemaId: true, scope: true, storeTableId: true } }).execute();
 
 // Create
-const created = await db.merkleStoreModule.create({ data: { apiName: '<String>', commitTableId: '<UUID>', databaseId: '<UUID>', entityField: '<String>', functionPrefix: '<String>', objectTableId: '<UUID>', permissionKey: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', refTableId: '<UUID>', schemaId: '<UUID>', scope: '<String>', storeTableId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.merkleStoreModule.create({ data: { apiName: '<String>', capabilityKey: '<String>', commitTableId: '<UUID>', databaseId: '<UUID>', entityField: '<String>', functionPrefix: '<String>', objectTableId: '<UUID>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', refTableId: '<UUID>', schemaId: '<UUID>', scope: '<String>', storeTableId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.merkleStoreModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -2286,7 +2528,7 @@ CRUD operations for NamespaceModule records.
 |-------|------|----------|
 | `apiName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `id` | UUID | No |
@@ -2308,13 +2550,13 @@ CRUD operations for NamespaceModule records.
 
 ```typescript
 // List all namespaceModule records
-const items = await db.namespaceModule.findMany({ select: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, namespaceEventsTableId: true, namespaceEventsTableName: true, namespacesTableId: true, namespacesTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const items = await db.namespaceModule.findMany({ select: { apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, namespaceEventsTableId: true, namespaceEventsTableName: true, namespacesTableId: true, namespacesTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.namespaceModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, namespaceEventsTableId: true, namespaceEventsTableName: true, namespacesTableId: true, namespacesTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
+const item = await db.namespaceModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, namespaceEventsTableId: true, namespaceEventsTableName: true, namespacesTableId: true, namespacesTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.namespaceModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', namespaceEventsTableId: '<UUID>', namespaceEventsTableName: '<String>', namespacesTableId: '<UUID>', namespacesTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.namespaceModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', namespaceEventsTableId: '<UUID>', namespaceEventsTableName: '<String>', namespacesTableId: '<UUID>', namespacesTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.namespaceModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -2334,7 +2576,7 @@ CRUD operations for NotificationsModule records.
 | `apiName` | String | Yes |
 | `channelsTableId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `deliveryLogTableId` | UUID | Yes |
 | `entityField` | String | Yes |
 | `hasChannels` | Boolean | Yes |
@@ -2360,19 +2602,59 @@ CRUD operations for NotificationsModule records.
 
 ```typescript
 // List all notificationsModule records
-const items = await db.notificationsModule.findMany({ select: { apiName: true, channelsTableId: true, databaseId: true, defaultPermissions: true, deliveryLogTableId: true, entityField: true, hasChannels: true, hasDigestMetadata: true, hasPreferences: true, hasSettingsExtension: true, hasSubscriptions: true, id: true, notificationsTableId: true, organizationSettingsTableId: true, ownerTableId: true, preferencesTableId: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, readStateTableId: true, schemaId: true, suppressionsTableId: true, userSettingsTableId: true } }).execute();
+const items = await db.notificationsModule.findMany({ select: { apiName: true, channelsTableId: true, databaseId: true, defaultCapabilities: true, deliveryLogTableId: true, entityField: true, hasChannels: true, hasDigestMetadata: true, hasPreferences: true, hasSettingsExtension: true, hasSubscriptions: true, id: true, notificationsTableId: true, organizationSettingsTableId: true, ownerTableId: true, preferencesTableId: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, readStateTableId: true, schemaId: true, suppressionsTableId: true, userSettingsTableId: true } }).execute();
 
 // Get one by id
-const item = await db.notificationsModule.findOne({ id: '<UUID>', select: { apiName: true, channelsTableId: true, databaseId: true, defaultPermissions: true, deliveryLogTableId: true, entityField: true, hasChannels: true, hasDigestMetadata: true, hasPreferences: true, hasSettingsExtension: true, hasSubscriptions: true, id: true, notificationsTableId: true, organizationSettingsTableId: true, ownerTableId: true, preferencesTableId: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, readStateTableId: true, schemaId: true, suppressionsTableId: true, userSettingsTableId: true } }).execute();
+const item = await db.notificationsModule.findOne({ id: '<UUID>', select: { apiName: true, channelsTableId: true, databaseId: true, defaultCapabilities: true, deliveryLogTableId: true, entityField: true, hasChannels: true, hasDigestMetadata: true, hasPreferences: true, hasSettingsExtension: true, hasSubscriptions: true, id: true, notificationsTableId: true, organizationSettingsTableId: true, ownerTableId: true, preferencesTableId: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, readStateTableId: true, schemaId: true, suppressionsTableId: true, userSettingsTableId: true } }).execute();
 
 // Create
-const created = await db.notificationsModule.create({ data: { apiName: '<String>', channelsTableId: '<UUID>', databaseId: '<UUID>', defaultPermissions: '<String>', deliveryLogTableId: '<UUID>', entityField: '<String>', hasChannels: '<Boolean>', hasDigestMetadata: '<Boolean>', hasPreferences: '<Boolean>', hasSettingsExtension: '<Boolean>', hasSubscriptions: '<Boolean>', notificationsTableId: '<UUID>', organizationSettingsTableId: '<UUID>', ownerTableId: '<UUID>', preferencesTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', readStateTableId: '<UUID>', schemaId: '<UUID>', suppressionsTableId: '<UUID>', userSettingsTableId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.notificationsModule.create({ data: { apiName: '<String>', channelsTableId: '<UUID>', databaseId: '<UUID>', defaultCapabilities: '<String>', deliveryLogTableId: '<UUID>', entityField: '<String>', hasChannels: '<Boolean>', hasDigestMetadata: '<Boolean>', hasPreferences: '<Boolean>', hasSettingsExtension: '<Boolean>', hasSubscriptions: '<Boolean>', notificationsTableId: '<UUID>', organizationSettingsTableId: '<UUID>', ownerTableId: '<UUID>', preferencesTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', readStateTableId: '<UUID>', schemaId: '<UUID>', suppressionsTableId: '<UUID>', userSettingsTableId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.notificationsModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.notificationsModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.oauthRequestsModule`
+
+CRUD operations for OauthRequestsModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `databaseId` | UUID | Yes |
+| `entityField` | String | Yes |
+| `entityTableId` | UUID | Yes |
+| `id` | UUID | No |
+| `oauthAuthorizationRequestsTableId` | UUID | Yes |
+| `oauthAuthorizationRequestsTableName` | String | Yes |
+| `pendingIdentityLinksTableId` | UUID | Yes |
+| `pendingIdentityLinksTableName` | String | Yes |
+| `prefix` | String | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `privateSchemaName` | String | Yes |
+| `scope` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all oauthRequestsModule records
+const items = await db.oauthRequestsModule.findMany({ select: { databaseId: true, entityField: true, entityTableId: true, id: true, oauthAuthorizationRequestsTableId: true, oauthAuthorizationRequestsTableName: true, pendingIdentityLinksTableId: true, pendingIdentityLinksTableName: true, prefix: true, privateSchemaId: true, privateSchemaName: true, scope: true } }).execute();
+
+// Get one by id
+const item = await db.oauthRequestsModule.findOne({ id: '<UUID>', select: { databaseId: true, entityField: true, entityTableId: true, id: true, oauthAuthorizationRequestsTableId: true, oauthAuthorizationRequestsTableName: true, pendingIdentityLinksTableId: true, pendingIdentityLinksTableName: true, prefix: true, privateSchemaId: true, privateSchemaName: true, scope: true } }).execute();
+
+// Create
+const created = await db.oauthRequestsModule.create({ data: { databaseId: '<UUID>', entityField: '<String>', entityTableId: '<UUID>', oauthAuthorizationRequestsTableId: '<UUID>', oauthAuthorizationRequestsTableName: '<String>', pendingIdentityLinksTableId: '<UUID>', pendingIdentityLinksTableName: '<String>', prefix: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', scope: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.oauthRequestsModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.oauthRequestsModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.pagesModule`
@@ -2420,56 +2702,6 @@ const updated = await db.pagesModule.update({ where: { id: '<UUID>' }, data: { a
 
 // Delete
 const deleted = await db.pagesModule.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.permissionsModule`
-
-CRUD operations for PermissionsModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `actorTableId` | UUID | Yes |
-| `apiName` | String | Yes |
-| `bitlen` | Int | Yes |
-| `databaseId` | UUID | Yes |
-| `defaultTableId` | UUID | Yes |
-| `defaultTableName` | String | Yes |
-| `entityField` | String | Yes |
-| `entityTableId` | UUID | Yes |
-| `getByMask` | String | Yes |
-| `getMask` | String | Yes |
-| `getMaskByName` | String | Yes |
-| `getPaddedMask` | String | Yes |
-| `id` | UUID | No |
-| `prefix` | String | Yes |
-| `privateApiName` | String | Yes |
-| `privateSchemaId` | UUID | Yes |
-| `privateSchemaName` | String | Yes |
-| `publicSchemaName` | String | Yes |
-| `schemaId` | UUID | Yes |
-| `scope` | String | Yes |
-| `tableId` | UUID | Yes |
-| `tableName` | String | Yes |
-
-**Operations:**
-
-```typescript
-// List all permissionsModule records
-const items = await db.permissionsModule.findMany({ select: { actorTableId: true, apiName: true, bitlen: true, databaseId: true, defaultTableId: true, defaultTableName: true, entityField: true, entityTableId: true, getByMask: true, getMask: true, getMaskByName: true, getPaddedMask: true, id: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
-
-// Get one by id
-const item = await db.permissionsModule.findOne({ id: '<UUID>', select: { actorTableId: true, apiName: true, bitlen: true, databaseId: true, defaultTableId: true, defaultTableName: true, entityField: true, entityTableId: true, getByMask: true, getMask: true, getMaskByName: true, getPaddedMask: true, id: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
-
-// Create
-const created = await db.permissionsModule.create({ data: { actorTableId: '<UUID>', apiName: '<String>', bitlen: '<Int>', databaseId: '<UUID>', defaultTableId: '<UUID>', defaultTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', getByMask: '<String>', getMask: '<String>', getMaskByName: '<String>', getPaddedMask: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.permissionsModule.update({ where: { id: '<UUID>' }, data: { actorTableId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.permissionsModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.phoneNumbersModule`
@@ -2614,22 +2846,24 @@ CRUD operations for ProfilesModule records.
 |-------|------|----------|
 | `actorTableId` | UUID | Yes |
 | `apiName` | String | Yes |
+| `capabilitiesTableId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `id` | UUID | No |
+| `membershipProfilesTableId` | UUID | Yes |
+| `membershipProfilesTableName` | String | Yes |
 | `membershipsTableId` | UUID | Yes |
-| `permissionsTableId` | UUID | Yes |
 | `prefix` | String | Yes |
 | `privateApiName` | String | Yes |
 | `privateSchemaId` | UUID | Yes |
 | `privateSchemaName` | String | Yes |
+| `profileCapabilitiesTableId` | UUID | Yes |
+| `profileCapabilitiesTableName` | String | Yes |
 | `profileDefinitionGrantsTableId` | UUID | Yes |
 | `profileDefinitionGrantsTableName` | String | Yes |
 | `profileGrantsTableId` | UUID | Yes |
 | `profileGrantsTableName` | String | Yes |
-| `profilePermissionsTableId` | UUID | Yes |
-| `profilePermissionsTableName` | String | Yes |
 | `profileTemplatesTableId` | UUID | Yes |
 | `profileTemplatesTableName` | String | Yes |
 | `publicSchemaName` | String | Yes |
@@ -2642,13 +2876,13 @@ CRUD operations for ProfilesModule records.
 
 ```typescript
 // List all profilesModule records
-const items = await db.profilesModule.findMany({ select: { actorTableId: true, apiName: true, databaseId: true, entityField: true, entityTableId: true, id: true, membershipsTableId: true, permissionsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileTemplatesTableId: true, profileTemplatesTableName: true, publicSchemaName: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
+const items = await db.profilesModule.findMany({ select: { actorTableId: true, apiName: true, capabilitiesTableId: true, databaseId: true, entityField: true, entityTableId: true, id: true, membershipProfilesTableId: true, membershipProfilesTableName: true, membershipsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, profileCapabilitiesTableId: true, profileCapabilitiesTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileTemplatesTableId: true, profileTemplatesTableName: true, publicSchemaName: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
 
 // Get one by id
-const item = await db.profilesModule.findOne({ id: '<UUID>', select: { actorTableId: true, apiName: true, databaseId: true, entityField: true, entityTableId: true, id: true, membershipsTableId: true, permissionsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileTemplatesTableId: true, profileTemplatesTableName: true, publicSchemaName: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
+const item = await db.profilesModule.findOne({ id: '<UUID>', select: { actorTableId: true, apiName: true, capabilitiesTableId: true, databaseId: true, entityField: true, entityTableId: true, id: true, membershipProfilesTableId: true, membershipProfilesTableName: true, membershipsTableId: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, profileCapabilitiesTableId: true, profileCapabilitiesTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileTemplatesTableId: true, profileTemplatesTableName: true, publicSchemaName: true, schemaId: true, scope: true, tableId: true, tableName: true } }).execute();
 
 // Create
-const created = await db.profilesModule.create({ data: { actorTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityTableId: '<UUID>', membershipsTableId: '<UUID>', permissionsTableId: '<UUID>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', profileDefinitionGrantsTableId: '<UUID>', profileDefinitionGrantsTableName: '<String>', profileGrantsTableId: '<UUID>', profileGrantsTableName: '<String>', profilePermissionsTableId: '<UUID>', profilePermissionsTableName: '<String>', profileTemplatesTableId: '<UUID>', profileTemplatesTableName: '<String>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute();
+const created = await db.profilesModule.create({ data: { actorTableId: '<UUID>', apiName: '<String>', capabilitiesTableId: '<UUID>', databaseId: '<UUID>', entityField: '<String>', entityTableId: '<UUID>', membershipProfilesTableId: '<UUID>', membershipProfilesTableName: '<String>', membershipsTableId: '<UUID>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', profileCapabilitiesTableId: '<UUID>', profileCapabilitiesTableName: '<String>', profileDefinitionGrantsTableId: '<UUID>', profileDefinitionGrantsTableName: '<String>', profileGrantsTableId: '<UUID>', profileGrantsTableName: '<String>', profileTemplatesTableId: '<UUID>', profileTemplatesTableName: '<String>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.profilesModule.update({ where: { id: '<UUID>' }, data: { actorTableId: '<UUID>' }, select: { id: true } }).execute();
@@ -2668,7 +2902,7 @@ CRUD operations for RateLimitMetersModule records.
 | `apiName` | String | Yes |
 | `checkRateLimitFunction` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `id` | UUID | No |
 | `prefix` | String | Yes |
 | `privateApiName` | String | Yes |
@@ -2687,13 +2921,13 @@ CRUD operations for RateLimitMetersModule records.
 
 ```typescript
 // List all rateLimitMetersModule records
-const items = await db.rateLimitMetersModule.findMany({ select: { apiName: true, checkRateLimitFunction: true, databaseId: true, defaultPermissions: true, id: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, rateLimitOverridesTableId: true, rateLimitOverridesTableName: true, rateLimitStateTableId: true, rateLimitStateTableName: true, rateWindowLimitsTableId: true, rateWindowLimitsTableName: true, schemaId: true } }).execute();
+const items = await db.rateLimitMetersModule.findMany({ select: { apiName: true, checkRateLimitFunction: true, databaseId: true, defaultCapabilities: true, id: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, rateLimitOverridesTableId: true, rateLimitOverridesTableName: true, rateLimitStateTableId: true, rateLimitStateTableName: true, rateWindowLimitsTableId: true, rateWindowLimitsTableName: true, schemaId: true } }).execute();
 
 // Get one by id
-const item = await db.rateLimitMetersModule.findOne({ id: '<UUID>', select: { apiName: true, checkRateLimitFunction: true, databaseId: true, defaultPermissions: true, id: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, rateLimitOverridesTableId: true, rateLimitOverridesTableName: true, rateLimitStateTableId: true, rateLimitStateTableName: true, rateWindowLimitsTableId: true, rateWindowLimitsTableName: true, schemaId: true } }).execute();
+const item = await db.rateLimitMetersModule.findOne({ id: '<UUID>', select: { apiName: true, checkRateLimitFunction: true, databaseId: true, defaultCapabilities: true, id: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, rateLimitOverridesTableId: true, rateLimitOverridesTableName: true, rateLimitStateTableId: true, rateLimitStateTableName: true, rateWindowLimitsTableId: true, rateWindowLimitsTableName: true, schemaId: true } }).execute();
 
 // Create
-const created = await db.rateLimitMetersModule.create({ data: { apiName: '<String>', checkRateLimitFunction: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', rateLimitOverridesTableId: '<UUID>', rateLimitOverridesTableName: '<String>', rateLimitStateTableId: '<UUID>', rateLimitStateTableName: '<String>', rateWindowLimitsTableId: '<UUID>', rateWindowLimitsTableName: '<String>', schemaId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.rateLimitMetersModule.create({ data: { apiName: '<String>', checkRateLimitFunction: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', rateLimitOverridesTableId: '<UUID>', rateLimitOverridesTableName: '<String>', rateLimitStateTableId: '<UUID>', rateLimitStateTableName: '<String>', rateWindowLimitsTableId: '<UUID>', rateWindowLimitsTableName: '<String>', schemaId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.rateLimitMetersModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -2843,7 +3077,7 @@ CRUD operations for ResourceModule records.
 |-------|------|----------|
 | `apiName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `id` | UUID | No |
@@ -2882,13 +3116,13 @@ CRUD operations for ResourceModule records.
 
 ```typescript
 // List all resourceModule records
-const items = await db.resourceModule.findMany({ select: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, installationStoreName: true, merkleStoreModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, requirementsStateViewName: true, resolvedRequirementsViewName: true, resourceBillingRollupFunction: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceEventsTableId: true, resourceEventsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourceStatusChecksTableId: true, resourceStatusChecksTableName: true, resourceUsageLogTableId: true, resourceUsageLogTableName: true, resourceUsageSummaryTableId: true, resourceUsageSummaryTableName: true, resourcesTableId: true, resourcesTableName: true, rollupResourceUsageSummaryFunction: true, schemaId: true, scope: true } }).execute();
+const items = await db.resourceModule.findMany({ select: { apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, installationStoreName: true, merkleStoreModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, requirementsStateViewName: true, resolvedRequirementsViewName: true, resourceBillingRollupFunction: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceEventsTableId: true, resourceEventsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourceStatusChecksTableId: true, resourceStatusChecksTableName: true, resourceUsageLogTableId: true, resourceUsageLogTableName: true, resourceUsageSummaryTableId: true, resourceUsageSummaryTableName: true, resourcesTableId: true, resourcesTableName: true, rollupResourceUsageSummaryFunction: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.resourceModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, installationStoreName: true, merkleStoreModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, requirementsStateViewName: true, resolvedRequirementsViewName: true, resourceBillingRollupFunction: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceEventsTableId: true, resourceEventsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourceStatusChecksTableId: true, resourceStatusChecksTableName: true, resourceUsageLogTableId: true, resourceUsageLogTableName: true, resourceUsageSummaryTableId: true, resourceUsageSummaryTableName: true, resourcesTableId: true, resourcesTableName: true, rollupResourceUsageSummaryFunction: true, schemaId: true, scope: true } }).execute();
+const item = await db.resourceModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, installationStoreName: true, merkleStoreModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, requirementsStateViewName: true, resolvedRequirementsViewName: true, resourceBillingRollupFunction: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceEventsTableId: true, resourceEventsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourceStatusChecksTableId: true, resourceStatusChecksTableName: true, resourceUsageLogTableId: true, resourceUsageLogTableName: true, resourceUsageSummaryTableId: true, resourceUsageSummaryTableName: true, resourcesTableId: true, resourcesTableName: true, rollupResourceUsageSummaryFunction: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.resourceModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', installationStoreName: '<String>', merkleStoreModuleId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', requirementsStateViewName: '<String>', resolvedRequirementsViewName: '<String>', resourceBillingRollupFunction: '<String>', resourceDefinitionsTableId: '<UUID>', resourceDefinitionsTableName: '<String>', resourceEventsTableId: '<UUID>', resourceEventsTableName: '<String>', resourceInstallationsTableId: '<UUID>', resourceInstallationsTableName: '<String>', resourceStatusChecksTableId: '<UUID>', resourceStatusChecksTableName: '<String>', resourceUsageLogTableId: '<UUID>', resourceUsageLogTableName: '<String>', resourceUsageSummaryTableId: '<UUID>', resourceUsageSummaryTableName: '<String>', resourcesTableId: '<UUID>', resourcesTableName: '<String>', rollupResourceUsageSummaryFunction: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.resourceModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', installationStoreName: '<String>', merkleStoreModuleId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', requirementsStateViewName: '<String>', resolvedRequirementsViewName: '<String>', resourceBillingRollupFunction: '<String>', resourceDefinitionsTableId: '<UUID>', resourceDefinitionsTableName: '<String>', resourceEventsTableId: '<UUID>', resourceEventsTableName: '<String>', resourceInstallationsTableId: '<UUID>', resourceInstallationsTableName: '<String>', resourceStatusChecksTableId: '<UUID>', resourceStatusChecksTableName: '<String>', resourceUsageLogTableId: '<UUID>', resourceUsageLogTableName: '<String>', resourceUsageSummaryTableId: '<UUID>', resourceUsageSummaryTableName: '<String>', resourcesTableId: '<UUID>', resourcesTableName: '<String>', rollupResourceUsageSummaryFunction: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resourceModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -2947,9 +3181,11 @@ CRUD operations for RouteModule records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `apiName` | String | Yes |
+| `appLinksFunctionName` | String | Yes |
 | `catalogModuleId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `deepLinkFunctionName` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `domainModuleId` | UUID | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
@@ -2975,19 +3211,52 @@ CRUD operations for RouteModule records.
 
 ```typescript
 // List all routeModule records
-const items = await db.routeModule.findMany({ select: { apiName: true, catalogModuleId: true, databaseId: true, defaultPermissions: true, domainModuleId: true, entityField: true, entityTableId: true, hostnameBindingsTableId: true, hostnameBindingsTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, routeBindingsTableId: true, routeBindingsTableName: true, routesTableId: true, routesTableName: true, schemaId: true, scope: true } }).execute();
+const items = await db.routeModule.findMany({ select: { apiName: true, appLinksFunctionName: true, catalogModuleId: true, databaseId: true, deepLinkFunctionName: true, defaultCapabilities: true, domainModuleId: true, entityField: true, entityTableId: true, hostnameBindingsTableId: true, hostnameBindingsTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, routeBindingsTableId: true, routeBindingsTableName: true, routesTableId: true, routesTableName: true, schemaId: true, scope: true } }).execute();
 
 // Get one by id
-const item = await db.routeModule.findOne({ id: '<UUID>', select: { apiName: true, catalogModuleId: true, databaseId: true, defaultPermissions: true, domainModuleId: true, entityField: true, entityTableId: true, hostnameBindingsTableId: true, hostnameBindingsTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, routeBindingsTableId: true, routeBindingsTableName: true, routesTableId: true, routesTableName: true, schemaId: true, scope: true } }).execute();
+const item = await db.routeModule.findOne({ id: '<UUID>', select: { apiName: true, appLinksFunctionName: true, catalogModuleId: true, databaseId: true, deepLinkFunctionName: true, defaultCapabilities: true, domainModuleId: true, entityField: true, entityTableId: true, hostnameBindingsTableId: true, hostnameBindingsTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, routeBindingsTableId: true, routeBindingsTableName: true, routesTableId: true, routesTableName: true, schemaId: true, scope: true } }).execute();
 
 // Create
-const created = await db.routeModule.create({ data: { apiName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', defaultPermissions: '<String>', domainModuleId: '<UUID>', entityField: '<String>', entityTableId: '<UUID>', hostnameBindingsTableId: '<UUID>', hostnameBindingsTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', resolverFunctionName: '<String>', routeBindingsTableId: '<UUID>', routeBindingsTableName: '<String>', routesTableId: '<UUID>', routesTableName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
+const created = await db.routeModule.create({ data: { apiName: '<String>', appLinksFunctionName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', deepLinkFunctionName: '<String>', defaultCapabilities: '<String>', domainModuleId: '<UUID>', entityField: '<String>', entityTableId: '<UUID>', hostnameBindingsTableId: '<UUID>', hostnameBindingsTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', resolverFunctionName: '<String>', routeBindingsTableId: '<UUID>', routeBindingsTableName: '<String>', routesTableId: '<UUID>', routesTableName: '<String>', schemaId: '<UUID>', scope: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.routeModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.routeModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.scopeTypesModule`
+
+CRUD operations for ScopeTypesModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `privateSchemaName` | String | Yes |
+| `schemaId` | UUID | Yes |
+| `scopeTypesTableId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all scopeTypesModule records
+const items = await db.scopeTypesModule.findMany({ select: { databaseId: true, id: true, privateSchemaName: true, schemaId: true, scopeTypesTableId: true } }).execute();
+
+// Get one by id
+const item = await db.scopeTypesModule.findOne({ id: '<UUID>', select: { databaseId: true, id: true, privateSchemaName: true, schemaId: true, scopeTypesTableId: true } }).execute();
+
+// Create
+const created = await db.scopeTypesModule.create({ data: { databaseId: '<UUID>', privateSchemaName: '<String>', schemaId: '<UUID>', scopeTypesTableId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.scopeTypesModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.scopeTypesModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.secureTableProvision`
@@ -3113,7 +3382,7 @@ CRUD operations for SiteSurfaceModule records.
 | `apiName` | String | Yes |
 | `catalogModuleId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `id` | UUID | No |
@@ -3147,13 +3416,13 @@ CRUD operations for SiteSurfaceModule records.
 
 ```typescript
 // List all siteSurfaceModule records
-const items = await db.siteSurfaceModule.findMany({ select: { apiName: true, catalogModuleId: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, siteAppLinksTableId: true, siteAppLinksTableName: true, siteDeepLinksTableId: true, siteDeepLinksTableName: true, siteErrorPagesTableId: true, siteErrorPagesTableName: true, siteMetadataTableId: true, siteMetadataTableName: true, siteModulesTableId: true, siteModulesTableName: true, siteThemesTableId: true, siteThemesTableName: true, siteWebConfigTableId: true, siteWebConfigTableName: true, sitesTableId: true, sitesTableName: true } }).execute();
+const items = await db.siteSurfaceModule.findMany({ select: { apiName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, siteAppLinksTableId: true, siteAppLinksTableName: true, siteDeepLinksTableId: true, siteDeepLinksTableName: true, siteErrorPagesTableId: true, siteErrorPagesTableName: true, siteMetadataTableId: true, siteMetadataTableName: true, siteModulesTableId: true, siteModulesTableName: true, siteThemesTableId: true, siteThemesTableName: true, siteWebConfigTableId: true, siteWebConfigTableName: true, sitesTableId: true, sitesTableName: true } }).execute();
 
 // Get one by id
-const item = await db.siteSurfaceModule.findOne({ id: '<UUID>', select: { apiName: true, catalogModuleId: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, siteAppLinksTableId: true, siteAppLinksTableName: true, siteDeepLinksTableId: true, siteDeepLinksTableName: true, siteErrorPagesTableId: true, siteErrorPagesTableName: true, siteMetadataTableId: true, siteMetadataTableName: true, siteModulesTableId: true, siteModulesTableName: true, siteThemesTableId: true, siteThemesTableName: true, siteWebConfigTableId: true, siteWebConfigTableName: true, sitesTableId: true, sitesTableName: true } }).execute();
+const item = await db.siteSurfaceModule.findOne({ id: '<UUID>', select: { apiName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, siteAppLinksTableId: true, siteAppLinksTableName: true, siteDeepLinksTableId: true, siteDeepLinksTableName: true, siteErrorPagesTableId: true, siteErrorPagesTableName: true, siteMetadataTableId: true, siteMetadataTableName: true, siteModulesTableId: true, siteModulesTableName: true, siteThemesTableId: true, siteThemesTableName: true, siteWebConfigTableId: true, siteWebConfigTableName: true, sitesTableId: true, sitesTableName: true } }).execute();
 
 // Create
-const created = await db.siteSurfaceModule.create({ data: { apiName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', siteAppLinksTableId: '<UUID>', siteAppLinksTableName: '<String>', siteDeepLinksTableId: '<UUID>', siteDeepLinksTableName: '<String>', siteErrorPagesTableId: '<UUID>', siteErrorPagesTableName: '<String>', siteMetadataTableId: '<UUID>', siteMetadataTableName: '<String>', siteModulesTableId: '<UUID>', siteModulesTableName: '<String>', siteThemesTableId: '<UUID>', siteThemesTableName: '<String>', siteWebConfigTableId: '<UUID>', siteWebConfigTableName: '<String>', sitesTableId: '<UUID>', sitesTableName: '<String>' }, select: { id: true } }).execute();
+const created = await db.siteSurfaceModule.create({ data: { apiName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', siteAppLinksTableId: '<UUID>', siteAppLinksTableName: '<String>', siteDeepLinksTableId: '<UUID>', siteDeepLinksTableName: '<String>', siteErrorPagesTableId: '<UUID>', siteErrorPagesTableName: '<String>', siteMetadataTableId: '<UUID>', siteMetadataTableName: '<String>', siteModulesTableId: '<UUID>', siteModulesTableName: '<String>', siteThemesTableId: '<UUID>', siteThemesTableName: '<String>', siteWebConfigTableId: '<UUID>', siteWebConfigTableName: '<String>', sitesTableId: '<UUID>', sitesTableName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.siteSurfaceModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -3226,8 +3495,8 @@ CRUD operations for StorageModule records.
 | `catalogModuleId` | UUID | Yes |
 | `confirmUploadDelay` | Interval | Yes |
 | `databaseId` | UUID | Yes |
+| `defaultCapabilities` | String | Yes |
 | `defaultMaxFileSize` | BigInt | Yes |
-| `defaultPermissions` | String | Yes |
 | `downloadUrlExpirySeconds` | Int | Yes |
 | `endpoint` | String | Yes |
 | `entityField` | String | Yes |
@@ -3264,13 +3533,13 @@ CRUD operations for StorageModule records.
 
 ```typescript
 // List all storageModule records
-const items = await db.storageModule.findMany({ select: { allowedOrigins: true, apiName: true, bucketsTableId: true, bucketsTableName: true, cacheTtlSeconds: true, catalogModuleId: true, confirmUploadDelay: true, databaseId: true, defaultMaxFileSize: true, defaultPermissions: true, downloadUrlExpirySeconds: true, endpoint: true, entityField: true, entityTableId: true, fileEventsTableId: true, filesTableId: true, filesTableName: true, hasAuditLog: true, hasConfirmUpload: true, hasContentHash: true, hasCustomKeys: true, hasPathShares: true, hasVersioning: true, id: true, maxBulkFiles: true, maxBulkTotalSize: true, maxFilenameLength: true, pathSharesTableId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provider: true, provisions: true, publicSchemaName: true, publicUrlPrefix: true, restrictReads: true, schemaId: true, scope: true, uploadUrlExpirySeconds: true } }).execute();
+const items = await db.storageModule.findMany({ select: { allowedOrigins: true, apiName: true, bucketsTableId: true, bucketsTableName: true, cacheTtlSeconds: true, catalogModuleId: true, confirmUploadDelay: true, databaseId: true, defaultCapabilities: true, defaultMaxFileSize: true, downloadUrlExpirySeconds: true, endpoint: true, entityField: true, entityTableId: true, fileEventsTableId: true, filesTableId: true, filesTableName: true, hasAuditLog: true, hasConfirmUpload: true, hasContentHash: true, hasCustomKeys: true, hasPathShares: true, hasVersioning: true, id: true, maxBulkFiles: true, maxBulkTotalSize: true, maxFilenameLength: true, pathSharesTableId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provider: true, provisions: true, publicSchemaName: true, publicUrlPrefix: true, restrictReads: true, schemaId: true, scope: true, uploadUrlExpirySeconds: true } }).execute();
 
 // Get one by id
-const item = await db.storageModule.findOne({ id: '<UUID>', select: { allowedOrigins: true, apiName: true, bucketsTableId: true, bucketsTableName: true, cacheTtlSeconds: true, catalogModuleId: true, confirmUploadDelay: true, databaseId: true, defaultMaxFileSize: true, defaultPermissions: true, downloadUrlExpirySeconds: true, endpoint: true, entityField: true, entityTableId: true, fileEventsTableId: true, filesTableId: true, filesTableName: true, hasAuditLog: true, hasConfirmUpload: true, hasContentHash: true, hasCustomKeys: true, hasPathShares: true, hasVersioning: true, id: true, maxBulkFiles: true, maxBulkTotalSize: true, maxFilenameLength: true, pathSharesTableId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provider: true, provisions: true, publicSchemaName: true, publicUrlPrefix: true, restrictReads: true, schemaId: true, scope: true, uploadUrlExpirySeconds: true } }).execute();
+const item = await db.storageModule.findOne({ id: '<UUID>', select: { allowedOrigins: true, apiName: true, bucketsTableId: true, bucketsTableName: true, cacheTtlSeconds: true, catalogModuleId: true, confirmUploadDelay: true, databaseId: true, defaultCapabilities: true, defaultMaxFileSize: true, downloadUrlExpirySeconds: true, endpoint: true, entityField: true, entityTableId: true, fileEventsTableId: true, filesTableId: true, filesTableName: true, hasAuditLog: true, hasConfirmUpload: true, hasContentHash: true, hasCustomKeys: true, hasPathShares: true, hasVersioning: true, id: true, maxBulkFiles: true, maxBulkTotalSize: true, maxFilenameLength: true, pathSharesTableId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provider: true, provisions: true, publicSchemaName: true, publicUrlPrefix: true, restrictReads: true, schemaId: true, scope: true, uploadUrlExpirySeconds: true } }).execute();
 
 // Create
-const created = await db.storageModule.create({ data: { allowedOrigins: '<String>', apiName: '<String>', bucketsTableId: '<UUID>', bucketsTableName: '<String>', cacheTtlSeconds: '<Int>', catalogModuleId: '<UUID>', confirmUploadDelay: '<Interval>', databaseId: '<UUID>', defaultMaxFileSize: '<BigInt>', defaultPermissions: '<String>', downloadUrlExpirySeconds: '<Int>', endpoint: '<String>', entityField: '<String>', entityTableId: '<UUID>', fileEventsTableId: '<UUID>', filesTableId: '<UUID>', filesTableName: '<String>', hasAuditLog: '<Boolean>', hasConfirmUpload: '<Boolean>', hasContentHash: '<Boolean>', hasCustomKeys: '<Boolean>', hasPathShares: '<Boolean>', hasVersioning: '<Boolean>', maxBulkFiles: '<Int>', maxBulkTotalSize: '<BigInt>', maxFilenameLength: '<Int>', pathSharesTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provider: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', publicUrlPrefix: '<String>', restrictReads: '<Boolean>', schemaId: '<UUID>', scope: '<String>', uploadUrlExpirySeconds: '<Int>' }, select: { id: true } }).execute();
+const created = await db.storageModule.create({ data: { allowedOrigins: '<String>', apiName: '<String>', bucketsTableId: '<UUID>', bucketsTableName: '<String>', cacheTtlSeconds: '<Int>', catalogModuleId: '<UUID>', confirmUploadDelay: '<Interval>', databaseId: '<UUID>', defaultCapabilities: '<String>', defaultMaxFileSize: '<BigInt>', downloadUrlExpirySeconds: '<Int>', endpoint: '<String>', entityField: '<String>', entityTableId: '<UUID>', fileEventsTableId: '<UUID>', filesTableId: '<UUID>', filesTableName: '<String>', hasAuditLog: '<Boolean>', hasConfirmUpload: '<Boolean>', hasContentHash: '<Boolean>', hasCustomKeys: '<Boolean>', hasPathShares: '<Boolean>', hasVersioning: '<Boolean>', maxBulkFiles: '<Int>', maxBulkTotalSize: '<BigInt>', maxFilenameLength: '<Int>', pathSharesTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provider: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', publicUrlPrefix: '<String>', restrictReads: '<Boolean>', schemaId: '<UUID>', scope: '<String>', uploadUrlExpirySeconds: '<Int>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.storageModule.update({ where: { id: '<UUID>' }, data: { allowedOrigins: '<String>' }, select: { id: true } }).execute();
@@ -3453,6 +3722,41 @@ const updated = await db.userSettingsModule.update({ where: { id: '<UUID>' }, da
 const deleted = await db.userSettingsModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.userSettingsSecurityModule`
+
+CRUD operations for UserSettingsSecurityModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `apiName` | String | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `ownerTableId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `tableId` | UUID | Yes |
+| `tableName` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all userSettingsSecurityModule records
+const items = await db.userSettingsSecurityModule.findMany({ select: { apiName: true, databaseId: true, id: true, ownerTableId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+
+// Get one by id
+const item = await db.userSettingsSecurityModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, id: true, ownerTableId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+
+// Create
+const created = await db.userSettingsSecurityModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.userSettingsSecurityModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.userSettingsSecurityModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.userStateModule`
 
 CRUD operations for UserStateModule records.
@@ -3615,7 +3919,7 @@ CRUD operations for WebhookModule records.
 |-------|------|----------|
 | `apiName` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `defaultPermissions` | String | Yes |
+| `defaultCapabilities` | String | Yes |
 | `entityField` | String | Yes |
 | `entityTableId` | UUID | Yes |
 | `functionInvocationModuleId` | UUID | Yes |
@@ -3641,13 +3945,13 @@ CRUD operations for WebhookModule records.
 
 ```typescript
 // List all webhookModule records
-const items = await db.webhookModule.findMany({ select: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, functionInvocationModuleId: true, functionModuleId: true, id: true, infraSecretsModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, webhookEndpointsTableId: true, webhookEndpointsTableName: true, webhookEventsTableId: true, webhookEventsTableName: true } }).execute();
+const items = await db.webhookModule.findMany({ select: { apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, functionInvocationModuleId: true, functionModuleId: true, id: true, infraSecretsModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, webhookEndpointsTableId: true, webhookEndpointsTableName: true, webhookEventsTableId: true, webhookEventsTableName: true } }).execute();
 
 // Get one by id
-const item = await db.webhookModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, functionInvocationModuleId: true, functionModuleId: true, id: true, infraSecretsModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, webhookEndpointsTableId: true, webhookEndpointsTableName: true, webhookEventsTableId: true, webhookEventsTableName: true } }).execute();
+const item = await db.webhookModule.findOne({ id: '<UUID>', select: { apiName: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, functionInvocationModuleId: true, functionModuleId: true, id: true, infraSecretsModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, webhookEndpointsTableId: true, webhookEndpointsTableName: true, webhookEventsTableId: true, webhookEventsTableName: true } }).execute();
 
 // Create
-const created = await db.webhookModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', functionInvocationModuleId: '<UUID>', functionModuleId: '<UUID>', infraSecretsModuleId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', webhookEndpointsTableId: '<UUID>', webhookEndpointsTableName: '<String>', webhookEventsTableId: '<UUID>', webhookEventsTableName: '<String>' }, select: { id: true } }).execute();
+const created = await db.webhookModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', functionInvocationModuleId: '<UUID>', functionModuleId: '<UUID>', infraSecretsModuleId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', webhookEndpointsTableId: '<UUID>', webhookEndpointsTableName: '<String>', webhookEventsTableId: '<UUID>', webhookEventsTableName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.webhookModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute();
@@ -3657,42 +3961,6 @@ const deleted = await db.webhookModule.delete({ where: { id: '<UUID>' } }).execu
 ```
 
 ## Custom Operations
-
-### `db.query.resolveBlueprintField`
-
-Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `databaseId` | UUID |
-  | `fieldName` | String |
-  | `tableId` | UUID |
-
-```typescript
-const result = await db.query.resolveBlueprintField({ databaseId: '<UUID>', fieldName: '<String>', tableId: '<UUID>' }).execute();
-```
-
-### `db.query.resolveBlueprintTable`
-
-Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `databaseId` | UUID |
-  | `defaultSchemaId` | UUID |
-  | `schemaName` | String |
-  | `tableMap` | JSON |
-  | `tableName` | String |
-
-```typescript
-const result = await db.query.resolveBlueprintTable({ databaseId: '<UUID>', defaultSchemaId: '<UUID>', schemaName: '<String>', tableMap: '<JSON>', tableName: '<String>' }).execute();
-```
 
 ### `db.mutation.constructBlueprint`
 
@@ -3740,111 +4008,6 @@ and lifecycle settings.
 
 ```typescript
 const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>', ownerId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.provisionCheckConstraint`
-
-Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionCheckConstraintInput (required) |
-
-```typescript
-const result = await db.mutation.provisionCheckConstraint({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.provisionFullTextSearch`
-
-Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionFullTextSearchInput (required) |
-
-```typescript
-const result = await db.mutation.provisionFullTextSearch({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.provisionIndex`
-
-Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionIndexInput (required) |
-
-```typescript
-const result = await db.mutation.provisionIndex({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.provisionRelation`
-
-Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionRelationInput (required) |
-
-```typescript
-const result = await db.mutation.provisionRelation({ input: '<ProvisionRelationInput>' }).execute();
-```
-
-### `db.mutation.provisionSpatialRelation`
-
-Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionSpatialRelationInput (required) |
-
-```typescript
-const result = await db.mutation.provisionSpatialRelation({ input: '<ProvisionSpatialRelationInput>' }).execute();
-```
-
-### `db.mutation.provisionTable`
-
-Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionTableInput (required) |
-
-```typescript
-const result = await db.mutation.provisionTable({ input: '<ProvisionTableInput>' }).execute();
-```
-
-### `db.mutation.provisionUniqueConstraint`
-
-Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionUniqueConstraintInput (required) |
-
-```typescript
-const result = await db.mutation.provisionUniqueConstraint({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute();
 ```
 
 ---

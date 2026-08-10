@@ -2,14 +2,14 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Records of individual permission grants and revocations for members via bitmask
+Records of individual capability grants and revocations for members via bitmask
 
 ## Usage
 
 ```typescript
 db.appGrant.findMany({ select: { id: true } }).execute()
 db.appGrant.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.appGrant.create({ data: { actorId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissions: '<BitString>' }, select: { id: true } }).execute()
+db.appGrant.create({ data: { actorId: '<UUID>', capabilities: '<BitString>', grantorId: '<UUID>', isGrant: '<Boolean>' }, select: { id: true } }).execute()
 db.appGrant.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.appGrant.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.appGrant.findMany({
 
 ```typescript
 const item = await db.appGrant.create({
-  data: { actorId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissions: '<BitString>' },
+  data: { actorId: '<UUID>', capabilities: '<BitString>', grantorId: '<UUID>', isGrant: '<Boolean>' },
   select: { id: true }
 }).execute();
 ```

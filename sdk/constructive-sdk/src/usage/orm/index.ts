@@ -23,12 +23,14 @@ import { OrgLimitCreditModel } from './models/orgLimitCredit';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { OrgLimitEventModel } from './models/orgLimitEvent';
 import { OrgLimitWarningModel } from './models/orgLimitWarning';
+import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';
+export { createQueryOperations } from './query';
 export { createMutationOperations } from './mutation';
 /**
  * Create an ORM client instance
@@ -74,6 +76,7 @@ export function createClient(config: OrmClientConfig) {
     orgLimitDefault: new OrgLimitDefaultModel(client),
     orgLimitEvent: new OrgLimitEventModel(client),
     orgLimitWarning: new OrgLimitWarningModel(client),
+    query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };
 }
