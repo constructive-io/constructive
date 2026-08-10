@@ -38,6 +38,12 @@ const dbTools = createDbTools({
 pi.use(dbTools);
 ```
 
+## Provisioning
+
+`provision_database` requests a database through the `requestDatabase` mutation on the api endpoint. When the requested module set matches a cataloged preset, the backend claims a warm pre-baked database in seconds. Otherwise a background job provisions the database cold. The tool polls the provision ticket on the modules endpoint until the database and its owner bootstrap are complete. Then it writes the credentials to the project `.env` and returns.
+
+For local development, the cold path and the warm pool depend on the backend's jobs worker. Start the worker in `constructive-db` with `pnpm dev:fn`. If the worker is not running, cold tickets stay `pending` and the tool times out after 240 seconds.
+
 ## Host contract
 
 `PiToolsHost` is the only integration surface:
