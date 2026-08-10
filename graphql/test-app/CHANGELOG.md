@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.11.10](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@2.11.9...@constructive-io/test-codegen-app@2.11.10) (2026-08-10)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
 ## [2.11.9](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@2.11.8...@constructive-io/test-codegen-app@2.11.9) (2026-08-08)
 
 **Note:** Version bump only for package @constructive-io/test-codegen-app

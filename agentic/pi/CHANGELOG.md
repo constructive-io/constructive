@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.10.6...@agentic-kit/pi@0.11.0) (2026-08-10)
+
+### Features
+
+- **node-type-registry:** sync the registry from constructive-db ([1404b35](https://github.com/constructive-io/constructive/commit/1404b3541d0d6acc9a271d0cb553bda21aaca5da))
+- **pi:** switch provision_database to requestDatabase ([cba955d](https://github.com/constructive-io/constructive/commit/cba955dedd6d84bf911bd7cac179570a82000702))
+
 ## [0.10.6](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.10.5...@agentic-kit/pi@0.10.6) (2026-08-08)
 
 **Note:** Version bump only for package @agentic-kit/pi

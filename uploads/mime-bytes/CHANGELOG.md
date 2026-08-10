@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/constructive-io/constructive/compare/mime-bytes@0.30.0...mime-bytes@0.31.0) (2026-08-10)
+
+### Features
+
+- **storage:** reject uploads whose extension, declared type and bytes disagree ([0560be0](https://github.com/constructive-io/constructive/commit/0560be0830f7d73e1bbdda442be8d3d4be359759))
+
 # [0.30.0](https://github.com/constructive-io/constructive/compare/mime-bytes@0.29.2...mime-bytes@0.30.0) (2026-08-02)
 
 **Note:** Version bump only for package mime-bytes

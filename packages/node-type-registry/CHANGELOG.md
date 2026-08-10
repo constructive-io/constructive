@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/constructive-io/constructive/compare/node-type-registry@1.14.3...node-type-registry@1.15.0) (2026-08-10)
+
+### Features
+
+- **node-type-registry:** sync the registry from constructive-db ([1404b35](https://github.com/constructive-io/constructive/commit/1404b3541d0d6acc9a271d0cb553bda21aaca5da))
+
 ## [1.14.3](https://github.com/constructive-io/constructive/compare/node-type-registry@1.14.2...node-type-registry@1.14.3) (2026-08-07)
 
 **Note:** Version bump only for package node-type-registry
