@@ -10,6 +10,13 @@ import type { ModulePreset } from './types';
  * procedures which rely on `internal_secrets_module` to decrypt the client
  * secret at auth time.
  *
+ * `oauth_requests_module` covers the leg between those two: while the browser
+ * is at the provider, the database holds the state it must echo back with the
+ * PKCE verifier that belongs to it, and any identity that verified but is
+ * waiting on the account owner to accept a link. `app_settings_auth`
+ * already declared how long that may take (`oauth_state_max_age`); this is
+ * what the setting governs.
+ *
  * Password fallback stays on by default (break-glass for admins); flip the
  * `allow_password_sign_*` toggles off in `app_settings_auth` for strictly
  * SSO-only.
@@ -33,16 +40,16 @@ export const PresetAuthSso: ModulePreset = {
   good_for: [
     'B2B apps where end users sign in via their employer IdP',
     'Consumer apps that want "Sign in with Google / GitHub"',
-    'Apps that need to federate identity with a specific provider ecosystem'
+    'Apps that need to federate identity with a specific provider ecosystem',
   ],
   not_for: [
     'Apps that also need passkeys and rate limits — use `auth:hardened`',
-    'Strictly-SSO apps that want NO email storage — needs the emails-optional refactor; not supported by a preset today'
+    'Strictly-SSO apps that want NO email storage — needs the emails-optional refactor; not supported by a preset today',
   ],
   modules: [
     'users_module',
     'membership_types_module',
-    ['permissions_module', { scope: 'app' }],
+    ['capabilities_module', { scope: 'app' }],
     ['limits_module', { scope: 'app' }],
     ['levels_module', { scope: 'app' }],
     ['memberships_module', { scope: 'app' }],
@@ -54,7 +61,8 @@ export const PresetAuthSso: ModulePreset = {
     'rls_module',
     'user_auth_module',
     'connected_accounts_module',
-    ['identity_providers_module', { scope: 'app' }]
+    ['identity_providers_module', { scope: 'app' }],
+    ['oauth_requests_module', { scope: 'app' }],
   ],
-  extends: ['auth:email']
+  extends: ['auth:email'],
 };

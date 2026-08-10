@@ -114,11 +114,3 @@ exceptions:
     versions: ["7.8.0"]
     reason: ^7.8.0 floor matches the newest release; nothing older satisfies it
     until: 2026-08-16
-  - package: minimatch
-    versions: ["10.2.6"]
-    reason: ^10.2.6 floor matches the newest release; nothing older satisfies it
-    until: 2026-08-10
-  - package: "@0no-co/graphql.web"
-    versions: ["1.3.3"]
-    reason: ^1.3.3 floor matches the newest release; nothing older satisfies it
-    until: 2026-08-10

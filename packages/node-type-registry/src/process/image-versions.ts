@@ -96,16 +96,36 @@ export const ProcessImageVersions: NodeTypeDefinition = {
         description: 'Trigger events that fire the job',
         default: ['INSERT']
       },
+      file_field: {
+        type: 'string',
+        format: 'column-ref',
+        description:
+          'Name of an upload/image domain column holding the file reference. ' +
+          'When set, the trigger reads the object key, MIME type and bucket id ' +
+          'out of that document (NEW.<file_field> ->> \'key\', ...) instead of ' +
+          'requiring key/mime_type/bucket_id columns beside it, and the MIME ' +
+          'patterns match against <file_field> ->> \'mime\'.'
+      },
       payload_custom: {
         type: 'object',
-        additionalProperties: { type: 'string', format: 'column-ref' },
-        description: 'Custom payload key-to-column mapping for the job trigger',
-        default: {
-          file_id: 'id',
-          key: 'key',
-          mime_type: 'mime_type',
-          bucket_id: 'bucket_id'
-        }
+        additionalProperties: {
+          oneOf: [
+            { type: 'string', format: 'column-ref' },
+            {
+              type: 'object',
+              properties: {
+                field: { type: 'string', format: 'column-ref' },
+                path: { type: 'array', items: { type: 'string' }, minItems: 1 }
+              },
+              required: ['field', 'path']
+            }
+          ]
+        },
+        description:
+          'Custom payload key-to-source mapping for the job trigger. A source is ' +
+          'either a column name or a read into a jsonb column ' +
+          '({"field": "upload", "path": ["key"]}). Defaults to the four file ' +
+          'columns, or to the file_field document when file_field is set.'
       },
       trigger_conditions: triggerConditionsProperty,
 

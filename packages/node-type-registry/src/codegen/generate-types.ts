@@ -17,9 +17,6 @@
  *   npx ts-node src/codegen/generate-types.ts [--outdir <dir>] [--meta <path>]
  */
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const babelGenerator = require('@babel/generator');
-const generate = babelGenerator.default ?? babelGenerator;
 import * as t from '@babel/types';
 import { existsSync,mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -28,6 +25,10 @@ import { generateTypeScriptTypes } from 'schema-typescript';
 
 import { allNodeTypes } from '../index';
 import type { NodeTypeDefinition } from '../types';
+
+ 
+const babelGenerator = require('@babel/generator');
+const generate = babelGenerator.default ?? babelGenerator;
 
 // ---------------------------------------------------------------------------
 // _meta types (matches TableMeta / FieldMeta from MetaSchemaPlugin)
@@ -223,70 +224,6 @@ function buildTriggerConditionInterface(): t.ExportNamedDeclaration {
       addJSDoc(optionalProp('NOT', condRef), 'Negated condition.')
     ]),
     'Recursive condition type for compound trigger WHEN clauses. Leaf conditions specify {field, op, value?, row?, ref?}. Combinators nest via AND, OR, NOT.'
-  );
-}
-
-// ---------------------------------------------------------------------------
-// FieldType — structured PostgreSQL type representation.
-// ---------------------------------------------------------------------------
-
-function buildFieldTypeInterface(): t.ExportNamedDeclaration {
-  const argType = t.tsUnionType([
-    t.tsStringKeyword(),
-    t.tsNumberKeyword(),
-    t.tsBooleanKeyword()
-  ]);
-
-  return addJSDoc(
-    exportInterface('FieldType', [
-      addJSDoc(requiredProp('name', t.tsStringKeyword()), 'Type name. Must be a valid SQL identifier.'),
-      addJSDoc(optionalProp('schema', t.tsStringKeyword()), 'Schema qualifier.'),
-      addJSDoc(optionalProp('args', t.tsArrayType(argType)), 'Type arguments (e.g., [10, 2] for numeric(10,2), ["Point", 4326] for geometry).'),
-      addJSDoc(optionalProp('array_dimensions', t.tsNumberKeyword()), 'Number of array dimensions. 1 = text[], 2 = text[][].'),
-      addJSDoc(optionalProp('range', t.tsArrayType(t.tsStringKeyword())), 'Interval field range. 1-2 elements: ["day"] or ["day", "second"].')
-    ]),
-    'Structured representation of a PostgreSQL data type. Stored as JSONB in metaschema_public.field.type.'
-  );
-}
-
-// ---------------------------------------------------------------------------
-// FieldDefault — structured PostgreSQL default value expression.
-// ---------------------------------------------------------------------------
-
-function buildFieldDefaultInterface(): t.ExportNamedDeclaration {
-  const defaultRef = t.tsTypeReference(t.identifier('FieldDefault'));
-  const fieldTypeRef = t.tsTypeReference(t.identifier('FieldType'));
-
-  const valueType = t.tsUnionType([
-    t.tsStringKeyword(),
-    t.tsNumberKeyword(),
-    t.tsBooleanKeyword(),
-    t.tsNullKeyword(),
-    t.tsArrayType(t.tsUnknownKeyword()),
-    recordType(t.tsStringKeyword(), t.tsUnknownKeyword())
-  ]);
-
-  const argType = t.tsUnionType([
-    t.tsStringKeyword(),
-    t.tsNumberKeyword(),
-    t.tsBooleanKeyword(),
-    t.tsNullKeyword(),
-    defaultRef
-  ]);
-
-  return addJSDoc(
-    exportInterface('FieldDefault', [
-      addJSDoc(optionalProp('value', valueType), 'Literal value (string, number, boolean, null, array, or object).'),
-      addJSDoc(optionalProp('function', t.tsStringKeyword()), 'Function name. Must be a valid SQL identifier.'),
-      addJSDoc(optionalProp('schema', t.tsStringKeyword()), 'Schema qualifier for function.'),
-      addJSDoc(optionalProp('args', t.tsArrayType(argType)), 'Function arguments (recursive).'),
-      addJSDoc(optionalProp('cast', fieldTypeRef), 'Output type cast.'),
-      addJSDoc(optionalProp('operator', t.tsStringKeyword()), 'Binary operator (e.g., "+", "-", "||").'),
-      addJSDoc(optionalProp('left', defaultRef), 'Left operand for operator expression.'),
-      addJSDoc(optionalProp('right', defaultRef), 'Right operand for operator expression.'),
-      addJSDoc(optionalProp('sql_keyword', t.tsStringKeyword()), 'SQL keyword (e.g., "CURRENT_TIMESTAMP", "CURRENT_USER").')
-    ]),
-    'Structured representation of a PostgreSQL default value expression. Stored as JSONB in metaschema_public.field.default_value.'
   );
 }
 
@@ -491,17 +428,32 @@ function buildBlueprintField(
     );
   }
   // Static fallback
-  const fieldTypeRef = t.tsTypeReference(t.identifier('FieldType'));
-  const fieldDefaultRef = t.tsTypeReference(t.identifier('FieldDefault'));
   return addJSDoc(
     exportInterface('BlueprintField', [
       addJSDoc(requiredProp('name', t.tsStringKeyword()), 'The column name.'),
-      addJSDoc(requiredProp('type', t.tsUnionType([fieldTypeRef, t.tsStringKeyword()])), 'PostgreSQL type as a FieldType object (e.g., { name: "text" }) or legacy string.'),
+      addJSDoc(requiredProp('type', t.tsStringKeyword()), 'The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid").'),
       addJSDoc(optionalProp('is_required', t.tsBooleanKeyword()), 'Whether the column has a NOT NULL constraint.'),
-      addJSDoc(optionalProp('default_value', t.tsUnionType([fieldDefaultRef, t.tsStringKeyword()])), 'Default value as a FieldDefault object (e.g., { function: "now" }) or legacy string.'),
+      addJSDoc(optionalProp('default_value', t.tsStringKeyword()), 'SQL default value expression (e.g., "true", "now()").'),
       addJSDoc(optionalProp('description', t.tsStringKeyword()), 'Comment/description for this field.')
     ]),
     'A custom field (column) to add to a blueprint table.'
+  );
+}
+
+function buildBlueprintPolicyWithCheck(
+  authzNodes: NodeTypeDefinition[]
+): t.ExportNamedDeclaration {
+  const policyTypeAnnotation =
+    authzNodes.length > 0
+      ? strUnion(authzNodes.map((nt) => nt.name))
+      : t.tsStringKeyword();
+
+  return addJSDoc(
+    exportInterface('BlueprintPolicyWithCheck', [
+      addJSDoc(requiredProp('$type', policyTypeAnnotation), 'Authz* policy type name for the WITH CHECK expression.'),
+      addJSDoc(optionalProp('data', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Policy-specific data (structure varies by policy type).')
+    ]),
+    'A WITH CHECK override node for an UPDATE policy. Its expression governs the resulting row while the main policy node governs the targeted row.'
   );
 }
 
@@ -525,7 +477,8 @@ function buildBlueprintPolicy(
       addJSDoc(optionalProp('permissive', t.tsBooleanKeyword()), 'Whether this policy is permissive (true) or restrictive (false). Defaults to true.'),
       addJSDoc(optionalProp('policy_role', t.tsStringKeyword()), 'Role for this policy. Defaults to "authenticated".'),
       addJSDoc(optionalProp('policy_name', t.tsStringKeyword()), 'Optional custom name for this policy.'),
-      addJSDoc(optionalProp('data', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Policy-specific data (structure varies by policy type).')
+      addJSDoc(optionalProp('data', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Policy-specific data (structure varies by policy type).'),
+      addJSDoc(optionalProp('with_check', t.tsTypeReference(t.identifier('BlueprintPolicyWithCheck'))), 'Optional WITH CHECK override node. Only valid for UPDATE policies; when omitted, WITH CHECK inherits the USING expression.')
     ]),
     'An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention.'
   );
@@ -865,12 +818,12 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
         'Storage scope. "app" (default) creates app-level storage (no owner_id). "org" creates per-org/user storage (owner_id = org entity id, buckets seeded per-entity via AFTER INSERT trigger). Only "app" and "org" are allowed — child entity types get storage via entity_types[].storage.'
       ),
       addJSDoc(
-        optionalProp('storage_key', t.tsStringKeyword()),
-        'Discriminator for multi-module storage. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{storage_key}_buckets. Max 16 chars, lowercase snake_case.'
+        optionalProp('key', t.tsStringKeyword()),
+        'Module key discriminator. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_buckets. Max 16 chars, lowercase snake_case.'
       ),
       addJSDoc(
-        optionalProp('prefix', t.tsStringKeyword()),
-        'Override the table-name prefix. By default the prefix is derived from the scope (e.g. "org"). Set to an empty string to produce unprefixed table names (e.g. "buckets" instead of "org_buckets").'
+        optionalProp('storage_key', t.tsStringKeyword()),
+        '@deprecated Use `key` instead. Kept for backward compatibility.'
       ),
       addJSDoc(
         optionalProp(
@@ -907,6 +860,14 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('confirm_upload_delay', t.tsStringKeyword()),
         'Delay before the first upload confirmation attempt (PostgreSQL interval string, e.g. "30 seconds"). Only used when has_confirm_upload is true. Defaults to "30 seconds".'
+      ),
+      addJSDoc(
+        optionalProp('staging', t.tsBooleanKeyword()),
+        'Provision a temporary staging bucket (type temp, tagged default-temp) that stages for the private default bucket, so uploads land there and are promoted into their destination on confirmation. Setting staging_ttl implies this. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('staging_ttl', t.tsStringKeyword()),
+        'How long an unpromoted staged file survives before it is eligible for expiry (PostgreSQL interval string, e.g. "24 hours"). Implies staging. Defaults to "24 hours".'
       ),
       addJSDoc(
         optionalProp(
@@ -1053,10 +1014,6 @@ function buildBlueprintNamespaceConfig(): t.ExportNamedDeclaration {
         'Module discriminator for multi-module namespaces. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_namespaces.'
       ),
       addJSDoc(
-        optionalProp('prefix', t.tsStringKeyword()),
-        'Override the table-name prefix. By default the prefix is derived from the scope (e.g. "org"). Set to an empty string to produce unprefixed table names (e.g. "namespaces" instead of "org_namespaces").'
-      ),
-      addJSDoc(
         optionalProp(
           'policies',
           t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintPolicy')))
@@ -1106,10 +1063,6 @@ function buildBlueprintFunctionConfig(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('key', t.tsStringKeyword()),
         'Module discriminator for multi-module functions. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_function_definitions.'
-      ),
-      addJSDoc(
-        optionalProp('prefix', t.tsStringKeyword()),
-        'Override the table-name prefix. By default the prefix is derived from the scope (e.g. "org"). Set to an empty string to produce unprefixed table names (e.g. "function_definitions" instead of "org_function_definitions").'
       ),
       addJSDoc(
         optionalProp(
@@ -1167,10 +1120,6 @@ function buildBlueprintAgentConfig(): t.ExportNamedDeclaration {
         'Module discriminator for multi-module agents. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_agent_thread.'
       ),
       addJSDoc(
-        optionalProp('prefix', t.tsStringKeyword()),
-        'Override the table-name prefix. By default the prefix is derived from the scope (e.g. "org"). Set to an empty string to produce unprefixed table names (e.g. "agent_thread" instead of "org_agent_thread").'
-      ),
-      addJSDoc(
         optionalProp('api_name', t.tsStringKeyword()),
         'API name for the agent module. Used in GraphQL naming. Defaults to "agent".'
       ),
@@ -1180,46 +1129,32 @@ function buildBlueprintAgentConfig(): t.ExportNamedDeclaration {
       ),
       addJSDoc(
         optionalProp('has_resources', t.tsBooleanKeyword()),
-        'Whether to provision the unified agent_resource table (kind: skill/knowledge/convention) with auto-chunking (ProcessChunks) and vector embeddings. Defaults to false.'
+        'Whether to provision the unified agent_resource table (skills + knowledge with slug, kind, search, embedding). Standalone flag — also auto-enabled by has_agents. Defaults to false.'
       ),
       addJSDoc(
         optionalProp('has_agents', t.tsBooleanKeyword()),
-        'Whether to provision agent + agent_persona tables for agent registry and templates. Implies has_resources. Defaults to false.'
+        'Whether to provision the agent registry (agent table + agent_persona table). Implies has_resources = true. Defaults to false.'
       ),
       addJSDoc(
         optionalProp(
           'resources',
           t.tsArrayType(
             t.tsTypeLiteral([
-              optionalProp('has_chunks', t.tsBooleanKeyword()),
               optionalProp('dimensions', t.tsNumberKeyword()),
               optionalProp('chunk_size', t.tsNumberKeyword()),
               optionalProp('chunk_overlap', t.tsNumberKeyword()),
-              optionalProp(
-                'chunk_strategy',
-                t.tsUnionType([
-                  t.tsLiteralType(t.stringLiteral('fixed')),
-                  t.tsLiteralType(t.stringLiteral('sentence')),
-                  t.tsLiteralType(t.stringLiteral('paragraph')),
-                  t.tsLiteralType(t.stringLiteral('semantic'))
-                ])
-              ),
+              optionalProp('chunk_strategy', t.tsUnionType([
+                t.tsLiteralType(t.stringLiteral('paragraph')),
+                t.tsLiteralType(t.stringLiteral('sentence')),
+                t.tsLiteralType(t.stringLiteral('token')),
+              ])),
               optionalProp('embedding_model', t.tsStringKeyword()),
               optionalProp('embedding_provider', t.tsStringKeyword()),
-              optionalProp(
-                'search_indexes',
-                t.tsArrayType(
-                  t.tsUnionType([
-                    t.tsLiteralType(t.stringLiteral('tsvector')),
-                    t.tsLiteralType(t.stringLiteral('bm25')),
-                    t.tsLiteralType(t.stringLiteral('trigram'))
-                  ])
-                )
-              )
+              optionalProp('search_indexes', t.tsArrayType(t.tsStringKeyword())),
             ])
           )
         ),
-        'Resource configuration array. Controls vector dimensions, chunking strategy, embedding model/provider, and text search indexes for the agent_resource table. Set has_chunks to false to disable the ProcessChunks pipeline. Defaults: 768 dimensions, 1000 chunk_size, 200 chunk_overlap, paragraph strategy, ["tsvector"] search indexes.'
+        'Resource configuration array. First element configures the agent_resource table: vector dimensions (default 768), chunk_size (default 1000), chunk_strategy (default "paragraph"), chunk_overlap (default 200), embedding_model, embedding_provider, search_indexes (default ["bm25"]).'
       ),
       addJSDoc(
         optionalProp(
@@ -1269,7 +1204,7 @@ function buildBlueprintAgentConfig(): t.ExportNamedDeclaration {
         'Per-table overrides for agent tables. Each key targets a specific table (thread, message, task, prompt, plan, resource, agent, persona) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision.'
       )
     ]),
-    'Agent module configuration. When used at the top level of a blueprint, the scope field controls whether agents are app-level ("app", default) or org-level ("org"). When used inside entity_types[], scope is inherited from the entity type. Provisions thread, message, task, prompt tables. Opt-in: has_plans (plan + approval workflow), has_resources (unified skills/knowledge with chunking), has_agents (agent registry + personas, implies has_resources).'
+    'Agent module configuration. When used at the top level of a blueprint, the scope field controls whether agents are app-level ("app", default) or org-level ("org"). When used inside entity_types[], scope is inherited from the entity type. Provisions thread, message, task, prompt tables. has_resources adds unified agent_resource (skills + knowledge). has_agents adds agent registry + personas (implies has_resources).'
   );
 }
 
@@ -1278,7 +1213,7 @@ function buildBlueprintAgentConfig(): t.ExportNamedDeclaration {
  *
  * Matches the jsonb shape accepted by graphs on entity_type_provision.
  * Graph module requires a merkle_store_module_id dependency, so
- * entity_type_provision only registers permissions. The graph module itself
+ * entity_type_provision only registers capabilities. The graph module itself
  * must be provisioned separately with the merkle store dependency resolved.
  */
 function buildBlueprintGraphConfig(): t.ExportNamedDeclaration {
@@ -1296,7 +1231,7 @@ function buildBlueprintGraphConfig(): t.ExportNamedDeclaration {
         'RLS policy overrides for the graph tables. NULL = apply defaults from apply_graph_security().'
       )
     ]),
-    'Graph module configuration. Presence triggers permission registration (manage_graphs, execute_graphs). The graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers permissions here — the graph module itself must be provisioned separately.'
+    'Graph module configuration. Presence triggers capability registration (manage_graphs, execute_graphs). The graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers capabilities here — the graph module itself must be provisioned separately.'
   );
 }
 
@@ -1378,7 +1313,7 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
       ),
       addJSDoc(
         optionalProp('has_profiles', t.tsBooleanKeyword()),
-        'Whether to provision a profiles module for this entity type. Defaults to false.'
+        'Whether to provision a profiles module for this entity type. Defaults to false. A membership may hold any number of profiles: the {prefix}_membership_profiles assignment table holds every profile it holds and the membership mask is granted | bit_or(held profile masks).'
       ),
       addJSDoc(
         optionalProp('has_levels', t.tsBooleanKeyword()),
@@ -1411,7 +1346,7 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
             t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
           )
         ),
-        'Storage module configuration array. Presence triggers provisioning (same inference model as namespaces, functions, agents). Each entry provisions a separate storage module with its own tables, RLS, and settings. Each entry may specify a storage_key for multi-module support (defaults to "default").'
+        'Storage module configuration array. Presence triggers provisioning (same inference model as namespaces, functions, agents). Each entry provisions a separate storage module with its own tables, RLS, and settings. Each entry may specify a key for multi-module support (defaults to "default").'
       ),
       addJSDoc(
         optionalProp(
@@ -1420,7 +1355,7 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
             t.tsTypeReference(t.identifier('BlueprintNamespaceConfig'))
           )
         ),
-        'Namespace module configuration array. Presence triggers provisioning. Each entry provisions a namespace_module with its own tables, computed-name proxy, and entity-scoped RLS. Registers manage_namespaces permission bit. "[{}]" = provision one default namespace module.'
+        'Namespace module configuration array. Presence triggers provisioning. Each entry provisions a namespace_module with its own tables, computed-name proxy, and entity-scoped RLS. Registers manage_namespaces capability bit. "[{}]" = provision one default namespace module.'
       ),
       addJSDoc(
         optionalProp(
@@ -1429,7 +1364,7 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
             t.tsTypeReference(t.identifier('BlueprintFunctionConfig'))
           )
         ),
-        'Function module configuration array. Presence triggers provisioning. Each entry provisions function_definitions, function_invocations (partitioned), and function_execution_logs tables. Registers manage_functions + invoke_functions permission bits. "[{}]" = provision one default function module.'
+        'Function module configuration array. Presence triggers provisioning. Each entry provisions function_definitions, function_invocations (partitioned), and function_execution_logs tables. Registers manage_functions + invoke_functions capability bits. "[{}]" = provision one default function module.'
       ),
       addJSDoc(
         optionalProp(
@@ -1447,7 +1382,7 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
             t.tsTypeReference(t.identifier('BlueprintGraphConfig'))
           )
         ),
-        'Graph module configuration array. Presence triggers permission registration (manage_graphs, execute_graphs). Graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers permissions here. "[{}]" = register default graph permissions.'
+        'Graph module configuration array. Presence triggers capability registration (manage_graphs, execute_graphs). Graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers capabilities here. "[{}]" = register default graph capabilities.'
       )
     ]),
     'An entity type entry for Phase 0 of construct_blueprint(). When name is provided, provisions a new entity type with its own entity table, membership modules, and security policies via entity_type_provision. When name is omitted and only prefix is given, extends an existing entity type (e.g., the built-in "org") with additional capabilities like storage — without creating a new entity type.'
@@ -1670,8 +1605,6 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   // -- Shared recursive types (emitted before parameter interfaces) --
   statements.push(sectionComment('Shared recursive types'));
   statements.push(buildTriggerConditionInterface());
-  statements.push(buildFieldTypeInterface());
-  statements.push(buildFieldDefaultInterface());
 
   // -- Parameter interfaces grouped by category --
   const categoryOrder = ['billing', 'check', 'data', 'event', 'guard', 'limit', 'limit_enforce', 'limit_track', 'limit_warning', 'search', 'job', 'process', 'authz', 'relation', 'view'];
@@ -1693,6 +1626,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
     : 'Static fallback (no _meta provided)';
   statements.push(sectionComment(`Structural types — ${metaSource}`));
   statements.push(buildBlueprintField(meta));
+  statements.push(buildBlueprintPolicyWithCheck(authzNodes));
   statements.push(buildBlueprintPolicy(authzNodes, meta));
   statements.push(buildBlueprintFtsSource());
   statements.push(buildBlueprintFullTextSearch());
@@ -1744,6 +1678,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
     '// These types match the JSONB shape expected by construct_blueprint().',
     '// All field names are snake_case to match the SQL convention.',
     '',
+    "import type { FieldDefault, FieldType } from './types';",
     ''
   ].join('\n');
 

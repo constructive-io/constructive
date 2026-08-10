@@ -22,16 +22,21 @@ export const AuthzPeerOwnership: NodeTypeDefinition = {
         type: 'string',
         description: "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability."
       },
-      permission: {
-        type: 'string',
-        description: 'Single permission name to check on the current user membership (resolved to bitstring mask)'
-      },
-      permissions: {
+      levels: {
         type: 'array',
         items: {
-          type: 'string'
+          type: 'string',
         },
-        description: 'Multiple permission names to check on the current user membership (ORed together into mask)'
+        description:
+          'Achievement level names to require (kind=level catalog rows, merged into the same mask)',
+      },
+      capabilities: {
+        type: 'array',
+        items: {
+          type: 'string',
+        },
+        description:
+          'Capability names of any kind (capability, level, ...) merged into the same mask',
       },
       is_admin: {
         type: 'boolean',

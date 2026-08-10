@@ -24,20 +24,20 @@ export const GuardStepUp: NodeTypeDefinition = {
         description:
           'Which verification method satisfies the step-up requirement ' +
           '(password_or_mfa is the legacy spelling of fresh_auth)',
-        default: 'fresh_auth'
+        default: 'fresh_auth',
       },
       events: {
         type: 'array',
         items: {
           type: 'string',
-          enum: ['INSERT', 'UPDATE', 'DELETE']
+          enum: ['INSERT', 'UPDATE', 'DELETE'],
         },
         description: 'Which DML events require step-up verification',
-        default: ['UPDATE', 'DELETE']
+        default: ['UPDATE', 'DELETE'],
       },
-      ...conditionProperties
+      ...conditionProperties,
     },
-    required: []
+    required: [],
   },
-  tags: ['guard', 'triggers', 'auth', 'step-up', 'mfa', 'security']
+  tags: ['guard', 'triggers', 'auth', 'step-up', 'mfa', 'security'],
 };

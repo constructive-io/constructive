@@ -1,11 +1,11 @@
 import type { ModulePreset } from './types';
 
 /**
- * `b2b` — `auth:hardened` plus orgs, invites, permissions, levels,
+ * `b2b` — `auth:hardened` plus orgs, invites, capabilities, levels,
  * profiles, and hierarchy. The full multi-tenant / B2B SaaS shape.
  *
  * Installs both app-scoped AND org-scoped instances of the membership,
- * permission, limit, level, profile, and invite modules. `hierarchy_module`
+ * capability, limit, level, profile, and invite modules. `hierarchy_module`
  * at the org scope enables nested org/team structures.
  *
  * This is a large install — every B2B concept Constructive ships. Don't
@@ -14,12 +14,12 @@ import type { ModulePreset } from './types';
  */
 export const PresetB2b: ModulePreset = {
   name: 'b2b',
-  display_name: 'B2B SaaS (orgs + invites + permissions)',
+  display_name: 'B2B SaaS (orgs + invites + capabilities)',
   summary:
-    '`auth:hardened` + orgs, invites, fine-grained permissions, levels, profiles, hierarchy.',
+    '`auth:hardened` + orgs, invites, fine-grained capabilities, levels, profiles, hierarchy.',
   description:
-    'Everything in `auth:hardened`, plus the full org/team/permission stack at both app and ' +
-    'org membership scopes. You get: memberships at org scope, permissions at app and org ' +
+    'Everything in `auth:hardened`, plus the full org/team/capability stack at both app and ' +
+    'org membership scopes. You get: memberships at org scope, capabilities at app and org ' +
     'scopes for fine-grained RBAC, limits at app and org scopes for per-scope quota ' +
     'enforcement, levels at app and org scopes for role bundles, profiles at app and org ' +
     'scopes for per-scope user display info, hierarchy at org scope for nested org structures, ' +
@@ -27,13 +27,13 @@ export const PresetB2b: ModulePreset = {
     'the concept of a "workspace" / "team" / "tenant" that users belong to and act within.',
   good_for: [
     'B2B SaaS with multi-tenant workspaces / teams',
-    'Apps where permissions scope to an organization, not globally',
+    'Apps where capabilities scope to an organization, not globally',
     'Apps with an invite-based onboarding flow (admins invite members)',
-    'Apps that need nested org hierarchies (parent org / sub-org / team)'
+    'Apps that need nested org hierarchies (parent org / sub-org / team)',
   ],
   not_for: [
     'Single-tenant consumer apps — use `auth:hardened` or `auth:email`',
-    'Apps where all users see the same global dataset — orgs would add overhead with no benefit'
+    'Apps where all users see the same global dataset — orgs would add overhead with no benefit',
   ],
   modules: [
     'users_module',
@@ -54,8 +54,8 @@ export const PresetB2b: ModulePreset = {
     'webauthn_credentials_module',
     'webauthn_auth_module',
     'phone_numbers_module',
-    ['permissions_module', { scope: 'app' }],
-    ['permissions_module', { scope: 'org' }],
+    ['capabilities_module', { scope: 'app' }],
+    ['capabilities_module', { scope: 'org' }],
     ['limits_module', { scope: 'app' }],
     ['limits_module', { scope: 'org' }],
     ['levels_module', { scope: 'app' }],
@@ -65,7 +65,8 @@ export const PresetB2b: ModulePreset = {
     ['hierarchy_module', { scope: 'org' }],
     ['invites_module', { scope: 'app' }],
     ['invites_module', { scope: 'org' }],
-    'devices_module'
+    'devices_module',
+    'user_settings_security_module',
   ],
-  extends: ['auth:hardened']
+  extends: ['auth:hardened'],
 };

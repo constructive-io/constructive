@@ -26,16 +26,16 @@ export const PresetAuthPasskey: ModulePreset = {
   good_for: [
     'Apps where you want users to adopt phishing-resistant auth',
     'Consumer apps with a tech-forward audience',
-    'Internal tools protecting sensitive data where FIDO2 is a requirement'
+    'Internal tools protecting sensitive data where FIDO2 is a requirement',
   ],
   not_for: [
     'Apps that also need SSO or SMS — use `auth:hardened` for everything',
-    'Apps where the end-user device mix is heavy on old browsers that lack WebAuthn'
+    'Apps where the end-user device mix is heavy on old browsers that lack WebAuthn',
   ],
   modules: [
     'users_module',
     'membership_types_module',
-    ['permissions_module', { scope: 'app' }],
+    ['capabilities_module', { scope: 'app' }],
     ['limits_module', { scope: 'app' }],
     ['levels_module', { scope: 'app' }],
     ['memberships_module', { scope: 'app' }],
@@ -48,7 +48,7 @@ export const PresetAuthPasskey: ModulePreset = {
     'user_auth_module',
     'session_secrets_module',
     'webauthn_credentials_module',
-    'webauthn_auth_module'
+    'webauthn_auth_module',
   ],
-  extends: ['auth:email']
+  extends: ['auth:email'],
 };

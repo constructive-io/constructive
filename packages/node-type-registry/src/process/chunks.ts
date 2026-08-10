@@ -88,7 +88,7 @@ export const ProcessChunks: NodeTypeDefinition = {
       chunks_table_name: {
         type: 'string',
         description:
-          'Override the chunks table name. Defaults to {parent_table}_chunks.'
+          'Override the chunks table name. Defaults to {parent_table}_chunks.',
       },
 
       // ── Metadata ───────────────────────────────────────────────────

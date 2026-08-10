@@ -36,9 +36,13 @@ export const DataMemberOwner: NodeTypeDefinition = {
         description: 'If true, creates B-tree indexes on the owner and entity columns',
         default: true
       },
+      entity_type: {
+        type: 'string',
+        description: "Scope name for SPRT resolution (e.g. 'org', 'room'). Resolved to a membership type via the database's membership_types_module. This is the authoring form — use it instead of membership_type."
+      },
       membership_type: {
         type: 'integer',
-        description: 'Membership type for SPRT resolution. Required for entity-scoped provisioning.',
+        description: 'Resolved membership type for SPRT resolution. Internal: prefer entity_type. Cannot be combined with entity_type.',
         default: null
       }
     }

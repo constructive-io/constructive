@@ -88,18 +88,70 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
         description: 'Trigger events that fire the job',
         default: ['INSERT']
       },
+      file_field: {
+        type: 'string',
+        format: 'column-ref',
+        description:
+          'Name of an upload/image domain column holding the file reference. ' +
+          'When set, the trigger reads the object key, MIME type and bucket id ' +
+          'out of that document (NEW.<file_field> ->> \'key\', ...) instead of ' +
+          'requiring key/mime_type/bucket_id columns beside it, and the MIME ' +
+          'patterns match against <file_field> ->> \'mime\'.'
+      },
       payload_custom: {
         type: 'object',
-        additionalProperties: { type: 'string', format: 'column-ref' },
-        description: 'Custom payload key-to-column mapping for the job trigger',
-        default: {
-          file_id: 'id',
-          key: 'key',
-          mime_type: 'mime_type',
-          bucket_id: 'bucket_id'
-        }
+        additionalProperties: {
+          oneOf: [
+            { type: 'string', format: 'column-ref' },
+            {
+              type: 'object',
+              properties: {
+                field: { type: 'string', format: 'column-ref' },
+                path: { type: 'array', items: { type: 'string' }, minItems: 1 }
+              },
+              required: ['field', 'path']
+            }
+          ]
+        },
+        description:
+          'Custom payload key-to-source mapping for the job trigger. A source is ' +
+          'either a column name or a read into a jsonb column ' +
+          '({"field": "upload", "path": ["key"]}). Defaults to the four file ' +
+          'columns, or to the file_field document when file_field is set.'
       },
       trigger_conditions: triggerConditionsProperty,
+
+      // ── Bucket refs (optional — stamped into the job payload) ──────
+      source_bucket: {
+        type: 'object',
+        description:
+          'Typed bucket reference ({"$ref":"bucket","tags":[...],"type":...}) for ' +
+          'the bucket the source files live in, when it is not the record\'s own ' +
+          'bucket_id (which payload_custom already carries). Stamped into the ' +
+          'trigger payload at attach time and resolved to coordinates at dispatch.',
+        properties: {
+          $ref: { type: 'string', enum: ['bucket'] },
+          tags: { type: 'array', items: { type: 'string' } },
+          key: { type: 'string' },
+          type: { type: 'string', enum: ['public', 'private', 'temp'] }
+        },
+        required: ['$ref']
+      },
+      variants_bucket: {
+        type: 'object',
+        description:
+          'Typed bucket reference for where derived outputs (thumbnails, resized ' +
+          'variants, extracted assets) are written. Stamped into the trigger payload ' +
+          'at attach time and resolved to coordinates at dispatch, so the function ' +
+          'never selects a bucket.',
+        properties: {
+          $ref: { type: 'string', enum: ['bucket'] },
+          tags: { type: 'array', items: { type: 'string' } },
+          key: { type: 'string' },
+          type: { type: 'string', enum: ['public', 'private', 'temp'] }
+        },
+        required: ['$ref']
+      },
 
       // ── Entity billing scope ──────────────────────────────────────
       entity_field: {
@@ -148,7 +200,7 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
         description:
           'Whether to create a chunks table via ProcessChunks. Defaults to true ' +
           'when extraction is provided, false in direct mode. Set explicitly ' +
-          'to override.'
+          'to override.',
       },
       chunks: {
         type: 'object',

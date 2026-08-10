@@ -35,7 +35,7 @@ export const AuthzFilePath: NodeTypeDefinition = {
         type: 'string',
         description: 'Name of the files table (or use files_table_id)'
       },
-      permission_field: {
+      capability_field: {
         type: 'string',
         format: 'column-ref',
         description: 'Boolean column on the path_shares table that grants the required permission (e.g. can_read, can_write)'
@@ -54,7 +54,7 @@ export const AuthzFilePath: NodeTypeDefinition = {
       }
     },
     required: [
-      'permission_field'
+      'capability_field'
     ]
   },
   tags: [

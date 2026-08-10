@@ -10,7 +10,7 @@ import type { ModulePreset } from './types';
  * `set_password`, `reset_password`, `forgot_password`, `verify_email`,
  * `delete_account`, `my_sessions`, API-key CRUD. Nothing more.
  *
- * Includes permissions, limits, and levels modules (app scope) because
+ * Includes capabilities, limits, and levels modules (app scope) because
  * the app-scoped memberships module has NOT NULL foreign keys to the
  * tables they create (grants, caps, levels).
  *
@@ -23,10 +23,10 @@ export const PresetAuthEmail: ModulePreset = {
   name: 'auth:email',
   display_name: 'Email + Password',
   summary:
-    'Standard email/password auth flow with app-level permissions. No orgs, no SSO, no MFA.',
+    'Standard email/password auth flow with app-level capabilities. No orgs, no SSO, no MFA.',
   description:
     'Installs `user_auth_module` with exactly the table dependencies its insert trigger ' +
-    'hard-requires: users, app-scoped memberships (plus their permissions/limits/levels ' +
+    'hard-requires: users, app-scoped memberships (plus their capabilities/limits/levels ' +
     'dependencies), emails, user state, user secrets, sessions, plus RLS. You get the ' +
     'standard password-based auth procedures (sign_up, sign_in, reset_password, ' +
     "verify_email, delete_account, ...) and that's it. Everything else in the module " +
@@ -38,17 +38,17 @@ export const PresetAuthEmail: ModulePreset = {
     'Single-tenant consumer apps in the first week of development',
     'Internal tools where one simple login is enough',
     'Demos and hobby projects that need real password auth',
-    'B2C SaaS before org/team features are needed'
+    'B2C SaaS before org/team features are needed',
   ],
   not_for: [
     'Apps with org/team/workspace structure — use `b2b`',
     'Apps that need SSO or passkeys from day one — use `auth:sso` or `auth:passkey`',
-    'Production apps at scale — use `auth:hardened` (adds rate limits, SSO, passkeys, SMS)'
+    'Production apps at scale — use `auth:hardened` (adds rate limits, SSO, passkeys, SMS)',
   ],
   modules: [
     'users_module',
     'membership_types_module',
-    ['permissions_module', { scope: 'app' }],
+    ['capabilities_module', { scope: 'app' }],
     ['limits_module', { scope: 'app' }],
     ['levels_module', { scope: 'app' }],
     ['memberships_module', { scope: 'app' }],
@@ -58,6 +58,6 @@ export const PresetAuthEmail: ModulePreset = {
     ['internal_secrets_module', { scope: 'app' }],
     'emails_module',
     'rls_module',
-    'user_auth_module'
-  ]
+    'user_auth_module',
+  ],
 };

@@ -25,16 +25,16 @@ export const PresetMinimal: ModulePreset = {
   good_for: [
     'Internal tools where an upstream proxy supplies the user identity',
     'Backend-of-backend services that only need RLS, not an auth surface',
-    'Prototypes that will bolt on a richer auth preset later'
+    'Prototypes that will bolt on a richer auth preset later',
   ],
   not_for: [
     'Any app that needs `sign_up` / `sign_in` / `reset_password` out of the box — use `auth:email` instead',
-    'Multi-tenant / org-scoped apps — use `b2b`'
+    'Multi-tenant / org-scoped apps — use `b2b`',
   ],
   modules: [
     'users_module',
     'sessions_module',
     'rls_module',
-    'user_state_module'
-  ]
+    'user_state_module',
+  ],
 };
