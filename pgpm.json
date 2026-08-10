@@ -3,16 +3,16 @@
     "testing/*"
   ],
   "dependencies": {
-    "@constructive-db/apps": "5.0.0",
-    "@constructive-db/catalog": "5.0.0",
-    "@constructive-db/routing": "6.0.0",
-    "@constructive-db/routing-platform": "5.0.0",
-    "@pgpm/database-jobs": "0.33.1",
-    "@pgpm/function-resolution": "0.33.1",
-    "@pgpm/jwt-claims": "0.33.0",
-    "@pgpm/metaschema-modules": "0.33.1",
-    "@pgpm/metaschema-schema": "0.33.1",
-    "@pgpm/stamps": "0.33.0",
-    "@pgpm/uuid": "0.33.0"
+    "@constructive-db/apps": "5.1.0",
+    "@constructive-db/catalog": "5.1.0",
+    "@constructive-db/routing": "6.1.0",
+    "@constructive-db/routing-platform": "5.1.0",
+    "@pgpm/database-jobs": "0.41.0",
+    "@pgpm/function-resolution": "0.41.0",
+    "@pgpm/jwt-claims": "0.41.0",
+    "@pgpm/metaschema-modules": "0.41.0",
+    "@pgpm/metaschema-schema": "0.41.0",
+    "@pgpm/stamps": "0.41.0",
+    "@pgpm/uuid": "0.41.0"
   }
 }
