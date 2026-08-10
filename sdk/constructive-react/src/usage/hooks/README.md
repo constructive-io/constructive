@@ -32,6 +32,41 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
+| `useAppAchievementRewardsQuery` | Query | Defines rewards granted when a level is achieved; supports limit_credits and meter_credits |
+| `useAppAchievementRewardQuery` | Query | Defines rewards granted when a level is achieved; supports limit_credits and meter_credits |
+| `useCreateAppAchievementRewardMutation` | Mutation | Defines rewards granted when a level is achieved; supports limit_credits and meter_credits |
+| `useUpdateAppAchievementRewardMutation` | Mutation | Defines rewards granted when a level is achieved; supports limit_credits and meter_credits |
+| `useDeleteAppAchievementRewardMutation` | Mutation | Defines rewards granted when a level is achieved; supports limit_credits and meter_credits |
+| `useAppEventAggregatesQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useAppEventAggregateQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useCreateAppEventAggregateMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useUpdateAppEventAggregateMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useDeleteAppEventAggregateMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useAppEventsQuery` | Query | Partitioned append-only log of individual user actions; every single event ever recorded |
+| `useAppEventQuery` | Query | Partitioned append-only log of individual user actions; every single event ever recorded |
+| `useCreateAppEventMutation` | Mutation | Partitioned append-only log of individual user actions; every single event ever recorded |
+| `useUpdateAppEventMutation` | Mutation | Partitioned append-only log of individual user actions; every single event ever recorded |
+| `useDeleteAppEventMutation` | Mutation | Partitioned append-only log of individual user actions; every single event ever recorded |
+| `useAppEventTypesQuery` | Query | Catalog of known event types with per-type configuration for aggregation, retention, and level participation |
+| `useAppEventTypeQuery` | Query | Catalog of known event types with per-type configuration for aggregation, retention, and level participation |
+| `useCreateAppEventTypeMutation` | Mutation | Catalog of known event types with per-type configuration for aggregation, retention, and level participation |
+| `useUpdateAppEventTypeMutation` | Mutation | Catalog of known event types with per-type configuration for aggregation, retention, and level participation |
+| `useDeleteAppEventTypeMutation` | Mutation | Catalog of known event types with per-type configuration for aggregation, retention, and level participation |
+| `useAppLevelsQuery` | Query | Defines available levels that users can achieve by completing requirements |
+| `useAppLevelQuery` | Query | Defines available levels that users can achieve by completing requirements |
+| `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useUpdateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useDeleteAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useAppLevelGrantsQuery` | Query | Records when a user achieves a level; prevents duplicate reward grants |
+| `useAppLevelGrantQuery` | Query | Records when a user achieves a level; prevents duplicate reward grants |
+| `useCreateAppLevelGrantMutation` | Mutation | Records when a user achieves a level; prevents duplicate reward grants |
+| `useUpdateAppLevelGrantMutation` | Mutation | Records when a user achieves a level; prevents duplicate reward grants |
+| `useDeleteAppLevelGrantMutation` | Mutation | Records when a user achieves a level; prevents duplicate reward grants |
+| `useAppLevelRequirementsQuery` | Query | Defines the specific requirements that must be met to achieve a level |
+| `useAppLevelRequirementQuery` | Query | Defines the specific requirements that must be met to achieve a level |
+| `useCreateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
+| `useUpdateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
+| `useDeleteAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
 | `useAppLimitCapsQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
 | `useAppLimitCapQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
 | `useCreateAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
@@ -47,11 +82,11 @@ function App() {
 | `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useUpdateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useDeleteAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
-| `useAppLimitCreditCodesQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
-| `useAppLimitCreditCodeQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
-| `useCreateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
-| `useUpdateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
-| `useDeleteAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useAppLimitCreditCodesQuery` | Query | Redeemable credit codes managed by admins with the add_credits capability |
+| `useAppLimitCreditCodeQuery` | Query | Redeemable credit codes managed by admins with the add_credits capability |
+| `useCreateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits capability |
+| `useUpdateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits capability |
+| `useDeleteAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits capability |
 | `useAppLimitCreditCodeItemsQuery` | Query | Items within a credit code — each row grants credits for a specific limit definition |
 | `useAppLimitCreditCodeItemQuery` | Query | Items within a credit code — each row grants credits for a specific limit definition |
 | `useCreateAppLimitCreditCodeItemMutation` | Mutation | Items within a credit code — each row grants credits for a specific limit definition |
@@ -82,6 +117,36 @@ function App() {
 | `useCreateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useUpdateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useDeleteAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useBillingUsageSummariesQuery` | Query | Permanent monthly usage summary per entity per meter (user-facing billing dashboard) |
+| `useBillingUsageSummaryQuery` | Query | Permanent monthly usage summary per entity per meter (user-facing billing dashboard) |
+| `useCreateBillingUsageSummaryMutation` | Mutation | Permanent monthly usage summary per entity per meter (user-facing billing dashboard) |
+| `useUpdateBillingUsageSummaryMutation` | Mutation | Permanent monthly usage summary per entity per meter (user-facing billing dashboard) |
+| `useDeleteBillingUsageSummaryMutation` | Mutation | Permanent monthly usage summary per entity per meter (user-facing billing dashboard) |
+| `useLedgersQuery` | Query | Append-only event log for all billing events (usage, grants, adjustments) |
+| `useLedgerQuery` | Query | Append-only event log for all billing events (usage, grants, adjustments) |
+| `useCreateLedgerMutation` | Mutation | Append-only event log for all billing events (usage, grants, adjustments) |
+| `useUpdateLedgerMutation` | Mutation | Append-only event log for all billing events (usage, grants, adjustments) |
+| `useDeleteLedgerMutation` | Mutation | Append-only event log for all billing events (usage, grants, adjustments) |
+| `useMetersQuery` | Query | Defines billable meters (what to track: quotas, feature flags, credit pools) |
+| `useMeterQuery` | Query | Defines billable meters (what to track: quotas, feature flags, credit pools) |
+| `useCreateMeterMutation` | Mutation | Defines billable meters (what to track: quotas, feature flags, credit pools) |
+| `useUpdateMeterMutation` | Mutation | Defines billable meters (what to track: quotas, feature flags, credit pools) |
+| `useDeleteMeterMutation` | Mutation | Defines billable meters (what to track: quotas, feature flags, credit pools) |
+| `useMeterCreditsQuery` | Query | Append-only ledger of credit grants for billing meters that automatically update balances |
+| `useMeterCreditQuery` | Query | Append-only ledger of credit grants for billing meters that automatically update balances |
+| `useCreateMeterCreditMutation` | Mutation | Append-only ledger of credit grants for billing meters that automatically update balances |
+| `useUpdateMeterCreditMutation` | Mutation | Append-only ledger of credit grants for billing meters that automatically update balances |
+| `useDeleteMeterCreditMutation` | Mutation | Append-only ledger of credit grants for billing meters that automatically update balances |
+| `useMeterDefaultsQuery` | Query | Default meter catalog: defines which meters are available and their default plan_limit values for new entities |
+| `useMeterDefaultQuery` | Query | Default meter catalog: defines which meters are available and their default plan_limit values for new entities |
+| `useCreateMeterDefaultMutation` | Mutation | Default meter catalog: defines which meters are available and their default plan_limit values for new entities |
+| `useUpdateMeterDefaultMutation` | Mutation | Default meter catalog: defines which meters are available and their default plan_limit values for new entities |
+| `useDeleteMeterDefaultMutation` | Mutation | Default meter catalog: defines which meters are available and their default plan_limit values for new entities |
+| `useMeterSourcesQuery` | Query | Maps billing meters to typed usage summary table columns for automated usage reconciliation. Each row tells reconcile_typed_usage() which column to aggregate and how. |
+| `useMeterSourceQuery` | Query | Maps billing meters to typed usage summary table columns for automated usage reconciliation. Each row tells reconcile_typed_usage() which column to aggregate and how. |
+| `useCreateMeterSourceMutation` | Mutation | Maps billing meters to typed usage summary table columns for automated usage reconciliation. Each row tells reconcile_typed_usage() which column to aggregate and how. |
+| `useUpdateMeterSourceMutation` | Mutation | Maps billing meters to typed usage summary table columns for automated usage reconciliation. Each row tells reconcile_typed_usage() which column to aggregate and how. |
+| `useDeleteMeterSourceMutation` | Mutation | Maps billing meters to typed usage summary table columns for automated usage reconciliation. Each row tells reconcile_typed_usage() which column to aggregate and how. |
 | `useOrgLimitAggregatesQuery` | Query | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
 | `useOrgLimitAggregateQuery` | Query | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
 | `useCreateOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
@@ -122,16 +187,209 @@ function App() {
 | `useCreateOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useUpdateOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useDeleteOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `usePlanCapsQuery` | Query | Maps each plan to feature flag cap values (written to limit_caps when plan is applied) |
+| `usePlanCapQuery` | Query | Maps each plan to feature flag cap values (written to limit_caps when plan is applied) |
+| `useCreatePlanCapMutation` | Mutation | Maps each plan to feature flag cap values (written to limit_caps when plan is applied) |
+| `useUpdatePlanCapMutation` | Mutation | Maps each plan to feature flag cap values (written to limit_caps when plan is applied) |
+| `useDeletePlanCapMutation` | Mutation | Maps each plan to feature flag cap values (written to limit_caps when plan is applied) |
+| `usePlansQuery` | Query | Defines plan tiers with named limit configurations |
+| `usePlanQuery` | Query | Defines plan tiers with named limit configurations |
+| `useCreatePlanMutation` | Mutation | Defines plan tiers with named limit configurations |
+| `useUpdatePlanMutation` | Mutation | Defines plan tiers with named limit configurations |
+| `useDeletePlanMutation` | Mutation | Defines plan tiers with named limit configurations |
+| `usePlanLimitsQuery` | Query | Maps each plan to specific limit names and their maximum allowed values |
+| `usePlanLimitQuery` | Query | Maps each plan to specific limit names and their maximum allowed values |
+| `useCreatePlanLimitMutation` | Mutation | Maps each plan to specific limit names and their maximum allowed values |
+| `useUpdatePlanLimitMutation` | Mutation | Maps each plan to specific limit names and their maximum allowed values |
+| `useDeletePlanLimitMutation` | Mutation | Maps each plan to specific limit names and their maximum allowed values |
+| `usePlanMeterLimitsQuery` | Query | Maps each plan to billing meter quotas (plan_limit values written to balances when plan is applied) |
+| `usePlanMeterLimitQuery` | Query | Maps each plan to billing meter quotas (plan_limit values written to balances when plan is applied) |
+| `useCreatePlanMeterLimitMutation` | Mutation | Maps each plan to billing meter quotas (plan_limit values written to balances when plan is applied) |
+| `useUpdatePlanMeterLimitMutation` | Mutation | Maps each plan to billing meter quotas (plan_limit values written to balances when plan is applied) |
+| `useDeletePlanMeterLimitMutation` | Mutation | Maps each plan to billing meter quotas (plan_limit values written to balances when plan is applied) |
+| `usePlanOverridesQuery` | Query | Per-entity limit overrides that take precedence over plan defaults |
+| `usePlanOverrideQuery` | Query | Per-entity limit overrides that take precedence over plan defaults |
+| `useCreatePlanOverrideMutation` | Mutation | Per-entity limit overrides that take precedence over plan defaults |
+| `useUpdatePlanOverrideMutation` | Mutation | Per-entity limit overrides that take precedence over plan defaults |
+| `useDeletePlanOverrideMutation` | Mutation | Per-entity limit overrides that take precedence over plan defaults |
+| `usePlanPricingsQuery` | Query | Billing intervals and pricing for each plan tier |
+| `usePlanPricingQuery` | Query | Billing intervals and pricing for each plan tier |
+| `useCreatePlanPricingMutation` | Mutation | Billing intervals and pricing for each plan tier |
+| `useUpdatePlanPricingMutation` | Mutation | Billing intervals and pricing for each plan tier |
+| `useDeletePlanPricingMutation` | Mutation | Billing intervals and pricing for each plan tier |
+| `usePlanSubscriptionsQuery` | Query | Assigns a plan to an entity with subscription lifecycle (start, end, active state) |
+| `usePlanSubscriptionQuery` | Query | Assigns a plan to an entity with subscription lifecycle (start, end, active state) |
+| `useCreatePlanSubscriptionMutation` | Mutation | Assigns a plan to an entity with subscription lifecycle (start, end, active state) |
+| `useUpdatePlanSubscriptionMutation` | Mutation | Assigns a plan to an entity with subscription lifecycle (start, end, active state) |
+| `useDeletePlanSubscriptionMutation` | Mutation | Assigns a plan to an entity with subscription lifecycle (start, end, active state) |
+| `useCaptureAppLimitDefaultsQuery` | Query | captureAppLimitDefaults |
+| `useCaptureOrgLimitDefaultsQuery` | Query | captureOrgLimitDefaults |
+| `useCaptureTrustLadderQuery` | Query | captureTrustLadder |
+| `useEventsAchievedQuery` | Query | eventsAchieved |
+| `useEventsRequiredQuery` | Query | Reads and enables pagination through a set of `AppLevelRequirement`. |
+| `useGrantAchievementMutation` | Mutation | grantAchievement |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
+| `useRecomputeCapabilitiesMutation` | Mutation | recomputeCapabilities |
+| `useRevokeAchievementMutation` | Mutation | revokeAchievement |
 | `useSeedAppLimitCapsDefaultsMutation` | Mutation | seedAppLimitCapsDefaults |
 | `useSeedAppLimitDefaultsMutation` | Mutation | seedAppLimitDefaults |
+| `useSeedMeterDefaultsMutation` | Mutation | seedMeterDefaults |
 | `useSeedOrgLimitCapsDefaultsMutation` | Mutation | seedOrgLimitCapsDefaults |
 | `useSeedOrgLimitDefaultsMutation` | Mutation | seedOrgLimitDefaults |
+| `useSeedPlanMutation` | Mutation | seedPlan |
+| `useSeedTrustLadderMutation` | Mutation | seedTrustLadder |
 
 ## Table Hooks
+
+### AppAchievementReward
+
+```typescript
+// List all appAchievementRewards
+const { data, isLoading } = useAppAchievementRewardsQuery({
+  selection: { fields: { amount: true, createdAt: true, creditType: true, expiresInterval: true, id: true, levelName: true, rewardType: true, targetName: true, updatedAt: true } },
+});
+
+// Get one appAchievementReward
+const { data: item } = useAppAchievementRewardQuery({
+  id: '<UUID>',
+  selection: { fields: { amount: true, createdAt: true, creditType: true, expiresInterval: true, id: true, levelName: true, rewardType: true, targetName: true, updatedAt: true } },
+});
+
+// Create a appAchievementReward
+const { mutate: create } = useCreateAppAchievementRewardMutation({
+  selection: { fields: { id: true } },
+});
+create({ amount: '<Int>', creditType: '<String>', expiresInterval: '<Interval>', levelName: '<String>', rewardType: '<String>', targetName: '<String>' });
+```
+
+### AppEventAggregate
+
+```typescript
+// List all appEventAggregates
+const { data, isLoading } = useAppEventAggregatesQuery({
+  selection: { fields: { actorId: true, count: true, createdAt: true, id: true, name: true, periodStart: true, updatedAt: true } },
+});
+
+// Get one appEventAggregate
+const { data: item } = useAppEventAggregateQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, count: true, createdAt: true, id: true, name: true, periodStart: true, updatedAt: true } },
+});
+
+// Create a appEventAggregate
+const { mutate: create } = useCreateAppEventAggregateMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', count: '<Int>', name: '<String>', periodStart: '<Datetime>' });
+```
+
+### AppEvent
+
+```typescript
+// List all appEvents
+const { data, isLoading } = useAppEventsQuery({
+  selection: { fields: { actorId: true, count: true, createdAt: true, id: true, name: true } },
+});
+
+// Get one appEvent
+const { data: item } = useAppEventQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, count: true, createdAt: true, id: true, name: true } },
+});
+
+// Create a appEvent
+const { mutate: create } = useCreateAppEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', count: '<Int>', name: '<String>' });
+```
+
+### AppEventType
+
+```typescript
+// List all appEventTypes
+const { data, isLoading } = useAppEventTypesQuery({
+  selection: { fields: { aggregation: true, category: true, createdAt: true, description: true, feedsLevels: true, id: true, isActive: true, name: true, periodInterval: true, updatedAt: true } },
+});
+
+// Get one appEventType
+const { data: item } = useAppEventTypeQuery({
+  id: '<UUID>',
+  selection: { fields: { aggregation: true, category: true, createdAt: true, description: true, feedsLevels: true, id: true, isActive: true, name: true, periodInterval: true, updatedAt: true } },
+});
+
+// Create a appEventType
+const { mutate: create } = useCreateAppEventTypeMutation({
+  selection: { fields: { id: true } },
+});
+create({ aggregation: '<String>', category: '<String>', description: '<String>', feedsLevels: '<Boolean>', isActive: '<Boolean>', name: '<String>', periodInterval: '<Interval>' });
+```
+
+### AppLevel
+
+```typescript
+// List all appLevels
+const { data, isLoading } = useAppLevelsQuery({
+  selection: { fields: { createdAt: true, description: true, id: true, image: true, name: true, ownerId: true, updatedAt: true } },
+});
+
+// Get one appLevel
+const { data: item } = useAppLevelQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, description: true, id: true, image: true, name: true, ownerId: true, updatedAt: true } },
+});
+
+// Create a appLevel
+const { mutate: create } = useCreateAppLevelMutation({
+  selection: { fields: { id: true } },
+});
+create({ description: '<String>', image: '<Image>', name: '<String>', ownerId: '<UUID>' });
+```
+
+### AppLevelGrant
+
+```typescript
+// List all appLevelGrants
+const { data, isLoading } = useAppLevelGrantsQuery({
+  selection: { fields: { actorId: true, createdAt: true, expiresAt: true, id: true, levelName: true, periodStart: true, updatedAt: true } },
+});
+
+// Get one appLevelGrant
+const { data: item } = useAppLevelGrantQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, createdAt: true, expiresAt: true, id: true, levelName: true, periodStart: true, updatedAt: true } },
+});
+
+// Create a appLevelGrant
+const { mutate: create } = useCreateAppLevelGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', expiresAt: '<Datetime>', levelName: '<String>', periodStart: '<Datetime>' });
+```
+
+### AppLevelRequirement
+
+```typescript
+// List all appLevelRequirements
+const { data, isLoading } = useAppLevelRequirementsQuery({
+  selection: { fields: { createdAt: true, description: true, groupKey: true, id: true, level: true, metric: true, name: true, priority: true, requiredCount: true, updatedAt: true } },
+});
+
+// Get one appLevelRequirement
+const { data: item } = useAppLevelRequirementQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, description: true, groupKey: true, id: true, level: true, metric: true, name: true, priority: true, requiredCount: true, updatedAt: true } },
+});
+
+// Create a appLevelRequirement
+const { mutate: create } = useCreateAppLevelRequirementMutation({
+  selection: { fields: { id: true } },
+});
+create({ description: '<String>', groupKey: '<String>', level: '<String>', metric: '<String>', name: '<String>', priority: '<Int>', requiredCount: '<Int>' });
+```
 
 ### AppLimitCap
 
@@ -343,6 +601,132 @@ const { mutate: create } = useCreateAppLimitWarningMutation({
 create({ name: '<String>', taskIdentifier: '<String>', thresholdValue: '<BigInt>', warningType: '<String>' });
 ```
 
+### BillingUsageSummary
+
+```typescript
+// List all billingUsageSummaries
+const { data, isLoading } = useBillingUsageSummariesQuery({
+  selection: { fields: { creditsConsumed: true, entityId: true, entityType: true, id: true, meterSlug: true, organizationId: true, overageUnits: true, periodEnd: true, periodStart: true, planLimit: true, quantityUsed: true } },
+});
+
+// Get one billingUsageSummary
+const { data: item } = useBillingUsageSummaryQuery({
+  id: '<UUID>',
+  selection: { fields: { creditsConsumed: true, entityId: true, entityType: true, id: true, meterSlug: true, organizationId: true, overageUnits: true, periodEnd: true, periodStart: true, planLimit: true, quantityUsed: true } },
+});
+
+// Create a billingUsageSummary
+const { mutate: create } = useCreateBillingUsageSummaryMutation({
+  selection: { fields: { id: true } },
+});
+create({ creditsConsumed: '<BigInt>', entityId: '<UUID>', entityType: '<String>', meterSlug: '<String>', organizationId: '<UUID>', overageUnits: '<BigInt>', periodEnd: '<Datetime>', periodStart: '<Datetime>', planLimit: '<BigInt>', quantityUsed: '<BigInt>' });
+```
+
+### Ledger
+
+```typescript
+// List all ledgers
+const { data, isLoading } = useLedgersQuery({
+  selection: { fields: { createdAt: true, delta: true, entityId: true, entityType: true, entryType: true, id: true, ledgerClass: true, metadata: true, meterSlug: true, organizationId: true, usageAfter: true } },
+});
+
+// Get one ledger
+const { data: item } = useLedgerQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, delta: true, entityId: true, entityType: true, entryType: true, id: true, ledgerClass: true, metadata: true, meterSlug: true, organizationId: true, usageAfter: true } },
+});
+
+// Create a ledger
+const { mutate: create } = useCreateLedgerMutation({
+  selection: { fields: { id: true } },
+});
+create({ delta: '<BigInt>', entityId: '<UUID>', entityType: '<String>', entryType: '<String>', ledgerClass: '<String>', metadata: '<JSON>', meterSlug: '<String>', organizationId: '<UUID>', usageAfter: '<BigInt>' });
+```
+
+### Meter
+
+```typescript
+// List all meters
+const { data, isLoading } = useMetersQuery({
+  selection: { fields: { aggregation: true, categoryMeter: true, creditCost: true, displayName: true, id: true, isActive: true, meterType: true, periodInterval: true, rolloverCap: true, slug: true, unit: true } },
+});
+
+// Get one meter
+const { data: item } = useMeterQuery({
+  id: '<UUID>',
+  selection: { fields: { aggregation: true, categoryMeter: true, creditCost: true, displayName: true, id: true, isActive: true, meterType: true, periodInterval: true, rolloverCap: true, slug: true, unit: true } },
+});
+
+// Create a meter
+const { mutate: create } = useCreateMeterMutation({
+  selection: { fields: { id: true } },
+});
+create({ aggregation: '<String>', categoryMeter: '<String>', creditCost: '<Int>', displayName: '<String>', isActive: '<Boolean>', meterType: '<String>', periodInterval: '<Interval>', rolloverCap: '<BigInt>', slug: '<String>', unit: '<String>' });
+```
+
+### MeterCredit
+
+```typescript
+// List all meterCredits
+const { data, isLoading } = useMeterCreditsQuery({
+  selection: { fields: { amount: true, createdAt: true, creditType: true, entityId: true, entityType: true, expiresAt: true, id: true, meterId: true, organizationId: true, reason: true } },
+});
+
+// Get one meterCredit
+const { data: item } = useMeterCreditQuery({
+  id: '<UUID>',
+  selection: { fields: { amount: true, createdAt: true, creditType: true, entityId: true, entityType: true, expiresAt: true, id: true, meterId: true, organizationId: true, reason: true } },
+});
+
+// Create a meterCredit
+const { mutate: create } = useCreateMeterCreditMutation({
+  selection: { fields: { id: true } },
+});
+create({ amount: '<BigInt>', creditType: '<String>', entityId: '<UUID>', entityType: '<String>', expiresAt: '<Datetime>', meterId: '<UUID>', organizationId: '<UUID>', reason: '<String>' });
+```
+
+### MeterDefault
+
+```typescript
+// List all meterDefaults
+const { data, isLoading } = useMeterDefaultsQuery({
+  selection: { fields: { categoryMeter: true, creditCost: true, defaultPlanLimit: true, displayName: true, id: true, isActive: true, meterType: true, slug: true, unit: true } },
+});
+
+// Get one meterDefault
+const { data: item } = useMeterDefaultQuery({
+  id: '<UUID>',
+  selection: { fields: { categoryMeter: true, creditCost: true, defaultPlanLimit: true, displayName: true, id: true, isActive: true, meterType: true, slug: true, unit: true } },
+});
+
+// Create a meterDefault
+const { mutate: create } = useCreateMeterDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ categoryMeter: '<String>', creditCost: '<BigFloat>', defaultPlanLimit: '<BigInt>', displayName: '<String>', isActive: '<Boolean>', meterType: '<String>', slug: '<String>', unit: '<String>' });
+```
+
+### MeterSource
+
+```typescript
+// List all meterSources
+const { data, isLoading } = useMeterSourcesQuery({
+  selection: { fields: { aggregationType: true, dimensionPath: true, id: true, isActive: true, meterSlug: true, sourceMetric: true } },
+});
+
+// Get one meterSource
+const { data: item } = useMeterSourceQuery({
+  id: '<UUID>',
+  selection: { fields: { aggregationType: true, dimensionPath: true, id: true, isActive: true, meterSlug: true, sourceMetric: true } },
+});
+
+// Create a meterSource
+const { mutate: create } = useCreateMeterSourceMutation({
+  selection: { fields: { id: true } },
+});
+create({ aggregationType: '<String>', dimensionPath: '<String>', isActive: '<Boolean>', meterSlug: '<String>', sourceMetric: '<String>' });
+```
+
 ### OrgLimitAggregate
 
 ```typescript
@@ -511,7 +895,213 @@ const { mutate: create } = useCreateOrgLimitWarningMutation({
 create({ entityId: '<UUID>', name: '<String>', taskIdentifier: '<String>', thresholdValue: '<BigInt>', warningType: '<String>' });
 ```
 
+### PlanCap
+
+```typescript
+// List all planCaps
+const { data, isLoading } = usePlanCapsQuery({
+  selection: { fields: { capName: true, capValue: true, id: true, planId: true } },
+});
+
+// Get one planCap
+const { data: item } = usePlanCapQuery({
+  id: '<UUID>',
+  selection: { fields: { capName: true, capValue: true, id: true, planId: true } },
+});
+
+// Create a planCap
+const { mutate: create } = useCreatePlanCapMutation({
+  selection: { fields: { id: true } },
+});
+create({ capName: '<String>', capValue: '<BigInt>', planId: '<UUID>' });
+```
+
+### Plan
+
+```typescript
+// List all plans
+const { data, isLoading } = usePlansQuery({
+  selection: { fields: { description: true, id: true, isActive: true, name: true } },
+});
+
+// Get one plan
+const { data: item } = usePlanQuery({
+  id: '<UUID>',
+  selection: { fields: { description: true, id: true, isActive: true, name: true } },
+});
+
+// Create a plan
+const { mutate: create } = useCreatePlanMutation({
+  selection: { fields: { id: true } },
+});
+create({ description: '<String>', isActive: '<Boolean>', name: '<String>' });
+```
+
+### PlanLimit
+
+```typescript
+// List all planLimits
+const { data, isLoading } = usePlanLimitsQuery({
+  selection: { fields: { id: true, limitName: true, maxValue: true, planId: true } },
+});
+
+// Get one planLimit
+const { data: item } = usePlanLimitQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, limitName: true, maxValue: true, planId: true } },
+});
+
+// Create a planLimit
+const { mutate: create } = useCreatePlanLimitMutation({
+  selection: { fields: { id: true } },
+});
+create({ limitName: '<String>', maxValue: '<BigInt>', planId: '<UUID>' });
+```
+
+### PlanMeterLimit
+
+```typescript
+// List all planMeterLimits
+const { data, isLoading } = usePlanMeterLimitsQuery({
+  selection: { fields: { id: true, meterSlug: true, planId: true, planLimit: true } },
+});
+
+// Get one planMeterLimit
+const { data: item } = usePlanMeterLimitQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, meterSlug: true, planId: true, planLimit: true } },
+});
+
+// Create a planMeterLimit
+const { mutate: create } = useCreatePlanMeterLimitMutation({
+  selection: { fields: { id: true } },
+});
+create({ meterSlug: '<String>', planId: '<UUID>', planLimit: '<BigInt>' });
+```
+
+### PlanOverride
+
+```typescript
+// List all planOverrides
+const { data, isLoading } = usePlanOverridesQuery({
+  selection: { fields: { entityId: true, expiresAt: true, id: true, limitName: true, maxValue: true, reason: true } },
+});
+
+// Get one planOverride
+const { data: item } = usePlanOverrideQuery({
+  id: '<UUID>',
+  selection: { fields: { entityId: true, expiresAt: true, id: true, limitName: true, maxValue: true, reason: true } },
+});
+
+// Create a planOverride
+const { mutate: create } = useCreatePlanOverrideMutation({
+  selection: { fields: { id: true } },
+});
+create({ entityId: '<UUID>', expiresAt: '<Datetime>', limitName: '<String>', maxValue: '<BigInt>', reason: '<String>' });
+```
+
+### PlanPricing
+
+```typescript
+// List all planPricings
+const { data, isLoading } = usePlanPricingsQuery({
+  selection: { fields: { billingInterval: true, currency: true, discountPercent: true, id: true, isActive: true, planId: true, price: true } },
+});
+
+// Get one planPricing
+const { data: item } = usePlanPricingQuery({
+  id: '<UUID>',
+  selection: { fields: { billingInterval: true, currency: true, discountPercent: true, id: true, isActive: true, planId: true, price: true } },
+});
+
+// Create a planPricing
+const { mutate: create } = useCreatePlanPricingMutation({
+  selection: { fields: { id: true } },
+});
+create({ billingInterval: '<String>', currency: '<String>', discountPercent: '<BigFloat>', isActive: '<Boolean>', planId: '<UUID>', price: '<BigInt>' });
+```
+
+### PlanSubscription
+
+```typescript
+// List all planSubscriptions
+const { data, isLoading } = usePlanSubscriptionsQuery({
+  selection: { fields: { endsAt: true, entityId: true, entityType: true, id: true, isActive: true, organizationId: true, planId: true, startsAt: true } },
+});
+
+// Get one planSubscription
+const { data: item } = usePlanSubscriptionQuery({
+  id: '<UUID>',
+  selection: { fields: { endsAt: true, entityId: true, entityType: true, id: true, isActive: true, organizationId: true, planId: true, startsAt: true } },
+});
+
+// Create a planSubscription
+const { mutate: create } = useCreatePlanSubscriptionMutation({
+  selection: { fields: { id: true } },
+});
+create({ endsAt: '<Datetime>', entityId: '<UUID>', entityType: '<String>', isActive: '<Boolean>', organizationId: '<UUID>', planId: '<UUID>', startsAt: '<Datetime>' });
+```
+
 ## Custom Operation Hooks
+
+### `useCaptureAppLimitDefaultsQuery`
+
+captureAppLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
+
+### `useCaptureOrgLimitDefaultsQuery`
+
+captureOrgLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
+
+### `useCaptureTrustLadderQuery`
+
+captureTrustLadder
+
+- **Type:** query
+- **Arguments:** none
+
+### `useEventsAchievedQuery`
+
+eventsAchieved
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `level` | String |
+  | `roleId` | UUID |
+
+### `useEventsRequiredQuery`
+
+Reads and enables pagination through a set of `AppLevelRequirement`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `after` | Cursor |
+  | `first` | Int |
+  | `level` | String |
+  | `offset` | Int |
+  | `roleId` | UUID |
+
+### `useGrantAchievementMutation`
+
+grantAchievement
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | GrantAchievementInput (required) |
 
 ### `useProvisionBucketMutation`
 
@@ -526,6 +1116,28 @@ and lifecycle settings.
   | Argument | Type |
   |----------|------|
   | `input` | ProvisionBucketInput (required) |
+
+### `useRecomputeCapabilitiesMutation`
+
+recomputeCapabilities
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RecomputeCapabilitiesInput (required) |
+
+### `useRevokeAchievementMutation`
+
+revokeAchievement
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeAchievementInput (required) |
 
 ### `useSeedAppLimitCapsDefaultsMutation`
 
@@ -549,6 +1161,17 @@ seedAppLimitDefaults
   |----------|------|
   | `input` | SeedAppLimitDefaultsInput (required) |
 
+### `useSeedMeterDefaultsMutation`
+
+seedMeterDefaults
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SeedMeterDefaultsInput (required) |
+
 ### `useSeedOrgLimitCapsDefaultsMutation`
 
 seedOrgLimitCapsDefaults
@@ -570,6 +1193,28 @@ seedOrgLimitDefaults
   | Argument | Type |
   |----------|------|
   | `input` | SeedOrgLimitDefaultsInput (required) |
+
+### `useSeedPlanMutation`
+
+seedPlan
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SeedPlanInput (required) |
+
+### `useSeedTrustLadderMutation`
+
+seedTrustLadder
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SeedTrustLadderInput (required) |
 
 ---
 

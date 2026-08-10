@@ -5,6 +5,13 @@
  */
 
 import type {
+  AppAchievementReward,
+  AppEvent,
+  AppEventAggregate,
+  AppEventType,
+  AppLevel,
+  AppLevelGrant,
+  AppLevelRequirement,
   AppLimit,
   AppLimitCap,
   AppLimitCapsDefault,
@@ -15,6 +22,12 @@ import type {
   AppLimitDefault,
   AppLimitEvent,
   AppLimitWarning,
+  BillingUsageSummary,
+  Ledger,
+  Meter,
+  MeterCredit,
+  MeterDefault,
+  MeterSource,
   OrgLimit,
   OrgLimitAggregate,
   OrgLimitCap,
@@ -23,6 +36,13 @@ import type {
   OrgLimitDefault,
   OrgLimitEvent,
   OrgLimitWarning,
+  Plan,
+  PlanCap,
+  PlanLimit,
+  PlanMeterLimit,
+  PlanOverride,
+  PlanPricing,
+  PlanSubscription,
   BigFloatFilter,
   BigIntFilter,
   BitStringFilter,
@@ -41,6 +61,152 @@ import type {
   UUIDListFilter,
   VectorFilter,
 } from './types';
+export type ConstructiveInternalTypeImage = unknown;
+/** Methods to use when ordering `AppAchievementReward`. */
+export type AppAchievementRewardOrderBy =
+  | 'AMOUNT_ASC'
+  | 'AMOUNT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREDIT_TYPE_ASC'
+  | 'CREDIT_TYPE_DESC'
+  | 'EXPIRES_INTERVAL_ASC'
+  | 'EXPIRES_INTERVAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LEVEL_NAME_ASC'
+  | 'LEVEL_NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REWARD_TYPE_ASC'
+  | 'REWARD_TYPE_DESC'
+  | 'TARGET_NAME_ASC'
+  | 'TARGET_NAME_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `AppEventAggregate`. */
+export type AppEventAggregateOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'COUNT_ASC'
+  | 'COUNT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PERIOD_START_ASC'
+  | 'PERIOD_START_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `AppEvent`. */
+export type AppEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'COUNT_ASC'
+  | 'COUNT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `AppEventType`. */
+export type AppEventTypeOrderBy =
+  | 'AGGREGATION_ASC'
+  | 'AGGREGATION_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'FEEDS_LEVELS_ASC'
+  | 'FEEDS_LEVELS_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PERIOD_INTERVAL_ASC'
+  | 'PERIOD_INTERVAL_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `AppLevelGrant`. */
+export type AppLevelGrantOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LEVEL_NAME_ASC'
+  | 'LEVEL_NAME_DESC'
+  | 'NATURAL'
+  | 'PERIOD_START_ASC'
+  | 'PERIOD_START_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `AppLevel`. */
+export type AppLevelOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `AppLevelRequirement`. */
+export type AppLevelRequirementOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'GROUP_KEY_ASC'
+  | 'GROUP_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LEVEL_ASC'
+  | 'LEVEL_DESC'
+  | 'METRIC_ASC'
+  | 'METRIC_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIORITY_ASC'
+  | 'PRIORITY_DESC'
+  | 'REQUIRED_COUNT_ASC'
+  | 'REQUIRED_COUNT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `AppLimitCap`. */
 export type AppLimitCapOrderBy =
   | 'ENTITY_ID_ASC'
@@ -217,6 +383,152 @@ export type AppLimitWarningOrderBy =
   | 'THRESHOLD_VALUE_DESC'
   | 'WARNING_TYPE_ASC'
   | 'WARNING_TYPE_DESC';
+/** Methods to use when ordering `BillingUsageSummary`. */
+export type BillingUsageSummaryOrderBy =
+  | 'CREDITS_CONSUMED_ASC'
+  | 'CREDITS_CONSUMED_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METER_SLUG_ASC'
+  | 'METER_SLUG_DESC'
+  | 'NATURAL'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'OVERAGE_UNITS_ASC'
+  | 'OVERAGE_UNITS_DESC'
+  | 'PERIOD_END_ASC'
+  | 'PERIOD_END_DESC'
+  | 'PERIOD_START_ASC'
+  | 'PERIOD_START_DESC'
+  | 'PLAN_LIMIT_ASC'
+  | 'PLAN_LIMIT_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'QUANTITY_USED_ASC'
+  | 'QUANTITY_USED_DESC';
+/** Methods to use when ordering `Ledger`. */
+export type LedgerOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DELTA_ASC'
+  | 'DELTA_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ENTRY_TYPE_ASC'
+  | 'ENTRY_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LEDGER_CLASS_ASC'
+  | 'LEDGER_CLASS_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'METER_SLUG_ASC'
+  | 'METER_SLUG_DESC'
+  | 'NATURAL'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'USAGE_AFTER_ASC'
+  | 'USAGE_AFTER_DESC';
+/** Methods to use when ordering `MeterCredit`. */
+export type MeterCreditOrderBy =
+  | 'AMOUNT_ASC'
+  | 'AMOUNT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREDIT_TYPE_ASC'
+  | 'CREDIT_TYPE_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METER_ID_ASC'
+  | 'METER_ID_DESC'
+  | 'NATURAL'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REASON_ASC'
+  | 'REASON_DESC';
+/** Methods to use when ordering `MeterDefault`. */
+export type MeterDefaultOrderBy =
+  | 'CATEGORY_METER_ASC'
+  | 'CATEGORY_METER_DESC'
+  | 'CREDIT_COST_ASC'
+  | 'CREDIT_COST_DESC'
+  | 'DEFAULT_PLAN_LIMIT_ASC'
+  | 'DEFAULT_PLAN_LIMIT_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'METER_TYPE_ASC'
+  | 'METER_TYPE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'UNIT_ASC'
+  | 'UNIT_DESC';
+/** Methods to use when ordering `Meter`. */
+export type MeterOrderBy =
+  | 'AGGREGATION_ASC'
+  | 'AGGREGATION_DESC'
+  | 'CATEGORY_METER_ASC'
+  | 'CATEGORY_METER_DESC'
+  | 'CREDIT_COST_ASC'
+  | 'CREDIT_COST_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'METER_TYPE_ASC'
+  | 'METER_TYPE_DESC'
+  | 'NATURAL'
+  | 'PERIOD_INTERVAL_ASC'
+  | 'PERIOD_INTERVAL_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ROLLOVER_CAP_ASC'
+  | 'ROLLOVER_CAP_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'UNIT_ASC'
+  | 'UNIT_DESC';
+/** Methods to use when ordering `MeterSource`. */
+export type MeterSourceOrderBy =
+  | 'AGGREGATION_TYPE_ASC'
+  | 'AGGREGATION_TYPE_DESC'
+  | 'DIMENSION_PATH_ASC'
+  | 'DIMENSION_PATH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'METER_SLUG_ASC'
+  | 'METER_SLUG_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SOURCE_METRIC_ASC'
+  | 'SOURCE_METRIC_DESC';
 /** Methods to use when ordering `OrgLimitAggregate`. */
 export type OrgLimitAggregateOrderBy =
   | 'ENTITY_ID_ASC'
@@ -391,6 +703,508 @@ export type OrgLimitWarningOrderBy =
   | 'THRESHOLD_VALUE_DESC'
   | 'WARNING_TYPE_ASC'
   | 'WARNING_TYPE_DESC';
+/** Methods to use when ordering `PlanCap`. */
+export type PlanCapOrderBy =
+  | 'CAP_NAME_ASC'
+  | 'CAP_NAME_DESC'
+  | 'CAP_VALUE_ASC'
+  | 'CAP_VALUE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PLAN_ID_ASC'
+  | 'PLAN_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `PlanLimit`. */
+export type PlanLimitOrderBy =
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LIMIT_NAME_ASC'
+  | 'LIMIT_NAME_DESC'
+  | 'MAX_VALUE_ASC'
+  | 'MAX_VALUE_DESC'
+  | 'NATURAL'
+  | 'PLAN_ID_ASC'
+  | 'PLAN_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `PlanMeterLimit`. */
+export type PlanMeterLimitOrderBy =
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METER_SLUG_ASC'
+  | 'METER_SLUG_DESC'
+  | 'NATURAL'
+  | 'PLAN_ID_ASC'
+  | 'PLAN_ID_DESC'
+  | 'PLAN_LIMIT_ASC'
+  | 'PLAN_LIMIT_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `Plan`. */
+export type PlanOrderBy =
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `PlanOverride`. */
+export type PlanOverrideOrderBy =
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LIMIT_NAME_ASC'
+  | 'LIMIT_NAME_DESC'
+  | 'MAX_VALUE_ASC'
+  | 'MAX_VALUE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REASON_ASC'
+  | 'REASON_DESC';
+/** Methods to use when ordering `PlanPricing`. */
+export type PlanPricingOrderBy =
+  | 'BILLING_INTERVAL_ASC'
+  | 'BILLING_INTERVAL_DESC'
+  | 'CURRENCY_ASC'
+  | 'CURRENCY_DESC'
+  | 'DISCOUNT_PERCENT_ASC'
+  | 'DISCOUNT_PERCENT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'NATURAL'
+  | 'PLAN_ID_ASC'
+  | 'PLAN_ID_DESC'
+  | 'PRICE_ASC'
+  | 'PRICE_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `PlanSubscription`. */
+export type PlanSubscriptionOrderBy =
+  | 'ENDS_AT_ASC'
+  | 'ENDS_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'NATURAL'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'PLAN_ID_ASC'
+  | 'PLAN_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STARTS_AT_ASC'
+  | 'STARTS_AT_DESC';
+/** A filter to be used against `AppAchievementReward` object types. All fields are combined with a logical ‘and.’ */
+export interface AppAchievementRewardFilter {
+  /** Filter by the object’s `amount` field. */
+  amount?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppAchievementRewardFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `creditType` field. */
+  creditType?: StringFilter;
+  /** Filter by the object’s `expiresInterval` field. */
+  expiresInterval?: IntervalFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `levelName` field. */
+  levelName?: StringFilter;
+  /** Negates the expression. */
+  not?: AppAchievementRewardFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppAchievementRewardFilter[];
+  /** Filter by the object’s `rewardType` field. */
+  rewardType?: StringFilter;
+  /** Filter by the object’s `targetName` field. */
+  targetName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `AppAchievementReward` */
+export interface AppAchievementRewardInput {
+  /** Number of credits to grant; unused by capability rewards */
+  amount?: number;
+  createdAt?: string;
+  /** Credit type: permanent, expiring, etc. */
+  creditType?: string;
+  /** Optional duration after which the granted credit expires; NULL means never expires */
+  expiresInterval?: IntervalInput;
+  id?: string;
+  /** Name of the level this reward is granted for */
+  levelName: string;
+  /** Type of reward: limit_credit, meter_credit, or capability */
+  rewardType: string;
+  /** Target limit name, meter slug, or capability catalog name */
+  targetName: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AppAchievementReward`. Fields that are set will be updated. */
+export interface AppAchievementRewardPatch {
+  /** Number of credits to grant; unused by capability rewards */
+  amount?: number;
+  createdAt?: string;
+  /** Credit type: permanent, expiring, etc. */
+  creditType?: string;
+  /** Optional duration after which the granted credit expires; NULL means never expires */
+  expiresInterval?: IntervalInput;
+  id?: string;
+  /** Name of the level this reward is granted for */
+  levelName?: string;
+  /** Type of reward: limit_credit, meter_credit, or capability */
+  rewardType?: string;
+  /** Target limit name, meter slug, or capability catalog name */
+  targetName?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `AppEventAggregate` object types. All fields are combined with a logical ‘and.’ */
+export interface AppEventAggregateFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppEventAggregateFilter[];
+  /** Filter by the object’s `count` field. */
+  count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AppEventAggregateFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppEventAggregateFilter[];
+  /** Filter by the object’s `periodStart` field. */
+  periodStart?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `AppEventAggregate` */
+export interface AppEventAggregateInput {
+  actorId?: string;
+  /** Cumulative count of completed steps toward this requirement */
+  count?: number;
+  createdAt?: string;
+  id?: string;
+  /** Name identifier of the level requirement being tracked */
+  name: string;
+  /** Start of current counting period; NULL means lifetime counting */
+  periodStart?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AppEventAggregate`. Fields that are set will be updated. */
+export interface AppEventAggregatePatch {
+  actorId?: string;
+  /** Cumulative count of completed steps toward this requirement */
+  count?: number;
+  createdAt?: string;
+  id?: string;
+  /** Name identifier of the level requirement being tracked */
+  name?: string;
+  /** Start of current counting period; NULL means lifetime counting */
+  periodStart?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `AppEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface AppEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppEventFilter[];
+  /** Filter by the object’s `count` field. */
+  count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AppEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppEventFilter[];
+}
+/** An input for mutations affecting `AppEvent` */
+export interface AppEventInput {
+  actorId?: string;
+  /** Number of units completed in this step action */
+  count?: number;
+  createdAt?: string;
+  /** Unique identifier for each event (uuidv7 provides temporal ordering) */
+  id?: string;
+  /** Name identifier of the level requirement this step fulfills */
+  name: string;
+}
+/** Represents an update to a `AppEvent`. Fields that are set will be updated. */
+export interface AppEventPatch {
+  actorId?: string;
+  /** Number of units completed in this step action */
+  count?: number;
+  createdAt?: string;
+  /** Unique identifier for each event (uuidv7 provides temporal ordering) */
+  id?: string;
+  /** Name identifier of the level requirement this step fulfills */
+  name?: string;
+}
+/** A filter to be used against `AppEventType` object types. All fields are combined with a logical ‘and.’ */
+export interface AppEventTypeFilter {
+  /** Filter by the object’s `aggregation` field. */
+  aggregation?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppEventTypeFilter[];
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `feedsLevels` field. */
+  feedsLevels?: BooleanFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AppEventTypeFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppEventTypeFilter[];
+  /** Filter by the object’s `periodInterval` field. */
+  periodInterval?: IntervalFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `AppEventType` */
+export interface AppEventTypeInput {
+  /** Aggregation mode: count, sum, last_value, or none */
+  aggregation?: string;
+  /** Grouping category: onboarding, engagement, analytics, commerce, etc. */
+  category?: string;
+  createdAt?: string;
+  /** Human-readable description of this event type */
+  description?: string;
+  /** Whether this event type participates in the levels/badge system by updating aggregates */
+  feedsLevels?: boolean;
+  id?: string;
+  /** Whether recording of this event type is enabled */
+  isActive?: boolean;
+  /** Unique name identifier for this event type */
+  name: string;
+  /** Optional period for aggregate count reset; NULL means lifetime counting */
+  periodInterval?: IntervalInput;
+  updatedAt?: string;
+}
+/** Represents an update to a `AppEventType`. Fields that are set will be updated. */
+export interface AppEventTypePatch {
+  /** Aggregation mode: count, sum, last_value, or none */
+  aggregation?: string;
+  /** Grouping category: onboarding, engagement, analytics, commerce, etc. */
+  category?: string;
+  createdAt?: string;
+  /** Human-readable description of this event type */
+  description?: string;
+  /** Whether this event type participates in the levels/badge system by updating aggregates */
+  feedsLevels?: boolean;
+  id?: string;
+  /** Whether recording of this event type is enabled */
+  isActive?: boolean;
+  /** Unique name identifier for this event type */
+  name?: string;
+  /** Optional period for aggregate count reset; NULL means lifetime counting */
+  periodInterval?: IntervalInput;
+  updatedAt?: string;
+}
+/** A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLevelFilter {
+  /** Checks for all expressions in this list. */
+  and?: AppLevelFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `image` field. */
+  image?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AppLevelFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLevelFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `AppLevelGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLevelGrantFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLevelGrantFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `levelName` field. */
+  levelName?: StringFilter;
+  /** Negates the expression. */
+  not?: AppLevelGrantFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLevelGrantFilter[];
+  /** Filter by the object’s `periodStart` field. */
+  periodStart?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `AppLevelGrant` */
+export interface AppLevelGrantInput {
+  actorId?: string;
+  createdAt?: string;
+  /** When this grant lapses; NULL means it holds until revoked */
+  expiresAt?: string;
+  id?: string;
+  /** Name of the level that was achieved */
+  levelName: string;
+  /** Period start for periodic achievements; -infinity for non-periodic (earn-once) */
+  periodStart?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AppLevelGrant`. Fields that are set will be updated. */
+export interface AppLevelGrantPatch {
+  actorId?: string;
+  createdAt?: string;
+  /** When this grant lapses; NULL means it holds until revoked */
+  expiresAt?: string;
+  id?: string;
+  /** Name of the level that was achieved */
+  levelName?: string;
+  /** Period start for periodic achievements; -infinity for non-periodic (earn-once) */
+  periodStart?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `AppLevel` */
+export interface AppLevelInput {
+  createdAt?: string;
+  /** Human-readable description of what this level represents */
+  description?: string;
+  id?: string;
+  /** Badge or icon image associated with this level */
+  image?: ConstructiveInternalTypeImage;
+  /** Unique name of the level */
+  name: string;
+  /** Optional owner (actor) who created or manages this level */
+  ownerId?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AppLevel`. Fields that are set will be updated. */
+export interface AppLevelPatch {
+  createdAt?: string;
+  /** Human-readable description of what this level represents */
+  description?: string;
+  id?: string;
+  /** Badge or icon image associated with this level */
+  image?: ConstructiveInternalTypeImage;
+  /** Upload for Badge or icon image associated with this level */
+  imageUpload?: File;
+  /** Unique name of the level */
+  name?: string;
+  /** Optional owner (actor) who created or manages this level */
+  ownerId?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `AppLevelRequirement` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLevelRequirementFilter {
+  /** Checks for all expressions in this list. */
+  and?: AppLevelRequirementFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `groupKey` field. */
+  groupKey?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `level` field. */
+  level?: StringFilter;
+  /** Filter by the object’s `metric` field. */
+  metric?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AppLevelRequirementFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLevelRequirementFilter[];
+  /** Filter by the object’s `priority` field. */
+  priority?: IntFilter;
+  /** Filter by the object’s `requiredCount` field. */
+  requiredCount?: IntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `AppLevelRequirement` */
+export interface AppLevelRequirementInput {
+  createdAt?: string;
+  /** Human-readable description of what this requirement entails */
+  description?: string;
+  /** Requirements of a level sharing this key satisfy it as alternatives; NULL requires this one on its own */
+  groupKey?: string;
+  id?: string;
+  /** Name of the level this requirement belongs to */
+  level: string;
+  /** Computed signal to compare against required_count instead of an event count; currently only account_age_days */
+  metric?: string;
+  /** Name identifier of the requirement (matches step names) */
+  name: string;
+  /** Display ordering priority; lower values appear first */
+  priority?: number;
+  /** Number of steps needed to satisfy this requirement */
+  requiredCount?: number;
+  updatedAt?: string;
+}
+/** Represents an update to a `AppLevelRequirement`. Fields that are set will be updated. */
+export interface AppLevelRequirementPatch {
+  createdAt?: string;
+  /** Human-readable description of what this requirement entails */
+  description?: string;
+  /** Requirements of a level sharing this key satisfy it as alternatives; NULL requires this one on its own */
+  groupKey?: string;
+  id?: string;
+  /** Name of the level this requirement belongs to */
+  level?: string;
+  /** Computed signal to compare against required_count instead of an event count; currently only account_age_days */
+  metric?: string;
+  /** Name identifier of the requirement (matches step names) */
+  name?: string;
+  /** Display ordering priority; lower values appear first */
+  priority?: number;
+  /** Number of steps needed to satisfy this requirement */
+  requiredCount?: number;
+  updatedAt?: string;
+}
 /** A filter to be used against `AppLimitCap` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitCapFilter {
   /** Checks for all expressions in this list. */
@@ -877,7 +1691,7 @@ export interface AppLimitInput {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -905,7 +1719,7 @@ export interface AppLimitPatch {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -959,6 +1773,155 @@ export interface AppLimitWarningPatch {
   /** Threshold type: absolute (fixed count) or percentage (of max) */
   warningType?: string;
 }
+/** A filter to be used against `BillingUsageSummary` object types. All fields are combined with a logical ‘and.’ */
+export interface BillingUsageSummaryFilter {
+  /** Checks for all expressions in this list. */
+  and?: BillingUsageSummaryFilter[];
+  /** Filter by the object’s `creditsConsumed` field. */
+  creditsConsumed?: BigIntFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `meterSlug` field. */
+  meterSlug?: StringFilter;
+  /** Negates the expression. */
+  not?: BillingUsageSummaryFilter;
+  /** Checks for any expressions in this list. */
+  or?: BillingUsageSummaryFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `overageUnits` field. */
+  overageUnits?: BigIntFilter;
+  /** Filter by the object’s `periodEnd` field. */
+  periodEnd?: DatetimeFilter;
+  /** Filter by the object’s `periodStart` field. */
+  periodStart?: DatetimeFilter;
+  /** Filter by the object’s `planLimit` field. */
+  planLimit?: BigIntFilter;
+  /** Filter by the object’s `quantityUsed` field. */
+  quantityUsed?: BigIntFilter;
+}
+/** An input for mutations affecting `BillingUsageSummary` */
+export interface BillingUsageSummaryInput {
+  /** Universal credits consumed during this period */
+  creditsConsumed?: string;
+  /** The entity (org, team, user) this summary belongs to */
+  entityId: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  id?: string;
+  /** Which meter this summary tracks */
+  meterSlug: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Units consumed beyond the plan limit (quantity_used - plan_limit when positive) */
+  overageUnits?: string;
+  /** End of the billing period this summary covers */
+  periodEnd: string;
+  /** Start of the billing period this summary covers */
+  periodStart: string;
+  /** Plan limit that was in effect during this period */
+  planLimit?: string;
+  /** Total units consumed during this period */
+  quantityUsed?: string;
+}
+/** Represents an update to a `BillingUsageSummary`. Fields that are set will be updated. */
+export interface BillingUsageSummaryPatch {
+  /** Universal credits consumed during this period */
+  creditsConsumed?: string;
+  /** The entity (org, team, user) this summary belongs to */
+  entityId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  id?: string;
+  /** Which meter this summary tracks */
+  meterSlug?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Units consumed beyond the plan limit (quantity_used - plan_limit when positive) */
+  overageUnits?: string;
+  /** End of the billing period this summary covers */
+  periodEnd?: string;
+  /** Start of the billing period this summary covers */
+  periodStart?: string;
+  /** Plan limit that was in effect during this period */
+  planLimit?: string;
+  /** Total units consumed during this period */
+  quantityUsed?: string;
+}
+/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeImageFilter {
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeImage;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeImage;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeImage;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeImage;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeImage[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeImage;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeImage;
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeImage[];
+}
+export interface CreateAppAchievementRewardInput {
+  /** The `AppAchievementReward` to be created by this mutation. */
+  appAchievementReward: AppAchievementRewardInput;
+  clientMutationId?: string;
+}
+export interface CreateAppEventAggregateInput {
+  /** The `AppEventAggregate` to be created by this mutation. */
+  appEventAggregate: AppEventAggregateInput;
+  clientMutationId?: string;
+}
+export interface CreateAppEventInput {
+  /** The `AppEvent` to be created by this mutation. */
+  appEvent: AppEventInput;
+  clientMutationId?: string;
+}
+export interface CreateAppEventTypeInput {
+  /** The `AppEventType` to be created by this mutation. */
+  appEventType: AppEventTypeInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLevelGrantInput {
+  /** The `AppLevelGrant` to be created by this mutation. */
+  appLevelGrant: AppLevelGrantInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLevelInput {
+  /** The `AppLevel` to be created by this mutation. */
+  appLevel: AppLevelInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLevelRequirementInput {
+  /** The `AppLevelRequirement` to be created by this mutation. */
+  appLevelRequirement: AppLevelRequirementInput;
+  clientMutationId?: string;
+}
 export interface CreateAppLimitCapInput {
   /** The `AppLimitCap` to be created by this mutation. */
   appLimitCap: AppLimitCapInput;
@@ -1009,6 +1972,36 @@ export interface CreateAppLimitWarningInput {
   appLimitWarning: AppLimitWarningInput;
   clientMutationId?: string;
 }
+export interface CreateBillingUsageSummaryInput {
+  /** The `BillingUsageSummary` to be created by this mutation. */
+  billingUsageSummary: BillingUsageSummaryInput;
+  clientMutationId?: string;
+}
+export interface CreateLedgerInput {
+  clientMutationId?: string;
+  /** The `Ledger` to be created by this mutation. */
+  ledger: LedgerInput;
+}
+export interface CreateMeterCreditInput {
+  clientMutationId?: string;
+  /** The `MeterCredit` to be created by this mutation. */
+  meterCredit: MeterCreditInput;
+}
+export interface CreateMeterDefaultInput {
+  clientMutationId?: string;
+  /** The `MeterDefault` to be created by this mutation. */
+  meterDefault: MeterDefaultInput;
+}
+export interface CreateMeterInput {
+  clientMutationId?: string;
+  /** The `Meter` to be created by this mutation. */
+  meter: MeterInput;
+}
+export interface CreateMeterSourceInput {
+  clientMutationId?: string;
+  /** The `MeterSource` to be created by this mutation. */
+  meterSource: MeterSourceInput;
+}
 export interface CreateOrgLimitAggregateInput {
   clientMutationId?: string;
   /** The `OrgLimitAggregate` to be created by this mutation. */
@@ -1048,6 +2041,71 @@ export interface CreateOrgLimitWarningInput {
   clientMutationId?: string;
   /** The `OrgLimitWarning` to be created by this mutation. */
   orgLimitWarning: OrgLimitWarningInput;
+}
+export interface CreatePlanCapInput {
+  clientMutationId?: string;
+  /** The `PlanCap` to be created by this mutation. */
+  planCap: PlanCapInput;
+}
+export interface CreatePlanInput {
+  clientMutationId?: string;
+  /** The `Plan` to be created by this mutation. */
+  plan: PlanInput;
+}
+export interface CreatePlanLimitInput {
+  clientMutationId?: string;
+  /** The `PlanLimit` to be created by this mutation. */
+  planLimit: PlanLimitInput;
+}
+export interface CreatePlanMeterLimitInput {
+  clientMutationId?: string;
+  /** The `PlanMeterLimit` to be created by this mutation. */
+  planMeterLimit: PlanMeterLimitInput;
+}
+export interface CreatePlanOverrideInput {
+  clientMutationId?: string;
+  /** The `PlanOverride` to be created by this mutation. */
+  planOverride: PlanOverrideInput;
+}
+export interface CreatePlanPricingInput {
+  clientMutationId?: string;
+  /** The `PlanPricing` to be created by this mutation. */
+  planPricing: PlanPricingInput;
+}
+export interface CreatePlanSubscriptionInput {
+  clientMutationId?: string;
+  /** The `PlanSubscription` to be created by this mutation. */
+  planSubscription: PlanSubscriptionInput;
+}
+export interface DeleteAppAchievementRewardInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppEventAggregateInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppEventInput {
+  clientMutationId?: string;
+  createdAt: string;
+  /** Unique identifier for each event (uuidv7 provides temporal ordering) */
+  id: string;
+}
+export interface DeleteAppEventTypeInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLevelGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLevelInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLevelRequirementInput {
+  clientMutationId?: string;
+  id: string;
 }
 export interface DeleteAppLimitCapInput {
   clientMutationId?: string;
@@ -1091,6 +2149,32 @@ export interface DeleteAppLimitWarningInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteBillingUsageSummaryInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteLedgerInput {
+  clientMutationId?: string;
+  createdAt: string;
+  /** Unique identifier for each ledger entry */
+  id: string;
+}
+export interface DeleteMeterCreditInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteMeterDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteMeterInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteMeterSourceInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteOrgLimitAggregateInput {
   clientMutationId?: string;
   id: string;
@@ -1124,6 +2208,39 @@ export interface DeleteOrgLimitInput {
 export interface DeleteOrgLimitWarningInput {
   clientMutationId?: string;
   id: string;
+}
+export interface DeletePlanCapInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlanInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlanLimitInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlanMeterLimitInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlanOverrideInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlanPricingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlanSubscriptionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface GrantAchievementInput {
+  actorId?: string;
+  clientMutationId?: string;
+  levelName?: string;
 }
 /** A filter to be used against Interval fields. All fields are combined with a logical ‘and.’ */
 export interface IntervalFilter {
@@ -1168,6 +2285,368 @@ export interface IntervalInput {
   seconds?: number;
   /** A quantity of years. */
   years?: number;
+}
+/** A filter to be used against `Ledger` object types. All fields are combined with a logical ‘and.’ */
+export interface LedgerFilter {
+  /** Checks for all expressions in this list. */
+  and?: LedgerFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `delta` field. */
+  delta?: BigIntFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `entryType` field. */
+  entryType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ledgerClass` field. */
+  ledgerClass?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `meterSlug` field. */
+  meterSlug?: StringFilter;
+  /** Negates the expression. */
+  not?: LedgerFilter;
+  /** Checks for any expressions in this list. */
+  or?: LedgerFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `usageAfter` field. */
+  usageAfter?: BigIntFilter;
+}
+/** An input for mutations affecting `Ledger` */
+export interface LedgerInput {
+  createdAt?: string;
+  /** Change amount (positive = grant/credit, negative = consumption/debit) */
+  delta: string;
+  /** The entity this ledger entry belongs to */
+  entityId: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  /** Specific type: increment, decrement, credit_purchase, plan_grant, reset, adjustment */
+  entryType?: string;
+  /** Unique identifier for each ledger entry */
+  id?: string;
+  /** Classification: usage, grant, adjustment, refund */
+  ledgerClass?: string;
+  /** Additional context (reason, source, Stripe receipt, etc.) */
+  metadata?: unknown;
+  /** Which meter this entry is for */
+  meterSlug: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Running total of usage after this entry */
+  usageAfter: string;
+}
+/** Represents an update to a `Ledger`. Fields that are set will be updated. */
+export interface LedgerPatch {
+  createdAt?: string;
+  /** Change amount (positive = grant/credit, negative = consumption/debit) */
+  delta?: string;
+  /** The entity this ledger entry belongs to */
+  entityId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  /** Specific type: increment, decrement, credit_purchase, plan_grant, reset, adjustment */
+  entryType?: string;
+  /** Unique identifier for each ledger entry */
+  id?: string;
+  /** Classification: usage, grant, adjustment, refund */
+  ledgerClass?: string;
+  /** Additional context (reason, source, Stripe receipt, etc.) */
+  metadata?: unknown;
+  /** Which meter this entry is for */
+  meterSlug?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Running total of usage after this entry */
+  usageAfter?: string;
+}
+/** A filter to be used against `MeterCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface MeterCreditFilter {
+  /** Filter by the object’s `amount` field. */
+  amount?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: MeterCreditFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `creditType` field. */
+  creditType?: StringFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `meter` relation. */
+  meter?: MeterFilter;
+  /** Filter by the object’s `meterId` field. */
+  meterId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: MeterCreditFilter;
+  /** Checks for any expressions in this list. */
+  or?: MeterCreditFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+}
+/** An input for mutations affecting `MeterCredit` */
+export interface MeterCreditInput {
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount: string;
+  /** When this credit was granted */
+  createdAt?: string;
+  /** Credit behavior: permanent (survives reset), period (zeroed on reset), or rollover (unused portion carries forward) */
+  creditType?: string;
+  /** Entity this credit applies to */
+  entityId: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+  /** When this credit expires. NULL means the credit never expires. */
+  expiresAt?: string;
+  id?: string;
+  /** FK to meters — which meter definition this credit applies to */
+  meterId: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+/** Represents an update to a `MeterCredit`. Fields that are set will be updated. */
+export interface MeterCreditPatch {
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount?: string;
+  /** When this credit was granted */
+  createdAt?: string;
+  /** Credit behavior: permanent (survives reset), period (zeroed on reset), or rollover (unused portion carries forward) */
+  creditType?: string;
+  /** Entity this credit applies to */
+  entityId?: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+  /** When this credit expires. NULL means the credit never expires. */
+  expiresAt?: string;
+  id?: string;
+  /** FK to meters — which meter definition this credit applies to */
+  meterId?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+/** A filter to be used against `MeterDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface MeterDefaultFilter {
+  /** Checks for all expressions in this list. */
+  and?: MeterDefaultFilter[];
+  /** Filter by the object’s `categoryMeter` field. */
+  categoryMeter?: StringFilter;
+  /** Filter by the object’s `creditCost` field. */
+  creditCost?: BigFloatFilter;
+  /** Filter by the object’s `defaultPlanLimit` field. */
+  defaultPlanLimit?: BigIntFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `meterType` field. */
+  meterType?: StringFilter;
+  /** Negates the expression. */
+  not?: MeterDefaultFilter;
+  /** Checks for any expressions in this list. */
+  or?: MeterDefaultFilter[];
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `unit` field. */
+  unit?: StringFilter;
+}
+/** An input for mutations affecting `MeterDefault` */
+export interface MeterDefaultInput {
+  /** Slug of the category pool meter (usage_pool) this meter belongs to, enabling the per-task -> category -> universal waterfall for default-provisioned meters. NULL skips the category pool. */
+  categoryMeter?: string;
+  /** Universal credits consumed per unit of this meter. NULL disables universal credit fallback. */
+  creditCost?: string;
+  /** Default plan_limit value for new entity balances. 0 means no quota; -1 (negative) means unlimited. */
+  defaultPlanLimit?: string;
+  /** Human-readable name for the default meter */
+  displayName?: string;
+  id?: string;
+  /** Whether this default meter is actively provisioned for new entities */
+  isActive?: boolean;
+  /** Type of meter: quota, boolean, or usage_pool */
+  meterType?: string;
+  /** Meter slug that matches the slug in the meters table */
+  slug: string;
+  /** Unit of measurement for this meter (e.g. tokens, requests, images, compute_ms, credits) */
+  unit?: string;
+}
+/** Represents an update to a `MeterDefault`. Fields that are set will be updated. */
+export interface MeterDefaultPatch {
+  /** Slug of the category pool meter (usage_pool) this meter belongs to, enabling the per-task -> category -> universal waterfall for default-provisioned meters. NULL skips the category pool. */
+  categoryMeter?: string;
+  /** Universal credits consumed per unit of this meter. NULL disables universal credit fallback. */
+  creditCost?: string;
+  /** Default plan_limit value for new entity balances. 0 means no quota; -1 (negative) means unlimited. */
+  defaultPlanLimit?: string;
+  /** Human-readable name for the default meter */
+  displayName?: string;
+  id?: string;
+  /** Whether this default meter is actively provisioned for new entities */
+  isActive?: boolean;
+  /** Type of meter: quota, boolean, or usage_pool */
+  meterType?: string;
+  /** Meter slug that matches the slug in the meters table */
+  slug?: string;
+  /** Unit of measurement for this meter (e.g. tokens, requests, images, compute_ms, credits) */
+  unit?: string;
+}
+/** A filter to be used against `Meter` object types. All fields are combined with a logical ‘and.’ */
+export interface MeterFilter {
+  /** Filter by the object’s `aggregation` field. */
+  aggregation?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: MeterFilter[];
+  /** Filter by the object’s `categoryMeter` field. */
+  categoryMeter?: StringFilter;
+  /** Filter by the object’s `creditCost` field. */
+  creditCost?: IntFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `meterCredits` relation. */
+  meterCredits?: MeterToManyMeterCreditFilter;
+  /** `meterCredits` exist. */
+  meterCreditsExist?: boolean;
+  /** Filter by the object’s `meterType` field. */
+  meterType?: StringFilter;
+  /** Negates the expression. */
+  not?: MeterFilter;
+  /** Checks for any expressions in this list. */
+  or?: MeterFilter[];
+  /** Filter by the object’s `periodInterval` field. */
+  periodInterval?: IntervalFilter;
+  /** Filter by the object’s `rolloverCap` field. */
+  rolloverCap?: BigIntFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `unit` field. */
+  unit?: StringFilter;
+}
+/** An input for mutations affecting `Meter` */
+export interface MeterInput {
+  /** How usage is aggregated: cumulative (sum over period) or peak (max watermark) */
+  aggregation?: string;
+  /** Slug of the category pool meter this meter belongs to. When set, usage overflow charges the category pool before falling through to universal credits. NULL means skip category pool and fall through directly to universal. */
+  categoryMeter?: string;
+  /** Universal credits consumed per unit of this meter. NULL disables universal credit fallback. */
+  creditCost?: number;
+  /** Human-readable name for the meter */
+  displayName?: string;
+  id?: string;
+  /** Whether this meter is currently active */
+  isActive?: boolean;
+  /** Type of meter: quota (consumable), boolean (feature flag), or usage_pool (category aggregator) */
+  meterType?: string;
+  /** Reset cadence for this meter (e.g. 1 month, 1 year). NULL means no periodic reset. */
+  periodInterval?: IntervalInput;
+  /** Maximum unused units that carry forward on rollover reset. NULL means unlimited rollover. */
+  rolloverCap?: string;
+  /** Unique identifier for the meter (e.g. api_requests, storage_gb, seats) */
+  slug: string;
+  /** Unit of measurement for this meter (e.g. tokens, characters, audio_seconds, pages, images, megapixels, bytes, requests, compute_ms, credits) */
+  unit?: string;
+}
+/** Represents an update to a `Meter`. Fields that are set will be updated. */
+export interface MeterPatch {
+  /** How usage is aggregated: cumulative (sum over period) or peak (max watermark) */
+  aggregation?: string;
+  /** Slug of the category pool meter this meter belongs to. When set, usage overflow charges the category pool before falling through to universal credits. NULL means skip category pool and fall through directly to universal. */
+  categoryMeter?: string;
+  /** Universal credits consumed per unit of this meter. NULL disables universal credit fallback. */
+  creditCost?: number;
+  /** Human-readable name for the meter */
+  displayName?: string;
+  id?: string;
+  /** Whether this meter is currently active */
+  isActive?: boolean;
+  /** Type of meter: quota (consumable), boolean (feature flag), or usage_pool (category aggregator) */
+  meterType?: string;
+  /** Reset cadence for this meter (e.g. 1 month, 1 year). NULL means no periodic reset. */
+  periodInterval?: IntervalInput;
+  /** Maximum unused units that carry forward on rollover reset. NULL means unlimited rollover. */
+  rolloverCap?: string;
+  /** Unique identifier for the meter (e.g. api_requests, storage_gb, seats) */
+  slug?: string;
+  /** Unit of measurement for this meter (e.g. tokens, characters, audio_seconds, pages, images, megapixels, bytes, requests, compute_ms, credits) */
+  unit?: string;
+}
+/** A filter to be used against `MeterSource` object types. All fields are combined with a logical ‘and.’ */
+export interface MeterSourceFilter {
+  /** Filter by the object’s `aggregationType` field. */
+  aggregationType?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: MeterSourceFilter[];
+  /** Filter by the object’s `dimensionPath` field. */
+  dimensionPath?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `meterSlug` field. */
+  meterSlug?: StringFilter;
+  /** Negates the expression. */
+  not?: MeterSourceFilter;
+  /** Checks for any expressions in this list. */
+  or?: MeterSourceFilter[];
+  /** Filter by the object’s `sourceMetric` field. */
+  sourceMetric?: StringFilter;
+}
+/** An input for mutations affecting `MeterSource` */
+export interface MeterSourceInput {
+  /** How to aggregate the column. Built-in types: sum, sum_bytes_to_gb, peak. Custom types supported. */
+  aggregationType?: string;
+  /** Column name in the typed usage summary table (e.g. total_reads, avg_read_time_ms, size_bytes) */
+  dimensionPath: string;
+  id?: string;
+  /** Soft-delete flag. Inactive sources are skipped during reconciliation. */
+  isActive?: boolean;
+  /** Slug of the billing meter this source feeds (matches meters.slug in the billing module) */
+  meterSlug: string;
+  /** Source table type: table_usage (db_table_stats_usage_summary), query_time (db_query_stats_usage_summary), or row_count (trigger-based, skipped by reconcile) */
+  sourceMetric: string;
+}
+/** Represents an update to a `MeterSource`. Fields that are set will be updated. */
+export interface MeterSourcePatch {
+  /** How to aggregate the column. Built-in types: sum, sum_bytes_to_gb, peak. Custom types supported. */
+  aggregationType?: string;
+  /** Column name in the typed usage summary table (e.g. total_reads, avg_read_time_ms, size_bytes) */
+  dimensionPath?: string;
+  id?: string;
+  /** Soft-delete flag. Inactive sources are skipped during reconciliation. */
+  isActive?: boolean;
+  /** Slug of the billing meter this source feeds (matches meters.slug in the billing module) */
+  meterSlug?: string;
+  /** Source table type: table_usage (db_table_stats_usage_summary), query_time (db_query_stats_usage_summary), or row_count (trigger-based, skipped by reconcile) */
+  sourceMetric?: string;
+}
+/** A filter to be used against many `MeterCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface MeterToManyMeterCreditFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: MeterCreditFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: MeterCreditFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: MeterCreditFilter;
 }
 /** A filter to be used against `OrgLimitAggregate` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgLimitAggregateFilter {
@@ -1223,7 +2702,7 @@ export interface OrgLimitAggregateInput {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this entity by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -1253,7 +2732,7 @@ export interface OrgLimitAggregatePatch {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this entity by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -1599,7 +3078,7 @@ export interface OrgLimitInput {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -1628,7 +3107,7 @@ export interface OrgLimitPatch {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -1688,6 +3167,394 @@ export interface OrgLimitWarningPatch {
   /** Threshold type: absolute (fixed count) or percentage (of max) */
   warningType?: string;
 }
+/** A filter to be used against `PlanCap` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanCapFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlanCapFilter[];
+  /** Filter by the object’s `capName` field. */
+  capName?: StringFilter;
+  /** Filter by the object’s `capValue` field. */
+  capValue?: BigIntFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlanCapFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlanCapFilter[];
+  /** Filter by the object’s `plan` relation. */
+  plan?: PlanFilter;
+  /** Filter by the object’s `planId` field. */
+  planId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlanCap` */
+export interface PlanCapInput {
+  /** Name of the cap/feature flag this plan sets (must match a name in caps_defaults or limit_caps) */
+  capName: string;
+  /** Cap value to set when this plan is applied. Convention: 0=disabled, 1=enabled, N=numeric cap, negative=unlimited */
+  capValue?: string;
+  id?: string;
+  /** Reference to the plan this cap setting belongs to */
+  planId: string;
+}
+/** Represents an update to a `PlanCap`. Fields that are set will be updated. */
+export interface PlanCapPatch {
+  /** Name of the cap/feature flag this plan sets (must match a name in caps_defaults or limit_caps) */
+  capName?: string;
+  /** Cap value to set when this plan is applied. Convention: 0=disabled, 1=enabled, N=numeric cap, negative=unlimited */
+  capValue?: string;
+  id?: string;
+  /** Reference to the plan this cap setting belongs to */
+  planId?: string;
+}
+/** A filter to be used against `Plan` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlanFilter[];
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlanFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlanFilter[];
+  /** Filter by the object’s `planCaps` relation. */
+  planCaps?: PlanToManyPlanCapFilter;
+  /** `planCaps` exist. */
+  planCapsExist?: boolean;
+  /** Filter by the object’s `planLimits` relation. */
+  planLimits?: PlanToManyPlanLimitFilter;
+  /** `planLimits` exist. */
+  planLimitsExist?: boolean;
+  /** Filter by the object’s `planMeterLimits` relation. */
+  planMeterLimits?: PlanToManyPlanMeterLimitFilter;
+  /** `planMeterLimits` exist. */
+  planMeterLimitsExist?: boolean;
+  /** Filter by the object’s `planPricings` relation. */
+  planPricings?: PlanToManyPlanPricingFilter;
+  /** `planPricings` exist. */
+  planPricingsExist?: boolean;
+  /** Filter by the object’s `planSubscriptions` relation. */
+  planSubscriptions?: PlanToManyPlanSubscriptionFilter;
+  /** `planSubscriptions` exist. */
+  planSubscriptionsExist?: boolean;
+}
+/** An input for mutations affecting `Plan` */
+export interface PlanInput {
+  /** Human-readable description of the plan tier */
+  description?: string;
+  id?: string;
+  /** Whether this plan can currently be applied to entities */
+  isActive?: boolean;
+  /** Unique name identifier of the plan (e.g. free, pro, enterprise) */
+  name: string;
+}
+/** A filter to be used against `PlanLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanLimitFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlanLimitFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `limitName` field. */
+  limitName?: StringFilter;
+  /** Filter by the object’s `maxValue` field. */
+  maxValue?: BigIntFilter;
+  /** Negates the expression. */
+  not?: PlanLimitFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlanLimitFilter[];
+  /** Filter by the object’s `plan` relation. */
+  plan?: PlanFilter;
+  /** Filter by the object’s `planId` field. */
+  planId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlanLimit` */
+export interface PlanLimitInput {
+  id?: string;
+  /** Name of the limit this plan sets (must match the name field in a limits table) */
+  limitName: string;
+  /** Maximum value to set on the limit when this plan is applied; negative means unlimited */
+  maxValue: string;
+  /** Reference to the plan this limit configuration belongs to */
+  planId: string;
+}
+/** Represents an update to a `PlanLimit`. Fields that are set will be updated. */
+export interface PlanLimitPatch {
+  id?: string;
+  /** Name of the limit this plan sets (must match the name field in a limits table) */
+  limitName?: string;
+  /** Maximum value to set on the limit when this plan is applied; negative means unlimited */
+  maxValue?: string;
+  /** Reference to the plan this limit configuration belongs to */
+  planId?: string;
+}
+/** A filter to be used against `PlanMeterLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanMeterLimitFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlanMeterLimitFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `meterSlug` field. */
+  meterSlug?: StringFilter;
+  /** Negates the expression. */
+  not?: PlanMeterLimitFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlanMeterLimitFilter[];
+  /** Filter by the object’s `plan` relation. */
+  plan?: PlanFilter;
+  /** Filter by the object’s `planId` field. */
+  planId?: UUIDFilter;
+  /** Filter by the object’s `planLimit` field. */
+  planLimit?: BigIntFilter;
+}
+/** An input for mutations affecting `PlanMeterLimit` */
+export interface PlanMeterLimitInput {
+  id?: string;
+  /** Slug of the billing meter this plan sets a quota for (must match a slug in the meters table) */
+  meterSlug: string;
+  /** Reference to the plan this meter limit belongs to */
+  planId: string;
+  /** Billing quota to set on the balance when this plan is applied; negative means unlimited */
+  planLimit: string;
+}
+/** Represents an update to a `PlanMeterLimit`. Fields that are set will be updated. */
+export interface PlanMeterLimitPatch {
+  id?: string;
+  /** Slug of the billing meter this plan sets a quota for (must match a slug in the meters table) */
+  meterSlug?: string;
+  /** Reference to the plan this meter limit belongs to */
+  planId?: string;
+  /** Billing quota to set on the balance when this plan is applied; negative means unlimited */
+  planLimit?: string;
+}
+/** A filter to be used against `PlanOverride` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanOverrideFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlanOverrideFilter[];
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `limitName` field. */
+  limitName?: StringFilter;
+  /** Filter by the object’s `maxValue` field. */
+  maxValue?: BigIntFilter;
+  /** Negates the expression. */
+  not?: PlanOverrideFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlanOverrideFilter[];
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+}
+/** An input for mutations affecting `PlanOverride` */
+export interface PlanOverrideInput {
+  /** Entity receiving the custom override (personal org or actual org) */
+  entityId: string;
+  /** When this override expires; NULL means permanent */
+  expiresAt?: string;
+  id?: string;
+  /** Name of the limit being overridden */
+  limitName: string;
+  /** Override maximum value; negative means unlimited */
+  maxValue: string;
+  /** Admin note explaining why this override was granted */
+  reason?: string;
+}
+/** Represents an update to a `PlanOverride`. Fields that are set will be updated. */
+export interface PlanOverridePatch {
+  /** Entity receiving the custom override (personal org or actual org) */
+  entityId?: string;
+  /** When this override expires; NULL means permanent */
+  expiresAt?: string;
+  id?: string;
+  /** Name of the limit being overridden */
+  limitName?: string;
+  /** Override maximum value; negative means unlimited */
+  maxValue?: string;
+  /** Admin note explaining why this override was granted */
+  reason?: string;
+}
+/** Represents an update to a `Plan`. Fields that are set will be updated. */
+export interface PlanPatch {
+  /** Human-readable description of the plan tier */
+  description?: string;
+  id?: string;
+  /** Whether this plan can currently be applied to entities */
+  isActive?: boolean;
+  /** Unique name identifier of the plan (e.g. free, pro, enterprise) */
+  name?: string;
+}
+/** A filter to be used against `PlanPricing` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanPricingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlanPricingFilter[];
+  /** Filter by the object’s `billingInterval` field. */
+  billingInterval?: StringFilter;
+  /** Filter by the object’s `currency` field. */
+  currency?: StringFilter;
+  /** Filter by the object’s `discountPercent` field. */
+  discountPercent?: BigFloatFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Negates the expression. */
+  not?: PlanPricingFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlanPricingFilter[];
+  /** Filter by the object’s `plan` relation. */
+  plan?: PlanFilter;
+  /** Filter by the object’s `planId` field. */
+  planId?: UUIDFilter;
+  /** Filter by the object’s `price` field. */
+  price?: BigIntFilter;
+}
+/** An input for mutations affecting `PlanPricing` */
+export interface PlanPricingInput {
+  /** Billing cycle identifier (e.g. monthly, yearly, lifetime) */
+  billingInterval: string;
+  /** ISO 4217 currency code (lowercase) */
+  currency?: string;
+  /** Discount percentage off the base price (0-100); NULL means no discount */
+  discountPercent?: string;
+  id?: string;
+  /** Whether this pricing option is currently available */
+  isActive?: boolean;
+  /** Reference to the plan this pricing belongs to */
+  planId: string;
+  /** Price in smallest currency unit (e.g. cents); negative means contact-sales */
+  price: string;
+}
+/** Represents an update to a `PlanPricing`. Fields that are set will be updated. */
+export interface PlanPricingPatch {
+  /** Billing cycle identifier (e.g. monthly, yearly, lifetime) */
+  billingInterval?: string;
+  /** ISO 4217 currency code (lowercase) */
+  currency?: string;
+  /** Discount percentage off the base price (0-100); NULL means no discount */
+  discountPercent?: string;
+  id?: string;
+  /** Whether this pricing option is currently available */
+  isActive?: boolean;
+  /** Reference to the plan this pricing belongs to */
+  planId?: string;
+  /** Price in smallest currency unit (e.g. cents); negative means contact-sales */
+  price?: string;
+}
+/** A filter to be used against `PlanSubscription` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanSubscriptionFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlanSubscriptionFilter[];
+  /** Filter by the object’s `endsAt` field. */
+  endsAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Negates the expression. */
+  not?: PlanSubscriptionFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlanSubscriptionFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `plan` relation. */
+  plan?: PlanFilter;
+  /** Filter by the object’s `planId` field. */
+  planId?: UUIDFilter;
+  /** Filter by the object’s `startsAt` field. */
+  startsAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlanSubscription` */
+export interface PlanSubscriptionInput {
+  /** When the subscription expires (NULL = no expiration) */
+  endsAt?: string;
+  /** The entity (org, team, user) this subscription belongs to */
+  entityId: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+  id?: string;
+  /** Whether the subscription is currently active */
+  isActive?: boolean;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Reference to the plan this subscription is for */
+  planId: string;
+  /** When the subscription becomes active */
+  startsAt?: string;
+}
+/** Represents an update to a `PlanSubscription`. Fields that are set will be updated. */
+export interface PlanSubscriptionPatch {
+  /** When the subscription expires (NULL = no expiration) */
+  endsAt?: string;
+  /** The entity (org, team, user) this subscription belongs to */
+  entityId?: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+  id?: string;
+  /** Whether the subscription is currently active */
+  isActive?: boolean;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Reference to the plan this subscription is for */
+  planId?: string;
+  /** When the subscription becomes active */
+  startsAt?: string;
+}
+/** A filter to be used against many `PlanCap` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanToManyPlanCapFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlanCapFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlanCapFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlanCapFilter;
+}
+/** A filter to be used against many `PlanLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanToManyPlanLimitFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlanLimitFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlanLimitFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlanLimitFilter;
+}
+/** A filter to be used against many `PlanMeterLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanToManyPlanMeterLimitFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlanMeterLimitFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlanMeterLimitFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlanMeterLimitFilter;
+}
+/** A filter to be used against many `PlanPricing` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanToManyPlanPricingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlanPricingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlanPricingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlanPricingFilter;
+}
+/** A filter to be used against many `PlanSubscription` object types. All fields are combined with a logical ‘and.’ */
+export interface PlanToManyPlanSubscriptionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlanSubscriptionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlanSubscriptionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlanSubscriptionFilter;
+}
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
   bucketKey: string;
@@ -1697,11 +3564,24 @@ export interface ProvisionBucketInput {
    */
   ownerId?: string;
 }
+export interface RecomputeCapabilitiesInput {
+  actorId?: string;
+  clientMutationId?: string;
+}
+export interface RevokeAchievementInput {
+  actorId?: string;
+  clientMutationId?: string;
+  levelName?: string;
+}
 export interface SeedAppLimitCapsDefaultsInput {
   clientMutationId?: string;
   defaults?: unknown;
 }
 export interface SeedAppLimitDefaultsInput {
+  clientMutationId?: string;
+  defaults?: unknown;
+}
+export interface SeedMeterDefaultsInput {
   clientMutationId?: string;
   defaults?: unknown;
 }
@@ -1712,6 +3592,59 @@ export interface SeedOrgLimitCapsDefaultsInput {
 export interface SeedOrgLimitDefaultsInput {
   clientMutationId?: string;
   defaults?: unknown;
+}
+export interface SeedPlanInput {
+  clientMutationId?: string;
+  planConfig?: unknown;
+  planName?: string;
+}
+export interface SeedTrustLadderInput {
+  clientMutationId?: string;
+  ladder?: unknown;
+}
+export interface UpdateAppAchievementRewardInput {
+  /** An object where the defined keys will be set on the `AppAchievementReward` being updated. */
+  appAchievementRewardPatch: AppAchievementRewardPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppEventAggregateInput {
+  /** An object where the defined keys will be set on the `AppEventAggregate` being updated. */
+  appEventAggregatePatch: AppEventAggregatePatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppEventInput {
+  /** An object where the defined keys will be set on the `AppEvent` being updated. */
+  appEventPatch: AppEventPatch;
+  clientMutationId?: string;
+  createdAt: string;
+  /** Unique identifier for each event (uuidv7 provides temporal ordering) */
+  id: string;
+}
+export interface UpdateAppEventTypeInput {
+  /** An object where the defined keys will be set on the `AppEventType` being updated. */
+  appEventTypePatch: AppEventTypePatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLevelGrantInput {
+  /** An object where the defined keys will be set on the `AppLevelGrant` being updated. */
+  appLevelGrantPatch: AppLevelGrantPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLevelInput {
+  /** An object where the defined keys will be set on the `AppLevel` being updated. */
+  appLevelPatch: AppLevelPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLevelRequirementInput {
+  /** An object where the defined keys will be set on the `AppLevelRequirement` being updated. */
+  appLevelRequirementPatch: AppLevelRequirementPatch;
+  clientMutationId?: string;
+  id: string;
 }
 export interface UpdateAppLimitCapInput {
   /** An object where the defined keys will be set on the `AppLimitCap` being updated. */
@@ -1775,6 +3708,44 @@ export interface UpdateAppLimitWarningInput {
   clientMutationId?: string;
   id: string;
 }
+export interface UpdateBillingUsageSummaryInput {
+  /** An object where the defined keys will be set on the `BillingUsageSummary` being updated. */
+  billingUsageSummaryPatch: BillingUsageSummaryPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateLedgerInput {
+  clientMutationId?: string;
+  createdAt: string;
+  /** Unique identifier for each ledger entry */
+  id: string;
+  /** An object where the defined keys will be set on the `Ledger` being updated. */
+  ledgerPatch: LedgerPatch;
+}
+export interface UpdateMeterCreditInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `MeterCredit` being updated. */
+  meterCreditPatch: MeterCreditPatch;
+}
+export interface UpdateMeterDefaultInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `MeterDefault` being updated. */
+  meterDefaultPatch: MeterDefaultPatch;
+}
+export interface UpdateMeterInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Meter` being updated. */
+  meterPatch: MeterPatch;
+}
+export interface UpdateMeterSourceInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `MeterSource` being updated. */
+  meterSourcePatch: MeterSourcePatch;
+}
 export interface UpdateOrgLimitAggregateInput {
   clientMutationId?: string;
   id: string;
@@ -1825,9 +3796,100 @@ export interface UpdateOrgLimitWarningInput {
   /** An object where the defined keys will be set on the `OrgLimitWarning` being updated. */
   orgLimitWarningPatch: OrgLimitWarningPatch;
 }
+export interface UpdatePlanCapInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlanCap` being updated. */
+  planCapPatch: PlanCapPatch;
+}
+export interface UpdatePlanInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Plan` being updated. */
+  planPatch: PlanPatch;
+}
+export interface UpdatePlanLimitInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlanLimit` being updated. */
+  planLimitPatch: PlanLimitPatch;
+}
+export interface UpdatePlanMeterLimitInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlanMeterLimit` being updated. */
+  planMeterLimitPatch: PlanMeterLimitPatch;
+}
+export interface UpdatePlanOverrideInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlanOverride` being updated. */
+  planOverridePatch: PlanOverridePatch;
+}
+export interface UpdatePlanPricingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlanPricing` being updated. */
+  planPricingPatch: PlanPricingPatch;
+}
+export interface UpdatePlanSubscriptionInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlanSubscription` being updated. */
+  planSubscriptionPatch: PlanSubscriptionPatch;
+}
 /** Root meta schema type */
 export interface MetaSchema {
   tables: MetaTable[];
+}
+/** A connection to a list of `AppAchievementReward` values. */
+export interface AppAchievementRewardConnection {
+  edges: AppAchievementRewardEdge[];
+  nodes: AppAchievementReward[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppEventAggregate` values. */
+export interface AppEventAggregateConnection {
+  edges: AppEventAggregateEdge[];
+  nodes: AppEventAggregate[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppEventType` values. */
+export interface AppEventTypeConnection {
+  edges: AppEventTypeEdge[];
+  nodes: AppEventType[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppEvent` values. */
+export interface AppEventConnection {
+  edges: AppEventEdge[];
+  nodes: AppEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLevelGrant` values. */
+export interface AppLevelGrantConnection {
+  edges: AppLevelGrantEdge[];
+  nodes: AppLevelGrant[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLevelRequirement` values. */
+export interface AppLevelRequirementConnection {
+  edges: AppLevelRequirementEdge[];
+  nodes: AppLevelRequirement[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLevel` values. */
+export interface AppLevelConnection {
+  edges: AppLevelEdge[];
+  nodes: AppLevel[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
 /** A connection to a list of `AppLimitCap` values. */
 export interface AppLimitCapConnection {
@@ -1899,6 +3961,48 @@ export interface AppLimitConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `BillingUsageSummary` values. */
+export interface BillingUsageSummaryConnection {
+  edges: BillingUsageSummaryEdge[];
+  nodes: BillingUsageSummary[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Ledger` values. */
+export interface LedgerConnection {
+  edges: LedgerEdge[];
+  nodes: Ledger[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `MeterCredit` values. */
+export interface MeterCreditConnection {
+  edges: MeterCreditEdge[];
+  nodes: MeterCredit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `MeterDefault` values. */
+export interface MeterDefaultConnection {
+  edges: MeterDefaultEdge[];
+  nodes: MeterDefault[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `MeterSource` values. */
+export interface MeterSourceConnection {
+  edges: MeterSourceEdge[];
+  nodes: MeterSource[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Meter` values. */
+export interface MeterConnection {
+  edges: MeterEdge[];
+  nodes: Meter[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `OrgLimitAggregate` values. */
 export interface OrgLimitAggregateConnection {
   edges: OrgLimitAggregateEdge[];
@@ -1954,6 +4058,97 @@ export interface OrgLimitConnection {
   nodes: OrgLimit[];
   pageInfo: PageInfo;
   totalCount: number;
+}
+/** A connection to a list of `PlanCap` values. */
+export interface PlanCapConnection {
+  edges: PlanCapEdge[];
+  nodes: PlanCap[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlanLimit` values. */
+export interface PlanLimitConnection {
+  edges: PlanLimitEdge[];
+  nodes: PlanLimit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlanMeterLimit` values. */
+export interface PlanMeterLimitConnection {
+  edges: PlanMeterLimitEdge[];
+  nodes: PlanMeterLimit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlanOverride` values. */
+export interface PlanOverrideConnection {
+  edges: PlanOverrideEdge[];
+  nodes: PlanOverride[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlanPricing` values. */
+export interface PlanPricingConnection {
+  edges: PlanPricingEdge[];
+  nodes: PlanPricing[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlanSubscription` values. */
+export interface PlanSubscriptionConnection {
+  edges: PlanSubscriptionEdge[];
+  nodes: PlanSubscription[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Plan` values. */
+export interface PlanConnection {
+  edges: PlanEdge[];
+  nodes: Plan[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+export interface CreateAppAchievementRewardPayload {
+  /** The `AppAchievementReward` that was created by this mutation. */
+  appAchievementReward?: AppAchievementReward | null;
+  appAchievementRewardEdge?: AppAchievementRewardEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppEventPayload {
+  /** The `AppEvent` that was created by this mutation. */
+  appEvent?: AppEvent | null;
+  appEventEdge?: AppEventEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppEventAggregatePayload {
+  /** The `AppEventAggregate` that was created by this mutation. */
+  appEventAggregate?: AppEventAggregate | null;
+  appEventAggregateEdge?: AppEventAggregateEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppEventTypePayload {
+  /** The `AppEventType` that was created by this mutation. */
+  appEventType?: AppEventType | null;
+  appEventTypeEdge?: AppEventTypeEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLevelPayload {
+  /** The `AppLevel` that was created by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLevelGrantPayload {
+  /** The `AppLevelGrant` that was created by this mutation. */
+  appLevelGrant?: AppLevelGrant | null;
+  appLevelGrantEdge?: AppLevelGrantEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLevelRequirementPayload {
+  /** The `AppLevelRequirement` that was created by this mutation. */
+  appLevelRequirement?: AppLevelRequirement | null;
+  appLevelRequirementEdge?: AppLevelRequirementEdge | null;
+  clientMutationId?: string | null;
 }
 export interface CreateAppLimitPayload {
   /** The `AppLimit` that was created by this mutation. */
@@ -2015,6 +4210,42 @@ export interface CreateAppLimitWarningPayload {
   appLimitWarningEdge?: AppLimitWarningEdge | null;
   clientMutationId?: string | null;
 }
+export interface CreateBillingUsageSummaryPayload {
+  /** The `BillingUsageSummary` that was created by this mutation. */
+  billingUsageSummary?: BillingUsageSummary | null;
+  billingUsageSummaryEdge?: BillingUsageSummaryEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateLedgerPayload {
+  clientMutationId?: string | null;
+  /** The `Ledger` that was created by this mutation. */
+  ledger?: Ledger | null;
+  ledgerEdge?: LedgerEdge | null;
+}
+export interface CreateMeterPayload {
+  clientMutationId?: string | null;
+  /** The `Meter` that was created by this mutation. */
+  meter?: Meter | null;
+  meterEdge?: MeterEdge | null;
+}
+export interface CreateMeterCreditPayload {
+  clientMutationId?: string | null;
+  /** The `MeterCredit` that was created by this mutation. */
+  meterCredit?: MeterCredit | null;
+  meterCreditEdge?: MeterCreditEdge | null;
+}
+export interface CreateMeterDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `MeterDefault` that was created by this mutation. */
+  meterDefault?: MeterDefault | null;
+  meterDefaultEdge?: MeterDefaultEdge | null;
+}
+export interface CreateMeterSourcePayload {
+  clientMutationId?: string | null;
+  /** The `MeterSource` that was created by this mutation. */
+  meterSource?: MeterSource | null;
+  meterSourceEdge?: MeterSourceEdge | null;
+}
 export interface CreateOrgLimitPayload {
   clientMutationId?: string | null;
   /** The `OrgLimit` that was created by this mutation. */
@@ -2062,6 +4293,90 @@ export interface CreateOrgLimitWarningPayload {
   /** The `OrgLimitWarning` that was created by this mutation. */
   orgLimitWarning?: OrgLimitWarning | null;
   orgLimitWarningEdge?: OrgLimitWarningEdge | null;
+}
+export interface CreatePlanPayload {
+  clientMutationId?: string | null;
+  /** The `Plan` that was created by this mutation. */
+  plan?: Plan | null;
+  planEdge?: PlanEdge | null;
+}
+export interface CreatePlanCapPayload {
+  clientMutationId?: string | null;
+  /** The `PlanCap` that was created by this mutation. */
+  planCap?: PlanCap | null;
+  planCapEdge?: PlanCapEdge | null;
+}
+export interface CreatePlanLimitPayload {
+  clientMutationId?: string | null;
+  /** The `PlanLimit` that was created by this mutation. */
+  planLimit?: PlanLimit | null;
+  planLimitEdge?: PlanLimitEdge | null;
+}
+export interface CreatePlanMeterLimitPayload {
+  clientMutationId?: string | null;
+  /** The `PlanMeterLimit` that was created by this mutation. */
+  planMeterLimit?: PlanMeterLimit | null;
+  planMeterLimitEdge?: PlanMeterLimitEdge | null;
+}
+export interface CreatePlanOverridePayload {
+  clientMutationId?: string | null;
+  /** The `PlanOverride` that was created by this mutation. */
+  planOverride?: PlanOverride | null;
+  planOverrideEdge?: PlanOverrideEdge | null;
+}
+export interface CreatePlanPricingPayload {
+  clientMutationId?: string | null;
+  /** The `PlanPricing` that was created by this mutation. */
+  planPricing?: PlanPricing | null;
+  planPricingEdge?: PlanPricingEdge | null;
+}
+export interface CreatePlanSubscriptionPayload {
+  clientMutationId?: string | null;
+  /** The `PlanSubscription` that was created by this mutation. */
+  planSubscription?: PlanSubscription | null;
+  planSubscriptionEdge?: PlanSubscriptionEdge | null;
+}
+export interface DeleteAppAchievementRewardPayload {
+  /** The `AppAchievementReward` that was deleted by this mutation. */
+  appAchievementReward?: AppAchievementReward | null;
+  appAchievementRewardEdge?: AppAchievementRewardEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppEventPayload {
+  /** The `AppEvent` that was deleted by this mutation. */
+  appEvent?: AppEvent | null;
+  appEventEdge?: AppEventEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppEventAggregatePayload {
+  /** The `AppEventAggregate` that was deleted by this mutation. */
+  appEventAggregate?: AppEventAggregate | null;
+  appEventAggregateEdge?: AppEventAggregateEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppEventTypePayload {
+  /** The `AppEventType` that was deleted by this mutation. */
+  appEventType?: AppEventType | null;
+  appEventTypeEdge?: AppEventTypeEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLevelPayload {
+  /** The `AppLevel` that was deleted by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLevelGrantPayload {
+  /** The `AppLevelGrant` that was deleted by this mutation. */
+  appLevelGrant?: AppLevelGrant | null;
+  appLevelGrantEdge?: AppLevelGrantEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLevelRequirementPayload {
+  /** The `AppLevelRequirement` that was deleted by this mutation. */
+  appLevelRequirement?: AppLevelRequirement | null;
+  appLevelRequirementEdge?: AppLevelRequirementEdge | null;
+  clientMutationId?: string | null;
 }
 export interface DeleteAppLimitPayload {
   /** The `AppLimit` that was deleted by this mutation. */
@@ -2123,6 +4438,42 @@ export interface DeleteAppLimitWarningPayload {
   appLimitWarningEdge?: AppLimitWarningEdge | null;
   clientMutationId?: string | null;
 }
+export interface DeleteBillingUsageSummaryPayload {
+  /** The `BillingUsageSummary` that was deleted by this mutation. */
+  billingUsageSummary?: BillingUsageSummary | null;
+  billingUsageSummaryEdge?: BillingUsageSummaryEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteLedgerPayload {
+  clientMutationId?: string | null;
+  /** The `Ledger` that was deleted by this mutation. */
+  ledger?: Ledger | null;
+  ledgerEdge?: LedgerEdge | null;
+}
+export interface DeleteMeterPayload {
+  clientMutationId?: string | null;
+  /** The `Meter` that was deleted by this mutation. */
+  meter?: Meter | null;
+  meterEdge?: MeterEdge | null;
+}
+export interface DeleteMeterCreditPayload {
+  clientMutationId?: string | null;
+  /** The `MeterCredit` that was deleted by this mutation. */
+  meterCredit?: MeterCredit | null;
+  meterCreditEdge?: MeterCreditEdge | null;
+}
+export interface DeleteMeterDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `MeterDefault` that was deleted by this mutation. */
+  meterDefault?: MeterDefault | null;
+  meterDefaultEdge?: MeterDefaultEdge | null;
+}
+export interface DeleteMeterSourcePayload {
+  clientMutationId?: string | null;
+  /** The `MeterSource` that was deleted by this mutation. */
+  meterSource?: MeterSource | null;
+  meterSourceEdge?: MeterSourceEdge | null;
+}
 export interface DeleteOrgLimitPayload {
   clientMutationId?: string | null;
   /** The `OrgLimit` that was deleted by this mutation. */
@@ -2171,6 +4522,51 @@ export interface DeleteOrgLimitWarningPayload {
   orgLimitWarning?: OrgLimitWarning | null;
   orgLimitWarningEdge?: OrgLimitWarningEdge | null;
 }
+export interface DeletePlanPayload {
+  clientMutationId?: string | null;
+  /** The `Plan` that was deleted by this mutation. */
+  plan?: Plan | null;
+  planEdge?: PlanEdge | null;
+}
+export interface DeletePlanCapPayload {
+  clientMutationId?: string | null;
+  /** The `PlanCap` that was deleted by this mutation. */
+  planCap?: PlanCap | null;
+  planCapEdge?: PlanCapEdge | null;
+}
+export interface DeletePlanLimitPayload {
+  clientMutationId?: string | null;
+  /** The `PlanLimit` that was deleted by this mutation. */
+  planLimit?: PlanLimit | null;
+  planLimitEdge?: PlanLimitEdge | null;
+}
+export interface DeletePlanMeterLimitPayload {
+  clientMutationId?: string | null;
+  /** The `PlanMeterLimit` that was deleted by this mutation. */
+  planMeterLimit?: PlanMeterLimit | null;
+  planMeterLimitEdge?: PlanMeterLimitEdge | null;
+}
+export interface DeletePlanOverridePayload {
+  clientMutationId?: string | null;
+  /** The `PlanOverride` that was deleted by this mutation. */
+  planOverride?: PlanOverride | null;
+  planOverrideEdge?: PlanOverrideEdge | null;
+}
+export interface DeletePlanPricingPayload {
+  clientMutationId?: string | null;
+  /** The `PlanPricing` that was deleted by this mutation. */
+  planPricing?: PlanPricing | null;
+  planPricingEdge?: PlanPricingEdge | null;
+}
+export interface DeletePlanSubscriptionPayload {
+  clientMutationId?: string | null;
+  /** The `PlanSubscription` that was deleted by this mutation. */
+  planSubscription?: PlanSubscription | null;
+  planSubscriptionEdge?: PlanSubscriptionEdge | null;
+}
+export interface GrantAchievementPayload {
+  clientMutationId?: string | null;
+}
 export interface ProvisionBucketPayload {
   /** The access type applied */
   accessType: string;
@@ -2185,11 +4581,21 @@ export interface ProvisionBucketPayload {
   /** Whether provisioning succeeded */
   success: boolean;
 }
+export interface RecomputeCapabilitiesPayload {
+  clientMutationId?: string | null;
+}
+export interface RevokeAchievementPayload {
+  clientMutationId?: string | null;
+}
 export interface SeedAppLimitCapsDefaultsPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
 export interface SeedAppLimitDefaultsPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface SeedMeterDefaultsPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -2200,6 +4606,56 @@ export interface SeedOrgLimitCapsDefaultsPayload {
 export interface SeedOrgLimitDefaultsPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
+}
+export interface SeedPlanPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface SeedTrustLadderPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface UpdateAppAchievementRewardPayload {
+  /** The `AppAchievementReward` that was updated by this mutation. */
+  appAchievementReward?: AppAchievementReward | null;
+  appAchievementRewardEdge?: AppAchievementRewardEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppEventPayload {
+  /** The `AppEvent` that was updated by this mutation. */
+  appEvent?: AppEvent | null;
+  appEventEdge?: AppEventEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppEventAggregatePayload {
+  /** The `AppEventAggregate` that was updated by this mutation. */
+  appEventAggregate?: AppEventAggregate | null;
+  appEventAggregateEdge?: AppEventAggregateEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppEventTypePayload {
+  /** The `AppEventType` that was updated by this mutation. */
+  appEventType?: AppEventType | null;
+  appEventTypeEdge?: AppEventTypeEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLevelPayload {
+  /** The `AppLevel` that was updated by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLevelGrantPayload {
+  /** The `AppLevelGrant` that was updated by this mutation. */
+  appLevelGrant?: AppLevelGrant | null;
+  appLevelGrantEdge?: AppLevelGrantEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLevelRequirementPayload {
+  /** The `AppLevelRequirement` that was updated by this mutation. */
+  appLevelRequirement?: AppLevelRequirement | null;
+  appLevelRequirementEdge?: AppLevelRequirementEdge | null;
+  clientMutationId?: string | null;
 }
 export interface UpdateAppLimitPayload {
   /** The `AppLimit` that was updated by this mutation. */
@@ -2261,6 +4717,42 @@ export interface UpdateAppLimitWarningPayload {
   appLimitWarningEdge?: AppLimitWarningEdge | null;
   clientMutationId?: string | null;
 }
+export interface UpdateBillingUsageSummaryPayload {
+  /** The `BillingUsageSummary` that was updated by this mutation. */
+  billingUsageSummary?: BillingUsageSummary | null;
+  billingUsageSummaryEdge?: BillingUsageSummaryEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateLedgerPayload {
+  clientMutationId?: string | null;
+  /** The `Ledger` that was updated by this mutation. */
+  ledger?: Ledger | null;
+  ledgerEdge?: LedgerEdge | null;
+}
+export interface UpdateMeterPayload {
+  clientMutationId?: string | null;
+  /** The `Meter` that was updated by this mutation. */
+  meter?: Meter | null;
+  meterEdge?: MeterEdge | null;
+}
+export interface UpdateMeterCreditPayload {
+  clientMutationId?: string | null;
+  /** The `MeterCredit` that was updated by this mutation. */
+  meterCredit?: MeterCredit | null;
+  meterCreditEdge?: MeterCreditEdge | null;
+}
+export interface UpdateMeterDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `MeterDefault` that was updated by this mutation. */
+  meterDefault?: MeterDefault | null;
+  meterDefaultEdge?: MeterDefaultEdge | null;
+}
+export interface UpdateMeterSourcePayload {
+  clientMutationId?: string | null;
+  /** The `MeterSource` that was updated by this mutation. */
+  meterSource?: MeterSource | null;
+  meterSourceEdge?: MeterSourceEdge | null;
+}
 export interface UpdateOrgLimitPayload {
   clientMutationId?: string | null;
   /** The `OrgLimit` that was updated by this mutation. */
@@ -2309,6 +4801,48 @@ export interface UpdateOrgLimitWarningPayload {
   orgLimitWarning?: OrgLimitWarning | null;
   orgLimitWarningEdge?: OrgLimitWarningEdge | null;
 }
+export interface UpdatePlanPayload {
+  clientMutationId?: string | null;
+  /** The `Plan` that was updated by this mutation. */
+  plan?: Plan | null;
+  planEdge?: PlanEdge | null;
+}
+export interface UpdatePlanCapPayload {
+  clientMutationId?: string | null;
+  /** The `PlanCap` that was updated by this mutation. */
+  planCap?: PlanCap | null;
+  planCapEdge?: PlanCapEdge | null;
+}
+export interface UpdatePlanLimitPayload {
+  clientMutationId?: string | null;
+  /** The `PlanLimit` that was updated by this mutation. */
+  planLimit?: PlanLimit | null;
+  planLimitEdge?: PlanLimitEdge | null;
+}
+export interface UpdatePlanMeterLimitPayload {
+  clientMutationId?: string | null;
+  /** The `PlanMeterLimit` that was updated by this mutation. */
+  planMeterLimit?: PlanMeterLimit | null;
+  planMeterLimitEdge?: PlanMeterLimitEdge | null;
+}
+export interface UpdatePlanOverridePayload {
+  clientMutationId?: string | null;
+  /** The `PlanOverride` that was updated by this mutation. */
+  planOverride?: PlanOverride | null;
+  planOverrideEdge?: PlanOverrideEdge | null;
+}
+export interface UpdatePlanPricingPayload {
+  clientMutationId?: string | null;
+  /** The `PlanPricing` that was updated by this mutation. */
+  planPricing?: PlanPricing | null;
+  planPricingEdge?: PlanPricingEdge | null;
+}
+export interface UpdatePlanSubscriptionPayload {
+  clientMutationId?: string | null;
+  /** The `PlanSubscription` that was updated by this mutation. */
+  planSubscription?: PlanSubscription | null;
+  planSubscriptionEdge?: PlanSubscriptionEdge | null;
+}
 /** Information about a database table */
 export interface MetaTable {
   constraints: MetaConstraints;
@@ -2336,11 +4870,11 @@ export interface MetaTable {
   tableName: string;
   uniqueConstraints: MetaUniqueConstraint[];
 }
-/** A `AppLimitCap` edge in the connection. */
-export interface AppLimitCapEdge {
+/** A `AppAchievementReward` edge in the connection. */
+export interface AppAchievementRewardEdge {
   cursor?: string | null;
-  /** The `AppLimitCap` at the end of the edge. */
-  node?: AppLimitCap | null;
+  /** The `AppAchievementReward` at the end of the edge. */
+  node?: AppAchievementReward | null;
 }
 /** Information about pagination in a connection. */
 export interface PageInfo {
@@ -2352,6 +4886,48 @@ export interface PageInfo {
   hasPreviousPage: boolean;
   /** When paginating backwards, the cursor to continue. */
   startCursor?: string | null;
+}
+/** A `AppEventAggregate` edge in the connection. */
+export interface AppEventAggregateEdge {
+  cursor?: string | null;
+  /** The `AppEventAggregate` at the end of the edge. */
+  node?: AppEventAggregate | null;
+}
+/** A `AppEventType` edge in the connection. */
+export interface AppEventTypeEdge {
+  cursor?: string | null;
+  /** The `AppEventType` at the end of the edge. */
+  node?: AppEventType | null;
+}
+/** A `AppEvent` edge in the connection. */
+export interface AppEventEdge {
+  cursor?: string | null;
+  /** The `AppEvent` at the end of the edge. */
+  node?: AppEvent | null;
+}
+/** A `AppLevelGrant` edge in the connection. */
+export interface AppLevelGrantEdge {
+  cursor?: string | null;
+  /** The `AppLevelGrant` at the end of the edge. */
+  node?: AppLevelGrant | null;
+}
+/** A `AppLevelRequirement` edge in the connection. */
+export interface AppLevelRequirementEdge {
+  cursor?: string | null;
+  /** The `AppLevelRequirement` at the end of the edge. */
+  node?: AppLevelRequirement | null;
+}
+/** A `AppLevel` edge in the connection. */
+export interface AppLevelEdge {
+  cursor?: string | null;
+  /** The `AppLevel` at the end of the edge. */
+  node?: AppLevel | null;
+}
+/** A `AppLimitCap` edge in the connection. */
+export interface AppLimitCapEdge {
+  cursor?: string | null;
+  /** The `AppLimitCap` at the end of the edge. */
+  node?: AppLimitCap | null;
 }
 /** A `AppLimitCapsDefault` edge in the connection. */
 export interface AppLimitCapsDefaultEdge {
@@ -2407,6 +4983,42 @@ export interface AppLimitEdge {
   /** The `AppLimit` at the end of the edge. */
   node?: AppLimit | null;
 }
+/** A `BillingUsageSummary` edge in the connection. */
+export interface BillingUsageSummaryEdge {
+  cursor?: string | null;
+  /** The `BillingUsageSummary` at the end of the edge. */
+  node?: BillingUsageSummary | null;
+}
+/** A `Ledger` edge in the connection. */
+export interface LedgerEdge {
+  cursor?: string | null;
+  /** The `Ledger` at the end of the edge. */
+  node?: Ledger | null;
+}
+/** A `MeterCredit` edge in the connection. */
+export interface MeterCreditEdge {
+  cursor?: string | null;
+  /** The `MeterCredit` at the end of the edge. */
+  node?: MeterCredit | null;
+}
+/** A `MeterDefault` edge in the connection. */
+export interface MeterDefaultEdge {
+  cursor?: string | null;
+  /** The `MeterDefault` at the end of the edge. */
+  node?: MeterDefault | null;
+}
+/** A `MeterSource` edge in the connection. */
+export interface MeterSourceEdge {
+  cursor?: string | null;
+  /** The `MeterSource` at the end of the edge. */
+  node?: MeterSource | null;
+}
+/** A `Meter` edge in the connection. */
+export interface MeterEdge {
+  cursor?: string | null;
+  /** The `Meter` at the end of the edge. */
+  node?: Meter | null;
+}
 /** A `OrgLimitAggregate` edge in the connection. */
 export interface OrgLimitAggregateEdge {
   cursor?: string | null;
@@ -2454,6 +5066,48 @@ export interface OrgLimitEdge {
   cursor?: string | null;
   /** The `OrgLimit` at the end of the edge. */
   node?: OrgLimit | null;
+}
+/** A `PlanCap` edge in the connection. */
+export interface PlanCapEdge {
+  cursor?: string | null;
+  /** The `PlanCap` at the end of the edge. */
+  node?: PlanCap | null;
+}
+/** A `PlanLimit` edge in the connection. */
+export interface PlanLimitEdge {
+  cursor?: string | null;
+  /** The `PlanLimit` at the end of the edge. */
+  node?: PlanLimit | null;
+}
+/** A `PlanMeterLimit` edge in the connection. */
+export interface PlanMeterLimitEdge {
+  cursor?: string | null;
+  /** The `PlanMeterLimit` at the end of the edge. */
+  node?: PlanMeterLimit | null;
+}
+/** A `PlanOverride` edge in the connection. */
+export interface PlanOverrideEdge {
+  cursor?: string | null;
+  /** The `PlanOverride` at the end of the edge. */
+  node?: PlanOverride | null;
+}
+/** A `PlanPricing` edge in the connection. */
+export interface PlanPricingEdge {
+  cursor?: string | null;
+  /** The `PlanPricing` at the end of the edge. */
+  node?: PlanPricing | null;
+}
+/** A `PlanSubscription` edge in the connection. */
+export interface PlanSubscriptionEdge {
+  cursor?: string | null;
+  /** The `PlanSubscription` at the end of the edge. */
+  node?: PlanSubscription | null;
+}
+/** A `Plan` edge in the connection. */
+export interface PlanEdge {
+  cursor?: string | null;
+  /** The `Plan` at the end of the edge. */
+  node?: Plan | null;
 }
 /** Table constraints */
 export interface MetaConstraints {

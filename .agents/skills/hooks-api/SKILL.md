@@ -1,25 +1,25 @@
 ---
 name: hooks-api
-description: React Query hooks for the api API — provides typed query and mutation hooks for 80 tables and 17 custom operations
+description: React Query hooks for the api API — provides typed query and mutation hooks for 86 tables and 17 custom operations
 ---
 
 # hooks-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the api API — provides typed query and mutation hooks for 80 tables and 17 custom operations
+React Query hooks for the api API — provides typed query and mutation hooks for 86 tables and 17 custom operations
 
 ## Usage
 
 ```typescript
 // Import hooks
-import { useApiSchemasQuery } from './hooks';
+import { useApisQuery } from './hooks';
 
 // Query hooks: use<Model>Query, use<Model>sQuery
 // Mutation hooks: useCreate<Model>Mutation, useUpdate<Model>Mutation, useDelete<Model>Mutation
 // Bulk mutation hooks (when enabled): useBulkCreate<Model>Mutation, useBulkUpsert<Model>Mutation, etc.
 
-const { data, isLoading } = useApiSchemasQuery({
+const { data, isLoading } = useApisQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -29,7 +29,7 @@ const { data, isLoading } = useApiSchemasQuery({
 ### Query records
 
 ```typescript
-const { data, isLoading } = useApiSchemasQuery({
+const { data, isLoading } = useApisQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -38,10 +38,11 @@ const { data, isLoading } = useApiSchemasQuery({
 
 See the `references/` directory for detailed per-entity API documentation:
 
+- [api](references/api.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
-- [apis](references/apis.md)
-- [ast-migration](references/ast-migration.md)
+- [app-component](references/app-component.md)
+- [app](references/app.md)
 - [check-constraint](references/check-constraint.md)
 - [composite-type](references/composite-type.md)
 - [cors-setting](references/cors-setting.md)
@@ -54,6 +55,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [domain-event](references/domain-event.md)
 - [domain-type](references/domain-type.md)
 - [domain-verification](references/domain-verification.md)
+- [email-identity](references/email-identity.md)
+- [email-provider-account](references/email-provider-account.md)
+- [email-site-identity](references/email-site-identity.md)
 - [embedding-chunk](references/embedding-chunk.md)
 - [enum](references/enum.md)
 - [exclusion-constraint](references/exclusion-constraint.md)
@@ -70,13 +74,16 @@ See the `references/` directory for detailed per-entity API documentation:
 - [node-type-registry](references/node-type-registry.md)
 - [page](references/page.md)
 - [partition](references/partition.md)
+- [platform-api](references/platform-api.md)
 - [platform-api-schema](references/platform-api-schema.md)
 - [platform-api-setting](references/platform-api-setting.md)
-- [platform-apis](references/platform-apis.md)
 - [platform-cors-setting](references/platform-cors-setting.md)
 - [platform-domain](references/platform-domain.md)
 - [platform-domain-event](references/platform-domain-event.md)
 - [platform-domain-verification](references/platform-domain-verification.md)
+- [platform-email-identity](references/platform-email-identity.md)
+- [platform-email-provider-account](references/platform-email-provider-account.md)
+- [platform-email-site-identity](references/platform-email-site-identity.md)
 - [platform-managed-domain](references/platform-managed-domain.md)
 - [platform-page](references/platform-page.md)
 - [platform-site-app-link](references/platform-site-app-link.md)
@@ -104,7 +111,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [site-theme](references/site-theme.md)
 - [site-web-config](references/site-web-config.md)
 - [spatial-relation](references/spatial-relation.md)
-- [sql-action](references/sql-action.md)
 - [table-behavior](references/table-behavior.md)
 - [table](references/table.md)
 - [table-grant](references/table-grant.md)
@@ -124,14 +130,14 @@ See the `references/` directory for detailed per-entity API documentation:
 - [resolve-http-route](references/resolve-http-route.md)
 - [resolve-route](references/resolve-route.md)
 - [resolve-site-app-links](references/resolve-site-app-links.md)
-- [accept-database-transfer](references/accept-database-transfer.md)
 - [apply-rls](references/apply-rls.md)
-- [cancel-database-transfer](references/cancel-database-transfer.md)
+- [apps-install-app](references/apps-install-app.md)
+- [apps-uninstall-app](references/apps-uninstall-app.md)
+- [apps-upgrade-app](references/apps-upgrade-app.md)
 - [domains-assign-subdomain](references/domains-assign-subdomain.md)
 - [platform-domains-assign-subdomain](references/platform-domains-assign-subdomain.md)
 - [platform-sites-provision-static-site](references/platform-sites-provision-static-site.md)
 - [provision-bucket](references/provision-bucket.md)
-- [reject-database-transfer](references/reject-database-transfer.md)
 - [request-database](references/request-database.md)
 - [set-field-order](references/set-field-order.md)
 - [sites-provision-static-site](references/sites-provision-static-site.md)

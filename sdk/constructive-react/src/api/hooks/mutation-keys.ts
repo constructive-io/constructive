@@ -18,6 +18,14 @@
 // Entity Mutation Keys
 // ============================================================================
 
+export const apiMutationKeys = {
+  /** All api mutation keys */ all: ['mutation', 'api'] as const,
+  /** Create api mutation key */ create: () => ['mutation', 'api', 'create'] as const,
+  /** Update api mutation key */ update: (id: string | number) =>
+    ['mutation', 'api', 'update', id] as const,
+  /** Delete api mutation key */ delete: (id: string | number) =>
+    ['mutation', 'api', 'delete', id] as const,
+} as const;
 export const apiSchemaMutationKeys = {
   /** All apiSchema mutation keys */ all: ['mutation', 'apischema'] as const,
   /** Create apiSchema mutation key */ create: () => ['mutation', 'apischema', 'create'] as const,
@@ -34,22 +42,22 @@ export const apiSettingMutationKeys = {
   /** Delete apiSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'apisetting', 'delete', id] as const,
 } as const;
-export const apisMutationKeys = {
-  /** All apis mutation keys */ all: ['mutation', 'apis'] as const,
-  /** Create apis mutation key */ create: () => ['mutation', 'apis', 'create'] as const,
-  /** Update apis mutation key */ update: (id: string | number) =>
-    ['mutation', 'apis', 'update', id] as const,
-  /** Delete apis mutation key */ delete: (id: string | number) =>
-    ['mutation', 'apis', 'delete', id] as const,
+export const appComponentMutationKeys = {
+  /** All appComponent mutation keys */ all: ['mutation', 'appcomponent'] as const,
+  /** Create appComponent mutation key */ create: () =>
+    ['mutation', 'appcomponent', 'create'] as const,
+  /** Update appComponent mutation key */ update: (id: string | number) =>
+    ['mutation', 'appcomponent', 'update', id] as const,
+  /** Delete appComponent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'appcomponent', 'delete', id] as const,
 } as const;
-export const astMigrationMutationKeys = {
-  /** All astMigration mutation keys */ all: ['mutation', 'astmigration'] as const,
-  /** Create astMigration mutation key */ create: () =>
-    ['mutation', 'astmigration', 'create'] as const,
-  /** Update astMigration mutation key */ update: (id: string | number) =>
-    ['mutation', 'astmigration', 'update', id] as const,
-  /** Delete astMigration mutation key */ delete: (id: string | number) =>
-    ['mutation', 'astmigration', 'delete', id] as const,
+export const appMutationKeys = {
+  /** All app mutation keys */ all: ['mutation', 'app'] as const,
+  /** Create app mutation key */ create: () => ['mutation', 'app', 'create'] as const,
+  /** Update app mutation key */ update: (id: string | number) =>
+    ['mutation', 'app', 'update', id] as const,
+  /** Delete app mutation key */ delete: (id: string | number) =>
+    ['mutation', 'app', 'delete', id] as const,
 } as const;
 export const checkConstraintMutationKeys = {
   /** All checkConstraint mutation keys */ all: ['mutation', 'checkconstraint'] as const,
@@ -154,6 +162,33 @@ export const domainVerificationMutationKeys = {
     ['mutation', 'domainverification', 'update', id] as const,
   /** Delete domainVerification mutation key */ delete: (id: string | number) =>
     ['mutation', 'domainverification', 'delete', id] as const,
+} as const;
+export const emailIdentityMutationKeys = {
+  /** All emailIdentity mutation keys */ all: ['mutation', 'emailidentity'] as const,
+  /** Create emailIdentity mutation key */ create: () =>
+    ['mutation', 'emailidentity', 'create'] as const,
+  /** Update emailIdentity mutation key */ update: (id: string | number) =>
+    ['mutation', 'emailidentity', 'update', id] as const,
+  /** Delete emailIdentity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'emailidentity', 'delete', id] as const,
+} as const;
+export const emailProviderAccountMutationKeys = {
+  /** All emailProviderAccount mutation keys */ all: ['mutation', 'emailprovideraccount'] as const,
+  /** Create emailProviderAccount mutation key */ create: () =>
+    ['mutation', 'emailprovideraccount', 'create'] as const,
+  /** Update emailProviderAccount mutation key */ update: (id: string | number) =>
+    ['mutation', 'emailprovideraccount', 'update', id] as const,
+  /** Delete emailProviderAccount mutation key */ delete: (id: string | number) =>
+    ['mutation', 'emailprovideraccount', 'delete', id] as const,
+} as const;
+export const emailSiteIdentityMutationKeys = {
+  /** All emailSiteIdentity mutation keys */ all: ['mutation', 'emailsiteidentity'] as const,
+  /** Create emailSiteIdentity mutation key */ create: () =>
+    ['mutation', 'emailsiteidentity', 'create'] as const,
+  /** Update emailSiteIdentity mutation key */ update: (id: string | number) =>
+    ['mutation', 'emailsiteidentity', 'update', id] as const,
+  /** Delete emailSiteIdentity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'emailsiteidentity', 'delete', id] as const,
 } as const;
 export const embeddingChunkMutationKeys = {
   /** All embeddingChunk mutation keys */ all: ['mutation', 'embeddingchunk'] as const,
@@ -295,6 +330,15 @@ export const partitionMutationKeys = {
   /** Delete partition mutation key */ delete: (id: string | number) =>
     ['mutation', 'partition', 'delete', id] as const,
 } as const;
+export const platformApiMutationKeys = {
+  /** All platformApi mutation keys */ all: ['mutation', 'platformapi'] as const,
+  /** Create platformApi mutation key */ create: () =>
+    ['mutation', 'platformapi', 'create'] as const,
+  /** Update platformApi mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformapi', 'update', id] as const,
+  /** Delete platformApi mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformapi', 'delete', id] as const,
+} as const;
 export const platformApiSchemaMutationKeys = {
   /** All platformApiSchema mutation keys */ all: ['mutation', 'platformapischema'] as const,
   /** Create platformApiSchema mutation key */ create: () =>
@@ -312,15 +356,6 @@ export const platformApiSettingMutationKeys = {
     ['mutation', 'platformapisetting', 'update', id] as const,
   /** Delete platformApiSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformapisetting', 'delete', id] as const,
-} as const;
-export const platformApisMutationKeys = {
-  /** All platformApis mutation keys */ all: ['mutation', 'platformapis'] as const,
-  /** Create platformApis mutation key */ create: () =>
-    ['mutation', 'platformapis', 'create'] as const,
-  /** Update platformApis mutation key */ update: (id: string | number) =>
-    ['mutation', 'platformapis', 'update', id] as const,
-  /** Delete platformApis mutation key */ delete: (id: string | number) =>
-    ['mutation', 'platformapis', 'delete', id] as const,
 } as const;
 export const platformCorsSettingMutationKeys = {
   /** All platformCorsSetting mutation keys */ all: ['mutation', 'platformcorssetting'] as const,
@@ -360,6 +395,42 @@ export const platformDomainVerificationMutationKeys = {
     ['mutation', 'platformdomainverification', 'update', id] as const,
   /** Delete platformDomainVerification mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformdomainverification', 'delete', id] as const,
+} as const;
+export const platformEmailIdentityMutationKeys = {
+  /** All platformEmailIdentity mutation keys */ all: [
+    'mutation',
+    'platformemailidentity',
+  ] as const,
+  /** Create platformEmailIdentity mutation key */ create: () =>
+    ['mutation', 'platformemailidentity', 'create'] as const,
+  /** Update platformEmailIdentity mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformemailidentity', 'update', id] as const,
+  /** Delete platformEmailIdentity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformemailidentity', 'delete', id] as const,
+} as const;
+export const platformEmailProviderAccountMutationKeys = {
+  /** All platformEmailProviderAccount mutation keys */ all: [
+    'mutation',
+    'platformemailprovideraccount',
+  ] as const,
+  /** Create platformEmailProviderAccount mutation key */ create: () =>
+    ['mutation', 'platformemailprovideraccount', 'create'] as const,
+  /** Update platformEmailProviderAccount mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformemailprovideraccount', 'update', id] as const,
+  /** Delete platformEmailProviderAccount mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformemailprovideraccount', 'delete', id] as const,
+} as const;
+export const platformEmailSiteIdentityMutationKeys = {
+  /** All platformEmailSiteIdentity mutation keys */ all: [
+    'mutation',
+    'platformemailsiteidentity',
+  ] as const,
+  /** Create platformEmailSiteIdentity mutation key */ create: () =>
+    ['mutation', 'platformemailsiteidentity', 'create'] as const,
+  /** Update platformEmailSiteIdentity mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformemailsiteidentity', 'update', id] as const,
+  /** Delete platformEmailSiteIdentity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformemailsiteidentity', 'delete', id] as const,
 } as const;
 export const platformManagedDomainMutationKeys = {
   /** All platformManagedDomain mutation keys */ all: [
@@ -609,14 +680,6 @@ export const spatialRelationMutationKeys = {
   /** Delete spatialRelation mutation key */ delete: (id: string | number) =>
     ['mutation', 'spatialrelation', 'delete', id] as const,
 } as const;
-export const sqlActionMutationKeys = {
-  /** All sqlAction mutation keys */ all: ['mutation', 'sqlaction'] as const,
-  /** Create sqlAction mutation key */ create: () => ['mutation', 'sqlaction', 'create'] as const,
-  /** Update sqlAction mutation key */ update: (id: string | number) =>
-    ['mutation', 'sqlaction', 'update', id] as const,
-  /** Delete sqlAction mutation key */ delete: (id: string | number) =>
-    ['mutation', 'sqlaction', 'delete', id] as const,
-} as const;
 export const tableBehaviorMutationKeys = {
   /** All tableBehavior mutation keys */ all: ['mutation', 'tablebehavior'] as const,
   /** Create tableBehavior mutation key */ create: () =>
@@ -736,18 +799,22 @@ export const webauthnSettingMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
-  /** Mutation key for acceptDatabaseTransfer */ acceptDatabaseTransfer: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'acceptDatabaseTransfer', identifier] as const)
-      : (['mutation', 'acceptDatabaseTransfer'] as const),
   /** Mutation key for applyRls */ applyRls: (identifier?: string) =>
     identifier
       ? (['mutation', 'applyRls', identifier] as const)
       : (['mutation', 'applyRls'] as const),
-  /** Mutation key for cancelDatabaseTransfer */ cancelDatabaseTransfer: (identifier?: string) =>
+  /** Mutation key for appsInstallApp */ appsInstallApp: (identifier?: string) =>
     identifier
-      ? (['mutation', 'cancelDatabaseTransfer', identifier] as const)
-      : (['mutation', 'cancelDatabaseTransfer'] as const),
+      ? (['mutation', 'appsInstallApp', identifier] as const)
+      : (['mutation', 'appsInstallApp'] as const),
+  /** Mutation key for appsUninstallApp */ appsUninstallApp: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'appsUninstallApp', identifier] as const)
+      : (['mutation', 'appsUninstallApp'] as const),
+  /** Mutation key for appsUpgradeApp */ appsUpgradeApp: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'appsUpgradeApp', identifier] as const)
+      : (['mutation', 'appsUpgradeApp'] as const),
   /** Mutation key for domainsAssignSubdomain */ domainsAssignSubdomain: (identifier?: string) =>
     identifier
       ? (['mutation', 'domainsAssignSubdomain', identifier] as const)
@@ -768,10 +835,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
       : (['mutation', 'provisionBucket'] as const),
-  /** Mutation key for rejectDatabaseTransfer */ rejectDatabaseTransfer: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'rejectDatabaseTransfer', identifier] as const)
-      : (['mutation', 'rejectDatabaseTransfer'] as const),
   /** Mutation key for requestDatabase */ requestDatabase: (identifier?: string) =>
     identifier
       ? (['mutation', 'requestDatabase', identifier] as const)
@@ -810,10 +873,11 @@ export const customMutationKeys = {
  * ```
  */
 export const mutationKeys = {
+  api: apiMutationKeys,
   apiSchema: apiSchemaMutationKeys,
   apiSetting: apiSettingMutationKeys,
-  apis: apisMutationKeys,
-  astMigration: astMigrationMutationKeys,
+  appComponent: appComponentMutationKeys,
+  app: appMutationKeys,
   checkConstraint: checkConstraintMutationKeys,
   compositeType: compositeTypeMutationKeys,
   corsSetting: corsSettingMutationKeys,
@@ -826,6 +890,9 @@ export const mutationKeys = {
   domainEvent: domainEventMutationKeys,
   domainType: domainTypeMutationKeys,
   domainVerification: domainVerificationMutationKeys,
+  emailIdentity: emailIdentityMutationKeys,
+  emailProviderAccount: emailProviderAccountMutationKeys,
+  emailSiteIdentity: emailSiteIdentityMutationKeys,
   embeddingChunk: embeddingChunkMutationKeys,
   enum: enumMutationKeys,
   exclusionConstraint: exclusionConstraintMutationKeys,
@@ -842,13 +909,16 @@ export const mutationKeys = {
   nodeTypeRegistry: nodeTypeRegistryMutationKeys,
   page: pageMutationKeys,
   partition: partitionMutationKeys,
+  platformApi: platformApiMutationKeys,
   platformApiSchema: platformApiSchemaMutationKeys,
   platformApiSetting: platformApiSettingMutationKeys,
-  platformApis: platformApisMutationKeys,
   platformCorsSetting: platformCorsSettingMutationKeys,
   platformDomain: platformDomainMutationKeys,
   platformDomainEvent: platformDomainEventMutationKeys,
   platformDomainVerification: platformDomainVerificationMutationKeys,
+  platformEmailIdentity: platformEmailIdentityMutationKeys,
+  platformEmailProviderAccount: platformEmailProviderAccountMutationKeys,
+  platformEmailSiteIdentity: platformEmailSiteIdentityMutationKeys,
   platformManagedDomain: platformManagedDomainMutationKeys,
   platformPage: platformPageMutationKeys,
   platformSiteAppLink: platformSiteAppLinkMutationKeys,
@@ -876,7 +946,6 @@ export const mutationKeys = {
   siteTheme: siteThemeMutationKeys,
   siteWebConfig: siteWebConfigMutationKeys,
   spatialRelation: spatialRelationMutationKeys,
-  sqlAction: sqlActionMutationKeys,
   tableBehavior: tableBehaviorMutationKeys,
   table: tableMutationKeys,
   tableGrant: tableGrantMutationKeys,

@@ -236,7 +236,7 @@ export interface AgentModule {
   agentTableName?: string | null;
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   hasAgents?: boolean | null;
@@ -281,7 +281,7 @@ export interface ApiSurfaceModule {
   corsSettingsTableId?: string | null;
   corsSettingsTableName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   id: string;
@@ -301,7 +301,7 @@ export interface AppModule {
   appsTableName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   id: string;
@@ -320,8 +320,8 @@ export interface BillingModule {
   balancesTableId?: string | null;
   balancesTableName?: string | null;
   databaseId?: string | null;
+  defaultCapabilities?: string[] | null;
   defaultMeterCatalog?: Record<string, unknown> | null;
-  defaultPermissions?: string[] | null;
   id: string;
   ledgerTableId?: string | null;
   ledgerTableName?: string | null;
@@ -349,16 +349,22 @@ export interface BillingProviderModule {
   apiName?: string | null;
   billingCustomersTableId?: string | null;
   billingCustomersTableName?: string | null;
+  billingInvoicesTableId?: string | null;
+  billingInvoicesTableName?: string | null;
   billingPricesTableId?: string | null;
   billingPricesTableName?: string | null;
   billingProductsTableId?: string | null;
   billingProductsTableName?: string | null;
+  billingRefundsTableId?: string | null;
+  billingRefundsTableName?: string | null;
   billingSubscriptionsTableId?: string | null;
   billingSubscriptionsTableName?: string | null;
   billingWebhookEventsTableId?: string | null;
   billingWebhookEventsTableName?: string | null;
   databaseId?: string | null;
   id: string;
+  listPendingUsageSyncFunction?: string | null;
+  markUsageSyncedFunction?: string | null;
   prefix?: string | null;
   pricesTableId?: string | null;
   privateApiName?: string | null;
@@ -366,8 +372,10 @@ export interface BillingProviderModule {
   processBillingEventFunction?: string | null;
   productsTableId?: string | null;
   provider?: string | null;
+  recordRefundFunction?: string | null;
   schemaId?: string | null;
   subscriptionsTableId?: string | null;
+  upsertInvoiceFunction?: string | null;
 }
 /** An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build. */
 export interface Blueprint {
@@ -464,16 +472,42 @@ export interface BlueprintTemplate {
   /** Access control for the template. private: only the owner can see and copy. public: anyone can browse and copy from the marketplace. Defaults to private. */
   visibility?: string | null;
 }
+export interface CapabilitiesModule {
+  actorTableId?: string | null;
+  apiName?: string | null;
+  bitlen?: number | null;
+  databaseId?: string | null;
+  defaultTableId?: string | null;
+  defaultTableName?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  getByMask?: string | null;
+  getMask?: string | null;
+  getMaskByName?: string | null;
+  getPaddedMask?: string | null;
+  id: string;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  tableId?: string | null;
+  tableName?: string | null;
+}
 export interface CatalogModule {
   apiName?: string | null;
   apisTableId?: string | null;
   apisTableName?: string | null;
   appsTableId?: string | null;
   appsTableName?: string | null;
+  bindingsTableId?: string | null;
+  bindingsTableName?: string | null;
   bucketsTableId?: string | null;
   bucketsTableName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   domainsTableId?: string | null;
   domainsTableName?: string | null;
   entityTableId?: string | null;
@@ -548,6 +582,25 @@ export interface ConnectedAccountsModule {
   tableId?: string | null;
   tableName?: string | null;
 }
+export interface ContentPresetModule {
+  apiName?: string | null;
+  contentPresetsTableId?: string | null;
+  createdAt?: string | null;
+  databaseId?: string | null;
+  entityTableId?: string | null;
+  id: string;
+  merkleStoreModuleId?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaId?: string | null;
+  publicSchemaName?: string | null;
+  scope?: string | null;
+  storeName?: string | null;
+}
 export interface CryptoAddressesModule {
   apiName?: string | null;
   cryptoNetwork?: string | null;
@@ -576,6 +629,19 @@ export interface CryptoAuthModule {
   userField?: string | null;
   usersTableId?: string | null;
 }
+export interface DataCapabilitiesField {
+  capabilitiesModuleId?: string | null;
+  databaseId?: string | null;
+  fieldId?: string | null;
+  fromFieldId?: string | null;
+  id: string;
+  mappingFieldId?: string | null;
+  mappingKeyFieldId?: string | null;
+  mappingTableId?: string | null;
+  mode?: string | null;
+  subsetGuard?: boolean | null;
+  tableId?: string | null;
+}
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
   /** When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger */
@@ -598,7 +664,7 @@ export interface DatabaseProvisionModule {
   /** Uniform billing anchor: when the request was fulfilled with a usable database (cold provision completion or warm pool claim). Platform absorbs all provisioning compute before this point */
   fulfilledAt?: string | null;
   id: string;
-  /** JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["permissions_module", {"scope": "app"}]) */
+  /** JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["capabilities_module", {"scope": "app"}]) */
   modules?: Record<string, unknown> | null;
   /** Additional configuration options for provisioning */
   options?: Record<string, unknown> | null;
@@ -617,7 +683,7 @@ export interface DatabaseSettingsModule {
   databaseId?: string | null;
   databaseSettingsTableId?: string | null;
   databaseSettingsTableName?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   id: string;
@@ -701,7 +767,7 @@ export interface DbUsageModule {
   collectDbQueryStatsFunction?: string | null;
   collectDbTableStatsFunction?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   id: string;
   interval?: string | null;
@@ -756,7 +822,7 @@ export interface DomainModule {
   apiName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   domainEventsTableId?: string | null;
   domainEventsTableName?: string | null;
   domainVerificationsTableId?: string | null;
@@ -778,6 +844,28 @@ export interface DomainModule {
   schemaId?: string | null;
   scope?: string | null;
 }
+export interface EmailSenderModule {
+  apiName?: string | null;
+  databaseId?: string | null;
+  defaultCapabilities?: string[] | null;
+  emailIdentitiesTableId?: string | null;
+  emailIdentitiesTableName?: string | null;
+  emailProviderAccountsTableId?: string | null;
+  emailProviderAccountsTableName?: string | null;
+  emailSiteIdentitiesTableId?: string | null;
+  emailSiteIdentitiesTableName?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  id: string;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  siteSurfaceModuleId?: string | null;
+}
 export interface EmailsModule {
   apiName?: string | null;
   databaseId?: string | null;
@@ -791,7 +879,7 @@ export interface EmailsModule {
 }
 /**
  * Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
- *      and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+ *      and installs the required modules (capabilities, memberships, limits) plus optional modules (profiles, levels, invites).
  *      Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
  *      via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
  *      Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).
@@ -813,7 +901,7 @@ export interface EntityTypeProvision {
    *        - policies  (jsonb array) RLS policy overrides. NULL = apply defaults from apply_function_security().
    *      Creates {prefix}_function_definitions (or {prefix}_{key}_function_definitions for non-default keys)
    *      with entity-scoped RLS and a job trigger dispatching function:provision tasks.
-   *      Registers manage_functions + invoke_functions permission bits on first provision.
+   *      Registers manage_functions + invoke_functions capability bits on first provision.
    *      Example: functions := '[{}]'::jsonb
    */
   functions?: Record<string, unknown> | null;
@@ -823,9 +911,9 @@ export interface EntityTypeProvision {
    *      Each element recognizes (all optional):
    *        - key       (text) module discriminator. Defaults to 'default'.
    *        - policies  (jsonb array) RLS policy overrides. NULL = apply defaults from apply_graph_security().
-   *      Registers manage_graphs + execute_graphs permission bits on first provision.
+   *      Registers manage_graphs + execute_graphs capability bits on first provision.
    *      Graph module requires a merkle_store_module_id dependency, so entity_type_provision
-   *      only registers permissions here. The graph module itself must be provisioned
+   *      only registers capabilities here. The graph module itself must be provisioned
    *      separately with the merkle store dependency resolved.
    *      Example: graphs := '[{}]'::jsonb
    */
@@ -865,8 +953,11 @@ export interface EntityTypeProvision {
   hasLimits?: boolean | null;
   /**
    * Whether to provision profiles_module for this type. Defaults to false.
-   *      Profiles provide named permission roles (e.g. 'Editor', 'Viewer') with pre-configured permission bitmasks.
-   *      When true, creates profile tables and applies profiles security.
+   *      Profiles provide named capability roles (e.g. 'Editor', 'Viewer') with pre-configured capability bitmasks.
+   *      When true, creates profile tables and applies profiles security. A membership may hold
+   *      any number of profiles: the membership_profiles assignment table holds every profile a
+   *      membership holds and the membership mask is granted | bit_or(held profile masks), with
+   *      memberships.profile_id kept as a pointer at one held profile.
    */
   hasProfiles?: boolean | null;
   /** Unique identifier for this provision row. */
@@ -893,7 +984,7 @@ export interface EntityTypeProvision {
    *        - policies  (jsonb array) RLS policy overrides. NULL = apply defaults from apply_namespace_security().
    *      Creates {prefix}_namespaces (or {prefix}_{key}_namespaces for non-default keys)
    *      with entity-scoped RLS (AuthzEntityMembership) and a rename proxy trigger.
-   *      Registers manage_namespaces permission bit on first provision.
+   *      Registers manage_namespaces capability bit on first provision.
    *      Example: namespaces := '[{}]'::jsonb
    */
   namespaces?: Record<string, unknown> | null;
@@ -915,7 +1006,7 @@ export interface EntityTypeProvision {
   outGraphModuleId?: string | null;
   outGraphsTableId?: string | null;
   /**
-   * Output: array of installed module labels (e.g. ARRAY['permissions_module:data_room', 'memberships_module:data_room', 'invites_module:data_room']).
+   * Output: array of installed module labels (e.g. ARRAY['capabilities_module:data_room', 'memberships_module:data_room', 'invites_module:data_room']).
    *      Populated by the trigger. Useful for verifying which modules were provisioned.
    */
   outInstalledModules?: string[] | null;
@@ -959,7 +1050,7 @@ export interface EntityTypeProvision {
   parentEntity?: string | null;
   /**
    * SQL prefix used for table and module naming, e.g. 'data_room', 'team_channel'. Required.
-   *      Drives entity table name (prefix || 's' by default), module labels (permissions_module:prefix),
+   *      Drives entity table name (prefix || 's' by default), module labels (capabilities_module:prefix),
    *      and membership table names (prefix_memberships, prefix_members, etc.).
    *      Must be unique per database — the (database_id, prefix) constraint ensures graceful ON CONFLICT DO NOTHING.
    */
@@ -973,8 +1064,8 @@ export interface EntityTypeProvision {
    *      Defaults (applied when table_provision IS NULL and skip_entity_policies=false):
    *        - SELECT (parent_member): parent entity members can see child entities (only when is_visible=true)
    *        - SELECT (self_member):   direct members of the entity can see it
-   *        - INSERT:                 create_entity permission on the parent entity
-   *        - UPDATE:                 admin_entity permission on the entity itself
+   *        - INSERT:                 create_entity capability on the parent entity
+   *        - UPDATE:                 admin_entity capability on the entity itself
    *        - DELETE:                 owner of the entity can delete it
    */
   skipEntityPolicies?: boolean | null;
@@ -993,7 +1084,7 @@ export interface EntityTypeProvision {
    *        - download_url_expiry_seconds   (integer) presigned GET URL expiry override
    *        - default_max_file_size         (bigint)  global max file size in bytes for this module
    *        - allowed_origins               (text[])  default CORS origins for all buckets in this module
-   *        - restrict_reads                (boolean) require read_files permission for SELECT on files
+   *        - restrict_reads                (boolean) require read_files capability for SELECT on files
    *        - has_path_shares               (boolean) enable virtual filesystem + path share policies
    *        - has_versioning                (boolean) enable file version chains
    *        - has_content_hash              (boolean) enable content hash for dedup
@@ -1019,7 +1110,7 @@ export interface EntityTypeProvision {
   tableName?: string | null;
   /**
    * Single jsonb object describing the full security setup to apply to the entity table.
-   *      Uses the same vocabulary as metaschema_modules_public.provision_table() and blueprint tables[]
+   *      Uses the same vocabulary as metaschema_modules_private.provision_table() and blueprint tables[]
    *      entries, so an entity table is configured the same way an ordinary blueprint table is.
    *      Defaults to NULL; when non-NULL, the five default policies are implicitly replaced by
    *      table_provision.policies[] (is_visible becomes a no-op on this path).
@@ -1056,7 +1147,7 @@ export interface EventsModule {
   actorTableId?: string | null;
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   eventAggregatesTableId?: string | null;
@@ -1065,6 +1156,7 @@ export interface EventsModule {
   eventTypesTableName?: string | null;
   eventsTableId?: string | null;
   eventsTableName?: string | null;
+  expireGrants?: string | null;
   grantAchievement?: string | null;
   id: string;
   interval?: string | null;
@@ -1081,9 +1173,11 @@ export interface EventsModule {
   privateSchemaId?: string | null;
   privateSchemaName?: string | null;
   publicSchemaName?: string | null;
+  recomputeCapabilities?: string | null;
   recordEvent?: string | null;
   removeEvent?: string | null;
   retention?: string | null;
+  revokeAchievement?: string | null;
   schemaId?: string | null;
   scope?: string | null;
   stepsRequired?: string | null;
@@ -1093,13 +1187,26 @@ export interface EventsModule {
   tgEventBool?: string | null;
   tgEventToggle?: string | null;
   tgEventToggleBool?: string | null;
+  tgLevelGrantSync?: string | null;
   tgUpdateAggregates?: string | null;
+  trustLadder?: Record<string, unknown> | null;
   upsertAggregate?: string | null;
+}
+export interface FileRefField {
+  bucketKey?: string | null;
+  bucketTags?: string[] | null;
+  databaseId?: string | null;
+  enforceFk?: boolean | null;
+  fieldId?: string | null;
+  id: string;
+  isPublic?: boolean | null;
+  storageModuleId?: string | null;
+  tableId?: string | null;
 }
 export interface FunctionDeploymentModule {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   deploymentEventsTableId?: string | null;
   deploymentEventsTableName?: string | null;
   deploymentsTableId?: string | null;
@@ -1124,7 +1231,7 @@ export interface FunctionInvocationModule {
   attemptsTableId?: string | null;
   attemptsTableName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   executionLogsTableId?: string | null;
@@ -1148,7 +1255,7 @@ export interface FunctionModule {
   bindingsTableName?: string | null;
   capabilityBindingsTableId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   definitionsTableId?: string | null;
   definitionsTableName?: string | null;
   entityField?: string | null;
@@ -1170,7 +1277,7 @@ export interface GraphExecutionModule {
   apiName?: string | null;
   createdAt?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   executionsTableId?: string | null;
@@ -1195,7 +1302,7 @@ export interface GraphModule {
   apiName?: string | null;
   createdAt?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   graphsTableId?: string | null;
@@ -1218,7 +1325,7 @@ export interface HierarchyModule {
   chartEdgesTableName?: string | null;
   createdAt?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   getManagersFunction?: string | null;
@@ -1239,7 +1346,7 @@ export interface HierarchyModule {
 export interface HttpRouteModule {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   functionModuleId?: string | null;
@@ -1442,6 +1549,7 @@ export interface LimitsModule {
   limitCreditsTableId?: string | null;
   limitDecrementFunction?: string | null;
   limitDecrementTrigger?: string | null;
+  limitDefaults?: Record<string, unknown> | null;
   limitIncrementFunction?: string | null;
   limitIncrementTrigger?: string | null;
   limitUpdateTrigger?: string | null;
@@ -1472,9 +1580,12 @@ export interface MembershipsModule {
   adminGrantsTableId?: string | null;
   adminGrantsTableName?: string | null;
   apiName?: string | null;
+  capabilitiesTableId?: string | null;
+  capabilityDefaultCapabilitiesTableId?: string | null;
+  capabilityDefaultGrantsTableId?: string | null;
   databaseId?: string | null;
+  defaultCapabilitiesTableId?: string | null;
   defaultLimitsTableId?: string | null;
-  defaultPermissionsTableId?: string | null;
   entityField?: string | null;
   entityIdsByMask?: string | null;
   entityIdsByPerm?: string | null;
@@ -1497,9 +1608,6 @@ export interface MembershipsModule {
   membershipsTableName?: string | null;
   ownerGrantsTableId?: string | null;
   ownerGrantsTableName?: string | null;
-  permissionDefaultGrantsTableId?: string | null;
-  permissionDefaultPermissionsTableId?: string | null;
-  permissionsTableId?: string | null;
   prefix?: string | null;
   privateApiName?: string | null;
   privateSchemaId?: string | null;
@@ -1511,6 +1619,7 @@ export interface MembershipsModule {
 }
 export interface MerkleStoreModule {
   apiName?: string | null;
+  capabilityKey?: string | null;
   commitTableId?: string | null;
   createdAt?: string | null;
   databaseId?: string | null;
@@ -1518,7 +1627,6 @@ export interface MerkleStoreModule {
   functionPrefix?: string | null;
   id: string;
   objectTableId?: string | null;
-  permissionKey?: string | null;
   prefix?: string | null;
   privateApiName?: string | null;
   privateSchemaId?: string | null;
@@ -1532,7 +1640,7 @@ export interface MerkleStoreModule {
 export interface NamespaceModule {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   id: string;
@@ -1554,7 +1662,7 @@ export interface NotificationsModule {
   apiName?: string | null;
   channelsTableId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   deliveryLogTableId?: string | null;
   entityField?: string | null;
   hasChannels?: boolean | null;
@@ -1576,6 +1684,28 @@ export interface NotificationsModule {
   suppressionsTableId?: string | null;
   userSettingsTableId?: string | null;
 }
+/**
+ * Config row for the oauth_requests_module, which provisions the in-flight half of an SSO
+ *      sign-in: the OAuth authorization requests table (state + PKCE code_verifier) and the
+ *      pending identity links table (a verified identity parked under a single-use ticket),
+ *      both private, plus the five SECURITY DEFINER procedures that are their only surface.
+ *      Sibling of identity_providers_module (durable provider configuration) rather than part
+ *      of it: this is ephemeral, purged flow state with its own retention.
+ */
+export interface OauthRequestsModule {
+  databaseId?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  id: string;
+  oauthAuthorizationRequestsTableId?: string | null;
+  oauthAuthorizationRequestsTableName?: string | null;
+  pendingIdentityLinksTableId?: string | null;
+  pendingIdentityLinksTableName?: string | null;
+  prefix?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  scope?: string | null;
+}
 export interface PagesModule {
   apiName?: string | null;
   createdAt?: string | null;
@@ -1596,30 +1726,6 @@ export interface PagesModule {
   siteSurfaceModuleId?: string | null;
   sitesTableId?: string | null;
   storeNamePrefix?: string | null;
-}
-export interface PermissionsModule {
-  actorTableId?: string | null;
-  apiName?: string | null;
-  bitlen?: number | null;
-  databaseId?: string | null;
-  defaultTableId?: string | null;
-  defaultTableName?: string | null;
-  entityField?: string | null;
-  entityTableId?: string | null;
-  getByMask?: string | null;
-  getMask?: string | null;
-  getMaskByName?: string | null;
-  getPaddedMask?: string | null;
-  id: string;
-  prefix?: string | null;
-  privateApiName?: string | null;
-  privateSchemaId?: string | null;
-  privateSchemaName?: string | null;
-  publicSchemaName?: string | null;
-  schemaId?: string | null;
-  scope?: string | null;
-  tableId?: string | null;
-  tableName?: string | null;
 }
 export interface PhoneNumbersModule {
   apiName?: string | null;
@@ -1679,22 +1785,24 @@ export interface PrincipalAuthModule {
 export interface ProfilesModule {
   actorTableId?: string | null;
   apiName?: string | null;
+  capabilitiesTableId?: string | null;
   databaseId?: string | null;
   entityField?: string | null;
   entityTableId?: string | null;
   id: string;
+  membershipProfilesTableId?: string | null;
+  membershipProfilesTableName?: string | null;
   membershipsTableId?: string | null;
-  permissionsTableId?: string | null;
   prefix?: string | null;
   privateApiName?: string | null;
   privateSchemaId?: string | null;
   privateSchemaName?: string | null;
+  profileCapabilitiesTableId?: string | null;
+  profileCapabilitiesTableName?: string | null;
   profileDefinitionGrantsTableId?: string | null;
   profileDefinitionGrantsTableName?: string | null;
   profileGrantsTableId?: string | null;
   profileGrantsTableName?: string | null;
-  profilePermissionsTableId?: string | null;
-  profilePermissionsTableName?: string | null;
   profileTemplatesTableId?: string | null;
   profileTemplatesTableName?: string | null;
   publicSchemaName?: string | null;
@@ -1707,7 +1815,7 @@ export interface RateLimitMetersModule {
   apiName?: string | null;
   checkRateLimitFunction?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   id: string;
   prefix?: string | null;
   privateApiName?: string | null;
@@ -1885,7 +1993,7 @@ export interface RelationProvision {
 export interface ResourceModule {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   id: string;
@@ -1937,9 +2045,11 @@ export interface RlsModule {
 }
 export interface RouteModule {
   apiName?: string | null;
+  appLinksFunctionName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  deepLinkFunctionName?: string | null;
+  defaultCapabilities?: string[] | null;
   domainModuleId?: string | null;
   entityField?: string | null;
   entityTableId?: string | null;
@@ -1960,6 +2070,13 @@ export interface RouteModule {
   routesTableName?: string | null;
   schemaId?: string | null;
   scope?: string | null;
+}
+export interface ScopeTypesModule {
+  databaseId?: string | null;
+  id: string;
+  privateSchemaName?: string | null;
+  schemaId?: string | null;
+  scopeTypesTableId?: string | null;
 }
 /** Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. */
 export interface SecureTableProvision {
@@ -2013,7 +2130,7 @@ export interface SiteSurfaceModule {
   apiName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   id: string;
@@ -2074,8 +2191,8 @@ export interface StorageModule {
   catalogModuleId?: string | null;
   confirmUploadDelay?: string | null;
   databaseId?: string | null;
+  defaultCapabilities?: string[] | null;
   defaultMaxFileSize?: string | null;
-  defaultPermissions?: string[] | null;
   downloadUrlExpirySeconds?: number | null;
   endpoint?: string | null;
   entityField?: string | null;
@@ -2183,6 +2300,15 @@ export interface UserSettingsModule {
   tableId?: string | null;
   tableName?: string | null;
 }
+export interface UserSettingsSecurityModule {
+  apiName?: string | null;
+  databaseId?: string | null;
+  id: string;
+  ownerTableId?: string | null;
+  schemaId?: string | null;
+  tableId?: string | null;
+  tableName?: string | null;
+}
 export interface UserStateModule {
   databaseId?: string | null;
   entityField?: string | null;
@@ -2236,7 +2362,7 @@ export interface WebauthnCredentialsModule {
 export interface WebhookModule {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   functionInvocationModuleId?: string | null;
@@ -2292,6 +2418,9 @@ export interface BlueprintTemplateRelations {
   blueprintTemplatesByForkedFromId?: ConnectionResult<BlueprintTemplate>;
   blueprintsByTemplateId?: ConnectionResult<Blueprint>;
 }
+export interface CapabilitiesModuleRelations {
+  dataCapabilitiesFields?: ConnectionResult<DataCapabilitiesField>;
+}
 export interface CatalogModuleRelations {
   apiSurfaceModules?: ConnectionResult<ApiSurfaceModule>;
   appModules?: ConnectionResult<AppModule>;
@@ -2302,8 +2431,14 @@ export interface CatalogModuleRelations {
 export interface ComputeLogModuleRelations {}
 export interface ConfigSecretsUserModuleRelations {}
 export interface ConnectedAccountsModuleRelations {}
+export interface ContentPresetModuleRelations {
+  merkleStoreModule?: MerkleStoreModule | null;
+}
 export interface CryptoAddressesModuleRelations {}
 export interface CryptoAuthModuleRelations {}
+export interface DataCapabilitiesFieldRelations {
+  capabilitiesModule?: CapabilitiesModule | null;
+}
 export interface DatabaseProvisionModuleRelations {}
 export interface DatabaseSettingsModuleRelations {}
 export interface DbPoolConfigRelations {}
@@ -2319,9 +2454,15 @@ export interface DomainModuleRelations {
   catalogModule?: CatalogModule | null;
   routeModules?: ConnectionResult<RouteModule>;
 }
+export interface EmailSenderModuleRelations {
+  siteSurfaceModule?: SiteSurfaceModule | null;
+}
 export interface EmailsModuleRelations {}
 export interface EntityTypeProvisionRelations {}
 export interface EventsModuleRelations {}
+export interface FileRefFieldRelations {
+  storageModule?: StorageModule | null;
+}
 export interface FunctionDeploymentModuleRelations {
   functionModule?: FunctionModule | null;
   namespaceModule?: NamespaceModule | null;
@@ -2361,6 +2502,7 @@ export interface LimitsModuleRelations {}
 export interface MembershipTypesModuleRelations {}
 export interface MembershipsModuleRelations {}
 export interface MerkleStoreModuleRelations {
+  contentPresetModules?: ConnectionResult<ContentPresetModule>;
   dbPresetModules?: ConnectionResult<DbPresetModule>;
   graphModules?: ConnectionResult<GraphModule>;
   pagesModules?: ConnectionResult<PagesModule>;
@@ -2372,11 +2514,11 @@ export interface NamespaceModuleRelations {
   webhookModules?: ConnectionResult<WebhookModule>;
 }
 export interface NotificationsModuleRelations {}
+export interface OauthRequestsModuleRelations {}
 export interface PagesModuleRelations {
   merkleStoreModule?: MerkleStoreModule | null;
   siteSurfaceModule?: SiteSurfaceModule | null;
 }
-export interface PermissionsModuleRelations {}
 export interface PhoneNumbersModuleRelations {}
 export interface PlansModuleRelations {}
 export interface PrincipalAuthModuleRelations {}
@@ -2395,21 +2537,25 @@ export interface RouteModuleRelations {
   catalogModule?: CatalogModule | null;
   domainModule?: DomainModule | null;
 }
+export interface ScopeTypesModuleRelations {}
 export interface SecureTableProvisionRelations {}
 export interface SessionSecretsModuleRelations {}
 export interface SessionsModuleRelations {}
 export interface SiteSurfaceModuleRelations {
   catalogModule?: CatalogModule | null;
+  emailSenderModules?: ConnectionResult<EmailSenderModule>;
   pagesModules?: ConnectionResult<PagesModule>;
 }
 export interface StorageLogModuleRelations {}
 export interface StorageModuleRelations {
+  fileRefFields?: ConnectionResult<FileRefField>;
   httpRouteModules?: ConnectionResult<HttpRouteModule>;
 }
 export interface TransferLogModuleRelations {}
 export interface UserAuthModuleRelations {}
 export interface UserCredentialsModuleRelations {}
 export interface UserSettingsModuleRelations {}
+export interface UserSettingsSecurityModuleRelations {}
 export interface UserStateModuleRelations {}
 export interface UsersModuleRelations {}
 export interface WebauthnAuthModuleRelations {}
@@ -2431,15 +2577,19 @@ export type BlueprintWithRelations = Blueprint & BlueprintRelations;
 export type BlueprintConstructionWithRelations = BlueprintConstruction &
   BlueprintConstructionRelations;
 export type BlueprintTemplateWithRelations = BlueprintTemplate & BlueprintTemplateRelations;
+export type CapabilitiesModuleWithRelations = CapabilitiesModule & CapabilitiesModuleRelations;
 export type CatalogModuleWithRelations = CatalogModule & CatalogModuleRelations;
 export type ComputeLogModuleWithRelations = ComputeLogModule & ComputeLogModuleRelations;
 export type ConfigSecretsUserModuleWithRelations = ConfigSecretsUserModule &
   ConfigSecretsUserModuleRelations;
 export type ConnectedAccountsModuleWithRelations = ConnectedAccountsModule &
   ConnectedAccountsModuleRelations;
+export type ContentPresetModuleWithRelations = ContentPresetModule & ContentPresetModuleRelations;
 export type CryptoAddressesModuleWithRelations = CryptoAddressesModule &
   CryptoAddressesModuleRelations;
 export type CryptoAuthModuleWithRelations = CryptoAuthModule & CryptoAuthModuleRelations;
+export type DataCapabilitiesFieldWithRelations = DataCapabilitiesField &
+  DataCapabilitiesFieldRelations;
 export type DatabaseProvisionModuleWithRelations = DatabaseProvisionModule &
   DatabaseProvisionModuleRelations;
 export type DatabaseSettingsModuleWithRelations = DatabaseSettingsModule &
@@ -2453,9 +2603,11 @@ export type DenormalizedTableFieldWithRelations = DenormalizedTableField &
   DenormalizedTableFieldRelations;
 export type DevicesModuleWithRelations = DevicesModule & DevicesModuleRelations;
 export type DomainModuleWithRelations = DomainModule & DomainModuleRelations;
+export type EmailSenderModuleWithRelations = EmailSenderModule & EmailSenderModuleRelations;
 export type EmailsModuleWithRelations = EmailsModule & EmailsModuleRelations;
 export type EntityTypeProvisionWithRelations = EntityTypeProvision & EntityTypeProvisionRelations;
 export type EventsModuleWithRelations = EventsModule & EventsModuleRelations;
+export type FileRefFieldWithRelations = FileRefField & FileRefFieldRelations;
 export type FunctionDeploymentModuleWithRelations = FunctionDeploymentModule &
   FunctionDeploymentModuleRelations;
 export type FunctionInvocationModuleWithRelations = FunctionInvocationModule &
@@ -2484,8 +2636,8 @@ export type MembershipsModuleWithRelations = MembershipsModule & MembershipsModu
 export type MerkleStoreModuleWithRelations = MerkleStoreModule & MerkleStoreModuleRelations;
 export type NamespaceModuleWithRelations = NamespaceModule & NamespaceModuleRelations;
 export type NotificationsModuleWithRelations = NotificationsModule & NotificationsModuleRelations;
+export type OauthRequestsModuleWithRelations = OauthRequestsModule & OauthRequestsModuleRelations;
 export type PagesModuleWithRelations = PagesModule & PagesModuleRelations;
-export type PermissionsModuleWithRelations = PermissionsModule & PermissionsModuleRelations;
 export type PhoneNumbersModuleWithRelations = PhoneNumbersModule & PhoneNumbersModuleRelations;
 export type PlansModuleWithRelations = PlansModule & PlansModuleRelations;
 export type PrincipalAuthModuleWithRelations = PrincipalAuthModule & PrincipalAuthModuleRelations;
@@ -2498,6 +2650,7 @@ export type RelationProvisionWithRelations = RelationProvision & RelationProvisi
 export type ResourceModuleWithRelations = ResourceModule & ResourceModuleRelations;
 export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
 export type RouteModuleWithRelations = RouteModule & RouteModuleRelations;
+export type ScopeTypesModuleWithRelations = ScopeTypesModule & ScopeTypesModuleRelations;
 export type SecureTableProvisionWithRelations = SecureTableProvision &
   SecureTableProvisionRelations;
 export type SessionSecretsModuleWithRelations = SessionSecretsModule &
@@ -2511,6 +2664,8 @@ export type UserAuthModuleWithRelations = UserAuthModule & UserAuthModuleRelatio
 export type UserCredentialsModuleWithRelations = UserCredentialsModule &
   UserCredentialsModuleRelations;
 export type UserSettingsModuleWithRelations = UserSettingsModule & UserSettingsModuleRelations;
+export type UserSettingsSecurityModuleWithRelations = UserSettingsSecurityModule &
+  UserSettingsSecurityModuleRelations;
 export type UserStateModuleWithRelations = UserStateModule & UserStateModuleRelations;
 export type UsersModuleWithRelations = UsersModule & UsersModuleRelations;
 export type WebauthnAuthModuleWithRelations = WebauthnAuthModule & WebauthnAuthModuleRelations;
@@ -2523,7 +2678,7 @@ export type AgentModuleSelect = {
   agentTableName?: boolean;
   apiName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   hasAgents?: boolean;
@@ -2568,7 +2723,7 @@ export type ApiSurfaceModuleSelect = {
   corsSettingsTableId?: boolean;
   corsSettingsTableName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   id?: boolean;
@@ -2591,7 +2746,7 @@ export type AppModuleSelect = {
   appsTableName?: boolean;
   catalogModuleId?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   id?: boolean;
@@ -2613,8 +2768,8 @@ export type BillingModuleSelect = {
   balancesTableId?: boolean;
   balancesTableName?: boolean;
   databaseId?: boolean;
+  defaultCapabilities?: boolean;
   defaultMeterCatalog?: boolean;
-  defaultPermissions?: boolean;
   id?: boolean;
   ledgerTableId?: boolean;
   ledgerTableName?: boolean;
@@ -2642,16 +2797,22 @@ export type BillingProviderModuleSelect = {
   apiName?: boolean;
   billingCustomersTableId?: boolean;
   billingCustomersTableName?: boolean;
+  billingInvoicesTableId?: boolean;
+  billingInvoicesTableName?: boolean;
   billingPricesTableId?: boolean;
   billingPricesTableName?: boolean;
   billingProductsTableId?: boolean;
   billingProductsTableName?: boolean;
+  billingRefundsTableId?: boolean;
+  billingRefundsTableName?: boolean;
   billingSubscriptionsTableId?: boolean;
   billingSubscriptionsTableName?: boolean;
   billingWebhookEventsTableId?: boolean;
   billingWebhookEventsTableName?: boolean;
   databaseId?: boolean;
   id?: boolean;
+  listPendingUsageSyncFunction?: boolean;
+  markUsageSyncedFunction?: boolean;
   prefix?: boolean;
   pricesTableId?: boolean;
   privateApiName?: boolean;
@@ -2659,8 +2820,10 @@ export type BillingProviderModuleSelect = {
   processBillingEventFunction?: boolean;
   productsTableId?: boolean;
   provider?: boolean;
+  recordRefundFunction?: boolean;
   schemaId?: boolean;
   subscriptionsTableId?: boolean;
+  upsertInvoiceFunction?: boolean;
 };
 export type BlueprintSelect = {
   createdAt?: boolean;
@@ -2738,16 +2901,48 @@ export type BlueprintTemplateSelect = {
     orderBy?: BlueprintOrderBy[];
   };
 };
+export type CapabilitiesModuleSelect = {
+  actorTableId?: boolean;
+  apiName?: boolean;
+  bitlen?: boolean;
+  databaseId?: boolean;
+  defaultTableId?: boolean;
+  defaultTableName?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  getByMask?: boolean;
+  getMask?: boolean;
+  getMaskByName?: boolean;
+  getPaddedMask?: boolean;
+  id?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  privateSchemaId?: boolean;
+  privateSchemaName?: boolean;
+  publicSchemaName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  tableId?: boolean;
+  tableName?: boolean;
+  dataCapabilitiesFields?: {
+    select: DataCapabilitiesFieldSelect;
+    first?: number;
+    filter?: DataCapabilitiesFieldFilter;
+    orderBy?: DataCapabilitiesFieldOrderBy[];
+  };
+};
 export type CatalogModuleSelect = {
   apiName?: boolean;
   apisTableId?: boolean;
   apisTableName?: boolean;
   appsTableId?: boolean;
   appsTableName?: boolean;
+  bindingsTableId?: boolean;
+  bindingsTableName?: boolean;
   bucketsTableId?: boolean;
   bucketsTableName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   domainsTableId?: boolean;
   domainsTableName?: boolean;
   entityTableId?: boolean;
@@ -2852,6 +3047,28 @@ export type ConnectedAccountsModuleSelect = {
   tableId?: boolean;
   tableName?: boolean;
 };
+export type ContentPresetModuleSelect = {
+  apiName?: boolean;
+  contentPresetsTableId?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  entityTableId?: boolean;
+  id?: boolean;
+  merkleStoreModuleId?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  privateSchemaId?: boolean;
+  privateSchemaName?: boolean;
+  provisions?: boolean;
+  publicSchemaId?: boolean;
+  publicSchemaName?: boolean;
+  scope?: boolean;
+  storeName?: boolean;
+  merkleStoreModule?: {
+    select: MerkleStoreModuleSelect;
+  };
+};
 export type CryptoAddressesModuleSelect = {
   apiName?: boolean;
   cryptoNetwork?: boolean;
@@ -2880,6 +3097,22 @@ export type CryptoAuthModuleSelect = {
   userField?: boolean;
   usersTableId?: boolean;
 };
+export type DataCapabilitiesFieldSelect = {
+  capabilitiesModuleId?: boolean;
+  databaseId?: boolean;
+  fieldId?: boolean;
+  fromFieldId?: boolean;
+  id?: boolean;
+  mappingFieldId?: boolean;
+  mappingKeyFieldId?: boolean;
+  mappingTableId?: boolean;
+  mode?: boolean;
+  subsetGuard?: boolean;
+  tableId?: boolean;
+  capabilitiesModule?: {
+    select: CapabilitiesModuleSelect;
+  };
+};
 export type DatabaseProvisionModuleSelect = {
   async?: boolean;
   bootstrapError?: boolean;
@@ -2906,7 +3139,7 @@ export type DatabaseSettingsModuleSelect = {
   databaseId?: boolean;
   databaseSettingsTableId?: boolean;
   databaseSettingsTableName?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   id?: boolean;
@@ -2978,7 +3211,7 @@ export type DbUsageModuleSelect = {
   collectDbQueryStatsFunction?: boolean;
   collectDbTableStatsFunction?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   id?: boolean;
   interval?: boolean;
@@ -3033,7 +3266,7 @@ export type DomainModuleSelect = {
   apiName?: boolean;
   catalogModuleId?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   domainEventsTableId?: boolean;
   domainEventsTableName?: boolean;
   domainVerificationsTableId?: boolean;
@@ -3062,6 +3295,31 @@ export type DomainModuleSelect = {
     first?: number;
     filter?: RouteModuleFilter;
     orderBy?: RouteModuleOrderBy[];
+  };
+};
+export type EmailSenderModuleSelect = {
+  apiName?: boolean;
+  databaseId?: boolean;
+  defaultCapabilities?: boolean;
+  emailIdentitiesTableId?: boolean;
+  emailIdentitiesTableName?: boolean;
+  emailProviderAccountsTableId?: boolean;
+  emailProviderAccountsTableName?: boolean;
+  emailSiteIdentitiesTableId?: boolean;
+  emailSiteIdentitiesTableName?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  id?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  provisions?: boolean;
+  publicSchemaName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  siteSurfaceModuleId?: boolean;
+  siteSurfaceModule?: {
+    select: SiteSurfaceModuleSelect;
   };
 };
 export type EmailsModuleSelect = {
@@ -3122,7 +3380,7 @@ export type EventsModuleSelect = {
   actorTableId?: boolean;
   apiName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   eventAggregatesTableId?: boolean;
@@ -3131,6 +3389,7 @@ export type EventsModuleSelect = {
   eventTypesTableName?: boolean;
   eventsTableId?: boolean;
   eventsTableName?: boolean;
+  expireGrants?: boolean;
   grantAchievement?: boolean;
   id?: boolean;
   interval?: boolean;
@@ -3147,9 +3406,11 @@ export type EventsModuleSelect = {
   privateSchemaId?: boolean;
   privateSchemaName?: boolean;
   publicSchemaName?: boolean;
+  recomputeCapabilities?: boolean;
   recordEvent?: boolean;
   removeEvent?: boolean;
   retention?: boolean;
+  revokeAchievement?: boolean;
   schemaId?: boolean;
   scope?: boolean;
   stepsRequired?: boolean;
@@ -3159,13 +3420,29 @@ export type EventsModuleSelect = {
   tgEventBool?: boolean;
   tgEventToggle?: boolean;
   tgEventToggleBool?: boolean;
+  tgLevelGrantSync?: boolean;
   tgUpdateAggregates?: boolean;
+  trustLadder?: boolean;
   upsertAggregate?: boolean;
+};
+export type FileRefFieldSelect = {
+  bucketKey?: boolean;
+  bucketTags?: boolean;
+  databaseId?: boolean;
+  enforceFk?: boolean;
+  fieldId?: boolean;
+  id?: boolean;
+  isPublic?: boolean;
+  storageModuleId?: boolean;
+  tableId?: boolean;
+  storageModule?: {
+    select: StorageModuleSelect;
+  };
 };
 export type FunctionDeploymentModuleSelect = {
   apiName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   deploymentEventsTableId?: boolean;
   deploymentEventsTableName?: boolean;
   deploymentsTableId?: boolean;
@@ -3196,7 +3473,7 @@ export type FunctionInvocationModuleSelect = {
   attemptsTableId?: boolean;
   attemptsTableName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   executionLogsTableId?: boolean;
@@ -3226,7 +3503,7 @@ export type FunctionModuleSelect = {
   bindingsTableName?: boolean;
   capabilityBindingsTableId?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   definitionsTableId?: boolean;
   definitionsTableName?: boolean;
   entityField?: boolean;
@@ -3266,7 +3543,7 @@ export type GraphExecutionModuleSelect = {
   apiName?: boolean;
   createdAt?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   executionsTableId?: boolean;
@@ -3294,7 +3571,7 @@ export type GraphModuleSelect = {
   apiName?: boolean;
   createdAt?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   graphsTableId?: boolean;
@@ -3326,7 +3603,7 @@ export type HierarchyModuleSelect = {
   chartEdgesTableName?: boolean;
   createdAt?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   getManagersFunction?: boolean;
@@ -3347,7 +3624,7 @@ export type HierarchyModuleSelect = {
 export type HttpRouteModuleSelect = {
   apiName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   functionModuleId?: boolean;
@@ -3543,6 +3820,7 @@ export type LimitsModuleSelect = {
   limitCreditsTableId?: boolean;
   limitDecrementFunction?: boolean;
   limitDecrementTrigger?: boolean;
+  limitDefaults?: boolean;
   limitIncrementFunction?: boolean;
   limitIncrementTrigger?: boolean;
   limitUpdateTrigger?: boolean;
@@ -3573,9 +3851,12 @@ export type MembershipsModuleSelect = {
   adminGrantsTableId?: boolean;
   adminGrantsTableName?: boolean;
   apiName?: boolean;
+  capabilitiesTableId?: boolean;
+  capabilityDefaultCapabilitiesTableId?: boolean;
+  capabilityDefaultGrantsTableId?: boolean;
   databaseId?: boolean;
+  defaultCapabilitiesTableId?: boolean;
   defaultLimitsTableId?: boolean;
-  defaultPermissionsTableId?: boolean;
   entityField?: boolean;
   entityIdsByMask?: boolean;
   entityIdsByPerm?: boolean;
@@ -3598,9 +3879,6 @@ export type MembershipsModuleSelect = {
   membershipsTableName?: boolean;
   ownerGrantsTableId?: boolean;
   ownerGrantsTableName?: boolean;
-  permissionDefaultGrantsTableId?: boolean;
-  permissionDefaultPermissionsTableId?: boolean;
-  permissionsTableId?: boolean;
   prefix?: boolean;
   privateApiName?: boolean;
   privateSchemaId?: boolean;
@@ -3612,6 +3890,7 @@ export type MembershipsModuleSelect = {
 };
 export type MerkleStoreModuleSelect = {
   apiName?: boolean;
+  capabilityKey?: boolean;
   commitTableId?: boolean;
   createdAt?: boolean;
   databaseId?: boolean;
@@ -3619,7 +3898,6 @@ export type MerkleStoreModuleSelect = {
   functionPrefix?: boolean;
   id?: boolean;
   objectTableId?: boolean;
-  permissionKey?: boolean;
   prefix?: boolean;
   privateApiName?: boolean;
   privateSchemaId?: boolean;
@@ -3629,6 +3907,12 @@ export type MerkleStoreModuleSelect = {
   schemaId?: boolean;
   scope?: boolean;
   storeTableId?: boolean;
+  contentPresetModules?: {
+    select: ContentPresetModuleSelect;
+    first?: number;
+    filter?: ContentPresetModuleFilter;
+    orderBy?: ContentPresetModuleOrderBy[];
+  };
   dbPresetModules?: {
     select: DbPresetModuleSelect;
     first?: number;
@@ -3657,7 +3941,7 @@ export type MerkleStoreModuleSelect = {
 export type NamespaceModuleSelect = {
   apiName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   id?: boolean;
@@ -3697,7 +3981,7 @@ export type NotificationsModuleSelect = {
   apiName?: boolean;
   channelsTableId?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   deliveryLogTableId?: boolean;
   entityField?: boolean;
   hasChannels?: boolean;
@@ -3718,6 +4002,20 @@ export type NotificationsModuleSelect = {
   schemaId?: boolean;
   suppressionsTableId?: boolean;
   userSettingsTableId?: boolean;
+};
+export type OauthRequestsModuleSelect = {
+  databaseId?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  id?: boolean;
+  oauthAuthorizationRequestsTableId?: boolean;
+  oauthAuthorizationRequestsTableName?: boolean;
+  pendingIdentityLinksTableId?: boolean;
+  pendingIdentityLinksTableName?: boolean;
+  prefix?: boolean;
+  privateSchemaId?: boolean;
+  privateSchemaName?: boolean;
+  scope?: boolean;
 };
 export type PagesModuleSelect = {
   apiName?: boolean;
@@ -3745,30 +4043,6 @@ export type PagesModuleSelect = {
   siteSurfaceModule?: {
     select: SiteSurfaceModuleSelect;
   };
-};
-export type PermissionsModuleSelect = {
-  actorTableId?: boolean;
-  apiName?: boolean;
-  bitlen?: boolean;
-  databaseId?: boolean;
-  defaultTableId?: boolean;
-  defaultTableName?: boolean;
-  entityField?: boolean;
-  entityTableId?: boolean;
-  getByMask?: boolean;
-  getMask?: boolean;
-  getMaskByName?: boolean;
-  getPaddedMask?: boolean;
-  id?: boolean;
-  prefix?: boolean;
-  privateApiName?: boolean;
-  privateSchemaId?: boolean;
-  privateSchemaName?: boolean;
-  publicSchemaName?: boolean;
-  schemaId?: boolean;
-  scope?: boolean;
-  tableId?: boolean;
-  tableName?: boolean;
 };
 export type PhoneNumbersModuleSelect = {
   apiName?: boolean;
@@ -3827,22 +4101,24 @@ export type PrincipalAuthModuleSelect = {
 export type ProfilesModuleSelect = {
   actorTableId?: boolean;
   apiName?: boolean;
+  capabilitiesTableId?: boolean;
   databaseId?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   id?: boolean;
+  membershipProfilesTableId?: boolean;
+  membershipProfilesTableName?: boolean;
   membershipsTableId?: boolean;
-  permissionsTableId?: boolean;
   prefix?: boolean;
   privateApiName?: boolean;
   privateSchemaId?: boolean;
   privateSchemaName?: boolean;
+  profileCapabilitiesTableId?: boolean;
+  profileCapabilitiesTableName?: boolean;
   profileDefinitionGrantsTableId?: boolean;
   profileDefinitionGrantsTableName?: boolean;
   profileGrantsTableId?: boolean;
   profileGrantsTableName?: boolean;
-  profilePermissionsTableId?: boolean;
-  profilePermissionsTableName?: boolean;
   profileTemplatesTableId?: boolean;
   profileTemplatesTableName?: boolean;
   publicSchemaName?: boolean;
@@ -3855,7 +4131,7 @@ export type RateLimitMetersModuleSelect = {
   apiName?: boolean;
   checkRateLimitFunction?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   id?: boolean;
   prefix?: boolean;
   privateApiName?: boolean;
@@ -3926,7 +4202,7 @@ export type RelationProvisionSelect = {
 export type ResourceModuleSelect = {
   apiName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   id?: boolean;
@@ -3990,9 +4266,11 @@ export type RlsModuleSelect = {
 };
 export type RouteModuleSelect = {
   apiName?: boolean;
+  appLinksFunctionName?: boolean;
   catalogModuleId?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  deepLinkFunctionName?: boolean;
+  defaultCapabilities?: boolean;
   domainModuleId?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
@@ -4019,6 +4297,13 @@ export type RouteModuleSelect = {
   domainModule?: {
     select: DomainModuleSelect;
   };
+};
+export type ScopeTypesModuleSelect = {
+  databaseId?: boolean;
+  id?: boolean;
+  privateSchemaName?: boolean;
+  schemaId?: boolean;
+  scopeTypesTableId?: boolean;
 };
 export type SecureTableProvisionSelect = {
   databaseId?: boolean;
@@ -4058,7 +4343,7 @@ export type SiteSurfaceModuleSelect = {
   apiName?: boolean;
   catalogModuleId?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   id?: boolean;
@@ -4089,6 +4374,12 @@ export type SiteSurfaceModuleSelect = {
   sitesTableName?: boolean;
   catalogModule?: {
     select: CatalogModuleSelect;
+  };
+  emailSenderModules?: {
+    select: EmailSenderModuleSelect;
+    first?: number;
+    filter?: EmailSenderModuleFilter;
+    orderBy?: EmailSenderModuleOrderBy[];
   };
   pagesModules?: {
     select: PagesModuleSelect;
@@ -4128,8 +4419,8 @@ export type StorageModuleSelect = {
   catalogModuleId?: boolean;
   confirmUploadDelay?: boolean;
   databaseId?: boolean;
+  defaultCapabilities?: boolean;
   defaultMaxFileSize?: boolean;
-  defaultPermissions?: boolean;
   downloadUrlExpirySeconds?: boolean;
   endpoint?: boolean;
   entityField?: boolean;
@@ -4161,6 +4452,12 @@ export type StorageModuleSelect = {
   schemaId?: boolean;
   scope?: boolean;
   uploadUrlExpirySeconds?: boolean;
+  fileRefFields?: {
+    select: FileRefFieldSelect;
+    first?: number;
+    filter?: FileRefFieldFilter;
+    orderBy?: FileRefFieldOrderBy[];
+  };
   httpRouteModules?: {
     select: HttpRouteModuleSelect;
     first?: number;
@@ -4238,6 +4535,15 @@ export type UserSettingsModuleSelect = {
   tableId?: boolean;
   tableName?: boolean;
 };
+export type UserSettingsSecurityModuleSelect = {
+  apiName?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  ownerTableId?: boolean;
+  schemaId?: boolean;
+  tableId?: boolean;
+  tableName?: boolean;
+};
 export type UserStateModuleSelect = {
   databaseId?: boolean;
   entityField?: boolean;
@@ -4289,7 +4595,7 @@ export type WebauthnCredentialsModuleSelect = {
 export type WebhookModuleSelect = {
   apiName?: boolean;
   databaseId?: boolean;
-  defaultPermissions?: boolean;
+  defaultCapabilities?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
   functionInvocationModuleId?: boolean;
@@ -4335,8 +4641,8 @@ export interface AgentModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -4433,8 +4739,8 @@ export interface ApiSurfaceModuleFilter {
   corsSettingsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -4481,8 +4787,8 @@ export interface AppModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -4523,10 +4829,10 @@ export interface BillingModuleFilter {
   balancesTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `defaultMeterCatalog` field. */
   defaultMeterCatalog?: JSONFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `ledgerTableId` field. */
@@ -4585,6 +4891,10 @@ export interface BillingProviderModuleFilter {
   billingCustomersTableId?: UUIDFilter;
   /** Filter by the object’s `billingCustomersTableName` field. */
   billingCustomersTableName?: StringFilter;
+  /** Filter by the object’s `billingInvoicesTableId` field. */
+  billingInvoicesTableId?: UUIDFilter;
+  /** Filter by the object’s `billingInvoicesTableName` field. */
+  billingInvoicesTableName?: StringFilter;
   /** Filter by the object’s `billingPricesTableId` field. */
   billingPricesTableId?: UUIDFilter;
   /** Filter by the object’s `billingPricesTableName` field. */
@@ -4593,6 +4903,10 @@ export interface BillingProviderModuleFilter {
   billingProductsTableId?: UUIDFilter;
   /** Filter by the object’s `billingProductsTableName` field. */
   billingProductsTableName?: StringFilter;
+  /** Filter by the object’s `billingRefundsTableId` field. */
+  billingRefundsTableId?: UUIDFilter;
+  /** Filter by the object’s `billingRefundsTableName` field. */
+  billingRefundsTableName?: StringFilter;
   /** Filter by the object’s `billingSubscriptionsTableId` field. */
   billingSubscriptionsTableId?: UUIDFilter;
   /** Filter by the object’s `billingSubscriptionsTableName` field. */
@@ -4605,6 +4919,10 @@ export interface BillingProviderModuleFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `listPendingUsageSyncFunction` field. */
+  listPendingUsageSyncFunction?: StringFilter;
+  /** Filter by the object’s `markUsageSyncedFunction` field. */
+  markUsageSyncedFunction?: StringFilter;
   /** Negates the expression. */
   not?: BillingProviderModuleFilter;
   /** Checks for any expressions in this list. */
@@ -4623,10 +4941,14 @@ export interface BillingProviderModuleFilter {
   productsTableId?: UUIDFilter;
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
+  /** Filter by the object’s `recordRefundFunction` field. */
+  recordRefundFunction?: StringFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `subscriptionsTableId` field. */
   subscriptionsTableId?: UUIDFilter;
+  /** Filter by the object’s `upsertInvoiceFunction` field. */
+  upsertInvoiceFunction?: StringFilter;
 }
 export interface BlueprintFilter {
   /** Checks for all expressions in this list. */
@@ -4760,6 +5082,62 @@ export interface BlueprintTemplateFilter {
   /** Filter by the object’s `visibility` field. */
   visibility?: StringFilter;
 }
+export interface CapabilitiesModuleFilter {
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: CapabilitiesModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `bitlen` field. */
+  bitlen?: IntFilter;
+  /** Filter by the object’s `dataCapabilitiesFields` relation. */
+  dataCapabilitiesFields?: CapabilitiesModuleToManyDataCapabilitiesFieldFilter;
+  /** `dataCapabilitiesFields` exist. */
+  dataCapabilitiesFieldsExist?: boolean;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableId` field. */
+  defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
+  defaultTableName?: StringFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `getByMask` field. */
+  getByMask?: StringFilter;
+  /** Filter by the object’s `getMask` field. */
+  getMask?: StringFilter;
+  /** Filter by the object’s `getMaskByName` field. */
+  getMaskByName?: StringFilter;
+  /** Filter by the object’s `getPaddedMask` field. */
+  getPaddedMask?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: CapabilitiesModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: CapabilitiesModuleFilter[];
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+}
 export interface CatalogModuleFilter {
   /** Checks for all expressions in this list. */
   and?: CatalogModuleFilter[];
@@ -4781,14 +5159,18 @@ export interface CatalogModuleFilter {
   appsTableId?: UUIDFilter;
   /** Filter by the object’s `appsTableName` field. */
   appsTableName?: StringFilter;
+  /** Filter by the object’s `bindingsTableId` field. */
+  bindingsTableId?: UUIDFilter;
+  /** Filter by the object’s `bindingsTableName` field. */
+  bindingsTableName?: StringFilter;
   /** Filter by the object’s `bucketsTableId` field. */
   bucketsTableId?: UUIDFilter;
   /** Filter by the object’s `bucketsTableName` field. */
   bucketsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `domainModules` relation. */
   domainModules?: CatalogModuleToManyDomainModuleFilter;
   /** `domainModules` exist. */
@@ -4964,6 +5346,50 @@ export interface ConnectedAccountsModuleFilter {
   /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
 }
+export interface ContentPresetModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: ContentPresetModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `contentPresetsTableId` field. */
+  contentPresetsTableId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `merkleStoreModule` relation. */
+  merkleStoreModule?: MerkleStoreModuleFilter;
+  /** Filter by the object’s `merkleStoreModuleId` field. */
+  merkleStoreModuleId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ContentPresetModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: ContentPresetModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaId` field. */
+  publicSchemaId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `storeName` field. */
+  storeName?: StringFilter;
+}
 export interface CryptoAddressesModuleFilter {
   /** Checks for all expressions in this list. */
   and?: CryptoAddressesModuleFilter[];
@@ -5028,6 +5454,38 @@ export interface CryptoAuthModuleFilter {
   /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
 }
+export interface DataCapabilitiesFieldFilter {
+  /** Checks for all expressions in this list. */
+  and?: DataCapabilitiesFieldFilter[];
+  /** Filter by the object’s `capabilitiesModule` relation. */
+  capabilitiesModule?: CapabilitiesModuleFilter;
+  /** Filter by the object’s `capabilitiesModuleId` field. */
+  capabilitiesModuleId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `fromFieldId` field. */
+  fromFieldId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `mappingFieldId` field. */
+  mappingFieldId?: UUIDFilter;
+  /** Filter by the object’s `mappingKeyFieldId` field. */
+  mappingKeyFieldId?: UUIDFilter;
+  /** Filter by the object’s `mappingTableId` field. */
+  mappingTableId?: UUIDFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
+  /** Negates the expression. */
+  not?: DataCapabilitiesFieldFilter;
+  /** Checks for any expressions in this list. */
+  or?: DataCapabilitiesFieldFilter[];
+  /** Filter by the object’s `subsetGuard` field. */
+  subsetGuard?: BooleanFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+}
 export interface DatabaseProvisionModuleFilter {
   /** Checks for all expressions in this list. */
   and?: DatabaseProvisionModuleFilter[];
@@ -5085,8 +5543,8 @@ export interface DatabaseSettingsModuleFilter {
   databaseSettingsTableId?: UUIDFilter;
   /** Filter by the object’s `databaseSettingsTableName` field. */
   databaseSettingsTableName?: StringFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -5241,8 +5699,8 @@ export interface DbUsageModuleFilter {
   collectDbTableStatsFunction?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `id` field. */
@@ -5371,8 +5829,8 @@ export interface DomainModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `domainEventsTableId` field. */
   domainEventsTableId?: UUIDFilter;
   /** Filter by the object’s `domainEventsTableName` field. */
@@ -5421,6 +5879,58 @@ export interface DomainModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+}
+export interface EmailSenderModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: EmailSenderModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
+  /** Filter by the object’s `emailIdentitiesTableId` field. */
+  emailIdentitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `emailIdentitiesTableName` field. */
+  emailIdentitiesTableName?: StringFilter;
+  /** Filter by the object’s `emailProviderAccountsTableId` field. */
+  emailProviderAccountsTableId?: UUIDFilter;
+  /** Filter by the object’s `emailProviderAccountsTableName` field. */
+  emailProviderAccountsTableName?: StringFilter;
+  /** Filter by the object’s `emailSiteIdentitiesTableId` field. */
+  emailSiteIdentitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `emailSiteIdentitiesTableName` field. */
+  emailSiteIdentitiesTableName?: StringFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: EmailSenderModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: EmailSenderModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `siteSurfaceModule` relation. */
+  siteSurfaceModule?: SiteSurfaceModuleFilter;
+  /** A related `siteSurfaceModule` exists. */
+  siteSurfaceModuleExists?: boolean;
+  /** Filter by the object’s `siteSurfaceModuleId` field. */
+  siteSurfaceModuleId?: UUIDFilter;
 }
 export interface EmailsModuleFilter {
   /** Checks for all expressions in this list. */
@@ -5547,8 +6057,8 @@ export interface EventsModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -5565,6 +6075,8 @@ export interface EventsModuleFilter {
   eventsTableId?: UUIDFilter;
   /** Filter by the object’s `eventsTableName` field. */
   eventsTableName?: StringFilter;
+  /** Filter by the object’s `expireGrants` field. */
+  expireGrants?: StringFilter;
   /** Filter by the object’s `grantAchievement` field. */
   grantAchievement?: StringFilter;
   /** Filter by the object’s `id` field. */
@@ -5601,12 +6113,16 @@ export interface EventsModuleFilter {
   privateSchemaName?: StringFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
+  /** Filter by the object’s `recomputeCapabilities` field. */
+  recomputeCapabilities?: StringFilter;
   /** Filter by the object’s `recordEvent` field. */
   recordEvent?: StringFilter;
   /** Filter by the object’s `removeEvent` field. */
   removeEvent?: StringFilter;
   /** Filter by the object’s `retention` field. */
   retention?: StringFilter;
+  /** Filter by the object’s `revokeAchievement` field. */
+  revokeAchievement?: StringFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
@@ -5625,10 +6141,42 @@ export interface EventsModuleFilter {
   tgEventToggle?: StringFilter;
   /** Filter by the object’s `tgEventToggleBool` field. */
   tgEventToggleBool?: StringFilter;
+  /** Filter by the object’s `tgLevelGrantSync` field. */
+  tgLevelGrantSync?: StringFilter;
   /** Filter by the object’s `tgUpdateAggregates` field. */
   tgUpdateAggregates?: StringFilter;
+  /** Filter by the object’s `trustLadder` field. */
+  trustLadder?: JSONFilter;
   /** Filter by the object’s `upsertAggregate` field. */
   upsertAggregate?: StringFilter;
+}
+export interface FileRefFieldFilter {
+  /** Checks for all expressions in this list. */
+  and?: FileRefFieldFilter[];
+  /** Filter by the object’s `bucketKey` field. */
+  bucketKey?: StringFilter;
+  /** Filter by the object’s `bucketTags` field. */
+  bucketTags?: StringListFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `enforceFk` field. */
+  enforceFk?: BooleanFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublic` field. */
+  isPublic?: BooleanFilter;
+  /** Negates the expression. */
+  not?: FileRefFieldFilter;
+  /** Checks for any expressions in this list. */
+  or?: FileRefFieldFilter[];
+  /** Filter by the object’s `storageModule` relation. */
+  storageModule?: StorageModuleFilter;
+  /** Filter by the object’s `storageModuleId` field. */
+  storageModuleId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
 }
 export interface FunctionDeploymentModuleFilter {
   /** Checks for all expressions in this list. */
@@ -5637,8 +6185,8 @@ export interface FunctionDeploymentModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `deploymentEventsTableId` field. */
   deploymentEventsTableId?: UUIDFilter;
   /** Filter by the object’s `deploymentEventsTableName` field. */
@@ -5699,8 +6247,8 @@ export interface FunctionInvocationModuleFilter {
   attemptsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -5755,8 +6303,8 @@ export interface FunctionModuleFilter {
   capabilityBindingsTableId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `definitionsTableId` field. */
   definitionsTableId?: UUIDFilter;
   /** Filter by the object’s `definitionsTableName` field. */
@@ -5815,8 +6363,8 @@ export interface GraphExecutionModuleFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -5871,8 +6419,8 @@ export interface GraphModuleFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -5927,8 +6475,8 @@ export interface HierarchyModuleFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -5973,8 +6521,8 @@ export interface HttpRouteModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -6387,6 +6935,8 @@ export interface LimitsModuleFilter {
   limitDecrementFunction?: StringFilter;
   /** Filter by the object’s `limitDecrementTrigger` field. */
   limitDecrementTrigger?: StringFilter;
+  /** Filter by the object’s `limitDefaults` field. */
+  limitDefaults?: JSONFilter;
   /** Filter by the object’s `limitIncrementFunction` field. */
   limitIncrementFunction?: StringFilter;
   /** Filter by the object’s `limitIncrementTrigger` field. */
@@ -6455,12 +7005,18 @@ export interface MembershipsModuleFilter {
   and?: MembershipsModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `capabilitiesTableId` field. */
+  capabilitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `capabilityDefaultCapabilitiesTableId` field. */
+  capabilityDefaultCapabilitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `capabilityDefaultGrantsTableId` field. */
+  capabilityDefaultGrantsTableId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultCapabilitiesTableId` field. */
+  defaultCapabilitiesTableId?: UUIDFilter;
   /** Filter by the object’s `defaultLimitsTableId` field. */
   defaultLimitsTableId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissionsTableId` field. */
-  defaultPermissionsTableId?: UUIDFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityIdsByMask` field. */
@@ -6509,12 +7065,6 @@ export interface MembershipsModuleFilter {
   ownerGrantsTableId?: UUIDFilter;
   /** Filter by the object’s `ownerGrantsTableName` field. */
   ownerGrantsTableName?: StringFilter;
-  /** Filter by the object’s `permissionDefaultGrantsTableId` field. */
-  permissionDefaultGrantsTableId?: UUIDFilter;
-  /** Filter by the object’s `permissionDefaultPermissionsTableId` field. */
-  permissionDefaultPermissionsTableId?: UUIDFilter;
-  /** Filter by the object’s `permissionsTableId` field. */
-  permissionsTableId?: UUIDFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `privateApiName` field. */
@@ -6537,8 +7087,14 @@ export interface MerkleStoreModuleFilter {
   and?: MerkleStoreModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `capabilityKey` field. */
+  capabilityKey?: StringFilter;
   /** Filter by the object’s `commitTableId` field. */
   commitTableId?: UUIDFilter;
+  /** Filter by the object’s `contentPresetModules` relation. */
+  contentPresetModules?: MerkleStoreModuleToManyContentPresetModuleFilter;
+  /** `contentPresetModules` exist. */
+  contentPresetModulesExist?: boolean;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -6567,8 +7123,6 @@ export interface MerkleStoreModuleFilter {
   pagesModules?: MerkleStoreModuleToManyPagesModuleFilter;
   /** `pagesModules` exist. */
   pagesModulesExist?: boolean;
-  /** Filter by the object’s `permissionKey` field. */
-  permissionKey?: StringFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `privateApiName` field. */
@@ -6599,8 +7153,8 @@ export interface NamespaceModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -6659,8 +7213,8 @@ export interface NotificationsModuleFilter {
   channelsTableId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `deliveryLogTableId` field. */
   deliveryLogTableId?: UUIDFilter;
   /** Filter by the object’s `entityField` field. */
@@ -6705,6 +7259,38 @@ export interface NotificationsModuleFilter {
   suppressionsTableId?: UUIDFilter;
   /** Filter by the object’s `userSettingsTableId` field. */
   userSettingsTableId?: UUIDFilter;
+}
+export interface OauthRequestsModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: OauthRequestsModuleFilter[];
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: OauthRequestsModuleFilter;
+  /** Filter by the object’s `oauthAuthorizationRequestsTableId` field. */
+  oauthAuthorizationRequestsTableId?: UUIDFilter;
+  /** Filter by the object’s `oauthAuthorizationRequestsTableName` field. */
+  oauthAuthorizationRequestsTableName?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: OauthRequestsModuleFilter[];
+  /** Filter by the object’s `pendingIdentityLinksTableId` field. */
+  pendingIdentityLinksTableId?: UUIDFilter;
+  /** Filter by the object’s `pendingIdentityLinksTableName` field. */
+  pendingIdentityLinksTableName?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
 }
 export interface PagesModuleFilter {
   /** Checks for all expressions in this list. */
@@ -6757,58 +7343,6 @@ export interface PagesModuleFilter {
   sitesTableId?: UUIDFilter;
   /** Filter by the object’s `storeNamePrefix` field. */
   storeNamePrefix?: StringFilter;
-}
-export interface PermissionsModuleFilter {
-  /** Filter by the object’s `actorTableId` field. */
-  actorTableId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: PermissionsModuleFilter[];
-  /** Filter by the object’s `apiName` field. */
-  apiName?: StringFilter;
-  /** Filter by the object’s `bitlen` field. */
-  bitlen?: IntFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultTableId` field. */
-  defaultTableId?: UUIDFilter;
-  /** Filter by the object’s `defaultTableName` field. */
-  defaultTableName?: StringFilter;
-  /** Filter by the object’s `entityField` field. */
-  entityField?: StringFilter;
-  /** Filter by the object’s `entityTableId` field. */
-  entityTableId?: UUIDFilter;
-  /** Filter by the object’s `getByMask` field. */
-  getByMask?: StringFilter;
-  /** Filter by the object’s `getMask` field. */
-  getMask?: StringFilter;
-  /** Filter by the object’s `getMaskByName` field. */
-  getMaskByName?: StringFilter;
-  /** Filter by the object’s `getPaddedMask` field. */
-  getPaddedMask?: StringFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Negates the expression. */
-  not?: PermissionsModuleFilter;
-  /** Checks for any expressions in this list. */
-  or?: PermissionsModuleFilter[];
-  /** Filter by the object’s `prefix` field. */
-  prefix?: StringFilter;
-  /** Filter by the object’s `privateApiName` field. */
-  privateApiName?: StringFilter;
-  /** Filter by the object’s `privateSchemaId` field. */
-  privateSchemaId?: UUIDFilter;
-  /** Filter by the object’s `privateSchemaName` field. */
-  privateSchemaName?: StringFilter;
-  /** Filter by the object’s `publicSchemaName` field. */
-  publicSchemaName?: StringFilter;
-  /** Filter by the object’s `schemaId` field. */
-  schemaId?: UUIDFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: StringFilter;
-  /** Filter by the object’s `tableId` field. */
-  tableId?: UUIDFilter;
-  /** Filter by the object’s `tableName` field. */
-  tableName?: StringFilter;
 }
 export interface PhoneNumbersModuleFilter {
   /** Checks for all expressions in this list. */
@@ -6937,6 +7471,8 @@ export interface ProfilesModuleFilter {
   and?: ProfilesModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `capabilitiesTableId` field. */
+  capabilitiesTableId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `entityField` field. */
@@ -6945,14 +7481,16 @@ export interface ProfilesModuleFilter {
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `membershipProfilesTableId` field. */
+  membershipProfilesTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipProfilesTableName` field. */
+  membershipProfilesTableName?: StringFilter;
   /** Filter by the object’s `membershipsTableId` field. */
   membershipsTableId?: UUIDFilter;
   /** Negates the expression. */
   not?: ProfilesModuleFilter;
   /** Checks for any expressions in this list. */
   or?: ProfilesModuleFilter[];
-  /** Filter by the object’s `permissionsTableId` field. */
-  permissionsTableId?: UUIDFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `privateApiName` field. */
@@ -6961,6 +7499,10 @@ export interface ProfilesModuleFilter {
   privateSchemaId?: UUIDFilter;
   /** Filter by the object’s `privateSchemaName` field. */
   privateSchemaName?: StringFilter;
+  /** Filter by the object’s `profileCapabilitiesTableId` field. */
+  profileCapabilitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `profileCapabilitiesTableName` field. */
+  profileCapabilitiesTableName?: StringFilter;
   /** Filter by the object’s `profileDefinitionGrantsTableId` field. */
   profileDefinitionGrantsTableId?: UUIDFilter;
   /** Filter by the object’s `profileDefinitionGrantsTableName` field. */
@@ -6969,10 +7511,6 @@ export interface ProfilesModuleFilter {
   profileGrantsTableId?: UUIDFilter;
   /** Filter by the object’s `profileGrantsTableName` field. */
   profileGrantsTableName?: StringFilter;
-  /** Filter by the object’s `profilePermissionsTableId` field. */
-  profilePermissionsTableId?: UUIDFilter;
-  /** Filter by the object’s `profilePermissionsTableName` field. */
-  profilePermissionsTableName?: StringFilter;
   /** Filter by the object’s `profileTemplatesTableId` field. */
   profileTemplatesTableId?: UUIDFilter;
   /** Filter by the object’s `profileTemplatesTableName` field. */
@@ -6997,8 +7535,8 @@ export interface RateLimitMetersModuleFilter {
   checkRateLimitFunction?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
@@ -7155,8 +7693,8 @@ export interface ResourceModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -7279,6 +7817,8 @@ export interface RouteModuleFilter {
   and?: RouteModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `appLinksFunctionName` field. */
+  appLinksFunctionName?: StringFilter;
   /** Filter by the object’s `catalogModule` relation. */
   catalogModule?: CatalogModuleFilter;
   /** A related `catalogModule` exists. */
@@ -7287,8 +7827,10 @@ export interface RouteModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `deepLinkFunctionName` field. */
+  deepLinkFunctionName?: StringFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `domainModule` relation. */
   domainModule?: DomainModuleFilter;
   /** A related `domainModule` exists. */
@@ -7337,6 +7879,24 @@ export interface RouteModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+}
+export interface ScopeTypesModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: ScopeTypesModuleFilter[];
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ScopeTypesModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: ScopeTypesModuleFilter[];
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scopeTypesTableId` field. */
+  scopeTypesTableId?: UUIDFilter;
 }
 export interface SecureTableProvisionFilter {
   /** Checks for all expressions in this list. */
@@ -7431,8 +7991,12 @@ export interface SiteSurfaceModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
+  /** Filter by the object’s `emailSenderModules` relation. */
+  emailSenderModules?: SiteSurfaceModuleToManyEmailSenderModuleFilter;
+  /** `emailSenderModules` exist. */
+  emailSenderModulesExist?: boolean;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -7565,10 +8129,10 @@ export interface StorageModuleFilter {
   confirmUploadDelay?: IntervalFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `defaultMaxFileSize` field. */
   defaultMaxFileSize?: BigIntFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
   /** Filter by the object’s `downloadUrlExpirySeconds` field. */
   downloadUrlExpirySeconds?: IntFilter;
   /** Filter by the object’s `endpoint` field. */
@@ -7579,6 +8143,10 @@ export interface StorageModuleFilter {
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `fileEventsTableId` field. */
   fileEventsTableId?: UUIDFilter;
+  /** Filter by the object’s `fileRefFields` relation. */
+  fileRefFields?: StorageModuleToManyFileRefFieldFilter;
+  /** `fileRefFields` exist. */
+  fileRefFieldsExist?: boolean;
   /** Filter by the object’s `filesTableId` field. */
   filesTableId?: UUIDFilter;
   /** Filter by the object’s `filesTableName` field. */
@@ -7796,6 +8364,28 @@ export interface UserSettingsModuleFilter {
   /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
 }
+export interface UserSettingsSecurityModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: UserSettingsSecurityModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: UserSettingsSecurityModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: UserSettingsSecurityModuleFilter[];
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+}
 export interface UserStateModuleFilter {
   /** Checks for all expressions in this list. */
   and?: UserStateModuleFilter[];
@@ -7915,8 +8505,8 @@ export interface WebhookModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -7988,8 +8578,8 @@ export type AgentModuleOrderBy =
   | 'API_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -8078,8 +8668,8 @@ export type ApiSurfaceModuleOrderBy =
   | 'CORS_SETTINGS_TABLE_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -8118,8 +8708,8 @@ export type AppModuleOrderBy =
   | 'CATALOG_MODULE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -8156,10 +8746,10 @@ export type BillingModuleOrderBy =
   | 'BALANCES_TABLE_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'DEFAULT_METER_CATALOG_ASC'
   | 'DEFAULT_METER_CATALOG_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'LEDGER_TABLE_ID_ASC'
@@ -8214,6 +8804,10 @@ export type BillingProviderModuleOrderBy =
   | 'BILLING_CUSTOMERS_TABLE_ID_DESC'
   | 'BILLING_CUSTOMERS_TABLE_NAME_ASC'
   | 'BILLING_CUSTOMERS_TABLE_NAME_DESC'
+  | 'BILLING_INVOICES_TABLE_ID_ASC'
+  | 'BILLING_INVOICES_TABLE_ID_DESC'
+  | 'BILLING_INVOICES_TABLE_NAME_ASC'
+  | 'BILLING_INVOICES_TABLE_NAME_DESC'
   | 'BILLING_PRICES_TABLE_ID_ASC'
   | 'BILLING_PRICES_TABLE_ID_DESC'
   | 'BILLING_PRICES_TABLE_NAME_ASC'
@@ -8222,6 +8816,10 @@ export type BillingProviderModuleOrderBy =
   | 'BILLING_PRODUCTS_TABLE_ID_DESC'
   | 'BILLING_PRODUCTS_TABLE_NAME_ASC'
   | 'BILLING_PRODUCTS_TABLE_NAME_DESC'
+  | 'BILLING_REFUNDS_TABLE_ID_ASC'
+  | 'BILLING_REFUNDS_TABLE_ID_DESC'
+  | 'BILLING_REFUNDS_TABLE_NAME_ASC'
+  | 'BILLING_REFUNDS_TABLE_NAME_DESC'
   | 'BILLING_SUBSCRIPTIONS_TABLE_ID_ASC'
   | 'BILLING_SUBSCRIPTIONS_TABLE_ID_DESC'
   | 'BILLING_SUBSCRIPTIONS_TABLE_NAME_ASC'
@@ -8234,6 +8832,10 @@ export type BillingProviderModuleOrderBy =
   | 'DATABASE_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'LIST_PENDING_USAGE_SYNC_FUNCTION_ASC'
+  | 'LIST_PENDING_USAGE_SYNC_FUNCTION_DESC'
+  | 'MARK_USAGE_SYNCED_FUNCTION_ASC'
+  | 'MARK_USAGE_SYNCED_FUNCTION_DESC'
   | 'NATURAL'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC'
@@ -8251,10 +8853,14 @@ export type BillingProviderModuleOrderBy =
   | 'PRODUCTS_TABLE_ID_DESC'
   | 'PROVIDER_ASC'
   | 'PROVIDER_DESC'
+  | 'RECORD_REFUND_FUNCTION_ASC'
+  | 'RECORD_REFUND_FUNCTION_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SUBSCRIPTIONS_TABLE_ID_ASC'
-  | 'SUBSCRIPTIONS_TABLE_ID_DESC';
+  | 'SUBSCRIPTIONS_TABLE_ID_DESC'
+  | 'UPSERT_INVOICE_FUNCTION_ASC'
+  | 'UPSERT_INVOICE_FUNCTION_DESC';
 export type BlueprintOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
@@ -8353,6 +8959,54 @@ export type BlueprintTemplateOrderBy =
   | 'VERSION_DESC'
   | 'VISIBILITY_ASC'
   | 'VISIBILITY_DESC';
+export type CapabilitiesModuleOrderBy =
+  | 'ACTOR_TABLE_ID_ASC'
+  | 'ACTOR_TABLE_ID_DESC'
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'BITLEN_ASC'
+  | 'BITLEN_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_TABLE_ID_ASC'
+  | 'DEFAULT_TABLE_ID_DESC'
+  | 'DEFAULT_TABLE_NAME_ASC'
+  | 'DEFAULT_TABLE_NAME_DESC'
+  | 'ENTITY_FIELD_ASC'
+  | 'ENTITY_FIELD_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'GET_BY_MASK_ASC'
+  | 'GET_BY_MASK_DESC'
+  | 'GET_MASK_ASC'
+  | 'GET_MASK_BY_NAME_ASC'
+  | 'GET_MASK_BY_NAME_DESC'
+  | 'GET_MASK_DESC'
+  | 'GET_PADDED_MASK_ASC'
+  | 'GET_PADDED_MASK_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'TABLE_ID_ASC'
+  | 'TABLE_ID_DESC'
+  | 'TABLE_NAME_ASC'
+  | 'TABLE_NAME_DESC';
 export type CatalogModuleOrderBy =
   | 'APIS_TABLE_ID_ASC'
   | 'APIS_TABLE_ID_DESC'
@@ -8364,14 +9018,18 @@ export type CatalogModuleOrderBy =
   | 'APPS_TABLE_ID_DESC'
   | 'APPS_TABLE_NAME_ASC'
   | 'APPS_TABLE_NAME_DESC'
+  | 'BINDINGS_TABLE_ID_ASC'
+  | 'BINDINGS_TABLE_ID_DESC'
+  | 'BINDINGS_TABLE_NAME_ASC'
+  | 'BINDINGS_TABLE_NAME_DESC'
   | 'BUCKETS_TABLE_ID_ASC'
   | 'BUCKETS_TABLE_ID_DESC'
   | 'BUCKETS_TABLE_NAME_ASC'
   | 'BUCKETS_TABLE_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'DOMAINS_TABLE_ID_ASC'
   | 'DOMAINS_TABLE_ID_DESC'
   | 'DOMAINS_TABLE_NAME_ASC'
@@ -8521,6 +9179,44 @@ export type ConnectedAccountsModuleOrderBy =
   | 'TABLE_ID_DESC'
   | 'TABLE_NAME_ASC'
   | 'TABLE_NAME_DESC';
+export type ContentPresetModuleOrderBy =
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'CONTENT_PRESETS_TABLE_ID_ASC'
+  | 'CONTENT_PRESETS_TABLE_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MERKLE_STORE_MODULE_ID_ASC'
+  | 'MERKLE_STORE_MODULE_ID_DESC'
+  | 'NATURAL'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'PUBLIC_SCHEMA_ID_ASC'
+  | 'PUBLIC_SCHEMA_ID_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'STORE_NAME_ASC'
+  | 'STORE_NAME_DESC';
 export type CryptoAddressesModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -8577,6 +9273,32 @@ export type CryptoAuthModuleOrderBy =
   | 'USERS_TABLE_ID_DESC'
   | 'USER_FIELD_ASC'
   | 'USER_FIELD_DESC';
+export type DataCapabilitiesFieldOrderBy =
+  | 'CAPABILITIES_MODULE_ID_ASC'
+  | 'CAPABILITIES_MODULE_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'FIELD_ID_ASC'
+  | 'FIELD_ID_DESC'
+  | 'FROM_FIELD_ID_ASC'
+  | 'FROM_FIELD_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAPPING_FIELD_ID_ASC'
+  | 'MAPPING_FIELD_ID_DESC'
+  | 'MAPPING_KEY_FIELD_ID_ASC'
+  | 'MAPPING_KEY_FIELD_ID_DESC'
+  | 'MAPPING_TABLE_ID_ASC'
+  | 'MAPPING_TABLE_ID_DESC'
+  | 'MODE_ASC'
+  | 'MODE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SUBSET_GUARD_ASC'
+  | 'SUBSET_GUARD_DESC'
+  | 'TABLE_ID_ASC'
+  | 'TABLE_ID_DESC';
 export type DatabaseProvisionModuleOrderBy =
   | 'ASYNC_ASC'
   | 'ASYNC_DESC'
@@ -8628,8 +9350,8 @@ export type DatabaseSettingsModuleOrderBy =
   | 'DATABASE_SETTINGS_TABLE_ID_DESC'
   | 'DATABASE_SETTINGS_TABLE_NAME_ASC'
   | 'DATABASE_SETTINGS_TABLE_NAME_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -8766,8 +9488,8 @@ export type DbUsageModuleOrderBy =
   | 'COLLECT_DB_TABLE_STATS_FUNCTION_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ID_ASC'
@@ -8876,8 +9598,8 @@ export type DomainModuleOrderBy =
   | 'CATALOG_MODULE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'DOMAINS_TABLE_ID_ASC'
   | 'DOMAINS_TABLE_ID_DESC'
   | 'DOMAINS_TABLE_NAME_ASC'
@@ -8921,6 +9643,50 @@ export type DomainModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC';
+export type EmailSenderModuleOrderBy =
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
+  | 'EMAIL_IDENTITIES_TABLE_ID_ASC'
+  | 'EMAIL_IDENTITIES_TABLE_ID_DESC'
+  | 'EMAIL_IDENTITIES_TABLE_NAME_ASC'
+  | 'EMAIL_IDENTITIES_TABLE_NAME_DESC'
+  | 'EMAIL_PROVIDER_ACCOUNTS_TABLE_ID_ASC'
+  | 'EMAIL_PROVIDER_ACCOUNTS_TABLE_ID_DESC'
+  | 'EMAIL_PROVIDER_ACCOUNTS_TABLE_NAME_ASC'
+  | 'EMAIL_PROVIDER_ACCOUNTS_TABLE_NAME_DESC'
+  | 'EMAIL_SITE_IDENTITIES_TABLE_ID_ASC'
+  | 'EMAIL_SITE_IDENTITIES_TABLE_ID_DESC'
+  | 'EMAIL_SITE_IDENTITIES_TABLE_NAME_ASC'
+  | 'EMAIL_SITE_IDENTITIES_TABLE_NAME_DESC'
+  | 'ENTITY_FIELD_ASC'
+  | 'ENTITY_FIELD_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'SITE_SURFACE_MODULE_ID_ASC'
+  | 'SITE_SURFACE_MODULE_ID_DESC';
 export type EmailsModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -9036,8 +9802,8 @@ export type EventsModuleOrderBy =
   | 'API_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -9054,6 +9820,8 @@ export type EventsModuleOrderBy =
   | 'EVENT_TYPES_TABLE_ID_DESC'
   | 'EVENT_TYPES_TABLE_NAME_ASC'
   | 'EVENT_TYPES_TABLE_NAME_DESC'
+  | 'EXPIRE_GRANTS_ASC'
+  | 'EXPIRE_GRANTS_DESC'
   | 'GRANT_ACHIEVEMENT_ASC'
   | 'GRANT_ACHIEVEMENT_DESC'
   | 'ID_ASC'
@@ -9089,12 +9857,16 @@ export type EventsModuleOrderBy =
   | 'PRIVATE_SCHEMA_NAME_DESC'
   | 'PUBLIC_SCHEMA_NAME_ASC'
   | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'RECOMPUTE_CAPABILITIES_ASC'
+  | 'RECOMPUTE_CAPABILITIES_DESC'
   | 'RECORD_EVENT_ASC'
   | 'RECORD_EVENT_DESC'
   | 'REMOVE_EVENT_ASC'
   | 'REMOVE_EVENT_DESC'
   | 'RETENTION_ASC'
   | 'RETENTION_DESC'
+  | 'REVOKE_ACHIEVEMENT_ASC'
+  | 'REVOKE_ACHIEVEMENT_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
@@ -9113,17 +9885,43 @@ export type EventsModuleOrderBy =
   | 'TG_EVENT_TOGGLE_BOOL_ASC'
   | 'TG_EVENT_TOGGLE_BOOL_DESC'
   | 'TG_EVENT_TOGGLE_DESC'
+  | 'TG_LEVEL_GRANT_SYNC_ASC'
+  | 'TG_LEVEL_GRANT_SYNC_DESC'
   | 'TG_UPDATE_AGGREGATES_ASC'
   | 'TG_UPDATE_AGGREGATES_DESC'
+  | 'TRUST_LADDER_ASC'
+  | 'TRUST_LADDER_DESC'
   | 'UPSERT_AGGREGATE_ASC'
   | 'UPSERT_AGGREGATE_DESC';
+export type FileRefFieldOrderBy =
+  | 'BUCKET_KEY_ASC'
+  | 'BUCKET_KEY_DESC'
+  | 'BUCKET_TAGS_ASC'
+  | 'BUCKET_TAGS_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ENFORCE_FK_ASC'
+  | 'ENFORCE_FK_DESC'
+  | 'FIELD_ID_ASC'
+  | 'FIELD_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PUBLIC_ASC'
+  | 'IS_PUBLIC_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORAGE_MODULE_ID_ASC'
+  | 'STORAGE_MODULE_ID_DESC'
+  | 'TABLE_ID_ASC'
+  | 'TABLE_ID_DESC';
 export type FunctionDeploymentModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'DEPLOYMENTS_TABLE_ID_ASC'
   | 'DEPLOYMENTS_TABLE_ID_DESC'
   | 'DEPLOYMENTS_TABLE_NAME_ASC'
@@ -9172,8 +9970,8 @@ export type FunctionInvocationModuleOrderBy =
   | 'ATTEMPTS_TABLE_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -9220,8 +10018,8 @@ export type FunctionModuleOrderBy =
   | 'CAPABILITY_BINDINGS_TABLE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'DEFINITIONS_TABLE_ID_ASC'
   | 'DEFINITIONS_TABLE_ID_DESC'
   | 'DEFINITIONS_TABLE_NAME_ASC'
@@ -9264,8 +10062,8 @@ export type GraphExecutionModuleOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -9314,8 +10112,8 @@ export type GraphModuleOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -9360,8 +10158,8 @@ export type HierarchyModuleOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -9402,8 +10200,8 @@ export type HttpRouteModuleOrderBy =
   | 'API_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -9764,6 +10562,8 @@ export type LimitsModuleOrderBy =
   | 'LIMIT_DECREMENT_FUNCTION_DESC'
   | 'LIMIT_DECREMENT_TRIGGER_ASC'
   | 'LIMIT_DECREMENT_TRIGGER_DESC'
+  | 'LIMIT_DEFAULTS_ASC'
+  | 'LIMIT_DEFAULTS_DESC'
   | 'LIMIT_INCREMENT_FUNCTION_ASC'
   | 'LIMIT_INCREMENT_FUNCTION_DESC'
   | 'LIMIT_INCREMENT_TRIGGER_ASC'
@@ -9824,12 +10624,18 @@ export type MembershipsModuleOrderBy =
   | 'ADMIN_GRANTS_TABLE_NAME_DESC'
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
+  | 'CAPABILITIES_TABLE_ID_ASC'
+  | 'CAPABILITIES_TABLE_ID_DESC'
+  | 'CAPABILITY_DEFAULT_CAPABILITIES_TABLE_ID_ASC'
+  | 'CAPABILITY_DEFAULT_CAPABILITIES_TABLE_ID_DESC'
+  | 'CAPABILITY_DEFAULT_GRANTS_TABLE_ID_ASC'
+  | 'CAPABILITY_DEFAULT_GRANTS_TABLE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DEFAULT_CAPABILITIES_TABLE_ID_ASC'
+  | 'DEFAULT_CAPABILITIES_TABLE_ID_DESC'
   | 'DEFAULT_LIMITS_TABLE_ID_ASC'
   | 'DEFAULT_LIMITS_TABLE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_TABLE_ID_ASC'
-  | 'DEFAULT_PERMISSIONS_TABLE_ID_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_IDS_BY_MASK_ASC'
@@ -9875,12 +10681,6 @@ export type MembershipsModuleOrderBy =
   | 'OWNER_GRANTS_TABLE_ID_DESC'
   | 'OWNER_GRANTS_TABLE_NAME_ASC'
   | 'OWNER_GRANTS_TABLE_NAME_DESC'
-  | 'PERMISSIONS_TABLE_ID_ASC'
-  | 'PERMISSIONS_TABLE_ID_DESC'
-  | 'PERMISSION_DEFAULT_GRANTS_TABLE_ID_ASC'
-  | 'PERMISSION_DEFAULT_GRANTS_TABLE_ID_DESC'
-  | 'PERMISSION_DEFAULT_PERMISSIONS_TABLE_ID_ASC'
-  | 'PERMISSION_DEFAULT_PERMISSIONS_TABLE_ID_DESC'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC'
   | 'PRIMARY_KEY_ASC'
@@ -9902,6 +10702,8 @@ export type MembershipsModuleOrderBy =
 export type MerkleStoreModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
+  | 'CAPABILITY_KEY_ASC'
+  | 'CAPABILITY_KEY_DESC'
   | 'COMMIT_TABLE_ID_ASC'
   | 'COMMIT_TABLE_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -9917,8 +10719,6 @@ export type MerkleStoreModuleOrderBy =
   | 'NATURAL'
   | 'OBJECT_TABLE_ID_ASC'
   | 'OBJECT_TABLE_ID_DESC'
-  | 'PERMISSION_KEY_ASC'
-  | 'PERMISSION_KEY_DESC'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC'
   | 'PRIMARY_KEY_ASC'
@@ -9944,8 +10744,8 @@ export type NamespaceModuleOrderBy =
   | 'API_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -9988,8 +10788,8 @@ export type NotificationsModuleOrderBy =
   | 'CHANNELS_TABLE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'DELIVERY_LOG_TABLE_ID_ASC'
   | 'DELIVERY_LOG_TABLE_ID_DESC'
   | 'ENTITY_FIELD_ASC'
@@ -10033,6 +10833,34 @@ export type NotificationsModuleOrderBy =
   | 'SUPPRESSIONS_TABLE_ID_DESC'
   | 'USER_SETTINGS_TABLE_ID_ASC'
   | 'USER_SETTINGS_TABLE_ID_DESC';
+export type OauthRequestsModuleOrderBy =
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ENTITY_FIELD_ASC'
+  | 'ENTITY_FIELD_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'OAUTH_AUTHORIZATION_REQUESTS_TABLE_ID_ASC'
+  | 'OAUTH_AUTHORIZATION_REQUESTS_TABLE_ID_DESC'
+  | 'OAUTH_AUTHORIZATION_REQUESTS_TABLE_NAME_ASC'
+  | 'OAUTH_AUTHORIZATION_REQUESTS_TABLE_NAME_DESC'
+  | 'PENDING_IDENTITY_LINKS_TABLE_ID_ASC'
+  | 'PENDING_IDENTITY_LINKS_TABLE_ID_DESC'
+  | 'PENDING_IDENTITY_LINKS_TABLE_NAME_ASC'
+  | 'PENDING_IDENTITY_LINKS_TABLE_NAME_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC';
 export type PagesModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -10075,54 +10903,6 @@ export type PagesModuleOrderBy =
   | 'SITE_SURFACE_MODULE_ID_DESC'
   | 'STORE_NAME_PREFIX_ASC'
   | 'STORE_NAME_PREFIX_DESC';
-export type PermissionsModuleOrderBy =
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'BITLEN_ASC'
-  | 'BITLEN_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_TABLE_ID_ASC'
-  | 'DEFAULT_TABLE_ID_DESC'
-  | 'DEFAULT_TABLE_NAME_ASC'
-  | 'DEFAULT_TABLE_NAME_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'GET_BY_MASK_ASC'
-  | 'GET_BY_MASK_DESC'
-  | 'GET_MASK_ASC'
-  | 'GET_MASK_BY_NAME_ASC'
-  | 'GET_MASK_BY_NAME_DESC'
-  | 'GET_MASK_DESC'
-  | 'GET_PADDED_MASK_ASC'
-  | 'GET_PADDED_MASK_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
 export type PhoneNumbersModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -10236,6 +11016,8 @@ export type ProfilesModuleOrderBy =
   | 'ACTOR_TABLE_ID_DESC'
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
+  | 'CAPABILITIES_TABLE_ID_ASC'
+  | 'CAPABILITIES_TABLE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'ENTITY_FIELD_ASC'
@@ -10246,9 +11028,11 @@ export type ProfilesModuleOrderBy =
   | 'ID_DESC'
   | 'MEMBERSHIPS_TABLE_ID_ASC'
   | 'MEMBERSHIPS_TABLE_ID_DESC'
+  | 'MEMBERSHIP_PROFILES_TABLE_ID_ASC'
+  | 'MEMBERSHIP_PROFILES_TABLE_ID_DESC'
+  | 'MEMBERSHIP_PROFILES_TABLE_NAME_ASC'
+  | 'MEMBERSHIP_PROFILES_TABLE_NAME_DESC'
   | 'NATURAL'
-  | 'PERMISSIONS_TABLE_ID_ASC'
-  | 'PERMISSIONS_TABLE_ID_DESC'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC'
   | 'PRIMARY_KEY_ASC'
@@ -10259,6 +11043,10 @@ export type ProfilesModuleOrderBy =
   | 'PRIVATE_SCHEMA_ID_DESC'
   | 'PRIVATE_SCHEMA_NAME_ASC'
   | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'PROFILE_CAPABILITIES_TABLE_ID_ASC'
+  | 'PROFILE_CAPABILITIES_TABLE_ID_DESC'
+  | 'PROFILE_CAPABILITIES_TABLE_NAME_ASC'
+  | 'PROFILE_CAPABILITIES_TABLE_NAME_DESC'
   | 'PROFILE_DEFINITION_GRANTS_TABLE_ID_ASC'
   | 'PROFILE_DEFINITION_GRANTS_TABLE_ID_DESC'
   | 'PROFILE_DEFINITION_GRANTS_TABLE_NAME_ASC'
@@ -10267,10 +11055,6 @@ export type ProfilesModuleOrderBy =
   | 'PROFILE_GRANTS_TABLE_ID_DESC'
   | 'PROFILE_GRANTS_TABLE_NAME_ASC'
   | 'PROFILE_GRANTS_TABLE_NAME_DESC'
-  | 'PROFILE_PERMISSIONS_TABLE_ID_ASC'
-  | 'PROFILE_PERMISSIONS_TABLE_ID_DESC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_ASC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_DESC'
   | 'PROFILE_TEMPLATES_TABLE_ID_ASC'
   | 'PROFILE_TEMPLATES_TABLE_ID_DESC'
   | 'PROFILE_TEMPLATES_TABLE_NAME_ASC'
@@ -10292,8 +11076,8 @@ export type RateLimitMetersModuleOrderBy =
   | 'CHECK_RATE_LIMIT_FUNCTION_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
@@ -10434,8 +11218,8 @@ export type ResourceModuleOrderBy =
   | 'API_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -10538,12 +11322,16 @@ export type RlsModuleOrderBy =
 export type RouteModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
+  | 'APP_LINKS_FUNCTION_NAME_ASC'
+  | 'APP_LINKS_FUNCTION_NAME_DESC'
   | 'CATALOG_MODULE_ID_ASC'
   | 'CATALOG_MODULE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEEP_LINK_FUNCTION_NAME_ASC'
+  | 'DEEP_LINK_FUNCTION_NAME_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'DOMAIN_MODULE_ID_ASC'
   | 'DOMAIN_MODULE_ID_DESC'
   | 'ENTITY_FIELD_ASC'
@@ -10587,6 +11375,20 @@ export type RouteModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC';
+export type ScopeTypesModuleOrderBy =
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'SCOPE_TYPES_TABLE_ID_ASC'
+  | 'SCOPE_TYPES_TABLE_ID_DESC';
 export type SecureTableProvisionOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
@@ -10662,8 +11464,8 @@ export type SiteSurfaceModuleOrderBy =
   | 'CATALOG_MODULE_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -10784,10 +11586,10 @@ export type StorageModuleOrderBy =
   | 'CONFIRM_UPLOAD_DELAY_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'DEFAULT_MAX_FILE_SIZE_ASC'
   | 'DEFAULT_MAX_FILE_SIZE_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
   | 'DOWNLOAD_URL_EXPIRY_SECONDS_ASC'
   | 'DOWNLOAD_URL_EXPIRY_SECONDS_DESC'
   | 'ENDPOINT_ASC'
@@ -10993,6 +11795,24 @@ export type UserSettingsModuleOrderBy =
   | 'TABLE_ID_DESC'
   | 'TABLE_NAME_ASC'
   | 'TABLE_NAME_DESC';
+export type UserSettingsSecurityModuleOrderBy =
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'OWNER_TABLE_ID_ASC'
+  | 'OWNER_TABLE_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'TABLE_ID_ASC'
+  | 'TABLE_ID_DESC'
+  | 'TABLE_NAME_ASC'
+  | 'TABLE_NAME_DESC';
 export type UserStateModuleOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
@@ -11094,8 +11914,8 @@ export type WebhookModuleOrderBy =
   | 'API_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'DEFAULT_CAPABILITIES_ASC'
+  | 'DEFAULT_CAPABILITIES_DESC'
   | 'ENTITY_FIELD_ASC'
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
@@ -11147,7 +11967,7 @@ export interface CreateAgentModuleInput {
     agentTableName?: string;
     apiName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     hasAgents?: boolean;
@@ -11185,7 +12005,7 @@ export interface AgentModulePatch {
   agentTableName?: string | null;
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   hasAgents?: boolean | null;
@@ -11240,7 +12060,7 @@ export interface CreateApiSurfaceModuleInput {
     corsSettingsTableId?: string;
     corsSettingsTableName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     policies?: Record<string, unknown>;
@@ -11264,7 +12084,7 @@ export interface ApiSurfaceModulePatch {
   corsSettingsTableId?: string | null;
   corsSettingsTableName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   policies?: Record<string, unknown> | null;
@@ -11294,7 +12114,7 @@ export interface CreateAppModuleInput {
     appsTableName?: string;
     catalogModuleId?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     policies?: Record<string, unknown>;
@@ -11316,7 +12136,7 @@ export interface AppModulePatch {
   appsTableName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   policies?: Record<string, unknown> | null;
@@ -11345,8 +12165,8 @@ export interface CreateBillingModuleInput {
     balancesTableId?: string;
     balancesTableName?: string;
     databaseId: string;
+    defaultCapabilities?: string[];
     defaultMeterCatalog?: Record<string, unknown>;
-    defaultPermissions?: string[];
     ledgerTableId?: string;
     ledgerTableName?: string;
     meterCreditsTableId?: string;
@@ -11375,8 +12195,8 @@ export interface BillingModulePatch {
   balancesTableId?: string | null;
   balancesTableName?: string | null;
   databaseId?: string | null;
+  defaultCapabilities?: string[] | null;
   defaultMeterCatalog?: Record<string, unknown> | null;
-  defaultPermissions?: string[] | null;
   ledgerTableId?: string | null;
   ledgerTableName?: string | null;
   meterCreditsTableId?: string | null;
@@ -11414,15 +12234,21 @@ export interface CreateBillingProviderModuleInput {
     apiName?: string;
     billingCustomersTableId?: string;
     billingCustomersTableName?: string;
+    billingInvoicesTableId?: string;
+    billingInvoicesTableName?: string;
     billingPricesTableId?: string;
     billingPricesTableName?: string;
     billingProductsTableId?: string;
     billingProductsTableName?: string;
+    billingRefundsTableId?: string;
+    billingRefundsTableName?: string;
     billingSubscriptionsTableId?: string;
     billingSubscriptionsTableName?: string;
     billingWebhookEventsTableId?: string;
     billingWebhookEventsTableName?: string;
     databaseId: string;
+    listPendingUsageSyncFunction?: string;
+    markUsageSyncedFunction?: string;
     prefix?: string;
     pricesTableId?: string;
     privateApiName?: string;
@@ -11430,23 +12256,31 @@ export interface CreateBillingProviderModuleInput {
     processBillingEventFunction?: string;
     productsTableId?: string;
     provider?: string;
+    recordRefundFunction?: string;
     schemaId?: string;
     subscriptionsTableId?: string;
+    upsertInvoiceFunction?: string;
   };
 }
 export interface BillingProviderModulePatch {
   apiName?: string | null;
   billingCustomersTableId?: string | null;
   billingCustomersTableName?: string | null;
+  billingInvoicesTableId?: string | null;
+  billingInvoicesTableName?: string | null;
   billingPricesTableId?: string | null;
   billingPricesTableName?: string | null;
   billingProductsTableId?: string | null;
   billingProductsTableName?: string | null;
+  billingRefundsTableId?: string | null;
+  billingRefundsTableName?: string | null;
   billingSubscriptionsTableId?: string | null;
   billingSubscriptionsTableName?: string | null;
   billingWebhookEventsTableId?: string | null;
   billingWebhookEventsTableName?: string | null;
   databaseId?: string | null;
+  listPendingUsageSyncFunction?: string | null;
+  markUsageSyncedFunction?: string | null;
   prefix?: string | null;
   pricesTableId?: string | null;
   privateApiName?: string | null;
@@ -11454,8 +12288,10 @@ export interface BillingProviderModulePatch {
   processBillingEventFunction?: string | null;
   productsTableId?: string | null;
   provider?: string | null;
+  recordRefundFunction?: string | null;
   schemaId?: string | null;
   subscriptionsTableId?: string | null;
+  upsertInvoiceFunction?: string | null;
 }
 export interface UpdateBillingProviderModuleInput {
   clientMutationId?: string;
@@ -11582,6 +12418,64 @@ export interface DeleteBlueprintTemplateInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateCapabilitiesModuleInput {
+  clientMutationId?: string;
+  capabilitiesModule: {
+    actorTableId?: string;
+    apiName?: string;
+    bitlen?: number;
+    databaseId: string;
+    defaultTableId?: string;
+    defaultTableName?: string;
+    entityField?: string;
+    entityTableId?: string;
+    getByMask?: string;
+    getMask?: string;
+    getMaskByName?: string;
+    getPaddedMask?: string;
+    prefix?: string;
+    privateApiName?: string;
+    privateSchemaId?: string;
+    privateSchemaName?: string;
+    publicSchemaName?: string;
+    schemaId?: string;
+    scope: string;
+    tableId?: string;
+    tableName?: string;
+  };
+}
+export interface CapabilitiesModulePatch {
+  actorTableId?: string | null;
+  apiName?: string | null;
+  bitlen?: number | null;
+  databaseId?: string | null;
+  defaultTableId?: string | null;
+  defaultTableName?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  getByMask?: string | null;
+  getMask?: string | null;
+  getMaskByName?: string | null;
+  getPaddedMask?: string | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  tableId?: string | null;
+  tableName?: string | null;
+}
+export interface UpdateCapabilitiesModuleInput {
+  clientMutationId?: string;
+  id: string;
+  capabilitiesModulePatch: CapabilitiesModulePatch;
+}
+export interface DeleteCapabilitiesModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateCatalogModuleInput {
   clientMutationId?: string;
   catalogModule: {
@@ -11590,10 +12484,12 @@ export interface CreateCatalogModuleInput {
     apisTableName?: string;
     appsTableId?: string;
     appsTableName?: string;
+    bindingsTableId?: string;
+    bindingsTableName?: string;
     bucketsTableId?: string;
     bucketsTableName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     domainsTableId?: string;
     domainsTableName?: string;
     entityTableId?: string;
@@ -11631,10 +12527,12 @@ export interface CatalogModulePatch {
   apisTableName?: string | null;
   appsTableId?: string | null;
   appsTableName?: string | null;
+  bindingsTableId?: string | null;
+  bindingsTableName?: string | null;
   bucketsTableId?: string | null;
   bucketsTableName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   domainsTableId?: string | null;
   domainsTableName?: string | null;
   entityTableId?: string | null;
@@ -11790,6 +12688,52 @@ export interface DeleteConnectedAccountsModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateContentPresetModuleInput {
+  clientMutationId?: string;
+  contentPresetModule: {
+    apiName?: string;
+    contentPresetsTableId?: string;
+    databaseId: string;
+    entityTableId?: string;
+    merkleStoreModuleId: string;
+    policies?: Record<string, unknown>;
+    prefix: string;
+    privateApiName?: string;
+    privateSchemaId?: string;
+    privateSchemaName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaId?: string;
+    publicSchemaName?: string;
+    scope: string;
+    storeName: string;
+  };
+}
+export interface ContentPresetModulePatch {
+  apiName?: string | null;
+  contentPresetsTableId?: string | null;
+  databaseId?: string | null;
+  entityTableId?: string | null;
+  merkleStoreModuleId?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaId?: string | null;
+  publicSchemaName?: string | null;
+  scope?: string | null;
+  storeName?: string | null;
+}
+export interface UpdateContentPresetModuleInput {
+  clientMutationId?: string;
+  id: string;
+  contentPresetModulePatch: ContentPresetModulePatch;
+}
+export interface DeleteContentPresetModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateCryptoAddressesModuleInput {
   clientMutationId?: string;
   cryptoAddressesModule: {
@@ -11866,6 +12810,42 @@ export interface DeleteCryptoAuthModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateDataCapabilitiesFieldInput {
+  clientMutationId?: string;
+  dataCapabilitiesField: {
+    capabilitiesModuleId: string;
+    databaseId: string;
+    fieldId: string;
+    fromFieldId?: string;
+    mappingFieldId?: string;
+    mappingKeyFieldId?: string;
+    mappingTableId?: string;
+    mode?: string;
+    subsetGuard?: boolean;
+    tableId: string;
+  };
+}
+export interface DataCapabilitiesFieldPatch {
+  capabilitiesModuleId?: string | null;
+  databaseId?: string | null;
+  fieldId?: string | null;
+  fromFieldId?: string | null;
+  mappingFieldId?: string | null;
+  mappingKeyFieldId?: string | null;
+  mappingTableId?: string | null;
+  mode?: string | null;
+  subsetGuard?: boolean | null;
+  tableId?: string | null;
+}
+export interface UpdateDataCapabilitiesFieldInput {
+  clientMutationId?: string;
+  id: string;
+  dataCapabilitiesFieldPatch: DataCapabilitiesFieldPatch;
+}
+export interface DeleteDataCapabilitiesFieldInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateDatabaseProvisionModuleInput {
   clientMutationId?: string;
   databaseProvisionModule: {
@@ -11921,7 +12901,7 @@ export interface CreateDatabaseSettingsModuleInput {
     databaseId: string;
     databaseSettingsTableId?: string;
     databaseSettingsTableName?: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     policies?: Record<string, unknown>;
@@ -11944,7 +12924,7 @@ export interface DatabaseSettingsModulePatch {
   databaseId?: string | null;
   databaseSettingsTableId?: string | null;
   databaseSettingsTableName?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   policies?: Record<string, unknown> | null;
@@ -12089,7 +13069,7 @@ export interface CreateDbUsageModuleInput {
     collectDbQueryStatsFunction?: string;
     collectDbTableStatsFunction?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     interval?: string;
     prefix?: string;
@@ -12118,7 +13098,7 @@ export interface DbUsageModulePatch {
   collectDbQueryStatsFunction?: string | null;
   collectDbTableStatsFunction?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   interval?: string | null;
   prefix?: string | null;
@@ -12240,7 +13220,7 @@ export interface CreateDomainModuleInput {
     apiName?: string;
     catalogModuleId?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     domainEventsTableId?: string;
     domainEventsTableName?: string;
     domainVerificationsTableId?: string;
@@ -12266,7 +13246,7 @@ export interface DomainModulePatch {
   apiName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   domainEventsTableId?: string | null;
   domainEventsTableName?: string | null;
   domainVerificationsTableId?: string | null;
@@ -12293,6 +13273,60 @@ export interface UpdateDomainModuleInput {
   domainModulePatch: DomainModulePatch;
 }
 export interface DeleteDomainModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEmailSenderModuleInput {
+  clientMutationId?: string;
+  emailSenderModule: {
+    apiName?: string;
+    databaseId: string;
+    defaultCapabilities?: string[];
+    emailIdentitiesTableId?: string;
+    emailIdentitiesTableName?: string;
+    emailProviderAccountsTableId?: string;
+    emailProviderAccountsTableName?: string;
+    emailSiteIdentitiesTableId?: string;
+    emailSiteIdentitiesTableName?: string;
+    entityField?: string;
+    entityTableId?: string;
+    policies?: Record<string, unknown>;
+    prefix?: string;
+    privateApiName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaName?: string;
+    schemaId?: string;
+    scope: string;
+    siteSurfaceModuleId?: string;
+  };
+}
+export interface EmailSenderModulePatch {
+  apiName?: string | null;
+  databaseId?: string | null;
+  defaultCapabilities?: string[] | null;
+  emailIdentitiesTableId?: string | null;
+  emailIdentitiesTableName?: string | null;
+  emailProviderAccountsTableId?: string | null;
+  emailProviderAccountsTableName?: string | null;
+  emailSiteIdentitiesTableId?: string | null;
+  emailSiteIdentitiesTableName?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  siteSurfaceModuleId?: string | null;
+}
+export interface UpdateEmailSenderModuleInput {
+  clientMutationId?: string;
+  id: string;
+  emailSenderModulePatch: EmailSenderModulePatch;
+}
+export interface DeleteEmailSenderModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12428,7 +13462,7 @@ export interface CreateEventsModuleInput {
     actorTableId?: string;
     apiName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     eventAggregatesTableId?: string;
@@ -12437,6 +13471,7 @@ export interface CreateEventsModuleInput {
     eventTypesTableName?: string;
     eventsTableId?: string;
     eventsTableName?: string;
+    expireGrants?: string;
     grantAchievement?: string;
     interval?: string;
     levelAchieved?: string;
@@ -12452,9 +13487,11 @@ export interface CreateEventsModuleInput {
     privateSchemaId?: string;
     privateSchemaName?: string;
     publicSchemaName?: string;
+    recomputeCapabilities?: string;
     recordEvent?: string;
     removeEvent?: string;
     retention?: string;
+    revokeAchievement?: string;
     schemaId?: string;
     scope: string;
     stepsRequired?: string;
@@ -12464,7 +13501,9 @@ export interface CreateEventsModuleInput {
     tgEventBool?: string;
     tgEventToggle?: string;
     tgEventToggleBool?: string;
+    tgLevelGrantSync?: string;
     tgUpdateAggregates?: string;
+    trustLadder?: Record<string, unknown>;
     upsertAggregate?: string;
   };
 }
@@ -12474,7 +13513,7 @@ export interface EventsModulePatch {
   actorTableId?: string | null;
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   eventAggregatesTableId?: string | null;
@@ -12483,6 +13522,7 @@ export interface EventsModulePatch {
   eventTypesTableName?: string | null;
   eventsTableId?: string | null;
   eventsTableName?: string | null;
+  expireGrants?: string | null;
   grantAchievement?: string | null;
   interval?: string | null;
   levelAchieved?: string | null;
@@ -12498,9 +13538,11 @@ export interface EventsModulePatch {
   privateSchemaId?: string | null;
   privateSchemaName?: string | null;
   publicSchemaName?: string | null;
+  recomputeCapabilities?: string | null;
   recordEvent?: string | null;
   removeEvent?: string | null;
   retention?: string | null;
+  revokeAchievement?: string | null;
   schemaId?: string | null;
   scope?: string | null;
   stepsRequired?: string | null;
@@ -12510,7 +13552,9 @@ export interface EventsModulePatch {
   tgEventBool?: string | null;
   tgEventToggle?: string | null;
   tgEventToggleBool?: string | null;
+  tgLevelGrantSync?: string | null;
   tgUpdateAggregates?: string | null;
+  trustLadder?: Record<string, unknown> | null;
   upsertAggregate?: string | null;
 }
 export interface UpdateEventsModuleInput {
@@ -12522,12 +13566,44 @@ export interface DeleteEventsModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateFileRefFieldInput {
+  clientMutationId?: string;
+  fileRefField: {
+    bucketKey?: string;
+    bucketTags?: string[];
+    databaseId: string;
+    enforceFk?: boolean;
+    fieldId: string;
+    isPublic?: boolean;
+    storageModuleId: string;
+    tableId: string;
+  };
+}
+export interface FileRefFieldPatch {
+  bucketKey?: string | null;
+  bucketTags?: string[] | null;
+  databaseId?: string | null;
+  enforceFk?: boolean | null;
+  fieldId?: string | null;
+  isPublic?: boolean | null;
+  storageModuleId?: string | null;
+  tableId?: string | null;
+}
+export interface UpdateFileRefFieldInput {
+  clientMutationId?: string;
+  id: string;
+  fileRefFieldPatch: FileRefFieldPatch;
+}
+export interface DeleteFileRefFieldInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateFunctionDeploymentModuleInput {
   clientMutationId?: string;
   functionDeploymentModule: {
     apiName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     deploymentEventsTableId?: string;
     deploymentEventsTableName?: string;
     deploymentsTableId?: string;
@@ -12550,7 +13626,7 @@ export interface CreateFunctionDeploymentModuleInput {
 export interface FunctionDeploymentModulePatch {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   deploymentEventsTableId?: string | null;
   deploymentEventsTableName?: string | null;
   deploymentsTableId?: string | null;
@@ -12585,7 +13661,7 @@ export interface CreateFunctionInvocationModuleInput {
     attemptsTableId?: string;
     attemptsTableName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     executionLogsTableId?: string;
@@ -12608,7 +13684,7 @@ export interface FunctionInvocationModulePatch {
   attemptsTableId?: string | null;
   attemptsTableName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   executionLogsTableId?: string | null;
@@ -12642,7 +13718,7 @@ export interface CreateFunctionModuleInput {
     bindingsTableName?: string;
     capabilityBindingsTableId?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     definitionsTableId?: string;
     definitionsTableName?: string;
     entityField?: string;
@@ -12666,7 +13742,7 @@ export interface FunctionModulePatch {
   bindingsTableName?: string | null;
   capabilityBindingsTableId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   definitionsTableId?: string | null;
   definitionsTableName?: string | null;
   entityField?: string | null;
@@ -12697,7 +13773,7 @@ export interface CreateGraphExecutionModuleInput {
   graphExecutionModule: {
     apiName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     executionsTableId?: string;
@@ -12721,7 +13797,7 @@ export interface CreateGraphExecutionModuleInput {
 export interface GraphExecutionModulePatch {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   executionsTableId?: string | null;
@@ -12755,7 +13831,7 @@ export interface CreateGraphModuleInput {
   graphModule: {
     apiName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     graphsTableId?: string;
@@ -12774,7 +13850,7 @@ export interface CreateGraphModuleInput {
 export interface GraphModulePatch {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   graphsTableId?: string | null;
@@ -12806,7 +13882,7 @@ export interface CreateHierarchyModuleInput {
     chartEdgesTableId?: string;
     chartEdgesTableName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId: string;
     getManagersFunction?: string;
@@ -12830,7 +13906,7 @@ export interface HierarchyModulePatch {
   chartEdgesTableId?: string | null;
   chartEdgesTableName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   getManagersFunction?: string | null;
@@ -12861,7 +13937,7 @@ export interface CreateHttpRouteModuleInput {
   httpRouteModule: {
     apiName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     functionModuleId?: string;
@@ -12884,7 +13960,7 @@ export interface CreateHttpRouteModuleInput {
 export interface HttpRouteModulePatch {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   functionModuleId?: string | null;
@@ -13292,6 +14368,7 @@ export interface CreateLimitsModuleInput {
     limitCreditsTableId?: string;
     limitDecrementFunction?: string;
     limitDecrementTrigger?: string;
+    limitDefaults?: Record<string, unknown>;
     limitIncrementFunction?: string;
     limitIncrementTrigger?: string;
     limitUpdateTrigger?: string;
@@ -13331,6 +14408,7 @@ export interface LimitsModulePatch {
   limitCreditsTableId?: string | null;
   limitDecrementFunction?: string | null;
   limitDecrementTrigger?: string | null;
+  limitDefaults?: Record<string, unknown> | null;
   limitIncrementFunction?: string | null;
   limitIncrementTrigger?: string | null;
   limitUpdateTrigger?: string | null;
@@ -13389,9 +14467,12 @@ export interface CreateMembershipsModuleInput {
     adminGrantsTableId?: string;
     adminGrantsTableName?: string;
     apiName?: string;
+    capabilitiesTableId?: string;
+    capabilityDefaultCapabilitiesTableId?: string;
+    capabilityDefaultGrantsTableId?: string;
     databaseId: string;
+    defaultCapabilitiesTableId?: string;
     defaultLimitsTableId?: string;
-    defaultPermissionsTableId?: string;
     entityField?: string;
     entityIdsByMask?: string;
     entityIdsByPerm?: string;
@@ -13413,9 +14494,6 @@ export interface CreateMembershipsModuleInput {
     membershipsTableName?: string;
     ownerGrantsTableId?: string;
     ownerGrantsTableName?: string;
-    permissionDefaultGrantsTableId?: string;
-    permissionDefaultPermissionsTableId?: string;
-    permissionsTableId?: string;
     prefix?: string;
     privateApiName?: string;
     privateSchemaId?: string;
@@ -13433,9 +14511,12 @@ export interface MembershipsModulePatch {
   adminGrantsTableId?: string | null;
   adminGrantsTableName?: string | null;
   apiName?: string | null;
+  capabilitiesTableId?: string | null;
+  capabilityDefaultCapabilitiesTableId?: string | null;
+  capabilityDefaultGrantsTableId?: string | null;
   databaseId?: string | null;
+  defaultCapabilitiesTableId?: string | null;
   defaultLimitsTableId?: string | null;
-  defaultPermissionsTableId?: string | null;
   entityField?: string | null;
   entityIdsByMask?: string | null;
   entityIdsByPerm?: string | null;
@@ -13457,9 +14538,6 @@ export interface MembershipsModulePatch {
   membershipsTableName?: string | null;
   ownerGrantsTableId?: string | null;
   ownerGrantsTableName?: string | null;
-  permissionDefaultGrantsTableId?: string | null;
-  permissionDefaultPermissionsTableId?: string | null;
-  permissionsTableId?: string | null;
   prefix?: string | null;
   privateApiName?: string | null;
   privateSchemaId?: string | null;
@@ -13482,12 +14560,12 @@ export interface CreateMerkleStoreModuleInput {
   clientMutationId?: string;
   merkleStoreModule: {
     apiName?: string;
+    capabilityKey?: string;
     commitTableId?: string;
     databaseId: string;
     entityField?: string;
     functionPrefix?: string;
     objectTableId?: string;
-    permissionKey?: string;
     prefix?: string;
     privateApiName?: string;
     privateSchemaId?: string;
@@ -13501,12 +14579,12 @@ export interface CreateMerkleStoreModuleInput {
 }
 export interface MerkleStoreModulePatch {
   apiName?: string | null;
+  capabilityKey?: string | null;
   commitTableId?: string | null;
   databaseId?: string | null;
   entityField?: string | null;
   functionPrefix?: string | null;
   objectTableId?: string | null;
-  permissionKey?: string | null;
   prefix?: string | null;
   privateApiName?: string | null;
   privateSchemaId?: string | null;
@@ -13531,7 +14609,7 @@ export interface CreateNamespaceModuleInput {
   namespaceModule: {
     apiName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     namespaceEventsTableId?: string;
@@ -13552,7 +14630,7 @@ export interface CreateNamespaceModuleInput {
 export interface NamespaceModulePatch {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   namespaceEventsTableId?: string | null;
@@ -13584,7 +14662,7 @@ export interface CreateNotificationsModuleInput {
     apiName?: string;
     channelsTableId?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     deliveryLogTableId?: string;
     entityField?: string;
     hasChannels?: boolean;
@@ -13610,7 +14688,7 @@ export interface NotificationsModulePatch {
   apiName?: string | null;
   channelsTableId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   deliveryLogTableId?: string | null;
   entityField?: string | null;
   hasChannels?: boolean | null;
@@ -13637,6 +14715,44 @@ export interface UpdateNotificationsModuleInput {
   notificationsModulePatch: NotificationsModulePatch;
 }
 export interface DeleteNotificationsModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateOauthRequestsModuleInput {
+  clientMutationId?: string;
+  oauthRequestsModule: {
+    databaseId: string;
+    entityField?: string;
+    entityTableId?: string;
+    oauthAuthorizationRequestsTableId?: string;
+    oauthAuthorizationRequestsTableName?: string;
+    pendingIdentityLinksTableId?: string;
+    pendingIdentityLinksTableName?: string;
+    prefix?: string;
+    privateSchemaId?: string;
+    privateSchemaName?: string;
+    scope: string;
+  };
+}
+export interface OauthRequestsModulePatch {
+  databaseId?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  oauthAuthorizationRequestsTableId?: string | null;
+  oauthAuthorizationRequestsTableName?: string | null;
+  pendingIdentityLinksTableId?: string | null;
+  pendingIdentityLinksTableName?: string | null;
+  prefix?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  scope?: string | null;
+}
+export interface UpdateOauthRequestsModuleInput {
+  clientMutationId?: string;
+  id: string;
+  oauthRequestsModulePatch: OauthRequestsModulePatch;
+}
+export interface DeleteOauthRequestsModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -13687,64 +14803,6 @@ export interface UpdatePagesModuleInput {
   pagesModulePatch: PagesModulePatch;
 }
 export interface DeletePagesModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreatePermissionsModuleInput {
-  clientMutationId?: string;
-  permissionsModule: {
-    actorTableId?: string;
-    apiName?: string;
-    bitlen?: number;
-    databaseId: string;
-    defaultTableId?: string;
-    defaultTableName?: string;
-    entityField?: string;
-    entityTableId?: string;
-    getByMask?: string;
-    getMask?: string;
-    getMaskByName?: string;
-    getPaddedMask?: string;
-    prefix?: string;
-    privateApiName?: string;
-    privateSchemaId?: string;
-    privateSchemaName?: string;
-    publicSchemaName?: string;
-    schemaId?: string;
-    scope: string;
-    tableId?: string;
-    tableName?: string;
-  };
-}
-export interface PermissionsModulePatch {
-  actorTableId?: string | null;
-  apiName?: string | null;
-  bitlen?: number | null;
-  databaseId?: string | null;
-  defaultTableId?: string | null;
-  defaultTableName?: string | null;
-  entityField?: string | null;
-  entityTableId?: string | null;
-  getByMask?: string | null;
-  getMask?: string | null;
-  getMaskByName?: string | null;
-  getPaddedMask?: string | null;
-  prefix?: string | null;
-  privateApiName?: string | null;
-  privateSchemaId?: string | null;
-  privateSchemaName?: string | null;
-  publicSchemaName?: string | null;
-  schemaId?: string | null;
-  scope?: string | null;
-  tableId?: string | null;
-  tableName?: string | null;
-}
-export interface UpdatePermissionsModuleInput {
-  clientMutationId?: string;
-  id: string;
-  permissionsModulePatch: PermissionsModulePatch;
-}
-export interface DeletePermissionsModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -13891,21 +14949,23 @@ export interface CreateProfilesModuleInput {
   profilesModule: {
     actorTableId?: string;
     apiName?: string;
+    capabilitiesTableId?: string;
     databaseId: string;
     entityField?: string;
     entityTableId?: string;
+    membershipProfilesTableId?: string;
+    membershipProfilesTableName?: string;
     membershipsTableId?: string;
-    permissionsTableId?: string;
     prefix?: string;
     privateApiName?: string;
     privateSchemaId?: string;
     privateSchemaName?: string;
+    profileCapabilitiesTableId?: string;
+    profileCapabilitiesTableName?: string;
     profileDefinitionGrantsTableId?: string;
     profileDefinitionGrantsTableName?: string;
     profileGrantsTableId?: string;
     profileGrantsTableName?: string;
-    profilePermissionsTableId?: string;
-    profilePermissionsTableName?: string;
     profileTemplatesTableId?: string;
     profileTemplatesTableName?: string;
     publicSchemaName?: string;
@@ -13918,21 +14978,23 @@ export interface CreateProfilesModuleInput {
 export interface ProfilesModulePatch {
   actorTableId?: string | null;
   apiName?: string | null;
+  capabilitiesTableId?: string | null;
   databaseId?: string | null;
   entityField?: string | null;
   entityTableId?: string | null;
+  membershipProfilesTableId?: string | null;
+  membershipProfilesTableName?: string | null;
   membershipsTableId?: string | null;
-  permissionsTableId?: string | null;
   prefix?: string | null;
   privateApiName?: string | null;
   privateSchemaId?: string | null;
   privateSchemaName?: string | null;
+  profileCapabilitiesTableId?: string | null;
+  profileCapabilitiesTableName?: string | null;
   profileDefinitionGrantsTableId?: string | null;
   profileDefinitionGrantsTableName?: string | null;
   profileGrantsTableId?: string | null;
   profileGrantsTableName?: string | null;
-  profilePermissionsTableId?: string | null;
-  profilePermissionsTableName?: string | null;
   profileTemplatesTableId?: string | null;
   profileTemplatesTableName?: string | null;
   publicSchemaName?: string | null;
@@ -13956,7 +15018,7 @@ export interface CreateRateLimitMetersModuleInput {
     apiName?: string;
     checkRateLimitFunction?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     prefix?: string;
     privateApiName?: string;
     privateSchemaId?: string;
@@ -13975,7 +15037,7 @@ export interface RateLimitMetersModulePatch {
   apiName?: string | null;
   checkRateLimitFunction?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   prefix?: string | null;
   privateApiName?: string | null;
   privateSchemaId?: string | null;
@@ -14139,7 +15201,7 @@ export interface CreateResourceModuleInput {
   resourceModule: {
     apiName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     installationStoreName?: string;
@@ -14177,7 +15239,7 @@ export interface CreateResourceModuleInput {
 export interface ResourceModulePatch {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   installationStoreName?: string | null;
@@ -14264,9 +15326,11 @@ export interface CreateRouteModuleInput {
   clientMutationId?: string;
   routeModule: {
     apiName?: string;
+    appLinksFunctionName?: string;
     catalogModuleId?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    deepLinkFunctionName?: string;
+    defaultCapabilities?: string[];
     domainModuleId?: string;
     entityField?: string;
     entityTableId?: string;
@@ -14290,9 +15354,11 @@ export interface CreateRouteModuleInput {
 }
 export interface RouteModulePatch {
   apiName?: string | null;
+  appLinksFunctionName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  deepLinkFunctionName?: string | null;
+  defaultCapabilities?: string[] | null;
   domainModuleId?: string | null;
   entityField?: string | null;
   entityTableId?: string | null;
@@ -14319,6 +15385,30 @@ export interface UpdateRouteModuleInput {
   routeModulePatch: RouteModulePatch;
 }
 export interface DeleteRouteModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateScopeTypesModuleInput {
+  clientMutationId?: string;
+  scopeTypesModule: {
+    databaseId: string;
+    privateSchemaName?: string;
+    schemaId?: string;
+    scopeTypesTableId?: string;
+  };
+}
+export interface ScopeTypesModulePatch {
+  databaseId?: string | null;
+  privateSchemaName?: string | null;
+  schemaId?: string | null;
+  scopeTypesTableId?: string | null;
+}
+export interface UpdateScopeTypesModuleInput {
+  clientMutationId?: string;
+  id: string;
+  scopeTypesModulePatch: ScopeTypesModulePatch;
+}
+export interface DeleteScopeTypesModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -14426,7 +15516,7 @@ export interface CreateSiteSurfaceModuleInput {
     apiName?: string;
     catalogModuleId?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     policies?: Record<string, unknown>;
@@ -14460,7 +15550,7 @@ export interface SiteSurfaceModulePatch {
   apiName?: string | null;
   catalogModuleId?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   policies?: Record<string, unknown> | null;
@@ -14563,8 +15653,8 @@ export interface CreateStorageModuleInput {
     catalogModuleId?: string;
     confirmUploadDelay?: IntervalInput;
     databaseId: string;
+    defaultCapabilities?: string[];
     defaultMaxFileSize?: string;
-    defaultPermissions?: string[];
     downloadUrlExpirySeconds?: number;
     endpoint?: string;
     entityField?: string;
@@ -14606,8 +15696,8 @@ export interface StorageModulePatch {
   catalogModuleId?: string | null;
   confirmUploadDelay?: IntervalInput | null;
   databaseId?: string | null;
+  defaultCapabilities?: string[] | null;
   defaultMaxFileSize?: string | null;
-  defaultPermissions?: string[] | null;
   downloadUrlExpirySeconds?: number | null;
   endpoint?: string | null;
   entityField?: string | null;
@@ -14828,6 +15918,34 @@ export interface DeleteUserSettingsModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateUserSettingsSecurityModuleInput {
+  clientMutationId?: string;
+  userSettingsSecurityModule: {
+    apiName?: string;
+    databaseId: string;
+    ownerTableId?: string;
+    schemaId?: string;
+    tableId?: string;
+    tableName?: string;
+  };
+}
+export interface UserSettingsSecurityModulePatch {
+  apiName?: string | null;
+  databaseId?: string | null;
+  ownerTableId?: string | null;
+  schemaId?: string | null;
+  tableId?: string | null;
+  tableName?: string | null;
+}
+export interface UpdateUserSettingsSecurityModuleInput {
+  clientMutationId?: string;
+  id: string;
+  userSettingsSecurityModulePatch: UserSettingsSecurityModulePatch;
+}
+export interface DeleteUserSettingsSecurityModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateUserStateModuleInput {
   clientMutationId?: string;
   userStateModule: {
@@ -14969,7 +16087,7 @@ export interface CreateWebhookModuleInput {
   webhookModule: {
     apiName?: string;
     databaseId: string;
-    defaultPermissions?: string[];
+    defaultCapabilities?: string[];
     entityField?: string;
     entityTableId?: string;
     functionInvocationModuleId?: string;
@@ -14994,7 +16112,7 @@ export interface CreateWebhookModuleInput {
 export interface WebhookModulePatch {
   apiName?: string | null;
   databaseId?: string | null;
-  defaultPermissions?: string[] | null;
+  defaultCapabilities?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
   functionInvocationModuleId?: string | null;
@@ -15033,6 +16151,9 @@ export const connectionFieldsMap = {
     blueprintTemplatesByForkedFromId: 'BlueprintTemplate',
     blueprintsByTemplateId: 'Blueprint',
   },
+  CapabilitiesModule: {
+    dataCapabilitiesFields: 'DataCapabilitiesField',
+  },
   CatalogModule: {
     apiSurfaceModules: 'ApiSurfaceModule',
     appModules: 'AppModule',
@@ -15058,6 +16179,7 @@ export const connectionFieldsMap = {
     webhookModules: 'WebhookModule',
   },
   MerkleStoreModule: {
+    contentPresetModules: 'ContentPresetModule',
     dbPresetModules: 'DbPresetModule',
     graphModules: 'GraphModule',
     pagesModules: 'PagesModule',
@@ -15072,9 +16194,11 @@ export const connectionFieldsMap = {
     httpRouteModules: 'HttpRouteModule',
   },
   SiteSurfaceModule: {
+    emailSenderModules: 'EmailSenderModule',
     pagesModules: 'PagesModule',
   },
   StorageModule: {
+    fileRefFields: 'FileRefField',
     httpRouteModules: 'HttpRouteModule',
   },
 } as Record<string, Record<string, string>>;
@@ -15100,79 +16224,6 @@ export interface ProvisionBucketInput {
    * Omit for app-level (database-wide) storage.
    */
   ownerId?: string;
-}
-export interface ProvisionCheckConstraintInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  definition?: Record<string, unknown>;
-  tableId?: string;
-}
-export interface ProvisionFullTextSearchInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  definition?: Record<string, unknown>;
-  tableId?: string;
-}
-export interface ProvisionIndexInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  definition?: Record<string, unknown>;
-  tableId?: string;
-}
-export interface ProvisionRelationInput {
-  apiRequired?: boolean;
-  clientMutationId?: string;
-  createIndex?: boolean;
-  databaseId?: string;
-  deleteAction?: string;
-  exposeInApi?: boolean;
-  fieldName?: string;
-  grants?: Record<string, unknown>;
-  isRequired?: boolean;
-  junctionSchemaId?: string;
-  junctionTableId?: string;
-  junctionTableName?: string;
-  nodes?: Record<string, unknown>;
-  policies?: Record<string, unknown>;
-  relationType?: string;
-  sourceFieldName?: string;
-  sourceTableId?: string;
-  targetFieldName?: string;
-  targetTableId?: string;
-  useCompositeKey?: boolean;
-}
-export interface ProvisionSpatialRelationInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  name?: string;
-  operator?: string;
-  paramName?: string;
-  sourceFieldId?: string;
-  sourceTableId?: string;
-  targetFieldId?: string;
-  targetTableId?: string;
-}
-export interface ProvisionTableInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  description?: string;
-  fields?: Record<string, unknown>;
-  fullTextSearches?: Record<string, unknown>;
-  grants?: Record<string, unknown>;
-  indexes?: Record<string, unknown>;
-  nodes?: Record<string, unknown>;
-  policies?: Record<string, unknown>;
-  schemaId?: string;
-  tableId?: string;
-  tableName?: string;
-  uniqueConstraints?: Record<string, unknown>;
-  useRls?: boolean;
-}
-export interface ProvisionUniqueConstraintInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  definition?: Record<string, unknown>;
-  tableId?: string;
 }
 /** A filter to be used against many `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
 export interface BlueprintToManyBlueprintConstructionFilter {
@@ -15200,6 +16251,15 @@ export interface BlueprintTemplateToManyBlueprintFilter {
   none?: BlueprintFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: BlueprintFilter;
+}
+/** A filter to be used against many `DataCapabilitiesField` object types. All fields are combined with a logical ‘and.’ */
+export interface CapabilitiesModuleToManyDataCapabilitiesFieldFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DataCapabilitiesFieldFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DataCapabilitiesFieldFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DataCapabilitiesFieldFilter;
 }
 /** A filter to be used against many `ApiSurfaceModule` object types. All fields are combined with a logical ‘and.’ */
 export interface CatalogModuleToManyApiSurfaceModuleFilter {
@@ -15334,6 +16394,15 @@ export interface InfraSecretsModuleToManyWebhookModuleFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: WebhookModuleFilter;
 }
+/** A filter to be used against many `ContentPresetModule` object types. All fields are combined with a logical ‘and.’ */
+export interface MerkleStoreModuleToManyContentPresetModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ContentPresetModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ContentPresetModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ContentPresetModuleFilter;
+}
 /** A filter to be used against many `DbPresetModule` object types. All fields are combined with a logical ‘and.’ */
 export interface MerkleStoreModuleToManyDbPresetModuleFilter {
   /** Filters to entities where every related entity matches. */
@@ -15445,6 +16514,15 @@ export interface JSONListFilter {
   /** Overlaps the specified list of values. */
   overlaps?: Record<string, unknown>[];
 }
+/** A filter to be used against many `EmailSenderModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteSurfaceModuleToManyEmailSenderModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: EmailSenderModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmailSenderModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmailSenderModuleFilter;
+}
 /** A filter to be used against many `PagesModule` object types. All fields are combined with a logical ‘and.’ */
 export interface SiteSurfaceModuleToManyPagesModuleFilter {
   /** Filters to entities where every related entity matches. */
@@ -15453,6 +16531,15 @@ export interface SiteSurfaceModuleToManyPagesModuleFilter {
   none?: PagesModuleFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: PagesModuleFilter;
+}
+/** A filter to be used against many `FileRefField` object types. All fields are combined with a logical ‘and.’ */
+export interface StorageModuleToManyFileRefFieldFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: FileRefFieldFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FileRefFieldFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: FileRefFieldFilter;
 }
 /** A filter to be used against many `HttpRouteModule` object types. All fields are combined with a logical ‘and.’ */
 export interface StorageModuleToManyHttpRouteModuleFilter {
@@ -15469,7 +16556,7 @@ export interface AgentModuleInput {
   agentTableName?: string;
   apiName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   hasAgents?: boolean;
@@ -15515,7 +16602,7 @@ export interface ApiSurfaceModuleInput {
   corsSettingsTableId?: string;
   corsSettingsTableName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   id?: string;
@@ -15536,7 +16623,7 @@ export interface AppModuleInput {
   appsTableName?: string;
   catalogModuleId?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   id?: string;
@@ -15556,8 +16643,8 @@ export interface BillingModuleInput {
   balancesTableId?: string;
   balancesTableName?: string;
   databaseId: string;
+  defaultCapabilities?: string[];
   defaultMeterCatalog?: Record<string, unknown>;
-  defaultPermissions?: string[];
   id?: string;
   ledgerTableId?: string;
   ledgerTableName?: string;
@@ -15586,16 +16673,22 @@ export interface BillingProviderModuleInput {
   apiName?: string;
   billingCustomersTableId?: string;
   billingCustomersTableName?: string;
+  billingInvoicesTableId?: string;
+  billingInvoicesTableName?: string;
   billingPricesTableId?: string;
   billingPricesTableName?: string;
   billingProductsTableId?: string;
   billingProductsTableName?: string;
+  billingRefundsTableId?: string;
+  billingRefundsTableName?: string;
   billingSubscriptionsTableId?: string;
   billingSubscriptionsTableName?: string;
   billingWebhookEventsTableId?: string;
   billingWebhookEventsTableName?: string;
   databaseId: string;
   id?: string;
+  listPendingUsageSyncFunction?: string;
+  markUsageSyncedFunction?: string;
   prefix?: string;
   pricesTableId?: string;
   privateApiName?: string;
@@ -15603,8 +16696,10 @@ export interface BillingProviderModuleInput {
   processBillingEventFunction?: string;
   productsTableId?: string;
   provider?: string;
+  recordRefundFunction?: string;
   schemaId?: string;
   subscriptionsTableId?: string;
+  upsertInvoiceFunction?: string;
 }
 /** An input for mutations affecting `Blueprint` */
 export interface BlueprintInput {
@@ -15701,6 +16796,31 @@ export interface BlueprintTemplateInput {
   /** Access control for the template. private: only the owner can see and copy. public: anyone can browse and copy from the marketplace. Defaults to private. */
   visibility?: string;
 }
+/** An input for mutations affecting `CapabilitiesModule` */
+export interface CapabilitiesModuleInput {
+  actorTableId?: string;
+  apiName?: string;
+  bitlen?: number;
+  databaseId: string;
+  defaultTableId?: string;
+  defaultTableName?: string;
+  entityField?: string;
+  entityTableId?: string;
+  getByMask?: string;
+  getMask?: string;
+  getMaskByName?: string;
+  getPaddedMask?: string;
+  id?: string;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  publicSchemaName?: string;
+  schemaId?: string;
+  scope: string;
+  tableId?: string;
+  tableName?: string;
+}
 /** An input for mutations affecting `CatalogModule` */
 export interface CatalogModuleInput {
   apiName?: string;
@@ -15708,10 +16828,12 @@ export interface CatalogModuleInput {
   apisTableName?: string;
   appsTableId?: string;
   appsTableName?: string;
+  bindingsTableId?: string;
+  bindingsTableName?: string;
   bucketsTableId?: string;
   bucketsTableName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   domainsTableId?: string;
   domainsTableName?: string;
   entityTableId?: string;
@@ -15789,6 +16911,26 @@ export interface ConnectedAccountsModuleInput {
   tableId?: string;
   tableName: string;
 }
+/** An input for mutations affecting `ContentPresetModule` */
+export interface ContentPresetModuleInput {
+  apiName?: string;
+  contentPresetsTableId?: string;
+  createdAt?: string;
+  databaseId: string;
+  entityTableId?: string;
+  id?: string;
+  merkleStoreModuleId: string;
+  policies?: Record<string, unknown>;
+  prefix: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaId?: string;
+  publicSchemaName?: string;
+  scope: string;
+  storeName: string;
+}
 /** An input for mutations affecting `CryptoAddressesModule` */
 export interface CryptoAddressesModuleInput {
   apiName?: string;
@@ -15819,6 +16961,20 @@ export interface CryptoAuthModuleInput {
   userField: string;
   usersTableId?: string;
 }
+/** An input for mutations affecting `DataCapabilitiesField` */
+export interface DataCapabilitiesFieldInput {
+  capabilitiesModuleId: string;
+  databaseId: string;
+  fieldId: string;
+  fromFieldId?: string;
+  id?: string;
+  mappingFieldId?: string;
+  mappingKeyFieldId?: string;
+  mappingTableId?: string;
+  mode?: string;
+  subsetGuard?: boolean;
+  tableId: string;
+}
 /** An input for mutations affecting `DatabaseProvisionModule` */
 export interface DatabaseProvisionModuleInput {
   /** When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger */
@@ -15841,7 +16997,7 @@ export interface DatabaseProvisionModuleInput {
   /** Uniform billing anchor: when the request was fulfilled with a usable database (cold provision completion or warm pool claim). Platform absorbs all provisioning compute before this point */
   fulfilledAt?: string;
   id?: string;
-  /** JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["permissions_module", {"scope": "app"}]) */
+  /** JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["capabilities_module", {"scope": "app"}]) */
   modules?: Record<string, unknown>;
   /** Additional configuration options for provisioning */
   options?: Record<string, unknown>;
@@ -15861,7 +17017,7 @@ export interface DatabaseSettingsModuleInput {
   databaseId: string;
   databaseSettingsTableId?: string;
   databaseSettingsTableName?: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   id?: string;
@@ -15966,7 +17122,7 @@ export interface DbUsageModuleInput {
   collectDbQueryStatsFunction?: string;
   collectDbTableStatsFunction?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   id?: string;
   interval?: string;
@@ -16025,7 +17181,7 @@ export interface DomainModuleInput {
   apiName?: string;
   catalogModuleId?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   domainEventsTableId?: string;
   domainEventsTableName?: string;
   domainVerificationsTableId?: string;
@@ -16046,6 +17202,29 @@ export interface DomainModuleInput {
   publicSchemaName?: string;
   schemaId?: string;
   scope: string;
+}
+/** An input for mutations affecting `EmailSenderModule` */
+export interface EmailSenderModuleInput {
+  apiName?: string;
+  databaseId: string;
+  defaultCapabilities?: string[];
+  emailIdentitiesTableId?: string;
+  emailIdentitiesTableName?: string;
+  emailProviderAccountsTableId?: string;
+  emailProviderAccountsTableName?: string;
+  emailSiteIdentitiesTableId?: string;
+  emailSiteIdentitiesTableName?: string;
+  entityField?: string;
+  entityTableId?: string;
+  id?: string;
+  policies?: Record<string, unknown>;
+  prefix?: string;
+  privateApiName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaName?: string;
+  schemaId?: string;
+  scope: string;
+  siteSurfaceModuleId?: string;
 }
 /** An input for mutations affecting `EmailsModule` */
 export interface EmailsModuleInput {
@@ -16074,7 +17253,7 @@ export interface EntityTypeProvisionInput {
    *        - policies  (jsonb array) RLS policy overrides. NULL = apply defaults from apply_function_security().
    *      Creates {prefix}_function_definitions (or {prefix}_{key}_function_definitions for non-default keys)
    *      with entity-scoped RLS and a job trigger dispatching function:provision tasks.
-   *      Registers manage_functions + invoke_functions permission bits on first provision.
+   *      Registers manage_functions + invoke_functions capability bits on first provision.
    *      Example: functions := '[{}]'::jsonb
    */
   functions?: Record<string, unknown>;
@@ -16084,9 +17263,9 @@ export interface EntityTypeProvisionInput {
    *      Each element recognizes (all optional):
    *        - key       (text) module discriminator. Defaults to 'default'.
    *        - policies  (jsonb array) RLS policy overrides. NULL = apply defaults from apply_graph_security().
-   *      Registers manage_graphs + execute_graphs permission bits on first provision.
+   *      Registers manage_graphs + execute_graphs capability bits on first provision.
    *      Graph module requires a merkle_store_module_id dependency, so entity_type_provision
-   *      only registers permissions here. The graph module itself must be provisioned
+   *      only registers capabilities here. The graph module itself must be provisioned
    *      separately with the merkle store dependency resolved.
    *      Example: graphs := '[{}]'::jsonb
    */
@@ -16126,8 +17305,11 @@ export interface EntityTypeProvisionInput {
   hasLimits?: boolean;
   /**
    * Whether to provision profiles_module for this type. Defaults to false.
-   *      Profiles provide named permission roles (e.g. 'Editor', 'Viewer') with pre-configured permission bitmasks.
-   *      When true, creates profile tables and applies profiles security.
+   *      Profiles provide named capability roles (e.g. 'Editor', 'Viewer') with pre-configured capability bitmasks.
+   *      When true, creates profile tables and applies profiles security. A membership may hold
+   *      any number of profiles: the membership_profiles assignment table holds every profile a
+   *      membership holds and the membership mask is granted | bit_or(held profile masks), with
+   *      memberships.profile_id kept as a pointer at one held profile.
    */
   hasProfiles?: boolean;
   /** Unique identifier for this provision row. */
@@ -16154,7 +17336,7 @@ export interface EntityTypeProvisionInput {
    *        - policies  (jsonb array) RLS policy overrides. NULL = apply defaults from apply_namespace_security().
    *      Creates {prefix}_namespaces (or {prefix}_{key}_namespaces for non-default keys)
    *      with entity-scoped RLS (AuthzEntityMembership) and a rename proxy trigger.
-   *      Registers manage_namespaces permission bit on first provision.
+   *      Registers manage_namespaces capability bit on first provision.
    *      Example: namespaces := '[{}]'::jsonb
    */
   namespaces?: Record<string, unknown>;
@@ -16176,7 +17358,7 @@ export interface EntityTypeProvisionInput {
   outGraphModuleId?: string;
   outGraphsTableId?: string;
   /**
-   * Output: array of installed module labels (e.g. ARRAY['permissions_module:data_room', 'memberships_module:data_room', 'invites_module:data_room']).
+   * Output: array of installed module labels (e.g. ARRAY['capabilities_module:data_room', 'memberships_module:data_room', 'invites_module:data_room']).
    *      Populated by the trigger. Useful for verifying which modules were provisioned.
    */
   outInstalledModules?: string[];
@@ -16220,7 +17402,7 @@ export interface EntityTypeProvisionInput {
   parentEntity?: string;
   /**
    * SQL prefix used for table and module naming, e.g. 'data_room', 'team_channel'. Required.
-   *      Drives entity table name (prefix || 's' by default), module labels (permissions_module:prefix),
+   *      Drives entity table name (prefix || 's' by default), module labels (capabilities_module:prefix),
    *      and membership table names (prefix_memberships, prefix_members, etc.).
    *      Must be unique per database — the (database_id, prefix) constraint ensures graceful ON CONFLICT DO NOTHING.
    */
@@ -16234,8 +17416,8 @@ export interface EntityTypeProvisionInput {
    *      Defaults (applied when table_provision IS NULL and skip_entity_policies=false):
    *        - SELECT (parent_member): parent entity members can see child entities (only when is_visible=true)
    *        - SELECT (self_member):   direct members of the entity can see it
-   *        - INSERT:                 create_entity permission on the parent entity
-   *        - UPDATE:                 admin_entity permission on the entity itself
+   *        - INSERT:                 create_entity capability on the parent entity
+   *        - UPDATE:                 admin_entity capability on the entity itself
    *        - DELETE:                 owner of the entity can delete it
    */
   skipEntityPolicies?: boolean;
@@ -16254,7 +17436,7 @@ export interface EntityTypeProvisionInput {
    *        - download_url_expiry_seconds   (integer) presigned GET URL expiry override
    *        - default_max_file_size         (bigint)  global max file size in bytes for this module
    *        - allowed_origins               (text[])  default CORS origins for all buckets in this module
-   *        - restrict_reads                (boolean) require read_files permission for SELECT on files
+   *        - restrict_reads                (boolean) require read_files capability for SELECT on files
    *        - has_path_shares               (boolean) enable virtual filesystem + path share policies
    *        - has_versioning                (boolean) enable file version chains
    *        - has_content_hash              (boolean) enable content hash for dedup
@@ -16280,7 +17462,7 @@ export interface EntityTypeProvisionInput {
   tableName?: string;
   /**
    * Single jsonb object describing the full security setup to apply to the entity table.
-   *      Uses the same vocabulary as metaschema_modules_public.provision_table() and blueprint tables[]
+   *      Uses the same vocabulary as metaschema_modules_private.provision_table() and blueprint tables[]
    *      entries, so an entity table is configured the same way an ordinary blueprint table is.
    *      Defaults to NULL; when non-NULL, the five default policies are implicitly replaced by
    *      table_provision.policies[] (is_visible becomes a no-op on this path).
@@ -16318,7 +17500,7 @@ export interface EventsModuleInput {
   actorTableId?: string;
   apiName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   eventAggregatesTableId?: string;
@@ -16327,6 +17509,7 @@ export interface EventsModuleInput {
   eventTypesTableName?: string;
   eventsTableId?: string;
   eventsTableName?: string;
+  expireGrants?: string;
   grantAchievement?: string;
   id?: string;
   interval?: string;
@@ -16343,9 +17526,11 @@ export interface EventsModuleInput {
   privateSchemaId?: string;
   privateSchemaName?: string;
   publicSchemaName?: string;
+  recomputeCapabilities?: string;
   recordEvent?: string;
   removeEvent?: string;
   retention?: string;
+  revokeAchievement?: string;
   schemaId?: string;
   scope: string;
   stepsRequired?: string;
@@ -16355,14 +17540,28 @@ export interface EventsModuleInput {
   tgEventBool?: string;
   tgEventToggle?: string;
   tgEventToggleBool?: string;
+  tgLevelGrantSync?: string;
   tgUpdateAggregates?: string;
+  trustLadder?: Record<string, unknown>;
   upsertAggregate?: string;
+}
+/** An input for mutations affecting `FileRefField` */
+export interface FileRefFieldInput {
+  bucketKey?: string;
+  bucketTags?: string[];
+  databaseId: string;
+  enforceFk?: boolean;
+  fieldId: string;
+  id?: string;
+  isPublic?: boolean;
+  storageModuleId: string;
+  tableId: string;
 }
 /** An input for mutations affecting `FunctionDeploymentModule` */
 export interface FunctionDeploymentModuleInput {
   apiName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   deploymentEventsTableId?: string;
   deploymentEventsTableName?: string;
   deploymentsTableId?: string;
@@ -16388,7 +17587,7 @@ export interface FunctionInvocationModuleInput {
   attemptsTableId?: string;
   attemptsTableName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   executionLogsTableId?: string;
@@ -16413,7 +17612,7 @@ export interface FunctionModuleInput {
   bindingsTableName?: string;
   capabilityBindingsTableId?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   definitionsTableId?: string;
   definitionsTableName?: string;
   entityField?: string;
@@ -16436,7 +17635,7 @@ export interface GraphExecutionModuleInput {
   apiName?: string;
   createdAt?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   executionsTableId?: string;
@@ -16462,7 +17661,7 @@ export interface GraphModuleInput {
   apiName?: string;
   createdAt?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   graphsTableId?: string;
@@ -16486,7 +17685,7 @@ export interface HierarchyModuleInput {
   chartEdgesTableName?: string;
   createdAt?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId: string;
   getManagersFunction?: string;
@@ -16508,7 +17707,7 @@ export interface HierarchyModuleInput {
 export interface HttpRouteModuleInput {
   apiName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   functionModuleId?: string;
@@ -16699,6 +17898,7 @@ export interface LimitsModuleInput {
   limitCreditsTableId?: string;
   limitDecrementFunction?: string;
   limitDecrementTrigger?: string;
+  limitDefaults?: Record<string, unknown>;
   limitIncrementFunction?: string;
   limitIncrementTrigger?: string;
   limitUpdateTrigger?: string;
@@ -16731,9 +17931,12 @@ export interface MembershipsModuleInput {
   adminGrantsTableId?: string;
   adminGrantsTableName?: string;
   apiName?: string;
+  capabilitiesTableId?: string;
+  capabilityDefaultCapabilitiesTableId?: string;
+  capabilityDefaultGrantsTableId?: string;
   databaseId: string;
+  defaultCapabilitiesTableId?: string;
   defaultLimitsTableId?: string;
-  defaultPermissionsTableId?: string;
   entityField?: string;
   entityIdsByMask?: string;
   entityIdsByPerm?: string;
@@ -16756,9 +17959,6 @@ export interface MembershipsModuleInput {
   membershipsTableName?: string;
   ownerGrantsTableId?: string;
   ownerGrantsTableName?: string;
-  permissionDefaultGrantsTableId?: string;
-  permissionDefaultPermissionsTableId?: string;
-  permissionsTableId?: string;
   prefix?: string;
   privateApiName?: string;
   privateSchemaId?: string;
@@ -16771,6 +17971,7 @@ export interface MembershipsModuleInput {
 /** An input for mutations affecting `MerkleStoreModule` */
 export interface MerkleStoreModuleInput {
   apiName?: string;
+  capabilityKey?: string;
   commitTableId?: string;
   createdAt?: string;
   databaseId: string;
@@ -16778,7 +17979,6 @@ export interface MerkleStoreModuleInput {
   functionPrefix?: string;
   id?: string;
   objectTableId?: string;
-  permissionKey?: string;
   prefix?: string;
   privateApiName?: string;
   privateSchemaId?: string;
@@ -16793,7 +17993,7 @@ export interface MerkleStoreModuleInput {
 export interface NamespaceModuleInput {
   apiName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   id?: string;
@@ -16816,7 +18016,7 @@ export interface NotificationsModuleInput {
   apiName?: string;
   channelsTableId?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   deliveryLogTableId?: string;
   entityField?: string;
   hasChannels?: boolean;
@@ -16837,6 +18037,21 @@ export interface NotificationsModuleInput {
   schemaId?: string;
   suppressionsTableId?: string;
   userSettingsTableId?: string;
+}
+/** An input for mutations affecting `OauthRequestsModule` */
+export interface OauthRequestsModuleInput {
+  databaseId: string;
+  entityField?: string;
+  entityTableId?: string;
+  id?: string;
+  oauthAuthorizationRequestsTableId?: string;
+  oauthAuthorizationRequestsTableName?: string;
+  pendingIdentityLinksTableId?: string;
+  pendingIdentityLinksTableName?: string;
+  prefix?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  scope: string;
 }
 /** An input for mutations affecting `PagesModule` */
 export interface PagesModuleInput {
@@ -16859,31 +18074,6 @@ export interface PagesModuleInput {
   siteSurfaceModuleId?: string;
   sitesTableId?: string;
   storeNamePrefix?: string;
-}
-/** An input for mutations affecting `PermissionsModule` */
-export interface PermissionsModuleInput {
-  actorTableId?: string;
-  apiName?: string;
-  bitlen?: number;
-  databaseId: string;
-  defaultTableId?: string;
-  defaultTableName?: string;
-  entityField?: string;
-  entityTableId?: string;
-  getByMask?: string;
-  getMask?: string;
-  getMaskByName?: string;
-  getPaddedMask?: string;
-  id?: string;
-  prefix?: string;
-  privateApiName?: string;
-  privateSchemaId?: string;
-  privateSchemaName?: string;
-  publicSchemaName?: string;
-  schemaId?: string;
-  scope: string;
-  tableId?: string;
-  tableName?: string;
 }
 /** An input for mutations affecting `PhoneNumbersModule` */
 export interface PhoneNumbersModuleInput {
@@ -16946,22 +18136,24 @@ export interface PrincipalAuthModuleInput {
 export interface ProfilesModuleInput {
   actorTableId?: string;
   apiName?: string;
+  capabilitiesTableId?: string;
   databaseId: string;
   entityField?: string;
   entityTableId?: string;
   id?: string;
+  membershipProfilesTableId?: string;
+  membershipProfilesTableName?: string;
   membershipsTableId?: string;
-  permissionsTableId?: string;
   prefix?: string;
   privateApiName?: string;
   privateSchemaId?: string;
   privateSchemaName?: string;
+  profileCapabilitiesTableId?: string;
+  profileCapabilitiesTableName?: string;
   profileDefinitionGrantsTableId?: string;
   profileDefinitionGrantsTableName?: string;
   profileGrantsTableId?: string;
   profileGrantsTableName?: string;
-  profilePermissionsTableId?: string;
-  profilePermissionsTableName?: string;
   profileTemplatesTableId?: string;
   profileTemplatesTableName?: string;
   publicSchemaName?: string;
@@ -16975,7 +18167,7 @@ export interface RateLimitMetersModuleInput {
   apiName?: string;
   checkRateLimitFunction?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   id?: string;
   prefix?: string;
   privateApiName?: string;
@@ -17147,7 +18339,7 @@ export interface RelationProvisionInput {
 export interface ResourceModuleInput {
   apiName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   id?: string;
@@ -17201,9 +18393,11 @@ export interface RlsModuleInput {
 /** An input for mutations affecting `RouteModule` */
 export interface RouteModuleInput {
   apiName?: string;
+  appLinksFunctionName?: string;
   catalogModuleId?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  deepLinkFunctionName?: string;
+  defaultCapabilities?: string[];
   domainModuleId?: string;
   entityField?: string;
   entityTableId?: string;
@@ -17224,6 +18418,14 @@ export interface RouteModuleInput {
   routesTableName?: string;
   schemaId?: string;
   scope: string;
+}
+/** An input for mutations affecting `ScopeTypesModule` */
+export interface ScopeTypesModuleInput {
+  databaseId: string;
+  id?: string;
+  privateSchemaName?: string;
+  schemaId?: string;
+  scopeTypesTableId?: string;
 }
 /** An input for mutations affecting `SecureTableProvision` */
 export interface SecureTableProvisionInput {
@@ -17279,7 +18481,7 @@ export interface SiteSurfaceModuleInput {
   apiName?: string;
   catalogModuleId?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   id?: string;
@@ -17342,8 +18544,8 @@ export interface StorageModuleInput {
   catalogModuleId?: string;
   confirmUploadDelay?: IntervalInput;
   databaseId: string;
+  defaultCapabilities?: string[];
   defaultMaxFileSize?: string;
-  defaultPermissions?: string[];
   downloadUrlExpirySeconds?: number;
   endpoint?: string;
   entityField?: string;
@@ -17450,6 +18652,16 @@ export interface UserSettingsModuleInput {
   tableId?: string;
   tableName?: string;
 }
+/** An input for mutations affecting `UserSettingsSecurityModule` */
+export interface UserSettingsSecurityModuleInput {
+  apiName?: string;
+  databaseId: string;
+  id?: string;
+  ownerTableId?: string;
+  schemaId?: string;
+  tableId?: string;
+  tableName?: string;
+}
 /** An input for mutations affecting `UserStateModule` */
 export interface UserStateModuleInput {
   databaseId: string;
@@ -17507,7 +18719,7 @@ export interface WebauthnCredentialsModuleInput {
 export interface WebhookModuleInput {
   apiName?: string;
   databaseId: string;
-  defaultPermissions?: string[];
+  defaultCapabilities?: string[];
   entityField?: string;
   entityTableId?: string;
   functionInvocationModuleId?: string;
@@ -17664,6 +18876,39 @@ export interface BlueprintFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
+/** A filter to be used against `DataCapabilitiesField` object types. All fields are combined with a logical ‘and.’ */
+export interface DataCapabilitiesFieldFilter {
+  /** Checks for all expressions in this list. */
+  and?: DataCapabilitiesFieldFilter[];
+  /** Filter by the object’s `capabilitiesModule` relation. */
+  capabilitiesModule?: CapabilitiesModuleFilter;
+  /** Filter by the object’s `capabilitiesModuleId` field. */
+  capabilitiesModuleId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `fromFieldId` field. */
+  fromFieldId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `mappingFieldId` field. */
+  mappingFieldId?: UUIDFilter;
+  /** Filter by the object’s `mappingKeyFieldId` field. */
+  mappingKeyFieldId?: UUIDFilter;
+  /** Filter by the object’s `mappingTableId` field. */
+  mappingTableId?: UUIDFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
+  /** Negates the expression. */
+  not?: DataCapabilitiesFieldFilter;
+  /** Checks for any expressions in this list. */
+  or?: DataCapabilitiesFieldFilter[];
+  /** Filter by the object’s `subsetGuard` field. */
+  subsetGuard?: BooleanFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+}
 /** A filter to be used against `ApiSurfaceModule` object types. All fields are combined with a logical ‘and.’ */
 export interface ApiSurfaceModuleFilter {
   /** Checks for all expressions in this list. */
@@ -17694,8 +18939,8 @@ export interface ApiSurfaceModuleFilter {
   corsSettingsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -17743,8 +18988,8 @@ export interface AppModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -17788,8 +19033,8 @@ export interface DomainModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `domainEventsTableId` field. */
   domainEventsTableId?: UUIDFilter;
   /** Filter by the object’s `domainEventsTableName` field. */
@@ -17845,6 +19090,8 @@ export interface RouteModuleFilter {
   and?: RouteModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `appLinksFunctionName` field. */
+  appLinksFunctionName?: StringFilter;
   /** Filter by the object’s `catalogModule` relation. */
   catalogModule?: CatalogModuleFilter;
   /** A related `catalogModule` exists. */
@@ -17853,8 +19100,10 @@ export interface RouteModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `deepLinkFunctionName` field. */
+  deepLinkFunctionName?: StringFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `domainModule` relation. */
   domainModule?: DomainModuleFilter;
   /** A related `domainModule` exists. */
@@ -17918,8 +19167,12 @@ export interface SiteSurfaceModuleFilter {
   catalogModuleId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
+  /** Filter by the object’s `emailSenderModules` relation. */
+  emailSenderModules?: SiteSurfaceModuleToManyEmailSenderModuleFilter;
+  /** `emailSenderModules` exist. */
+  emailSenderModulesExist?: boolean;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -17993,8 +19246,8 @@ export interface WebhookModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -18064,8 +19317,8 @@ export interface FunctionDeploymentModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `deploymentEventsTableId` field. */
   deploymentEventsTableId?: UUIDFilter;
   /** Filter by the object’s `deploymentEventsTableName` field. */
@@ -18123,8 +19376,8 @@ export interface HttpRouteModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -18188,8 +19441,8 @@ export interface GraphExecutionModuleFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -18234,6 +19487,51 @@ export interface GraphExecutionModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+}
+/** A filter to be used against `ContentPresetModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ContentPresetModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: ContentPresetModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `contentPresetsTableId` field. */
+  contentPresetsTableId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `merkleStoreModule` relation. */
+  merkleStoreModule?: MerkleStoreModuleFilter;
+  /** Filter by the object’s `merkleStoreModuleId` field. */
+  merkleStoreModuleId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ContentPresetModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: ContentPresetModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaId` field. */
+  publicSchemaId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `storeName` field. */
+  storeName?: StringFilter;
 }
 /** A filter to be used against `DbPresetModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DbPresetModuleFilter {
@@ -18290,8 +19588,8 @@ export interface GraphModuleFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -18392,8 +19690,8 @@ export interface ResourceModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -18476,6 +19774,88 @@ export interface ResourceModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+}
+/** A filter to be used against `EmailSenderModule` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailSenderModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: EmailSenderModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
+  /** Filter by the object’s `emailIdentitiesTableId` field. */
+  emailIdentitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `emailIdentitiesTableName` field. */
+  emailIdentitiesTableName?: StringFilter;
+  /** Filter by the object’s `emailProviderAccountsTableId` field. */
+  emailProviderAccountsTableId?: UUIDFilter;
+  /** Filter by the object’s `emailProviderAccountsTableName` field. */
+  emailProviderAccountsTableName?: StringFilter;
+  /** Filter by the object’s `emailSiteIdentitiesTableId` field. */
+  emailSiteIdentitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `emailSiteIdentitiesTableName` field. */
+  emailSiteIdentitiesTableName?: StringFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: EmailSenderModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: EmailSenderModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `siteSurfaceModule` relation. */
+  siteSurfaceModule?: SiteSurfaceModuleFilter;
+  /** A related `siteSurfaceModule` exists. */
+  siteSurfaceModuleExists?: boolean;
+  /** Filter by the object’s `siteSurfaceModuleId` field. */
+  siteSurfaceModuleId?: UUIDFilter;
+}
+/** A filter to be used against `FileRefField` object types. All fields are combined with a logical ‘and.’ */
+export interface FileRefFieldFilter {
+  /** Checks for all expressions in this list. */
+  and?: FileRefFieldFilter[];
+  /** Filter by the object’s `bucketKey` field. */
+  bucketKey?: StringFilter;
+  /** Filter by the object’s `bucketTags` field. */
+  bucketTags?: StringListFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `enforceFk` field. */
+  enforceFk?: BooleanFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublic` field. */
+  isPublic?: BooleanFilter;
+  /** Negates the expression. */
+  not?: FileRefFieldFilter;
+  /** Checks for any expressions in this list. */
+  or?: FileRefFieldFilter[];
+  /** Filter by the object’s `storageModule` relation. */
+  storageModule?: StorageModuleFilter;
+  /** Filter by the object’s `storageModuleId` field. */
+  storageModuleId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
 }
 /** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDFilter {
@@ -18703,6 +20083,88 @@ export interface IntFilter {
   /** Not included in the specified list. */
   notIn?: number[];
 }
+/** A filter to be used against `CapabilitiesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CapabilitiesModuleFilter {
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: CapabilitiesModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `bitlen` field. */
+  bitlen?: IntFilter;
+  /** Filter by the object’s `dataCapabilitiesFields` relation. */
+  dataCapabilitiesFields?: CapabilitiesModuleToManyDataCapabilitiesFieldFilter;
+  /** `dataCapabilitiesFields` exist. */
+  dataCapabilitiesFieldsExist?: boolean;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableId` field. */
+  defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
+  defaultTableName?: StringFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `getByMask` field. */
+  getByMask?: StringFilter;
+  /** Filter by the object’s `getMask` field. */
+  getMask?: StringFilter;
+  /** Filter by the object’s `getMaskByName` field. */
+  getMaskByName?: StringFilter;
+  /** Filter by the object’s `getPaddedMask` field. */
+  getPaddedMask?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: CapabilitiesModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: CapabilitiesModuleFilter[];
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+}
+/** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
+export interface BooleanFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: boolean;
+  /** Greater than the specified value. */
+  greaterThan?: boolean;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: boolean;
+  /** Included in the specified list. */
+  in?: boolean[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: boolean;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: boolean;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: boolean;
+  /** Not equal to the specified value. */
+  notEqualTo?: boolean;
+  /** Not included in the specified list. */
+  notIn?: boolean[];
+}
 /** A filter to be used against `CatalogModule` object types. All fields are combined with a logical ‘and.’ */
 export interface CatalogModuleFilter {
   /** Checks for all expressions in this list. */
@@ -18725,14 +20187,18 @@ export interface CatalogModuleFilter {
   appsTableId?: UUIDFilter;
   /** Filter by the object’s `appsTableName` field. */
   appsTableName?: StringFilter;
+  /** Filter by the object’s `bindingsTableId` field. */
+  bindingsTableId?: UUIDFilter;
+  /** Filter by the object’s `bindingsTableName` field. */
+  bindingsTableName?: StringFilter;
   /** Filter by the object’s `bucketsTableId` field. */
   bucketsTableId?: UUIDFilter;
   /** Filter by the object’s `bucketsTableName` field. */
   bucketsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `domainModules` relation. */
   domainModules?: CatalogModuleToManyDomainModuleFilter;
   /** `domainModules` exist. */
@@ -18822,8 +20288,8 @@ export interface FunctionInvocationModuleFilter {
   attemptsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -18879,8 +20345,8 @@ export interface FunctionModuleFilter {
   capabilityBindingsTableId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `definitionsTableId` field. */
   definitionsTableId?: UUIDFilter;
   /** Filter by the object’s `definitionsTableName` field. */
@@ -18983,8 +20449,8 @@ export interface NamespaceModuleFilter {
   apiName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `entityField` field. */
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
@@ -19054,10 +20520,10 @@ export interface StorageModuleFilter {
   confirmUploadDelay?: IntervalFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultCapabilities` field. */
+  defaultCapabilities?: StringListFilter;
   /** Filter by the object’s `defaultMaxFileSize` field. */
   defaultMaxFileSize?: BigIntFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
   /** Filter by the object’s `downloadUrlExpirySeconds` field. */
   downloadUrlExpirySeconds?: IntFilter;
   /** Filter by the object’s `endpoint` field. */
@@ -19068,6 +20534,10 @@ export interface StorageModuleFilter {
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `fileEventsTableId` field. */
   fileEventsTableId?: UUIDFilter;
+  /** Filter by the object’s `fileRefFields` relation. */
+  fileRefFields?: StorageModuleToManyFileRefFieldFilter;
+  /** `fileRefFields` exist. */
+  fileRefFieldsExist?: boolean;
   /** Filter by the object’s `filesTableId` field. */
   filesTableId?: UUIDFilter;
   /** Filter by the object’s `filesTableName` field. */
@@ -19135,8 +20605,14 @@ export interface MerkleStoreModuleFilter {
   and?: MerkleStoreModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `capabilityKey` field. */
+  capabilityKey?: StringFilter;
   /** Filter by the object’s `commitTableId` field. */
   commitTableId?: UUIDFilter;
+  /** Filter by the object’s `contentPresetModules` relation. */
+  contentPresetModules?: MerkleStoreModuleToManyContentPresetModuleFilter;
+  /** `contentPresetModules` exist. */
+  contentPresetModulesExist?: boolean;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -19165,8 +20641,6 @@ export interface MerkleStoreModuleFilter {
   pagesModules?: MerkleStoreModuleToManyPagesModuleFilter;
   /** `pagesModules` exist. */
   pagesModulesExist?: boolean;
-  /** Filter by the object’s `permissionKey` field. */
-  permissionKey?: StringFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `privateApiName` field. */
@@ -19189,31 +20663,6 @@ export interface MerkleStoreModuleFilter {
   scope?: StringFilter;
   /** Filter by the object’s `storeTableId` field. */
   storeTableId?: UUIDFilter;
-}
-/** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
-export interface BooleanFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: boolean;
-  /** Greater than the specified value. */
-  greaterThan?: boolean;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: boolean;
-  /** Included in the specified list. */
-  in?: boolean[];
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: boolean;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: boolean;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: boolean;
-  /** Not equal to the specified value. */
-  notEqualTo?: boolean;
-  /** Not included in the specified list. */
-  notIn?: boolean[];
 }
 /** A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’ */
 export interface BigIntFilter {
@@ -19278,62 +20727,6 @@ export type ProvisionBucketPayloadSelect = {
   error?: boolean;
   provider?: boolean;
   success?: boolean;
-};
-export interface ProvisionCheckConstraintPayload {
-  clientMutationId?: string | null;
-}
-export type ProvisionCheckConstraintPayloadSelect = {
-  clientMutationId?: boolean;
-};
-export interface ProvisionFullTextSearchPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type ProvisionFullTextSearchPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface ProvisionIndexPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type ProvisionIndexPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface ProvisionRelationPayload {
-  clientMutationId?: string | null;
-  result?: ProvisionRelationRecord[] | null;
-}
-export type ProvisionRelationPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: ProvisionRelationRecordSelect;
-  };
-};
-export interface ProvisionSpatialRelationPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type ProvisionSpatialRelationPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface ProvisionTablePayload {
-  clientMutationId?: string | null;
-  result?: ProvisionTableRecord[] | null;
-}
-export type ProvisionTablePayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: ProvisionTableRecordSelect;
-  };
-};
-export interface ProvisionUniqueConstraintPayload {
-  clientMutationId?: string | null;
-}
-export type ProvisionUniqueConstraintPayloadSelect = {
-  clientMutationId?: boolean;
 };
 export interface CreateAgentModulePayload {
   /** The `AgentModule` that was created by this mutation. */
@@ -19695,6 +21088,51 @@ export type DeleteBlueprintTemplatePayloadSelect = {
   };
   clientMutationId?: boolean;
 };
+export interface CreateCapabilitiesModulePayload {
+  /** The `CapabilitiesModule` that was created by this mutation. */
+  capabilitiesModule?: CapabilitiesModule | null;
+  capabilitiesModuleEdge?: CapabilitiesModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type CreateCapabilitiesModulePayloadSelect = {
+  capabilitiesModule?: {
+    select: CapabilitiesModuleSelect;
+  };
+  capabilitiesModuleEdge?: {
+    select: CapabilitiesModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateCapabilitiesModulePayload {
+  /** The `CapabilitiesModule` that was updated by this mutation. */
+  capabilitiesModule?: CapabilitiesModule | null;
+  capabilitiesModuleEdge?: CapabilitiesModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateCapabilitiesModulePayloadSelect = {
+  capabilitiesModule?: {
+    select: CapabilitiesModuleSelect;
+  };
+  capabilitiesModuleEdge?: {
+    select: CapabilitiesModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteCapabilitiesModulePayload {
+  /** The `CapabilitiesModule` that was deleted by this mutation. */
+  capabilitiesModule?: CapabilitiesModule | null;
+  capabilitiesModuleEdge?: CapabilitiesModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteCapabilitiesModulePayloadSelect = {
+  capabilitiesModule?: {
+    select: CapabilitiesModuleSelect;
+  };
+  capabilitiesModuleEdge?: {
+    select: CapabilitiesModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
 export interface CreateCatalogModulePayload {
   /** The `CatalogModule` that was created by this mutation. */
   catalogModule?: CatalogModule | null;
@@ -19875,6 +21313,51 @@ export type DeleteConnectedAccountsModulePayloadSelect = {
     select: ConnectedAccountsModuleEdgeSelect;
   };
 };
+export interface CreateContentPresetModulePayload {
+  clientMutationId?: string | null;
+  /** The `ContentPresetModule` that was created by this mutation. */
+  contentPresetModule?: ContentPresetModule | null;
+  contentPresetModuleEdge?: ContentPresetModuleEdge | null;
+}
+export type CreateContentPresetModulePayloadSelect = {
+  clientMutationId?: boolean;
+  contentPresetModule?: {
+    select: ContentPresetModuleSelect;
+  };
+  contentPresetModuleEdge?: {
+    select: ContentPresetModuleEdgeSelect;
+  };
+};
+export interface UpdateContentPresetModulePayload {
+  clientMutationId?: string | null;
+  /** The `ContentPresetModule` that was updated by this mutation. */
+  contentPresetModule?: ContentPresetModule | null;
+  contentPresetModuleEdge?: ContentPresetModuleEdge | null;
+}
+export type UpdateContentPresetModulePayloadSelect = {
+  clientMutationId?: boolean;
+  contentPresetModule?: {
+    select: ContentPresetModuleSelect;
+  };
+  contentPresetModuleEdge?: {
+    select: ContentPresetModuleEdgeSelect;
+  };
+};
+export interface DeleteContentPresetModulePayload {
+  clientMutationId?: string | null;
+  /** The `ContentPresetModule` that was deleted by this mutation. */
+  contentPresetModule?: ContentPresetModule | null;
+  contentPresetModuleEdge?: ContentPresetModuleEdge | null;
+}
+export type DeleteContentPresetModulePayloadSelect = {
+  clientMutationId?: boolean;
+  contentPresetModule?: {
+    select: ContentPresetModuleSelect;
+  };
+  contentPresetModuleEdge?: {
+    select: ContentPresetModuleEdgeSelect;
+  };
+};
 export interface CreateCryptoAddressesModulePayload {
   clientMutationId?: string | null;
   /** The `CryptoAddressesModule` that was created by this mutation. */
@@ -19963,6 +21446,51 @@ export type DeleteCryptoAuthModulePayloadSelect = {
   };
   cryptoAuthModuleEdge?: {
     select: CryptoAuthModuleEdgeSelect;
+  };
+};
+export interface CreateDataCapabilitiesFieldPayload {
+  clientMutationId?: string | null;
+  /** The `DataCapabilitiesField` that was created by this mutation. */
+  dataCapabilitiesField?: DataCapabilitiesField | null;
+  dataCapabilitiesFieldEdge?: DataCapabilitiesFieldEdge | null;
+}
+export type CreateDataCapabilitiesFieldPayloadSelect = {
+  clientMutationId?: boolean;
+  dataCapabilitiesField?: {
+    select: DataCapabilitiesFieldSelect;
+  };
+  dataCapabilitiesFieldEdge?: {
+    select: DataCapabilitiesFieldEdgeSelect;
+  };
+};
+export interface UpdateDataCapabilitiesFieldPayload {
+  clientMutationId?: string | null;
+  /** The `DataCapabilitiesField` that was updated by this mutation. */
+  dataCapabilitiesField?: DataCapabilitiesField | null;
+  dataCapabilitiesFieldEdge?: DataCapabilitiesFieldEdge | null;
+}
+export type UpdateDataCapabilitiesFieldPayloadSelect = {
+  clientMutationId?: boolean;
+  dataCapabilitiesField?: {
+    select: DataCapabilitiesFieldSelect;
+  };
+  dataCapabilitiesFieldEdge?: {
+    select: DataCapabilitiesFieldEdgeSelect;
+  };
+};
+export interface DeleteDataCapabilitiesFieldPayload {
+  clientMutationId?: string | null;
+  /** The `DataCapabilitiesField` that was deleted by this mutation. */
+  dataCapabilitiesField?: DataCapabilitiesField | null;
+  dataCapabilitiesFieldEdge?: DataCapabilitiesFieldEdge | null;
+}
+export type DeleteDataCapabilitiesFieldPayloadSelect = {
+  clientMutationId?: boolean;
+  dataCapabilitiesField?: {
+    select: DataCapabilitiesFieldSelect;
+  };
+  dataCapabilitiesFieldEdge?: {
+    select: DataCapabilitiesFieldEdgeSelect;
   };
 };
 export interface CreateDatabaseProvisionModulePayload {
@@ -20415,6 +21943,51 @@ export type DeleteDomainModulePayloadSelect = {
     select: DomainModuleEdgeSelect;
   };
 };
+export interface CreateEmailSenderModulePayload {
+  clientMutationId?: string | null;
+  /** The `EmailSenderModule` that was created by this mutation. */
+  emailSenderModule?: EmailSenderModule | null;
+  emailSenderModuleEdge?: EmailSenderModuleEdge | null;
+}
+export type CreateEmailSenderModulePayloadSelect = {
+  clientMutationId?: boolean;
+  emailSenderModule?: {
+    select: EmailSenderModuleSelect;
+  };
+  emailSenderModuleEdge?: {
+    select: EmailSenderModuleEdgeSelect;
+  };
+};
+export interface UpdateEmailSenderModulePayload {
+  clientMutationId?: string | null;
+  /** The `EmailSenderModule` that was updated by this mutation. */
+  emailSenderModule?: EmailSenderModule | null;
+  emailSenderModuleEdge?: EmailSenderModuleEdge | null;
+}
+export type UpdateEmailSenderModulePayloadSelect = {
+  clientMutationId?: boolean;
+  emailSenderModule?: {
+    select: EmailSenderModuleSelect;
+  };
+  emailSenderModuleEdge?: {
+    select: EmailSenderModuleEdgeSelect;
+  };
+};
+export interface DeleteEmailSenderModulePayload {
+  clientMutationId?: string | null;
+  /** The `EmailSenderModule` that was deleted by this mutation. */
+  emailSenderModule?: EmailSenderModule | null;
+  emailSenderModuleEdge?: EmailSenderModuleEdge | null;
+}
+export type DeleteEmailSenderModulePayloadSelect = {
+  clientMutationId?: boolean;
+  emailSenderModule?: {
+    select: EmailSenderModuleSelect;
+  };
+  emailSenderModuleEdge?: {
+    select: EmailSenderModuleEdgeSelect;
+  };
+};
 export interface CreateEmailsModulePayload {
   clientMutationId?: string | null;
   /** The `EmailsModule` that was created by this mutation. */
@@ -20548,6 +22121,51 @@ export type DeleteEventsModulePayloadSelect = {
   };
   eventsModuleEdge?: {
     select: EventsModuleEdgeSelect;
+  };
+};
+export interface CreateFileRefFieldPayload {
+  clientMutationId?: string | null;
+  /** The `FileRefField` that was created by this mutation. */
+  fileRefField?: FileRefField | null;
+  fileRefFieldEdge?: FileRefFieldEdge | null;
+}
+export type CreateFileRefFieldPayloadSelect = {
+  clientMutationId?: boolean;
+  fileRefField?: {
+    select: FileRefFieldSelect;
+  };
+  fileRefFieldEdge?: {
+    select: FileRefFieldEdgeSelect;
+  };
+};
+export interface UpdateFileRefFieldPayload {
+  clientMutationId?: string | null;
+  /** The `FileRefField` that was updated by this mutation. */
+  fileRefField?: FileRefField | null;
+  fileRefFieldEdge?: FileRefFieldEdge | null;
+}
+export type UpdateFileRefFieldPayloadSelect = {
+  clientMutationId?: boolean;
+  fileRefField?: {
+    select: FileRefFieldSelect;
+  };
+  fileRefFieldEdge?: {
+    select: FileRefFieldEdgeSelect;
+  };
+};
+export interface DeleteFileRefFieldPayload {
+  clientMutationId?: string | null;
+  /** The `FileRefField` that was deleted by this mutation. */
+  fileRefField?: FileRefField | null;
+  fileRefFieldEdge?: FileRefFieldEdge | null;
+}
+export type DeleteFileRefFieldPayloadSelect = {
+  clientMutationId?: boolean;
+  fileRefField?: {
+    select: FileRefFieldSelect;
+  };
+  fileRefFieldEdge?: {
+    select: FileRefFieldEdgeSelect;
   };
 };
 export interface CreateFunctionDeploymentModulePayload {
@@ -21495,6 +23113,51 @@ export type DeleteNotificationsModulePayloadSelect = {
     select: NotificationsModuleEdgeSelect;
   };
 };
+export interface CreateOauthRequestsModulePayload {
+  clientMutationId?: string | null;
+  /** The `OauthRequestsModule` that was created by this mutation. */
+  oauthRequestsModule?: OauthRequestsModule | null;
+  oauthRequestsModuleEdge?: OauthRequestsModuleEdge | null;
+}
+export type CreateOauthRequestsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  oauthRequestsModule?: {
+    select: OauthRequestsModuleSelect;
+  };
+  oauthRequestsModuleEdge?: {
+    select: OauthRequestsModuleEdgeSelect;
+  };
+};
+export interface UpdateOauthRequestsModulePayload {
+  clientMutationId?: string | null;
+  /** The `OauthRequestsModule` that was updated by this mutation. */
+  oauthRequestsModule?: OauthRequestsModule | null;
+  oauthRequestsModuleEdge?: OauthRequestsModuleEdge | null;
+}
+export type UpdateOauthRequestsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  oauthRequestsModule?: {
+    select: OauthRequestsModuleSelect;
+  };
+  oauthRequestsModuleEdge?: {
+    select: OauthRequestsModuleEdgeSelect;
+  };
+};
+export interface DeleteOauthRequestsModulePayload {
+  clientMutationId?: string | null;
+  /** The `OauthRequestsModule` that was deleted by this mutation. */
+  oauthRequestsModule?: OauthRequestsModule | null;
+  oauthRequestsModuleEdge?: OauthRequestsModuleEdge | null;
+}
+export type DeleteOauthRequestsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  oauthRequestsModule?: {
+    select: OauthRequestsModuleSelect;
+  };
+  oauthRequestsModuleEdge?: {
+    select: OauthRequestsModuleEdgeSelect;
+  };
+};
 export interface CreatePagesModulePayload {
   clientMutationId?: string | null;
   /** The `PagesModule` that was created by this mutation. */
@@ -21538,51 +23201,6 @@ export type DeletePagesModulePayloadSelect = {
   };
   pagesModuleEdge?: {
     select: PagesModuleEdgeSelect;
-  };
-};
-export interface CreatePermissionsModulePayload {
-  clientMutationId?: string | null;
-  /** The `PermissionsModule` that was created by this mutation. */
-  permissionsModule?: PermissionsModule | null;
-  permissionsModuleEdge?: PermissionsModuleEdge | null;
-}
-export type CreatePermissionsModulePayloadSelect = {
-  clientMutationId?: boolean;
-  permissionsModule?: {
-    select: PermissionsModuleSelect;
-  };
-  permissionsModuleEdge?: {
-    select: PermissionsModuleEdgeSelect;
-  };
-};
-export interface UpdatePermissionsModulePayload {
-  clientMutationId?: string | null;
-  /** The `PermissionsModule` that was updated by this mutation. */
-  permissionsModule?: PermissionsModule | null;
-  permissionsModuleEdge?: PermissionsModuleEdge | null;
-}
-export type UpdatePermissionsModulePayloadSelect = {
-  clientMutationId?: boolean;
-  permissionsModule?: {
-    select: PermissionsModuleSelect;
-  };
-  permissionsModuleEdge?: {
-    select: PermissionsModuleEdgeSelect;
-  };
-};
-export interface DeletePermissionsModulePayload {
-  clientMutationId?: string | null;
-  /** The `PermissionsModule` that was deleted by this mutation. */
-  permissionsModule?: PermissionsModule | null;
-  permissionsModuleEdge?: PermissionsModuleEdge | null;
-}
-export type DeletePermissionsModulePayloadSelect = {
-  clientMutationId?: boolean;
-  permissionsModule?: {
-    select: PermissionsModuleSelect;
-  };
-  permissionsModuleEdge?: {
-    select: PermissionsModuleEdgeSelect;
   };
 };
 export interface CreatePhoneNumbersModulePayload {
@@ -22080,6 +23698,51 @@ export type DeleteRouteModulePayloadSelect = {
     select: RouteModuleEdgeSelect;
   };
 };
+export interface CreateScopeTypesModulePayload {
+  clientMutationId?: string | null;
+  /** The `ScopeTypesModule` that was created by this mutation. */
+  scopeTypesModule?: ScopeTypesModule | null;
+  scopeTypesModuleEdge?: ScopeTypesModuleEdge | null;
+}
+export type CreateScopeTypesModulePayloadSelect = {
+  clientMutationId?: boolean;
+  scopeTypesModule?: {
+    select: ScopeTypesModuleSelect;
+  };
+  scopeTypesModuleEdge?: {
+    select: ScopeTypesModuleEdgeSelect;
+  };
+};
+export interface UpdateScopeTypesModulePayload {
+  clientMutationId?: string | null;
+  /** The `ScopeTypesModule` that was updated by this mutation. */
+  scopeTypesModule?: ScopeTypesModule | null;
+  scopeTypesModuleEdge?: ScopeTypesModuleEdge | null;
+}
+export type UpdateScopeTypesModulePayloadSelect = {
+  clientMutationId?: boolean;
+  scopeTypesModule?: {
+    select: ScopeTypesModuleSelect;
+  };
+  scopeTypesModuleEdge?: {
+    select: ScopeTypesModuleEdgeSelect;
+  };
+};
+export interface DeleteScopeTypesModulePayload {
+  clientMutationId?: string | null;
+  /** The `ScopeTypesModule` that was deleted by this mutation. */
+  scopeTypesModule?: ScopeTypesModule | null;
+  scopeTypesModuleEdge?: ScopeTypesModuleEdge | null;
+}
+export type DeleteScopeTypesModulePayloadSelect = {
+  clientMutationId?: boolean;
+  scopeTypesModule?: {
+    select: ScopeTypesModuleSelect;
+  };
+  scopeTypesModuleEdge?: {
+    select: ScopeTypesModuleEdgeSelect;
+  };
+};
 export interface CreateSecureTableProvisionPayload {
   clientMutationId?: string | null;
   /** The `SecureTableProvision` that was created by this mutation. */
@@ -22530,6 +24193,51 @@ export type DeleteUserSettingsModulePayloadSelect = {
     select: UserSettingsModuleEdgeSelect;
   };
 };
+export interface CreateUserSettingsSecurityModulePayload {
+  clientMutationId?: string | null;
+  /** The `UserSettingsSecurityModule` that was created by this mutation. */
+  userSettingsSecurityModule?: UserSettingsSecurityModule | null;
+  userSettingsSecurityModuleEdge?: UserSettingsSecurityModuleEdge | null;
+}
+export type CreateUserSettingsSecurityModulePayloadSelect = {
+  clientMutationId?: boolean;
+  userSettingsSecurityModule?: {
+    select: UserSettingsSecurityModuleSelect;
+  };
+  userSettingsSecurityModuleEdge?: {
+    select: UserSettingsSecurityModuleEdgeSelect;
+  };
+};
+export interface UpdateUserSettingsSecurityModulePayload {
+  clientMutationId?: string | null;
+  /** The `UserSettingsSecurityModule` that was updated by this mutation. */
+  userSettingsSecurityModule?: UserSettingsSecurityModule | null;
+  userSettingsSecurityModuleEdge?: UserSettingsSecurityModuleEdge | null;
+}
+export type UpdateUserSettingsSecurityModulePayloadSelect = {
+  clientMutationId?: boolean;
+  userSettingsSecurityModule?: {
+    select: UserSettingsSecurityModuleSelect;
+  };
+  userSettingsSecurityModuleEdge?: {
+    select: UserSettingsSecurityModuleEdgeSelect;
+  };
+};
+export interface DeleteUserSettingsSecurityModulePayload {
+  clientMutationId?: string | null;
+  /** The `UserSettingsSecurityModule` that was deleted by this mutation. */
+  userSettingsSecurityModule?: UserSettingsSecurityModule | null;
+  userSettingsSecurityModuleEdge?: UserSettingsSecurityModuleEdge | null;
+}
+export type DeleteUserSettingsSecurityModulePayloadSelect = {
+  clientMutationId?: boolean;
+  userSettingsSecurityModule?: {
+    select: UserSettingsSecurityModuleSelect;
+  };
+  userSettingsSecurityModuleEdge?: {
+    select: UserSettingsSecurityModuleEdgeSelect;
+  };
+};
 export interface CreateUserStateModulePayload {
   clientMutationId?: string | null;
   /** The `UserStateModule` that was created by this mutation. */
@@ -22755,26 +24463,6 @@ export type DeleteWebhookModulePayloadSelect = {
     select: WebhookModuleEdgeSelect;
   };
 };
-export interface ProvisionRelationRecord {
-  outFieldId?: string | null;
-  outJunctionTableId?: string | null;
-  outSourceFieldId?: string | null;
-  outTargetFieldId?: string | null;
-}
-export type ProvisionRelationRecordSelect = {
-  outFieldId?: boolean;
-  outJunctionTableId?: boolean;
-  outSourceFieldId?: boolean;
-  outTargetFieldId?: boolean;
-};
-export interface ProvisionTableRecord {
-  outFields?: string[] | null;
-  outTableId?: string | null;
-}
-export type ProvisionTableRecordSelect = {
-  outFields?: boolean;
-  outTableId?: boolean;
-};
 /** A `AgentModule` edge in the connection. */
 export interface AgentModuleEdge {
   cursor?: string | null;
@@ -22871,6 +24559,18 @@ export type BlueprintTemplateEdgeSelect = {
     select: BlueprintTemplateSelect;
   };
 };
+/** A `CapabilitiesModule` edge in the connection. */
+export interface CapabilitiesModuleEdge {
+  cursor?: string | null;
+  /** The `CapabilitiesModule` at the end of the edge. */
+  node?: CapabilitiesModule | null;
+}
+export type CapabilitiesModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: CapabilitiesModuleSelect;
+  };
+};
 /** A `CatalogModule` edge in the connection. */
 export interface CatalogModuleEdge {
   cursor?: string | null;
@@ -22919,6 +24619,18 @@ export type ConnectedAccountsModuleEdgeSelect = {
     select: ConnectedAccountsModuleSelect;
   };
 };
+/** A `ContentPresetModule` edge in the connection. */
+export interface ContentPresetModuleEdge {
+  cursor?: string | null;
+  /** The `ContentPresetModule` at the end of the edge. */
+  node?: ContentPresetModule | null;
+}
+export type ContentPresetModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ContentPresetModuleSelect;
+  };
+};
 /** A `CryptoAddressesModule` edge in the connection. */
 export interface CryptoAddressesModuleEdge {
   cursor?: string | null;
@@ -22941,6 +24653,18 @@ export type CryptoAuthModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: CryptoAuthModuleSelect;
+  };
+};
+/** A `DataCapabilitiesField` edge in the connection. */
+export interface DataCapabilitiesFieldEdge {
+  cursor?: string | null;
+  /** The `DataCapabilitiesField` at the end of the edge. */
+  node?: DataCapabilitiesField | null;
+}
+export type DataCapabilitiesFieldEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DataCapabilitiesFieldSelect;
   };
 };
 /** A `DatabaseProvisionModule` edge in the connection. */
@@ -23063,6 +24787,18 @@ export type DomainModuleEdgeSelect = {
     select: DomainModuleSelect;
   };
 };
+/** A `EmailSenderModule` edge in the connection. */
+export interface EmailSenderModuleEdge {
+  cursor?: string | null;
+  /** The `EmailSenderModule` at the end of the edge. */
+  node?: EmailSenderModule | null;
+}
+export type EmailSenderModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EmailSenderModuleSelect;
+  };
+};
 /** A `EmailsModule` edge in the connection. */
 export interface EmailsModuleEdge {
   cursor?: string | null;
@@ -23097,6 +24833,18 @@ export type EventsModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: EventsModuleSelect;
+  };
+};
+/** A `FileRefField` edge in the connection. */
+export interface FileRefFieldEdge {
+  cursor?: string | null;
+  /** The `FileRefField` at the end of the edge. */
+  node?: FileRefField | null;
+}
+export type FileRefFieldEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: FileRefFieldSelect;
   };
 };
 /** A `FunctionDeploymentModule` edge in the connection. */
@@ -23351,6 +25099,18 @@ export type NotificationsModuleEdgeSelect = {
     select: NotificationsModuleSelect;
   };
 };
+/** A `OauthRequestsModule` edge in the connection. */
+export interface OauthRequestsModuleEdge {
+  cursor?: string | null;
+  /** The `OauthRequestsModule` at the end of the edge. */
+  node?: OauthRequestsModule | null;
+}
+export type OauthRequestsModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: OauthRequestsModuleSelect;
+  };
+};
 /** A `PagesModule` edge in the connection. */
 export interface PagesModuleEdge {
   cursor?: string | null;
@@ -23361,18 +25121,6 @@ export type PagesModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PagesModuleSelect;
-  };
-};
-/** A `PermissionsModule` edge in the connection. */
-export interface PermissionsModuleEdge {
-  cursor?: string | null;
-  /** The `PermissionsModule` at the end of the edge. */
-  node?: PermissionsModule | null;
-}
-export type PermissionsModuleEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: PermissionsModuleSelect;
   };
 };
 /** A `PhoneNumbersModule` edge in the connection. */
@@ -23507,6 +25255,18 @@ export type RouteModuleEdgeSelect = {
     select: RouteModuleSelect;
   };
 };
+/** A `ScopeTypesModule` edge in the connection. */
+export interface ScopeTypesModuleEdge {
+  cursor?: string | null;
+  /** The `ScopeTypesModule` at the end of the edge. */
+  node?: ScopeTypesModule | null;
+}
+export type ScopeTypesModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ScopeTypesModuleSelect;
+  };
+};
 /** A `SecureTableProvision` edge in the connection. */
 export interface SecureTableProvisionEdge {
   cursor?: string | null;
@@ -23625,6 +25385,18 @@ export type UserSettingsModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: UserSettingsModuleSelect;
+  };
+};
+/** A `UserSettingsSecurityModule` edge in the connection. */
+export interface UserSettingsSecurityModuleEdge {
+  cursor?: string | null;
+  /** The `UserSettingsSecurityModule` at the end of the edge. */
+  node?: UserSettingsSecurityModule | null;
+}
+export type UserSettingsSecurityModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: UserSettingsSecurityModuleSelect;
   };
 };
 /** A `UserStateModule` edge in the connection. */

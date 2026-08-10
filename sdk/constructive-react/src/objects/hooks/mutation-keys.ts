@@ -76,14 +76,26 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'insertNodeAtPath', identifier] as const)
       : (['mutation', 'insertNodeAtPath'] as const),
+  /** Mutation key for insertNodesAtPaths */ insertNodesAtPaths: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'insertNodesAtPaths', identifier] as const)
+      : (['mutation', 'insertNodesAtPaths'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
       : (['mutation', 'provisionBucket'] as const),
+  /** Mutation key for setAndCommit */ setAndCommit: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'setAndCommit', identifier] as const)
+      : (['mutation', 'setAndCommit'] as const),
   /** Mutation key for setDataAtPath */ setDataAtPath: (identifier?: string) =>
     identifier
       ? (['mutation', 'setDataAtPath', identifier] as const)
       : (['mutation', 'setDataAtPath'] as const),
+  /** Mutation key for setManyAndCommit */ setManyAndCommit: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'setManyAndCommit', identifier] as const)
+      : (['mutation', 'setManyAndCommit'] as const),
 } as const;
 /**
 

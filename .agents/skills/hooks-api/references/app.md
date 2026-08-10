@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Mobile and native app configuration linked to a site, including store links and identifiers
+App aggregates: thin identity rows whose components are global catalog references
 
 ## Usage
 
 ```typescript
-useAppsQuery({ selection: { fields: { appIdPrefix: true, appImage: true, appStoreId: true, appStoreLink: true, databaseId: true, id: true, name: true, playStoreLink: true, siteId: true } } })
-useAppQuery({ id: '<UUID>', selection: { fields: { appIdPrefix: true, appImage: true, appStoreId: true, appStoreLink: true, databaseId: true, id: true, name: true, playStoreLink: true, siteId: true } } })
+useAppsQuery({ selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, status: true, title: true, updatedAt: true } } })
+useAppQuery({ id: '<UUID>', selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, status: true, title: true, updatedAt: true } } })
 useCreateAppMutation({ selection: { fields: { id: true } } })
 useUpdateAppMutation({ selection: { fields: { id: true } } })
 useDeleteAppMutation({})
@@ -20,7 +20,7 @@ useDeleteAppMutation({})
 
 ```typescript
 const { data, isLoading } = useAppsQuery({
-  selection: { fields: { appIdPrefix: true, appImage: true, appStoreId: true, appStoreLink: true, databaseId: true, id: true, name: true, playStoreLink: true, siteId: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, status: true, title: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppsQuery({
 const { mutate } = useCreateAppMutation({
   selection: { fields: { id: true } },
 });
-mutate({ appIdPrefix: '<String>', appImage: '<Image>', appStoreId: '<String>', appStoreLink: '<Url>', databaseId: '<UUID>', name: '<String>', playStoreLink: '<Url>', siteId: '<UUID>' });
+mutate({ config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPublished: '<Boolean>', name: '<String>', status: '<String>', title: '<String>' });
 ```

@@ -13,12 +13,15 @@ import { BillingProviderModuleModel } from './models/billingProviderModule';
 import { BlueprintModel } from './models/blueprint';
 import { BlueprintConstructionModel } from './models/blueprintConstruction';
 import { BlueprintTemplateModel } from './models/blueprintTemplate';
+import { CapabilitiesModuleModel } from './models/capabilitiesModule';
 import { CatalogModuleModel } from './models/catalogModule';
 import { ComputeLogModuleModel } from './models/computeLogModule';
 import { ConfigSecretsUserModuleModel } from './models/configSecretsUserModule';
 import { ConnectedAccountsModuleModel } from './models/connectedAccountsModule';
+import { ContentPresetModuleModel } from './models/contentPresetModule';
 import { CryptoAddressesModuleModel } from './models/cryptoAddressesModule';
 import { CryptoAuthModuleModel } from './models/cryptoAuthModule';
+import { DataCapabilitiesFieldModel } from './models/dataCapabilitiesField';
 import { DatabaseProvisionModuleModel } from './models/databaseProvisionModule';
 import { DatabaseSettingsModuleModel } from './models/databaseSettingsModule';
 import { DbPoolConfigModel } from './models/dbPoolConfig';
@@ -29,9 +32,11 @@ import { DefaultIdsModuleModel } from './models/defaultIdsModule';
 import { DenormalizedTableFieldModel } from './models/denormalizedTableField';
 import { DevicesModuleModel } from './models/devicesModule';
 import { DomainModuleModel } from './models/domainModule';
+import { EmailSenderModuleModel } from './models/emailSenderModule';
 import { EmailsModuleModel } from './models/emailsModule';
 import { EntityTypeProvisionModel } from './models/entityTypeProvision';
 import { EventsModuleModel } from './models/eventsModule';
+import { FileRefFieldModel } from './models/fileRefField';
 import { FunctionDeploymentModuleModel } from './models/functionDeploymentModule';
 import { FunctionInvocationModuleModel } from './models/functionInvocationModule';
 import { FunctionModuleModel } from './models/functionModule';
@@ -53,8 +58,8 @@ import { MembershipsModuleModel } from './models/membershipsModule';
 import { MerkleStoreModuleModel } from './models/merkleStoreModule';
 import { NamespaceModuleModel } from './models/namespaceModule';
 import { NotificationsModuleModel } from './models/notificationsModule';
+import { OauthRequestsModuleModel } from './models/oauthRequestsModule';
 import { PagesModuleModel } from './models/pagesModule';
-import { PermissionsModuleModel } from './models/permissionsModule';
 import { PhoneNumbersModuleModel } from './models/phoneNumbersModule';
 import { PlansModuleModel } from './models/plansModule';
 import { PrincipalAuthModuleModel } from './models/principalAuthModule';
@@ -66,6 +71,7 @@ import { RelationProvisionModel } from './models/relationProvision';
 import { ResourceModuleModel } from './models/resourceModule';
 import { RlsModuleModel } from './models/rlsModule';
 import { RouteModuleModel } from './models/routeModule';
+import { ScopeTypesModuleModel } from './models/scopeTypesModule';
 import { SecureTableProvisionModel } from './models/secureTableProvision';
 import { SessionSecretsModuleModel } from './models/sessionSecretsModule';
 import { SessionsModuleModel } from './models/sessionsModule';
@@ -76,19 +82,18 @@ import { TransferLogModuleModel } from './models/transferLogModule';
 import { UserAuthModuleModel } from './models/userAuthModule';
 import { UserCredentialsModuleModel } from './models/userCredentialsModule';
 import { UserSettingsModuleModel } from './models/userSettingsModule';
+import { UserSettingsSecurityModuleModel } from './models/userSettingsSecurityModule';
 import { UserStateModuleModel } from './models/userStateModule';
 import { UsersModuleModel } from './models/usersModule';
 import { WebauthnAuthModuleModel } from './models/webauthnAuthModule';
 import { WebauthnCredentialsModuleModel } from './models/webauthnCredentialsModule';
 import { WebhookModuleModel } from './models/webhookModule';
-import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';
-export { createQueryOperations } from './query';
 export { createMutationOperations } from './mutation';
 /**
  * Create an ORM client instance
@@ -124,12 +129,15 @@ export function createClient(config: OrmClientConfig) {
     blueprint: new BlueprintModel(client),
     blueprintConstruction: new BlueprintConstructionModel(client),
     blueprintTemplate: new BlueprintTemplateModel(client),
+    capabilitiesModule: new CapabilitiesModuleModel(client),
     catalogModule: new CatalogModuleModel(client),
     computeLogModule: new ComputeLogModuleModel(client),
     configSecretsUserModule: new ConfigSecretsUserModuleModel(client),
     connectedAccountsModule: new ConnectedAccountsModuleModel(client),
+    contentPresetModule: new ContentPresetModuleModel(client),
     cryptoAddressesModule: new CryptoAddressesModuleModel(client),
     cryptoAuthModule: new CryptoAuthModuleModel(client),
+    dataCapabilitiesField: new DataCapabilitiesFieldModel(client),
     databaseProvisionModule: new DatabaseProvisionModuleModel(client),
     databaseSettingsModule: new DatabaseSettingsModuleModel(client),
     dbPoolConfig: new DbPoolConfigModel(client),
@@ -140,9 +148,11 @@ export function createClient(config: OrmClientConfig) {
     denormalizedTableField: new DenormalizedTableFieldModel(client),
     devicesModule: new DevicesModuleModel(client),
     domainModule: new DomainModuleModel(client),
+    emailSenderModule: new EmailSenderModuleModel(client),
     emailsModule: new EmailsModuleModel(client),
     entityTypeProvision: new EntityTypeProvisionModel(client),
     eventsModule: new EventsModuleModel(client),
+    fileRefField: new FileRefFieldModel(client),
     functionDeploymentModule: new FunctionDeploymentModuleModel(client),
     functionInvocationModule: new FunctionInvocationModuleModel(client),
     functionModule: new FunctionModuleModel(client),
@@ -164,8 +174,8 @@ export function createClient(config: OrmClientConfig) {
     merkleStoreModule: new MerkleStoreModuleModel(client),
     namespaceModule: new NamespaceModuleModel(client),
     notificationsModule: new NotificationsModuleModel(client),
+    oauthRequestsModule: new OauthRequestsModuleModel(client),
     pagesModule: new PagesModuleModel(client),
-    permissionsModule: new PermissionsModuleModel(client),
     phoneNumbersModule: new PhoneNumbersModuleModel(client),
     plansModule: new PlansModuleModel(client),
     principalAuthModule: new PrincipalAuthModuleModel(client),
@@ -177,6 +187,7 @@ export function createClient(config: OrmClientConfig) {
     resourceModule: new ResourceModuleModel(client),
     rlsModule: new RlsModuleModel(client),
     routeModule: new RouteModuleModel(client),
+    scopeTypesModule: new ScopeTypesModuleModel(client),
     secureTableProvision: new SecureTableProvisionModel(client),
     sessionSecretsModule: new SessionSecretsModuleModel(client),
     sessionsModule: new SessionsModuleModel(client),
@@ -187,12 +198,12 @@ export function createClient(config: OrmClientConfig) {
     userAuthModule: new UserAuthModuleModel(client),
     userCredentialsModule: new UserCredentialsModuleModel(client),
     userSettingsModule: new UserSettingsModuleModel(client),
+    userSettingsSecurityModule: new UserSettingsSecurityModuleModel(client),
     userStateModule: new UserStateModuleModel(client),
     usersModule: new UsersModuleModel(client),
     webauthnAuthModule: new WebauthnAuthModuleModel(client),
     webauthnCredentialsModule: new WebauthnCredentialsModuleModel(client),
     webhookModule: new WebhookModuleModel(client),
-    query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };
 }

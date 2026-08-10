@@ -5,10 +5,11 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { ApiModel } from './models/api';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiSettingModel } from './models/apiSetting';
-import { ApisModel } from './models/apis';
-import { AstMigrationModel } from './models/astMigration';
+import { AppComponentModel } from './models/appComponent';
+import { AppModel } from './models/app';
 import { CheckConstraintModel } from './models/checkConstraint';
 import { CompositeTypeModel } from './models/compositeType';
 import { CorsSettingModel } from './models/corsSetting';
@@ -21,6 +22,9 @@ import { DomainModel } from './models/domain';
 import { DomainEventModel } from './models/domainEvent';
 import { DomainTypeModel } from './models/domainType';
 import { DomainVerificationModel } from './models/domainVerification';
+import { EmailIdentityModel } from './models/emailIdentity';
+import { EmailProviderAccountModel } from './models/emailProviderAccount';
+import { EmailSiteIdentityModel } from './models/emailSiteIdentity';
 import { EmbeddingChunkModel } from './models/embeddingChunk';
 import { EnumModel } from './models/enum';
 import { ExclusionConstraintModel } from './models/exclusionConstraint';
@@ -37,13 +41,16 @@ import { ManagedDomainModel } from './models/managedDomain';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { PageModel } from './models/page';
 import { PartitionModel } from './models/partition';
+import { PlatformApiModel } from './models/platformApi';
 import { PlatformApiSchemaModel } from './models/platformApiSchema';
 import { PlatformApiSettingModel } from './models/platformApiSetting';
-import { PlatformApisModel } from './models/platformApis';
 import { PlatformCorsSettingModel } from './models/platformCorsSetting';
 import { PlatformDomainModel } from './models/platformDomain';
 import { PlatformDomainEventModel } from './models/platformDomainEvent';
 import { PlatformDomainVerificationModel } from './models/platformDomainVerification';
+import { PlatformEmailIdentityModel } from './models/platformEmailIdentity';
+import { PlatformEmailProviderAccountModel } from './models/platformEmailProviderAccount';
+import { PlatformEmailSiteIdentityModel } from './models/platformEmailSiteIdentity';
 import { PlatformManagedDomainModel } from './models/platformManagedDomain';
 import { PlatformPageModel } from './models/platformPage';
 import { PlatformSiteAppLinkModel } from './models/platformSiteAppLink';
@@ -71,7 +78,6 @@ import { SiteModuleModel } from './models/siteModule';
 import { SiteThemeModel } from './models/siteTheme';
 import { SiteWebConfigModel } from './models/siteWebConfig';
 import { SpatialRelationModel } from './models/spatialRelation';
-import { SqlActionModel } from './models/sqlAction';
 import { TableBehaviorModel } from './models/tableBehavior';
 import { TableModel } from './models/table';
 import { TableGrantModel } from './models/tableGrant';
@@ -120,10 +126,11 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    api: new ApiModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiSetting: new ApiSettingModel(client),
-    apis: new ApisModel(client),
-    astMigration: new AstMigrationModel(client),
+    appComponent: new AppComponentModel(client),
+    app: new AppModel(client),
     checkConstraint: new CheckConstraintModel(client),
     compositeType: new CompositeTypeModel(client),
     corsSetting: new CorsSettingModel(client),
@@ -136,6 +143,9 @@ export function createClient(config: OrmClientConfig) {
     domainEvent: new DomainEventModel(client),
     domainType: new DomainTypeModel(client),
     domainVerification: new DomainVerificationModel(client),
+    emailIdentity: new EmailIdentityModel(client),
+    emailProviderAccount: new EmailProviderAccountModel(client),
+    emailSiteIdentity: new EmailSiteIdentityModel(client),
     embeddingChunk: new EmbeddingChunkModel(client),
     enum: new EnumModel(client),
     exclusionConstraint: new ExclusionConstraintModel(client),
@@ -152,13 +162,16 @@ export function createClient(config: OrmClientConfig) {
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
     page: new PageModel(client),
     partition: new PartitionModel(client),
+    platformApi: new PlatformApiModel(client),
     platformApiSchema: new PlatformApiSchemaModel(client),
     platformApiSetting: new PlatformApiSettingModel(client),
-    platformApis: new PlatformApisModel(client),
     platformCorsSetting: new PlatformCorsSettingModel(client),
     platformDomain: new PlatformDomainModel(client),
     platformDomainEvent: new PlatformDomainEventModel(client),
     platformDomainVerification: new PlatformDomainVerificationModel(client),
+    platformEmailIdentity: new PlatformEmailIdentityModel(client),
+    platformEmailProviderAccount: new PlatformEmailProviderAccountModel(client),
+    platformEmailSiteIdentity: new PlatformEmailSiteIdentityModel(client),
     platformManagedDomain: new PlatformManagedDomainModel(client),
     platformPage: new PlatformPageModel(client),
     platformSiteAppLink: new PlatformSiteAppLinkModel(client),
@@ -186,7 +199,6 @@ export function createClient(config: OrmClientConfig) {
     siteTheme: new SiteThemeModel(client),
     siteWebConfig: new SiteWebConfigModel(client),
     spatialRelation: new SpatialRelationModel(client),
-    sqlAction: new SqlActionModel(client),
     tableBehavior: new TableBehaviorModel(client),
     table: new TableModel(client),
     tableGrant: new TableGrantModel(client),

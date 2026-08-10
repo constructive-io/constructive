@@ -2,15 +2,15 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Mobile and native app configuration linked to a site, including store links and identifiers
+App aggregates: thin identity rows whose components are global catalog references
 
 ## Usage
 
 ```typescript
 db.app.findMany({ select: { id: true } }).execute()
 db.app.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.app.create({ data: { appIdPrefix: '<String>', appImage: '<Image>', appStoreId: '<String>', appStoreLink: '<Url>', databaseId: '<UUID>', name: '<String>', playStoreLink: '<Url>', siteId: '<UUID>' }, select: { id: true } }).execute()
-db.app.update({ where: { id: '<UUID>' }, data: { appIdPrefix: '<String>' }, select: { id: true } }).execute()
+db.app.create({ data: { config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPublished: '<Boolean>', name: '<String>', status: '<String>', title: '<String>' }, select: { id: true } }).execute()
+db.app.update({ where: { id: '<UUID>' }, data: { config: '<JSON>' }, select: { id: true } }).execute()
 db.app.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.app.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.app.findMany({
-  select: { id: true, appIdPrefix: true }
+  select: { id: true, config: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.app.findMany({
 
 ```typescript
 const item = await db.app.create({
-  data: { appIdPrefix: '<String>', appImage: '<Image>', appStoreId: '<String>', appStoreLink: '<Url>', databaseId: '<UUID>', name: '<String>', playStoreLink: '<Url>', siteId: '<UUID>' },
+  data: { config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPublished: '<Boolean>', name: '<String>', status: '<String>', title: '<String>' },
   select: { id: true }
 }).execute();
 ```
