@@ -176,6 +176,7 @@ export class GraphQLClient {
     if (condition && Object.keys(condition).length > 0) {
       const filterParts = Object.entries(condition)
         .map(([k, v]) => {
+          if (Array.isArray(v)) return `${k}: { in: [${v.map((item) => `"${item}"`).join(', ')}] }`;
           if (typeof v === 'string') return `${k}: { equalTo: "${v}" }`;
           if (typeof v === 'boolean') return `${k}: { equalTo: ${v} }`;
           if (typeof v === 'number') return `${k}: { equalTo: ${v} }`;

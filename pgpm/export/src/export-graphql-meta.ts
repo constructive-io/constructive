@@ -144,6 +144,23 @@ export const exportGraphQLMeta = async ({
   database_id
 }: ExportGraphQLMetaParams): Promise<ExportGraphQLMetaResult> => {
   const sql: Record<string, string> = {};
+  // Raw rows per key (post GraphQL→Postgres conversion), kept for derived
+  // projections (see catalog plane derivation below).
+  const rawRows: Record<string, Record<string, unknown>[]> = {};
+
+  // Binding tables (hostname_bindings, route_bindings) carry no database_id;
+  // tenant ownership flows through domain_id → routing_public.domains. Fetch
+  // the tenant's domain ids once so those keys can be filtered by
+  // domainId IN (...).
+  let domainIds: string[] = [];
+  if (META_TABLE_ORDER.some((k) => META_TABLE_CONFIG[k]?.filterViaDomainIds)) {
+    const domainRows = await client.fetchAllNodes<{ id: string }>(
+      getGraphQLQueryName('domains'),
+      'id',
+      { databaseId: database_id }
+    );
+    domainIds = domainRows.map((r) => r.id);
+  }
 
   const queryAndParse = async (key: string) => {
     const tableConfig = META_TABLE_CONFIG[key];
@@ -152,8 +169,7 @@ export const exportGraphQLMeta = async ({
     // Schema-qualified manifest keys (e.g. catalog_private.apis)
     // mark tables whose name collides with a table in another plane. GraphQL
     // type/query names are derived from the bare table name, so these cannot
-    // be addressed unambiguously through the meta API — only the SQL flow
-    // exports them.
+    // be addressed unambiguously through the meta API in a mixed build.
     if (key.includes('.')) return;
 
     // Build fields dynamically: either from hardcoded config or via introspection
@@ -167,7 +183,9 @@ export const exportGraphQLMeta = async ({
     // The 'database' table is fetched by id, not by database_id
     const condition = key === 'database'
       ? { id: database_id }
-      : { databaseId: database_id };
+      : tableConfig.filterViaDomainIds
+        ? { domainId: domainIds }
+        : { databaseId: database_id };
 
     try {
       const rows = await client.fetchAllNodes(
@@ -225,6 +243,8 @@ export const exportGraphQLMeta = async ({
 
         if (Object.keys(dynamicFields).length === 0) return;
 
+        rawRows[key] = pgRows;
+
         // Omit columnDefaults columns from row data so the Parser never sees them.
         // configFields already excludes them (via buildDynamicFieldsFromGraphQL),
         // so dynamicFields won't contain them either — but the pgRow data still does.
@@ -277,6 +297,49 @@ export const exportGraphQLMeta = async ({
   }
   for (const keys of keysBySchema.values()) {
     await Promise.all(keys.map(key => queryAndParse(key)));
+  }
+
+  // Catalog plane projection: catalog_private.apis is trigger-derived from
+  // routing_public.apis by catalog_private.tg_apis_catalog_sync(). During
+  // migration replay the sync trigger is skipped (session_replication_role),
+  // and the catalog tables can't be queried through the meta API (bare-name
+  // collisions with routing_public) — so the projection is materialized here,
+  // mirroring the trigger mapping 1:1. resolve_route() needs these rows to
+  // build resolved_config for api targets.
+  const apisRows = rawRows['apis'];
+  if (sql['apis'] && apisRows?.length) {
+    const projected = apisRows.map((r) => ({
+      id: r.id,
+      owner_scope: 'database',
+      owner_key: r.database_id,
+      is_visible: r.is_published ?? false,
+      database_id: r.database_id,
+      name: r.name,
+      dbname: r.dbname,
+      role_name: r.role_name,
+      anon_role: r.anon_role,
+      config: r.config ?? null
+    }));
+    const parser = new Parser({
+      schema: 'catalog_private',
+      table: 'apis',
+      fields: {
+        id: 'uuid',
+        owner_scope: 'text',
+        owner_key: 'uuid',
+        is_visible: 'boolean',
+        database_id: 'uuid',
+        name: 'text',
+        dbname: 'text',
+        role_name: 'text',
+        anon_role: 'text',
+        config: 'jsonb'
+      }
+    });
+    const parsed = await parser.parse(projected);
+    if (parsed) {
+      sql['catalog_private.apis'] = parsed;
+    }
   }
 
   return sql;
