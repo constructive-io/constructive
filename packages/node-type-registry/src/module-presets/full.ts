@@ -38,13 +38,13 @@ export const PresetFull: ModulePreset = {
     'users_module',
     'membership_types_module',
     // App-level (membership_type = 1)
-    ['permissions_module', { scope: 'app' }],
+    ['capabilities_module', { scope: 'app' }],
     ['limits_module', { scope: 'app' }],
     ['memberships_module', { scope: 'app' }],
     ['events_module', { scope: 'app' }],
     ['profiles_module', { scope: 'app' }],
     // Org-level (membership_type = 2)
-    ['permissions_module', { scope: 'org' }],
+    ['capabilities_module', { scope: 'org' }],
     ['limits_module', { scope: 'org' }],
     ['memberships_module', { scope: 'org' }],
     ['events_module', { scope: 'org' }],
@@ -72,6 +72,7 @@ export const PresetFull: ModulePreset = {
     'webauthn_credentials_module',
     // User settings + notifications (user_settings_module must precede notifications_module)
     'user_settings_module',
+    'user_settings_security_module',
     'notifications_module',
     // Connected accounts
     'connected_accounts_module',
@@ -87,7 +88,7 @@ export const PresetFull: ModulePreset = {
     ['storage_module', { scope: 'app', has_versioning: true, has_content_hash: true, has_custom_keys: true, has_audit_log: true }],
     // Infrastructure (functions, namespaces)
     ['namespace_module', { scope: 'app' }],
-    ['function_module', { scope: 'app' }]
+    ['function_module', { scope: 'app' }],
   ],
   extends: ['b2b:storage']
 };

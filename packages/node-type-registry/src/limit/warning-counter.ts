@@ -13,26 +13,26 @@ export const LimitWarningCounter: NodeTypeDefinition = {
       limit_name: {
         type: 'string',
         description:
-          'Name of the limit to watch (must match a limit_warnings.name entry, e.g. "projects", "members")'
+          'Name of the limit to watch (must match a limit_warnings.name entry, e.g. "projects", "members")',
       },
       scope: {
         type: 'string',
         description:
           'Membership type prefix that determines which limits_module row to use. Resolved dynamically via memberships_module — supports any provisioned type (e.g. "app", "org", "data_room", "channel", "team").',
-        default: 'app'
+        default: 'app',
       },
       actor_field: {
         type: 'string',
         format: 'column-ref',
         description:
           'Column on the target table that holds the actor id for limit lookup',
-        default: 'owner_id'
+        default: 'owner_id',
       },
       entity_field: {
         type: 'string',
         format: 'column-ref',
         description:
-          'Column on the target table that holds (or references) the entity id. When provided, entity_id is included in the job payload and dedup state. For FK lookups (e.g., channel_id → channels.entity_id), combine with entity_lookup.'
+          'Column on the target table that holds (or references) the entity id. When provided, entity_id is included in the job payload and dedup state. For FK lookups (e.g., channel_id → channels.entity_id), combine with entity_lookup.',
       },
       entity_lookup: {
         type: 'object',
@@ -42,23 +42,23 @@ export const LimitWarningCounter: NodeTypeDefinition = {
           obj_table: {
             type: 'string',
             description:
-              'Name of the related table to look up entity_id from (e.g., "channels"). Required.'
+              'Name of the related table to look up entity_id from (e.g., "channels"). Required.',
           },
           obj_schema: {
             type: 'string',
             description:
-              'Schema of the related table (user-facing name, e.g., "public"). Optional — if omitted, resolved by table name within the same database_id (raises error if ambiguous).'
+              'Schema of the related table (user-facing name, e.g., "public"). Optional — if omitted, resolved by table name within the same database_id (raises error if ambiguous).',
           },
           obj_field: {
             type: 'string',
             description:
-              'Column on the related table that holds the entity_id (e.g., "entity_id"). Required.'
-          }
+              'Column on the related table that holds the entity_id (e.g., "entity_id"). Required.',
+          },
         },
-        required: ['obj_table', 'obj_field']
-      }
+        required: ['obj_table', 'obj_field'],
+      },
     },
-    required: ['limit_name']
+    required: ['limit_name'],
   },
-  tags: ['limits', 'triggers', 'warning', 'notifications']
+  tags: ['limits', 'triggers', 'warning', 'notifications'],
 };

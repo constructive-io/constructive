@@ -15,10 +15,10 @@ export const CheckNotEqual: NodeTypeDefinition = {
         items: { type: 'string', format: 'column-ref' },
         description: 'Two columns that must not be equal',
         minItems: 2,
-        maxItems: 2
-      }
+        maxItems: 2,
+      },
     },
-    required: ['columns']
+    required: ['columns'],
   },
-  tags: ['check', 'constraint', 'validation', 'inequality']
+  tags: ['check', 'constraint', 'validation', 'inequality'],
 };

@@ -5,7 +5,7 @@ import type { ModulePreset } from './types';
  * and magic-link / OTP infrastructure all installed. Production-ready
  * consumer auth with the full identifier matrix.
  *
- * Still single-tenant (no orgs / teams / invites / permissions). For
+ * Still single-tenant (no orgs / teams / invites / capabilities). For
  * multi-tenant B2B, step up to `b2b`.
  */
 export const PresetAuthHardened: ModulePreset = {
@@ -28,12 +28,12 @@ export const PresetAuthHardened: ModulePreset = {
   ],
   not_for: [
     'Hobby projects / demos — way too much infrastructure; use `auth:email`',
-    'Multi-tenant B2B apps — use `b2b`, which layers orgs + invites + permissions on top'
+    'Multi-tenant B2B apps — use `b2b`, which layers orgs + invites + capabilities on top'
   ],
   modules: [
     'users_module',
     'membership_types_module',
-    ['permissions_module', { scope: 'app' }],
+    ['capabilities_module', { scope: 'app' }],
     ['limits_module', { scope: 'app' }],
     ['levels_module', { scope: 'app' }],
     ['memberships_module', { scope: 'app' }],
@@ -51,7 +51,8 @@ export const PresetAuthHardened: ModulePreset = {
     'webauthn_credentials_module',
     'webauthn_auth_module',
     'phone_numbers_module',
-    'devices_module'
+    'devices_module',
+    'user_settings_security_module'
   ],
   extends: ['auth:email', 'auth:email+magic', 'auth:sso', 'auth:passkey']
 };

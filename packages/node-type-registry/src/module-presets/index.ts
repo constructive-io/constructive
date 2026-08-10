@@ -4,10 +4,14 @@ export type {
   BillingModuleOptions,
   CatalogModuleOptions,
   DefaultMeterCatalogEntry,
+  EventsModuleOptions,
+  LimitDefault,
+  LimitsModuleOptions,
   MerkleStoreModuleOptions,
   ModuleEntry,
   ModulePreset,
-  StorageModuleOptions
+  StorageModuleOptions,
+  TrustLadderRung,
 } from './types';
 
 import { getModuleType } from '../module-types';
@@ -31,7 +35,7 @@ export {
   PresetB2b,
   PresetB2bStorage,
   PresetFull,
-  PresetMinimal
+  PresetMinimal,
 };
 
 /**
@@ -47,7 +51,7 @@ export const allModulePresets: ModulePreset[] = [
   PresetAuthHardened,
   PresetB2b,
   PresetB2bStorage,
-  PresetFull
+  PresetFull,
 ];
 
 /** Look up a preset by name. Returns undefined if the name isn't known. */
@@ -61,11 +65,11 @@ function moduleName(entry: ModulePreset['modules'][number]): string {
 
 export function resolvePresetModules(
   preset: ModulePreset,
-  options: { includeInternal?: boolean } = {}
+  options: { includeInternal?: boolean } = {},
 ): ModulePreset['modules'] {
   if (options.includeInternal) return preset.modules;
   return preset.modules.filter(
-    (entry) => !getModuleType(moduleName(entry))?.internal
+    (entry) => !getModuleType(moduleName(entry))?.internal,
   );
 }
 
@@ -73,7 +77,7 @@ export const publicModulePresets: ModulePreset[] = allModulePresets
   .filter((preset) => !preset.internal)
   .map((preset) => ({
     ...preset,
-    modules: resolvePresetModules(preset)
+    modules: resolvePresetModules(preset),
   }));
 
 export function getPublicModulePreset(name: string): ModulePreset | undefined {

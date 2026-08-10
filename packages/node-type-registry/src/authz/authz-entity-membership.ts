@@ -27,16 +27,27 @@ export const AuthzEntityMembership: NodeTypeDefinition = {
         type: 'string',
         description: "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability."
       },
-      permission: {
-        type: 'string',
-        description: 'Single permission name to check (resolved to bitstring mask)'
-      },
-      permissions: {
+      levels: {
         type: 'array',
         items: {
-          type: 'string'
+          type: 'string',
         },
-        description: 'Multiple permission names to check (ORed together into mask)'
+        description:
+          'Achievement level names to require (kind=level catalog rows, merged into the same mask)',
+      },
+      capabilities: {
+        type: 'array',
+        items: {
+          type: 'string',
+        },
+        description:
+          'Capability names of any kind (capability, level, ...) merged into the same mask',
+      },
+      mask_column: {
+        type: 'string',
+        format: 'column-ref',
+        description:
+          'Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. Narrows access row by row without joining a grant table; a zero mask requires nothing. Composes with capability/capabilities — both are ANDed.',
       },
       is_admin: {
         type: 'boolean',

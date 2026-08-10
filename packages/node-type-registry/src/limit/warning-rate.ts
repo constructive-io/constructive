@@ -13,20 +13,20 @@ export const LimitWarningRate: NodeTypeDefinition = {
       meter_slug: {
         type: 'string',
         description:
-          'Slug of the billing meter to check rate limits against (must match a meters table entry)'
+          'Slug of the billing meter to check rate limits against (must match a meters table entry)',
       },
       scope: {
         type: 'string',
         description:
           'Membership type prefix that determines which limits_module row to use for warnings and warning_state tables. Resolved dynamically via memberships_module — supports any provisioned type (e.g. "app", "org", "data_room", "channel", "team").',
-        default: 'app'
+        default: 'app',
       },
       entity_field: {
         type: 'string',
         format: 'column-ref',
         description:
           'Column on the target table that holds (or references) the entity id for rate limit lookup. For direct entity_id columns, just set this field. For FK lookups (e.g., channel_id → channels.entity_id), combine with entity_lookup.',
-        default: 'entity_id'
+        default: 'entity_id',
       },
       entity_lookup: {
         type: 'object',
@@ -36,30 +36,30 @@ export const LimitWarningRate: NodeTypeDefinition = {
           obj_table: {
             type: 'string',
             description:
-              'Name of the related table to look up entity_id from (e.g., "channels"). Required.'
+              'Name of the related table to look up entity_id from (e.g., "channels"). Required.',
           },
           obj_schema: {
             type: 'string',
             description:
-              'Schema of the related table (user-facing name, e.g., "public"). Optional — if omitted, resolved by table name within the same database_id (raises error if ambiguous).'
+              'Schema of the related table (user-facing name, e.g., "public"). Optional — if omitted, resolved by table name within the same database_id (raises error if ambiguous).',
           },
           obj_field: {
             type: 'string',
             description:
-              'Column on the related table that holds the entity_id (e.g., "entity_id"). Required.'
-          }
+              'Column on the related table that holds the entity_id (e.g., "entity_id"). Required.',
+          },
         },
-        required: ['obj_table', 'obj_field']
+        required: ['obj_table', 'obj_field'],
       },
       actor_field: {
         type: 'string',
         format: 'column-ref',
         description:
           'Column on the target table that holds the actor id for rate limit lookup',
-        default: 'owner_id'
-      }
+        default: 'owner_id',
+      },
     },
-    required: ['meter_slug']
+    required: ['meter_slug'],
   },
-  tags: ['rate-limits', 'triggers', 'warning', 'notifications', 'metering']
+  tags: ['rate-limits', 'triggers', 'warning', 'notifications', 'metering'],
 };

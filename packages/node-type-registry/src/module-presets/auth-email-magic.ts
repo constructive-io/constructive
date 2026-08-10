@@ -28,16 +28,16 @@ export const PresetAuthEmailMagic: ModulePreset = {
   good_for: [
     'Consumer apps that want passwordless from day one',
     'Apps targeting users who forget passwords (newsletters, one-off tools)',
-    'Hardening path from `auth:email` without jumping all the way to `auth:hardened`'
+    'Hardening path from `auth:email` without jumping all the way to `auth:hardened`',
   ],
   not_for: [
     'Apps that need SSO or passkeys — use `auth:sso` or `auth:passkey`',
-    'Production at scale — use `auth:hardened` for rate limiting'
+    'Production at scale — use `auth:hardened` for rate limiting',
   ],
   modules: [
     'users_module',
     'membership_types_module',
-    ['permissions_module', { scope: 'app' }],
+    ['capabilities_module', { scope: 'app' }],
     ['limits_module', { scope: 'app' }],
     ['levels_module', { scope: 'app' }],
     ['memberships_module', { scope: 'app' }],
@@ -48,7 +48,7 @@ export const PresetAuthEmailMagic: ModulePreset = {
     'emails_module',
     'rls_module',
     'user_auth_module',
-    'session_secrets_module'
+    'session_secrets_module',
   ],
-  extends: ['auth:email']
+  extends: ['auth:email'],
 };

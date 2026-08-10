@@ -13,15 +13,15 @@ export const CheckOneOf: NodeTypeDefinition = {
       column: {
         type: 'string',
         format: 'column-ref',
-        description: 'Column to validate against the allowed values'
+        description: 'Column to validate against the allowed values',
       },
       values: {
         type: 'array',
         items: { type: 'string' },
-        description: 'Array of allowed values for the column'
-      }
+        description: 'Array of allowed values for the column',
+      },
     },
-    required: ['column', 'values']
+    required: ['column', 'values'],
   },
-  tags: ['check', 'constraint', 'validation', 'enum']
+  tags: ['check', 'constraint', 'validation', 'enum'],
 };

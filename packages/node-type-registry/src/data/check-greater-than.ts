@@ -13,21 +13,21 @@ export const CheckGreaterThan: NodeTypeDefinition = {
       column: {
         type: 'string',
         format: 'column-ref',
-        description: 'Single column to compare against value (mutually exclusive with columns)'
+        description: 'Single column to compare against value (mutually exclusive with columns)',
       },
       value: {
         type: 'number',
         description: 'Threshold value for single-column comparison (column > value)',
-        default: 0
+        default: 0,
       },
       columns: {
         type: 'array',
         items: { type: 'string', format: 'column-ref' },
         description: 'Two columns for cross-column comparison (columns[0] > columns[1])',
         minItems: 2,
-        maxItems: 2
-      }
-    }
+        maxItems: 2,
+      },
+    },
   },
-  tags: ['check', 'constraint', 'validation', 'comparison']
+  tags: ['check', 'constraint', 'validation', 'comparison'],
 };

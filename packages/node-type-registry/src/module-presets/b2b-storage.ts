@@ -14,9 +14,9 @@ import type { ModulePreset } from './types';
 export const PresetB2bStorage: ModulePreset = {
   name: 'b2b:storage',
   display_name: 'B2B SaaS + File Storage',
-  summary: '`b2b` + file upload infrastructure (buckets, files, RLS).',
+  summary: 'Orgs + invites + capabilities + file upload infrastructure (buckets, files, RLS).',
   description:
-    'Everything in `b2b` (auth:hardened + orgs + invites + permissions + levels + profiles + ' +
+    'Everything in `b2b` (auth:hardened + orgs + invites + capabilities + levels + profiles + ' +
     'hierarchy), plus `storage_module` for file uploads. The storage module creates ' +
     '`app_buckets` and `app_files` tables with full RLS: AuthzPublishable for public reads, ' +
     'AuthzAppMembership for member access, AuthzDirectOwner for uploader-only modify/delete. ' +
@@ -35,8 +35,8 @@ export const PresetB2bStorage: ModulePreset = {
   modules: [
     'users_module',
     'membership_types_module',
-    ['permissions_module', { scope: 'app' }],
-    ['permissions_module', { scope: 'org' }],
+    ['capabilities_module', { scope: 'app' }],
+    ['capabilities_module', { scope: 'org' }],
     ['limits_module', { scope: 'app' }],
     ['limits_module', { scope: 'org' }],
     ['levels_module', { scope: 'app' }],
@@ -54,6 +54,11 @@ export const PresetB2bStorage: ModulePreset = {
     'rate_limits_module',
     'connected_accounts_module',
     ['identity_providers_module', { scope: 'app' }],
+    // The leg between the two above: while the browser is at the provider, the
+    // database holds the state it must echo back with the PKCE verifier that
+    // belongs to it. A tenant with providers configured and no place to keep
+    // that has an SSO surface it cannot complete a sign-in through.
+    ['oauth_requests_module', { scope: 'app' }],
     'webauthn_credentials_module',
     'webauthn_auth_module',
     'phone_numbers_module',
@@ -63,7 +68,8 @@ export const PresetB2bStorage: ModulePreset = {
     ['invites_module', { scope: 'app' }],
     ['invites_module', { scope: 'org' }],
     ['storage_module', { scope: 'app' }],
-    'devices_module'
+    'devices_module',
+    'user_settings_security_module'
   ],
   extends: ['b2b']
 };

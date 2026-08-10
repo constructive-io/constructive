@@ -47,6 +47,12 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     description: 'Provisions external account connections.'
   },
   {
+    name: 'content_preset_module',
+    display_name: 'Content Preset',
+    description: 'Provisions the seed-content preset catalog.',
+    internal: true
+  },
+  {
     name: 'crypto_addresses_module',
     display_name: 'Crypto Addresses',
     description: 'Provisions cryptocurrency address identity.'
@@ -78,6 +84,12 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     display_name: 'Domain',
     description: 'Provisions catalog-backed domain surfaces.',
     internal: true
+  },
+  {
+    name: 'email_sender_module',
+    display_name: 'Email Sender',
+    description:
+      'Provisions outbound sender identities, provider accounts, and site bindings.'
   },
   {
     name: 'emails_module',
@@ -198,9 +210,22 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     description: 'Provisions user notification data.'
   },
   {
-    name: 'permissions_module',
-    display_name: 'Permissions',
-    description: 'Provisions scoped permission data.'
+    name: 'oauth_requests_module',
+    display_name: 'OAuth Requests',
+    description:
+      'Provisions in-flight OAuth authorization requests and pending identity links.'
+  },
+  {
+    name: 'pages_module',
+    display_name: 'Pages',
+    description:
+      'Provisions merkle-versioned site pages (content only, no routing surface).',
+    internal: true
+  },
+  {
+    name: 'capabilities_module',
+    display_name: 'Capabilities',
+    description: 'Provisions scoped capability data.'
   },
   {
     name: 'phone_numbers_module',
@@ -250,6 +275,12 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     internal: true
   },
   {
+    name: 'scope_types_module',
+    display_name: 'Scope Types',
+    description: 'Provisions the scope-type registry a database resolves scopes against.',
+    internal: true
+  },
+  {
     name: 'session_secrets_module',
     display_name: 'Session Secrets',
     description: 'Provisions session and magic-link secrets.'
@@ -294,6 +325,11 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     name: 'user_settings_module',
     display_name: 'User Settings',
     description: 'Provisions user settings.'
+  },
+  {
+    name: 'user_settings_security_module',
+    display_name: 'User Security Settings',
+    description: 'Provisions per-user MFA enrollment state and the MFA procedures.'
   },
   {
     name: 'user_state_module',

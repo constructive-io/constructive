@@ -7,6 +7,7 @@
 // These types match the JSONB shape expected by construct_blueprint().
 // All field names are snake_case to match the SQL convention.
 
+import type { FieldDefault, FieldType } from './types';
 /**
  * ===========================================================================
  * Shared recursive types
@@ -34,40 +35,6 @@ export interface TriggerCondition {
   OR?: TriggerCondition[];
   /** Negated condition. */
   NOT?: TriggerCondition;
-}
-/** Structured representation of a PostgreSQL data type. Stored as JSONB in metaschema_public.field.type. */
-export interface FieldType {
-  /** Type name. Must be a valid SQL identifier. */
-  name: string;
-  /** Schema qualifier. */
-  schema?: string;
-  /** Type arguments (e.g., [10, 2] for numeric(10,2), ["Point", 4326] for geometry). */
-  args?: (string | number | boolean)[];
-  /** Number of array dimensions. 1 = text[], 2 = text[][]. */
-  array_dimensions?: number;
-  /** Interval field range. 1-2 elements: ["day"] or ["day", "second"]. */
-  range?: string[];
-}
-/** Structured representation of a PostgreSQL default value expression. Stored as JSONB in metaschema_public.field.default_value. */
-export interface FieldDefault {
-  /** Literal value (string, number, boolean, null, array, or object). */
-  value?: string | number | boolean | null | unknown[] | Record<string, unknown>;
-  /** Function name. Must be a valid SQL identifier. */
-  function?: string;
-  /** Schema qualifier for function. */
-  schema?: string;
-  /** Function arguments (recursive). */
-  args?: (string | number | boolean | null | FieldDefault)[];
-  /** Output type cast. */
-  cast?: FieldType;
-  /** Binary operator (e.g., "+", "-", "||"). */
-  operator?: string;
-  /** Left operand for operator expression. */
-  left?: FieldDefault;
-  /** Right operand for operator expression. */
-  right?: FieldDefault;
-  /** SQL keyword (e.g., "CURRENT_TIMESTAMP", "CURRENT_USER"). */
-  sql_keyword?: string;
 }
 /**
  * ===========================================================================
@@ -333,7 +300,9 @@ export interface DataMemberOwnerParams {
   include_user_fk?: boolean;
   /* If true, creates B-tree indexes on the owner and entity columns */
   create_index?: boolean;
-  /* Membership type for SPRT resolution. Required for entity-scoped provisioning. */
+  /* Scope name for SPRT resolution (e.g. 'org', 'room'). Resolved to a membership type via the database's membership_types_module. This is the authoring form — use it instead of membership_type. */
+  entity_type?: string;
+  /* Resolved membership type for SPRT resolution. Internal: prefer entity_type. Cannot be combined with entity_type. */
   membership_type?: number;
 }
 /** Restricts which user can modify specific columns in shared objects. Creates an AFTER UPDATE trigger that throws OWNED_PROPS when a non-owner tries to change protected fields. References fields by name in data jsonb. */
@@ -368,6 +337,29 @@ export interface DataPeoplestampsParams {
   include_user_fk?: boolean;
   /* If true, creates B-tree indexes on the peoplestamp columns */
   create_index?: boolean;
+}
+/** Per-row required permissions. A profile compiles a person to bits so no policy joins a profiles table; this compiles a row to bits so no policy joins a grant table either — the row carries the mask an actor must hold, and an AuthzEntityMembership policy with mask_column checks it as one bitwise subset test against the SPRT. The mask only narrows: it takes access away from someone membership already lets in, and never grants access to a non-member. Zero requires nothing, which is what an unclassified row defaults to. In direct mode the writer sets the mask and the subset guard bounds it to bits the writer holds; in derived mode it is copied from a mapping row (classification -> mask) by generated triggers, so authors edit one classification instead of every document. */
+export interface DataCapabilitiesParams {
+  /* Name of the bit(n) mask column to create on this table. */
+  field?: string;
+  /* Selects the capabilities module whose bit numbering the mask is measured in, by scope (e.g. "app", "org") or by table prefix. Required only when the database has more than one; several with no selector raises naming the candidates. */
+  capabilities?: string;
+  /* Capability names every row requires unless told otherwise, resolved to a literal mask and baked into the column default. Omitted means a zero mask: requires nothing. */
+  default?: string[];
+  /* Who writes the mask: "direct" the writer, bounded by the subset guard; "derived" the mapping row named by from_column, stamped by generated triggers and hidden from mutations. */
+  mode?: 'direct' | 'derived';
+  /* Derived mode only: the column on this table naming the mapping row to copy the mask from (e.g. classification_id). */
+  from_column?: string;
+  /* Derived mode only: table holding one mask per class (e.g. document_classifications). */
+  mapping_table?: string;
+  /* Derived mode only: column on the mapping table that from_column matches. */
+  mapping_key?: string;
+  /* Derived mode only: the mapping table's own bit(n) mask column. Created when absent, so a classification table needs no DataCapabilities declaration of its own. Defaults to the same name as field. */
+  mapping_column?: string;
+  /* Direct mode only: refuse a write requiring bits the writer does not hold, so nobody can lock a row away from everyone including themselves. Off is for trusted-writer tables only. */
+  subset_guard?: boolean;
+  /* Direct mode only: the entity column the subset guard's membership check reads. */
+  entity_field?: string;
 }
 /** Adds acting-principal tracking for creates/updates: created_by_principal/updated_by_principal record the acting principal — agent, API key, service identity, or the user itself (jwt_public.current_principal_id()). */
 export interface DataPrincipalstampsParams {
@@ -973,7 +965,9 @@ export interface ProcessExtractionParams {
   task_identifier?: string;
   /* Trigger events that fire the job */
   events?: ('INSERT' | 'UPDATE')[];
-  /* Custom payload key-to-column mapping for the job trigger */
+  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. */
+  file_field?: string;
+  /* Custom payload key-to-source mapping for the job trigger. A source is either a column name or a read into a jsonb column ({"field": "upload", "path": ["key"]}). Defaults to the four file columns, or to the file_field document when file_field is set. */
   payload_custom?: {
     [key: string]: unknown;
   };
@@ -1018,12 +1012,28 @@ export interface ProcessFileEmbeddingParams {
   task_identifier?: string;
   /* Trigger events that fire the job */
   events?: ('INSERT' | 'UPDATE')[];
-  /* Custom payload key-to-column mapping for the job trigger */
+  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. */
+  file_field?: string;
+  /* Custom payload key-to-source mapping for the job trigger. A source is either a column name or a read into a jsonb column ({"field": "upload", "path": ["key"]}). Defaults to the four file columns, or to the file_field document when file_field is set. */
   payload_custom?: {
     [key: string]: unknown;
   };
   /* Additional compound conditions beyond auto-generated filtering. Merged with the auto-generated conditions via AND. */
   trigger_conditions?: TriggerCondition | TriggerCondition[];
+  /* Typed bucket reference ({"$ref":"bucket","tags":[...],"type":...}) for the bucket the source files live in, when it is not the record's own bucket_id (which payload_custom already carries). Stamped into the trigger payload at attach time and resolved to coordinates at dispatch. */
+  source_bucket?: {
+    $ref: 'bucket';
+    tags?: string[];
+    key?: string;
+    type?: 'public' | 'private' | 'temp';
+  };
+  /* Typed bucket reference for where derived outputs (thumbnails, resized variants, extracted assets) are written. Stamped into the trigger payload at attach time and resolved to coordinates at dispatch, so the function never selects a bucket. */
+  variants_bucket?: {
+    $ref: 'bucket';
+    tags?: string[];
+    key?: string;
+    type?: 'public' | 'private' | 'temp';
+  };
   /* Column on the trigger table that holds (or references) the entity_id for billing scope. Forwarded to the composed JobTrigger. */
   entity_field?: string;
   /* FK lookup configuration for resolving entity_id through a related table. Forwarded to the composed JobTrigger. */
@@ -1075,7 +1085,9 @@ export interface ProcessImageEmbeddingParams {
   task_identifier?: string;
   /* Trigger events that fire the job */
   events?: ('INSERT' | 'UPDATE')[];
-  /* Custom payload key-to-column mapping for the job trigger */
+  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. */
+  file_field?: string;
+  /* Custom payload key-to-source mapping for the job trigger. A source is either a column name or a read into a jsonb column ({"field": "upload", "path": ["key"]}). Defaults to the four file columns, or to the file_field document when file_field is set. */
   payload_custom?: {
     [key: string]: unknown;
   };
@@ -1124,7 +1136,9 @@ export interface ProcessImageVersionsParams {
   task_identifier?: string;
   /* Trigger events that fire the job */
   events?: ('INSERT' | 'UPDATE')[];
-  /* Custom payload key-to-column mapping for the job trigger */
+  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. */
+  file_field?: string;
+  /* Custom payload key-to-source mapping for the job trigger. A source is either a column name or a read into a jsonb column ({"field": "upload", "path": ["key"]}). Defaults to the four file columns, or to the file_field document when file_field is set. */
   payload_custom?: {
     [key: string]: unknown;
   };
@@ -1157,21 +1171,21 @@ export type AuthzAllowAllParams = {};
 export interface AuthzAppMemberOwnerParams {
   /* Column name containing the owner user ID (e.g., actor_id) */
   owner_field: string;
-  /* Single permission name to check (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check (ORed together into mask) */
-  permissions?: string[];
+  /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
+  levels?: string[];
+  /* Capability names of any kind (capability, level, ...) merged into the same mask */
+  capabilities?: string[];
   /* If true, require is_admin flag */
   is_admin?: boolean;
   /* If true, require is_owner flag */
   is_owner?: boolean;
 }
-/** App-level membership check (hardcoded membership_type=1). Verifies the user has app membership (optionally with specific permission) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. For entity-scoped checks (org, channel, etc.), use AuthzEntityMembership instead. */
+/** App-level membership check (hardcoded membership_type=1). Verifies the user has app membership (optionally with specific capability) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. For entity-scoped checks (org, channel, etc.), use AuthzEntityMembership instead. */
 export interface AuthzAppMembershipParams {
-  /* Single permission name to check (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check (ORed together into mask) */
-  permissions?: string[];
+  /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
+  levels?: string[];
+  /* Capability names of any kind (capability, level, ...) merged into the same mask */
+  capabilities?: string[];
   /* If true, require is_admin flag */
   is_admin?: boolean;
   /* If true, require is_owner flag */
@@ -1242,10 +1256,12 @@ export interface AuthzEntityMembershipParams {
   membership_type?: number | string;
   /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
   entity_type?: string;
-  /* Single permission name to check (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check (ORed together into mask) */
-  permissions?: string[];
+  /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
+  levels?: string[];
+  /* Capability names of any kind (capability, level, ...) merged into the same mask */
+  capabilities?: string[];
+  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. Narrows access row by row without joining a grant table; a zero mask requires nothing. Composes with capability/capabilities — both are ANDed. */
+  mask_column?: string;
   /* If true, require is_admin flag */
   is_admin?: boolean;
   /* If true, require is_owner flag */
@@ -1266,7 +1282,7 @@ export interface AuthzFilePathParams {
   /* Name of the files table (or use files_table_id) */
   files_table?: string;
   /* Boolean column on the path_shares table that grants the required permission (e.g. can_read, can_write) */
-  permission_field: string;
+  capability_field: string;
   /* Column on the files table referencing the bucket */
   bucket_field?: string;
   /* Ltree column on the files table representing the file path */
@@ -1289,10 +1305,10 @@ export interface AuthzMemberOwnerParams {
   membership_type?: number | string;
   /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. */
   entity_type?: string;
-  /* Single permission name to check (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check (ORed together into mask) */
-  permissions?: string[];
+  /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
+  levels?: string[];
+  /* Capability names of any kind (capability, level, ...) merged into the same mask */
+  capabilities?: string[];
 }
 /** Restrictive policy that blocks read-only members from mutations. Checks actor_id + is_read_only IS NOT TRUE on the SPRT. Designed to run as a restrictive counterpart after a permissive AuthzEntityMembership policy has already verified membership. */
 export interface AuthzNotReadOnlyParams {
@@ -1320,10 +1336,10 @@ export interface AuthzPeerOwnershipParams {
   membership_type?: number | string;
   /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
   entity_type?: string;
-  /* Single permission name to check on the current user membership (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check on the current user membership (ORed together into mask) */
-  permissions?: string[];
+  /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
+  levels?: string[];
+  /* Capability names of any kind (capability, level, ...) merged into the same mask */
+  capabilities?: string[];
   /* If true, require is_admin flag on current user membership */
   is_admin?: boolean;
   /* If true, require is_owner flag on current user membership */
@@ -1360,10 +1376,10 @@ export interface AuthzRelatedEntityMembershipParams {
   obj_field_id?: string;
   /* Field name on join table to match against SPRT entity_id */
   obj_field?: string;
-  /* Single permission name to check (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check (ORed together into mask) */
-  permissions?: string[];
+  /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
+  levels?: string[];
+  /* Capability names of any kind (capability, level, ...) merged into the same mask */
+  capabilities?: string[];
   /* If true, require is_admin flag */
   is_admin?: boolean;
   /* If true, require is_owner flag */
@@ -1408,10 +1424,10 @@ export interface AuthzRelatedMemberOwnerParams {
   obj_field_id?: string;
   /* Field name on join table to match against SPRT entity_id */
   obj_field?: string;
-  /* Single permission name to check (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check (ORed together into mask) */
-  permissions?: string[];
+  /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
+  levels?: string[];
+  /* Capability names of any kind (capability, level, ...) merged into the same mask */
+  capabilities?: string[];
   /* If true, require is_admin flag */
   is_admin?: boolean;
   /* If true, require is_owner flag */
@@ -1437,10 +1453,10 @@ export interface AuthzRelatedPeerOwnershipParams {
   obj_field?: string;
   /* Field on related table to select for matching entity_field */
   obj_ref_field?: string;
-  /* Single permission name to check on the current user membership (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check on the current user membership (ORed together into mask) */
-  permissions?: string[];
+  /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
+  levels?: string[];
+  /* Capability names of any kind (capability, level, ...) merged into the same mask */
+  capabilities?: string[];
   /* If true, require is_admin flag on current user membership */
   is_admin?: boolean;
   /* If true, require is_owner flag on current user membership */
@@ -1688,14 +1704,21 @@ export interface ViewTableProjectionParams {
 export interface BlueprintField {
   /** The column name. */
   name: string;
-  /** PostgreSQL type as a FieldType object (e.g., { name: "text" }) or legacy string. */
-  type: FieldType | string;
+  /** The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid"). */
+  type: string;
   /** Whether the column has a NOT NULL constraint. */
   is_required?: boolean;
-  /** Default value as a FieldDefault object (e.g., { function: "now" }) or legacy string. */
-  default_value?: FieldDefault | string;
+  /** SQL default value expression (e.g., "true", "now()"). */
+  default_value?: string;
   /** Comment/description for this field. */
   description?: string;
+}
+/** A WITH CHECK override node for an UPDATE policy. Its expression governs the resulting row while the main policy node governs the targeted row. */
+export interface BlueprintPolicyWithCheck {
+  /** Authz* policy type name for the WITH CHECK expression. */
+  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
+  /** Policy-specific data (structure varies by policy type). */
+  data?: Record<string, unknown>;
 }
 /** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
@@ -1711,6 +1734,8 @@ export interface BlueprintPolicy {
   policy_name?: string;
   /** Policy-specific data (structure varies by policy type). */
   data?: Record<string, unknown>;
+  /** Optional WITH CHECK override node. Only valid for UPDATE policies; when omitted, WITH CHECK inherits the USING expression. */
+  with_check?: BlueprintPolicyWithCheck;
 }
 /** A source field contributing to a full-text search tsvector column. */
 export interface BlueprintFtsSource {
@@ -1816,10 +1841,10 @@ export interface BlueprintBucketSeed {
 export interface BlueprintStorageConfig {
   /** Storage scope. "app" (default) creates app-level storage (no owner_id). "org" creates per-org/user storage (owner_id = org entity id, buckets seeded per-entity via AFTER INSERT trigger). Only "app" and "org" are allowed — child entity types get storage via entity_types[].storage. */
   scope?: 'app' | 'org';
-  /** Discriminator for multi-module storage. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{storage_key}_buckets. Max 16 chars, lowercase snake_case. */
+  /** Module key discriminator. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_buckets. Max 16 chars, lowercase snake_case. */
+  key?: string;
+  /** @deprecated Use `key` instead. Kept for backward compatibility. */
   storage_key?: string;
-  /** Override the table-name prefix. By default the prefix is derived from the scope (e.g. "org"). Set to an empty string to produce unprefixed table names (e.g. "buckets" instead of "org_buckets"). */
-  prefix?: string;
   /** Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. */
   buckets?: BlueprintBucketSeed[];
   /** Override for presigned upload URL expiry time in seconds. */
@@ -1834,6 +1859,10 @@ export interface BlueprintStorageConfig {
   has_confirm_upload?: boolean;
   /** Delay before the first upload confirmation attempt (PostgreSQL interval string, e.g. "30 seconds"). Only used when has_confirm_upload is true. Defaults to "30 seconds". */
   confirm_upload_delay?: string;
+  /** Provision a temporary staging bucket (type temp, tagged default-temp) that stages for the private default bucket, so uploads land there and are promoted into their destination on confirmation. Setting staging_ttl implies this. Defaults to false. */
+  staging?: boolean;
+  /** How long an unpromoted staged file survives before it is eligible for expiry (PostgreSQL interval string, e.g. "24 hours"). Implies staging. Defaults to "24 hours". */
+  staging_ttl?: string;
   /** Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. When a key includes policies[], those REPLACE the default storage policies for that table; tables without a key still get defaults. */
   provisions?: {
     files?: BlueprintEntityTableProvision;
@@ -1881,8 +1910,6 @@ export interface BlueprintNamespaceConfig {
   scope?: 'app' | 'org';
   /** Module discriminator for multi-module namespaces. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_namespaces. */
   key?: string;
-  /** Override the table-name prefix. By default the prefix is derived from the scope (e.g. "org"). Set to an empty string to produce unprefixed table names (e.g. "namespaces" instead of "org_namespaces"). */
-  prefix?: string;
   /** RLS policy overrides for the namespaces table. NULL = apply defaults from apply_namespace_security(). */
   policies?: BlueprintPolicy[];
   /** Per-table overrides for namespace tables. Each key targets a specific table (namespaces, namespace_events) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision. */
@@ -1897,8 +1924,6 @@ export interface BlueprintFunctionConfig {
   scope?: 'app' | 'org';
   /** Module discriminator for multi-module functions. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_function_definitions. */
   key?: string;
-  /** Override the table-name prefix. By default the prefix is derived from the scope (e.g. "org"). Set to an empty string to produce unprefixed table names (e.g. "function_definitions" instead of "org_function_definitions"). */
-  prefix?: string;
   /** RLS policy overrides for the function tables. NULL = apply defaults from apply_function_security(). */
   policies?: BlueprintPolicy[];
   /** Per-table overrides for function tables. Each key targets a specific table (definitions, invocations, execution_logs) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision. */
@@ -1908,32 +1933,29 @@ export interface BlueprintFunctionConfig {
     execution_logs?: BlueprintEntityTableProvision;
   };
 }
-/** Agent module configuration. When used at the top level of a blueprint, the scope field controls whether agents are app-level ("app", default) or org-level ("org"). When used inside entity_types[], scope is inherited from the entity type. Provisions thread, message, task, prompt tables. Opt-in: has_plans (plan + approval workflow), has_resources (unified skills/knowledge with chunking), has_agents (agent registry + personas, implies has_resources). */
+/** Agent module configuration. When used at the top level of a blueprint, the scope field controls whether agents are app-level ("app", default) or org-level ("org"). When used inside entity_types[], scope is inherited from the entity type. Provisions thread, message, task, prompt tables. has_resources adds unified agent_resource (skills + knowledge). has_agents adds agent registry + personas (implies has_resources). */
 export interface BlueprintAgentConfig {
   /** Agent scope. "app" (default) creates app-level agent tables (membership_type = NULL). "org" creates per-org agent tables. Only used at the top level of a blueprint definition — entity-scoped agents inherit scope from the entity type. */
   scope?: 'app' | 'org';
   /** Module discriminator for multi-module agents. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_agent_thread. */
   key?: string;
-  /** Override the table-name prefix. By default the prefix is derived from the scope (e.g. "org"). Set to an empty string to produce unprefixed table names (e.g. "agent_thread" instead of "org_agent_thread"). */
-  prefix?: string;
   /** API name for the agent module. Used in GraphQL naming. Defaults to "agent". */
   api_name?: string;
   /** Whether to provision the agent_plan table for workflow plans with ordered tasks and approval gates. When true, tasks belong to plans (plan_id NOT NULL) instead of directly to threads. Defaults to false. */
   has_plans?: boolean;
-  /** Whether to provision the unified agent_resource table (kind: skill/knowledge/convention) with auto-chunking (ProcessChunks) and vector embeddings. Defaults to false. */
+  /** Whether to provision the unified agent_resource table (skills + knowledge with slug, kind, search, embedding). Standalone flag — also auto-enabled by has_agents. Defaults to false. */
   has_resources?: boolean;
-  /** Whether to provision agent + agent_persona tables for agent registry and templates. Implies has_resources. Defaults to false. */
+  /** Whether to provision the agent registry (agent table + agent_persona table). Implies has_resources = true. Defaults to false. */
   has_agents?: boolean;
-  /** Resource configuration array. Controls vector dimensions, chunking strategy, embedding model/provider, and text search indexes for the agent_resource table. Set has_chunks to false to disable the ProcessChunks pipeline. Defaults: 768 dimensions, 1000 chunk_size, 200 chunk_overlap, paragraph strategy, ["tsvector"] search indexes. */
+  /** Resource configuration array. First element configures the agent_resource table: vector dimensions (default 768), chunk_size (default 1000), chunk_strategy (default "paragraph"), chunk_overlap (default 200), embedding_model, embedding_provider, search_indexes (default ["bm25"]). */
   resources?: {
-    has_chunks?: boolean;
     dimensions?: number;
     chunk_size?: number;
     chunk_overlap?: number;
-    chunk_strategy?: 'fixed' | 'sentence' | 'paragraph' | 'semantic';
+    chunk_strategy?: 'paragraph' | 'sentence' | 'token';
     embedding_model?: string;
     embedding_provider?: string;
-    search_indexes?: ('tsvector' | 'bm25' | 'trigram')[];
+    search_indexes?: string[];
   }[];
   /** RLS policy overrides for the agent tables. NULL = apply defaults from apply_agent_security(). */
   policies?: BlueprintPolicy[];
@@ -1949,7 +1971,7 @@ export interface BlueprintAgentConfig {
     persona?: BlueprintEntityTableProvision;
   };
 }
-/** Graph module configuration. Presence triggers permission registration (manage_graphs, execute_graphs). The graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers permissions here — the graph module itself must be provisioned separately. */
+/** Graph module configuration. Presence triggers capability registration (manage_graphs, execute_graphs). The graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers capabilities here — the graph module itself must be provisioned separately. */
 export interface BlueprintGraphConfig {
   /** Module discriminator for multi-module graphs. Defaults to "default". */
   key?: string;
@@ -1988,7 +2010,7 @@ export interface BlueprintEntityType {
   is_visible?: boolean;
   /** Whether to provision a limits module for this entity type. Defaults to false. */
   has_limits?: boolean;
-  /** Whether to provision a profiles module for this entity type. Defaults to false. */
+  /** Whether to provision a profiles module for this entity type. Defaults to false. A membership may hold any number of profiles: the {prefix}_membership_profiles assignment table holds every profile it holds and the membership mask is granted | bit_or(held profile masks). */
   has_profiles?: boolean;
   /** Whether to provision a levels module for this entity type. Defaults to false. */
   has_levels?: boolean;
@@ -2000,15 +2022,15 @@ export interface BlueprintEntityType {
   skip_entity_policies?: boolean;
   /** Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible). */
   table_provision?: BlueprintEntityTableProvision;
-  /** Storage module configuration array. Presence triggers provisioning (same inference model as namespaces, functions, agents). Each entry provisions a separate storage module with its own tables, RLS, and settings. Each entry may specify a storage_key for multi-module support (defaults to "default"). */
+  /** Storage module configuration array. Presence triggers provisioning (same inference model as namespaces, functions, agents). Each entry provisions a separate storage module with its own tables, RLS, and settings. Each entry may specify a key for multi-module support (defaults to "default"). */
   storage?: BlueprintStorageConfig[];
-  /** Namespace module configuration array. Presence triggers provisioning. Each entry provisions a namespace_module with its own tables, computed-name proxy, and entity-scoped RLS. Registers manage_namespaces permission bit. "[{}]" = provision one default namespace module. */
+  /** Namespace module configuration array. Presence triggers provisioning. Each entry provisions a namespace_module with its own tables, computed-name proxy, and entity-scoped RLS. Registers manage_namespaces capability bit. "[{}]" = provision one default namespace module. */
   namespaces?: BlueprintNamespaceConfig[];
-  /** Function module configuration array. Presence triggers provisioning. Each entry provisions function_definitions, function_invocations (partitioned), and function_execution_logs tables. Registers manage_functions + invoke_functions permission bits. "[{}]" = provision one default function module. */
+  /** Function module configuration array. Presence triggers provisioning. Each entry provisions function_definitions, function_invocations (partitioned), and function_execution_logs tables. Registers manage_functions + invoke_functions capability bits. "[{}]" = provision one default function module. */
   functions?: BlueprintFunctionConfig[];
   /** Agent module configuration array. Presence triggers provisioning. Each entry provisions thread, message, task, prompt tables (and optionally knowledge with vector embeddings). "[{}]" = provision one default agent module. */
   agents?: BlueprintAgentConfig[];
-  /** Graph module configuration array. Presence triggers permission registration (manage_graphs, execute_graphs). Graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers permissions here. "[{}]" = register default graph permissions. */
+  /** Graph module configuration array. Presence triggers capability registration (manage_graphs, execute_graphs). Graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers capabilities here. "[{}]" = register default graph capabilities. */
   graphs?: BlueprintGraphConfig[];
 }
 /**
@@ -2018,7 +2040,7 @@ export interface BlueprintEntityType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataHistory' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
+export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataHistory' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataCapabilities' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: 'AuthzAllowAll';
@@ -2167,6 +2189,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: 'DataPeoplestamps';
   data: DataPeoplestampsParams;
+} | {
+  $type: 'DataCapabilities';
+  data: DataCapabilitiesParams;
 } | {
   $type: 'DataPrincipalstamps';
   data: DataPrincipalstampsParams;

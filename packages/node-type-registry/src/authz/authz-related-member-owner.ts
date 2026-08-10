@@ -61,14 +61,21 @@ export const AuthzRelatedMemberOwner: NodeTypeDefinition = {
         format: 'column-ref',
         description: 'Field name on join table to match against SPRT entity_id'
       },
-      permission: {
-        type: 'string',
-        description: 'Single permission name to check (resolved to bitstring mask)'
-      },
-      permissions: {
+      levels: {
         type: 'array',
-        items: { type: 'string' },
-        description: 'Multiple permission names to check (ORed together into mask)'
+        items: {
+          type: 'string',
+        },
+        description:
+          'Achievement level names to require (kind=level catalog rows, merged into the same mask)',
+      },
+      capabilities: {
+        type: 'array',
+        items: {
+          type: 'string',
+        },
+        description:
+          'Capability names of any kind (capability, level, ...) merged into the same mask',
       },
       is_admin: {
         type: 'boolean',

@@ -63,10 +63,10 @@ describe('resolveProvisionModules', () => {
     const dropped = names(resolveProvisionModules([{ remove: ['devices_module'] }]));
     expect(dropped).not.toContain('devices_module');
 
-    // permissions_module exists at both app and org scope in b2b:storage.
-    const scoped = resolveProvisionModules([{ remove: ['permissions_module:org'] }]);
-    const permKeys = scoped.filter((m) => moduleKey(m).startsWith('permissions_module'));
-    expect(permKeys.map(moduleKey)).toEqual(['permissions_module:app']);
+    // capabilities_module exists at both app and org scope in b2b:storage.
+    const scoped = resolveProvisionModules([{ remove: ['capabilities_module:org'] }]);
+    const capabilityKeys = scoped.filter((m) => moduleKey(m).startsWith('capabilities_module'));
+    expect(capabilityKeys.map(moduleKey)).toEqual(['capabilities_module:app']);
   });
 
   it('applies remove before add within a layer, letting add re-introduce', () => {

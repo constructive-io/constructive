@@ -13,14 +13,14 @@ export const LimitEnforceRate: NodeTypeDefinition = {
       meter_slug: {
         type: 'string',
         description:
-          'Slug of the billing meter to check rate limits against (must match a meters table entry, e.g. "messaging", "inference")'
+          'Slug of the billing meter to check rate limits against (must match a meters table entry, e.g. "messaging", "inference")',
       },
       entity_field: {
         type: 'string',
         format: 'column-ref',
         description:
           'Column on the target table that holds (or references) the entity id for rate limiting. For direct entity_id columns, just set this field. For FK lookups (e.g., channel_id → channels.entity_id), combine with entity_lookup.',
-        default: 'entity_id'
+        default: 'entity_id',
       },
       entity_lookup: {
         type: 'object',
@@ -30,40 +30,40 @@ export const LimitEnforceRate: NodeTypeDefinition = {
           obj_table: {
             type: 'string',
             description:
-              'Name of the related table to look up entity_id from (e.g., "channels"). Required.'
+              'Name of the related table to look up entity_id from (e.g., "channels"). Required.',
           },
           obj_schema: {
             type: 'string',
             description:
-              'Schema of the related table (user-facing name, e.g., "public"). Optional — if omitted, resolved by table name within the same database_id (raises error if ambiguous).'
+              'Schema of the related table (user-facing name, e.g., "public"). Optional — if omitted, resolved by table name within the same database_id (raises error if ambiguous).',
           },
           obj_field: {
             type: 'string',
             description:
-              'Column on the related table that holds the entity_id (e.g., "entity_id"). Required.'
-          }
+              'Column on the related table that holds the entity_id (e.g., "entity_id"). Required.',
+          },
         },
-        required: ['obj_table', 'obj_field']
+        required: ['obj_table', 'obj_field'],
       },
       actor_field: {
         type: 'string',
         format: 'column-ref',
         description:
           'Column on the target table that holds the actor id (user) for rate limiting',
-        default: 'owner_id'
+        default: 'owner_id',
       },
       events: {
         type: 'array',
         items: {
           type: 'string',
-          enum: ['INSERT', 'UPDATE']
+          enum: ['INSERT', 'UPDATE'],
         },
         description:
           'Which DML events to enforce rate limits on (DELETE is excluded since it reduces load)',
-        default: ['INSERT']
-      }
+        default: ['INSERT'],
+      },
     },
-    required: ['meter_slug']
+    required: ['meter_slug'],
   },
-  tags: ['rate-limits', 'triggers', 'enforce', 'metering', 'abuse-protection']
+  tags: ['rate-limits', 'triggers', 'enforce', 'metering', 'abuse-protection'],
 };

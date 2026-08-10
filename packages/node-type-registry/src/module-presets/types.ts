@@ -1,14 +1,16 @@
 /**
  * A preset is a named, curated bundle of Constructive modules intended for a
  * recognizable app shape (internal tool, consumer email login, SSO-only B2B,
- * etc.). Presets are metadata only — passing `preset.modules` to the
- * provisioning function is what actually installs them.
+ * etc.). Presets are metadata only — passing `preset.modules` to
+ * `provision_database_modules(v_modules => ...)` is what actually installs
+ * them.
  *
  * Presets are NOT node types. They are a sibling concept: node types are
  * reusable building blocks used inside a blueprint; presets are starting
  * points for which modules to install before any blueprint is authored.
  *
- * All module names match the canonical provisioning module names.
+ * All module names match the `rls_module`, `user_auth_module`, ... names in
+ * `metaschema_generators.provision_database_modules` in constructive-db.
  *
  * Naming uses snake_case for module names to match the server-side SQL
  * convention, and kebab-ish `auth:hardened` for preset names because they're
@@ -16,8 +18,9 @@
  */
 
 /**
- * Options shared by every module entry. All fields map 1:1 to what each
- * module reads from `e->'options'`. NULL/omitted fields use module defaults.
+ * Options shared by every module entry. All fields map 1:1 to what
+ * `metaschema_generators.provision_database_modules` reads from
+ * `e->'options'` for the module. NULL/omitted fields use module defaults.
  */
 export type BaseModuleOptions = {
   /** Scope for scoped modules: 'app' (membership_type = app) or 'org' (per-org). Some modules also accept 'platform'. */
@@ -86,6 +89,63 @@ export type StorageModuleOptions = BaseModuleOptions & {
   has_confirm_upload?: boolean;
   /** Postgres interval literal, e.g. '30 seconds'. */
   confirm_upload_delay?: string;
+  /** Provision a temp staging bucket that stages for the private default. */
+  staging?: boolean;
+  /** Staged-file expiry window; implies staging. Postgres interval literal, e.g. '24 hours'. */
+  staging_ttl?: string;
+};
+
+/** One rung of a trust ladder: the row set provisioning inserts per rung. */
+export type TrustLadderRung = {
+  /** Level earned when the requirement is met, e.g. 'established'. */
+  level: string;
+  /** Event type counted towards the rung. Mutually exclusive with `metric`. */
+  event?: string;
+  /** Computed signal compared against `required_count`, e.g. 'account_age_days'. */
+  metric?: string;
+  /** Threshold; defaults to 1. */
+  required_count?: number;
+  /** Level capability the rung projects into. Omitted → a badge with no bit. */
+  capability?: string;
+  /** Rungs sharing a group are alternatives: any one of them satisfies it. */
+  group?: string;
+  /** Default-limit name this rung deposits credits into when earned. */
+  limit?: string;
+  /** Credits deposited into `limit`; defaults to 0. */
+  limit_amount?: number;
+};
+
+/** One baseline limit: a row in the tenant's default-limits table. */
+export type LimitDefault = {
+  /** Limit name, referenced by ladder rungs that pay credits into it. */
+  name: string;
+  /** Baseline allowance before any credits are earned. */
+  max: number;
+};
+
+/**
+ * Limits module options. `limit_defaults` is the baseline capacity seeded at
+ * provision: omitted seeds nothing (every tenant before this option), a string
+ * names a `limit_defaults` preset in the content catalog (`'metered'` is the
+ * conservative baseline the metered trust ladder pays credits into — a catalog
+ * row like any other, retunable without a code change), and an array is the
+ * caller's own document inline.
+ */
+export type LimitsModuleOptions = BaseModuleOptions & {
+  limit_defaults?: string | LimitDefault[];
+};
+
+/**
+ * Events module options. `trust_ladder` is the trust content seeded at
+ * provision: omitted seeds nothing, a string names a `trust_ladder` preset in
+ * the content catalog — `'humanity'` for evidence that an account belongs to
+ * someone (one reachable channel plus onboarding), `'metered'` where capacity
+ * is rationed (reachable → accountable → established → trusted → vouched) —
+ * and an array is the caller's own ladder inline. App scope only — an entity ladder belongs to an
+ * organization that does not exist at provision time.
+ */
+export type EventsModuleOptions = BaseModuleOptions & {
+  trust_ladder?: string | TrustLadderRung[];
 };
 
 /** Catalog module options (table-name overrides). */
@@ -99,7 +159,7 @@ export type CatalogModuleOptions = BaseModuleOptions & {
 export type MerkleStoreModuleOptions = BaseModuleOptions & {
   prefix: string;
   function_prefix?: string;
-  permission_key?: string;
+  capability_key?: string;
 };
 
 /**
@@ -111,6 +171,8 @@ export type ModuleEntry =
   | ['billing_module', BillingModuleOptions]
   | ['agent_module', AgentModuleOptions]
   | ['storage_module', StorageModuleOptions]
+  | ['events_module', EventsModuleOptions]
+  | ['limits_module', LimitsModuleOptions]
   | ['catalog_module', CatalogModuleOptions]
   | ['merkle_store_module', MerkleStoreModuleOptions]
   | [string, BaseModuleOptions & Record<string, unknown>];
@@ -143,12 +205,12 @@ export interface ModulePreset {
    * List of modules to install. Each entry is either a plain module name
    * (string) or a Babel-style tuple [name, options] for modules that need
    * configuration. Module names must match the canonical list accepted by
-   * the canonical provisioning module list.
+   * `metaschema_generators.provision_database_modules` in constructive-db.
    * Order doesn't matter — provisioning resolves dependencies.
    *
    * Examples:
    *   'users_module'                              — simple module
-   *   ['permissions_module', { scope: 'app' }]    — scoped module
+   *   ['capabilities_module', { scope: 'app' }]    — scoped module
    *   ['agent_module', { scope: 'app', has_plans: true }]        — feature-flagged module
    */
   modules: ModuleEntry[];
