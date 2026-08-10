@@ -111,6 +111,7 @@ export const createOAuthRouter = (options: OAuthRouterOptions): Router => {
         code,
         providerReturnedError,
         browserBinding,
+        deviceToken: req.deviceToken ?? null,
         requestTimeoutMs: options.requestTimeoutMs
       });
 

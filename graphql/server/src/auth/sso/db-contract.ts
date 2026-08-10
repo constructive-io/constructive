@@ -6,6 +6,7 @@ import {
   buildHandoffContinuationUrl,
   type HandoffMaterial
 } from './handoff';
+import { createOpaqueMaterial, hashOpaqueValue } from './opaque';
 import type {
   ContinueUnifiedLoginInput,
   StartUnifiedLoginInput,
@@ -26,19 +27,21 @@ import type {
  *
  * Exact v1 signatures fixed by this integration:
  *
- * - `start_unified_login(uuid, text, text, text, text)` returns
- *   `transaction_id`, safe Site display fields, `sign_in_mode`,
+ * - `start_unified_login(bytea, uuid, text, text, text, bytea)` accepts a
+ *   server-generated transaction digest and returns safe Site display fields,
+ *   `sign_in_mode`,
  *   `reusable_authentication`, and optional safe current-user display fields.
- * - `confirm_unified_login(text, text, bytea)` returns the associated `user_id`
+ * - `confirm_unified_login(bytea, bytea, bytea)` returns the associated `user_id`
  *   and the transaction-bound Site callback continuation fields.
- * - `sign_in_unified_login(text, text, text, boolean, text, text, text, bytea)`
- *   and `sign_up_unified_login(...)` return the unchanged local credential
- *   columns and the same continuation fields.
+ * - `sign_in_unified_login(bytea, text, text, boolean, text, bytea, text,
+ *   text, bytea)` and `sign_up_unified_login(...)` return the unchanged local
+ *   credential columns and the same continuation fields.
  *
- * The final `text` arguments are the server-read authentication-center browser
- * binding and device-token values. The transaction identifier is an opaque
- * token whose digest is stored by DB; it is deliberately not modelled as a row
- * UUID.
+ * Browser-held transaction and binding values are always digested before they
+ * cross the DB boundary. The SSO browser binding is not an anonymous-session
+ * CSRF secret, so the unchanged local credential primitive receives no CSRF
+ * value unless a future flow establishes such a session explicitly. The
+ * transaction identifier is deliberately not modelled as a row UUID.
  */
 export const SSO_DB_FUNCTIONS = {
   start: 'start_unified_login',
@@ -175,18 +178,20 @@ export const startUnifiedLogin = async (
   browserBinding: string
 ): Promise<StartDatabaseResult> => {
   const operation = SSO_DB_FUNCTIONS.start;
+  const transaction = createOpaqueMaterial();
   const row = await callFunction(
     context,
     surface,
     operation,
     [
+      sql.value(transaction.hash),
       sql.value(input.siteId),
       sql.value(input.callbackUrl ?? null),
       sql.value(input.returnTo ?? '/'),
       sql.value(input.siteState),
-      sql.value(browserBinding)
+      sql.value(hashOpaqueValue(browserBinding))
     ],
-    ['uuid', 'text', 'text', 'text', 'text']
+    ['bytea', 'uuid', 'text', 'text', 'text', 'bytea']
   );
   const signInMode = requiredString(row, 'sign_in_mode', operation);
   if (signInMode !== 'confirm' && signInMode !== 'silent') {
@@ -203,7 +208,7 @@ export const startUnifiedLogin = async (
     : null;
 
   return {
-    transactionId: requiredString(row, 'transaction_id', operation),
+    transactionId: transaction.value,
     site: {
       id: requiredString(row, 'site_id', operation),
       displayName: requiredString(row, 'site_display_name', operation),
@@ -233,11 +238,11 @@ export const confirmUnifiedLogin = async (
     surface,
     operation,
     [
-      sql.value(input.transactionId),
-      sql.value(browserBinding),
+      sql.value(hashOpaqueValue(input.transactionId)),
+      sql.value(hashOpaqueValue(browserBinding)),
       sql.value(handoff.hash)
     ],
-    ['text', 'text', 'bytea']
+    ['bytea', 'bytea', 'bytea']
   );
   requiredString(row, 'user_id', operation);
   return {
@@ -260,16 +265,27 @@ const authenticateWithPassword = async (
     surface,
     functionName,
     [
-      sql.value(input.transactionId),
+      sql.value(hashOpaqueValue(input.transactionId)),
       sql.value(input.email),
       sql.value(input.password),
       sql.value(input.rememberMe ?? false),
       sql.value('bearer'),
-      sql.value(browserBinding),
+      sql.value(hashOpaqueValue(browserBinding)),
+      sql.value(null),
       sql.value(input.deviceToken ?? null),
       sql.value(handoff.hash)
     ],
-    ['text', 'text', 'text', 'boolean', 'text', 'text', 'text', 'bytea']
+    [
+      'bytea',
+      'text',
+      'text',
+      'boolean',
+      'text',
+      'bytea',
+      'text',
+      'text',
+      'bytea'
+    ]
   );
 
   // Strict-auth/MFA/step-up integration is explicitly outside v1. The DB

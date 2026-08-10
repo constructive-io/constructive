@@ -311,7 +311,7 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
             return result;
           }
 
-          const res = (event.requestDigest.requestContext as {
+          const grafservResponse = (event.requestDigest.requestContext as {
             expressv4?: {
               res?: {
                 setHeader: (name: string, value: string | string[]) => void;
@@ -319,6 +319,10 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
               };
             };
           })?.expressv4?.res;
+          // Grafserv's Express adapter always exposes the request, but some
+          // versions do not copy the response onto requestContext. Express
+          // itself links the authoritative response as req.res.
+          const res = grafservResponse ?? req.res;
           const noStore = mutationFields.some(field =>
             NO_STORE_AUTH_MUTATIONS.has(field.fieldName)
           );
@@ -417,7 +421,7 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
               if (existingCookies) {
                 if (Array.isArray(existingCookies)) {
                   allCookies.push(...existingCookies);
-                } else {
+                } else if (typeof existingCookies === 'string') {
                   allCookies.push(existingCookies);
                 }
               }

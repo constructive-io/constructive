@@ -228,6 +228,11 @@ const buildPreset = (
           if (req.api?.apiId) {
             context['jwt.claims.api_id'] = req.api.apiId;
           }
+          // Independent trusted Site identity from scoped routing. A Site is
+          // not inferred from api_id because multiple Sites may share one API.
+          if (req.api?.siteId) {
+            context['jwt.claims.site_id'] = req.api.siteId;
+          }
           if (req.clientIp) {
             context['jwt.claims.ip_address'] = req.clientIp;
           }
@@ -365,7 +370,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         try {
           const instance = await inFlight;
           return instance.handler(req, res, next);
-        } catch (error) {
+        } catch {
           log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`);
           // Fall through to Phase C to retry creation
         }

@@ -14,6 +14,7 @@ import {
   requiredString
 } from './db-contract';
 import type { HandoffMaterial } from './handoff';
+import { hashOpaqueValue } from './opaque';
 
 export const PROVIDER_DB_FUNCTIONS = {
   start: 'start_provider_oauth_request',
@@ -25,15 +26,15 @@ export const PROVIDER_DB_FUNCTIONS = {
 /**
  * Fixed Constructive/DB signatures for the Provider subflow:
  *
- * - `start_provider_oauth_request(text, text, text, text, text, text, text)`
+ * - `start_provider_oauth_request(bytea, text, text, text, text, text, bytea)`
  *   accepts unified transaction token, Provider key, state, verifier, nonce,
  *   redirect URI, and browser binding; returns `oauth_request_id`.
- * - `read_provider_oauth_request(text, text)` and
- *   `consume_provider_oauth_request(text, text)` accept state plus browser
+ * - `read_provider_oauth_request(text, bytea)` and
+ *   `consume_provider_oauth_request(text, bytea)` accept state plus browser
  *   binding and return the request fields parsed below. Consume atomically
  *   marks the state used before Provider callback handling.
  * - `complete_provider_unified_login(uuid, text, text, text, jsonb, text,
- *   boolean, text, bytea)` accepts request ID plus normalized identity,
+ *   boolean, text, bytea, bytea)` accepts request ID plus normalized identity,
  *   existing credential options, browser binding, and the server-generated
  *   handoff digest; it returns the unchanged identity-auth credential result
  *   and transaction-bound callback continuation.
@@ -85,15 +86,15 @@ export const startProviderOAuthRequest = async (
     surface,
     operation,
     [
-      sql.value(input.transactionId),
+      sql.value(hashOpaqueValue(input.transactionId)),
       sql.value(input.providerKey),
       sql.value(input.state),
       sql.value(input.codeVerifier),
       sql.value(input.nonce),
       sql.value(input.redirectUri),
-      sql.value(input.browserBinding)
+      sql.value(hashOpaqueValue(input.browserBinding))
     ],
-    ['text', 'text', 'text', 'text', 'text', 'text', 'text']
+    ['bytea', 'text', 'text', 'text', 'text', 'text', 'bytea']
   );
   requiredString(row, 'oauth_request_id', operation);
 };
@@ -111,8 +112,8 @@ const restoreProviderOAuthRequest = async (
     context,
     surface,
     functionName,
-    [sql.value(state), sql.value(browserBinding)],
-    ['text', 'text']
+    [sql.value(state), sql.value(hashOpaqueValue(browserBinding))],
+    ['text', 'bytea']
   );
   return {
     requestId: requiredString(row, 'oauth_request_id', functionName),
@@ -164,6 +165,7 @@ export const completeProviderUnifiedLogin = async (
     requestId: string;
     identity: NormalizedExternalIdentity;
     browserBinding: string;
+    deviceToken: string | null;
     handoff: HandoffMaterial;
   }
 ): Promise<ProviderCredentialResult> => {
@@ -180,10 +182,22 @@ export const completeProviderUnifiedLogin = async (
       sql.value(JSON.stringify(input.identity.profile)),
       sql.value('bearer'),
       sql.value(false),
-      sql.value(input.browserBinding),
+      sql.value(input.deviceToken),
+      sql.value(hashOpaqueValue(input.browserBinding)),
       sql.value(input.handoff.hash)
     ],
-    ['uuid', 'text', 'text', 'text', 'jsonb', 'text', 'boolean', 'text', 'bytea']
+    [
+      'uuid',
+      'text',
+      'text',
+      'text',
+      'jsonb',
+      'text',
+      'boolean',
+      'text',
+      'bytea',
+      'bytea'
+    ]
   );
 
   const mfaRequired = requiredBoolean(

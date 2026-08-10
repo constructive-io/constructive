@@ -141,8 +141,22 @@ describe('identityProvidersLoader', () => {
   };
 
   const provisioned = (rows: unknown[]) => [
-    { rows: [{ schema_name: 'tenant_a_auth_private', table_name: 'identity_providers' }] },
-    { rows: [{ schema_name: 'tenant_a_secrets', table_name: 'internal_secrets' }] },
+    {
+      rows: [{
+        schema_name: 'tenant_a_auth_private',
+        table_name: 'identity_providers',
+        scope: 'database',
+        prefix: ''
+      }]
+    },
+    {
+      rows: [{
+        schema_name: 'tenant_a_secrets',
+        table_name: 'internal_secrets',
+        scope: 'database',
+        prefix: ''
+      }]
+    },
     { rows }
   ];
 
@@ -152,9 +166,10 @@ describe('identityProvidersLoader', () => {
     const module = await identityProvidersLoader.resolve(ctx(pool, 'db-a'));
 
     expect(calls[0].values).toEqual(['db-a']);
-    expect(calls[1].values).toEqual(['db-a']);
-    expect(calls[2].text).toContain('"tenant_a_secrets"."internal_secrets_get"');
+    expect(calls[1].values).toEqual(['db-a', 'database']);
+    expect(calls[2].text).toContain('"tenant_a_secrets"."_internal_secrets_get"');
     expect(calls[2].text).toContain('"tenant_a_auth_private"."identity_providers"');
+    expect(calls[2].values).toEqual(['db-a']);
     expect(module?.providers.google).toMatchObject({
       clientId: 'client-abc',
       clientSecret: 'shh',
@@ -170,7 +185,14 @@ describe('identityProvidersLoader', () => {
 
   it('fails when the secret store is absent instead of yielding a secretless client', async () => {
     const { pool } = fakePool([
-      { rows: [{ schema_name: 'tenant_a_auth_private', table_name: 'identity_providers' }] },
+      {
+        rows: [{
+          schema_name: 'tenant_a_auth_private',
+          table_name: 'identity_providers',
+          scope: 'database',
+          prefix: ''
+        }]
+      },
       { rows: [] }
     ]);
     await expect(identityProvidersLoader.resolve(ctx(pool))).rejects.toThrow(

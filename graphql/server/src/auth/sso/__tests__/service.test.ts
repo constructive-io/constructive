@@ -51,6 +51,9 @@ const makeContext = (
     api: {
       apiId: options.runtime
         ? '00000000-0000-0000-0000-000000000020'
+        : undefined,
+      siteId: options.runtime
+        ? '00000000-0000-0000-0000-000000000024'
         : undefined
     },
     token: options.runtime
@@ -63,6 +66,9 @@ const makeContext = (
       }
       : null,
     requestOrigin: 'https://auth.example.com',
+    siteId: options.runtime
+      ? '00000000-0000-0000-0000-000000000024'
+      : null,
     userId: options.userId ?? null,
     useModule: jest.fn(async (name: string) => {
       if (name === 'ssoSurface') return surface;
@@ -105,7 +111,6 @@ describe('unified authentication GraphQL service', () => {
 
   it('starts through the current Tenant SSO function and merges Provider options', async () => {
     const { context, query } = makeContext({
-      transaction_id: opaque,
       site_id: '00000000-0000-0000-0000-000000000001',
       site_display_name: 'Customer Portal',
       site_icon_url: null,
@@ -128,16 +133,18 @@ describe('unified authentication GraphQL service', () => {
     expect(result.providers).toEqual([
       { key: 'google-workspace', displayName: 'Google Workspace' }
     ]);
+    expect(result.transactionId).toMatch(/^[A-Za-z0-9_-]{43}$/);
     expect(result.site.displayName).toBe('Customer Portal');
     expect(query.mock.calls[0][0]).toContain(
       '"tenant_acme_sso_private"."start_unified_login"'
     );
     expect(query.mock.calls[0][1]).toEqual([
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
       '00000000-0000-0000-0000-000000000001',
       null,
       '/approvals/42',
       opaque,
-      opaque
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/)
     ]);
   });
 
@@ -175,12 +182,13 @@ describe('unified authentication GraphQL service', () => {
       '"tenant_acme_sso_private"."sign_in_unified_login"'
     );
     expect(query.mock.calls[0][1]).toEqual([
-      opaque,
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
       'user@example.com',
       'correct horse battery staple',
       true,
       'bearer',
-      opaque,
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
+      null,
       null,
       expect.stringMatching(/^\\x[0-9a-f]{64}$/)
     ]);
@@ -207,8 +215,8 @@ describe('unified authentication GraphQL service', () => {
       '"tenant_acme_sso_private"."confirm_unified_login"'
     );
     expect(query.mock.calls[0][1]).toEqual([
-      opaque,
-      opaque,
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
       expect.stringMatching(/^\\x[0-9a-f]{64}$/)
     ]);
   });
@@ -306,13 +314,13 @@ describe('unified authentication GraphQL service', () => {
       '"tenant_acme_sso_private"."start_provider_oauth_request"'
     );
     expect(query.mock.calls[0][1]).toEqual([
-      opaque,
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
       googleProvider.slug,
       expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
       expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
       expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
       'https://auth.example.com/auth/oauth/callback',
-      opaque
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/)
     ]);
   });
 

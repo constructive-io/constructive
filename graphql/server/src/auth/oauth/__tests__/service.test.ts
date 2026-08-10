@@ -133,6 +133,7 @@ describe('Provider OAuth orchestration', () => {
       code: 'provider-authorization-code',
       providerReturnedError: false,
       browserBinding,
+      deviceToken: null,
       requestTimeoutMs: 1000,
       fetch: providerFetch as typeof fetch
     });
@@ -155,7 +156,8 @@ describe('Provider OAuth orchestration', () => {
       }),
       'bearer',
       false,
-      browserBinding,
+      null,
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
       expect.stringMatching(/^\\x[0-9a-f]{64}$/)
     ]);
   });
@@ -173,6 +175,7 @@ describe('Provider OAuth orchestration', () => {
       state: opaqueState,
       providerReturnedError: true,
       browserBinding,
+      deviceToken: null,
       requestTimeoutMs: 1000
     })).rejects.toMatchObject({ code: 'OAUTH_AUTHORIZATION_CANCELLED' });
     expect(query).toHaveBeenCalledTimes(1);

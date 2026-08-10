@@ -26,6 +26,7 @@ const makeApp = () => {
   app.use((req, _res, next) => {
     req.constructive = context;
     req.cookies = { csrf_token: 'b'.repeat(64) };
+    req.deviceToken = 'device-token';
     req.api = {
       dbname: 'tenant',
       anonRole: 'anonymous',
@@ -87,6 +88,11 @@ describe('OAuth HTTP routes', () => {
       'https://portal.example.com/auth/complete?handoff=handoff-code&site_state=site-state'
     );
     expect(response.text).not.toContain('cnc_auth_center_token');
+    expect(mockedComplete).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({ deviceToken: 'device-token' })
+    );
   });
 
   it('returns only a stable safe cancellation classification', async () => {

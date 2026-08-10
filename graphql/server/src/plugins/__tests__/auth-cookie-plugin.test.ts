@@ -344,9 +344,9 @@ describe('AuthCookiePlugin unified-auth cookie boundary', () => {
                     cookieHttponly: false,
                     cookieSamesite: 'lax'
                   }
-                }
-              },
-              res: { setHeader, getHeader }
+                },
+                res: { setHeader, getHeader }
+              }
             }
           }
         }
@@ -453,7 +453,7 @@ describe('AuthCookiePlugin P0 scenarios', () => {
   const simulatePluginCookieDecision = (
     query: string,
     response: GraphQLResponse,
-    config: CookieConfig = defaultConfig
+    _config: CookieConfig = defaultConfig
   ): { sessionCookie?: string; deviceCookie?: string; cleared: string[] } => {
     const result: { sessionCookie?: string; deviceCookie?: string; cleared: string[] } = {
       cleared: [],

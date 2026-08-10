@@ -1,8 +1,7 @@
-import { createHash, randomBytes } from 'node:crypto';
-
 import { errors } from '@constructive-io/errors';
 
-const HANDOFF_BYTES = 32;
+import { createOpaqueMaterial, hashOpaqueValue } from './opaque';
+
 const HANDOFF_CODE = /^[A-Za-z0-9_-]{43}$/;
 const SITE_STATE = /^[A-Za-z0-9_-]{32,128}$/;
 
@@ -13,13 +12,13 @@ export interface HandoffMaterial {
 }
 
 export const createHandoffMaterial = (): HandoffMaterial => {
-  const code = randomBytes(HANDOFF_BYTES).toString('base64url');
-  return { code, hash: hashHandoffCode(code) };
+  const material = createOpaqueMaterial();
+  return { code: material.value, hash: material.hash };
 };
 
 export const hashHandoffCode = (code: string): string => {
   if (!HANDOFF_CODE.test(code)) throw errors.INVALID_SSO_HANDOFF();
-  return `\\x${createHash('sha256').update(code, 'utf8').digest('hex')}`;
+  return hashOpaqueValue(code);
 };
 
 /**

@@ -81,6 +81,7 @@ export const completeProviderAuthentication = async (
     code?: string;
     providerReturnedError: boolean;
     browserBinding: string;
+    deviceToken: string | null;
     requestTimeoutMs: number;
     fetch?: typeof fetch;
   }
@@ -125,6 +126,7 @@ export const completeProviderAuthentication = async (
     requestId: request.requestId,
     identity,
     browserBinding: input.browserBinding,
+    deviceToken: input.deviceToken,
     handoff: createHandoffMaterial()
   });
 };

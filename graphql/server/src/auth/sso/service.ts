@@ -243,6 +243,7 @@ export const createUnifiedAuthService = (oauthEnabled: boolean): UnifiedAuthServ
       token.kind !== 'api_key' ||
       typeof token.principal_id !== 'string' ||
       !context.api.apiId ||
+      !context.siteId ||
       token.access_level === 'read_only'
     ) {
       throw errors.FORBIDDEN();
