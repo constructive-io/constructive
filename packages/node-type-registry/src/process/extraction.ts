@@ -71,6 +71,7 @@ export const ProcessExtraction: NodeTypeDefinition = {
       // ── Job routing ───────────────────────────────────────────────
       task_identifier: {
         type: 'string',
+        format: 'function-ref',
         description: 'Job task identifier for the extraction worker',
         default: 'document:extract_file_text'
       },

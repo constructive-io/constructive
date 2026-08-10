@@ -87,6 +87,7 @@ export const ProcessImageVersions: NodeTypeDefinition = {
       // ── Job routing ───────────────────────────────────────────────
       task_identifier: {
         type: 'string',
+        format: 'function-ref',
         description: 'Job task identifier for the image processing worker',
         default: 'image:process_image_versions'
       },

@@ -166,6 +166,7 @@ export const SearchUnified: NodeTypeDefinition = {
               },
               chunking_task_name: {
                 type: 'string',
+                format: 'function-ref',
                 description: 'Task identifier for the chunking job queue',
                 default: 'embedding:generate_chunks'
               }
