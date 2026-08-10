@@ -77,6 +77,7 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
       // ── Job routing ────────────────────────────────────────────────
       task_identifier: {
         type: 'string',
+        format: 'function-ref',
         description:
           'Job task identifier for the worker. In direct mode this is the ' +
           'embedding worker; in extract mode this is the extraction worker.',
@@ -252,6 +253,7 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
           },
           chunking_task_name: {
             type: 'string',
+            format: 'function-ref',
             description: 'Task identifier for the chunking job queue',
             default: 'embedding:generate_chunks'
           }
