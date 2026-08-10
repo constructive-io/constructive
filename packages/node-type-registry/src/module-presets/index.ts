@@ -15,28 +15,13 @@ export type {
 } from './types';
 
 import { getModuleType } from '../module-types';
-import { PresetAuthEmail } from './auth-email';
-import { PresetAuthEmailMagic } from './auth-email-magic';
 import { PresetAuthHardened } from './auth-hardened';
-import { PresetAuthPasskey } from './auth-passkey';
-import { PresetAuthSso } from './auth-sso';
-import { PresetB2b } from './b2b';
 import { PresetB2bStorage } from './b2b-storage';
 import { PresetFull } from './full';
 import { PresetMinimal } from './minimal';
 import type { ModulePreset } from './types';
 
-export {
-  PresetAuthEmail,
-  PresetAuthEmailMagic,
-  PresetAuthHardened,
-  PresetAuthPasskey,
-  PresetAuthSso,
-  PresetB2b,
-  PresetB2bStorage,
-  PresetFull,
-  PresetMinimal,
-};
+export { PresetAuthHardened, PresetB2bStorage, PresetFull, PresetMinimal };
 
 /**
  * Ordered list of all shipped module presets, from smallest to largest
@@ -44,12 +29,7 @@ export {
  */
 export const allModulePresets: ModulePreset[] = [
   PresetMinimal,
-  PresetAuthEmail,
-  PresetAuthEmailMagic,
-  PresetAuthSso,
-  PresetAuthPasskey,
   PresetAuthHardened,
-  PresetB2b,
   PresetB2bStorage,
   PresetFull,
 ];
