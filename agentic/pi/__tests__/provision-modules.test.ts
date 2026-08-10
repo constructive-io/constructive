@@ -26,7 +26,7 @@ describe('resolveProvisionModules', () => {
   });
 
   it('selects a named preset via the last layer that sets one', () => {
-    const full = resolveProvisionModules([{ preset: 'b2b' }, { preset: 'full' }]);
+    const full = resolveProvisionModules([{ preset: 'auth:hardened' }, { preset: 'full' }]);
     expect(full).toEqual(getModulePreset('full')!.modules);
   });
 

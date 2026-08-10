@@ -156,15 +156,45 @@ describe('module type registry', () => {
   test('registers the complete public preset lineage', () => {
     expect(allModulePresets.map(({ name }) => name)).toEqual([
       'minimal',
-      'auth:email',
-      'auth:email+magic',
-      'auth:sso',
-      'auth:passkey',
       'auth:hardened',
-      'b2b',
       'b2b:storage',
       'full'
     ]);
+  });
+
+  test('every preset names a module in the registry', () => {
+    const known = new Set(allModuleTypes.map(({ name }) => name));
+    for (const preset of allModulePresets) {
+      for (const entry of preset.modules) {
+        const name = typeof entry === 'string' ? entry : entry[0];
+        expect({ preset: preset.name, module: name }).toEqual({
+          preset: preset.name,
+          module: known.has(name) ? name : `<unknown module: ${name}>`
+        });
+      }
+    }
+  });
+
+  test('every preset extends a preset that still ships', () => {
+    const names = new Set(allModulePresets.map(({ name }) => name));
+    for (const preset of allModulePresets) {
+      for (const parent of preset.extends ?? []) {
+        expect(names.has(parent)).toBe(true);
+      }
+    }
+  });
+
+  test('a preset that installs events asks for a trust ladder', () => {
+    for (const preset of allModulePresets) {
+      for (const entry of preset.modules) {
+        if (typeof entry === 'string' || entry[0] !== 'events_module') continue;
+        expect({ preset: preset.name, ...entry[1] }).toEqual({
+          preset: preset.name,
+          scope: entry[1].scope,
+          trust_ladder: 'humanity'
+        });
+      }
+    }
   });
 
   test('keeps published preset scopes and feature options', () => {

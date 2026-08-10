@@ -18,11 +18,12 @@ export const PresetFull: ModulePreset = {
   display_name: 'Full (every module)',
   summary: 'Install every standard Constructive module with explicit module list.',
   description:
-    'Installs every standard module in the catalog: everything in `b2b` plus ' +
+    'Installs every standard module in the catalog: everything in `b2b:storage` plus ' +
     '`storage_module` with all feature flags (versioning, content hash, custom keys, audit log), ' +
     '`crypto_addresses_module` for wallet-based sign-in, `plans_module` and `billing_module` ' +
     'for subscription management, `notifications_module` for in-app notifications, and ' +
-    '`events_module` at both app and org scopes. Usage logging modules are opt-in only — ' +
+    '`events_module` at both app and org scopes carrying the `humanity` trust ladder. ' +
+    'Usage logging modules are opt-in only — ' +
     'add them explicitly if needed.',
   good_for: [
     'Reference / demo databases that showcase every Constructive feature',
@@ -41,13 +42,13 @@ export const PresetFull: ModulePreset = {
     ['capabilities_module', { scope: 'app' }],
     ['limits_module', { scope: 'app' }],
     ['memberships_module', { scope: 'app' }],
-    ['events_module', { scope: 'app' }],
+    ['events_module', { scope: 'app', trust_ladder: 'humanity' }],
     ['profiles_module', { scope: 'app' }],
     // Org-level (membership_type = 2)
     ['capabilities_module', { scope: 'org' }],
     ['limits_module', { scope: 'org' }],
     ['memberships_module', { scope: 'org' }],
-    ['events_module', { scope: 'org' }],
+    ['events_module', { scope: 'org', trust_ladder: 'humanity' }],
     ['profiles_module', { scope: 'org' }],
     // Hierarchy
     ['hierarchy_module', { scope: 'org' }],

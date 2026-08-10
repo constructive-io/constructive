@@ -1,7 +1,9 @@
 import type { ModulePreset } from './types';
 
 /**
- * `b2b:storage` — everything in `b2b` plus `storage_module` for file uploads.
+ * `b2b:storage` — `auth:hardened` plus orgs, invites, capabilities, levels,
+ * profiles, hierarchy, and `storage_module` for file uploads. The full
+ * multi-tenant / B2B SaaS shape.
  *
  * This is the common shape for B2B SaaS apps that need file upload
  * infrastructure tied to their org/workspace structure. The storage module
@@ -16,8 +18,10 @@ export const PresetB2bStorage: ModulePreset = {
   display_name: 'B2B SaaS + File Storage',
   summary: 'Orgs + invites + capabilities + file upload infrastructure (buckets, files, RLS).',
   description:
-    'Everything in `b2b` (auth:hardened + orgs + invites + capabilities + levels + profiles + ' +
-    'hierarchy), plus `storage_module` for file uploads. The storage module creates ' +
+    'Everything in `auth:hardened`, plus orgs, invites, capabilities, profiles and hierarchy at ' +
+    'both app and org membership scopes, an `events_module` at both scopes carrying the ' +
+    '`humanity` trust ladder (so a member can earn `level.reachable` and a policy can gate on ' +
+    'it), and `storage_module` for file uploads. The storage module creates ' +
     '`app_buckets` and `app_files` tables with full RLS: AuthzPublishable for public reads, ' +
     'AuthzAppMembership for member access, AuthzDirectOwner for uploader-only modify/delete. ' +
     'Entity-type provisioning with a non-empty `storage` array adds per-scope storage tables ' +
@@ -29,8 +33,8 @@ export const PresetB2bStorage: ModulePreset = {
     'Apps that need per-entity-type file storage (e.g., project files, team assets)'
   ],
   not_for: [
-    'Single-tenant consumer apps — use `auth:email` or `auth:hardened` and add storage separately',
-    'Apps without file upload needs — use `b2b` to avoid the storage table overhead'
+    'Single-tenant consumer apps — use `auth:hardened` and add storage separately',
+    'Apps without file upload needs — drop `storage_module` from the module list'
   ],
   modules: [
     'users_module',
@@ -39,8 +43,12 @@ export const PresetB2bStorage: ModulePreset = {
     ['capabilities_module', { scope: 'org' }],
     ['limits_module', { scope: 'app' }],
     ['limits_module', { scope: 'org' }],
-    ['levels_module', { scope: 'app' }],
-    ['levels_module', { scope: 'org' }],
+    // Levels come from the events module — `levels_module` is not a provisioned
+    // module, so the entries this replaces installed nothing and a B2B database
+    // could not earn a level at all. `humanity` at both scopes: the app ladder
+    // is seeded at provision, the org ladder rides each organization's insert.
+    ['events_module', { scope: 'app', trust_ladder: 'humanity' }],
+    ['events_module', { scope: 'org', trust_ladder: 'humanity' }],
     ['memberships_module', { scope: 'app' }],
     ['memberships_module', { scope: 'org' }],
     'sessions_module',
@@ -71,5 +79,5 @@ export const PresetB2bStorage: ModulePreset = {
     'devices_module',
     'user_settings_security_module'
   ],
-  extends: ['b2b']
+  extends: ['auth:hardened']
 };
