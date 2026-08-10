@@ -2054,8 +2054,8 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0
       stripe:
-        specifier: ^17.7.0
-        version: 17.7.0
+        specifier: ^22.4.0
+        version: 22.4.0(@types/node@25.9.1)
     devDependencies:
       '@aws-sdk/client-s3':
         specifier: ^3.1052.0
@@ -14464,12 +14464,17 @@ packages:
       }
     engines: { node: '>=8' }
 
-  stripe@17.7.0:
+  stripe@22.4.0:
     resolution:
       {
-        integrity: sha512-aT2BU9KkizY9SATf14WhhYVv2uOapBWX0OFWF4xvcj1mPaNotlSc2CsxpS4DS46ZueSppmCF5BX1sNYBtwBvfw==,
+        integrity: sha512-LVJ+tcSYeqOSnXr3i+Kz2tZ7y0crLLdP2uwD/4wccrmEVyn0g/Heo0pF7as7rxS/sOjJzrb1lxgZY0Y0Dx1pSA==,
       }
-    engines: { node: '>=12.*' }
+    engines: { node: '>=18' }
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   strnum@2.3.0:
     resolution:
@@ -23241,10 +23246,9 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  stripe@17.7.0:
-    dependencies:
-      '@types/node': 22.19.19
-      qs: 6.14.1
+  stripe@22.4.0(@types/node@25.9.1):
+    optionalDependencies:
+      '@types/node': 25.9.1
 
   strnum@2.3.0: {}
 
