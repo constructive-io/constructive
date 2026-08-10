@@ -7,49 +7,52 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
-  AcceptDatabaseTransferInput,
   ApplyRlsInput,
-  CancelDatabaseTransferInput,
+  AppsInstallAppInput,
+  AppsUninstallAppInput,
+  AppsUpgradeAppInput,
   DomainsAssignSubdomainInput,
   PlatformDomainsAssignSubdomainInput,
   PlatformSitesProvisionStaticSiteInput,
   ProvisionBucketInput,
-  RejectDatabaseTransferInput,
   RequestDatabaseInput,
   SetFieldOrderInput,
   SitesProvisionStaticSiteInput,
-  AcceptDatabaseTransferPayload,
   ApplyRlsPayload,
-  CancelDatabaseTransferPayload,
+  AppsInstallAppPayload,
+  AppsUninstallAppPayload,
+  AppsUpgradeAppPayload,
   DomainsAssignSubdomainPayload,
   PlatformDomainsAssignSubdomainPayload,
   PlatformSitesProvisionStaticSitePayload,
   ProvisionBucketPayload,
-  RejectDatabaseTransferPayload,
   RequestDatabasePayload,
   SetFieldOrderPayload,
   SitesProvisionStaticSitePayload,
-  AcceptDatabaseTransferPayloadSelect,
   ApplyRlsPayloadSelect,
-  CancelDatabaseTransferPayloadSelect,
+  AppsInstallAppPayloadSelect,
+  AppsUninstallAppPayloadSelect,
+  AppsUpgradeAppPayloadSelect,
   DomainsAssignSubdomainPayloadSelect,
   PlatformDomainsAssignSubdomainPayloadSelect,
   PlatformSitesProvisionStaticSitePayloadSelect,
   ProvisionBucketPayloadSelect,
-  RejectDatabaseTransferPayloadSelect,
   RequestDatabasePayloadSelect,
   SetFieldOrderPayloadSelect,
   SitesProvisionStaticSitePayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface AcceptDatabaseTransferVariables {
-  input: AcceptDatabaseTransferInput;
-}
 export interface ApplyRlsVariables {
   input: ApplyRlsInput;
 }
-export interface CancelDatabaseTransferVariables {
-  input: CancelDatabaseTransferInput;
+export interface AppsInstallAppVariables {
+  input: AppsInstallAppInput;
+}
+export interface AppsUninstallAppVariables {
+  input: AppsUninstallAppInput;
+}
+export interface AppsUpgradeAppVariables {
+  input: AppsUpgradeAppInput;
 }
 export interface DomainsAssignSubdomainVariables {
   input: DomainsAssignSubdomainInput;
@@ -69,9 +72,6 @@ and lifecycle settings.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
-}
-export interface RejectDatabaseTransferVariables {
-  input: RejectDatabaseTransferInput;
 }
 /**
  * Variables for requestDatabase
@@ -94,35 +94,6 @@ export interface SitesProvisionStaticSiteVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
-    acceptDatabaseTransfer: <S extends AcceptDatabaseTransferPayloadSelect>(
-      args: AcceptDatabaseTransferVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, AcceptDatabaseTransferPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        acceptDatabaseTransfer: InferSelectResult<AcceptDatabaseTransferPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'AcceptDatabaseTransfer',
-        fieldName: 'acceptDatabaseTransfer',
-        ...buildCustomDocument(
-          'mutation',
-          'AcceptDatabaseTransfer',
-          'acceptDatabaseTransfer',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'AcceptDatabaseTransferInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'AcceptDatabaseTransferPayload'
-        ),
-      }),
     applyRls: <S extends ApplyRlsPayloadSelect>(
       args: ApplyRlsVariables,
       options: {
@@ -152,33 +123,91 @@ export function createMutationOperations(client: OrmClient) {
           'ApplyRlsPayload'
         ),
       }),
-    cancelDatabaseTransfer: <S extends CancelDatabaseTransferPayloadSelect>(
-      args: CancelDatabaseTransferVariables,
+    appsInstallApp: <S extends AppsInstallAppPayloadSelect>(
+      args: AppsInstallAppVariables,
       options: {
         select: S;
-      } & StrictSelect<S, CancelDatabaseTransferPayloadSelect>
+      } & StrictSelect<S, AppsInstallAppPayloadSelect>
     ) =>
       new QueryBuilder<{
-        cancelDatabaseTransfer: InferSelectResult<CancelDatabaseTransferPayload, S> | null;
+        appsInstallApp: InferSelectResult<AppsInstallAppPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'CancelDatabaseTransfer',
-        fieldName: 'cancelDatabaseTransfer',
+        operationName: 'AppsInstallApp',
+        fieldName: 'appsInstallApp',
         ...buildCustomDocument(
           'mutation',
-          'CancelDatabaseTransfer',
-          'cancelDatabaseTransfer',
+          'AppsInstallApp',
+          'appsInstallApp',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'CancelDatabaseTransferInput!',
+              type: 'AppsInstallAppInput!',
             },
           ],
           connectionFieldsMap,
-          'CancelDatabaseTransferPayload'
+          'AppsInstallAppPayload'
+        ),
+      }),
+    appsUninstallApp: <S extends AppsUninstallAppPayloadSelect>(
+      args: AppsUninstallAppVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, AppsUninstallAppPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        appsUninstallApp: InferSelectResult<AppsUninstallAppPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'AppsUninstallApp',
+        fieldName: 'appsUninstallApp',
+        ...buildCustomDocument(
+          'mutation',
+          'AppsUninstallApp',
+          'appsUninstallApp',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'AppsUninstallAppInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'AppsUninstallAppPayload'
+        ),
+      }),
+    appsUpgradeApp: <S extends AppsUpgradeAppPayloadSelect>(
+      args: AppsUpgradeAppVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, AppsUpgradeAppPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        appsUpgradeApp: InferSelectResult<AppsUpgradeAppPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'AppsUpgradeApp',
+        fieldName: 'appsUpgradeApp',
+        ...buildCustomDocument(
+          'mutation',
+          'AppsUpgradeApp',
+          'appsUpgradeApp',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'AppsUpgradeAppInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'AppsUpgradeAppPayload'
         ),
       }),
     domainsAssignSubdomain: <S extends DomainsAssignSubdomainPayloadSelect>(
@@ -301,35 +330,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionBucketPayload'
-        ),
-      }),
-    rejectDatabaseTransfer: <S extends RejectDatabaseTransferPayloadSelect>(
-      args: RejectDatabaseTransferVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RejectDatabaseTransferPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        rejectDatabaseTransfer: InferSelectResult<RejectDatabaseTransferPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RejectDatabaseTransfer',
-        fieldName: 'rejectDatabaseTransfer',
-        ...buildCustomDocument(
-          'mutation',
-          'RejectDatabaseTransfer',
-          'rejectDatabaseTransfer',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RejectDatabaseTransferInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RejectDatabaseTransferPayload'
         ),
       }),
     requestDatabase: <S extends RequestDatabasePayloadSelect>(

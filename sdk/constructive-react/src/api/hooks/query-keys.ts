@@ -19,6 +19,15 @@
 // Entity Query Keys
 // ============================================================================
 
+export const apiKeys = {
+  /** All api queries */ all: ['api'] as const,
+  /** List query keys */ lists: () => [...apiKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...apiKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...apiKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...apiKeys.details(), id] as const,
+} as const;
 export const apiSchemaKeys = {
   /** All apiSchema queries */ all: ['apischema'] as const,
   /** List query keys */ lists: () => [...apiSchemaKeys.all, 'list'] as const,
@@ -37,23 +46,23 @@ export const apiSettingKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...apiSettingKeys.details(), id] as const,
 } as const;
-export const apisKeys = {
-  /** All apis queries */ all: ['apis'] as const,
-  /** List query keys */ lists: () => [...apisKeys.all, 'list'] as const,
+export const appComponentKeys = {
+  /** All appComponent queries */ all: ['appcomponent'] as const,
+  /** List query keys */ lists: () => [...appComponentKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...apisKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...apisKeys.all, 'detail'] as const,
+    [...appComponentKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...appComponentKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...apisKeys.details(), id] as const,
+    [...appComponentKeys.details(), id] as const,
 } as const;
-export const astMigrationKeys = {
-  /** All astMigration queries */ all: ['astmigration'] as const,
-  /** List query keys */ lists: () => [...astMigrationKeys.all, 'list'] as const,
+export const appKeys = {
+  /** All app queries */ all: ['app'] as const,
+  /** List query keys */ lists: () => [...appKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...astMigrationKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...astMigrationKeys.all, 'detail'] as const,
+    [...appKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...appKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...astMigrationKeys.details(), id] as const,
+    [...appKeys.details(), id] as const,
 } as const;
 export const checkConstraintKeys = {
   /** All checkConstraint queries */ all: ['checkconstraint'] as const,
@@ -162,6 +171,33 @@ export const domainVerificationKeys = {
   /** Detail query keys */ details: () => [...domainVerificationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...domainVerificationKeys.details(), id] as const,
+} as const;
+export const emailIdentityKeys = {
+  /** All emailIdentity queries */ all: ['emailidentity'] as const,
+  /** List query keys */ lists: () => [...emailIdentityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...emailIdentityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...emailIdentityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...emailIdentityKeys.details(), id] as const,
+} as const;
+export const emailProviderAccountKeys = {
+  /** All emailProviderAccount queries */ all: ['emailprovideraccount'] as const,
+  /** List query keys */ lists: () => [...emailProviderAccountKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...emailProviderAccountKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...emailProviderAccountKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...emailProviderAccountKeys.details(), id] as const,
+} as const;
+export const emailSiteIdentityKeys = {
+  /** All emailSiteIdentity queries */ all: ['emailsiteidentity'] as const,
+  /** List query keys */ lists: () => [...emailSiteIdentityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...emailSiteIdentityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...emailSiteIdentityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...emailSiteIdentityKeys.details(), id] as const,
 } as const;
 export const embeddingChunkKeys = {
   /** All embeddingChunk queries */ all: ['embeddingchunk'] as const,
@@ -308,6 +344,15 @@ export const partitionKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...partitionKeys.details(), id] as const,
 } as const;
+export const platformApiKeys = {
+  /** All platformApi queries */ all: ['platformapi'] as const,
+  /** List query keys */ lists: () => [...platformApiKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformApiKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformApiKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformApiKeys.details(), id] as const,
+} as const;
 export const platformApiSchemaKeys = {
   /** All platformApiSchema queries */ all: ['platformapischema'] as const,
   /** List query keys */ lists: () => [...platformApiSchemaKeys.all, 'list'] as const,
@@ -325,15 +370,6 @@ export const platformApiSettingKeys = {
   /** Detail query keys */ details: () => [...platformApiSettingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformApiSettingKeys.details(), id] as const,
-} as const;
-export const platformApisKeys = {
-  /** All platformApis queries */ all: ['platformapis'] as const,
-  /** List query keys */ lists: () => [...platformApisKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...platformApisKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...platformApisKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...platformApisKeys.details(), id] as const,
 } as const;
 export const platformCorsSettingKeys = {
   /** All platformCorsSetting queries */ all: ['platformcorssetting'] as const,
@@ -371,6 +407,34 @@ export const platformDomainVerificationKeys = {
     [...platformDomainVerificationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformDomainVerificationKeys.details(), id] as const,
+} as const;
+export const platformEmailIdentityKeys = {
+  /** All platformEmailIdentity queries */ all: ['platformemailidentity'] as const,
+  /** List query keys */ lists: () => [...platformEmailIdentityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformEmailIdentityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformEmailIdentityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformEmailIdentityKeys.details(), id] as const,
+} as const;
+export const platformEmailProviderAccountKeys = {
+  /** All platformEmailProviderAccount queries */ all: ['platformemailprovideraccount'] as const,
+  /** List query keys */ lists: () => [...platformEmailProviderAccountKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformEmailProviderAccountKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformEmailProviderAccountKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformEmailProviderAccountKeys.details(), id] as const,
+} as const;
+export const platformEmailSiteIdentityKeys = {
+  /** All platformEmailSiteIdentity queries */ all: ['platformemailsiteidentity'] as const,
+  /** List query keys */ lists: () => [...platformEmailSiteIdentityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformEmailSiteIdentityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformEmailSiteIdentityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformEmailSiteIdentityKeys.details(), id] as const,
 } as const;
 export const platformManagedDomainKeys = {
   /** All platformManagedDomain queries */ all: ['platformmanageddomain'] as const,
@@ -615,15 +679,6 @@ export const spatialRelationKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...spatialRelationKeys.details(), id] as const,
 } as const;
-export const sqlActionKeys = {
-  /** All sqlAction queries */ all: ['sqlaction'] as const,
-  /** List query keys */ lists: () => [...sqlActionKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...sqlActionKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...sqlActionKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...sqlActionKeys.details(), id] as const,
-} as const;
 export const tableBehaviorKeys = {
   /** All tableBehavior queries */ all: ['tablebehavior'] as const,
   /** List query keys */ lists: () => [...tableBehaviorKeys.all, 'list'] as const,
@@ -783,10 +838,11 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
+  api: apiKeys,
   apiSchema: apiSchemaKeys,
   apiSetting: apiSettingKeys,
-  apis: apisKeys,
-  astMigration: astMigrationKeys,
+  appComponent: appComponentKeys,
+  app: appKeys,
   checkConstraint: checkConstraintKeys,
   compositeType: compositeTypeKeys,
   corsSetting: corsSettingKeys,
@@ -799,6 +855,9 @@ export const queryKeys = {
   domainEvent: domainEventKeys,
   domainType: domainTypeKeys,
   domainVerification: domainVerificationKeys,
+  emailIdentity: emailIdentityKeys,
+  emailProviderAccount: emailProviderAccountKeys,
+  emailSiteIdentity: emailSiteIdentityKeys,
   embeddingChunk: embeddingChunkKeys,
   enum: enumKeys,
   exclusionConstraint: exclusionConstraintKeys,
@@ -815,13 +874,16 @@ export const queryKeys = {
   nodeTypeRegistry: nodeTypeRegistryKeys,
   page: pageKeys,
   partition: partitionKeys,
+  platformApi: platformApiKeys,
   platformApiSchema: platformApiSchemaKeys,
   platformApiSetting: platformApiSettingKeys,
-  platformApis: platformApisKeys,
   platformCorsSetting: platformCorsSettingKeys,
   platformDomain: platformDomainKeys,
   platformDomainEvent: platformDomainEventKeys,
   platformDomainVerification: platformDomainVerificationKeys,
+  platformEmailIdentity: platformEmailIdentityKeys,
+  platformEmailProviderAccount: platformEmailProviderAccountKeys,
+  platformEmailSiteIdentity: platformEmailSiteIdentityKeys,
   platformManagedDomain: platformManagedDomainKeys,
   platformPage: platformPageKeys,
   platformSiteAppLink: platformSiteAppLinkKeys,
@@ -849,7 +911,6 @@ export const queryKeys = {
   siteTheme: siteThemeKeys,
   siteWebConfig: siteWebConfigKeys,
   spatialRelation: spatialRelationKeys,
-  sqlAction: sqlActionKeys,
   tableBehavior: tableBehaviorKeys,
   table: tableKeys,
   tableGrant: tableGrantKeys,

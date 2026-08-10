@@ -2838,6 +2838,12 @@ type Mutation {
     """
     input: SignInCrossOriginInput!
   ): SignInCrossOriginPayload
+  signInMagicLink(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignInMagicLinkInput!
+  ): SignInMagicLinkPayload
   signInSmsOtp(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2856,6 +2862,12 @@ type Mutation {
     """
     input: SignUpInput!
   ): SignUpPayload
+  signUpMagicLink(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignUpMagicLinkInput!
+  ): SignUpMagicLinkPayload
   signUpSms(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3085,7 +3097,9 @@ type PageInfo {
 User phone numbers with country code, verification, and primary-number management
 """
 type PhoneNumber {
-  """Country calling code (e.g. +1, +44)"""
+  """
+  Country calling code the number was entered under (e.g. +1, +44). Display only: `number` already carries it, and sign-in matches `number`.
+  """
   cc: String!
   createdAt: Datetime
   id: UUID!
@@ -3101,7 +3115,9 @@ type PhoneNumber {
   """
   name: String
 
-  """The phone number without country code"""
+  """
+  The full number in E.164 form, country calling code included (e.g. +15551234567). This is the value SMS sign-in and MFA match, so it is unique across the table and constrained to that shape.
+  """
   number: String!
 
   """Reads a single `User` that is related to this `PhoneNumber`."""
@@ -3182,7 +3198,9 @@ input PhoneNumberFilter {
 
 """An input for mutations affecting `PhoneNumber`"""
 input PhoneNumberInput {
-  """Country calling code (e.g. +1, +44)"""
+  """
+  Country calling code the number was entered under (e.g. +1, +44). Display only: `number` already carries it, and sign-in matches `number`.
+  """
   cc: String!
   createdAt: Datetime
   id: UUID
@@ -3198,7 +3216,9 @@ input PhoneNumberInput {
   """
   name: String
 
-  """The phone number without country code"""
+  """
+  The full number in E.164 form, country calling code included (e.g. +15551234567). This is the value SMS sign-in and MFA match, so it is unique across the table and constrained to that shape.
+  """
   number: String!
   ownerId: UUID
   updatedAt: Datetime
@@ -3233,7 +3253,9 @@ enum PhoneNumberOrderBy {
 Represents an update to a `PhoneNumber`. Fields that are set will be updated.
 """
 input PhoneNumberPatch {
-  """Country calling code (e.g. +1, +44)"""
+  """
+  Country calling code the number was entered under (e.g. +1, +44). Display only: `number` already carries it, and sign-in matches `number`.
+  """
   cc: String
   createdAt: Datetime
   id: UUID
@@ -3249,7 +3271,9 @@ input PhoneNumberPatch {
   """
   name: String
 
-  """The phone number without country code"""
+  """
+  The full number in E.164 form, country calling code included (e.g. +15551234567). This is the value SMS sign-in and MFA match, so it is unique across the table and constrained to that shape.
+  """
   number: String
   ownerId: UUID
   updatedAt: Datetime
@@ -3607,11 +3631,11 @@ enum PrincipalOrderBy {
 }
 
 """
-Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions.
+Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions.
 """
 type PrincipalScopeOverride {
   """
-  Optional permission mask; AND-masked with parent permissions during cascade. NULL means no extra mask.
+  Optional capability mask; AND-masked with parent capabilities during cascade. NULL means no extra mask.
   """
   allowedMask: BitString
   createdAt: Datetime
@@ -4549,6 +4573,40 @@ input SignInInput {
   rememberMe: Boolean
 }
 
+"""All input for the `signInMagicLink` mutation."""
+input SignInMagicLinkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  credentialKind: String
+  deviceToken: String
+  rememberMe: Boolean
+  token: String
+}
+
+"""The output of our `signInMagicLink` mutation."""
+type SignInMagicLinkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: SignInMagicLinkRecord
+}
+
+type SignInMagicLinkRecord {
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+  userId: UUID
+}
+
 """The output of our `signIn` mutation."""
 type SignInPayload {
   """
@@ -4646,6 +4704,40 @@ input SignUpInput {
   email: String
   password: String
   rememberMe: Boolean
+}
+
+"""All input for the `signUpMagicLink` mutation."""
+input SignUpMagicLinkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  credentialKind: String
+  deviceToken: String
+  rememberMe: Boolean
+  token: String
+}
+
+"""The output of our `signUpMagicLink` mutation."""
+type SignUpMagicLinkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: SignUpMagicLinkRecord
+}
+
+type SignUpMagicLinkRecord {
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+  userId: UUID
 }
 
 """The output of our `signUp` mutation."""

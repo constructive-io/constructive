@@ -5,6 +5,13 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { AppAchievementRewardModel } from './models/appAchievementReward';
+import { AppEventAggregateModel } from './models/appEventAggregate';
+import { AppEventModel } from './models/appEvent';
+import { AppEventTypeModel } from './models/appEventType';
+import { AppLevelModel } from './models/appLevel';
+import { AppLevelGrantModel } from './models/appLevelGrant';
+import { AppLevelRequirementModel } from './models/appLevelRequirement';
 import { AppLimitCapModel } from './models/appLimitCap';
 import { AppLimitCapsDefaultModel } from './models/appLimitCapsDefault';
 import { AppLimitModel } from './models/appLimit';
@@ -15,6 +22,12 @@ import { AppLimitCreditRedemptionModel } from './models/appLimitCreditRedemption
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { AppLimitEventModel } from './models/appLimitEvent';
 import { AppLimitWarningModel } from './models/appLimitWarning';
+import { BillingUsageSummaryModel } from './models/billingUsageSummary';
+import { LedgerModel } from './models/ledger';
+import { MeterModel } from './models/meter';
+import { MeterCreditModel } from './models/meterCredit';
+import { MeterDefaultModel } from './models/meterDefault';
+import { MeterSourceModel } from './models/meterSource';
 import { OrgLimitAggregateModel } from './models/orgLimitAggregate';
 import { OrgLimitCapModel } from './models/orgLimitCap';
 import { OrgLimitCapsDefaultModel } from './models/orgLimitCapsDefault';
@@ -23,12 +36,21 @@ import { OrgLimitCreditModel } from './models/orgLimitCredit';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { OrgLimitEventModel } from './models/orgLimitEvent';
 import { OrgLimitWarningModel } from './models/orgLimitWarning';
+import { PlanCapModel } from './models/planCap';
+import { PlanModel } from './models/plan';
+import { PlanLimitModel } from './models/planLimit';
+import { PlanMeterLimitModel } from './models/planMeterLimit';
+import { PlanOverrideModel } from './models/planOverride';
+import { PlanPricingModel } from './models/planPricing';
+import { PlanSubscriptionModel } from './models/planSubscription';
+import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';
+export { createQueryOperations } from './query';
 export { createMutationOperations } from './mutation';
 /**
  * Create an ORM client instance
@@ -56,6 +78,13 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    appAchievementReward: new AppAchievementRewardModel(client),
+    appEventAggregate: new AppEventAggregateModel(client),
+    appEvent: new AppEventModel(client),
+    appEventType: new AppEventTypeModel(client),
+    appLevel: new AppLevelModel(client),
+    appLevelGrant: new AppLevelGrantModel(client),
+    appLevelRequirement: new AppLevelRequirementModel(client),
     appLimitCap: new AppLimitCapModel(client),
     appLimitCapsDefault: new AppLimitCapsDefaultModel(client),
     appLimit: new AppLimitModel(client),
@@ -66,6 +95,12 @@ export function createClient(config: OrmClientConfig) {
     appLimitDefault: new AppLimitDefaultModel(client),
     appLimitEvent: new AppLimitEventModel(client),
     appLimitWarning: new AppLimitWarningModel(client),
+    billingUsageSummary: new BillingUsageSummaryModel(client),
+    ledger: new LedgerModel(client),
+    meter: new MeterModel(client),
+    meterCredit: new MeterCreditModel(client),
+    meterDefault: new MeterDefaultModel(client),
+    meterSource: new MeterSourceModel(client),
     orgLimitAggregate: new OrgLimitAggregateModel(client),
     orgLimitCap: new OrgLimitCapModel(client),
     orgLimitCapsDefault: new OrgLimitCapsDefaultModel(client),
@@ -74,6 +109,14 @@ export function createClient(config: OrmClientConfig) {
     orgLimitDefault: new OrgLimitDefaultModel(client),
     orgLimitEvent: new OrgLimitEventModel(client),
     orgLimitWarning: new OrgLimitWarningModel(client),
+    planCap: new PlanCapModel(client),
+    plan: new PlanModel(client),
+    planLimit: new PlanLimitModel(client),
+    planMeterLimit: new PlanMeterLimitModel(client),
+    planOverride: new PlanOverrideModel(client),
+    planPricing: new PlanPricingModel(client),
+    planSubscription: new PlanSubscriptionModel(client),
+    query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };
 }

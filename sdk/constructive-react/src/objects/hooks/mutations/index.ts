@@ -18,5 +18,8 @@ export * from './useUpdateStoreMutation';
 export * from './useDeleteStoreMutation';
 export * from './useInitEmptyRepoMutation';
 export * from './useInsertNodeAtPathMutation';
+export * from './useInsertNodesAtPathsMutation';
 export * from './useProvisionBucketMutation';
+export * from './useSetAndCommitMutation';
 export * from './useSetDataAtPathMutation';
+export * from './useSetManyAndCommitMutation';

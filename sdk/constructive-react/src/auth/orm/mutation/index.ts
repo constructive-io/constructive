@@ -30,9 +30,11 @@ import type {
   SetPasswordInput,
   SignInInput,
   SignInCrossOriginInput,
+  SignInMagicLinkInput,
   SignInSmsOtpInput,
   SignOutInput,
   SignUpInput,
+  SignUpMagicLinkInput,
   SignUpSmsInput,
   VerifyEmailInput,
   VerifyPasswordInput,
@@ -60,9 +62,11 @@ import type {
   SetPasswordPayload,
   SignInPayload,
   SignInCrossOriginPayload,
+  SignInMagicLinkPayload,
   SignInSmsOtpPayload,
   SignOutPayload,
   SignUpPayload,
+  SignUpMagicLinkPayload,
   SignUpSmsPayload,
   VerifyEmailPayload,
   VerifyPasswordPayload,
@@ -90,9 +94,11 @@ import type {
   SetPasswordPayloadSelect,
   SignInPayloadSelect,
   SignInCrossOriginPayloadSelect,
+  SignInMagicLinkPayloadSelect,
   SignInSmsOtpPayloadSelect,
   SignOutPayloadSelect,
   SignUpPayloadSelect,
+  SignUpMagicLinkPayloadSelect,
   SignUpSmsPayloadSelect,
   VerifyEmailPayloadSelect,
   VerifyPasswordPayloadSelect,
@@ -175,6 +181,9 @@ export interface SignInVariables {
 export interface SignInCrossOriginVariables {
   input: SignInCrossOriginInput;
 }
+export interface SignInMagicLinkVariables {
+  input: SignInMagicLinkInput;
+}
 export interface SignInSmsOtpVariables {
   input: SignInSmsOtpInput;
 }
@@ -183,6 +192,9 @@ export interface SignOutVariables {
 }
 export interface SignUpVariables {
   input: SignUpInput;
+}
+export interface SignUpMagicLinkVariables {
+  input: SignUpMagicLinkInput;
 }
 export interface SignUpSmsVariables {
   input: SignUpSmsInput;
@@ -865,6 +877,35 @@ export function createMutationOperations(client: OrmClient) {
           'SignInCrossOriginPayload'
         ),
       }),
+    signInMagicLink: <S extends SignInMagicLinkPayloadSelect>(
+      args: SignInMagicLinkVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SignInMagicLinkPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        signInMagicLink: InferSelectResult<SignInMagicLinkPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SignInMagicLink',
+        fieldName: 'signInMagicLink',
+        ...buildCustomDocument(
+          'mutation',
+          'SignInMagicLink',
+          'signInMagicLink',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SignInMagicLinkInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SignInMagicLinkPayload'
+        ),
+      }),
     signInSmsOtp: <S extends SignInSmsOtpPayloadSelect>(
       args: SignInSmsOtpVariables,
       options: {
@@ -950,6 +991,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SignUpPayload'
+        ),
+      }),
+    signUpMagicLink: <S extends SignUpMagicLinkPayloadSelect>(
+      args: SignUpMagicLinkVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SignUpMagicLinkPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        signUpMagicLink: InferSelectResult<SignUpMagicLinkPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SignUpMagicLink',
+        fieldName: 'signUpMagicLink',
+        ...buildCustomDocument(
+          'mutation',
+          'SignUpMagicLink',
+          'signUpMagicLink',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SignUpMagicLinkInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SignUpMagicLinkPayload'
         ),
       }),
     signUpSms: <S extends SignUpSmsPayloadSelect>(

@@ -2,14 +2,14 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
+Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status
 
 ## Usage
 
 ```typescript
 db.appMembership.findMany({ select: { id: true } }).execute()
 db.appMembership.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.appMembership.create({ data: { actorId: '<UUID>', createdBy: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isOwner: '<Boolean>', isVerified: '<Boolean>', permissions: '<BitString>', profileId: '<UUID>', updatedBy: '<UUID>' }, select: { id: true } }).execute()
+db.appMembership.create({ data: { actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isOwner: '<Boolean>', isVerified: '<Boolean>', profileId: '<UUID>', updatedBy: '<UUID>' }, select: { id: true } }).execute()
 db.appMembership.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.appMembership.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.appMembership.findMany({
 
 ```typescript
 const item = await db.appMembership.create({
-  data: { actorId: '<UUID>', createdBy: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isOwner: '<Boolean>', isVerified: '<Boolean>', permissions: '<BitString>', profileId: '<UUID>', updatedBy: '<UUID>' },
+  data: { actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isOwner: '<Boolean>', isVerified: '<Boolean>', profileId: '<UUID>', updatedBy: '<UUID>' },
   select: { id: true }
 }).execute();
 ```
