@@ -877,7 +877,7 @@ export interface AppLimitInput {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -905,7 +905,7 @@ export interface AppLimitPatch {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -1223,7 +1223,7 @@ export interface OrgLimitAggregateInput {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this entity by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -1253,7 +1253,7 @@ export interface OrgLimitAggregatePatch {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this entity by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -1599,7 +1599,7 @@ export interface OrgLimitInput {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -1628,7 +1628,7 @@ export interface OrgLimitPatch {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;

@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions.
+Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions.
 
 ## Usage
 

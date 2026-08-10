@@ -17,6 +17,7 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   actorId: 'uuid',
+  capabilities: 'string',
   createdAt: 'string',
   createdBy: 'uuid',
   entityId: 'uuid',
@@ -30,7 +31,6 @@ const fieldSchema: FieldSchema = {
   isExternal: 'boolean',
   isOwner: 'boolean',
   isReadOnly: 'boolean',
-  permissions: 'string',
   profileId: 'uuid',
   updatedAt: 'string',
   updatedBy: 'uuid',
@@ -87,6 +87,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       actorId: true,
+      capabilities: true,
       createdAt: true,
       createdBy: true,
       entityId: true,
@@ -100,7 +101,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isExternal: true,
       isOwner: true,
       isReadOnly: true,
-      permissions: true,
       profileId: true,
       updatedAt: true,
       updatedBy: true,
@@ -125,6 +125,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       actorId: true,
+      capabilities: true,
       createdAt: true,
       createdBy: true,
       entityId: true,
@@ -138,7 +139,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isExternal: true,
       isOwner: true,
       isReadOnly: true,
-      permissions: true,
       profileId: true,
       updatedAt: true,
       updatedBy: true,
@@ -175,6 +175,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           actorId: true,
+          capabilities: true,
           createdAt: true,
           createdBy: true,
           entityId: true,
@@ -188,7 +189,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           isExternal: true,
           isOwner: true,
           isReadOnly: true,
-          permissions: true,
           profileId: true,
           updatedAt: true,
           updatedBy: true,
@@ -212,6 +212,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'actorId',
         message: 'actorId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'capabilities',
+        message: 'capabilities',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -291,13 +298,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'permissions',
-        message: 'permissions',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'profileId',
         message: 'profileId',
         required: false,
@@ -321,6 +321,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           actorId: cleanedData.actorId,
+          capabilities: cleanedData.capabilities,
           createdBy: cleanedData.createdBy,
           entityId: cleanedData.entityId,
           granted: cleanedData.granted,
@@ -332,12 +333,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isExternal: cleanedData.isExternal,
           isOwner: cleanedData.isOwner,
           isReadOnly: cleanedData.isReadOnly,
-          permissions: cleanedData.permissions,
           profileId: cleanedData.profileId,
           updatedBy: cleanedData.updatedBy,
         },
         select: {
           actorId: true,
+          capabilities: true,
           createdAt: true,
           createdBy: true,
           entityId: true,
@@ -351,7 +352,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isExternal: true,
           isOwner: true,
           isReadOnly: true,
-          permissions: true,
           profileId: true,
           updatedAt: true,
           updatedBy: true,
@@ -384,6 +384,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'capabilities',
+        message: 'capabilities',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'createdBy',
         message: 'createdBy',
         required: false,
@@ -460,13 +467,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'permissions',
-        message: 'permissions',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'profileId',
         message: 'profileId',
         required: false,
@@ -490,6 +490,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           actorId: cleanedData.actorId,
+          capabilities: cleanedData.capabilities,
           createdBy: cleanedData.createdBy,
           entityId: cleanedData.entityId,
           granted: cleanedData.granted,
@@ -501,12 +502,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isExternal: cleanedData.isExternal,
           isOwner: cleanedData.isOwner,
           isReadOnly: cleanedData.isReadOnly,
-          permissions: cleanedData.permissions,
           profileId: cleanedData.profileId,
           updatedBy: cleanedData.updatedBy,
         },
         select: {
           actorId: true,
+          capabilities: true,
           createdAt: true,
           createdBy: true,
           entityId: true,
@@ -520,7 +521,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isExternal: true,
           isOwner: true,
           isReadOnly: true,
-          permissions: true,
           profileId: true,
           updatedAt: true,
           updatedBy: true,

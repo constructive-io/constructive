@@ -13,6 +13,20 @@ export interface AppAdminGrant {
   isGrant: boolean | null;
   updatedAt: string | null;
 }
+export interface AppCapabilityDefaultCapability {
+  capabilityId: string | null;
+  createdAt: string | null;
+  id: string | null;
+  updatedAt: string | null;
+}
+export interface AppCapabilityDefaultGrant {
+  capabilityId: string | null;
+  createdAt: string | null;
+  grantorId: string | null;
+  id: string | null;
+  isGrant: boolean | null;
+  updatedAt: string | null;
+}
 export interface AppClaimedInvite {
   createdAt: string | null;
   data: unknown | null;
@@ -23,11 +37,11 @@ export interface AppClaimedInvite {
 }
 export interface AppGrant {
   actorId: string | null;
+  capabilities: string | null;
   createdAt: string | null;
   grantorId: string | null;
   id: string | null;
   isGrant: boolean | null;
-  permissions: string | null;
   updatedAt: string | null;
 }
 export interface AppInvite {
@@ -49,6 +63,7 @@ export interface AppInvite {
 }
 export interface AppMembership {
   actorId: string | null;
+  capabilities: string | null;
   createdAt: string | null;
   createdBy: string | null;
   granted: string | null;
@@ -60,7 +75,6 @@ export interface AppMembership {
   isDisabled: boolean | null;
   isOwner: boolean | null;
   isVerified: boolean | null;
-  permissions: string | null;
   profileId: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
@@ -82,31 +96,6 @@ export interface AppOwnerGrant {
   isGrant: boolean | null;
   updatedAt: string | null;
 }
-export interface AppPermission {
-  bitnum: number | null;
-  bitstr: string | null;
-  description: string | null;
-  id: string | null;
-  name: string | null;
-}
-export interface AppPermissionDefault {
-  id: string | null;
-  permissions: string | null;
-}
-export interface AppPermissionDefaultGrant {
-  createdAt: string | null;
-  grantorId: string | null;
-  id: string | null;
-  isGrant: boolean | null;
-  permissionId: string | null;
-  updatedAt: string | null;
-}
-export interface AppPermissionDefaultPermission {
-  createdAt: string | null;
-  id: string | null;
-  permissionId: string | null;
-  updatedAt: string | null;
-}
 export interface MembershipType {
   description: string | null;
   hasUsersTableEntry: boolean | null;
@@ -117,6 +106,22 @@ export interface MembershipType {
 }
 export interface OrgAdminGrant {
   actorId: string | null;
+  createdAt: string | null;
+  entityId: string | null;
+  grantorId: string | null;
+  id: string | null;
+  isGrant: boolean | null;
+  updatedAt: string | null;
+}
+export interface OrgCapabilityDefaultCapability {
+  capabilityId: string | null;
+  createdAt: string | null;
+  entityId: string | null;
+  id: string | null;
+  updatedAt: string | null;
+}
+export interface OrgCapabilityDefaultGrant {
+  capabilityId: string | null;
   createdAt: string | null;
   entityId: string | null;
   grantorId: string | null;
@@ -164,12 +169,12 @@ export interface OrgGetSubordinatesRecord {
 }
 export interface OrgGrant {
   actorId: string | null;
+  capabilities: string | null;
   createdAt: string | null;
   entityId: string | null;
   grantorId: string | null;
   id: string | null;
   isGrant: boolean | null;
-  permissions: string | null;
   updatedAt: string | null;
 }
 export interface OrgInvite {
@@ -213,6 +218,7 @@ export interface OrgMemberProfile {
 }
 export interface OrgMembership {
   actorId: string | null;
+  capabilities: string | null;
   createdAt: string | null;
   createdBy: string | null;
   entityId: string | null;
@@ -226,7 +232,6 @@ export interface OrgMembership {
   isExternal: boolean | null;
   isOwner: boolean | null;
   isReadOnly: boolean | null;
-  permissions: string | null;
   profileId: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
@@ -263,34 +268,6 @@ export interface OrgOwnerGrant {
   grantorId: string | null;
   id: string | null;
   isGrant: boolean | null;
-  updatedAt: string | null;
-}
-export interface OrgPermission {
-  bitnum: number | null;
-  bitstr: string | null;
-  description: string | null;
-  id: string | null;
-  name: string | null;
-}
-export interface OrgPermissionDefault {
-  entityId: string | null;
-  id: string | null;
-  permissions: string | null;
-}
-export interface OrgPermissionDefaultGrant {
-  createdAt: string | null;
-  entityId: string | null;
-  grantorId: string | null;
-  id: string | null;
-  isGrant: boolean | null;
-  permissionId: string | null;
-  updatedAt: string | null;
-}
-export interface OrgPermissionDefaultPermission {
-  createdAt: string | null;
-  entityId: string | null;
-  id: string | null;
-  permissionId: string | null;
   updatedAt: string | null;
 }
 export interface StringFilter {

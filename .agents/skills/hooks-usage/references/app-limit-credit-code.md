@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Redeemable credit codes managed by admins with the add_credits permission
+Redeemable credit codes managed by admins with the add_credits capability
 
 ## Usage
 

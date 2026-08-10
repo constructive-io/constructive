@@ -26,9 +26,9 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
+| `api` | api CRUD operations |
 | `api-schema` | apiSchema CRUD operations |
 | `api-setting` | apiSetting CRUD operations |
-| `apis` | apis CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
 | `check-constraint` | checkConstraint CRUD operations |
 | `composite-type` | compositeType CRUD operations |
@@ -42,6 +42,9 @@ csdk auth set-token <your-token>
 | `domain-event` | domainEvent CRUD operations |
 | `domain-type` | domainType CRUD operations |
 | `domain-verification` | domainVerification CRUD operations |
+| `email-identity` | emailIdentity CRUD operations |
+| `email-provider-account` | emailProviderAccount CRUD operations |
+| `email-site-identity` | emailSiteIdentity CRUD operations |
 | `embedding-chunk` | embeddingChunk CRUD operations |
 | `enum` | enum CRUD operations |
 | `exclusion-constraint` | exclusionConstraint CRUD operations |
@@ -58,13 +61,16 @@ csdk auth set-token <your-token>
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `page` | page CRUD operations |
 | `partition` | partition CRUD operations |
+| `platform-api` | platformApi CRUD operations |
 | `platform-api-schema` | platformApiSchema CRUD operations |
 | `platform-api-setting` | platformApiSetting CRUD operations |
-| `platform-apis` | platformApis CRUD operations |
 | `platform-cors-setting` | platformCorsSetting CRUD operations |
 | `platform-domain` | platformDomain CRUD operations |
 | `platform-domain-event` | platformDomainEvent CRUD operations |
 | `platform-domain-verification` | platformDomainVerification CRUD operations |
+| `platform-email-identity` | platformEmailIdentity CRUD operations |
+| `platform-email-provider-account` | platformEmailProviderAccount CRUD operations |
+| `platform-email-site-identity` | platformEmailSiteIdentity CRUD operations |
 | `platform-managed-domain` | platformManagedDomain CRUD operations |
 | `platform-page` | platformPage CRUD operations |
 | `platform-site-app-link` | platformSiteAppLink CRUD operations |
@@ -174,6 +180,37 @@ Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
+### `api`
+
+CRUD operations for Api records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all api records |
+| `find-first` | Find first matching api record |
+| `get` | Get a api by id |
+| `create` | Create a new api |
+| `update` | Update an existing api |
+| `delete` | Delete a api |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `anonRole` | String |
+| `config` | JSON |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `dbname` | String |
+| `id` | UUID |
+| `isPublished` | Boolean |
+| `name` | String |
+| `roleName` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `name`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
+
 ### `api-schema`
 
 CRUD operations for ApiSchema records.
@@ -239,37 +276,6 @@ CRUD operations for ApiSetting records.
 
 **Required create fields:** `apiId`, `databaseId`
 **Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableDirectUploads`, `enableI18N`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `options`, `statementTimeoutMs`
-
-### `apis`
-
-CRUD operations for Apis records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all apis records |
-| `find-first` | Find first matching apis record |
-| `get` | Get a apis by id |
-| `create` | Create a new apis |
-| `update` | Update an existing apis |
-| `delete` | Delete a apis |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `anonRole` | String |
-| `config` | JSON |
-| `createdAt` | Datetime |
-| `databaseId` | UUID |
-| `dbname` | String |
-| `id` | UUID |
-| `isPublished` | Boolean |
-| `name` | String |
-| `roleName` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `databaseId`, `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
 
 ### `ast-migration`
 
@@ -697,6 +703,103 @@ CRUD operations for DomainVerification records.
 
 **Required create fields:** `databaseId`, `method`
 **Optional create fields (backend defaults):** `attempts`, `domainId`, `error`, `expiresAt`, `lastCheckedAt`, `managedDomainId`, `recordName`, `recordType`, `recordValue`, `status`, `verifiedAt`
+
+### `email-identity`
+
+CRUD operations for EmailIdentity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all emailIdentity records |
+| `find-first` | Find first matching emailIdentity record |
+| `get` | Get a emailIdentity by id |
+| `create` | Create a new emailIdentity |
+| `update` | Update an existing emailIdentity |
+| `delete` | Delete a emailIdentity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `fromAddress` | String |
+| `fromName` | String |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `isDefault` | Boolean |
+| `name` | String |
+| `providerAccountId` | UUID |
+| `replyToAddress` | String |
+| `supportAddress` | String |
+| `transportMode` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `fromAddress`, `name`
+**Optional create fields (backend defaults):** `fromName`, `isActive`, `isDefault`, `providerAccountId`, `replyToAddress`, `supportAddress`, `transportMode`
+
+### `email-provider-account`
+
+CRUD operations for EmailProviderAccount records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all emailProviderAccount records |
+| `find-first` | Find first matching emailProviderAccount record |
+| `get` | Get a emailProviderAccount by id |
+| `create` | Create a new emailProviderAccount |
+| `update` | Update an existing emailProviderAccount |
+| `delete` | Delete a emailProviderAccount |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiBaseUrl` | String |
+| `createdAt` | Datetime |
+| `credentialsSecretName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `name` | String |
+| `provider` | String |
+| `providerAccountName` | String |
+| `region` | String |
+| `smtpHost` | String |
+| `smtpPort` | Int |
+| `smtpSecure` | Boolean |
+| `smtpUser` | String |
+| `updatedAt` | Datetime |
+| `webhookSigningSecretName` | String |
+
+**Required create fields:** `credentialsSecretName`, `databaseId`, `name`, `provider`
+**Optional create fields (backend defaults):** `apiBaseUrl`, `isActive`, `providerAccountName`, `region`, `smtpHost`, `smtpPort`, `smtpSecure`, `smtpUser`, `webhookSigningSecretName`
+
+### `email-site-identity`
+
+CRUD operations for EmailSiteIdentity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all emailSiteIdentity records |
+| `find-first` | Find first matching emailSiteIdentity record |
+| `get` | Get a emailSiteIdentity by id |
+| `create` | Create a new emailSiteIdentity |
+| `update` | Update an existing emailSiteIdentity |
+| `delete` | Delete a emailSiteIdentity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `emailIdentityId` | UUID |
+| `id` | UUID |
+| `siteId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `emailIdentityId`, `siteId`
 
 ### `embedding-chunk`
 
@@ -1236,6 +1339,36 @@ CRUD operations for Partition records.
 **Required create fields:** `databaseId`, `partitionKeyId`, `strategy`, `tableId`
 **Optional create fields (backend defaults):** `interval`, `isParented`, `namingPattern`, `premake`, `retention`, `retentionKeepTable`
 
+### `platform-api`
+
+CRUD operations for PlatformApi records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformApi records |
+| `find-first` | Find first matching platformApi record |
+| `get` | Get a platformApi by id |
+| `create` | Create a new platformApi |
+| `update` | Update an existing platformApi |
+| `delete` | Delete a platformApi |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `anonRole` | String |
+| `config` | JSON |
+| `createdAt` | Datetime |
+| `dbname` | String |
+| `id` | UUID |
+| `isPublished` | Boolean |
+| `name` | String |
+| `roleName` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
+
 ### `platform-api-schema`
 
 CRUD operations for PlatformApiSchema records.
@@ -1299,36 +1432,6 @@ CRUD operations for PlatformApiSetting records.
 
 **Required create fields:** `apiId`
 **Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableDirectUploads`, `enableI18N`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `options`, `statementTimeoutMs`
-
-### `platform-apis`
-
-CRUD operations for PlatformApis records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformApis records |
-| `find-first` | Find first matching platformApis record |
-| `get` | Get a platformApis by id |
-| `create` | Create a new platformApis |
-| `update` | Update an existing platformApis |
-| `delete` | Delete a platformApis |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `anonRole` | String |
-| `config` | JSON |
-| `createdAt` | Datetime |
-| `dbname` | String |
-| `id` | UUID |
-| `isPublished` | Boolean |
-| `name` | String |
-| `roleName` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
 
 ### `platform-cors-setting`
 
@@ -1456,6 +1559,100 @@ CRUD operations for PlatformDomainVerification records.
 
 **Required create fields:** `method`
 **Optional create fields (backend defaults):** `attempts`, `domainId`, `error`, `expiresAt`, `lastCheckedAt`, `managedDomainId`, `recordName`, `recordType`, `recordValue`, `status`, `verifiedAt`
+
+### `platform-email-identity`
+
+CRUD operations for PlatformEmailIdentity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformEmailIdentity records |
+| `find-first` | Find first matching platformEmailIdentity record |
+| `get` | Get a platformEmailIdentity by id |
+| `create` | Create a new platformEmailIdentity |
+| `update` | Update an existing platformEmailIdentity |
+| `delete` | Delete a platformEmailIdentity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `fromAddress` | String |
+| `fromName` | String |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `isDefault` | Boolean |
+| `name` | String |
+| `providerAccountId` | UUID |
+| `replyToAddress` | String |
+| `supportAddress` | String |
+| `transportMode` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `fromAddress`, `name`
+**Optional create fields (backend defaults):** `fromName`, `isActive`, `isDefault`, `providerAccountId`, `replyToAddress`, `supportAddress`, `transportMode`
+
+### `platform-email-provider-account`
+
+CRUD operations for PlatformEmailProviderAccount records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformEmailProviderAccount records |
+| `find-first` | Find first matching platformEmailProviderAccount record |
+| `get` | Get a platformEmailProviderAccount by id |
+| `create` | Create a new platformEmailProviderAccount |
+| `update` | Update an existing platformEmailProviderAccount |
+| `delete` | Delete a platformEmailProviderAccount |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiBaseUrl` | String |
+| `createdAt` | Datetime |
+| `credentialsSecretName` | String |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `name` | String |
+| `provider` | String |
+| `providerAccountName` | String |
+| `region` | String |
+| `smtpHost` | String |
+| `smtpPort` | Int |
+| `smtpSecure` | Boolean |
+| `smtpUser` | String |
+| `updatedAt` | Datetime |
+| `webhookSigningSecretName` | String |
+
+**Required create fields:** `credentialsSecretName`, `name`, `provider`
+**Optional create fields (backend defaults):** `apiBaseUrl`, `isActive`, `providerAccountName`, `region`, `smtpHost`, `smtpPort`, `smtpSecure`, `smtpUser`, `webhookSigningSecretName`
+
+### `platform-email-site-identity`
+
+CRUD operations for PlatformEmailSiteIdentity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformEmailSiteIdentity records |
+| `find-first` | Find first matching platformEmailSiteIdentity record |
+| `get` | Get a platformEmailSiteIdentity by id |
+| `create` | Create a new platformEmailSiteIdentity |
+| `update` | Update an existing platformEmailSiteIdentity |
+| `delete` | Delete a platformEmailSiteIdentity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `emailIdentityId` | UUID |
+| `id` | UUID |
+| `siteId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `emailIdentityId`, `siteId`
 
 ### `platform-managed-domain`
 

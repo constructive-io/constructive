@@ -227,6 +227,15 @@ export interface InsertNodeAtPathInput {
   root?: string;
   sId?: string;
 }
+export interface InsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: unknown[];
+  kidsList?: unknown;
+  ktreeList?: unknown;
+  paths?: unknown;
+  root?: string;
+  sId?: string;
+}
 /** A filter to be used against `Object` object types. All fields are combined with a logical ‘and.’ */
 export interface ObjectFilter {
   /** Checks for all expressions in this list. */
@@ -332,12 +341,31 @@ export interface RefPatch {
   /** Store this ref belongs to */
   storeId?: string;
 }
+export interface SetAndCommitInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
 export interface SetDataAtPathInput {
   clientMutationId?: string;
   data?: unknown;
   path?: string[];
   root?: string;
   sId?: string;
+}
+export interface SetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: unknown;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
 }
 /** A filter to be used against `Store` object types. All fields are combined with a logical ‘and.’ */
 export interface StoreFilter {
@@ -512,6 +540,10 @@ export interface InsertNodeAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface InsertNodesAtPathsPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
 export interface ProvisionBucketPayload {
   /** The access type applied */
   accessType: string;
@@ -526,9 +558,19 @@ export interface ProvisionBucketPayload {
   /** Whether provisioning succeeded */
   success: boolean;
 }
+export interface SetAndCommitPayload {
+  clientMutationId?: string | null;
+  commitEdge?: CommitEdge | null;
+  result?: Commit | null;
+}
 export interface SetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface SetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  commitEdge?: CommitEdge | null;
+  result?: Commit | null;
 }
 export interface UpdateCommitPayload {
   clientMutationId?: string | null;

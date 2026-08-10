@@ -5,6 +5,18 @@
  */
 import type { ApiExposureLevel, ObjectCategory } from './schema-types';
 export type ConstructiveInternalTypeImage = unknown;
+export interface Api {
+  anonRole: string | null;
+  config: unknown | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  dbname: string | null;
+  id: string | null;
+  isPublished: boolean | null;
+  name: string | null;
+  roleName: string | null;
+  updatedAt: string | null;
+}
 export interface ApiSchema {
   apiId: string | null;
   createdAt: string | null;
@@ -32,18 +44,6 @@ export interface ApiSetting {
   id: string | null;
   options: unknown | null;
   statementTimeoutMs: string | null;
-  updatedAt: string | null;
-}
-export interface Apis {
-  anonRole: string | null;
-  config: unknown | null;
-  createdAt: string | null;
-  databaseId: string | null;
-  dbname: string | null;
-  id: string | null;
-  isPublished: boolean | null;
-  name: string | null;
-  roleName: string | null;
   updatedAt: string | null;
 }
 export interface AstMigration {
@@ -227,6 +227,47 @@ export interface DomainVerification {
   status: string | null;
   updatedAt: string | null;
   verifiedAt: string | null;
+}
+export interface EmailIdentity {
+  createdAt: string | null;
+  databaseId: string | null;
+  fromAddress: string | null;
+  fromName: string | null;
+  id: string | null;
+  isActive: boolean | null;
+  isDefault: boolean | null;
+  name: string | null;
+  providerAccountId: string | null;
+  replyToAddress: string | null;
+  supportAddress: string | null;
+  transportMode: string | null;
+  updatedAt: string | null;
+}
+export interface EmailProviderAccount {
+  apiBaseUrl: string | null;
+  createdAt: string | null;
+  credentialsSecretName: string | null;
+  databaseId: string | null;
+  id: string | null;
+  isActive: boolean | null;
+  name: string | null;
+  provider: string | null;
+  providerAccountName: string | null;
+  region: string | null;
+  smtpHost: string | null;
+  smtpPort: number | null;
+  smtpSecure: boolean | null;
+  smtpUser: string | null;
+  updatedAt: string | null;
+  webhookSigningSecretName: string | null;
+}
+export interface EmailSiteIdentity {
+  createdAt: string | null;
+  databaseId: string | null;
+  emailIdentityId: string | null;
+  id: string | null;
+  siteId: string | null;
+  updatedAt: string | null;
 }
 export interface EmbeddingChunk {
   chunkOverlap: number | null;
@@ -463,6 +504,17 @@ export interface Partition {
   tableId: string | null;
   updatedAt: string | null;
 }
+export interface PlatformApi {
+  anonRole: string | null;
+  config: unknown | null;
+  createdAt: string | null;
+  dbname: string | null;
+  id: string | null;
+  isPublished: boolean | null;
+  name: string | null;
+  roleName: string | null;
+  updatedAt: string | null;
+}
 export interface PlatformApiSchema {
   apiId: string | null;
   createdAt: string | null;
@@ -488,17 +540,6 @@ export interface PlatformApiSetting {
   id: string | null;
   options: unknown | null;
   statementTimeoutMs: string | null;
-  updatedAt: string | null;
-}
-export interface PlatformApis {
-  anonRole: string | null;
-  config: unknown | null;
-  createdAt: string | null;
-  dbname: string | null;
-  id: string | null;
-  isPublished: boolean | null;
-  name: string | null;
-  roleName: string | null;
   updatedAt: string | null;
 }
 export interface PlatformCorsSetting {
@@ -552,6 +593,44 @@ export interface PlatformDomainVerification {
   status: string | null;
   updatedAt: string | null;
   verifiedAt: string | null;
+}
+export interface PlatformEmailIdentity {
+  createdAt: string | null;
+  fromAddress: string | null;
+  fromName: string | null;
+  id: string | null;
+  isActive: boolean | null;
+  isDefault: boolean | null;
+  name: string | null;
+  providerAccountId: string | null;
+  replyToAddress: string | null;
+  supportAddress: string | null;
+  transportMode: string | null;
+  updatedAt: string | null;
+}
+export interface PlatformEmailProviderAccount {
+  apiBaseUrl: string | null;
+  createdAt: string | null;
+  credentialsSecretName: string | null;
+  id: string | null;
+  isActive: boolean | null;
+  name: string | null;
+  provider: string | null;
+  providerAccountName: string | null;
+  region: string | null;
+  smtpHost: string | null;
+  smtpPort: number | null;
+  smtpSecure: boolean | null;
+  smtpUser: string | null;
+  updatedAt: string | null;
+  webhookSigningSecretName: string | null;
+}
+export interface PlatformEmailSiteIdentity {
+  createdAt: string | null;
+  emailIdentityId: string | null;
+  id: string | null;
+  siteId: string | null;
+  updatedAt: string | null;
 }
 export interface PlatformManagedDomain {
   allowPublicUsage: boolean | null;

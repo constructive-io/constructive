@@ -942,7 +942,7 @@ export interface PhoneNumberFilter {
 }
 /** An input for mutations affecting `PhoneNumber` */
 export interface PhoneNumberInput {
-  /** Country calling code (e.g. +1, +44) */
+  /** Country calling code the number was entered under (e.g. +1, +44). Display only: `number` already carries it, and sign-in matches `number`. */
   cc: string;
   createdAt?: string;
   id?: string;
@@ -952,14 +952,14 @@ export interface PhoneNumberInput {
   isVerified?: boolean;
   /** Optional user-provided label for this phone number (e.g. "Mobile", "Work"). */
   name?: string;
-  /** The phone number without country code */
+  /** The full number in E.164 form, country calling code included (e.g. +15551234567). This is the value SMS sign-in and MFA match, so it is unique across the table and constrained to that shape. */
   number: string;
   ownerId?: string;
   updatedAt?: string;
 }
 /** Represents an update to a `PhoneNumber`. Fields that are set will be updated. */
 export interface PhoneNumberPatch {
-  /** Country calling code (e.g. +1, +44) */
+  /** Country calling code the number was entered under (e.g. +1, +44). Display only: `number` already carries it, and sign-in matches `number`. */
   cc?: string;
   createdAt?: string;
   id?: string;
@@ -969,7 +969,7 @@ export interface PhoneNumberPatch {
   isVerified?: boolean;
   /** Optional user-provided label for this phone number (e.g. "Mobile", "Work"). */
   name?: string;
-  /** The phone number without country code */
+  /** The full number in E.164 form, country calling code included (e.g. +15551234567). This is the value SMS sign-in and MFA match, so it is unique across the table and constrained to that shape. */
   number?: string;
   ownerId?: string;
   updatedAt?: string;
@@ -1200,6 +1200,13 @@ export interface SignInInput {
   password?: string;
   rememberMe?: boolean;
 }
+export interface SignInMagicLinkInput {
+  clientMutationId?: string;
+  credentialKind?: string;
+  deviceToken?: string;
+  rememberMe?: boolean;
+  token?: string;
+}
 export interface SignInSmsOtpInput {
   clientMutationId?: string;
   code?: string;
@@ -1219,6 +1226,13 @@ export interface SignUpInput {
   email?: string;
   password?: string;
   rememberMe?: boolean;
+}
+export interface SignUpMagicLinkInput {
+  clientMutationId?: string;
+  credentialKind?: string;
+  deviceToken?: string;
+  rememberMe?: boolean;
+  token?: string;
 }
 export interface SignUpSmsInput {
   clientMutationId?: string;
@@ -1944,6 +1958,10 @@ export interface SignInCrossOriginPayload {
   clientMutationId?: string | null;
   result?: SignInCrossOriginRecord | null;
 }
+export interface SignInMagicLinkPayload {
+  clientMutationId?: string | null;
+  result?: SignInMagicLinkRecord | null;
+}
 export interface SignInSmsOtpPayload {
   clientMutationId?: string | null;
   result?: SignInSmsOtpRecord | null;
@@ -1954,6 +1972,10 @@ export interface SignOutPayload {
 export interface SignUpPayload {
   clientMutationId?: string | null;
   result?: SignUpRecord | null;
+}
+export interface SignUpMagicLinkPayload {
+  clientMutationId?: string | null;
+  result?: SignUpMagicLinkRecord | null;
 }
 export interface SignUpSmsPayload {
   clientMutationId?: string | null;
@@ -2168,6 +2190,11 @@ export interface SignInCrossOriginRecord {
   totpEnabled?: boolean | null;
   userId?: string | null;
 }
+export interface SignInMagicLinkRecord {
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  userId?: string | null;
+}
 export interface SignInSmsOtpRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
@@ -2179,6 +2206,11 @@ export interface SignUpRecord {
   id?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+  userId?: string | null;
+}
+export interface SignUpMagicLinkRecord {
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
   userId?: string | null;
 }
 export interface SignUpSmsRecord {

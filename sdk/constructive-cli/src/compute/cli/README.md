@@ -26,6 +26,7 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
+| `content-preset` | contentPreset CRUD operations |
 | `db-preset` | dbPreset CRUD operations |
 | `function-api-binding` | functionApiBinding CRUD operations |
 | `function-capability-binding` | functionCapabilityBinding CRUD operations |
@@ -105,12 +106,19 @@ csdk auth set-token <your-token>
 | `import-graph-json` | importGraphJson |
 | `infra-init-empty-repo` | infraInitEmptyRepo |
 | `infra-insert-node-at-path` | infraInsertNodeAtPath |
+| `infra-insert-nodes-at-paths` | infraInsertNodesAtPaths |
+| `infra-set-and-commit` | infraSetAndCommit |
 | `infra-set-data-at-path` | infraSetDataAtPath |
+| `infra-set-many-and-commit` | infraSetManyAndCommit |
 | `init-empty-repo` | initEmptyRepo |
 | `insert-node-at-path` | insertNodeAtPath |
+| `insert-nodes-at-paths` | insertNodesAtPaths |
 | `platform-infra-init-empty-repo` | platformInfraInitEmptyRepo |
 | `platform-infra-insert-node-at-path` | platformInfraInsertNodeAtPath |
+| `platform-infra-insert-nodes-at-paths` | platformInfraInsertNodesAtPaths |
+| `platform-infra-set-and-commit` | platformInfraSetAndCommit |
 | `platform-infra-set-data-at-path` | platformInfraSetDataAtPath |
+| `platform-infra-set-many-and-commit` | platformInfraSetManyAndCommit |
 | `platform-resource-installations-install` | platformResourceInstallationsInstall |
 | `platform-resource-installations-rollback` | platformResourceInstallationsRollback |
 | `platform-resource-installations-uninstall` | platformResourceInstallationsUninstall |
@@ -124,7 +132,9 @@ and lifecycle settings. |
 | `resource-installations-uninstall` | resourceInstallationsUninstall |
 | `resource-installations-upgrade` | resourceInstallationsUpgrade |
 | `save-graph` | saveGraph |
+| `set-and-commit` | setAndCommit |
 | `set-data-at-path` | setDataAtPath |
+| `set-many-and-commit` | setManyAndCommit |
 | `start-execution` | startExecution |
 | `validate-function-graph` | validateFunctionGraph |
 
@@ -168,6 +178,38 @@ Manage per-context key-value configuration variables.
 Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
+
+### `content-preset`
+
+CRUD operations for ContentPreset records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all contentPreset records |
+| `find-first` | Find first matching contentPreset record |
+| `get` | Get a contentPreset by id |
+| `create` | Create a new contentPreset |
+| `update` | Update an existing contentPreset |
+| `delete` | Delete a contentPreset |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `active` | Boolean |
+| `commitId` | UUID |
+| `createdAt` | Datetime |
+| `definition` | JSON |
+| `description` | String |
+| `id` | UUID |
+| `kind` | String |
+| `label` | String |
+| `slug` | String |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `definition`, `kind`, `slug`
+**Optional create fields (backend defaults):** `active`, `commitId`, `description`, `label`, `storeId`
 
 ### `db-preset`
 
@@ -309,6 +351,7 @@ CRUD operations for FunctionDefinition records.
 | `requiredBuckets` | String |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredModels` | String |
+| `requiredModules` | String |
 | `requiredSecrets` | ResourceRequirement |
 | `resources` | JSON |
 | `runtime` | String |
@@ -322,7 +365,7 @@ CRUD operations for FunctionDefinition records.
 | `volatile` | Boolean |
 
 **Required create fields:** `category`, `databaseId`, `name`
-**Optional create fields (backend defaults):** `accessChannels`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
+**Optional create fields (backend defaults):** `accessChannels`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredModules`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
 
 ### `function-deployment`
 
@@ -354,6 +397,7 @@ CRUD operations for FunctionDeployment records.
 | `lastError` | String |
 | `lastErrorAt` | Datetime |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `resources` | JSON |
 | `revision` | Int |
 | `scaleMax` | Int |
@@ -365,7 +409,7 @@ CRUD operations for FunctionDeployment records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `image`, `namespaceId`
-**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
+**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `realm`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
 
 ### `function-deployment-event`
 
@@ -1112,6 +1156,7 @@ CRUD operations for PlatformFunctionDefinition records.
 | `requiredBuckets` | String |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredModels` | String |
+| `requiredModules` | String |
 | `requiredSecrets` | ResourceRequirement |
 | `resources` | JSON |
 | `runtime` | String |
@@ -1126,7 +1171,7 @@ CRUD operations for PlatformFunctionDefinition records.
 | `volatile` | Boolean |
 
 **Required create fields:** `category`, `name`
-**Optional create fields (backend defaults):** `accessChannels`, `billable`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `system`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
+**Optional create fields (backend defaults):** `accessChannels`, `billable`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredModules`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `system`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
 
 ### `platform-function-deployment`
 
@@ -1157,6 +1202,7 @@ CRUD operations for PlatformFunctionDeployment records.
 | `lastError` | String |
 | `lastErrorAt` | Datetime |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `resources` | JSON |
 | `revision` | Int |
 | `scaleMax` | Int |
@@ -1168,7 +1214,7 @@ CRUD operations for PlatformFunctionDeployment records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `image`, `namespaceId`
-**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
+**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `realm`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
 
 ### `platform-function-deployment-event`
 
@@ -2641,6 +2687,42 @@ infraInsertNodeAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
+### `infra-insert-nodes-at-paths`
+
+infraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `infra-set-and-commit`
+
+infraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `infra-set-data-at-path`
 
 infraSetDataAtPath
@@ -2655,6 +2737,22 @@ infraSetDataAtPath
   | `--input.path` | String |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
+
+### `infra-set-many-and-commit`
+
+infraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `init-empty-repo`
 
@@ -2683,6 +2781,23 @@ insertNodeAtPath
   | `--input.kids` | UUID |
   | `--input.ktree` | String |
   | `--input.path` | String |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `insert-nodes-at-paths`
+
+insertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
@@ -2716,6 +2831,42 @@ platformInfraInsertNodeAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
+### `platform-infra-insert-nodes-at-paths`
+
+platformInfraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `platform-infra-set-and-commit`
+
+platformInfraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `platform-infra-set-data-at-path`
 
 platformInfraSetDataAtPath
@@ -2730,6 +2881,22 @@ platformInfraSetDataAtPath
   | `--input.path` | String |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
+
+### `platform-infra-set-many-and-commit`
+
+platformInfraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `platform-resource-installations-install`
 
@@ -2868,6 +3035,25 @@ saveGraph
   | `--input.message` | String |
   | `--input.rootHash` | UUID |
 
+### `set-and-commit`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `set-data-at-path`
 
 setDataAtPath
@@ -2882,6 +3068,22 @@ setDataAtPath
   | `--input.path` | String |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
+
+### `set-many-and-commit`
+
+setManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `start-execution`
 

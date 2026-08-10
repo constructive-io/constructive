@@ -5,6 +5,7 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { ContentPresetModel } from './models/contentPreset';
 import { DbPresetModel } from './models/dbPreset';
 import { FunctionApiBindingModel } from './models/functionApiBinding';
 import { FunctionCapabilityBindingModel } from './models/functionCapabilityBinding';
@@ -109,6 +110,7 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    contentPreset: new ContentPresetModel(client),
     dbPreset: new DbPresetModel(client),
     functionApiBinding: new FunctionApiBindingModel(client),
     functionCapabilityBinding: new FunctionCapabilityBindingModel(client),

@@ -23,6 +23,122 @@ type AcceptDatabaseTransferPayload {
   result: Boolean
 }
 
+"""
+API surfaces exposed by this scope; publication makes a surface bindable from other scopes
+"""
+type Api {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Reads and enables pagination through a set of `ApiSchema`."""
+  apiSchemas(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ApiSchema`."""
+    orderBy: [ApiSchemaOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ApiSchemaFilter
+  ): ApiSchemaConnection!
+
+  """Reads a single `ApiSetting` that is related to this `Api`."""
+  apiSetting: ApiSetting
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+
+  """Reads and enables pagination through a set of `CorsSetting`."""
+  corsSettings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `CorsSetting`."""
+    orderBy: [CorsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CorsSettingFilter
+  ): CorsSettingConnection!
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID!
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean!
+
+  """Owner-local API surface name"""
+  name: String!
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `Api` values."""
+type ApiConnection {
+  """
+  A list of edges which contains the `Api` and cursor to aid in pagination.
+  """
+  edges: [ApiEdge]!
+
+  """A list of `Api` objects."""
+  nodes: [Api]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Api` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Api` edge in the connection."""
+type ApiEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Api` at the end of the edge."""
+  node: Api
+}
+
 enum ApiExposureLevel {
   EXPOSABLE
   INTERNAL_ONLY
@@ -71,10 +187,153 @@ input ApiExposureLevelFilter {
   notIn: [ApiExposureLevel!]
 }
 
+"""
+A filter to be used against `Api` object types. All fields are combined with a logical ‘and.’
+"""
+input ApiFilter {
+  """Checks for all expressions in this list."""
+  and: [ApiFilter!]
+
+  """Filter by the object’s `anonRole` field."""
+  anonRole: StringFilter
+
+  """Filter by the object’s `apiSchemas` relation."""
+  apiSchemas: ApiToManyApiSchemaFilter
+
+  """`apiSchemas` exist."""
+  apiSchemasExist: Boolean
+
+  """Filter by the object’s `apiSetting` relation."""
+  apiSetting: ApiSettingFilter
+
+  """A related `apiSetting` exists."""
+  apiSettingExists: Boolean
+
+  """Filter by the object’s `config` field."""
+  config: JSONFilter
+
+  """Filter by the object’s `corsSettings` relation."""
+  corsSettings: ApiToManyCorsSettingFilter
+
+  """`corsSettings` exist."""
+  corsSettingsExist: Boolean
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `dbname` field."""
+  dbname: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isPublished` field."""
+  isPublished: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: ApiFilter
+
+  """Checks for any expressions in this list."""
+  or: [ApiFilter!]
+
+  """Filter by the object’s `roleName` field."""
+  roleName: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `Api`"""
+input ApiInput {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean
+
+  """Owner-local API surface name"""
+  name: String!
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `Api`."""
+enum ApiOrderBy {
+  ANON_ROLE_ASC
+  ANON_ROLE_DESC
+  CONFIG_ASC
+  CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DBNAME_ASC
+  DBNAME_DESC
+  ID_ASC
+  ID_DESC
+  IS_PUBLISHED_ASC
+  IS_PUBLISHED_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROLE_NAME_ASC
+  ROLE_NAME_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""Represents an update to a `Api`. Fields that are set will be updated."""
+input ApiPatch {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean
+
+  """Owner-local API surface name"""
+  name: String
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
 """Join table linking API surfaces to the metaschema schemas they expose"""
 type ApiSchema {
-  """Reads a single `Apis` that is related to this `ApiSchema`."""
-  api: Apis
+  """Reads a single `Api` that is related to this `ApiSchema`."""
+  api: Api
 
   """API surface that exposes this schema"""
   apiId: UUID!
@@ -126,7 +385,7 @@ input ApiSchemaFilter {
   and: [ApiSchemaFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: ApisFilter
+  api: ApiFilter
 
   """Filter by the object’s `apiId` field."""
   apiId: UUIDFilter
@@ -211,8 +470,8 @@ input ApiSchemaPatch {
 Per-API feature flag overrides; NULL columns inherit from database_settings
 """
 type ApiSetting {
-  """Reads a single `Apis` that is related to this `ApiSetting`."""
-  api: Apis
+  """Reads a single `Api` that is related to this `ApiSetting`."""
+  api: Api
 
   """API surface these settings override for"""
   apiId: UUID!
@@ -328,7 +587,7 @@ input ApiSettingFilter {
   and: [ApiSettingFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: ApisFilter
+  api: ApiFilter
 
   """Filter by the object’s `apiId` field."""
   apiId: UUIDFilter
@@ -606,268 +865,9 @@ input ApiSettingPatch {
 }
 
 """
-API surfaces exposed by this scope; publication makes a surface bindable from other scopes
-"""
-type Apis {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Reads and enables pagination through a set of `ApiSchema`."""
-  apiSchemasByApiId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `ApiSchema`."""
-    orderBy: [ApiSchemaOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ApiSchemaFilter
-  ): ApiSchemaConnection!
-
-  """Reads a single `ApiSetting` that is related to this `Apis`."""
-  apiSettingByApiId: ApiSetting
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-
-  """Reads and enables pagination through a set of `CorsSetting`."""
-  corsSettingsByApiId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `CorsSetting`."""
-    orderBy: [CorsSettingOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: CorsSettingFilter
-  ): CorsSettingConnection!
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID!
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean!
-
-  """Owner-local API surface name"""
-  name: String!
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""A connection to a list of `Apis` values."""
-type ApisConnection {
-  """
-  A list of edges which contains the `Apis` and cursor to aid in pagination.
-  """
-  edges: [ApisEdge]!
-
-  """A list of `Apis` objects."""
-  nodes: [Apis]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Apis` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Apis` edge in the connection."""
-type ApisEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Apis` at the end of the edge."""
-  node: Apis
-}
-
-"""
-A filter to be used against `Apis` object types. All fields are combined with a logical ‘and.’
-"""
-input ApisFilter {
-  """Checks for all expressions in this list."""
-  and: [ApisFilter!]
-
-  """Filter by the object’s `anonRole` field."""
-  anonRole: StringFilter
-
-  """Filter by the object’s `apiSchemasByApiId` relation."""
-  apiSchemasByApiId: ApisToManyApiSchemaFilter
-
-  """`apiSchemasByApiId` exist."""
-  apiSchemasByApiIdExist: Boolean
-
-  """Filter by the object’s `apiSettingByApiId` relation."""
-  apiSettingByApiId: ApiSettingFilter
-
-  """A related `apiSettingByApiId` exists."""
-  apiSettingByApiIdExists: Boolean
-
-  """Filter by the object’s `config` field."""
-  config: JSONFilter
-
-  """Filter by the object’s `corsSettingsByApiId` relation."""
-  corsSettingsByApiId: ApisToManyCorsSettingFilter
-
-  """`corsSettingsByApiId` exist."""
-  corsSettingsByApiIdExist: Boolean
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `dbname` field."""
-  dbname: StringFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isPublished` field."""
-  isPublished: BooleanFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Negates the expression."""
-  not: ApisFilter
-
-  """Checks for any expressions in this list."""
-  or: [ApisFilter!]
-
-  """Filter by the object’s `roleName` field."""
-  roleName: StringFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `Apis`"""
-input ApisInput {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean
-
-  """Owner-local API surface name"""
-  name: String!
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""Methods to use when ordering `Apis`."""
-enum ApisOrderBy {
-  ANON_ROLE_ASC
-  ANON_ROLE_DESC
-  CONFIG_ASC
-  CONFIG_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  DBNAME_ASC
-  DBNAME_DESC
-  ID_ASC
-  ID_DESC
-  IS_PUBLISHED_ASC
-  IS_PUBLISHED_DESC
-  NAME_ASC
-  NAME_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ROLE_NAME_ASC
-  ROLE_NAME_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""Represents an update to a `Apis`. Fields that are set will be updated."""
-input ApisPatch {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean
-
-  """Owner-local API surface name"""
-  name: String
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’
 """
-input ApisToManyApiSchemaFilter {
+input ApiToManyApiSchemaFilter {
   """Filters to entities where every related entity matches."""
   every: ApiSchemaFilter
 
@@ -881,7 +881,7 @@ input ApisToManyApiSchemaFilter {
 """
 A filter to be used against many `CorsSetting` object types. All fields are combined with a logical ‘and.’
 """
-input ApisToManyCorsSettingFilter {
+input ApiToManyCorsSettingFilter {
   """Filters to entities where every related entity matches."""
   every: CorsSettingFilter
 
@@ -1568,8 +1568,8 @@ type CorsSetting {
   """Array of allowed CORS origins (e.g. https://example.com)"""
   allowedOrigins: [String]!
 
-  """Reads a single `Apis` that is related to this `CorsSetting`."""
-  api: Apis
+  """Reads a single `Api` that is related to this `CorsSetting`."""
+  api: Api
 
   """
   Optional API surface for per-API override; NULL means scope-wide default
@@ -1620,7 +1620,7 @@ input CorsSettingFilter {
   and: [CorsSettingFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: ApisFilter
+  api: ApiFilter
 
   """A related `api` exists."""
   apiExists: Boolean
@@ -1702,6 +1702,41 @@ input CorsSettingPatch {
   updatedAt: Datetime
 }
 
+"""All input for the create `Api` mutation."""
+input CreateApiInput {
+  """The `Api` to be created by this mutation."""
+  api: ApiInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `Api` mutation."""
+type CreateApiPayload {
+  """The `Api` that was created by this mutation."""
+  api: Api
+
+  """An edge for our `Api`. May be used by Relay 1."""
+  apiEdge(
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `ApiSchema` mutation."""
 input CreateApiSchemaInput {
   """The `ApiSchema` to be created by this mutation."""
@@ -1759,41 +1794,6 @@ type CreateApiSettingPayload {
     """The method to use when ordering `ApiSetting`."""
     orderBy: [ApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ApiSettingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `Apis` mutation."""
-input CreateApisInput {
-  """The `Apis` to be created by this mutation."""
-  apis: ApisInput!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our create `Apis` mutation."""
-type CreateApisPayload {
-  """The `Apis` that was created by this mutation."""
-  apis: Apis
-
-  """An edge for our `Apis`. May be used by Relay 1."""
-  apisEdge(
-    """The method to use when ordering `Apis`."""
-    orderBy: [ApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApisEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -2220,6 +2220,111 @@ type CreateDomainVerificationPayload {
     """The method to use when ordering `DomainVerification`."""
     orderBy: [DomainVerificationOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DomainVerificationEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `EmailIdentity` mutation."""
+input CreateEmailIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `EmailIdentity` to be created by this mutation."""
+  emailIdentity: EmailIdentityInput!
+}
+
+"""The output of our create `EmailIdentity` mutation."""
+type CreateEmailIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmailIdentity` that was created by this mutation."""
+  emailIdentity: EmailIdentity
+
+  """An edge for our `EmailIdentity`. May be used by Relay 1."""
+  emailIdentityEdge(
+    """The method to use when ordering `EmailIdentity`."""
+    orderBy: [EmailIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmailIdentityEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `EmailProviderAccount` mutation."""
+input CreateEmailProviderAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `EmailProviderAccount` to be created by this mutation."""
+  emailProviderAccount: EmailProviderAccountInput!
+}
+
+"""The output of our create `EmailProviderAccount` mutation."""
+type CreateEmailProviderAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmailProviderAccount` that was created by this mutation."""
+  emailProviderAccount: EmailProviderAccount
+
+  """An edge for our `EmailProviderAccount`. May be used by Relay 1."""
+  emailProviderAccountEdge(
+    """The method to use when ordering `EmailProviderAccount`."""
+    orderBy: [EmailProviderAccountOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmailProviderAccountEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `EmailSiteIdentity` mutation."""
+input CreateEmailSiteIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `EmailSiteIdentity` to be created by this mutation."""
+  emailSiteIdentity: EmailSiteIdentityInput!
+}
+
+"""The output of our create `EmailSiteIdentity` mutation."""
+type CreateEmailSiteIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmailSiteIdentity` that was created by this mutation."""
+  emailSiteIdentity: EmailSiteIdentity
+
+  """An edge for our `EmailSiteIdentity`. May be used by Relay 1."""
+  emailSiteIdentityEdge(
+    """The method to use when ordering `EmailSiteIdentity`."""
+    orderBy: [EmailSiteIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmailSiteIdentityEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2789,6 +2894,41 @@ type CreatePartitionPayload {
   query: Query
 }
 
+"""All input for the create `PlatformApi` mutation."""
+input CreatePlatformApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformApi` to be created by this mutation."""
+  platformApi: PlatformApiInput!
+}
+
+"""The output of our create `PlatformApi` mutation."""
+type CreatePlatformApiPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformApi` that was created by this mutation."""
+  platformApi: PlatformApi
+
+  """An edge for our `PlatformApi`. May be used by Relay 1."""
+  platformApiEdge(
+    """The method to use when ordering `PlatformApi`."""
+    orderBy: [PlatformApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformApiEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `PlatformApiSchema` mutation."""
 input CreatePlatformApiSchemaInput {
   """
@@ -2852,41 +2992,6 @@ type CreatePlatformApiSettingPayload {
     """The method to use when ordering `PlatformApiSetting`."""
     orderBy: [PlatformApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformApiSettingEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `PlatformApis` mutation."""
-input CreatePlatformApisInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `PlatformApis` to be created by this mutation."""
-  platformApis: PlatformApisInput!
-}
-
-"""The output of our create `PlatformApis` mutation."""
-type CreatePlatformApisPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformApis` that was created by this mutation."""
-  platformApis: PlatformApis
-
-  """An edge for our `PlatformApis`. May be used by Relay 1."""
-  platformApisEdge(
-    """The method to use when ordering `PlatformApis`."""
-    orderBy: [PlatformApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformApisEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -3027,6 +3132,113 @@ type CreatePlatformDomainVerificationPayload {
     """The method to use when ordering `PlatformDomainVerification`."""
     orderBy: [PlatformDomainVerificationOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformDomainVerificationEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformEmailIdentity` mutation."""
+input CreatePlatformEmailIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailIdentity` to be created by this mutation."""
+  platformEmailIdentity: PlatformEmailIdentityInput!
+}
+
+"""The output of our create `PlatformEmailIdentity` mutation."""
+type CreatePlatformEmailIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailIdentity` that was created by this mutation."""
+  platformEmailIdentity: PlatformEmailIdentity
+
+  """An edge for our `PlatformEmailIdentity`. May be used by Relay 1."""
+  platformEmailIdentityEdge(
+    """The method to use when ordering `PlatformEmailIdentity`."""
+    orderBy: [PlatformEmailIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformEmailIdentityEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformEmailProviderAccount` mutation."""
+input CreatePlatformEmailProviderAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailProviderAccount` to be created by this mutation."""
+  platformEmailProviderAccount: PlatformEmailProviderAccountInput!
+}
+
+"""The output of our create `PlatformEmailProviderAccount` mutation."""
+type CreatePlatformEmailProviderAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailProviderAccount` that was created by this mutation."""
+  platformEmailProviderAccount: PlatformEmailProviderAccount
+
+  """
+  An edge for our `PlatformEmailProviderAccount`. May be used by Relay 1.
+  """
+  platformEmailProviderAccountEdge(
+    """The method to use when ordering `PlatformEmailProviderAccount`."""
+    orderBy: [PlatformEmailProviderAccountOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformEmailProviderAccountEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformEmailSiteIdentity` mutation."""
+input CreatePlatformEmailSiteIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailSiteIdentity` to be created by this mutation."""
+  platformEmailSiteIdentity: PlatformEmailSiteIdentityInput!
+}
+
+"""The output of our create `PlatformEmailSiteIdentity` mutation."""
+type CreatePlatformEmailSiteIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailSiteIdentity` that was created by this mutation."""
+  platformEmailSiteIdentity: PlatformEmailSiteIdentity
+
+  """An edge for our `PlatformEmailSiteIdentity`. May be used by Relay 1."""
+  platformEmailSiteIdentityEdge(
+    """The method to use when ordering `PlatformEmailSiteIdentity`."""
+    orderBy: [PlatformEmailSiteIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformEmailSiteIdentityEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -5795,7 +6007,7 @@ type DatabaseProvisionModule {
   id: UUID!
 
   """
-  JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["permissions_module", {"scope": "app"}])
+  JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["capabilities_module", {"scope": "app"}])
   """
   modules: JSON!
 
@@ -7016,6 +7228,39 @@ input DefaultPrivilegePatch {
   schemaId: UUID
 }
 
+"""All input for the `deleteApi` mutation."""
+input DeleteApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Api` mutation."""
+type DeleteApiPayload {
+  """The `Api` that was deleted by this mutation."""
+  api: Api
+
+  """An edge for our `Api`. May be used by Relay 1."""
+  apiEdge(
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deleteApiSchema` mutation."""
 input DeleteApiSchemaInput {
   """
@@ -7069,39 +7314,6 @@ type DeleteApiSettingPayload {
     """The method to use when ordering `ApiSetting`."""
     orderBy: [ApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ApiSettingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `deleteApis` mutation."""
-input DeleteApisInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `Apis` mutation."""
-type DeleteApisPayload {
-  """The `Apis` that was deleted by this mutation."""
-  apis: Apis
-
-  """An edge for our `Apis`. May be used by Relay 1."""
-  apisEdge(
-    """The method to use when ordering `Apis`."""
-    orderBy: [ApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApisEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -7504,6 +7716,105 @@ type DeleteDomainVerificationPayload {
     """The method to use when ordering `DomainVerification`."""
     orderBy: [DomainVerificationOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DomainVerificationEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteEmailIdentity` mutation."""
+input DeleteEmailIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `EmailIdentity` mutation."""
+type DeleteEmailIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmailIdentity` that was deleted by this mutation."""
+  emailIdentity: EmailIdentity
+
+  """An edge for our `EmailIdentity`. May be used by Relay 1."""
+  emailIdentityEdge(
+    """The method to use when ordering `EmailIdentity`."""
+    orderBy: [EmailIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmailIdentityEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteEmailProviderAccount` mutation."""
+input DeleteEmailProviderAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `EmailProviderAccount` mutation."""
+type DeleteEmailProviderAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmailProviderAccount` that was deleted by this mutation."""
+  emailProviderAccount: EmailProviderAccount
+
+  """An edge for our `EmailProviderAccount`. May be used by Relay 1."""
+  emailProviderAccountEdge(
+    """The method to use when ordering `EmailProviderAccount`."""
+    orderBy: [EmailProviderAccountOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmailProviderAccountEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteEmailSiteIdentity` mutation."""
+input DeleteEmailSiteIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `EmailSiteIdentity` mutation."""
+type DeleteEmailSiteIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmailSiteIdentity` that was deleted by this mutation."""
+  emailSiteIdentity: EmailSiteIdentity
+
+  """An edge for our `EmailSiteIdentity`. May be used by Relay 1."""
+  emailSiteIdentityEdge(
+    """The method to use when ordering `EmailSiteIdentity`."""
+    orderBy: [EmailSiteIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmailSiteIdentityEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -8043,6 +8354,39 @@ type DeletePartitionPayload {
   query: Query
 }
 
+"""All input for the `deletePlatformApi` mutation."""
+input DeletePlatformApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformApi` mutation."""
+type DeletePlatformApiPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformApi` that was deleted by this mutation."""
+  platformApi: PlatformApi
+
+  """An edge for our `PlatformApi`. May be used by Relay 1."""
+  platformApiEdge(
+    """The method to use when ordering `PlatformApi`."""
+    orderBy: [PlatformApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformApiEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deletePlatformApiSchema` mutation."""
 input DeletePlatformApiSchemaInput {
   """
@@ -8102,39 +8446,6 @@ type DeletePlatformApiSettingPayload {
     """The method to use when ordering `PlatformApiSetting`."""
     orderBy: [PlatformApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformApiSettingEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `deletePlatformApis` mutation."""
-input DeletePlatformApisInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `PlatformApis` mutation."""
-type DeletePlatformApisPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformApis` that was deleted by this mutation."""
-  platformApis: PlatformApis
-
-  """An edge for our `PlatformApis`. May be used by Relay 1."""
-  platformApisEdge(
-    """The method to use when ordering `PlatformApis`."""
-    orderBy: [PlatformApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformApisEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -8267,6 +8578,107 @@ type DeletePlatformDomainVerificationPayload {
     """The method to use when ordering `PlatformDomainVerification`."""
     orderBy: [PlatformDomainVerificationOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformDomainVerificationEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformEmailIdentity` mutation."""
+input DeletePlatformEmailIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformEmailIdentity` mutation."""
+type DeletePlatformEmailIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailIdentity` that was deleted by this mutation."""
+  platformEmailIdentity: PlatformEmailIdentity
+
+  """An edge for our `PlatformEmailIdentity`. May be used by Relay 1."""
+  platformEmailIdentityEdge(
+    """The method to use when ordering `PlatformEmailIdentity`."""
+    orderBy: [PlatformEmailIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformEmailIdentityEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformEmailProviderAccount` mutation."""
+input DeletePlatformEmailProviderAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformEmailProviderAccount` mutation."""
+type DeletePlatformEmailProviderAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailProviderAccount` that was deleted by this mutation."""
+  platformEmailProviderAccount: PlatformEmailProviderAccount
+
+  """
+  An edge for our `PlatformEmailProviderAccount`. May be used by Relay 1.
+  """
+  platformEmailProviderAccountEdge(
+    """The method to use when ordering `PlatformEmailProviderAccount`."""
+    orderBy: [PlatformEmailProviderAccountOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformEmailProviderAccountEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformEmailSiteIdentity` mutation."""
+input DeletePlatformEmailSiteIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformEmailSiteIdentity` mutation."""
+type DeletePlatformEmailSiteIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailSiteIdentity` that was deleted by this mutation."""
+  platformEmailSiteIdentity: PlatformEmailSiteIdentity
+
+  """An edge for our `PlatformEmailSiteIdentity`. May be used by Relay 1."""
+  platformEmailSiteIdentityEdge(
+    """The method to use when ordering `PlatformEmailSiteIdentity`."""
+    orderBy: [PlatformEmailSiteIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformEmailSiteIdentityEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -10923,6 +11335,821 @@ type DomainsAssignSubdomainPayload {
   """
   query: Query
   result: Domain
+}
+
+"""
+Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through
+"""
+type EmailIdentity {
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Reads and enables pagination through a set of `EmailSiteIdentity`."""
+  emailSiteIdentities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `EmailSiteIdentity`."""
+    orderBy: [EmailSiteIdentityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: EmailSiteIdentityFilter
+  ): EmailSiteIdentityConnection!
+
+  """
+  Envelope/header From address, lower-case. Must be accepted by the sending account at the provider.
+  """
+  fromAddress: String!
+
+  """Display name shown beside the from address"""
+  fromName: String
+  id: UUID!
+
+  """Whether this identity may be resolved for a send"""
+  isActive: Boolean!
+
+  """
+  The scope default identity, used when no site binding resolves. At most one per scope key.
+  """
+  isDefault: Boolean!
+
+  """Operator-facing name for this identity (e.g. transactional, support)"""
+  name: String!
+
+  """
+  Reads a single `EmailProviderAccount` that is related to this `EmailIdentity`.
+  """
+  providerAccount: EmailProviderAccount
+
+  """
+  Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared.
+  """
+  providerAccountId: UUID
+
+  """Reply-To address when replies should not go to the from address"""
+  replyToAddress: String
+
+  """Support address rendered in message bodies and footers"""
+  supportAddress: String
+
+  """
+  own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback
+  """
+  transportMode: String!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `EmailIdentity` values."""
+type EmailIdentityConnection {
+  """
+  A list of edges which contains the `EmailIdentity` and cursor to aid in pagination.
+  """
+  edges: [EmailIdentityEdge]!
+
+  """A list of `EmailIdentity` objects."""
+  nodes: [EmailIdentity]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `EmailIdentity` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `EmailIdentity` edge in the connection."""
+type EmailIdentityEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `EmailIdentity` at the end of the edge."""
+  node: EmailIdentity
+}
+
+"""
+A filter to be used against `EmailIdentity` object types. All fields are combined with a logical ‘and.’
+"""
+input EmailIdentityFilter {
+  """Checks for all expressions in this list."""
+  and: [EmailIdentityFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `emailSiteIdentities` relation."""
+  emailSiteIdentities: EmailIdentityToManyEmailSiteIdentityFilter
+
+  """`emailSiteIdentities` exist."""
+  emailSiteIdentitiesExist: Boolean
+
+  """Filter by the object’s `fromAddress` field."""
+  fromAddress: StringFilter
+
+  """Filter by the object’s `fromName` field."""
+  fromName: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `isDefault` field."""
+  isDefault: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: EmailIdentityFilter
+
+  """Checks for any expressions in this list."""
+  or: [EmailIdentityFilter!]
+
+  """Filter by the object’s `providerAccount` relation."""
+  providerAccount: EmailProviderAccountFilter
+
+  """A related `providerAccount` exists."""
+  providerAccountExists: Boolean
+
+  """Filter by the object’s `providerAccountId` field."""
+  providerAccountId: UUIDFilter
+
+  """Filter by the object’s `replyToAddress` field."""
+  replyToAddress: StringFilter
+
+  """Filter by the object’s `supportAddress` field."""
+  supportAddress: StringFilter
+
+  """Filter by the object’s `transportMode` field."""
+  transportMode: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `EmailIdentity`"""
+input EmailIdentityInput {
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """
+  Envelope/header From address, lower-case. Must be accepted by the sending account at the provider.
+  """
+  fromAddress: String!
+
+  """Display name shown beside the from address"""
+  fromName: String
+  id: UUID
+
+  """Whether this identity may be resolved for a send"""
+  isActive: Boolean
+
+  """
+  The scope default identity, used when no site binding resolves. At most one per scope key.
+  """
+  isDefault: Boolean
+
+  """Operator-facing name for this identity (e.g. transactional, support)"""
+  name: String!
+
+  """
+  Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared.
+  """
+  providerAccountId: UUID
+
+  """Reply-To address when replies should not go to the from address"""
+  replyToAddress: String
+
+  """Support address rendered in message bodies and footers"""
+  supportAddress: String
+
+  """
+  own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback
+  """
+  transportMode: String
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `EmailIdentity`."""
+enum EmailIdentityOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  FROM_ADDRESS_ASC
+  FROM_ADDRESS_DESC
+  FROM_NAME_ASC
+  FROM_NAME_DESC
+  ID_ASC
+  ID_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  IS_DEFAULT_ASC
+  IS_DEFAULT_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROVIDER_ACCOUNT_ID_ASC
+  PROVIDER_ACCOUNT_ID_DESC
+  REPLY_TO_ADDRESS_ASC
+  REPLY_TO_ADDRESS_DESC
+  SUPPORT_ADDRESS_ASC
+  SUPPORT_ADDRESS_DESC
+  TRANSPORT_MODE_ASC
+  TRANSPORT_MODE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `EmailIdentity`. Fields that are set will be updated.
+"""
+input EmailIdentityPatch {
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """
+  Envelope/header From address, lower-case. Must be accepted by the sending account at the provider.
+  """
+  fromAddress: String
+
+  """Display name shown beside the from address"""
+  fromName: String
+  id: UUID
+
+  """Whether this identity may be resolved for a send"""
+  isActive: Boolean
+
+  """
+  The scope default identity, used when no site binding resolves. At most one per scope key.
+  """
+  isDefault: Boolean
+
+  """Operator-facing name for this identity (e.g. transactional, support)"""
+  name: String
+
+  """
+  Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared.
+  """
+  providerAccountId: UUID
+
+  """Reply-To address when replies should not go to the from address"""
+  replyToAddress: String
+
+  """Support address rendered in message bodies and footers"""
+  supportAddress: String
+
+  """
+  own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback
+  """
+  transportMode: String
+  updatedAt: Datetime
+}
+
+"""
+A filter to be used against many `EmailSiteIdentity` object types. All fields are combined with a logical ‘and.’
+"""
+input EmailIdentityToManyEmailSiteIdentityFilter {
+  """Filters to entities where every related entity matches."""
+  every: EmailSiteIdentityFilter
+
+  """Filters to entities where no related entity matches."""
+  none: EmailSiteIdentityFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: EmailSiteIdentityFilter
+}
+
+"""
+A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself)
+"""
+type EmailProviderAccount {
+  """
+  Provider API base URL when it is not the provider default (e.g. Mailgun EU)
+  """
+  apiBaseUrl: String
+  createdAt: Datetime
+
+  """
+  Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here.
+  """
+  credentialsSecretName: String!
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Reads and enables pagination through a set of `EmailIdentity`."""
+  emailIdentitiesByProviderAccountId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `EmailIdentity`."""
+    orderBy: [EmailIdentityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: EmailIdentityFilter
+  ): EmailIdentityConnection!
+  id: UUID!
+
+  """
+  Whether identities may send through this account. Disabling one row stops every identity that references it.
+  """
+  isActive: Boolean!
+
+  """Operator-facing name for this account (e.g. transactional, marketing)"""
+  name: String!
+
+  """
+  integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK
+  """
+  provider: String!
+
+  """
+  Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name
+  """
+  providerAccountName: String
+
+  """Provider region for region-addressed providers (e.g. SES us-east-1)"""
+  region: String
+
+  """SMTP host (provider = smtp, or a provider addressed over SMTP)"""
+  smtpHost: String
+
+  """SMTP port"""
+  smtpPort: Int
+
+  """Whether the SMTP connection uses implicit TLS"""
+  smtpSecure: Boolean
+
+  """
+  SMTP username; the password is a secret, addressed by credentials_secret_name
+  """
+  smtpUser: String
+  updatedAt: Datetime
+
+  """
+  Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store.
+  """
+  webhookSigningSecretName: String
+}
+
+"""A connection to a list of `EmailProviderAccount` values."""
+type EmailProviderAccountConnection {
+  """
+  A list of edges which contains the `EmailProviderAccount` and cursor to aid in pagination.
+  """
+  edges: [EmailProviderAccountEdge]!
+
+  """A list of `EmailProviderAccount` objects."""
+  nodes: [EmailProviderAccount]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `EmailProviderAccount` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `EmailProviderAccount` edge in the connection."""
+type EmailProviderAccountEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `EmailProviderAccount` at the end of the edge."""
+  node: EmailProviderAccount
+}
+
+"""
+A filter to be used against `EmailProviderAccount` object types. All fields are combined with a logical ‘and.’
+"""
+input EmailProviderAccountFilter {
+  """Checks for all expressions in this list."""
+  and: [EmailProviderAccountFilter!]
+
+  """Filter by the object’s `apiBaseUrl` field."""
+  apiBaseUrl: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `credentialsSecretName` field."""
+  credentialsSecretName: StringFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `emailIdentitiesByProviderAccountId` relation."""
+  emailIdentitiesByProviderAccountId: EmailProviderAccountToManyEmailIdentityFilter
+
+  """`emailIdentitiesByProviderAccountId` exist."""
+  emailIdentitiesByProviderAccountIdExist: Boolean
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: EmailProviderAccountFilter
+
+  """Checks for any expressions in this list."""
+  or: [EmailProviderAccountFilter!]
+
+  """Filter by the object’s `provider` field."""
+  provider: StringFilter
+
+  """Filter by the object’s `providerAccountName` field."""
+  providerAccountName: StringFilter
+
+  """Filter by the object’s `region` field."""
+  region: StringFilter
+
+  """Filter by the object’s `smtpHost` field."""
+  smtpHost: StringFilter
+
+  """Filter by the object’s `smtpPort` field."""
+  smtpPort: IntFilter
+
+  """Filter by the object’s `smtpSecure` field."""
+  smtpSecure: BooleanFilter
+
+  """Filter by the object’s `smtpUser` field."""
+  smtpUser: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `webhookSigningSecretName` field."""
+  webhookSigningSecretName: StringFilter
+}
+
+"""An input for mutations affecting `EmailProviderAccount`"""
+input EmailProviderAccountInput {
+  """
+  Provider API base URL when it is not the provider default (e.g. Mailgun EU)
+  """
+  apiBaseUrl: String
+  createdAt: Datetime
+
+  """
+  Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here.
+  """
+  credentialsSecretName: String!
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+  id: UUID
+
+  """
+  Whether identities may send through this account. Disabling one row stops every identity that references it.
+  """
+  isActive: Boolean
+
+  """Operator-facing name for this account (e.g. transactional, marketing)"""
+  name: String!
+
+  """
+  integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK
+  """
+  provider: String!
+
+  """
+  Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name
+  """
+  providerAccountName: String
+
+  """Provider region for region-addressed providers (e.g. SES us-east-1)"""
+  region: String
+
+  """SMTP host (provider = smtp, or a provider addressed over SMTP)"""
+  smtpHost: String
+
+  """SMTP port"""
+  smtpPort: Int
+
+  """Whether the SMTP connection uses implicit TLS"""
+  smtpSecure: Boolean
+
+  """
+  SMTP username; the password is a secret, addressed by credentials_secret_name
+  """
+  smtpUser: String
+  updatedAt: Datetime
+
+  """
+  Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store.
+  """
+  webhookSigningSecretName: String
+}
+
+"""Methods to use when ordering `EmailProviderAccount`."""
+enum EmailProviderAccountOrderBy {
+  API_BASE_URL_ASC
+  API_BASE_URL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREDENTIALS_SECRET_NAME_ASC
+  CREDENTIALS_SECRET_NAME_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  ID_ASC
+  ID_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROVIDER_ACCOUNT_NAME_ASC
+  PROVIDER_ACCOUNT_NAME_DESC
+  PROVIDER_ASC
+  PROVIDER_DESC
+  REGION_ASC
+  REGION_DESC
+  SMTP_HOST_ASC
+  SMTP_HOST_DESC
+  SMTP_PORT_ASC
+  SMTP_PORT_DESC
+  SMTP_SECURE_ASC
+  SMTP_SECURE_DESC
+  SMTP_USER_ASC
+  SMTP_USER_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  WEBHOOK_SIGNING_SECRET_NAME_ASC
+  WEBHOOK_SIGNING_SECRET_NAME_DESC
+}
+
+"""
+Represents an update to a `EmailProviderAccount`. Fields that are set will be updated.
+"""
+input EmailProviderAccountPatch {
+  """
+  Provider API base URL when it is not the provider default (e.g. Mailgun EU)
+  """
+  apiBaseUrl: String
+  createdAt: Datetime
+
+  """
+  Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here.
+  """
+  credentialsSecretName: String
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+  id: UUID
+
+  """
+  Whether identities may send through this account. Disabling one row stops every identity that references it.
+  """
+  isActive: Boolean
+
+  """Operator-facing name for this account (e.g. transactional, marketing)"""
+  name: String
+
+  """
+  integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK
+  """
+  provider: String
+
+  """
+  Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name
+  """
+  providerAccountName: String
+
+  """Provider region for region-addressed providers (e.g. SES us-east-1)"""
+  region: String
+
+  """SMTP host (provider = smtp, or a provider addressed over SMTP)"""
+  smtpHost: String
+
+  """SMTP port"""
+  smtpPort: Int
+
+  """Whether the SMTP connection uses implicit TLS"""
+  smtpSecure: Boolean
+
+  """
+  SMTP username; the password is a secret, addressed by credentials_secret_name
+  """
+  smtpUser: String
+  updatedAt: Datetime
+
+  """
+  Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store.
+  """
+  webhookSigningSecretName: String
+}
+
+"""
+A filter to be used against many `EmailIdentity` object types. All fields are combined with a logical ‘and.’
+"""
+input EmailProviderAccountToManyEmailIdentityFilter {
+  """Filters to entities where every related entity matches."""
+  every: EmailIdentityFilter
+
+  """Filters to entities where no related entity matches."""
+  none: EmailIdentityFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: EmailIdentityFilter
+}
+
+"""
+Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity.
+"""
+type EmailSiteIdentity {
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """
+  Reads a single `EmailIdentity` that is related to this `EmailSiteIdentity`.
+  """
+  emailIdentity: EmailIdentity
+
+  """Identity this site sends as"""
+  emailIdentityId: UUID!
+  id: UUID!
+
+  """Reads a single `Site` that is related to this `EmailSiteIdentity`."""
+  site: Site
+
+  """Site whose mail is sent as the bound identity"""
+  siteId: UUID!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `EmailSiteIdentity` values."""
+type EmailSiteIdentityConnection {
+  """
+  A list of edges which contains the `EmailSiteIdentity` and cursor to aid in pagination.
+  """
+  edges: [EmailSiteIdentityEdge]!
+
+  """A list of `EmailSiteIdentity` objects."""
+  nodes: [EmailSiteIdentity]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `EmailSiteIdentity` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `EmailSiteIdentity` edge in the connection."""
+type EmailSiteIdentityEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `EmailSiteIdentity` at the end of the edge."""
+  node: EmailSiteIdentity
+}
+
+"""
+A filter to be used against `EmailSiteIdentity` object types. All fields are combined with a logical ‘and.’
+"""
+input EmailSiteIdentityFilter {
+  """Checks for all expressions in this list."""
+  and: [EmailSiteIdentityFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `emailIdentity` relation."""
+  emailIdentity: EmailIdentityFilter
+
+  """Filter by the object’s `emailIdentityId` field."""
+  emailIdentityId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: EmailSiteIdentityFilter
+
+  """Checks for any expressions in this list."""
+  or: [EmailSiteIdentityFilter!]
+
+  """Filter by the object’s `site` relation."""
+  site: SiteFilter
+
+  """Filter by the object’s `siteId` field."""
+  siteId: UUIDFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `EmailSiteIdentity`"""
+input EmailSiteIdentityInput {
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Identity this site sends as"""
+  emailIdentityId: UUID!
+  id: UUID
+
+  """Site whose mail is sent as the bound identity"""
+  siteId: UUID!
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `EmailSiteIdentity`."""
+enum EmailSiteIdentityOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  EMAIL_IDENTITY_ID_ASC
+  EMAIL_IDENTITY_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SITE_ID_ASC
+  SITE_ID_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `EmailSiteIdentity`. Fields that are set will be updated.
+"""
+input EmailSiteIdentityPatch {
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """Identity this site sends as"""
+  emailIdentityId: UUID
+  id: UUID
+
+  """Site whose mail is sent as the bound identity"""
+  siteId: UUID
+  updatedAt: Datetime
 }
 
 type EmbeddingChunk {
@@ -14337,6 +15564,14 @@ type Mutation {
     input: CancelDatabaseTransferInput!
   ): CancelDatabaseTransferPayload
 
+  """Creates a single `Api`."""
+  createApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateApiInput!
+  ): CreateApiPayload
+
   """Creates a single `ApiSchema`."""
   createApiSchema(
     """
@@ -14352,14 +15587,6 @@ type Mutation {
     """
     input: CreateApiSettingInput!
   ): CreateApiSettingPayload
-
-  """Creates a single `Apis`."""
-  createApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateApisInput!
-  ): CreateApisPayload
 
   """Creates a single `CheckConstraint`."""
   createCheckConstraint(
@@ -14456,6 +15683,30 @@ type Mutation {
     """
     input: CreateDomainVerificationInput!
   ): CreateDomainVerificationPayload
+
+  """Creates a single `EmailIdentity`."""
+  createEmailIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateEmailIdentityInput!
+  ): CreateEmailIdentityPayload
+
+  """Creates a single `EmailProviderAccount`."""
+  createEmailProviderAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateEmailProviderAccountInput!
+  ): CreateEmailProviderAccountPayload
+
+  """Creates a single `EmailSiteIdentity`."""
+  createEmailSiteIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateEmailSiteIdentityInput!
+  ): CreateEmailSiteIdentityPayload
 
   """Creates a single `EmbeddingChunk`."""
   createEmbeddingChunk(
@@ -14585,6 +15836,14 @@ type Mutation {
     input: CreatePartitionInput!
   ): CreatePartitionPayload
 
+  """Creates a single `PlatformApi`."""
+  createPlatformApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformApiInput!
+  ): CreatePlatformApiPayload
+
   """Creates a single `PlatformApiSchema`."""
   createPlatformApiSchema(
     """
@@ -14600,14 +15859,6 @@ type Mutation {
     """
     input: CreatePlatformApiSettingInput!
   ): CreatePlatformApiSettingPayload
-
-  """Creates a single `PlatformApis`."""
-  createPlatformApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePlatformApisInput!
-  ): CreatePlatformApisPayload
 
   """Creates a single `PlatformCorsSetting`."""
   createPlatformCorsSetting(
@@ -14640,6 +15891,30 @@ type Mutation {
     """
     input: CreatePlatformDomainVerificationInput!
   ): CreatePlatformDomainVerificationPayload
+
+  """Creates a single `PlatformEmailIdentity`."""
+  createPlatformEmailIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformEmailIdentityInput!
+  ): CreatePlatformEmailIdentityPayload
+
+  """Creates a single `PlatformEmailProviderAccount`."""
+  createPlatformEmailProviderAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformEmailProviderAccountInput!
+  ): CreatePlatformEmailProviderAccountPayload
+
+  """Creates a single `PlatformEmailSiteIdentity`."""
+  createPlatformEmailSiteIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformEmailSiteIdentityInput!
+  ): CreatePlatformEmailSiteIdentityPayload
 
   """Creates a single `PlatformManagedDomain`."""
   createPlatformManagedDomain(
@@ -14961,6 +16236,14 @@ type Mutation {
     input: CreateWebauthnSettingInput!
   ): CreateWebauthnSettingPayload
 
+  """Deletes a single `Api` using a unique key."""
+  deleteApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteApiInput!
+  ): DeleteApiPayload
+
   """Deletes a single `ApiSchema` using a unique key."""
   deleteApiSchema(
     """
@@ -14976,14 +16259,6 @@ type Mutation {
     """
     input: DeleteApiSettingInput!
   ): DeleteApiSettingPayload
-
-  """Deletes a single `Apis` using a unique key."""
-  deleteApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteApisInput!
-  ): DeleteApisPayload
 
   """Deletes a single `CheckConstraint` using a unique key."""
   deleteCheckConstraint(
@@ -15080,6 +16355,30 @@ type Mutation {
     """
     input: DeleteDomainVerificationInput!
   ): DeleteDomainVerificationPayload
+
+  """Deletes a single `EmailIdentity` using a unique key."""
+  deleteEmailIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteEmailIdentityInput!
+  ): DeleteEmailIdentityPayload
+
+  """Deletes a single `EmailProviderAccount` using a unique key."""
+  deleteEmailProviderAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteEmailProviderAccountInput!
+  ): DeleteEmailProviderAccountPayload
+
+  """Deletes a single `EmailSiteIdentity` using a unique key."""
+  deleteEmailSiteIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteEmailSiteIdentityInput!
+  ): DeleteEmailSiteIdentityPayload
 
   """Deletes a single `EmbeddingChunk` using a unique key."""
   deleteEmbeddingChunk(
@@ -15209,6 +16508,14 @@ type Mutation {
     input: DeletePartitionInput!
   ): DeletePartitionPayload
 
+  """Deletes a single `PlatformApi` using a unique key."""
+  deletePlatformApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformApiInput!
+  ): DeletePlatformApiPayload
+
   """Deletes a single `PlatformApiSchema` using a unique key."""
   deletePlatformApiSchema(
     """
@@ -15224,14 +16531,6 @@ type Mutation {
     """
     input: DeletePlatformApiSettingInput!
   ): DeletePlatformApiSettingPayload
-
-  """Deletes a single `PlatformApis` using a unique key."""
-  deletePlatformApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePlatformApisInput!
-  ): DeletePlatformApisPayload
 
   """Deletes a single `PlatformCorsSetting` using a unique key."""
   deletePlatformCorsSetting(
@@ -15264,6 +16563,30 @@ type Mutation {
     """
     input: DeletePlatformDomainVerificationInput!
   ): DeletePlatformDomainVerificationPayload
+
+  """Deletes a single `PlatformEmailIdentity` using a unique key."""
+  deletePlatformEmailIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformEmailIdentityInput!
+  ): DeletePlatformEmailIdentityPayload
+
+  """Deletes a single `PlatformEmailProviderAccount` using a unique key."""
+  deletePlatformEmailProviderAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformEmailProviderAccountInput!
+  ): DeletePlatformEmailProviderAccountPayload
+
+  """Deletes a single `PlatformEmailSiteIdentity` using a unique key."""
+  deletePlatformEmailSiteIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformEmailSiteIdentityInput!
+  ): DeletePlatformEmailSiteIdentityPayload
 
   """Deletes a single `PlatformManagedDomain` using a unique key."""
   deletePlatformManagedDomain(
@@ -15650,6 +16973,14 @@ type Mutation {
     input: SitesProvisionStaticSiteInput!
   ): SitesProvisionStaticSitePayload
 
+  """Updates a single `Api` using a unique key and a patch."""
+  updateApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateApiInput!
+  ): UpdateApiPayload
+
   """Updates a single `ApiSchema` using a unique key and a patch."""
   updateApiSchema(
     """
@@ -15665,14 +16996,6 @@ type Mutation {
     """
     input: UpdateApiSettingInput!
   ): UpdateApiSettingPayload
-
-  """Updates a single `Apis` using a unique key and a patch."""
-  updateApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateApisInput!
-  ): UpdateApisPayload
 
   """Updates a single `CheckConstraint` using a unique key and a patch."""
   updateCheckConstraint(
@@ -15769,6 +17092,32 @@ type Mutation {
     """
     input: UpdateDomainVerificationInput!
   ): UpdateDomainVerificationPayload
+
+  """Updates a single `EmailIdentity` using a unique key and a patch."""
+  updateEmailIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateEmailIdentityInput!
+  ): UpdateEmailIdentityPayload
+
+  """
+  Updates a single `EmailProviderAccount` using a unique key and a patch.
+  """
+  updateEmailProviderAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateEmailProviderAccountInput!
+  ): UpdateEmailProviderAccountPayload
+
+  """Updates a single `EmailSiteIdentity` using a unique key and a patch."""
+  updateEmailSiteIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateEmailSiteIdentityInput!
+  ): UpdateEmailSiteIdentityPayload
 
   """Updates a single `EmbeddingChunk` using a unique key and a patch."""
   updateEmbeddingChunk(
@@ -15902,6 +17251,14 @@ type Mutation {
     input: UpdatePartitionInput!
   ): UpdatePartitionPayload
 
+  """Updates a single `PlatformApi` using a unique key and a patch."""
+  updatePlatformApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformApiInput!
+  ): UpdatePlatformApiPayload
+
   """Updates a single `PlatformApiSchema` using a unique key and a patch."""
   updatePlatformApiSchema(
     """
@@ -15917,14 +17274,6 @@ type Mutation {
     """
     input: UpdatePlatformApiSettingInput!
   ): UpdatePlatformApiSettingPayload
-
-  """Updates a single `PlatformApis` using a unique key and a patch."""
-  updatePlatformApis(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePlatformApisInput!
-  ): UpdatePlatformApisPayload
 
   """Updates a single `PlatformCorsSetting` using a unique key and a patch."""
   updatePlatformCorsSetting(
@@ -15959,6 +17308,36 @@ type Mutation {
     """
     input: UpdatePlatformDomainVerificationInput!
   ): UpdatePlatformDomainVerificationPayload
+
+  """
+  Updates a single `PlatformEmailIdentity` using a unique key and a patch.
+  """
+  updatePlatformEmailIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformEmailIdentityInput!
+  ): UpdatePlatformEmailIdentityPayload
+
+  """
+  Updates a single `PlatformEmailProviderAccount` using a unique key and a patch.
+  """
+  updatePlatformEmailProviderAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformEmailProviderAccountInput!
+  ): UpdatePlatformEmailProviderAccountPayload
+
+  """
+  Updates a single `PlatformEmailSiteIdentity` using a unique key and a patch.
+  """
+  updatePlatformEmailSiteIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformEmailSiteIdentityInput!
+  ): UpdatePlatformEmailSiteIdentityPayload
 
   """
   Updates a single `PlatformManagedDomain` using a unique key and a patch.
@@ -16416,10 +17795,10 @@ input NodeTypeRegistryPatch {
 enum ObjectCategory {
   APP
   AUTH
+  CAPABILITIES
   CORE
   MEMBERSHIPS
   MODULE
-  PERMISSIONS
 }
 
 """
@@ -16875,12 +18254,237 @@ input PartitionPatch {
   updatedAt: Datetime
 }
 
+"""
+API surfaces exposed by this scope; publication makes a surface bindable from other scopes
+"""
+type PlatformApi {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID!
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean!
+
+  """Owner-local API surface name"""
+  name: String!
+
+  """Reads and enables pagination through a set of `PlatformApiSchema`."""
+  platformApiSchemasByApiId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformApiSchema`."""
+    orderBy: [PlatformApiSchemaOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformApiSchemaFilter
+  ): PlatformApiSchemaConnection!
+
+  """
+  Reads a single `PlatformApiSetting` that is related to this `PlatformApi`.
+  """
+  platformApiSettingByApiId: PlatformApiSetting
+
+  """
+  Reads a single `PlatformCorsSetting` that is related to this `PlatformApi`.
+  """
+  platformCorsSettingByApiId: PlatformCorsSetting
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformApi` values."""
+type PlatformApiConnection {
+  """
+  A list of edges which contains the `PlatformApi` and cursor to aid in pagination.
+  """
+  edges: [PlatformApiEdge]!
+
+  """A list of `PlatformApi` objects."""
+  nodes: [PlatformApi]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PlatformApi` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PlatformApi` edge in the connection."""
+type PlatformApiEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformApi` at the end of the edge."""
+  node: PlatformApi
+}
+
+"""
+A filter to be used against `PlatformApi` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformApiFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformApiFilter!]
+
+  """Filter by the object’s `anonRole` field."""
+  anonRole: StringFilter
+
+  """Filter by the object’s `config` field."""
+  config: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `dbname` field."""
+  dbname: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isPublished` field."""
+  isPublished: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformApiFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformApiFilter!]
+
+  """Filter by the object’s `platformApiSchemasByApiId` relation."""
+  platformApiSchemasByApiId: PlatformApiToManyPlatformApiSchemaFilter
+
+  """`platformApiSchemasByApiId` exist."""
+  platformApiSchemasByApiIdExist: Boolean
+
+  """Filter by the object’s `platformApiSettingByApiId` relation."""
+  platformApiSettingByApiId: PlatformApiSettingFilter
+
+  """A related `platformApiSettingByApiId` exists."""
+  platformApiSettingByApiIdExists: Boolean
+
+  """Filter by the object’s `platformCorsSettingByApiId` relation."""
+  platformCorsSettingByApiId: PlatformCorsSettingFilter
+
+  """A related `platformCorsSettingByApiId` exists."""
+  platformCorsSettingByApiIdExists: Boolean
+
+  """Filter by the object’s `roleName` field."""
+  roleName: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `PlatformApi`"""
+input PlatformApiInput {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean
+
+  """Owner-local API surface name"""
+  name: String!
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `PlatformApi`."""
+enum PlatformApiOrderBy {
+  ANON_ROLE_ASC
+  ANON_ROLE_DESC
+  CONFIG_ASC
+  CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DBNAME_ASC
+  DBNAME_DESC
+  ID_ASC
+  ID_DESC
+  IS_PUBLISHED_ASC
+  IS_PUBLISHED_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROLE_NAME_ASC
+  ROLE_NAME_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformApi`. Fields that are set will be updated.
+"""
+input PlatformApiPatch {
+  """Anonymous role the API executes as"""
+  anonRole: String
+
+  """Module-specific configuration for this API surface"""
+  config: JSON
+  createdAt: Datetime
+
+  """Database this API surface serves"""
+  dbname: String
+  id: UUID
+
+  """Whether other scopes may see and route to this API surface"""
+  isPublished: Boolean
+
+  """Owner-local API surface name"""
+  name: String
+
+  """Authenticated role the API executes as"""
+  roleName: String
+  updatedAt: Datetime
+}
+
 """Join table linking API surfaces to the metaschema schemas they expose"""
 type PlatformApiSchema {
   """
-  Reads a single `PlatformApis` that is related to this `PlatformApiSchema`.
+  Reads a single `PlatformApi` that is related to this `PlatformApiSchema`.
   """
-  api: PlatformApis
+  api: PlatformApi
 
   """API surface that exposes this schema"""
   apiId: UUID!
@@ -16931,7 +18535,7 @@ input PlatformApiSchemaFilter {
   and: [PlatformApiSchemaFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: PlatformApisFilter
+  api: PlatformApiFilter
 
   """Filter by the object’s `apiId` field."""
   apiId: UUIDFilter
@@ -17006,9 +18610,9 @@ Per-API feature flag overrides; NULL columns inherit from database_settings
 """
 type PlatformApiSetting {
   """
-  Reads a single `PlatformApis` that is related to this `PlatformApiSetting`.
+  Reads a single `PlatformApi` that is related to this `PlatformApiSetting`.
   """
-  api: PlatformApis
+  api: PlatformApi
 
   """API surface these settings override for"""
   apiId: UUID!
@@ -17123,7 +18727,7 @@ input PlatformApiSettingFilter {
   and: [PlatformApiSettingFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: PlatformApisFilter
+  api: PlatformApiFilter
 
   """Filter by the object’s `apiId` field."""
   apiId: UUIDFilter
@@ -17390,234 +18994,9 @@ input PlatformApiSettingPatch {
 }
 
 """
-API surfaces exposed by this scope; publication makes a surface bindable from other scopes
-"""
-type PlatformApis {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID!
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean!
-
-  """Owner-local API surface name"""
-  name: String!
-
-  """Reads and enables pagination through a set of `PlatformApiSchema`."""
-  platformApiSchemasByApiId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PlatformApiSchema`."""
-    orderBy: [PlatformApiSchemaOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PlatformApiSchemaFilter
-  ): PlatformApiSchemaConnection!
-
-  """
-  Reads a single `PlatformApiSetting` that is related to this `PlatformApis`.
-  """
-  platformApiSettingByApiId: PlatformApiSetting
-
-  """
-  Reads a single `PlatformCorsSetting` that is related to this `PlatformApis`.
-  """
-  platformCorsSettingByApiId: PlatformCorsSetting
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""A connection to a list of `PlatformApis` values."""
-type PlatformApisConnection {
-  """
-  A list of edges which contains the `PlatformApis` and cursor to aid in pagination.
-  """
-  edges: [PlatformApisEdge]!
-
-  """A list of `PlatformApis` objects."""
-  nodes: [PlatformApis]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `PlatformApis` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `PlatformApis` edge in the connection."""
-type PlatformApisEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `PlatformApis` at the end of the edge."""
-  node: PlatformApis
-}
-
-"""
-A filter to be used against `PlatformApis` object types. All fields are combined with a logical ‘and.’
-"""
-input PlatformApisFilter {
-  """Checks for all expressions in this list."""
-  and: [PlatformApisFilter!]
-
-  """Filter by the object’s `anonRole` field."""
-  anonRole: StringFilter
-
-  """Filter by the object’s `config` field."""
-  config: JSONFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `dbname` field."""
-  dbname: StringFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isPublished` field."""
-  isPublished: BooleanFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Negates the expression."""
-  not: PlatformApisFilter
-
-  """Checks for any expressions in this list."""
-  or: [PlatformApisFilter!]
-
-  """Filter by the object’s `platformApiSchemasByApiId` relation."""
-  platformApiSchemasByApiId: PlatformApisToManyPlatformApiSchemaFilter
-
-  """`platformApiSchemasByApiId` exist."""
-  platformApiSchemasByApiIdExist: Boolean
-
-  """Filter by the object’s `platformApiSettingByApiId` relation."""
-  platformApiSettingByApiId: PlatformApiSettingFilter
-
-  """A related `platformApiSettingByApiId` exists."""
-  platformApiSettingByApiIdExists: Boolean
-
-  """Filter by the object’s `platformCorsSettingByApiId` relation."""
-  platformCorsSettingByApiId: PlatformCorsSettingFilter
-
-  """A related `platformCorsSettingByApiId` exists."""
-  platformCorsSettingByApiIdExists: Boolean
-
-  """Filter by the object’s `roleName` field."""
-  roleName: StringFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `PlatformApis`"""
-input PlatformApisInput {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean
-
-  """Owner-local API surface name"""
-  name: String!
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""Methods to use when ordering `PlatformApis`."""
-enum PlatformApisOrderBy {
-  ANON_ROLE_ASC
-  ANON_ROLE_DESC
-  CONFIG_ASC
-  CONFIG_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  DBNAME_ASC
-  DBNAME_DESC
-  ID_ASC
-  ID_DESC
-  IS_PUBLISHED_ASC
-  IS_PUBLISHED_DESC
-  NAME_ASC
-  NAME_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ROLE_NAME_ASC
-  ROLE_NAME_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""
-Represents an update to a `PlatformApis`. Fields that are set will be updated.
-"""
-input PlatformApisPatch {
-  """Anonymous role the API executes as"""
-  anonRole: String
-
-  """Module-specific configuration for this API surface"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database this API surface serves"""
-  dbname: String
-  id: UUID
-
-  """Whether other scopes may see and route to this API surface"""
-  isPublished: Boolean
-
-  """Owner-local API surface name"""
-  name: String
-
-  """Authenticated role the API executes as"""
-  roleName: String
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against many `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’
 """
-input PlatformApisToManyPlatformApiSchemaFilter {
+input PlatformApiToManyPlatformApiSchemaFilter {
   """Filters to entities where every related entity matches."""
   every: PlatformApiSchemaFilter
 
@@ -17636,9 +19015,9 @@ type PlatformCorsSetting {
   allowedOrigins: [String]!
 
   """
-  Reads a single `PlatformApis` that is related to this `PlatformCorsSetting`.
+  Reads a single `PlatformApi` that is related to this `PlatformCorsSetting`.
   """
-  api: PlatformApis
+  api: PlatformApi
 
   """
   Optional API surface for per-API override; NULL means scope-wide default
@@ -17688,7 +19067,7 @@ input PlatformCorsSettingFilter {
   and: [PlatformCorsSettingFilter!]
 
   """Filter by the object’s `api` relation."""
-  api: PlatformApisFilter
+  api: PlatformApiFilter
 
   """A related `api` exists."""
   apiExists: Boolean
@@ -18635,6 +20014,789 @@ type PlatformDomainsAssignSubdomainPayload {
 }
 
 """
+Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through
+"""
+type PlatformEmailIdentity {
+  createdAt: Datetime
+
+  """
+  Envelope/header From address, lower-case. Must be accepted by the sending account at the provider.
+  """
+  fromAddress: String!
+
+  """Display name shown beside the from address"""
+  fromName: String
+  id: UUID!
+
+  """Whether this identity may be resolved for a send"""
+  isActive: Boolean!
+
+  """
+  The scope default identity, used when no site binding resolves. At most one per scope key.
+  """
+  isDefault: Boolean!
+
+  """Operator-facing name for this identity (e.g. transactional, support)"""
+  name: String!
+
+  """
+  Reads and enables pagination through a set of `PlatformEmailSiteIdentity`.
+  """
+  platformEmailSiteIdentitiesByEmailIdentityId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformEmailSiteIdentity`."""
+    orderBy: [PlatformEmailSiteIdentityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformEmailSiteIdentityFilter
+  ): PlatformEmailSiteIdentityConnection!
+
+  """
+  Reads a single `PlatformEmailProviderAccount` that is related to this `PlatformEmailIdentity`.
+  """
+  providerAccount: PlatformEmailProviderAccount
+
+  """
+  Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared.
+  """
+  providerAccountId: UUID
+
+  """Reply-To address when replies should not go to the from address"""
+  replyToAddress: String
+
+  """Support address rendered in message bodies and footers"""
+  supportAddress: String
+
+  """
+  own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback
+  """
+  transportMode: String!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformEmailIdentity` values."""
+type PlatformEmailIdentityConnection {
+  """
+  A list of edges which contains the `PlatformEmailIdentity` and cursor to aid in pagination.
+  """
+  edges: [PlatformEmailIdentityEdge]!
+
+  """A list of `PlatformEmailIdentity` objects."""
+  nodes: [PlatformEmailIdentity]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformEmailIdentity` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformEmailIdentity` edge in the connection."""
+type PlatformEmailIdentityEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformEmailIdentity` at the end of the edge."""
+  node: PlatformEmailIdentity
+}
+
+"""
+A filter to be used against `PlatformEmailIdentity` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformEmailIdentityFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformEmailIdentityFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `fromAddress` field."""
+  fromAddress: StringFilter
+
+  """Filter by the object’s `fromName` field."""
+  fromName: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `isDefault` field."""
+  isDefault: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformEmailIdentityFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformEmailIdentityFilter!]
+
+  """
+  Filter by the object’s `platformEmailSiteIdentitiesByEmailIdentityId` relation.
+  """
+  platformEmailSiteIdentitiesByEmailIdentityId: PlatformEmailIdentityToManyPlatformEmailSiteIdentityFilter
+
+  """`platformEmailSiteIdentitiesByEmailIdentityId` exist."""
+  platformEmailSiteIdentitiesByEmailIdentityIdExist: Boolean
+
+  """Filter by the object’s `providerAccount` relation."""
+  providerAccount: PlatformEmailProviderAccountFilter
+
+  """A related `providerAccount` exists."""
+  providerAccountExists: Boolean
+
+  """Filter by the object’s `providerAccountId` field."""
+  providerAccountId: UUIDFilter
+
+  """Filter by the object’s `replyToAddress` field."""
+  replyToAddress: StringFilter
+
+  """Filter by the object’s `supportAddress` field."""
+  supportAddress: StringFilter
+
+  """Filter by the object’s `transportMode` field."""
+  transportMode: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `PlatformEmailIdentity`"""
+input PlatformEmailIdentityInput {
+  createdAt: Datetime
+
+  """
+  Envelope/header From address, lower-case. Must be accepted by the sending account at the provider.
+  """
+  fromAddress: String!
+
+  """Display name shown beside the from address"""
+  fromName: String
+  id: UUID
+
+  """Whether this identity may be resolved for a send"""
+  isActive: Boolean
+
+  """
+  The scope default identity, used when no site binding resolves. At most one per scope key.
+  """
+  isDefault: Boolean
+
+  """Operator-facing name for this identity (e.g. transactional, support)"""
+  name: String!
+
+  """
+  Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared.
+  """
+  providerAccountId: UUID
+
+  """Reply-To address when replies should not go to the from address"""
+  replyToAddress: String
+
+  """Support address rendered in message bodies and footers"""
+  supportAddress: String
+
+  """
+  own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback
+  """
+  transportMode: String
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `PlatformEmailIdentity`."""
+enum PlatformEmailIdentityOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  FROM_ADDRESS_ASC
+  FROM_ADDRESS_DESC
+  FROM_NAME_ASC
+  FROM_NAME_DESC
+  ID_ASC
+  ID_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  IS_DEFAULT_ASC
+  IS_DEFAULT_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROVIDER_ACCOUNT_ID_ASC
+  PROVIDER_ACCOUNT_ID_DESC
+  REPLY_TO_ADDRESS_ASC
+  REPLY_TO_ADDRESS_DESC
+  SUPPORT_ADDRESS_ASC
+  SUPPORT_ADDRESS_DESC
+  TRANSPORT_MODE_ASC
+  TRANSPORT_MODE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformEmailIdentity`. Fields that are set will be updated.
+"""
+input PlatformEmailIdentityPatch {
+  createdAt: Datetime
+
+  """
+  Envelope/header From address, lower-case. Must be accepted by the sending account at the provider.
+  """
+  fromAddress: String
+
+  """Display name shown beside the from address"""
+  fromName: String
+  id: UUID
+
+  """Whether this identity may be resolved for a send"""
+  isActive: Boolean
+
+  """
+  The scope default identity, used when no site binding resolves. At most one per scope key.
+  """
+  isDefault: Boolean
+
+  """Operator-facing name for this identity (e.g. transactional, support)"""
+  name: String
+
+  """
+  Same-scope provider account this identity sends through. Required for transport_mode = own, NULL for platform_shared.
+  """
+  providerAccountId: UUID
+
+  """Reply-To address when replies should not go to the from address"""
+  replyToAddress: String
+
+  """Support address rendered in message bodies and footers"""
+  supportAddress: String
+
+  """
+  own = send through provider_account_id in this scope; platform_shared = send through the platform installation's shared account, an explicit recorded choice and never an implicit fallback
+  """
+  transportMode: String
+  updatedAt: Datetime
+}
+
+"""
+A filter to be used against many `PlatformEmailSiteIdentity` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformEmailIdentityToManyPlatformEmailSiteIdentityFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformEmailSiteIdentityFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformEmailSiteIdentityFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformEmailSiteIdentityFilter
+}
+
+"""
+A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself)
+"""
+type PlatformEmailProviderAccount {
+  """
+  Provider API base URL when it is not the provider default (e.g. Mailgun EU)
+  """
+  apiBaseUrl: String
+  createdAt: Datetime
+
+  """
+  Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here.
+  """
+  credentialsSecretName: String!
+  id: UUID!
+
+  """
+  Whether identities may send through this account. Disabling one row stops every identity that references it.
+  """
+  isActive: Boolean!
+
+  """Operator-facing name for this account (e.g. transactional, marketing)"""
+  name: String!
+
+  """Reads and enables pagination through a set of `PlatformEmailIdentity`."""
+  platformEmailIdentitiesByProviderAccountId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformEmailIdentity`."""
+    orderBy: [PlatformEmailIdentityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformEmailIdentityFilter
+  ): PlatformEmailIdentityConnection!
+
+  """
+  integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK
+  """
+  provider: String!
+
+  """
+  Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name
+  """
+  providerAccountName: String
+
+  """Provider region for region-addressed providers (e.g. SES us-east-1)"""
+  region: String
+
+  """SMTP host (provider = smtp, or a provider addressed over SMTP)"""
+  smtpHost: String
+
+  """SMTP port"""
+  smtpPort: Int
+
+  """Whether the SMTP connection uses implicit TLS"""
+  smtpSecure: Boolean
+
+  """
+  SMTP username; the password is a secret, addressed by credentials_secret_name
+  """
+  smtpUser: String
+  updatedAt: Datetime
+
+  """
+  Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store.
+  """
+  webhookSigningSecretName: String
+}
+
+"""A connection to a list of `PlatformEmailProviderAccount` values."""
+type PlatformEmailProviderAccountConnection {
+  """
+  A list of edges which contains the `PlatformEmailProviderAccount` and cursor to aid in pagination.
+  """
+  edges: [PlatformEmailProviderAccountEdge]!
+
+  """A list of `PlatformEmailProviderAccount` objects."""
+  nodes: [PlatformEmailProviderAccount]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformEmailProviderAccount` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformEmailProviderAccount` edge in the connection."""
+type PlatformEmailProviderAccountEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformEmailProviderAccount` at the end of the edge."""
+  node: PlatformEmailProviderAccount
+}
+
+"""
+A filter to be used against `PlatformEmailProviderAccount` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformEmailProviderAccountFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformEmailProviderAccountFilter!]
+
+  """Filter by the object’s `apiBaseUrl` field."""
+  apiBaseUrl: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `credentialsSecretName` field."""
+  credentialsSecretName: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformEmailProviderAccountFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformEmailProviderAccountFilter!]
+
+  """
+  Filter by the object’s `platformEmailIdentitiesByProviderAccountId` relation.
+  """
+  platformEmailIdentitiesByProviderAccountId: PlatformEmailProviderAccountToManyPlatformEmailIdentityFilter
+
+  """`platformEmailIdentitiesByProviderAccountId` exist."""
+  platformEmailIdentitiesByProviderAccountIdExist: Boolean
+
+  """Filter by the object’s `provider` field."""
+  provider: StringFilter
+
+  """Filter by the object’s `providerAccountName` field."""
+  providerAccountName: StringFilter
+
+  """Filter by the object’s `region` field."""
+  region: StringFilter
+
+  """Filter by the object’s `smtpHost` field."""
+  smtpHost: StringFilter
+
+  """Filter by the object’s `smtpPort` field."""
+  smtpPort: IntFilter
+
+  """Filter by the object’s `smtpSecure` field."""
+  smtpSecure: BooleanFilter
+
+  """Filter by the object’s `smtpUser` field."""
+  smtpUser: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `webhookSigningSecretName` field."""
+  webhookSigningSecretName: StringFilter
+}
+
+"""An input for mutations affecting `PlatformEmailProviderAccount`"""
+input PlatformEmailProviderAccountInput {
+  """
+  Provider API base URL when it is not the provider default (e.g. Mailgun EU)
+  """
+  apiBaseUrl: String
+  createdAt: Datetime
+
+  """
+  Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here.
+  """
+  credentialsSecretName: String!
+  id: UUID
+
+  """
+  Whether identities may send through this account. Disabling one row stops every identity that references it.
+  """
+  isActive: Boolean
+
+  """Operator-facing name for this account (e.g. transactional, marketing)"""
+  name: String!
+
+  """
+  integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK
+  """
+  provider: String!
+
+  """
+  Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name
+  """
+  providerAccountName: String
+
+  """Provider region for region-addressed providers (e.g. SES us-east-1)"""
+  region: String
+
+  """SMTP host (provider = smtp, or a provider addressed over SMTP)"""
+  smtpHost: String
+
+  """SMTP port"""
+  smtpPort: Int
+
+  """Whether the SMTP connection uses implicit TLS"""
+  smtpSecure: Boolean
+
+  """
+  SMTP username; the password is a secret, addressed by credentials_secret_name
+  """
+  smtpUser: String
+  updatedAt: Datetime
+
+  """
+  Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store.
+  """
+  webhookSigningSecretName: String
+}
+
+"""Methods to use when ordering `PlatformEmailProviderAccount`."""
+enum PlatformEmailProviderAccountOrderBy {
+  API_BASE_URL_ASC
+  API_BASE_URL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREDENTIALS_SECRET_NAME_ASC
+  CREDENTIALS_SECRET_NAME_DESC
+  ID_ASC
+  ID_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROVIDER_ACCOUNT_NAME_ASC
+  PROVIDER_ACCOUNT_NAME_DESC
+  PROVIDER_ASC
+  PROVIDER_DESC
+  REGION_ASC
+  REGION_DESC
+  SMTP_HOST_ASC
+  SMTP_HOST_DESC
+  SMTP_PORT_ASC
+  SMTP_PORT_DESC
+  SMTP_SECURE_ASC
+  SMTP_SECURE_DESC
+  SMTP_USER_ASC
+  SMTP_USER_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  WEBHOOK_SIGNING_SECRET_NAME_ASC
+  WEBHOOK_SIGNING_SECRET_NAME_DESC
+}
+
+"""
+Represents an update to a `PlatformEmailProviderAccount`. Fields that are set will be updated.
+"""
+input PlatformEmailProviderAccountPatch {
+  """
+  Provider API base URL when it is not the provider default (e.g. Mailgun EU)
+  """
+  apiBaseUrl: String
+  createdAt: Datetime
+
+  """
+  Name of the secret holding this account's API key or SMTP password. The value is resolved from the secret store at send time (realm = this row's id) and is never stored here.
+  """
+  credentialsSecretName: String
+  id: UUID
+
+  """
+  Whether identities may send through this account. Disabling one row stops every identity that references it.
+  """
+  isActive: Boolean
+
+  """Operator-facing name for this account (e.g. transactional, marketing)"""
+  name: String
+
+  """
+  integration_providers.slug of the provider this account is at (mailgun, ses, postmark, smtp), matched by string not by FK
+  """
+  provider: String
+
+  """
+  Account identifier at the provider — the Mailgun sending domain, the SES verified identity, the Postmark server name
+  """
+  providerAccountName: String
+
+  """Provider region for region-addressed providers (e.g. SES us-east-1)"""
+  region: String
+
+  """SMTP host (provider = smtp, or a provider addressed over SMTP)"""
+  smtpHost: String
+
+  """SMTP port"""
+  smtpPort: Int
+
+  """Whether the SMTP connection uses implicit TLS"""
+  smtpSecure: Boolean
+
+  """
+  SMTP username; the password is a secret, addressed by credentials_secret_name
+  """
+  smtpUser: String
+  updatedAt: Datetime
+
+  """
+  Name of the secret used to verify this provider's delivery/bounce webhooks. Name only; the value stays in the secret store.
+  """
+  webhookSigningSecretName: String
+}
+
+"""
+A filter to be used against many `PlatformEmailIdentity` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformEmailProviderAccountToManyPlatformEmailIdentityFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformEmailIdentityFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformEmailIdentityFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformEmailIdentityFilter
+}
+
+"""
+Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity.
+"""
+type PlatformEmailSiteIdentity {
+  createdAt: Datetime
+
+  """
+  Reads a single `PlatformEmailIdentity` that is related to this `PlatformEmailSiteIdentity`.
+  """
+  emailIdentity: PlatformEmailIdentity
+
+  """Identity this site sends as"""
+  emailIdentityId: UUID!
+  id: UUID!
+
+  """
+  Reads a single `PlatformSite` that is related to this `PlatformEmailSiteIdentity`.
+  """
+  site: PlatformSite
+
+  """Site whose mail is sent as the bound identity"""
+  siteId: UUID!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformEmailSiteIdentity` values."""
+type PlatformEmailSiteIdentityConnection {
+  """
+  A list of edges which contains the `PlatformEmailSiteIdentity` and cursor to aid in pagination.
+  """
+  edges: [PlatformEmailSiteIdentityEdge]!
+
+  """A list of `PlatformEmailSiteIdentity` objects."""
+  nodes: [PlatformEmailSiteIdentity]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformEmailSiteIdentity` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformEmailSiteIdentity` edge in the connection."""
+type PlatformEmailSiteIdentityEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformEmailSiteIdentity` at the end of the edge."""
+  node: PlatformEmailSiteIdentity
+}
+
+"""
+A filter to be used against `PlatformEmailSiteIdentity` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformEmailSiteIdentityFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformEmailSiteIdentityFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `emailIdentity` relation."""
+  emailIdentity: PlatformEmailIdentityFilter
+
+  """Filter by the object’s `emailIdentityId` field."""
+  emailIdentityId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: PlatformEmailSiteIdentityFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformEmailSiteIdentityFilter!]
+
+  """Filter by the object’s `site` relation."""
+  site: PlatformSiteFilter
+
+  """Filter by the object’s `siteId` field."""
+  siteId: UUIDFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `PlatformEmailSiteIdentity`"""
+input PlatformEmailSiteIdentityInput {
+  createdAt: Datetime
+
+  """Identity this site sends as"""
+  emailIdentityId: UUID!
+  id: UUID
+
+  """Site whose mail is sent as the bound identity"""
+  siteId: UUID!
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `PlatformEmailSiteIdentity`."""
+enum PlatformEmailSiteIdentityOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  EMAIL_IDENTITY_ID_ASC
+  EMAIL_IDENTITY_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SITE_ID_ASC
+  SITE_ID_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformEmailSiteIdentity`. Fields that are set will be updated.
+"""
+input PlatformEmailSiteIdentityPatch {
+  createdAt: Datetime
+
+  """Identity this site sends as"""
+  emailIdentityId: UUID
+  id: UUID
+
+  """Site whose mail is sent as the bound identity"""
+  siteId: UUID
+  updatedAt: Datetime
+}
+
+"""
 Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
 """
 type PlatformManagedDomain {
@@ -19245,6 +21407,11 @@ type PlatformSite {
 
   """Owner-local site surface name"""
   name: String!
+
+  """
+  Reads a single `PlatformEmailSiteIdentity` that is related to this `PlatformSite`.
+  """
+  platformEmailSiteIdentityBySiteId: PlatformEmailSiteIdentity
 
   """Reads and enables pagination through a set of `PlatformPage`."""
   platformPagesBySiteId(
@@ -20074,6 +22241,12 @@ input PlatformSiteFilter {
 
   """Checks for any expressions in this list."""
   or: [PlatformSiteFilter!]
+
+  """Filter by the object’s `platformEmailSiteIdentityBySiteId` relation."""
+  platformEmailSiteIdentityBySiteId: PlatformEmailSiteIdentityFilter
+
+  """A related `platformEmailSiteIdentityBySiteId` exists."""
+  platformEmailSiteIdentityBySiteIdExists: Boolean
 
   """Filter by the object’s `platformPagesBySiteId` relation."""
   platformPagesBySiteId: PlatformSiteToManyPlatformPageFilter
@@ -21976,8 +24149,8 @@ type Query {
     where: ApiSettingFilter
   ): ApiSettingConnection
 
-  """Reads and enables pagination through a set of `Apis`."""
-  apises(
+  """Reads and enables pagination through a set of `Api`."""
+  apis(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -21996,14 +24169,14 @@ type Query {
     """
     offset: Int
 
-    """The method to use when ordering `Apis`."""
-    orderBy: [ApisOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: ApisFilter
-  ): ApisConnection
+    where: ApiFilter
+  ): ApiConnection
   applyRegistryDefaults(data: JSON, nodeType: String): JSON
 
   """Reads and enables pagination through a set of `AstMigration`."""
@@ -22382,6 +24555,93 @@ type Query {
     """
     where: DomainFilter
   ): DomainConnection
+
+  """Reads and enables pagination through a set of `EmailIdentity`."""
+  emailIdentities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `EmailIdentity`."""
+    orderBy: [EmailIdentityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: EmailIdentityFilter
+  ): EmailIdentityConnection
+
+  """Reads and enables pagination through a set of `EmailProviderAccount`."""
+  emailProviderAccounts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `EmailProviderAccount`."""
+    orderBy: [EmailProviderAccountOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: EmailProviderAccountFilter
+  ): EmailProviderAccountConnection
+
+  """Reads and enables pagination through a set of `EmailSiteIdentity`."""
+  emailSiteIdentities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `EmailSiteIdentity`."""
+    orderBy: [EmailSiteIdentityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: EmailSiteIdentityFilter
+  ): EmailSiteIdentityConnection
 
   """Reads and enables pagination through a set of `EmbeddingChunk`."""
   embeddingChunks(
@@ -22907,8 +25167,8 @@ type Query {
     where: PlatformApiSettingFilter
   ): PlatformApiSettingConnection
 
-  """Reads and enables pagination through a set of `PlatformApis`."""
-  platformApises(
+  """Reads and enables pagination through a set of `PlatformApi`."""
+  platformApis(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -22927,14 +25187,14 @@ type Query {
     """
     offset: Int
 
-    """The method to use when ordering `PlatformApis`."""
-    orderBy: [PlatformApisOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `PlatformApi`."""
+    orderBy: [PlatformApiOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: PlatformApisFilter
-  ): PlatformApisConnection
+    where: PlatformApiFilter
+  ): PlatformApiConnection
 
   """Reads and enables pagination through a set of `PlatformCorsSetting`."""
   platformCorsSettings(
@@ -23053,6 +25313,97 @@ type Query {
     """
     where: PlatformDomainFilter
   ): PlatformDomainConnection
+
+  """Reads and enables pagination through a set of `PlatformEmailIdentity`."""
+  platformEmailIdentities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformEmailIdentity`."""
+    orderBy: [PlatformEmailIdentityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformEmailIdentityFilter
+  ): PlatformEmailIdentityConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformEmailProviderAccount`.
+  """
+  platformEmailProviderAccounts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformEmailProviderAccount`."""
+    orderBy: [PlatformEmailProviderAccountOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformEmailProviderAccountFilter
+  ): PlatformEmailProviderAccountConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformEmailSiteIdentity`.
+  """
+  platformEmailSiteIdentities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformEmailSiteIdentity`."""
+    orderBy: [PlatformEmailSiteIdentityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformEmailSiteIdentityFilter
+  ): PlatformEmailSiteIdentityConnection
 
   """Reads and enables pagination through a set of `PlatformManagedDomain`."""
   platformManagedDomains(
@@ -26009,6 +28360,9 @@ type Site {
 
   """Human-readable site description"""
   description: String
+
+  """Reads a single `EmailSiteIdentity` that is related to this `Site`."""
+  emailSiteIdentity: EmailSiteIdentity
   id: UUID!
 
   """
@@ -26863,6 +29217,12 @@ input SiteFilter {
 
   """Filter by the object’s `description` field."""
   description: StringFilter
+
+  """Filter by the object’s `emailSiteIdentity` relation."""
+  emailSiteIdentity: EmailSiteIdentityFilter
+
+  """A related `emailSiteIdentity` exists."""
+  emailSiteIdentityExists: Boolean
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
@@ -30902,6 +33262,44 @@ input UniqueConstraintToManyUniqueConstraintBehaviorFilter {
   some: UniqueConstraintBehaviorFilter
 }
 
+"""All input for the `updateApi` mutation."""
+input UpdateApiInput {
+  """
+  An object where the defined keys will be set on the `Api` being updated.
+  """
+  apiPatch: ApiPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our update `Api` mutation."""
+type UpdateApiPayload {
+  """The `Api` that was updated by this mutation."""
+  api: Api
+
+  """An edge for our `Api`. May be used by Relay 1."""
+  apiEdge(
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updateApiSchema` mutation."""
 input UpdateApiSchemaInput {
   """
@@ -30965,44 +33363,6 @@ type UpdateApiSettingPayload {
     """The method to use when ordering `ApiSetting`."""
     orderBy: [ApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ApiSettingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updateApis` mutation."""
-input UpdateApisInput {
-  """
-  An object where the defined keys will be set on the `Apis` being updated.
-  """
-  apisPatch: ApisPatch!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our update `Apis` mutation."""
-type UpdateApisPayload {
-  """The `Apis` that was updated by this mutation."""
-  apis: Apis
-
-  """An edge for our `Apis`. May be used by Relay 1."""
-  apisEdge(
-    """The method to use when ordering `Apis`."""
-    orderBy: [ApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApisEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -31465,6 +33825,120 @@ type UpdateDomainVerificationPayload {
     """The method to use when ordering `DomainVerification`."""
     orderBy: [DomainVerificationOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DomainVerificationEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateEmailIdentity` mutation."""
+input UpdateEmailIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `EmailIdentity` being updated.
+  """
+  emailIdentityPatch: EmailIdentityPatch!
+  id: UUID!
+}
+
+"""The output of our update `EmailIdentity` mutation."""
+type UpdateEmailIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmailIdentity` that was updated by this mutation."""
+  emailIdentity: EmailIdentity
+
+  """An edge for our `EmailIdentity`. May be used by Relay 1."""
+  emailIdentityEdge(
+    """The method to use when ordering `EmailIdentity`."""
+    orderBy: [EmailIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmailIdentityEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateEmailProviderAccount` mutation."""
+input UpdateEmailProviderAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `EmailProviderAccount` being updated.
+  """
+  emailProviderAccountPatch: EmailProviderAccountPatch!
+  id: UUID!
+}
+
+"""The output of our update `EmailProviderAccount` mutation."""
+type UpdateEmailProviderAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmailProviderAccount` that was updated by this mutation."""
+  emailProviderAccount: EmailProviderAccount
+
+  """An edge for our `EmailProviderAccount`. May be used by Relay 1."""
+  emailProviderAccountEdge(
+    """The method to use when ordering `EmailProviderAccount`."""
+    orderBy: [EmailProviderAccountOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmailProviderAccountEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateEmailSiteIdentity` mutation."""
+input UpdateEmailSiteIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `EmailSiteIdentity` being updated.
+  """
+  emailSiteIdentityPatch: EmailSiteIdentityPatch!
+  id: UUID!
+}
+
+"""The output of our update `EmailSiteIdentity` mutation."""
+type UpdateEmailSiteIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmailSiteIdentity` that was updated by this mutation."""
+  emailSiteIdentity: EmailSiteIdentity
+
+  """An edge for our `EmailSiteIdentity`. May be used by Relay 1."""
+  emailSiteIdentityEdge(
+    """The method to use when ordering `EmailSiteIdentity`."""
+    orderBy: [EmailSiteIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmailSiteIdentityEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -32084,6 +34558,44 @@ type UpdatePartitionPayload {
   query: Query
 }
 
+"""All input for the `updatePlatformApi` mutation."""
+input UpdatePlatformApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformApi` being updated.
+  """
+  platformApiPatch: PlatformApiPatch!
+}
+
+"""The output of our update `PlatformApi` mutation."""
+type UpdatePlatformApiPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformApi` that was updated by this mutation."""
+  platformApi: PlatformApi
+
+  """An edge for our `PlatformApi`. May be used by Relay 1."""
+  platformApiEdge(
+    """The method to use when ordering `PlatformApi`."""
+    orderBy: [PlatformApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformApiEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updatePlatformApiSchema` mutation."""
 input UpdatePlatformApiSchemaInput {
   """
@@ -32153,44 +34665,6 @@ type UpdatePlatformApiSettingPayload {
     """The method to use when ordering `PlatformApiSetting`."""
     orderBy: [PlatformApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformApiSettingEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updatePlatformApis` mutation."""
-input UpdatePlatformApisInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `PlatformApis` being updated.
-  """
-  platformApisPatch: PlatformApisPatch!
-}
-
-"""The output of our update `PlatformApis` mutation."""
-type UpdatePlatformApisPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformApis` that was updated by this mutation."""
-  platformApis: PlatformApis
-
-  """An edge for our `PlatformApis`. May be used by Relay 1."""
-  platformApisEdge(
-    """The method to use when ordering `PlatformApis`."""
-    orderBy: [PlatformApisOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformApisEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -32343,6 +34817,122 @@ type UpdatePlatformDomainVerificationPayload {
     """The method to use when ordering `PlatformDomainVerification`."""
     orderBy: [PlatformDomainVerificationOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformDomainVerificationEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformEmailIdentity` mutation."""
+input UpdatePlatformEmailIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformEmailIdentity` being updated.
+  """
+  platformEmailIdentityPatch: PlatformEmailIdentityPatch!
+}
+
+"""The output of our update `PlatformEmailIdentity` mutation."""
+type UpdatePlatformEmailIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailIdentity` that was updated by this mutation."""
+  platformEmailIdentity: PlatformEmailIdentity
+
+  """An edge for our `PlatformEmailIdentity`. May be used by Relay 1."""
+  platformEmailIdentityEdge(
+    """The method to use when ordering `PlatformEmailIdentity`."""
+    orderBy: [PlatformEmailIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformEmailIdentityEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformEmailProviderAccount` mutation."""
+input UpdatePlatformEmailProviderAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformEmailProviderAccount` being updated.
+  """
+  platformEmailProviderAccountPatch: PlatformEmailProviderAccountPatch!
+}
+
+"""The output of our update `PlatformEmailProviderAccount` mutation."""
+type UpdatePlatformEmailProviderAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailProviderAccount` that was updated by this mutation."""
+  platformEmailProviderAccount: PlatformEmailProviderAccount
+
+  """
+  An edge for our `PlatformEmailProviderAccount`. May be used by Relay 1.
+  """
+  platformEmailProviderAccountEdge(
+    """The method to use when ordering `PlatformEmailProviderAccount`."""
+    orderBy: [PlatformEmailProviderAccountOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformEmailProviderAccountEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformEmailSiteIdentity` mutation."""
+input UpdatePlatformEmailSiteIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformEmailSiteIdentity` being updated.
+  """
+  platformEmailSiteIdentityPatch: PlatformEmailSiteIdentityPatch!
+}
+
+"""The output of our update `PlatformEmailSiteIdentity` mutation."""
+type UpdatePlatformEmailSiteIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformEmailSiteIdentity` that was updated by this mutation."""
+  platformEmailSiteIdentity: PlatformEmailSiteIdentity
+
+  """An edge for our `PlatformEmailSiteIdentity`. May be used by Relay 1."""
+  platformEmailSiteIdentityEdge(
+    """The method to use when ordering `PlatformEmailSiteIdentity`."""
+    orderBy: [PlatformEmailSiteIdentityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformEmailSiteIdentityEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

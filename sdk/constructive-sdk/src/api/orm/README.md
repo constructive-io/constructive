@@ -21,9 +21,9 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
+| `api` | findMany, findOne, create, update, delete |
 | `apiSchema` | findMany, findOne, create, update, delete |
 | `apiSetting` | findMany, findOne, create, update, delete |
-| `apis` | findMany, findOne, create, update, delete |
 | `astMigration` | findMany, findOne, create, update, delete |
 | `checkConstraint` | findMany, findOne, create, update, delete |
 | `compositeType` | findMany, findOne, create, update, delete |
@@ -37,6 +37,9 @@ const db = createClient({
 | `domainEvent` | findMany, findOne, create, update, delete |
 | `domainType` | findMany, findOne, create, update, delete |
 | `domainVerification` | findMany, findOne, create, update, delete |
+| `emailIdentity` | findMany, findOne, create, update, delete |
+| `emailProviderAccount` | findMany, findOne, create, update, delete |
+| `emailSiteIdentity` | findMany, findOne, create, update, delete |
 | `embeddingChunk` | findMany, findOne, create, update, delete |
 | `enum` | findMany, findOne, create, update, delete |
 | `exclusionConstraint` | findMany, findOne, create, update, delete |
@@ -53,13 +56,16 @@ const db = createClient({
 | `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `page` | findMany, findOne, create, update, delete |
 | `partition` | findMany, findOne, create, update, delete |
+| `platformApi` | findMany, findOne, create, update, delete |
 | `platformApiSchema` | findMany, findOne, create, update, delete |
 | `platformApiSetting` | findMany, findOne, create, update, delete |
-| `platformApis` | findMany, findOne, create, update, delete |
 | `platformCorsSetting` | findMany, findOne, create, update, delete |
 | `platformDomain` | findMany, findOne, create, update, delete |
 | `platformDomainEvent` | findMany, findOne, create, update, delete |
 | `platformDomainVerification` | findMany, findOne, create, update, delete |
+| `platformEmailIdentity` | findMany, findOne, create, update, delete |
+| `platformEmailProviderAccount` | findMany, findOne, create, update, delete |
+| `platformEmailSiteIdentity` | findMany, findOne, create, update, delete |
 | `platformManagedDomain` | findMany, findOne, create, update, delete |
 | `platformPage` | findMany, findOne, create, update, delete |
 | `platformSiteAppLink` | findMany, findOne, create, update, delete |
@@ -103,6 +109,44 @@ const db = createClient({
 | `webauthnSetting` | findMany, findOne, create, update, delete |
 
 ## Table Operations
+
+### `db.api`
+
+CRUD operations for Api records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `anonRole` | String | Yes |
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `dbname` | String | Yes |
+| `id` | UUID | No |
+| `isPublished` | Boolean | Yes |
+| `name` | String | Yes |
+| `roleName` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all api records
+const items = await db.api.findMany({ select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.api.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.api.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.api.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.api.delete({ where: { id: '<UUID>' } }).execute();
+```
 
 ### `db.apiSchema`
 
@@ -183,44 +227,6 @@ const updated = await db.apiSetting.update({ where: { id: '<UUID>' }, data: { ap
 
 // Delete
 const deleted = await db.apiSetting.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.apis`
-
-CRUD operations for Apis records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `anonRole` | String | Yes |
-| `config` | JSON | Yes |
-| `createdAt` | Datetime | No |
-| `databaseId` | UUID | Yes |
-| `dbname` | String | Yes |
-| `id` | UUID | No |
-| `isPublished` | Boolean | Yes |
-| `name` | String | Yes |
-| `roleName` | String | Yes |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all apis records
-const items = await db.apis.findMany({ select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.apis.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.apis.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.apis.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.apis.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.astMigration`
@@ -741,6 +747,125 @@ const updated = await db.domainVerification.update({ where: { id: '<UUID>' }, da
 
 // Delete
 const deleted = await db.domainVerification.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.emailIdentity`
+
+CRUD operations for EmailIdentity records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `fromAddress` | String | Yes |
+| `fromName` | String | Yes |
+| `id` | UUID | No |
+| `isActive` | Boolean | Yes |
+| `isDefault` | Boolean | Yes |
+| `name` | String | Yes |
+| `providerAccountId` | UUID | Yes |
+| `replyToAddress` | String | Yes |
+| `supportAddress` | String | Yes |
+| `transportMode` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all emailIdentity records
+const items = await db.emailIdentity.findMany({ select: { createdAt: true, databaseId: true, fromAddress: true, fromName: true, id: true, isActive: true, isDefault: true, name: true, providerAccountId: true, replyToAddress: true, supportAddress: true, transportMode: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.emailIdentity.findOne({ id: '<UUID>', select: { createdAt: true, databaseId: true, fromAddress: true, fromName: true, id: true, isActive: true, isDefault: true, name: true, providerAccountId: true, replyToAddress: true, supportAddress: true, transportMode: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.emailIdentity.create({ data: { databaseId: '<UUID>', fromAddress: '<String>', fromName: '<String>', isActive: '<Boolean>', isDefault: '<Boolean>', name: '<String>', providerAccountId: '<UUID>', replyToAddress: '<String>', supportAddress: '<String>', transportMode: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.emailIdentity.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.emailIdentity.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.emailProviderAccount`
+
+CRUD operations for EmailProviderAccount records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `apiBaseUrl` | String | Yes |
+| `createdAt` | Datetime | No |
+| `credentialsSecretName` | String | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `isActive` | Boolean | Yes |
+| `name` | String | Yes |
+| `provider` | String | Yes |
+| `providerAccountName` | String | Yes |
+| `region` | String | Yes |
+| `smtpHost` | String | Yes |
+| `smtpPort` | Int | Yes |
+| `smtpSecure` | Boolean | Yes |
+| `smtpUser` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `webhookSigningSecretName` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all emailProviderAccount records
+const items = await db.emailProviderAccount.findMany({ select: { apiBaseUrl: true, createdAt: true, credentialsSecretName: true, databaseId: true, id: true, isActive: true, name: true, provider: true, providerAccountName: true, region: true, smtpHost: true, smtpPort: true, smtpSecure: true, smtpUser: true, updatedAt: true, webhookSigningSecretName: true } }).execute();
+
+// Get one by id
+const item = await db.emailProviderAccount.findOne({ id: '<UUID>', select: { apiBaseUrl: true, createdAt: true, credentialsSecretName: true, databaseId: true, id: true, isActive: true, name: true, provider: true, providerAccountName: true, region: true, smtpHost: true, smtpPort: true, smtpSecure: true, smtpUser: true, updatedAt: true, webhookSigningSecretName: true } }).execute();
+
+// Create
+const created = await db.emailProviderAccount.create({ data: { apiBaseUrl: '<String>', credentialsSecretName: '<String>', databaseId: '<UUID>', isActive: '<Boolean>', name: '<String>', provider: '<String>', providerAccountName: '<String>', region: '<String>', smtpHost: '<String>', smtpPort: '<Int>', smtpSecure: '<Boolean>', smtpUser: '<String>', webhookSigningSecretName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.emailProviderAccount.update({ where: { id: '<UUID>' }, data: { apiBaseUrl: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.emailProviderAccount.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.emailSiteIdentity`
+
+CRUD operations for EmailSiteIdentity records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `emailIdentityId` | UUID | Yes |
+| `id` | UUID | No |
+| `siteId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all emailSiteIdentity records
+const items = await db.emailSiteIdentity.findMany({ select: { createdAt: true, databaseId: true, emailIdentityId: true, id: true, siteId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.emailSiteIdentity.findOne({ id: '<UUID>', select: { createdAt: true, databaseId: true, emailIdentityId: true, id: true, siteId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.emailSiteIdentity.create({ data: { databaseId: '<UUID>', emailIdentityId: '<UUID>', siteId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.emailSiteIdentity.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.emailSiteIdentity.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.embeddingChunk`
@@ -1394,6 +1519,43 @@ const updated = await db.partition.update({ where: { id: '<UUID>' }, data: { dat
 const deleted = await db.partition.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.platformApi`
+
+CRUD operations for PlatformApi records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `anonRole` | String | Yes |
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `dbname` | String | Yes |
+| `id` | UUID | No |
+| `isPublished` | Boolean | Yes |
+| `name` | String | Yes |
+| `roleName` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformApi records
+const items = await db.platformApi.findMany({ select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformApi.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformApi.create({ data: { anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformApi.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformApi.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.platformApiSchema`
 
 CRUD operations for PlatformApiSchema records.
@@ -1471,43 +1633,6 @@ const updated = await db.platformApiSetting.update({ where: { id: '<UUID>' }, da
 
 // Delete
 const deleted = await db.platformApiSetting.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.platformApis`
-
-CRUD operations for PlatformApis records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `anonRole` | String | Yes |
-| `config` | JSON | Yes |
-| `createdAt` | Datetime | No |
-| `dbname` | String | Yes |
-| `id` | UUID | No |
-| `isPublished` | Boolean | Yes |
-| `name` | String | Yes |
-| `roleName` | String | Yes |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all platformApis records
-const items = await db.platformApis.findMany({ select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.platformApis.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.platformApis.create({ data: { anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.platformApis.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.platformApis.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformCorsSetting`
@@ -1664,6 +1789,122 @@ const updated = await db.platformDomainVerification.update({ where: { id: '<UUID
 
 // Delete
 const deleted = await db.platformDomainVerification.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformEmailIdentity`
+
+CRUD operations for PlatformEmailIdentity records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `fromAddress` | String | Yes |
+| `fromName` | String | Yes |
+| `id` | UUID | No |
+| `isActive` | Boolean | Yes |
+| `isDefault` | Boolean | Yes |
+| `name` | String | Yes |
+| `providerAccountId` | UUID | Yes |
+| `replyToAddress` | String | Yes |
+| `supportAddress` | String | Yes |
+| `transportMode` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformEmailIdentity records
+const items = await db.platformEmailIdentity.findMany({ select: { createdAt: true, fromAddress: true, fromName: true, id: true, isActive: true, isDefault: true, name: true, providerAccountId: true, replyToAddress: true, supportAddress: true, transportMode: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformEmailIdentity.findOne({ id: '<UUID>', select: { createdAt: true, fromAddress: true, fromName: true, id: true, isActive: true, isDefault: true, name: true, providerAccountId: true, replyToAddress: true, supportAddress: true, transportMode: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformEmailIdentity.create({ data: { fromAddress: '<String>', fromName: '<String>', isActive: '<Boolean>', isDefault: '<Boolean>', name: '<String>', providerAccountId: '<UUID>', replyToAddress: '<String>', supportAddress: '<String>', transportMode: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformEmailIdentity.update({ where: { id: '<UUID>' }, data: { fromAddress: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformEmailIdentity.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformEmailProviderAccount`
+
+CRUD operations for PlatformEmailProviderAccount records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `apiBaseUrl` | String | Yes |
+| `createdAt` | Datetime | No |
+| `credentialsSecretName` | String | Yes |
+| `id` | UUID | No |
+| `isActive` | Boolean | Yes |
+| `name` | String | Yes |
+| `provider` | String | Yes |
+| `providerAccountName` | String | Yes |
+| `region` | String | Yes |
+| `smtpHost` | String | Yes |
+| `smtpPort` | Int | Yes |
+| `smtpSecure` | Boolean | Yes |
+| `smtpUser` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `webhookSigningSecretName` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformEmailProviderAccount records
+const items = await db.platformEmailProviderAccount.findMany({ select: { apiBaseUrl: true, createdAt: true, credentialsSecretName: true, id: true, isActive: true, name: true, provider: true, providerAccountName: true, region: true, smtpHost: true, smtpPort: true, smtpSecure: true, smtpUser: true, updatedAt: true, webhookSigningSecretName: true } }).execute();
+
+// Get one by id
+const item = await db.platformEmailProviderAccount.findOne({ id: '<UUID>', select: { apiBaseUrl: true, createdAt: true, credentialsSecretName: true, id: true, isActive: true, name: true, provider: true, providerAccountName: true, region: true, smtpHost: true, smtpPort: true, smtpSecure: true, smtpUser: true, updatedAt: true, webhookSigningSecretName: true } }).execute();
+
+// Create
+const created = await db.platformEmailProviderAccount.create({ data: { apiBaseUrl: '<String>', credentialsSecretName: '<String>', isActive: '<Boolean>', name: '<String>', provider: '<String>', providerAccountName: '<String>', region: '<String>', smtpHost: '<String>', smtpPort: '<Int>', smtpSecure: '<Boolean>', smtpUser: '<String>', webhookSigningSecretName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformEmailProviderAccount.update({ where: { id: '<UUID>' }, data: { apiBaseUrl: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformEmailProviderAccount.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformEmailSiteIdentity`
+
+CRUD operations for PlatformEmailSiteIdentity records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `emailIdentityId` | UUID | Yes |
+| `id` | UUID | No |
+| `siteId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformEmailSiteIdentity records
+const items = await db.platformEmailSiteIdentity.findMany({ select: { createdAt: true, emailIdentityId: true, id: true, siteId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformEmailSiteIdentity.findOne({ id: '<UUID>', select: { createdAt: true, emailIdentityId: true, id: true, siteId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformEmailSiteIdentity.create({ data: { emailIdentityId: '<UUID>', siteId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformEmailSiteIdentity.update({ where: { id: '<UUID>' }, data: { emailIdentityId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformEmailSiteIdentity.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformManagedDomain`

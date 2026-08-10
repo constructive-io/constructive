@@ -1,13 +1,13 @@
 ---
 name: orm-usage
-description: ORM client for the usage API — provides typed CRUD operations for 18 tables and 5 custom operations
+description: ORM client for the usage API — provides typed CRUD operations for 18 tables and 7 custom operations
 ---
 
 # orm-usage
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the usage API — provides typed CRUD operations for 18 tables and 5 custom operations
+ORM client for the usage API — provides typed CRUD operations for 18 tables and 7 custom operations
 
 ## Usage
 
@@ -55,6 +55,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-limit-default](references/org-limit-default.md)
 - [org-limit-event](references/org-limit-event.md)
 - [org-limit-warning](references/org-limit-warning.md)
+- [capture-app-limit-defaults](references/capture-app-limit-defaults.md)
+- [capture-org-limit-defaults](references/capture-org-limit-defaults.md)
 - [provision-bucket](references/provision-bucket.md)
 - [seed-app-limit-caps-defaults](references/seed-app-limit-caps-defaults.md)
 - [seed-app-limit-defaults](references/seed-app-limit-defaults.md)

@@ -181,6 +181,17 @@ export const orgLimitWarningKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgLimitWarningKeys.details(), id] as const,
 } as const;
+
+// ============================================================================
+// Custom Query Keys
+// ============================================================================
+
+export const customQueryKeys = {
+  /** Query key for captureAppLimitDefaults */ captureAppLimitDefaults: () =>
+    ['captureAppLimitDefaults'] as const,
+  /** Query key for captureOrgLimitDefaults */ captureOrgLimitDefaults: () =>
+    ['captureOrgLimitDefaults'] as const,
+} as const;
 /**
 
 // ============================================================================
@@ -222,6 +233,7 @@ export const queryKeys = {
   orgLimitDefault: orgLimitDefaultKeys,
   orgLimitEvent: orgLimitEventKeys,
   orgLimitWarning: orgLimitWarningKeys,
+  custom: customQueryKeys,
 } as const;
 /** Type representing all available query key scopes */
 export type QueryKeyScope = keyof typeof queryKeys;

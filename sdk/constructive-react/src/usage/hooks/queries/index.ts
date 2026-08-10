@@ -39,3 +39,5 @@ export * from './useOrgLimitEventsQuery';
 export * from './useOrgLimitEventQuery';
 export * from './useOrgLimitWarningsQuery';
 export * from './useOrgLimitWarningQuery';
+export * from './useCaptureAppLimitDefaultsQuery';
+export * from './useCaptureOrgLimitDefaultsQuery';

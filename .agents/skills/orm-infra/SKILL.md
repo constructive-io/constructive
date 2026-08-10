@@ -1,13 +1,13 @@
 ---
 name: orm-infra
-description: ORM client for the infra API — provides typed CRUD operations for 10 tables and 4 custom operations
+description: ORM client for the infra API — provides typed CRUD operations for 11 tables and 7 custom operations
 ---
 
 # orm-infra
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the infra API — provides typed CRUD operations for 10 tables and 4 custom operations
+ORM client for the infra API — provides typed CRUD operations for 11 tables and 7 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the infra API — provides typed CRUD operations for 10 tables an
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: dbPreset, namespace, namespaceEvent, platformInfraCommit, platformInfraGetAllTreeNodesRecord, platformInfraObject, platformInfraRef, platformInfraStore, ...
+// Available models: contentPreset, dbPreset, namespace, namespaceEvent, platformInfraCommit, platformInfraGetAllTreeNodesRecord, platformInfraObject, platformInfraRef, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -28,7 +28,7 @@ db.<model>.delete({ where: { id: '<UUID>' } }).execute()
 ### Query records
 
 ```typescript
-const items = await db.dbPreset.findMany({
+const items = await db.contentPreset.findMany({
   select: { id: true }
 }).execute();
 ```
@@ -37,6 +37,7 @@ const items = await db.dbPreset.findMany({
 
 See the `references/` directory for detailed per-entity API documentation:
 
+- [content-preset](references/content-preset.md)
 - [db-preset](references/db-preset.md)
 - [namespace](references/namespace.md)
 - [namespace-event](references/namespace-event.md)
@@ -49,5 +50,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [platform-namespace-event](references/platform-namespace-event.md)
 - [platform-infra-init-empty-repo](references/platform-infra-init-empty-repo.md)
 - [platform-infra-insert-node-at-path](references/platform-infra-insert-node-at-path.md)
+- [platform-infra-insert-nodes-at-paths](references/platform-infra-insert-nodes-at-paths.md)
+- [platform-infra-set-and-commit](references/platform-infra-set-and-commit.md)
 - [platform-infra-set-data-at-path](references/platform-infra-set-data-at-path.md)
+- [platform-infra-set-many-and-commit](references/platform-infra-set-many-and-commit.md)
 - [provision-bucket](references/provision-bucket.md)

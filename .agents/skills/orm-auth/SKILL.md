@@ -1,13 +1,13 @@
 ---
 name: orm-auth
-description: ORM client for the auth API — provides typed CRUD operations for 13 tables and 35 custom operations
+description: ORM client for the auth API — provides typed CRUD operations for 13 tables and 37 custom operations
 ---
 
 # orm-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the auth API — provides typed CRUD operations for 13 tables and 35 custom operations
+ORM client for the auth API — provides typed CRUD operations for 13 tables and 37 custom operations
 
 ## Usage
 
@@ -78,9 +78,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [set-password](references/set-password.md)
 - [sign-in](references/sign-in.md)
 - [sign-in-cross-origin](references/sign-in-cross-origin.md)
+- [sign-in-magic-link](references/sign-in-magic-link.md)
 - [sign-in-sms-otp](references/sign-in-sms-otp.md)
 - [sign-out](references/sign-out.md)
 - [sign-up](references/sign-up.md)
+- [sign-up-magic-link](references/sign-up-magic-link.md)
 - [sign-up-sms](references/sign-up-sms.md)
 - [verify-email](references/verify-email.md)
 - [verify-password](references/verify-password.md)

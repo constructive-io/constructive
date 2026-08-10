@@ -32,6 +32,11 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
+| `useApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useApiQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeleteApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useCreateApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
@@ -42,11 +47,6 @@ function App() {
 | `useCreateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useUpdateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useDeleteApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
-| `useApisesQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useCreateApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useUpdateApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useDeleteApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useAstMigrationsQuery` | Query | List all astMigrations |
 | `useAstMigrationQuery` | Query | Get one astMigration |
 | `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
@@ -112,6 +112,21 @@ function App() {
 | `useCreateDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
 | `useUpdateDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
 | `useDeleteDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
+| `useEmailIdentitiesQuery` | Query | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `useEmailIdentityQuery` | Query | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `useCreateEmailIdentityMutation` | Mutation | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `useUpdateEmailIdentityMutation` | Mutation | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `useDeleteEmailIdentityMutation` | Mutation | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `useEmailProviderAccountsQuery` | Query | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `useEmailProviderAccountQuery` | Query | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `useCreateEmailProviderAccountMutation` | Mutation | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `useUpdateEmailProviderAccountMutation` | Mutation | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `useDeleteEmailProviderAccountMutation` | Mutation | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `useEmailSiteIdentitiesQuery` | Query | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
+| `useEmailSiteIdentityQuery` | Query | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
+| `useCreateEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
+| `useUpdateEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
+| `useDeleteEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
 | `useEmbeddingChunksQuery` | Query | List all embeddingChunks |
 | `useEmbeddingChunkQuery` | Query | Get one embeddingChunk |
 | `useCreateEmbeddingChunkMutation` | Mutation | Create a embeddingChunk |
@@ -192,6 +207,11 @@ function App() {
 | `useCreatePartitionMutation` | Mutation | Create a partition |
 | `useUpdatePartitionMutation` | Mutation | Update a partition |
 | `useDeletePartitionMutation` | Mutation | Delete a partition |
+| `usePlatformApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `usePlatformApiQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeletePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `usePlatformApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `usePlatformApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useCreatePlatformApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
@@ -202,11 +222,6 @@ function App() {
 | `useCreatePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useUpdatePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useDeletePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
-| `usePlatformApisesQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `usePlatformApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useCreatePlatformApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useUpdatePlatformApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useDeletePlatformApisMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `usePlatformCorsSettingsQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
 | `usePlatformCorsSettingQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
 | `useCreatePlatformCorsSettingMutation` | Mutation | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
@@ -227,6 +242,21 @@ function App() {
 | `useCreatePlatformDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
 | `useUpdatePlatformDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
 | `useDeletePlatformDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
+| `usePlatformEmailIdentitiesQuery` | Query | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `usePlatformEmailIdentityQuery` | Query | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `useCreatePlatformEmailIdentityMutation` | Mutation | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `useUpdatePlatformEmailIdentityMutation` | Mutation | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `useDeletePlatformEmailIdentityMutation` | Mutation | Outbound sender identity: the from/reply-to/support addresses a tenant sends as, and the provider account the mail leaves through |
+| `usePlatformEmailProviderAccountsQuery` | Query | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `usePlatformEmailProviderAccountQuery` | Query | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `useCreatePlatformEmailProviderAccountMutation` | Mutation | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `useUpdatePlatformEmailProviderAccountMutation` | Mutation | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `useDeletePlatformEmailProviderAccountMutation` | Mutation | A tenant's configured account at an email provider: provider slug, endpoint coordinates, and the NAME of the secret holding its credentials (never the credential itself) |
+| `usePlatformEmailSiteIdentitiesQuery` | Query | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
+| `usePlatformEmailSiteIdentityQuery` | Query | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
+| `useCreatePlatformEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
+| `useUpdatePlatformEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
+| `useDeletePlatformEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
 | `usePlatformManagedDomainsQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
 | `usePlatformManagedDomainQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
 | `useCreatePlatformManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
@@ -461,6 +491,27 @@ Example usage:
 
 ## Table Hooks
 
+### Api
+
+```typescript
+// List all apis
+const { data, isLoading } = useApisQuery({
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Get one api
+const { data: item } = useApiQuery({
+  id: '<UUID>',
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Create a api
+const { mutate: create } = useCreateApiMutation({
+  selection: { fields: { id: true } },
+});
+create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+```
+
 ### ApiSchema
 
 ```typescript
@@ -501,27 +552,6 @@ const { mutate: create } = useCreateApiSettingMutation({
   selection: { fields: { id: true } },
 });
 create({ apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>', statementTimeoutMs: '<BigInt>' });
-```
-
-### Apis
-
-```typescript
-// List all apises
-const { data, isLoading } = useApisesQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Get one apis
-const { data: item } = useApisQuery({
-  id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Create a apis
-const { mutate: create } = useCreateApisMutation({
-  selection: { fields: { id: true } },
-});
-create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### AstMigration
@@ -795,6 +825,69 @@ const { mutate: create } = useCreateDomainVerificationMutation({
   selection: { fields: { id: true } },
 });
 create({ attempts: '<Int>', databaseId: '<UUID>', domainId: '<UUID>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' });
+```
+
+### EmailIdentity
+
+```typescript
+// List all emailIdentities
+const { data, isLoading } = useEmailIdentitiesQuery({
+  selection: { fields: { createdAt: true, databaseId: true, fromAddress: true, fromName: true, id: true, isActive: true, isDefault: true, name: true, providerAccountId: true, replyToAddress: true, supportAddress: true, transportMode: true, updatedAt: true } },
+});
+
+// Get one emailIdentity
+const { data: item } = useEmailIdentityQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, fromAddress: true, fromName: true, id: true, isActive: true, isDefault: true, name: true, providerAccountId: true, replyToAddress: true, supportAddress: true, transportMode: true, updatedAt: true } },
+});
+
+// Create a emailIdentity
+const { mutate: create } = useCreateEmailIdentityMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', fromAddress: '<String>', fromName: '<String>', isActive: '<Boolean>', isDefault: '<Boolean>', name: '<String>', providerAccountId: '<UUID>', replyToAddress: '<String>', supportAddress: '<String>', transportMode: '<String>' });
+```
+
+### EmailProviderAccount
+
+```typescript
+// List all emailProviderAccounts
+const { data, isLoading } = useEmailProviderAccountsQuery({
+  selection: { fields: { apiBaseUrl: true, createdAt: true, credentialsSecretName: true, databaseId: true, id: true, isActive: true, name: true, provider: true, providerAccountName: true, region: true, smtpHost: true, smtpPort: true, smtpSecure: true, smtpUser: true, updatedAt: true, webhookSigningSecretName: true } },
+});
+
+// Get one emailProviderAccount
+const { data: item } = useEmailProviderAccountQuery({
+  id: '<UUID>',
+  selection: { fields: { apiBaseUrl: true, createdAt: true, credentialsSecretName: true, databaseId: true, id: true, isActive: true, name: true, provider: true, providerAccountName: true, region: true, smtpHost: true, smtpPort: true, smtpSecure: true, smtpUser: true, updatedAt: true, webhookSigningSecretName: true } },
+});
+
+// Create a emailProviderAccount
+const { mutate: create } = useCreateEmailProviderAccountMutation({
+  selection: { fields: { id: true } },
+});
+create({ apiBaseUrl: '<String>', credentialsSecretName: '<String>', databaseId: '<UUID>', isActive: '<Boolean>', name: '<String>', provider: '<String>', providerAccountName: '<String>', region: '<String>', smtpHost: '<String>', smtpPort: '<Int>', smtpSecure: '<Boolean>', smtpUser: '<String>', webhookSigningSecretName: '<String>' });
+```
+
+### EmailSiteIdentity
+
+```typescript
+// List all emailSiteIdentities
+const { data, isLoading } = useEmailSiteIdentitiesQuery({
+  selection: { fields: { createdAt: true, databaseId: true, emailIdentityId: true, id: true, siteId: true, updatedAt: true } },
+});
+
+// Get one emailSiteIdentity
+const { data: item } = useEmailSiteIdentityQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, emailIdentityId: true, id: true, siteId: true, updatedAt: true } },
+});
+
+// Create a emailSiteIdentity
+const { mutate: create } = useCreateEmailSiteIdentityMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', emailIdentityId: '<UUID>', siteId: '<UUID>' });
 ```
 
 ### EmbeddingChunk
@@ -1133,6 +1226,27 @@ const { mutate: create } = useCreatePartitionMutation({
 create({ databaseId: '<UUID>', interval: '<String>', isParented: '<Boolean>', namingPattern: '<String>', partitionKeyId: '<UUID>', premake: '<Int>', retention: '<String>', retentionKeepTable: '<Boolean>', strategy: '<String>', tableId: '<UUID>' });
 ```
 
+### PlatformApi
+
+```typescript
+// List all platformApis
+const { data, isLoading } = usePlatformApisQuery({
+  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Get one platformApi
+const { data: item } = usePlatformApiQuery({
+  id: '<UUID>',
+  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Create a platformApi
+const { mutate: create } = useCreatePlatformApiMutation({
+  selection: { fields: { id: true } },
+});
+create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+```
+
 ### PlatformApiSchema
 
 ```typescript
@@ -1173,27 +1287,6 @@ const { mutate: create } = useCreatePlatformApiSettingMutation({
   selection: { fields: { id: true } },
 });
 create({ apiId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>', statementTimeoutMs: '<BigInt>' });
-```
-
-### PlatformApis
-
-```typescript
-// List all platformApises
-const { data, isLoading } = usePlatformApisesQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Get one platformApis
-const { data: item } = usePlatformApisQuery({
-  id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
-});
-
-// Create a platformApis
-const { mutate: create } = useCreatePlatformApisMutation({
-  selection: { fields: { id: true } },
-});
-create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### PlatformCorsSetting
@@ -1278,6 +1371,69 @@ const { mutate: create } = useCreatePlatformDomainVerificationMutation({
   selection: { fields: { id: true } },
 });
 create({ attempts: '<Int>', domainId: '<UUID>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' });
+```
+
+### PlatformEmailIdentity
+
+```typescript
+// List all platformEmailIdentities
+const { data, isLoading } = usePlatformEmailIdentitiesQuery({
+  selection: { fields: { createdAt: true, fromAddress: true, fromName: true, id: true, isActive: true, isDefault: true, name: true, providerAccountId: true, replyToAddress: true, supportAddress: true, transportMode: true, updatedAt: true } },
+});
+
+// Get one platformEmailIdentity
+const { data: item } = usePlatformEmailIdentityQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, fromAddress: true, fromName: true, id: true, isActive: true, isDefault: true, name: true, providerAccountId: true, replyToAddress: true, supportAddress: true, transportMode: true, updatedAt: true } },
+});
+
+// Create a platformEmailIdentity
+const { mutate: create } = useCreatePlatformEmailIdentityMutation({
+  selection: { fields: { id: true } },
+});
+create({ fromAddress: '<String>', fromName: '<String>', isActive: '<Boolean>', isDefault: '<Boolean>', name: '<String>', providerAccountId: '<UUID>', replyToAddress: '<String>', supportAddress: '<String>', transportMode: '<String>' });
+```
+
+### PlatformEmailProviderAccount
+
+```typescript
+// List all platformEmailProviderAccounts
+const { data, isLoading } = usePlatformEmailProviderAccountsQuery({
+  selection: { fields: { apiBaseUrl: true, createdAt: true, credentialsSecretName: true, id: true, isActive: true, name: true, provider: true, providerAccountName: true, region: true, smtpHost: true, smtpPort: true, smtpSecure: true, smtpUser: true, updatedAt: true, webhookSigningSecretName: true } },
+});
+
+// Get one platformEmailProviderAccount
+const { data: item } = usePlatformEmailProviderAccountQuery({
+  id: '<UUID>',
+  selection: { fields: { apiBaseUrl: true, createdAt: true, credentialsSecretName: true, id: true, isActive: true, name: true, provider: true, providerAccountName: true, region: true, smtpHost: true, smtpPort: true, smtpSecure: true, smtpUser: true, updatedAt: true, webhookSigningSecretName: true } },
+});
+
+// Create a platformEmailProviderAccount
+const { mutate: create } = useCreatePlatformEmailProviderAccountMutation({
+  selection: { fields: { id: true } },
+});
+create({ apiBaseUrl: '<String>', credentialsSecretName: '<String>', isActive: '<Boolean>', name: '<String>', provider: '<String>', providerAccountName: '<String>', region: '<String>', smtpHost: '<String>', smtpPort: '<Int>', smtpSecure: '<Boolean>', smtpUser: '<String>', webhookSigningSecretName: '<String>' });
+```
+
+### PlatformEmailSiteIdentity
+
+```typescript
+// List all platformEmailSiteIdentities
+const { data, isLoading } = usePlatformEmailSiteIdentitiesQuery({
+  selection: { fields: { createdAt: true, emailIdentityId: true, id: true, siteId: true, updatedAt: true } },
+});
+
+// Get one platformEmailSiteIdentity
+const { data: item } = usePlatformEmailSiteIdentityQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, emailIdentityId: true, id: true, siteId: true, updatedAt: true } },
+});
+
+// Create a platformEmailSiteIdentity
+const { mutate: create } = useCreatePlatformEmailSiteIdentityMutation({
+  selection: { fields: { id: true } },
+});
+create({ emailIdentityId: '<UUID>', siteId: '<UUID>' });
 ```
 
 ### PlatformManagedDomain

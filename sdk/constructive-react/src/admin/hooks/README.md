@@ -37,26 +37,36 @@ function App() {
 | `useCreateAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useUpdateAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useDeleteAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
+| `useAppCapabilityDefaultCapabilitiesQuery` | Query | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useAppCapabilityDefaultCapabilityQuery` | Query | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useCreateAppCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useUpdateAppCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useDeleteAppCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useAppCapabilityDefaultGrantsQuery` | Query | Audit log of capability additions and removals from the defaults bitmask |
+| `useAppCapabilityDefaultGrantQuery` | Query | Audit log of capability additions and removals from the defaults bitmask |
+| `useCreateAppCapabilityDefaultGrantMutation` | Mutation | Audit log of capability additions and removals from the defaults bitmask |
+| `useUpdateAppCapabilityDefaultGrantMutation` | Mutation | Audit log of capability additions and removals from the defaults bitmask |
+| `useDeleteAppCapabilityDefaultGrantMutation` | Mutation | Audit log of capability additions and removals from the defaults bitmask |
 | `useAppClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
 | `useAppClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
 | `useCreateAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useUpdateAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useDeleteAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
-| `useAppGrantsQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
-| `useAppGrantQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
-| `useCreateAppGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
-| `useUpdateAppGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
-| `useDeleteAppGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
+| `useAppGrantsQuery` | Query | Records of individual capability grants and revocations for members via bitmask |
+| `useAppGrantQuery` | Query | Records of individual capability grants and revocations for members via bitmask |
+| `useCreateAppGrantMutation` | Mutation | Records of individual capability grants and revocations for members via bitmask |
+| `useUpdateAppGrantMutation` | Mutation | Records of individual capability grants and revocations for members via bitmask |
+| `useDeleteAppGrantMutation` | Mutation | Records of individual capability grants and revocations for members via bitmask |
 | `useAppInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useAppInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useCreateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useUpdateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useDeleteAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useAppMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useAppMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useUpdateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useDeleteAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useAppMembershipsQuery` | Query | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
+| `useAppMembershipQuery` | Query | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
+| `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
+| `useUpdateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
+| `useDeleteAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
 | `useAppMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useAppMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
@@ -67,26 +77,6 @@ function App() {
 | `useCreateAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useUpdateAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useDeleteAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
-| `useAppPermissionsQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useAppPermissionQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useCreateAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useUpdateAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useDeleteAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useAppPermissionDefaultsQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
-| `useAppPermissionDefaultQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
-| `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useUpdateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useDeleteAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useAppPermissionDefaultGrantsQuery` | Query | Audit log of permission additions and removals from the defaults bitmask |
-| `useAppPermissionDefaultGrantQuery` | Query | Audit log of permission additions and removals from the defaults bitmask |
-| `useCreateAppPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
-| `useUpdateAppPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
-| `useDeleteAppPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
-| `useAppPermissionDefaultPermissionsQuery` | Query | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
-| `useAppPermissionDefaultPermissionQuery` | Query | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
-| `useCreateAppPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
-| `useUpdateAppPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
-| `useDeleteAppPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
 | `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
@@ -97,6 +87,16 @@ function App() {
 | `useCreateOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useUpdateOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useDeleteOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
+| `useOrgCapabilityDefaultCapabilitiesQuery` | Query | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useOrgCapabilityDefaultCapabilityQuery` | Query | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useCreateOrgCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useUpdateOrgCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useDeleteOrgCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
+| `useOrgCapabilityDefaultGrantsQuery` | Query | Audit log of capability additions and removals from the defaults bitmask |
+| `useOrgCapabilityDefaultGrantQuery` | Query | Audit log of capability additions and removals from the defaults bitmask |
+| `useCreateOrgCapabilityDefaultGrantMutation` | Mutation | Audit log of capability additions and removals from the defaults bitmask |
+| `useUpdateOrgCapabilityDefaultGrantMutation` | Mutation | Audit log of capability additions and removals from the defaults bitmask |
+| `useDeleteOrgCapabilityDefaultGrantMutation` | Mutation | Audit log of capability additions and removals from the defaults bitmask |
 | `useOrgChartEdgesQuery` | Query | Organizational chart edges defining parent-child reporting relationships between members within an entity |
 | `useOrgChartEdgeQuery` | Query | Organizational chart edges defining parent-child reporting relationships between members within an entity |
 | `useCreateOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
@@ -116,11 +116,11 @@ function App() {
 | `useCreateOrgGetManagersRecordMutation` | Mutation | Create a orgGetManagersRecord |
 | `useOrgGetSubordinatesQuery` | Query | List all orgGetSubordinates |
 | `useCreateOrgGetSubordinatesRecordMutation` | Mutation | Create a orgGetSubordinatesRecord |
-| `useOrgGrantsQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
-| `useOrgGrantQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
-| `useCreateOrgGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
-| `useUpdateOrgGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
-| `useDeleteOrgGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
+| `useOrgGrantsQuery` | Query | Records of individual capability grants and revocations for members via bitmask |
+| `useOrgGrantQuery` | Query | Records of individual capability grants and revocations for members via bitmask |
+| `useCreateOrgGrantMutation` | Mutation | Records of individual capability grants and revocations for members via bitmask |
+| `useUpdateOrgGrantMutation` | Mutation | Records of individual capability grants and revocations for members via bitmask |
+| `useDeleteOrgGrantMutation` | Mutation | Records of individual capability grants and revocations for members via bitmask |
 | `useOrgInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useOrgInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useCreateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
@@ -136,11 +136,11 @@ function App() {
 | `useCreateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useUpdateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useDeleteOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
-| `useOrgMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useOrgMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useCreateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useUpdateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useDeleteOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useOrgMembershipsQuery` | Query | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
+| `useOrgMembershipQuery` | Query | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
+| `useCreateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
+| `useUpdateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
+| `useDeleteOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with capability bitmasks, ownership, and admin status |
 | `useOrgMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useOrgMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
@@ -156,35 +156,7 @@ function App() {
 | `useCreateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useUpdateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useDeleteOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
-| `useOrgPermissionsQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useOrgPermissionQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useCreateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useUpdateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useDeleteOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useOrgPermissionDefaultsQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
-| `useOrgPermissionDefaultQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
-| `useCreateOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useUpdateOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useDeleteOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useOrgPermissionDefaultGrantsQuery` | Query | Audit log of permission additions and removals from the defaults bitmask |
-| `useOrgPermissionDefaultGrantQuery` | Query | Audit log of permission additions and removals from the defaults bitmask |
-| `useCreateOrgPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
-| `useUpdateOrgPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
-| `useDeleteOrgPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
-| `useOrgPermissionDefaultPermissionsQuery` | Query | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
-| `useOrgPermissionDefaultPermissionQuery` | Query | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
-| `useCreateOrgPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
-| `useUpdateOrgPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
-| `useDeleteOrgPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
-| `useAppPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppPermission`. |
-| `useAppPermissionsGetMaskQuery` | Query | appPermissionsGetMask |
-| `useAppPermissionsGetMaskByNamesQuery` | Query | appPermissionsGetMaskByNames |
-| `useAppPermissionsGetPaddedMaskQuery` | Query | appPermissionsGetPaddedMask |
 | `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
-| `useOrgPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `OrgPermission`. |
-| `useOrgPermissionsGetMaskQuery` | Query | orgPermissionsGetMask |
-| `useOrgPermissionsGetMaskByNamesQuery` | Query | orgPermissionsGetMaskByNames |
-| `useOrgPermissionsGetPaddedMaskQuery` | Query | orgPermissionsGetPaddedMask |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -215,6 +187,48 @@ const { mutate: create } = useCreateAppAdminGrantMutation({
 create({ actorId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
+### AppCapabilityDefaultCapability
+
+```typescript
+// List all appCapabilityDefaultCapabilities
+const { data, isLoading } = useAppCapabilityDefaultCapabilitiesQuery({
+  selection: { fields: { capabilityId: true, createdAt: true, id: true, updatedAt: true } },
+});
+
+// Get one appCapabilityDefaultCapability
+const { data: item } = useAppCapabilityDefaultCapabilityQuery({
+  id: '<UUID>',
+  selection: { fields: { capabilityId: true, createdAt: true, id: true, updatedAt: true } },
+});
+
+// Create a appCapabilityDefaultCapability
+const { mutate: create } = useCreateAppCapabilityDefaultCapabilityMutation({
+  selection: { fields: { id: true } },
+});
+create({ capabilityId: '<UUID>' });
+```
+
+### AppCapabilityDefaultGrant
+
+```typescript
+// List all appCapabilityDefaultGrants
+const { data, isLoading } = useAppCapabilityDefaultGrantsQuery({
+  selection: { fields: { capabilityId: true, createdAt: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
+});
+
+// Get one appCapabilityDefaultGrant
+const { data: item } = useAppCapabilityDefaultGrantQuery({
+  id: '<UUID>',
+  selection: { fields: { capabilityId: true, createdAt: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
+});
+
+// Create a appCapabilityDefaultGrant
+const { mutate: create } = useCreateAppCapabilityDefaultGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ capabilityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
+```
+
 ### AppClaimedInvite
 
 ```typescript
@@ -241,20 +255,20 @@ create({ data: '<JSON>', receiverId: '<UUID>', senderId: '<UUID>' });
 ```typescript
 // List all appGrants
 const { data, isLoading } = useAppGrantsQuery({
-  selection: { fields: { actorId: true, createdAt: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
 });
 
 // Get one appGrant
 const { data: item } = useAppGrantQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, createdAt: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
 });
 
 // Create a appGrant
 const { mutate: create } = useCreateAppGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissions: '<BitString>' });
+create({ actorId: '<UUID>', capabilities: '<BitString>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
 ### AppInvite
@@ -283,20 +297,20 @@ create({ channel: '<String>', data: '<JSON>', email: '<Email>', expiresAt: '<Dat
 ```typescript
 // List all appMemberships
 const { data, isLoading } = useAppMembershipsQuery({
-  selection: { fields: { actorId: true, createdAt: true, createdBy: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, permissions: true, profileId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, profileId: true, updatedAt: true, updatedBy: true } },
 });
 
 // Get one appMembership
 const { data: item } = useAppMembershipQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, createdAt: true, createdBy: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, permissions: true, profileId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, profileId: true, updatedAt: true, updatedBy: true } },
 });
 
 // Create a appMembership
 const { mutate: create } = useCreateAppMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', createdBy: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isOwner: '<Boolean>', isVerified: '<Boolean>', permissions: '<BitString>', profileId: '<UUID>', updatedBy: '<UUID>' });
+create({ actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isOwner: '<Boolean>', isVerified: '<Boolean>', profileId: '<UUID>', updatedBy: '<UUID>' });
 ```
 
 ### AppMembershipDefault
@@ -341,90 +355,6 @@ const { mutate: create } = useCreateAppOwnerGrantMutation({
 create({ actorId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
-### AppPermission
-
-```typescript
-// List all appPermissions
-const { data, isLoading } = useAppPermissionsQuery({
-  selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, name: true } },
-});
-
-// Get one appPermission
-const { data: item } = useAppPermissionQuery({
-  id: '<UUID>',
-  selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, name: true } },
-});
-
-// Create a appPermission
-const { mutate: create } = useCreateAppPermissionMutation({
-  selection: { fields: { id: true } },
-});
-create({ bitnum: '<Int>', bitstr: '<BitString>', description: '<String>', name: '<String>' });
-```
-
-### AppPermissionDefault
-
-```typescript
-// List all appPermissionDefaults
-const { data, isLoading } = useAppPermissionDefaultsQuery({
-  selection: { fields: { id: true, permissions: true } },
-});
-
-// Get one appPermissionDefault
-const { data: item } = useAppPermissionDefaultQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, permissions: true } },
-});
-
-// Create a appPermissionDefault
-const { mutate: create } = useCreateAppPermissionDefaultMutation({
-  selection: { fields: { id: true } },
-});
-create({ permissions: '<BitString>' });
-```
-
-### AppPermissionDefaultGrant
-
-```typescript
-// List all appPermissionDefaultGrants
-const { data, isLoading } = useAppPermissionDefaultGrantsQuery({
-  selection: { fields: { createdAt: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } },
-});
-
-// Get one appPermissionDefaultGrant
-const { data: item } = useAppPermissionDefaultGrantQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } },
-});
-
-// Create a appPermissionDefaultGrant
-const { mutate: create } = useCreateAppPermissionDefaultGrantMutation({
-  selection: { fields: { id: true } },
-});
-create({ grantorId: '<UUID>', isGrant: '<Boolean>', permissionId: '<UUID>' });
-```
-
-### AppPermissionDefaultPermission
-
-```typescript
-// List all appPermissionDefaultPermissions
-const { data, isLoading } = useAppPermissionDefaultPermissionsQuery({
-  selection: { fields: { createdAt: true, id: true, permissionId: true, updatedAt: true } },
-});
-
-// Get one appPermissionDefaultPermission
-const { data: item } = useAppPermissionDefaultPermissionQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, id: true, permissionId: true, updatedAt: true } },
-});
-
-// Create a appPermissionDefaultPermission
-const { mutate: create } = useCreateAppPermissionDefaultPermissionMutation({
-  selection: { fields: { id: true } },
-});
-create({ permissionId: '<UUID>' });
-```
-
 ### MembershipType
 
 ```typescript
@@ -465,6 +395,48 @@ const { mutate: create } = useCreateOrgAdminGrantMutation({
   selection: { fields: { id: true } },
 });
 create({ actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
+```
+
+### OrgCapabilityDefaultCapability
+
+```typescript
+// List all orgCapabilityDefaultCapabilities
+const { data, isLoading } = useOrgCapabilityDefaultCapabilitiesQuery({
+  selection: { fields: { capabilityId: true, createdAt: true, entityId: true, id: true, updatedAt: true } },
+});
+
+// Get one orgCapabilityDefaultCapability
+const { data: item } = useOrgCapabilityDefaultCapabilityQuery({
+  id: '<UUID>',
+  selection: { fields: { capabilityId: true, createdAt: true, entityId: true, id: true, updatedAt: true } },
+});
+
+// Create a orgCapabilityDefaultCapability
+const { mutate: create } = useCreateOrgCapabilityDefaultCapabilityMutation({
+  selection: { fields: { id: true } },
+});
+create({ capabilityId: '<UUID>', entityId: '<UUID>' });
+```
+
+### OrgCapabilityDefaultGrant
+
+```typescript
+// List all orgCapabilityDefaultGrants
+const { data, isLoading } = useOrgCapabilityDefaultGrantsQuery({
+  selection: { fields: { capabilityId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
+});
+
+// Get one orgCapabilityDefaultGrant
+const { data: item } = useOrgCapabilityDefaultGrantQuery({
+  id: '<UUID>',
+  selection: { fields: { capabilityId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
+});
+
+// Create a orgCapabilityDefaultGrant
+const { mutate: create } = useCreateOrgCapabilityDefaultGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ capabilityId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
 ### OrgChartEdge
@@ -565,20 +537,20 @@ create({ depth: '<Int>', userId: '<UUID>' });
 ```typescript
 // List all orgGrants
 const { data, isLoading } = useOrgGrantsQuery({
-  selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
 });
 
 // Get one orgGrant
 const { data: item } = useOrgGrantQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
 });
 
 // Create a orgGrant
 const { mutate: create } = useCreateOrgGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissions: '<BitString>' });
+create({ actorId: '<UUID>', capabilities: '<BitString>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
 ### OrgInvite
@@ -649,20 +621,20 @@ create({ actorId: '<UUID>', bio: '<String>', displayName: '<String>', email: '<S
 ```typescript
 // List all orgMemberships
 const { data, isLoading } = useOrgMembershipsQuery({
-  selection: { fields: { actorId: true, createdAt: true, createdBy: true, entityId: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isExternal: true, isOwner: true, isReadOnly: true, permissions: true, profileId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, entityId: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isExternal: true, isOwner: true, isReadOnly: true, profileId: true, updatedAt: true, updatedBy: true } },
 });
 
 // Get one orgMembership
 const { data: item } = useOrgMembershipQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, createdAt: true, createdBy: true, entityId: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isExternal: true, isOwner: true, isReadOnly: true, permissions: true, profileId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, entityId: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isExternal: true, isOwner: true, isReadOnly: true, profileId: true, updatedAt: true, updatedBy: true } },
 });
 
 // Create a orgMembership
 const { mutate: create } = useCreateOrgMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', createdBy: '<UUID>', entityId: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isReadOnly: '<Boolean>', permissions: '<BitString>', profileId: '<UUID>', updatedBy: '<UUID>' });
+create({ actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', entityId: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isReadOnly: '<Boolean>', profileId: '<UUID>', updatedBy: '<UUID>' });
 ```
 
 ### OrgMembershipDefault
@@ -728,138 +700,7 @@ const { mutate: create } = useCreateOrgOwnerGrantMutation({
 create({ actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
-### OrgPermission
-
-```typescript
-// List all orgPermissions
-const { data, isLoading } = useOrgPermissionsQuery({
-  selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, name: true } },
-});
-
-// Get one orgPermission
-const { data: item } = useOrgPermissionQuery({
-  id: '<UUID>',
-  selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, name: true } },
-});
-
-// Create a orgPermission
-const { mutate: create } = useCreateOrgPermissionMutation({
-  selection: { fields: { id: true } },
-});
-create({ bitnum: '<Int>', bitstr: '<BitString>', description: '<String>', name: '<String>' });
-```
-
-### OrgPermissionDefault
-
-```typescript
-// List all orgPermissionDefaults
-const { data, isLoading } = useOrgPermissionDefaultsQuery({
-  selection: { fields: { entityId: true, id: true, permissions: true } },
-});
-
-// Get one orgPermissionDefault
-const { data: item } = useOrgPermissionDefaultQuery({
-  id: '<UUID>',
-  selection: { fields: { entityId: true, id: true, permissions: true } },
-});
-
-// Create a orgPermissionDefault
-const { mutate: create } = useCreateOrgPermissionDefaultMutation({
-  selection: { fields: { id: true } },
-});
-create({ entityId: '<UUID>', permissions: '<BitString>' });
-```
-
-### OrgPermissionDefaultGrant
-
-```typescript
-// List all orgPermissionDefaultGrants
-const { data, isLoading } = useOrgPermissionDefaultGrantsQuery({
-  selection: { fields: { createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } },
-});
-
-// Get one orgPermissionDefaultGrant
-const { data: item } = useOrgPermissionDefaultGrantQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } },
-});
-
-// Create a orgPermissionDefaultGrant
-const { mutate: create } = useCreateOrgPermissionDefaultGrantMutation({
-  selection: { fields: { id: true } },
-});
-create({ entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissionId: '<UUID>' });
-```
-
-### OrgPermissionDefaultPermission
-
-```typescript
-// List all orgPermissionDefaultPermissions
-const { data, isLoading } = useOrgPermissionDefaultPermissionsQuery({
-  selection: { fields: { createdAt: true, entityId: true, id: true, permissionId: true, updatedAt: true } },
-});
-
-// Get one orgPermissionDefaultPermission
-const { data: item } = useOrgPermissionDefaultPermissionQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, entityId: true, id: true, permissionId: true, updatedAt: true } },
-});
-
-// Create a orgPermissionDefaultPermission
-const { mutate: create } = useCreateOrgPermissionDefaultPermissionMutation({
-  selection: { fields: { id: true } },
-});
-create({ entityId: '<UUID>', permissionId: '<UUID>' });
-```
-
 ## Custom Operation Hooks
-
-### `useAppPermissionsGetByMaskQuery`
-
-Reads and enables pagination through a set of `AppPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `after` | Cursor |
-  | `first` | Int |
-  | `mask` | BitString |
-  | `offset` | Int |
-
-### `useAppPermissionsGetMaskQuery`
-
-appPermissionsGetMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `ids` | [UUID] |
-
-### `useAppPermissionsGetMaskByNamesQuery`
-
-appPermissionsGetMaskByNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `names` | [String] |
-
-### `useAppPermissionsGetPaddedMaskQuery`
-
-appPermissionsGetPaddedMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
 
 ### `useOrgIsManagerOfQuery`
 
@@ -874,53 +715,6 @@ orgIsManagerOf
   | `maxDepth` | Int |
   | `targetEntityId` | UUID |
   | `userId` | UUID |
-
-### `useOrgPermissionsGetByMaskQuery`
-
-Reads and enables pagination through a set of `OrgPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `after` | Cursor |
-  | `first` | Int |
-  | `mask` | BitString |
-  | `offset` | Int |
-
-### `useOrgPermissionsGetMaskQuery`
-
-orgPermissionsGetMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `ids` | [UUID] |
-
-### `useOrgPermissionsGetMaskByNamesQuery`
-
-orgPermissionsGetMaskByNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `names` | [String] |
-
-### `useOrgPermissionsGetPaddedMaskQuery`
-
-orgPermissionsGetPaddedMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
 
 ### `useProvisionBucketMutation`
 
