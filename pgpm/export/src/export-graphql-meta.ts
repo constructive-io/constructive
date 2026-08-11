@@ -9,6 +9,7 @@
 import { Parser } from 'csv-to-pg';
 import { toSnakeCase } from 'inflekt';
 
+import { projectCatalogApis } from './catalog-projection';
 import { FieldType, getTimestampDefaultColumnsForTable, META_TABLE_CONFIG, META_TABLE_ORDER, TableConfig } from './export-utils';
 import { GraphQLClient } from './graphql-client';
 import {
@@ -300,43 +301,14 @@ export const exportGraphQLMeta = async ({
   }
 
   // Catalog plane projection: catalog_private.apis is trigger-derived from
-  // routing_public.apis by catalog_private.tg_apis_catalog_sync(). During
-  // migration replay the sync trigger is skipped (session_replication_role),
+  // routing_public.apis (catalog_private.tg_apis_catalog_sync). The sync
+  // trigger is skipped during migration replay (session_replication_role),
   // and the catalog tables can't be queried through the meta API (bare-name
-  // collisions with routing_public) — so the projection is materialized here,
-  // mirroring the trigger mapping 1:1. resolve_route() needs these rows to
-  // build resolved_config for api targets.
+  // collisions with routing_public) — so the projection is materialized here.
+  // Shared with the SQL flow (see catalog-projection.ts) for cross-flow parity.
   const apisRows = rawRows['apis'];
   if (sql['apis'] && apisRows?.length) {
-    const projected = apisRows.map((r) => ({
-      id: r.id,
-      owner_scope: 'database',
-      owner_key: r.database_id,
-      is_visible: r.is_published ?? false,
-      database_id: r.database_id,
-      name: r.name,
-      dbname: r.dbname,
-      role_name: r.role_name,
-      anon_role: r.anon_role,
-      config: r.config ?? null
-    }));
-    const parser = new Parser({
-      schema: 'catalog_private',
-      table: 'apis',
-      fields: {
-        id: 'uuid',
-        owner_scope: 'text',
-        owner_key: 'uuid',
-        is_visible: 'boolean',
-        database_id: 'uuid',
-        name: 'text',
-        dbname: 'text',
-        role_name: 'text',
-        anon_role: 'text',
-        config: 'jsonb'
-      }
-    });
-    const parsed = await parser.parse(projected);
+    const parsed = await projectCatalogApis(apisRows);
     if (parsed) {
       sql['catalog_private.apis'] = parsed;
     }
