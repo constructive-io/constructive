@@ -28,7 +28,8 @@ import { requireDatabaseId } from './types';
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
 const IDENTITY_PROVIDERS_DISCOVERY_SQL = `
-  SELECT s.schema_name AS schema_name, m.table_name AS table_name
+  SELECT s.schema_name AS schema_name, m.table_name AS table_name,
+         m.scope, m.prefix
   FROM metaschema_modules_public.identity_providers_module m
   JOIN metaschema_public.schema s ON s.id = m.private_schema_id
   WHERE m.database_id = $1
@@ -36,29 +37,37 @@ const IDENTITY_PROVIDERS_DISCOVERY_SQL = `
 `;
 
 const INTERNAL_SECRETS_DISCOVERY_SQL = `
-  SELECT s.schema_name AS schema_name, m.internal_secrets_table_name AS table_name
+  SELECT s.schema_name AS schema_name, m.internal_secrets_table_name AS table_name,
+         m.scope, m.prefix
   FROM metaschema_modules_public.internal_secrets_module m
   JOIN metaschema_public.schema s ON s.id = m.private_schema_id
-  WHERE m.database_id = $1
+  WHERE m.database_id = $1 AND m.scope = $2
   LIMIT 1
 `;
 
 interface DiscoveredLocation {
   schema_name: string;
   table_name: string;
+  scope: string;
+  prefix: string;
 }
 
 /**
  * The providers query, with the tenant's own secret getter inlined.
  *
- * The getter is `<internal_secrets_table_name>_get(name, namespace_id)` in the
- * discovered store schema — the same function the auth procedures use, so a
- * secret rotated through the platform's rotate verb is picked up with no
- * further coordination. A provider whose `client_secret_id` is set but whose
- * secret does not resolve yields `clientSecret: null`, which the caller must
- * treat as a configuration fault rather than as a public client.
+ * The getter is the generated internal-secrets getter in the discovered store
+ * schema — the same function the auth procedures use, so a secret rotated
+ * through the platform's rotate verb is picked up with no further
+ * coordination. Database-scoped stores take the current database ID as their
+ * first argument; app/platform stores do not. A provider whose
+ * `client_secret_id` is set but whose secret does not resolve yields
+ * `clientSecret: null`, which the caller must treat as a configuration fault
+ * rather than as a public client.
  */
-const buildProvidersQuery = (providers: DiscoveredLocation, secrets: DiscoveredLocation) => `
+const buildProvidersQuery = (
+  providers: DiscoveredLocation,
+  secrets: DiscoveredLocation
+) => `
   SELECT
     p.id,
     p.slug,
@@ -68,7 +77,8 @@ const buildProvidersQuery = (providers: DiscoveredLocation, secrets: DiscoveredL
     p.client_id,
     CASE
       WHEN p.client_secret_id IS NULL THEN NULL
-      ELSE "${secrets.schema_name}"."${secrets.table_name}_get"(
+      ELSE "${secrets.schema_name}"."${secrets.prefix}_internal_secrets_get"(
+        ${secrets.scope === 'database' ? '$1,' : ''}
         p.slug || '/client-secret',
         uuid_nil()
       )
@@ -155,16 +165,16 @@ const toProviderConfig = (row: ProviderRow): IdentityProviderConfig => {
 const discoverOne = async (
   ctx: LoaderContext,
   sql: string,
-  moduleName: string
+  values: unknown[]
 ): Promise<DiscoveredLocation | undefined> => {
-  const result = await ctx.tenantPool.query<DiscoveredLocation>(sql, [ctx.databaseId]);
+  const result = await ctx.tenantPool.query<DiscoveredLocation>(sql, values);
   const row = result.rows[0];
   if (!row?.schema_name || !row?.table_name) {
     // Not provisioned for this tenant — the loader contract's undefined. The
     // module name is kept in the debug trail rather than guessed at by callers.
     return undefined;
   }
-  return { schema_name: row.schema_name, table_name: row.table_name };
+  return row;
 };
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
@@ -184,14 +194,14 @@ export const identityProvidersLoader: ModuleLoader<IdentityProvidersModule> =
       const providers = await discoverOne(
         ctx,
         IDENTITY_PROVIDERS_DISCOVERY_SQL,
-        'identity_providers_module'
+        [databaseId]
       );
       if (!providers) return undefined;
 
       const secrets = await discoverOne(
         ctx,
         INTERNAL_SECRETS_DISCOVERY_SQL,
-        'internal_secrets_module'
+        [databaseId, providers.scope]
       );
       // A provider table without its secret store cannot yield a usable client
       // secret, and silently returning secret-less providers would present a
@@ -203,7 +213,10 @@ export const identityProvidersLoader: ModuleLoader<IdentityProvidersModule> =
         );
       }
 
-      const result = await tenantPool.query<ProviderRow>(buildProvidersQuery(providers, secrets));
+      const result = await tenantPool.query<ProviderRow>(
+        buildProvidersQuery(providers, secrets),
+        secrets.scope === 'database' ? [databaseId] : []
+      );
 
       const bySlug: Record<string, IdentityProviderConfig> = {};
       for (const row of result.rows) {

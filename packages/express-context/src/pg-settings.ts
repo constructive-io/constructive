@@ -64,6 +64,13 @@ export function buildPgSettings(input: PgSettingsInput): Record<string, string> 
     settings['jwt.claims.api_id'] = api.apiId;
   }
 
+  // Site provenance is an independent trusted routing fact. Multiple Sites
+  // may share an API, so it must never be reconstructed from api_id, Origin,
+  // Referer, or token claims.
+  if (api.siteId) {
+    settings['jwt.claims.site_id'] = api.siteId;
+  }
+
   // Distributed tracing
   settings['request.id'] = requestId;
 

@@ -44,6 +44,7 @@ const matchedRoute = (overrides: Partial<ResolvedRoute> = {}): ResolvedRoute => 
   verification_status: 'verified',
   tls_status: 'ready',
   tls_secret_name: 'tls-api-example-com',
+  runtime_site_id: 'site-1',
   ...overrides
 });
 
@@ -104,6 +105,7 @@ describe('routeToApiStructure', () => {
     expect(structure).toEqual(
       expect.objectContaining({
         apiId: 'api-1',
+        siteId: 'site-1',
         databaseId: 'db-1',
         dbname: 'tenant_db',
         roleName: 'api_role',

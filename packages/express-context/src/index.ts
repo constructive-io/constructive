@@ -56,6 +56,7 @@ export type {
   LlmConfig,
   PubkeyChallengeSettings,
   RlsModule,
+  SsoSurface,
   WebauthnSettings,
   WithPgClient,
 } from './types';
@@ -103,6 +104,7 @@ export {
   requireDatabaseId,
   requireIdentityProvider,
   rlsLoader,
+  ssoSurfaceLoader,
   webauthnLoader,
 } from './loaders';
 
