@@ -1,5 +1,11 @@
 import { createCsrfMiddleware } from '@constructive-io/csrf';
-import { createContextMiddleware, createDefaultRegistry, requestIdMiddleware } from '@constructive-io/express-context';
+import {
+  createContextMiddleware,
+  createDefaultRegistry,
+  identityProvidersLoader,
+  requestIdMiddleware,
+  ssoSurfaceLoader
+} from '@constructive-io/express-context';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
@@ -93,6 +99,11 @@ class Server {
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
     const requestLogger = createRequestLogger({ observabilityEnabled });
+    const contextLoaders = createDefaultRegistry();
+    contextLoaders.register(ssoSurfaceLoader);
+    if (effectiveOpts.oauth?.enabled) {
+      contextLoaders.register(identityProvidersLoader);
+    }
 
     // Log startup configuration (non-sensitive values only)
     const apiOpts = (effectiveOpts as any).api || {};
@@ -165,7 +176,7 @@ class Server {
     app.use(authenticate);
     app.use(createContextMiddleware({
       pg: effectiveOpts.pg,
-      loaders: createDefaultRegistry(),
+      loaders: contextLoaders,
       routingSchema: getRoutingSchema(effectiveOpts)
     }));
     app.use(createCaptchaMiddleware());

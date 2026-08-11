@@ -1,4 +1,8 @@
-import type { ApiOptions,GraphileOptions } from '@constructive-io/graphql-types';
+import type {
+  ApiOptions,
+  GraphileOptions,
+  OAuthServerOptions
+} from '@constructive-io/graphql-types';
 import type { DocumentNode, GraphQLError } from 'graphql';
 import type { Server } from 'http';
 import type { PgTestClient } from 'pgsql-test/test-client';
@@ -39,6 +43,8 @@ export interface ServerOptions {
    * ```
    */
   api?: Partial<ApiOptions>;
+  /** GraphQL-server OAuth options forwarded through the normal typed config path. */
+  oauth?: OAuthServerOptions;
 }
 
 /**

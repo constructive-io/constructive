@@ -16,11 +16,13 @@ import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
+import { createUnifiedAuthPlugin } from '../auth/sso';
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import type { DatabaseSettings } from '../types';
+import { createGrafastRequestContext } from './grafast-context';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
@@ -167,12 +169,14 @@ const buildPreset = (
   roleName: string,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
-  compute?: ComputeConfig
+  compute?: ComputeConfig,
+  oauthEnabled = false
 ): GraphileConfig.Preset => {
   return {
     extends: [createConstructivePreset(databaseSettings)],
     plugins: [
       AuthCookiePlugin,
+      createUnifiedAuthPlugin(oauthEnabled),
       // Only registered when the compute module is provisioned for this
       // database — all schema/table names come from the constructive
       // metaschema (express-context compute module loader); the plugin has
@@ -275,7 +279,7 @@ const buildPreset = (
               pgSettings['request.id'] = req.requestId;
             }
 
-            return { pgSettings };
+            return createGrafastRequestContext(req, pgSettings);
           }
 
           // Private (in-cluster) surface: there is no token — identity
@@ -304,7 +308,7 @@ const buildPreset = (
             if (req.requestId) {
               pgSettings['request.id'] = req.requestId;
             }
-            return { pgSettings };
+            return createGrafastRequestContext(req, pgSettings);
           }
         }
 
@@ -316,9 +320,7 @@ const buildPreset = (
           anonSettings['request.id'] = req.requestId;
         }
 
-        return {
-          pgSettings: anonSettings
-        };
+        return createGrafastRequestContext(req, anonSettings);
       }
     }
   };
@@ -408,7 +410,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
+      const preset = buildPreset(
+        pool,
+        schema || [],
+        anonRole,
+        roleName,
+        api.databaseSettings,
+        api.apiId,
+        compute,
+        opts.oauth?.enabled ?? false
+      );
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,
