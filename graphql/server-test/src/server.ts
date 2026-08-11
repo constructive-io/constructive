@@ -48,7 +48,10 @@ export const createTestServer = async (
     server: {
       ...opts.server,
       host,
-      port
+      port,
+      ...(serverOpts.trustProxy !== undefined && {
+        trustProxy: serverOpts.trustProxy
+      })
     }
   };
 

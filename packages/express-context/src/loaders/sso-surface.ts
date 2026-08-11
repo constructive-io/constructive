@@ -15,7 +15,7 @@ import type { LoaderContext, ModuleLoader } from './types';
 import { requireDatabaseId } from './types';
 
 const SSO_SURFACE_SQL = `
-  SELECT private_schema.name AS private_schema
+  SELECT private_schema.schema_name AS private_schema
   FROM metaschema_modules_public.unified_auth_module unified_auth
   JOIN metaschema_public.schema private_schema
     ON private_schema.id = unified_auth.private_schema_id

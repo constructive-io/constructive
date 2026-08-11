@@ -16,6 +16,8 @@ export interface ServerOptions {
   port?: number;
   /** Host to bind the server to (defaults to localhost) */
   host?: string;
+  /** Trust the forwarded protocol when a test exercises an HTTPS callback. */
+  trustProxy?: boolean;
   /**
    * Which server to run this suite against:
    * - `true` (default): the production `@constructive-io/graphql-server`, which

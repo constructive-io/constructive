@@ -49,6 +49,9 @@ describe('ssoSurfaceLoader', () => {
     expect(calls[0].text).toMatch(
       /private_schema\.id = unified_auth\.private_schema_id/
     );
+    expect(calls[0].text).toMatch(
+      /private_schema\.schema_name AS private_schema/
+    );
   });
 
   it('returns undefined when this Tenant has no provisioned module', async () => {
