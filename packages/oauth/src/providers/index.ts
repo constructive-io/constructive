@@ -1,29 +1,28 @@
-import { OAuthProviderConfig } from '../types';
-import { facebookProvider } from './facebook';
-import { extractPrimaryEmail,GITHUB_EMAILS_URL, githubProvider } from './github';
-import { googleProvider } from './google';
-import { linkedinProvider } from './linkedin';
+import type { ProviderAdapter } from '../adapter';
+import { ProviderAdapterError } from '../types';
+import { githubAdapter } from './github';
+import { googleAdapter } from './google';
 
-export const providers: Record<string, OAuthProviderConfig> = {
-  google: googleProvider,
-  github: githubProvider,
-  facebook: facebookProvider,
-  linkedin: linkedinProvider,
+const providerAdapters = new Map<string, ProviderAdapter>([
+  [googleAdapter.kind, googleAdapter as ProviderAdapter],
+  [githubAdapter.kind, githubAdapter as ProviderAdapter]
+]);
+
+export const getProviderAdapter = (providerKey: string): ProviderAdapter => {
+  const adapter = providerAdapters.get(providerKey);
+  if (!adapter) {
+    throw new ProviderAdapterError(
+      'INVALID_CONFIGURATION',
+      'The selected identity Provider is not supported.'
+    );
+  }
+  return adapter;
 };
 
-export function getProvider(id: string): OAuthProviderConfig | undefined {
-  return providers[id];
-}
+export const getProviderAdapterKinds = (): readonly string[] =>
+  [...providerAdapters.keys()];
 
-export function getProviderIds(): string[] {
-  return Object.keys(providers);
-}
-
-export {
-  extractPrimaryEmail,
-  facebookProvider,
-  GITHUB_EMAILS_URL,
-  githubProvider,
-  googleProvider,
-  linkedinProvider,
-};
+export type { ValidatedGitHubConfiguration } from './github';
+export { githubAdapter } from './github';
+export type { ValidatedGoogleConfiguration } from './google';
+export { googleAdapter } from './google';

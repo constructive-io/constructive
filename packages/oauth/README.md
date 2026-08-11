@@ -1,128 +1,69 @@
 # @constructive-io/oauth
 
-<p align="center" width="100%">
-  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
-</p>
+Protocol primitives and Provider adapters for Constructive OAuth/OIDC sign-in.
 
-<p align="center" width="100%">
-  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
-    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
-  </a>
-  <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE">
-    <img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/>
-  </a>
-  <a href="https://www.npmjs.com/package/@constructive-io/oauth">
-    <img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=packages%2Foauth%2Fpackage.json"/>
-  </a>
-</p>
+The package owns:
 
-> Minimal OAuth 2.0 client for social authentication
+- cryptographically random OAuth state, OIDC nonce, and RFC 7636 S256 PKCE;
+- authorization URL construction with protected parameters;
+- exact Provider endpoint allowlists and bounded, no-redirect JSON requests;
+- a protocol-neutral `ProviderAdapter` contract;
+- registered Google/OIDC and GitHub/OAuth adapter implementations; and
+- safe normalized external identities without raw Provider payloads or tokens.
 
-A lightweight OAuth 2.0 client for social authentication with Google, GitHub, Facebook, and LinkedIn. Uses [`@constructive-io/csrf`](../csrf) for secure state management. No external auth library dependencies - uses native fetch for HTTP requests.
+It deliberately does not own Express routes, Cookies, Tenant resolution,
+database state, account association, Constructive credentials, or Site handoff.
+Those remain in their Constructive orchestration owners.
 
-## Installation
+## Security model
 
-```bash
-pnpm add @constructive-io/oauth
-```
+Every Provider flow uses Authorization Code with S256 PKCE. Constructive creates
+and persists the state, verifier, and optional nonce before navigation. Only the
+state and S256 challenge reach the browser. The callback supplies the code to
+Constructive, and the selected adapter exchanges it with the original
+server-held verifier.
 
-## Usage
+Provider configuration is supplied by the caller after Tenant-scoped loader
+resolution. Adapters do not read environment variables or databases. Endpoints
+must match the concrete adapter's HTTPS allowlist, requests reject redirects,
+and Provider response bodies are never included in errors.
 
-### Basic Setup
+## Example
 
-```typescript
-import { createOAuthClient } from '@constructive-io/oauth';
+```ts
+import {
+  deriveS256CodeChallenge,
+  generateCodeVerifier,
+  generateOidcNonce,
+  generateOpaqueState,
+  getProviderAdapter
+} from '@constructive-io/oauth';
 
-const client = createOAuthClient({
-  providers: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    },
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    },
-  },
-  baseUrl: 'https://api.example.com',
+const adapter = getProviderAdapter(provider.slug);
+const config = adapter.validateConfiguration(provider);
+const state = generateOpaqueState();
+const codeVerifier = generateCodeVerifier();
+const nonce = adapter.kind === 'google' ? generateOidcNonce() : undefined;
+
+const { url } = adapter.createAuthorizationRequest({
+  config,
+  redirectUri,
+  state,
+  codeChallenge: deriveS256CodeChallenge(codeVerifier),
+  nonce
 });
-
-// Generate authorization URL
-const { url, state } = client.getAuthorizationUrl({ provider: 'google' });
-
-// After user authorizes, exchange code for profile
-const profile = await client.handleCallback({ provider: 'google', code });
 ```
 
-### Express Middleware
+The common service persists the request artifacts before using `url`. It later
+calls `completeAuthorization` with the callback code and server-held artifacts,
+then consumes only the returned `NormalizedExternalIdentity`.
 
-```typescript
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import { createOAuthMiddleware } from '@constructive-io/oauth';
+## Legacy surface
 
-const app = express();
-app.use(cookieParser());
-
-const oauth = createOAuthMiddleware({
-  providers: {
-    google: { clientId: '...', clientSecret: '...' },
-    github: { clientId: '...', clientSecret: '...' },
-    facebook: { clientId: '...', clientSecret: '...' },
-    linkedin: { clientId: '...', clientSecret: '...' },
-  },
-  baseUrl: 'https://api.example.com',
-  onSuccess: async (profile, context) => {
-    // Handle successful authentication
-    // Create/update user in database, generate session token, etc.
-    return { user: profile };
-  },
-  onError: (error, context) => {
-    console.error('OAuth error:', error);
-  },
-  successRedirect: 'https://app.example.com/dashboard',
-  errorRedirect: 'https://app.example.com/login?error=auth_failed',
-});
-
-// Mount routes
-app.get('/auth/:provider', oauth.initiateAuth);
-app.get('/auth/:provider/callback', oauth.handleCallback);
-app.get('/auth/providers', oauth.getProviders);
-```
-
-## Supported Providers
-
-| Provider | Scopes |
-|----------|--------|
-| Google | `openid`, `email`, `profile` |
-| GitHub | `user:email`, `read:user` |
-| Facebook | `email`, `public_profile` |
-| LinkedIn | `openid`, `profile`, `email` |
-
-## API
-
-### `createOAuthClient(config)`
-
-Creates an OAuth client instance.
-
-### `createOAuthMiddleware(config)`
-
-Creates Express route handlers for OAuth flows.
-
-### `OAuthProfile`
-
-The normalized user profile returned after authentication:
-
-```typescript
-interface OAuthProfile {
-  provider: string;      // 'google', 'github', etc.
-  providerId: string;    // Provider's unique user ID
-  email: string | null;
-  name: string | null;
-  picture: string | null;
-  raw: unknown;          // Original provider response
-}
-```
+The previous hard-coded Provider registry, Express middleware,
+`/auth/providers` discovery handler, browser state Cookie, and raw profile
+payload are intentionally not part of this API. Provider discovery belongs to
+Tenant-scoped GraphQL, and replay protection belongs to persisted server state.
 
 ## License
 
