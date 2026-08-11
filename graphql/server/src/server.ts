@@ -267,6 +267,12 @@ class Server {
     this.listenClient = client;
     this.listenRelease = release;
 
+    // Attached before any query is issued: an 'error' event on a Client with no
+    // listener is rethrown by Node and takes the whole process down.
+    client.on('error', (e) => {
+      this.dropListener(client, 'Error with database notify listener', e);
+    });
+
     client.on('notification', ({ channel, payload }) => {
       if (channel === 'schema:update' && payload) {
         log.info('schema:update', payload);
@@ -274,19 +280,31 @@ class Server {
       }
     });
 
-    client.query('LISTEN "schema:update"');
-
-    client.on('error', (e) => {
-      if (this.shuttingDown) {
-        release();
-        return;
-      }
-      this.error('Error with database notify listener', e);
-      release();
-      this.addEventListener();
+    client.query('LISTEN "schema:update"').catch((e) => {
+      this.dropListener(client, 'Failed to LISTEN for schema:update', e);
     });
 
     this.log('connected and listening for changes...');
+  }
+
+  private dropListener(client: PoolClient, message: string, err: unknown): void {
+    // Another path (shutdown, an earlier failure) already tore this client down.
+    if (this.listenClient !== client) return;
+
+    const release = this.listenRelease;
+    this.listenClient = null;
+    this.listenRelease = null;
+    client.removeAllListeners('notification');
+    client.removeAllListeners('error');
+
+    if (this.shuttingDown) {
+      release?.();
+      return;
+    }
+
+    this.error(message, err);
+    release?.();
+    this.addEventListener();
   }
 
   async removeEventListener(): Promise<void> {
