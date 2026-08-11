@@ -18,11 +18,11 @@ export const REAL_RUNTIME_FIXTURE = {
 const modules = [
   'users_module',
   'membership_types_module',
-  ['permissions_module', { scope: 'app' }],
+  ['capabilities_module', { scope: 'app' }],
   ['limits_module', { scope: 'app' }],
   ['levels_module', { scope: 'app' }],
   ['memberships_module', { scope: 'app' }],
-  ['permissions_module', { scope: 'org' }],
+  ['capabilities_module', { scope: 'org' }],
   ['limits_module', { scope: 'org' }],
   ['memberships_module', { scope: 'org' }],
   'sessions_module',
