@@ -111,7 +111,9 @@ describe('Provider OAuth orchestration', () => {
         is_verified: true,
         totp_enabled: false,
         mfa_required: false,
-        continuation_url: null
+        callback_url: 'https://portal.example.com/auth/complete',
+        site_state: 't'.repeat(43),
+        handoff_expires_at: '2026-08-10T12:01:00.000Z'
       }
     ]);
     const providerFetch = jest.fn()
@@ -137,6 +139,9 @@ describe('Provider OAuth orchestration', () => {
     });
 
     expect(result.accessToken).toBe('cnc_auth_center_token');
+    expect(result.continuationUrl).toMatch(
+      /^https:\/\/portal\.example\.com\/auth\/complete\?handoff=/
+    );
     expect(providerFetch).toHaveBeenCalledTimes(2);
     expect(query).toHaveBeenCalledTimes(2);
     expect(query.mock.calls[1]?.[1]).toEqual([
@@ -152,6 +157,7 @@ describe('Provider OAuth orchestration', () => {
       'bearer',
       false,
       null,
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
       expect.stringMatching(/^\\x[0-9a-f]{64}$/)
     ]);
   });

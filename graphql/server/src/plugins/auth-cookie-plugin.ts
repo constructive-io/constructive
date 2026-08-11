@@ -98,6 +98,19 @@ const UNIFIED_AUTH_SIGN_IN_MUTATIONS = new Set([
   'signUpUnifiedLogin'
 ]);
 
+const NO_STORE_AUTH_MUTATIONS = new Set([
+  'startUnifiedLogin',
+  'confirmUnifiedLogin',
+  'signInUnifiedLogin',
+  'signUpUnifiedLogin',
+  'startProviderAuthentication',
+  'redeemUnifiedLoginHandoff'
+]);
+
+// `redeemUnifiedLoginHandoff` is intentionally absent: its caller is the
+// target Site server, and only that Site's response may write its first-party
+// Cookie. Constructive returns the distinct Site-local credential as data.
+
 /**
  * Auth mutations that should clear the session cookie.
  */
@@ -298,6 +311,36 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
             return result;
           }
 
+          const grafservResponse = (event.requestDigest.requestContext as {
+            expressv4?: {
+              res?: {
+                setHeader: (name: string, value: string | string[]) => void;
+                getHeader: (name: string) => string | string[] | undefined;
+              };
+            };
+          })?.expressv4?.res;
+          // Grafserv's Express adapter always exposes the request, but some
+          // versions do not copy the response onto requestContext. Express
+          // itself links the authoritative response as req.res.
+          const res = grafservResponse ?? req.res;
+          const noStore = mutationFields.some(field =>
+            NO_STORE_AUTH_MUTATIONS.has(field.fieldName)
+          );
+          const authResult: BufferResult = noStore
+            ? {
+              ...bufferResult,
+              headers: {
+                ...bufferResult.headers,
+                'cache-control': 'no-store',
+                pragma: 'no-cache'
+              }
+            }
+            : bufferResult;
+          if (noStore && res?.setHeader) {
+            res.setHeader('Cache-Control', 'no-store');
+            res.setHeader('Pragma', 'no-cache');
+          }
+
           // Check for auth mutations
           const signInMutation = mutationFields.find(field =>
             SIGN_IN_MUTATIONS.has(field.fieldName)
@@ -307,7 +350,7 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
           );
 
           if (!signInMutation && !signOutMutation) {
-            return result;
+            return authResult;
           }
 
           log.debug(
@@ -323,7 +366,7 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
 
           // Skip if there are GraphQL errors
           if (graphqlResponse.errors?.length || !graphqlResponse.data) {
-            return result;
+            return authResult;
           }
 
           const data = graphqlResponse.data;
@@ -370,19 +413,6 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
 
           // Set cookies directly on Express response and return modified headers
           if (cookiesToSet.length > 0) {
-            const grafservResponse = (event.requestDigest.requestContext as {
-              expressv4?: {
-                res?: {
-                  setHeader: (name: string, value: string | string[]) => void;
-                  getHeader: (name: string) => string | string[] | undefined;
-                };
-              };
-            })?.expressv4?.res;
-            // Grafserv's Express adapter always exposes the request, but some
-            // versions do not copy the response onto requestContext. Express
-            // itself links the authoritative response as req.res.
-            const res = grafservResponse ?? req.res;
-
             if (res?.setHeader) {
               // Get existing Set-Cookie headers from Express response
               const existingCookies = res.getHeader('Set-Cookie');
@@ -402,18 +432,18 @@ export const AuthCookiePlugin: GraphileConfig.Plugin = {
             }
 
             // Also update the BufferResult headers for grafserv to pass through
-            const updatedHeaders = { ...bufferResult.headers };
+            const updatedHeaders = { ...authResult.headers };
 
             // Remove set-cookie from grafserv headers since we set it on Express
             delete updatedHeaders['set-cookie'];
 
             return {
-              ...bufferResult,
+              ...authResult,
               headers: updatedHeaders,
             };
           }
 
-          return result;
+          return authResult;
         },
       },
     },

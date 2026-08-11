@@ -40,6 +40,7 @@ const makeContext = (
   options: {
     userId?: string | null;
     providers?: Record<string, IdentityProviderConfig>;
+    runtime?: boolean;
   } = {}
 ): { context: ConstructiveContext; query: jest.Mock } => {
   const query = jest.fn(async () => ({
@@ -47,7 +48,27 @@ const makeContext = (
   } as unknown as QueryResult));
   const client = { query } as unknown as PoolClient;
   const context = {
+    api: {
+      apiId: options.runtime
+        ? '00000000-0000-0000-0000-000000000020'
+        : undefined,
+      siteId: options.runtime
+        ? '00000000-0000-0000-0000-000000000024'
+        : undefined
+    },
+    token: options.runtime
+      ? {
+        id: '00000000-0000-0000-0000-000000000021',
+        user_id: '00000000-0000-0000-0000-000000000022',
+        principal_id: '00000000-0000-0000-0000-000000000023',
+        kind: 'api_key',
+        access_level: 'full_access'
+      }
+      : null,
     requestOrigin: 'https://auth.example.com',
+    siteId: options.runtime
+      ? '00000000-0000-0000-0000-000000000024'
+      : null,
     userId: options.userId ?? null,
     useModule: jest.fn(async (name: string) => {
       if (name === 'ssoSurface') return surface;
@@ -135,7 +156,10 @@ describe('unified authentication GraphQL service', () => {
       access_token_expires_at: '2026-08-10T00:00:00.000Z',
       is_verified: false,
       totp_enabled: false,
-      mfa_required: false
+      mfa_required: false,
+      callback_url: 'https://portal.example.com/auth/complete',
+      site_state: opaque,
+      handoff_expires_at: '2026-08-10T00:01:00.000Z'
     });
     const service = createUnifiedAuthService(false);
 
@@ -150,7 +174,9 @@ describe('unified authentication GraphQL service', () => {
     );
 
     expect(result.accessToken).toBe('cnc_live_bt_secret');
-    expect(result.continuationUrl).toBeNull();
+    expect(result.continuationUrl).toMatch(
+      /^https:\/\/portal\.example\.com\/auth\/complete\?handoff=[A-Za-z0-9_-]{43}&site_state=/
+    );
     expect(query).toHaveBeenCalledTimes(1);
     expect(query.mock.calls[0][0]).toContain(
       '"tenant_acme_sso_private"."sign_in_unified_login"'
@@ -163,8 +189,107 @@ describe('unified authentication GraphQL service', () => {
       'bearer',
       expect.stringMatching(/^\\x[0-9a-f]{64}$/),
       null,
-      null
+      null,
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/)
     ]);
+  });
+
+  it('creates the same handoff continuation for reusable authentication', async () => {
+    const { context, query } = makeContext({
+      user_id: '00000000-0000-0000-0000-000000000011',
+      callback_url: 'https://portal.example.com/auth/complete',
+      site_state: opaque,
+      handoff_expires_at: '2026-08-10T00:01:00.000Z'
+    }, { userId: '00000000-0000-0000-0000-000000000011' });
+    const service = createUnifiedAuthService(false);
+
+    const result = await service.confirm(
+      { constructive: context, browserBinding: opaque },
+      { transactionId: opaque }
+    );
+
+    expect(result.continuationUrl).toMatch(
+      /^https:\/\/portal\.example\.com\/auth\/complete\?handoff=/
+    );
+    expect(query.mock.calls[0][0]).toContain(
+      '"tenant_acme_sso_private"."confirm_unified_login"'
+    );
+    expect(query.mock.calls[0][1]).toEqual([
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/),
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/)
+    ]);
+  });
+
+  it('creates the shared handoff through the registration wrapper', async () => {
+    const { context, query } = makeContext({
+      id: '00000000-0000-0000-0000-000000000010',
+      user_id: '00000000-0000-0000-0000-000000000011',
+      access_token: 'cnc_live_bt_registration',
+      access_token_expires_at: '2026-08-10T00:00:00.000Z',
+      is_verified: false,
+      totp_enabled: false,
+      mfa_required: false,
+      callback_url: 'https://portal.example.com/auth/complete',
+      site_state: opaque,
+      handoff_expires_at: '2026-08-10T00:01:00.000Z'
+    });
+    const service = createUnifiedAuthService(false);
+
+    await expect(service.signUp(
+      { constructive: context, browserBinding: opaque },
+      {
+        transactionId: opaque,
+        email: 'new@example.com',
+        password: 'correct horse battery staple'
+      }
+    )).resolves.toMatchObject({
+      accessToken: 'cnc_live_bt_registration',
+      continuationUrl: expect.stringMatching(/handoff=/)
+    });
+    expect(query.mock.calls[0][0]).toContain(
+      '"tenant_acme_sso_private"."sign_up_unified_login"'
+    );
+  });
+
+  it('redeems through an authenticated routed Site runtime API key', async () => {
+    const { context, query } = makeContext({
+      id: '00000000-0000-0000-0000-000000000030',
+      user_id: '00000000-0000-0000-0000-000000000031',
+      access_token: 'cnc_live_bt_site',
+      access_token_expires_at: '2026-08-10T01:00:00.000Z',
+      is_verified: true,
+      totp_enabled: false,
+      mfa_required: false,
+      return_to: '/approvals/42'
+    }, { runtime: true });
+    const service = createUnifiedAuthService(false);
+    const handoffCode = 'h'.repeat(43);
+
+    await expect(service.redeem(
+      { constructive: context },
+      { handoffCode }
+    )).resolves.toMatchObject({
+      accessToken: 'cnc_live_bt_site',
+      returnTo: '/approvals/42'
+    });
+    expect(query.mock.calls[0][0]).toContain(
+      '"tenant_acme_sso_private"."redeem_sso_handoff"'
+    );
+    expect(query.mock.calls[0][1]).toEqual([
+      expect.stringMatching(/^\\x[0-9a-f]{64}$/)
+    ]);
+  });
+
+  it('does not let an auth-center browser credential redeem a Site handoff', async () => {
+    const { context, query } = makeContext();
+    const service = createUnifiedAuthService(false);
+
+    await expect(service.redeem(
+      { constructive: context },
+      { handoffCode: 'h'.repeat(43) }
+    )).rejects.toMatchObject({ code: 'UNAUTHENTICATED' });
+    expect(query).not.toHaveBeenCalled();
   });
 
   it('starts Provider authentication without exposing transaction or PKCE secrets', async () => {
