@@ -1,14 +1,13 @@
 import { errors } from '@constructive-io/errors';
 import type {
   ConstructiveContext,
-  IdentityProviderConfig,
-  IdentityProvidersModule,
   SsoSurface
 } from '@constructive-io/express-context';
 import {
-  getProviderAdapter,
-  getProviderAdapterKinds,
-  type IdentityProviderConfiguration
+  generateCodeVerifier,
+  generateOidcNonce,
+  generateOpaqueState,
+  validateProviderCallbackUri
 } from '@constructive-io/oauth';
 
 import {
@@ -17,9 +16,16 @@ import {
   signUpUnifiedLogin,
   startUnifiedLogin
 } from './db-contract';
+import {
+  loadProviderDisplayOptions,
+  resolveConfiguredProvider
+} from './provider-config';
+import { startProviderOAuthRequest } from './provider-db-contract';
 import type {
   ContinueUnifiedLoginInput,
   ProviderDisplayOption,
+  StartProviderAuthenticationInput,
+  StartProviderAuthenticationPayload,
   StartUnifiedLoginInput,
   StartUnifiedLoginPayload,
   UnifiedAuthGraphQLContext,
@@ -65,6 +71,15 @@ const requireBrowserBinding = (
   return graphQLContext.browserBinding;
 };
 
+const requireRequestOrigin = (context: ConstructiveContext): string => {
+  if (!context.requestOrigin) {
+    throw errors.INTERNAL_FAILURE({
+      details: 'The routed authentication-center origin is unavailable.'
+    });
+  }
+  return context.requestOrigin;
+};
+
 const validateStartInput = (input: StartUnifiedLoginInput): void => {
   if (!SITE_STATE.test(input.siteState)) {
     throw errors.INVALID_SSO_SITE_STATE();
@@ -81,67 +96,6 @@ const validateStartInput = (input: StartUnifiedLoginInput): void => {
   if (input.callbackUrl && input.callbackUrl.length > 2048) {
     throw errors.INVALID_SSO_CALLBACK();
   }
-};
-
-const toOAuthConfiguration = (
-  provider: IdentityProviderConfig
-): IdentityProviderConfiguration => ({
-  slug: provider.slug,
-  kind: provider.kind,
-  displayName: provider.displayName,
-  enabled: provider.enabled,
-  clientId: provider.clientId,
-  clientSecret: provider.clientSecret,
-  authorizationUrl: provider.authorizationUrl,
-  tokenUrl: provider.tokenUrl,
-  userinfoUrl: provider.userinfoUrl,
-  issuerUrl: provider.issuerUrl,
-  discoveryDoc: provider.discoveryDoc,
-  jwks: provider.jwks,
-  acceptableClientIds: provider.acceptableClientIds,
-  scopes: provider.scopes,
-  extraAuthorizationParams: provider.extraAuthorizationParams,
-  emailOptional: provider.emailOptional,
-  skipNonceCheck: provider.skipNonceCheck,
-  pkceEnabled: provider.pkceEnabled
-});
-
-const providerDisplayOptions = (
-  module: IdentityProvidersModule | undefined
-): ProviderDisplayOption[] => {
-  if (!module) return [];
-  const supportedKinds = new Set(getProviderAdapterKinds());
-  const options: ProviderDisplayOption[] = [];
-
-  for (const provider of Object.values(module.providers)) {
-    if (!provider.enabled || !supportedKinds.has(provider.kind)) continue;
-    try {
-      getProviderAdapter(provider.kind).validateConfiguration(
-        toOAuthConfiguration(provider)
-      );
-    } catch (cause) {
-      throw errors.IDENTITY_PROVIDER_NOT_CONFIGURED(
-        {},
-        undefined,
-        { cause }
-      );
-    }
-    options.push({ key: provider.slug, displayName: provider.displayName });
-  }
-
-  return options.sort((left, right) =>
-    left.displayName.localeCompare(right.displayName) ||
-    left.key.localeCompare(right.key)
-  );
-};
-
-const loadProviderDisplayOptions = async (
-  context: ConstructiveContext,
-  oauthEnabled: boolean
-): Promise<ProviderDisplayOption[]> => {
-  if (!oauthEnabled) return [];
-  const providers = await context.useModule('identityProviders');
-  return providerDisplayOptions(providers);
 };
 
 export interface UnifiedAuthService {
@@ -162,6 +116,10 @@ export interface UnifiedAuthService {
     context: UnifiedAuthGraphQLContext,
     input: UnifiedPasswordInput
   ): Promise<UnifiedLoginCredentialPayload>;
+  startProvider(
+    context: UnifiedAuthGraphQLContext,
+    input: StartProviderAuthenticationInput
+  ): Promise<StartProviderAuthenticationPayload>;
 }
 
 export const createUnifiedAuthService = (oauthEnabled: boolean): UnifiedAuthService => ({
@@ -208,5 +166,46 @@ export const createUnifiedAuthService = (oauthEnabled: boolean): UnifiedAuthServ
     const browserBinding = requireBrowserBinding(graphQLContext);
     const surface = await resolveSsoSurface(context);
     return signUpUnifiedLogin(context, surface, input, browserBinding);
+  },
+
+  async startProvider(graphQLContext, input) {
+    if (!oauthEnabled) throw errors.OAUTH_SIGN_IN_DISABLED();
+    validateTransactionInput(input);
+    if (!input.providerKey || input.providerKey.length > 128) {
+      throw errors.IDENTITY_PROVIDER_NOT_CONFIGURED();
+    }
+    const context = requireContext(graphQLContext);
+    const browserBinding = requireBrowserBinding(graphQLContext);
+    const requestOrigin = requireRequestOrigin(context);
+    const surface = await resolveSsoSurface(context);
+    await resolveConfiguredProvider(context, input.providerKey);
+
+    let redirectUri: string;
+    try {
+      redirectUri = validateProviderCallbackUri(
+        new URL('/auth/oauth/callback', requestOrigin).toString()
+      );
+    } catch (cause) {
+      throw errors.INTERNAL_FAILURE(
+        { details: 'The authentication-center Provider callback is invalid.' },
+        undefined,
+        { cause }
+      );
+    }
+
+    const state = generateOpaqueState();
+    await startProviderOAuthRequest(context, surface, {
+      transactionId: input.transactionId,
+      providerKey: input.providerKey,
+      state,
+      codeVerifier: generateCodeVerifier(),
+      nonce: generateOidcNonce(),
+      redirectUri,
+      browserBinding
+    });
+
+    return {
+      authorizationUrl: `/auth/oauth/authorize?state=${encodeURIComponent(state)}`
+    };
   }
 });

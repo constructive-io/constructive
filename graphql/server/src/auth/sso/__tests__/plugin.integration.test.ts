@@ -53,7 +53,8 @@ describe('UnifiedAuthPlugin schema integration', () => {
         'startUnifiedLogin',
         'confirmUnifiedLogin',
         'signInUnifiedLogin',
-        'signUpUnifiedLogin'
+        'signUpUnifiedLogin',
+        'startProviderAuthentication'
       ])
     );
   });

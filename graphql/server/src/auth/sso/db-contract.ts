@@ -45,7 +45,7 @@ export const SSO_DB_FUNCTIONS = {
   signUp: 'sign_up_unified_login'
 } as const;
 
-type DatabaseRecord = Record<string, unknown>;
+export type DatabaseRecord = Record<string, unknown>;
 
 interface StartDatabaseResult {
   transactionId: string;
@@ -62,14 +62,14 @@ const invalidDatabaseResult = (operation: string, cause?: unknown): Error =>
     cause === undefined ? undefined : { cause }
   );
 
-const asRecord = (value: unknown, operation: string): DatabaseRecord => {
+export const asRecord = (value: unknown, operation: string): DatabaseRecord => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw invalidDatabaseResult(operation);
   }
   return value as DatabaseRecord;
 };
 
-const requiredString = (
+export const requiredString = (
   row: DatabaseRecord,
   field: string,
   operation: string
@@ -81,7 +81,7 @@ const requiredString = (
   return value;
 };
 
-const optionalString = (
+export const optionalString = (
   row: DatabaseRecord,
   field: string,
   operation: string
@@ -92,7 +92,7 @@ const optionalString = (
   return value;
 };
 
-const requiredBoolean = (
+export const requiredBoolean = (
   row: DatabaseRecord,
   field: string,
   operation: string
@@ -102,7 +102,7 @@ const requiredBoolean = (
   return value;
 };
 
-type SqlCast = 'boolean' | 'bytea' | 'text' | 'uuid';
+export type SqlCast = 'boolean' | 'bytea' | 'jsonb' | 'text' | 'uuid';
 
 const castValue = (
   value: ReturnType<typeof sql.value>,
@@ -113,6 +113,8 @@ const castValue = (
     return sql.fragment`${value}::boolean`;
   case 'bytea':
     return sql.fragment`${value}::bytea`;
+  case 'jsonb':
+    return sql.fragment`${value}::jsonb`;
   case 'text':
     return sql.fragment`${value}::text`;
   case 'uuid':
@@ -120,7 +122,7 @@ const castValue = (
   }
 };
 
-const callFunction = async (
+export const callFunction = async (
   context: ConstructiveContext,
   surface: SsoSurface,
   functionName: string,
