@@ -25,6 +25,7 @@ exports[`Export Flow E2E Export to second workspace should match snapshot for se
   "migrate/apis.sql",
   "migrate/app_module.sql",
   "migrate/catalog_module.sql",
+  "migrate/catalog_private.apis.sql",
   "migrate/database.sql",
   "migrate/database_settings_module.sql",
   "migrate/domain_module.sql",

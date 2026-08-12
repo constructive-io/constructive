@@ -592,6 +592,16 @@
       "table": "routes"
     },
     {
+      "key": "hostname_bindings",
+      "schema": "routing_public",
+      "table": "hostname_bindings"
+    },
+    {
+      "key": "route_bindings",
+      "schema": "routing_public",
+      "table": "route_bindings"
+    },
+    {
       "key": "site_app_links",
       "schema": "routing_public",
       "table": "site_app_links"
@@ -670,11 +680,6 @@
       "key": "catalog_private.domains",
       "schema": "catalog_private",
       "table": "domains"
-    },
-    {
-      "key": "functions",
-      "schema": "catalog_private",
-      "table": "functions"
     },
     {
       "key": "namespaces",
@@ -955,6 +960,12 @@
     ],
     "routing_public.routes": [
       "created_at",
+      "updated_at"
+    ],
+    "routing_public.hostname_bindings": [
+      "updated_at"
+    ],
+    "routing_public.route_bindings": [
       "updated_at"
     ],
     "routing_public.site_app_links": [

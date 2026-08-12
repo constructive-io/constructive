@@ -178,6 +178,13 @@ export interface TableConfig {
   conflictDoNothing?: boolean;
   typeOverrides?: Record<string, FieldType>; // only for special types (image, upload, url) that can't be inferred
   gqlTypeName?: string; // override for GraphQL type name when automatic derivation doesn't match PostGraphile's inflector
+  /**
+   * Table has no database_id column; rows belong to a tenant through their
+   * domain_id FK (e.g. hostname_bindings, route_bindings). The export filters
+   * them by `domainId in (<tenant's domain ids>)` — the tenant's domain ids
+   * are pre-fetched once per export run.
+   */
+  filterViaDomainIds?: boolean;
   /** Columns whose values are environment-specific and should be excluded from the
    *  exported INSERT so that the column's DDL DEFAULT applies at deploy time.
    *  Key = column name, Value = the SQL expression the column defaults to (for documentation).
@@ -205,6 +212,12 @@ export interface MetaExportTableEntry {
  * values must come from DDL defaults at deploy time.
  */
 export const META_TABLE_OVERRIDES: Record<string, Omit<TableConfig, 'schema' | 'table'>> = {
+  hostname_bindings: {
+    filterViaDomainIds: true
+  },
+  route_bindings: {
+    filterViaDomainIds: true
+  },
   sites: {
     typeOverrides: {
       og_image: 'image',

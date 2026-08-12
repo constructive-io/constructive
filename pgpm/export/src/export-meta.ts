@@ -3,6 +3,7 @@ import { Parser } from 'csv-to-pg';
 import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 
+import { projectCatalogApis } from './catalog-projection';
 import { FieldType, getTableColumnsWithDefaults, isTimestampDefaultColumn,mapPgTypeToFieldType, META_TABLE_CONFIG, META_TABLE_ORDER, TableConfig } from './export-utils';
 
 /**
@@ -84,6 +85,9 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
     database: dbname
   });
   const sql: Record<string, string> = {};
+  // Raw rows per key (post column-default stripping), kept for derived
+  // projections (see catalog plane projection below).
+  const rawRows: Record<string, Record<string, unknown>[]> = {};
 
   // Cache for dynamically built parsers and their field configs
   const parsers: Record<string, Parser> = {};
@@ -160,6 +164,8 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
           }
         }
 
+        rawRows[key] = result.rows;
+
         const parsed = await parser.parse(result.rows);
         if (parsed) {
           sql[key] = parsed;
@@ -179,8 +185,27 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   // itself, which is keyed by id.
   for (const key of META_TABLE_ORDER) {
     const tableConfig = META_TABLE_CONFIG[key];
-    const filterColumn = key === 'database' ? 'id' : 'database_id';
-    await queryAndParse(key, `SELECT * FROM ${tableConfig.schema}.${tableConfig.table} WHERE ${filterColumn} = $1 ORDER BY id`);
+    // Binding tables (hostname_bindings, route_bindings) carry no database_id;
+    // tenant ownership flows through domain_id → routing_public.domains.
+    const filterSql = key === 'database'
+      ? 'id = $1'
+      : tableConfig.filterViaDomainIds
+        ? 'domain_id IN (SELECT id FROM routing_public.domains WHERE database_id = $1)'
+        : 'database_id = $1';
+    await queryAndParse(key, `SELECT * FROM ${tableConfig.schema}.${tableConfig.table} WHERE ${filterSql} ORDER BY id`);
+  }
+
+  // Catalog plane projection: catalog_private.apis is trigger-derived from
+  // routing_public.apis (catalog_private.tg_apis_catalog_sync). The sync
+  // trigger is skipped during migration replay (session_replication_role),
+  // so the projection is materialized here. Shared with the GraphQL flow
+  // (see catalog-projection.ts) for cross-flow parity.
+  const apisRows = rawRows['apis'];
+  if (sql['apis'] && apisRows?.length) {
+    const parsed = await projectCatalogApis(apisRows);
+    if (parsed) {
+      sql['catalog_private.apis'] = parsed;
+    }
   }
 
   return sql;
