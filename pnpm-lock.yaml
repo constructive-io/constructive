@@ -225,6 +225,9 @@ importers:
 
   agentic/pi:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@agentic-kit/harness':
         specifier: workspace:^
         version: link:../harness/dist

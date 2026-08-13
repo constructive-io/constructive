@@ -1,18 +1,21 @@
 import type { CleanedEnv, CleanOptions, Spec,ValidatorSpec } from 'envalid';
 import {
+  applyDefaultMiddleware,
   bool,
-  cleanEnv as envalidCleanEnv,
+  customCleanEnv,
   email,
   EnvError,
   EnvMissingError,
   host,
   json,
   makeValidator,
-  num,
   port,
   str,
   testOnly,
   url} from 'envalid';
+
+import { type EnvCheck, runChecks } from './checks';
+import { isSecretSpec, redactMessage, stripSecret, withRedactedSerialization } from './redact';
 
 /**
  * NODE_ENV resolved with "house" semantics.
@@ -86,15 +89,43 @@ const withResolvedNodeEnv = (
 };
 
 /**
- * Custom reporter that throws an error instead of calling process.exit
- * This allows errors to be caught and handled properly in tests and applications
+ * Reporter that throws instead of calling `process.exit`, so errors can be
+ * caught and handled in tests and applications. It also owns the two things
+ * envalid's own reporter cannot do: it REDACTS values for vars marked secret
+ * (envalid quotes the offending value into its message), and it runs the
+ * cross-field `checks` so their failures join the same consolidated report
+ * rather than throwing separately after the call.
  */
-const throwingReporter = <T>({ errors }: { errors: Partial<Record<keyof T, Error>> }) => {
-  const errorKeys = Object.keys(errors) as (keyof T)[];
-  if (errorKeys.length > 0) {
-    const missingVars = errorKeys.map((key) => `${String(key)}: ${errors[key]?.message ?? 'unknown error'}`);
-    throw new EnvError(`Missing or invalid environment variables:\n  ${missingVars.join('\n  ')}`);
-  }
+const makeReporter =
+  <T>(
+    environment: Record<string, string | undefined>,
+    secretNames: ReadonlySet<string>,
+    checks: readonly EnvCheck<never>[]
+  ) =>
+    ({ errors, env: cleaned }: { errors: Partial<Record<keyof T, Error>>; env: unknown }) => {
+      const failedVars = new Set(Object.keys(errors));
+      const lines = [...failedVars].map((name) => {
+        const error = errors[name as keyof T];
+        const message = !error
+          ? 'unknown error'
+          : secretNames.has(name)
+            ? redactMessage(error, environment[name])
+            : error.message;
+        return `${name}: ${message}`;
+      });
+
+      for (const failure of runChecks(checks, cleaned as never, failedVars)) {
+        lines.push(`${failure.vars.join(', ')}: ${failure.message}`);
+      }
+
+      if (lines.length > 0) {
+        throw new EnvError(`Missing or invalid environment variables:\n  ${lines.join('\n  ')}`);
+      }
+    };
+
+export type EnvOptions<S> = CleanOptions<S> & {
+  /** Constraints between vars, evaluated over the cleaned values. */
+  checks?: readonly EnvCheck<never>[];
 };
 
 /**
@@ -104,12 +135,26 @@ const throwingReporter = <T>({ errors }: { errors: Partial<Record<keyof T, Error
 const cleanEnv = <S extends Record<string, ValidatorSpec<unknown>>>(
   environment: Record<string, string | undefined>,
   specs: S,
-  options?: CleanOptions<S>
+  options?: EnvOptions<S>
 ): CleanedEnv<S> => {
-  return envalidCleanEnv(withResolvedNodeEnv(environment), specs, {
-    reporter: throwingReporter,
-    ...options
-  });
+  const { checks = [], ...cleanOptions } = options ?? {};
+  const secretNames = new Set(
+    Object.entries(specs)
+      .filter(([, spec]) => isSecretSpec(spec))
+      .map(([name]) => name)
+  );
+  // customCleanEnv, not cleanEnv: the redacting serializers have to be defined
+  // on the plain cleaned object, before envalid proxies and freezes it.
+  return customCleanEnv(
+    withResolvedNodeEnv(environment),
+    stripSecret(specs),
+    (plainCleaned, rawEnvironment) =>
+      applyDefaultMiddleware(withRedactedSerialization(plainCleaned, secretNames), rawEnvironment),
+    {
+      reporter: makeReporter<S>(environment, secretNames, checks),
+      ...cleanOptions
+    }
+  ) as CleanedEnv<S>;
 };
 
 // ── Fallback classes ─────────────────────────────────────────────────────────
@@ -126,7 +171,10 @@ const cleanEnv = <S extends Record<string, ValidatorSpec<unknown>>>(
 // `devDefault` relies on the NODE_ENV normalization above, so it is enforced in
 // production even when NODE_ENV is only implicitly set.
 
-type ValidatorFactory<T> = (spec?: Spec<T>) => ValidatorSpec<T>;
+// Loosely typed on purpose: a house validator takes a wider spec than envalid's
+// (`list`'s per-item `choices`, `num`'s `min`/`max`), and these wrappers only
+// ever add a default to it.
+type ValidatorFactory<T> = (spec?: Spec<T> | any) => ValidatorSpec<T>;
 
 /** Class 1 — always resolves to `defaultValue` when the var is unset. */
 const withDefault = <T>(
@@ -197,9 +245,15 @@ type Specs = Record<string, ValidatorSpec<unknown>>;
 /**
  * Validate environment variables
  *
+ * Everything declared in `secrets` is treated as sensitive: its value is never
+ * printed in a validation error, and it is redacted from `JSON.stringify`/
+ * `util.inspect` output of the returned object. Mark a var in `vars` the same
+ * way with `str({ secret: true })`.
+ *
  * @param inputEnv - The environment object (usually process.env)
  * @param secrets - Required environment variables (validated with envalid)
  * @param vars - Optional environment variables (validated with envalid)
+ * @param options - `checks` for constraints between vars
  * @returns Validated and cleaned environment object
  *
  * @example
@@ -213,6 +267,9 @@ type Specs = Record<string, ValidatorSpec<unknown>>;
  *   {
  *     PORT: port({ default: 3000 }),
  *     DEBUG: bool({ default: false })
+ *   },
+ *   {
+ *     checks: [distinct(['CONTROL_USER', 'UPSTREAM_USER'])]
  *   }
  * );
  * ```
@@ -220,13 +277,19 @@ type Specs = Record<string, ValidatorSpec<unknown>>;
 const env = <S extends Specs, V extends Specs>(
   inputEnv: Record<string, string | undefined>,
   secrets: S = {} as S,
-  vars: V = {} as V
+  vars: V = {} as V,
+  options: EnvOptions<S & V> = {}
 ): CleanedEnv<S & V> => {
-  // First pass: validate optional vars
+  const secretSpecs = Object.fromEntries(
+    Object.entries(secrets).map(([name, spec]) => [name, { ...spec, secret: true }])
+  ) as unknown as S;
+
+  // First pass: validate optional vars. Cross-field checks are deferred to the
+  // second pass, where the secrets are cleaned too and the check can see them.
   const varEnv = cleanEnv(inputEnv, vars);
 
   const mergedEnv = { ...inputEnv, ...varEnv } as unknown as Record<string, string | undefined>;
-  return cleanEnv(mergedEnv, { ...secrets, ...vars }) as unknown as CleanedEnv<S & V>;
+  return cleanEnv(mergedEnv, { ...secretSpecs, ...vars }, options as EnvOptions<S & V>) as unknown as CleanedEnv<S & V>;
 };
 
 export {
@@ -242,7 +305,6 @@ export {
   host,
   json,
   makeValidator,
-  num,
   // Lenient coercion
   parseEnvBoolean,
   parseEnvList,
@@ -254,5 +316,29 @@ export {
   url,
   // Fallback-class wrappers
   withDefault};
+
+// House validators: csv lists, bounded numbers, durations, string enums.
+// `num` shadows envalid's on purpose — same acceptance, plus min/max/integer.
+export {
+  duration,
+  type DurationSpec,
+  enumerated,
+  int,
+  list,
+  type ListSpec,
+  num,
+  type NumSpec,
+  oneOf} from './validators';
+
+// Cross-field checks.
+export {
+  distinct,
+  type EnvCheck,
+  mutuallyExclusive,
+  requiredWhen,
+  runChecks} from './checks';
+
+// Secret handling.
+export { redactEnvError, type SecretSpec } from './redact';
 
 export type { CleanedEnv, Spec,ValidatorSpec };
