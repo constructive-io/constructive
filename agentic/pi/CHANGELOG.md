@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.13.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.12.0...@agentic-kit/pi@0.13.0) (2026-08-13)
+
+### Features
+
+- **harness:** make the whole gate policy host-supplied ([d679814](https://github.com/constructive-io/constructive/commit/d6798140ccfc24b85013a55b0464a2c93e9db29d))
+
 # [0.12.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.11.1...@agentic-kit/pi@0.12.0) (2026-08-13)
 
 ### Features
