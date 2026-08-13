@@ -90,6 +90,13 @@ export {
   RequiredInputPreset,
 } from './required-input-plugin';
 
+// Convenience re-export; implementation is owned by the independent package.
+export {
+  ConstructivePgIntrospectionPlugin,
+  ScopedIntrospectionPreset,
+  scopedIntrospectionUpstreamContract,
+} from 'graphile-scoped-introspection';
+
 // Unified search — tsvector + BM25 + pg_trgm + pgvector behind a single adapter architecture
 export type {
   Bm25AdapterOptions,
