@@ -64,9 +64,16 @@ export {
   createConfirmGate,
 } from './confirm-gate';
 export {
+  CONTEXT_ENV_KEYS,
+  CONTEXT_ENV_PREFIX,
+  type ContextEnvKey,
+  type ContextSource,
   deriveSubdomainEndpoint,
+  fromEnvFile,
+  fromEnvironment,
   type ModulesClient,
   type ProjectContext,
+  type ProjectContextFailureCode,
   resolveDataToken,
   resolveProjectContext,
 } from './context';

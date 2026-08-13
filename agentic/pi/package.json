@@ -29,6 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "12factor-env": "workspace:^",
     "@agentic-kit/harness": "workspace:^",
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/sdk": "workspace:^",

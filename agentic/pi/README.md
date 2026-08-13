@@ -38,6 +38,36 @@ const dbTools = createDbTools({
 pi.use(dbTools);
 ```
 
+## Project context
+
+The tools need a bound database: an access key, a database id, and optionally endpoint/name pins. Where those values come from is the host's choice — `resolveProjectContext` takes values, not a directory:
+
+```ts
+import { fromEnvironment, resolveProjectContext } from '@agentic-kit/pi';
+
+// headless: container, Job, CI — nothing on disk, nothing to commit
+await resolveProjectContext(fromEnvironment());
+
+// local project: read <cwd>/.env (what Desktop and the CLI do)
+await resolveProjectContext(cwd);
+
+// anything else: a record, or a lookup function into a secret store
+await resolveProjectContext((name) => vault.get(name));
+```
+
+Injected variables carry a `CONSTRUCTIVE_` prefix; the bare names are also accepted (that is what the scaffolder writes into a project `.env`), with the prefixed spelling winning:
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `CONSTRUCTIVE_ACCESS_TOKEN` | yes | project data-plane key |
+| `CONSTRUCTIVE_DATABASE_ID` | yes | bound database |
+| `CONSTRUCTIVE_DATABASE_NAME` | no | derives the per-db data endpoint |
+| `CONSTRUCTIVE_API_ENDPOINT` | no | data-plane api pin |
+| `CONSTRUCTIVE_MODULES_ENDPOINT` | no | data-plane modules pin |
+| `CONSTRUCTIVE_OWNER_ID` | no | owner fallback when the probe omits it |
+
+Endpoint pins from the source apply to the **data plane only**. The control plane (binding probe, schema resolution, blueprint/schema tools) always uses the host's `backendConfig()` and the account bearer, so an untrusted cloned project cannot redirect it.
+
 ## Provisioning
 
 `provision_database` requests a database through the `requestDatabase` mutation on the api endpoint. When the requested module set matches a cataloged preset, the backend claims a warm pre-baked database in seconds. Otherwise a background job provisions the database cold. The tool polls the provision ticket on the modules endpoint until the database and its owner bootstrap are complete. Then it writes the credentials to the project `.env` and returns.
