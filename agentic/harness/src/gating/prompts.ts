@@ -18,9 +18,12 @@ export const MUTATING_DB_TOOLS = new Set<string>([
 ]);
 
 import { filterInternalPolicies } from '../blueprint/internal-policies';
-import type { ConfirmPreview, ConfirmPreviewField, ConfirmPreviewTable } from './preview';
-
-export type ConfirmPrompt = { title: string; message: string; preview?: ConfirmPreview };
+import type {
+  ConfirmPreview,
+  ConfirmPreviewField,
+  ConfirmPreviewTable,
+  ConfirmPrompt,
+} from './preview';
 
 function str(input: Record<string, unknown> | undefined, key: string): string | undefined {
   const value = input?.[key];

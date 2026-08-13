@@ -1,5 +1,6 @@
 import { ConfirmGate, ConfirmGateDeps, createConfirmGate, GateHost } from '../src/gating/confirm-gate';
 import { createDeclineGuard } from '../src/gating/decline-guard';
+import type { GatePolicy } from '../src/gating/policy';
 import { buildConfirmPrompt, MUTATING_DB_TOOLS } from '../src/gating/prompts';
 
 type Harness = {
@@ -281,6 +282,75 @@ describe('confirm gate: the gated-tool set is injectable', () => {
       await gate.onToolCall(call('provision_database', 'tc-1', {}), host, CWD)
     ).toBeUndefined();
     expect(confirmCalls()).toBe(0);
+  });
+});
+
+describe('confirm gate: a host can supply its own policy', () => {
+  // What a remote coding host wants: gate the shell, and only when the command
+  // is destructive. Nothing Constructive-specific, no project context.
+  function createShellHostHarness() {
+    let confirmed: { title: string; message: string } | undefined;
+    const host: GateHost = {
+      hasUI: true,
+      confirmTool: async (_toolCallId, title, message) => {
+        confirmed = { title, message };
+        return false;
+      },
+      notifyToolSkipped: () => undefined,
+    };
+    const policy: GatePolicy = {
+      isGated: (event) => event.toolName === 'bash',
+      resolvePrompt: async (event) => {
+        const command = typeof event.input?.command === 'string' ? event.input.command : '';
+        if (!/rm -rf|push --force/.test(command)) return null;
+        return { title: 'Run a destructive command?', message: `Allow \`${command}\`?` };
+      },
+    };
+    return { gate: createConfirmGate({ policy }), host, confirmed: () => confirmed };
+  }
+
+  it('gates the host\'s tool and ignores the Constructive default set', async () => {
+    const { gate, host, confirmed } = createShellHostHarness();
+
+    const gated = await gate.onToolCall(call('bash', 'tc-1', { command: 'rm -rf /src' }), host, CWD);
+    expect(gated?.block).toBe(true);
+    expect(gated?.reason).toMatch(/declined it/);
+    expect(confirmed()?.title).toBe('Run a destructive command?');
+    expect(confirmed()?.message).toContain('rm -rf /src');
+
+    // delete_table is in MUTATING_DB_TOOLS, but this host's policy never gates it.
+    expect(
+      await gate.onToolCall(call('delete_table', 'tc-2', { table_name: 'users' }), host, CWD)
+    ).toBeUndefined();
+  });
+
+  it('lets the policy wave a gated tool through on its arguments', async () => {
+    const { gate, host, confirmed } = createShellHostHarness();
+    expect(
+      await gate.onToolCall(call('bash', 'tc-1', { command: 'ls -la' }), host, CWD)
+    ).toBeUndefined();
+    expect(confirmed()).toBeUndefined();
+  });
+
+  it('still applies the decline memory and the headless block', async () => {
+    const { gate, host } = createShellHostHarness();
+    const input = { command: 'git push --force' };
+
+    await gate.onToolCall(call('bash', 'tc-1', input), host, CWD);
+    const retry = await gate.onToolCall(call('bash', 'tc-2', input), host, CWD);
+    expect(retry?.reason).toMatch(/already declined/);
+
+    const headless: GateHost = {
+      hasUI: false,
+      confirmTool: async () => true,
+      notifyToolSkipped: () => undefined,
+    };
+    const blocked = await gate.onToolCall(
+      call('bash', 'tc-3', { command: 'rm -rf /src' }),
+      headless,
+      CWD
+    );
+    expect(blocked?.reason).toMatch(/no confirmation UI/);
   });
 });
 
