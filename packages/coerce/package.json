@@ -1,8 +1,8 @@
 {
-  "name": "12factor-env",
-  "version": "1.28.0",
+  "name": "@constructive-io/coerce",
+  "version": "0.0.1",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Environment variable validation for 12-factor apps",
+  "description": "Coerce untrusted unknown values into narrow TypeScript types",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -28,20 +28,12 @@
     "test": "jest",
     "test:watch": "jest --watch"
   },
-  "dependencies": {
-    "@constructive-io/coerce": "workspace:^",
-    "envalid": "^8.2.0"
-  },
   "devDependencies": {
-    "@types/node": "^22.19.11",
-    "makage": "^0.3.0",
-    "ts-node": "^10.9.2"
+    "makage": "^0.3.0"
   },
   "keywords": [
-    "environment",
-    "env",
+    "coerce",
     "validation",
-    "12factor",
-    "constructive"
+    "typescript"
   ]
 }

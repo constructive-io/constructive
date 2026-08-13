@@ -1,3 +1,4 @@
+import { asBoolean, asNumber, asString, asStringList } from '@constructive-io/coerce';
 import type { CleanedEnv, CleanOptions, Spec,ValidatorSpec } from 'envalid';
 import {
   applyDefaultMiddleware,
@@ -197,47 +198,38 @@ const required = <T>(
 ): ValidatorSpec<T> => validator({ ...spec });
 
 // ── Lenient coercion helpers ─────────────────────────────────────────────────
+//
+// Thin env-shaped adapters over `@constructive-io/coerce`: the coercion rules
+// themselves are shared with every other runtime value in the house, and only
+// the env convention — "unset or blank means `undefined`, not a default" —
+// lives here.
 
 /**
- * Parse a boolean env value leniently: `true`/`1`/`yes` (case-insensitive) are
- * true, everything else (including unset/blank => undefined) is false. Matches
- * `@pgpmjs/env`'s `parseEnvBoolean`.
+ * Parse a boolean env value leniently: `true`/`1`/`yes`/`on`/`t`/`y`
+ * (case-insensitive) are true, an unrecognised spelling is false, and
+ * unset/blank is `undefined`. Matches `@pgpmjs/env`'s `parseEnvBoolean`.
  */
-const parseEnvBoolean = (val?: string): boolean | undefined => {
-  if (val === undefined || val === '') return undefined;
-  return ['true', '1', 'yes'].includes(val.trim().toLowerCase());
-};
+const parseEnvBoolean = (val?: string): boolean | undefined =>
+  asString(val) === null ? undefined : asBoolean(val) ?? false;
 
 /** Parse a numeric env value; unset/blank/non-finite => undefined. */
-const parseEnvNumber = (val?: string): number | undefined => {
-  if (val === undefined || val === '') return undefined;
-  const n = Number(val);
-  return Number.isFinite(n) ? n : undefined;
-};
+const parseEnvNumber = (val?: string): number | undefined =>
+  asString(val) === null ? undefined : asNumber(Number(val)) ?? undefined;
 
 /**
  * Parse a comma-separated env value into a trimmed, non-empty string list;
  * unset/blank => undefined.
  */
-const parseEnvList = (val?: string): string[] | undefined => {
-  if (!val) return undefined;
-  return val
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-};
+const parseEnvList = (val?: string): string[] | undefined => asStringList(val) ?? undefined;
 
 /**
  * Lenient boolean validator. Unlike envalid's built-in `bool` (which rejects
- * e.g. `TRUE`/`yes`), this accepts `true`/`1`/`yes` case-insensitively. Safe to
+ * e.g. `TRUE`/`yes`), this accepts every spelling `asBoolean` knows
+ * (`true`/`1`/`yes`/`on`/`t`/`y`) case-insensitively. Safe to
  * combine with a boolean `default`/`devDefault` (envalid also runs the validator
  * against the typed default).
  */
-const boolish = makeValidator<boolean>((value: string) => {
-  const raw = value as unknown;
-  if (typeof raw === 'boolean') return raw;
-  return parseEnvBoolean(String(raw)) ?? false;
-});
+const boolish = makeValidator<boolean>((value: string) => asBoolean(value) ?? false);
 
 // Type for specs object
 type Specs = Record<string, ValidatorSpec<unknown>>;

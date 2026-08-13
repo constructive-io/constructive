@@ -246,6 +246,13 @@ describe('env', () => {
       expect(parseEnvBoolean('')).toBeUndefined();
     });
 
+    it('parseEnvBoolean inherits the shared spellings, unknown ones staying false', () => {
+      expect(parseEnvBoolean('on')).toBe(true);
+      expect(parseEnvBoolean('y')).toBe(true);
+      expect(parseEnvBoolean('off')).toBe(false);
+      expect(parseEnvBoolean('maybe')).toBe(false);
+    });
+
     it('parseEnvNumber parses finite numbers only', () => {
       expect(parseEnvNumber('42')).toBe(42);
       expect(parseEnvNumber('3.14')).toBe(3.14);
