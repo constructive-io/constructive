@@ -5,24 +5,35 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@dataplan/json': 1.0.1
+  '@dataplan/pg': 1.1.1
+  '@graphile-contrib/pg-many-to-many': 2.0.0-rc.2
+  '@graphile/lru': 5.0.0
+  '@smithy/node-http-handler': <4.5.0
   grafast: 1.1.2
   grafserv: 1.0.1
   graphile-build: 5.1.1
   graphile-build-pg: 5.1.3
   graphile-config: 1.1.0
   graphile-utils: 5.0.3
-  postgraphile: 5.1.4
-  pg-sql2: 5.0.1
-  pg-introspection: 1.0.1
-  tamedevil: 0.1.1
-  '@dataplan/pg': 1.1.1
-  '@dataplan/json': 1.0.1
-  '@graphile/lru': 5.0.0
-  '@graphile-contrib/pg-many-to-many': 2.0.0-rc.2
   graphql: 16.13.0
-  '@smithy/node-http-handler': <4.5.0
+  pg-introspection: 1.0.1
+  pg-sql2: 5.0.1
+  postgraphile: 5.1.4
+  tamedevil: 0.1.1
 
 packageExtensionsChecksum: sha256-x8B4zkJ4KLRX+yspUWxuggXWlz6zrBLSIh72pNhpPiE=
+
+patchedDependencies:
+  '@dataplan/pg':
+    hash: a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2
+    path: patches/@dataplan__pg.patch
+  graphile-build-pg:
+    hash: 8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5
+    path: patches/graphile-build-pg.patch
+  pg-introspection@1.0.1:
+    hash: 004a0acc578342e50b175514c03b45108e9d3a85e8928696b0fdaef995ec4b25
+    path: patches/pg-introspection@1.0.1.patch
 
 importers:
   .:
@@ -373,19 +384,19 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
       graphile-utils:
         specifier: 5.0.3
-        version: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+        version: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql:
         specifier: 16.13.0
         version: 16.13.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(138876491c004694bff1843ee79c8872)
+        version: 5.1.4(564ecc69f17f317514da2378ea0ee7d1)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -399,7 +410,7 @@ importers:
     dependencies:
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       grafast:
         specifier: 1.1.2
         version: 1.1.2(graphql@16.13.0)
@@ -408,7 +419,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -420,7 +431,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(138876491c004694bff1843ee79c8872)
+        version: 5.1.4(564ecc69f17f317514da2378ea0ee7d1)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -461,7 +472,7 @@ importers:
         version: link:../../postgres/pg-cache/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -481,13 +492,13 @@ importers:
     dependencies:
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       graphile-build:
         specifier: 5.1.1
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -502,7 +513,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a)
+        version: 5.1.4(ba6398e917e9857a0084b873121de2c9)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -525,7 +536,7 @@ importers:
         version: link:../../postgres/query-builder/dist
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -537,7 +548,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -575,7 +586,7 @@ importers:
     dependencies:
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       grafast:
         specifier: 1.1.2
         version: 1.1.2(graphql@16.13.0)
@@ -584,7 +595,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -596,7 +607,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
+        version: 5.1.4(a8630eea9ec1b1fcc351d9a56a9502d8)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -622,7 +633,7 @@ importers:
     dependencies:
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       accept-language-parser:
         specifier: ^1.5.0
         version: 1.5.0
@@ -634,7 +645,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -646,7 +657,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
+        version: 5.1.4(a8630eea9ec1b1fcc351d9a56a9502d8)
     devDependencies:
       '@types/accept-language-parser':
         specifier: ^1.5.4
@@ -684,7 +695,7 @@ importers:
         version: link:../../packages/llm-env/dist
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       grafast:
         specifier: 1.1.2
         version: 1.1.2(graphql@16.13.0)
@@ -693,7 +704,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-cache:
         specifier: workspace:^
         version: link:../graphile-cache/dist
@@ -702,7 +713,7 @@ importers:
         version: 1.1.0
       graphile-utils:
         specifier: 5.0.3
-        version: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+        version: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql:
         specifier: 16.13.0
         version: 16.13.0
@@ -711,7 +722,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(138876491c004694bff1843ee79c8872)
+        version: 5.1.4(564ecc69f17f317514da2378ea0ee7d1)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -737,7 +748,7 @@ importers:
     dependencies:
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       grafast:
         specifier: 1.1.2
         version: 1.1.2(graphql@16.13.0)
@@ -746,7 +757,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -758,7 +769,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(138876491c004694bff1843ee79c8872)
+        version: 5.1.4(564ecc69f17f317514da2378ea0ee7d1)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -784,7 +795,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -793,7 +804,7 @@ importers:
         version: 16.13.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
+        version: 5.1.4(a8630eea9ec1b1fcc351d9a56a9502d8)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -807,7 +818,7 @@ importers:
     dependencies:
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       grafast:
         specifier: 1.1.2
         version: 1.1.2(graphql@16.13.0)
@@ -816,7 +827,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -831,7 +842,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(138876491c004694bff1843ee79c8872)
+        version: 5.1.4(564ecc69f17f317514da2378ea0ee7d1)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -854,13 +865,13 @@ importers:
     dependencies:
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       graphile-build:
         specifier: 5.1.1
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -872,7 +883,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
+        version: 5.1.4(a8630eea9ec1b1fcc351d9a56a9502d8)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -886,7 +897,7 @@ importers:
     dependencies:
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       grafast:
         specifier: 1.1.2
         version: 1.1.2(graphql@16.13.0)
@@ -895,7 +906,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -907,7 +918,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a)
+        version: 5.1.4(ba6398e917e9857a0084b873121de2c9)
     devDependencies:
       '@types/geojson':
         specifier: ^7946.0.14
@@ -951,13 +962,13 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
       graphile-utils:
         specifier: 5.0.3
-        version: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+        version: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql:
         specifier: 16.13.0
         version: 16.13.0
@@ -969,7 +980,7 @@ importers:
         version: link:../../uploads/mime-bytes/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(138876491c004694bff1843ee79c8872)
+        version: 5.1.4(564ecc69f17f317514da2378ea0ee7d1)
     devDependencies:
       '@constructive-io/s3-utils':
         specifier: workspace:^
@@ -992,7 +1003,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -1007,7 +1018,7 @@ importers:
         version: 8.21.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
     devDependencies:
       '@types/pg':
         specifier: ^8.20.4
@@ -1036,19 +1047,19 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
       graphile-utils:
         specifier: 5.0.3
-        version: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+        version: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql:
         specifier: 16.13.0
         version: 16.13.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(138876491c004694bff1843ee79c8872)
+        version: 5.1.4(564ecc69f17f317514da2378ea0ee7d1)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -1068,7 +1079,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -1114,7 +1125,7 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
     publishDirectory: dist
 
   graphile/graphile-schema:
@@ -1156,13 +1167,13 @@ importers:
     dependencies:
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       graphile-build:
         specifier: 5.1.1
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -1177,7 +1188,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a)
+        version: 5.1.4(ba6398e917e9857a0084b873121de2c9)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -1230,7 +1241,7 @@ importers:
         version: 1.0.1(grafast@1.1.2(graphql@16.13.0))
       '@dataplan/pg':
         specifier: 1.1.1
-        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+        version: 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       '@graphile-contrib/pg-many-to-many':
         specifier: 2.0.0-rc.2
         version: 2.0.0-rc.2
@@ -1263,7 +1274,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-bulk-mutations:
         specifier: workspace:^
         version: link:../graphile-bulk-mutations/dist
@@ -1308,7 +1319,7 @@ importers:
         version: link:../graphile-upload-plugin/dist
       graphile-utils:
         specifier: 5.0.3
-        version: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+        version: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql:
         specifier: 16.13.0
         version: 16.13.0
@@ -1332,7 +1343,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
       request-ip:
         specifier: ^3.3.0
         version: 3.3.0
@@ -1376,7 +1387,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -1417,7 +1428,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -1435,7 +1446,7 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
     devDependencies:
       '@types/pg':
         specifier: ^8.20.4
@@ -1455,7 +1466,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -1464,7 +1475,7 @@ importers:
         version: 16.13.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a)
+        version: 5.1.4(ba6398e917e9857a0084b873121de2c9)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -1606,7 +1617,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-cache:
         specifier: workspace:^
         version: link:../../graphile/graphile-cache/dist
@@ -1618,7 +1629,7 @@ importers:
         version: link:../../graphile/graphile-settings/dist
       graphile-utils:
         specifier: 5.0.3
-        version: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+        version: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql:
         specifier: 16.13.0
         version: 16.13.0
@@ -1636,7 +1647,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -1709,7 +1720,7 @@ importers:
         version: link:../../postgres/pg-env/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -1853,7 +1864,7 @@ importers:
         version: 1.1.2(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -1874,7 +1885,7 @@ importers:
         version: 11.2.7
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
     devDependencies:
       makage:
         specifier: ^0.3.0
@@ -1894,7 +1905,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -1918,7 +1929,7 @@ importers:
         version: 8.20.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(cf7ef086788d1d3f644d1dc7345cb344)
+        version: 5.1.4(a2bc1f0f07e2072a3ead26bf7ded50e6)
       ws:
         specifier: ^8.20.0
         version: 8.20.1
@@ -2007,7 +2018,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-cache:
         specifier: workspace:^
         version: link:../../graphile/graphile-cache/dist
@@ -2022,7 +2033,7 @@ importers:
         version: link:../../graphile/graphile-settings/dist
       graphile-utils:
         specifier: 5.0.3
-        version: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+        version: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql:
         specifier: 16.13.0
         version: 16.13.0
@@ -2049,7 +2060,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
       request-ip:
         specifier: ^3.3.0
         version: 3.3.0
@@ -2090,6 +2101,9 @@ importers:
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
+      pg-introspection:
+        specifier: 1.0.1
+        version: 1.0.1(patch_hash=004a0acc578342e50b175514c03b45108e9d3a85e8928696b0fdaef995ec4b25)
       supertest:
         specifier: ^7.2.2
         version: 7.2.2
@@ -2203,7 +2217,7 @@ importers:
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
       graphile-build-pg:
         specifier: 5.1.3
-        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+        version: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
@@ -2227,7 +2241,7 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
+        version: 5.1.4(d2fbc9214324995a9f19d45c874ffd17)
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
@@ -16140,7 +16154,7 @@ snapshots:
       grafast: 1.1.2(graphql@16.13.0)
       tslib: 2.8.1
 
-  '@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)':
+  '@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)':
     dependencies:
       '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
       '@graphile/lru': 5.0.0
@@ -16160,7 +16174,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)':
+  '@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)':
     dependencies:
       '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
       '@graphile/lru': 5.0.0
@@ -20241,9 +20255,9 @@ snapshots:
       - supports-color
       - use-sync-external-store
 
-  graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1):
+  graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1):
     dependencies:
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)
+      '@dataplan/pg': 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)
       '@types/node': 22.19.19
       debug: 4.4.3(supports-color@5.5.0)
       grafast: 1.1.2(graphql@16.13.0)
@@ -20251,7 +20265,7 @@ snapshots:
       graphile-config: 1.1.0
       graphql: 16.13.0
       jsonwebtoken: 9.0.3
-      pg-introspection: 1.0.1
+      pg-introspection: 1.0.1(patch_hash=004a0acc578342e50b175514c03b45108e9d3a85e8928696b0fdaef995ec4b25)
       pg-sql2: 5.0.1
       tamedevil: 0.1.1
       tslib: 2.8.1
@@ -20260,9 +20274,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1):
+  graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1):
     dependencies:
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@dataplan/pg': 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       '@types/node': 22.19.19
       debug: 4.4.3(supports-color@5.5.0)
       grafast: 1.1.2(graphql@16.13.0)
@@ -20270,7 +20284,7 @@ snapshots:
       graphile-config: 1.1.0
       graphql: 16.13.0
       jsonwebtoken: 9.0.3
-      pg-introspection: 1.0.1
+      pg-introspection: 1.0.1(patch_hash=004a0acc578342e50b175514c03b45108e9d3a85e8928696b0fdaef995ec4b25)
       pg-sql2: 5.0.1
       tamedevil: 0.1.1
       tslib: 2.8.1
@@ -20309,9 +20323,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  graphile-utils@5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1):
+  graphile-utils@5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1):
     dependencies:
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)
+      '@dataplan/pg': 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)
       debug: 4.4.3(supports-color@5.5.0)
       grafast: 1.1.2(graphql@16.13.0)
       graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
@@ -20321,13 +20335,13 @@ snapshots:
       tamedevil: 0.1.1
       tslib: 2.8.1
     optionalDependencies:
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1)
+      graphile-build-pg: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1)
     transitivePeerDependencies:
       - supports-color
 
-  graphile-utils@5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1):
+  graphile-utils@5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1):
     dependencies:
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@dataplan/pg': 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       debug: 4.4.3(supports-color@5.5.0)
       grafast: 1.1.2(graphql@16.13.0)
       graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
@@ -20337,7 +20351,7 @@ snapshots:
       tamedevil: 0.1.1
       tslib: 2.8.1
     optionalDependencies:
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-build-pg: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -22196,7 +22210,7 @@ snapshots:
 
   pg-int8@1.0.1: {}
 
-  pg-introspection@1.0.1:
+  pg-introspection@1.0.1(patch_hash=004a0acc578342e50b175514c03b45108e9d3a85e8928696b0fdaef995ec4b25):
     dependencies:
       tslib: 2.8.1
 
@@ -22339,10 +22353,10 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postgraphile@5.1.4(138876491c004694bff1843ee79c8872):
+  postgraphile@5.1.4(564ecc69f17f317514da2378ea0ee7d1):
     dependencies:
       '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@dataplan/pg': 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       '@graphile/lru': 5.0.0
       '@types/node': 22.19.19
       '@types/pg': 8.20.4
@@ -22350,9 +22364,9 @@ snapshots:
       grafast: 1.1.2(graphql@16.13.0)
       grafserv: 1.0.1(@types/node@22.19.15)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
       graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-build-pg: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config: 1.1.0
-      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql: 16.13.0
       iterall: 1.3.0
       jsonwebtoken: 9.0.3
@@ -22366,10 +22380,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  postgraphile@5.1.4(b3fb9399b7b000ca872a8f427cb73d08):
+  postgraphile@5.1.4(a2bc1f0f07e2072a3ead26bf7ded50e6):
     dependencies:
       '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@dataplan/pg': 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)
       '@graphile/lru': 5.0.0
       '@types/node': 22.19.19
       '@types/pg': 8.20.4
@@ -22377,36 +22391,9 @@ snapshots:
       grafast: 1.1.2(graphql@16.13.0)
       grafserv: 1.0.1(@types/node@25.9.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
       graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-build-pg: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1)
       graphile-config: 1.1.0
-      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
-      graphql: 16.13.0
-      iterall: 1.3.0
-      jsonwebtoken: 9.0.3
-      pg: 8.21.0
-      pg-sql2: 5.0.1
-      tamedevil: 0.1.1
-      tslib: 2.8.1
-      ws: 8.20.1
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
-  postgraphile@5.1.4(cf7ef086788d1d3f644d1dc7345cb344):
-    dependencies:
-      '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)
-      '@graphile/lru': 5.0.0
-      '@types/node': 22.19.19
-      '@types/pg': 8.20.4
-      debug: 4.4.3(supports-color@5.5.0)
-      grafast: 1.1.2(graphql@16.13.0)
-      grafserv: 1.0.1(@types/node@25.9.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
-      graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1)
-      graphile-config: 1.1.0
-      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql: 16.13.0
       iterall: 1.3.0
       jsonwebtoken: 9.0.3
@@ -22420,10 +22407,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  postgraphile@5.1.4(f282a162d8bd20a217e08c60f5396af8):
+  postgraphile@5.1.4(a8630eea9ec1b1fcc351d9a56a9502d8):
     dependencies:
       '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@dataplan/pg': 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       '@graphile/lru': 5.0.0
       '@types/node': 22.19.19
       '@types/pg': 8.20.4
@@ -22431,9 +22418,9 @@ snapshots:
       grafast: 1.1.2(graphql@16.13.0)
       grafserv: 1.0.1(@types/node@22.19.19)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
       graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-build-pg: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config: 1.1.0
-      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql: 16.13.0
       iterall: 1.3.0
       jsonwebtoken: 9.0.3
@@ -22447,10 +22434,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  postgraphile@5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a):
+  postgraphile@5.1.4(ba6398e917e9857a0084b873121de2c9):
     dependencies:
       '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@dataplan/pg': 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       '@graphile/lru': 5.0.0
       '@types/node': 22.19.19
       '@types/pg': 8.20.4
@@ -22458,9 +22445,36 @@ snapshots:
       grafast: 1.1.2(graphql@16.13.0)
       grafserv: 1.0.1(@types/node@22.19.11)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
       graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-build-pg: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config: 1.1.0
-      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphql: 16.13.0
+      iterall: 1.3.0
+      jsonwebtoken: 9.0.3
+      pg: 8.21.0
+      pg-sql2: 5.0.1
+      tamedevil: 0.1.1
+      tslib: 2.8.1
+      ws: 8.20.1
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  postgraphile@5.1.4(d2fbc9214324995a9f19d45c874ffd17):
+    dependencies:
+      '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
+      '@dataplan/pg': 1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@graphile/lru': 5.0.0
+      '@types/node': 22.19.19
+      '@types/pg': 8.20.4
+      debug: 4.4.3(supports-color@5.5.0)
+      grafast: 1.1.2(graphql@16.13.0)
+      grafserv: 1.0.1(@types/node@25.9.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
+      graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
+      graphile-build-pg: 5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.1.0
+      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(patch_hash=8cce8579f3bee5e9919d3ebed74a4b07e94b8198951fc1a6b3bbf8444f5ad6a5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql: 16.13.0
       iterall: 1.3.0
       jsonwebtoken: 9.0.3

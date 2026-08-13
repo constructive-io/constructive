@@ -40,6 +40,11 @@ const preset = {
     makePgService({
       connectionString: 'postgres://user:pass@localhost/mydb',
       schemas: ['app_public'],
+      // Temporary until Graphile's progressive introspection is available.
+      introspectionMode: 'scoped-required',
+      introspectionScopedCatalogTypes: 'dependency-closure',
+      // Retire only the exact connection used for the catalog query.
+      introspectionClientReleaseMode: 'destroy',
     }),
   ],
 };
@@ -51,6 +56,13 @@ const httpServer = require('http').createServer(app);
 serv.addTo(app, httpServer);
 httpServer.listen(5000);
 ```
+
+Scoped introspection is an explicit, temporary compatibility seam. It fails
+closed when a required schema is missing, when dependency closure crosses an
+unapproved schema, or when an adaptor cannot prove it owns the exact client
+requested for destruction. Runtime request connections keep their normal pool
+reuse behavior. This seam should be removed after migrating to Graphile's
+progressive introspection support.
 
 ## Features
 

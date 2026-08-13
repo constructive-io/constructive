@@ -1,0 +1,229 @@
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index c4fd418656c8f063c74113471835538120e2f215..5853aa3c5fec0a578d9f49fa7b5a2b663755f6d0 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -1,5 +1,6 @@
+ import type { PgRegistry } from "@dataplan/pg";
+ import type { PartitionExpose } from "./interfaces.ts";
++export declare const introspectionClientReleaseCapability: "graphile-build-pg-exact-client-destroy-v1";
+ export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.ts";
+ export { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.ts";
+ export { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.ts";
+diff --git a/dist/index.js b/dist/index.js
+index 94611d28be45c9fdd696923f4affac86a25544e4..f6431a22e6e329827748d1057bf0be776e67deb4 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,5 +1,6 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
++exports.introspectionClientReleaseCapability = "graphile-build-pg-exact-client-destroy-v1";
+ exports.sql = exports.withPgClientFromPgService = exports.getWithPgClientFromPgService = exports.version = exports.parseDatabaseIdentifiers = exports.parseDatabaseIdentifier = exports.defaultPreset = exports.PgTypesPlugin = exports.PgTablesPlugin = exports.PgTableNodePlugin = exports.PgRowByUniquePlugin = exports.PgRemoveExtensionResourcesPlugin = exports.PgRelationsPlugin = exports.PgRegistryReductionPlugin = exports.PgRegistryPlugin = exports.PgRefsPlugin = exports.PgRBACPlugin = exports.PgProceduresPlugin = exports.PgPolymorphismPlugin = exports.PgPolymorphismOnlyArgumentPlugin = exports.PgOrderCustomFieldsPlugin = exports.PgOrderByPrimaryKeyPlugin = exports.PgOrderAllAttributesPlugin = exports.PgNodeIdAttributesPlugin = exports.PgMutationUpdateDeletePlugin = exports.PgMutationPayloadEdgePlugin = exports.PgMutationCreatePlugin = exports.PgLtreePlugin = exports.PgJWTPlugin = exports.PgIntrospectionPlugin = exports.PgInterfaceModeUnionAllRowsPlugin = exports.PgIndexBehaviorsPlugin = exports.PgFirstLastBeforeAfterArgsPlugin = exports.PgFakeConstraintsPlugin = exports.PgEnumTablesPlugin = exports.PgEnumDomainsPlugin = exports.PgCustomTypeFieldPlugin = exports.PgConnectionTotalCountPlugin = exports.PgConnectionArgOrderByPlugin = exports.PgConnectionArgOrderByDefaultValuePlugin = exports.PgConditionCustomFieldsPlugin = exports.PgConditionArgumentPlugin = exports.PgCodecsPlugin = exports.PgBasicsPlugin = exports.PgAttributesPlugin = exports.PgAttributeDeprecationPlugin = exports.PgAllRowsPlugin = void 0;
+ var PgAllRowsPlugin_ts_1 = require("./plugins/PgAllRowsPlugin.js");
+ Object.defineProperty(exports, "PgAllRowsPlugin", { enumerable: true, get: function () { return PgAllRowsPlugin_ts_1.PgAllRowsPlugin; } });
+diff --git a/dist/plugins/PgIntrospectionPlugin.d.ts b/dist/plugins/PgIntrospectionPlugin.d.ts
+index 821629b96574c90ff58804be3aa3b98c4443c7a0..cf861c4ef564f8f1cdac16610cd2559c38e1421f 100644
+--- a/dist/plugins/PgIntrospectionPlugin.d.ts
++++ b/dist/plugins/PgIntrospectionPlugin.d.ts
+@@ -1,6 +1,22 @@
+ import { PgExecutor } from "@dataplan/pg";
+ import type { PromiseOrDirect } from "grafast";
+ import type { Introspection, PgAttribute, PgAuthMembers, PgClass, PgConstraint, PgDepend, PgDescription, PgEnum, PgExtension, PgIndex, PgInherits, PgLanguage, PgNamespace, PgProc, PgRange, PgRoles, PgType } from "pg-introspection";
++declare global {
++    namespace GraphileConfig {
++        interface PgServiceConfiguration<TAdaptor extends keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors> {
++            /** Selects the catalog query used during this service's gather phase. */
++            introspectionMode?: "stock" | "scoped-required";
++            /** Catalog types retained by scoped introspection; defaults to all for compatibility. */
++            introspectionScopedCatalogTypes?: "all" | "dependency-closure";
++            /** Non-root schemas that scoped dependency closure may retain. */
++            introspectionAllowedDependencySchemas?: readonly string[];
++            /** Exact installed extension names whose optional capability metadata is required. */
++            introspectionCapabilityExtensions?: readonly string[];
++            /** How to release the exact client after its catalog query. */
++            introspectionClientReleaseMode?: "reuse" | "destroy";
++        }
++    }
++}
+ export type PgEntityWithId = PgNamespace | PgClass | PgConstraint | PgProc | PgRoles | PgType | PgEnum | PgExtension | PgExtension | PgIndex | PgLanguage;
+ declare global {
+     namespace GraphileBuild {
+diff --git a/dist/plugins/PgIntrospectionPlugin.js b/dist/plugins/PgIntrospectionPlugin.js
+index a1597b1dc9a4f76d3debc80f5ef151f4e58bc2cd..0714e4f1aa6b9a5f60373f868942b2e054eebf95 100644
+--- a/dist/plugins/PgIntrospectionPlugin.js
++++ b/dist/plugins/PgIntrospectionPlugin.js
+@@ -42,6 +42,118 @@ function makeGetEntities(loc) {
+         return list;
+     };
+ }
++function getIntrospectionQuery(pgService) {
++    const mode = pgService.introspectionMode ?? "stock";
++    const configuredCatalogTypes = pgService.introspectionScopedCatalogTypes;
++    const configuredCapabilityExtensions = pgService.introspectionCapabilityExtensions;
++    const scopedCatalogTypes = configuredCatalogTypes ?? "all";
++    if (scopedCatalogTypes !== "all" && scopedCatalogTypes !== "dependency-closure") {
++        throw new Error(`Unsupported scoped catalog type policy '${scopedCatalogTypes}' for service '${pgService.name}'`);
++    }
++    if (mode === "stock") {
++        if (configuredCatalogTypes !== undefined) {
++            throw new Error(`Scoped catalog type policy is only valid with scoped-required introspection for service '${pgService.name}'`);
++        }
++        if (configuredCapabilityExtensions !== undefined) {
++            throw new Error(`Scoped extension capabilities are only valid with scoped-required introspection for service '${pgService.name}'`);
++        }
++        return {
++            query: { text: (0, pg_introspection_1.makeIntrospectionQuery)() },
++            requiredSchemas: null,
++            allowedSchemas: null,
++            scopedCatalogTypes: null,
++        };
++    }
++    if (mode === "scoped-required") {
++        const requiredSchemas = pgService.schemas ?? [];
++        const dependencySchemas = pgService.introspectionAllowedDependencySchemas ?? [];
++        const capabilityExtensions = configuredCapabilityExtensions ?? [];
++        return {
++            query: (0, pg_introspection_1.makeSchemaScopedIntrospectionQuery)(requiredSchemas, {
++                catalogTypes: scopedCatalogTypes,
++                capabilityExtensions,
++            }),
++            requiredSchemas,
++            allowedSchemas: [...new Set([...requiredSchemas, ...dependencySchemas, "pg_catalog"])],
++            scopedCatalogTypes,
++        };
++    }
++    throw new Error(`Unsupported PostgreSQL introspection mode '${mode}' for service '${pgService.name}'`);
++}
++function assertScopedNamespaces(introspection, requiredSchemas, allowedSchemas, serviceName) {
++    if (requiredSchemas === null) {
++        return;
++    }
++    const found = new Set(introspection.namespaces.map((namespace) => namespace.nspname));
++    const missing = requiredSchemas.filter((schema) => !found.has(schema));
++    if (missing.length > 0) {
++        throw new Error(`Schema-scoped introspection for service '${serviceName}' did not find required schema(s): ${missing.join(", ")}`);
++    }
++    const allowed = new Set(allowedSchemas);
++    const unexpected = [...found].filter((schema) => !allowed.has(schema));
++    if (unexpected.length > 0) {
++        throw new Error(`Schema-scoped introspection for service '${serviceName}' crossed into unapproved dependency schema(s): ${unexpected.join(", ")}`);
++    }
++}
++function assertDependencyClosureTypes(introspection, scopedCatalogTypes, serviceName) {
++    if (scopedCatalogTypes !== "dependency-closure") {
++        return;
++    }
++    const retainedTypeOids = new Set(introspection.types.map((type) => String(type._id)));
++    const requireType = (oid, objectKind, objectContext, field) => {
++        if (oid === null || oid === undefined || String(oid) === "0") {
++            return;
++        }
++        const normalizedOid = String(oid);
++        // pg-introspection deliberately removes extension-owned composite
++        // resources from the public arrays after constructing its lookup maps.
++        // Array and user-object dependencies still resolve through that exact
++        // lookup, so validate the same runtime resolution surface instead of
++        // rejecting a coherent extension-pruned result.
++        const resolvesThroughIntrospection = retainedTypeOids.has(normalizedOid) ||
++            introspection._lookups?.typeById?.has(normalizedOid) === true;
++        if (!resolvesThroughIntrospection) {
++            throw new Error(`Dependency-closure introspection for service '${serviceName}' retained ${objectKind} '${objectContext}' field '${field}' referencing missing pg_type OID '${normalizedOid}'`);
++        }
++    };
++    const requireTypes = (oids, objectKind, objectContext, field) => {
++        for (const oid of oids ?? []) {
++            requireType(oid, objectKind, objectContext, field);
++        }
++    };
++    for (const entity of introspection.classes) {
++        const context = `${entity.relname} (${entity._id})`;
++        requireType(entity.reltype, "pg_class", context, "reltype");
++        requireType(entity.reloftype, "pg_class", context, "reloftype");
++    }
++    for (const entity of introspection.attributes) {
++        requireType(entity.atttypid, "pg_attribute", `${entity.attrelid}.${entity.attname}`, "atttypid");
++    }
++    for (const entity of introspection.constraints) {
++        requireType(entity.contypid, "pg_constraint", `${entity.conname} (${entity._id})`, "contypid");
++    }
++    for (const entity of introspection.procs) {
++        const context = `${entity.proname} (${entity._id})`;
++        requireType(entity.prorettype, "pg_proc", context, "prorettype");
++        requireTypes(entity.proargtypes, "pg_proc", context, "proargtypes");
++        requireTypes(entity.proallargtypes, "pg_proc", context, "proallargtypes");
++    }
++    for (const entity of introspection.types) {
++        const context = `${entity.typname} (${entity._id})`;
++        requireType(entity.typbasetype, "pg_type", context, "typbasetype");
++        requireType(entity.typelem, "pg_type", context, "typelem");
++        requireType(entity.typarray, "pg_type", context, "typarray");
++    }
++    for (const entity of introspection.enums) {
++        requireType(entity.enumtypid, "pg_enum", `${entity.enumlabel} (${entity._id})`, "enumtypid");
++    }
++    for (const entity of introspection.ranges) {
++        const context = `range ${entity.rngtypid ?? "unknown"}`;
++        requireType(entity.rngtypid, "pg_range", context, "rngtypid");
++        requireType(entity.rngsubtype, "pg_range", context, "rngsubtype");
++        requireType(entity.rngmultitypid, "pg_range", context, "rngmultitypid");
++    }
++}
+ exports.PgIntrospectionPlugin = {
+     name: "PgIntrospectionPlugin",
+     description: "Introspects PostgreSQL databases and makes the results available to other plugins",
+@@ -171,8 +283,8 @@ exports.PgIntrospectionPlugin = {
+                 return type?.getEnumValues() ?? [];
+             },
+             async getRangeByType(info, serviceName, typeId) {
+-                const type = await info.helpers.pgIntrospection.getType(serviceName, typeId);
+-                return type?.getRange();
++                const relevant = await getDb(info, serviceName);
++                return relevant.introspection.ranges.find((range) => range.rngtypid === typeId || range.rngmultitypid === typeId);
+             },
+             async getExtensionByName(info, serviceName, extensionName) {
+                 const relevant = await getDb(info, serviceName);
+@@ -198,11 +310,20 @@ exports.PgIntrospectionPlugin = {
+                             info.cache.introspectionResultsPromise = null;
+                         });
+                         const rawIntrospections = await introspectionPromise;
+-                        const introspections = rawIntrospections.map(({ pgService, introspectionText }) => ({
+-                            pgService,
++                        // Scoped mode keeps raw text only in this gather's async frame.
++                        // Clear only the exact promise we consumed so every later gather
++                        // re-queries, while concurrent helpers still share parsed state.
++                        if (rawIntrospections.some(({ requiredSchemas }) => requiredSchemas !== null) &&
++                            info.cache.introspectionResultsPromise === introspectionPromise) {
++                            info.cache.introspectionResultsPromise = null;
++                        }
++                        const introspections = rawIntrospections.map(({ pgService, introspectionText, requiredSchemas, allowedSchemas, scopedCatalogTypes }) => {
+                             // IMPORTANT: parseIntrospectionResults must NOT be cached, because other plugins mutate it.
+-                            introspection: (0, pg_introspection_1.parseIntrospectionResults)(introspectionText),
+-                        }));
++                            const introspection = (0, pg_introspection_1.parseIntrospectionResults)(introspectionText);
++                            assertScopedNamespaces(introspection, requiredSchemas, allowedSchemas, pgService.name);
++                            assertDependencyClosureTypes(introspection, scopedCatalogTypes, pgService.name);
++                            return { pgService, introspection };
++                        });
+                         // Store the resolved state, so access during announcements doesn't cause the system to hang
+                         info.state.getIntrospectionPromise = introspections;
+                         // Announce the introspection results.
+@@ -416,14 +537,16 @@ function introspectPgServices(pgServices) {
+             seenPgSettingsKeys.set(pgSettingsKey, i);
+         }
+         // Do the introspection
+-        const introspectionQuery = (0, pg_introspection_1.makeIntrospectionQuery)();
++        const { query, requiredSchemas, allowedSchemas, scopedCatalogTypes } = getIntrospectionQuery(pgService);
++        const clientReleaseMode = pgService.introspectionClientReleaseMode ?? "reuse";
+         const { rows: [row], } = await (0, pg_1.withPgClientFromPgService)(pgService, pgService.pgSettingsForIntrospection ?? null, (client) => client.query({
+-            text: introspectionQuery,
+-        }));
++            text: query.text,
++            values: query.values,
++        }), clientReleaseMode === "reuse" ? undefined : { clientReleaseMode });
+         if (!row) {
+             throw new Error("Introspection failed");
+         }
+-        return { pgService, introspectionText: row.introspection };
++        return { pgService, introspectionText: row.introspection, requiredSchemas, allowedSchemas, scopedCatalogTypes };
+     }));
+ }
+ //# sourceMappingURL=PgIntrospectionPlugin.js.map
