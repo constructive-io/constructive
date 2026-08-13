@@ -175,7 +175,3 @@ Ephemeral databases are useful for:
 - **Integration tests**: Isolated database per test suite
 - **CI pipelines**: Clean database state for each run
 - **Local development**: Experiment without affecting shared databases
-
-## License
-
-MIT

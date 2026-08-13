@@ -8,7 +8,6 @@ import {
   buildSkillReference,
   fieldPlaceholder,
   formatArgType,
-  getReadmeFooter,
   getReadmeHeader,
   pkPlaceholder,
 } from './docs-utils';
@@ -210,7 +209,6 @@ export function generateHooksReadme(
     }
   }
 
-  lines.push(...getReadmeFooter());
 
   return {
     fileName: 'README.md',

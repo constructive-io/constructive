@@ -4,17 +4,21 @@ import {
   cleanEnv,
   distinct,
   duration,
+  email,
   enumerated,
   env,
+  host,
   int,
   list,
   mutuallyExclusive,
   num,
   oneOf,
+  port,
   redactEnvError,
   requiredWhen,
   str,
   url,
+  uuid,
   withDefault} from '../src';
 
 describe('list()', () => {
@@ -322,5 +326,53 @@ describe('secret redaction', () => {
 
     const untouched = new Error('nothing to redact');
     expect(redactEnvError(untouched)).toBe(untouched);
+  });
+});
+
+describe('value-shape validators (shared with @constructive-io/coerce)', () => {
+  it('accepts the shapes each one names', () => {
+    const config = cleanEnv(
+      {
+        PORT: '5432',
+        API_URL: 'https://api.constructive.io',
+        PGHOST: 'db.internal',
+        SUPPORT_EMAIL: 'developers@constructive.io',
+        TENANT_ID: '3f2504e0-4f89-11d3-9a0c-0305e82c3301'
+      },
+      {
+        PORT: port(),
+        API_URL: url(),
+        PGHOST: host(),
+        SUPPORT_EMAIL: email(),
+        TENANT_ID: uuid()
+      }
+    );
+    expect(config.PORT).toBe(5432);
+    expect(config.API_URL).toBe('https://api.constructive.io');
+    expect(config.PGHOST).toBe('db.internal');
+    expect(config.SUPPORT_EMAIL).toBe('developers@constructive.io');
+    expect(config.TENANT_ID).toBe('3f2504e0-4f89-11d3-9a0c-0305e82c3301');
+  });
+
+  it('throws on a port outside 1..65535 rather than booting on it', () => {
+    expect(() => cleanEnv({ PORT: '65536' }, { PORT: port() })).toThrow(/PORT/);
+    expect(() => cleanEnv({ PORT: 'http' }, { PORT: port() })).toThrow(/PORT/);
+  });
+
+  it('throws on a scheme-less url and a host carrying a port', () => {
+    expect(() => cleanEnv({ API_URL: 'api.constructive.io' }, { API_URL: url() })).toThrow(/API_URL/);
+    expect(() => cleanEnv({ PGHOST: 'db.internal:5432' }, { PGHOST: host() })).toThrow(/PGHOST/);
+  });
+
+  it('throws on a malformed email and a truncated uuid', () => {
+    expect(() => cleanEnv({ SUPPORT_EMAIL: 'developers' }, { SUPPORT_EMAIL: email() })).toThrow(
+      /SUPPORT_EMAIL/
+    );
+    expect(() => cleanEnv({ TENANT_ID: '3f2504e0' }, { TENANT_ID: uuid() })).toThrow(/TENANT_ID/);
+  });
+
+  it('resolves a typed default through the same coercion', () => {
+    const config = cleanEnv({}, { PORT: port({ default: 3000 }) });
+    expect(config.PORT).toBe(3000);
   });
 });

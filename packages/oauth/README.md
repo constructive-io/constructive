@@ -123,7 +123,3 @@ interface OAuthProfile {
   raw: unknown;          // Original provider response
 }
 ```
-
-## License
-
-MIT

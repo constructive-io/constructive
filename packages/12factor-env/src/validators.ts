@@ -9,11 +9,56 @@
 // Every validator keeps the library's contract: unset resolves the default,
 // set-but-invalid THROWS. None of them silently degrade to an empty list or a
 // NaN, because that is how "allowlist" becomes "allow nothing" at runtime.
+//
+// What each one ACCEPTS comes from `@constructive-io/coerce`, so an env var and
+// a request body agree on what a port, a URL, a host, a duration or an integer
+// is. Only the env part lives here: the envalid spec plumbing, the bounds and
+// per-item `choices`, and the error text that joins the consolidated report.
 
+import {
+  asDuration,
+  asEmail,
+  asHostname,
+  asNumberIn,
+  asNumeric,
+  asOneOf,
+  asPort,
+  asStringList,
+  asUrl,
+  asUuid,
+  type Bounds
+} from '@constructive-io/coerce';
 import type { Spec, ValidatorSpec } from 'envalid';
 import { EnvError, makeValidator } from 'envalid';
 
 const asSpec = <T>(spec: Record<string, unknown>): Spec<T> => spec as Spec<T>;
+
+/**
+ * Turn a coercer into an envalid validator: `null` becomes the throw envalid
+ * expects, so a set-but-invalid var lands in the consolidated report.
+ */
+const validator = <T>(coerce: (input: unknown) => T | null, expected: string) =>
+  (spec: Spec<T> = {}): ValidatorSpec<T> =>
+    makeValidator<T>(((input: string) => {
+      const value = coerce(input);
+      if (value === null) throw new EnvError(`Invalid ${expected} input: "${input}"`);
+      return value;
+    }) as (input: string) => T)(spec) as ValidatorSpec<T>;
+
+/** A TCP/UDP port: an integer in 1..65535. */
+export const port = validator(asPort, 'port');
+
+/** An absolute URL, scheme included. */
+export const url = validator(asUrl, 'url');
+
+/** A bare hostname or IP address — no scheme, port or path. */
+export const host = validator(asHostname, 'host');
+
+/** An email address. */
+export const email = validator(asEmail, 'email');
+
+/** A UUID in canonical 8-4-4-4-12 hex form. */
+export const uuid = validator(asUuid, 'uuid');
 
 // ── list() ───────────────────────────────────────────────────────────────────
 
@@ -46,11 +91,7 @@ export const list = <T extends string = string>(
   const { separator = ',', choices, ...rest } = spec;
 
   const parse = (input: string | T[]): T[] => {
-    const items = (
-      Array.isArray(input) ? input.map(String) : String(input).split(separator)
-    )
-      .map((item) => item.trim())
-      .filter(Boolean) as T[];
+    const items = (asStringList(input, separator) ?? []) as T[];
 
     if (items.length === 0) {
       throw new EnvError(
@@ -87,16 +128,14 @@ export type NumSpec = Spec<number> & {
 };
 
 const parseNumber = (input: string | number, spec: NumSpec): number => {
-  const value = typeof input === 'number' ? input : Number(input);
-  if (!Number.isFinite(value)) throw new EnvError(`Invalid number input: "${input}"`);
+  const value = asNumeric(input);
+  if (value === null) throw new EnvError(`Invalid number input: "${input}"`);
   if (spec.integer && !Number.isInteger(value)) {
     throw new EnvError(`Expected an integer, got: "${input}"`);
   }
-  if (spec.min !== undefined && value < spec.min) {
-    throw new EnvError(`Expected a number >= ${spec.min}, got: "${input}"`);
-  }
-  if (spec.max !== undefined && value > spec.max) {
-    throw new EnvError(`Expected a number <= ${spec.max}, got: "${input}"`);
+  if (asNumberIn(value, spec as Bounds) === null) {
+    const bound = spec.min !== undefined && value < spec.min ? `>= ${spec.min}` : `<= ${spec.max}`;
+    throw new EnvError(`Expected a number ${bound}, got: "${input}"`);
   }
   return value;
 };
@@ -127,14 +166,6 @@ export const int = (spec: Omit<NumSpec, 'integer'> = {}): ValidatorSpec<number> 
 
 // ── duration() ──────────────────────────────────────────────────────────────
 
-const DURATION_UNITS_MS: Record<string, number> = {
-  ms: 1,
-  s: 1_000,
-  m: 60_000,
-  h: 3_600_000,
-  d: 86_400_000
-};
-
 export type DurationSpec = Spec<number> & {
   /** Inclusive lower bound in milliseconds. Default: 0 (no negative durations). */
   min?: number;
@@ -144,7 +175,7 @@ export type DurationSpec = Spec<number> & {
 
 /**
  * Duration normalized to milliseconds, accepting a bare number of ms or a
- * suffixed value: `30s`, `5m`, `2h`, `1d`, `500ms`.
+ * suffixed value: `30s`, `5m`, `2h`, `1d`, `1w`, `500ms`.
  *
  * ```ts
  * duration()                       // '30s' -> 30000, '250' -> 250
@@ -155,11 +186,9 @@ export const duration = (spec: DurationSpec = {}): ValidatorSpec<number> => {
   const { min = 0, max, ...rest } = spec;
 
   const parse = (input: string | number): number => {
-    if (typeof input === 'number') return parseNumber(input, { min, max });
-    const match = /^(-?\d+(?:\.\d+)?)\s*(ms|s|m|h|d)?$/i.exec(String(input).trim());
-    if (!match) throw new EnvError(`Invalid duration input: "${input}"`);
-    const unit = (match[2] ?? 'ms').toLowerCase();
-    return parseNumber(Number(match[1]) * DURATION_UNITS_MS[unit], { min, max });
+    const ms = asDuration(input);
+    if (ms === null) throw new EnvError(`Invalid duration input: "${input}"`);
+    return parseNumber(ms, { min, max });
   };
 
   return makeValidator<number>(parse as (input: string) => number)(
@@ -183,9 +212,9 @@ export const enumerated = <T extends string>(
   spec: Omit<Spec<T>, 'choices'> = {}
 ): ValidatorSpec<T> => {
   const parse = (input: string): T => {
-    const value = String(input) as T;
-    if (!choices.includes(value)) {
-      throw new EnvError(`Value "${value}" not in choices [${choices.join(', ')}]`);
+    const value = asOneOf(input, choices as readonly string[]) as T | null;
+    if (value === null) {
+      throw new EnvError(`Value "${input}" not in choices [${choices.join(', ')}]`);
     }
     return value;
   };

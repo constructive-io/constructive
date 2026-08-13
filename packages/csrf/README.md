@@ -150,7 +150,3 @@ This works because:
 - Attackers can't read cookies from other domains (same-origin policy)
 - Attackers can't set cookies for your domain
 - Only legitimate requests from your site can include both the cookie and the matching token
-
-## License
-
-MIT

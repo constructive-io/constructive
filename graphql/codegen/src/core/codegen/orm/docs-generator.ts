@@ -11,7 +11,6 @@ import {
   fieldPlaceholder,
   formatArgType,
   getEditableFields,
-  getReadmeFooter,
   getReadmeHeader,
   pkPlaceholder,
 } from '../docs-utils';
@@ -184,7 +183,6 @@ export function generateOrmReadme(
     }
   }
 
-  lines.push(...getReadmeFooter());
 
   return {
     fileName: 'README.md',

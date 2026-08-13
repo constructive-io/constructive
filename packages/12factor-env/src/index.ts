@@ -1,19 +1,15 @@
-import { asBoolean, asNumber, asString, asStringList } from '@constructive-io/coerce';
+import { asBoolean, asNumeric, asString, asStringList } from '@constructive-io/coerce';
 import type { CleanedEnv, CleanOptions, Spec,ValidatorSpec } from 'envalid';
 import {
   applyDefaultMiddleware,
   bool,
   customCleanEnv,
-  email,
   EnvError,
   EnvMissingError,
-  host,
   json,
   makeValidator,
-  port,
   str,
-  testOnly,
-  url} from 'envalid';
+  testOnly} from 'envalid';
 
 import { type EnvCheck, runChecks } from './checks';
 import { isSecretSpec, redactMessage, stripSecret, withRedactedSerialization } from './redact';
@@ -213,8 +209,7 @@ const parseEnvBoolean = (val?: string): boolean | undefined =>
   asString(val) === null ? undefined : asBoolean(val) ?? false;
 
 /** Parse a numeric env value; unset/blank/non-finite => undefined. */
-const parseEnvNumber = (val?: string): number | undefined =>
-  asString(val) === null ? undefined : asNumber(Number(val)) ?? undefined;
+const parseEnvNumber = (val?: string): number | undefined => asNumeric(val) ?? undefined;
 
 /**
  * Parse a comma-separated env value into a trimmed, non-empty string list;
@@ -290,37 +285,41 @@ export {
   // Re-export from envalid
   cleanEnv,
   devDefault,
-  email,
   env,
   EnvError,
   EnvMissingError,
-  host,
   json,
   makeValidator,
   // Lenient coercion
   parseEnvBoolean,
   parseEnvList,
   parseEnvNumber,
-  port,
   required,
   str,
   testOnly,
-  url,
   // Fallback-class wrappers
   withDefault};
 
-// House validators: csv lists, bounded numbers, durations, string enums.
-// `num` shadows envalid's on purpose — same acceptance, plus min/max/integer.
+// House validators, all of them coercing through `@constructive-io/coerce`:
+// csv lists, bounded numbers, durations, string enums, and the value shapes
+// envalid also ships (`port`/`url`/`host`/`email`, plus `uuid`, which it does
+// not) — shadowed on purpose so a var and a request body agree on what each one
+// accepts. `num` keeps envalid's acceptance and adds min/max/integer.
 export {
   duration,
   type DurationSpec,
+  email,
   enumerated,
+  host,
   int,
   list,
   type ListSpec,
   num,
   type NumSpec,
-  oneOf} from './validators';
+  oneOf,
+  port,
+  url,
+  uuid} from './validators';
 
 // Cross-field checks.
 export {

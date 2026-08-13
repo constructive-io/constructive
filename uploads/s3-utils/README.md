@@ -217,7 +217,3 @@ Returns `{ success: true }` if the bucket was created or already exists.
 | [`@constructive-io/etag-stream`](../etag-stream) | ETag generation from streams |
 | [`@constructive-io/content-type-stream`](../content-type-stream) | Magic-byte content-type detection |
 | [`@constructive-io/uuid-hash`](../uuid-hash) | Deterministic UUID generation from file content |
-
-## License
-
-MIT

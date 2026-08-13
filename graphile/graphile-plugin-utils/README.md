@@ -60,7 +60,3 @@ const computed = Object.values(build.input.pgRegistry.pgResources).filter(
   isComputedScalarAttributeResource
 );
 ```
-
-## License
-
-MIT
