@@ -20,6 +20,43 @@ index 94611d28be45c9fdd696923f4affac86a25544e4..f6431a22e6e329827748d1057bf0be77
  exports.sql = exports.withPgClientFromPgService = exports.getWithPgClientFromPgService = exports.version = exports.parseDatabaseIdentifiers = exports.parseDatabaseIdentifier = exports.defaultPreset = exports.PgTypesPlugin = exports.PgTablesPlugin = exports.PgTableNodePlugin = exports.PgRowByUniquePlugin = exports.PgRemoveExtensionResourcesPlugin = exports.PgRelationsPlugin = exports.PgRegistryReductionPlugin = exports.PgRegistryPlugin = exports.PgRefsPlugin = exports.PgRBACPlugin = exports.PgProceduresPlugin = exports.PgPolymorphismPlugin = exports.PgPolymorphismOnlyArgumentPlugin = exports.PgOrderCustomFieldsPlugin = exports.PgOrderByPrimaryKeyPlugin = exports.PgOrderAllAttributesPlugin = exports.PgNodeIdAttributesPlugin = exports.PgMutationUpdateDeletePlugin = exports.PgMutationPayloadEdgePlugin = exports.PgMutationCreatePlugin = exports.PgLtreePlugin = exports.PgJWTPlugin = exports.PgIntrospectionPlugin = exports.PgInterfaceModeUnionAllRowsPlugin = exports.PgIndexBehaviorsPlugin = exports.PgFirstLastBeforeAfterArgsPlugin = exports.PgFakeConstraintsPlugin = exports.PgEnumTablesPlugin = exports.PgEnumDomainsPlugin = exports.PgCustomTypeFieldPlugin = exports.PgConnectionTotalCountPlugin = exports.PgConnectionArgOrderByPlugin = exports.PgConnectionArgOrderByDefaultValuePlugin = exports.PgConditionCustomFieldsPlugin = exports.PgConditionArgumentPlugin = exports.PgCodecsPlugin = exports.PgBasicsPlugin = exports.PgAttributesPlugin = exports.PgAttributeDeprecationPlugin = exports.PgAllRowsPlugin = void 0;
  var PgAllRowsPlugin_ts_1 = require("./plugins/PgAllRowsPlugin.js");
  Object.defineProperty(exports, "PgAllRowsPlugin", { enumerable: true, get: function () { return PgAllRowsPlugin_ts_1.PgAllRowsPlugin; } });
+diff --git a/dist/plugins/PgBasicsPlugin.js b/dist/plugins/PgBasicsPlugin.js
+index c31c42d380ce1431a89983ca3bc99f7e44aaeece..a19cda24f555b01ad837b7e52b9a3c4aab3d21e4 100644
+--- a/dist/plugins/PgBasicsPlugin.js
++++ b/dist/plugins/PgBasicsPlugin.js
+@@ -276,6 +276,11 @@ exports.PgBasicsPlugin = {
+                 };
+                 const resourceByCodecCacheUnstrict = new Map();
+                 const resourceByCodecCacheStrict = new Map();
++                build.registerBuildStateDisposer(() => {
++                    pgCodecMetaLookup.clear();
++                    resourceByCodecCacheUnstrict.clear();
++                    resourceByCodecCacheStrict.clear();
++                });
+                 const pgTableResource = (codec, strict = true) => {
+                     const resourceByCodecCache = strict
+                         ? resourceByCodecCacheStrict
+diff --git a/dist/plugins/PgCodecsPlugin.js b/dist/plugins/PgCodecsPlugin.js
+index bc9893d3f853f77ba5204c295840467db29cd279..8d8e5ceb0f38fde014474e646a61da0851fcdf20 100644
+--- a/dist/plugins/PgCodecsPlugin.js
++++ b/dist/plugins/PgCodecsPlugin.js
+@@ -535,8 +535,15 @@ exports.PgCodecsPlugin = {
+     schema: {
+         hooks: {
+             build(build) {
+-                build.allPgCodecs = new Set();
++                const allPgCodecs = new Set();
++                build.allPgCodecs = allPgCodecs;
+                 const lookup = Object.create(null);
++                build.registerBuildStateDisposer(() => {
++                    allPgCodecs.clear();
++                    for (const serviceName of Object.keys(lookup)) {
++                        delete lookup[serviceName];
++                    }
++                });
+                 build.getPgCodecByDatabaseName = (serviceName, schemaName, typeName) => {
+                     const codec = lookup[serviceName]?.[schemaName]?.[typeName];
+                     if (codec == null) {
 diff --git a/dist/plugins/PgIntrospectionPlugin.d.ts b/dist/plugins/PgIntrospectionPlugin.d.ts
 index 821629b96574c90ff58804be3aa3b98c4443c7a0..cf861c4ef564f8f1cdac16610cd2559c38e1421f 100644
 --- a/dist/plugins/PgIntrospectionPlugin.d.ts
@@ -227,3 +264,22 @@ index a1597b1dc9a4f76d3debc80f5ef151f4e58bc2cd..0714e4f1aa6b9a5f60373f868942b2e0
      }));
  }
  //# sourceMappingURL=PgIntrospectionPlugin.js.map
+diff --git a/dist/plugins/PgPolymorphismPlugin.js b/dist/plugins/PgPolymorphismPlugin.js
+index b1892244aebf936cb697d9e664e6b3c2432e8c0e..6907c0d70640bebd87c93377c3e30f901b18efa9 100644
+--- a/dist/plugins/PgPolymorphismPlugin.js
++++ b/dist/plugins/PgPolymorphismPlugin.js
+@@ -554,6 +554,14 @@ exports.PgPolymorphismPlugin = {
+                     }
+                 }
+                 const pgCodecByPolymorphicUnionModeTypeName = Object.create(null);
++                build.registerBuildStateDisposer(() => {
++                    for (const key of Object.keys(pgResourcesByPolymorphicTypeName)) {
++                        delete pgResourcesByPolymorphicTypeName[key];
++                    }
++                    for (const key of Object.keys(pgCodecByPolymorphicUnionModeTypeName)) {
++                        delete pgCodecByPolymorphicUnionModeTypeName[key];
++                    }
++                });
+                 for (const codec of Object.values(pgRegistry.pgCodecs)) {
+                     if (!codec.polymorphism)
+                         continue;

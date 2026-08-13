@@ -136,6 +136,14 @@ function callGraphQLObjectTypeFieldsHook(
   });
 }
 
+function callFinalizeHook(schema: GraphQLSchema, build: any): GraphQLSchema {
+  const finalizeHook = MetaSchemaPlugin.schema!.hooks!.finalize as (
+    schema: GraphQLSchema,
+    build: any
+  ) => GraphQLSchema;
+  return finalizeHook(schema, build);
+}
+
 function deepClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
@@ -2016,6 +2024,7 @@ describe('MetaSchemaPlugin', () => {
         }),
         types: [userType]
       });
+      callFinalizeHook(schema, build);
       const result = await graphql({
         schema,
         source: `
@@ -2086,6 +2095,7 @@ describe('MetaSchemaPlugin', () => {
             })
           ]
         });
+        callFinalizeHook(schema, build);
         return schema;
       };
 
@@ -2112,7 +2122,7 @@ describe('MetaSchemaPlugin', () => {
       ).toEqual(['Project']);
     });
 
-    it('validates metadata against schema changes made by later finalizers', async () => {
+    it('snapshots metadata from the finalized executable schema', async () => {
       const codec = createMockCodec('user', {
         id: createMockAttribute('text')
       });
@@ -2143,12 +2153,11 @@ describe('MetaSchemaPlugin', () => {
         fields: queryFields
       });
       const schema = new GraphQLSchema({ query: queryType });
-
-      // Before later finalizers mutate the schema, the metadata resolves the
-      // list entry-point; the resolver must recompute from the final schema.
+      // Simulate an earlier finalizer removing an entry-point before the meta
+      // plugin snapshots the executable schema.
       expect((collectTablesMeta(build, schema) as any[])[0].query.all).toBe('users');
-
       delete queryType.getFields().users;
+      callFinalizeHook(schema, build);
       const result = await graphql({
         schema,
         source: '{ _meta { tables { query { all } } } }'

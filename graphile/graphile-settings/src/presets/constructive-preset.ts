@@ -15,6 +15,7 @@ import { UploadPreset } from 'graphile-upload-plugin';
 
 import { getBucketProvisionerConnection } from '../bucket-provisioner-resolver';
 import {
+  BuildStateRetirementPlugin,
   ConflictDetectorPreset,
   EnableAllFilterColumnsPreset,
   InflectorLoggerPreset,
@@ -107,6 +108,7 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
  * - MetaSchemaPreset (_meta introspection)
  * - PgTypeMappingsPreset (email, url, etc.)
  * - RequiredInputPreset (@requiredInput support)
+ * - BuildStateRetirementPlugin (release construction-only state after validation)
  *
  * FLAG-CONTROLLED PRESETS:
  * - enableConnectionFilter  -> ConnectionFilterPreset, EnableAllFilterColumnsPreset
@@ -285,7 +287,8 @@ export function createConstructivePreset(
   }
 
   const preset: GraphileConfig.Preset = {
-    extends: presets
+    extends: presets,
+    plugins: [BuildStateRetirementPlugin]
   };
 
   if (disablePlugins.length > 0) {

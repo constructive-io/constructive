@@ -328,6 +328,11 @@ export function createUnifiedSearchPlugin(
       },
 
       hooks: {
+        build(build) {
+          build.registerBuildStateDisposer(() => codecCache.clear());
+          return build;
+        },
+
         /**
          * Register all adapter-specific GraphQL types during init.
          */

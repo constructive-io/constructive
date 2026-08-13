@@ -111,6 +111,7 @@ packageExtensions:
 patchedDependencies:
   '@dataplan/pg': patches/@dataplan__pg.patch
   graphile-build-pg: patches/graphile-build-pg.patch
+  graphile-build@5.1.1: patches/graphile-build@5.1.1.patch
   pg-introspection@1.0.1: patches/pg-introspection@1.0.1.patch
 
 # The only dependencies permitted to run install scripts.
