@@ -1,7 +1,12 @@
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
 import {
   bool,
   boolish,
   devDefault,
+  dotenv,
   env,
   getNodeEnv,
   getStrictEnvMode,
@@ -9,6 +14,7 @@ import {
   isDevelopment,
   isProduction,
   isTest,
+  parseDotenv,
   parseEnvBoolean,
   parseEnvList,
   parseEnvNumber,
@@ -295,6 +301,71 @@ describe('env', () => {
     it('is throw only for STRICT_ENV=throw (case-insensitive)', () => {
       expect(getStrictEnvMode({ STRICT_ENV: 'throw' })).toBe('throw');
       expect(getStrictEnvMode({ STRICT_ENV: 'THROW' })).toBe('throw');
+    });
+  });
+
+  describe('dotenv', () => {
+    let dir: string;
+
+    beforeEach(() => {
+      dir = mkdtempSync(path.join(os.tmpdir(), '12factor-env-'));
+    });
+
+    afterEach(() => {
+      rmSync(dir, { recursive: true, force: true });
+    });
+
+    it('parses dotenv source with parseDotenv', () => {
+      const parsed = parseDotenv('A=1\n# comment\nB="two words"\n');
+      expect(parsed).toEqual({ A: '1', B: 'two words' });
+    });
+
+    it('merges .env values under the environment (environment wins)', () => {
+      writeFileSync(path.join(dir, '.env'), 'FROM_FILE=file\nSHARED=file\n');
+      const merged = dotenv({ cwd: dir, environment: { SHARED: 'env', FROM_ENV: 'env' } });
+      expect(merged).toEqual({ FROM_FILE: 'file', SHARED: 'env', FROM_ENV: 'env' });
+    });
+
+    it('lets file values win when override is true', () => {
+      writeFileSync(path.join(dir, '.env'), 'SHARED=file\n');
+      const merged = dotenv({ cwd: dir, environment: { SHARED: 'env' }, override: true });
+      expect(merged.SHARED).toBe('file');
+    });
+
+    it('returns the environment unchanged when the file is missing', () => {
+      const merged = dotenv({ cwd: dir, environment: { ONLY: 'env' } });
+      expect(merged).toEqual({ ONLY: 'env' });
+    });
+
+    it('resolves an explicit path over cwd/file', () => {
+      const custom = path.join(dir, 'custom.env');
+      writeFileSync(custom, 'CUSTOM=yes\n');
+      const merged = dotenv({ path: custom, cwd: '/nonexistent', environment: {} });
+      expect(merged).toEqual({ CUSTOM: 'yes' });
+    });
+
+    it('resolves a custom file name under cwd', () => {
+      writeFileSync(path.join(dir, '.env.local'), 'LOCAL=yes\n');
+      const merged = dotenv({ cwd: dir, file: '.env.local', environment: {} });
+      expect(merged).toEqual({ LOCAL: 'yes' });
+    });
+
+    it('never mutates process.env or the provided environment', () => {
+      writeFileSync(path.join(dir, '.env'), 'DOTENV_MUTATION_CHECK=file\n');
+      const provided = { KEEP: 'env' };
+      dotenv({ cwd: dir, environment: provided });
+      dotenv({ cwd: dir });
+      expect(provided).toEqual({ KEEP: 'env' });
+      expect(process.env.DOTENV_MUTATION_CHECK).toBeUndefined();
+    });
+
+    it('composes with env() for validation', () => {
+      writeFileSync(path.join(dir, '.env'), 'DATABASE_URL=postgres://localhost/dev\n');
+      const config = env(
+        dotenv({ cwd: dir, environment: {} }),
+        { DATABASE_URL: str() }
+      );
+      expect(config.DATABASE_URL).toBe('postgres://localhost/dev');
     });
   });
 });

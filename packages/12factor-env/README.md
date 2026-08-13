@@ -115,6 +115,39 @@ parseEnvBoolean('YES'); // true
 parseEnvNumber('42');   // 42
 ```
 
+## Opt-in dotenv support
+
+The 12-factor rule is **environment first, `.env` as a local-dev convenience**.
+`dotenv()` builds an environment record where a local `.env` fills gaps but real
+environment variables always win. It never mutates `process.env`, a missing file
+is not an error, and nothing changes unless you call it — existing `env()` usage
+is unaffected.
+
+```ts
+import { env, dotenv, str, port } from '12factor-env';
+
+const config = env(
+  dotenv(),                       // process.env, backed by ./.env when present
+  { DATABASE_URL: str() },
+  { PORT: port({ default: 3000 }) }
+);
+```
+
+Options:
+
+```ts
+dotenv();                                  // <cwd>/.env merged under process.env
+dotenv({ cwd: projectDir });               // look for .env in another directory
+dotenv({ file: '.env.local' });            // different file name under cwd
+dotenv({ path: '/etc/app/config.env' });   // explicit file path
+dotenv({ environment: {} });               // file only, ignore process.env
+dotenv({ override: true });                // file values win over the environment
+```
+
+Parsing uses Node's built-in dotenv parser (`util.parseEnv`), which handles
+comments, quoting, and `export` prefixes. The raw parser is exported as
+`parseDotenv(source)` if you need it directly.
+
 ## Validators
 
 All validators from [envalid](https://github.com/af/envalid) are re-exported:
