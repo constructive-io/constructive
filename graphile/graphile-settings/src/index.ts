@@ -35,7 +35,10 @@
 import 'postgraphile/grafserv';
 import 'graphile-build';
 
-import { makePgService } from 'postgraphile/adaptors/pg';
+import type { ScopedIntrospectionServiceOptions } from 'graphile-scoped-introspection';
+import { makePgService as makePostGraphilePgService } from 'postgraphile/adaptors/pg';
+
+import { makeConfiguredPgService } from './scoped-introspection-service';
 
 // ============================================================================
 // Re-export all plugins and presets
@@ -43,7 +46,10 @@ import { makePgService } from 'postgraphile/adaptors/pg';
 
 // Main preset + factory
 export type { ConstructivePresetOptions } from './presets/constructive-preset';
-export { ConstructivePreset, createConstructivePreset } from './presets/constructive-preset';
+export {
+  ConstructivePreset,
+  createConstructivePreset,
+} from './presets/constructive-preset';
 
 // Re-export all plugins for convenience
 export * from './plugins/index';
@@ -55,8 +61,19 @@ export * from './presets/index';
 // Utilities
 // ============================================================================
 
-// Re-export makePgService for convenience
-export { makePgService };
+export type ConstructivePgServiceOptions = Parameters<
+  typeof makePostGraphilePgService
+>[0] &
+  ScopedIntrospectionServiceOptions;
+
+/** Construct a PG service with CNC's opt-in introspection controls. */
+export const makePgService = (options: ConstructivePgServiceOptions) =>
+  makeConfiguredPgService(makePostGraphilePgService, options);
+
+export {
+  normalizeIntrospectionDependencySchemas,
+  resolveIntrospectionSettings,
+} from './introspection-settings';
 
 // Presigned URL utilities
 export { getPresignedUrlS3Config } from './presigned-url-resolver';
