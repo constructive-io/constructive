@@ -4,10 +4,10 @@ import { performance } from 'node:perf_hooks';
 import {
   defaultPreset as graphileBuildPreset,
   makeSchema,
-  ReleaseBuildStatePlugin,
 } from 'graphile-build';
 import { defaultPreset as graphileBuildPgPreset } from 'graphile-build-pg';
 import type { GraphileConfig } from 'graphile-config';
+import { BuildStateRetirementPlugin } from 'graphile-settings/plugins/build-state-retirement';
 import { execute, lexicographicSortSchema, parse, printSchema } from 'graphql';
 import { makePgService as makePostGraphilePgService } from 'postgraphile/adaptors/pg';
 
@@ -150,7 +150,7 @@ export const makeWorkerPreset = (
     }
   );
   const plugins: GraphileConfig.Plugin[] = [CaptureBuildPlugin(capture)];
-  if (definition.retireBuildState) plugins.push(ReleaseBuildStatePlugin);
+  if (definition.retireBuildState) plugins.push(BuildStateRetirementPlugin);
   return {
     preset: {
       extends: [graphileBuildPreset, graphileBuildPgPreset],
