@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.29.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.28.0...12factor-env@1.29.0) (2026-08-13)
+
+### Features
+
+- **coerce:** add @constructive-io/coerce and re-base 12factor-env's lenient parsers on it ([ee0c9f6](https://github.com/constructive-io/constructive/commit/ee0c9f65a96b12728eddfaf6a11f57df59855a46))
+
 # [1.28.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.27.1...12factor-env@1.28.0) (2026-08-13)
 
 ### Features

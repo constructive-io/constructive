@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/test-codegen-app",
-  "version": "2.11.11",
+  "version": "2.11.12",
   "private": true,
   "type": "module",
   "scripts": {
