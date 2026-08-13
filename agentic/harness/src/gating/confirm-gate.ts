@@ -51,6 +51,13 @@ export type ConfirmGateDeps = {
     blueprintName: string | undefined,
     displayName: string
   ): Promise<ConfirmPreview | undefined>;
+  /**
+   * Tool names that require a human decision. The policy belongs to the host,
+   * not the harness: Desktop/CLI gate Constructive's mutating db tools, a
+   * remote coding host gates a different set. Defaults to
+   * `MUTATING_DB_TOOLS`.
+   */
+  gatedTools?: ReadonlySet<string>;
 };
 
 export type ConfirmGate = {
@@ -60,6 +67,7 @@ export type ConfirmGate = {
 
 export function createConfirmGate(deps: ConfirmGateDeps): ConfirmGate {
   const declineGuard = createDeclineGuard();
+  const gatedTools = deps.gatedTools ?? MUTATING_DB_TOOLS;
 
   async function confirmOrDecline(
     event: GateToolCallEvent,
@@ -89,7 +97,7 @@ export function createConfirmGate(deps: ConfirmGateDeps): ConfirmGate {
     onAgentStart: () => declineGuard.clear(),
 
     onToolCall: async (event, host, cwd) => {
-      if (!MUTATING_DB_TOOLS.has(event.toolName)) return;
+      if (!gatedTools.has(event.toolName)) return;
 
       const input = event.input;
 
