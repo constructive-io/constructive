@@ -2632,6 +2632,37 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
+  packages/perf-harness:
+    dependencies:
+      graphile-build:
+        specifier: 5.1.1
+        version: 5.1.1(patch_hash=4914e3e86d4c8d82d9972a239ecc5c54ce43d6d79ab95b00dc0f1da3a53a5032)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
+      graphile-build-pg:
+        specifier: 5.1.3
+        version: 5.1.3(patch_hash=9145c8e4ae69ef92f0812d00676cd3242fd16122ee922fb3b82584b23ff7e2e5)(@dataplan/pg@1.1.1(patch_hash=a7c958d2d1d134e846226ca965d40145679ae0d5d7970ab61e7a1638295e38a2)(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(patch_hash=4914e3e86d4c8d82d9972a239ecc5c54ce43d6d79ab95b00dc0f1da3a53a5032)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config:
+        specifier: 1.1.0
+        version: 1.1.0
+      graphql:
+        specifier: 16.13.0
+        version: 16.13.0
+      pg:
+        specifier: ^8.21.0
+        version: 8.21.0
+      postgraphile:
+        specifier: 5.1.4
+        version: 5.1.4(30f6c21ce20175065337dc728508839f)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.19
+      '@types/pg':
+        specifier: ^8.20.4
+        version: 8.20.4
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+
   packages/postmaster:
     dependencies:
       12factor-env:
