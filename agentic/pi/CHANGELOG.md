@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.13.0...@agentic-kit/pi@0.14.0) (2026-08-13)
+
+### Features
+
+- **pi:** injectable project context source with CONSTRUCTIVE_-prefixed env vars ([17c8fab](https://github.com/constructive-io/constructive/commit/17c8fab7c552c4faa1a49d5e64aa7c599f36932e))
+
 # [0.13.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.12.0...@agentic-kit/pi@0.13.0) (2026-08-13)
 
 ### Features

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.28.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.27.1...12factor-env@1.28.0) (2026-08-13)
+
+### Features
+
+- **12factor-env:** list/bounded num/duration/enumerated validators, cross-field checks, secret redaction ([5baba02](https://github.com/constructive-io/constructive/commit/5baba02258034e8e62522495704bfef1d6c065a2))
+- **12factor-env:** opt-in dotenv support via dotenv()/parseDotenv ([fe0bd61](https://github.com/constructive-io/constructive/commit/fe0bd61f472f4dfa85e1c809048b0281c76c8f57))
+
 ## [1.27.1](https://github.com/constructive-io/constructive/compare/12factor-env@1.27.0...12factor-env@1.27.1) (2026-08-05)
 
 **Note:** Version bump only for package 12factor-env

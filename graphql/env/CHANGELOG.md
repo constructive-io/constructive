@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.29.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.29.3...@constructive-io/graphql-env@3.29.4) (2026-08-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
 ## [3.29.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.29.2...@constructive-io/graphql-env@3.29.3) (2026-08-05)
 
 **Note:** Version bump only for package @constructive-io/graphql-env
