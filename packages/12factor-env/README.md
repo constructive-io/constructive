@@ -166,6 +166,20 @@ Parsing uses Node's built-in dotenv parser (`util.parseEnv`), which handles
 comments, quoting, and `export` prefixes. The raw parser is exported as
 `parseDotenv(source)` if you need it directly.
 
+## The contract: unset may default, invalid always throws
+
+Two different things, deliberately:
+
+- **Unset** — resolves `default`/`devDefault`/`testDefault` if the spec has one, otherwise throws.
+- **Set but invalid** — **always throws.** A value that is present and wrong is never
+  silently replaced by a default or a fallback, because a typo'd `AUTH_KINDS` degrading
+  to "allow nothing" (or a bad `PORT` degrading to 3000) is a security incident, not a
+  recovery. This is why `list()` treats "set, but yields no items" as an error rather
+  than returning `[]`.
+
+Errors from one `env()` call are reported **together**, including cross-field `checks`,
+so an operator fixes one deployment instead of one variable per redeploy.
+
 ## Validators
 
 All validators from [envalid](https://github.com/af/envalid) are re-exported:
@@ -180,6 +194,67 @@ All validators from [envalid](https://github.com/af/envalid) are re-exported:
 | `url()` | Valid URL |
 | `email()` | Valid email address |
 | `json()` | JSON string (parsed) |
+
+House validators add what consumers were otherwise hand-rolling after `env()`:
+
+| Validator | Description |
+|-----------|-------------|
+| `list()` | Separated list of trimmed, non-empty strings. `list({ separator: ':' })`, and `list({ choices: [...] as const })` checks membership **per item** and types the result as the union array |
+| `num({ min, max, integer })` | Number with inclusive bounds (superset of envalid's `num`) |
+| `int({ min, max })` | `num({ integer: true })` |
+| `duration()` | Milliseconds, accepting `250`, `500ms`, `30s`, `5m`, `2h`, `1d` |
+| `enumerated([...] as const)` / `oneOf` | `str({ choices })` with a discoverable name and literal-union typing |
+
+```ts
+import { duration, enumerated, env, int, list, str } from '12factor-env';
+
+const config = env(process.env, {}, {
+  AUTH_KINDS: list({ choices: ['api_key', 'jwt'] as const, default: ['api_key'] }),
+  CACHE_TTL: duration({ default: 30_000 }),
+  POOL_MAX: int({ min: 1, max: 64, default: 10 }),
+  CODEGEN_MODE: enumerated(['per-function', 'combined'] as const, { default: 'combined' })
+});
+```
+
+## Cross-field checks
+
+Constraints *between* vars belong in the schema, not in an ad-hoc `if` after it — that
+way they run against cleaned values and their failures join the same report:
+
+```ts
+import { distinct, env, mutuallyExclusive, requiredWhen, str } from '12factor-env';
+
+const config = env(process.env, { CONTROL_ROLE: str(), DATA_ROLE: str() }, {}, {
+  checks: [
+    distinct(['CONTROL_ROLE', 'DATA_ROLE'], 'the control role needs BYPASSRLS; the data role must not have it'),
+    mutuallyExclusive(['AUTH_TOKEN', 'AUTH_TOKEN_FILE']),
+    requiredWhen('TLS_ENABLED', ['TLS_CERT', 'TLS_KEY']),
+    { vars: ['MIN', 'MAX'], check: (v) => v.MIN <= v.MAX, message: 'MIN must not exceed MAX' }
+  ]
+});
+```
+
+A check is **skipped** when any var it names already failed validation, so "both unset"
+is not also reported as "both equal".
+
+## Secrets are not printed
+
+envalid quotes the offending value into its message (`Invalid url: "postgres://u:pw@h/db"`),
+which puts passwords in crash logs. Anything passed as `env()`'s `secrets` argument — or
+marked `str({ secret: true })` — is redacted instead:
+
+```ts
+const config = env(process.env, { DATABASE_URL: url() }, { PORT: port({ default: 3000 }) });
+
+config.DATABASE_URL          // the real value
+JSON.stringify(config)       // {"DATABASE_URL":"[redacted]","PORT":3000}
+console.log(config)          // redacted too (util.inspect)
+
+// a malformed DATABASE_URL reports: 'Invalid url: "[redacted]" (value redacted, 42 chars)'
+// a MISSING one still reports its desc, since there is no value to leak
+```
+
+Use `redactEnvError(err, [knownSecret])` when re-logging an error you built yourself.
 
 ### Validator Options
 
@@ -196,13 +271,14 @@ const config = env(process.env, {
 
 ## API
 
-### `env(inputEnv, secrets, vars)`
+### `env(inputEnv, secrets, vars, options?)`
 
 Main function to validate environment variables.
 
 - `inputEnv` - The environment object (usually `process.env`)
-- `secrets` - Required environment variables
+- `secrets` - Required environment variables (treated as sensitive: redacted in errors and serialization)
 - `vars` - Optional environment variables
+- `options.checks` - Constraints between vars, evaluated over the cleaned values
 
 ## Re-exports from envalid
 
