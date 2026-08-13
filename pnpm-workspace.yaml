@@ -15,7 +15,7 @@ packages:
 # Most malicious releases are found and yanked well inside that window.
 minimumReleaseAge: 2880
 
-# Exempt from the wait: 6 scope glob(s), 41 first-party package(s), 7 exception(s).
+# Exempt from the wait: 6 scope glob(s), 41 first-party package(s), 4 exception(s).
 # First-party membership comes from the inventory.
 minimumReleaseAgeExclude:
   - "@constructive-db/*"
@@ -67,10 +67,7 @@ minimumReleaseAgeExclude:
   - yanse
   - "@typescript-eslint/eslint-plugin@8.66.0" # ^8.66.0 floor matches the newest release; nothing older satisfies it (expires 2026-08-17)
   - "@typescript-eslint/parser@8.66.0" # ^8.66.0 floor matches the newest release; nothing older satisfies it (expires 2026-08-17)
-  - "@playwright/test@1.62.1" # ^1.62.1 floor matches the newest release; nothing older satisfies it (expires 2026-08-13)
   - "@types/pg@8.20.4" # ^8.20.4 floor matches the newest release; nothing older satisfies it (expires 2026-08-18)
-  - "@types/react@19.2.18" # ^19.2.18 floor matches the newest release; nothing older satisfies it (expires 2026-08-13)
-  - "@types/react-dom@19.2.4" # ^19.2.4 floor matches the newest release; nothing older satisfies it (expires 2026-08-13)
   - "@types/semver@7.8.0" # ^7.8.0 floor matches the newest release; nothing older satisfies it (expires 2026-08-16)
 
 # Off: transitive dependencies may resolve from git or a URL.
