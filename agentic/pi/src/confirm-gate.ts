@@ -35,6 +35,8 @@ export type ConfirmGateDeps = {
   resolveProjectContext: typeof resolveProjectContext;
   resolveDataToken: typeof resolveDataToken;
   createTemplatePreviewTables: typeof createTemplatePreviewTables;
+  /** Tool names to gate; defaults to the harness's `MUTATING_DB_TOOLS`. */
+  gatedTools?: ReadonlySet<string>;
 };
 
 export type ConfirmGate = {
@@ -47,6 +49,7 @@ export type ConfirmGate = {
 
 export function createConfirmGate(deps: ConfirmGateDeps): ConfirmGate {
   const gate: HarnessConfirmGate = createHarnessConfirmGate({
+    gatedTools: deps.gatedTools,
     isProjectRunnable: async (cwd) => {
       const resolved = await deps.resolveProjectContext(cwd);
       return resolved.context !== null;

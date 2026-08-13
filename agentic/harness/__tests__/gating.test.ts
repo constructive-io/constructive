@@ -1,6 +1,6 @@
 import { ConfirmGate, ConfirmGateDeps, createConfirmGate, GateHost } from '../src/gating/confirm-gate';
 import { createDeclineGuard } from '../src/gating/decline-guard';
-import { buildConfirmPrompt } from '../src/gating/prompts';
+import { buildConfirmPrompt, MUTATING_DB_TOOLS } from '../src/gating/prompts';
 
 type Harness = {
   gate: ConfirmGate;
@@ -215,6 +215,72 @@ describe('confirm gate: declines are respected', () => {
     );
     expect(result?.block).toBe(true);
     expect(withToken.confirmCalls()).toBe(1);
+  });
+});
+
+describe('confirm gate: the gated-tool set is injectable', () => {
+  it('gates the default MUTATING_DB_TOOLS set when none is injected', async () => {
+    const { gate, host, confirmCalls } = createHarness({ isProjectRunnable: async () => true });
+    for (const toolName of MUTATING_DB_TOOLS) {
+      if (toolName === 'add_records' || toolName === 'create_api_key') continue; // tokenless: skipped
+      const result = await gate.onToolCall(call(toolName, `tc-${toolName}`, {}), host, CWD);
+      expect(result?.block).toBe(true);
+    }
+    expect(confirmCalls()).toBe(MUTATING_DB_TOOLS.size - 2);
+  });
+
+  it('gates only the injected set: a custom tool is gated, a default one is not', async () => {
+    const { gate, host, confirmCalls } = createHarness({
+      isProjectRunnable: async () => true,
+      gatedTools: new Set(['bash']),
+    });
+
+    const gated = await gate.onToolCall(call('bash', 'tc-1', { command: 'rm -rf /' }), host, CWD);
+    expect(gated?.block).toBe(true);
+    expect(gated?.reason).toMatch(/declined it/);
+    expect(confirmCalls()).toBe(1);
+
+    // delete_table is in MUTATING_DB_TOOLS but not in the injected set.
+    const ungated = await gate.onToolCall(
+      call('delete_table', 'tc-2', { table_name: 'users' }),
+      host,
+      CWD
+    );
+    expect(ungated).toBeUndefined();
+    expect(confirmCalls()).toBe(1);
+  });
+
+  it('applies the decline guard and headless block to injected tools too', async () => {
+    const { gate, host, confirmCalls, skipNotices } = createHarness({
+      isProjectRunnable: async () => true,
+      gatedTools: new Set(['bash']),
+    });
+    const input = { command: 'git push --force' };
+
+    await gate.onToolCall(call('bash', 'tc-1', input), host, CWD);
+    const retry = await gate.onToolCall(call('bash', 'tc-2', input), host, CWD);
+    expect(retry?.reason).toMatch(/already declined/);
+    expect(confirmCalls()).toBe(1);
+    expect(skipNotices()).toEqual(['tc-2']);
+
+    const headless: GateHost = {
+      hasUI: false,
+      confirmTool: async () => true,
+      notifyToolSkipped: () => undefined,
+    };
+    const blocked = await gate.onToolCall(call('bash', 'tc-3', {}), headless, CWD);
+    expect(blocked?.reason).toMatch(/no confirmation UI/);
+  });
+
+  it('gates nothing when an empty set is injected', async () => {
+    const { gate, host, confirmCalls } = createHarness({
+      isProjectRunnable: async () => true,
+      gatedTools: new Set<string>(),
+    });
+    expect(
+      await gate.onToolCall(call('provision_database', 'tc-1', {}), host, CWD)
+    ).toBeUndefined();
+    expect(confirmCalls()).toBe(0);
   });
 });
 
