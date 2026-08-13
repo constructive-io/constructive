@@ -2320,6 +2320,9 @@ importers:
 
   packages/12factor-env:
     dependencies:
+      '@constructive-io/coerce':
+        specifier: workspace:^
+        version: link:../coerce/dist
       envalid:
         specifier: ^8.2.0
         version: 8.2.0
@@ -2447,6 +2450,13 @@ importers:
       '@types/pg':
         specifier: ^8.20.4
         version: 8.20.4
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
+  packages/coerce:
+    devDependencies:
       makage:
         specifier: ^0.3.0
         version: 0.3.0
