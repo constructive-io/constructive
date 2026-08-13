@@ -115,7 +115,7 @@ parseEnvBoolean('YES'); // true
 parseEnvNumber('42');   // 42
 ```
 
-## Opt-in dotenv support
+## Opt-in dotenv support (`12factor-env/dotenv`)
 
 The 12-factor rule is **environment first, `.env` as a local-dev convenience**.
 `dotenv()` builds an environment record where a local `.env` fills gaps but real
@@ -123,14 +123,32 @@ environment variables always win. It never mutates `process.env`, a missing file
 is not an error, and nothing changes unless you call it — existing `env()` usage
 is unaffected.
 
+It lives in its own **node-only** entry point, because it imports `node:fs`. The
+main `12factor-env` entry stays free of node builtins so it can be bundled for a
+browser, an Electron renderer, or a Next.js client component:
+
 ```ts
-import { env, dotenv, str, port } from '12factor-env';
+import { env, str, port } from '12factor-env';
+import { dotenv } from '12factor-env/dotenv';   // node only
 
 const config = env(
   dotenv(),                       // process.env, backed by ./.env when present
   { DATABASE_URL: str() },
   { PORT: port({ default: 3000 }) }
 );
+```
+
+In a client/renderer bundle, keep importing only from `12factor-env` and pass
+whatever environment record the framework gives you (`process.env` as inlined by
+Next/Vite, or values the main process forwarded over IPC) — `env()` validates any
+record, so nothing needs to read a file:
+
+```ts
+import { env, str } from '12factor-env';
+
+const config = env({ NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL }, {
+  NEXT_PUBLIC_API_URL: str()
+});
 ```
 
 Options:

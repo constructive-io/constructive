@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -6,7 +6,6 @@ import {
   bool,
   boolish,
   devDefault,
-  dotenv,
   env,
   getNodeEnv,
   getStrictEnvMode,
@@ -14,7 +13,6 @@ import {
   isDevelopment,
   isProduction,
   isTest,
-  parseDotenv,
   parseEnvBoolean,
   parseEnvList,
   parseEnvNumber,
@@ -23,6 +21,7 @@ import {
   str,
   url,
   withDefault} from '../src';
+import { dotenv, parseDotenv } from '../src/dotenv';
 
 describe('env', () => {
   const ORIGINAL_ENV = { ...process.env };
@@ -357,6 +356,17 @@ describe('env', () => {
       dotenv({ cwd: dir });
       expect(provided).toEqual({ KEEP: 'env' });
       expect(process.env.DOTENV_MUTATION_CHECK).toBeUndefined();
+    });
+
+    it('is not reachable from the main entry, which stays browser-safe', () => {
+      const main = require('../src') as Record<string, unknown>;
+      expect(main.dotenv).toBeUndefined();
+      expect(main.parseDotenv).toBeUndefined();
+
+      // The main entry is bundled into browsers/Electron renderers/Next client
+      // components; a node builtin import there breaks those bundles.
+      const source = readFileSync(path.join(__dirname, '../src/index.ts'), 'utf8');
+      expect(source).not.toMatch(/from '(node:|fs|path)/);
     });
 
     it('composes with env() for validation', () => {
