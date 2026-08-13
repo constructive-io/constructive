@@ -10,6 +10,7 @@ import { PgAggregatesPreset } from 'graphile-pg-aggregates';
 import { createPostgisOperatorFactory,GraphilePostgisPreset } from 'graphile-postgis';
 import { PresignedUrlPreset } from 'graphile-presigned-url-plugin';
 import { RealtimeSubscriptionsPreset } from 'graphile-realtime-subscriptions';
+import { ScopedIntrospectionPreset } from 'graphile-scoped-introspection';
 import { createMatchesOperatorFactory, createTrgmOperatorFactories,UnifiedSearchPreset } from 'graphile-search';
 import { UploadPreset } from 'graphile-upload-plugin';
 
@@ -154,6 +155,8 @@ export function createConstructivePreset(
   const presets: GraphileConfig.Preset[] = [
     // Core (always on)
     MinimalPreset,
+    // Keep PostgreSQL introspection scoped to each configured service.
+    ScopedIntrospectionPreset,
     ConflictDetectorPreset,
     InflektPreset,
     InflectorLoggerPreset,
