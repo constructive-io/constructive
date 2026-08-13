@@ -3,6 +3,7 @@ import {
   type ConfirmGate as HarnessConfirmGate,
   createConfirmGate as createHarnessConfirmGate,
   type GateHost,
+  type GatePolicy,
 } from '@agentic-kit/harness';
 import type {
   ExtensionContext,
@@ -39,6 +40,13 @@ export type ConfirmGateDeps = {
   gatedTools?: ReadonlySet<string>;
 };
 
+/**
+ * Constructive's database deps, or a `GatePolicy` of the host's own — a pi
+ * host with no Constructive project (a remote coding job gating `bash`) has
+ * nothing to give the former.
+ */
+export type ConfirmGateOptions = ConfirmGateDeps | { policy: GatePolicy };
+
 export type ConfirmGate = {
   onAgentStart: () => void;
   onToolCall: (
@@ -47,32 +55,36 @@ export type ConfirmGate = {
   ) => Promise<ToolCallEventResult | undefined>;
 };
 
-export function createConfirmGate(deps: ConfirmGateDeps): ConfirmGate {
-  const gate: HarnessConfirmGate = createHarnessConfirmGate({
-    gatedTools: deps.gatedTools,
-    isProjectRunnable: async (cwd) => {
-      const resolved = await deps.resolveProjectContext(cwd);
-      return resolved.context !== null;
-    },
-    hasDataToken: async (cwd) => {
-      const resolved = await deps.resolveProjectContext(cwd);
-      if (!resolved.context) return false;
-      const token = await deps.resolveDataToken(resolved.context);
-      return Boolean(token.token);
-    },
-    resolveTemplatePreview: async (cwd, blueprintName, displayName) => {
-      const resolved = await deps.resolveProjectContext(cwd);
-      if (!resolved.context) return undefined;
-      const result = await deps.createTemplatePreviewTables(resolved.context, blueprintName);
-      if (result.tables.length === 0) return undefined;
-      return {
-        kind: 'template',
-        displayName,
-        blueprintName: result.blueprintName || undefined,
-        tables: result.tables,
-      };
-    },
-  });
+export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
+  const gate: HarnessConfirmGate = createHarnessConfirmGate(
+    'policy' in options
+      ? options
+      : {
+        gatedTools: options.gatedTools,
+        isProjectRunnable: async (cwd) => {
+          const resolved = await options.resolveProjectContext(cwd);
+          return resolved.context !== null;
+        },
+        hasDataToken: async (cwd) => {
+          const resolved = await options.resolveProjectContext(cwd);
+          if (!resolved.context) return false;
+          const token = await options.resolveDataToken(resolved.context);
+          return Boolean(token.token);
+        },
+        resolveTemplatePreview: async (cwd, blueprintName, displayName) => {
+          const resolved = await options.resolveProjectContext(cwd);
+          if (!resolved.context) return undefined;
+          const result = await options.createTemplatePreviewTables(resolved.context, blueprintName);
+          if (result.tables.length === 0) return undefined;
+          return {
+            kind: 'template',
+            displayName,
+            blueprintName: result.blueprintName || undefined,
+            tables: result.tables,
+          };
+        },
+      },
+  );
 
   return {
     onAgentStart: gate.onAgentStart,

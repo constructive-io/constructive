@@ -23,3 +23,6 @@ export type ConfirmPreview =
   | { kind: 'template'; displayName: string; blueprintName?: string; tables: ConfirmPreviewTable[] }
   | { kind: 'policies'; tableName: string; policies: string[] }
   | { kind: 'field'; tableName: string; field: ConfirmPreviewField };
+
+/** What a host puts in front of the user for one gated call. */
+export type ConfirmPrompt = { title: string; message: string; preview?: ConfirmPreview };

@@ -1,19 +1,17 @@
+import type { ConstructiveGateDeps } from './constructive-policy';
+import { createConstructiveGatePolicy } from './constructive-policy';
 import { buildDeclineReason, createDeclineGuard } from './decline-guard';
+import type { GatePolicy, GateToolCallEvent } from './policy';
 import type { ConfirmPreview } from './preview';
-import { buildConfirmPrompt, MUTATING_DB_TOOLS } from './prompts';
 
 /**
- * Host-neutral confirm gate for mutating db tools. Structurally mirrors the
- * pi extension `tool_call` hook so a pi adapter is a thin mapping, but takes
- * every host capability (confirm UI, skip notification, context/token/preview
- * resolvers) as injected deps — no Electron, no pi imports.
+ * Host-neutral confirm gate. It owns the mechanics of asking a human —
+ * decline memory, auto-skipping a declined retry, refusing gated calls on a
+ * headless host — and takes both the host's capabilities (confirm UI, skip
+ * notification) and its policy (which calls are gated, what the prompt says)
+ * as injected dependencies. Structurally mirrors the pi extension `tool_call`
+ * hook so a pi adapter is a thin mapping: no Electron, no pi imports.
  */
-
-export type GateToolCallEvent = {
-  toolName: string;
-  toolCallId: string;
-  input?: Record<string, unknown>;
-};
 
 /** `block: true` stops the tool call; `reason` is surfaced to the agent. */
 export type GateResult = { block: true; reason: string } | undefined;
@@ -32,78 +30,36 @@ export type GateHost = {
   notifyToolSkipped(toolCallId: string): void;
 };
 
-export type ConfirmGateDeps = {
-  /**
-   * Whether the project is provisioned/runnable at `cwd`. Unrunnable calls
-   * skip the confirm so the tool can return its clean "provision first"
-   * message instead of making the user approve something that fails.
-   */
-  isProjectRunnable(cwd: string): Promise<boolean>;
-  /** Whether a data-plane token is available (gates `add_records`). */
-  hasDataToken(cwd: string): Promise<boolean>;
-  /**
-   * Resolve the preview for `create_template` (its tables live in the
-   * blueprint it copies, not in the tool input). Return undefined when a
-   * preview can't be built.
-   */
-  resolveTemplatePreview(
-    cwd: string,
-    blueprintName: string | undefined,
-    displayName: string
-  ): Promise<ConfirmPreview | undefined>;
-  /**
-   * Tool names that require a human decision. The policy belongs to the host,
-   * not the harness: Desktop/CLI gate Constructive's mutating db tools, a
-   * remote coding host gates a different set. Defaults to
-   * `MUTATING_DB_TOOLS`.
-   */
-  gatedTools?: ReadonlySet<string>;
-};
+/**
+ * The Constructive database deps, from which the gate derives the default
+ * `GatePolicy`. Kept as the name every existing host passes.
+ */
+export type ConfirmGateDeps = ConstructiveGateDeps;
+
+/**
+ * Either hand the gate the Constructive deps and get its database policy, or
+ * hand it a policy of your own — a remote coding host gating `bash` has no
+ * project context or data token to speak of.
+ */
+export type ConfirmGateOptions = ConfirmGateDeps | { policy: GatePolicy };
 
 export type ConfirmGate = {
   onAgentStart: () => void;
   onToolCall: (event: GateToolCallEvent, host: GateHost, cwd: string) => Promise<GateResult>;
 };
 
-export function createConfirmGate(deps: ConfirmGateDeps): ConfirmGate {
+export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
   const declineGuard = createDeclineGuard();
-  const gatedTools = deps.gatedTools ?? MUTATING_DB_TOOLS;
-
-  async function confirmOrDecline(
-    event: GateToolCallEvent,
-    host: GateHost,
-    input: Record<string, unknown> | undefined,
-    preview?: ConfirmPreview
-  ): Promise<GateResult> {
-    const { title, message, preview: basePreview } = buildConfirmPrompt(event.toolName, input);
-    const approved = await host.confirmTool(
-      event.toolCallId,
-      title,
-      message,
-      preview ?? basePreview
-    );
-    if (!approved) {
-      declineGuard.recordDecline(event.toolName, input);
-      return { block: true, reason: buildDeclineReason(event.toolName) };
-    }
-    // An approved mutation changes database state, so earlier declines may no
-    // longer describe the same effect (e.g. a create_template preview derives
-    // from the blueprint, not the input) — let them re-prompt with fresh eyes.
-    declineGuard.clear();
-    return undefined;
-  }
+  const policy: GatePolicy =
+    'policy' in options ? options.policy : createConstructiveGatePolicy(options);
 
   return {
     onAgentStart: () => declineGuard.clear(),
 
     onToolCall: async (event, host, cwd) => {
-      if (!gatedTools.has(event.toolName)) return;
+      if (!policy.isGated(event)) return;
 
       const input = event.input;
-
-      // manage_entity_types multiplexes read + write actions behind one tool
-      // name; its read action is not a mutation, so it skips the gate.
-      if (event.toolName === 'manage_entity_types' && input?.action === 'list') return;
 
       const retryBlock = declineGuard.checkRetry(event.toolName, input);
       if (retryBlock) {
@@ -120,32 +76,24 @@ export function createConfirmGate(deps: ConfirmGateDeps): ConfirmGate {
         };
       }
 
-      // provision_database is the tool that CREATES the project context, so it
-      // can't gate on an existing one — confirm it directly.
-      if (event.toolName === 'provision_database') {
-        return confirmOrDecline(event, host, input);
-      }
+      const prompt = await policy.resolvePrompt(event, cwd);
+      if (!prompt) return;
 
-      if (!(await deps.isProjectRunnable(cwd))) return;
-      // Tools that need an app sign-in skip the confirm when no data token
-      // exists — the tool returns its sign-in prompt instead of making the
-      // user approve something that fails.
-      if (
-        (event.toolName === 'add_records' || event.toolName === 'create_api_key') &&
-        !(await deps.hasDataToken(cwd))
-      ) {
-        return;
+      const approved = await host.confirmTool(
+        event.toolCallId,
+        prompt.title,
+        prompt.message,
+        prompt.preview
+      );
+      if (!approved) {
+        declineGuard.recordDecline(event.toolName, input);
+        return { block: true, reason: buildDeclineReason(event.toolName) };
       }
-
-      let resolvedPreview: ConfirmPreview | undefined;
-      if (event.toolName === 'create_template') {
-        const blueprintName =
-          typeof input?.blueprintName === 'string' ? input.blueprintName : undefined;
-        const displayName = typeof input?.displayName === 'string' ? input.displayName : '';
-        resolvedPreview = await deps.resolveTemplatePreview(cwd, blueprintName, displayName);
-      }
-
-      return confirmOrDecline(event, host, input, resolvedPreview);
+      // An approved mutation changes state, so earlier declines may no longer
+      // describe the same effect (e.g. a create_template preview derives from
+      // the blueprint, not the input) — let them re-prompt with fresh eyes.
+      declineGuard.clear();
+      return undefined;
     },
   };
 }
