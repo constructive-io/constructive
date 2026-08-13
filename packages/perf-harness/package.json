@@ -1,0 +1,36 @@
+{
+  "name": "@constructive-io/perf-harness",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reusable fresh-process Graphile performance harness",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "bin": {
+    "cperf": "index.js"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest"
+  },
+  "dependencies": {
+    "graphile-build": "5.1.1",
+    "graphile-build-pg": "5.1.3",
+    "graphile-config": "1.1.0",
+    "graphql": "16.13.0",
+    "pg": "^8.21.0",
+    "postgraphile": "5.1.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "@types/pg": "^8.20.4",
+    "makage": "^0.3.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}
