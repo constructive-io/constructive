@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.16.0](https://github.com/constructive-io/constructive/compare/node-type-registry@1.15.0...node-type-registry@1.16.0) (2026-08-13)
+
+### Features
+
+- **node-type-registry:** mark all task-identifier fields as function-ref ([27fa5be](https://github.com/constructive-io/constructive/commit/27fa5be4939d859db447ae20e63156013ae4e2dd))
+- **presets:** four presets that provision what they name ([c2d8857](https://github.com/constructive-io/constructive/commit/c2d8857eb9e2445c3987b770e0131a65539c5eee))
+
 # [1.15.0](https://github.com/constructive-io/constructive/compare/node-type-registry@1.14.3...node-type-registry@1.15.0) (2026-08-10)
 
 ### Features

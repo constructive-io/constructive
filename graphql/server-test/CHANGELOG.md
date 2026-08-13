@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.8](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.17.7...graphql-server-test@3.17.8) (2026-08-13)
+
+### Bug Fixes
+
+- **graphql-server:** attach the notify client's error handler before the LISTEN ([7de64ae](https://github.com/constructive-io/constructive/commit/7de64ae4e50df894d1d6df5bf4f4a63a1fce13e6))
+
 ## [3.17.7](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.17.6...graphql-server-test@3.17.7) (2026-08-10)
 
 **Note:** Version bump only for package graphql-server-test

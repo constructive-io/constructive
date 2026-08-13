@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.16.11](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.16.10...@constructive-io/graphql-server@5.16.11) (2026-08-13)
+
+### Bug Fixes
+
+- **graphql-server:** attach the notify client's error handler before the LISTEN ([7de64ae](https://github.com/constructive-io/constructive/commit/7de64ae4e50df894d1d6df5bf4f4a63a1fce13e6))
+
 ## [5.16.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.16.9...@constructive-io/graphql-server@5.16.10) (2026-08-10)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

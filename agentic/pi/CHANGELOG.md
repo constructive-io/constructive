@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.11.1...@agentic-kit/pi@0.12.0) (2026-08-13)
+
+### Features
+
+- **harness:** make the confirm gate's gated-tool set injectable ([b264d04](https://github.com/constructive-io/constructive/commit/b264d04c862226c0269983942f9048f179a3b367))
+- **presets:** four presets that provision what they name ([c2d8857](https://github.com/constructive-io/constructive/commit/c2d8857eb9e2445c3987b770e0131a65539c5eee))
+
 ## [0.11.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.11.0...@agentic-kit/pi@0.11.1) (2026-08-10)
 
 **Note:** Version bump only for package @agentic-kit/pi

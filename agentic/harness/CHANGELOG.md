@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.10.1...@agentic-kit/harness@0.11.0) (2026-08-13)
+
+### Features
+
+- **harness:** make the confirm gate's gated-tool set injectable ([b264d04](https://github.com/constructive-io/constructive/commit/b264d04c862226c0269983942f9048f179a3b367))
+
 ## [0.10.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.10.0...@agentic-kit/harness@0.10.1) (2026-08-05)
 
 **Note:** Version bump only for package @agentic-kit/harness
