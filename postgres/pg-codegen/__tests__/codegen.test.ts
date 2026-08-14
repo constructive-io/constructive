@@ -1,120 +1,61 @@
-process.env.LOG_SCOPE='pg-codegen';
-
 import { join } from 'path';
 import { getConnections, seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
-import { generateCodeTree } from '../src/codegen/codegen';
-import getIntrospectionRows from '../src/introspect';
-import type { DatabaseObject } from '../src/types';
+import { checkFileTree, generate, isClean, writeFileTree } from '../src/generate';
 
 const sql = (f: string) => join(__dirname, '/../sql', f);
+const FIXTURES = join(__dirname, '..', '__fixtures__', 'generated');
 
 let teardown: () => Promise<void>;
 let pg: PgTestClient;
+let files: Record<string, string>;
 
 beforeAll(async () => {
-  ({ pg, teardown } = await getConnections({},
-    [
-      seed.sqlfile([sql('test.sql')])
-    ]
-  ));
+  ({ pg, teardown } = await getConnections({}, [seed.sqlfile([sql('test.sql')])]));
+  files = await generate(pg.client, { schemas: ['codegen_test'] });
 });
 
 afterAll(() => teardown());
 
-it('fetches introspection rows from test schema', async () => {
-  const rows: DatabaseObject[] = await getIntrospectionRows({
-    client: pg.client,
-    introspectionOptions: {
-      pgLegacyFunctionsOnly: false,
-      pgIgnoreRBAC: true
-    },
-    namespacesToIntrospect: ['codegen_test'],
-    includeExtensions: false
-  });
-
-  expect(rows.length).toBeGreaterThan(0);
-  expect(rows.find(r => r.kind === 'class' && r.name === 'users')).toBeTruthy();
-  expect(rows.find(r => r.kind === 'class' && r.name === 'posts')).toBeTruthy();
+it('emits one module per table plus enums and barrels', () => {
+  expect(Object.keys(files).sort()).toEqual([
+    'codegen_test/active-users.ts',
+    'codegen_test/agent-runs.ts',
+    'codegen_test/enums.ts',
+    'codegen_test/index.ts',
+    'codegen_test/posts.ts',
+    'codegen_test/users.ts',
+    'index.ts'
+  ]);
 });
 
-it('generates _common.ts with UUID and Timestamp types', async () => {
-  const rows = await getIntrospectionRows({
-    client: pg.client,
-    introspectionOptions: {
-      pgLegacyFunctionsOnly: false,
-      pgIgnoreRBAC: true
-    },
-    namespacesToIntrospect: ['codegen_test'],
-    includeExtensions: false
-  });
-
-  const output = generateCodeTree(rows, {
-    includeTimestamps: true,
-    includeUUID: true
-  });
-
-  const common = output['schemas/_common.ts'];
-  expect(common).toMatchSnapshot();
+it('generates the users module', () => {
+  expect(files['codegen_test/users.ts']).toMatchSnapshot();
 });
 
-it('generates interfaces and classes for tables', async () => {
-  const rows = await getIntrospectionRows({
-    client: pg.client,
-    introspectionOptions: {
-      pgLegacyFunctionsOnly: false,
-      pgIgnoreRBAC: true
-    },
-    namespacesToIntrospect: ['codegen_test'],
-    includeExtensions: false
-  });
-
-  const output = generateCodeTree(rows, {
-    includeTimestamps: true,
-    includeUUID: true
-  });
-
-  const schema = output['schemas/codegen_test.ts'];
-  expect(schema).toMatchSnapshot();
+it('generates the posts module', () => {
+  expect(files['codegen_test/posts.ts']).toMatchSnapshot();
 });
 
-it('imports UUID and Timestamp when used in schema', async () => {
-  const rows = await getIntrospectionRows({
-    client: pg.client,
-    introspectionOptions: {
-      pgLegacyFunctionsOnly: false,
-      pgIgnoreRBAC: true
-    },
-    namespacesToIntrospect: ['codegen_test'],
-    includeExtensions: false
-  });
-
-  const output = generateCodeTree(rows, {
-    includeTimestamps: true,
-    includeUUID: true
-  });
-
-  const schema = output['schemas/codegen_test.ts'];
-  expect(schema).toMatch(/import\s+\{\s*UUID,\s*Timestamp\s*\}\s+from ["']\.\/_common["']/);
+it('generates the agent_runs module (enums, arrays, jsonb, bigint)', () => {
+  expect(files['codegen_test/agent-runs.ts']).toMatchSnapshot();
 });
 
-it('generates an index.ts that exports schema namespace', async () => {
-  const rows = await getIntrospectionRows({
-    client: pg.client,
-    introspectionOptions: {
-      pgLegacyFunctionsOnly: false,
-      pgIgnoreRBAC: true
-    },
-    namespacesToIntrospect: ['codegen_test'],
-    includeExtensions: false
-  });
+it('generates the enums module', () => {
+  expect(files['codegen_test/enums.ts']).toMatchSnapshot();
+});
 
-  const output = generateCodeTree(rows, {
-    includeTimestamps: true,
-    includeUUID: true
-  });
+it('generates the schema and root barrels', () => {
+  expect(files['codegen_test/index.ts']).toMatchSnapshot();
+  expect(files['index.ts']).toMatchSnapshot();
+});
 
-  const index = output['index.ts'];
-  expect(index).toMatchSnapshot();
+it('matches the committed __fixtures__/generated output (drift check)', async () => {
+  if (process.env.PG_CODEGEN_UPDATE_FIXTURES) {
+    await writeFileTree(FIXTURES, files);
+  }
+  const report = await checkFileTree(FIXTURES, files);
+  expect(report).toEqual({ missing: [], stale: [] });
+  expect(isClean(report)).toBe(true);
 });

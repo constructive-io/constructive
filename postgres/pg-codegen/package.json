@@ -2,8 +2,11 @@
   "name": "pg-codegen",
   "version": "5.10.11",
   "author": "Constructive <developers@constructive.io>",
-  "description": "PostgreSQL Codegen",
+  "description": "Type-safe TypeScript codegen from live PostgreSQL schemas: row types, coerce-backed decoders, serializers, table metadata, and enum unions",
   "main": "index.js",
+  "bin": {
+    "pg-codegen": "cli.js"
+  },
   "module": "esm/index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -25,7 +28,7 @@
     "prepack": "npm run build",
     "build": "makage build",
     "build:dev": "makage build --dev",
-    "dev": "ts-node ./src/index.ts",
+    "dev": "ts-node ./src/cli.ts",
     "lint": "eslint . --fix",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -41,18 +44,16 @@
   "dependencies": {
     "@babel/generator": "^7.29.1",
     "@babel/types": "^7.29.0",
-    "@pgpmjs/logger": "workspace:^",
-    "@pgpmjs/server-utils": "workspace:^",
-    "@pgpmjs/types": "workspace:^",
+    "@constructive-io/coerce": "workspace:^",
     "inflekt": "^0.8.1",
+    "introspectron": "workspace:^",
     "pg": "^8.21.0",
-    "pg-cache": "workspace:^",
-    "pg-env": "workspace:^",
-    "pgsql-test": "workspace:^"
+    "pg-env": "workspace:^"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.8",
     "@types/pg": "^8.20.4",
-    "makage": "^0.3.0"
+    "makage": "^0.3.0",
+    "pgsql-test": "workspace:^"
   }
 }

@@ -17,6 +17,7 @@ export type PgClass = WithTags<{
   namespaceId: string;
   namespaceName: string;
   typeId?: string;
+  classKind?: string;
   isExtensionConfigurationTable?: boolean;
 
   // Linked
@@ -37,6 +38,10 @@ export type PgAttribute = WithTags<{
   name: string;
   num: number;
   typeId: string;
+  typeModifier?: number | null;
+  isNotNull?: boolean;
+  hasDefault?: boolean;
+  identity?: string;
 
   // Linked
   class?: PgClass;
@@ -54,8 +59,14 @@ export type PgType = WithTags<{
   namespaceId: string;
   type: string;
   classId?: string;
+  category?: string;
+  domainIsNotNull?: boolean;
   domainBaseTypeId?: string;
   arrayItemTypeId?: string;
+  typeLength?: number;
+  isPgArray?: boolean;
+  enumVariants?: string[] | null;
+  rangeSubTypeId?: string | null;
 
   // Linked
   namespace?: PgNamespace;
