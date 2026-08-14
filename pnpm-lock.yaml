@@ -255,6 +255,13 @@ importers:
   agentic/protocol:
     publishDirectory: dist
 
+  agentic/pi-ext-metered-model:
+    devDependencies:
+      '@earendil-works/pi-coding-agent':
+        specifier: 0.79.6
+        version: 0.79.6(ws@8.20.1)(zod@4.4.3)
+    publishDirectory: dist
+
   agentic/pi-ext-run-log:
     dependencies:
       '@agentic-kit/run-log':
