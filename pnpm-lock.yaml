@@ -287,6 +287,9 @@ importers:
         version: 19.2.5(react@19.2.5)
     publishDirectory: dist
 
+  agentic/run-log:
+    publishDirectory: dist
+
   examples/codegen-integration:
     dependencies:
       '@0no-co/graphql.web':
