@@ -37,6 +37,24 @@ export const POSTS_TABLE = {
     publishedAt: 'published_at'
   }
 } as const;
+/** Per-column decoders for `codegen_test.posts`, for a value that is not a whole
+ * row: a joined projection, an aliased column, a partial SELECT.
+ *
+ * A NOT NULL column's decoder throws `CoerceError` and takes an overridable
+ * label, so a projection can name its own alias; a nullable column's is
+ * lenient and answers `null`.
+ *
+ * ```ts
+ * id: POSTS_FIELDS.id(row.id),
+ * ``` */
+export const POSTS_FIELDS = {
+  /** `id` (uuid) */id: (value: unknown, label = 'posts.id'): string => requireUuid(value, label),
+  /** `user_id` (int4) */userId: (value: unknown, label = 'posts.user_id'): number => requireInteger(value, label),
+  /** `title` (text) */title: (value: unknown, label = 'posts.title'): string => requireString(value, label),
+  /** `body` (text) */body: (value: unknown): string | null => asString(value),
+  /** `published` (bool) */published: (value: unknown): boolean | null => asBoolean(value),
+  /** `published_at` (timestamptz) */publishedAt: (value: unknown): string | null => asIsoString(value)
+} as const;
 /** Decode an untrusted camelCase value (a wire envelope, a parsed body) into `Posts`.
  *
  * Throws `CoerceError` naming the offending field when a required column is

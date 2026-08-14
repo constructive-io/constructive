@@ -57,6 +57,29 @@ export const AGENT_RUNS_TABLE = {
     finishedAt: 'finished_at'
   }
 } as const;
+/** Per-column decoders for `codegen_test.agent_runs`, for a value that is not a whole
+ * row: a joined projection, an aliased column, a partial SELECT.
+ *
+ * A NOT NULL column's decoder throws `CoerceError` and takes an overridable
+ * label, so a projection can name its own alias; a nullable column's is
+ * lenient and answers `null`.
+ *
+ * ```ts
+ * id: AGENT_RUNS_FIELDS.id(row.id),
+ * ``` */
+export const AGENT_RUNS_FIELDS = {
+  /** `id` (uuid) */id: (value: unknown, label = 'agent_runs.id'): string => requireUuid(value, label),
+  /** `thread_id` (uuid) */threadId: (value: unknown, label = 'agent_runs.thread_id'): string => requireUuid(value, label),
+  /** `status` (run_status) */status: (value: unknown, label = 'agent_runs.status'): RunStatus => requireRunStatus(value, label),
+  /** `tags` (_text) */tags: (value: unknown, label = 'agent_runs.tags'): string[] => requireArrayOf(value, asString, label, 'an array of non-empty strings'),
+  /** `retry_seconds` (_int4) */retrySeconds: (value: unknown): number[] | null => asArrayOf(value, asInteger),
+  /** `metadata` (jsonb) */metadata: (value: unknown, label = 'agent_runs.metadata'): Record<string, unknown> | unknown[] => requireJson(value, label),
+  /** `settings` (json) */settings: (value: unknown): Record<string, unknown> | unknown[] | null => asJson(value),
+  /** `last_event_seq` (int8) */lastEventSeq: (value: unknown, label = 'agent_runs.last_event_seq'): number => requireNumericInteger(value, label),
+  /** `score` (numeric) */score: (value: unknown): number | null => asNumeric(value),
+  /** `started_at` (timestamptz) */startedAt: (value: unknown): string | null => asIsoString(value),
+  /** `finished_at` (timestamptz) */finishedAt: (value: unknown): string | null => asIsoString(value)
+} as const;
 /** Decode an untrusted camelCase value (a wire envelope, a parsed body) into `AgentRuns`.
  *
  * Throws `CoerceError` naming the offending field when a required column is
