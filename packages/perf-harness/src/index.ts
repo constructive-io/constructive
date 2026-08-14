@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+export * from './build-state-retirement-suite';
 export * from './fixture';
 export * from './metrics';
 export * from './process';

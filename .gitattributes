@@ -1,3 +1,6 @@
 # SQL, plans and control files are content-addressed and compared verbatim in
 # tests, so the working tree must use LF on every platform.
 * text=auto eol=lf
+
+# pnpm patches retain upstream whitespace in context lines.
+patches/*.patch whitespace=-blank-at-eol

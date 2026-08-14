@@ -105,6 +105,10 @@ packageExtensions:
     dependencies:
       '@jest/test-sequencer': ^29.7.0
 
+patchedDependencies:
+  'graphile-build-pg@5.1.3': patches/graphile-build-pg@5.1.3.patch
+  'graphile-build@5.1.1': patches/graphile-build@5.1.1.patch
+
 # The only dependencies permitted to run install scripts.
 allowBuilds:
   "@launchql/protobufjs": true

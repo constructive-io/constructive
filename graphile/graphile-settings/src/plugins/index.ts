@@ -7,6 +7,9 @@
 // Minimal preset - PostGraphile without Node/Relay features
 export { MinimalPreset } from './minimal-preset';
 
+// CNC-owned opt-in for retiring construction-only Graphile state
+export { BuildStateRetirementPlugin } from './build-state-retirement';
+
 // Custom inflector using inflekt library
 export {
   InflektPlugin,

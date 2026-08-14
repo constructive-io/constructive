@@ -10,22 +10,19 @@ import type { MetaBuild, TableMeta } from './types';
 
 const runtimeTablesBySchema = new WeakMap<GraphQLSchema, TableMeta[]>();
 
-function getRuntimeTablesMeta(
-  build: MetaBuild,
-  schema: GraphQLSchema
-): TableMeta[] {
-  let tables = runtimeTablesBySchema.get(schema);
+function getRuntimeTablesMeta(schema: GraphQLSchema): TableMeta[] {
+  const tables = runtimeTablesBySchema.get(schema);
   if (!tables) {
-    tables = collectTablesMeta(build, schema);
-    runtimeTablesBySchema.set(schema, tables);
+    throw new Error(
+      'Meta schema runtime state was not finalized for this GraphQL schema'
+    );
   }
   return tables;
 }
 
 /**
  * Returns the table metadata memoized for the given executable schema, or
- * `undefined` if `_meta` has not been resolved against that schema (e.g. the
- * meta plugin is disabled or `_meta` was never executed).
+ * `undefined` when the meta plugin was not installed for that schema.
  */
 export function getTablesMetaForSchema(
   schema: GraphQLSchema
@@ -41,11 +38,15 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLObjectType_fields(rawFields, rawBuild, rawContext) {
         if (!rawContext.scope.isRootQuery) return rawFields;
-        const build = rawBuild as unknown as MetaBuild;
         return extendQueryWithMetaField(
           rawFields as unknown as Record<string, unknown>,
-          (schema) => getRuntimeTablesMeta(build, schema),
+          getRuntimeTablesMeta
         ) as typeof rawFields;
+      },
+      finalize(schema, rawBuild) {
+        const build = rawBuild as unknown as MetaBuild;
+        runtimeTablesBySchema.set(schema, collectTablesMeta(build, schema));
+        return schema;
       },
     },
   },

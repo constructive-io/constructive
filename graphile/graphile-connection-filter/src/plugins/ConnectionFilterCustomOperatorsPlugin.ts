@@ -51,10 +51,17 @@ export const ConnectionFilterCustomOperatorsPlugin: GraphileConfig.Plugin = {
     hooks: {
       build(build) {
         // Initialize the filter registry
-        build[$$filters] = new Map<
+        const filters = new Map<
           string,
           Map<string, ConnectionFilterOperatorSpec>
         >();
+        build[$$filters] = filters;
+        build.registerBuildStateDisposer(() => {
+          for (const operators of filters.values()) {
+            operators.clear();
+          }
+          filters.clear();
+        });
 
         return build;
       },

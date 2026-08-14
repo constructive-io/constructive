@@ -1,0 +1,56 @@
+diff --git a/dist/plugins/PgBasicsPlugin.js b/dist/plugins/PgBasicsPlugin.js
+index c31c42d380ce1431a89983ca3bc99f7e44aaeece..a19cda24f555b01ad837b7e52b9a3c4aab3d21e4 100644
+--- a/dist/plugins/PgBasicsPlugin.js
++++ b/dist/plugins/PgBasicsPlugin.js
+@@ -276,6 +276,11 @@ exports.PgBasicsPlugin = {
+                 };
+                 const resourceByCodecCacheUnstrict = new Map();
+                 const resourceByCodecCacheStrict = new Map();
++                build.registerBuildStateDisposer(() => {
++                    pgCodecMetaLookup.clear();
++                    resourceByCodecCacheUnstrict.clear();
++                    resourceByCodecCacheStrict.clear();
++                });
+                 const pgTableResource = (codec, strict = true) => {
+                     const resourceByCodecCache = strict
+                         ? resourceByCodecCacheStrict
+diff --git a/dist/plugins/PgCodecsPlugin.js b/dist/plugins/PgCodecsPlugin.js
+index bc9893d3f853f77ba5204c295840467db29cd279..8d8e5ceb0f38fde014474e646a61da0851fcdf20 100644
+--- a/dist/plugins/PgCodecsPlugin.js
++++ b/dist/plugins/PgCodecsPlugin.js
+@@ -535,8 +535,15 @@ exports.PgCodecsPlugin = {
+     schema: {
+         hooks: {
+             build(build) {
+-                build.allPgCodecs = new Set();
++                const allPgCodecs = new Set();
++                build.allPgCodecs = allPgCodecs;
+                 const lookup = Object.create(null);
++                build.registerBuildStateDisposer(() => {
++                    allPgCodecs.clear();
++                    for (const serviceName of Object.keys(lookup)) {
++                        delete lookup[serviceName];
++                    }
++                });
+                 build.getPgCodecByDatabaseName = (serviceName, schemaName, typeName) => {
+                     const codec = lookup[serviceName]?.[schemaName]?.[typeName];
+                     if (codec == null) {
+diff --git a/dist/plugins/PgPolymorphismPlugin.js b/dist/plugins/PgPolymorphismPlugin.js
+index b1892244aebf936cb697d9e664e6b3c2432e8c0e..6907c0d70640bebd87c93377c3e30f901b18efa9 100644
+--- a/dist/plugins/PgPolymorphismPlugin.js
++++ b/dist/plugins/PgPolymorphismPlugin.js
+@@ -554,6 +554,14 @@ exports.PgPolymorphismPlugin = {
+                     }
+                 }
+                 const pgCodecByPolymorphicUnionModeTypeName = Object.create(null);
++                build.registerBuildStateDisposer(() => {
++                    for (const key of Object.keys(pgResourcesByPolymorphicTypeName)) {
++                        delete pgResourcesByPolymorphicTypeName[key];
++                    }
++                    for (const key of Object.keys(pgCodecByPolymorphicUnionModeTypeName)) {
++                        delete pgCodecByPolymorphicUnionModeTypeName[key];
++                    }
++                });
+                 for (const codec of Object.values(pgRegistry.pgCodecs)) {
+                     if (!codec.polymorphism)
+                         continue;

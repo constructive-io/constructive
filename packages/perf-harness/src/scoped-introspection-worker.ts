@@ -5,8 +5,10 @@ import {
   makeSchema,
 } from 'graphile-build';
 import { defaultPreset as graphileBuildPgPreset } from 'graphile-build-pg';
+import type { GraphileConfig } from 'graphile-config';
 import { ScopedIntrospectionPreset } from 'graphile-scoped-introspection';
 import { makePgService as makeConstructivePgService } from 'graphile-settings';
+import { BuildStateRetirementPlugin } from 'graphile-settings/plugins';
 import { execute, lexicographicSortSchema, parse, printSchema } from 'graphql';
 import { makePgService as makePostGraphilePgService } from 'postgraphile/adaptors/pg';
 
@@ -21,7 +23,30 @@ import {
 
 interface ScopedWorkerConfig {
   mode: 'stock' | 'scoped';
+  retireBuildState?: boolean;
   schemas: string[];
+}
+
+let capturedBuild: GraphileBuild.BuildBase | undefined;
+
+const PerformanceHarnessBuildCapturePlugin: GraphileConfig.Plugin = {
+  name: 'PerformanceHarnessBuildCapturePlugin',
+  schema: {
+    hooks: {
+      build(build) {
+        capturedBuild = build;
+        return build;
+      },
+    },
+  },
+};
+
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PerformanceHarnessBuildCapturePlugin: true;
+    }
+  }
 }
 
 const validateConfig = (value: unknown): ScopedWorkerConfig => {
@@ -42,7 +67,36 @@ const validateConfig = (value: unknown): ScopedWorkerConfig => {
       'scoped introspection worker requires a non-empty schemas array'
     );
   }
-  return { mode: config.mode, schemas: config.schemas };
+  if (
+    config.retireBuildState !== undefined &&
+    typeof config.retireBuildState !== 'boolean'
+  ) {
+    throw new Error(
+      'scoped introspection worker retireBuildState must be a boolean'
+    );
+  }
+  return {
+    mode: config.mode,
+    retireBuildState: config.retireBuildState ?? false,
+    schemas: config.schemas,
+  };
+};
+
+const getBuildState = (): 'released' | 'retained' => {
+  if (!capturedBuild) throw new Error('benchmark build was not captured');
+  try {
+    void capturedBuild.input;
+    return 'retained';
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      (error as Error & { code?: string }).code ===
+        'GRAPHILE_BUILD_STATE_RELEASED'
+    ) {
+      return 'released';
+    }
+    throw error;
+  }
 };
 
 const main = async (): Promise<void> => {
@@ -74,15 +128,21 @@ const main = async (): Promise<void> => {
 
     const result = await measureBenchmarkCase(
       caseName,
-      async () =>
-        makeSchema({
+      async () => {
+        capturedBuild = undefined;
+        return makeSchema({
           extends: [
             graphileBuildPreset,
             graphileBuildPgPreset,
             ...(config.mode === 'scoped' ? [ScopedIntrospectionPreset] : []),
           ],
+          plugins: [
+            PerformanceHarnessBuildCapturePlugin,
+            ...(config.retireBuildState ? [BuildStateRetirementPlugin] : []),
+          ],
           pgServices: [service],
-        }),
+        });
+      },
       async ({ schema }) => {
         const execution = await execute({
           schema,
@@ -94,12 +154,26 @@ const main = async (): Promise<void> => {
         ) {
           throw new Error('runtime verification query failed');
         }
+        const buildState = getBuildState();
+        const expectedBuildState = config.retireBuildState
+          ? 'released'
+          : 'retained';
+        const caseValidationErrors: string[] = [];
+        if (buildState !== expectedBuildState) {
+          caseValidationErrors.push(
+            `expected build state ${expectedBuildState}, received ${buildState}`
+          );
+        }
         const schemaText = printSchema(lexicographicSortSchema(schema));
         return {
           schemaHash: createHash('sha256').update(schemaText).digest('hex'),
           schemaTypeCount: Object.keys(schema.getTypeMap()).length,
           runtimeVerified: true as const,
-          metadata: { introspectionMode: config.mode },
+          caseValidation: {
+            passed: caseValidationErrors.length === 0,
+            errors: caseValidationErrors,
+          },
+          metadata: { buildState, introspectionMode: config.mode },
         };
       }
     );
