@@ -1,0 +1,38 @@
+{
+  "name": "@agentic-kit/run-log",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "The append-only agent run log \u2014 pi session entries stored verbatim under a run/seq wrapper, with projections for transcript, usage, tool state and resumable sessions",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "agentic-kit",
+    "pi",
+    "coding-agent",
+    "run-log",
+    "constructive"
+  ]
+}

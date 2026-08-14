@@ -1,0 +1,52 @@
+{
+  "name": "@agentic-kit/pi-embed",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "compose a pi coding-agent session with Constructive's run log, metering and approval lanes — one embedding for local and cloud runs",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@agentic-kit/pi-ext-gate": "workspace:^",
+    "@agentic-kit/pi-ext-metered-model": "workspace:^",
+    "@agentic-kit/pi-ext-run-log": "workspace:^",
+    "@agentic-kit/pi-ext-usage-report": "workspace:^",
+    "@agentic-kit/run-log": "workspace:^"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.79.0"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "0.79.6"
+  },
+  "keywords": [
+    "agentic-kit",
+    "pi",
+    "coding-agent",
+    "embed",
+    "run-log",
+    "constructive"
+  ]
+}
