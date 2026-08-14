@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/constructive-io/constructive/compare/@constructive-io/coerce@0.2.0...@constructive-io/coerce@0.3.0) (2026-08-14)
+
+### Features
+
+- **pg-codegen:** rewrite as introspectron-backed IR + emitters ([07245e0](https://github.com/constructive-io/constructive/commit/07245e09307d9e7621a7d3ff8057154c5eba2365))
+
 # [0.2.0](https://github.com/constructive-io/constructive/compare/@constructive-io/coerce@0.1.0...@constructive-io/coerce@0.2.0) (2026-08-14)
 
 ### Features

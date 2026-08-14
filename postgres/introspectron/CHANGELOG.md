@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.12.0](https://github.com/constructive-io/constructive/compare/introspectron@5.11.13...introspectron@5.12.0) (2026-08-14)
+
+### Features
+
+- **pg-codegen:** rewrite as introspectron-backed IR + emitters ([07245e0](https://github.com/constructive-io/constructive/commit/07245e09307d9e7621a7d3ff8057154c5eba2365))
+
 ## [5.11.13](https://github.com/constructive-io/constructive/compare/introspectron@5.11.12...introspectron@5.11.13) (2026-08-14)
 
 **Note:** Version bump only for package introspectron
