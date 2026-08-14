@@ -1,0 +1,45 @@
+{
+  "name": "@agentic-kit/pi-ext-gate",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "pi extension that gates tool calls through a declared policy and a remote approval channel",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.79.0"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "0.79.6"
+  },
+  "keywords": [
+    "agentic-kit",
+    "pi",
+    "coding-agent",
+    "approvals",
+    "policy",
+    "constructive"
+  ]
+}
