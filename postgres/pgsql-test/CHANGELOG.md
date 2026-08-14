@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.10.10](https://github.com/constructive-io/constructive/compare/pgsql-test@5.10.9...pgsql-test@5.10.10) (2026-08-14)
+
+**Note:** Version bump only for package pgsql-test
+
 ## [5.10.9](https://github.com/constructive-io/constructive/compare/pgsql-test@5.10.8...pgsql-test@5.10.9) (2026-08-13)
 
 **Note:** Version bump only for package pgsql-test

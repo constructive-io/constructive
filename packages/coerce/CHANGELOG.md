@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/constructive-io/constructive/compare/@constructive-io/coerce@0.1.0...@constructive-io/coerce@0.2.0) (2026-08-14)
+
+### Features
+
+- **coerce:** add domain coercers and route 12factor-env's validators through them ([b95329c](https://github.com/constructive-io/constructive/commit/b95329cea8d659bfa2672d30da2d71d251aa7c9b))
+
 # 0.1.0 (2026-08-13)
 
 ### Features

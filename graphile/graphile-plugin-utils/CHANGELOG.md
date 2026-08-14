@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/constructive-io/constructive/compare/graphile-plugin-utils@1.10.1...graphile-plugin-utils@1.11.0) (2026-08-14)
+
+### Features
+
+- **coerce:** add domain coercers and route 12factor-env's validators through them ([b95329c](https://github.com/constructive-io/constructive/commit/b95329cea8d659bfa2672d30da2d71d251aa7c9b))
+
 ## [1.10.1](https://github.com/constructive-io/constructive/compare/graphile-plugin-utils@1.10.0...graphile-plugin-utils@1.10.1) (2026-08-05)
 
 ### Bug Fixes

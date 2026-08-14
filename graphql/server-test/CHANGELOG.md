@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.18.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.17.10...graphql-server-test@3.18.0) (2026-08-14)
+
+### Features
+
+- **coerce:** add domain coercers and route 12factor-env's validators through them ([b95329c](https://github.com/constructive-io/constructive/commit/b95329cea8d659bfa2672d30da2d71d251aa7c9b))
+
 ## [3.17.10](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.17.9...graphql-server-test@3.17.10) (2026-08-13)
 
 **Note:** Version bump only for package graphql-server-test
