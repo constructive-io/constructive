@@ -1,6 +1,6 @@
 import type { GraphQLSDKConfigTarget } from '../../types/config';
 import type { GeneratedDocFile } from './docs-utils';
-import { getReadmeFooter,getReadmeHeader } from './docs-utils';
+import { getReadmeHeader } from './docs-utils';
 
 export interface TargetReadmeOptions {
   hasOrm: boolean;
@@ -108,7 +108,6 @@ export function generateTargetReadme(
     lines.push('');
   }
 
-  lines.push(...getReadmeFooter());
 
   return {
     fileName: 'README.md',
@@ -143,7 +142,6 @@ export function generateRootRootReadme(
   }
   lines.push('');
 
-  lines.push(...getReadmeFooter());
 
   return {
     fileName: 'README.md',

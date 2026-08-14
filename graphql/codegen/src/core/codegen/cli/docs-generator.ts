@@ -13,7 +13,6 @@ import {
   flattenArgs,
   flattenedArgsToFlags,
   getEditableFields,
-  getReadmeFooter,
   getReadmeHeader,
 } from '../docs-utils';
 import {
@@ -221,7 +220,6 @@ export function generateReadme(
   lines.push('```');
   lines.push('');
 
-  lines.push(...getReadmeFooter());
 
   return {
     fileName: 'README.md',
@@ -901,7 +899,6 @@ export function generateMultiTargetReadme(
   lines.push('```');
   lines.push('');
 
-  lines.push(...getReadmeFooter());
 
   return {
     fileName: 'README.md',

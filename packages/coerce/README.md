@@ -56,9 +56,32 @@ const messageId = requireString(body.message_id, 'message_id'); // string, or th
 | `asIsoString` | `requireIsoString` | a `Date` (serialised) or a string (verbatim) |
 | `asOneOf` | `requireOneOf` | one of the given string literals |
 
+Then the text-carried and named shapes — what an env var, a query string or a header hands you:
+
+| lenient | strict | accepts |
+| --- | --- | --- |
+| `asNumeric` | `requireNumeric` | a finite number, or a numeric string (`'5'`) |
+| `asNumericInteger` | `requireNumericInteger` | an integer, or an integral string (`'5'`) |
+| `asNumberIn` | `requireNumberIn` | a finite number within `{ min, max }`, inclusive |
+| `asIntegerIn` | `requireIntegerIn` | an integer within `{ min, max }`, inclusive |
+| `asPort` | `requirePort` | a port: an integer in `1..65535`, from a number or a string |
+| `asBigInt` | `requireBigInt` | a `bigint`, an integer, or a digit string |
+| `asUrl` | `requireUrl` | an absolute URL — a scheme is required |
+| `asHostname` | `requireHostname` | a hostname or IP address — no scheme, port or path |
+| `asEmail` | `requireEmail` | an email address |
+| `asUuid` | `requireUuid` | a canonical UUID |
+| `asDuration` | `requireDuration` | milliseconds, or a suffixed duration (`'30s'`, `'5m'`, `'2h'`, `'1d'`, `'1w'`) |
+| `asJson` | `requireJson` | an object or array, or a string that parses to one |
+
+```ts
+const port = asPort(process.env.PORT);   // 1..65535, or null
+const ttl = asDuration('30s');           // 30000
+const timeout = asIntegerIn(body.timeout_ms, { min: 1, max: 60_000 });
+```
+
 ## rules
 
-- **No guessing across types.** `'5'` is not an integer and `1` is not a string. Only `asBoolean` and `asDate` read strings, because env vars and query strings carry nothing else.
+- **No guessing across types.** `'5'` is not an integer to `asInteger` and `1` is not a string. A JSON body that sent a string meant a string; the coercers that do read text (`asNumeric`, `asPort`, `asDuration`, `asBoolean`, `asDate`, `asJson`) say so in their names, because an env var or a query string carries nothing else.
 - **A blank string is absent.** `''` and `'   '` coerce to `null`, so an empty value can never read as a supplied identifier.
 - **All-or-nothing lists.** `asStringArray` rejects the whole array rather than dropping bad entries — that is how a list of allowed origins quietly shrinks.
 - **No transport semantics.** `CoerceError` carries the `label` that failed, not an HTTP status. Map it at your boundary:
@@ -74,8 +97,4 @@ try {
 
 ## related
 
-`12factor-env` builds on this package for its lenient env parsing, and adds envalid-backed environment *schemas* (`cleanEnv`, redaction, cross-field checks). Reach for `12factor-env` when validating `process.env` at boot, and for this package when validating a value at runtime.
-
-## license
-
-MIT
+`12factor-env` coerces through this package: its `port`/`url`/`host`/`email`/`uuid`/`duration`/`num`/`int`/`list`/`enumerated` validators are these coercers wrapped in envalid specs, so a variable and a request body agree on what each shape accepts. On top it adds what is environment-only — schemas (`cleanEnv`), defaults, secret redaction, cross-field checks. Reach for `12factor-env` when validating `process.env` at boot, and for this package when validating a value at runtime.

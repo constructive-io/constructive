@@ -525,7 +525,3 @@ the plugin detects that at schema-build time and skips type, filter,
 aggregate, and spatial-relation registration instead of breaking the
 build. Turning PostGIS on later only requires restarting the server
 (or invalidating the schema cache) — no config change.
-
-## License
-
-MIT

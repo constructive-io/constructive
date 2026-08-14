@@ -129,7 +129,3 @@ query {
   }
 }
 ```
-
-## License
-
-MIT

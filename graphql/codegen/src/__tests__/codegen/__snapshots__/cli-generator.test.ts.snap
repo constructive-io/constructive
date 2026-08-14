@@ -161,16 +161,6 @@ Use \`--no-tty\` to skip all interactive prompts (useful for scripts and CI):
 \`\`\`bash
 myapp --no-tty car create --name "Sedan" --year 2024
 \`\`\`
-
----
-
-Built by the [Constructive](https://constructive.io) team.
-
-## Disclaimer
-
-AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
-
-No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
 "
 `;
 
@@ -1584,16 +1574,6 @@ Authenticate a user
   |----------|------|
   | \`email\` | String (required) |
   | \`password\` | String (required) |
-
----
-
-Built by the [Constructive](https://constructive.io) team.
-
-## Disclaimer
-
-AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
-
-No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
 "
 `;
 
@@ -2028,16 +2008,6 @@ Use \`--no-tty\` to skip all interactive prompts (useful for scripts and CI):
 \`\`\`bash
 myapp --no-tty auth:user create --name "Example"
 \`\`\`
-
----
-
-Built by the [Constructive](https://constructive.io) team.
-
-## Disclaimer
-
-AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
-
-No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
 "
 `;
 
@@ -4040,16 +4010,6 @@ Authenticate a user
 \`\`\`typescript
 const result = await db.mutation.login({ email: '<String>', password: '<String>' }).execute();
 \`\`\`
-
----
-
-Built by the [Constructive](https://constructive.io) team.
-
-## Disclaimer
-
-AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
-
-No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
 "
 `;
 
@@ -4273,16 +4233,6 @@ See [hooks/README.md](./hooks/README.md) for full hook reference.
 inquirerer-based CLI commands for \`myapp\`.
 
 See [cli/README.md](./cli/README.md) for command reference.
-
----
-
-Built by the [Constructive](https://constructive.io) team.
-
-## Disclaimer
-
-AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
-
-No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
 "
 `;
 
@@ -4301,15 +4251,5 @@ exports[`target docs generator generates root-root README for multi-target 1`] =
 |-----|----------|------------|------|
 | auth | http://auth.localhost/graphql | ORM | [./generated/auth/README.md](./generated/auth/README.md) |
 | app | http://app.localhost/graphql | ORM, React Query, CLI | [./generated/app/README.md](./generated/app/README.md) |
-
----
-
-Built by the [Constructive](https://constructive.io) team.
-
-## Disclaimer
-
-AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
-
-No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
 "
 `;

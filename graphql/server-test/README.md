@@ -236,7 +236,3 @@ const { query } = await getConnections({
 | `@constructive-io/graphql-test` | None | Direct PostGraphile execution |
 | `@constructive-io/playwright-test` | Real HTTP | Direct PostGraphile execution |
 | **`graphql-server-test`** | Real HTTP | **SuperTest HTTP requests** |
-
-## License
-
-MIT

@@ -884,7 +884,3 @@ pnpm test
 - PostGraphile endpoint with `_meta` query enabled
 - React Query v5 (peer dependency for React Query hooks)
 - No dependencies for ORM client (uses native fetch)
-
-## License
-
-MIT

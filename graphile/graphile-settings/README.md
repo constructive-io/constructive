@@ -209,7 +209,3 @@ COMMENT ON FUNCTION full_name(users) IS E'@filterable';
 | Variable | Description |
 |----------|-------------|
 | `INFLECTOR_LOG=1` | Enable inflector debug logging |
-
-## License
-
-MIT
