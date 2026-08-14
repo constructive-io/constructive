@@ -31,6 +31,22 @@ export const USERS_TABLE = {
     createdAt: 'created_at'
   }
 } as const;
+/** Per-column decoders for `codegen_test.users`, for a value that is not a whole
+ * row: a joined projection, an aliased column, a partial SELECT.
+ *
+ * A NOT NULL column's decoder throws `CoerceError` and takes an overridable
+ * label, so a projection can name its own alias; a nullable column's is
+ * lenient and answers `null`.
+ *
+ * ```ts
+ * id: USERS_FIELDS.id(row.id),
+ * ``` */
+export const USERS_FIELDS = {
+  /** `id` (int4) */id: (value: unknown, label = 'users.id'): number => requireInteger(value, label),
+  /** `username` (citext) */username: (value: unknown, label = 'users.username'): string => requireString(value, label),
+  /** `email` (email) */email: (value: unknown): string | null => asString(value),
+  /** `created_at` (timestamptz) */createdAt: (value: unknown, label = 'users.created_at'): string => requireIsoString(value, label)
+} as const;
 /** Decode an untrusted camelCase value (a wire envelope, a parsed body) into `Users`.
  *
  * Throws `CoerceError` naming the offending field when a required column is

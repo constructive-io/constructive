@@ -25,6 +25,20 @@ export const ACTIVE_USERS_TABLE = {
     username: 'username'
   }
 } as const;
+/** Per-column decoders for `codegen_test.active_users`, for a value that is not a whole
+ * row: a joined projection, an aliased column, a partial SELECT.
+ *
+ * A NOT NULL column's decoder throws `CoerceError` and takes an overridable
+ * label, so a projection can name its own alias; a nullable column's is
+ * lenient and answers `null`.
+ *
+ * ```ts
+ * id: ACTIVE_USERS_FIELDS.id(row.id),
+ * ``` */
+export const ACTIVE_USERS_FIELDS = {
+  /** `id` (int4) */id: (value: unknown): number | null => asInteger(value),
+  /** `username` (citext) */username: (value: unknown): string | null => asString(value)
+} as const;
 /** Decode an untrusted camelCase value (a wire envelope, a parsed body) into `ActiveUsers`.
  *
  * Throws `CoerceError` naming the offending field when a required column is

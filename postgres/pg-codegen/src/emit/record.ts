@@ -90,13 +90,18 @@ export interface RecordModuleUsage {
   enumImports: Set<string>;
 }
 
+/**
+ * The decode call for one column, against an arbitrary value expression and an
+ * arbitrary label expression, so a whole-record decoder (`record.foo`, label
+ * `` `${label}.foo` ``) and a single-field decoder (`value`, label `label`)
+ * share one definition of what a column's runtime check is.
+ */
 const decodeExpression = (
   column: IrColumn,
-  key: string,
+  value: t.Expression,
+  label: t.Expression,
   usage: RecordModuleUsage
 ): t.Expression => {
-  const value = member('record', key);
-
   if (column.scalar === 'unknown') {
     // No runtime shape to assert; the value passes through typed `unknown`.
     return value;
@@ -115,7 +120,7 @@ const decodeExpression = (
       return t.callExpression(t.identifier('requireArrayOf'), [
         value,
         t.identifier(elementName),
-        labelTemplate(key),
+        label,
         t.stringLiteral(`an array of ${enumTypeName(enumName)} values`)
       ]);
     }
@@ -123,7 +128,7 @@ const decodeExpression = (
     usage.enumImports.add(fnName);
     return column.nullable
       ? t.callExpression(t.identifier(fnName), [value])
-      : t.callExpression(t.identifier(fnName), [value, labelTemplate(key)]);
+      : t.callExpression(t.identifier(fnName), [value, label]);
   }
 
   const coercer = COERCERS[column.scalar];
@@ -138,7 +143,7 @@ const decodeExpression = (
     return t.callExpression(t.identifier('requireArrayOf'), [
       value,
       t.identifier(coercer.as),
-      labelTemplate(key),
+      label,
       t.stringLiteral(coercer.expectedArray)
     ]);
   }
@@ -147,7 +152,43 @@ const decodeExpression = (
   usage.coerceImports.add(fnName);
   return column.nullable
     ? t.callExpression(t.identifier(fnName), [value])
-    : t.callExpression(t.identifier(fnName), [value, labelTemplate(key)]);
+    : t.callExpression(t.identifier(fnName), [value, label]);
+};
+
+/**
+ * `<TABLE>_FIELDS`: one decoder per column, for rows that are NOT a whole
+ * table row — a joined projection, an aliased column, a partial SELECT — where
+ * a record decoder would reject the absent columns.
+ *
+ * A nullable column's decoder is lenient (`T | null`, no label); a NOT NULL
+ * column's is strict and throws `CoerceError` naming the column, with the label
+ * overridable so a projection can name its own alias.
+ */
+const fieldsConstant = (
+  table: IrTable,
+  name: string,
+  usage: RecordModuleUsage
+): t.ExportNamedDeclaration => {
+  const properties = table.columns.map(column => {
+    const valueParam = t.identifier('value');
+    valueParam.typeAnnotation = t.tsTypeAnnotation(t.tsUnknownKeyword());
+
+    const params: (t.Identifier | t.AssignmentPattern)[] = [valueParam];
+    let label: t.Expression = t.stringLiteral(`${table.name}.${column.name}`);
+    if (!column.nullable && column.scalar !== 'unknown') {
+      params.push(t.assignmentPattern(t.identifier('label'), label));
+      label = t.identifier('label');
+    }
+
+    const fn = t.arrowFunctionExpression(params, decodeExpression(column, valueParam, label, usage));
+    fn.returnType = t.tsTypeAnnotation(columnTsType(column));
+
+    const property = t.objectProperty(objectKey(column.propertyName), fn);
+    t.addComment(property, 'leading', `* \`${column.name}\` (${column.pgType}) `, false);
+    return property;
+  });
+
+  return exportConst(name, asConst(t.objectExpression(properties)));
 };
 
 const decoderFunction = (
@@ -174,9 +215,13 @@ const decoderFunction = (
   ]);
 
   const resultObject = t.objectExpression(
-    table.columns.map(column =>
-      t.objectProperty(objectKey(keyFor(column)), decodeExpression(column, keyFor(column), usage))
-    )
+    table.columns.map(column => {
+      const key = keyFor(column);
+      return t.objectProperty(
+        objectKey(key),
+        decodeExpression(column, member('record', key), labelTemplate(key), usage)
+      );
+    })
   );
 
   const fn = t.arrowFunctionExpression(
@@ -193,6 +238,7 @@ export const emitRecordModule = (table: IrTable): string => {
   const pascal = toPascalCase(table.name);
   const rowTypeName = `${pascal}Row`;
   const metadataName = `${toConstantCase(table.name)}_TABLE`;
+  const fieldsName = `${toConstantCase(table.name)}_FIELDS`;
   const qualified = `${table.schema}.${table.name}`;
 
   const statements: t.Statement[] = [];
@@ -252,6 +298,15 @@ export const emitRecordModule = (table: IrTable): string => {
   );
   withJsDoc(metadata, `Column metadata for \`${qualified}\`.`);
   statements.push(metadata);
+
+  // Per-column decoders, for projections a record decoder cannot describe.
+  const example = table.columns[0];
+  statements.push(
+    withJsDoc(
+      fieldsConstant(table, fieldsName, usage),
+      `Per-column decoders for \`${qualified}\`, for a value that is not a whole\n * row: a joined projection, an aliased column, a partial SELECT.\n *\n * A NOT NULL column's decoder throws \`CoerceError\` and takes an overridable\n * label, so a projection can name its own alias; a nullable column's is\n * lenient and answers \`null\`.${example ? `\n *\n * \`\`\`ts\n * ${example.propertyName}: ${fieldsName}.${example.propertyName}(row.${example.name}),\n * \`\`\`` : ''}`
+    )
+  );
 
   // Decoders.
   statements.push(
