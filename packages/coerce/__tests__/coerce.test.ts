@@ -1,4 +1,5 @@
 import {
+  asArrayOf,
   asBigInt,
   asBoolean,
   asDate,
@@ -22,6 +23,7 @@ import {
   asUrl,
   asUuid,
   CoerceError,
+  requireArrayOf,
   requireInteger,
   requireIntegerIn,
   requireNumberIn,
@@ -109,6 +111,25 @@ describe('asStringArray', () => {
   it('rejects non-arrays', () => {
     expect(asStringArray('a')).toBeNull();
     expect(asStringArray({ 0: 'a' })).toBeNull();
+  });
+});
+
+describe('asArrayOf / requireArrayOf', () => {
+  it('coerces every entry through the element coercer', () => {
+    expect(asArrayOf([], asInteger)).toEqual([]);
+    expect(asArrayOf([1, 2], asInteger)).toEqual([1, 2]);
+  });
+
+  it('rejects the whole array on one bad entry', () => {
+    expect(asArrayOf([1, 'x'], asInteger)).toBeNull();
+    expect(asArrayOf('nope', asInteger)).toBeNull();
+  });
+
+  it('requireArrayOf throws a labelled CoerceError with the expected text', () => {
+    expect(requireArrayOf([1], asInteger, 'run.seconds', 'an array of integers')).toEqual([1]);
+    expect(() => requireArrayOf([1, 'x'], asInteger, 'run.seconds', 'an array of integers')).toThrow(
+      'run.seconds is required (expected an array of integers)'
+    );
   });
 });
 

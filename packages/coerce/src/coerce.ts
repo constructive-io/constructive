@@ -83,6 +83,37 @@ export const asStringArray = (value: unknown): string[] | null => {
 };
 
 /**
+ * An array whose every entry coerces through `element`, else `null`. One bad
+ * entry rejects the whole array — a partially-valid list is a partially-wrong
+ * answer.
+ */
+export const asArrayOf = <T>(
+  value: unknown,
+  element: (entry: unknown) => T | null
+): T[] | null => {
+  if (!Array.isArray(value)) return null;
+  const entries: T[] = [];
+  for (const item of value) {
+    const coerced = element(item);
+    if (coerced === null) return null;
+    entries.push(coerced);
+  }
+  return entries;
+};
+
+/** {@link asArrayOf}, throwing {@link CoerceError} when absent. */
+export const requireArrayOf = <T>(
+  value: unknown,
+  element: (entry: unknown) => T | null,
+  label: string,
+  expected = 'an array of valid entries'
+): T[] => {
+  const entries = asArrayOf(value, element);
+  if (entries === null) throw new CoerceError(label, expected);
+  return entries;
+};
+
+/**
  * A list of non-empty strings from either an array (see
  * {@link asStringArray}) or a delimited string, else `null`.
  *
