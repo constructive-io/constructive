@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.12.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.11.0...pg-codegen@5.12.0) (2026-08-14)
+
+### Features
+
+- **pg-codegen:** emit per-column field decoders for projections ([9a12628](https://github.com/constructive-io/constructive/commit/9a12628265c622a93df6b66e0bf2b16ab98fdf6a))
+
 # [5.11.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.10.11...pg-codegen@5.11.0) (2026-08-14)
 
 ### Features
