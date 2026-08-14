@@ -1,6 +1,6 @@
 {
   "name": "@agentic-kit/pi-embed",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "compose a pi coding-agent session with Constructive's run log, metering and approval lanes — one embedding for local and cloud runs",
   "main": "index.js",

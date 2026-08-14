@@ -1,6 +1,6 @@
 {
   "name": "@agentic-kit/pi-ext-gate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "pi extension that gates tool calls through a declared policy and a remote approval channel",
   "main": "index.js",

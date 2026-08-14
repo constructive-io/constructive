@@ -1,6 +1,6 @@
 {
   "name": "@agentic-kit/pi-ext-run-log",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "pi extension that mirrors every session entry into an @agentic-kit/run-log store, verbatim and in order",
   "main": "index.js",

@@ -1,6 +1,6 @@
 {
   "name": "@agentic-kit/pi-ext-usage-report",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "pi extension that reports each assistant message’s token usage and cost to the Constructive gateway’s /v1/usage endpoint",
   "main": "index.js",
