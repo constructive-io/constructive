@@ -262,6 +262,17 @@ importers:
         version: 0.79.6(ws@8.20.1)(zod@4.4.3)
     publishDirectory: dist
 
+  agentic/pi-ext-usage-report:
+    dependencies:
+      '@agentic-kit/pi-ext-metered-model':
+        specifier: workspace:^
+        version: link:../pi-ext-metered-model/dist
+    devDependencies:
+      '@earendil-works/pi-coding-agent':
+        specifier: 0.79.6
+        version: 0.79.6(ws@8.20.1)(zod@4.4.3)
+    publishDirectory: dist
+
   agentic/pi-ext-run-log:
     dependencies:
       '@agentic-kit/run-log':
