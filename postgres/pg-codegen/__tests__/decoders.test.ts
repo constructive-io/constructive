@@ -10,9 +10,9 @@ import type { PgTestClient } from 'pgsql-test/test-client';
 
 import type { AgentRuns } from '../__fixtures__/generated/codegen_test/agent-runs';
 import {
-  AGENT_RUNS_FIELDS,
-  AGENT_RUNS_TABLE,
+  agentRunsFields,
   agentRunsFromRow,
+  agentRunsTable,
   decodeAgentRuns,
   decodeAgentRunsFromRow,
   decodeAgentRunsRow,
@@ -146,47 +146,47 @@ describe('serializeAgentRuns', () => {
 
 describe('table metadata', () => {
   it('carries columns, primary key and the field mapping', () => {
-    expect(AGENT_RUNS_TABLE.qualifiedName).toBe('codegen_test.agent_runs');
-    expect(AGENT_RUNS_TABLE.primaryKey).toEqual(['id']);
-    expect(AGENT_RUNS_TABLE.columns).toContain('last_event_seq');
-    expect(AGENT_RUNS_TABLE.columnByField.lastEventSeq).toBe('last_event_seq');
+    expect(agentRunsTable.qualifiedName).toBe('codegen_test.agent_runs');
+    expect(agentRunsTable.primaryKey).toEqual(['id']);
+    expect(agentRunsTable.columns).toContain('last_event_seq');
+    expect(agentRunsTable.columnByField.lastEventSeq).toBe('last_event_seq');
   });
 });
 
 describe('per-column field decoders', () => {
   it('decodes one column of a projection a record decoder could not describe', () => {
     const joined = { run_id: RUN_ID, status: 'running', thread_name: 'main' };
-    expect(AGENT_RUNS_FIELDS.id(joined.run_id)).toBe(RUN_ID);
-    expect(AGENT_RUNS_FIELDS.status(joined.status)).toBe('running');
+    expect(agentRunsFields.id(joined.run_id)).toBe(RUN_ID);
+    expect(agentRunsFields.status(joined.status)).toBe('running');
   });
 
   it('parses the text forms pg returns, as the row decoder does', () => {
-    expect(AGENT_RUNS_FIELDS.lastEventSeq('9007199254740')).toBe(9007199254740);
-    expect(AGENT_RUNS_FIELDS.score('0.7500')).toBe(0.75);
+    expect(agentRunsFields.lastEventSeq('9007199254740')).toBe(9007199254740);
+    expect(agentRunsFields.score('0.7500')).toBe(0.75);
   });
 
   it('throws naming the column when a NOT NULL column is absent', () => {
-    expect(() => AGENT_RUNS_FIELDS.id(undefined)).toThrow(
+    expect(() => agentRunsFields.id(undefined)).toThrow(
       'agent_runs.id is required (expected a UUID)'
     );
-    expect(() => AGENT_RUNS_FIELDS.status('exploded')).toThrow(CoerceError);
+    expect(() => agentRunsFields.status('exploded')).toThrow(CoerceError);
   });
 
   it('takes an overridden label so a projection can name its own alias', () => {
-    expect(() => AGENT_RUNS_FIELDS.id(null, 'thread_run.run_id')).toThrow(
+    expect(() => agentRunsFields.id(null, 'thread_run.run_id')).toThrow(
       'thread_run.run_id is required (expected a UUID)'
     );
   });
 
   it('answers null for a nullable column rather than throwing', () => {
-    expect(AGENT_RUNS_FIELDS.finishedAt(null)).toBeNull();
-    expect(AGENT_RUNS_FIELDS.settings(undefined)).toBeNull();
+    expect(agentRunsFields.finishedAt(null)).toBeNull();
+    expect(agentRunsFields.settings(undefined)).toBeNull();
   });
 
   it('agrees with the row decoder on every column of a whole row', () => {
     const row: Record<string, unknown> = { ...decodeAgentRunsRow(validRow) };
-    for (const [field, column] of Object.entries(AGENT_RUNS_TABLE.columnByField)) {
-      const decode = AGENT_RUNS_FIELDS[field as keyof typeof AGENT_RUNS_FIELDS];
+    for (const [field, column] of Object.entries(agentRunsTable.columnByField)) {
+      const decode = agentRunsFields[field as keyof typeof agentRunsFields];
       expect(decode(validRow[column])).toEqual(row[column]);
     }
   });

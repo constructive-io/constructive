@@ -4,7 +4,7 @@
  * TableClient per table over the generated metadata and field decoders.
  */
 import * as fs from 'fs';
-import { toCamelCase, toConstantCase, toPascalCase } from 'inflekt';
+import { toCamelCase, toPascalCase } from 'inflekt';
 import * as path from 'path';
 
 import { IrSchema, IrTable } from '../ir';
@@ -48,10 +48,10 @@ export const emitSchemaDbModule = (schema: IrSchema): string => {
 
   for (const table of schema.tables) {
     const appType = toPascalCase(table.name);
-    const constant = toConstantCase(table.name);
+    const model = toCamelCase(table.name);
     const file = `./${tableFileName(table.name)}`;
     statements.push(typeImport([appType], file));
-    statements.push(namedImport([`${constant}_FIELDS`, `${constant}_TABLE`], file));
+    statements.push(namedImport([`${model}Fields`, `${model}Table`], file));
   }
 
   const tableNameProps = schema.tables.map(table => {
@@ -122,14 +122,14 @@ export const emitSchemaDbModule = (schema: IrSchema): string => {
   );
 
   const clientProperties: t.ObjectProperty[] = schema.tables.map(table => {
-    const constant = toConstantCase(table.name);
+    const model = toCamelCase(table.name);
     const spec = t.objectExpression([
       t.objectProperty(
         t.identifier('schema'),
         t.logicalExpression(
           '??',
           t.optionalMemberExpression(t.identifier('options'), t.identifier('schema'), false, true),
-          t.memberExpression(t.identifier(`${constant}_TABLE`), t.identifier('schema'))
+          t.memberExpression(t.identifier(`${model}Table`), t.identifier('schema'))
         )
       ),
       t.objectProperty(
@@ -142,14 +142,14 @@ export const emitSchemaDbModule = (schema: IrSchema): string => {
             false,
             true
           ),
-          t.memberExpression(t.identifier(`${constant}_TABLE`), t.identifier('name'))
+          t.memberExpression(t.identifier(`${model}Table`), t.identifier('name'))
         )
       ),
       t.objectProperty(
         t.identifier('columnByField'),
-        t.memberExpression(t.identifier(`${constant}_TABLE`), t.identifier('columnByField'))
+        t.memberExpression(t.identifier(`${model}Table`), t.identifier('columnByField'))
       ),
-      t.objectProperty(t.identifier('fields'), t.identifier(`${constant}_FIELDS`))
+      t.objectProperty(t.identifier('fields'), t.identifier(`${model}Fields`))
     ]);
     const jsonFields = table.columns.filter(column => column.scalar === 'json');
     if (jsonFields.length > 0) {

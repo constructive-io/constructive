@@ -18,7 +18,7 @@ export interface UsersRow {
   created_at: string;
 }
 /** Column metadata for `codegen_test.users`. */
-export const USERS_TABLE = {
+export const usersTable = {
   schema: 'codegen_test',
   name: 'users',
   qualifiedName: 'codegen_test.users',
@@ -39,9 +39,9 @@ export const USERS_TABLE = {
  * lenient and answers `null`.
  *
  * ```ts
- * id: USERS_FIELDS.id(row.id),
+ * id: usersFields.id(row.id),
  * ``` */
-export const USERS_FIELDS = {
+export const usersFields = {
   /** `id` (int4) */id: (value: unknown, label = 'users.id'): number => requireInteger(value, label),
   /** `username` (citext) */username: (value: unknown, label = 'users.username'): string => requireString(value, label),
   /** `email` (email) */email: (value: unknown): string | null => asString(value),

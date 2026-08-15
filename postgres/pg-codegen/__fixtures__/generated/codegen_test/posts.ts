@@ -22,7 +22,7 @@ export interface PostsRow {
   published_at: string | null;
 }
 /** Column metadata for `codegen_test.posts`. */
-export const POSTS_TABLE = {
+export const postsTable = {
   schema: 'codegen_test',
   name: 'posts',
   qualifiedName: 'codegen_test.posts',
@@ -45,9 +45,9 @@ export const POSTS_TABLE = {
  * lenient and answers `null`.
  *
  * ```ts
- * id: POSTS_FIELDS.id(row.id),
+ * id: postsFields.id(row.id),
  * ``` */
-export const POSTS_FIELDS = {
+export const postsFields = {
   /** `id` (uuid) */id: (value: unknown, label = 'posts.id'): string => requireUuid(value, label),
   /** `user_id` (int4) */userId: (value: unknown, label = 'posts.user_id'): number => requireInteger(value, label),
   /** `title` (text) */title: (value: unknown, label = 'posts.title'): string => requireString(value, label),
