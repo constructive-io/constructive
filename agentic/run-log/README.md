@@ -77,10 +77,24 @@ for await (const batch of follow(store, 'run-1', { waitForChange })) {
 | --- | --- |
 | `projectParts` | the renderable transcript — a tool call and its later result collapse into one part, so no renderer correlates messages itself |
 | `projectUsage` | tokens and cost, per `provider/model` and per run, including nested tool usage and compaction calls |
-| `projectToolState` | what is running, and what is waiting on a human (approvals ride in the log as pi `custom` messages, so a surface that reconnects hours later still sees a pending request) |
+| `projectToolState` | what is running, what is waiting on a human, and how the gate settled each call (approvals and gate decisions ride in the log as pi `custom` messages, so a surface that reconnects hours later still sees a pending request) |
+| `projectSpans` | how long each step took, and inside what — tool spans (call → result), model spans, approval spans (request → answer) with parents, for a timeline |
 | `projectSession` | a pi session file — the resume path, cloud → local included |
 
-All four are pure and total: the same records always produce the same output, whichever host wrote them, which is the property the tests assert as *placement invariance*.
+All of them are pure and total: the same records always produce the same output, whichever host wrote them, which is the property the tests assert as *placement invariance*.
+
+A span duration derived from a *pair of writes* is a bound, not a measurement — the gap between a tool call and its result includes the wait for a human — so every span says which it is (`timing: 'bounded' | 'measured'`) and a tool span carries its approval wait separately. An interval that never closed stays `open` with no duration, because a run still in flight must not look like one that finished.
+
+## Entry types
+
+New event kinds are namespaced pi `custom` messages, not new tables: the log stores entries verbatim, so a type is only a `customType` string plus a validator. `constructiveEntryTypes()` is the registry of the ones this platform writes — approval requests and answers, and `constructive.gate.decision` — each pairing a details type with a runtime assertion, a label, and a visibility:
+
+| Visibility | Meaning |
+| --- | --- |
+| `surface` | part of the conversation the model sees — an approval question and its answer |
+| `log-only` | audit and trace data, never fed back to the model — a gate decision, which the model already learned of through the blocked call's error |
+
+An unregistered type is `log-only`: a trace view showing an unknown row is right, a prompt built from one is not.
 
 Unreadable input fails loudly. A corrupt record, a mixed-version log, or a session whose header is not first throws rather than degrading into an empty transcript — a run that silently renders as blank is worse than one that reports it cannot be read. An *unknown* entry type is different: it is carried through as an `unknown` part, so a log written by a newer pi still renders.
 
