@@ -34,39 +34,44 @@ export interface TableSpec<App> {
 }
 
 /**
- * Select shape — same as the GraphQL ORM, stated either way round:
- *
- * - `{ id: true, name: true }` reads those fields and nothing else;
- * - `{ databaseId: false }` reads every field except that one, for the field a
- *   record has in general but this binding's table does not (a scope's copy of
- *   a table without the scope key column) or that a caller must not carry (a
- *   secret's id, row bookkeeping).
- *
- * Naming a field `true` is a projection and wins outright: the excluded ones
- * are simply not in it.
+ * `select: { id: true, name: true }` — read those fields and nothing else.
+ * Same shape and same inference as the GraphQL ORM's select.
  */
 export type SelectShape<App> = { [K in keyof App]?: boolean };
+
+/**
+ * `omit: { databaseId: true }` — read the record except those fields, for the
+ * field a record has in general but this binding's table does not (a scope's
+ * copy of a table without the scope key column) or that a caller must not
+ * carry (a secret's id, row bookkeeping). Prisma's `omit`, and the reason it
+ * exists there too: naming everything else is not the same statement.
+ *
+ * Mutually exclusive with `select` — a projection already says what it reads.
+ */
+export type OmitShape<App> = { [K in keyof App]?: boolean };
 
 type TrueKeys<App, S> = {
   [K in keyof S]-?: S[K] extends true ? K & keyof App : never;
 }[keyof S];
 
-type FalseKeys<App, S> = {
-  [K in keyof S]-?: S[K] extends false ? K & keyof App : never;
-}[keyof S];
+/** The record minus what `omit` names, which is the record when it names none. */
+type OmitResult<App, O> = O extends OmitShape<App>
+  ? [TrueKeys<App, O>] extends [never]
+    ? App
+    : Omit<App, TrueKeys<App, O>>
+  : App;
 
-/**
- * Rows narrow to what the select states: the picked fields, else the record
- * minus the excluded ones. No `select` returns the full record.
- */
-export type SelectResult<App, S extends SelectShape<App> | undefined> =
+/** Rows narrow to what the args state: `select` picks, `omit` subtracts. */
+export type SelectResult<
+  App,
+  S extends SelectShape<App> | undefined,
+  O extends OmitShape<App> | undefined = undefined
+> =
   S extends SelectShape<App>
     ? [TrueKeys<App, S>] extends [never]
-      ? [FalseKeys<App, S>] extends [never]
-        ? App
-        : Omit<App, FalseKeys<App, S>>
+      ? OmitResult<App, O>
       : Pick<App, TrueKeys<App, S>>
-    : App;
+    : OmitResult<App, O>;
 
 /** Per-field operators from the shared query-spec grammar. */
 export interface FieldOps<V> {
@@ -143,34 +148,62 @@ export type OrderDirection = 'ASC' | 'DESC';
 /** Order spec keyed by camelCase field names, e.g. `{ createdAt: 'DESC' }`. */
 export type OrderBy<App> = { [K in keyof App]?: OrderDirection };
 
-export interface FindManyArgs<App, S extends SelectShape<App> | undefined> {
-  where?: Where<App>;
+/**
+ * What a call reads. `select` and `omit` are alternatives, not layers, and
+ * stating both is refused at the call rather than silently resolved.
+ */
+export interface Projection<
+  App,
+  S extends SelectShape<App> | undefined,
+  O extends OmitShape<App> | undefined
+> {
   select?: S;
+  omit?: O;
+}
+
+export interface FindManyArgs<
+  App,
+  S extends SelectShape<App> | undefined,
+  O extends OmitShape<App> | undefined
+> extends Projection<App, S, O> {
+  where?: Where<App>;
   orderBy?: OrderBy<App> | OrderBy<App>[];
   limit?: number;
   offset?: number;
 }
 
-export interface FindFirstArgs<App, S extends SelectShape<App> | undefined> {
+export interface FindFirstArgs<
+  App,
+  S extends SelectShape<App> | undefined,
+  O extends OmitShape<App> | undefined
+> extends Projection<App, S, O> {
   where?: Where<App>;
-  select?: S;
   orderBy?: OrderBy<App> | OrderBy<App>[];
 }
 
-export interface CreateArgs<App, S extends SelectShape<App> | undefined> {
+export interface CreateArgs<
+  App,
+  S extends SelectShape<App> | undefined,
+  O extends OmitShape<App> | undefined
+> extends Projection<App, S, O> {
   data: Data<App>;
-  select?: S;
 }
 
-export interface UpdateArgs<App, S extends SelectShape<App> | undefined> {
+export interface UpdateArgs<
+  App,
+  S extends SelectShape<App> | undefined,
+  O extends OmitShape<App> | undefined
+> extends Projection<App, S, O> {
   where: Where<App>;
   data: Data<App>;
-  select?: S;
 }
 
-export interface DeleteArgs<App, S extends SelectShape<App> | undefined> {
+export interface DeleteArgs<
+  App,
+  S extends SelectShape<App> | undefined,
+  O extends OmitShape<App> | undefined
+> extends Projection<App, S, O> {
   where: Where<App>;
-  select?: S;
 }
 
 /** Thrown by `findFirstOrThrow` / `updateOrThrow` when no row matches. */
@@ -197,10 +230,11 @@ export class TableClient<App> {
     private readonly db: Queryable
   ) {}
 
-  async findMany<S extends SelectShape<App> | undefined = undefined>(
-    args: FindManyArgs<App, S> = {}
-  ): Promise<SelectResult<App, S>[]> {
-    const fields = this.selectedFields(args.select);
+  async findMany<
+    S extends SelectShape<App> | undefined = undefined,
+    O extends OmitShape<App> | undefined = undefined
+  >(args: FindManyArgs<App, S, O> = {}): Promise<SelectResult<App, S, O>[]> {
+    const fields = this.selectedFields(args);
     const query = this.baseQuery().select(fields.map(field => this.column(field)));
     const predicate = this.predicate(args.where);
     if (predicate) query.where(predicate);
@@ -212,16 +246,18 @@ export class TableClient<App> {
     return rows.map(row => this.decodeRow(row, fields));
   }
 
-  async findFirst<S extends SelectShape<App> | undefined = undefined>(
-    args: FindFirstArgs<App, S> = {}
-  ): Promise<SelectResult<App, S> | null> {
-    const rows = await this.findMany({ ...args, limit: 1 });
+  async findFirst<
+    S extends SelectShape<App> | undefined = undefined,
+    O extends OmitShape<App> | undefined = undefined
+  >(args: FindFirstArgs<App, S, O> = {}): Promise<SelectResult<App, S, O> | null> {
+    const rows = await this.findMany<S, O>({ ...args, limit: 1 });
     return rows.length > 0 ? rows[0] : null;
   }
 
-  async findFirstOrThrow<S extends SelectShape<App> | undefined = undefined>(
-    args: FindFirstArgs<App, S> = {}
-  ): Promise<SelectResult<App, S>> {
+  async findFirstOrThrow<
+    S extends SelectShape<App> | undefined = undefined,
+    O extends OmitShape<App> | undefined = undefined
+  >(args: FindFirstArgs<App, S, O> = {}): Promise<SelectResult<App, S, O>> {
     const row = await this.findFirst(args);
     if (row === null) throw new RowNotFoundError(this.spec.table, 'findFirstOrThrow');
     return row;
@@ -237,10 +273,11 @@ export class TableClient<App> {
     return Number(row.count);
   }
 
-  async create<S extends SelectShape<App> | undefined = undefined>(
-    args: CreateArgs<App, S>
-  ): Promise<SelectResult<App, S>> {
-    const fields = this.selectedFields(args.select);
+  async create<
+    S extends SelectShape<App> | undefined = undefined,
+    O extends OmitShape<App> | undefined = undefined
+  >(args: CreateArgs<App, S, O>): Promise<SelectResult<App, S, O>> {
+    const fields = this.selectedFields(args);
     const query = this.baseQuery()
       .insert(this.encodeData(args.data))
       .returning(fields.map(field => this.column(field)));
@@ -249,10 +286,11 @@ export class TableClient<App> {
     return this.decodeRow(rows[0], fields);
   }
 
-  async update<S extends SelectShape<App> | undefined = undefined>(
-    args: UpdateArgs<App, S>
-  ): Promise<SelectResult<App, S>[]> {
-    const fields = this.selectedFields(args.select);
+  async update<
+    S extends SelectShape<App> | undefined = undefined,
+    O extends OmitShape<App> | undefined = undefined
+  >(args: UpdateArgs<App, S, O>): Promise<SelectResult<App, S, O>[]> {
+    const fields = this.selectedFields(args);
     const query = this.baseQuery()
       .update(this.encodeData(args.data))
       .where(this.required(args.where, 'update'))
@@ -262,18 +300,20 @@ export class TableClient<App> {
     return rows.map(row => this.decodeRow(row, fields));
   }
 
-  async updateOrThrow<S extends SelectShape<App> | undefined = undefined>(
-    args: UpdateArgs<App, S>
-  ): Promise<SelectResult<App, S>> {
+  async updateOrThrow<
+    S extends SelectShape<App> | undefined = undefined,
+    O extends OmitShape<App> | undefined = undefined
+  >(args: UpdateArgs<App, S, O>): Promise<SelectResult<App, S, O>> {
     const rows = await this.update(args);
     if (rows.length === 0) throw new RowNotFoundError(this.spec.table, 'updateOrThrow');
     return rows[0];
   }
 
-  async delete<S extends SelectShape<App> | undefined = undefined>(
-    args: DeleteArgs<App, S>
-  ): Promise<SelectResult<App, S>[]> {
-    const fields = this.selectedFields(args.select);
+  async delete<
+    S extends SelectShape<App> | undefined = undefined,
+    O extends OmitShape<App> | undefined = undefined
+  >(args: DeleteArgs<App, S, O>): Promise<SelectResult<App, S, O>[]> {
+    const fields = this.selectedFields(args);
     const query = this.baseQuery()
       .delete()
       .where(this.required(args.where, 'delete'))
@@ -296,26 +336,34 @@ export class TableClient<App> {
     return this.spec.columnByField[field] ?? field;
   }
 
-  private selectedFields(select: SelectShape<App> | undefined): (keyof App & string)[] {
+  private selectedFields(args: {
+    select?: SelectShape<App>;
+    omit?: OmitShape<App>;
+  }): (keyof App & string)[] {
     const all = Object.keys(this.spec.columnByField) as (keyof App & string)[];
-    if (!select) return all;
-    const picked = all.filter(field => select[field] === true);
-    if (picked.length > 0) return picked;
-    // Nothing picked: the select either excludes fields or says nothing at all,
-    // and both read what is left.
-    return all.filter(field => select[field] !== false);
+    if (args.select && args.omit) {
+      throw new Error(
+        `${this.spec.table}: state either 'select' or 'omit' — a projection already says what it reads.`
+      );
+    }
+    if (args.select) {
+      const picked = all.filter(field => args.select![field] === true);
+      if (picked.length > 0) return picked;
+    }
+    if (args.omit) return all.filter(field => args.omit![field] !== true);
+    return all;
   }
 
-  private decodeRow<S extends SelectShape<App> | undefined>(
+  private decodeRow<S extends SelectShape<App> | undefined, O extends OmitShape<App> | undefined>(
     row: unknown,
     fields: (keyof App & string)[]
-  ): SelectResult<App, S> {
+  ): SelectResult<App, S, O> {
     const raw = row as Record<string, unknown>;
     const decoded: Record<string, unknown> = {};
     for (const field of fields) {
       decoded[field] = this.spec.fields[field](raw[this.column(field)]);
     }
-    return decoded as SelectResult<App, S>;
+    return decoded as SelectResult<App, S, O>;
   }
 
   /**

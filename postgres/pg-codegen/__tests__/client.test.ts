@@ -84,29 +84,31 @@ it('treats bare values as equalTo and null as isNull', async () => {
   expect(noEmail.map(u => u.username)).toEqual(['mallory']);
 });
 
-it('excludes a field the binding must not read, and keeps the rest', async () => {
+it('omits a field the binding must not read, and keeps the rest', async () => {
   const created = await db.users.create({
     data: { username: 'nadia', email: 'nadia@example.com' },
     // A column this caller must not carry — the same shape a scope's copy of a
     // table without the scope key column needs.
-    select: { email: false }
+    omit: { email: true }
   });
   expect(created).toEqual({ id: created.id, username: 'nadia', createdAt: created.createdAt });
 
   const found = await db.users.findFirstOrThrow({
     where: { id: created.id },
-    select: { email: false, createdAt: false }
+    omit: { email: true, createdAt: true }
   });
   expect(found).toEqual({ id: created.id, username: 'nadia' });
-  // @ts-expect-error an excluded field is absent from the result type, not just the row
-  found.email;
+  // @ts-expect-error an omitted field is absent from the result type, not just the row
+  const _absent: unknown = found.email;
 
-  // A field named `true` is a projection: the exclusions are simply not in it.
-  const projected = await db.users.findFirstOrThrow({
-    where: { id: created.id },
-    select: { username: true, email: false }
-  });
-  expect(projected).toEqual({ username: 'nadia' });
+  // Stating both is a contradiction, not a layering — refused, never resolved.
+  await expect(
+    db.users.findFirstOrThrow({
+      where: { id: created.id },
+      select: { username: true },
+      omit: { email: true }
+    })
+  ).rejects.toThrow(/either 'select' or 'omit'/);
 });
 
 it('combines and/or/not filters', async () => {
