@@ -171,6 +171,28 @@ export interface CreateArgs<App, S extends SelectShape<App> | undefined> {
   select?: S;
 }
 
+/**
+ * An upsert states the unique columns it conflicts on, the row to insert, and
+ * what to set when one already exists. No `update` means an existing row is
+ * left as it is (`ON CONFLICT DO NOTHING`), and then there may be no row to
+ * return.
+ *
+ * ```ts
+ * await db.appConfigs.upsert({
+ *   conflict: ['namespaceId', 'name'],
+ *   create: { name, value, namespaceId },
+ *   update: { value, updatedAt: fn('now') }
+ * });
+ * ```
+ */
+export interface UpsertArgs<App, S extends SelectShape<App> | undefined> {
+  /** The unique fields to conflict on, named as generated fields. */
+  conflict: readonly (keyof App & string)[];
+  create: Data<App>;
+  update?: Data<App>;
+  select?: S;
+}
+
 export interface UpdateArgs<App, S extends SelectShape<App> | undefined> {
   where: Where<App>;
   data: Data<App>;
@@ -256,6 +278,35 @@ export class TableClient<App> {
     const { text, values } = query.build();
     const { rows } = await this.db.query(text, values);
     return this.decodeRow(rows[0], fields);
+  }
+
+  /**
+   * Insert a row, or reconcile the one the conflict target already matches.
+   * Returns the resulting row, or null when a conflicting row was left as it
+   * is by an upsert that states no `update`.
+   */
+  async upsert<S extends SelectShape<App> | undefined = undefined>(
+    args: UpsertArgs<App, S>
+  ): Promise<SelectResult<App, S> | null> {
+    if (args.conflict.length === 0) {
+      throw new Error(
+        `${this.spec.table}.upsert: refusing an empty conflict target, which names no unique constraint`
+      );
+    }
+    const fields = this.selectedFields(args.select);
+    const columns = args.conflict.map(field => this.column(field));
+    const updateColumns = args.update ? this.encodeData(args.update) : {};
+    const query = this.baseQuery()
+      .insert(this.encodeData(args.create))
+      .onConflict(
+        Object.keys(updateColumns).length > 0
+          ? { columns, action: 'update', updateColumns }
+          : { columns, action: 'nothing' }
+      )
+      .returning(fields.map(field => this.column(field)));
+    const { text, values } = query.build();
+    const { rows } = await this.db.query(text, values);
+    return rows.length > 0 ? this.decodeRow(rows[0], fields) : null;
   }
 
   async update<S extends SelectShape<App> | undefined = undefined>(
