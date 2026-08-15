@@ -182,7 +182,8 @@ export class TableClient<App> {
   ): Promise<SelectResult<App, S>[]> {
     const fields = this.selectedFields(args.select);
     const query = this.baseQuery().select(fields.map(field => this.column(field)));
-    if (args.where) query.where(this.filter(args.where));
+    const predicate = this.predicate(args.where);
+    if (predicate) query.where(predicate);
     this.applyOrderBy(query, args.orderBy);
     if (args.limit !== undefined) query.limit(args.limit);
     if (args.offset !== undefined) query.offset(args.offset);
@@ -208,7 +209,8 @@ export class TableClient<App> {
 
   async count(where?: Where<App>): Promise<number> {
     const query = this.baseQuery().select([]).selectExpr('count', fn('count', [lit(1)]));
-    if (where) query.where(this.filter(where));
+    const predicate = this.predicate(where);
+    if (predicate) query.where(predicate);
     const { text, values } = query.build();
     const { rows } = await this.db.query(text, values);
     const row = rows[0] as { count: string | number };
@@ -233,7 +235,7 @@ export class TableClient<App> {
     const fields = this.selectedFields(args.select);
     const query = this.baseQuery()
       .update(this.encodeData(args.data))
-      .where(this.filter(args.where))
+      .where(this.required(args.where, 'update'))
       .returning(fields.map(field => this.column(field)));
     const { text, values } = query.build();
     const { rows } = await this.db.query(text, values);
@@ -254,7 +256,7 @@ export class TableClient<App> {
     const fields = this.selectedFields(args.select);
     const query = this.baseQuery()
       .delete()
-      .where(this.filter(args.where))
+      .where(this.required(args.where, 'delete'))
       .returning(fields.map(field => this.column(field)));
     const { text, values } = query.build();
     const { rows } = await this.db.query(text, values);
@@ -291,6 +293,28 @@ export class TableClient<App> {
       decoded[field] = this.spec.fields[field](raw[this.column(field)]);
     }
     return decoded as SelectResult<App, S>;
+  }
+
+  /**
+   * The predicate to apply, or nothing to apply: a caller that spreads a
+   * conditional key column (a scope that records none) states an empty filter,
+   * and an unqualified read is what it asked for.
+   */
+  private predicate(where: Where<App> | undefined): Filter | undefined {
+    if (!where) return undefined;
+    const filter = this.filter(where);
+    return Object.keys(filter).length > 0 ? filter : undefined;
+  }
+
+  /** A write says which rows: an empty filter would mean the whole table. */
+  private required(where: Where<App>, operation: string): Filter {
+    const predicate = this.predicate(where);
+    if (!predicate) {
+      throw new Error(
+        `${this.spec.table}.${operation}: refusing an empty where filter, which would match every row`
+      );
+    }
+    return predicate;
   }
 
   private filter(where: Where<App>): Filter {
