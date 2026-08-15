@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.10.6...@constructive-io/query-builder@3.11.0) (2026-08-15)
+
+### Features
+
+- **query-builder,pg-codegen:** state a row lock on a read ([fe3f4e9](https://github.com/constructive-io/constructive/commit/fe3f4e99d572d8785cdbc2bee3a899c224d7c635))
+
 ## [3.10.6](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.10.5...@constructive-io/query-builder@3.10.6) (2026-08-15)
 
 **Note:** Version bump only for package @constructive-io/query-builder

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.19.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.18.0...pg-codegen@5.19.0) (2026-08-15)
+
+### Features
+
+- **query-builder,pg-codegen:** state a row lock on a read ([fe3f4e9](https://github.com/constructive-io/constructive/commit/fe3f4e99d572d8785cdbc2bee3a899c224d7c635))
+
 # [5.18.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.17.0...pg-codegen@5.18.0) (2026-08-15)
 
 ### Bug Fixes

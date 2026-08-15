@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.2](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-embed@0.2.1...@agentic-kit/pi-embed@0.2.2) (2026-08-15)
+
+**Note:** Version bump only for package @agentic-kit/pi-embed
+
 ## [0.2.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-embed@0.2.0...@agentic-kit/pi-embed@0.2.1) (2026-08-15)
 
 ### Bug Fixes
