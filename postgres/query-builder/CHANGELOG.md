@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.10.5](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.10.4...@constructive-io/query-builder@3.10.5) (2026-08-15)
+
+### Bug Fixes
+
+- **query-builder:** emit real AST nodes for keyword expressions ([e68b6f4](https://github.com/constructive-io/constructive/commit/e68b6f4b4fae892159bda7d5c77f77cef46c723d))
+
 ## [3.10.4](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.10.3...@constructive-io/query-builder@3.10.4) (2026-08-10)
 
 **Note:** Version bump only for package @constructive-io/query-builder
