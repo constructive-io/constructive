@@ -31,7 +31,7 @@ npm install @constructive-io/query-builder
 - Fluent, chainable API
 - SDK-style JSON filters for `WHERE`/`HAVING` (`{ status: { equalTo: 'active' } }`), matching the generated ORM/SDK filter grammar
 - Composable expressions (`col()`, `fn()`, `add()`, `eq()`, ...) usable in SELECT, WHERE, SET, ON CONFLICT, and RETURNING
-- Full support for: `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `JOIN`, `CTE`, `ON CONFLICT`, `RETURNING`, `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT`/`OFFSET`, `DISTINCT`, function/procedure calls
+- Full support for: `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `JOIN`, `CTE`, `ON CONFLICT`, `RETURNING`, `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT`/`OFFSET`, `FOR UPDATE`/`FOR SHARE`, `DISTINCT`, function/procedure calls
 
 ## Usage
 
@@ -509,6 +509,25 @@ new QueryBuilder()
   .limit(10)
   .offset(20)
   .build();
+
+// FOR UPDATE — lock the row a read-then-write is about to change
+new QueryBuilder()
+  .schema('app_public')
+  .table('runs')
+  .select(['id', 'status'])
+  .where({ id: { equalTo: runId } })
+  .lock()
+  .build();
+
+// FOR UPDATE SKIP LOCKED — a queue claim moves on rather than waiting
+new QueryBuilder()
+  .table('jobs')
+  .select(['id'])
+  .where({ status: { equalTo: 'pending' } })
+  .orderBy('created_at', 'ASC')
+  .limit(1)
+  .lock('update', { skipLocked: true })
+  .build();
 ```
 
 ## API
@@ -535,6 +554,7 @@ new QueryBuilder()
 | `.having(...predicates)` | HAVING clause (JSON filters and/or expressions) |
 | `.limit(n)` | LIMIT clause |
 | `.offset(n)` | OFFSET clause |
+| `.lock(strength?, opts?)` | Row lock: `'update'` (default), `'noKeyUpdate'`, `'share'`, `'keyShare'`; `opts: { skipLocked?, noWait? }` |
 | `.distinct()` | SELECT DISTINCT |
 | `.returning(columns)` | RETURNING clause (column names or `{ expr, as }` items) |
 | `.onConflict(opts)` | ON CONFLICT (DO NOTHING or DO UPDATE) |

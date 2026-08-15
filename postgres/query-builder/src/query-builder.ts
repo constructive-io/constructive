@@ -53,6 +53,23 @@ type SortDir = 'ASC' | 'DESC';
 type NullsOrder = 'FIRST' | 'LAST';
 type ConflictAction = 'nothing' | 'update';
 
+// Row-level lock strengths, weakest-blocking last, as PostgreSQL states them.
+export type LockStrength = 'update' | 'noKeyUpdate' | 'share' | 'keyShare';
+
+// What to do about a row someone else already holds: wait for it (the
+// default), pass over it, or fail rather than block.
+export interface LockOptions {
+  skipLocked?: boolean;
+  noWait?: boolean;
+}
+
+const LOCK_STRENGTHS: Record<LockStrength, string> = {
+  update: 'LCS_FORUPDATE',
+  noKeyUpdate: 'LCS_FORNOKEYUPDATE',
+  share: 'LCS_FORSHARE',
+  keyShare: 'LCS_FORKEYSHARE',
+};
+
 // A SELECT target: a column name string, or a computed expression with alias.
 export interface SelectExpr {
   expr: Expr;
@@ -435,6 +452,7 @@ export class QueryBuilder {
   private _ctes: CteSpec[] = [];
   private _onConflict: OnConflictSpec | undefined;
   private _funcCall: { name: string; args?: FnArgs; schema?: string; as?: string } | undefined;
+  private _lock: { strength: LockStrength; opts?: LockOptions } | undefined;
 
   // -------------------------------------------------------------------------
   // Schema / Table
@@ -614,6 +632,19 @@ export class QueryBuilder {
     return this;
   }
 
+  // Row-level lock on the rows this SELECT reads:
+  //   .lock()                              -> FOR UPDATE
+  //   .lock('share')                       -> FOR SHARE
+  //   .lock('update', { skipLocked: true }) -> FOR UPDATE SKIP LOCKED
+  //   .lock('update', { noWait: true })     -> FOR UPDATE NOWAIT
+  lock(strength: LockStrength = 'update', opts?: LockOptions): this {
+    if (opts?.skipLocked && opts?.noWait) {
+      throw new Error('A lock either skips locked rows or refuses to wait for them, not both.');
+    }
+    this._lock = { strength, opts };
+    return this;
+  }
+
   // -------------------------------------------------------------------------
   // RETURNING
   // -------------------------------------------------------------------------
@@ -686,6 +717,7 @@ export class QueryBuilder {
       }
       : undefined;
     c._funcCall = this._funcCall ? { ...this._funcCall } : undefined;
+    c._lock = this._lock ? { ...this._lock, opts: this._lock.opts ? { ...this._lock.opts } : undefined } : undefined;
     c._fromFunction = this._fromFunction ? { ...this._fromFunction } : undefined;
     return c;
   }
@@ -1062,6 +1094,7 @@ export class QueryBuilder {
 
     return nodes.selectStmt({
       distinctClause: this._distinct ? [] : undefined,
+      lockingClause: this._buildLockingClause() as any[],
       targetList: targetList as any[],
       fromClause: this._buildFromClause() as any[],
       whereClause: whereClause as any,
@@ -1073,6 +1106,21 @@ export class QueryBuilder {
       limitOption: limitCount ? 'LIMIT_OPTION_COUNT' as any : undefined,
       op: 'SETOP_NONE' as any,
     });
+  }
+
+  private _buildLockingClause(): unknown[] | undefined {
+    if (!this._lock) return undefined;
+    const { strength, opts } = this._lock;
+    return [
+      nodes.lockingClause({
+        strength: LOCK_STRENGTHS[strength] as any,
+        waitPolicy: (opts?.skipLocked
+          ? 'LockWaitSkip'
+          : opts?.noWait
+            ? 'LockWaitError'
+            : undefined) as any,
+      }),
+    ];
   }
 
   private _buildSelect(): QueryOutput {

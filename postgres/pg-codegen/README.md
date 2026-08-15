@@ -63,6 +63,8 @@ One `create<Schema>Db(db, options?)` factory per schema, one client per table:
 | `delete({ where, select? })` | the deleted rows |
 | `$with(db)` | the same clients bound to another connection |
 
+A read also takes `lock` — `FOR UPDATE` and friends, see [Transactions](#transactions).
+
 `where` / `select` / `orderBy` are keyed by camelCase field names and mapped to physical columns for you. `where` speaks the same query-spec grammar as the GraphQL side — `equalTo`, `notEqualTo`, `in`, `notIn`, `lessThan`, `greaterThanOrEqualTo`, `like`, `likeInsensitive`, `startsWith`, `includes`, `isNull`, … — and a bare value means `equalTo` (`null` means `isNull`):
 
 ```ts
@@ -154,6 +156,23 @@ try {
   client.release();
 }
 ```
+
+A read that decides a write states the lock it needs, so two concurrent workers cannot both act on the same row:
+
+```ts
+const run = await tx.agentRuns.findFirstOrThrow({ where: { id }, lock: 'update' });
+// FOR UPDATE — the other transaction waits here
+await tx.agentRuns.update({ where: { id: run.id }, data: { status: 'running' } });
+
+// a queue claim would rather move on than wait
+const next = await tx.jobs.findFirst({
+  where: { status: 'pending' },
+  orderBy: { createdAt: 'ASC' },
+  lock: { strength: 'update', skipLocked: true }
+});
+```
+
+`lock` takes `'update'`, `'noKeyUpdate'`, `'share'` or `'keyShare'`, and the object form adds `skipLocked` or `noWait`.
 
 ### Tables provisioned under a different name
 

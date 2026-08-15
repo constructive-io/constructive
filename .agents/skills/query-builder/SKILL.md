@@ -54,6 +54,16 @@ new QueryBuilder()
   .limit(10)
   .offset(20)
   .build();
+
+// Row locks: .lock() is FOR UPDATE; also 'noKeyUpdate' | 'share' | 'keyShare',
+// with { skipLocked } or { noWait } (never both).
+new QueryBuilder()
+  .table('jobs')
+  .select(['id'])
+  .where({ status: { equalTo: 'pending' } })
+  .limit(1)
+  .lock('update', { skipLocked: true })
+  .build();
 ```
 
 ## WHERE Filters (SDK JSON style)
