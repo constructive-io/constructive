@@ -186,8 +186,12 @@ export interface CreateArgs<App, S extends SelectShape<App> | undefined> {
  * ```
  */
 export interface UpsertArgs<App, S extends SelectShape<App> | undefined> {
-  /** The unique fields to conflict on, named as generated fields. */
-  conflict: readonly (keyof App & string)[];
+  /**
+   * The unique fields to conflict on. Generated fields autocomplete and map to
+   * their columns; a runtime-configured column (a scope key this binding's
+   * table carries) is named as the column it is.
+   */
+  conflict: readonly (keyof App & string)[] | readonly string[];
   create: Data<App>;
   update?: Data<App>;
   select?: S;
