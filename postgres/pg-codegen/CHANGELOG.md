@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.18.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.17.0...pg-codegen@5.18.0) (2026-08-15)
+
+### Bug Fixes
+
+- **pg-codegen:** let an upsert conflict on a runtime-configured column ([9cbb994](https://github.com/constructive-io/constructive/commit/9cbb994ffa8b4f3b0694f4e1d75b33ea41f86bf9))
+
+### Features
+
+- **pg-codegen:** generate an upsert that states its conflict target ([1f49179](https://github.com/constructive-io/constructive/commit/1f49179dc03aeec3ed5de581ab6ab8d06027247f))
+
 # [5.17.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.16.0...pg-codegen@5.17.0) (2026-08-15)
 
 ### Features
