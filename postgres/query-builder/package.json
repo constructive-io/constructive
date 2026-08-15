@@ -36,9 +36,11 @@
     "database"
   ],
   "devDependencies": {
-    "makage": "^0.3.0"
+    "makage": "^0.3.0",
+    "pgsql-test": "workspace:^"
   },
   "dependencies": {
+    "@pgsql/quotes": "^18.2.4",
     "pg-ast": "workspace:^",
     "pgsql-deparser": "^18.3.6",
     "query-spec": "workspace:^"

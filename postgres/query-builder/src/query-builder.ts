@@ -8,6 +8,9 @@ import type {
   PatternFilterOperator
 } from 'query-spec';
 
+import type { CallPosition } from './keyword-exprs';
+import { keywordExprNode } from './keyword-exprs';
+
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
@@ -205,6 +208,22 @@ function funcCallNode(name: string, args: unknown[], schema?: string) {
   });
 }
 
+// A call by name: a FuncCall, or the dedicated node for the keyword-expression
+// family (COALESCE, NULLIF, GREATEST, LEAST). A schema-qualified name is always
+// a real function call and is never remapped.
+function callNode(
+  name: string,
+  args: unknown[],
+  schema?: string,
+  position: CallPosition = 'expression'
+) {
+  if (!schema) {
+    const keywordNode = keywordExprNode(name, args, position);
+    if (keywordNode) return keywordNode;
+  }
+  return funcCallNode(name, args, schema);
+}
+
 function namedArgNode(name: string, val: unknown) {
   return nodes.namedArgExpr({
     arg: val as any,
@@ -277,7 +296,7 @@ export function fn(name: string, args?: FnArgs, opts?: { schema?: string }): Exp
     schema = name.slice(0, idx);
     fname = name.slice(idx + 1);
   }
-  return (alloc) => funcCallNode(fname, buildFnArgNodes(args, alloc), schema);
+  return (alloc) => callNode(fname, buildFnArgNodes(args, alloc), schema);
 }
 
 function operandToNode(v: Operand, alloc: ParamAllocator): unknown {
@@ -994,7 +1013,12 @@ export class QueryBuilder {
   }
 
   private _rangeFunctionNode(spec: { name: string; args?: FnArgs; schema?: string; as?: string }): unknown {
-    const funcNode = funcCallNode(spec.name, buildFnArgNodes(spec.args, this._alloc), spec.schema);
+    const funcNode = callNode(
+      spec.name,
+      buildFnArgNodes(spec.args, this._alloc),
+      spec.schema,
+      'from'
+    );
     return nodes.rangeFunction({
       functions: [nodes.list({ items: [funcNode] as any[] })] as any[],
       lateral: false,
@@ -1218,7 +1242,12 @@ export class QueryBuilder {
     const fc = this._funcCall!;
     const funcArgs = buildFnArgNodes(fc.args, this._alloc);
 
-    const funcNode = funcCallNode(fc.name, funcArgs, fc.schema);
+    const funcNode = callNode(
+      fc.name,
+      funcArgs,
+      fc.schema,
+      this._selectItems.length > 0 ? 'from' : 'expression'
+    );
 
     if (this._selectItems.length > 0) {
       const targetList = this._buildTargetList(this._selectItems);

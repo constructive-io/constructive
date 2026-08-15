@@ -107,7 +107,7 @@ jobs:
           - batch: uploads
             packages: 'uploads/mime-bytes uploads/uuid-hash uploads/uuid-stream uploads/etag-hash uploads/etag-stream uploads/stream-to-etag uploads/content-type-stream uploads/upload-names uploads/s3-utils'
           - batch: packages-core
-            packages: 'packages/url-domains packages/coerce postgres/query-builder packages/csrf packages/oauth packages/12factor-env packages/orm packages/express-context packages/errors packages/llm-env packages/node-type-registry packages/query-spec packages/server-utils postgres/pg-cache postgres/pg-env'
+            packages: 'packages/url-domains packages/coerce packages/csrf packages/oauth packages/12factor-env packages/orm packages/express-context packages/errors packages/llm-env packages/node-type-registry packages/query-spec packages/server-utils postgres/pg-cache postgres/pg-env'
           - batch: packages-services
             packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli postgres/pgsql-client postgres/pg-ast'
           - batch: graphql
@@ -240,7 +240,7 @@ jobs:
       matrix:
         include:
           - batch: pg-core
-            packages: 'pgpm/ast pgpm/traverse pgpm/bundle pgpm/core pgpm/cli pgpm/portability pgpm/export packages/client packages/safegres postgres/pg-codegen'
+            packages: 'pgpm/ast pgpm/traverse pgpm/bundle pgpm/core pgpm/cli pgpm/portability pgpm/export packages/client packages/safegres postgres/pg-codegen postgres/query-builder'
           - batch: pg-postgres
             packages: 'postgres/pgsql-test postgres/drizzle-orm-test postgres/introspectron graphile/graphile-test graphile/graphile-connection-filter graphile/graphile-postgis'
           - batch: pg-graphql
