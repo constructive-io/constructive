@@ -3,3 +3,4 @@
  */
 /* eslint-disable */
 export * as codegenTest from './codegen_test';
+export * from './client';

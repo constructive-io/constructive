@@ -1,6 +1,7 @@
 import {
   asArrayOf,
   asBigInt,
+  asBigIntString,
   asBoolean,
   asDate,
   asDuration,
@@ -310,6 +311,24 @@ describe('asBigInt', () => {
     expect(asBigInt(1.5)).toBeNull();
     expect(asBigInt('1.5')).toBeNull();
     expect(asBigInt('ten')).toBeNull();
+  });
+});
+
+describe('asBigIntString', () => {
+  it('normalises every accepted shape to canonical digits', () => {
+    expect(asBigIntString(10n)).toBe('10');
+    expect(asBigIntString(10)).toBe('10');
+    expect(asBigIntString('007')).toBe('7');
+  });
+
+  it('keeps a value a JS number could not hold', () => {
+    expect(asBigIntString('9007199254740993')).toBe('9007199254740993');
+  });
+
+  it('rejects what is not a whole number', () => {
+    expect(asBigIntString(1.5)).toBeNull();
+    expect(asBigIntString('ten')).toBeNull();
+    expect(asBigIntString(null)).toBeNull();
   });
 });
 

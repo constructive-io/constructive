@@ -106,6 +106,20 @@ await db.emailIdentities.findFirst({ select: { databaseId: false } });
 
 Excluding is what a caller reaches for when a field must not be carried — a secret's id, row bookkeeping — or when this binding's table genuinely lacks it: an excluded field is absent from the type, so reading it does not compile. Naming any field `true` is a projection and wins outright; the excluded ones are simply not in it.
 
+### Naming a filter or a write input
+
+The client's own vocabulary is exported from the package root, keyed by a generated record, so a function that takes a filter or the values of a write says so without restating the fields:
+
+```ts
+import type { Data, Where } from './generated';
+import type { EmailIdentities } from './generated/routing_public';
+
+const active = (extra: Where<EmailIdentities>) => ({ isActive: true, ...extra });
+type IdentityInput = Data<EmailIdentities>;   // every field optional, camelCase
+```
+
+`Where`, `Data`, `SelectShape`, `OrderBy` and `Queryable` all come from there.
+
 ### Transactions
 
 `$with` rebinds every table client to another connection, so a transaction is the same code against a different handle:
@@ -152,7 +166,9 @@ For every table, view, materialized view and partitioned table in the schemas yo
 
 Plus, per schema, a `db.ts` (the client above), an `enums.ts` — a literal union, a `readonly` value list and `as*`/`require*` checkers for every PostgreSQL enum a column references — and barrels; and one shared `client.ts` runtime at the root.
 
-Every decoder is backed by [`@constructive-io/coerce`](../../packages/coerce): a NOT NULL column throws `CoerceError` naming the offending column, a nullable column answers `null`, and the text forms `pg` returns for `int8`/`numeric` are parsed rather than passed through as strings. Nothing is silently coerced across types, so a malformed row cannot become a default value.
+Every decoder is backed by [`@constructive-io/coerce`](../../packages/coerce): a NOT NULL column throws `CoerceError` naming the offending column, a nullable column answers `null`, and the text form `pg` returns for `numeric` is parsed to a number. Nothing is silently coerced across types, so a malformed row cannot become a default value.
+
+An `int8` column is a **`string`** — the canonical digits of the value, which is how `pg` returns the type, how `graphql/codegen` spells its `BigInt` scalar, and the only representation that keeps an id past 2^53 (a `number` would round `9007199254740993` to its neighbour). Its decoder accepts any of the three shapes a 64-bit value arrives in — `bigint`, integer `number`, digit string — and answers the canonical digits, so `'007'` and `7` both decode to `'7'`; a write states the string and PostgreSQL reads it as `int8`.
 
 ## 🔧 Below the client
 

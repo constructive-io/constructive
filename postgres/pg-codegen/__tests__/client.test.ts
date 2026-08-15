@@ -52,7 +52,7 @@ it('narrows the result with select and maps camelCase fields to columns', async 
   expect(run.threadId).toBe('00000000-0000-0000-0000-000000000001');
   expect(run.status).toBe('running');
   expect(run.tags).toEqual(['a', 'b']);
-  expect(run.lastEventSeq).toBe(0);
+  expect(run.lastEventSeq).toBe('0');
 });
 
 it('filters with the query-spec grammar and orders/limits', async () => {
@@ -139,14 +139,14 @@ it('writes a value derived from the column it sets', async () => {
   const run = await db.agentRuns.create({
     data: { threadId: '00000000-0000-0000-0000-000000000002', status: 'running' }
   });
-  expect(run.lastEventSeq).toBe(0);
+  expect(run.lastEventSeq).toBe('0');
 
   const [bumped] = await db.agentRuns.update({
     where: { id: run.id },
     data: { lastEventSeq: add(col('last_event_seq'), 1), status: 'succeeded' },
     select: { lastEventSeq: true, status: true }
   });
-  expect(bumped).toEqual({ lastEventSeq: 1, status: 'succeeded' });
+  expect(bumped).toEqual({ lastEventSeq: '1', status: 'succeeded' });
 });
 
 it('deletes rows and reports what was removed', async () => {
