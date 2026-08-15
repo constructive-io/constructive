@@ -18,6 +18,8 @@ export type PgClass = WithTags<{
   namespaceName: string;
   typeId?: string;
   classKind?: string;
+  /** `pg_class.relispartition`: the class is a partition of a partitioned table. */
+  isPartition?: boolean;
   isExtensionConfigurationTable?: boolean;
 
   // Linked

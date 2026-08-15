@@ -6,5 +6,6 @@ export * from './enums';
 export * from './active-users';
 export * from './agent-runs';
 export * from './posts';
+export * from './usage-events';
 export * from './users';
 export * from './db';

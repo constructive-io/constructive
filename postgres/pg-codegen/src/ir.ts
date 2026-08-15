@@ -145,15 +145,45 @@ const resolveType = (type: PgType, typeById: Map<string, PgType>): ResolvedType 
   return { scalar: scalar ?? 'unknown', isArray: false };
 };
 
+export interface IrTableFilter {
+  /** Table names to emit; glob patterns supported. Defaults to `['*']`. */
+  include?: string[];
+  /** Table names to skip; glob patterns supported. */
+  exclude?: string[];
+  /** Table names always skipped by a project convention; glob patterns supported. */
+  systemExclude?: string[];
+}
+
 export interface BuildIrOptions {
   /** The schemas to include, in the order their modules should be emitted. */
   schemas: string[];
+  /** Which tables of those schemas to emit. */
+  tables?: IrTableFilter;
 }
+
+/** Matches a name against simple `*`/`?` glob patterns, as graphql/codegen does. */
+const matchesPatterns = (name: string, patterns: readonly string[]): boolean =>
+  patterns.some(pattern => {
+    if (pattern.includes('*') || pattern.includes('?')) {
+      const expression = new RegExp(`^${pattern.replace(/\*/g, '.*').replace(/\?/g, '.')}$`);
+      return expression.test(name);
+    }
+    return name === pattern;
+  });
 
 export const buildIr = (
   introspection: PgIntrospectionResultByKind,
-  { schemas }: BuildIrOptions
+  { schemas, tables: tableFilter }: BuildIrOptions
 ): Ir => {
+  const include = tableFilter?.include ?? ['*'];
+  const exclude = [...(tableFilter?.exclude ?? []), ...(tableFilter?.systemExclude ?? [])];
+  const isEmitted = (cls: PgClass): boolean => {
+    // A child partition is storage for its parent partitioned table, which is
+    // the relation callers read and write.
+    if (cls.isPartition === true) return false;
+    if (!matchesPatterns(cls.name, include)) return false;
+    return exclude.length === 0 || !matchesPatterns(cls.name, exclude);
+  };
   const typeById = new Map<string, PgType>(introspection.type.map(type => [type.id, type]));
   const namespaceNameById = new Map<string, string>(
     introspection.namespace.map(namespace => [namespace.id, namespace.name])
@@ -187,7 +217,13 @@ export const buildIr = (
     };
 
     const tables: IrTable[] = introspection.class
-      .filter((cls: PgClass) => cls.namespaceName === schemaName && cls.classKind !== undefined && cls.classKind in TABLE_KINDS)
+      .filter(
+        (cls: PgClass) =>
+          cls.namespaceName === schemaName &&
+          cls.classKind !== undefined &&
+          cls.classKind in TABLE_KINDS &&
+          isEmitted(cls)
+      )
       .map((cls: PgClass): IrTable => {
         const attributes = (attributesByClassId.get(cls.id) ?? [])
           .filter(attribute => attribute.num > 0)

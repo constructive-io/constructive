@@ -10,6 +10,8 @@ import type { AgentRuns } from './agent-runs';
 import { agentRunsFields, agentRunsTable } from './agent-runs';
 import type { Posts } from './posts';
 import { postsFields, postsTable } from './posts';
+import type { UsageEvents } from './usage-events';
+import { usageEventsFields, usageEventsTable } from './usage-events';
 import type { Users } from './users';
 import { usersFields, usersTable } from './users';
 /** Runtime overrides for the physical schema and per-table names, for tables provisioned into per-tenant schemas. */
@@ -19,6 +21,7 @@ export interface CodegenTestDbOptions {
     activeUsers?: string;
     agentRuns?: string;
     posts?: string;
+    usageEvents?: string;
     users?: string;
   };
 }
@@ -26,6 +29,7 @@ export interface CodegenTestDb {
   activeUsers: TableClient<ActiveUsers>;
   agentRuns: TableClient<AgentRuns>;
   posts: TableClient<Posts>;
+  usageEvents: TableClient<UsageEvents>;
   users: TableClient<Users>;
   /** Rebind every table client to another connection (e.g. a transaction's PoolClient). */
   $with(db: Queryable): CodegenTestDb;
@@ -50,6 +54,12 @@ export const createCodegenTestDb = (db: Queryable, options: CodegenTestDbOptions
     table: options?.tables?.posts ?? postsTable.name,
     columnByField: postsTable.columnByField,
     fields: postsFields
+  }, db),
+  usageEvents: new TableClient<UsageEvents>({
+    schema: options?.schema ?? usageEventsTable.schema,
+    table: options?.tables?.usageEvents ?? usageEventsTable.name,
+    columnByField: usageEventsTable.columnByField,
+    fields: usageEventsFields
   }, db),
   users: new TableClient<Users>({
     schema: options?.schema ?? usersTable.schema,

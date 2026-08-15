@@ -17,6 +17,8 @@ interface CliArgs {
   schemas: string[];
   out: string;
   check: boolean;
+  include: string[];
+  exclude: string[];
 }
 
 const USAGE = `Usage: pg-codegen --schema <name> [--schema <name> ...] --out <dir> [--check]
@@ -24,6 +26,8 @@ const USAGE = `Usage: pg-codegen --schema <name> [--schema <name> ...] --out <di
 Options:
   --schema <name>  A schema to generate records for (repeatable, or comma-separated)
   --out <dir>      Directory the generated files are written to (or compared against)
+  --table <glob>   Only generate these tables (repeatable, or comma-separated)
+  --exclude <glob> Skip these tables (repeatable, or comma-separated)
   --check          Compare against the files already in --out and exit non-zero on drift
   --help           Show this message
 
@@ -31,17 +35,26 @@ Connection settings come from the standard PG environment variables.`;
 
 export const parseArgs = (argv: string[]): CliArgs => {
   const schemas: string[] = [];
+  const include: string[] = [];
+  const exclude: string[] = [];
   let out = '';
   let check = false;
+  const values = (value: string | undefined, flag: string): string[] => {
+    if (!value) throw new Error(`${flag} requires a value`);
+    return value.split(',').map(name => name.trim()).filter(Boolean);
+  };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     switch (arg) {
-    case '--schema': {
-      const value = argv[++i];
-      if (!value) throw new Error('--schema requires a value');
-      schemas.push(...value.split(',').map(name => name.trim()).filter(Boolean));
+    case '--schema':
+      schemas.push(...values(argv[++i], '--schema'));
       break;
-    }
+    case '--table':
+      include.push(...values(argv[++i], '--table'));
+      break;
+    case '--exclude':
+      exclude.push(...values(argv[++i], '--exclude'));
+      break;
     case '--out': {
       const value = argv[++i];
       if (!value) throw new Error('--out requires a value');
@@ -62,7 +75,7 @@ export const parseArgs = (argv: string[]): CliArgs => {
   }
   if (schemas.length === 0) throw new Error('At least one --schema is required');
   if (!out) throw new Error('--out is required');
-  return { schemas, out, check };
+  return { schemas, out, check, include, exclude };
 };
 
 export const main = async (argv: string[]): Promise<number> => {
@@ -86,7 +99,13 @@ export const main = async (argv: string[]): Promise<number> => {
   });
   await client.connect();
   try {
-    const files = await generate(client, { schemas: args.schemas });
+    const files = await generate(client, {
+      schemas: args.schemas,
+      tables: {
+        ...(args.include.length > 0 ? { include: args.include } : {}),
+        ...(args.exclude.length > 0 ? { exclude: args.exclude } : {})
+      }
+    });
     if (args.check) {
       const report = await checkFileTree(args.out, files);
       if (isClean(report)) {

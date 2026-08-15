@@ -11,7 +11,7 @@ import { emitRootIndex, emitSchemaIndex, tableFileName } from './emit/barrel';
 import { emitClientRuntime, emitSchemaDbModule } from './emit/client';
 import { emitEnumsModule } from './emit/enums';
 import { emitRecordModule } from './emit/record';
-import { buildIr, Ir } from './ir';
+import { buildIr, Ir, IrTableFilter } from './ir';
 
 /** Emit the full generated file tree (relative path -> content) from an IR. */
 export const emitFileTree = (ir: Ir): Record<string, string> => {
@@ -33,15 +33,17 @@ export const emitFileTree = (ir: Ir): Record<string, string> => {
 
 export interface GenerateOptions {
   schemas: string[];
+  /** Which tables of those schemas to emit; child partitions are never emitted. */
+  tables?: IrTableFilter;
 }
 
 /** Introspect `schemas` through the given client and emit the file tree. */
 export const generate = async (
   client: ClientBase,
-  { schemas }: GenerateOptions
+  { schemas, tables }: GenerateOptions
 ): Promise<Record<string, string>> => {
   const introspection = await introspect(client, { schemas });
-  const ir = buildIr(introspection, { schemas });
+  const ir = buildIr(introspection, { schemas, tables });
   return emitFileTree(ir);
 };
 
