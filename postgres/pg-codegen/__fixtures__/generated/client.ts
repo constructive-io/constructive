@@ -33,18 +33,38 @@ export interface TableSpec<App> {
   jsonFields?: readonly string[];
 }
 
-/** Select shape: `{ id: true, name: true }` — same as the GraphQL ORM. */
+/**
+ * Select shape — same as the GraphQL ORM, stated either way round:
+ *
+ * - `{ id: true, name: true }` reads those fields and nothing else;
+ * - `{ databaseId: false }` reads every field except that one, for the field a
+ *   record has in general but this binding's table does not (a scope's copy of
+ *   a table without the scope key column) or that a caller must not carry (a
+ *   secret's id, row bookkeeping).
+ *
+ * Naming a field `true` is a projection and wins outright: the excluded ones
+ * are simply not in it.
+ */
 export type SelectShape<App> = { [K in keyof App]?: boolean };
 
 type TrueKeys<App, S> = {
   [K in keyof S]-?: S[K] extends true ? K & keyof App : never;
 }[keyof S];
 
-/** Rows narrow to the selected fields; no `select` returns the full record. */
+type FalseKeys<App, S> = {
+  [K in keyof S]-?: S[K] extends false ? K & keyof App : never;
+}[keyof S];
+
+/**
+ * Rows narrow to what the select states: the picked fields, else the record
+ * minus the excluded ones. No `select` returns the full record.
+ */
 export type SelectResult<App, S extends SelectShape<App> | undefined> =
   S extends SelectShape<App>
     ? [TrueKeys<App, S>] extends [never]
-      ? App
+      ? [FalseKeys<App, S>] extends [never]
+        ? App
+        : Omit<App, FalseKeys<App, S>>
       : Pick<App, TrueKeys<App, S>>
     : App;
 
@@ -280,7 +300,10 @@ export class TableClient<App> {
     const all = Object.keys(this.spec.columnByField) as (keyof App & string)[];
     if (!select) return all;
     const picked = all.filter(field => select[field] === true);
-    return picked.length > 0 ? picked : all;
+    if (picked.length > 0) return picked;
+    // Nothing picked: the select either excludes fields or says nothing at all,
+    // and both read what is left.
+    return all.filter(field => select[field] !== false);
   }
 
   private decodeRow<S extends SelectShape<App> | undefined>(
