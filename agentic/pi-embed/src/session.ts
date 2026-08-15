@@ -84,6 +84,15 @@ export async function startRun(options: StartRunOptions): Promise<EmbeddedRun> {
 
   const result = await options.pi.createAgentSession({ ...options.session, cwd, agentDir, resourceLoader });
 
+  // pi emits `session_start` from `bindExtensions`, which its own CLI modes call
+  // once their UI exists — `createAgentSession` never does. An embedder that
+  // skips it loads the extensions but never starts them: the metered lane never
+  // selects the gateway model, so a cloud run's calls leave on whatever provider
+  // key the process happens to hold, unmetered, and the log lane never binds on
+  // resume. So the embedding, not the host, fires it.
+  await result.session.bindExtensions({});
+  assertMeteredModelSelected(run, result.session);
+
   return {
     run,
     session: result.session,
@@ -101,6 +110,25 @@ export async function startRun(options: StartRunOptions): Promise<EmbeddedRun> {
       if (failure !== undefined) throw failure;
     }
   };
+}
+
+/**
+ * The metered lane's whole purpose is that usage cannot be under-reported, so a
+ * session that ended up on some other provider must fail the run rather than
+ * quietly bill nothing.
+ */
+function assertMeteredModelSelected(run: ComposedRun, session: CreateAgentSessionResult['session']): void {
+  const lane = run.lanes.meteredModel;
+  if (!lane?.selectedModel) return;
+
+  const model = session.model;
+  if (model?.provider === lane.providerName && model.id === lane.selectedModel) return;
+
+  throw new Error(
+    `pi-embed: the metered lane selected "${lane.providerName}/${lane.selectedModel}" but the ` +
+    `session is on "${model ? `${model.provider}/${model.id}` : 'no model'}" — model calls would ` +
+    'leave outside the gateway and go unmetered'
+  );
 }
 
 const defaultResourceLoader =
