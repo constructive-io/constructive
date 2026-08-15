@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.13.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.12.0...pg-codegen@5.13.0) (2026-08-15)
+
+### Bug Fixes
+
+- **pg-codegen:** escape table file names that collide with reserved schema modules ([604debf](https://github.com/constructive-io/constructive/commit/604debf6f98722235515771298be4f70f28b15b9))
+
+### Features
+
+- **pg-codegen:** allow physical scope-key columns in write data ([92643ed](https://github.com/constructive-io/constructive/commit/92643ed65b15eca186c14e0b80b277fd8e637a16))
+- **pg-codegen:** generated Prisma-like db client over query-builder ([c59b1e8](https://github.com/constructive-io/constructive/commit/c59b1e84a196b8bad40e9c29f137abcb418aa828))
+
 # [5.12.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.11.0...pg-codegen@5.12.0) (2026-08-14)
 
 ### Features
