@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.16.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.15.0...pg-codegen@5.16.0) (2026-08-15)
+
+### Features
+
+- **pg-codegen:** accept a SQL expression as a write value ([d6dbdf4](https://github.com/constructive-io/constructive/commit/d6dbdf4712393329f0af388e32440bbd860078fe))
+
 # [5.15.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.14.1...pg-codegen@5.15.0) (2026-08-15)
 
 ### Features
