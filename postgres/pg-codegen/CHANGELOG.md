@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.14.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.13.1...pg-codegen@5.14.0) (2026-08-15)
+
+### Bug Fixes
+
+- **pg-codegen:** read unqualified on an empty where, refuse an empty write filter ([f007180](https://github.com/constructive-io/constructive/commit/f007180315f5c0fbc8b8634df1dd2b67df611ba0))
+
+### Features
+
+- **pg-codegen:** state a select as exclusions, not only a key list ([a9ce153](https://github.com/constructive-io/constructive/commit/a9ce1531b588bba636c893dab795ec8da1511f09))
+
 ## [5.13.1](https://github.com/constructive-io/constructive/compare/pg-codegen@5.13.0...pg-codegen@5.13.1) (2026-08-15)
 
 **Note:** Version bump only for package pg-codegen
