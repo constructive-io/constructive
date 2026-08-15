@@ -66,6 +66,7 @@ Then the text-carried and named shapes — what an env var, a query string or a 
 | `asIntegerIn` | `requireIntegerIn` | an integer within `{ min, max }`, inclusive |
 | `asPort` | `requirePort` | a port: an integer in `1..65535`, from a number or a string |
 | `asBigInt` | `requireBigInt` | a `bigint`, an integer, or a digit string |
+| `asBigIntString` | `requireBigIntString` | the same, answered as canonical digits — the wire form of an `int8` |
 | `asUrl` | `requireUrl` | an absolute URL — a scheme is required |
 | `asHostname` | `requireHostname` | a hostname or IP address — no scheme, port or path |
 | `asEmail` | `requireEmail` | an email address |

@@ -26,7 +26,11 @@ interface CoercerPair {
 const COERCERS: Record<string, CoercerPair> = {
   boolean: { require: 'requireBoolean', as: 'asBoolean', expectedArray: 'an array of booleans' },
   integer: { require: 'requireInteger', as: 'asInteger', expectedArray: 'an array of integers' },
-  bigint: { require: 'requireNumericInteger', as: 'asNumericInteger', expectedArray: 'an array of integers' },
+  bigint: {
+    require: 'requireBigIntString',
+    as: 'asBigIntString',
+    expectedArray: 'an array of whole numbers'
+  },
   number: { require: 'requireNumeric', as: 'asNumeric', expectedArray: 'an array of numbers' },
   string: { require: 'requireString', as: 'asString', expectedArray: 'an array of non-empty strings' },
   uuid: { require: 'requireUuid', as: 'asUuid', expectedArray: 'an array of UUIDs' },
@@ -39,9 +43,12 @@ const scalarTsType = (column: IrColumn): t.TSType => {
   case 'boolean':
     return t.tsBooleanKeyword();
   case 'integer':
-  case 'bigint':
   case 'number':
     return t.tsNumberKeyword();
+  // int8 carries values a JS number cannot hold, so it is a digit string —
+  // the same spelling graphql/codegen gives the `BigInt` scalar, and the one
+  // node-postgres already returns for the type.
+  case 'bigint':
   case 'string':
   case 'uuid':
   case 'timestamp':

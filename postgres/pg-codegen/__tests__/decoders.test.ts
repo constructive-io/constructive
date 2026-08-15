@@ -38,7 +38,7 @@ const validCamel: AgentRuns = {
   retrySeconds: [5, 30],
   metadata: { attempt: 1 },
   settings: null,
-  lastEventSeq: 42,
+  lastEventSeq: '42',
   score: 0.75,
   startedAt: '2026-01-01T00:00:00.000Z',
   finishedAt: null
@@ -82,6 +82,7 @@ describe('decodeAgentRuns (camelCase envelope)', () => {
     expect(() => decodeAgentRuns({ ...validCamel, lastEventSeq: 'not-a-number' })).toThrow(
       CoerceError
     );
+    expect(() => decodeAgentRuns({ ...validCamel, lastEventSeq: 1.5 })).toThrow(CoerceError);
     expect(() => decodeAgentRuns({ ...validCamel, id: 'not-a-uuid' })).toThrow(
       'codegen_test.agent_runs.id is required (expected a UUID)'
     );
@@ -114,14 +115,14 @@ describe('decodeAgentRuns (camelCase envelope)', () => {
 describe('decodeAgentRunsRow / agentRunsFromRow', () => {
   it('decodes a snake_case row, parsing the text forms pg returns', () => {
     const row = decodeAgentRunsRow(validRow);
-    expect(row.last_event_seq).toBe(9007199254740);
+    expect(row.last_event_seq).toBe('9007199254740');
     expect(row.score).toBe(0.75);
   });
 
   it('converts a row to the camelCase shape', () => {
     const run = agentRunsFromRow(decodeAgentRunsRow(validRow));
     expect(run.threadId).toBe(THREAD_ID);
-    expect(run.lastEventSeq).toBe(9007199254740);
+    expect(run.lastEventSeq).toBe('9007199254740');
     expect(run.settings).toEqual({ theme: 'dark' });
   });
 
@@ -132,9 +133,9 @@ describe('decodeAgentRunsRow / agentRunsFromRow', () => {
 
 describe('serializeAgentRuns', () => {
   it('maps camelCase fields onto snake_case columns', () => {
-    expect(serializeAgentRuns({ threadId: THREAD_ID, lastEventSeq: 7 })).toEqual({
+    expect(serializeAgentRuns({ threadId: THREAD_ID, lastEventSeq: '7' })).toEqual({
       thread_id: THREAD_ID,
-      last_event_seq: 7
+      last_event_seq: '7'
     });
   });
 
@@ -161,7 +162,7 @@ describe('per-column field decoders', () => {
   });
 
   it('parses the text forms pg returns, as the row decoder does', () => {
-    expect(agentRunsFields.lastEventSeq('9007199254740')).toBe(9007199254740);
+    expect(agentRunsFields.lastEventSeq('9007199254740')).toBe('9007199254740');
     expect(agentRunsFields.score('0.7500')).toBe(0.75);
   });
 
@@ -220,7 +221,7 @@ describe('against real database rows', () => {
       tags: ['alpha', 'beta'],
       retrySeconds: [5, 30],
       metadata: { attempt: 1 },
-      lastEventSeq: 42,
+      lastEventSeq: '42',
       score: 0.75,
       startedAt: '2026-01-01T00:00:00.000Z'
     });
@@ -246,7 +247,7 @@ describe('against real database rows', () => {
     expect(run.retrySeconds).toEqual([5, 30]);
     expect(run.metadata).toEqual({ attempt: 1 });
     expect(run.settings).toBeNull();
-    expect(run.lastEventSeq).toBe(42);
+    expect(run.lastEventSeq).toBe('42');
     expect(run.score).toBe(0.75);
     expect(run.startedAt).toBe('2026-01-01T00:00:00.000Z');
     expect(run.finishedAt).toBeNull();

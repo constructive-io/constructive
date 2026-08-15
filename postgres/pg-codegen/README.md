@@ -152,7 +152,9 @@ For every table, view, materialized view and partitioned table in the schemas yo
 
 Plus, per schema, a `db.ts` (the client above), an `enums.ts` — a literal union, a `readonly` value list and `as*`/`require*` checkers for every PostgreSQL enum a column references — and barrels; and one shared `client.ts` runtime at the root.
 
-Every decoder is backed by [`@constructive-io/coerce`](../../packages/coerce): a NOT NULL column throws `CoerceError` naming the offending column, a nullable column answers `null`, and the text forms `pg` returns for `int8`/`numeric` are parsed rather than passed through as strings. Nothing is silently coerced across types, so a malformed row cannot become a default value.
+Every decoder is backed by [`@constructive-io/coerce`](../../packages/coerce): a NOT NULL column throws `CoerceError` naming the offending column, a nullable column answers `null`, and the text form `pg` returns for `numeric` is parsed to a number. Nothing is silently coerced across types, so a malformed row cannot become a default value.
+
+An `int8` column is a **`string`** — the canonical digits of the value, which is how `pg` returns the type, how `graphql/codegen` spells its `BigInt` scalar, and the only representation that keeps an id past 2^53 (a `number` would round `9007199254740993` to its neighbour). Its decoder accepts any of the three shapes a 64-bit value arrives in — `bigint`, integer `number`, digit string — and answers the canonical digits, so `'007'` and `7` both decode to `'7'`; a write states the string and PostgreSQL reads it as `int8`.
 
 ## 🔧 Below the client
 

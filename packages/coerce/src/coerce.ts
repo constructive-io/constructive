@@ -214,6 +214,18 @@ export const asBigInt = (value: unknown): bigint | null => {
 const INTEGER_TEXT = /^[+-]?\d+$/;
 
 /**
+ * A whole number in its canonical text form, else `null` — {@link asBigInt}
+ * spelled the way a 64-bit value travels.
+ *
+ * Text is the wire format for `int8`: node-postgres returns the type as a
+ * string, JSON carries it as one, and a `number` would silently lose identity
+ * past 2^53. Every accepted shape is normalised through `BigInt`, so `'007'`
+ * and `7` both answer `'7'` and two ids compare as themselves.
+ */
+export const asBigIntString = (value: unknown): string | null =>
+  asBigInt(value)?.toString() ?? null;
+
+/**
  * An absolute URL, returned **verbatim**, else `null`. A scheme is required, so
  * `'example.com'` — which is a path, and a classic way to fetch the wrong
  * thing — does not qualify.
@@ -343,6 +355,8 @@ export const requireNumericInteger = require_(asNumericInteger, 'an integer');
 export const requirePort = require_(asPort, 'a port in 1..65535');
 /** {@link asBigInt}, throwing {@link CoerceError} when absent. */
 export const requireBigInt = require_(asBigInt, 'a whole number');
+/** {@link asBigIntString}, throwing {@link CoerceError} when absent. */
+export const requireBigIntString = require_(asBigIntString, 'a whole number');
 /** {@link asUrl}, throwing {@link CoerceError} when absent. */
 export const requireUrl = require_(asUrl, 'an absolute URL');
 /** {@link asHostname}, throwing {@link CoerceError} when absent. */
