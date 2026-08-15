@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-embed@0.2.0...@agentic-kit/pi-embed@0.2.1) (2026-08-15)
+
+### Bug Fixes
+
+- **pi-embed:** start the extensions, and refuse a metered run that is not on the gateway model ([dfb459a](https://github.com/constructive-io/constructive/commit/dfb459ad436a2a686e35987e61beb57cd575bc9c))
+
 # 0.2.0 (2026-08-14)
 
 ### Features
