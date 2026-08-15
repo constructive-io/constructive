@@ -4,6 +4,8 @@ export type {
   Filter,
   FnArg,
   FnArgs,
+  LockOptions,
+  LockStrength,
   Operand,
   ParamAllocator,
   QueryOutput,
