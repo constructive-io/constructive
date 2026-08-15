@@ -8,6 +8,12 @@
  */
 
 export {
+  constructiveEntryTypes,
+  type EntryTypeDefinition,
+  EntryTypeRegistry,
+  type EntryVisibility
+} from './entry-types';
+export {
   follow,
   type FollowOptions,
   readAll
@@ -64,6 +70,18 @@ export {
   type SessionProjectionOptions
 } from './projectors/session';
 export {
+  type ApprovalSpan,
+  type ModelSpan,
+  projectSpans,
+  type Span,
+  type SpanBase,
+  type SpanKind,
+  type SpanProjection,
+  type SpanStatus,
+  type SpanTiming,
+  type ToolSpan
+} from './projectors/spans';
+export {
   APPROVAL_REQUEST_TYPE,
   APPROVAL_RESOLUTION_TYPE,
   type ApprovalRequestInput,
@@ -71,6 +89,13 @@ export {
   type ApprovalResolutionInput,
   approvalResolutionMessage,
   type ApprovalState,
+  assertApprovalRequestDetails,
+  assertApprovalResolutionDetails,
+  assertGateDecisionDetails,
+  GATE_DECISION_TYPE,
+  type GateDecisionDetails,
+  gateDecisionMessage,
+  type GateDecisionState,
   projectToolState,
   type ToolCallState,
   type ToolCallStatus,
