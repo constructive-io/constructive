@@ -149,6 +149,47 @@ it('writes a value derived from the column it sets', async () => {
   expect(bumped).toEqual({ lastEventSeq: '1', status: 'succeeded' });
 });
 
+it('inserts a row, or reconciles the one the conflict target matches', async () => {
+  const inserted = await db.users.upsert({
+    conflict: ['username'],
+    create: { username: 'mo', email: 'mo@example.com' },
+    update: { email: 'mo@example.com' },
+    select: { id: true, email: true }
+  });
+  expect(inserted?.email).toBe('mo@example.com');
+
+  const reconciled = await db.users.upsert({
+    conflict: ['username'],
+    create: { username: 'mo', email: 'ignored@example.com' },
+    update: { email: 'mo@corp.example' },
+    select: { id: true, email: true }
+  });
+  expect(reconciled).toEqual({ id: inserted?.id, email: 'mo@corp.example' });
+  expect(await db.users.count({ username: 'mo' })).toBe(1);
+});
+
+it('leaves a conflicting row as it is when an upsert states no update', async () => {
+  const first = await db.users.upsert({
+    conflict: ['username'],
+    create: { username: 'nia', email: 'nia@example.com' }
+  });
+  expect(first?.email).toBe('nia@example.com');
+
+  // DO NOTHING skipped the row, so there is none to return.
+  expect(
+    await db.users.upsert({ conflict: ['username'], create: { username: 'nia', email: 'other@example.com' } })
+  ).toBeNull();
+  expect((await db.users.findFirstOrThrow({ where: { username: 'nia' } })).email).toBe(
+    'nia@example.com'
+  );
+});
+
+it('refuses an upsert that names no conflict target', async () => {
+  await expect(db.users.upsert({ conflict: [], create: { username: 'omar' } })).rejects.toThrow(
+    /refusing an empty conflict target/
+  );
+});
+
 it('deletes rows and reports what was removed', async () => {
   await db.users.create({ data: { username: 'ivan' } });
   const removed = await db.users.delete({ where: { username: 'ivan' }, select: { username: true } });

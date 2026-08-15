@@ -57,6 +57,7 @@ One `create<Schema>Db(db, options?)` factory per schema, one client per table:
 | `findFirstOrThrow(args?)` | `SelectResult`, else `RowNotFoundError` |
 | `count(where?)` | `number` |
 | `create({ data, select? })` | the inserted row |
+| `upsert({ conflict, create, update?, select? })` | the inserted or reconciled row, else `null` |
 | `update({ where, data, select? })` | the updated rows |
 | `updateOrThrow({ where, data, select? })` | one updated row, else `RowNotFoundError` |
 | `delete({ where, select? })` | the deleted rows |
@@ -88,6 +89,23 @@ await db.resources.update({
 ```
 
 An expression is deparsed in place — never bound as a value, never serialized as one.
+
+### Upsert
+
+`upsert` states the unique fields it conflicts on, the row to insert, and what to set when one already exists:
+
+```ts
+import { fn } from '@constructive-io/query-builder';
+
+await db.appConfigs.upsert({
+  conflict: ['namespaceId', 'name'],
+  create: { name, value, namespaceId },
+  update: { value, updatedAt: fn('now') }
+});
+// INSERT INTO … ON CONFLICT (namespace_id, name) DO UPDATE SET value = $1, updated_at = now() RETURNING …
+```
+
+Stating no `update` leaves a conflicting row as it is (`ON CONFLICT DO NOTHING`), and then there is no row to return — the result is `null`. An empty `conflict` throws, since it names no unique constraint.
 
 ### Selections type the result
 
