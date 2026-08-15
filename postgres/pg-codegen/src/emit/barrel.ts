@@ -4,7 +4,13 @@ import { toCamelCase, toKebabCase } from 'inflekt';
 import { IrSchema } from '../ir';
 import { generateCode, t } from './babel';
 
-export const tableFileName = (tableName: string): string => toKebabCase(tableName);
+/** File names the schema directory reserves for its own modules. */
+const RESERVED_FILE_NAMES = new Set(['index', 'db', 'enums']);
+
+export const tableFileName = (tableName: string): string => {
+  const name = toKebabCase(tableName);
+  return RESERVED_FILE_NAMES.has(name) ? `${name}-table` : name;
+};
 
 export const emitSchemaIndex = (schema: IrSchema): string => {
   const statements: t.Statement[] = [];
@@ -14,6 +20,7 @@ export const emitSchemaIndex = (schema: IrSchema): string => {
   for (const table of schema.tables) {
     statements.push(t.exportAllDeclaration(t.stringLiteral(`./${tableFileName(table.name)}`)));
   }
+  statements.push(t.exportAllDeclaration(t.stringLiteral('./db')));
   return generateCode(statements);
 };
 

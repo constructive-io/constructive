@@ -7,3 +7,4 @@ export * from './active-users';
 export * from './agent-runs';
 export * from './posts';
 export * from './users';
+export * from './db';
