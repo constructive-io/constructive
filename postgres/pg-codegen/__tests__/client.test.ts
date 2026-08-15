@@ -120,6 +120,28 @@ it('findFirstOrThrow raises on no match', async () => {
   await expect(db.users.findFirstOrThrow({ where: { id: 999999 } })).rejects.toThrow(RowNotFoundError);
 });
 
+it('reads unqualified when a conditional filter spreads to nothing', async () => {
+  await db.users.create({ data: { username: 'karl' } });
+  const keyColumn: string | null = null;
+
+  const rows = await db.users.findMany({
+    where: { ...(keyColumn ? { username: keyColumn } : {}) },
+    select: { username: true }
+  });
+  expect(rows.map(u => u.username)).toEqual(['karl']);
+  expect(await db.users.count({})).toBe(1);
+});
+
+it('refuses a write whose filter would match every row', async () => {
+  await db.users.create({ data: { username: 'lena' } });
+
+  await expect(db.users.update({ where: {}, data: { email: 'x@example.com' } })).rejects.toThrow(
+    /refusing an empty where filter/
+  );
+  await expect(db.users.delete({ where: {} })).rejects.toThrow(/refusing an empty where filter/);
+  expect(await db.users.count()).toBe(1);
+});
+
 it('rebinds to another connection with $with', async () => {
   const rebound = db.$with(pg.client);
   await rebound.users.create({ data: { username: 'judy' } });
