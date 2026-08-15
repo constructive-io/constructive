@@ -27,6 +27,7 @@ it('emits one module per table plus enums and barrels', () => {
     'codegen_test/enums.ts',
     'codegen_test/index.ts',
     'codegen_test/posts.ts',
+    'codegen_test/usage-events.ts',
     'codegen_test/users.ts',
     'index.ts'
   ]);

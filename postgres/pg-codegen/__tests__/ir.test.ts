@@ -1,4 +1,4 @@
-import { introspect } from 'introspectron';
+import { introspect, type PgIntrospectionResultByKind } from 'introspectron';
 import { join } from 'path';
 import { getConnections, seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
@@ -10,10 +10,11 @@ const sql = (f: string) => join(__dirname, '/../sql', f);
 let teardown: () => Promise<void>;
 let pg: PgTestClient;
 let ir: Ir;
+let introspection: PgIntrospectionResultByKind;
 
 beforeAll(async () => {
   ({ pg, teardown } = await getConnections({}, [seed.sqlfile([sql('test.sql')])]));
-  const introspection = await introspect(pg.client, { schemas: ['codegen_test'] });
+  introspection = await introspect(pg.client, { schemas: ['codegen_test'] });
   ir = buildIr(introspection, { schemas: ['codegen_test'] });
 });
 
@@ -37,6 +38,7 @@ it('normalizes tables, views and their primary keys', () => {
     'view:active_users',
     'table:agent_runs',
     'table:posts',
+    'partitioned table:usage_events',
     'table:users'
   ]);
   expect(table('users').primaryKey).toEqual(['id']);
@@ -88,6 +90,31 @@ it('collects enums and links enum columns to them', () => {
     enumName: 'run_status',
     nullable: false
   });
+});
+
+it('emits a partitioned table but none of its child partitions', () => {
+  expect(table('usage_events').primaryKey).toEqual(['id', 'recorded_at']);
+  expect(ir.schemas[0].tables.map(candidate => candidate.name)).not.toContain(
+    'usage_events_p_20260101'
+  );
+});
+
+it('filters tables by include and exclude globs', () => {
+  const names = (options: Parameters<typeof buildIr>[1]) =>
+    buildIr(introspection, options).schemas[0].tables.map(candidate => candidate.name);
+
+  expect(names({ schemas: ['codegen_test'], tables: { include: ['agent_*', 'users'] } })).toEqual([
+    'agent_runs',
+    'users'
+  ]);
+  expect(names({ schemas: ['codegen_test'], tables: { exclude: ['posts', 'active_*'] } })).toEqual([
+    'agent_runs',
+    'usage_events',
+    'users'
+  ]);
+  expect(
+    names({ schemas: ['codegen_test'], tables: { include: ['*'], systemExclude: ['usage_*'] } })
+  ).toEqual(['active_users', 'agent_runs', 'posts', 'users']);
 });
 
 it('carries table and column comments', () => {

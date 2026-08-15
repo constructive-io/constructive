@@ -149,6 +149,7 @@ export const makeIntrospectionQuery = (serverVersionNum, options = {}) => {
         rel.oid as "id",
         rel.relname as "name",
         rel.relkind as "classKind",
+        ${serverVersionNum >= 100000 ? 'rel.relispartition' : 'false'} as "isPartition",
         dsc.description as "description",
         rel.relnamespace as "namespaceId",
         nsp.nspname as "namespaceName",
@@ -181,7 +182,10 @@ export const makeIntrospectionQuery = (serverVersionNum, options = {}) => {
         rel.relpersistence in ('p') and
         -- We don't want classes that will clash with GraphQL (treat them as private)
         rel.relname not like E'\\\\_\\\\_%' and
-        rel.relkind in ('r', 'v', 'm', 'c', 'f') and
+        -- \`p\` is a partitioned table: the logical relation callers read and
+        -- write. Its child partitions come back too, flagged by
+        -- \`isPartition\` so consumers can treat them as storage.
+        rel.relkind in ('r', 'p', 'v', 'm', 'c', 'f') and
         ($2 is true or not exists(
           select 1
           from pg_catalog.pg_depend

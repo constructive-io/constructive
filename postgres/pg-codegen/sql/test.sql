@@ -50,6 +50,22 @@ COMMENT ON COLUMN codegen_test.agent_runs.last_event_seq IS 'Highest event seq a
 CREATE VIEW codegen_test.active_users AS
 SELECT id, username FROM codegen_test.users WHERE username IS NOT NULL;
 
+-- A partitioned table with child partitions: only the parent is an API surface
+CREATE TABLE codegen_test.usage_events (
+    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    recorded_at timestamptz NOT NULL,
+    amount numeric(10, 4),
+    PRIMARY KEY (id, recorded_at)
+) PARTITION BY RANGE (recorded_at);
+
+CREATE TABLE codegen_test.usage_events_p_20260101
+    PARTITION OF codegen_test.usage_events
+    FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
+
+CREATE TABLE codegen_test.usage_events_p_20260201
+    PARTITION OF codegen_test.usage_events
+    FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');
+
 -- A function (to test procedure introspection)
 CREATE FUNCTION codegen_test.user_count() RETURNS integer AS $$
 BEGIN
