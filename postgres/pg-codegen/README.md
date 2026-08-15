@@ -75,6 +75,20 @@ await db.posts.findMany({ where: { or: [{ authorId }, { editorId: authorId }], n
 
 Writes are encoded from the generated column metadata (json/jsonb columns stringified, `Date` → ISO), and every returned row comes back through the generated per-column decoders, so a value that does not match its column's type raises `CoerceError` instead of flowing on as a lie.
 
+A write value may also be an expression, so a write that reads the column it sets stays one statement instead of a read followed by a write:
+
+```ts
+import { add, col } from '@constructive-io/query-builder';
+
+await db.resources.update({
+  where: { id },
+  data: { status: 'failed', lastError: message, errorCount: add(col('error_count'), 1) }
+});
+// UPDATE … SET status = $1, last_error = $2, error_count = error_count + 1 WHERE id = $3
+```
+
+An expression is deparsed in place — never bound as a value, never serialized as one.
+
 ### Selections type the result
 
 `select` is the only projection, stated either way round, and the return type follows it with nothing to annotate:

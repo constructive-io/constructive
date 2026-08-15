@@ -3,6 +3,7 @@
  * __fixtures__ output runs real queries through TableClient against a
  * provisioned database.
  */
+import { add, col } from '@constructive-io/query-builder';
 import { join } from 'path';
 import { getConnections, seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
@@ -132,6 +133,20 @@ it('updates matching rows and returns the decoded projection', async () => {
   await expect(
     db.users.updateOrThrow({ where: { username: 'nobody' }, data: { email: 'x@example.com' } })
   ).rejects.toThrow(RowNotFoundError);
+});
+
+it('writes a value derived from the column it sets', async () => {
+  const run = await db.agentRuns.create({
+    data: { threadId: '00000000-0000-0000-0000-000000000002', status: 'running' }
+  });
+  expect(run.lastEventSeq).toBe(0);
+
+  const [bumped] = await db.agentRuns.update({
+    where: { id: run.id },
+    data: { lastEventSeq: add(col('last_event_seq'), 1), status: 'succeeded' },
+    select: { lastEventSeq: true, status: true }
+  });
+  expect(bumped).toEqual({ lastEventSeq: 1, status: 'succeeded' });
 });
 
 it('deletes rows and reports what was removed', async () => {
