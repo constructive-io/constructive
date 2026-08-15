@@ -14,6 +14,7 @@ export const emitSchemaIndex = (schema: IrSchema): string => {
   for (const table of schema.tables) {
     statements.push(t.exportAllDeclaration(t.stringLiteral(`./${tableFileName(table.name)}`)));
   }
+  statements.push(t.exportAllDeclaration(t.stringLiteral('./db')));
   return generateCode(statements);
 };
 

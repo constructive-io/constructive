@@ -8,6 +8,7 @@ import path from 'path';
 import { ClientBase } from 'pg';
 
 import { emitRootIndex, emitSchemaIndex, tableFileName } from './emit/barrel';
+import { emitClientRuntime, emitSchemaDbModule } from './emit/client';
 import { emitEnumsModule } from './emit/enums';
 import { emitRecordModule } from './emit/record';
 import { buildIr, Ir } from './ir';
@@ -22,8 +23,10 @@ export const emitFileTree = (ir: Ir): Record<string, string> => {
     for (const table of schema.tables) {
       files[`${schema.name}/${tableFileName(table.name)}.ts`] = emitRecordModule(table);
     }
+    files[`${schema.name}/db.ts`] = emitSchemaDbModule(schema);
     files[`${schema.name}/index.ts`] = emitSchemaIndex(schema);
   }
+  files['client.ts'] = emitClientRuntime();
   files['index.ts'] = emitRootIndex(ir.schemas);
   return files;
 };
