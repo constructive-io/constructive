@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.17.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.16.0...pg-codegen@5.17.0) (2026-08-15)
+
+### Features
+
+- **pg-codegen:** export the client's Where/Data/Select types from the package root ([339cc1f](https://github.com/constructive-io/constructive/commit/339cc1f2d041d6f71ee1581863e989bb75787124))
+
 # [5.16.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.15.0...pg-codegen@5.16.0) (2026-08-15)
 
 ### Features
