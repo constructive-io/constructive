@@ -106,6 +106,20 @@ await db.emailIdentities.findFirst({ select: { databaseId: false } });
 
 Excluding is what a caller reaches for when a field must not be carried — a secret's id, row bookkeeping — or when this binding's table genuinely lacks it: an excluded field is absent from the type, so reading it does not compile. Naming any field `true` is a projection and wins outright; the excluded ones are simply not in it.
 
+### Naming a filter or a write input
+
+The client's own vocabulary is exported from the package root, keyed by a generated record, so a function that takes a filter or the values of a write says so without restating the fields:
+
+```ts
+import type { Data, Where } from './generated';
+import type { EmailIdentities } from './generated/routing_public';
+
+const active = (extra: Where<EmailIdentities>) => ({ isActive: true, ...extra });
+type IdentityInput = Data<EmailIdentities>;   // every field optional, camelCase
+```
+
+`Where`, `Data`, `SelectShape`, `OrderBy` and `Queryable` all come from there.
+
 ### Transactions
 
 `$with` rebinds every table client to another connection, so a transaction is the same code against a different handle:

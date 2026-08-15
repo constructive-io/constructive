@@ -32,5 +32,9 @@ export const emitRootIndex = (schemas: IrSchema[]): string => {
       t.stringLiteral(`./${schema.name}`)
     )
   );
+  // The client's own vocabulary — `Where`, `Data`, `SelectShape`, `OrderBy` —
+  // so a consumer that names a filter or a write input states it over a
+  // generated record instead of hand-writing the field list again.
+  statements.push(t.exportAllDeclaration(t.stringLiteral('./client')));
   return generateCode(statements);
 };

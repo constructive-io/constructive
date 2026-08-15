@@ -304,6 +304,7 @@ exports[`generates the schema and root barrels 2`] = `
  */
 /* eslint-disable */
 export * as codegenTest from './codegen_test';
+export * from './client';
 "
 `;
 
