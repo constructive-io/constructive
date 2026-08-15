@@ -5,13 +5,13 @@
 import { TableClient } from '../client';
 import type { Queryable } from '../client';
 import type { ActiveUsers } from './active-users';
-import { ACTIVE_USERS_FIELDS, ACTIVE_USERS_TABLE } from './active-users';
+import { activeUsersFields, activeUsersTable } from './active-users';
 import type { AgentRuns } from './agent-runs';
-import { AGENT_RUNS_FIELDS, AGENT_RUNS_TABLE } from './agent-runs';
+import { agentRunsFields, agentRunsTable } from './agent-runs';
 import type { Posts } from './posts';
-import { POSTS_FIELDS, POSTS_TABLE } from './posts';
+import { postsFields, postsTable } from './posts';
 import type { Users } from './users';
-import { USERS_FIELDS, USERS_TABLE } from './users';
+import { usersFields, usersTable } from './users';
 /** Runtime overrides for the physical schema and per-table names, for tables provisioned into per-tenant schemas. */
 export interface CodegenTestDbOptions {
   schema?: string;
@@ -33,29 +33,29 @@ export interface CodegenTestDb {
 /** One Prisma-like client per table over any pg Pool/Client, decoding rows into the generated CodegenTest application types. */
 export const createCodegenTestDb = (db: Queryable, options: CodegenTestDbOptions = {}): CodegenTestDb => ({
   activeUsers: new TableClient<ActiveUsers>({
-    schema: options?.schema ?? ACTIVE_USERS_TABLE.schema,
-    table: options?.tables?.activeUsers ?? ACTIVE_USERS_TABLE.name,
-    columnByField: ACTIVE_USERS_TABLE.columnByField,
-    fields: ACTIVE_USERS_FIELDS
+    schema: options?.schema ?? activeUsersTable.schema,
+    table: options?.tables?.activeUsers ?? activeUsersTable.name,
+    columnByField: activeUsersTable.columnByField,
+    fields: activeUsersFields
   }, db),
   agentRuns: new TableClient<AgentRuns>({
-    schema: options?.schema ?? AGENT_RUNS_TABLE.schema,
-    table: options?.tables?.agentRuns ?? AGENT_RUNS_TABLE.name,
-    columnByField: AGENT_RUNS_TABLE.columnByField,
-    fields: AGENT_RUNS_FIELDS,
+    schema: options?.schema ?? agentRunsTable.schema,
+    table: options?.tables?.agentRuns ?? agentRunsTable.name,
+    columnByField: agentRunsTable.columnByField,
+    fields: agentRunsFields,
     jsonFields: ['metadata', 'settings']
   }, db),
   posts: new TableClient<Posts>({
-    schema: options?.schema ?? POSTS_TABLE.schema,
-    table: options?.tables?.posts ?? POSTS_TABLE.name,
-    columnByField: POSTS_TABLE.columnByField,
-    fields: POSTS_FIELDS
+    schema: options?.schema ?? postsTable.schema,
+    table: options?.tables?.posts ?? postsTable.name,
+    columnByField: postsTable.columnByField,
+    fields: postsFields
   }, db),
   users: new TableClient<Users>({
-    schema: options?.schema ?? USERS_TABLE.schema,
-    table: options?.tables?.users ?? USERS_TABLE.name,
-    columnByField: USERS_TABLE.columnByField,
-    fields: USERS_FIELDS
+    schema: options?.schema ?? usersTable.schema,
+    table: options?.tables?.users ?? usersTable.name,
+    columnByField: usersTable.columnByField,
+    fields: usersFields
   }, db),
   $with: (next: Queryable) => createCodegenTestDb(next, options)
 });

@@ -37,7 +37,7 @@ export interface AgentRunsRow {
   finished_at: string | null;
 }
 /** Column metadata for `codegen_test.agent_runs`. */
-export const AGENT_RUNS_TABLE = {
+export const agentRunsTable = {
   schema: 'codegen_test',
   name: 'agent_runs',
   qualifiedName: 'codegen_test.agent_runs',
@@ -65,9 +65,9 @@ export const AGENT_RUNS_TABLE = {
  * lenient and answers `null`.
  *
  * ```ts
- * id: AGENT_RUNS_FIELDS.id(row.id),
+ * id: agentRunsFields.id(row.id),
  * ``` */
-export const AGENT_RUNS_FIELDS = {
+export const agentRunsFields = {
   /** `id` (uuid) */id: (value: unknown, label = 'agent_runs.id'): string => requireUuid(value, label),
   /** `thread_id` (uuid) */threadId: (value: unknown, label = 'agent_runs.thread_id'): string => requireUuid(value, label),
   /** `status` (run_status) */status: (value: unknown, label = 'agent_runs.status'): RunStatus => requireRunStatus(value, label),

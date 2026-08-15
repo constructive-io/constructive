@@ -14,7 +14,7 @@ export interface ActiveUsersRow {
   username: string | null;
 }
 /** Column metadata for `codegen_test.active_users`. */
-export const ACTIVE_USERS_TABLE = {
+export const activeUsersTable = {
   schema: 'codegen_test',
   name: 'active_users',
   qualifiedName: 'codegen_test.active_users',
@@ -33,9 +33,9 @@ export const ACTIVE_USERS_TABLE = {
  * lenient and answers `null`.
  *
  * ```ts
- * id: ACTIVE_USERS_FIELDS.id(row.id),
+ * id: activeUsersFields.id(row.id),
  * ``` */
-export const ACTIVE_USERS_FIELDS = {
+export const activeUsersFields = {
   /** `id` (int4) */id: (value: unknown): number | null => asInteger(value),
   /** `username` (citext) */username: (value: unknown): string | null => asString(value)
 } as const;

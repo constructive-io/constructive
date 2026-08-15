@@ -3,7 +3,7 @@
  * snake_case row interface, coerce-backed decoders for both, row/application
  * converters, a serializer for writes, and typed table metadata.
  */
-import { toCamelCase, toConstantCase, toPascalCase } from 'inflekt';
+import { toCamelCase, toPascalCase } from 'inflekt';
 
 import { IrColumn, IrTable } from '../ir';
 import {
@@ -156,7 +156,7 @@ const decodeExpression = (
 };
 
 /**
- * `<TABLE>_FIELDS`: one decoder per column, for rows that are NOT a whole
+ * `<table>Fields`: one decoder per column, for rows that are NOT a whole
  * table row — a joined projection, an aliased column, a partial SELECT — where
  * a record decoder would reject the absent columns.
  *
@@ -237,8 +237,8 @@ export const emitRecordModule = (table: IrTable): string => {
   const usage: RecordModuleUsage = { coerceImports: new Set(), enumImports: new Set() };
   const pascal = toPascalCase(table.name);
   const rowTypeName = `${pascal}Row`;
-  const metadataName = `${toConstantCase(table.name)}_TABLE`;
-  const fieldsName = `${toConstantCase(table.name)}_FIELDS`;
+  const metadataName = `${toCamelCase(table.name)}Table`;
+  const fieldsName = `${toCamelCase(table.name)}Fields`;
   const qualified = `${table.schema}.${table.name}`;
 
   const statements: t.Statement[] = [];

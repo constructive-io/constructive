@@ -12,9 +12,113 @@
    <a href="https://www.npmjs.com/package/pg-codegen"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=postgres%2Fpg-codegen%2Fpackage.json"/></a>
 </p>
 
-Type-safe TypeScript from a live PostgreSQL schema: application and row types, runtime decoders, serializers, column metadata and enum unions — one tree-shakable module per table.
+A Prisma-like, fully typed database client generated from your live PostgreSQL schema — plus the types, decoders and serializers it is built on.
 
-> A database row arrives as `unknown`. `pg-codegen` is what turns it into a value TypeScript can trust, without a hand-written `as string` in sight.
+> No hand-written row mappers, no `row.created_at as string`, no column lists at the call site. Point it at a database and query.
+
+## 🚀 Quick start
+
+```bash
+npm install pg-codegen
+pg-codegen --schema app_public --out src/generated
+```
+
+```ts
+import { Pool } from 'pg';
+import { createAppPublicDb } from './generated/app_public/db';
+
+const db = createAppPublicDb(new Pool());
+
+// full row, decoded and camelCase — no select needed
+const user = await db.users.findFirst({ where: { email: 'nadia@example.com' } });
+
+// narrow it inline; the result type follows
+const names = await db.users.findMany({
+  where: { isActive: true, createdAt: { greaterThan: since } },
+  select: { id: true, username: true },
+  orderBy: { createdAt: 'DESC' },
+  limit: 20
+});
+
+const created = await db.users.create({ data: { username: 'nadia', email: 'nadia@example.com' } });
+await db.users.updateOrThrow({ where: { id: created.id }, data: { isActive: false } });
+```
+
+Connection settings come from the standard PG environment (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`) via `pg-env`.
+
+## 🧭 The client
+
+One `create<Schema>Db(db, options?)` factory per schema, one client per table:
+
+| Method | Returns |
+|---|---|
+| `findMany(args?)` | `SelectResult[]` |
+| `findFirst(args?)` | `SelectResult \| null` |
+| `findFirstOrThrow(args?)` | `SelectResult`, else `RowNotFoundError` |
+| `count(where?)` | `number` |
+| `create({ data, select? })` | the inserted row |
+| `update({ where, data, select? })` | the updated rows |
+| `updateOrThrow({ where, data, select? })` | one updated row, else `RowNotFoundError` |
+| `delete({ where, select? })` | the deleted rows |
+| `$with(db)` | the same clients bound to another connection |
+
+`where` / `select` / `orderBy` are keyed by camelCase field names and mapped to physical columns for you. `where` speaks the same query-spec grammar as the GraphQL side — `equalTo`, `notEqualTo`, `in`, `notIn`, `lessThan`, `greaterThanOrEqualTo`, `like`, `likeInsensitive`, `startsWith`, `includes`, `isNull`, … — and a bare value means `equalTo` (`null` means `isNull`):
+
+```ts
+await db.posts.findMany({ where: { authorId, status: { in: ['draft', 'review'] }, publishedAt: null } });
+await db.posts.findMany({ where: { or: [{ authorId }, { editorId: authorId }], not: { status: 'archived' } } });
+```
+
+`and` / `or` / `not` nest the same shape.
+
+`update` and `delete` **require** a `where`: an empty filter throws rather than rewriting the table. Reads accept one and read the table unfiltered.
+
+Writes are encoded from the generated column metadata (json/jsonb columns stringified, `Date` → ISO), and every returned row comes back through the generated per-column decoders, so a value that does not match its column's type raises `CoerceError` instead of flowing on as a lie.
+
+### Selections type the result
+
+`select` is the only projection, stated either way round, and the return type follows it with nothing to annotate:
+
+```ts
+await db.emailIdentities.findFirst({ where: { id } });
+// EmailIdentities | null — every column
+
+await db.emailIdentities.findFirst({ select: { id: true, slug: true } });
+// Pick<EmailIdentities, 'id' | 'slug'> | null
+
+await db.emailIdentities.findFirst({ select: { databaseId: false } });
+// Omit<EmailIdentities, 'databaseId'> | null
+```
+
+Excluding is what a caller reaches for when a field must not be carried — a secret's id, row bookkeeping — or when this binding's table genuinely lacks it: an excluded field is absent from the type, so reading it does not compile. Naming any field `true` is a projection and wins outright; the excluded ones are simply not in it.
+
+### Transactions
+
+`$with` rebinds every table client to another connection, so a transaction is the same code against a different handle:
+
+```ts
+const client = await pool.connect();
+try {
+  await client.query('BEGIN');
+  const tx = db.$with(client);
+  const run = await tx.agentRuns.create({ data: { threadId, status: 'running' } });
+  await tx.agentEvents.create({ data: { runId: run.id, seq: 1 } });
+  await client.query('COMMIT');
+} finally {
+  client.release();
+}
+```
+
+### Tables provisioned under a different name
+
+The schema and physical table names are runtime arguments, so one generated client serves a per-tenant or per-scope deployment of the same tables:
+
+```ts
+const routing = createRoutingPublicDb(pool, {
+  schema: tenant.schema,
+  tables: { emailIdentities: 'platform_email_identities' }
+});
+```
 
 ## ✨ What it generates
 
@@ -24,25 +128,47 @@ For every table, view, materialized view and partitioned table in the schemas yo
 |---|---|
 | `AgentRuns` | application shape, camelCase |
 | `AgentRunsRow` | database row shape, snake_case |
-| `AGENT_RUNS_TABLE` | `schema`, `name`, `qualifiedName`, `columns`, `primaryKey`, `columnByField` |
-| `AGENT_RUNS_FIELDS` | one decoder per column, for projections |
+| `agentRunsTable` | `schema`, `name`, `qualifiedName`, `columns`, `primaryKey`, `columnByField` |
+| `agentRunsFields` | one decoder per column, for projections |
 | `decodeAgentRuns` | decode an untrusted camelCase envelope (a wire payload, a parsed body) |
 | `decodeAgentRunsRow` | decode an untrusted database row |
 | `agentRunsFromRow` | row → application shape |
 | `decodeAgentRunsFromRow` | both, composed |
 | `serializeAgentRuns` | `Partial<AgentRuns>` → `Partial<AgentRunsRow>` for INSERT/UPDATE |
 
-Plus an `enums.ts` per schema: a literal union, a `readonly` value list and `as*`/`require*` checkers for every PostgreSQL enum a column references.
+Plus, per schema, a `db.ts` (the client above), an `enums.ts` — a literal union, a `readonly` value list and `as*`/`require*` checkers for every PostgreSQL enum a column references — and barrels; and one shared `client.ts` runtime at the root.
 
 Every decoder is backed by [`@constructive-io/coerce`](../../packages/coerce): a NOT NULL column throws `CoerceError` naming the offending column, a nullable column answers `null`, and the text forms `pg` returns for `int8`/`numeric` are parsed rather than passed through as strings. Nothing is silently coerced across types, so a malformed row cannot become a default value.
 
-## 🛠️ Install
+## 🔧 Below the client
 
-```bash
-npm install pg-codegen
+The client covers single-table reads and writes. For a join, a function call, or SQL the builder does not model, keep the query and decode its columns — `agentRunsFields` takes an overridable label so the error names the alias the query actually used:
+
+```ts
+import { agentRunsFields } from '@my/db-types/codegen_test/agent-runs';
+import { threadsFields } from '@my/db-types/codegen_test/threads';
+
+const { rows } = await db.query(`
+  SELECT r.id, r.status, t.title AS thread_title
+  FROM agent_runs r JOIN threads t ON t.id = r.thread_id
+`);
+
+const summaries = rows.map(row => ({
+  id: agentRunsFields.id(row.id),
+  status: agentRunsFields.status(row.status),
+  threadTitle: threadsFields.title(row.thread_title, 'run_summary.thread_title')
+}));
 ```
 
-## 🚀 Usage
+A whole row from a `SELECT *`-shaped query decodes in one call, and each table is its own module so a bundle carries only what it touches:
+
+```ts
+import { decodeAgentRunsFromRow } from '@my/db-types/codegen_test/agent-runs';
+
+const run = decodeAgentRunsFromRow(rows[0]); // AgentRuns, or CoerceError naming the column
+```
+
+## 📟 CLI
 
 ```bash
 pg-codegen --schema app_public --out src/generated
@@ -52,9 +178,9 @@ pg-codegen --schema app_public --out src/generated --check
 
 `--check` re-introspects and compares against the committed output, exiting non-zero on drift — run it in CI so generated types cannot go stale against a migration.
 
-Connection settings come from the standard PG environment (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`) via `pg-env`.
+## 🧩 Programmatic use
 
-Programmatically — for a schema whose physical name is per-tenant, say, where you want to rewrite it to a stable alias before emitting:
+For a schema whose physical name is per-tenant, say, where you want to rewrite it to a stable alias before emitting:
 
 ```ts
 import { Client } from 'pg';
@@ -70,53 +196,6 @@ for (const schema of ir.schemas) {
 await writeFileTree(outDir, emitFileTree(ir));
 ```
 
-## 📟 Example output
-
-```ts
-// generated/codegen_test/agent-runs.ts
-export interface AgentRuns {
-  id: string;
-  threadId: string;
-  status: RunStatus;
-  tags: string[];
-  retrySeconds: number[] | null;
-  lastEventSeq: number;
-  finishedAt: string | null;
-}
-
-export const decodeAgentRunsFromRow = (value: unknown, label = 'codegen_test.agent_runs'): AgentRuns =>
-  agentRunsFromRow(decodeAgentRunsRow(value, label));
-```
-
-Consume per table, so a bundle carries only the tables it touches:
-
-```ts
-import { decodeAgentRunsFromRow } from '@my/db-types/codegen_test/agent-runs';
-
-const { rows } = await db.query('SELECT * FROM agent_runs WHERE id = $1', [id]);
-const run = decodeAgentRunsFromRow(rows[0]); // AgentRuns, or CoerceError naming the column
-```
-
-### Projections
-
-A joined or partial SELECT is not a whole row, so a record decoder would reject it. Decode it column by column instead — `FIELDS` takes an overridable label so the error names the alias the query actually used:
-
-```ts
-import { AGENT_RUNS_FIELDS } from '@my/db-types/codegen_test/agent-runs';
-import { THREADS_FIELDS } from '@my/db-types/codegen_test/threads';
-
-const { rows } = await db.query(`
-  SELECT r.id, r.status, t.title AS thread_title
-  FROM agent_runs r JOIN threads t ON t.id = r.thread_id
-`);
-
-const summaries = rows.map(row => ({
-  id: AGENT_RUNS_FIELDS.id(row.id),
-  status: AGENT_RUNS_FIELDS.status(row.status),
-  threadTitle: THREADS_FIELDS.title(row.thread_title, 'run_summary.thread_title')
-}));
-```
-
 ## 🧱 How it works
 
 ```
@@ -125,4 +204,4 @@ PostgreSQL → introspectron → IR (ir.ts) → emitters (emit/*) → file tree
 
 `buildIr` normalizes an introspection result into the shape every emitter consumes: columns with a resolved scalar, nullability, defaults, primary keys, and the enums they reference. Domains are unwrapped to their base type, arrays carry their element scalar, and a type with no mapping degrades to `unknown` rather than to `any` — the generator never claims to know a shape it does not.
 
-Emission is Babel AST rather than string templates, so output is stable enough to snapshot and to diff in `--check`.
+Emission is Babel AST rather than string templates, so output is stable enough to snapshot and to diff in `--check`. The client runtime is the one exception: `emit/templates/client.ts` is real, typechecked, tested source that is copied into the output, so the runtime every generated client shares is not assembled from AST.

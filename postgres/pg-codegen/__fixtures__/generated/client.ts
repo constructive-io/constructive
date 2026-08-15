@@ -18,7 +18,7 @@ export interface Queryable {
   query(text: string, values?: unknown[]): Promise<{ rows: unknown[]; rowCount?: number | null }>;
 }
 
-/** One generated decoder per field, as emitted in the `<TABLE>_FIELDS` constant. */
+/** One generated decoder per field, as emitted in the `<table>Fields` constant. */
 export type FieldDecoders<App> = {
   [K in keyof App]: (value: unknown, label?: string) => App[K];
 };
