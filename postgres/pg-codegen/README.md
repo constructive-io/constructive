@@ -16,8 +16,6 @@ Type-safe TypeScript from a live PostgreSQL schema: application and row types, r
 
 > A database row arrives as `unknown`. `pg-codegen` is what turns it into a value TypeScript can trust, without a hand-written `as string` in sight.
 
----
-
 ## ✨ What it generates
 
 For every table, view, materialized view and partitioned table in the schemas you name, one module:
