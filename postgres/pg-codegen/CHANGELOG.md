@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.15.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.14.1...pg-codegen@5.15.0) (2026-08-15)
+
+### Features
+
+- **pg-codegen:** skip child partitions, filter tables like graphql/codegen ([5546ebb](https://github.com/constructive-io/constructive/commit/5546ebb22db5b2f251d97cbff73a7c2fe6db834f))
+
 ## [5.14.1](https://github.com/constructive-io/constructive/compare/pg-codegen@5.14.0...pg-codegen@5.14.1) (2026-08-15)
 
 **Note:** Version bump only for package pg-codegen
