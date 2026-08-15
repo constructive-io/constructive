@@ -111,6 +111,13 @@ export type Where<App> = {
   not?: Where<App>;
 };
 
+/**
+ * Write data keyed by camelCase field names. Extra string keys are physical
+ * column names — runtime-configured scope key columns are stamped the same
+ * way any other value is.
+ */
+export type Data<App> = Partial<App> & { [column: string]: unknown };
+
 export type OrderDirection = 'ASC' | 'DESC';
 
 /** Order spec keyed by camelCase field names, e.g. `{ createdAt: 'DESC' }`. */
@@ -131,13 +138,13 @@ export interface FindFirstArgs<App, S extends SelectShape<App> | undefined> {
 }
 
 export interface CreateArgs<App, S extends SelectShape<App> | undefined> {
-  data: Partial<App>;
+  data: Data<App>;
   select?: S;
 }
 
 export interface UpdateArgs<App, S extends SelectShape<App> | undefined> {
   where: Where<App>;
-  data: Partial<App>;
+  data: Data<App>;
   select?: S;
 }
 
@@ -333,7 +340,7 @@ export class TableClient<App> {
     }
   }
 
-  private encodeData(data: Partial<App>): Record<string, SqlValue> {
+  private encodeData(data: Data<App>): Record<string, SqlValue> {
     const encoded: Record<string, SqlValue> = {};
     for (const [field, value] of Object.entries(data)) {
       if (value === undefined) continue;
