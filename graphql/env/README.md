@@ -44,6 +44,14 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 ### GraphQL Schema
 - `GRAPHILE_SCHEMA` - Comma-separated list of PostgreSQL schemas to expose
 
+### Grafast Cache Limits
+- `GRAPHILE_QUERY_CACHE_MAX_LENGTH` - Maximum parsed and validated queries retained per schema
+- `GRAPHILE_OPERATIONS_CACHE_MAX_LENGTH` - Maximum operations retained for plan lookup per schema
+- `GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH` - Maximum context/variable-specific plans retained per operation
+
+Each cache limit must be a safe integer of at least `2`. When omitted, Grafast's
+upstream default for that cache remains in effect.
+
 ### Feature Flags
 - `FEATURES_SIMPLE_INFLECTION` - Enable simple inflection plugin
 - `FEATURES_OPPOSITE_BASE_NAMES` - Enable opposite base names

@@ -10,7 +10,11 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
-import { createConstructivePreset, makePgService } from 'graphile-settings';
+import {
+  createConstructivePreset,
+  createGrafastCacheLimitsPreset,
+  makePgService
+} from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -79,10 +83,17 @@ const buildPreset = (
   introspectionRole: string | undefined,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
-  compute?: ComputeConfig
+  compute?: ComputeConfig,
+  grafastCache?: NonNullable<ConstructiveOptions['graphile']>['grafastCache']
 ): GraphileConfig.Preset => {
+  const grafastCachePreset = createGrafastCacheLimitsPreset(grafastCache);
   return {
-    extends: [createConstructivePreset(databaseSettings)],
+    extends: [
+      createConstructivePreset(databaseSettings),
+      ...(Object.keys(grafastCachePreset).length > 0
+        ? [grafastCachePreset]
+        : [])
+    ],
     plugins: [
       AuthCookiePlugin,
       RequestProtectionPlugin,
@@ -366,7 +377,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         opts.api?.introspectionRole,
         api.databaseSettings,
         api.apiId,
-        compute
+        compute,
+        opts.graphile?.grafastCache
       );
       const creationPromise = observeGraphileBuild(
         {
