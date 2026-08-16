@@ -170,6 +170,13 @@ export type ConstructiveAPIToken = {
   parent_session_id?: string;
   /** Caller-declared purpose recorded on the credential at exchange time. */
   intent?: string;
+  email?: string;
+  user_email?: string;
+  entity_id?: string;
+  entity_type?: string;
+  organization_id?: string;
+  tenant_id?: string;
+  role_type?: string;
   [key: string]: unknown;
 };
 
@@ -373,6 +380,7 @@ declare global {
       clientIp?: string;
       requestId?: string;
       token?: ConstructiveAPIToken;
+      deviceToken?: string;
       constructive?: ConstructiveContext;
     }
   }

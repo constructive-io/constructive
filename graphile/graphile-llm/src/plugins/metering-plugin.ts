@@ -39,6 +39,10 @@ import type { PgClient } from '../config-cache';
 import { getLlmBillingConfig } from '../config-cache';
 import type { MeteringContext, MeteringOptions, WithPgClient } from '../metering';
 import { meteredEmbed } from '../metering';
+import {
+  assertGraphileRequestContext,
+  withGraphileRequestPgClient,
+} from '../request-context';
 import type { EmbedderFunction, MeteringConfig } from '../types';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
@@ -61,31 +65,35 @@ function defaultResolveEntityId(pgSettings: Record<string, string>): string | nu
   return pgSettings['jwt.claims.user_id'] ?? null;
 }
 
-async function buildMeteringContext(
+export async function buildMeteringContext(
   graphqlContext: any,
   resolveEntityId: (pgSettings: Record<string, string>) => string | null
 ): Promise<MeteringContext | null> {
-  const pgSettings: Record<string, string> = graphqlContext?.pgSettings ?? {};
+  const pgSettings = graphqlContext?.pgSettings;
+  // Metering is a request plugin; malformed or missing request context is not
+  // equivalent to an unprovisioned optional billing module.
+  const withPgClient: WithPgClient | undefined = graphqlContext?.withPgClient;
+  // Validate before reading identity so an absent context cannot silently
+  // downgrade a request to the unmetered path.
+  assertGraphileRequestContext(withPgClient, pgSettings, 'LLM_METERING');
   const entityId = resolveEntityId(pgSettings);
   const databaseId = pgSettings['jwt.claims.database_id'] ?? null;
   const requestId = pgSettings['request.id'] ?? null;
   const actorId = pgSettings['jwt.claims.user_id'] ?? null;
   if (!entityId || !databaseId) return null;
 
-  const withPgClient: WithPgClient | undefined = graphqlContext?.withPgClient;
-  if (!withPgClient) return null;
-
   let billingConfig = null;
   let inferenceLogConfig = null;
-  try {
-    await withPgClient(pgSettings, async (pgClient: PgClient) => {
+  await withGraphileRequestPgClient(
+    withPgClient,
+    pgSettings,
+    async (pgClient: PgClient) => {
       const entry = await getLlmBillingConfig(pgClient, databaseId);
       billingConfig = entry.billing;
       inferenceLogConfig = entry.inferenceLog;
-    });
-  } catch {
-    return null;
-  }
+    },
+    'LLM_METERING'
+  );
 
   if (!billingConfig) return null;
 

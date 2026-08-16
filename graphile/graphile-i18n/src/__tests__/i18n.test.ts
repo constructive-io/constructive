@@ -8,6 +8,7 @@
  * - Fallback to base table values when no translation exists
  */
 
+import { buildPgSettings } from '@constructive-io/express-context';
 import type { GraphQLResponse } from 'graphile-test';
 import { getConnections, seed } from 'graphile-test';
 import { join } from 'path';
@@ -70,7 +71,28 @@ describe('graphile-i18n plugin', () => {
 
     db = connections.db;
     teardown = connections.teardown;
-    query = connections.query;
+    const baseQuery: QueryFn = connections.query;
+    const canonicalSettings = buildPgSettings({
+      api: {
+        apiId: 'i18n-test-api',
+        databaseId: 'i18n-test-database',
+        dbname: 'i18n_test',
+        anonRole: 'postgres',
+        roleName: 'postgres',
+        schema: ['i18n_test'],
+      },
+      token: { user_id: 'i18n-test-user' },
+      requestId: 'i18n-test-request',
+    });
+    query = (document, variables, commit, reqOptions = {}) =>
+      baseQuery(document, variables, commit, {
+        ...reqOptions,
+        pgSettings: {
+          ...canonicalSettings,
+          ...((reqOptions.pgSettings as Record<string, string> | undefined) ??
+            {}),
+        },
+      });
   });
 
   afterAll(async () => {

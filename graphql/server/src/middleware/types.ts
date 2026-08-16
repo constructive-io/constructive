@@ -1,19 +1,8 @@
-import type { RequestProtection } from '@constructive-io/express-context';
-
-import type { ApiStructure } from '../types';
-
-export type ConstructiveAPIToken = {
-  id?: string;
-  user_id?: string;
-  principal_id?: string;
-  session_id?: string;
-  access_level?: string;
-  kind?: string;
-  root_session_id?: string;
-  parent_session_id?: string;
-  intent?: string;
-  [key: string]: unknown;
-};
+import type {
+  ApiStructure,
+  ConstructiveAPIToken,
+  RequestProtection,
+} from '@constructive-io/express-context';
 
 declare global {
   namespace Express {
