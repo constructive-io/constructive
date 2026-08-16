@@ -43,6 +43,16 @@ declare global {
   }
 }
 
+/** Per-schema Grafast parse, operation, and operation-plan cache bounds. */
+export interface GrafastCacheLimits {
+  /** Maximum parsed and validated GraphQL documents retained by one schema. */
+  queryCacheMaxLength?: number;
+  /** Maximum GraphQL operations with retained plan lookup state per schema. */
+  operationsCacheMaxLength?: number;
+  /** Maximum context/variable-specific plans retained for one operation. */
+  operationOperationPlansCacheMaxLength?: number;
+}
+
 /**
  * PostGraphile/Graphile v5 configuration
  */
@@ -53,6 +63,8 @@ export interface GraphileOptions {
   extends?: GraphileConfig.Preset[];
   /** Preset overrides */
   preset?: Partial<GraphileConfig.Preset>;
+  /** Explicit per-schema Grafast cache bounds used for tenant-density control. */
+  grafastCache?: GrafastCacheLimits;
 }
 
 /**
