@@ -359,6 +359,32 @@ export const registry = {
   }),
 
   // ===========================================================================
+  // Graphile startup configuration (internal)
+  // ===========================================================================
+  GRAPHILE_CALLER_PRESET_NOT_TRUSTED: defineError({
+    code: 'GRAPHILE_CALLER_PRESET_NOT_TRUSTED',
+    class: 'internal',
+    http: 500,
+    message: 'Graphile caller presets have not been admitted into the server trust boundary.'
+  }),
+  GRAPHILE_CALLER_PRESET_INVALID: defineError<{ presetPath: string; reason: string }>({
+    code: 'GRAPHILE_CALLER_PRESET_INVALID',
+    class: 'internal',
+    http: 500,
+    message: 'Graphile caller preset "{{presetPath}}" is invalid: {{reason}}.'
+  }),
+  GRAPHILE_PROTECTED_PRESET_OVERRIDE: defineError<{
+    presetPath: string;
+    protectedSetting: string;
+  }>({
+    code: 'GRAPHILE_PROTECTED_PRESET_OVERRIDE',
+    class: 'internal',
+    http: 500,
+    message:
+      'Graphile caller preset "{{presetPath}}" may not configure protected setting "{{protectedSetting}}".'
+  }),
+
+  // ===========================================================================
   // pgpm CLI / engine (mostly internal) — behavior preserved from the former
   // pgpm/types error-factory so existing call sites are unchanged.
   // ===========================================================================
