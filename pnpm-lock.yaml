@@ -620,6 +620,9 @@ importers:
 
   graphile/graphile-i18n:
     dependencies:
+      '@constructive-io/express-context':
+        specifier: workspace:^
+        version: link:../../packages/express-context/dist
       '@dataplan/pg':
         specifier: 1.1.1
         version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
@@ -1210,6 +1213,9 @@ importers:
       '@constructive-io/bucket-provisioner':
         specifier: workspace:^
         version: link:../../packages/bucket-provisioner/dist
+      '@constructive-io/express-context':
+        specifier: workspace:^
+        version: link:../../packages/express-context/dist
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../../graphql/env/dist
@@ -1324,9 +1330,6 @@ importers:
       pg:
         specifier: ^8.21.0
         version: 8.21.0
-      pg-query-context:
-        specifier: workspace:^
-        version: link:../../postgres/pg-query-context/dist
       pg-sql2:
         specifier: 5.0.1
         version: 5.0.1
@@ -3442,6 +3445,9 @@ importers:
       makage:
         specifier: ^0.3.0
         version: 0.3.0
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../pgsql-test/dist
     publishDirectory: dist
 
   postgres/pg-seed:

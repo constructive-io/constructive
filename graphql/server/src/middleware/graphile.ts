@@ -21,6 +21,7 @@ import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import type { DatabaseSettings } from '../types';
+import { getGraphileRequestPgSettings } from './graphile-request-context';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
@@ -163,7 +164,6 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
 const buildPreset = (
   pool: import('pg').Pool,
   schemas: string[],
-  anonRole: string,
   roleName: string,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
@@ -209,110 +209,11 @@ const buildPreset = (
     grafast: {
       explain: process.env.NODE_ENV === 'development',
       context: (requestContext: Partial<Grafast.RequestContext>) => {
-      // In grafserv/express/v4, the request is available at requestContext.expressv4.req
-        const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
-        const context: Record<string, string> = {};
-
-        if (req) {
-          if (req.databaseId) {
-            context['jwt.claims.database_id'] = req.databaseId;
-          }
-          // API provenance — which API surface this request arrived through.
-          // Derived server-side by resolving the hostname through the scoped
-          // routing plane (resolve_route -> api_id); never taken from
-          // client-supplied headers, body, or token payload.
-          if (req.api?.apiId) {
-            context['jwt.claims.api_id'] = req.api.apiId;
-          }
-          if (req.clientIp) {
-            context['jwt.claims.ip_address'] = req.clientIp;
-          }
-          if (req.get('origin')) {
-            context['jwt.claims.origin'] = req.get('origin') as string;
-          }
-          if (req.get('User-Agent')) {
-            context['jwt.claims.user_agent'] = req.get('User-Agent') as string;
-          }
-          if (req.deviceToken) {
-            context['jwt.claims.device_token'] = req.deviceToken;
-          }
-
-          if (req.token?.user_id) {
-            const pgSettings: Record<string, string> = {
-              role: roleName,
-              'jwt.claims.token_id': req.token.id,
-              'jwt.claims.user_id': req.token.user_id,
-              ...context
-            };
-
-            if (req.token.session_id) {
-              pgSettings['jwt.claims.session_id'] = req.token.session_id;
-            }
-
-            // Propagate credential metadata as JWT claims so PG functions
-            // can read them via current_setting('jwt.claims.access_level') etc.
-            if (req.token.access_level) {
-              pgSettings['jwt.claims.access_level'] = req.token.access_level;
-            }
-            if (req.token.kind) {
-              pgSettings['jwt.claims.kind'] = req.token.kind;
-            }
-
-            // Principal identity — always set; equals user_id for human sessions
-            pgSettings['jwt.claims.principal_id'] = req.token.principal_id || req.token.user_id;
-
-            // Enforce read-only transactions for read_only credentials
-            if (req.token.access_level === 'read_only') {
-              pgSettings['default_transaction_read_only'] = 'on';
-            }
-
-            if (req.requestId) {
-              pgSettings['request.id'] = req.requestId;
-            }
-
-            return { pgSettings };
-          }
-
-          // Private (in-cluster) surface: there is no token — identity
-          // arrives on the trusted internal X-* headers stamped by the
-          // dispatching worker/sync gateway (the same vocabulary as
-          // X-Database-Id above). Map it into per-request claims so writes
-          // made through this surface carry actor attribution. Never applied
-          // on the public surface, where client-supplied identity headers
-          // must not assert identity.
-          const headerActorId = req.get('X-Actor-Id');
-          if (req.api?.isPublic === false && headerActorId) {
-            const pgSettings: Record<string, string> = {
-              role: roleName,
-              'jwt.claims.user_id': headerActorId,
-              'jwt.claims.principal_id': headerActorId,
-              ...context
-            };
-            const headerEntityId = req.get('X-Entity-Id');
-            if (headerEntityId) {
-              pgSettings['jwt.claims.entity_id'] = headerEntityId;
-            }
-            const headerOrganizationId = req.get('X-Organization-Id');
-            if (headerOrganizationId) {
-              pgSettings['jwt.claims.organization_id'] = headerOrganizationId;
-            }
-            if (req.requestId) {
-              pgSettings['request.id'] = req.requestId;
-            }
-            return { pgSettings };
-          }
-        }
-
-        const anonSettings: Record<string, string> = {
-          role: anonRole,
-          ...context
-        };
-        if (req?.requestId) {
-          anonSettings['request.id'] = req.requestId;
-        }
-
+        // In grafserv/express/v4, the request is available at requestContext.expressv4.req
+        const req = (requestContext as { expressv4?: { req?: Request } })
+          ?.expressv4?.req;
         return {
-          pgSettings: anonSettings
+          pgSettings: getGraphileRequestPgSettings(req, roleName),
         };
       }
     }
@@ -402,8 +303,17 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const pool = getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
+      const compute = api.apiId
+        ? await req.constructive?.useModule('compute')
+        : undefined;
+      const preset = buildPreset(
+        pool,
+        schema || [],
+        roleName,
+        api.databaseSettings,
+        api.apiId,
+        compute
+      );
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,

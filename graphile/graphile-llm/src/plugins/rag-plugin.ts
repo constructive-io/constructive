@@ -24,7 +24,13 @@ import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
 
-import type { ChatFunction, ChunkTableInfo, EmbedderFunction, RagDefaults } from '../types';
+import { withGraphileRequestPgClient } from '../request-context';
+import type {
+  ChatFunction,
+  ChunkTableInfo,
+  EmbedderFunction,
+  RagDefaults,
+} from '../types';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
 
@@ -307,20 +313,34 @@ export function createLlmRagPlugin(
               }> = [];
 
               if (chunkTables.length > 0) {
-                await withPgClient(pgSettings, async (pgClient: any) => {
-                  for (const table of chunkTables) {
-                    const query = buildChunkSearchSql(table, vectorString, limit, maxDistance);
-                    const result = await pgClient.query(query);
-                    for (const row of result.rows) {
-                      allChunks.push({
-                        content: row.content,
-                        parent_id: row.parent_id,
-                        distance: parseFloat(row.distance),
-                        table_name: table.parentCodecName
-                      });
+                await withGraphileRequestPgClient(
+                  withPgClient,
+                  pgSettings,
+                  async (pgClient) => {
+                    for (const table of chunkTables) {
+                      const query = buildChunkSearchSql(
+                        table,
+                        vectorString,
+                        limit,
+                        maxDistance
+                      );
+                      const result = await pgClient.query<{
+                        content: string;
+                        parent_id: string;
+                        distance: string;
+                      }>(query);
+                      for (const row of result.rows) {
+                        allChunks.push({
+                          content: row.content,
+                          parent_id: row.parent_id,
+                          distance: parseFloat(row.distance),
+                          table_name: table.parentCodecName,
+                        });
+                      }
                     }
-                  }
-                });
+                  },
+                  'RAG'
+                );
               }
 
               // Sort by distance (ascending) and take top N

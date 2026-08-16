@@ -264,9 +264,10 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
   // Provide a custom withPgClient function that uses the test client
   // This ensures GraphQL operations run within the test transaction
   // instead of getting a new connection from the pool
+  const isInTransaction = !input.useRoot;
   const withPgClientKey = pgService.withPgClientKey ?? 'withPgClient';
   contextValue[withPgClientKey] = async <T>(
-    _pgSettings: Record<string, string> | null,
+    requestedPgSettings: Record<string, string> | null,
     callback: (client: Client) => T | Promise<T>
   ): Promise<T> => {
     // Augment the client with withTransaction if it doesn't already have it.
@@ -291,14 +292,40 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
         }
       };
     }
-    return callback(pgClient);
+    const callbackSettings = requestedPgSettings ?? pgSettings;
+    if (!isInTransaction) {
+      await client.query('BEGIN');
+      try {
+        await setContextOnClient(
+          client,
+          callbackSettings,
+          callbackSettings.role ?? pgSettings.role
+        );
+        const result = await callback(client);
+        await client.query('COMMIT');
+        return result;
+      } catch (error) {
+        await client.query('ROLLBACK').catch(() => {});
+        throw error;
+      }
+    }
+
+    await setContextOnClient(
+      client,
+      callbackSettings,
+      callbackSettings.role ?? pgSettings.role
+    );
+    const result = await callback(client);
+    // Errors are rolled back by the existing execution savepoint below. On a
+    // successful derivative lane, explicitly restore the primary request
+    // context before returning control to the rest of the GraphQL operation.
+    await setContextOnClient(client, pgSettings, pgSettings.role);
+    return result;
   };
 
   // Check if we're in a transaction by looking at the test client's transaction state
   // When useRoot is true, we might not be in a transaction
   // pgsql-test's `db` client is in a transaction, but `pg` (root) client may not be
-  const isInTransaction = !input.useRoot;
-
   // Wrap the entire query execution in a savepoint if we're in a transaction
   // This matches v4 PostGraphile behavior where each mutation is wrapped in a savepoint
   // allowing the transaction to continue after a database error

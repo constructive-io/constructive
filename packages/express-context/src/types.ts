@@ -163,6 +163,12 @@ export type ConstructiveAPIToken = {
   session_id?: string;
   access_level?: string;
   kind?: string;
+  email?: string;
+  user_email?: string;
+  entity_id?: string;
+  organization_id?: string;
+  tenant_id?: string;
+  role_type?: string;
   [key: string]: unknown;
 };
 
@@ -340,6 +346,7 @@ declare global {
       clientIp?: string;
       requestId?: string;
       token?: ConstructiveAPIToken;
+      deviceToken?: string;
       constructive?: ConstructiveContext;
     }
   }
