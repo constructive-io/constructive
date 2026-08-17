@@ -1,4 +1,5 @@
 import { Pool, type PoolClient } from 'pg';
+import { defaultPgPoolFactory } from 'pg-cache';
 import { getConnections } from 'pgsql-test';
 
 import pgQueryContext, { withPgClient } from '../index';
@@ -10,6 +11,23 @@ interface SessionState {
   row_security: string;
   user_id: string;
 }
+
+interface CheckoutState {
+  application_name: string;
+  backend_pid: number;
+  default_transaction_read_only: string;
+  search_path: string;
+  row_security: string;
+}
+
+const CHECKOUT_STATE_QUERY = `
+  SELECT
+    current_setting('application_name') AS application_name,
+    pg_backend_pid() AS backend_pid,
+    current_setting('default_transaction_read_only') AS default_transaction_read_only,
+    current_setting('search_path') AS search_path,
+    current_setting('row_security') AS row_security
+`;
 
 async function readSessionState(client: PoolClient): Promise<SessionState> {
   const result = await client.query<SessionState>(`
@@ -23,17 +41,28 @@ async function readSessionState(client: PoolClient): Promise<SessionState> {
   return result.rows[0];
 }
 
+async function readCheckoutState(client: PoolClient): Promise<CheckoutState> {
+  const result = await client.query<CheckoutState>(CHECKOUT_STATE_QUERY);
+  return result.rows[0];
+}
+
 describe('pg-query-context transaction-local integration', () => {
   let db: Awaited<ReturnType<typeof getConnections>>['db'];
   let teardown: Awaited<ReturnType<typeof getConnections>>['teardown'];
   let singleClientPool: Pool;
+  let sanitizedPool: Pool;
 
   beforeAll(async () => {
     ({ db, teardown } = await getConnections({}, []));
     singleClientPool = new Pool({ ...db.config, max: 1 });
+    sanitizedPool = defaultPgPoolFactory({
+      ...db.config,
+      pool: { max: 1 },
+    }) as Pool;
   });
 
   afterAll(async () => {
+    if (sanitizedPool) await sanitizedPool.end();
     if (singleClientPool) await singleClientPool.end();
     if (teardown) await teardown();
   });
@@ -196,6 +225,101 @@ describe('pg-query-context transaction-local integration', () => {
       });
     } finally {
       afterRollbackClient.release();
+    }
+  });
+
+  it('sanitizes a reused checkout before applying the complete request context', async () => {
+    const firstClient = await sanitizedPool.connect();
+    let baseline: CheckoutState;
+    try {
+      baseline = await readCheckoutState(firstClient);
+      await firstClient.query("SET application_name TO 'f10-tenant-poison'");
+      await firstClient.query('SET default_transaction_read_only TO on');
+      await firstClient.query('SET search_path TO pg_catalog');
+      await firstClient.query('SET row_security TO off');
+      await firstClient.query({
+        name: 'f10-checkout-canary',
+        text: 'SELECT 1 AS value',
+      });
+    } finally {
+      firstClient.release();
+    }
+
+    const insideContext = await withPgClient(
+      sanitizedPool,
+      {
+        role: 'none',
+        transaction_read_only: 'on',
+        search_path: 'pg_catalog',
+        row_security: 'on',
+        'jwt.claims.user_id': 'f10-request-user',
+      },
+      async (client) => {
+        const state = await readSessionState(client);
+        const statement = await client.query<{ value: number }>({
+          name: 'f10-checkout-canary',
+          text: 'SELECT 2 AS value',
+        });
+        const checkout = await readCheckoutState(client);
+        return { checkout, state, value: statement.rows[0].value };
+      }
+    );
+
+    expect(insideContext.checkout.backend_pid).toBe(baseline.backend_pid);
+    expect(insideContext.checkout.application_name).toBe(
+      baseline.application_name
+    );
+    expect(insideContext.state).toEqual({
+      role: 'none',
+      transaction_read_only: 'on',
+      search_path: 'pg_catalog',
+      row_security: 'on',
+      user_id: 'f10-request-user',
+    });
+    expect(insideContext.value).toBe(2);
+
+    const afterRequest = await sanitizedPool.connect();
+    try {
+      await expect(readCheckoutState(afterRequest)).resolves.toEqual(baseline);
+    } finally {
+      afterRequest.release();
+    }
+  });
+
+  it('sanitizes direct pool.query checkouts through the same boundary', async () => {
+    const baseline = await sanitizedPool.query<CheckoutState>(
+      CHECKOUT_STATE_QUERY
+    );
+
+    await sanitizedPool.query("SET application_name TO 'f10-pool-query-poison'");
+
+    const restored = await sanitizedPool.query<CheckoutState>(
+      CHECKOUT_STATE_QUERY
+    );
+
+    expect(restored.rows[0]).toEqual(baseline.rows[0]);
+  });
+
+  it('destroys a checkout whose open transaction prevents sanitation', async () => {
+    const dirtyClient = await sanitizedPool.connect();
+    const dirtyState = await readCheckoutState(dirtyClient);
+    await dirtyClient.query('BEGIN');
+    await dirtyClient.query("SET application_name TO 'f10-open-transaction'");
+    dirtyClient.release();
+
+    await expect(sanitizedPool.connect()).rejects.toMatchObject({
+      code: '25001',
+    });
+
+    const replacementClient = await sanitizedPool.connect();
+    try {
+      const replacementState = await readCheckoutState(replacementClient);
+      expect(replacementState.backend_pid).not.toBe(dirtyState.backend_pid);
+      expect(replacementState.application_name).not.toBe(
+        'f10-open-transaction'
+      );
+    } finally {
+      replacementClient.release();
     }
   });
 });
