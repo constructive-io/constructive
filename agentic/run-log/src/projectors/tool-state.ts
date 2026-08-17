@@ -9,8 +9,8 @@
  * same — the cloud already treats the conversation as the approval UI.
  */
 
-import { contentText, isAssistantMessage, isPiMessageEntry, isToolResultMessage, toolCalls } from '../pi-entry';
 import type { RunEventRecord } from '../record';
+import { contentText, isAssistantMessage, isPiMessageEntry, isToolResultMessage, toolCalls } from '../transcripts/pi-entry';
 
 /** `customType` of an approval request written by the gate extension. */
 export const APPROVAL_REQUEST_TYPE = 'constructive.approval.request';

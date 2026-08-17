@@ -1,4 +1,4 @@
-import type { PiSessionEntry, PiSessionHeader, PiUsage } from '../src/pi-entry';
+import type { PiSessionEntry, PiSessionHeader, PiUsage } from '../src/transcripts/pi-entry';
 
 let counter = 0;
 const nextId = (): string => {

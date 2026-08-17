@@ -59,7 +59,7 @@ describe('FileRunLogStore', () => {
     appendFileSync(path, '{"runId":"run-1","seq":2,');
     await expect(store.read('run-1')).rejects.toThrow(/line 2 is not valid JSON/);
 
-    writeFileSync(path, '{"runId":"run-1","seq":1,"recordedAt":"x","piSessionVersion":3}\n');
+    writeFileSync(path, '{"runId":"run-1","seq":1,"recordedAt":"x","transcriptFormat":"pi","transcriptVersion":3}\n');
     await expect(store.read('run-1')).rejects.toThrow(/must be an object/);
   });
 });

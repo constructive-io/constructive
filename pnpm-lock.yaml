@@ -209,6 +209,9 @@ importers:
         version: 7.8.0
     publishDirectory: dist
 
+  agentic/metering:
+    publishDirectory: dist
+
   agentic/ollama:
     dependencies:
       '@agentic-kit/protocol':
@@ -231,6 +234,12 @@ importers:
       '@agentic-kit/harness':
         specifier: workspace:^
         version: link:../harness/dist
+      '@agentic-kit/metering':
+        specifier: workspace:^
+        version: link:../metering/dist
+      '@agentic-kit/run-log':
+        specifier: workspace:^
+        version: link:../run-log/dist
       '@constructive-io/graphql-query':
         specifier: workspace:^
         version: link:../../graphql/query/dist
@@ -250,65 +259,6 @@ importers:
       typebox:
         specifier: ^1.0.0
         version: 1.1.38
-    publishDirectory: dist
-
-  agentic/pi-embed:
-    dependencies:
-      '@agentic-kit/pi-ext-gate':
-        specifier: workspace:^
-        version: link:../pi-ext-gate/dist
-      '@agentic-kit/pi-ext-metered-model':
-        specifier: workspace:^
-        version: link:../pi-ext-metered-model/dist
-      '@agentic-kit/pi-ext-run-log':
-        specifier: workspace:^
-        version: link:../pi-ext-run-log/dist
-      '@agentic-kit/pi-ext-usage-report':
-        specifier: workspace:^
-        version: link:../pi-ext-usage-report/dist
-      '@agentic-kit/run-log':
-        specifier: workspace:^
-        version: link:../run-log/dist
-    devDependencies:
-      '@earendil-works/pi-coding-agent':
-        specifier: 0.79.6
-        version: 0.79.6(ws@8.20.1)(zod@4.4.3)
-    publishDirectory: dist
-
-  agentic/pi-ext-gate:
-    devDependencies:
-      '@earendil-works/pi-coding-agent':
-        specifier: 0.79.6
-        version: 0.79.6(ws@8.20.1)(zod@4.4.3)
-    publishDirectory: dist
-
-  agentic/pi-ext-metered-model:
-    devDependencies:
-      '@earendil-works/pi-coding-agent':
-        specifier: 0.79.6
-        version: 0.79.6(ws@8.20.1)(zod@4.4.3)
-    publishDirectory: dist
-
-  agentic/pi-ext-run-log:
-    dependencies:
-      '@agentic-kit/run-log':
-        specifier: workspace:^
-        version: link:../run-log/dist
-    devDependencies:
-      '@earendil-works/pi-coding-agent':
-        specifier: 0.79.6
-        version: 0.79.6(ws@8.20.1)(zod@4.4.3)
-    publishDirectory: dist
-
-  agentic/pi-ext-usage-report:
-    dependencies:
-      '@agentic-kit/pi-ext-metered-model':
-        specifier: workspace:^
-        version: link:../pi-ext-metered-model/dist
-    devDependencies:
-      '@earendil-works/pi-coding-agent':
-        specifier: 0.79.6
-        version: 0.79.6(ws@8.20.1)(zod@4.4.3)
     publishDirectory: dist
 
   agentic/protocol:

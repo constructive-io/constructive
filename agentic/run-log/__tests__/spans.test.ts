@@ -9,7 +9,7 @@ import {
   type ToolSpan,
   wrapEntry
 } from '../src';
-import type { PiSessionEntry } from '../src/pi-entry';
+import type { PiSessionEntry } from '../src/transcripts/pi-entry';
 import {
   assistantText,
   assistantToolCall,
