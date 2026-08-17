@@ -1,9 +1,9 @@
 /**
  * Module Loaders — pluggable per-database cached lookups.
  *
- * Each loader encapsulates a SQL query + type transform + LRU cache
- * for one piece of per-database configuration. Register loaders in
- * a LoaderRegistry and pass it to createContextMiddleware().
+ * Each loader encapsulates a SQL query + type transform + bounded exact-context
+ * LRU cache for one piece of per-database configuration. Register loaders in a
+ * LoaderRegistry and pass it to createContextMiddleware().
  *
  * Built-in loaders cover the standard Constructive modules:
  *   - rlsModule       (routing-plane rls_settings)
