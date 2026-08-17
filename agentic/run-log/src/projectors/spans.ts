@@ -16,6 +16,7 @@
  * still in flight must not look like one that finished.
  */
 
+import type { RunEventRecord } from '../record';
 import {
   contentText,
   isAssistantMessage,
@@ -23,8 +24,7 @@ import {
   isToolResultMessage,
   type PiUsage,
   toolCalls
-} from '../pi-entry';
-import type { RunEventRecord } from '../record';
+} from '../transcripts/pi-entry';
 import {
   APPROVAL_REQUEST_TYPE,
   APPROVAL_RESOLUTION_TYPE,

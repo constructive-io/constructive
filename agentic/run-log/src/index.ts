@@ -18,38 +18,7 @@ export {
   type FollowOptions,
   readAll
 } from './follow';
-export {
-  assertPiSessionEntry,
-  contentText,
-  isAssistantMessage,
-  isPiBranchSummaryEntry,
-  isPiCompactionEntry,
-  isPiMessageEntry,
-  isPiSessionHeader,
-  isToolResultMessage,
-  type PiAssistantMessage,
-  type PiBashExecutionMessage,
-  type PiBranchSummaryEntry,
-  type PiCompactionEntry,
-  type PiContent,
-  type PiCustomMessage,
-  type PiEntryBase,
-  type PiImageContent,
-  type PiMessage,
-  type PiMessageEntry,
-  type PiOtherEntry,
-  type PiSessionEntry,
-  type PiSessionHeader,
-  type PiSummaryMessage,
-  type PiTextContent,
-  type PiThinkingContent,
-  type PiToolCallContent,
-  type PiToolResultMessage,
-  type PiUsage,
-  type PiUsageCost,
-  type PiUserMessage,
-  toolCalls
-} from './pi-entry';
+export { type SessionEntrySource, SessionMirror, type SessionMirrorOptions } from './mirror';
 export {
   type BashPart,
   type Conversation,
@@ -114,7 +83,6 @@ export {
   idempotencyKey,
   RUN_LOG_WRAPPER_VERSION,
   type RunEventRecord,
-  SUPPORTED_PI_SESSION_VERSION,
   wrapEntry,
   type WrapEntryOptions
 } from './record';
@@ -129,3 +97,41 @@ export {
   type RunLogStore,
   START
 } from './store';
+export {
+  assertTranscriptFormat,
+  PI_TRANSCRIPT_FORMAT,
+  SUPPORTED_PI_TRANSCRIPT_VERSION,
+  type TranscriptFormat
+} from './transcripts/format';
+export {
+  assertPiSessionEntry,
+  contentText,
+  isAssistantMessage,
+  isPiBranchSummaryEntry,
+  isPiCompactionEntry,
+  isPiMessageEntry,
+  isPiSessionHeader,
+  isToolResultMessage,
+  type PiAssistantMessage,
+  type PiBashExecutionMessage,
+  type PiBranchSummaryEntry,
+  type PiCompactionEntry,
+  type PiContent,
+  type PiCustomMessage,
+  type PiEntryBase,
+  type PiImageContent,
+  type PiMessage,
+  type PiMessageEntry,
+  type PiOtherEntry,
+  type PiSessionEntry,
+  type PiSessionHeader,
+  type PiSummaryMessage,
+  type PiTextContent,
+  type PiThinkingContent,
+  type PiToolCallContent,
+  type PiToolResultMessage,
+  type PiUsage,
+  type PiUsageCost,
+  type PiUserMessage,
+  toolCalls
+} from './transcripts/pi-entry';

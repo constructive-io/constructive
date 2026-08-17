@@ -14,7 +14,7 @@ import {
   type RunEventRecord,
   wrapEntry
 } from '../src';
-import type { PiSessionEntry } from '../src/pi-entry';
+import type { PiSessionEntry } from '../src/transcripts/pi-entry';
 import {
   assistantText,
   assistantToolCall,
@@ -232,9 +232,9 @@ describe('projectToolState', () => {
 describe('projectSession', () => {
   it('projects a resumable session file with the header first', () => {
     const records = recordsOf(header(), userMessage('hi'), assistantText('hello'));
-    const { jsonl, entries, piSessionVersion } = projectSession(records);
+    const { jsonl, entries, transcriptVersion } = projectSession(records);
 
-    expect(piSessionVersion).toBe(3);
+    expect(transcriptVersion).toBe(3);
     expect(entries[0]).toMatchObject({ type: 'session', id: 'session-1' });
     expect(jsonl.endsWith('\n')).toBe(true);
     expect(parseSessionJsonl(jsonl)).toEqual(entries);
@@ -250,8 +250,12 @@ describe('projectSession', () => {
     expect(() => projectSession(recordsOf(userMessage('hi'), header()))).toThrow(/requires it first/);
 
     const mixed = recordsOf(userMessage('hi'), userMessage('there', 2));
-    mixed[1] = { ...mixed[1], piSessionVersion: 2 };
+    mixed[1] = { ...mixed[1], transcriptVersion: 2 };
     expect(() => projectSession(mixed)).toThrow(/mixes pi session versions/);
+
+    const foreign = recordsOf(header(), userMessage('hi'));
+    foreign[1] = { ...foreign[1], transcriptFormat: 'dsh' };
+    expect(() => projectSession(foreign)).toThrow(/reads "pi" entries only/);
   });
 
   it('rejects a malformed session file rather than returning a partial one', () => {

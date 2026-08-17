@@ -8,6 +8,7 @@
  * renders, minus the detail this version understands.
  */
 
+import type { RunEventRecord } from '../record';
 import {
   contentText,
   isAssistantMessage,
@@ -18,8 +19,7 @@ import {
   isToolResultMessage,
   type PiSessionEntry,
   toolCalls
-} from '../pi-entry';
-import type { RunEventRecord } from '../record';
+} from '../transcripts/pi-entry';
 
 export type ToolStatus = 'requested' | 'completed' | 'failed';
 

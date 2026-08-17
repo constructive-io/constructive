@@ -3,8 +3,9 @@ import {
   assertPiSessionEntry,
   assertRunEventRecord,
   idempotencyKey,
+  PI_TRANSCRIPT_FORMAT,
   RUN_LOG_WRAPPER_VERSION,
-  SUPPORTED_PI_SESSION_VERSION,
+  SUPPORTED_PI_TRANSCRIPT_VERSION,
   wrapEntry
 } from '../src';
 import { assistantText, header, resetIds, userMessage } from './fixtures';
@@ -12,7 +13,7 @@ import { assistantText, header, resetIds, userMessage } from './fixtures';
 beforeEach(resetIds);
 
 describe('wrapEntry', () => {
-  it('wraps a pi entry in the four platform fields, leaving the entry untouched', () => {
+  it('wraps a pi entry in the platform fields, leaving the entry untouched', () => {
     const entry = userMessage('hello');
     const record = wrapEntry({ runId: 'run-1', seq: 1, entry, recordedAt: '2026-01-01T00:00:00.000Z' });
 
@@ -20,17 +21,19 @@ describe('wrapEntry', () => {
       runId: 'run-1',
       seq: 1,
       recordedAt: '2026-01-01T00:00:00.000Z',
-      piSessionVersion: SUPPORTED_PI_SESSION_VERSION,
+      transcriptFormat: PI_TRANSCRIPT_FORMAT,
+      transcriptVersion: SUPPORTED_PI_TRANSCRIPT_VERSION,
       entry
     });
     // Same object, not a copy: the entry is stored verbatim.
     expect(record.entry).toBe(entry);
   });
 
-  it('defaults recordedAt and records the pi session version', () => {
+  it('defaults recordedAt and names the transcript the entry is encoded in', () => {
     const record = wrapEntry({ runId: 'run-1', seq: 1, entry: userMessage('hi') });
     expect(Date.parse(record.recordedAt)).not.toBeNaN();
-    expect(record.piSessionVersion).toBe(3);
+    expect(record.transcriptFormat).toBe('pi');
+    expect(record.transcriptVersion).toBe(3);
     expect(RUN_LOG_WRAPPER_VERSION).toBe(1);
   });
 
@@ -75,7 +78,8 @@ describe('assertRunEventRecord', () => {
     [{ ...valid, runId: '' }, /non-empty runId/],
     [{ ...valid, seq: 0 }, /invalid seq/],
     [{ ...valid, recordedAt: 5 }, /recordedAt/],
-    [{ ...valid, piSessionVersion: '3' }, /piSessionVersion/],
+    [{ ...valid, transcriptFormat: '' }, /transcriptFormat/],
+    [{ ...valid, transcriptVersion: '3' }, /transcriptVersion/],
     [{ ...valid, entry: 'nope' }, /must be an object/]
   ])('throws on a corrupt record (%#)', (record, message) => {
     expect(() => assertRunEventRecord(record)).toThrow(message);

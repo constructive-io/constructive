@@ -19,7 +19,6 @@ export const MUTATING_DB_TOOLS = new Set<string>([
 
 import { filterInternalPolicies } from '../blueprint/internal-policies';
 import type {
-  ConfirmPreview,
   ConfirmPreviewField,
   ConfirmPreviewTable,
   ConfirmPrompt,
