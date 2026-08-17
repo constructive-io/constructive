@@ -213,7 +213,7 @@ const buildPreset = (
         const req = (requestContext as { expressv4?: { req?: Request } })
           ?.expressv4?.req;
         return {
-          pgSettings: getGraphileRequestPgSettings(req, roleName),
+          pgSettings: getGraphileRequestPgSettings(req),
         };
       }
     }

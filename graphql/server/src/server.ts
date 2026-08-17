@@ -165,6 +165,7 @@ class Server {
     app.use(authenticate);
     app.use(createContextMiddleware({
       pg: effectiveOpts.pg,
+      dependencySchemas: effectiveOpts.graphile?.introspectionDependencySchemas,
       loaders: createDefaultRegistry(),
       routingSchema: getRoutingSchema(effectiveOpts)
     }));

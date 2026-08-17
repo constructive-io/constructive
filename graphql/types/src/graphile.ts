@@ -6,6 +6,8 @@ import type { GraphileConfig } from 'graphile-config';
 export interface GraphileOptions {
   /** Database schema(s) to expose through GraphQL */
   schema?: string | string[];
+  /** Ordered extension/shared schemas required by Graphile and request SQL. */
+  introspectionDependencySchemas?: string[];
   /** Additional presets to extend */
   extends?: GraphileConfig.Preset[];
   /** Preset overrides */
@@ -51,6 +53,7 @@ export interface ApiOptions {
  */
 export const graphileDefaults: GraphileOptions = {
   schema: [],
+  introspectionDependencySchemas: [],
   extends: [],
   preset: {}
 };
