@@ -42,12 +42,10 @@ describe('Graphile canonical request context', () => {
       constructive: { pgSettings },
     });
 
-    expect(getGraphileRequestPgSettings(req, baseApi.roleName)).toBe(
-      pgSettings
-    );
+    expect(getGraphileRequestPgSettings(req)).toBe(pgSettings);
   });
 
-  it('derives the existing trusted private identity lane from canonical settings', () => {
+  it('does not derive identity from unauthenticated private headers', () => {
     const privateApi = { ...baseApi, isPublic: false };
     const pgSettings = buildPgSettings({
       api: privateApi,
@@ -68,19 +66,11 @@ describe('Graphile canonical request context', () => {
       }
     );
 
-    const derived = getGraphileRequestPgSettings(req, privateApi.roleName);
-
-    expect(derived).toEqual({
-      ...pgSettings,
-      role: 'authenticated_runtime',
-      'jwt.claims.user_id': 'actor-1',
-      'jwt.claims.principal_id': 'actor-1',
-      'jwt.claims.entity_id': 'entity-1',
-      'jwt.claims.organization_id': 'organization-1',
-    });
-    expect(derived).not.toBe(pgSettings);
+    expect(getGraphileRequestPgSettings(req)).toBe(pgSettings);
     expect(pgSettings.role).toBe('anonymous_runtime');
     expect(pgSettings['jwt.claims.user_id']).toBe('');
+    expect(pgSettings['jwt.claims.entity_id']).toBe('');
+    expect(pgSettings['jwt.claims.organization_id']).toBe('');
   });
 
   it('does not trust private identity headers on a public surface', () => {
@@ -94,9 +84,7 @@ describe('Graphile canonical request context', () => {
       { 'X-Actor-Id': 'attacker-controlled' }
     );
 
-    expect(getGraphileRequestPgSettings(req, baseApi.roleName)).toBe(
-      pgSettings
-    );
+    expect(getGraphileRequestPgSettings(req)).toBe(pgSettings);
     expect(pgSettings['jwt.claims.user_id']).toBe('');
   });
 
@@ -113,9 +101,7 @@ describe('Graphile canonical request context', () => {
       { 'X-Actor-Id': 'header-user' }
     );
 
-    expect(getGraphileRequestPgSettings(req, privateApi.roleName)).toBe(
-      pgSettings
-    );
+    expect(getGraphileRequestPgSettings(req)).toBe(pgSettings);
     expect(pgSettings['jwt.claims.user_id']).toBe('token-user');
   });
 
@@ -129,7 +115,7 @@ describe('Graphile canonical request context', () => {
       }),
     ],
   ])('fails closed for %s', (_label, req) => {
-    expect(() => getGraphileRequestPgSettings(req, baseApi.roleName)).toThrow(
+    expect(() => getGraphileRequestPgSettings(req)).toThrow(
       /req\.constructive\.pgSettings/
     );
   });
