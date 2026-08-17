@@ -2512,6 +2512,9 @@ importers:
 
   packages/express-context:
     dependencies:
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../../graphql/types/dist
       '@constructive-io/url-domains':
         specifier: workspace:^
         version: link:../url-domains/dist
