@@ -3445,6 +3445,9 @@ importers:
       makage:
         specifier: ^0.3.0
         version: 0.3.0
+      pg-cache:
+        specifier: workspace:^
+        version: link:../pg-cache/dist
       pgsql-test:
         specifier: workspace:^
         version: link:../pgsql-test/dist

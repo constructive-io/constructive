@@ -23,6 +23,7 @@ npm install pg-cache
 ## Features
 
 - LRU cache for PostgreSQL connection pools
+- Checkout sanitation for reused node-postgres clients
 - Automatic pool cleanup and disposal
 - Extensible cleanup callback system
 - Service cache for general use
@@ -126,6 +127,11 @@ The main PostgreSQL pool cache instance.
 ### getPgPool(config: Partial<PgConfig>): Pool
 
 Get or create a cached PostgreSQL pool using the provided configuration.
+Clients from the default node-postgres factory run `DISCARD ALL` before every
+checkout, and stale client-side prepared-statement bookkeeping is cleared to
+match the server. If sanitation fails, the client is destroyed and the checkout
+fails. Alternate registered pool factories retain ownership of backend-specific
+checkout sanitation.
 
 ### svcCache
 
