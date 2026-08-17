@@ -9,8 +9,8 @@
  *     parallel. Useful for pre-warming or migration from the monolithic
  *     svcCache pattern.
  *
- * Each loader's result is independently cached per databaseId — resolving
- * one module never invalidates another.
+ * Each loader's result is independently cached per exact pool/schema/database
+ * contract — resolving one module never invalidates another.
  */
 
 import { Logger } from '@pgpmjs/logger';
@@ -26,8 +26,8 @@ export interface LoaderRegistry {
   /**
    * Resolve a single loader by name (lazy, on-demand).
    * Returns undefined if the loader isn't registered or the module
-   * isn't provisioned for this database. Results are cached per databaseId
-   * inside the loader's own LRU — repeated calls are cheap.
+   * isn't provisioned for this database. Results are cached per exact context
+   * contract inside the loader's own LRU — repeated calls are cheap.
    */
   resolve<T = unknown>(name: string, ctx: LoaderContext): Promise<T | undefined>;
 
@@ -40,8 +40,8 @@ export interface LoaderRegistry {
   /** Check whether a loader is registered. */
   has(name: string): boolean;
 
-  /** Invalidate caches for one database (or all databases if omitted). */
-  invalidate(databaseId?: string): void;
+  /** Invalidate one database, optionally limited to an exact pool pair. */
+  invalidate(databaseId?: string, context?: LoaderContext): void;
 
   /** List all registered loader names. */
   readonly names: string[];
@@ -96,9 +96,9 @@ export function createLoaderRegistry(): LoaderRegistry {
       return loaders.has(name);
     },
 
-    invalidate(databaseId?: string): void {
+    invalidate(databaseId?: string, context?: LoaderContext): void {
       for (const loader of loaders.values()) {
-        loader.invalidate(databaseId);
+        loader.invalidate(databaseId, context);
       }
       log.debug(
         databaseId
