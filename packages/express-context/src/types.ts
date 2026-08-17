@@ -286,6 +286,8 @@ export interface ConstructiveContext {
   requestId: string;
   /** Tenant database connection pool */
   pool: Pool;
+  /** Opaque identity of the exact runtime connection contract. */
+  runtimePoolIdentity: string;
   /** Execute a function within a tenant-scoped RLS transaction */
   withPgClient: WithPgClient;
 

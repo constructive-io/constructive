@@ -2512,6 +2512,9 @@ importers:
 
   packages/express-context:
     dependencies:
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../../graphql/types/dist
       '@constructive-io/url-domains':
         specifier: workspace:^
         version: link:../url-domains/dist
@@ -3360,9 +3363,6 @@ importers:
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
-      lru-cache:
-        specifier: ^11.2.7
-        version: 11.2.7
       pg:
         specifier: ^8.21.0
         version: 8.21.0

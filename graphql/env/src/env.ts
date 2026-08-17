@@ -8,6 +8,9 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   const {
     GRAPHILE_SCHEMA,
 
+    GRAPHQL_RUNTIME_PGUSER,
+    GRAPHQL_RUNTIME_PGPASSWORD,
+
     FEATURES_SIMPLE_INFLECTION,
     FEATURES_OPPOSITE_BASE_NAMES,
     FEATURES_POSTGIS,
@@ -47,6 +50,12 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   );
 
   return {
+    ...((GRAPHQL_RUNTIME_PGUSER || GRAPHQL_RUNTIME_PGPASSWORD) && {
+      runtimePg: {
+        ...(GRAPHQL_RUNTIME_PGUSER && { user: GRAPHQL_RUNTIME_PGUSER }),
+        ...(GRAPHQL_RUNTIME_PGPASSWORD && { password: GRAPHQL_RUNTIME_PGPASSWORD })
+      }
+    }),
     graphile: {
       ...(GRAPHILE_SCHEMA && {
         schema: GRAPHILE_SCHEMA.includes(',')

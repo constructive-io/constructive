@@ -1,22 +1,37 @@
-// Guards against the pg-cache close() resource leak fixed in feat/observability.
-//
-// Previously, close() reset this.closed = false after shutdown, allowing
-// set() to silently accept new pools that were never cleaned up. The module-
-// level closePromise also reset to null, enabling double-shutdown.
-//
-// These tests lock the fix: close() is final, set() rejects, and repeated
-// close() calls are idempotent. See pg-cache-close-leak.md for full details.
-
 import pg from 'pg';
 
-import { PgPoolCacheManager } from '../lru';
+import {
+  DEFAULT_PG_CACHE_MAX,
+  PG_CACHE_GRAPHILE_CONTRACT_CAPACITY,
+  PG_CACHE_OPERATIONAL_RESERVE,
+  PgPoolCacheManager,
+  PgPoolCapacityError,
+} from '../lru';
+
+describe('process lifecycle ownership', () => {
+  it('does not install process signal handlers from a library import', () => {
+    const beforeSigterm = process.listenerCount('SIGTERM');
+    const beforeSigint = process.listenerCount('SIGINT');
+
+    jest.isolateModules(() => {
+      jest.requireActual('../lru');
+    });
+
+    expect(process.listenerCount('SIGTERM')).toBe(beforeSigterm);
+    expect(process.listenerCount('SIGINT')).toBe(beforeSigint);
+  });
+});
 
 // Minimal mock — we only need pool.end() and pool.ended
 const createMockPool = (): pg.Pool => {
   let ended = false;
   return {
-    get ended() { return ended; },
-    end: jest.fn(async () => { ended = true; }),
+    get ended() {
+      return ended;
+    },
+    end: jest.fn(async () => {
+      ended = true;
+    }),
   } as unknown as pg.Pool;
 };
 
@@ -29,7 +44,11 @@ describe('PgPoolCacheManager', () => {
 
   afterEach(async () => {
     // Ensure all pools are cleaned up even if a test fails mid-way
-    try { await cache.close(); } catch { /* already closed */ }
+    try {
+      await cache.close();
+    } catch {
+      /* already closed */
+    }
   });
 
   it('stores and retrieves a pool', () => {
@@ -45,8 +64,11 @@ describe('PgPoolCacheManager', () => {
   });
 
   describe('configuration', () => {
-    it('uses env-var defaults (max=50) when no overrides given', () => {
-      expect(cache.config.max).toBe(50);
+    it('reserves two identities per supported Graphile contract plus operations', () => {
+      expect(DEFAULT_PG_CACHE_MAX).toBe(
+        PG_CACHE_GRAPHILE_CONTRACT_CAPACITY * 2 + PG_CACHE_OPERATIONAL_RESERVE
+      );
+      expect(cache.config.max).toBe(2064);
     });
 
     it('accepts constructor overrides', () => {
@@ -90,6 +112,171 @@ describe('PgPoolCacheManager', () => {
     });
   });
 
+  describe('leases and fail-closed admission', () => {
+    it('keeps database-name deletion as a migration alias for opaque keys', async () => {
+      const pool = createMockPool();
+      cache.set('pg:v1:opaque', pool);
+      cache.registerAlias('tenant_a', 'pg:v1:opaque');
+
+      cache.delete('tenant_a');
+      await cache.waitForDisposals();
+
+      expect(cache.has('pg:v1:opaque')).toBe(false);
+      expect(pool.end).toHaveBeenCalledTimes(1);
+    });
+
+    it('counts an existing exact identity as zero new slots', async () => {
+      const small = new PgPoolCacheManager({ max: 1 });
+      const pool = createMockPool();
+      const factory = jest.fn(() => pool);
+
+      const first = small.acquire('runtime-a', factory);
+      const second = small.acquire('runtime-a', factory);
+
+      expect(first.pool).toBe(pool);
+      expect(second.pool).toBe(pool);
+      expect(factory).toHaveBeenCalledTimes(1);
+      expect(small.getStats()).toMatchObject({
+        size: 1,
+        leasedPools: 1,
+        activeLeases: 2,
+        leasesAcquired: 2,
+      });
+
+      first.release();
+      first.release();
+      expect(small.getStats().activeLeases).toBe(1);
+      second.release();
+      await small.close();
+    });
+
+    it('refuses before constructing or ending when every slot is leased', async () => {
+      const small = new PgPoolCacheManager({ max: 1 });
+      const firstPool = createMockPool();
+      const first = small.acquire('runtime-a', () => firstPool);
+      const rejectedFactory = jest.fn(() => createMockPool());
+
+      let capacityError: PgPoolCapacityError | undefined;
+      try {
+        small.acquire('runtime-b', rejectedFactory);
+      } catch (error) {
+        capacityError = error as PgPoolCapacityError;
+      }
+
+      expect(capacityError).toBeInstanceOf(PgPoolCapacityError);
+      expect(capacityError).toMatchObject({
+        code: 'PG_POOL_CAPACITY',
+        retryAfterSeconds: 15,
+        max: 1,
+        size: 1,
+        leased: 1,
+      });
+      expect(rejectedFactory).not.toHaveBeenCalled();
+      expect(firstPool.end).not.toHaveBeenCalled();
+      expect(small.getStats().capacityRefusals).toBe(1);
+
+      first.release();
+      await small.close();
+    });
+
+    it('evicts only the least-recent zero-lease identity', async () => {
+      const small = new PgPoolCacheManager({ max: 2 });
+      const leasedPool = createMockPool();
+      const idlePool = createMockPool();
+      const replacementPool = createMockPool();
+      const lease = small.acquire('leased', () => leasedPool);
+      small.set('idle', idlePool);
+
+      small.set('replacement', replacementPool);
+      await small.waitForDisposals();
+
+      expect(small.has('leased')).toBe(true);
+      expect(leasedPool.end).not.toHaveBeenCalled();
+      expect(small.has('idle')).toBe(false);
+      expect(idlePool.end).toHaveBeenCalledTimes(1);
+      expect(small.has('replacement')).toBe(true);
+
+      lease.release();
+      await small.close();
+    });
+
+    it('keeps an expired leased identity until release', async () => {
+      jest.useFakeTimers();
+      const small = new PgPoolCacheManager({ max: 1, ttl: 50 });
+      const pool = createMockPool();
+      const lease = small.acquire('runtime', () => pool);
+      try {
+        jest.advanceTimersByTime(51);
+        expect(small.has('runtime')).toBe(true);
+        expect(pool.end).not.toHaveBeenCalled();
+
+        lease.release();
+        await small.waitForDisposals();
+
+        expect(small.has('runtime')).toBe(false);
+        expect(pool.end).toHaveBeenCalledTimes(1);
+        expect(small.getStats().ttlExpirations).toBe(1);
+      } finally {
+        jest.useRealTimers();
+        await small.close();
+      }
+    });
+
+    it('deterministically gives the final slot to the first synchronous acquisition', async () => {
+      const small = new PgPoolCacheManager({ max: 1 });
+      const firstFactory = jest.fn(() => createMockPool());
+      const secondFactory = jest.fn(() => createMockPool());
+
+      const outcomes = await Promise.allSettled([
+        Promise.resolve().then(() => small.acquire('first', firstFactory)),
+        Promise.resolve().then(() => small.acquire('second', secondFactory)),
+      ]);
+
+      expect(outcomes[0].status).toBe('fulfilled');
+      expect(outcomes[1].status).toBe('rejected');
+      expect((outcomes[1] as PromiseRejectedResult).reason).toBeInstanceOf(
+        PgPoolCapacityError
+      );
+      expect(firstFactory).toHaveBeenCalledTimes(1);
+      expect(secondFactory).not.toHaveBeenCalled();
+
+      if (outcomes[0].status === 'fulfilled') outcomes[0].value.release();
+      await small.close();
+    });
+
+    it('rolls back its reservation if pool construction fails', async () => {
+      const small = new PgPoolCacheManager({ max: 1 });
+      const retained = createMockPool();
+      small.set('retained', retained);
+
+      expect(() =>
+        small.acquire('broken', () => {
+          throw new Error('factory failed');
+        })
+      ).toThrow('factory failed');
+
+      expect(small.has('retained')).toBe(true);
+      expect(retained.end).not.toHaveBeenCalled();
+      expect(small.getStats()).toMatchObject({ size: 1, reservations: 0 });
+      await small.close();
+    });
+
+    it('does not end a physical pool retained under another exact identity', async () => {
+      const small = new PgPoolCacheManager({ max: 1 });
+      const sharedPool = createMockPool();
+
+      small.set('identity-a', sharedPool);
+      small.set('identity-b', sharedPool);
+      await small.waitForDisposals();
+      expect(sharedPool.end).not.toHaveBeenCalled();
+
+      small.delete('identity-b');
+      await small.waitForDisposals();
+      expect(sharedPool.end).toHaveBeenCalledTimes(1);
+      await small.close();
+    });
+  });
+
   describe('close() lifecycle', () => {
     it('set() after close() succeeds (cache re-opens for restart)', async () => {
       const pool1 = createMockPool();
@@ -119,6 +306,29 @@ describe('PgPoolCacheManager', () => {
       await cache.close();
       await cache.close(); // should not throw
 
+      expect(pool.end).toHaveBeenCalledTimes(1);
+    });
+
+    it('makes concurrent close callers await the same pool teardown', async () => {
+      let finishEnd!: () => void;
+      const ended = new Promise<void>((resolve) => {
+        finishEnd = resolve;
+      });
+      const pool = createMockPool();
+      (pool.end as jest.Mock).mockImplementation(() => ended);
+      cache.set('key1', pool);
+
+      const first = cache.close();
+      const second = cache.close();
+      let secondSettled = false;
+      void second.then(() => {
+        secondSettled = true;
+      });
+      await Promise.resolve();
+
+      expect(secondSettled).toBe(false);
+      finishEnd();
+      await Promise.all([first, second]);
       expect(pool.end).toHaveBeenCalledTimes(1);
     });
 
