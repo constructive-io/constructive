@@ -19,6 +19,19 @@ export {
   teardownPgPools
 } from './lru';
 export {
+  assertPgNotificationRole,
+  assertPgNotificationRoleClient,
+  auditPgNotificationRole,
+  auditPgNotificationRoleClient,
+  normalizePgNotificationRoleContracts,
+  PG_NOTIFICATION_ROLE_AUDIT_SQL,
+  PG_NOTIFICATION_ROLE_AUDIT_VERSION,
+  PG_NOTIFICATION_ROLE_CONTRACT_ERROR_CODE,
+  PG_NOTIFICATION_ROLE_UNSAFE_ERROR_CODE,
+  PgNotificationRoleContractError,
+  UnsafePgNotificationRoleError,
+} from './notification-role';
+export {
   acquirePgPool,
   buildConnectionString,
   defaultPgPoolFactory,
@@ -36,4 +49,10 @@ export type {
   PgPoolLease,
   PoolCleanupCallback,
 } from './lru';
+export type {
+  PgNotificationRoleAudit,
+  PgNotificationRoleClient,
+  PgNotificationRoleContract,
+  PgNotificationRoleViolationCode,
+} from './notification-role';
 export type { GetPgPoolOptions } from './pg';
