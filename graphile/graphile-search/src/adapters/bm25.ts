@@ -5,7 +5,7 @@
  * BM25 relevance scoring. Wraps the same SQL logic as graphile-bm25.
  *
  * Requires the Bm25CodecPlugin to be loaded first (for index discovery).
- * The adapter reads from the bm25IndexStore populated during the gather phase.
+ * The adapter reads metadata attached to this gather's codec attributes.
  *
  * Supports chunk-aware querying via @hasChunks smart tag: when the parent
  * table has chunks with a BM25 index, the adapter includes a lateral
@@ -15,19 +15,11 @@
 
 import type { SQL } from 'pg-sql2';
 
-import { bm25IndexStore as moduleBm25IndexStore } from '../codecs/bm25-codec';
+import type { Bm25IndexInfo } from '../codecs/bm25-codec';
 import type { FilterApplyResult,SearchableColumn, SearchAdapter } from '../types';
 import { type ChunksInfo,getChunksInfo } from './chunks';
 
-/**
- * BM25 index info discovered during gather phase.
- */
-export interface Bm25IndexInfo {
-  schemaName: string;
-  tableName: string;
-  columnName: string;
-  indexName: string;
-}
+export type { Bm25IndexInfo } from '../codecs/bm25-codec';
 
 /** Combined adapter data for a BM25-searchable column */
 interface Bm25ColumnData {
@@ -64,8 +56,6 @@ export function createBm25Adapter(
     // Try build.pgBm25IndexStore (set by standalone Bm25SearchPlugin's build hook)
     const buildStore = build.pgBm25IndexStore as Map<string, Bm25IndexInfo> | undefined;
     if (buildStore && buildStore.size > 0) return buildStore;
-    // Fall back to module-level store populated by Bm25CodecPlugin's gather phase
-    if (moduleBm25IndexStore && moduleBm25IndexStore.size > 0) return moduleBm25IndexStore;
     return undefined;
   }
 
@@ -74,6 +64,9 @@ export function createBm25Adapter(
     attributeName: string,
     build: any,
   ): Bm25IndexInfo | undefined {
+    const bound = codec.attributes?.[attributeName]?.extensions?.bm25Index;
+    if (bound) return bound as Bm25IndexInfo;
+
     const store = getIndexStore(build);
     if (!store) return undefined;
 
