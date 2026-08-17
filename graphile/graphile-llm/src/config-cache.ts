@@ -97,11 +97,29 @@ const INFERENCE_LOG_MODULE_SQL = `
 `;
 // ─── Cache ──────────────────────────────────────────────────────────────────
 
-const billingCache = new ModuleConfigCache<LlmBillingCacheEntry>({
-  name: 'billing-config',
-  ttlMs: 5 * 60 * 1000, // 5 minutes
-  max: 50
-});
+const BILLING_CACHE_MAX = 50;
+let billingCachesByScope = new WeakMap<
+  object,
+  ModuleConfigCache<LlmBillingCacheEntry>
+>();
+
+function getBillingCache(
+  cacheScope: object
+): ModuleConfigCache<LlmBillingCacheEntry> {
+  if ((typeof cacheScope !== 'object' && typeof cacheScope !== 'function') || cacheScope === null) {
+    throw new Error('LLM_CONFIG_CACHE_SCOPE_UNAVAILABLE');
+  }
+  let cache = billingCachesByScope.get(cacheScope);
+  if (!cache) {
+    cache = new ModuleConfigCache<LlmBillingCacheEntry>({
+      name: 'billing-config',
+      ttlMs: 5 * 60 * 1000, // 5 minutes
+      max: BILLING_CACHE_MAX
+    });
+    billingCachesByScope.set(cacheScope, cache);
+  }
+  return cache;
+}
 
 // ─── Resolution Functions ───────────────────────────────────────────────────
 
@@ -170,11 +188,14 @@ async function resolveBillingConfig(
  *
  * @param pgClient - A client connected to the tenant database (from withPgClient)
  * @param databaseId - The database UUID
+ * @param cacheScope - The exact Graphile build that owns the cached result
  */
 export async function getLlmBillingConfig(
   pgClient: PgClient,
-  databaseId: string
+  databaseId: string,
+  cacheScope: object
 ): Promise<LlmBillingCacheEntry> {
+  const billingCache = getBillingCache(cacheScope);
   const cached = billingCache.get(databaseId);
   if (cached) return cached;
 
@@ -189,9 +210,19 @@ export async function getLlmBillingConfig(
 }
 
 /**
- * Invalidate the cached config for a specific database (or all).
+ * Invalidate cached config for one exact owner. Omitting the owner resets all
+ * weakly owned caches without retaining their build identities.
  */
-export function invalidateLlmBillingConfig(databaseId?: string): void {
+export function invalidateLlmBillingConfig(
+  databaseId?: string,
+  cacheScope?: object
+): void {
+  if (!cacheScope) {
+    billingCachesByScope = new WeakMap();
+    return;
+  }
+  const billingCache = billingCachesByScope.get(cacheScope);
+  if (!billingCache) return;
   if (databaseId) {
     billingCache.delete(databaseId);
   } else {
@@ -200,8 +231,11 @@ export function invalidateLlmBillingConfig(databaseId?: string): void {
 }
 
 /**
- * Get cache stats for diagnostics.
+ * Get cache stats for an exact owner without retaining other build identities.
  */
-export function getLlmBillingCacheStats(): { size: number; max: number } {
-  return { size: billingCache.size, max: 50 };
+export function getLlmBillingCacheStats(cacheScope: object): { size: number; max: number } {
+  return {
+    size: billingCachesByScope.get(cacheScope)?.size ?? 0,
+    max: BILLING_CACHE_MAX
+  };
 }
