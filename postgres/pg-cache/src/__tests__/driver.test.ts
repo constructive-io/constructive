@@ -47,6 +47,7 @@ describe('pg-cache pool-factory seam', () => {
   it('getPgPool builds via the registered factory (no real pg connection)', () => {
     const cfg = freshConfig();
     const mock = createMockPool();
+    const alternateConnect = mock.connect;
     const factory = jest.fn<pg.Pool, [any]>(() => mock);
     registerPgPoolFactory(factory);
 
@@ -54,6 +55,7 @@ describe('pg-cache pool-factory seam', () => {
 
     expect(factory).toHaveBeenCalledTimes(1);
     expect(pool).toBe(mock);
+    expect(pool.connect).toBe(alternateConnect);
 
     pgCache.delete(cfg.database);
   });
