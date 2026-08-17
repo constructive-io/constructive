@@ -19,6 +19,28 @@ export {
   teardownPgPools
 } from './lru';
 export {
+  acquirePgNotificationBroker,
+  assertValidPgNotificationTopic,
+  DEFAULT_PG_NOTIFICATION_OPERATION_TIMEOUT_MS,
+  getPgNotificationBrokerIdentity,
+  getPgNotificationBrokerStats,
+  getPgNotificationDatabaseIdentity,
+  PG_NOTIFICATION_BROKER_FAILED_ERROR_CODE,
+  PG_NOTIFICATION_BROKER_IDENTITY_VERSION,
+  PG_NOTIFICATION_DATABASE_IDENTITY_VERSION,
+  PG_NOTIFICATION_LEASE_RELEASED_ERROR_CODE,
+  PG_NOTIFICATION_OPERATION_TIMEOUT_ERROR_CODE,
+  PG_NOTIFICATION_QUEUE_CAPACITY,
+  PG_NOTIFICATION_QUEUE_OVERFLOW_ERROR_CODE,
+  PG_NOTIFICATION_TOPIC_ERROR_CODE,
+  PgNotificationBrokerFailedError,
+  PgNotificationLeaseReleasedError,
+  PgNotificationOperationTimeoutError,
+  PgNotificationQueueOverflowError,
+  PgNotificationTopicError,
+  teardownPgNotificationBrokers,
+} from './notification-broker';
+export {
   assertPgNotificationRole,
   assertPgNotificationRoleClient,
   auditPgNotificationRole,
@@ -49,6 +71,13 @@ export type {
   PgPoolLease,
   PoolCleanupCallback,
 } from './lru';
+export type {
+  AcquirePgNotificationBrokerOptions,
+  PgAttestedNotificationBrokerLease,
+  PgNotificationBrokerLease,
+  PgNotificationBrokerStats,
+  PgNotificationListenerConfig,
+} from './notification-broker';
 export type {
   PgNotificationRoleAudit,
   PgNotificationRoleClient,
