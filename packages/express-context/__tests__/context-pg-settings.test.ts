@@ -4,6 +4,7 @@ import { buildContext } from '../src/context';
 
 jest.mock('pg-cache', () => ({
   getPgPool: jest.fn(() => ({ query: jest.fn(), connect: jest.fn() })),
+  getPgPoolIdentity: jest.fn(() => 'pg:v1:test'),
 }));
 
 describe('buildContext pgSettings forwarding', () => {

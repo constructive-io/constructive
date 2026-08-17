@@ -12,7 +12,10 @@ export {
   constructiveDefaults,
   constructiveGraphqlDefaults,
   ConstructiveGraphQLOptions,
-  ConstructiveOptions} from './constructive';
+  ConstructiveOptions,
+  RuntimePgConfig,
+  RuntimePgResolver,
+  RuntimePgResolverInput} from './constructive';
 
 // Export GraphQL adapter types
 export {
