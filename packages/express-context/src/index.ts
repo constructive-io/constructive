@@ -64,9 +64,23 @@ export type {
 export type { BillingClient, InferenceLogEntry } from './billing-client';
 export { createBillingClient } from './billing-client';
 
-// pgSettings builder
-export type { PgSettingsInput } from './pg-settings';
-export { buildPgSettings } from './pg-settings';
+// pgSettings builder and validation contract
+export type {
+  PgSettings,
+  PgSettingsInput,
+  RequiredPgSettingKey,
+  SecurityGucKey,
+  TrustedPgClaims,
+} from './pg-settings';
+export {
+  assertCompletePgSettings,
+  assertPgSettings,
+  buildPgSettings,
+  REQUIRED_PG_SETTING_KEYS,
+  SECURITY_GUC_KEYS,
+  withPgSettingsRole,
+  withTrustedPgClaims,
+} from './pg-settings';
 
 // withPgClient helper
 export { withPgClient } from './pg-client';

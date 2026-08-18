@@ -33,7 +33,8 @@
   },
   "devDependencies": {
     "@types/pg": "^8.20.4",
-    "makage": "^0.3.0"
+    "makage": "^0.3.0",
+    "pgsql-test": "workspace:^"
   },
   "keywords": [
     "postgresql",

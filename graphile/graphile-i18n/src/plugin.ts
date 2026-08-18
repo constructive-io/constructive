@@ -25,6 +25,7 @@ import { TYPES } from '@dataplan/pg';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 
+import { queryI18nWithContext } from './pg-query';
 import type { I18nPluginOptions, I18nTableInfo, TranslatableField } from './types';
 
 // ─── Namespace Augmentations ─────────────────────────────────────────────────
@@ -266,32 +267,29 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
                   $baseCols[column] = $parent.get(column);
                 }
                 const $withPgClient = (grafastContext() as any).get('withPgClient');
+                const $pgSettings = (grafastContext() as any).get('pgSettings');
                 const $langCodes = (grafastContext() as any).get('langCodes');
 
                 // Combine all inputs into a single step
                 const $input = object({
                   id: $id,
                   withPgClient: $withPgClient,
+                  pgSettings: $pgSettings,
                   langCodes: $langCodes,
                   ...$baseCols,
                 });
 
                 return lambda($input, async (input: any) => {
-                  const { id, withPgClient, langCodes: ctxLangCodes, ...baseCols } = input;
+                  const { id, withPgClient, pgSettings, langCodes: ctxLangCodes, ...baseCols } = input;
                   const langs: string[] = ctxLangCodes ?? defaultLanguages;
 
-                  if (!withPgClient || !id) {
-                    const result: Record<string, any> = { [langCodeGqlField]: null };
-                    for (const { gqlName, column } of baseColNames) {
-                      result[gqlName] = baseCols[column] ?? null;
-                    }
-                    return result;
-                  }
-
-                  const row = await withPgClient(null, async (client: any) => {
-                    const { rows } = await client.query(sqlQuery, [id, langs]);
-                    return rows[0] ?? null;
-                  });
+                  const row = await queryI18nWithContext(
+                    withPgClient,
+                    pgSettings,
+                    id,
+                    sqlQuery,
+                    [id, langs]
+                  );
 
                   if (!row) {
                     const result: Record<string, any> = { [langCodeGqlField]: null };

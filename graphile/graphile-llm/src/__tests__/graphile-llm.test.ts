@@ -1,4 +1,5 @@
 import OllamaClient from '@agentic-kit/ollama';
+import { buildPgSettings } from '@constructive-io/express-context';
 import type { GraphileConfig } from 'graphile-config';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { createPgvectorAdapter } from 'graphile-search/adapters/pgvector';
@@ -45,6 +46,8 @@ async function ensureNomicModel(): Promise<void> {
 type QueryFn = <TResult = unknown>(
   query: string,
   variables?: Record<string, unknown>,
+  commit?: boolean,
+  reqOptions?: Record<string, unknown>
 ) => Promise<GraphQLResponse<TResult>>;
 
 // =============================================================================
@@ -173,7 +176,29 @@ describe('graphile-llm schema enrichment', () => {
 
     db = connections.db;
     teardown = connections.teardown;
-    query = connections.query;
+    const baseQuery: QueryFn = connections.query;
+    const canonicalSettings = buildPgSettings({
+      api: {
+        apiId: 'llm-rag-test-api',
+        databaseId: 'llm-rag-test-database',
+        dbname: 'llm_test',
+        anonRole: 'postgres',
+        roleName: 'postgres',
+        schema: ['llm_test'],
+      },
+      token: { user_id: 'llm-rag-test-user' },
+      requestId: 'llm-rag-test-request',
+    });
+    query = <TResult = unknown>(
+      document: string,
+      variables?: Record<string, unknown>,
+      commit?: boolean,
+      reqOptions: Record<string, unknown> = {}
+    ) =>
+        baseQuery<TResult>(document, variables, commit, {
+          ...reqOptions,
+          pgSettings: canonicalSettings,
+        });
   });
 
   afterAll(async () => {
@@ -706,7 +731,29 @@ describe('RAG plugin schema enrichment', () => {
 
     db = connections.db;
     teardown = connections.teardown;
-    query = connections.query;
+    const baseQuery: QueryFn = connections.query;
+    const canonicalSettings = buildPgSettings({
+      api: {
+        apiId: 'llm-rag-test-api',
+        databaseId: 'llm-rag-test-database',
+        dbname: 'llm_test',
+        anonRole: 'postgres',
+        roleName: 'postgres',
+        schema: ['llm_test'],
+      },
+      token: { user_id: 'llm-rag-test-user' },
+      requestId: 'llm-rag-test-request',
+    });
+    query = <TResult = unknown>(
+      document: string,
+      variables?: Record<string, unknown>,
+      commit?: boolean,
+      reqOptions: Record<string, unknown> = {}
+    ) =>
+        baseQuery<TResult>(document, variables, commit, {
+          ...reqOptions,
+          pgSettings: canonicalSettings,
+        });
   });
 
   afterAll(async () => {

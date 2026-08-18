@@ -1,8 +1,10 @@
 import '../augmentations';
 
-import { sideEffectWithPgClient } from '@dataplan/pg';
+import { type PgClient, sideEffectWithPgClient } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType,GraphQLOutputType } from 'graphql';
+
+import { queryPgClient } from '../utils/pg-client';
 
 const version = '0.1.0';
 
@@ -105,7 +107,7 @@ export const BulkDeletePlugin: GraphileConfig.Plugin = {
                     const $result = sideEffectWithPgClient(
                       executor,
                       $input,
-                      async (pgClient: any, input: any) => {
+                      async (pgClient: PgClient, input: any) => {
                         if (requireWhere && (!input.where || Object.keys(input.where).length === 0)) {
                           throw new Error(
                             'Bulk delete requires a non-empty where condition. Set bulkRequireWhere: false to allow unrestricted deletes.'
@@ -194,12 +196,16 @@ export const BulkDeletePlugin: GraphileConfig.Plugin = {
                         // Use RETURNING <pk_columns> instead of RETURNING *
                         // For delete, we capture PKs before rows are gone
                         const text = `DELETE FROM ${compiledFrom}\nWHERE ${whereStr}\nRETURNING ${pkReturning}`;
-                        const mutationResult = await pgClient.query(text, values);
+                        const mutationResult = await queryPgClient<Record<string, unknown>>(
+                          pgClient,
+                          text,
+                          values
+                        );
                         const affectedCount = mutationResult.rowCount ?? 0;
 
                         // For delete, rows no longer exist so we can't do a
                         // follow-up SELECT. Return the PK values directly.
-                        const returning = mutationResult.rows || [];
+                        const returning = [...mutationResult.rows];
 
                         return {
                           affectedCount,
