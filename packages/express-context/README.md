@@ -57,7 +57,12 @@ app.post('/v1/chat', async (req, res) => {
 
 ## Module Loaders
 
-Each loader encapsulates a SQL query + type transform + per-databaseId LRU cache for one piece of per-database configuration. Loaders are registered in a `LoaderRegistry` and resolved lazily via `useModule(name)`.
+Each loader encapsulates a SQL query + type transform + bounded LRU cache for
+one piece of per-database configuration. Entries are isolated by the exact
+routing pool, tenant pool, routing schema, database, and API contract. TTLs are
+hard expiry bounds, and concurrent misses for one exact contract share a single
+resolution. Loaders are registered in a `LoaderRegistry` and resolved lazily
+via `useModule(name)`.
 
 ### Built-in loaders
 
