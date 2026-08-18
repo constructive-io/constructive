@@ -208,8 +208,8 @@ const preset = {
 ```
 
 The Constructive GraphQL server performs this pairing when
-`GRAPHILE_INTROSPECTION_MODE=scoped-required`; when unset or set to `stock`, it
-does not load the scoped package.
+`GRAPHILE_SCOPED_INTROSPECTION=true`; when unset or `false`, it does not load
+the scoped package.
 
 ## Smart Tags Reference
 

@@ -279,12 +279,22 @@ function getIntrospectionQuery(
 ): Omit<RawIntrospectionResult, 'pgService' | 'introspectionText'> & {
   query: PgQuery;
 } {
-  const mode = pgService.introspectionMode ?? 'stock';
+  const scopedIntrospection = pgService.scopedIntrospection;
   const configuredCatalogTypes = pgService.introspectionScopedCatalogTypes;
   const configuredCapabilityExtensions =
     pgService.introspectionCapabilityExtensions;
+  const configuredDependencySchemas =
+    pgService.introspectionAllowedDependencySchemas;
   const scopedCatalogTypes = configuredCatalogTypes ?? 'all';
 
+  if (
+    scopedIntrospection !== undefined &&
+    typeof scopedIntrospection !== "boolean"
+  ) {
+    throw new Error(
+      `scopedIntrospection must be a boolean for service '${pgService.name}'`,
+    );
+  }
   if (
     scopedCatalogTypes !== 'all' &&
     scopedCatalogTypes !== 'dependency-closure'
@@ -293,15 +303,23 @@ function getIntrospectionQuery(
       `Unsupported scoped catalog type policy '${scopedCatalogTypes}' for service '${pgService.name}'`
     );
   }
-  if (mode === 'stock') {
-    if (configuredCatalogTypes !== undefined) {
+  if (scopedIntrospection !== true) {
+    const configuredScopedOptions = [
+      configuredCatalogTypes !== undefined
+        ? "introspectionScopedCatalogTypes"
+        : null,
+      configuredDependencySchemas !== undefined
+        ? "introspectionAllowedDependencySchemas"
+        : null,
+      configuredCapabilityExtensions !== undefined
+        ? "introspectionCapabilityExtensions"
+        : null,
+    ].filter((option): option is string => option !== null);
+    if (configuredScopedOptions.length > 0) {
       throw new Error(
-        `Scoped catalog type policy is only valid with scoped-required introspection for service '${pgService.name}'`
-      );
-    }
-    if (configuredCapabilityExtensions !== undefined) {
-      throw new Error(
-        `Scoped extension capabilities are only valid with scoped-required introspection for service '${pgService.name}'`
+        `Scoped introspection option(s) ${configuredScopedOptions.join(
+          ", ",
+        )} require scopedIntrospection: true for service '${pgService.name}'`,
       );
     }
     return {
@@ -311,25 +329,19 @@ function getIntrospectionQuery(
       scopedCatalogTypes: null,
     };
   }
-  if (mode === 'scoped-required') {
-    const requiredSchemas = pgService.schemas ?? [];
-    const dependencySchemas =
-      pgService.introspectionAllowedDependencySchemas ?? [];
-    return {
-      query: makeSchemaScopedIntrospectionQuery(requiredSchemas, {
-        catalogTypes: scopedCatalogTypes,
-        capabilityExtensions: configuredCapabilityExtensions ?? [],
-      }),
-      requiredSchemas,
-      allowedSchemas: [
-        ...new Set([...requiredSchemas, ...dependencySchemas, 'pg_catalog']),
-      ],
-      scopedCatalogTypes,
-    };
-  }
-  throw new Error(
-    `Unsupported PostgreSQL introspection mode '${mode}' for service '${pgService.name}'`
-  );
+  const requiredSchemas = pgService.schemas ?? [];
+  const dependencySchemas = configuredDependencySchemas ?? [];
+  return {
+    query: makeSchemaScopedIntrospectionQuery(requiredSchemas, {
+      catalogTypes: scopedCatalogTypes,
+      capabilityExtensions: configuredCapabilityExtensions ?? [],
+    }),
+    requiredSchemas,
+    allowedSchemas: [
+      ...new Set([...requiredSchemas, ...dependencySchemas, 'pg_catalog']),
+    ],
+    scopedCatalogTypes,
+  };
 }
 
 

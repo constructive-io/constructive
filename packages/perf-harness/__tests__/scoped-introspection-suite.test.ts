@@ -9,12 +9,18 @@ describe('scoped introspection benchmark registration', () => {
       cases: [
         {
           name: 'stock',
-          workerConfig: { mode: 'stock', schemas: ['cperf_example'] },
+          workerConfig: {
+            scopedIntrospection: false,
+            schemas: ['cperf_example'],
+          },
           expectedSchemaGroup: 'introspection-equivalence',
         },
         {
           name: 'scoped',
-          workerConfig: { mode: 'scoped', schemas: ['cperf_example'] },
+          workerConfig: {
+            scopedIntrospection: true,
+            schemas: ['cperf_example'],
+          },
           expectedSchemaGroup: 'introspection-equivalence',
         },
       ],

@@ -20,7 +20,7 @@ describe('Graphile introspection mode wiring', () => {
 
     expect(loadScopedPreset).not.toHaveBeenCalled();
     expect(wiring.presets).toEqual([]);
-    expect(wiring.pgService).not.toHaveProperty('introspectionMode');
+    expect(wiring.pgService).not.toHaveProperty('scopedIntrospection');
     expect(wiring.pgService).not.toHaveProperty(
       'introspectionAllowedDependencySchemas'
     );
@@ -40,7 +40,7 @@ describe('Graphile introspection mode wiring', () => {
       pool,
       ['tenant_a'],
       {
-        introspectionMode: 'scoped-required',
+        scopedIntrospection: true,
         introspectionDependencySchemas: ['shared'],
         introspectionCapabilityExtensions: ['pg_trgm'],
       },
@@ -50,7 +50,7 @@ describe('Graphile introspection mode wiring', () => {
     expect(loadScopedPreset).toHaveBeenCalledTimes(1);
     expect(wiring.presets).toEqual([scopedPreset]);
     expect(wiring.pgService).toMatchObject({
-      introspectionMode: 'scoped-required',
+      scopedIntrospection: true,
       introspectionScopedCatalogTypes: 'dependency-closure',
       introspectionAllowedDependencySchemas: ['shared'],
       introspectionCapabilityExtensions: ['pg_trgm'],
@@ -60,5 +60,39 @@ describe('Graphile introspection mode wiring', () => {
         work_mem: '512kB',
       },
     });
+  });
+
+  it.each([
+    [
+      'dependency schemas',
+      { introspectionDependencySchemas: ['shared'] },
+    ],
+    [
+      'capability extensions',
+      { introspectionCapabilityExtensions: ['pg_trgm'] },
+    ],
+  ])('fails closed on %s while scoped introspection is disabled', async (_label, option) => {
+    const loadScopedPreset = jest.fn(async () => ({}));
+
+    await expect(
+      makeIntrospectionWiring(
+        pool,
+        ['tenant_a'],
+        { scopedIntrospection: false, ...option },
+        loadScopedPreset
+      )
+    ).rejects.toThrow(/require scopedIntrospection: true/);
+    expect(loadScopedPreset).not.toHaveBeenCalled();
+  });
+
+  it('rejects a non-boolean scoped introspection flag', async () => {
+    await expect(
+      makeIntrospectionWiring(
+        pool,
+        ['tenant_a'],
+        { scopedIntrospection: 'true' } as never,
+        jest.fn()
+      )
+    ).rejects.toThrow('graphile.scopedIntrospection must be a boolean');
   });
 });

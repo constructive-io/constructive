@@ -5,8 +5,6 @@ export {
   graphileDefaults,
   graphileFeatureDefaults,
   GraphileFeatureOptions,
-  GraphileIntrospectionMode,
-  graphileIntrospectionModes,
   GraphileOptions,
   ScopedCatalogTypes,
   ScopedIntrospectionServiceOptions} from './graphile';

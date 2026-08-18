@@ -1,20 +1,5 @@
-import { ConstructiveOptions, type GraphileIntrospectionMode, graphileIntrospectionModes } from '@constructive-io/graphql-types';
-import { env as validateEnv, parseEnvBoolean, parseEnvNumber, str } from '12factor-env';
-
-const parseGraphileIntrospectionMode = (
-  value: string | undefined
-): GraphileIntrospectionMode | undefined => {
-  if (value === undefined) return undefined;
-  return validateEnv(
-    { GRAPHILE_INTROSPECTION_MODE: value },
-    {},
-    {
-      GRAPHILE_INTROSPECTION_MODE: str({
-        choices: [...graphileIntrospectionModes]
-      })
-    }
-  ).GRAPHILE_INTROSPECTION_MODE as GraphileIntrospectionMode;
-};
+import { ConstructiveOptions } from '@constructive-io/graphql-types';
+import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 
 /**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
@@ -22,7 +7,7 @@ const parseGraphileIntrospectionMode = (
 export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial<ConstructiveOptions> => {
   const {
     GRAPHILE_SCHEMA,
-    GRAPHILE_INTROSPECTION_MODE,
+    GRAPHILE_SCOPED_INTROSPECTION,
 
     FEATURES_SIMPLE_INFLECTION,
     FEATURES_OPPOSITE_BASE_NAMES,
@@ -54,8 +39,8 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   // let an absent env var overwrite pgpm.json or consumer-specific values.
   const smsRequestTimeoutMs = parseEnvNumber(SMS_REQUEST_TIMEOUT_MS);
   const smsDryRun = parseEnvBoolean(SEND_SMS_DRY_RUN);
-  const introspectionMode = parseGraphileIntrospectionMode(
-    GRAPHILE_INTROSPECTION_MODE
+  const scopedIntrospection = parseEnvBoolean(
+    GRAPHILE_SCOPED_INTROSPECTION
   );
   const hasSmsEnvOverrides = Boolean(
     SMS_PROVIDER ||
@@ -72,7 +57,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
           : GRAPHILE_SCHEMA
       }),
-      ...(introspectionMode !== undefined && { introspectionMode })
+      ...(scopedIntrospection !== undefined && { scopedIntrospection })
     },
     features: {
       ...(FEATURES_SIMPLE_INFLECTION && { simpleInflection: parseEnvBoolean(FEATURES_SIMPLE_INFLECTION) }),

@@ -1,15 +1,10 @@
 import type { GraphileConfig } from 'graphile-config';
 
-export const graphileIntrospectionModes = ['stock', 'scoped-required'] as const;
-
-export type GraphileIntrospectionMode =
-  (typeof graphileIntrospectionModes)[number];
-
 export type ScopedCatalogTypes = 'all' | 'dependency-closure';
 
 export interface ScopedIntrospectionServiceOptions {
-  /** Selects the catalog query used during this service's gather phase. */
-  introspectionMode?: GraphileIntrospectionMode;
+  /** Use CNC schema-scoped introspection for this service. */
+  scopedIntrospection?: boolean;
   /** Catalog types retained by scoped introspection; defaults to all. */
   introspectionScopedCatalogTypes?: ScopedCatalogTypes;
   /** Non-root schemas that scoped dependency closure may retain. */
@@ -24,8 +19,8 @@ export interface ScopedIntrospectionServiceOptions {
 export interface GraphileOptions {
   /** Database schema(s) to expose through GraphQL */
   schema?: string | string[];
-  /** PostgreSQL catalog introspection implementation selected at startup. */
-  introspectionMode?: GraphileIntrospectionMode;
+  /** Use CNC schema-scoped PostgreSQL introspection. */
+  scopedIntrospection?: boolean;
   /** Additional schemas that scoped dependency closure may retain. */
   introspectionDependencySchemas?: string[];
   /** Installed extensions whose optional capability metadata must be retained. */
@@ -75,7 +70,7 @@ export interface ApiOptions {
  */
 export const graphileDefaults: GraphileOptions = {
   schema: [],
-  introspectionMode: 'stock',
+  scopedIntrospection: false,
   introspectionDependencySchemas: [],
   introspectionCapabilityExtensions: [],
   extends: [],

@@ -18,15 +18,15 @@ import {
 } from './process';
 
 interface ScopedWorkerConfig {
-  mode: 'stock' | 'scoped';
+  scopedIntrospection: boolean;
   schemas: string[];
 }
 
 const validateConfig = (value: unknown): ScopedWorkerConfig => {
   const config = value as Partial<ScopedWorkerConfig>;
-  if (config.mode !== 'stock' && config.mode !== 'scoped') {
+  if (typeof config.scopedIntrospection !== 'boolean') {
     throw new Error(
-      'scoped introspection worker requires stock or scoped mode'
+      'scoped introspection worker requires a scopedIntrospection boolean'
     );
   }
   if (
@@ -40,7 +40,10 @@ const validateConfig = (value: unknown): ScopedWorkerConfig => {
       'scoped introspection worker requires a non-empty schemas array'
     );
   }
-  return { mode: config.mode, schemas: config.schemas };
+  return {
+    scopedIntrospection: config.scopedIntrospection,
+    schemas: config.schemas,
+  };
 };
 
 const main = async (): Promise<void> => {
@@ -63,9 +66,9 @@ const main = async (): Promise<void> => {
       introspectionScopedCatalogTypes: 'dependency-closure' as const,
     };
     const service =
-      config.mode === 'stock'
-        ? makePostGraphilePgService(serviceOptions)
-        : makeScopedPgService(scopedServiceOptions);
+      config.scopedIntrospection
+        ? makeScopedPgService(scopedServiceOptions)
+        : makePostGraphilePgService(serviceOptions);
     release = async () => {
       await service.release();
     };
@@ -77,7 +80,9 @@ const main = async (): Promise<void> => {
           extends: [
             graphileBuildPreset,
             graphileBuildPgPreset,
-            ...(config.mode === 'scoped' ? [ScopedIntrospectionPreset] : []),
+            ...(config.scopedIntrospection
+              ? [ScopedIntrospectionPreset]
+              : []),
           ],
           pgServices: [service],
         }),
@@ -97,7 +102,7 @@ const main = async (): Promise<void> => {
           schemaHash: createHash('sha256').update(schemaText).digest('hex'),
           schemaTypeCount: Object.keys(schema.getTypeMap()).length,
           runtimeVerified: true as const,
-          metadata: { introspectionMode: config.mode },
+          metadata: { scopedIntrospection: config.scopedIntrospection },
         };
       }
     );

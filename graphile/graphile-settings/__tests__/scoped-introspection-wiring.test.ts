@@ -18,7 +18,7 @@ const makeUpstreamPgService = jest.fn((options: TestUpstreamOptions) => ({
 }));
 const makeScopedPgService = (
   options: TestUpstreamOptions &
-    Omit<ScopedIntrospectionServiceOptions, 'introspectionMode'>
+    Omit<ScopedIntrospectionServiceOptions, 'scopedIntrospection'>
 ) => makeConfiguredPgService(makeUpstreamPgService, options);
 
 describe('scoped introspection settings wiring', () => {
@@ -38,7 +38,7 @@ describe('scoped introspection settings wiring', () => {
 
     expect(service).toMatchObject({
       schemas: ['tenant_a'],
-      introspectionMode: 'scoped-required',
+      scopedIntrospection: true,
       introspectionScopedCatalogTypes: 'dependency-closure',
       introspectionAllowedDependencySchemas: ['shared'],
       introspectionCapabilityExtensions: ['pg_trgm'],

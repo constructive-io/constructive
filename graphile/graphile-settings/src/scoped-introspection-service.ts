@@ -38,7 +38,7 @@ type UpstreamPgServiceOptions = {
 
 export type ScopedIntrospectionOptions = Omit<
   ScopedIntrospectionServiceOptions,
-  'introspectionMode'
+  'scopedIntrospection'
 >;
 
 /**
@@ -74,7 +74,7 @@ export function makeConfiguredPgService<
   const introspectionAllowedDependencySchemas =
     normalizeIntrospectionDependencySchemas(configuredDependencySchemas);
   const pgSettingsForIntrospection = resolveIntrospectionSettings(
-    'scoped-required',
+    true,
     options.pgSettingsForIntrospection
   );
   const service = makeUpstreamPgService({
@@ -83,7 +83,7 @@ export function makeConfiguredPgService<
   } as TOptions);
 
   return Object.assign(service, {
-    introspectionMode: 'scoped-required' as const,
+    scopedIntrospection: true as const,
     introspectionScopedCatalogTypes:
       introspectionScopedCatalogTypes ?? 'dependency-closure',
     introspectionAllowedDependencySchemas,
