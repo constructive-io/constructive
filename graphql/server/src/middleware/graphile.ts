@@ -12,7 +12,11 @@ import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
-import { createConstructivePreset, makePgService } from 'graphile-settings';
+import {
+  createConstructivePreset,
+  createGrafastCacheLimitsPreset,
+  makePgService
+} from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -167,10 +171,17 @@ const buildPreset = (
   roleName: string,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
-  compute?: ComputeConfig
+  compute?: ComputeConfig,
+  grafastCache?: NonNullable<ConstructiveOptions['graphile']>['grafastCache']
 ): GraphileConfig.Preset => {
+  const grafastCachePreset = createGrafastCacheLimitsPreset(grafastCache);
   return {
-    extends: [createConstructivePreset(databaseSettings)],
+    extends: [
+      createConstructivePreset(databaseSettings),
+      ...(Object.keys(grafastCachePreset).length > 0
+        ? [grafastCachePreset]
+        : [])
+    ],
     plugins: [
       AuthCookiePlugin,
       // Only registered when the compute module is provisioned for this
@@ -403,7 +414,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
+      const preset = buildPreset(
+        pool,
+        schema || [],
+        anonRole,
+        roleName,
+        api.databaseSettings,
+        api.apiId,
+        compute,
+        opts.graphile?.grafastCache
+      );
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,
