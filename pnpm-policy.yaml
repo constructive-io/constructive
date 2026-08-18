@@ -86,7 +86,3 @@ allowBuilds:
 exceptions:
   # Toolchain floors caught up with the newest release, so the floor itself is
   # the only satisfying version.
-  - package: "@types/pg"
-    versions: ["8.20.4"]
-    reason: ^8.20.4 floor matches the newest release; nothing older satisfies it
-    until: 2026-08-18

@@ -15,7 +15,7 @@ packages:
 # Most malicious releases are found and yanked well inside that window.
 minimumReleaseAge: 2880
 
-# Exempt from the wait: 6 scope glob(s), 41 first-party package(s), 1 exception(s).
+# Exempt from the wait: 6 scope glob(s), 41 first-party package(s).
 # First-party membership comes from the inventory.
 minimumReleaseAgeExclude:
   - "@constructive-db/*"
@@ -65,7 +65,6 @@ minimumReleaseAgeExclude:
   - tamedevil
   - yamlize
   - yanse
-  - "@types/pg@8.20.4" # ^8.20.4 floor matches the newest release; nothing older satisfies it (expires 2026-08-18)
 
 # Off: transitive dependencies may resolve from git or a URL.
 blockExoticSubdeps: false
