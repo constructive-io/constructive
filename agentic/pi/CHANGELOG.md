@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.18.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.17.1...@agentic-kit/pi@0.18.0) (2026-08-18)
+
+### Features
+
+- **agentic:** extract the db tools into @agentic-kit/db-tools ([62808de](https://github.com/constructive-io/constructive/commit/62808de88bdcafdf68d57c17561d5b04ee75dc65))
+- **agentic:** neutral HarnessTool contract, pi binds it at its edge ([cbd30d0](https://github.com/constructive-io/constructive/commit/cbd30d0b0400c195b4567bf0c077a38d5d8d96fe))
+
 ## [0.17.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.17.0...@agentic-kit/pi@0.17.1) (2026-08-18)
 
 **Note:** Version bump only for package @agentic-kit/pi

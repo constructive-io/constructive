@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/run-log@0.5.0...@agentic-kit/run-log@0.6.0) (2026-08-18)
+
+### Features
+
+- **run-log:** read transcripts through a reader registry, pi as the first reader ([b0e3e52](https://github.com/constructive-io/constructive/commit/b0e3e52870b5e85e5de859384930d2238ffd4a66))
+
 # [0.5.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/run-log@0.4.0...@agentic-kit/run-log@0.5.0) (2026-08-18)
 
 **Note:** Version bump only for package @agentic-kit/run-log

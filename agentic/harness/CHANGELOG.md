@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.14.0...@agentic-kit/harness@0.15.0) (2026-08-18)
+
+### Features
+
+- **agentic:** neutral HarnessTool contract, pi binds it at its edge ([cbd30d0](https://github.com/constructive-io/constructive/commit/cbd30d0b0400c195b4567bf0c077a38d5d8d96fe))
+
 # [0.14.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.13.0...@agentic-kit/harness@0.14.0) (2026-08-18)
 
 **Note:** Version bump only for package @agentic-kit/harness
