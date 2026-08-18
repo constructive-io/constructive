@@ -2056,6 +2056,9 @@ importers:
       graphile-function-bindings:
         specifier: workspace:^
         version: link:../../graphile/graphile-function-bindings/dist
+      graphile-scoped-introspection:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-scoped-introspection/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist

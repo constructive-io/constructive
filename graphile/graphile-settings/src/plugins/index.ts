@@ -8,10 +8,7 @@
 export { MinimalPreset } from './minimal-preset';
 
 // Custom inflector using inflekt library
-export {
-  InflektPlugin,
-  InflektPreset,
-} from './custom-inflector';
+export { InflektPlugin, InflektPreset } from './custom-inflector';
 
 // Conflict detector for multi-schema setups
 export {
@@ -72,30 +69,20 @@ export type {
 
 // PG type mappings for custom PostgreSQL types (email, url, etc.)
 export type { TypeMapping } from './pg-type-mappings';
-export {
-  PgTypeMappingsPlugin,
-  PgTypeMappingsPreset,
-} from './pg-type-mappings';
+export { PgTypeMappingsPlugin, PgTypeMappingsPreset } from './pg-type-mappings';
 
 // Public key signature plugin for crypto authentication
 export type { PublicKeyChallengeConfig } from './PublicKeySignature';
 export { PublicKeySignature } from './PublicKeySignature';
 
 // Internal exports for testing
-export { _buildFieldMeta,_pgTypeToGqlType } from './meta-schema';
+export { _buildFieldMeta, _pgTypeToGqlType } from './meta-schema';
 
 // Required input plugin - makes @requiredInput tagged fields non-nullable in mutation inputs
 export {
   RequiredInputPlugin,
   RequiredInputPreset,
 } from './required-input-plugin';
-
-// Convenience re-export; implementation is owned by the independent package.
-export {
-  ConstructivePgIntrospectionPlugin,
-  ScopedIntrospectionPreset,
-  scopedIntrospectionUpstreamContract,
-} from 'graphile-scoped-introspection';
 
 // Unified search — tsvector + BM25 + pg_trgm + pgvector behind a single adapter architecture
 export type {

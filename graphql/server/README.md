@@ -115,27 +115,28 @@ This is a production-only server: every request is resolved through the scoped-r
 
 Configuration is merged from defaults, config files, and env vars via `@constructive-io/graphql-env`. See `graphql/env/README.md` for the full list and examples.
 
-| Env var                        | Purpose                               | Default                                                       |
-| ------------------------------ | ------------------------------------- | ------------------------------------------------------------- |
-| `PGHOST`                       | Postgres host                         | `localhost`                                                   |
-| `PGPORT`                       | Postgres port                         | `5432`                                                        |
-| `PGUSER`                       | Postgres user                         | `postgres`                                                    |
-| `PGPASSWORD`                   | Postgres password                     | `password`                                                    |
-| `PGDATABASE`                   | Postgres database                     | `postgres`                                                    |
-| `GRAPHILE_SCHEMA`              | Comma-separated schemas to expose     | empty                                                         |
-| `FEATURES_SIMPLE_INFLECTION`   | Enable simple inflection              | `true`                                                        |
-| `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
-| `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |
-| `API_ROUTING_SCHEMA`    | Schema containing `resolve_route()`   | `routing_public`                                 |
-| `API_IS_PUBLIC`                | Serve public APIs only                | `true`                                                        |
-| `API_EXPOSED_SCHEMAS`          | Additional schemas to expose          | empty                                                         |
-| `API_META_SCHEMAS`             | Meta schemas to query                 | `routing_public,metaschema_public,metaschema_modules_public` |
-| `API_ANON_ROLE`                | Anonymous role name                   | `administrator`                                               |
-| `API_ROLE_NAME`                | Authenticated role name               | `administrator`                                               |
-| `GRAPHQL_OBSERVABILITY_ENABLED` | Master switch for debug routes and sampler | `false`                                                  |
-| `GRAPHQL_DEBUG_SAMPLER_ENABLED` | Enables periodic NDJSON sampling when observability is on | `true`                                   |
-| `GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS` | Sampler interval in milliseconds | `10000`                                                       |
-| `GRAPHQL_DEBUG_SAMPLER_DIR`    | Override output directory for sampler logs | `graphql/server/logs`                                     |
+| Env var                             | Purpose                                                   | Default                                                      |
+| ----------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------ |
+| `PGHOST`                            | Postgres host                                             | `localhost`                                                  |
+| `PGPORT`                            | Postgres port                                             | `5432`                                                       |
+| `PGUSER`                            | Postgres user                                             | `postgres`                                                   |
+| `PGPASSWORD`                        | Postgres password                                         | `password`                                                   |
+| `PGDATABASE`                        | Postgres database                                         | `postgres`                                                   |
+| `GRAPHILE_SCHEMA`                   | Comma-separated schemas to expose                         | empty                                                        |
+| `GRAPHILE_INTROSPECTION_MODE`       | `stock` or opt-in `scoped-required`                       | `stock`                                                      |
+| `FEATURES_SIMPLE_INFLECTION`        | Enable simple inflection                                  | `true`                                                       |
+| `FEATURES_OPPOSITE_BASE_NAMES`      | Enable opposite base names                                | `true`                                                       |
+| `FEATURES_POSTGIS`                  | Enable PostGIS support                                    | `true`                                                       |
+| `API_ROUTING_SCHEMA`                | Schema containing `resolve_route()`                       | `routing_public`                                             |
+| `API_IS_PUBLIC`                     | Serve public APIs only                                    | `true`                                                       |
+| `API_EXPOSED_SCHEMAS`               | Additional schemas to expose                              | empty                                                        |
+| `API_META_SCHEMAS`                  | Meta schemas to query                                     | `routing_public,metaschema_public,metaschema_modules_public` |
+| `API_ANON_ROLE`                     | Anonymous role name                                       | `administrator`                                              |
+| `API_ROLE_NAME`                     | Authenticated role name                                   | `administrator`                                              |
+| `GRAPHQL_OBSERVABILITY_ENABLED`     | Master switch for debug routes and sampler                | `false`                                                      |
+| `GRAPHQL_DEBUG_SAMPLER_ENABLED`     | Enables periodic NDJSON sampling when observability is on | `true`                                                       |
+| `GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS` | Sampler interval in milliseconds                          | `10000`                                                      |
+| `GRAPHQL_DEBUG_SAMPLER_DIR`         | Override output directory for sampler logs                | `graphql/server/logs`                                        |
 
 ## Testing
 

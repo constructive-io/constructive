@@ -33,7 +33,7 @@ const options = getEnvOptions();
 // With overrides
 const options = getEnvOptions({
   graphile: { schema: ['public', 'app'] },
-  features: { simpleInflection: true }
+  features: { simpleInflection: true },
 });
 ```
 
@@ -42,14 +42,19 @@ const options = getEnvOptions({
 In addition to all environment variables supported by `@pgpmjs/env`, this package parses:
 
 ### GraphQL Schema
+
 - `GRAPHILE_SCHEMA` - Comma-separated list of PostgreSQL schemas to expose
+- `GRAPHILE_INTROSPECTION_MODE` - `stock` (default) or `scoped-required`;
+  invalid values fail during option resolution
 
 ### Feature Flags
+
 - `FEATURES_SIMPLE_INFLECTION` - Enable simple inflection plugin
 - `FEATURES_OPPOSITE_BASE_NAMES` - Enable opposite base names
 - `FEATURES_POSTGIS` - Enable PostGIS support
 
 ### API Configuration
+
 - `API_ROUTING_SCHEMA` - Schema containing the compiled `resolve_route()` resolver (production routing always resolves through it)
 - `API_IS_PUBLIC` - Whether API is public
 - `API_EXPOSED_SCHEMAS` - Comma-separated list of exposed schemas
@@ -63,7 +68,12 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
 
 ```typescript
 {
-  graphile: { schema: [] },
+  graphile: {
+    schema: [],
+    introspectionMode: 'stock',
+    introspectionDependencySchemas: [],
+    introspectionCapabilityExtensions: []
+  },
   features: {
     simpleInflection: true,
     oppositeBaseNames: true,
