@@ -6,10 +6,7 @@ import { getGraphQLEnvVars } from '../src/env';
 import { getEnvOptions } from '../src/merge';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
-  fs.writeFileSync(
-    path.join(dir, 'pgpm.json'),
-    JSON.stringify(config, null, 2)
-  );
+  fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
 };
 
 describe('getEnvOptions', () => {
@@ -27,20 +24,20 @@ describe('getEnvOptions', () => {
     writeConfig(tempDir, {
       pg: {
         host: 'config-host',
-        database: 'config-db',
+        database: 'config-db'
       },
       server: {
-        port: 4000,
+        port: 4000
       },
       graphile: {
-        schema: ['config_schema'],
+        schema: ['config_schema']
       },
       features: {
-        simpleInflection: false,
+        simpleInflection: false
       },
       api: {
         isPublic: false,
-        metaSchemas: ['config_meta'],
+        metaSchemas: ['config_meta']
       },
       sms: {
         provider: 'devsms',
@@ -48,9 +45,9 @@ describe('getEnvOptions', () => {
         requestTimeoutMs: 3000,
         dryRun: false,
         devsms: {
-          baseUrl: 'http://config-devsms:4000',
-        },
-      },
+          baseUrl: 'http://config-devsms:4000'
+        }
+      }
     });
 
     const testEnv: NodeJS.ProcessEnv = {
@@ -68,33 +65,33 @@ describe('getEnvOptions', () => {
       SMS_SENDER_ID: 'EnvSender',
       SMS_REQUEST_TIMEOUT_MS: '4000',
       SEND_SMS_DRY_RUN: 'true',
-      DEVSMS_BASE_URL: 'http://env-devsms:4000',
+      DEVSMS_BASE_URL: 'http://env-devsms:4000'
     };
 
     const result = getEnvOptions(
       {
         db: {
-          cwd: '<CWD>',
+          cwd: '<CWD>'
         },
         pg: {
-          host: 'override-host',
+          host: 'override-host'
         },
         server: {
-          port: 5000,
+          port: 5000
         },
         graphile: {
-          schema: ['override_schema'],
+          schema: ['override_schema']
         },
         features: {
-          oppositeBaseNames: false,
+          oppositeBaseNames: false
         },
         api: {
-          isPublic: false,
+          isPublic: false
         },
         sms: {
           senderId: 'OverrideSender',
-          requestTimeoutMs: 9000,
-        },
+          requestTimeoutMs: 9000
+        }
       },
       tempDir,
       testEnv
@@ -107,43 +104,36 @@ describe('getEnvOptions', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-replace-'));
     writeConfig(tempDir, {
       graphile: {
-        schema: ['config_schema', 'shared_schema'],
+        schema: ['config_schema', 'shared_schema']
       },
       api: {
         exposedSchemas: ['public', 'shared'],
-        metaSchemas: [
-          'metaschema_public',
-          'constructive_routing_public',
-          'config_meta',
-        ],
-      },
+        metaSchemas: ['metaschema_public', 'constructive_routing_public', 'config_meta']
+      }
     });
 
     const testEnv: NodeJS.ProcessEnv = {
       GRAPHILE_SCHEMA: 'shared_schema,env_schema',
       API_EXPOSED_SCHEMAS: 'shared,env_schema',
-      API_META_SCHEMAS: 'constructive_routing_public,env_meta',
+      API_META_SCHEMAS: 'constructive_routing_public,env_meta'
     };
 
     const result = getEnvOptions(
       {
         graphile: {
-          schema: ['override_schema', 'shared_schema'],
+          schema: ['override_schema', 'shared_schema']
         },
         api: {
           exposedSchemas: ['public', 'override_schema'],
-          metaSchemas: ['env_meta', 'override_meta'],
-        },
+          metaSchemas: ['env_meta', 'override_meta']
+        }
       },
       tempDir,
       testEnv
     );
 
     // Arrays are replaced, not merged - overrides win completely
-    expect(result.graphile?.schema).toEqual([
-      'override_schema',
-      'shared_schema',
-    ]);
+    expect(result.graphile?.schema).toEqual(['override_schema', 'shared_schema']);
     expect(result.api?.exposedSchemas).toEqual(['public', 'override_schema']);
     expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
   });
@@ -161,7 +151,7 @@ describe('getEnvOptions', () => {
     ).toBe('stock');
     expect(
       getGraphQLEnvVars({
-        GRAPHILE_INTROSPECTION_MODE: 'scoped-required',
+        GRAPHILE_INTROSPECTION_MODE: 'scoped-required'
       }).graphile?.introspectionMode
     ).toBe('scoped-required');
   });
@@ -180,17 +170,17 @@ describe('getEnvOptions', () => {
       path.join(os.tmpdir(), 'graphql-env-introspection-')
     );
     writeConfig(tempDir, {
-      graphile: { introspectionMode: 'stock' },
+      graphile: { introspectionMode: 'stock' }
     });
 
     expect(
       getEnvOptions({}, tempDir, {
-        GRAPHILE_INTROSPECTION_MODE: 'scoped-required',
+        GRAPHILE_INTROSPECTION_MODE: 'scoped-required'
       }).graphile?.introspectionMode
     ).toBe('scoped-required');
     expect(
       getEnvOptions({ graphile: { introspectionMode: 'stock' } }, tempDir, {
-        GRAPHILE_INTROSPECTION_MODE: 'scoped-required',
+        GRAPHILE_INTROSPECTION_MODE: 'scoped-required'
       }).graphile?.introspectionMode
     ).toBe('stock');
   });
@@ -200,7 +190,7 @@ describe('getEnvOptions', () => {
       path.join(os.tmpdir(), 'graphql-env-invalid-introspection-')
     );
     writeConfig(tempDir, {
-      graphile: { introspectionMode: 'scpoed' },
+      graphile: { introspectionMode: 'scpoed' }
     });
 
     expect(() => getEnvOptions({}, tempDir, {})).toThrow(
@@ -214,7 +204,7 @@ describe('getEnvOptions', () => {
       SMS_SENDER_ID: 'LocalSender',
       SMS_REQUEST_TIMEOUT_MS: '2500',
       SEND_SMS_DRY_RUN: 'true',
-      DEVSMS_BASE_URL: 'http://localhost:4000',
+      DEVSMS_BASE_URL: 'http://localhost:4000'
     });
 
     expect(result.sms).toEqual({
@@ -223,14 +213,14 @@ describe('getEnvOptions', () => {
       requestTimeoutMs: 2500,
       dryRun: true,
       devsms: {
-        baseUrl: 'http://localhost:4000',
-      },
+        baseUrl: 'http://localhost:4000'
+      }
     });
   });
 
   it('accepts custom SMS provider names', () => {
     const result = getGraphQLEnvVars({
-      SMS_PROVIDER: 'custom-sms-gateway',
+      SMS_PROVIDER: 'custom-sms-gateway'
     });
 
     expect(result.sms?.provider).toBe('custom-sms-gateway');
@@ -245,22 +235,22 @@ describe('getEnvOptions', () => {
         requestTimeoutMs: 3000,
         dryRun: false,
         devsms: {
-          baseUrl: 'http://config-devsms:4000',
-        },
-      },
+          baseUrl: 'http://config-devsms:4000'
+        }
+      }
     });
 
     const result = getEnvOptions(
       {
         sms: {
-          requestTimeoutMs: 9000,
-        },
+          requestTimeoutMs: 9000
+        }
       },
       tempDir,
       {
         SMS_SENDER_ID: 'EnvSender',
         SEND_SMS_DRY_RUN: 'true',
-        DEVSMS_BASE_URL: 'http://env-devsms:4000',
+        DEVSMS_BASE_URL: 'http://env-devsms:4000'
       }
     );
 
@@ -270,8 +260,8 @@ describe('getEnvOptions', () => {
       requestTimeoutMs: 9000,
       dryRun: true,
       devsms: {
-        baseUrl: 'http://env-devsms:4000',
-      },
+        baseUrl: 'http://env-devsms:4000'
+      }
     });
   });
 
@@ -281,7 +271,7 @@ describe('getEnvOptions', () => {
 
     try {
       const result = getEnvOptions({}, process.cwd(), {
-        SMS_PROVIDER: 'devsms',
+        SMS_PROVIDER: 'devsms'
       });
 
       expect(result.sms?.provider).toBe('devsms');
@@ -302,7 +292,7 @@ describe('getEnvOptions', () => {
 
   it('omits an invalid SMS timeout from partial env overrides', () => {
     const result = getGraphQLEnvVars({
-      SMS_REQUEST_TIMEOUT_MS: '5s',
+      SMS_REQUEST_TIMEOUT_MS: '5s'
     });
 
     expect(result.sms).toBeUndefined();
@@ -315,17 +305,17 @@ describe('getEnvOptions', () => {
     writeConfig(tempDir, {
       sms: {
         requestTimeoutMs: 3000,
-        dryRun: true,
-      },
+        dryRun: true
+      }
     });
 
     const result = getEnvOptions({}, tempDir, {
-      SMS_REQUEST_TIMEOUT_MS: '5s',
+      SMS_REQUEST_TIMEOUT_MS: '5s'
     });
 
     expect(result.sms).toEqual({
       requestTimeoutMs: 3000,
-      dryRun: true,
+      dryRun: true
     });
   });
 });

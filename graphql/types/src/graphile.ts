@@ -66,7 +66,7 @@ export const graphileDefaults: GraphileOptions = {
   introspectionDependencySchemas: [],
   introspectionCapabilityExtensions: [],
   extends: [],
-  preset: {},
+  preset: {}
 };
 
 /**
@@ -75,7 +75,7 @@ export const graphileDefaults: GraphileOptions = {
 export const graphileFeatureDefaults: GraphileFeatureOptions = {
   simpleInflection: true,
   oppositeBaseNames: true,
-  postgis: true,
+  postgis: true
 };
 
 /**
@@ -89,7 +89,7 @@ export const apiDefaults: ApiOptions = {
   metaSchemas: [
     'routing_public',
     'metaschema_public',
-    'metaschema_modules_public',
+    'metaschema_modules_public'
   ],
-  routingSchema: 'routing_public',
+  routingSchema: 'routing_public'
 };

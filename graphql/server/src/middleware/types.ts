@@ -1,7 +1,6 @@
-import type {
-  ApiStructure,
-  ConstructiveAPIToken,
-} from '@constructive-io/express-context';
+import type { ConstructiveAPIToken } from '@constructive-io/express-context';
+
+import type { ApiStructure } from '../types';
 
 export type { ConstructiveAPIToken } from '@constructive-io/express-context';
 

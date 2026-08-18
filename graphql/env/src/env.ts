@@ -1,14 +1,5 @@
-import {
-  ConstructiveOptions,
-  type GraphileIntrospectionMode,
-  graphileIntrospectionModes,
-} from '@constructive-io/graphql-types';
-import {
-  env as validateEnv,
-  parseEnvBoolean,
-  parseEnvNumber,
-  str,
-} from '12factor-env';
+import { ConstructiveOptions, type GraphileIntrospectionMode, graphileIntrospectionModes } from '@constructive-io/graphql-types';
+import { env as validateEnv, parseEnvBoolean, parseEnvNumber, str } from '12factor-env';
 
 const parseGraphileIntrospectionMode = (
   value: string | undefined
@@ -19,8 +10,8 @@ const parseGraphileIntrospectionMode = (
     {},
     {
       GRAPHILE_INTROSPECTION_MODE: str({
-        choices: [...graphileIntrospectionModes],
-      }),
+        choices: [...graphileIntrospectionModes]
+      })
     }
   ).GRAPHILE_INTROSPECTION_MODE as GraphileIntrospectionMode;
 };
@@ -28,9 +19,7 @@ const parseGraphileIntrospectionMode = (
 /**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
-export const getGraphQLEnvVars = (
-  env: NodeJS.ProcessEnv = process.env
-): Partial<ConstructiveOptions> => {
+export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial<ConstructiveOptions> => {
   const {
     GRAPHILE_SCHEMA,
     GRAPHILE_INTROSPECTION_MODE,
@@ -57,7 +46,7 @@ export const getGraphQLEnvVars = (
     SMS_SENDER_ID,
     SMS_REQUEST_TIMEOUT_MS,
     SEND_SMS_DRY_RUN,
-    DEVSMS_BASE_URL,
+    DEVSMS_BASE_URL
   } = env;
 
   // Keep this function as a partial env-override parser. SMS runtime defaults
@@ -80,31 +69,23 @@ export const getGraphQLEnvVars = (
     graphile: {
       ...(GRAPHILE_SCHEMA && {
         schema: GRAPHILE_SCHEMA.includes(',')
-          ? GRAPHILE_SCHEMA.split(',').map((s) => s.trim())
-          : GRAPHILE_SCHEMA,
+          ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
+          : GRAPHILE_SCHEMA
       }),
-      ...(introspectionMode !== undefined && { introspectionMode }),
+      ...(introspectionMode !== undefined && { introspectionMode })
     },
     features: {
-      ...(FEATURES_SIMPLE_INFLECTION && {
-        simpleInflection: parseEnvBoolean(FEATURES_SIMPLE_INFLECTION),
-      }),
-      ...(FEATURES_OPPOSITE_BASE_NAMES && {
-        oppositeBaseNames: parseEnvBoolean(FEATURES_OPPOSITE_BASE_NAMES),
-      }),
-      ...(FEATURES_POSTGIS && { postgis: parseEnvBoolean(FEATURES_POSTGIS) }),
+      ...(FEATURES_SIMPLE_INFLECTION && { simpleInflection: parseEnvBoolean(FEATURES_SIMPLE_INFLECTION) }),
+      ...(FEATURES_OPPOSITE_BASE_NAMES && { oppositeBaseNames: parseEnvBoolean(FEATURES_OPPOSITE_BASE_NAMES) }),
+      ...(FEATURES_POSTGIS && { postgis: parseEnvBoolean(FEATURES_POSTGIS) })
     },
     api: {
       ...(API_ROUTING_SCHEMA && { routingSchema: API_ROUTING_SCHEMA }),
       ...(API_IS_PUBLIC && { isPublic: parseEnvBoolean(API_IS_PUBLIC) }),
-      ...(API_EXPOSED_SCHEMAS && {
-        exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map((s) => s.trim()),
-      }),
-      ...(API_META_SCHEMAS && {
-        metaSchemas: API_META_SCHEMAS.split(',').map((s) => s.trim()),
-      }),
+      ...(API_EXPOSED_SCHEMAS && { exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map(s => s.trim()) }),
+      ...(API_META_SCHEMAS && { metaSchemas: API_META_SCHEMAS.split(',').map(s => s.trim()) }),
       ...(API_ANON_ROLE && { anonRole: API_ANON_ROLE }),
-      ...(API_ROLE_NAME && { roleName: API_ROLE_NAME }),
+      ...(API_ROLE_NAME && { roleName: API_ROLE_NAME })
     },
     ...((EMBEDDER_PROVIDER || CHAT_PROVIDER) && {
       llm: {
@@ -112,32 +93,32 @@ export const getGraphQLEnvVars = (
           embedder: {
             ...(EMBEDDER_PROVIDER && { provider: EMBEDDER_PROVIDER }),
             ...(EMBEDDER_MODEL && { model: EMBEDDER_MODEL }),
-            ...(EMBEDDER_BASE_URL && { baseUrl: EMBEDDER_BASE_URL }),
-          },
+            ...(EMBEDDER_BASE_URL && { baseUrl: EMBEDDER_BASE_URL })
+          }
         }),
         ...((CHAT_PROVIDER || CHAT_MODEL || CHAT_BASE_URL) && {
           chat: {
             ...(CHAT_PROVIDER && { provider: CHAT_PROVIDER }),
             ...(CHAT_MODEL && { model: CHAT_MODEL }),
-            ...(CHAT_BASE_URL && { baseUrl: CHAT_BASE_URL }),
-          },
-        }),
-      },
+            ...(CHAT_BASE_URL && { baseUrl: CHAT_BASE_URL })
+          }
+        })
+      }
     }),
     ...(hasSmsEnvOverrides && {
       sms: {
         ...(SMS_PROVIDER && { provider: SMS_PROVIDER }),
         ...(SMS_SENDER_ID && { senderId: SMS_SENDER_ID }),
         ...(smsRequestTimeoutMs !== undefined && {
-          requestTimeoutMs: smsRequestTimeoutMs,
+          requestTimeoutMs: smsRequestTimeoutMs
         }),
         ...(smsDryRun !== undefined && { dryRun: smsDryRun }),
         ...(DEVSMS_BASE_URL && {
           devsms: {
-            baseUrl: DEVSMS_BASE_URL,
-          },
-        }),
-      },
-    }),
+            baseUrl: DEVSMS_BASE_URL
+          }
+        })
+      }
+    })
   };
 };

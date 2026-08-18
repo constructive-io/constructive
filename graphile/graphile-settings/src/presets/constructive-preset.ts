@@ -5,22 +5,12 @@ import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { HistoryPreset } from 'graphile-history';
 import { I18nPreset } from 'graphile-i18n';
 import { GraphileLlmPreset } from 'graphile-llm';
-import {
-  createFolderOperatorFactory,
-  GraphileLtreePreset,
-} from 'graphile-ltree';
+import { createFolderOperatorFactory, GraphileLtreePreset } from 'graphile-ltree';
 import { PgAggregatesPreset } from 'graphile-pg-aggregates';
-import {
-  createPostgisOperatorFactory,
-  GraphilePostgisPreset,
-} from 'graphile-postgis';
+import { createPostgisOperatorFactory,GraphilePostgisPreset } from 'graphile-postgis';
 import { PresignedUrlPreset } from 'graphile-presigned-url-plugin';
 import { RealtimeSubscriptionsPreset } from 'graphile-realtime-subscriptions';
-import {
-  createMatchesOperatorFactory,
-  createTrgmOperatorFactories,
-  UnifiedSearchPreset,
-} from 'graphile-search';
+import { createMatchesOperatorFactory, createTrgmOperatorFactories,UnifiedSearchPreset } from 'graphile-search';
 import { UploadPreset } from 'graphile-upload-plugin';
 
 import { getBucketProvisionerConnection } from '../bucket-provisioner-resolver';
@@ -34,15 +24,9 @@ import {
   MinimalPreset,
   NoUniqueLookupPreset,
   PgTypeMappingsPreset,
-  RequiredInputPreset,
+  RequiredInputPreset
 } from '../plugins';
-import {
-  createBucketNameResolver,
-  createEnsureBucketProvisioned,
-  createProvisionerBucketNameResolver,
-  getAllowedOrigins,
-  getPresignedUrlS3Config,
-} from '../presigned-url-resolver';
+import { createBucketNameResolver, createEnsureBucketProvisioned, createProvisionerBucketNameResolver, getAllowedOrigins,getPresignedUrlS3Config } from '../presigned-url-resolver';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';
 
 /**
@@ -79,13 +63,11 @@ export interface ConstructivePresetOptions {
  * schema built from the Constructive preset fails loudly instead.
  */
 function assertSupportedNodeVersion(): void {
-  if (
-    typeof (Promise as { withResolvers?: unknown }).withResolvers !== 'function'
-  ) {
+  if (typeof (Promise as { withResolvers?: unknown }).withResolvers !== 'function') {
     throw new Error(
       `graphile-settings requires Node.js >= 22 (found ${process.version}): ` +
         'grafast/@dataplan/pg depend on Promise.withResolvers(). On older Node versions ' +
-        'connection (list) queries fail at runtime with "Cannot read properties of undefined (reading \'items\')".'
+        "connection (list) queries fail at runtime with \"Cannot read properties of undefined (reading 'items')\"."
     );
   }
 }
@@ -103,7 +85,7 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
   enableRealtime: false,
   enableBulk: false,
   enableI18n: false,
-  enableHistory: false,
+  enableHistory: false
 };
 
 /**
@@ -178,7 +160,7 @@ export function createConstructivePreset(
     NoUniqueLookupPreset,
     MetaSchemaPreset,
     PgTypeMappingsPreset,
-    RequiredInputPreset,
+    RequiredInputPreset
   ];
 
   if (opts.enableConnectionFilter) {
@@ -194,10 +176,7 @@ export function createConstructivePreset(
 
   if (opts.enableSearch) {
     presets.push(
-      UnifiedSearchPreset({
-        fullTextScalarName: 'FullText',
-        tsConfig: 'english',
-      })
+      UnifiedSearchPreset({ fullTextScalarName: 'FullText', tsConfig: 'english' })
     );
   }
 
@@ -213,7 +192,7 @@ export function createConstructivePreset(
     presets.push(
       UploadPreset({
         uploadFieldDefinitions: constructiveUploadFieldDefinitions,
-        maxFileSize: 10 * 1024 * 1024, // 10MB
+        maxFileSize: 10 * 1024 * 1024 // 10MB
       })
     );
   }
@@ -223,7 +202,7 @@ export function createConstructivePreset(
       PresignedUrlPreset({
         s3: getPresignedUrlS3Config,
         resolveBucketName: createBucketNameResolver(),
-        ensureBucketProvisioned: createEnsureBucketProvisioned(),
+        ensureBucketProvisioned: createEnsureBucketProvisioned()
       }),
       BucketProvisionerPreset({
         connection: getBucketProvisionerConnection,
@@ -237,7 +216,7 @@ export function createConstructivePreset(
         // the provisionBucket mutation. Disable the auto-provision-on-create
         // hook so a createBucket GraphQL mutation records the row without
         // eagerly minting an S3 bucket that may never receive an upload.
-        autoProvision: false,
+        autoProvision: false
       })
     );
   }
@@ -290,10 +269,7 @@ export function createConstructivePreset(
   // When connection filter is enabled it replaces the built-in condition arg.
   const disablePlugins: string[] = [];
   if (opts.enableConnectionFilter) {
-    disablePlugins.push(
-      'PgConditionArgumentPlugin',
-      'PgConditionCustomFieldsPlugin'
-    );
+    disablePlugins.push('PgConditionArgumentPlugin', 'PgConditionCustomFieldsPlugin');
   }
 
   // ----- schema options -----
@@ -309,7 +285,7 @@ export function createConstructivePreset(
   }
 
   const preset: GraphileConfig.Preset = {
-    extends: presets,
+    extends: presets
   };
 
   if (disablePlugins.length > 0) {
@@ -327,7 +303,6 @@ export function createConstructivePreset(
  * Default Constructive preset -- everything enabled except aggregates.
  * Backwards-compatible: identical to the previous static ConstructivePreset.
  */
-export const ConstructivePreset: GraphileConfig.Preset =
-  createConstructivePreset();
+export const ConstructivePreset: GraphileConfig.Preset = createConstructivePreset();
 
 export default ConstructivePreset;

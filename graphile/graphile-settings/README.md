@@ -100,40 +100,11 @@ query {
     tables {
       name
       schemaName
-      fields {
-        name
-        type {
-          pgType
-          gqlType
-          isArray
-        }
-        isNotNull
-        hasDefault
-      }
-      indexes {
-        name
-        isUnique
-        isPrimary
-        columns
-      }
-      constraints {
-        primaryKey
-        unique
-        foreignKey
-      }
-      inflection {
-        tableType
-        allRows
-        connection
-        edge
-      }
-      query {
-        all
-        one
-        create
-        update
-        delete
-      }
+      fields { name, type { pgType, gqlType, isArray }, isNotNull, hasDefault }
+      indexes { name, isUnique, isPrimary, columns }
+      constraints { primaryKey, unique, foreignKey }
+      inflection { tableType, allRows, connection, edge }
+      query { all, one, create, update, delete }
     }
   }
 }
@@ -142,7 +113,6 @@ query {
 Useful for code generation tools that need to understand the database structure.
 
 Testing strategy:
-
 - Metadata behavior is tested in-process with mocked PostGraphile build resources (no live DB required).
 - Snapshot coverage captures full multi-table metadata scenarios and query contract shape.
 - Run: `pnpm --filter graphile-settings exec jest --runInBand`
@@ -161,34 +131,34 @@ Logs inflector calls during schema build for debugging. Enable with `INFLECTOR_L
 
 ## Presets
 
-| Preset                         | Description                                      |
-| ------------------------------ | ------------------------------------------------ |
-| `ConstructivePreset`           | Main preset combining all features (recommended) |
-| `MinimalPreset`                | PostGraphile without Node/Relay features         |
-| `InflektPreset`                | Custom inflection using inflekt library          |
-| `ConflictDetectorPreset`       | Warns about naming conflicts between schemas     |
-| `InflectorLoggerPreset`        | Debug logging for inflector calls                |
-| `EnableAllFilterColumnsPreset` | Allow filtering on all columns                   |
-| `ManyToManyOptInPreset`        | Many-to-many with opt-in behavior                |
-| `NoUniqueLookupPreset`         | Disable non-primary-key lookups                  |
-| `MetaSchemaPreset`             | `_meta` query for schema introspection           |
-| `TsvectorCodecPreset`          | Support for tsvector/tsquery types               |
+| Preset | Description |
+|--------|-------------|
+| `ConstructivePreset` | Main preset combining all features (recommended) |
+| `MinimalPreset` | PostGraphile without Node/Relay features |
+| `InflektPreset` | Custom inflection using inflekt library |
+| `ConflictDetectorPreset` | Warns about naming conflicts between schemas |
+| `InflectorLoggerPreset` | Debug logging for inflector calls |
+| `EnableAllFilterColumnsPreset` | Allow filtering on all columns |
+| `ManyToManyOptInPreset` | Many-to-many with opt-in behavior |
+| `NoUniqueLookupPreset` | Disable non-primary-key lookups |
+| `MetaSchemaPreset` | `_meta` query for schema introspection |
+| `TsvectorCodecPreset` | Support for tsvector/tsquery types |
 
 ## Plugins
 
 Each preset includes one or more plugins that can be used individually:
 
-| Plugin                         | Description                   |
-| ------------------------------ | ----------------------------- |
-| `InflektPlugin`                | Custom inflection rules       |
-| `ConflictDetectorPlugin`       | Naming conflict detection     |
-| `InflectorLoggerPlugin`        | Debug logging                 |
-| `EnableAllFilterColumnsPlugin` | Enable all column filters     |
-| `ManyToManyOptInPlugin`        | Opt-in many-to-many behavior  |
-| `PrimaryKeyOnlyPlugin`         | Keep only primary key lookups |
-| `NoUniqueLookupPlugin`         | Disable all unique lookups    |
-| `MetaSchemaPlugin`             | Schema introspection          |
-| `TsvectorCodecPlugin`          | Tsvector type support         |
+| Plugin | Description |
+|--------|-------------|
+| `InflektPlugin` | Custom inflection rules |
+| `ConflictDetectorPlugin` | Naming conflict detection |
+| `InflectorLoggerPlugin` | Debug logging |
+| `EnableAllFilterColumnsPlugin` | Enable all column filters |
+| `ManyToManyOptInPlugin` | Opt-in many-to-many behavior |
+| `PrimaryKeyOnlyPlugin` | Keep only primary key lookups |
+| `NoUniqueLookupPlugin` | Disable all unique lookups |
+| `MetaSchemaPlugin` | Schema introspection |
+| `TsvectorCodecPlugin` | Tsvector type support |
 
 ## Building Schema Directly
 
@@ -264,8 +234,8 @@ COMMENT ON FUNCTION full_name(users) IS E'@filterable';
 
 ## Environment Variables
 
-| Variable          | Description                    |
-| ----------------- | ------------------------------ |
+| Variable | Description |
+|----------|-------------|
 | `INFLECTOR_LOG=1` | Enable inflector debug logging |
 
 ## License
