@@ -506,9 +506,11 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
 
       const stored = await physicalNameFor('public');
       expect(stored).toBeTruthy();
-      // Matches the resolver contract: {prefix}-{bucketKey}-{databaseId}
+      // Matches the resolver contract: {prefix}-{bucketKey}-{digest}, bounded
+      // to S3's 63-character limit.
       expect(stored).toContain('public');
-      expect(stored).toContain(aliceDatabaseId);
+      expect(stored).toMatch(/-public-[a-f0-9]{12}$/);
+      expect(stored!.length).toBeLessThanOrEqual(63);
       // ...and is exactly the bucket the presigned PUT targets.
       expect(bucketFromPresignedUrl(payload.uploadUrl)).toBe(stored);
     });
@@ -571,7 +573,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   // 1c. Eager provisioning via the provisionBucket mutation (Alice)
   //
   // The explicit provisionBucket mutation must mint the SAME tenant-aware
-  // physical name the lazy first-upload path would (`{prefix}-{key}-{db}`) and
+  // physical name the lazy first-upload path would (`{prefix}-{key}-{digest}`) and
   // persist it on the bucket row — never the bare logical key. This is the
   // regression guard for BucketProvisionerPreset being wired without a
   // resolveBucketName.
@@ -732,7 +734,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       expect(physical).toBeTruthy();
       // Lazy mints the same tenant-aware name the presigned PUT targets.
       expect(bucketFromPresignedUrl(uploadUrl)).toBe(physical);
-      expect(physical!.endsWith(`-${key}-${aliceDatabaseId}`)).toBe(true);
+      expect(physical).toMatch(new RegExp(`-${key}-[a-f0-9]{12}$`));
     });
   });
 
