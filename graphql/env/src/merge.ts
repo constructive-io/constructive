@@ -1,4 +1,4 @@
-import { constructiveGraphqlDefaults,ConstructiveOptions } from '@constructive-io/graphql-types';
+import { constructiveGraphqlDefaults,ConstructiveOptions,graphileIntrospectionModes } from '@constructive-io/graphql-types';
 import { getEnvOptions as getPgpmEnvOptions, loadConfigSync, replaceArrays } from '@pgpmjs/env';
 import deepmerge from 'deepmerge';
 
@@ -36,7 +36,7 @@ export const getEnvOptions = (
   const configOptions = loadConfigSync(cwd) as Partial<ConstructiveOptions>;
   
   // Merge in order: core -> graphql defaults -> config (for graphql keys) -> graphql env -> overrides
-  return deepmerge.all([
+  const options = deepmerge.all([
     coreOptions,
     constructiveGraphqlDefaults,
     // Only merge graphql-related keys from config (if present)
@@ -51,6 +51,18 @@ export const getEnvOptions = (
   ], {
     arrayMerge: replaceArrays
   }) as ConstructiveOptions;
+
+  const introspectionMode = options.graphile?.introspectionMode;
+  if (
+    introspectionMode !== undefined &&
+    !graphileIntrospectionModes.includes(introspectionMode)
+  ) {
+    throw new Error(
+      `Unsupported Graphile introspection mode '${String(introspectionMode)}'; expected one of: ${graphileIntrospectionModes.join(', ')}`
+    );
+  }
+
+  return options;
 };
 
 /**

@@ -123,6 +123,7 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `PGPASSWORD`                   | Postgres password                     | `password`                                                    |
 | `PGDATABASE`                   | Postgres database                     | `postgres`                                                    |
 | `GRAPHILE_SCHEMA`              | Comma-separated schemas to expose     | empty                                                         |
+| `GRAPHILE_INTROSPECTION_MODE`  | `stock` or opt-in `scoped-required`   | `stock`                                                       |
 | `FEATURES_SIMPLE_INFLECTION`   | Enable simple inflection              | `true`                                                        |
 | `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
 | `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |

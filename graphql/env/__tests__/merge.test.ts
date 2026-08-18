@@ -138,6 +138,66 @@ describe('getEnvOptions', () => {
     expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
   });
 
+  it('defaults to untouched stock introspection', () => {
+    const result = getEnvOptions({}, process.cwd(), {});
+
+    expect(result.graphile?.introspectionMode).toBe('stock');
+  });
+
+  it('accepts stock and scoped-required introspection environment modes', () => {
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_INTROSPECTION_MODE: 'stock' }).graphile
+        ?.introspectionMode
+    ).toBe('stock');
+    expect(
+      getGraphQLEnvVars({
+        GRAPHILE_INTROSPECTION_MODE: 'scoped-required'
+      }).graphile?.introspectionMode
+    ).toBe('scoped-required');
+  });
+
+  it('rejects malformed explicit introspection modes', () => {
+    expect(() =>
+      getGraphQLEnvVars({ GRAPHILE_INTROSPECTION_MODE: 'scpoed' })
+    ).toThrow(/GRAPHILE_INTROSPECTION_MODE/);
+    expect(() =>
+      getGraphQLEnvVars({ GRAPHILE_INTROSPECTION_MODE: '' })
+    ).toThrow(/GRAPHILE_INTROSPECTION_MODE/);
+  });
+
+  it('honors config, env, and runtime priority for introspection mode', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-introspection-')
+    );
+    writeConfig(tempDir, {
+      graphile: { introspectionMode: 'stock' }
+    });
+
+    expect(
+      getEnvOptions({}, tempDir, {
+        GRAPHILE_INTROSPECTION_MODE: 'scoped-required'
+      }).graphile?.introspectionMode
+    ).toBe('scoped-required');
+    expect(
+      getEnvOptions({ graphile: { introspectionMode: 'stock' } }, tempDir, {
+        GRAPHILE_INTROSPECTION_MODE: 'scoped-required'
+      }).graphile?.introspectionMode
+    ).toBe('stock');
+  });
+
+  it('rejects malformed config-file introspection modes', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-invalid-introspection-')
+    );
+    writeConfig(tempDir, {
+      graphile: { introspectionMode: 'scpoed' }
+    });
+
+    expect(() => getEnvOptions({}, tempDir, {})).toThrow(
+      /Unsupported Graphile introspection mode/
+    );
+  });
+
   it('parses SMS environment variables into typed options', () => {
     const result = getGraphQLEnvVars({
       SMS_PROVIDER: 'devsms',

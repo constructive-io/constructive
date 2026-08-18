@@ -70,6 +70,9 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
   },
   "graphile": {
     "extends": [],
+    "introspectionCapabilityExtensions": [],
+    "introspectionDependencySchemas": [],
+    "introspectionMode": "stock",
     "preset": {},
     "schema": [
       "override_schema",
