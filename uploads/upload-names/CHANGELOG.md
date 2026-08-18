@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.30.0](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-names@2.29.0...@constructive-io/upload-names@2.30.0) (2026-08-18)
+
+**Note:** Version bump only for package @constructive-io/upload-names
+
 # [2.29.0](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-names@2.28.3...@constructive-io/upload-names@2.29.0) (2026-08-02)
 
 **Note:** Version bump only for package @constructive-io/upload-names

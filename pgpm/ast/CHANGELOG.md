@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.13.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/ast@0.12.1...@pgpmjs/ast@0.13.0) (2026-08-18)
+
+**Note:** Version bump only for package @pgpmjs/ast
+
 ## [0.12.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/ast@0.12.0...@pgpmjs/ast@0.12.1) (2026-08-15)
 
 **Note:** Version bump only for package @pgpmjs/ast
