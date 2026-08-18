@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.20.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.20.0...graphql-server-test@3.20.1) (2026-08-18)
+
+### Bug Fixes
+
+- **uploads:** accept underscore-led keys, bound bucket names, dedup only live objects ([d10c9c3](https://github.com/constructive-io/constructive/commit/d10c9c3e68c376c8c197bf5f4b0c6f7af633f561))
+
 # [3.20.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.19.3...graphql-server-test@3.20.0) (2026-08-18)
 
 **Note:** Version bump only for package graphql-server-test
