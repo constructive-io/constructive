@@ -5,7 +5,9 @@ import express from 'express';
 import { grafserv } from 'grafserv/express/v4';
 import { postgraphile } from 'postgraphile';
 
+import { awaitGraphileBuildReadiness } from './build-readiness';
 import type { GraphileCacheEntry } from './graphile-cache';
+import { createPresetServicesReleaser } from './preset-services';
 
 const log = new Logger('graphile-cache:create');
 
@@ -42,12 +44,47 @@ export const createGraphileInstance = async (
   const { preset, cacheKey, enableRealtime = false } = opts;
 
   const pgl = postgraphile(preset);
+  const resolvedPreset = pgl.getResolvedPreset();
+  const releasePresetServices = createPresetServicesReleaser(resolvedPreset);
   const serv = pgl.createServ(grafserv);
 
   const handler = express();
   const httpServer = createServer(handler);
-  await serv.addTo(handler, httpServer);
-  await serv.ready();
+  let failedBuildReleasePromise: Promise<void> | null = null;
+  const releaseFailedBuild = (): Promise<void> => {
+    if (failedBuildReleasePromise) return failedBuildReleasePromise;
+    failedBuildReleasePromise = (async () => {
+      let firstError: unknown;
+      let failed = false;
+      try {
+        await pgl.release();
+      } catch (error) {
+        firstError = error;
+        failed = true;
+      }
+      try {
+        await releasePresetServices();
+      } catch (error) {
+        if (!failed) firstError = error;
+        failed = true;
+      }
+      if (failed) throw firstError;
+    })();
+    return failedBuildReleasePromise;
+  };
+
+  await awaitGraphileBuildReadiness({
+    schemaResult: pgl.getSchemaResult(),
+    addTo: () => serv.addTo(handler, httpServer),
+    ready: () => serv.ready(),
+    release: releaseFailedBuild,
+    onReleaseError: (releaseError) => {
+      log.error(
+        `Failed to release PostGraphile[${cacheKey}] after build failure:`,
+        releaseError
+      );
+    }
+  });
 
   const entry: GraphileCacheEntry = {
     pgl,
@@ -56,6 +93,7 @@ export const createGraphileInstance = async (
     httpServer,
     cacheKey,
     createdAt: Date.now(),
+    releasePresetServices
   };
 
   if (enableRealtime) {
@@ -65,7 +103,6 @@ export const createGraphileInstance = async (
       // Extract PgSubscriber and pool from the resolved preset's pgServices.
       // The pool is the same instance managed by pg-cache (via getPgPool)
       // and threaded into the preset by makePgService({ pool, schemas }).
-      const resolvedPreset = pgl.getResolvedPreset();
       const pgService = (resolvedPreset as any).pgServices?.[0];
       const pgSubscriber = pgService?.pgSubscriber ?? null;
       const pool = pgService?.adaptorSettings?.pool ?? null;
