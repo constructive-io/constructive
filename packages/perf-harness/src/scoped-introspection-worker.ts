@@ -12,10 +12,8 @@ import { makePgService as makePostGraphilePgService } from 'postgraphile/adaptor
 
 import { measureBenchmarkCase } from './metrics';
 import {
-  DATABASE_URL_ENV,
-  parseWorkerEnvelope,
+  parseWorkerProcessArgs,
   redactSecret,
-  WORKER_CONFIG_ENV,
   writeWorkerResult,
 } from './process';
 
@@ -46,12 +44,13 @@ const validateConfig = (value: unknown): ScopedWorkerConfig => {
 };
 
 const main = async (): Promise<void> => {
-  const databaseUrl = process.env[DATABASE_URL_ENV] ?? '';
+  let databaseUrl = '';
   let caseName = 'unknown';
   let release: (() => Promise<void>) | null = null;
   try {
-    if (!databaseUrl) throw new Error(`${DATABASE_URL_ENV} is required`);
-    const envelope = parseWorkerEnvelope(process.env[WORKER_CONFIG_ENV]);
+    const workerArgs = parseWorkerProcessArgs(process.argv.slice(2));
+    databaseUrl = workerArgs.databaseUrl;
+    const { envelope } = workerArgs;
     caseName = envelope.caseName;
     const config = validateConfig(envelope.workerConfig);
     const serviceOptions = {
@@ -59,13 +58,14 @@ const main = async (): Promise<void> => {
       schemas: config.schemas,
       pubsub: false,
     };
+    const scopedServiceOptions = {
+      ...serviceOptions,
+      introspectionScopedCatalogTypes: 'dependency-closure' as const,
+    };
     const service =
       config.mode === 'stock'
         ? makePostGraphilePgService(serviceOptions)
-        : makeScopedPgService({
-          ...serviceOptions,
-          introspectionScopedCatalogTypes: 'dependency-closure',
-        });
+        : makeScopedPgService(scopedServiceOptions);
     release = async () => {
       await service.release();
     };
