@@ -1,7 +1,4 @@
-import type {
-  GraphileIntrospectionMode,
-  GraphileOptions,
-} from '@constructive-io/graphql-types';
+import type { GraphileOptions } from '@constructive-io/graphql-types';
 import type { GraphileConfig } from 'graphile-config';
 import { makePgService, makeScopedPgService } from 'graphile-settings';
 import type { Pool } from 'pg';
@@ -25,10 +22,6 @@ const loadScopedIntrospectionPreset = (): Promise<GraphileConfig.Preset> => {
   return scopedIntrospectionPresetPromise;
 };
 
-const assertNever = (mode: never): never => {
-  throw new Error(`Unsupported Graphile introspection mode '${String(mode)}'`);
-};
-
 /**
  * Select the stock or scoped introspection wiring once, while constructing a
  * server-owned schema handler. The stock branch returns before the scoped
@@ -41,34 +34,49 @@ export const makeIntrospectionWiring = async (
   loadScopedPreset: ScopedIntrospectionPresetLoader = loadScopedIntrospectionPreset,
   introspectionRole?: string
 ): Promise<IntrospectionWiring> => {
-  const mode: GraphileIntrospectionMode =
-    graphileOptions?.introspectionMode ?? 'stock';
-
   const pgSettingsForIntrospection = introspectionRole ? { role: introspectionRole } : undefined;
+  const scopedIntrospection = graphileOptions?.scopedIntrospection;
+  if (
+    scopedIntrospection !== undefined &&
+    typeof scopedIntrospection !== 'boolean'
+  ) {
+    throw new Error('graphile.scopedIntrospection must be a boolean');
+  }
 
-  if (mode === 'stock') {
+  if (scopedIntrospection !== true) {
+    const configuredScopedOptions = [
+      (graphileOptions?.introspectionDependencySchemas?.length ?? 0) > 0
+        ? 'introspectionDependencySchemas'
+        : null,
+      (graphileOptions?.introspectionCapabilityExtensions?.length ?? 0) > 0
+        ? 'introspectionCapabilityExtensions'
+        : null,
+    ].filter((option): option is string => option !== null);
+    if (configuredScopedOptions.length > 0) {
+      throw new Error(
+        `Graphile scoped introspection option(s) ${configuredScopedOptions.join(
+          ', '
+        )} require scopedIntrospection: true`
+      );
+    }
     return {
       presets: [],
       pgService: makePgService({ pool, schemas, pgSettingsForIntrospection }),
     };
   }
 
-  if (mode === 'scoped-required') {
-    const scopedPreset = await loadScopedPreset();
-    return {
-      presets: [scopedPreset],
-      pgService: makeScopedPgService({
-        pool,
-        schemas,
-        pgSettingsForIntrospection,
-        introspectionScopedCatalogTypes: 'dependency-closure',
-        introspectionAllowedDependencySchemas:
-          graphileOptions?.introspectionDependencySchemas,
-        introspectionCapabilityExtensions:
-          graphileOptions?.introspectionCapabilityExtensions,
-      }),
-    };
-  }
-
-  return assertNever(mode);
+  const scopedPreset = await loadScopedPreset();
+  return {
+    presets: [scopedPreset],
+    pgService: makeScopedPgService({
+      pool,
+      schemas,
+      pgSettingsForIntrospection,
+      introspectionScopedCatalogTypes: 'dependency-closure',
+      introspectionAllowedDependencySchemas:
+        graphileOptions?.introspectionDependencySchemas,
+      introspectionCapabilityExtensions:
+        graphileOptions?.introspectionCapabilityExtensions,
+    }),
+  };
 };

@@ -9,7 +9,7 @@ const makeService = (overrides: Record<string, unknown> = {}): never =>
   ({
     name: 'main',
     schemas: ['tenant_a'],
-    introspectionMode: 'scoped-required',
+    scopedIntrospection: true,
     introspectionAllowedDependencySchemas: [],
     adaptor: {
       createWithPgClient: jest.fn(() => {
@@ -62,5 +62,47 @@ describe('scoped introspection service identity contract', () => {
         pgServices: [first, second],
       })
     ).rejects.toThrow(message);
+  });
+
+  it.each([
+    ['catalog type policy', { introspectionScopedCatalogTypes: 'all' }],
+    [
+      'dependency schemas',
+      { introspectionAllowedDependencySchemas: ['shared'] },
+    ],
+    [
+      'capability extensions',
+      { introspectionCapabilityExtensions: ['pg_trgm'] },
+    ],
+  ])(
+    'rejects %s unless scoped introspection is enabled',
+    async (_label, option) => {
+      await expect(
+        gather({
+          plugins: [PgScopedIntrospectionPlugin, consumerPlugin],
+          pgServices: [
+            makeService({
+              scopedIntrospection: false,
+              introspectionAllowedDependencySchemas: undefined,
+              ...option,
+            }),
+          ],
+        })
+      ).rejects.toThrow(/require scopedIntrospection: true/);
+    }
+  );
+
+  it('rejects a non-boolean scoped introspection flag', async () => {
+    await expect(
+      gather({
+        plugins: [PgScopedIntrospectionPlugin, consumerPlugin],
+        pgServices: [
+          makeService({
+            scopedIntrospection: 'true',
+            introspectionAllowedDependencySchemas: undefined,
+          }),
+        ],
+      })
+    ).rejects.toThrow('scopedIntrospection must be a boolean');
   });
 });

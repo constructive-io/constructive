@@ -50,7 +50,7 @@ describe('schema-scoped introspection runtime integration', () => {
                 schemas: ['tenant_a'],
               }),
               {
-                introspectionMode: 'scoped-required',
+                scopedIntrospection: true,
                 introspectionCapabilityExtensions: ['pg_trgm'],
                 ...(scopedCatalogTypes === undefined
                   ? {}
@@ -146,7 +146,7 @@ describe('schema-scoped introspection runtime integration', () => {
               schemas: ['tenant_a'],
             }),
             {
-              introspectionMode: 'scoped-required',
+              scopedIntrospection: true,
               introspectionScopedCatalogTypes: 'dependency-closure',
             }
           ) as never,

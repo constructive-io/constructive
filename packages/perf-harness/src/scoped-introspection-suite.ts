@@ -12,12 +12,12 @@ export const makeScopedIntrospectionSuite = (
   cases: [
     {
       name: 'stock',
-      workerConfig: { mode: 'stock', schemas: options.schemas },
+      workerConfig: { scopedIntrospection: false, schemas: options.schemas },
       expectedSchemaGroup: 'introspection-equivalence',
     },
     {
       name: 'scoped',
-      workerConfig: { mode: 'scoped', schemas: options.schemas },
+      workerConfig: { scopedIntrospection: true, schemas: options.schemas },
       expectedSchemaGroup: 'introspection-equivalence',
     },
   ],

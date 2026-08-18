@@ -74,7 +74,7 @@ const introspectionText = (schema: string): string =>
 const makeService = (
   name: string,
   schema: string,
-  mode: 'stock' | 'scoped-required',
+  scopedIntrospection: boolean,
   queries: Array<{ text: string; values?: unknown[] }>
 ): never => {
   const query = jest.fn(async (input: { text: string; values?: unknown[] }) => {
@@ -91,8 +91,7 @@ const makeService = (
   return {
     name,
     schemas: [schema],
-    introspectionMode: mode,
-    introspectionAllowedDependencySchemas: [],
+    scopedIntrospection,
     adaptor: {
       createWithPgClient: jest.fn(async () => withPgClient),
     },
@@ -128,8 +127,8 @@ describe('mixed stock/scoped introspection services', () => {
     const output = await gather({
       plugins: [PgScopedIntrospectionPlugin, observer],
       pgServices: [
-        makeService('stock', 'stock_schema', 'stock', queries),
-        makeService('scoped', 'scoped_schema', 'scoped-required', queries),
+        makeService('stock', 'stock_schema', false, queries),
+        makeService('scoped', 'scoped_schema', true, queries),
       ],
     });
 
@@ -181,7 +180,7 @@ describe('mixed stock/scoped introspection services', () => {
       extends: [graphileBuildPreset, graphileBuildPgPreset],
       plugins: [makeObserver('UpstreamStockObserverPlugin')],
       pgServices: [
-        makeService('main', 'stock_schema', 'stock', upstreamQueries),
+        makeService('main', 'stock_schema', false, upstreamQueries),
       ],
     };
     const replacementPreset = {
@@ -192,7 +191,7 @@ describe('mixed stock/scoped introspection services', () => {
       ],
       plugins: [makeObserver('ReplacementStockObserverPlugin')],
       pgServices: [
-        makeService('main', 'stock_schema', 'stock', replacementQueries),
+        makeService('main', 'stock_schema', false, replacementQueries),
       ],
     };
 
@@ -211,7 +210,7 @@ describe('mixed stock/scoped introspection services', () => {
       makeSchema({
         extends: [graphileBuildPreset, graphileBuildPgPreset],
         pgServices: [
-          makeService('main', 'stock_schema', 'stock', upstreamQueries),
+          makeService('main', 'stock_schema', false, upstreamQueries),
         ],
       }),
       makeSchema({
@@ -221,7 +220,7 @@ describe('mixed stock/scoped introspection services', () => {
           ScopedIntrospectionPreset,
         ],
         pgServices: [
-          makeService('main', 'stock_schema', 'stock', replacementQueries),
+          makeService('main', 'stock_schema', false, replacementQueries),
         ],
       }),
     ]);

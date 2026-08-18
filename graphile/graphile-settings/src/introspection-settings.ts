@@ -1,7 +1,3 @@
-import type { GraphileIntrospectionMode } from '@constructive-io/graphql-types';
-
-export type { GraphileIntrospectionMode } from '@constructive-io/graphql-types';
-
 export const DEFAULT_INTROSPECTION_STATEMENT_TIMEOUT = '120s';
 
 export const normalizeIntrospectionDependencySchemas = (
@@ -31,14 +27,14 @@ export const normalizeIntrospectionDependencySchemas = (
 ];
 
 export const resolveIntrospectionSettings = (
-  mode: GraphileIntrospectionMode,
+  scopedIntrospection: boolean,
   settings: Record<string, string | undefined> | null | undefined
 ): Record<string, string | undefined> => {
   const boundedSettings = { ...settings };
   if (!boundedSettings.statement_timeout) {
     boundedSettings.statement_timeout = DEFAULT_INTROSPECTION_STATEMENT_TIMEOUT;
   }
-  if (mode === 'scoped-required') {
+  if (scopedIntrospection) {
     return {
       ...boundedSettings,
       jit: 'off',

@@ -141,61 +141,51 @@ describe('getEnvOptions', () => {
   it('defaults to untouched stock introspection', () => {
     const result = getEnvOptions({}, process.cwd(), {});
 
-    expect(result.graphile?.introspectionMode).toBe('stock');
+    expect(result.graphile?.scopedIntrospection).toBe(false);
   });
 
-  it('accepts stock and scoped-required introspection environment modes', () => {
+  it('parses the scoped introspection environment boolean', () => {
     expect(
-      getGraphQLEnvVars({ GRAPHILE_INTROSPECTION_MODE: 'stock' }).graphile
-        ?.introspectionMode
-    ).toBe('stock');
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: 'true' }).graphile
+        ?.scopedIntrospection
+    ).toBe(true);
     expect(
       getGraphQLEnvVars({
-        GRAPHILE_INTROSPECTION_MODE: 'scoped-required'
-      }).graphile?.introspectionMode
-    ).toBe('scoped-required');
+        GRAPHILE_SCOPED_INTROSPECTION: 'false'
+      }).graphile?.scopedIntrospection
+    ).toBe(false);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: 'yes' }).graphile
+        ?.scopedIntrospection
+    ).toBe(true);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: 'not-enabled' })
+        .graphile?.scopedIntrospection
+    ).toBe(false);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: '' }).graphile
+        ?.scopedIntrospection
+    ).toBeUndefined();
   });
 
-  it('rejects malformed explicit introspection modes', () => {
-    expect(() =>
-      getGraphQLEnvVars({ GRAPHILE_INTROSPECTION_MODE: 'scpoed' })
-    ).toThrow(/GRAPHILE_INTROSPECTION_MODE/);
-    expect(() =>
-      getGraphQLEnvVars({ GRAPHILE_INTROSPECTION_MODE: '' })
-    ).toThrow(/GRAPHILE_INTROSPECTION_MODE/);
-  });
-
-  it('honors config, env, and runtime priority for introspection mode', () => {
+  it('honors config, env, and runtime priority for scoped introspection', () => {
     tempDir = fs.mkdtempSync(
       path.join(os.tmpdir(), 'graphql-env-introspection-')
     );
     writeConfig(tempDir, {
-      graphile: { introspectionMode: 'stock' }
+      graphile: { scopedIntrospection: false }
     });
 
     expect(
       getEnvOptions({}, tempDir, {
-        GRAPHILE_INTROSPECTION_MODE: 'scoped-required'
-      }).graphile?.introspectionMode
-    ).toBe('scoped-required');
+        GRAPHILE_SCOPED_INTROSPECTION: 'true'
+      }).graphile?.scopedIntrospection
+    ).toBe(true);
     expect(
-      getEnvOptions({ graphile: { introspectionMode: 'stock' } }, tempDir, {
-        GRAPHILE_INTROSPECTION_MODE: 'scoped-required'
-      }).graphile?.introspectionMode
-    ).toBe('stock');
-  });
-
-  it('rejects malformed config-file introspection modes', () => {
-    tempDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'graphql-env-invalid-introspection-')
-    );
-    writeConfig(tempDir, {
-      graphile: { introspectionMode: 'scpoed' }
-    });
-
-    expect(() => getEnvOptions({}, tempDir, {})).toThrow(
-      /Unsupported Graphile introspection mode/
-    );
+      getEnvOptions({ graphile: { scopedIntrospection: false } }, tempDir, {
+        GRAPHILE_SCOPED_INTROSPECTION: 'true'
+      }).graphile?.scopedIntrospection
+    ).toBe(false);
   });
 
   it('parses SMS environment variables into typed options', () => {

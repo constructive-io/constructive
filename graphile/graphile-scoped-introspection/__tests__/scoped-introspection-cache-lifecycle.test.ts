@@ -172,7 +172,7 @@ describe('scoped introspection raw-text lifecycle', () => {
     const pgService = {
       name: 'main',
       schemas: [SCHEMA],
-      introspectionMode: 'scoped-required',
+      scopedIntrospection: true,
       introspectionAllowedDependencySchemas: [] as readonly string[],
       adaptor,
       adaptorSettings: {},
