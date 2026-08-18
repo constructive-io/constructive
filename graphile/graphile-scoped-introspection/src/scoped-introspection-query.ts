@@ -5,7 +5,9 @@
  * the upstream query at runtime.
  */
 
-export type ScopedCatalogTypes = 'all' | 'dependency-closure';
+import type { ScopedCatalogTypes } from '@constructive-io/graphql-types';
+
+export type { ScopedCatalogTypes } from '@constructive-io/graphql-types';
 
 export interface SchemaScopedIntrospectionOptions {
   catalogTypes?: ScopedCatalogTypes;

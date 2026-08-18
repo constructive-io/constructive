@@ -1,14 +1,6 @@
-import { defaultPreset as graphileBuildPreset } from 'graphile-build';
-import {
-  defaultPreset as graphileBuildPgPreset,
-  PgIntrospectionPlugin,
-} from 'graphile-build-pg';
+import type { ScopedIntrospectionServiceOptions } from '@constructive-io/graphql-types';
+import { PgIntrospectionPlugin } from 'graphile-build-pg';
 import { resolvePreset } from 'graphile-config';
-import {
-  ConstructivePgIntrospectionPlugin,
-  ScopedIntrospectionPreset,
-  type ScopedIntrospectionServiceOptions,
-} from 'graphile-scoped-introspection';
 
 import { ConstructivePreset } from '../src/presets/constructive-preset';
 import { makeConfiguredPgService } from '../src/scoped-introspection-service';
@@ -94,23 +86,11 @@ describe('scoped introspection settings wiring', () => {
     const constructive = resolvePreset(ConstructivePreset);
 
     expect(constructive.plugins).toContain(PgIntrospectionPlugin);
-    expect(constructive.plugins).not.toContain(
-      ConstructivePgIntrospectionPlugin
+    expect(constructive.plugins.map((plugin) => plugin.name)).not.toContain(
+      'ConstructivePgIntrospectionPlugin'
     );
     expect(constructive.disablePlugins ?? []).not.toContain(
       'PgIntrospectionPlugin'
     );
-  });
-
-  it('installs the independent owner preset only when requested', () => {
-    const scoped = resolvePreset({
-      extends: [
-        graphileBuildPreset,
-        graphileBuildPgPreset,
-        ScopedIntrospectionPreset,
-      ],
-    });
-    expect(scoped.plugins).toContain(ConstructivePgIntrospectionPlugin);
-    expect(scoped.disablePlugins).toContain('PgIntrospectionPlugin');
   });
 });

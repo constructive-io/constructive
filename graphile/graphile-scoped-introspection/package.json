@@ -28,6 +28,9 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
+  "dependencies": {
+    "@constructive-io/graphql-types": "workspace:^"
+  },
   "devDependencies": {
     "@types/node": "^22.19.11",
     "graphql": "16.13.0",
