@@ -70,9 +70,11 @@ and lifecycle settings. |
 | `set-password` | setPassword |
 | `sign-in` | signIn |
 | `sign-in-cross-origin` | signInCrossOrigin |
+| `sign-in-magic-link` | signInMagicLink |
 | `sign-in-sms-otp` | signInSmsOtp |
 | `sign-out` | signOut |
 | `sign-up` | signUp |
+| `sign-up-magic-link` | signUpMagicLink |
 | `sign-up-sms` | signUpSms |
 | `verify-email` | verifyEmail |
 | `verify-password` | verifyPassword |
@@ -868,6 +870,21 @@ signInCrossOrigin
   | `--input.credentialKind` | String |
   | `--input.token` | String |
 
+### `sign-in-magic-link`
+
+signInMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.credentialKind` | String |
+  | `--input.deviceToken` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.token` | String |
+
 ### `sign-in-sms-otp`
 
 signInSmsOtp
@@ -911,6 +928,21 @@ signUp
   | `--input.email` | String |
   | `--input.password` | String |
   | `--input.rememberMe` | Boolean |
+
+### `sign-up-magic-link`
+
+signUpMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.credentialKind` | String |
+  | `--input.deviceToken` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.token` | String |
 
 ### `sign-up-sms`
 

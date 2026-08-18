@@ -19,4 +19,6 @@
 | infra | - | ORM | [./src/infra/README.md](./src/infra/README.md) |
 | modules | - | ORM | [./src/modules/README.md](./src/modules/README.md) |
 | objects | - | ORM | [./src/objects/README.md](./src/objects/README.md) |
+| remote | - | ORM | [./src/remote/README.md](./src/remote/README.md) |
+| storage | - | ORM | [./src/storage/README.md](./src/storage/README.md) |
 | usage | - | ORM | [./src/usage/README.md](./src/usage/README.md) |

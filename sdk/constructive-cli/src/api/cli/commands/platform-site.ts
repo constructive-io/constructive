@@ -19,6 +19,7 @@ const fieldSchema: FieldSchema = {
   activeCommitId: 'uuid',
   bucketId: 'uuid',
   createdAt: 'string',
+  createdByPrincipal: 'uuid',
   description: 'string',
   id: 'uuid',
   installationId: 'uuid',
@@ -28,6 +29,7 @@ const fieldSchema: FieldSchema = {
   resourceId: 'uuid',
   title: 'string',
   updatedAt: 'string',
+  updatedByPrincipal: 'uuid',
 };
 const usage =
   '\nplatform-site <command>\n\nCommands:\n  list                  List platformSite records\n  find-first            Find first matching platformSite record\n  get                   Get a platformSite by ID\n  create                Create a new platformSite\n  update                Update an existing platformSite\n  delete                Delete a platformSite\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -83,6 +85,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       activeCommitId: true,
       bucketId: true,
       createdAt: true,
+      createdByPrincipal: true,
       description: true,
       id: true,
       installationId: true,
@@ -92,6 +95,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       resourceId: true,
       title: true,
       updatedAt: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<PlatformSiteSelect, PlatformSiteFilter, PlatformSiteOrderBy> & {
@@ -115,6 +119,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       activeCommitId: true,
       bucketId: true,
       createdAt: true,
+      createdByPrincipal: true,
       description: true,
       id: true,
       installationId: true,
@@ -124,6 +129,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       resourceId: true,
       title: true,
       updatedAt: true,
+      updatedByPrincipal: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<PlatformSiteSelect, PlatformSiteFilter, PlatformSiteOrderBy> & {
@@ -159,6 +165,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           activeCommitId: true,
           bucketId: true,
           createdAt: true,
+          createdByPrincipal: true,
           description: true,
           id: true,
           installationId: true,
@@ -168,6 +175,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           resourceId: true,
           title: true,
           updatedAt: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -194,6 +202,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'bucketId',
         message: 'bucketId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -245,6 +260,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -257,6 +279,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           activeCommitId: cleanedData.activeCommitId,
           bucketId: cleanedData.bucketId,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           description: cleanedData.description,
           installationId: cleanedData.installationId,
           installationMemberSlug: cleanedData.installationMemberSlug,
@@ -264,11 +287,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           resourceId: cleanedData.resourceId,
           title: cleanedData.title,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           activeCommitId: true,
           bucketId: true,
           createdAt: true,
+          createdByPrincipal: true,
           description: true,
           id: true,
           installationId: true,
@@ -278,6 +303,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           resourceId: true,
           title: true,
           updatedAt: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -315,6 +341,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'description',
         message: 'description',
         required: false,
@@ -361,6 +394,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PlatformSitePatch;
@@ -373,6 +413,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           activeCommitId: cleanedData.activeCommitId,
           bucketId: cleanedData.bucketId,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           description: cleanedData.description,
           installationId: cleanedData.installationId,
           installationMemberSlug: cleanedData.installationMemberSlug,
@@ -380,11 +421,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           resourceId: cleanedData.resourceId,
           title: cleanedData.title,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           activeCommitId: true,
           bucketId: true,
           createdAt: true,
+          createdByPrincipal: true,
           description: true,
           id: true,
           installationId: true,
@@ -394,6 +437,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           resourceId: true,
           title: true,
           updatedAt: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();

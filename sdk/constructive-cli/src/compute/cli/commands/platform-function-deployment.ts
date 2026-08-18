@@ -17,8 +17,10 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   annotations: 'json',
+  catalogImageId: 'uuid',
   concurrency: 'int',
   createdAt: 'string',
+  createdByPrincipal: 'uuid',
   errorCount: 'int',
   handlerName: 'string',
   id: 'uuid',
@@ -28,6 +30,7 @@ const fieldSchema: FieldSchema = {
   lastError: 'string',
   lastErrorAt: 'string',
   namespaceId: 'uuid',
+  realm: 'string',
   resources: 'json',
   revision: 'int',
   scaleMax: 'int',
@@ -37,6 +40,7 @@ const fieldSchema: FieldSchema = {
   status: 'string',
   timeoutSeconds: 'int',
   updatedAt: 'string',
+  updatedByPrincipal: 'uuid',
 };
 const usage =
   '\nplatform-function-deployment <command>\n\nCommands:\n  list                  List platformFunctionDeployment records\n  find-first            Find first matching platformFunctionDeployment record\n  get                   Get a platformFunctionDeployment by ID\n  create                Create a new platformFunctionDeployment\n  update                Update an existing platformFunctionDeployment\n  delete                Delete a platformFunctionDeployment\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -90,8 +94,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       annotations: true,
+      catalogImageId: true,
       concurrency: true,
       createdAt: true,
+      createdByPrincipal: true,
       errorCount: true,
       handlerName: true,
       id: true,
@@ -101,6 +107,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       lastError: true,
       lastErrorAt: true,
       namespaceId: true,
+      realm: true,
       resources: true,
       revision: true,
       scaleMax: true,
@@ -110,6 +117,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       status: true,
       timeoutSeconds: true,
       updatedAt: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -135,8 +143,10 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       annotations: true,
+      catalogImageId: true,
       concurrency: true,
       createdAt: true,
+      createdByPrincipal: true,
       errorCount: true,
       handlerName: true,
       id: true,
@@ -146,6 +156,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       lastError: true,
       lastErrorAt: true,
       namespaceId: true,
+      realm: true,
       resources: true,
       revision: true,
       scaleMax: true,
@@ -155,6 +166,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       status: true,
       timeoutSeconds: true,
       updatedAt: true,
+      updatedByPrincipal: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -192,8 +204,10 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           annotations: true,
+          catalogImageId: true,
           concurrency: true,
           createdAt: true,
+          createdByPrincipal: true,
           errorCount: true,
           handlerName: true,
           id: true,
@@ -203,6 +217,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           lastError: true,
           lastErrorAt: true,
           namespaceId: true,
+          realm: true,
           resources: true,
           revision: true,
           scaleMax: true,
@@ -212,6 +227,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           status: true,
           timeoutSeconds: true,
           updatedAt: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -236,8 +252,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'catalogImageId',
+        message: 'catalogImageId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'concurrency',
         message: 'concurrency',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -296,6 +326,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
+        type: 'text',
+        name: 'realm',
+        message: 'realm',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'resources',
         message: 'resources',
@@ -351,6 +388,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -362,7 +406,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           annotations: cleanedData.annotations,
+          catalogImageId: cleanedData.catalogImageId,
           concurrency: cleanedData.concurrency,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           errorCount: cleanedData.errorCount,
           handlerName: cleanedData.handlerName,
           image: cleanedData.image,
@@ -371,6 +417,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           lastError: cleanedData.lastError,
           lastErrorAt: cleanedData.lastErrorAt,
           namespaceId: cleanedData.namespaceId,
+          realm: cleanedData.realm,
           resources: cleanedData.resources,
           revision: cleanedData.revision,
           scaleMax: cleanedData.scaleMax,
@@ -379,11 +426,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           serviceUrl: cleanedData.serviceUrl,
           status: cleanedData.status,
           timeoutSeconds: cleanedData.timeoutSeconds,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
+          catalogImageId: true,
           concurrency: true,
           createdAt: true,
+          createdByPrincipal: true,
           errorCount: true,
           handlerName: true,
           id: true,
@@ -393,6 +443,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           lastError: true,
           lastErrorAt: true,
           namespaceId: true,
+          realm: true,
           resources: true,
           revision: true,
           scaleMax: true,
@@ -402,6 +453,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           status: true,
           timeoutSeconds: true,
           updatedAt: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -432,8 +484,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'catalogImageId',
+        message: 'catalogImageId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'concurrency',
         message: 'concurrency',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -492,6 +558,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
+        type: 'text',
+        name: 'realm',
+        message: 'realm',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'resources',
         message: 'resources',
@@ -547,6 +620,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PlatformFunctionDeploymentPatch;
@@ -558,7 +638,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           annotations: cleanedData.annotations,
+          catalogImageId: cleanedData.catalogImageId,
           concurrency: cleanedData.concurrency,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           errorCount: cleanedData.errorCount,
           handlerName: cleanedData.handlerName,
           image: cleanedData.image,
@@ -567,6 +649,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           lastError: cleanedData.lastError,
           lastErrorAt: cleanedData.lastErrorAt,
           namespaceId: cleanedData.namespaceId,
+          realm: cleanedData.realm,
           resources: cleanedData.resources,
           revision: cleanedData.revision,
           scaleMax: cleanedData.scaleMax,
@@ -575,11 +658,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           serviceUrl: cleanedData.serviceUrl,
           status: cleanedData.status,
           timeoutSeconds: cleanedData.timeoutSeconds,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
+          catalogImageId: true,
           concurrency: true,
           createdAt: true,
+          createdByPrincipal: true,
           errorCount: true,
           handlerName: true,
           id: true,
@@ -589,6 +675,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           lastError: true,
           lastErrorAt: true,
           namespaceId: true,
+          realm: true,
           resources: true,
           revision: true,
           scaleMax: true,
@@ -598,6 +685,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           status: true,
           timeoutSeconds: true,
           updatedAt: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();

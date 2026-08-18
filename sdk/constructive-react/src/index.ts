@@ -15,4 +15,6 @@ export * as config from './config';
 export * as infra from './infra';
 export * as modules from './modules';
 export * as objects from './objects';
+export * as remote from './remote';
+export * as storage from './storage';
 export * as usage from './usage';

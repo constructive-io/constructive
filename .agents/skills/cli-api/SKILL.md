@@ -1,13 +1,13 @@
 ---
 name: cli-api
-description: CLI tool (csdk) for the api API — provides CRUD commands for 80 tables and 17 custom operations
+description: CLI tool (csdk) for the api API — provides CRUD commands for 86 tables and 16 custom operations
 ---
 
 # cli-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the api API — provides CRUD commands for 80 tables and 17 custom operations
+CLI tool (csdk) for the api API — provides CRUD commands for 86 tables and 16 custom operations
 
 ## Usage
 
@@ -23,13 +23,13 @@ csdk auth set-token <token>
 csdk config set <key> <value>
 csdk config get <key>
 
-# CRUD for any table (e.g. api-schema)
-csdk api-schema list
-csdk api-schema get --id <value>
-csdk api-schema create --<field> <value>
+# CRUD for any table (e.g. api)
+csdk api list
+csdk api get --id <value>
+csdk api create --<field> <value>
 
 # Non-interactive mode (skip all prompts, use flags only)
-csdk --no-tty api-schema list
+csdk --no-tty api list
 ```
 
 ## Examples
@@ -40,13 +40,13 @@ csdk --no-tty api-schema list
 csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
-csdk api-schema list
+csdk api list
 ```
 
 ### Non-interactive mode (for scripts and CI)
 
 ```bash
-csdk --no-tty api-schema create --<field> <value>
+csdk --no-tty api create --<field> <value>
 ```
 
 ## References
@@ -56,9 +56,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [context](references/context.md)
 - [auth](references/auth.md)
 - [config](references/config.md)
+- [api](references/api.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
-- [apis](references/apis.md)
 - [ast-migration](references/ast-migration.md)
 - [check-constraint](references/check-constraint.md)
 - [composite-type](references/composite-type.md)
@@ -72,6 +72,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [domain-event](references/domain-event.md)
 - [domain-type](references/domain-type.md)
 - [domain-verification](references/domain-verification.md)
+- [email-identity](references/email-identity.md)
+- [email-provider-account](references/email-provider-account.md)
+- [email-site-identity](references/email-site-identity.md)
 - [embedding-chunk](references/embedding-chunk.md)
 - [enum](references/enum.md)
 - [exclusion-constraint](references/exclusion-constraint.md)
@@ -82,19 +85,21 @@ See the `references/` directory for detailed per-entity API documentation:
 - [full-text-search](references/full-text-search.md)
 - [function](references/function.md)
 - [hostname-binding](references/hostname-binding.md)
-- [http-route](references/http-route.md)
 - [index](references/index.md)
 - [managed-domain](references/managed-domain.md)
 - [node-type-registry](references/node-type-registry.md)
 - [page](references/page.md)
 - [partition](references/partition.md)
+- [platform-api](references/platform-api.md)
 - [platform-api-schema](references/platform-api-schema.md)
 - [platform-api-setting](references/platform-api-setting.md)
-- [platform-apis](references/platform-apis.md)
 - [platform-cors-setting](references/platform-cors-setting.md)
 - [platform-domain](references/platform-domain.md)
 - [platform-domain-event](references/platform-domain-event.md)
 - [platform-domain-verification](references/platform-domain-verification.md)
+- [platform-email-identity](references/platform-email-identity.md)
+- [platform-email-provider-account](references/platform-email-provider-account.md)
+- [platform-email-site-identity](references/platform-email-site-identity.md)
 - [platform-managed-domain](references/platform-managed-domain.md)
 - [platform-page](references/platform-page.md)
 - [platform-site-app-link](references/platform-site-app-link.md)
@@ -108,6 +113,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [policy](references/policy.md)
 - [primary-key-constraint](references/primary-key-constraint.md)
 - [pubkey-setting](references/pubkey-setting.md)
+- [redirect](references/redirect.md)
 - [rls-setting](references/rls-setting.md)
 - [route-binding](references/route-binding.md)
 - [route](references/route.md)
@@ -139,7 +145,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [api-schema-names](references/api-schema-names.md)
 - [apply-registry-defaults](references/apply-registry-defaults.md)
 - [resolve-deep-link](references/resolve-deep-link.md)
-- [resolve-http-route](references/resolve-http-route.md)
 - [resolve-route](references/resolve-route.md)
 - [resolve-site-app-links](references/resolve-site-app-links.md)
 - [accept-database-transfer](references/accept-database-transfer.md)

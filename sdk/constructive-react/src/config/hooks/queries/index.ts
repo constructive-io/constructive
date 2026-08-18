@@ -5,8 +5,14 @@
  */
 export * from './useConfigsQuery';
 export * from './useConfigQuery';
+export * from './useInternalConfigsQuery';
+export * from './useInternalConfigQuery';
+export * from './useInternalSecretsQuery';
+export * from './useInternalSecretQuery';
 export * from './usePlatformConfigsQuery';
 export * from './usePlatformConfigQuery';
+export * from './usePlatformInternalConfigsQuery';
+export * from './usePlatformInternalConfigQuery';
 export * from './usePlatformInternalSecretsQuery';
 export * from './usePlatformInternalSecretQuery';
 export * from './usePlatformSecretsQuery';
