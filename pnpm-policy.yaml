@@ -86,19 +86,7 @@ allowBuilds:
 exceptions:
   # Toolchain floors caught up with the newest release, so the floor itself is
   # the only satisfying version.
-  - package: "@typescript-eslint/eslint-plugin"
-    versions: ["8.66.0"]
-    reason: ^8.66.0 floor matches the newest release; nothing older satisfies it
-    until: 2026-08-17
-  - package: "@typescript-eslint/parser"
-    versions: ["8.66.0"]
-    reason: ^8.66.0 floor matches the newest release; nothing older satisfies it
-    until: 2026-08-17
   - package: "@types/pg"
     versions: ["8.20.4"]
     reason: ^8.20.4 floor matches the newest release; nothing older satisfies it
     until: 2026-08-18
-  - package: "@types/semver"
-    versions: ["7.8.0"]
-    reason: ^7.8.0 floor matches the newest release; nothing older satisfies it
-    until: 2026-08-16

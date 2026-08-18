@@ -10,8 +10,13 @@
  * node-side write lives in `@agentic-kit/run-log/file-store`.
  */
 
-import { isPiSessionHeader, type PiSessionEntry } from '../pi-entry';
-import { assertOrdered, type RunEventRecord, SUPPORTED_PI_SESSION_VERSION } from '../record';
+import { assertOrdered, type RunEventRecord } from '../record';
+import {
+  assertTranscriptFormat,
+  PI_TRANSCRIPT_FORMAT,
+  SUPPORTED_PI_TRANSCRIPT_VERSION
+} from '../transcripts/format';
+import { isPiSessionHeader, type PiSessionEntry } from '../transcripts/pi-entry';
 
 export interface SessionProjectionOptions {
   /** Used when the log carries no session header (a run logged headerless). */
@@ -25,7 +30,7 @@ export interface SessionProjection {
   jsonl: string;
   /** Entries in file order, header first. */
   entries: PiSessionEntry[];
-  piSessionVersion: number;
+  transcriptVersion: number;
 }
 
 /**
@@ -38,14 +43,15 @@ export function projectSession(
   options: SessionProjectionOptions = {}
 ): SessionProjection {
   assertOrdered(records);
+  assertTranscriptFormat(records, PI_TRANSCRIPT_FORMAT);
 
-  const versions = new Set(records.map((record) => record.piSessionVersion));
+  const versions = new Set(records.map((record) => record.transcriptVersion));
   if (versions.size > 1) {
     throw new Error(
       `run log mixes pi session versions (${Array.from(versions).sort().join(', ')}); migrate the older entries before projecting a session`
     );
   }
-  const piSessionVersion = records[0]?.piSessionVersion ?? SUPPORTED_PI_SESSION_VERSION;
+  const transcriptVersion = records[0]?.transcriptVersion ?? SUPPORTED_PI_TRANSCRIPT_VERSION;
 
   const entries = records.map((record) => record.entry);
   const headerIndex = entries.findIndex(isPiSessionHeader);
@@ -61,7 +67,7 @@ export function projectSession(
       ? entries[0]
       : {
         type: 'session',
-        version: piSessionVersion,
+        version: transcriptVersion,
         id: options.sessionId ?? records[0]?.runId ?? 'run-log',
         timestamp: options.timestamp ?? records[0]?.recordedAt ?? new Date().toISOString(),
         ...(options.cwd ? { cwd: options.cwd } : {})
@@ -70,7 +76,7 @@ export function projectSession(
   const ordered = [header, ...body];
   return {
     entries: ordered,
-    piSessionVersion,
+    transcriptVersion,
     jsonl: ordered.map((entry) => JSON.stringify(entry)).join('\n') + '\n'
   };
 }

@@ -1,8 +1,8 @@
 {
   "name": "@agentic-kit/pi",
-  "version": "0.15.1",
+  "version": "0.16.0",
   "author": "Dan Lynch <pyramation@gmail.com>",
-  "description": "Pi adapter for agentic-kit — the Constructive typed db tools (provision, blueprint, codegen, records, policies, templates) and confirm gate as a pi coding-agent extension",
+  "description": "the pi adapter for agentic-kit — Constructive's typed db tools, confirm gate, and the run-log/metering/gate lanes attached to a pi coding-agent session",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -31,6 +31,8 @@
   "dependencies": {
     "12factor-env": "workspace:^",
     "@agentic-kit/harness": "workspace:^",
+    "@agentic-kit/metering": "workspace:^",
+    "@agentic-kit/run-log": "workspace:^",
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/sdk": "workspace:^",
     "node-type-registry": "workspace:^",

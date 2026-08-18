@@ -14,13 +14,11 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
-import type { PiSessionEntry } from './pi-entry';
 import { projectSession, type SessionProjectionOptions } from './projectors/session';
 import {
   assertRunEventRecord,
   idempotencyKey,
   type RunEventRecord,
-  SUPPORTED_PI_SESSION_VERSION,
   wrapEntry
 } from './record';
 import {
@@ -31,6 +29,7 @@ import {
   type RunLogStore,
   START
 } from './store';
+import type { PiSessionEntry } from './transcripts/pi-entry';
 
 export interface FileRunLogStoreOptions {
   /** Absolute path of the log file. Parent directories are created. */
@@ -85,7 +84,8 @@ export class FileRunLogStore implements RunLogStore {
           seq: existing.length + written.length + 1,
           entry,
           ...(options.recordedAt ? { recordedAt: options.recordedAt } : {}),
-          piSessionVersion: options.piSessionVersion ?? SUPPORTED_PI_SESSION_VERSION
+          ...(options.transcriptFormat === undefined ? {} : { transcriptFormat: options.transcriptFormat }),
+          ...(options.transcriptVersion === undefined ? {} : { transcriptVersion: options.transcriptVersion })
         })
       );
       seen.add(key);

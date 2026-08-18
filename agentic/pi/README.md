@@ -12,7 +12,19 @@
    <a href="https://www.npmjs.com/package/@agentic-kit/pi"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=agentic%2Fpi%2Fpackage.json"/></a>
 </p>
 
-The [pi coding agent](https://github.com/badlogic/pi-mono) adapter for **agentic-kit**: the Constructive typed database tools and the [`@agentic-kit/harness`](https://www.npmjs.com/package/@agentic-kit/harness) confirm gate, packaged as a pi extension any host can register — Constructive Desktop, the [`agent` CLI](https://www.npmjs.com/package/@agentic-kit/cli), or your own pi-based agent.
+The **one** [pi coding agent](https://github.com/badlogic/pi-mono) adapter for **agentic-kit**: the Constructive typed database tools, and everything that attaches a platform run to a pi session — the run gate, the run log, the metering gateway and usage reporting — for any host to register: Constructive Desktop, the [`agent` CLI](https://www.npmjs.com/package/@agentic-kit/cli), or your own pi-based agent.
+
+What a run *does* is harness-neutral and lives elsewhere; only its attachment to pi lives here.
+
+```
+neutral contracts                      this package                pi
+────────────────────────────────────   ─────────────────────────   ────────────────────
+@agentic-kit/harness  (gate, adapter)  tool_call ─► RunGate       pi.on('tool_call')
+@agentic-kit/metering (gateway, usage) MeteredGateway ─► provider  pi.registerProvider
+@agentic-kit/run-log  (append-only)    SessionMirror              pi's session manager
+```
+
+So a second, compatible harness is a *sibling adapter* — not a fork of the lanes.
 
 ```bash
 npm install @agentic-kit/pi
@@ -22,6 +34,8 @@ npm install @agentic-kit/pi
 
 - **16 typed db tools** — `provision_database`, `provision_blueprint`, `describe_schema`, `add_relation`, `delete_table`, `create_field` / `update_field` / `delete_field`, `add_policies`, `add_records`, `run_codegen`, and the template suite (`list` / `create` / `apply` / `update` / `delete`). Tool schemas are authored in [zod](https://zod.dev) and emitted as plain JSON Schema at pi's tool boundary.
 - **Confirm gate** — the harness's host-neutral gate wired to pi's `tool_call` events. Hosts with a rich confirm surface (Desktop) expose `confirmTool`/`notifyToolSkipped` on `ctx.ui`; everyone else gets pi's built-in `ui.confirm` dialog.
+- **Run lanes** — `composeRun` / `startRun` build a pi session with the run's lanes attached: `createRunLogExtension` mirrors pi's session entries into the run log under `transcriptFormat: 'pi'`, `createMeteredModelExtension` points pi at the Constructive gateway so usage cannot be under-reported, `createUsageReportExtension` self-reports usage when the host owns the provider keys, and `createGateExtension` suspends a gated tool call until a human answers.
+- **`piHarness`** — the `HarnessAdapter` face of the above: an `id`, the `transcriptFormat` its entries are written under, and `startRun`.
 - **Host injection** — credentials, backend endpoints, and data-plane tokens come from your host, not from the package:
 
 ```ts
@@ -88,7 +102,9 @@ For local development, the cold path and the warm pool depend on the backend's j
 
 ## Related
 
-- [`@agentic-kit/harness`](https://www.npmjs.com/package/@agentic-kit/harness) — host-neutral skills, gating, and blueprint core
+- [`@agentic-kit/harness`](https://www.npmjs.com/package/@agentic-kit/harness) — host-neutral skills, gating, blueprint core, and the `HarnessAdapter` contract
+- [`@agentic-kit/metering`](https://www.npmjs.com/package/@agentic-kit/metering) — the metered gateway and usage reporting
+- [`@agentic-kit/run-log`](https://www.npmjs.com/package/@agentic-kit/run-log) — the append-only run log
 - [`@agentic-kit/cli`](https://www.npmjs.com/package/@agentic-kit/cli) — `agent`, a local secure-by-default coding agent
 - [`agentic-kit`](https://www.npmjs.com/package/agentic-kit) — the umbrella package
 

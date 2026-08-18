@@ -9,21 +9,22 @@ The append-only **run log**: one ordered record of what an agent run did, wherev
 A coding agent run has to be observable from a desktop app, a web UI and a CLI; it has to be resumable after a crash, a restart, or a move from the cloud to a laptop; and it has to be meterable. Those are usually four subsystems. Here they are four *projections* of one log:
 
 ```
-pi session entries ──► run log (append-only) ──┬──► transcript parts   (what a UI draws)
-                                               ├──► usage totals       (what a run cost)
-                                               ├──► tool + approval    (what is blocked)
-                                               └──► pi session file    (how it resumes)
+harness entries ──► run log (append-only) ──┬──► transcript parts   (what a UI draws)
+                                            ├──► usage totals       (what a run cost)
+                                            ├──► tool + approval    (what is blocked)
+                                            └──► pi session file    (how it resumes)
 ```
 
-The log stores **pi entries verbatim** under four platform-owned fields. pi already versions and migrates its own session format, so re-encoding it into a second semantic event model would mean maintaining a translation layer that silently loses whatever pi adds next.
+The log stores a harness's **entries verbatim** under five platform-owned fields. A harness already versions and migrates its own session format, so re-encoding it into a second semantic event model would mean maintaining a translation layer that silently loses whatever it adds next. `transcriptFormat` is what makes that safe with more than one harness: it travels with the record, so a reader picks its projector by format and only then migrates by version.
 
 ```ts
 {
   runId,             // which run
   seq,               // 1-based, gapless, strictly increasing
   recordedAt,        // when the platform durably recorded it
-  piSessionVersion,  // pi's session format version at write time
-  entry              // the pi entry, byte-for-byte
+  transcriptFormat,  // which transcript the entry is encoded in, e.g. `pi`
+  transcriptVersion, // that transcript's format version at write time
+  entry              // the harness's entry, byte-for-byte
 }
 ```
 
@@ -100,8 +101,9 @@ Unreadable input fails loudly. A corrupt record, a mixed-version log, or a sessi
 
 ## Related
 
-- [`@agentic-kit/pi`](../pi) — Constructive's typed db tools as a pi extension
-- [`@agentic-kit/harness`](../harness) — host-neutral gates and policy
+- [`@agentic-kit/pi`](../pi) — the pi adapter: typed db tools, and the lane that mirrors pi's session entries into this log
+- [`@agentic-kit/harness`](../harness) — host-neutral gates, policy, and the harness adapter contract
+- [`@agentic-kit/metering`](../metering) — the metered gateway and usage reporting
 - [`agentic-server`](../agentic-server) — the metered inference gateway
 
 ## License

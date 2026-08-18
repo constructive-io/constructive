@@ -6,14 +6,14 @@
  * memory here for tests and for a run that has not been persisted yet.
  */
 
-import type { PiSessionEntry } from './pi-entry';
 import {
   assertOrdered,
   idempotencyKey,
   type RunEventRecord,
-  SUPPORTED_PI_SESSION_VERSION,
   wrapEntry
 } from './record';
+import type { TranscriptFormat } from './transcripts/format';
+import type { PiSessionEntry } from './transcripts/pi-entry';
 
 /** Read position: `afterSeq` is exclusive, so `0` means "from the start". */
 export interface RunLogCursor {
@@ -31,8 +31,10 @@ export interface RunLogPage {
 }
 
 export interface AppendOptions {
-  /** pi session format version the entries were produced under. */
-  piSessionVersion?: number;
+  /** Transcript the entries are encoded in. Defaults to pi's. */
+  transcriptFormat?: TranscriptFormat;
+  /** That transcript's format version the entries were produced under. */
+  transcriptVersion?: number;
   recordedAt?: string;
 }
 
@@ -73,7 +75,8 @@ export class MemoryRunLogStore implements RunLogStore {
         seq: records.length + written.length + 1,
         entry,
         ...(options.recordedAt ? { recordedAt: options.recordedAt } : {}),
-        piSessionVersion: options.piSessionVersion ?? SUPPORTED_PI_SESSION_VERSION
+        ...(options.transcriptFormat === undefined ? {} : { transcriptFormat: options.transcriptFormat }),
+        ...(options.transcriptVersion === undefined ? {} : { transcriptVersion: options.transcriptVersion })
       });
       written.push(record);
       seen.add(key);

@@ -25,6 +25,8 @@ Code only: **no skills are bundled**. Skills are pulled at runtime from [`constr
 - **Skill releases** — fetch a pinned release (npm version/range/dist-tag, or a git tag/semver/SHA/branch straight from GitHub), verified and cached under `~/.constructive/data/skills/<version>/`; offline falls back to the newest local release.
 - **Ordered overlays** — layer skill sources (hardened base → team overlays → private known-gaps), last write wins by skill name, with include/exclude filters and transitive `requires:` expansion.
 - **Confirm gating** — a host-neutral gate for mutating db tools: per-run decline memory (equivalent-args retries are auto-blocked), short-circuits for runnable projects, and structured previews your UI renders.
+- **Run gate** — a policy (`allow` / `deny` / `ask`) plus an approval rendezvous, so a cloud run's `rm -rf` can be answered from a browser tab. The gate settles the decision and records it; an adapter only maps its harness's tool-call event onto it.
+- **Harness adapter contract** — `HarnessAdapter` / `HarnessRun`: a harness is identified by an `id`, the `transcriptFormat` its entries are recorded under, and `startRun`. Nothing in the platform names a vendor.
 - **Blueprint logic** — `expandBlueprintDefaults()`, the zod `BlueprintZod`/JSON-Schema `BlueprintSchema`, field type/default parsing, and policy-provisioning tables.
 - **Appstash state** — everything lives in the [`appstash`](https://www.npmjs.com/package/appstash) `~/.constructive/{config,cache,data,logs}` layout; project directories are untouched.
 
@@ -71,6 +73,8 @@ materializeSkills(dirs.materializedDir, skills, {
 - **Freshness** — `checkForSkillsUpdate()` / `checkForSkillsUpdateFromGit()`: TTL-cached update checks that never throw, respect `compatibleSkillsRange`, and flag `harnessUpgradeRequired` when newer skills need newer tool code.
 - **Resolution** — `SkillsManifest`, `DirectorySkillSource` (agentskills.io layout: `<skill>/SKILL.md` + references/scripts), `resolveSkills()`, `materializeSkills()` with `{{VAR}}` substitution.
 - **Gating** — `createConfirmGate()`, `buildConfirmPrompt()`, `MUTATING_DB_TOOLS`, `ConfirmPreview`; adapters map host events onto `GateToolCallEvent`/`GateResult` 1:1.
+- **Run gate** — `createRunGate()`, `RunGatePolicy` / `RunGateRule` / `RunGateVerdict`, `ApprovalChannel` with `pollingApprovalChannel()` / `staticApprovalChannel()`, and `RunGateDecisionRecord` for the audit trail.
+- **Adapters** — `HarnessAdapter`, `HarnessRun`; [`@agentic-kit/pi`](https://www.npmjs.com/package/@agentic-kit/pi) is the first implementation.
 - **Blueprints** — `expandBlueprintDefaults()`, `BlueprintZod`/`BlueprintSchema`, field types/defaults, policy provisioning.
 
 ## Hosts

@@ -1,20 +1,23 @@
 /**
- * The run log record: four platform-owned fields around a verbatim pi entry.
+ * The run log record: five platform-owned fields around a verbatim harness entry.
  *
- * The wrapper exists to give an entry identity (which run) and order (which
- * position) across hosts — nothing else. It deliberately does not re-encode pi's
- * semantics, because pi already versions and migrates its own session format;
- * `piSessionVersion` records which version an entry was written under so a
- * reader can hand old entries to pi's migrations instead of guessing.
+ * The wrapper exists to give an entry identity (which run), order (which
+ * position) and readability (which transcript) across hosts — nothing else. It
+ * deliberately does not re-encode a harness's semantics, because a harness
+ * already versions and migrates its own session format; `transcriptFormat` says
+ * which reader can parse the entry, and `transcriptVersion` says which version
+ * that reader must migrate from.
  */
 
-import { assertPiSessionEntry, type PiSessionEntry } from './pi-entry';
+import {
+  PI_TRANSCRIPT_FORMAT,
+  SUPPORTED_PI_TRANSCRIPT_VERSION,
+  type TranscriptFormat
+} from './transcripts/format';
+import { assertPiSessionEntry, type PiSessionEntry } from './transcripts/pi-entry';
 
-/** Version of the wrapper itself — bumped only if these four fields change. */
+/** Version of the wrapper itself — bumped only if these fields change. */
 export const RUN_LOG_WRAPPER_VERSION = 1;
-
-/** The pi session format version this package projects without migration. */
-export const SUPPORTED_PI_SESSION_VERSION = 3;
 
 export interface RunEventRecord {
   /** The run this entry belongs to. */
@@ -23,9 +26,11 @@ export interface RunEventRecord {
   seq: number;
   /** When the platform durably recorded the entry (ISO 8601). */
   recordedAt: string;
-  /** pi's session format version at write time. */
-  piSessionVersion: number;
-  /** The pi session entry, byte-for-byte as pi produced it. */
+  /** The transcript the entry is encoded in, e.g. `pi`. */
+  transcriptFormat: TranscriptFormat;
+  /** That transcript's format version at write time. */
+  transcriptVersion: number;
+  /** The harness's session entry, byte-for-byte as it was produced. */
   entry: PiSessionEntry;
 }
 
@@ -34,7 +39,8 @@ export interface WrapEntryOptions {
   seq: number;
   entry: PiSessionEntry;
   recordedAt?: string;
-  piSessionVersion?: number;
+  transcriptFormat?: TranscriptFormat;
+  transcriptVersion?: number;
 }
 
 export function wrapEntry(options: WrapEntryOptions): RunEventRecord {
@@ -46,7 +52,8 @@ export function wrapEntry(options: WrapEntryOptions): RunEventRecord {
     runId: options.runId,
     seq: options.seq,
     recordedAt: options.recordedAt ?? new Date().toISOString(),
-    piSessionVersion: options.piSessionVersion ?? SUPPORTED_PI_SESSION_VERSION,
+    transcriptFormat: options.transcriptFormat ?? PI_TRANSCRIPT_FORMAT,
+    transcriptVersion: options.transcriptVersion ?? SUPPORTED_PI_TRANSCRIPT_VERSION,
     entry: assertPiSessionEntry(options.entry)
   };
 }
@@ -70,16 +77,22 @@ export function assertRunEventRecord(value: unknown): RunEventRecord {
   if (typeof record.recordedAt !== 'string') {
     throw new TypeError(`run log record ${record.runId}#${String(record.seq)} must carry recordedAt`);
   }
-  if (!Number.isInteger(record.piSessionVersion)) {
+  if (typeof record.transcriptFormat !== 'string' || record.transcriptFormat.length === 0) {
     throw new TypeError(
-      `run log record ${record.runId}#${String(record.seq)} must carry an integer piSessionVersion`
+      `run log record ${record.runId}#${String(record.seq)} must carry a non-empty transcriptFormat`
+    );
+  }
+  if (!Number.isInteger(record.transcriptVersion)) {
+    throw new TypeError(
+      `run log record ${record.runId}#${String(record.seq)} must carry an integer transcriptVersion`
     );
   }
   return {
     runId: record.runId,
     seq: record.seq as number,
     recordedAt: record.recordedAt,
-    piSessionVersion: record.piSessionVersion as number,
+    transcriptFormat: record.transcriptFormat,
+    transcriptVersion: record.transcriptVersion as number,
     entry: assertPiSessionEntry(record.entry)
   };
 }

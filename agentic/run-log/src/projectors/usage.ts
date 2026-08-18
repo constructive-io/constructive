@@ -9,9 +9,10 @@
  *
  * This projection describes what a run *observed*. It is reconciliation input,
  * never the billing authority — a gateway-observed record is (see
- * `@agentic-kit/pi-ext-metered-model`).
+ * `@agentic-kit/metering`).
  */
 
+import type { RunEventRecord } from '../record';
 import {
   isAssistantMessage,
   isPiBranchSummaryEntry,
@@ -19,8 +20,7 @@ import {
   isPiMessageEntry,
   isToolResultMessage,
   type PiUsage
-} from '../pi-entry';
-import type { RunEventRecord } from '../record';
+} from '../transcripts/pi-entry';
 
 export interface UsageTotals {
   input: number;

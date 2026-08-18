@@ -78,6 +78,47 @@ export {
   resolveProjectContext,
 } from './context';
 export {
+  type ComposedLanes,
+  type ComposedRun,
+  composeRun,
+  type ComposeRunOptions,
+  type GateLane,
+  type MeteringLane,
+  type RunLogLane,
+} from './embed/lanes';
+export {
+  type CreateResourceLoader,
+  type EmbeddedRun,
+  type PiModule,
+  type ResourceLoaderRequest,
+  startRun,
+  type StartRunOptions,
+} from './embed/session';
+export {
+  createGateExtension,
+  type GateExtension,
+  type GateExtensionOptions,
+} from './extensions/gate';
+export {
+  createMeteredModelExtension,
+  type MeteredModelExtension,
+  type MeteredModelExtensionOptions,
+  piProviderConfig,
+} from './extensions/metered-model';
+export {
+  createRunLogExtension,
+  MIRROR_EVENTS,
+  type MirrorEvent,
+  type RunLogExtension,
+  type RunLogExtensionOptions,
+} from './extensions/run-log';
+export {
+  createUsageReportExtension,
+  type UsageReportExtension,
+  type UsageReportExtensionOptions,
+} from './extensions/usage-report';
+export { PI_HARNESS_ID, piHarness, type PiHarnessRun } from './harness';
+export {
   type ActiveDataToken,
   configureHost,
   type DataAuthBroker,
