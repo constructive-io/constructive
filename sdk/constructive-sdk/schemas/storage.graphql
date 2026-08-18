@@ -1,0 +1,3482 @@
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
+
+"""
+A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’
+"""
+input BigIntFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BigInt
+
+  """Equal to the specified value."""
+  equalTo: BigInt
+
+  """Greater than the specified value."""
+  greaterThan: BigInt
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: BigInt
+
+  """Included in the specified list."""
+  in: [BigInt!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: BigInt
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: BigInt
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BigInt
+
+  """Not equal to the specified value."""
+  notEqualTo: BigInt
+
+  """Not included in the specified list."""
+  notIn: [BigInt!]
+}
+
+"""
+A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
+"""
+input BooleanFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Boolean
+
+  """Greater than the specified value."""
+  greaterThan: Boolean
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Boolean
+
+  """Included in the specified list."""
+  in: [Boolean!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Boolean
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Boolean
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Boolean
+
+  """Not equal to the specified value."""
+  notEqualTo: Boolean
+
+  """Not included in the specified list."""
+  notIn: [Boolean!]
+}
+
+"""
+Logical storage containers that group files with shared access policies and CDN behavior
+"""
+type Bucket {
+  """User who created this bucket. Forced to current_user_id() on INSERT."""
+  actorId: UUID!
+
+  """
+  When true, clients can provide custom S3 keys (e.g. reports/2024/Q1.pdf). When false (default), S3 key = content hash (automatic dedup). contentHash always required for integrity.
+  """
+  allowCustomKeys: Boolean!
+
+  """
+  Whitelist of allowed MIME types for files in this bucket (NULL = all allowed, enforcement deferred)
+  """
+  allowedMimeTypes: [String]
+
+  """
+  Per-bucket CORS allowed origins override (NULL = inherit from storage_module/plugin defaults). Use ARRAY['*'] for open/CDN mode.
+  """
+  allowedOrigins: [String]
+
+  """Reads and enables pagination through a set of `Bucket`."""
+  bucketsByDestinationBucketId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Bucket`."""
+    orderBy: [BucketOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: BucketFilter
+  ): BucketConnection!
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Human-readable description of the bucket purpose"""
+  description: String
+
+  """Reads a single `Bucket` that is related to this `Bucket`."""
+  destinationBucket: Bucket
+
+  """
+  For a temp bucket, the permanent bucket its uploads are promoted into. NULL on non-temp buckets; required on temp buckets.
+  """
+  destinationBucketId: UUID
+
+  """Reads and enables pagination through a set of `File`."""
+  files(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `File`."""
+    orderBy: [FileOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FileFilter
+  ): FileConnection!
+  id: UUID!
+
+  """
+  Whether bucket contents are publicly readable. Set to true when type is public.
+  """
+  isPublic: Boolean!
+
+  """
+  Unique bucket identifier used in S3 key paths (e.g. avatars, documents, temp)
+  """
+  key: String!
+
+  """
+  Maximum file size in bytes allowed in this bucket (NULL = no limit, enforcement deferred)
+  """
+  maxFileSize: BigInt
+
+  """
+  Physical S3/MinIO bucket name recorded at provision time (NULL until the physical bucket exists)
+  """
+  physicalName: String
+
+  """
+  For a temp bucket, how long an unpromoted staged file survives before it is eligible for expiry. NULL on non-temp buckets; required on temp buckets.
+  """
+  stagingTtl: Interval
+
+  """
+  Selector labels for capability resolution and grouping (e.g. uploads, variants, exports). A function's required bucket key is matched against these plus type.
+  """
+  tags: [String]
+
+  """
+  Bucket CDN access type: public (CDN-served), private (presigned GET), temp (staging uploads)
+  """
+  type: BucketType!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `Bucket` values."""
+type BucketConnection {
+  """
+  A list of edges which contains the `Bucket` and cursor to aid in pagination.
+  """
+  edges: [BucketEdge]!
+
+  """A list of `Bucket` objects."""
+  nodes: [Bucket]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Bucket` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Bucket` edge in the connection."""
+type BucketEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Bucket` at the end of the edge."""
+  node: Bucket
+}
+
+"""
+A filter to be used against `Bucket` object types. All fields are combined with a logical ‘and.’
+"""
+input BucketFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `allowCustomKeys` field."""
+  allowCustomKeys: BooleanFilter
+
+  """Filter by the object’s `allowedMimeTypes` field."""
+  allowedMimeTypes: StringListFilter
+
+  """Filter by the object’s `allowedOrigins` field."""
+  allowedOrigins: StringListFilter
+
+  """Checks for all expressions in this list."""
+  and: [BucketFilter!]
+
+  """Filter by the object’s `bucketsByDestinationBucketId` relation."""
+  bucketsByDestinationBucketId: BucketToManyBucketFilter
+
+  """`bucketsByDestinationBucketId` exist."""
+  bucketsByDestinationBucketIdExist: Boolean
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `destinationBucket` relation."""
+  destinationBucket: BucketFilter
+
+  """A related `destinationBucket` exists."""
+  destinationBucketExists: Boolean
+
+  """Filter by the object’s `destinationBucketId` field."""
+  destinationBucketId: UUIDFilter
+
+  """Filter by the object’s `files` relation."""
+  files: BucketToManyFileFilter
+
+  """`files` exist."""
+  filesExist: Boolean
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isPublic` field."""
+  isPublic: BooleanFilter
+
+  """Filter by the object’s `key` field."""
+  key: StringFilter
+
+  """Filter by the object’s `maxFileSize` field."""
+  maxFileSize: BigIntFilter
+
+  """Negates the expression."""
+  not: BucketFilter
+
+  """Checks for any expressions in this list."""
+  or: [BucketFilter!]
+
+  """Filter by the object’s `physicalName` field."""
+  physicalName: StringFilter
+
+  """Filter by the object’s `stagingTtl` field."""
+  stagingTtl: IntervalFilter
+
+  """Filter by the object’s `tags` field."""
+  tags: StringListFilter
+
+  """Filter by the object’s `type` field."""
+  type: BucketTypeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `Bucket`"""
+input BucketInput {
+  """User who created this bucket. Forced to current_user_id() on INSERT."""
+  actorId: UUID!
+
+  """
+  When true, clients can provide custom S3 keys (e.g. reports/2024/Q1.pdf). When false (default), S3 key = content hash (automatic dedup). contentHash always required for integrity.
+  """
+  allowCustomKeys: Boolean
+
+  """
+  Whitelist of allowed MIME types for files in this bucket (NULL = all allowed, enforcement deferred)
+  """
+  allowedMimeTypes: [String]
+
+  """
+  Per-bucket CORS allowed origins override (NULL = inherit from storage_module/plugin defaults). Use ARRAY['*'] for open/CDN mode.
+  """
+  allowedOrigins: [String]
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Human-readable description of the bucket purpose"""
+  description: String
+
+  """
+  For a temp bucket, the permanent bucket its uploads are promoted into. NULL on non-temp buckets; required on temp buckets.
+  """
+  destinationBucketId: UUID
+  id: UUID
+
+  """
+  Whether bucket contents are publicly readable. Set to true when type is public.
+  """
+  isPublic: Boolean
+
+  """
+  Unique bucket identifier used in S3 key paths (e.g. avatars, documents, temp)
+  """
+  key: String!
+
+  """
+  Maximum file size in bytes allowed in this bucket (NULL = no limit, enforcement deferred)
+  """
+  maxFileSize: BigInt
+
+  """
+  Physical S3/MinIO bucket name recorded at provision time (NULL until the physical bucket exists)
+  """
+  physicalName: String
+
+  """
+  For a temp bucket, how long an unpromoted staged file survives before it is eligible for expiry. NULL on non-temp buckets; required on temp buckets.
+  """
+  stagingTtl: IntervalInput
+
+  """
+  Selector labels for capability resolution and grouping (e.g. uploads, variants, exports). A function's required bucket key is matched against these plus type.
+  """
+  tags: [String]
+
+  """
+  Bucket CDN access type: public (CDN-served), private (presigned GET), temp (staging uploads)
+  """
+  type: BucketType
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `Bucket`."""
+enum BucketOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ALLOWED_MIME_TYPES_ASC
+  ALLOWED_MIME_TYPES_DESC
+  ALLOWED_ORIGINS_ASC
+  ALLOWED_ORIGINS_DESC
+  ALLOW_CUSTOM_KEYS_ASC
+  ALLOW_CUSTOM_KEYS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  DESTINATION_BUCKET_ID_ASC
+  DESTINATION_BUCKET_ID_DESC
+  ID_ASC
+  ID_DESC
+  IS_PUBLIC_ASC
+  IS_PUBLIC_DESC
+  KEY_ASC
+  KEY_DESC
+  MAX_FILE_SIZE_ASC
+  MAX_FILE_SIZE_DESC
+  NATURAL
+  PHYSICAL_NAME_ASC
+  PHYSICAL_NAME_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STAGING_TTL_ASC
+  STAGING_TTL_DESC
+  TAGS_ASC
+  TAGS_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `Bucket`. Fields that are set will be updated.
+"""
+input BucketPatch {
+  """User who created this bucket. Forced to current_user_id() on INSERT."""
+  actorId: UUID
+
+  """
+  When true, clients can provide custom S3 keys (e.g. reports/2024/Q1.pdf). When false (default), S3 key = content hash (automatic dedup). contentHash always required for integrity.
+  """
+  allowCustomKeys: Boolean
+
+  """
+  Whitelist of allowed MIME types for files in this bucket (NULL = all allowed, enforcement deferred)
+  """
+  allowedMimeTypes: [String]
+
+  """
+  Per-bucket CORS allowed origins override (NULL = inherit from storage_module/plugin defaults). Use ARRAY['*'] for open/CDN mode.
+  """
+  allowedOrigins: [String]
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """Human-readable description of the bucket purpose"""
+  description: String
+
+  """
+  For a temp bucket, the permanent bucket its uploads are promoted into. NULL on non-temp buckets; required on temp buckets.
+  """
+  destinationBucketId: UUID
+  id: UUID
+
+  """
+  Whether bucket contents are publicly readable. Set to true when type is public.
+  """
+  isPublic: Boolean
+
+  """
+  Unique bucket identifier used in S3 key paths (e.g. avatars, documents, temp)
+  """
+  key: String
+
+  """
+  Maximum file size in bytes allowed in this bucket (NULL = no limit, enforcement deferred)
+  """
+  maxFileSize: BigInt
+
+  """
+  Physical S3/MinIO bucket name recorded at provision time (NULL until the physical bucket exists)
+  """
+  physicalName: String
+
+  """
+  For a temp bucket, how long an unpromoted staged file survives before it is eligible for expiry. NULL on non-temp buckets; required on temp buckets.
+  """
+  stagingTtl: IntervalInput
+
+  """
+  Selector labels for capability resolution and grouping (e.g. uploads, variants, exports). A function's required bucket key is matched against these plus type.
+  """
+  tags: [String]
+
+  """
+  Bucket CDN access type: public (CDN-served), private (presigned GET), temp (staging uploads)
+  """
+  type: BucketType
+  updatedAt: Datetime
+}
+
+"""
+A filter to be used against many `Bucket` object types. All fields are combined with a logical ‘and.’
+"""
+input BucketToManyBucketFilter {
+  """Filters to entities where every related entity matches."""
+  every: BucketFilter
+
+  """Filters to entities where no related entity matches."""
+  none: BucketFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: BucketFilter
+}
+
+"""
+A filter to be used against many `File` object types. All fields are combined with a logical ‘and.’
+"""
+input BucketToManyFileFilter {
+  """Filters to entities where every related entity matches."""
+  every: FileFilter
+
+  """Filters to entities where no related entity matches."""
+  none: FileFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: FileFilter
+}
+
+enum BucketType {
+  PRIVATE
+  PUBLIC
+  TEMP
+}
+
+"""
+A filter to be used against BucketType fields. All fields are combined with a logical ‘and.’
+"""
+input BucketTypeFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BucketType
+
+  """Equal to the specified value."""
+  equalTo: BucketType
+
+  """Greater than the specified value."""
+  greaterThan: BucketType
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: BucketType
+
+  """Included in the specified list."""
+  in: [BucketType!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: BucketType
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: BucketType
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BucketType
+
+  """Not equal to the specified value."""
+  notEqualTo: BucketType
+
+  """Not included in the specified list."""
+  notIn: [BucketType!]
+}
+
+scalar ConstructiveInternalTypeUpload
+
+"""
+A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeUploadFilter {
+  """Contained by the specified JSON."""
+  containedBy: ConstructiveInternalTypeUpload
+
+  """Contains the specified JSON."""
+  contains: ConstructiveInternalTypeUpload
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: ConstructiveInternalTypeUpload
+
+  """Equal to the specified value."""
+  equalTo: ConstructiveInternalTypeUpload
+
+  """Greater than the specified value."""
+  greaterThan: ConstructiveInternalTypeUpload
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: ConstructiveInternalTypeUpload
+
+  """Included in the specified list."""
+  in: [ConstructiveInternalTypeUpload!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: ConstructiveInternalTypeUpload
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: ConstructiveInternalTypeUpload
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: ConstructiveInternalTypeUpload
+
+  """Not equal to the specified value."""
+  notEqualTo: ConstructiveInternalTypeUpload
+
+  """Not included in the specified list."""
+  notIn: [ConstructiveInternalTypeUpload!]
+}
+
+"""All input for the create `Bucket` mutation."""
+input CreateBucketInput {
+  """The `Bucket` to be created by this mutation."""
+  bucket: BucketInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `Bucket` mutation."""
+type CreateBucketPayload {
+  """The `Bucket` that was created by this mutation."""
+  bucket: Bucket
+
+  """An edge for our `Bucket`. May be used by Relay 1."""
+  bucketEdge(
+    """The method to use when ordering `Bucket`."""
+    orderBy: [BucketOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BucketEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `File` mutation."""
+input CreateFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `File` to be created by this mutation."""
+  file: FileInput!
+}
+
+"""The output of our create `File` mutation."""
+type CreateFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `File` that was created by this mutation."""
+  file: File
+
+  """An edge for our `File`. May be used by Relay 1."""
+  fileEdge(
+    """The method to use when ordering `File`."""
+    orderBy: [FileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FileEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformBucket` mutation."""
+input CreatePlatformBucketInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformBucket` to be created by this mutation."""
+  platformBucket: PlatformBucketInput!
+}
+
+"""The output of our create `PlatformBucket` mutation."""
+type CreatePlatformBucketPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformBucket` that was created by this mutation."""
+  platformBucket: PlatformBucket
+
+  """An edge for our `PlatformBucket`. May be used by Relay 1."""
+  platformBucketEdge(
+    """The method to use when ordering `PlatformBucket`."""
+    orderBy: [PlatformBucketOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformBucketEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformFile` mutation."""
+input CreatePlatformFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformFile` to be created by this mutation."""
+  platformFile: PlatformFileInput!
+}
+
+"""The output of our create `PlatformFile` mutation."""
+type CreatePlatformFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformFile` that was created by this mutation."""
+  platformFile: PlatformFile
+
+  """An edge for our `PlatformFile`. May be used by Relay 1."""
+  platformFileEdge(
+    """The method to use when ordering `PlatformFile`."""
+    orderBy: [PlatformFileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformFileEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""
+A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
+"""
+input DatetimeFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Datetime
+
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
+
+  """Included in the specified list."""
+  in: [Datetime!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Datetime
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Datetime
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
+
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
+}
+
+"""All input for the `deleteBucket` mutation."""
+input DeleteBucketInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Bucket` mutation."""
+type DeleteBucketPayload {
+  """The `Bucket` that was deleted by this mutation."""
+  bucket: Bucket
+
+  """An edge for our `Bucket`. May be used by Relay 1."""
+  bucketEdge(
+    """The method to use when ordering `Bucket`."""
+    orderBy: [BucketOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BucketEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteFile` mutation."""
+input DeleteFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `File` mutation."""
+type DeleteFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `File` that was deleted by this mutation."""
+  file: File
+
+  """An edge for our `File`. May be used by Relay 1."""
+  fileEdge(
+    """The method to use when ordering `File`."""
+    orderBy: [FileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FileEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformBucket` mutation."""
+input DeletePlatformBucketInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformBucket` mutation."""
+type DeletePlatformBucketPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformBucket` that was deleted by this mutation."""
+  platformBucket: PlatformBucket
+
+  """An edge for our `PlatformBucket`. May be used by Relay 1."""
+  platformBucketEdge(
+    """The method to use when ordering `PlatformBucket`."""
+    orderBy: [PlatformBucketOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformBucketEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformFile` mutation."""
+input DeletePlatformFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformFile` mutation."""
+type DeletePlatformFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformFile` that was deleted by this mutation."""
+  platformFile: PlatformFile
+
+  """An edge for our `PlatformFile`. May be used by Relay 1."""
+  platformFileEdge(
+    """The method to use when ordering `PlatformFile`."""
+    orderBy: [PlatformFileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformFileEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+Individual file records within buckets, with immutable identity fields and mutable metadata
+"""
+type File {
+  """
+  User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization.
+  """
+  actorId: UUID!
+
+  """Reads a single `Bucket` that is related to this `File`."""
+  bucket: Bucket
+
+  """
+  Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger.
+  """
+  bucketId: UUID!
+
+  """
+  SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately.
+  """
+  contentHash: String
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Human-readable description or alt text for the file (mutable)"""
+  description: String
+
+  """
+  URL to download this file. For public files, returns the public URL. For private files, returns a time-limited presigned URL.
+  """
+  downloadUrl: String
+
+  """
+  When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once.
+  """
+  expiryEnqueuedAt: Datetime
+  filePath: String
+
+  """
+  Original filename provided by the uploader. Used for display and Content-Disposition header on download.
+  """
+  filename: String
+  id: UUID!
+
+  """
+  Whether this file is publicly readable. Inherited from bucket on INSERT.
+  """
+  isPublic: Boolean!
+
+  """S3 object key for this file, unique within its bucket"""
+  key: String!
+
+  """
+  MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT.
+  """
+  mimeType: String!
+
+  """
+  When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged.
+  """
+  promotedAt: Datetime
+
+  """File size in bytes. Immutable after INSERT."""
+  size: BigInt!
+
+  """
+  File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed).
+  """
+  status: FileStatus!
+
+  """User-defined tags for categorization and search (mutable)"""
+  tags: [String]
+  updatedAt: Datetime
+
+  """
+  Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file.
+  """
+  upload: ConstructiveInternalTypeUpload
+}
+
+"""A connection to a list of `File` values."""
+type FileConnection {
+  """
+  A list of edges which contains the `File` and cursor to aid in pagination.
+  """
+  edges: [FileEdge]!
+
+  """A list of `File` objects."""
+  nodes: [File]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `File` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `File` edge in the connection."""
+type FileEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `File` at the end of the edge."""
+  node: File
+}
+
+"""
+A filter to be used against `File` object types. All fields are combined with a logical ‘and.’
+"""
+input FileFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [FileFilter!]
+
+  """Filter by the object’s `bucket` relation."""
+  bucket: BucketFilter
+
+  """Filter by the object’s `bucketId` field."""
+  bucketId: UUIDFilter
+
+  """Filter by the object’s `contentHash` field."""
+  contentHash: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `expiryEnqueuedAt` field."""
+  expiryEnqueuedAt: DatetimeFilter
+
+  """Filter by the object’s `filename` field."""
+  filename: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isPublic` field."""
+  isPublic: BooleanFilter
+
+  """Filter by the object’s `key` field."""
+  key: StringFilter
+
+  """Filter by the object’s `mimeType` field."""
+  mimeType: StringFilter
+
+  """Negates the expression."""
+  not: FileFilter
+
+  """Checks for any expressions in this list."""
+  or: [FileFilter!]
+
+  """Filter by the object’s `promotedAt` field."""
+  promotedAt: DatetimeFilter
+
+  """Filter by the object’s `size` field."""
+  size: BigIntFilter
+
+  """Filter by the object’s `status` field."""
+  status: FileStatusFilter
+
+  """Filter by the object’s `tags` field."""
+  tags: StringListFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `upload` field."""
+  upload: ConstructiveInternalTypeUploadFilter
+}
+
+"""An input for mutations affecting `File`"""
+input FileInput {
+  """
+  User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization.
+  """
+  actorId: UUID!
+
+  """
+  Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger.
+  """
+  bucketId: UUID!
+
+  """
+  SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately.
+  """
+  contentHash: String
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Human-readable description or alt text for the file (mutable)"""
+  description: String
+
+  """
+  When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once.
+  """
+  expiryEnqueuedAt: Datetime
+
+  """
+  Original filename provided by the uploader. Used for display and Content-Disposition header on download.
+  """
+  filename: String
+  id: UUID
+
+  """
+  Whether this file is publicly readable. Inherited from bucket on INSERT.
+  """
+  isPublic: Boolean
+
+  """S3 object key for this file, unique within its bucket"""
+  key: String!
+
+  """
+  MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT.
+  """
+  mimeType: String!
+
+  """
+  When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged.
+  """
+  promotedAt: Datetime
+
+  """File size in bytes. Immutable after INSERT."""
+  size: BigInt!
+
+  """
+  File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed).
+  """
+  status: FileStatus
+
+  """User-defined tags for categorization and search (mutable)"""
+  tags: [String]
+  updatedAt: Datetime
+
+  """
+  Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file.
+  """
+  upload: ConstructiveInternalTypeUpload
+}
+
+"""Methods to use when ordering `File`."""
+enum FileOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  BUCKET_ID_ASC
+  BUCKET_ID_DESC
+  CONTENT_HASH_ASC
+  CONTENT_HASH_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  EXPIRY_ENQUEUED_AT_ASC
+  EXPIRY_ENQUEUED_AT_DESC
+  FILENAME_ASC
+  FILENAME_DESC
+  ID_ASC
+  ID_DESC
+  IS_PUBLIC_ASC
+  IS_PUBLIC_DESC
+  KEY_ASC
+  KEY_DESC
+  MIME_TYPE_ASC
+  MIME_TYPE_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROMOTED_AT_ASC
+  PROMOTED_AT_DESC
+  SIZE_ASC
+  SIZE_DESC
+  STATUS_ASC
+  STATUS_DESC
+  TAGS_ASC
+  TAGS_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPLOAD_ASC
+  UPLOAD_DESC
+}
+
+"""Represents an update to a `File`. Fields that are set will be updated."""
+input FilePatch {
+  """
+  User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization.
+  """
+  actorId: UUID
+
+  """
+  Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger.
+  """
+  bucketId: UUID
+
+  """
+  SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately.
+  """
+  contentHash: String
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """Human-readable description or alt text for the file (mutable)"""
+  description: String
+
+  """
+  When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once.
+  """
+  expiryEnqueuedAt: Datetime
+
+  """
+  Original filename provided by the uploader. Used for display and Content-Disposition header on download.
+  """
+  filename: String
+  id: UUID
+
+  """
+  Whether this file is publicly readable. Inherited from bucket on INSERT.
+  """
+  isPublic: Boolean
+
+  """S3 object key for this file, unique within its bucket"""
+  key: String
+
+  """
+  MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT.
+  """
+  mimeType: String
+
+  """
+  When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged.
+  """
+  promotedAt: Datetime
+
+  """File size in bytes. Immutable after INSERT."""
+  size: BigInt
+
+  """
+  File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed).
+  """
+  status: FileStatus
+
+  """User-defined tags for categorization and search (mutable)"""
+  tags: [String]
+  updatedAt: Datetime
+
+  """
+  Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file.
+  """
+  upload: ConstructiveInternalTypeUpload
+
+  """
+  Upload for Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file.
+  """
+  uploadUpload: Upload
+}
+
+enum FileStatus {
+  EXPIRED
+  PROCESSED
+  REJECTED
+  REQUESTED
+  UPLOADED
+}
+
+"""
+A filter to be used against FileStatus fields. All fields are combined with a logical ‘and.’
+"""
+input FileStatusFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: FileStatus
+
+  """Equal to the specified value."""
+  equalTo: FileStatus
+
+  """Greater than the specified value."""
+  greaterThan: FileStatus
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: FileStatus
+
+  """Included in the specified list."""
+  in: [FileStatus!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: FileStatus
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: FileStatus
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: FileStatus
+
+  """Not equal to the specified value."""
+  notEqualTo: FileStatus
+
+  """Not included in the specified list."""
+  notIn: [FileStatus!]
+}
+
+"""All input for the `filesRename` mutation."""
+input FilesRenameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  fileId: UUID
+  newFilename: String
+}
+
+"""The output of our `filesRename` mutation."""
+type FilesRenamePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `File`. May be used by Relay 1."""
+  fileEdge(
+    """The method to use when ordering `File`."""
+    orderBy: [FileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FileEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: File
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+type Interval {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""
+A filter to be used against Interval fields. All fields are combined with a logical ‘and.’
+"""
+input IntervalFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: IntervalInput
+
+  """Equal to the specified value."""
+  equalTo: IntervalInput
+
+  """Greater than the specified value."""
+  greaterThan: IntervalInput
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: IntervalInput
+
+  """Included in the specified list."""
+  in: [IntervalInput!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: IntervalInput
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: IntervalInput
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: IntervalInput
+
+  """Not equal to the specified value."""
+  notEqualTo: IntervalInput
+
+  """Not included in the specified list."""
+  notIn: [IntervalInput!]
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+input IntervalInput {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  references: MetaRefTable!
+  type: String
+}
+
+"""Table constraints"""
+type MetaConstraints {
+  foreignKey: [MetaForeignKeyConstraint!]!
+  primaryKey: MetaPrimaryKeyConstraint
+  unique: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL enum type"""
+type MetaEnum {
+  """The PostgreSQL enum type name"""
+  name: String!
+
+  """Allowed values for this enum"""
+  values: [String!]!
+}
+
+"""Information about a table field/column"""
+type MetaField {
+  """PostgreSQL column name"""
+  columnName: String!
+  description: String
+
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
+  hasDefault: Boolean!
+  isForeignKey: Boolean!
+  isNotNull: Boolean!
+  isPrimaryKey: Boolean!
+
+  """Final GraphQL field name"""
+  name: String!
+  type: MetaType!
+}
+
+"""Information about a foreign key constraint"""
+type MetaForeignKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+  refFields: [MetaField!]
+  refTable: MetaRefTable
+  referencedFields: [String!]!
+  referencedTable: String!
+}
+
+"""A has-one or has-many (reverse FK) relation"""
+type MetaHasRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  referencedBy: MetaRefTable!
+  type: String
+}
+
+"""i18n metadata for a table with @i18n tag"""
+type MetaI18n {
+  """Fields that are translatable"""
+  translatableFields: [MetaI18nField!]!
+
+  """Name of the translation table"""
+  translationTable: String!
+}
+
+"""A translatable field"""
+type MetaI18nField {
+  """GraphQL field name"""
+  name: String!
+
+  """PostgreSQL column type (text, citext)"""
+  type: String!
+}
+
+"""Information about a database index"""
+type MetaIndex {
+  columns: [String!]!
+  fields: [MetaField!]
+  isPrimary: Boolean!
+  isUnique: Boolean!
+  name: String!
+}
+
+"""Table inflection names"""
+type MetaInflection {
+  allRows: String!
+  conditionType: String!
+  connection: String!
+  createInputType: String!
+  createPayloadType: String!
+  deletePayloadType: String!
+  edge: String!
+  filterType: String
+  orderByType: String!
+  patchType: String
+  tableType: String!
+  updatePayloadType: String
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  junctionTable: MetaRefTable!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
+  type: String
+}
+
+"""Information about a primary key constraint"""
+type MetaPrimaryKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""Table query/mutation names"""
+type MetaQuery {
+  all: String
+  create: String
+  delete: String
+  one: String
+  update: String
+}
+
+"""Realtime metadata for a table with @realtime tag"""
+type MetaRealtime {
+  """The generated subscription field name (e.g. onPostChanged)"""
+  subscriptionFieldName: String!
+}
+
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""
+How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+"""
+type MetaScalarEncoding {
+  """For 'vector': declared length, else null."""
+  dimensions: Int
+
+  """For 'ltree': values are dot-separated path strings."""
+  dotPath: Boolean
+
+  """For 'vector': element scalar (e.g. 'float')."""
+  elementType: String
+
+  """For 'geojson': Point/LineString/Polygon/…, else null."""
+  geometrySubtype: String
+
+  """
+  Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite.
+  """
+  kind: String!
+
+  """For 'geojson': spatial reference id, else null."""
+  srid: Int
+}
+
+"""Root meta schema type"""
+type MetaSchema {
+  tables: [MetaTable!]!
+}
+
+"""Provisioning scope metadata for a table"""
+type MetaScope {
+  """SQL name of the entity table for entity scopes, else null"""
+  entityTable: String
+
+  """
+  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  """
+  keyColumn: String
+
+  """
+  Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')
+  """
+  scope: String!
+
+  """Provenance of the scope metadata (always 'smartTag')"""
+  source: String!
+
+  """Coarse bucket: 'global', 'database', or 'entity'"""
+  tier: String!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+
+  """Column name (camelCase)"""
+  name: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+}
+
+"""Information about a database table"""
+type MetaTable {
+  constraints: MetaConstraints!
+  fields: [MetaField!]!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+  indexes: [MetaIndex!]!
+  inflection: MetaInflection!
+
+  """Final GraphQL output type name"""
+  name: String!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  query: MetaQuery!
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
+  relations: MetaRelations!
+  schemaName: String!
+
+  """Provisioning scope metadata (null if no @scope tag)"""
+  scope: MetaScope
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+
+  """PostgreSQL table name"""
+  tableName: String!
+  uniqueConstraints: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL type"""
+type MetaType {
+  """Scalar serialization contract (null for plain scalars)"""
+  encoding: MetaScalarEncoding
+  gqlType: String!
+  hasDefault: Boolean
+  isArray: Boolean!
+  isNotNull: Boolean
+  pgType: String!
+  subtype: String
+}
+
+"""Information about a unique constraint"""
+type MetaUniqueConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Bucket`."""
+  createBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateBucketInput!
+  ): CreateBucketPayload
+
+  """Creates a single `File`."""
+  createFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateFileInput!
+  ): CreateFilePayload
+
+  """Creates a single `PlatformBucket`."""
+  createPlatformBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformBucketInput!
+  ): CreatePlatformBucketPayload
+
+  """Creates a single `PlatformFile`."""
+  createPlatformFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformFileInput!
+  ): CreatePlatformFilePayload
+
+  """Deletes a single `Bucket` using a unique key."""
+  deleteBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBucketInput!
+  ): DeleteBucketPayload
+
+  """Deletes a single `File` using a unique key."""
+  deleteFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFileInput!
+  ): DeleteFilePayload
+
+  """Deletes a single `PlatformBucket` using a unique key."""
+  deletePlatformBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformBucketInput!
+  ): DeletePlatformBucketPayload
+
+  """Deletes a single `PlatformFile` using a unique key."""
+  deletePlatformFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformFileInput!
+  ): DeletePlatformFilePayload
+  filesRename(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: FilesRenameInput!
+  ): FilesRenamePayload
+  platformFilesRename(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformFilesRenameInput!
+  ): PlatformFilesRenamePayload
+
+  """
+  Provision an S3 bucket for a logical bucket in the database.
+  Reads the bucket config via RLS, then creates and configures
+  the S3 bucket with the appropriate privacy policies, CORS rules,
+  and lifecycle settings.
+  """
+  provisionBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionBucketInput!
+  ): ProvisionBucketPayload
+
+  """Updates a single `Bucket` using a unique key and a patch."""
+  updateBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBucketInput!
+  ): UpdateBucketPayload
+
+  """Updates a single `File` using a unique key and a patch."""
+  updateFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFileInput!
+  ): UpdateFilePayload
+
+  """Updates a single `PlatformBucket` using a unique key and a patch."""
+  updatePlatformBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformBucketInput!
+  ): UpdatePlatformBucketPayload
+
+  """Updates a single `PlatformFile` using a unique key and a patch."""
+  updatePlatformFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformFileInput!
+  ): UpdatePlatformFilePayload
+
+  """
+  Upload a file: resolves the bucket by key, creates the file row, and returns a presigned PUT URL.
+  """
+  uploadPlatformFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UploadPlatformFileInput!
+  ): UploadPlatformFilePayload
+
+  """
+  Upload multiple files: resolves the bucket by key, creates file rows, and returns presigned PUT URLs for each.
+  """
+  uploadPlatformFiles(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UploadPlatformFileBulkInput!
+  ): UploadPlatformFileBulkPayload
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""
+Logical storage containers that group files with shared access policies and CDN behavior
+"""
+type PlatformBucket {
+  """User who created this bucket. Forced to current_user_id() on INSERT."""
+  actorId: UUID!
+
+  """
+  When true, clients can provide custom S3 keys (e.g. reports/2024/Q1.pdf). When false (default), S3 key = content hash (automatic dedup). contentHash always required for integrity.
+  """
+  allowCustomKeys: Boolean!
+
+  """
+  Whitelist of allowed MIME types for files in this bucket (NULL = all allowed, enforcement deferred)
+  """
+  allowedMimeTypes: [String]
+
+  """
+  Per-bucket CORS allowed origins override (NULL = inherit from storage_module/plugin defaults). Use ARRAY['*'] for open/CDN mode.
+  """
+  allowedOrigins: [String]
+  createdAt: Datetime
+
+  """Human-readable description of the bucket purpose"""
+  description: String
+
+  """
+  Reads a single `PlatformBucket` that is related to this `PlatformBucket`.
+  """
+  destinationBucket: PlatformBucket
+
+  """
+  For a temp bucket, the permanent bucket its uploads are promoted into. NULL on non-temp buckets; required on temp buckets.
+  """
+  destinationBucketId: UUID
+  id: UUID!
+
+  """
+  Whether bucket contents are publicly readable. Set to true when type is public.
+  """
+  isPublic: Boolean!
+
+  """
+  Unique bucket identifier used in S3 key paths (e.g. avatars, documents, temp)
+  """
+  key: String!
+
+  """
+  Maximum file size in bytes allowed in this bucket (NULL = no limit, enforcement deferred)
+  """
+  maxFileSize: BigInt
+
+  """
+  Physical S3/MinIO bucket name recorded at provision time (NULL until the physical bucket exists)
+  """
+  physicalName: String
+
+  """Reads and enables pagination through a set of `PlatformBucket`."""
+  platformBucketsByDestinationBucketId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformBucket`."""
+    orderBy: [PlatformBucketOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformBucketFilter
+  ): PlatformBucketConnection!
+
+  """Reads and enables pagination through a set of `PlatformFile`."""
+  platformFilesByBucketId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformFile`."""
+    orderBy: [PlatformFileOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformFileFilter
+  ): PlatformFileConnection!
+
+  """
+  For a temp bucket, how long an unpromoted staged file survives before it is eligible for expiry. NULL on non-temp buckets; required on temp buckets.
+  """
+  stagingTtl: Interval
+
+  """
+  Selector labels for capability resolution and grouping (e.g. uploads, variants, exports). A function's required bucket key is matched against these plus type.
+  """
+  tags: [String]
+
+  """
+  Bucket CDN access type: public (CDN-served), private (presigned GET), temp (staging uploads)
+  """
+  type: BucketType!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformBucket` values."""
+type PlatformBucketConnection {
+  """
+  A list of edges which contains the `PlatformBucket` and cursor to aid in pagination.
+  """
+  edges: [PlatformBucketEdge]!
+
+  """A list of `PlatformBucket` objects."""
+  nodes: [PlatformBucket]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PlatformBucket` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PlatformBucket` edge in the connection."""
+type PlatformBucketEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformBucket` at the end of the edge."""
+  node: PlatformBucket
+}
+
+"""
+A filter to be used against `PlatformBucket` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformBucketFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `allowCustomKeys` field."""
+  allowCustomKeys: BooleanFilter
+
+  """Filter by the object’s `allowedMimeTypes` field."""
+  allowedMimeTypes: StringListFilter
+
+  """Filter by the object’s `allowedOrigins` field."""
+  allowedOrigins: StringListFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformBucketFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `destinationBucket` relation."""
+  destinationBucket: PlatformBucketFilter
+
+  """A related `destinationBucket` exists."""
+  destinationBucketExists: Boolean
+
+  """Filter by the object’s `destinationBucketId` field."""
+  destinationBucketId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isPublic` field."""
+  isPublic: BooleanFilter
+
+  """Filter by the object’s `key` field."""
+  key: StringFilter
+
+  """Filter by the object’s `maxFileSize` field."""
+  maxFileSize: BigIntFilter
+
+  """Negates the expression."""
+  not: PlatformBucketFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformBucketFilter!]
+
+  """Filter by the object’s `physicalName` field."""
+  physicalName: StringFilter
+
+  """
+  Filter by the object’s `platformBucketsByDestinationBucketId` relation.
+  """
+  platformBucketsByDestinationBucketId: PlatformBucketToManyPlatformBucketFilter
+
+  """`platformBucketsByDestinationBucketId` exist."""
+  platformBucketsByDestinationBucketIdExist: Boolean
+
+  """Filter by the object’s `platformFilesByBucketId` relation."""
+  platformFilesByBucketId: PlatformBucketToManyPlatformFileFilter
+
+  """`platformFilesByBucketId` exist."""
+  platformFilesByBucketIdExist: Boolean
+
+  """Filter by the object’s `stagingTtl` field."""
+  stagingTtl: IntervalFilter
+
+  """Filter by the object’s `tags` field."""
+  tags: StringListFilter
+
+  """Filter by the object’s `type` field."""
+  type: BucketTypeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `PlatformBucket`"""
+input PlatformBucketInput {
+  """User who created this bucket. Forced to current_user_id() on INSERT."""
+  actorId: UUID!
+
+  """
+  When true, clients can provide custom S3 keys (e.g. reports/2024/Q1.pdf). When false (default), S3 key = content hash (automatic dedup). contentHash always required for integrity.
+  """
+  allowCustomKeys: Boolean
+
+  """
+  Whitelist of allowed MIME types for files in this bucket (NULL = all allowed, enforcement deferred)
+  """
+  allowedMimeTypes: [String]
+
+  """
+  Per-bucket CORS allowed origins override (NULL = inherit from storage_module/plugin defaults). Use ARRAY['*'] for open/CDN mode.
+  """
+  allowedOrigins: [String]
+  createdAt: Datetime
+
+  """Human-readable description of the bucket purpose"""
+  description: String
+
+  """
+  For a temp bucket, the permanent bucket its uploads are promoted into. NULL on non-temp buckets; required on temp buckets.
+  """
+  destinationBucketId: UUID
+  id: UUID
+
+  """
+  Whether bucket contents are publicly readable. Set to true when type is public.
+  """
+  isPublic: Boolean
+
+  """
+  Unique bucket identifier used in S3 key paths (e.g. avatars, documents, temp)
+  """
+  key: String!
+
+  """
+  Maximum file size in bytes allowed in this bucket (NULL = no limit, enforcement deferred)
+  """
+  maxFileSize: BigInt
+
+  """
+  Physical S3/MinIO bucket name recorded at provision time (NULL until the physical bucket exists)
+  """
+  physicalName: String
+
+  """
+  For a temp bucket, how long an unpromoted staged file survives before it is eligible for expiry. NULL on non-temp buckets; required on temp buckets.
+  """
+  stagingTtl: IntervalInput
+
+  """
+  Selector labels for capability resolution and grouping (e.g. uploads, variants, exports). A function's required bucket key is matched against these plus type.
+  """
+  tags: [String]
+
+  """
+  Bucket CDN access type: public (CDN-served), private (presigned GET), temp (staging uploads)
+  """
+  type: BucketType
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `PlatformBucket`."""
+enum PlatformBucketOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ALLOWED_MIME_TYPES_ASC
+  ALLOWED_MIME_TYPES_DESC
+  ALLOWED_ORIGINS_ASC
+  ALLOWED_ORIGINS_DESC
+  ALLOW_CUSTOM_KEYS_ASC
+  ALLOW_CUSTOM_KEYS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  DESTINATION_BUCKET_ID_ASC
+  DESTINATION_BUCKET_ID_DESC
+  ID_ASC
+  ID_DESC
+  IS_PUBLIC_ASC
+  IS_PUBLIC_DESC
+  KEY_ASC
+  KEY_DESC
+  MAX_FILE_SIZE_ASC
+  MAX_FILE_SIZE_DESC
+  NATURAL
+  PHYSICAL_NAME_ASC
+  PHYSICAL_NAME_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STAGING_TTL_ASC
+  STAGING_TTL_DESC
+  TAGS_ASC
+  TAGS_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformBucket`. Fields that are set will be updated.
+"""
+input PlatformBucketPatch {
+  """User who created this bucket. Forced to current_user_id() on INSERT."""
+  actorId: UUID
+
+  """
+  When true, clients can provide custom S3 keys (e.g. reports/2024/Q1.pdf). When false (default), S3 key = content hash (automatic dedup). contentHash always required for integrity.
+  """
+  allowCustomKeys: Boolean
+
+  """
+  Whitelist of allowed MIME types for files in this bucket (NULL = all allowed, enforcement deferred)
+  """
+  allowedMimeTypes: [String]
+
+  """
+  Per-bucket CORS allowed origins override (NULL = inherit from storage_module/plugin defaults). Use ARRAY['*'] for open/CDN mode.
+  """
+  allowedOrigins: [String]
+  createdAt: Datetime
+
+  """Human-readable description of the bucket purpose"""
+  description: String
+
+  """
+  For a temp bucket, the permanent bucket its uploads are promoted into. NULL on non-temp buckets; required on temp buckets.
+  """
+  destinationBucketId: UUID
+  id: UUID
+
+  """
+  Whether bucket contents are publicly readable. Set to true when type is public.
+  """
+  isPublic: Boolean
+
+  """
+  Unique bucket identifier used in S3 key paths (e.g. avatars, documents, temp)
+  """
+  key: String
+
+  """
+  Maximum file size in bytes allowed in this bucket (NULL = no limit, enforcement deferred)
+  """
+  maxFileSize: BigInt
+
+  """
+  Physical S3/MinIO bucket name recorded at provision time (NULL until the physical bucket exists)
+  """
+  physicalName: String
+
+  """
+  For a temp bucket, how long an unpromoted staged file survives before it is eligible for expiry. NULL on non-temp buckets; required on temp buckets.
+  """
+  stagingTtl: IntervalInput
+
+  """
+  Selector labels for capability resolution and grouping (e.g. uploads, variants, exports). A function's required bucket key is matched against these plus type.
+  """
+  tags: [String]
+
+  """
+  Bucket CDN access type: public (CDN-served), private (presigned GET), temp (staging uploads)
+  """
+  type: BucketType
+  updatedAt: Datetime
+}
+
+"""
+A filter to be used against many `PlatformBucket` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformBucketToManyPlatformBucketFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformBucketFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformBucketFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformBucketFilter
+}
+
+"""
+A filter to be used against many `PlatformFile` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformBucketToManyPlatformFileFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformFileFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformFileFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformFileFilter
+}
+
+"""
+Individual file records within buckets, with immutable identity fields and mutable metadata
+"""
+type PlatformFile {
+  """
+  User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization.
+  """
+  actorId: UUID!
+
+  """
+  Reads a single `PlatformBucket` that is related to this `PlatformFile`.
+  """
+  bucket: PlatformBucket
+
+  """
+  Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger.
+  """
+  bucketId: UUID!
+
+  """
+  SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately.
+  """
+  contentHash: String
+  createdAt: Datetime
+
+  """Human-readable description or alt text for the file (mutable)"""
+  description: String
+
+  """
+  URL to download this file. For public files, returns the public URL. For private files, returns a time-limited presigned URL.
+  """
+  downloadUrl: String
+
+  """
+  When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once.
+  """
+  expiryEnqueuedAt: Datetime
+  filePath: String
+
+  """
+  Original filename provided by the uploader. Used for display and Content-Disposition header on download.
+  """
+  filename: String
+  id: UUID!
+
+  """
+  Whether this file is publicly readable. Inherited from bucket on INSERT.
+  """
+  isPublic: Boolean!
+
+  """S3 object key for this file, unique within its bucket"""
+  key: String!
+
+  """
+  MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT.
+  """
+  mimeType: String!
+
+  """
+  When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged.
+  """
+  promotedAt: Datetime
+
+  """File size in bytes. Immutable after INSERT."""
+  size: BigInt!
+
+  """
+  File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed).
+  """
+  status: FileStatus!
+
+  """User-defined tags for categorization and search (mutable)"""
+  tags: [String]
+  updatedAt: Datetime
+
+  """
+  Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file.
+  """
+  upload: ConstructiveInternalTypeUpload
+}
+
+"""A connection to a list of `PlatformFile` values."""
+type PlatformFileConnection {
+  """
+  A list of edges which contains the `PlatformFile` and cursor to aid in pagination.
+  """
+  edges: [PlatformFileEdge]!
+
+  """A list of `PlatformFile` objects."""
+  nodes: [PlatformFile]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PlatformFile` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PlatformFile` edge in the connection."""
+type PlatformFileEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformFile` at the end of the edge."""
+  node: PlatformFile
+}
+
+"""
+A filter to be used against `PlatformFile` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformFileFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformFileFilter!]
+
+  """Filter by the object’s `bucket` relation."""
+  bucket: PlatformBucketFilter
+
+  """Filter by the object’s `bucketId` field."""
+  bucketId: UUIDFilter
+
+  """Filter by the object’s `contentHash` field."""
+  contentHash: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `expiryEnqueuedAt` field."""
+  expiryEnqueuedAt: DatetimeFilter
+
+  """Filter by the object’s `filename` field."""
+  filename: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isPublic` field."""
+  isPublic: BooleanFilter
+
+  """Filter by the object’s `key` field."""
+  key: StringFilter
+
+  """Filter by the object’s `mimeType` field."""
+  mimeType: StringFilter
+
+  """Negates the expression."""
+  not: PlatformFileFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformFileFilter!]
+
+  """Filter by the object’s `promotedAt` field."""
+  promotedAt: DatetimeFilter
+
+  """Filter by the object’s `size` field."""
+  size: BigIntFilter
+
+  """Filter by the object’s `status` field."""
+  status: FileStatusFilter
+
+  """Filter by the object’s `tags` field."""
+  tags: StringListFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `upload` field."""
+  upload: ConstructiveInternalTypeUploadFilter
+}
+
+"""An input for mutations affecting `PlatformFile`"""
+input PlatformFileInput {
+  """
+  User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization.
+  """
+  actorId: UUID!
+
+  """
+  Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger.
+  """
+  bucketId: UUID!
+
+  """
+  SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately.
+  """
+  contentHash: String
+  createdAt: Datetime
+
+  """Human-readable description or alt text for the file (mutable)"""
+  description: String
+
+  """
+  When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once.
+  """
+  expiryEnqueuedAt: Datetime
+
+  """
+  Original filename provided by the uploader. Used for display and Content-Disposition header on download.
+  """
+  filename: String
+  id: UUID
+
+  """
+  Whether this file is publicly readable. Inherited from bucket on INSERT.
+  """
+  isPublic: Boolean
+
+  """S3 object key for this file, unique within its bucket"""
+  key: String!
+
+  """
+  MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT.
+  """
+  mimeType: String!
+
+  """
+  When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged.
+  """
+  promotedAt: Datetime
+
+  """File size in bytes. Immutable after INSERT."""
+  size: BigInt!
+
+  """
+  File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed).
+  """
+  status: FileStatus
+
+  """User-defined tags for categorization and search (mutable)"""
+  tags: [String]
+  updatedAt: Datetime
+
+  """
+  Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file.
+  """
+  upload: ConstructiveInternalTypeUpload
+}
+
+"""Methods to use when ordering `PlatformFile`."""
+enum PlatformFileOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  BUCKET_ID_ASC
+  BUCKET_ID_DESC
+  CONTENT_HASH_ASC
+  CONTENT_HASH_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  EXPIRY_ENQUEUED_AT_ASC
+  EXPIRY_ENQUEUED_AT_DESC
+  FILENAME_ASC
+  FILENAME_DESC
+  ID_ASC
+  ID_DESC
+  IS_PUBLIC_ASC
+  IS_PUBLIC_DESC
+  KEY_ASC
+  KEY_DESC
+  MIME_TYPE_ASC
+  MIME_TYPE_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROMOTED_AT_ASC
+  PROMOTED_AT_DESC
+  SIZE_ASC
+  SIZE_DESC
+  STATUS_ASC
+  STATUS_DESC
+  TAGS_ASC
+  TAGS_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPLOAD_ASC
+  UPLOAD_DESC
+}
+
+"""
+Represents an update to a `PlatformFile`. Fields that are set will be updated.
+"""
+input PlatformFilePatch {
+  """
+  User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization.
+  """
+  actorId: UUID
+
+  """
+  Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger.
+  """
+  bucketId: UUID
+
+  """
+  SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately.
+  """
+  contentHash: String
+  createdAt: Datetime
+
+  """Human-readable description or alt text for the file (mutable)"""
+  description: String
+
+  """
+  When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once.
+  """
+  expiryEnqueuedAt: Datetime
+
+  """
+  Original filename provided by the uploader. Used for display and Content-Disposition header on download.
+  """
+  filename: String
+  id: UUID
+
+  """
+  Whether this file is publicly readable. Inherited from bucket on INSERT.
+  """
+  isPublic: Boolean
+
+  """S3 object key for this file, unique within its bucket"""
+  key: String
+
+  """
+  MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT.
+  """
+  mimeType: String
+
+  """
+  When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged.
+  """
+  promotedAt: Datetime
+
+  """File size in bytes. Immutable after INSERT."""
+  size: BigInt
+
+  """
+  File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed).
+  """
+  status: FileStatus
+
+  """User-defined tags for categorization and search (mutable)"""
+  tags: [String]
+  updatedAt: Datetime
+
+  """
+  Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file.
+  """
+  upload: ConstructiveInternalTypeUpload
+
+  """
+  Upload for Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file.
+  """
+  uploadUpload: Upload
+}
+
+"""All input for the `platformFilesRename` mutation."""
+input PlatformFilesRenameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  fileId: UUID
+  newFilename: String
+}
+
+"""The output of our `platformFilesRename` mutation."""
+type PlatformFilesRenamePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `PlatformFile`. May be used by Relay 1."""
+  platformFileEdge(
+    """The method to use when ordering `PlatformFile`."""
+    orderBy: [PlatformFileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformFileEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: PlatformFile
+}
+
+input ProvisionBucketInput {
+  """The logical bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
+  """
+  Owner entity ID for entity-scoped bucket provisioning.
+  Omit for app-level (database-wide) storage.
+  """
+  ownerId: UUID
+}
+
+type ProvisionBucketPayload {
+  """The access type applied"""
+  accessType: String!
+
+  """The S3 bucket name that was provisioned"""
+  bucketName: String!
+
+  """The S3 endpoint (null for AWS S3 default)"""
+  endpoint: String
+
+  """Error message if provisioning failed"""
+  error: String
+
+  """The storage provider used"""
+  provider: String!
+
+  """Whether provisioning succeeded"""
+  success: Boolean!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+
+  """Reads and enables pagination through a set of `Bucket`."""
+  buckets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Bucket`."""
+    orderBy: [BucketOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: BucketFilter
+  ): BucketConnection
+
+  """Reads and enables pagination through a set of `File`."""
+  files(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `File`."""
+    orderBy: [FileOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FileFilter
+  ): FileConnection
+
+  """Reads and enables pagination through a set of `PlatformBucket`."""
+  platformBuckets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformBucket`."""
+    orderBy: [PlatformBucketOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformBucketFilter
+  ): PlatformBucketConnection
+
+  """Reads and enables pagination through a set of `PlatformFile`."""
+  platformFiles(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformFile`."""
+    orderBy: [PlatformFileOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformFileFilter
+  ): PlatformFileConnection
+}
+
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+}
+
+"""
+A filter to be used against String List fields. All fields are combined with a logical ‘and.’
+"""
+input StringListFilter {
+  """Any array item is equal to the specified value."""
+  anyEqualTo: String
+
+  """Any array item is greater than the specified value."""
+  anyGreaterThan: String
+
+  """Any array item is greater than or equal to the specified value."""
+  anyGreaterThanOrEqualTo: String
+
+  """Any array item is less than the specified value."""
+  anyLessThan: String
+
+  """Any array item is less than or equal to the specified value."""
+  anyLessThanOrEqualTo: String
+
+  """Any array item is not equal to the specified value."""
+  anyNotEqualTo: String
+
+  """Contained by the specified list of values."""
+  containedBy: [String]
+
+  """Contains the specified list of values."""
+  contains: [String]
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: [String]
+
+  """Equal to the specified value."""
+  equalTo: [String]
+
+  """Greater than the specified value."""
+  greaterThan: [String]
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: [String]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: [String]
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: [String]
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: [String]
+
+  """Not equal to the specified value."""
+  notEqualTo: [String]
+
+  """Overlaps the specified list of values."""
+  overlaps: [String]
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: UUID
+
+  """Equal to the specified value."""
+  equalTo: UUID
+
+  """Greater than the specified value."""
+  greaterThan: UUID
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: UUID
+
+  """Included in the specified list."""
+  in: [UUID!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: UUID
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: UUID
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: UUID
+
+  """Not equal to the specified value."""
+  notEqualTo: UUID
+
+  """Not included in the specified list."""
+  notIn: [UUID!]
+}
+
+"""All input for the `updateBucket` mutation."""
+input UpdateBucketInput {
+  """
+  An object where the defined keys will be set on the `Bucket` being updated.
+  """
+  bucketPatch: BucketPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our update `Bucket` mutation."""
+type UpdateBucketPayload {
+  """The `Bucket` that was updated by this mutation."""
+  bucket: Bucket
+
+  """An edge for our `Bucket`. May be used by Relay 1."""
+  bucketEdge(
+    """The method to use when ordering `Bucket`."""
+    orderBy: [BucketOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BucketEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateFile` mutation."""
+input UpdateFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `File` being updated.
+  """
+  filePatch: FilePatch!
+  id: UUID!
+}
+
+"""The output of our update `File` mutation."""
+type UpdateFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `File` that was updated by this mutation."""
+  file: File
+
+  """An edge for our `File`. May be used by Relay 1."""
+  fileEdge(
+    """The method to use when ordering `File`."""
+    orderBy: [FileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FileEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformBucket` mutation."""
+input UpdatePlatformBucketInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformBucket` being updated.
+  """
+  platformBucketPatch: PlatformBucketPatch!
+}
+
+"""The output of our update `PlatformBucket` mutation."""
+type UpdatePlatformBucketPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformBucket` that was updated by this mutation."""
+  platformBucket: PlatformBucket
+
+  """An edge for our `PlatformBucket`. May be used by Relay 1."""
+  platformBucketEdge(
+    """The method to use when ordering `PlatformBucket`."""
+    orderBy: [PlatformBucketOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformBucketEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformFile` mutation."""
+input UpdatePlatformFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformFile` being updated.
+  """
+  platformFilePatch: PlatformFilePatch!
+}
+
+"""The output of our update `PlatformFile` mutation."""
+type UpdatePlatformFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformFile` that was updated by this mutation."""
+  platformFile: PlatformFile
+
+  """An edge for our `PlatformFile`. May be used by Relay 1."""
+  platformFileEdge(
+    """The method to use when ordering `PlatformFile`."""
+    orderBy: [PlatformFileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformFileEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input UploadPlatformFileBulkFileInput {
+  """SHA-256 content hash (hex-encoded, 64 chars)"""
+  contentHash: String!
+
+  """MIME type of the file"""
+  contentType: String!
+
+  """Original filename (optional)"""
+  filename: String
+
+  """Custom S3 key (only when bucket has allow_custom_keys=true)"""
+  key: String
+
+  """File size in bytes"""
+  size: Int!
+}
+
+type UploadPlatformFileBulkFilePayload {
+  deduplicated: Boolean!
+  expiresAt: String
+
+  """The projection document for the created file."""
+  file: JSON
+  fileId: String!
+  key: String!
+  previousVersionId: String
+  uploadUrl: String
+}
+
+input UploadPlatformFileBulkInput {
+  """
+  Bucket key (e.g., "public", "private"). Omit to use the database's default bucket for the requested access.
+  """
+  bucketKey: String
+
+  """Array of files to upload"""
+  files: [UploadPlatformFileBulkFileInput!]!
+
+  """
+  Which default bucket to resolve when bucketKey is omitted. Ignored when bucketKey is given.
+  """
+  isPublic: Boolean
+}
+
+type UploadPlatformFileBulkPayload {
+  files: [UploadPlatformFileBulkFilePayload!]!
+}
+
+input UploadPlatformFileInput {
+  """
+  Bucket key (e.g., "public", "private"). Omit to use the database's default bucket for the requested access.
+  """
+  bucketKey: String
+
+  """SHA-256 content hash (hex-encoded, 64 chars)"""
+  contentHash: String!
+
+  """MIME type of the file"""
+  contentType: String!
+
+  """Original filename (optional)"""
+  filename: String
+
+  """
+  Which default bucket to resolve when bucketKey is omitted: the public one (true) or the private one (default false). Ignored when bucketKey is given.
+  """
+  isPublic: Boolean
+
+  """Custom S3 key (only when bucket has allow_custom_keys=true)"""
+  key: String
+
+  """File size in bytes"""
+  size: Int!
+}
+
+type UploadPlatformFilePayload {
+  """Whether this file was deduplicated (content already exists)"""
+  deduplicated: Boolean!
+
+  """Presigned URL expiry time (null if deduplicated)"""
+  expiresAt: String
+
+  """
+  The projection document for the created file: {id, key, bucket_id, mime, size, filename, url?}. Store this verbatim in an image/upload column — its `id` is what keeps the object from being garbage collected while the column still references it.
+  """
+  file: JSON
+
+  """The file ID (UUID)"""
+  fileId: String!
+
+  """The S3 object key"""
+  key: String!
+
+  """ID of the previous version (when using custom keys)"""
+  previousVersionId: String
+
+  """Presigned PUT URL (null if deduplicated)"""
+  uploadUrl: String
+}

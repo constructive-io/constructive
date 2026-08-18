@@ -17,8 +17,10 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   annotations: 'json',
+  catalogImageId: 'uuid',
   createdAt: 'string',
   createdBy: 'uuid',
+  createdByPrincipal: 'uuid',
   databaseId: 'uuid',
   defaultSpec: 'json',
   description: 'string',
@@ -35,6 +37,7 @@ const fieldSchema: FieldSchema = {
   stepUpMinAge: 'string',
   updatedAt: 'string',
   updatedBy: 'uuid',
+  updatedByPrincipal: 'uuid',
 };
 const usage =
   '\nresource-definition <command>\n\nCommands:\n  list                  List resourceDefinition records\n  find-first            Find first matching resourceDefinition record\n  get                   Get a resourceDefinition by ID\n  create                Create a new resourceDefinition\n  update                Update an existing resourceDefinition\n  delete                Delete a resourceDefinition\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -88,8 +91,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       annotations: true,
+      catalogImageId: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       defaultSpec: true,
       description: true,
@@ -106,6 +111,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       stepUpMinAge: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -131,8 +137,10 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       annotations: true,
+      catalogImageId: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       defaultSpec: true,
       description: true,
@@ -149,6 +157,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       stepUpMinAge: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -186,8 +195,10 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           annotations: true,
+          catalogImageId: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           defaultSpec: true,
           description: true,
@@ -204,6 +215,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           stepUpMinAge: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -228,8 +240,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'catalogImageId',
+        message: 'catalogImageId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'createdBy',
         message: 'createdBy',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -326,6 +352,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -337,7 +370,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           annotations: cleanedData.annotations,
+          catalogImageId: cleanedData.catalogImageId,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           defaultSpec: cleanedData.defaultSpec,
           description: cleanedData.description,
@@ -352,11 +387,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           slug: cleanedData.slug,
           stepUpMinAge: cleanedData.stepUpMinAge,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
+          catalogImageId: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           defaultSpec: true,
           description: true,
@@ -373,6 +411,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           stepUpMinAge: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -403,8 +442,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'catalogImageId',
+        message: 'catalogImageId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'createdBy',
         message: 'createdBy',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -501,6 +554,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as ResourceDefinitionPatch;
@@ -512,7 +572,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           annotations: cleanedData.annotations,
+          catalogImageId: cleanedData.catalogImageId,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           defaultSpec: cleanedData.defaultSpec,
           description: cleanedData.description,
@@ -527,11 +589,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           slug: cleanedData.slug,
           stepUpMinAge: cleanedData.stepUpMinAge,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
+          catalogImageId: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           defaultSpec: true,
           description: true,
@@ -548,6 +613,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           stepUpMinAge: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();

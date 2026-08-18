@@ -7,8 +7,8 @@ Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-
 ## Usage
 
 ```typescript
-useConfigsQuery({ selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } } })
-useConfigQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } } })
+useConfigsQuery({ selection: { fields: { annotations: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, updatedByPrincipal: true, value: true } } })
+useConfigQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, updatedByPrincipal: true, value: true } } })
 useCreateConfigMutation({ selection: { fields: { id: true } } })
 useUpdateConfigMutation({ selection: { fields: { id: true } } })
 useDeleteConfigMutation({})
@@ -20,7 +20,7 @@ useDeleteConfigMutation({})
 
 ```typescript
 const { data, isLoading } = useConfigsQuery({
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } },
+  selection: { fields: { annotations: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, updatedByPrincipal: true, value: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useConfigsQuery({
 const { mutate } = useCreateConfigMutation({
   selection: { fields: { id: true } },
 });
-mutate({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', value: '<String>' });
+mutate({ annotations: '<JSON>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', updatedByPrincipal: '<UUID>', value: '<String>' });
 ```
