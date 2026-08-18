@@ -1,5 +1,6 @@
 import 'graphile-build';
 
+import type { ScopedIntrospectionServiceOptions } from '@constructive-io/graphql-types';
 import { withPgClientFromPgService } from '@dataplan/pg';
 import {
   PgIntrospectionPlugin,
@@ -17,27 +18,15 @@ import {
   type ScopedCatalogTypes,
 } from './scoped-introspection-query';
 
-export type GraphileIntrospectionMode = 'stock' | 'scoped-required';
-
-export interface ScopedIntrospectionServiceOptions {
-  introspectionMode?: GraphileIntrospectionMode;
-  introspectionScopedCatalogTypes?: ScopedCatalogTypes;
-  introspectionAllowedDependencySchemas?: readonly string[];
-  introspectionCapabilityExtensions?: readonly string[];
-}
+export type {
+  GraphileIntrospectionMode,
+  ScopedIntrospectionServiceOptions,
+} from '@constructive-io/graphql-types';
 
 declare global {
   namespace GraphileConfig {
-    interface PgServiceConfiguration {
-      /** Selects the catalog query used during this service's gather phase. */
-      introspectionMode?: GraphileIntrospectionMode;
-      /** Catalog types retained by scoped introspection; defaults to all. */
-      introspectionScopedCatalogTypes?: ScopedCatalogTypes;
-      /** Non-root schemas that scoped dependency closure may retain. */
-      introspectionAllowedDependencySchemas?: readonly string[];
-      /** Installed extensions whose optional capability metadata is required. */
-      introspectionCapabilityExtensions?: readonly string[];
-    }
+    interface PgServiceConfiguration
+      extends ScopedIntrospectionServiceOptions {}
   }
 }
 

@@ -1,4 +1,6 @@
-export type GraphileIntrospectionMode = 'stock' | 'scoped-required';
+import type { GraphileIntrospectionMode } from '@constructive-io/graphql-types';
+
+export type { GraphileIntrospectionMode } from '@constructive-io/graphql-types';
 
 export const DEFAULT_INTROSPECTION_STATEMENT_TIMEOUT = '120s';
 

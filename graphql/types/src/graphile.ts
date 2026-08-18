@@ -5,6 +5,19 @@ export const graphileIntrospectionModes = ['stock', 'scoped-required'] as const;
 export type GraphileIntrospectionMode =
   (typeof graphileIntrospectionModes)[number];
 
+export type ScopedCatalogTypes = 'all' | 'dependency-closure';
+
+export interface ScopedIntrospectionServiceOptions {
+  /** Selects the catalog query used during this service's gather phase. */
+  introspectionMode?: GraphileIntrospectionMode;
+  /** Catalog types retained by scoped introspection; defaults to all. */
+  introspectionScopedCatalogTypes?: ScopedCatalogTypes;
+  /** Non-root schemas that scoped dependency closure may retain. */
+  introspectionAllowedDependencySchemas?: readonly string[];
+  /** Installed extensions whose optional capability metadata is required. */
+  introspectionCapabilityExtensions?: readonly string[];
+}
+
 /**
  * PostGraphile/Graphile v5 configuration
  */

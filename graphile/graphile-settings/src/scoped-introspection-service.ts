@@ -1,4 +1,4 @@
-import type { ScopedIntrospectionServiceOptions } from 'graphile-scoped-introspection';
+import type { ScopedIntrospectionServiceOptions } from '@constructive-io/graphql-types';
 
 import {
   normalizeIntrospectionDependencySchemas,
