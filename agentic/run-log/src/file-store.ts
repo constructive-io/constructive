@@ -29,7 +29,7 @@ import {
   type RunLogStore,
   START
 } from './store';
-import type { PiSessionEntry } from './transcripts/pi-entry';
+import type { TranscriptEntry } from './transcripts/entry';
 
 export interface FileRunLogStoreOptions {
   /** Absolute path of the log file. Parent directories are created. */
@@ -68,7 +68,7 @@ export class FileRunLogStore implements RunLogStore {
 
   async append(
     runId: string,
-    entries: readonly PiSessionEntry[],
+    entries: readonly TranscriptEntry[],
     options: AppendOptions = {}
   ): Promise<RunEventRecord[]> {
     const existing = this.load().filter((record) => record.runId === runId);

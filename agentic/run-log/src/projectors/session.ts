@@ -8,6 +8,11 @@
  *
  * Returns a string rather than writing a file: the projection is pure, and the
  * node-side write lives in `@agentic-kit/run-log/file-store`.
+ *
+ * Unlike the other projectors this one is deliberately *not* neutral:
+ * re-emitting a transcript in its native encoding is per-format work, so a
+ * second harness ships its own session projection beside its reader rather than
+ * reusing this. The neutral half of "read a log" is `../transcripts/event`.
  */
 
 import { assertOrdered, type RunEventRecord } from '../record';
@@ -53,7 +58,8 @@ export function projectSession(
   }
   const transcriptVersion = records[0]?.transcriptVersion ?? SUPPORTED_PI_TRANSCRIPT_VERSION;
 
-  const entries = records.map((record) => record.entry);
+  // Safe: every record was just asserted to carry the pi transcript format.
+  const entries = records.map((record) => record.entry as PiSessionEntry);
   const headerIndex = entries.findIndex(isPiSessionHeader);
   if (headerIndex > 0) {
     throw new Error(

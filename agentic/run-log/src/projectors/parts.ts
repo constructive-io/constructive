@@ -1,25 +1,18 @@
 /**
  * Renderable projection: run log records → an ordered list of parts a UI draws.
  *
- * This is the projection that replaces per-host transcript encodings. A tool
- * call and its later result collapse into one part, so a renderer never has to
- * correlate two messages itself, and an unknown entry type becomes an
- * `unknown` part rather than disappearing — a log written by a newer pi still
- * renders, minus the detail this version understands.
+ * This is the projection that replaces per-host transcript encodings. It reads
+ * neutral transcript events rather than any harness's entries, so a renderer
+ * draws a run without knowing which harness produced it. A tool call and its
+ * later result collapse into one part, so a renderer never has to correlate two
+ * messages itself, and an entry the format's reader does not understand becomes
+ * an `unknown` part rather than disappearing — a log written by a newer harness
+ * still renders, minus the detail this version understands.
  */
 
 import type { RunEventRecord } from '../record';
-import {
-  contentText,
-  isAssistantMessage,
-  isPiBranchSummaryEntry,
-  isPiCompactionEntry,
-  isPiMessageEntry,
-  isPiSessionHeader,
-  isToolResultMessage,
-  type PiSessionEntry,
-  toolCalls
-} from '../transcripts/pi-entry';
+import type { TranscriptEntry } from '../transcripts/entry';
+import { type ProjectionOptions, toEvents } from './events';
 
 export type ToolStatus = 'requested' | 'completed' | 'failed';
 
@@ -79,7 +72,7 @@ export interface SummaryPart extends PartBase {
 export interface UnknownPart extends PartBase {
   kind: 'unknown';
   entryType: string;
-  entry: PiSessionEntry;
+  entry: TranscriptEntry;
 }
 
 export type ConversationPart =
@@ -93,137 +86,120 @@ export type ConversationPart =
 
 export interface Conversation {
   parts: ConversationPart[];
-  /** From the session header, when the log carries one. */
+  /** From the transcript's opening entry, when the log carries one. */
   sessionId?: string;
   cwd?: string;
 }
 
 /**
  * Project records into a conversation. Pure and total: the same records always
- * produce the same parts, whichever host wrote them.
+ * produce the same parts, whichever harness wrote them.
  */
-export function projectParts(records: readonly RunEventRecord[]): Conversation {
+export function projectParts(
+  records: readonly RunEventRecord[],
+  options: ProjectionOptions = {}
+): Conversation {
   const parts: ConversationPart[] = [];
   const toolsByCallId = new Map<string, ToolPart>();
   let sessionId: string | undefined;
   let cwd: string | undefined;
 
-  for (const record of records) {
-    const { entry, seq } = record;
+  for (const { seq, event } of toEvents(records, options)) {
+    const base = { seq, ...(event.entryId === undefined ? {} : { entryId: event.entryId }) };
 
-    if (isPiSessionHeader(entry)) {
-      sessionId = entry.id;
-      if (typeof entry.cwd === 'string') cwd = entry.cwd;
-      continue;
+    switch (event.kind) {
+    case 'session-start':
+      if (event.sessionId !== undefined) sessionId = event.sessionId;
+      if (event.cwd !== undefined) cwd = event.cwd;
+      break;
+
+      // A model call is a trace and metering concern; its content arrives as the
+      // text and tool-call events that follow it.
+    case 'model-response':
+      break;
+
+    case 'text':
+      parts.push({
+        kind: 'text',
+        role: event.role,
+        text: event.text,
+        ...(event.model ? { model: event.model } : {}),
+        ...(event.provider ? { provider: event.provider } : {}),
+        ...base
+      });
+      break;
+
+    case 'thinking':
+      parts.push({ kind: 'thinking', text: event.text, ...base });
+      break;
+
+    case 'tool-call': {
+      const part: ToolPart = {
+        kind: 'tool',
+        toolCallId: event.toolCallId,
+        name: event.name,
+        arguments: event.arguments,
+        status: 'requested',
+        ...base
+      };
+      toolsByCallId.set(event.toolCallId, part);
+      parts.push(part);
+      break;
     }
 
-    if (isPiCompactionEntry(entry)) {
-      parts.push({ kind: 'summary', reason: 'compaction', summary: entry.summary, seq, entryId: entry.id });
-      continue;
-    }
-
-    if (isPiBranchSummaryEntry(entry)) {
-      parts.push({ kind: 'summary', reason: 'branch', summary: entry.summary, seq, entryId: entry.id });
-      continue;
-    }
-
-    if (!isPiMessageEntry(entry)) {
-      parts.push({ kind: 'unknown', entryType: entry.type, entry, seq, entryId: (entry as { id?: string }).id });
-      continue;
-    }
-
-    const message = entry.message;
-    const base = { seq, entryId: entry.id };
-
-    if (message.role === 'user') {
-      parts.push({ kind: 'text', role: 'user', text: contentText(message.content), ...base });
-      continue;
-    }
-
-    if (isAssistantMessage(message)) {
-      for (const block of Array.isArray(message.content) ? message.content : []) {
-        if (block.type === 'text' && block.text.length > 0) {
-          parts.push({
-            kind: 'text',
-            role: 'assistant',
-            text: block.text,
-            ...(message.model ? { model: message.model } : {}),
-            ...(message.provider ? { provider: message.provider } : {}),
-            ...base
-          });
-        } else if (block.type === 'thinking') {
-          parts.push({ kind: 'thinking', text: block.thinking, ...base });
-        }
-      }
-      for (const call of toolCalls(message)) {
-        const part: ToolPart = {
-          kind: 'tool',
-          toolCallId: call.id,
-          name: call.name,
-          arguments: call.arguments ?? {},
-          status: 'requested',
-          ...base
-        };
-        toolsByCallId.set(call.id, part);
-        parts.push(part);
-      }
-      continue;
-    }
-
-    if (isToolResultMessage(message)) {
-      const existing = toolsByCallId.get(message.toolCallId);
-      const output = contentText(message.content);
-      const status: ToolStatus = message.isError ? 'failed' : 'completed';
+    case 'tool-result': {
+      const existing = toolsByCallId.get(event.toolCallId);
+      const status: ToolStatus = event.failed ? 'failed' : 'completed';
       if (existing) {
         existing.status = status;
-        existing.output = output;
+        existing.output = event.output;
         existing.settledSeq = seq;
-        if (message.details !== undefined) existing.details = message.details;
+        if (event.details !== undefined) existing.details = event.details;
       } else {
         // A result whose call is not in this window (paged read, forked branch).
         parts.push({
           kind: 'tool',
-          toolCallId: message.toolCallId,
-          name: message.toolName,
+          toolCallId: event.toolCallId,
+          name: event.name,
           arguments: {},
           status,
-          output,
+          output: event.output,
           settledSeq: seq,
           ...base
         });
       }
-      continue;
+      break;
     }
 
-    if (message.role === 'bashExecution') {
+    case 'bash':
       parts.push({
         kind: 'bash',
-        command: message.command,
-        output: message.output,
-        ...(typeof message.exitCode === 'number' ? { exitCode: message.exitCode } : {}),
+        command: event.command,
+        output: event.output,
+        ...(event.exitCode === undefined ? {} : { exitCode: event.exitCode }),
         ...base
       });
-      continue;
-    }
+      break;
 
-    if (message.role === 'custom') {
+    case 'custom':
       parts.push({
         kind: 'custom',
-        customType: message.customType,
-        text: contentText(message.content),
-        display: message.display !== false,
-        ...(message.details !== undefined ? { details: message.details } : {}),
+        customType: event.customType,
+        text: event.text,
+        display: event.display,
+        ...(event.details === undefined ? {} : { details: event.details }),
         ...base
       });
-      continue;
-    }
+      break;
 
-    parts.push({
-      kind: 'summary',
-      reason: message.role === 'branchSummary' ? 'branch' : 'compaction',
-      summary: (message as { summary?: string }).summary ?? '',
-      ...base
-    });
+    case 'summary':
+      parts.push({ kind: 'summary', reason: event.reason, summary: event.summary, ...base });
+      break;
+
+    case 'unknown':
+      parts.push({ kind: 'unknown', entryType: event.entryType, entry: event.entry, ...base });
+      break;
+    }
   }
 
   return {

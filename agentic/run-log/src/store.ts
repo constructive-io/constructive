@@ -12,8 +12,8 @@ import {
   type RunEventRecord,
   wrapEntry
 } from './record';
+import type { TranscriptEntry } from './transcripts/entry';
 import type { TranscriptFormat } from './transcripts/format';
-import type { PiSessionEntry } from './transcripts/pi-entry';
 
 /** Read position: `afterSeq` is exclusive, so `0` means "from the start". */
 export interface RunLogCursor {
@@ -41,10 +41,10 @@ export interface AppendOptions {
 export interface RunLogAppendStore {
   /**
    * Append entries to a run, returning the records actually written. Entries
-   * already present (matched by pi entry id) are skipped, which makes an append
-   * safe to retry.
+   * already present (matched by transcript entry id) are skipped, which makes an
+   * append safe to retry.
    */
-  append(runId: string, entries: readonly PiSessionEntry[], options?: AppendOptions): Promise<RunEventRecord[]>;
+  append(runId: string, entries: readonly TranscriptEntry[], options?: AppendOptions): Promise<RunEventRecord[]>;
 }
 
 export interface RunLogReadStore {
@@ -60,7 +60,7 @@ export class MemoryRunLogStore implements RunLogStore {
 
   async append(
     runId: string,
-    entries: readonly PiSessionEntry[],
+    entries: readonly TranscriptEntry[],
     options: AppendOptions = {}
   ): Promise<RunEventRecord[]> {
     const records = this.runs.get(runId) ?? [];

@@ -3,7 +3,7 @@
  *
  * The log answers *what* happened and the parts projection answers *in what
  * order*, but a trace view asks "how long did this take, and inside what" —
- * questions pi's entries only answer in pairs. Every entry is timestamped, so a
+ * questions a transcript only answers in pairs. Every entry is timestamped, so a
  * tool call and its result, or an approval request and its answer, bracket an
  * interval; nothing new has to be stored to know it.
  *
@@ -17,14 +17,8 @@
  */
 
 import type { RunEventRecord } from '../record';
-import {
-  contentText,
-  isAssistantMessage,
-  isPiMessageEntry,
-  isToolResultMessage,
-  type PiUsage,
-  toolCalls
-} from '../transcripts/pi-entry';
+import type { TranscriptUsage } from '../transcripts/event';
+import { type ProjectionOptions, toEventGroups } from './events';
 import {
   APPROVAL_REQUEST_TYPE,
   APPROVAL_RESOLUTION_TYPE,
@@ -63,10 +57,10 @@ export interface ModelSpan extends SpanBase {
   kind: 'model';
   model?: string;
   provider?: string;
-  /** pi's provider response id — the join key to a metered inference row. */
+  /** The provider's response id — the join key to a metered inference row. */
   responseId?: string;
   stopReason?: string;
-  usage?: PiUsage;
+  usage?: TranscriptUsage;
   errorMessage?: string;
 }
 
@@ -115,64 +109,73 @@ const close = (span: Span, seq: number, at: string): void => {
 const detailsOf = (value: unknown): Record<string, unknown> =>
   typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {};
 
+const firstTimestamp = (events: readonly { at?: string }[]): string | undefined =>
+  events.find((event) => typeof event.at === 'string')?.at;
+
 /**
  * Project records into spans. Pure, and like the other projectors it ignores what
- * it does not recognise — a log written by a newer pi still traces. A *registered*
- * type that is malformed is another matter and throws: a gate decision naming no
- * tool call is a writer bug, and a trace that quietly omitted a refusal would be
- * worse than one that fails.
+ * it does not recognise — a log written by a newer harness still traces. A
+ * *registered* type that is malformed is another matter and throws: a gate
+ * decision naming no tool call is a writer bug, and a trace that quietly omitted
+ * a refusal would be worse than one that fails.
  */
-export function projectSpans(records: readonly RunEventRecord[]): SpanProjection {
+export function projectSpans(
+  records: readonly RunEventRecord[],
+  options: ProjectionOptions = {}
+): SpanProjection {
   const spans: Span[] = [];
   const tools = new Map<string, ToolSpan>();
   const approvals = new Map<string, ApprovalSpan>();
   /**
    * The end of the previous entry, which is the earliest the next model call
-   * can have begun — pi logs a response, never a request.
+   * can have begun — a transcript logs a response, never a request.
    */
   let previousAt: string | undefined;
 
-  for (const { entry, seq } of records) {
-    const at = typeof entry.timestamp === 'string' ? entry.timestamp : undefined;
+  for (const { events, seq } of toEventGroups(records, options)) {
+    const at = firstTimestamp(events);
     if (at === undefined) continue;
     const previous = previousAt;
     previousAt = at;
+    /** The model call the entry's tool calls belong to. */
+    let modelSpan: ModelSpan | undefined;
 
-    if (!isPiMessageEntry(entry)) continue;
-    const message = entry.message;
+    for (const event of events) {
+      if (event.kind === 'model-response') {
+        const span: ModelSpan = {
+          id: `model:${event.entryId ?? String(seq)}`,
+          kind: 'model',
+          name: event.model ?? 'model',
+          // The turn began no earlier than the previous entry was written; with
+          // no previous entry the interval is unknown and the span is a point.
+          startedAt: previous ?? at,
+          startSeq: seq,
+          endSeq: seq,
+          endedAt: at,
+          timing: 'bounded',
+          status: event.stopReason === 'error' ? 'error' : 'ok',
+          ...(event.model ? { model: event.model } : {}),
+          ...(event.provider ? { provider: event.provider } : {}),
+          ...(event.responseId ? { responseId: event.responseId } : {}),
+          ...(event.stopReason ? { stopReason: event.stopReason } : {}),
+          ...(event.usage ? { usage: event.usage } : {}),
+          ...(event.errorMessage ? { errorMessage: event.errorMessage } : {})
+        };
+        const duration = ms(span.startedAt, at);
+        if (duration !== undefined) span.durationMs = duration;
+        modelSpan = span;
+        spans.push(span);
+        continue;
+      }
 
-    if (isAssistantMessage(message)) {
-      const span: ModelSpan = {
-        id: `model:${entry.id}`,
-        kind: 'model',
-        name: message.model ?? 'model',
-        // The turn began no earlier than the previous entry was written; with no
-        // previous entry the interval is unknown and the span is a point.
-        startedAt: previous ?? at,
-        startSeq: seq,
-        endSeq: seq,
-        endedAt: at,
-        timing: 'bounded',
-        status: message.stopReason === 'error' ? 'error' : 'ok',
-        ...(message.model ? { model: message.model } : {}),
-        ...(message.provider ? { provider: message.provider } : {}),
-        ...(typeof message.responseId === 'string' ? { responseId: message.responseId } : {}),
-        ...(message.stopReason ? { stopReason: message.stopReason } : {}),
-        ...(message.usage ? { usage: message.usage } : {}),
-        ...(message.errorMessage ? { errorMessage: message.errorMessage } : {})
-      };
-      const duration = ms(span.startedAt, at);
-      if (duration !== undefined) span.durationMs = duration;
-      spans.push(span);
-
-      for (const call of toolCalls(message)) {
+      if (event.kind === 'tool-call') {
         const tool: ToolSpan = {
-          id: `tool:${call.id}`,
+          id: `tool:${event.toolCallId}`,
           kind: 'tool',
-          name: call.name,
-          parentId: span.id,
-          toolCallId: call.id,
-          arguments: call.arguments ?? {},
+          name: event.name,
+          ...(modelSpan ? { parentId: modelSpan.id } : {}),
+          toolCallId: event.toolCallId,
+          arguments: event.arguments,
           startedAt: at,
           startSeq: seq,
           // A call and its result are two writes; anything between them —
@@ -180,74 +183,74 @@ export function projectSpans(records: readonly RunEventRecord[]): SpanProjection
           timing: 'bounded',
           status: 'open'
         };
-        tools.set(call.id, tool);
+        tools.set(event.toolCallId, tool);
         spans.push(tool);
+        continue;
       }
-      continue;
-    }
 
-    if (isToolResultMessage(message)) {
-      const tool = tools.get(message.toolCallId);
-      if (!tool) continue;
-      close(tool, seq, at);
-      tool.status = message.isError ? 'error' : 'ok';
-      tool.output = contentText(message.content);
-      if (message.details !== undefined) tool.details = message.details;
-      const approval = approvals.get(message.toolCallId);
-      if (approval?.durationMs !== undefined) tool.approvalWaitMs = approval.durationMs;
-      continue;
-    }
-
-    if (message.role !== 'custom') continue;
-    const info = detailsOf(message.details);
-    const toolCallId = typeof info.toolCallId === 'string' ? info.toolCallId : undefined;
-    if (toolCallId === undefined) continue;
-
-    if (message.customType === APPROVAL_REQUEST_TYPE) {
-      const tool = tools.get(toolCallId);
-      const approval: ApprovalSpan = {
-        id: `approval:${toolCallId}`,
-        kind: 'approval',
-        name: tool?.name ?? 'approval',
-        ...(tool ? { parentId: tool.id } : {}),
-        toolCallId,
-        prompt: contentText(message.content),
-        startedAt: at,
-        startSeq: seq,
-        // Request and answer are exactly the interval a human held the run.
-        timing: 'measured',
-        status: 'open'
-      };
-      approvals.set(toolCallId, approval);
-      spans.push(approval);
-      continue;
-    }
-
-    if (message.customType === APPROVAL_RESOLUTION_TYPE) {
-      const approval = approvals.get(toolCallId);
-      if (!approval) continue;
-      close(approval, seq, at);
-      const approved = info.decision === 'approved';
-      approval.decision = approved ? 'approved' : 'rejected';
-      approval.status = approved ? 'ok' : 'denied';
-      if (typeof info.actorId === 'string') approval.actorId = info.actorId;
-      const tool = tools.get(toolCallId);
-      if (tool && approval.durationMs !== undefined) tool.approvalWaitMs = approval.durationMs;
-      continue;
-    }
-
-    if (message.customType === GATE_DECISION_TYPE) {
-      // Throws on a malformed decision — see the note on this function.
-      const decision = assertGateDecisionDetails(message.details, seq);
-      const tool = tools.get(decision.toolCallId);
-      if (!tool) continue;
-      tool.gateDecision = decision.decision;
-      if (decision.reason !== undefined) tool.gateReason = decision.reason;
-      // A denied call is never executed, so this write is the only thing that
-      // will ever close its span.
-      if (decision.decision === 'deny' && tool.status === 'open') {
+      if (event.kind === 'tool-result') {
+        const tool = tools.get(event.toolCallId);
+        if (!tool) continue;
         close(tool, seq, at);
-        tool.status = 'denied';
+        tool.status = event.failed ? 'error' : 'ok';
+        tool.output = event.output;
+        if (event.details !== undefined) tool.details = event.details;
+        const approval = approvals.get(event.toolCallId);
+        if (approval?.durationMs !== undefined) tool.approvalWaitMs = approval.durationMs;
+        continue;
+      }
+
+      if (event.kind !== 'custom') continue;
+      const info = detailsOf(event.details);
+      const toolCallId = typeof info.toolCallId === 'string' ? info.toolCallId : undefined;
+      if (toolCallId === undefined) continue;
+
+      if (event.customType === APPROVAL_REQUEST_TYPE) {
+        const tool = tools.get(toolCallId);
+        const approval: ApprovalSpan = {
+          id: `approval:${toolCallId}`,
+          kind: 'approval',
+          name: tool?.name ?? 'approval',
+          ...(tool ? { parentId: tool.id } : {}),
+          toolCallId,
+          prompt: event.text,
+          startedAt: at,
+          startSeq: seq,
+          // Request and answer are exactly the interval a human held the run.
+          timing: 'measured',
+          status: 'open'
+        };
+        approvals.set(toolCallId, approval);
+        spans.push(approval);
+        continue;
+      }
+
+      if (event.customType === APPROVAL_RESOLUTION_TYPE) {
+        const approval = approvals.get(toolCallId);
+        if (!approval) continue;
+        close(approval, seq, at);
+        const approved = info.decision === 'approved';
+        approval.decision = approved ? 'approved' : 'rejected';
+        approval.status = approved ? 'ok' : 'denied';
+        if (typeof info.actorId === 'string') approval.actorId = info.actorId;
+        const tool = tools.get(toolCallId);
+        if (tool && approval.durationMs !== undefined) tool.approvalWaitMs = approval.durationMs;
+        continue;
+      }
+
+      if (event.customType === GATE_DECISION_TYPE) {
+        // Throws on a malformed decision — see the note on this function.
+        const decision = assertGateDecisionDetails(event.details, seq);
+        const tool = tools.get(decision.toolCallId);
+        if (!tool) continue;
+        tool.gateDecision = decision.decision;
+        if (decision.reason !== undefined) tool.gateReason = decision.reason;
+        // A denied call is never executed, so this write is the only thing that
+        // will ever close its span.
+        if (decision.decision === 'deny' && tool.status === 'open') {
+          close(tool, seq, at);
+          tool.status = 'denied';
+        }
       }
     }
   }

@@ -1,7 +1,7 @@
 /**
  * Usage projection: run log records → token and cost totals.
  *
- * Every usage-bearing pi entry counts, not just assistant messages: a tool that
+ * Every usage-bearing event counts, not just model responses: a tool that
  * performed nested LLM work reports `usage` on its result, and compaction and
  * branch summaries are model calls the run paid for. Missing any of those makes
  * a run look cheaper than it was, which is exactly the kind of drift metering
@@ -13,14 +13,8 @@
  */
 
 import type { RunEventRecord } from '../record';
-import {
-  isAssistantMessage,
-  isPiBranchSummaryEntry,
-  isPiCompactionEntry,
-  isPiMessageEntry,
-  isToolResultMessage,
-  type PiUsage
-} from '../transcripts/pi-entry';
+import type { TranscriptUsage } from '../transcripts/event';
+import { type ProjectionOptions, toEvents } from './events';
 
 export interface UsageTotals {
   input: number;
@@ -55,7 +49,7 @@ const empty = (): UsageTotals => ({
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) ? value : 0);
 
-function fold(target: UsageTotals, usage: PiUsage): void {
+function fold(target: UsageTotals, usage: TranscriptUsage): void {
   const input = num(usage.input);
   const output = num(usage.output);
   const cacheRead = num(usage.cacheRead);
@@ -75,10 +69,13 @@ function fold(target: UsageTotals, usage: PiUsage): void {
 export const modelKey = (provider: string, model: string): string => `${provider}/${model}`;
 
 /** Fold every usage-bearing entry in the records into run totals. */
-export function projectUsage(records: readonly RunEventRecord[]): RunUsage {
+export function projectUsage(
+  records: readonly RunEventRecord[],
+  options: ProjectionOptions = {}
+): RunUsage {
   const totals: RunUsage = { ...empty(), byModel: {} };
 
-  const add = (usage: PiUsage | undefined, provider = 'unknown', model = 'unknown'): void => {
+  const add = (usage: TranscriptUsage | undefined, provider = 'unknown', model = 'unknown'): void => {
     if (!usage) return;
     fold(totals, usage);
     const key = modelKey(provider, model);
@@ -90,22 +87,17 @@ export function projectUsage(records: readonly RunEventRecord[]): RunUsage {
   let lastProvider = 'unknown';
   let lastModel = 'unknown';
 
-  for (const { entry } of records) {
-    if (isPiMessageEntry(entry)) {
-      const message = entry.message;
-      if (isAssistantMessage(message)) {
-        lastProvider = message.provider ?? lastProvider;
-        lastModel = message.model ?? lastModel;
-        add(message.usage, message.provider ?? 'unknown', message.model ?? 'unknown');
-      } else if (isToolResultMessage(message)) {
-        // Nested model work inside a tool: attributed to the run's current model,
-        // which is the model that requested the tool.
-        add(message.usage, lastProvider, lastModel);
-      }
+  for (const { event } of toEvents(records, options)) {
+    if (event.kind === 'model-response') {
+      lastProvider = event.provider ?? lastProvider;
+      lastModel = event.model ?? lastModel;
+      add(event.usage, event.provider ?? 'unknown', event.model ?? 'unknown');
       continue;
     }
-    if (isPiCompactionEntry(entry) || isPiBranchSummaryEntry(entry)) {
-      add(entry.usage, lastProvider, lastModel);
+    // Nested model work inside a tool or a summary: attributed to the run's
+    // current model, which is the model that asked for it.
+    if (event.kind === 'tool-result' || event.kind === 'summary') {
+      add(event.usage, lastProvider, lastModel);
     }
   }
 

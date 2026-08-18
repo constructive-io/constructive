@@ -17,6 +17,7 @@ export interface PiUsageCost {
   cacheRead?: number;
   cacheWrite?: number;
   total?: number;
+  [key: string]: unknown;
 }
 
 export interface PiUsage {
