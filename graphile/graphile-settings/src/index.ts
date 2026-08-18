@@ -39,7 +39,7 @@ import { makePgService } from 'postgraphile/adaptors/pg';
 
 import {
   makeConfiguredPgService,
-  type ScopedIntrospectionOptions,
+  type ScopedIntrospectionOptions
 } from './scoped-introspection-service';
 
 // ============================================================================
@@ -48,10 +48,7 @@ import {
 
 // Main preset + factory
 export type { ConstructivePresetOptions } from './presets/constructive-preset';
-export {
-  ConstructivePreset,
-  createConstructivePreset,
-} from './presets/constructive-preset';
+export { ConstructivePreset, createConstructivePreset } from './presets/constructive-preset';
 
 // Re-export all plugins for convenience
 export * from './plugins/index';
@@ -75,7 +72,7 @@ export const makeScopedPgService = (options: ScopedPgServiceOptions) =>
 
 export {
   normalizeIntrospectionDependencySchemas,
-  resolveIntrospectionSettings,
+  resolveIntrospectionSettings
 } from './introspection-settings';
 
 // Presigned URL utilities

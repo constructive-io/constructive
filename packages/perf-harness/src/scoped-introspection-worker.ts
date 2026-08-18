@@ -63,9 +63,9 @@ const main = async (): Promise<void> => {
       config.mode === 'stock'
         ? makePostGraphilePgService(serviceOptions)
         : makeScopedPgService({
-            ...serviceOptions,
-            introspectionScopedCatalogTypes: 'dependency-closure',
-          });
+          ...serviceOptions,
+          introspectionScopedCatalogTypes: 'dependency-closure',
+        });
     release = async () => {
       await service.release();
     };
