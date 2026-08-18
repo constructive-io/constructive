@@ -1570,12 +1570,41 @@ export type PgEntity =
   | PgDescription
   | PgAm;
 
+export interface IntrospectionQueryScope {
+  ctes?: string;
+  namespacePredicate: string;
+  classPredicate: string;
+  constraintPredicate: string;
+  procPredicate: string;
+  typePredicate: string;
+  extensionPredicate?: string;
+  languagePredicate?: string;
+  accessMethodPredicate: string;
+  rolePredicate?: string;
+  authMemberPredicate?: string;
+}
+
+const STOCK_QUERY_SCOPE: IntrospectionQueryScope = {
+  namespacePredicate: "nspname <> 'information_schema'",
+  classPredicate:
+    "relnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')",
+  constraintPredicate:
+    "connamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')",
+  procPredicate:
+    "pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')",
+  typePredicate:
+    "(typnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%'))\n    or (typnamespace = 'pg_catalog'::regnamespace)",
+  accessMethodPredicate: "true",
+  authMemberPredicate: "roleid in (select roles._id from roles)",
+};
+
 // We might want this to take options in future, so we've made it a function.
 /**
  * Builds a PostgreSQL introspection SQL query to return an object with the same shape as `Introspection` above.
  */
-export const makeIntrospectionQuery = () => `\
+export const buildIntrospectionQuery = (scope: IntrospectionQueryScope) => `\
 with
+${scope.ctes ?? ""}\
   database as (
     select pg_database.oid as _id, *
     from pg_catalog.pg_database
@@ -1585,14 +1614,14 @@ with
   namespaces as (
     select pg_namespace.oid as _id, *
     from pg_catalog.pg_namespace
-    where nspname <> 'information_schema'
+    where ${scope.namespacePredicate}
   ),
 
   classes as (
     select pg_class.oid as _id, *,
       pg_catalog.pg_relation_is_updatable(oid, true)::bit(8)::int4 as "updatable_mask"
     from pg_catalog.pg_class
-    where relnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
+    where ${scope.classPredicate}
   ),
 
   attributes as (
@@ -1604,32 +1633,37 @@ with
   constraints as (
     select pg_constraint.oid as _id, *
     from pg_catalog.pg_constraint
-    where connamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
+    where ${scope.constraintPredicate}
   ),
 
   procs as (
     select pg_proc.oid as _id, *
     from pg_catalog.pg_proc
-    where pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
+    where ${scope.procPredicate}
     and prorettype operator(pg_catalog.<>) 2279
   ),
 
   roles as (
     select pg_roles.oid as _id, *
     from pg_catalog.pg_roles
+${
+  scope.rolePredicate
+    ? `    where ${scope.rolePredicate}
+`
+    : ""
+}\
   ),
 
   auth_members as (
     select *
     from pg_catalog.pg_auth_members
-    where roleid in (select roles._id from roles)
+    where ${scope.authMemberPredicate ?? "roleid in (select roles._id from roles)"}
   ),
 
   types as (
     select pg_type.oid as _id, *
     from pg_catalog.pg_type
-    where (typnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%'))
-    or (typnamespace = 'pg_catalog'::regnamespace)
+    where ${scope.typePredicate}
   ),
 
   enums as (
@@ -1641,6 +1675,12 @@ with
   extensions as (
     select pg_extension.oid as _id, *
     from pg_catalog.pg_extension
+${
+  scope.extensionPredicate
+    ? `    where ${scope.extensionPredicate}
+`
+    : ""
+}\
   ),
 
   indexes as (
@@ -1658,6 +1698,12 @@ with
   languages as (
     select pg_language.oid as _id, *
     from pg_catalog.pg_language
+${
+  scope.languagePredicate
+    ? `    where ${scope.languagePredicate}
+`
+    : ""
+}\
   ),
 
   policies as (
@@ -1705,7 +1751,7 @@ with
   am as (
     select pg_am.oid as _id, *
     from pg_catalog.pg_am
-    where true
+    where ${scope.accessMethodPredicate}
   )
 select json_build_object(
   'database',
@@ -1785,3 +1831,6 @@ select json_build_object(
   1
 )::text as introspection
 `;
+
+export const makeIntrospectionQuery = () =>
+  buildIntrospectionQuery(STOCK_QUERY_SCOPE);

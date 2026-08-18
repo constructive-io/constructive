@@ -9,7 +9,7 @@ import type { PromiseOrDirect, Step } from "grafast";
 import { constant, context, noop, object, promiseWithResolve } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
-import type {} from "graphile-build-pg";
+import { version as graphileBuildPgVersion } from "graphile-build-pg";
 import type {
   Introspection,
   PgAttribute,
@@ -31,9 +31,16 @@ import type {
 } from "pg-introspection";
 import {
   makeIntrospectionQuery,
+  makeSchemaScopedIntrospectionQuery,
   parseIntrospectionResults,
+  type ScopedCatalogTypes,
 } from "../pg-introspection";
 
+import type { ScopedIntrospectionServiceOptions } from "./scopedOptions";
+import {
+  assertDependencyClosureTypes,
+  assertScopedNamespaces,
+} from "./scopedValidation";
 import { version } from "./version";
 import { watchFixtures } from "./watchFixtures";
 
@@ -41,6 +48,13 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Someone else created */
 const CLASH_CODES = ["23505", "42P06", "42P07", "42710"];
+const SUPPORTED_GRAPHILE_BUILD_PG_VERSION = "5.1.3";
+
+if (graphileBuildPgVersion !== SUPPORTED_GRAPHILE_BUILD_PG_VERSION) {
+  throw new Error(
+    `Unsupported graphile-build-pg introspection contract: expected ${SUPPORTED_GRAPHILE_BUILD_PG_VERSION}, received ${graphileBuildPgVersion}`,
+  );
+}
 
 export type PgEntityWithId =
   | PgNamespace
@@ -69,8 +83,11 @@ declare global {
 
   namespace GraphileConfig {
     interface Plugins {
-      PgIntrospectionPlugin: true;
+      PgScopedIntrospectionPlugin: true;
     }
+
+    interface PgServiceConfiguration
+      extends ScopedIntrospectionServiceOptions {}
 
     interface GatherHelpers {
       pgIntrospection: {
@@ -243,14 +260,78 @@ declare global {
   }
 }
 
-type RawIntrospectionResults = Array<{
+type RawIntrospectionResult = {
   pgService: GraphileConfig.PgServiceConfiguration;
   introspectionText: string;
-}>;
+  requiredSchemas: readonly string[] | null;
+  allowedSchemas: readonly string[] | null;
+  scopedCatalogTypes: ScopedCatalogTypes | null;
+};
+type RawIntrospectionResults = Array<RawIntrospectionResult>;
+type PgQuery = { text: string; values?: unknown[] };
 type IntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
   introspection: Introspection;
 }>;
+
+function getIntrospectionQuery(
+  pgService: GraphileConfig.PgServiceConfiguration
+): Omit<RawIntrospectionResult, 'pgService' | 'introspectionText'> & {
+  query: PgQuery;
+} {
+  const mode = pgService.introspectionMode ?? 'stock';
+  const configuredCatalogTypes = pgService.introspectionScopedCatalogTypes;
+  const configuredCapabilityExtensions =
+    pgService.introspectionCapabilityExtensions;
+  const scopedCatalogTypes = configuredCatalogTypes ?? 'all';
+
+  if (
+    scopedCatalogTypes !== 'all' &&
+    scopedCatalogTypes !== 'dependency-closure'
+  ) {
+    throw new Error(
+      `Unsupported scoped catalog type policy '${scopedCatalogTypes}' for service '${pgService.name}'`
+    );
+  }
+  if (mode === 'stock') {
+    if (configuredCatalogTypes !== undefined) {
+      throw new Error(
+        `Scoped catalog type policy is only valid with scoped-required introspection for service '${pgService.name}'`
+      );
+    }
+    if (configuredCapabilityExtensions !== undefined) {
+      throw new Error(
+        `Scoped extension capabilities are only valid with scoped-required introspection for service '${pgService.name}'`
+      );
+    }
+    return {
+      query: { text: makeIntrospectionQuery() },
+      requiredSchemas: null,
+      allowedSchemas: null,
+      scopedCatalogTypes: null,
+    };
+  }
+  if (mode === 'scoped-required') {
+    const requiredSchemas = pgService.schemas ?? [];
+    const dependencySchemas =
+      pgService.introspectionAllowedDependencySchemas ?? [];
+    return {
+      query: makeSchemaScopedIntrospectionQuery(requiredSchemas, {
+        catalogTypes: scopedCatalogTypes,
+        capabilityExtensions: configuredCapabilityExtensions ?? [],
+      }),
+      requiredSchemas,
+      allowedSchemas: [
+        ...new Set([...requiredSchemas, ...dependencySchemas, 'pg_catalog']),
+      ],
+      scopedCatalogTypes,
+    };
+  }
+  throw new Error(
+    `Unsupported PostgreSQL introspection mode '${mode}' for service '${pgService.name}'`
+  );
+}
+
 
 interface Cache {
   introspectionResultsPromise: null | Promise<RawIntrospectionResults>;
@@ -321,11 +402,12 @@ function makeGetEntities<
   };
 }
 
-export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
-  name: "PgIntrospectionPlugin",
+export const PgScopedIntrospectionPlugin: GraphileConfig.Plugin = {
+  name: "PgScopedIntrospectionPlugin",
   description:
-    "Introspects PostgreSQL databases and makes the results available to other plugins",
+    "Adds opt-in schema-scoped PostgreSQL introspection",
   version: version,
+  provides: ["PgIntrospectionPlugin"],
 
   // Run before PgRegistryPlugin because we want all the introspection to be
   // triggered/announced before the registryBuilder is built.
@@ -505,11 +587,11 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
 
       async getRangeByType(info, serviceName, typeId) {
-        const type = await info.helpers.pgIntrospection.getType(
-          serviceName,
-          typeId,
+        const relevant = await getDb(info, serviceName);
+        return relevant.introspection.ranges.find(
+          (range) =>
+            range.rngtypid === typeId || range.rngmultitypid === typeId,
         );
-        return type?.getRange();
       },
 
       async getExtensionByName(info, serviceName, extensionName) {
@@ -543,13 +625,36 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             });
 
             const rawIntrospections = await introspectionPromise;
+            if (
+              info.cache.introspectionResultsPromise === introspectionPromise
+            ) {
+              info.cache.introspectionResultsPromise = null;
+            }
 
             const introspections: IntrospectionResults = rawIntrospections.map(
-              ({ pgService, introspectionText }) => ({
+              ({
                 pgService,
+                introspectionText,
+                requiredSchemas,
+                allowedSchemas,
+                scopedCatalogTypes,
+              }) => {
                 // IMPORTANT: parseIntrospectionResults must NOT be cached, because other plugins mutate it.
-                introspection: parseIntrospectionResults(introspectionText),
-              }),
+                const introspection =
+                  parseIntrospectionResults(introspectionText);
+                assertScopedNamespaces(
+                  introspection,
+                  requiredSchemas,
+                  allowedSchemas,
+                  pgService.name,
+                );
+                assertDependencyClosureTypes(
+                  introspection,
+                  scopedCatalogTypes,
+                  pgService.name,
+                );
+                return { pgService, introspection };
+              },
             );
 
             // Store the resolved state, so access during announcements doesn't cause the system to hang
@@ -832,21 +937,46 @@ function introspectPgServices(
       }
 
       // Do the introspection
-      const introspectionQuery = makeIntrospectionQuery();
+      const { query, requiredSchemas, allowedSchemas, scopedCatalogTypes } =
+        getIntrospectionQuery(pgService);
       const {
         rows: [row],
       } = await withPgClientFromPgService(
         pgService,
         pgService.pgSettingsForIntrospection ?? null,
         (client) =>
-          client.query<{ introspection: string }>({
-            text: introspectionQuery,
-          }),
+          client.query<{ introspection: string }>(query),
       );
       if (!row) {
         throw new Error("Introspection failed");
       }
-      return { pgService, introspectionText: row.introspection };
+      return {
+        pgService,
+        introspectionText: row.introspection,
+        requiredSchemas,
+        allowedSchemas,
+        scopedCatalogTypes,
+      };
     }),
   );
 }
+
+/** Disable the upstream plugin atomically before installing the scoped-aware replacement. */
+export const ScopedIntrospectionPreset: GraphileConfig.Preset = {
+  disablePlugins: ["PgIntrospectionPlugin"],
+  plugins: [PgScopedIntrospectionPlugin],
+};
+
+const scopedGather = PgScopedIntrospectionPlugin.gather;
+
+export const scopedIntrospectionUpstreamContract = Object.freeze({
+  package: "graphile-build-pg",
+  version: SUPPORTED_GRAPHILE_BUILD_PG_VERSION,
+  pluginName: "PgIntrospectionPlugin",
+  namespace: scopedGather?.namespace,
+  hasInitialCache: typeof scopedGather?.initialCache === "function",
+  hasInitialState: typeof scopedGather?.initialState === "function",
+  hasWatch: typeof scopedGather?.watch === "function",
+  helperNames: Object.keys(scopedGather?.helpers ?? {}).sort(),
+  hookNames: Object.keys(scopedGather?.hooks ?? {}).sort(),
+});
