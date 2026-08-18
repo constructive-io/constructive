@@ -1,8 +1,6 @@
 import type { BlueprintDefinition } from '@agentic-kit/harness';
 import { z } from 'zod';
 
-import { toolSchema } from '../tool-schema';
-
 // delete_action is intentionally always sent: the backend REJECTS a
 // RelationBelongsTo whose delete_action is absent ("PROVISION_RELATION:
 // delete_action is required"). We default it to 'a' (NO ACTION) so the model
@@ -38,8 +36,6 @@ export const AddRelationZod = z.object({
     )
     .optional(),
 });
-
-export const AddRelationSchema = toolSchema(AddRelationZod);
 
 export type AddRelationParams = z.infer<typeof AddRelationZod>;
 

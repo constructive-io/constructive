@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
+import type { HarnessTool } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import { prewarmAppWorkspace } from '../app-workspace';
@@ -20,7 +20,6 @@ import { applySqlFixups } from '../provision-database/pg-fixups';
 import { selectProvisionRequest } from '../provision-database/preset-match';
 import { requestDatabaseProvision } from '../provision-database/request-database';
 import { type ProvisionOverlay, resolveProvisionModules } from '../provision-database/resolve';
-import { toolSchema } from '../tool-schema';
 
 const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
 const DEFAULT_MODULES_ENDPOINT = 'http://modules.localhost:3000/graphql';
@@ -54,7 +53,6 @@ const ProvisionDatabaseZod = z.object({
     )
     .optional(),
 });
-const ProvisionDatabaseSchema = toolSchema(ProvisionDatabaseZod);
 
 type Params = z.infer<typeof ProvisionDatabaseZod>;
 
@@ -88,8 +86,8 @@ function parseEnvKeys(source: string): Record<string, string> {
   return env;
 }
 
-export const provisionDatabaseTool: ToolDefinition<
-  typeof ProvisionDatabaseSchema,
+export const provisionDatabaseTool: HarnessTool<
+  typeof ProvisionDatabaseZod,
   ProvisionDatabaseDetails
 > = {
   name: 'provision_database',
@@ -98,8 +96,8 @@ export const provisionDatabaseTool: ToolDefinition<
     'Bootstrap a new Constructive database for the project under your account: provision the standard module set, enable membership defaults, and write credentials (DATABASE_ID, ACCESS_TOKEN, etc.) to the project .env. Run this ONCE before any schema/record tools. If the project is already bound to a live database under the signed-in account it skips; if the bound database no longer exists on this backend (refreshed/deleted) or belongs to a different account, pass reprovision: true to mint a fresh one (old keys archived in .env, old database kept; rebuild the schema afterwards).',
   promptSnippet:
     'provision_database: one-time bootstrap of the project database (owner + modules + .env). Run before describe_schema/provision_blueprint. Skips when the existing binding is live under the signed-in account; reprovision: true replaces a dead or foreign-account binding (archives old keys, never deletes the old db). Gated.',
-  parameters: ProvisionDatabaseSchema,
-  async execute(_id, params: Params, _signal, _onUpdate, ctx): Promise<ToolResult> {
+  parameters: ProvisionDatabaseZod,
+  async execute(params: Params, ctx): Promise<ToolResult> {
     const databaseName = params.database_name.trim();
     if (!databaseName) return fail('database_name is required.');
 

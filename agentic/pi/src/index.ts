@@ -1,8 +1,10 @@
+import type { AnyHarnessTool } from '@agentic-kit/harness';
 import type { ExtensionFactory } from '@earendil-works/pi-coding-agent';
 
 import { createConfirmGate } from './confirm-gate';
 import { resolveDataToken, resolveProjectContext } from './context';
 import { configureHost, type PiToolsHost } from './host';
+import { toPiTool } from './pi-tool';
 import { addPoliciesTool } from './tools/add-policies';
 import { addRecordsTool } from './tools/add-records';
 import { addRelationTool } from './tools/add-relation';
@@ -22,25 +24,38 @@ import {
   updateTemplateTool,
 } from './tools/templates';
 
+/**
+ * The Constructive database tools, in registration order.
+ *
+ * These are neutral `HarnessTool`s — nothing in `./tools` imports pi. A harness
+ * gets them by binding them to its own runner; `dbTools` below is that binding
+ * for pi.
+ */
+export const constructiveDbTools: readonly AnyHarnessTool[] = [
+  provisionDatabaseTool,
+  describeSchemaTool,
+  listTemplatesTool,
+  provisionBlueprintTool,
+  addRelationTool,
+  deleteTableTool,
+  createFieldTool,
+  updateFieldTool,
+  deleteFieldTool,
+  addPoliciesTool,
+  applyTemplateTool,
+  createTemplateTool,
+  updateTemplateTool,
+  deleteTemplateTool,
+  addRecordsTool,
+  manageEntityTypesTool,
+  createApiKeyTool,
+  runCodegenTool,
+];
+
 export const dbTools: ExtensionFactory = (pi) => {
-  pi.registerTool(provisionDatabaseTool);
-  pi.registerTool(describeSchemaTool);
-  pi.registerTool(listTemplatesTool);
-  pi.registerTool(provisionBlueprintTool);
-  pi.registerTool(addRelationTool);
-  pi.registerTool(deleteTableTool);
-  pi.registerTool(createFieldTool);
-  pi.registerTool(updateFieldTool);
-  pi.registerTool(deleteFieldTool);
-  pi.registerTool(addPoliciesTool);
-  pi.registerTool(applyTemplateTool);
-  pi.registerTool(createTemplateTool);
-  pi.registerTool(updateTemplateTool);
-  pi.registerTool(deleteTemplateTool);
-  pi.registerTool(addRecordsTool);
-  pi.registerTool(manageEntityTypesTool);
-  pi.registerTool(createApiKeyTool);
-  pi.registerTool(runCodegenTool);
+  for (const tool of constructiveDbTools) {
+    pi.registerTool(toPiTool(tool));
+  }
 
   const gate = createConfirmGate({
     resolveProjectContext,
@@ -129,6 +144,7 @@ export {
   type PiToolsHost,
   type PreviewToken,
 } from './host';
+export { toPiTool, toPiTools } from './pi-tool';
 export {
   loadProvisionManifest,
   parseProvisionManifest,

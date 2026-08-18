@@ -25,4 +25,5 @@ export * from './skills/registry';
 export * from './skills/source';
 export * from './skills/update-check';
 export * from './stash';
+export * from './tools/tool';
 export * from './types';

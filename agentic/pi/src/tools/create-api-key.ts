@@ -1,10 +1,9 @@
+import type { HarnessTool } from '@agentic-kit/harness';
 import { auth } from '@constructive-io/sdk';
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
 import { z } from 'zod';
 
 import { deriveSubdomainEndpoint, resolveDataToken, resolveProjectContext } from '../context';
 import { getHost } from '../host';
-import { toolSchema } from '../tool-schema';
 
 const CreateApiKeyZod = z.object({
   key_name: z
@@ -35,7 +34,6 @@ const CreateApiKeyZod = z.object({
     .describe('Key lifetime in days. Default 90.')
     .optional(),
 });
-const CreateApiKeySchema = toolSchema(CreateApiKeyZod);
 
 export type CreateApiKeyDetails = {
   success: boolean;
@@ -111,15 +109,15 @@ async function createPrincipalInputFields(endpoint: string): Promise<Set<string>
 
 type Params = z.infer<typeof CreateApiKeyZod>;
 
-export const createApiKeyTool: ToolDefinition<typeof CreateApiKeySchema, CreateApiKeyDetails> = {
+export const createApiKeyTool: HarnessTool<typeof CreateApiKeyZod, CreateApiKeyDetails> = {
   name: 'create_api_key',
   label: 'Create API key',
   description:
     'Mint an API key for the project database, owned by a machine principal. Optionally scope it to specific entity rows and/or read-only. The human confirms the mint, completes MFA step-up in the app when required, and receives the key via .env + a one-time reveal — the plaintext key never appears in this conversation. Requires the user to be signed in to their app in the Preview.',
   promptSnippet:
     'create_api_key: mint an entity-scoped API key for the project database. Gated; the plaintext goes to .env + a one-time reveal, never into the chat — reference it as its env var.',
-  parameters: CreateApiKeySchema,
-  async execute(_id, params: Params, _signal, _onUpdate, ctx) {
+  parameters: CreateApiKeyZod,
+  async execute(params: Params, ctx) {
     const keyName = params.key_name?.trim();
     if (!keyName) return fail('create_api_key requires "key_name".');
 

@@ -1,10 +1,8 @@
-import { toFieldDefault, toFieldType } from '@agentic-kit/harness';
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
+import { type HarnessTool, toFieldDefault, toFieldType } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import { resolveProjectContext } from '../context';
 import { findUniqueConstraintId, resolveField, resolveSchema, resolveTable } from '../schema-resolve';
-import { toolSchema } from '../tool-schema';
 
 export type MutationDetails = {
   success: boolean;
@@ -30,15 +28,14 @@ function fail(message: string) {
 const DeleteTableZod = z.object({
   table_name: z.string().describe('Name of the table to delete (snake_case)'),
 });
-const DeleteTableSchema = toolSchema(DeleteTableZod);
 
-export const deleteTableTool: ToolDefinition<typeof DeleteTableSchema, MutationDetails> = {
+export const deleteTableTool: HarnessTool<typeof DeleteTableZod, MutationDetails> = {
   name: 'delete_table',
   label: 'Delete table',
   description: 'Permanently delete a table and its data from the project database.',
   promptSnippet: 'delete_table: drop an existing table by name. Destructive — gated.',
-  parameters: DeleteTableSchema,
-  async execute(_id, params: z.infer<typeof DeleteTableZod>, _signal, _onUpdate, ctx) {
+  parameters: DeleteTableZod,
+  async execute(params: z.infer<typeof DeleteTableZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) return fail(resolved.reason);
     try {
@@ -74,15 +71,14 @@ const CreateFieldZod = z.object({
     .describe('Whether the field has a unique constraint. Defaults to false.')
     .optional(),
 });
-const CreateFieldSchema = toolSchema(CreateFieldZod);
 
-export const createFieldTool: ToolDefinition<typeof CreateFieldSchema, MutationDetails> = {
+export const createFieldTool: HarnessTool<typeof CreateFieldZod, MutationDetails> = {
   name: 'create_field',
   label: 'Create field',
   description: 'Add a new field (column) to an existing table in the project database.',
   promptSnippet: 'create_field: add a column to an existing table. Gated.',
-  parameters: CreateFieldSchema,
-  async execute(_id, params: z.infer<typeof CreateFieldZod>, _signal, _onUpdate, ctx) {
+  parameters: CreateFieldZod,
+  async execute(params: z.infer<typeof CreateFieldZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) return fail(resolved.reason);
     const { api, databaseId } = resolved.context;
@@ -148,15 +144,14 @@ const UpdateFieldZod = z.object({
     .optional(),
   is_unique: z.boolean().describe('Set or remove unique constraint').optional(),
 });
-const UpdateFieldSchema = toolSchema(UpdateFieldZod);
 
-export const updateFieldTool: ToolDefinition<typeof UpdateFieldSchema, MutationDetails> = {
+export const updateFieldTool: HarnessTool<typeof UpdateFieldZod, MutationDetails> = {
   name: 'update_field',
   label: 'Update field',
   description: 'Modify an existing field: rename, change type, toggle required/unique, or set default.',
   promptSnippet: 'update_field: rename/retype/toggle an existing column. Gated.',
-  parameters: UpdateFieldSchema,
-  async execute(_id, params: z.infer<typeof UpdateFieldZod>, _signal, _onUpdate, ctx) {
+  parameters: UpdateFieldZod,
+  async execute(params: z.infer<typeof UpdateFieldZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) return fail(resolved.reason);
     const { api, databaseId } = resolved.context;
@@ -227,15 +222,14 @@ const DeleteFieldZod = z.object({
   table_name: z.string().describe('Name of the table containing the field'),
   field_name: z.string().describe('Name of the field to delete'),
 });
-const DeleteFieldSchema = toolSchema(DeleteFieldZod);
 
-export const deleteFieldTool: ToolDefinition<typeof DeleteFieldSchema, MutationDetails> = {
+export const deleteFieldTool: HarnessTool<typeof DeleteFieldZod, MutationDetails> = {
   name: 'delete_field',
   label: 'Delete field',
   description: 'Permanently delete a field (column) from an existing table.',
   promptSnippet: 'delete_field: drop a column from a table by name. Destructive — gated.',
-  parameters: DeleteFieldSchema,
-  async execute(_id, params: z.infer<typeof DeleteFieldZod>, _signal, _onUpdate, ctx) {
+  parameters: DeleteFieldZod,
+  async execute(params: z.infer<typeof DeleteFieldZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) return fail(resolved.reason);
     try {

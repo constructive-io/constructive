@@ -1,15 +1,14 @@
+import type { HarnessTool } from '@agentic-kit/harness';
 import {
   buildPostGraphileCreate,
   toCamelCaseSingular,
   toCreateMutationName,
 } from '@constructive-io/graphql-query/generators';
 import { objects } from '@constructive-io/sdk';
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
 import { z } from 'zod';
 
 import { resolveDataToken, resolveProjectContext } from '../context';
 import { cleanTable, findMetaTable, META_QUERY, type MetaResponse } from '../records/meta';
-import { toolSchema } from '../tool-schema';
 
 export type AddRecordsDetails = {
   success: boolean;
@@ -59,15 +58,14 @@ const AddRecordsZod = z.object({
       'Rows to insert. Each is an object of column → value (camelCase or snake_case column names).',
     ),
 });
-const AddRecordsSchema = toolSchema(AddRecordsZod);
 
-export const addRecordsTool: ToolDefinition<typeof AddRecordsSchema, AddRecordsDetails> = {
+export const addRecordsTool: HarnessTool<typeof AddRecordsZod, AddRecordsDetails> = {
   name: 'add_records',
   label: 'Add records',
   description: "Insert one or more rows into a table in the project's app database.",
   promptSnippet: 'add_records: insert rows into an existing table. Gated.',
-  parameters: AddRecordsSchema,
-  async execute(_id, params: z.infer<typeof AddRecordsZod>, _signal, _onUpdate, ctx) {
+  parameters: AddRecordsZod,
+  async execute(params: z.infer<typeof AddRecordsZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) return fail(resolved.reason);
     const { dataEndpoint } = resolved.context;

@@ -1,4 +1,4 @@
-import type { ExtensionContext } from '@earendil-works/pi-coding-agent';
+import type { HarnessToolContext } from '@agentic-kit/harness';
 
 jest.mock('../src/context', () => ({
   resolveProjectContext: jest.fn(),
@@ -75,30 +75,24 @@ function mockFetchWith(entityIdsSupported: boolean) {
     const body = String(init?.body ?? '');
     const json = body.includes('__type')
       ? {
-          data: {
-            __type: {
-              inputFields: [
-                { name: 'name' },
-                ...(entityIdsSupported ? [{ name: 'entityIds' }, { name: 'isReadOnly' }] : []),
-              ],
-            },
+        data: {
+          __type: {
+            inputFields: [
+              { name: 'name' },
+              ...(entityIdsSupported ? [{ name: 'entityIds' }, { name: 'isReadOnly' }] : []),
+            ],
           },
-        }
+        },
+      }
       : { data: { createPrincipal: { result: 'prin-1' } } };
     return { json: async () => json };
   });
 }
 
-const ctx = { cwd: '/tmp/project' } as unknown as ExtensionContext;
+const ctx: HarnessToolContext = { cwd: '/tmp/project' };
 
 function run(params: Record<string, unknown>) {
-  return createApiKeyTool.execute(
-    'tc-1',
-    params as never,
-    undefined as never,
-    undefined as never,
-    ctx,
-  );
+  return createApiKeyTool.execute(params as never, ctx);
 }
 
 function useContext() {

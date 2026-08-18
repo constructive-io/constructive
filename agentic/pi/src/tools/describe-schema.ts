@@ -1,13 +1,9 @@
-import { fieldTypeToTypeName, isInternalPolicy } from '@agentic-kit/harness';
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
+import { fieldTypeToTypeName, type HarnessTool, isInternalPolicy } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import { resolveProjectContext } from '../context';
-import { toolSchema } from '../tool-schema';
 
 const ParamZod = z.object({});
-const ParamSchema = toolSchema(ParamZod);
-
 type Params = z.infer<typeof ParamZod>;
 
 type SchemaField = {
@@ -54,15 +50,15 @@ function formatText(details: DescribeSchemaDetails): string {
   return lines.join('\n');
 }
 
-export const describeSchemaTool: ToolDefinition<typeof ParamSchema, DescribeSchemaDetails> = {
+export const describeSchemaTool: HarnessTool<typeof ParamZod, DescribeSchemaDetails> = {
   name: 'describe_schema',
   label: 'Describe schema',
   description:
     'Inspect the current Constructive database schema for this project: application tables with their fields (name, type, required, default). Read-only.',
   promptSnippet:
     'describe_schema: list the project database tables and their fields. Read-only — call before modifying schema.',
-  parameters: ParamSchema,
-  async execute(_toolCallId, _params: Params, _signal, _onUpdate, ctx) {
+  parameters: ParamZod,
+  async execute(_params: Params, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) {
       return {

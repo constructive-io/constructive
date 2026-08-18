@@ -3,13 +3,10 @@ import {
   BlueprintZod,
   expandBlueprintDefaults,
   filterInternalPolicies,
+  type HarnessTool,
 } from '@agentic-kit/harness';
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
 
 import { resolveProjectContext } from '../context';
-import { toolSchema } from '../tool-schema';
-
-const BlueprintSchema = toolSchema(BlueprintZod);
 
 type Params = Blueprint;
 
@@ -50,7 +47,7 @@ function formatText(name: string, details: ProvisionBlueprintDetails): string {
   return lines.join('\n');
 }
 
-export const provisionBlueprintTool: ToolDefinition<typeof BlueprintSchema, ProvisionBlueprintDetails> =
+export const provisionBlueprintTool: HarnessTool<typeof BlueprintZod, ProvisionBlueprintDetails> =
   {
     name: 'provision_blueprint',
     label: 'Provision blueprint',
@@ -58,8 +55,8 @@ export const provisionBlueprintTool: ToolDefinition<typeof BlueprintSchema, Prov
       'Create one or more related tables (with fields, RLS policies, and relations) in the project database from a blueprint definition. Always put related tables in a SINGLE call so relations are created together.',
     promptSnippet:
       'provision_blueprint: create new tables from scratch in a single call (fields + policies + relations). Call describe_schema first.',
-    parameters: BlueprintSchema,
-    async execute(_toolCallId, params: Params, _signal, _onUpdate, ctx) {
+    parameters: BlueprintZod,
+    async execute(params: Params, ctx) {
       const empty: ProvisionBlueprintDetails = { created: 0, total: 0, tables: [], error: null };
 
       const resolved = await resolveProjectContext(ctx.cwd);

@@ -1,8 +1,7 @@
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
+import type { HarnessTool } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import { resolveProjectContext } from '../context';
-import { toolSchema } from '../tool-schema';
 
 const ManageEntityTypesZod = z.object({
   action: z
@@ -56,7 +55,6 @@ const ManageEntityTypesZod = z.object({
     .describe('Provision a storage module (files + buckets tables) for this type. Create only.')
     .optional(),
 });
-const ManageEntityTypesSchema = toolSchema(ManageEntityTypesZod);
 
 export type EntityTypeSummary = {
   id: string;
@@ -145,8 +143,8 @@ export function validateManageEntityTypes(params: Params): string | null {
   }
 }
 
-export const manageEntityTypesTool: ToolDefinition<
-  typeof ManageEntityTypesSchema,
+export const manageEntityTypesTool: HarnessTool<
+  typeof ManageEntityTypesZod,
   ManageEntityTypesDetails
 > = {
   name: 'manage_entity_types',
@@ -155,8 +153,8 @@ export const manageEntityTypesTool: ToolDefinition<
     'List, create, or delete entity types in the project database. An entity type (e.g. organization, team, project) provisions its own entity table plus membership wiring, and is the unit that API keys can be scoped to. Registrations are immutable once provisioned — to change one, delete it and create a new one. Deleting removes the registration; the already-provisioned entity table stays in the API schema.',
   promptSnippet:
     'manage_entity_types: list/create/delete entity types (orgs, teams, …) in the project database. list is free; create/delete are gated.',
-  parameters: ManageEntityTypesSchema,
-  async execute(_id, params: Params, _signal, _onUpdate, ctx) {
+  parameters: ManageEntityTypesZod,
+  async execute(params: Params, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) {
       return {

@@ -1,10 +1,8 @@
-import { type ConfirmPreviewTable, filterInternalPolicies } from '@agentic-kit/harness';
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
+import { type ConfirmPreviewTable, filterInternalPolicies, type HarnessTool } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import type { ModulesClient, ProjectContext } from '../context';
 import { resolveProjectContext } from '../context';
-import { toolSchema } from '../tool-schema';
 
 export type TemplateDetails = {
   success: boolean;
@@ -182,17 +180,16 @@ function done(success: boolean, message: string) {
 // ── list_templates ────────────────────────────────────────────────────────
 
 const ListTemplatesZod = z.object({});
-const ListTemplatesSchema = toolSchema(ListTemplatesZod);
 
-export const listTemplatesTool: ToolDefinition<typeof ListTemplatesSchema, ListTemplatesDetails> = {
+export const listTemplatesTool: HarnessTool<typeof ListTemplatesZod, ListTemplatesDetails> = {
   name: 'list_templates',
   label: 'List templates',
   description:
     'List the blueprint templates available to provision into the project database (display name, description, categories, table count). Read-only — these are a global catalog, not the project schema.',
   promptSnippet:
     'list_templates: list the available blueprint templates to apply. Read-only — call before apply_template.',
-  parameters: ListTemplatesSchema,
-  async execute(_id, _params: z.infer<typeof ListTemplatesZod>, _signal, _onUpdate, ctx) {
+  parameters: ListTemplatesZod,
+  async execute(_params: z.infer<typeof ListTemplatesZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) {
       return { content: [{ type: 'text', text: resolved.reason }], details: { templates: [] } };
@@ -250,17 +247,16 @@ const CreateTemplateZod = z.object({
     .describe('Categories for catalog grouping and discovery')
     .optional(),
 });
-const CreateTemplateSchema = toolSchema(CreateTemplateZod);
 
-export const createTemplateTool: ToolDefinition<typeof CreateTemplateSchema, CreateTemplateDetails> = {
+export const createTemplateTool: HarnessTool<typeof CreateTemplateZod, CreateTemplateDetails> = {
   name: 'create_template',
   label: 'Create template',
   description:
     'Save an existing project blueprint into the global template catalog as a reusable blueprint template. Defaults to the most recently provisioned blueprint; pass blueprintName to pick a specific one by display name. Gated.',
   promptSnippet:
     'create_template: save a project blueprint to the reusable template catalog. Gated.',
-  parameters: CreateTemplateSchema,
-  async execute(_id, params: z.infer<typeof CreateTemplateZod>, _signal, _onUpdate, ctx) {
+  parameters: CreateTemplateZod,
+  async execute(params: z.infer<typeof CreateTemplateZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) return done(false, resolved.reason);
     const { modules, ownerId } = resolved.context;
@@ -316,16 +312,15 @@ const ApplyTemplateZod = z.object({
     )
     .optional(),
 });
-const ApplyTemplateSchema = toolSchema(ApplyTemplateZod);
 
-export const applyTemplateTool: ToolDefinition<typeof ApplyTemplateSchema, TemplateDetails> = {
+export const applyTemplateTool: HarnessTool<typeof ApplyTemplateZod, TemplateDetails> = {
   name: 'apply_template',
   label: 'Apply template',
   description:
     'Apply an existing blueprint template to the project database, creating its tables. Use the template display name (from list_templates).',
   promptSnippet: 'apply_template: provision a saved blueprint template by display name. Gated.',
-  parameters: ApplyTemplateSchema,
-  async execute(_id, params: z.infer<typeof ApplyTemplateZod>, _signal, _onUpdate, ctx) {
+  parameters: ApplyTemplateZod,
+  async execute(params: z.infer<typeof ApplyTemplateZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) return done(false, resolved.reason);
     const { modules, databaseId, schemaId, ownerId } = resolved.context;
@@ -376,15 +371,14 @@ const UpdateTemplateZod = z.object({
     visibility: z.enum(['private', 'public']).describe('New visibility').optional(),
   }),
 });
-const UpdateTemplateSchema = toolSchema(UpdateTemplateZod);
 
-export const updateTemplateTool: ToolDefinition<typeof UpdateTemplateSchema, TemplateDetails> = {
+export const updateTemplateTool: HarnessTool<typeof UpdateTemplateZod, TemplateDetails> = {
   name: 'update_template',
   label: 'Update template',
   description: 'Update a blueprint template’s metadata (display name, description, categories, tags, visibility).',
   promptSnippet: 'update_template: edit a saved template’s metadata by display name. Gated.',
-  parameters: UpdateTemplateSchema,
-  async execute(_id, params: z.infer<typeof UpdateTemplateZod>, _signal, _onUpdate, ctx) {
+  parameters: UpdateTemplateZod,
+  async execute(params: z.infer<typeof UpdateTemplateZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) return done(false, resolved.reason);
     try {
@@ -408,15 +402,14 @@ export const updateTemplateTool: ToolDefinition<typeof UpdateTemplateSchema, Tem
 const DeleteTemplateZod = z.object({
   templateName: z.string().describe('The display name of the blueprint template to delete'),
 });
-const DeleteTemplateSchema = toolSchema(DeleteTemplateZod);
 
-export const deleteTemplateTool: ToolDefinition<typeof DeleteTemplateSchema, TemplateDetails> = {
+export const deleteTemplateTool: HarnessTool<typeof DeleteTemplateZod, TemplateDetails> = {
   name: 'delete_template',
   label: 'Delete template',
   description: 'Permanently delete a blueprint template by its display name.',
   promptSnippet: 'delete_template: remove a saved template by display name. Destructive — gated.',
-  parameters: DeleteTemplateSchema,
-  async execute(_id, params: z.infer<typeof DeleteTemplateZod>, _signal, _onUpdate, ctx) {
+  parameters: DeleteTemplateZod,
+  async execute(params: z.infer<typeof DeleteTemplateZod>, ctx) {
     const resolved = await resolveProjectContext(ctx.cwd);
     if (!resolved.context) return done(false, resolved.reason);
     try {
