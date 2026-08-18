@@ -80,7 +80,3 @@ Env overrides for CI and headless use (these win over the stored session; read p
 ## Roadmap
 
 - Harness system-prompt section + templates/prompts materialization, shared with constructive-desktop via a common adapter package.
-
-## Credits
-
-The interactive session is powered by the excellent [pi coding agent](https://github.com/badlogic/pi-mono) — thank you! `agent` layers the Constructive harness (skill releases, overlays, backend tooling) on top.

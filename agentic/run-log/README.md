@@ -105,7 +105,3 @@ Unreadable input fails loudly. A corrupt record, a mixed-version log, or a sessi
 - [`@agentic-kit/harness`](../harness) — host-neutral gates, policy, and the harness adapter contract
 - [`@agentic-kit/metering`](../metering) — the metered gateway and usage reporting
 - [`agentic-server`](../agentic-server) — the metered inference gateway
-
-## License
-
-SEE LICENSE IN LICENSE

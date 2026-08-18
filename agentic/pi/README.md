@@ -109,7 +109,3 @@ For local development, the cold path and the warm pool depend on the backend's j
 - [`@agentic-kit/run-log`](https://www.npmjs.com/package/@agentic-kit/run-log) — the append-only run log
 - [`@agentic-kit/cli`](https://www.npmjs.com/package/@agentic-kit/cli) — `agent`, a local secure-by-default coding agent
 - [`agentic-kit`](https://www.npmjs.com/package/agentic-kit) — the umbrella package
-
-## Credits
-
-Built on the excellent [pi coding agent](https://github.com/badlogic/pi-mono) by Mario Zechner.

@@ -62,7 +62,3 @@ const result = await describeSchemaTool.execute({ database_name: 'my-app' }, { c
 | [`@agentic-kit/harness`](https://www.npmjs.com/package/@agentic-kit/harness) | the neutral contracts: `HarnessTool`, `HarnessAdapter`, the run gate |
 | [`@agentic-kit/pi`](https://www.npmjs.com/package/@agentic-kit/pi) | the pi adapter: binds these tools and attaches a run's lanes to a pi session |
 | [`@agentic-kit/cli`](https://www.npmjs.com/package/@agentic-kit/cli) | the `agent` CLI, which materializes the tools into a pi agent dir |
-
-## License
-
-SEE LICENSE IN LICENSE
