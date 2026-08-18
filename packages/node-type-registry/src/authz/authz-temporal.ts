@@ -12,11 +12,13 @@ export const AuthzTemporal: NodeTypeDefinition = {
       valid_from_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column for start time (at least one of valid_from_field or valid_until_field required)'
       },
       valid_until_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column for end time (at least one of valid_from_field or valid_until_field required)'
       },
       valid_from_inclusive: {

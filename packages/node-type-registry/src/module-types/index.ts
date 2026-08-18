@@ -37,6 +37,13 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     internal: true
   },
   {
+    name: 'cluster_module',
+    display_name: 'Clusters',
+    description:
+      'Provisions the fleet catalog: clusters, their database servers, the physical databases on those servers, and where each logical database is placed.',
+    internal: true
+  },
+  {
     name: 'compute_log_module',
     display_name: 'Compute Log',
     description: 'Provisions compute usage logging.'
@@ -132,12 +139,6 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     description: 'Provisions organization hierarchy data.'
   },
   {
-    name: 'http_route_module',
-    display_name: 'HTTP Route',
-    description: 'Provisions catalog-backed HTTP routes.',
-    internal: true
-  },
-  {
     name: 'i18n_module',
     display_name: 'Internationalization',
     description: 'Provisions translation and locale data.'
@@ -159,6 +160,19 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     internal: true
   },
   {
+    name: 'image_module',
+    display_name: 'Images',
+    description:
+      'Provisions the container image catalog and its cross-scope usage grants.'
+  },
+  {
+    name: 'infra_module',
+    display_name: 'Infrastructure',
+    description:
+      'Provisions one scope\'s whole compute plane: functions, deployments and invocations, resources, the image and repository registry, graphs and their executions, the four usage logs, and the infrastructure secrets they read.',
+    internal: true
+  },
+  {
     name: 'infra_secrets_module',
     display_name: 'Infrastructure Secrets',
     description: 'Provisions platform infrastructure secrets.',
@@ -175,9 +189,21 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     description: 'Provisions application internal secrets.'
   },
   {
+    name: 'internal_config_module',
+    display_name: 'Internal Config',
+    description: 'Provisions plaintext internal configuration.'
+  },
+  {
     name: 'invites_module',
     display_name: 'Invites',
     description: 'Provisions membership invitation data.'
+  },
+  {
+    name: 'k8s_admission_module',
+    display_name: 'K8s Admission',
+    description:
+      'Provisions merkle-versioned Kubernetes admission policy catalogs (allowed kinds + spec rules).',
+    internal: true
   },
   {
     name: 'limits_module',
@@ -256,6 +282,18 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     name: 'rate_limits_module',
     display_name: 'Rate Limits',
     description: 'Provisions rate-limit counters and policy data.'
+  },
+  {
+    name: 'repository_module',
+    display_name: 'Repositories',
+    description:
+      'Provisions source repositories, their events, workflows, builds and local proposals.'
+  },
+  {
+    name: 'machine_module',
+    display_name: 'Machines',
+    description:
+      'Provisions enrolled machines, their command and terminal sessions, and the durable message ledger.'
   },
   {
     name: 'resource_module',

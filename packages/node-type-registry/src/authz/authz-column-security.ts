@@ -12,7 +12,7 @@ export const AuthzColumnSecurity: NodeTypeDefinition = {
     properties: {
       columns: {
         type: 'array',
-        items: { type: 'string', format: 'column-ref' },
+        items: { type: 'string', format: 'column-ref', 'x-column-scope': 'local' },
         description:
           'Guarded columns that share the same rule and authorization (e.g. ["is_shared"]).'
       },

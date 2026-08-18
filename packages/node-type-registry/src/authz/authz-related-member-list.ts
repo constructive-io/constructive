@@ -25,16 +25,19 @@ export const AuthzRelatedMemberList: NodeTypeDefinition = {
       owned_table_key: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'foreign',
         description: 'Array column in related table'
       },
       owned_table_ref_key: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'foreign',
         description: 'FK column in related table'
       },
       this_object_key: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'PK column in protected table'
       }
     },

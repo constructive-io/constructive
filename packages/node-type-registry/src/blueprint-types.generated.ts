@@ -98,6 +98,29 @@ export interface DataBulkParams {
   /* Enable bulk delete (+bulkDelete) */
   delete?: boolean;
 }
+/** Per-row required permissions. A profile compiles a person to bits so no policy joins a profiles table; this compiles a row to bits so no policy joins a grant table either — the row carries the mask an actor must hold, and an AuthzEntityMembership policy with mask_column checks it as one bitwise subset test against the SPRT. The mask only narrows: it takes access away from someone membership already lets in, and never grants access to a non-member. Zero requires nothing, which is what an unclassified row defaults to. In direct mode the writer sets the mask and the subset guard bounds it to bits the writer holds; in derived mode it is copied from a mapping row (classification -> mask) by generated triggers, so authors edit one classification instead of every document. */
+export interface DataCapabilitiesParams {
+  /* Name of the bit(n) mask column to create on this table. */
+  field?: string;
+  /* Selects the capabilities module whose bit numbering the mask is measured in, by scope (e.g. "app", "org") or by table prefix. Required only when the database has more than one; several with no selector raises naming the candidates. */
+  capabilities?: string;
+  /* Capability names every row requires unless told otherwise, resolved to a literal mask and baked into the column default. Omitted means a zero mask: requires nothing. */
+  default?: string[];
+  /* Who writes the mask: "direct" the writer, bounded by the subset guard; "derived" the mapping row named by from_column, stamped by generated triggers and hidden from mutations. */
+  mode?: 'direct' | 'derived';
+  /* Derived mode only: the column on this table naming the mapping row to copy the mask from (e.g. classification_id). */
+  from_column?: string;
+  /* Derived mode only: table holding one mask per class (e.g. document_classifications). */
+  mapping_table?: string;
+  /* Derived mode only: column on the mapping table that from_column matches. */
+  mapping_key?: string;
+  /* Derived mode only: the mapping table's own bit(n) mask column. Created when absent, so a classification table needs no DataCapabilities declaration of its own. Defaults to the same name as field. */
+  mapping_column?: string;
+  /* Direct mode only: refuse a write requiring bits the writer does not hold, so nobody can lock a row away from everyone including themselves. Off is for trusted-writer tables only. */
+  subset_guard?: boolean;
+  /* Direct mode only: the entity column the subset guard's membership check reads. */
+  entity_field?: string;
+}
 /** Creates a derived text field that automatically concatenates multiple source fields via BEFORE INSERT/UPDATE triggers. Used to produce a unified text representation (e.g., embedding_text) from multiple columns on a table. The trigger fires with '_000' prefix to run before Search* triggers alphabetically. */
 export interface DataCompositeFieldParams {
   /* Name of the derived text field to create */
@@ -288,6 +311,25 @@ export interface DataJsonbParams {
   /* Whether to create a GIN index */
   create_index?: boolean;
 }
+/** Adds a boolean lock column and guards mutations while a row is locked, so infrastructure rows other things depend on (a bucket a function needs, a route, a resource) are not deleted or edited by accident. Two enforcement modes: step_up requires recent strong verification (via GuardStepUp / require_step_up) for the guarded verbs, while block refuses them outright until the row is unlocked. Clearing the lock is itself step-up guarded, so unlocking is a deliberate, re-authenticated step rather than a silent prelude to deletion. */
+export interface DataLockParams {
+  /* Boolean column holding the lock state */
+  lock_field?: string;
+  /* Which DML events are guarded while the row is locked. INSERT is not lockable — a row cannot be locked before it exists. */
+  events?: ('UPDATE' | 'DELETE')[];
+  /* How a guarded verb is stopped while locked. step_up requires recent strong verification (needs a provisioned user_auth_module); block refuses the verb outright with ROW_LOCKED until unlocked. */
+  enforcement?: 'step_up' | 'block';
+  /* Verification method satisfying the step-up requirement, for the guarded verbs in step_up mode and for clearing the lock */
+  step_up_type?: 'password' | 'mfa' | 'fresh_auth';
+  /* Require step-up to change the lock column itself, so a locked row cannot be quietly unlocked and then deleted. Redundant (and therefore skipped) in step_up mode when UPDATE is already guarded. */
+  guard_unlock?: boolean;
+  /* For a guarded UPDATE, restrict the guard to changes touching these columns. Empty guards the whole row. */
+  protect_fields?: string[];
+  /* Initial value of the lock column for new rows */
+  default_locked?: boolean;
+  /* Optional interval (e.g. "24 hours"); in step_up mode the guard only fires for rows older than this, so freshly created rows stay easy to clean up. Empty guards rows of any age. */
+  min_age?: string;
+}
 /** Adds owner_id and entity_id columns with a compound AuthzMemberOwner policy. The actor must own the row (owner_id = current_user_id()) AND be a member of the entity (entity_id in SPRT). Use for private data within an entity scope — e.g., personal chat threads that belong to the company but only the author can see. */
 export interface DataMemberOwnerParams {
   /* Column name for the owner reference */
@@ -337,29 +379,6 @@ export interface DataPeoplestampsParams {
   include_user_fk?: boolean;
   /* If true, creates B-tree indexes on the peoplestamp columns */
   create_index?: boolean;
-}
-/** Per-row required permissions. A profile compiles a person to bits so no policy joins a profiles table; this compiles a row to bits so no policy joins a grant table either — the row carries the mask an actor must hold, and an AuthzEntityMembership policy with mask_column checks it as one bitwise subset test against the SPRT. The mask only narrows: it takes access away from someone membership already lets in, and never grants access to a non-member. Zero requires nothing, which is what an unclassified row defaults to. In direct mode the writer sets the mask and the subset guard bounds it to bits the writer holds; in derived mode it is copied from a mapping row (classification -> mask) by generated triggers, so authors edit one classification instead of every document. */
-export interface DataCapabilitiesParams {
-  /* Name of the bit(n) mask column to create on this table. */
-  field?: string;
-  /* Selects the capabilities module whose bit numbering the mask is measured in, by scope (e.g. "app", "org") or by table prefix. Required only when the database has more than one; several with no selector raises naming the candidates. */
-  capabilities?: string;
-  /* Capability names every row requires unless told otherwise, resolved to a literal mask and baked into the column default. Omitted means a zero mask: requires nothing. */
-  default?: string[];
-  /* Who writes the mask: "direct" the writer, bounded by the subset guard; "derived" the mapping row named by from_column, stamped by generated triggers and hidden from mutations. */
-  mode?: 'direct' | 'derived';
-  /* Derived mode only: the column on this table naming the mapping row to copy the mask from (e.g. classification_id). */
-  from_column?: string;
-  /* Derived mode only: table holding one mask per class (e.g. document_classifications). */
-  mapping_table?: string;
-  /* Derived mode only: column on the mapping table that from_column matches. */
-  mapping_key?: string;
-  /* Derived mode only: the mapping table's own bit(n) mask column. Created when absent, so a classification table needs no DataCapabilities declaration of its own. Defaults to the same name as field. */
-  mapping_column?: string;
-  /* Direct mode only: refuse a write requiring bits the writer does not hold, so nobody can lock a row away from everyone including themselves. Off is for trusted-writer tables only. */
-  subset_guard?: boolean;
-  /* Direct mode only: the entity column the subset guard's membership check reads. */
-  entity_field?: string;
 }
 /** Adds acting-principal tracking for creates/updates: created_by_principal/updated_by_principal record the acting principal — agent, API key, service identity, or the user itself (jwt_public.current_principal_id()). */
 export interface DataPrincipalstampsParams {
@@ -1234,6 +1253,11 @@ export interface AuthzCompositeParams {
     }[];
   };
 }
+/** Passes when the row's database column equals the session's pinned database claim (jwt.claims.database_id). Consults no principal, membership or entity, so it admits a connection whose identity is set by infrastructure — such as a cloud function's pg-wire proxy lane, which pins the claim from the connection and cannot widen it — to exactly the database that connection is bound to. A session with no claim fails loudly rather than reading nothing. */
+export interface AuthzDatabaseClaimParams {
+  /* Column carrying the row's database id */
+  entity_field?: string;
+}
 /** Denies all access. Generates FALSE expression. */
 export type AuthzDenyAllParams = {};
 /** Direct equality comparison between a table column and the current user ID. Simplest authorization pattern with no subqueries. */
@@ -1288,6 +1312,8 @@ export interface AuthzFilePathParams {
   /* Ltree column on the files table representing the file path */
   path_field?: string;
 }
+/** Passes only for human sessions: compares the session's principal claim to its user claim, so service principals (API keys, agents) are excluded. Typically applied as a restrictive policy alongside a permissive membership policy. */
+export type AuthzHumanOnlyParams = {};
 /** Check if current user is in an array column on the same row. */
 export interface AuthzMemberListParams {
   /* Column name containing the array of user IDs */
@@ -1492,6 +1518,13 @@ export interface AuthzValueExistsParams {
   ref_schema?: string;
   /* Name of the referenced table (or use ref_table_id) */
   ref_table?: string;
+  /* Reference to a table an installed module generated, resolved during blueprint construction (alternative to ref_table_id / ref_schema + ref_table) */
+  ref_module?: {
+    /* Module type owning the table, e.g. "agent" */type: string;
+    /* Logical table key within the module, e.g. "thread" */table: string;
+    /* Scope of the module instance, e.g. "app" or "org" */scope?: string;
+    /* Prefix of the module instance, for entity-scoped installations */prefix?: string;
+  };
   /* Join conditions between the protected row and the referenced table */
   join?: {
     /* Column on the protected table */local_column: string;
@@ -1511,6 +1544,13 @@ export interface AuthzValueMatchParams {
   ref_schema?: string;
   /* Name of the referenced table (or use ref_table_id) */
   ref_table?: string;
+  /* Reference to a table an installed module generated, resolved during blueprint construction (alternative to ref_table_id / ref_schema + ref_table) */
+  ref_module?: {
+    /* Module type owning the table, e.g. "agent" */type: string;
+    /* Logical table key within the module, e.g. "thread" */table: string;
+    /* Scope of the module instance, e.g. "app" or "org" */scope?: string;
+    /* Prefix of the module instance, for entity-scoped installations */prefix?: string;
+  };
   /* Join conditions between the protected row and the referenced table */
   join?: {
     /* Column on the protected table */local_column: string;
@@ -1716,14 +1756,14 @@ export interface BlueprintField {
 /** A WITH CHECK override node for an UPDATE policy. Its expression governs the resulting row while the main policy node governs the targeted row. */
 export interface BlueprintPolicyWithCheck {
   /** Authz* policy type name for the WITH CHECK expression. */
-  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
+  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
   /** Policy-specific data (structure varies by policy type). */
   data?: Record<string, unknown>;
 }
 /** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
+  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
   /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
   privileges?: string[];
   /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
@@ -1821,6 +1861,26 @@ export interface BlueprintTableUniqueConstraint {
   columns: string[];
   /** Optional schema name override. */
   schema_name?: string;
+}
+/** A reference from a blueprint table entry to a table generated by an installed module. Resolved through the module row's recorded table ids; a reference that matches no module instance or no provisioned table fails construction rather than creating a table. */
+export interface BlueprintModuleTableRef {
+  /** Module type owning the table. Currently "agent". */
+  type: string;
+  /** Logical table key within the module, not a table name. Agent: "thread", "message", "task", "prompt", "plan", "agent", "persona", "resource". */
+  table: string;
+  /** Scope of the module instance (e.g. "app", "org"). Required when the database installs the module at more than one scope. */
+  scope?: string;
+  /** Prefix of the module instance, for entity-scoped installations. */
+  prefix?: string;
+}
+/** A reference to an installed module, naming no table of its own. Used by a table entry whose provisions map supplies the table keys. */
+export interface BlueprintModuleInstallRef {
+  /** Module type of the install, e.g. "image". */
+  type: string;
+  /** Scope of the module instance (e.g. "app", "org"). Required when the database installs the module at more than one scope. */
+  scope?: string;
+  /** Prefix of the module instance, for entity-scoped installations. */
+  prefix?: string;
 }
 /** A bucket seed entry for storage.buckets[]. Creates an initial bucket row in the {prefix}_buckets table during entity type provisioning. Only used for app-level storage (not entity-scoped). */
 export interface BlueprintBucketSeed {
@@ -1947,6 +2007,8 @@ export interface BlueprintAgentConfig {
   has_resources?: boolean;
   /** Whether to provision the agent registry (agent table + agent_persona table). Implies has_resources = true. Defaults to false. */
   has_agents?: boolean;
+  /** Whether to provision the agent execution surface: agent_run (one supervised run of a thread — placement, cursor, artifacts), agent_event (that run's append-only transcript, agent session entries stored verbatim, append-only by grant with UNIQUE (run_id, seq)) and agent_run_workspace (the repositories a run works in — zero rows for a chat with no clone, one per repository otherwise, UNIQUE (run_id, repo)). Defaults to false. */
+  has_runs?: boolean;
   /** Resource configuration array. First element configures the agent_resource table: vector dimensions (default 768), chunk_size (default 1000), chunk_strategy (default "paragraph"), chunk_overlap (default 200), embedding_model, embedding_provider, search_indexes (default ["bm25"]). */
   resources?: {
     dimensions?: number;
@@ -1959,7 +2021,7 @@ export interface BlueprintAgentConfig {
   }[];
   /** RLS policy overrides for the agent tables. NULL = apply defaults from apply_agent_security(). */
   policies?: BlueprintPolicy[];
-  /** Per-table overrides for agent tables. Each key targets a specific table (thread, message, task, prompt, plan, resource, agent, persona) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision. */
+  /** Per-table overrides for agent tables. Each key targets a specific table (thread, message, task, prompt, plan, resource, agent, persona, run, event, workspace) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision. Overriding `event` replaces the append-only default, so a grant list there can make the transcript mutable; overriding `workspace` replaces its no-delete default. */
   provisions?: {
     thread?: BlueprintEntityTableProvision;
     message?: BlueprintEntityTableProvision;
@@ -1969,6 +2031,9 @@ export interface BlueprintAgentConfig {
     resource?: BlueprintEntityTableProvision;
     agent?: BlueprintEntityTableProvision;
     persona?: BlueprintEntityTableProvision;
+    run?: BlueprintEntityTableProvision;
+    event?: BlueprintEntityTableProvision;
+    workspace?: BlueprintEntityTableProvision;
   };
 }
 /** Graph module configuration. Presence triggers capability registration (manage_graphs, execute_graphs). The graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers capabilities here — the graph module itself must be provisioned separately. */
@@ -2040,7 +2105,7 @@ export interface BlueprintEntityType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataHistory' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataCapabilities' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
+export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCapabilities' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataHistory' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataLock' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: 'AuthzAllowAll';
@@ -2058,6 +2123,9 @@ export type BlueprintNodeObject = {
   $type: 'AuthzComposite';
   data: AuthzCompositeParams;
 } | {
+  $type: 'AuthzDatabaseClaim';
+  data: AuthzDatabaseClaimParams;
+} | {
   $type: 'AuthzDenyAll';
   data?: Record<string, never>;
 } | {
@@ -2072,6 +2140,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: 'AuthzFilePath';
   data: AuthzFilePathParams;
+} | {
+  $type: 'AuthzHumanOnly';
+  data?: Record<string, never>;
 } | {
   $type: 'AuthzMemberList';
   data: AuthzMemberListParams;
@@ -2136,6 +2207,9 @@ export type BlueprintNodeObject = {
   $type: 'DataBulk';
   data: DataBulkParams;
 } | {
+  $type: 'DataCapabilities';
+  data: DataCapabilitiesParams;
+} | {
   $type: 'DataCompositeField';
   data: DataCompositeFieldParams;
 } | {
@@ -2178,6 +2252,9 @@ export type BlueprintNodeObject = {
   $type: 'DataJsonb';
   data: DataJsonbParams;
 } | {
+  $type: 'DataLock';
+  data: DataLockParams;
+} | {
   $type: 'DataMemberOwner';
   data: DataMemberOwnerParams;
 } | {
@@ -2189,9 +2266,6 @@ export type BlueprintNodeObject = {
 } | {
   $type: 'DataPeoplestamps';
   data: DataPeoplestampsParams;
-} | {
-  $type: 'DataCapabilities';
-  data: DataCapabilitiesParams;
 } | {
   $type: 'DataPrincipalstamps';
   data: DataPrincipalstampsParams;
@@ -2309,34 +2383,44 @@ export type BlueprintNode = BlueprintNodeShorthand | BlueprintNodeObject;
 /** A relation entry in a blueprint definition. */
 export type BlueprintRelation = {
   $type: 'RelationBelongsTo';
-  source_table: string;
-  target_table: string;
+  /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
+  /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
   source_schema_name?: string;
   target_schema_name?: string;
+  /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
+  /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
 } & Partial<RelationBelongsToParams> | {
   $type: 'RelationHasMany';
-  source_table: string;
-  target_table: string;
+  /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
+  /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
   source_schema_name?: string;
   target_schema_name?: string;
+  /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
+  /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
 } & Partial<RelationHasManyParams> | {
   $type: 'RelationHasOne';
-  source_table: string;
-  target_table: string;
+  /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
+  /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
   source_schema_name?: string;
   target_schema_name?: string;
+  /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
+  /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
 } & Partial<RelationHasOneParams> | {
   $type: 'RelationManyToMany';
-  source_table: string;
-  target_table: string;
+  /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
+  /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
   source_schema_name?: string;
   target_schema_name?: string;
+  /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
+  /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
 } & Partial<RelationManyToManyParams> | {
   $type: 'RelationSpatial';
-  source_table: string;
-  target_table: string;
+  /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
+  /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
   source_schema_name?: string;
   target_schema_name?: string;
+  /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
+  /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
   /** Name of the geometry/geography column on source_table that carries the @spatialRelation smart tag. */source_field: string;
   /** Name of the geometry/geography column on target_table that the predicate is evaluated against. */target_field: string;
 } & Partial<RelationSpatialParams>;
@@ -2348,12 +2432,16 @@ export type BlueprintRelation = {
 ;
 /** A table definition within a blueprint. */
 export interface BlueprintTable {
-  /** The PostgreSQL table name to create. */
-  table_name: string;
+  /** The PostgreSQL table name to create. Required unless the entry carries a module reference instead. */
+  table_name?: string;
   /** Optional schema name (falls back to top-level default). */
   schema_name?: string;
-  /** Array of node type entries that define the table's behavior. */
-  nodes: BlueprintNode[];
+  /** Attach this entry to a table an installed module generated instead of naming one, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with table_name/schema_name. An entry carrying provisions names the install alone and leaves out table, since the provisions keys name the tables. */
+  module?: BlueprintModuleTableRef | BlueprintModuleInstallRef;
+  /** Provision security onto the tables the referenced module generated, keyed by the module's own table keys (e.g. { registries: { policies: [...] } } for an image module). Requires a module reference without "table", since the keys name the tables. Each entry takes ownership of the security it declares: the grants/policies given become that table's whole set, replacing what the module installed — unlike this entry's own policies[]/grants[], which layer onto one table. */
+  provisions?: Record<string, BlueprintEntityTableProvision>;
+  /** Array of node type entries that define the table's behavior. Omitted by an entry that only carries provisions or only attaches policies to a module table. */
+  nodes?: BlueprintNode[];
   /** Custom fields (columns) to add to the table. */
   fields?: BlueprintField[];
   /** RLS policies for this table. */

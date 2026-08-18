@@ -38,17 +38,20 @@ export const AuthzFilePath: NodeTypeDefinition = {
       capability_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'foreign',
         description: 'Boolean column on the path_shares table that grants the required permission (e.g. can_read, can_write)'
       },
       bucket_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'foreign',
         description: 'Column on the files table referencing the bucket',
         default: 'bucket_id'
       },
       path_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'foreign',
         description: 'Ltree column on the files table representing the file path',
         default: 'path'
       }

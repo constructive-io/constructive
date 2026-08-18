@@ -7,8 +7,8 @@ import type { ModulePreset } from './types';
  *
  * This is the common shape for B2B SaaS apps that need file upload
  * infrastructure tied to their org/workspace structure. The storage module
- * creates `app_buckets` and `app_files` tables with RLS policies, and
- * entity-type-level storage scopes can be provisioned on top.
+ * creates `buckets` and `files` tables with RLS policies on the `objects` API,
+ * and entity-type-level storage scopes can be provisioned on top.
  *
  * If you don't need orgs, use a lighter preset and add `storage_module`
  * separately via provisioning options.
@@ -21,8 +21,8 @@ export const PresetB2bStorage: ModulePreset = {
     'Everything in `auth:hardened`, plus orgs, invites, capabilities, profiles and hierarchy at ' +
     'both app and org membership scopes, an `events_module` at both scopes carrying the ' +
     '`humanity` trust ladder (so a member can earn `level.reachable` and a policy can gate on ' +
-    'it), and `storage_module` for file uploads. The storage module creates ' +
-    '`app_buckets` and `app_files` tables with full RLS: AuthzPublishable for public reads, ' +
+    'it), and `storage_module` for file uploads, exposed on the `storage` API. The storage ' +
+    'module creates `app_buckets` and `app_files` tables with full RLS: AuthzPublishable for public reads, ' +
     'AuthzAppMembership for member access, AuthzDirectOwner for uploader-only modify/delete. ' +
     'Entity-type provisioning with a non-empty `storage` array adds per-scope storage tables ' +
     'automatically (multiple modules per entity via key). Choose this when your B2B ' +
@@ -55,6 +55,7 @@ export const PresetB2bStorage: ModulePreset = {
     'user_state_module',
     'user_credentials_module',
     ['internal_secrets_module', { scope: 'app' }],
+    ['internal_config_module', { scope: 'app' }],
     'emails_module',
     'rls_module',
     'user_auth_module',
@@ -75,6 +76,11 @@ export const PresetB2bStorage: ModulePreset = {
     ['hierarchy_module', { scope: 'org' }],
     ['invites_module', { scope: 'app' }],
     ['invites_module', { scope: 'org' }],
+    // Binds the database to the typed catalog plane. Buckets are routable
+    // targets only through the buckets catalog, so storage_module requires it.
+    ['catalog_module', { scope: 'app' }],
+    // Routing and naming both come from the module defaults: the storage API
+    // (api_name defaults to 'storage') and the app_ prefix auto-filled from scope.
     ['storage_module', { scope: 'app' }],
     'devices_module',
     'user_settings_security_module'

@@ -12,6 +12,7 @@ export const AuthzAppMemberOwner: NodeTypeDefinition = {
       owner_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column name containing the owner user ID (e.g., actor_id)',
         default: 'owner_id'
       },

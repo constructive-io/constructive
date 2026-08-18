@@ -12,6 +12,7 @@ export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
       entity_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column name on protected table referencing the join table'
       },
       sel_field: {
@@ -53,6 +54,7 @@ export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
       obj_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'foreign',
         description: 'Field name on join table to match against SPRT entity_id'
       },
       levels: {

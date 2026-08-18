@@ -19,7 +19,8 @@ export const PresetFull: ModulePreset = {
   summary: 'Install every standard Constructive module with explicit module list.',
   description:
     'Installs every standard module in the catalog: everything in `b2b:storage` plus ' +
-    '`storage_module` with all feature flags (versioning, content hash, custom keys, audit log), ' +
+    '`storage_module` on the `storage` API with all feature flags (versioning, content hash, ' +
+    'custom keys, audit log), ' +
     '`crypto_addresses_module` for wallet-based sign-in, `plans_module` and `billing_module` ' +
     'for subscription management, `notifications_module` for in-app notifications, and ' +
     '`events_module` at both app and org scopes carrying the `humanity` trust ladder. ' +
@@ -65,6 +66,7 @@ export const PresetFull: ModulePreset = {
     'devices_module',
     'user_credentials_module',
     ['internal_secrets_module', { scope: 'app' }],
+    ['internal_config_module', { scope: 'app' }],
     'rls_module',
     // Contact modules
     'emails_module',
@@ -85,7 +87,12 @@ export const PresetFull: ModulePreset = {
     'webauthn_auth_module',
     // Internationalization
     'i18n_module',
-    // Storage (full features)
+    // Binds the database to the typed catalog plane. Every module below
+    // registers into it — buckets, namespaces and functions are all resolved
+    // through the catalog — so the binding is a hard dependency, not a hint.
+    ['catalog_module', { scope: 'app' }],
+    // Storage (full features). Routing and naming come from the module
+    // defaults: the storage API, and the app_ prefix auto-filled from scope.
     ['storage_module', { scope: 'app', has_versioning: true, has_content_hash: true, has_custom_keys: true, has_audit_log: true }],
     // Infrastructure (functions, namespaces)
     ['namespace_module', { scope: 'app' }],
