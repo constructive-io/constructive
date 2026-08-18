@@ -13,6 +13,7 @@ export const AuthzValueAllowed: NodeTypeDefinition = {
       column: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column on the protected table to check'
       },
       allowed: {
@@ -21,6 +22,7 @@ export const AuthzValueAllowed: NodeTypeDefinition = {
           {
             type: 'string',
             format: 'column-ref',
+            'x-column-scope': 'local',
             description: 'Local column name containing allowed values'
           },
           {

@@ -12,6 +12,7 @@ export const AuthzMemberList: NodeTypeDefinition = {
       array_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column name containing the array of user IDs'
       }
     },

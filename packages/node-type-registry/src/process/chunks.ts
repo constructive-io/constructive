@@ -138,7 +138,7 @@ export const ProcessChunks: NodeTypeDefinition = {
         type: 'string',
         format: 'function-ref',
         description: 'Task identifier for the chunking job queue',
-        default: 'embedding:generate_chunks'
+        default: 'embedding:chunk_record'
       }
     }
   },

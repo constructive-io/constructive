@@ -76,7 +76,7 @@ export const SearchVector: NodeTypeDefinition = {
         type: 'string',
         format: 'function-ref',
         description: 'Task identifier for the job queue. Must match a registered function definition when function_module is installed.',
-        default: 'embedding:generate_embedding'
+        default: 'embedding:embed_record'
       },
       chunks: {
         type: 'object',
@@ -122,7 +122,7 @@ export const SearchVector: NodeTypeDefinition = {
             type: 'string',
             format: 'function-ref',
             description: 'Task identifier for the chunking job queue. Must match a registered function definition when function_module is installed.',
-            default: 'embedding:generate_chunks'
+            default: 'embedding:chunk_record'
           }
         }
       }

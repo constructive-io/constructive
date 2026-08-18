@@ -46,6 +46,7 @@ export const PresetAuthHardened: ModulePreset = {
     'user_state_module',
     'user_credentials_module',
     ['internal_secrets_module', { scope: 'app' }],
+    ['internal_config_module', { scope: 'app' }],
     'emails_module',
     'rls_module',
     'user_auth_module',

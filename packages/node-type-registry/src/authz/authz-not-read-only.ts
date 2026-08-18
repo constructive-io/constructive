@@ -12,6 +12,7 @@ export const AuthzNotReadOnly: NodeTypeDefinition = {
       entity_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column name referencing the entity (e.g., entity_id, org_id)'
       },
       membership_type: {

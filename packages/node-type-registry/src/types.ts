@@ -123,6 +123,12 @@ export interface JSONSchema {
   default?: unknown;
   [key: string]: unknown;
   format?: string;
+  /**
+   * Which table a `format: 'column-ref'` value names: 'local' for a column of
+   * the table the node is attached to, 'foreign' for a column of another table
+   * the node references. Absent means 'local'.
+   */
+  'x-column-scope'?: 'local' | 'foreign';
 }
 
 /**

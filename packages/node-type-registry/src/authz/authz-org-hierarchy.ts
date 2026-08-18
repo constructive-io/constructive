@@ -20,12 +20,14 @@ export const AuthzOrgHierarchy: NodeTypeDefinition = {
       entity_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Field referencing the org entity',
         default: 'entity_id'
       },
       anchor_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Field referencing the user (e.g., owner_id)'
       },
       max_depth: {

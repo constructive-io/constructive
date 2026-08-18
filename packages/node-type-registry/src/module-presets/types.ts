@@ -77,6 +77,7 @@ export type AgentModuleOptions = BaseModuleOptions & {
   has_plans?: boolean;
   has_resources?: boolean;
   has_agents?: boolean;
+  has_runs?: boolean;
   resources?: unknown[];
 };
 

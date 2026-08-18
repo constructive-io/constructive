@@ -13,7 +13,8 @@ export const AuthzDirectOwnerAny: NodeTypeDefinition = {
         type: 'array',
         items: {
           type: 'string',
-          format: 'column-ref'
+          format: 'column-ref',
+          'x-column-scope': 'local'
         },
         description: 'Array of column names to check for ownership'
       }

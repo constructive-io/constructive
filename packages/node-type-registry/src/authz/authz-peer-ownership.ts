@@ -12,6 +12,7 @@ export const AuthzPeerOwnership: NodeTypeDefinition = {
       owner_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column name on protected table referencing the owning user (e.g., owner_id)'
       },
       membership_type: {

@@ -12,6 +12,7 @@ export const AuthzRelatedPeerOwnership: NodeTypeDefinition = {
       entity_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column name on protected table referencing the related table (e.g., message_id)'
       },
       membership_type: {
@@ -43,11 +44,13 @@ export const AuthzRelatedPeerOwnership: NodeTypeDefinition = {
       obj_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'foreign',
         description: 'Field name on related table containing the owner user ID (e.g., sender_id)'
       },
       obj_ref_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'foreign',
         description: 'Field on related table to select for matching entity_field',
         default: 'id'
       },

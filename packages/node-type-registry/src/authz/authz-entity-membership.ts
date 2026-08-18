@@ -12,6 +12,7 @@ export const AuthzEntityMembership: NodeTypeDefinition = {
       entity_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column name referencing the entity (e.g., entity_id, org_id)'
       },
       sel_field: {
@@ -46,6 +47,7 @@ export const AuthzEntityMembership: NodeTypeDefinition = {
       mask_column: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description:
           'Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. Narrows access row by row without joining a grant table; a zero mask requires nothing. Composes with capability/capabilities — both are ANDed.',
       },

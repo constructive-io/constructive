@@ -12,12 +12,14 @@ export const AuthzPublishable: NodeTypeDefinition = {
       is_published_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Boolean field indicating published state',
         default: 'is_published'
       },
       published_at_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Timestamp field for publish time',
         default: 'published_at'
       },

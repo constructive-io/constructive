@@ -19,6 +19,7 @@ export { DataImmutableFields } from './data-immutable-fields';
 export { DataInflection } from './data-inflection';
 export { DataInheritFromParent } from './data-inherit-from-parent';
 export { DataJsonb } from './data-jsonb';
+export { DataLock } from './data-lock';
 export { DataMemberOwner } from './data-member-owner';
 export { DataOwnedFields } from './data-owned-fields';
 export { DataOwnershipInEntity } from './data-ownership-in-entity';

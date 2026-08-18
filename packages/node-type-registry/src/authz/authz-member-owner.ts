@@ -12,12 +12,14 @@ export const AuthzMemberOwner: NodeTypeDefinition = {
       owner_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column name containing the owner user ID (e.g., owner_id)',
         default: 'owner_id'
       },
       entity_field: {
         type: 'string',
         format: 'column-ref',
+        'x-column-scope': 'local',
         description: 'Column name referencing the entity (e.g., entity_id)',
         default: 'entity_id'
       },

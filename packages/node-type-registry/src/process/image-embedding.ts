@@ -188,7 +188,7 @@ export const ProcessImageEmbedding: NodeTypeDefinition = {
           },
           metadata_fields: { type: 'object' },
           enqueue_chunking_job: { type: 'boolean', default: true },
-          chunking_task_name: { type: 'string', format: 'function-ref', default: 'embedding:generate_chunks' }
+          chunking_task_name: { type: 'string', format: 'function-ref', default: 'embedding:chunk_record' }
         }
       }
     }
