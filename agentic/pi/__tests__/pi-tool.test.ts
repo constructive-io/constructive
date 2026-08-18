@@ -1,11 +1,9 @@
-import { readdirSync,readFileSync } from 'node:fs';
-import path from 'node:path';
-
+import { constructiveDbTools } from '@agentic-kit/db-tools';
 import { defineHarnessTool } from '@agentic-kit/harness';
 import type { ExtensionAPI, ToolDefinition } from '@earendil-works/pi-coding-agent';
 import { z } from 'zod';
 
-import { constructiveDbTools, dbTools, toPiTool } from '../src';
+import { createDbTools, dbTools, toPiTool } from '../src';
 
 const echoTool = defineHarnessTool({
   name: 'echo',
@@ -97,17 +95,10 @@ describe('dbTools', () => {
       expect(tool.parameters).toMatchObject({ type: 'object' });
     }
   });
-});
 
-describe('the tool implementations', () => {
-  // The point of the neutral contract: a second harness can bind these tools
-  // without pulling pi in, which only holds while this stays true.
-  it('do not import pi', () => {
-    const dir = path.join(__dirname, '..', 'src', 'tools');
-    const offenders = readdirSync(dir)
-      .filter((file) => file.endsWith('.ts'))
-      .filter((file) => readFileSync(path.join(dir, file), 'utf8').includes('@earendil-works/'));
+  it('createDbTools configures the host and returns the extension', () => {
+    const host = { account: (): null => null, backendConfig: (): null => null };
 
-    expect(offenders).toEqual([]);
+    expect(createDbTools(host)).toBe(dbTools);
   });
 });

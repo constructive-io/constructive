@@ -1,57 +1,24 @@
-import type { AnyHarnessTool } from '@agentic-kit/harness';
+import {
+  configureHost,
+  constructiveDbTools,
+  createTemplatePreviewTables,
+  resolveDataToken,
+  resolveProjectContext,
+  type ToolsHost,
+} from '@agentic-kit/db-tools';
 import type { ExtensionFactory } from '@earendil-works/pi-coding-agent';
 
 import { createConfirmGate } from './confirm-gate';
-import { resolveDataToken, resolveProjectContext } from './context';
-import { configureHost, type PiToolsHost } from './host';
 import { toPiTool } from './pi-tool';
-import { addPoliciesTool } from './tools/add-policies';
-import { addRecordsTool } from './tools/add-records';
-import { addRelationTool } from './tools/add-relation';
-import { createApiKeyTool } from './tools/create-api-key';
-import { describeSchemaTool } from './tools/describe-schema';
-import { manageEntityTypesTool } from './tools/manage-entity-types';
-import { createFieldTool, deleteFieldTool, deleteTableTool, updateFieldTool } from './tools/mutations';
-import { provisionBlueprintTool } from './tools/provision-blueprint';
-import { provisionDatabaseTool } from './tools/provision-database';
-import { runCodegenTool } from './tools/run-codegen';
-import {
-  applyTemplateTool,
-  createTemplatePreviewTables,
-  createTemplateTool,
-  deleteTemplateTool,
-  listTemplatesTool,
-  updateTemplateTool,
-} from './tools/templates';
 
 /**
- * The Constructive database tools, in registration order.
+ * The Constructive db tools bound to pi.
  *
- * These are neutral `HarnessTool`s — nothing in `./tools` imports pi. A harness
- * gets them by binding them to its own runner; `dbTools` below is that binding
- * for pi.
+ * The tools themselves live in `@agentic-kit/db-tools` and know nothing about
+ * pi; this is the binding — `toPiTool` per tool, plus the confirm gate on pi's
+ * `tool_call` event. A sibling adapter writes its own equivalent of this file
+ * and registers the same `constructiveDbTools`.
  */
-export const constructiveDbTools: readonly AnyHarnessTool[] = [
-  provisionDatabaseTool,
-  describeSchemaTool,
-  listTemplatesTool,
-  provisionBlueprintTool,
-  addRelationTool,
-  deleteTableTool,
-  createFieldTool,
-  updateFieldTool,
-  deleteFieldTool,
-  addPoliciesTool,
-  applyTemplateTool,
-  createTemplateTool,
-  updateTemplateTool,
-  deleteTemplateTool,
-  addRecordsTool,
-  manageEntityTypesTool,
-  createApiKeyTool,
-  runCodegenTool,
-];
-
 export const dbTools: ExtensionFactory = (pi) => {
   for (const tool of constructiveDbTools) {
     pi.registerTool(toPiTool(tool));
@@ -67,7 +34,7 @@ export const dbTools: ExtensionFactory = (pi) => {
 };
 
 /** Configure the host and get the extension in one call. */
-export function createDbTools(host: PiToolsHost): ExtensionFactory {
+export function createDbTools(host: ToolsHost): ExtensionFactory {
   configureHost(host);
   return dbTools;
 }
@@ -78,20 +45,6 @@ export {
   type ConfirmGateOptions,
   createConfirmGate,
 } from './confirm-gate';
-export {
-  CONTEXT_ENV_KEYS,
-  CONTEXT_ENV_PREFIX,
-  type ContextEnvKey,
-  type ContextSource,
-  deriveSubdomainEndpoint,
-  fromEnvFile,
-  fromEnvironment,
-  type ModulesClient,
-  type ProjectContext,
-  type ProjectContextFailureCode,
-  resolveDataToken,
-  resolveProjectContext,
-} from './context';
 export {
   type ComposedLanes,
   type ComposedRun,
@@ -133,37 +86,49 @@ export {
   type UsageReportExtensionOptions,
 } from './extensions/usage-report';
 export { PI_HARNESS_ID, piHarness, type PiHarnessRun } from './harness';
+export { toPiTool, toPiTools } from './pi-tool';
+/**
+ * The db tools' own surface, re-exported so a pi host keeps one import. The
+ * package to depend on directly is `@agentic-kit/db-tools`.
+ */
 export {
   type ActiveDataToken,
   configureHost,
+  constructiveDbTools,
+  CONTEXT_ENV_KEYS,
+  CONTEXT_ENV_PREFIX,
+  type ContextEnvKey,
+  type ContextSource,
+  createTemplatePreviewTables,
   type DataAuthBroker,
+  DEFAULT_PROVISION_PRESET,
+  deriveSubdomainEndpoint,
+  fromEnvFile,
+  fromEnvironment,
   getHost,
   type HostAccount,
   type HostBackendConfig,
   type HostProvisionOverlay,
-  type PiToolsHost,
-  type PreviewToken,
-} from './host';
-export { toPiTool, toPiTools } from './pi-tool';
-export {
   loadProvisionManifest,
+  moduleKey,
+  type ModulePreset,
+  type ModulesClient,
   parseProvisionManifest,
+  type PreviewToken,
+  type ProjectContext,
+  type ProjectContextFailureCode,
   PROVISION_MANIFEST_FILE,
   type ProvisionManifest,
-} from './provision-database/manifest';
-export {
-  allModulePresets,
-  DEFAULT_PROVISION_PRESET,
-  getModulePreset,
-  type ModulePreset,
   type ProvisionModule,
-} from './provision-database/presets';
-export {
-  moduleKey,
   type ProvisionOverlay,
+  resolveDataToken,
+  resolveProjectContext,
   resolveProvisionModules,
-} from './provision-database/resolve';
-export { toolSchema } from './tool-schema';
-export { createTemplatePreviewTables } from './tools/templates';
+  type SecretDelivery,
+  type StepUpRequest,
+  toolSchema,
+  type ToolsHost,
+} from '@agentic-kit/db-tools';
+export { allModulePresets, getModulePreset } from '@agentic-kit/db-tools';
 
 export default dbTools;

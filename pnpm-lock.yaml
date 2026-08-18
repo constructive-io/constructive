@@ -189,6 +189,32 @@ importers:
         version: 4.9.3
     publishDirectory: dist
 
+  agentic/db-tools:
+    dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
+      '@agentic-kit/harness':
+        specifier: workspace:^
+        version: link:../harness/dist
+      '@constructive-io/graphql-query':
+        specifier: workspace:^
+        version: link:../../graphql/query/dist
+      '@constructive-io/sdk':
+        specifier: workspace:^
+        version: link:../../sdk/constructive-sdk/dist
+      node-type-registry:
+        specifier: workspace:^
+        version: link:../../packages/node-type-registry/dist
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      typebox:
+        specifier: ^1.0.0
+        version: 1.1.38
+    publishDirectory: dist
+
   agentic/harness:
     dependencies:
       appstash:
@@ -228,9 +254,9 @@ importers:
 
   agentic/pi:
     dependencies:
-      12factor-env:
+      '@agentic-kit/db-tools':
         specifier: workspace:^
-        version: link:../../packages/12factor-env/dist
+        version: link:../db-tools/dist
       '@agentic-kit/harness':
         specifier: workspace:^
         version: link:../harness/dist
@@ -240,15 +266,6 @@ importers:
       '@agentic-kit/run-log':
         specifier: workspace:^
         version: link:../run-log/dist
-      '@constructive-io/graphql-query':
-        specifier: workspace:^
-        version: link:../../graphql/query/dist
-      '@constructive-io/sdk':
-        specifier: workspace:^
-        version: link:../../sdk/constructive-sdk/dist
-      node-type-registry:
-        specifier: workspace:^
-        version: link:../../packages/node-type-registry/dist
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -256,9 +273,6 @@ importers:
       '@earendil-works/pi-coding-agent':
         specifier: 0.79.6
         version: 0.79.6(ws@8.20.1)(zod@4.4.3)
-      typebox:
-        specifier: ^1.0.0
-        version: 1.1.38
     publishDirectory: dist
 
   agentic/protocol:

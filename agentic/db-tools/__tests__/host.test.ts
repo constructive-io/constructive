@@ -1,6 +1,11 @@
 import { z } from 'zod';
 
-import dbTools, { configureHost, createDbTools, getHost, toolSchema } from '../src';
+import constructiveDbTools, {
+  configureHost,
+  createConstructiveDbTools,
+  getHost,
+  toolSchema
+} from '../src';
 
 describe('host configuration', () => {
   it('getHost throws before configureHost', () => {
@@ -17,12 +22,12 @@ describe('host configuration', () => {
     expect(getHost().account()?.userId).toBe('u1');
   });
 
-  it('createDbTools configures the host and returns the extension', () => {
+  it('createConstructiveDbTools configures the host and returns the tools', () => {
     const host = {
       account: (): null => null,
       backendConfig: (): null => null,
     };
-    expect(createDbTools(host)).toBe(dbTools);
+    expect(createConstructiveDbTools(host)).toBe(constructiveDbTools);
     expect(getHost()).toBe(host);
   });
 });
@@ -44,18 +49,10 @@ describe('toolSchema', () => {
   });
 });
 
-describe('dbTools extension', () => {
-  it('registers the 18 tools and both gate events', () => {
-    const registered: string[] = [];
-    const events: string[] = [];
-    const fakePi = {
-      registerTool: (tool: { name: string }) => registered.push(tool.name),
-      on: (event: string) => events.push(event),
-    };
-    (dbTools as (pi: unknown) => void)(fakePi);
-
-    expect(registered).toHaveLength(18);
-    expect(registered).toEqual(
+describe('constructiveDbTools', () => {
+  it('is the 18 db tools, harness-neutral', () => {
+    expect(constructiveDbTools).toHaveLength(18);
+    expect(constructiveDbTools.map((tool) => tool.name)).toEqual(
       expect.arrayContaining([
         'provision_database',
         'provision_blueprint',
@@ -77,6 +74,9 @@ describe('dbTools extension', () => {
         'delete_template',
       ]),
     );
-    expect(events).toEqual(['agent_start', 'tool_call']);
+    for (const tool of constructiveDbTools) {
+      expect(typeof tool.execute).toBe('function');
+      expect(tool.parameters).toBeDefined();
+    }
   });
 });

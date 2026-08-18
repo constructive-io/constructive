@@ -12,13 +12,14 @@
    <a href="https://www.npmjs.com/package/@agentic-kit/pi"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=agentic%2Fpi%2Fpackage.json"/></a>
 </p>
 
-The **one** [pi coding agent](https://github.com/badlogic/pi-mono) adapter for **agentic-kit**: the Constructive typed database tools, and everything that attaches a platform run to a pi session — the run gate, the run log, the metering gateway and usage reporting — for any host to register: Constructive Desktop, the [`agent` CLI](https://www.npmjs.com/package/@agentic-kit/cli), or your own pi-based agent.
+The **one** [pi coding agent](https://github.com/badlogic/pi-mono) adapter for **agentic-kit**: everything that attaches a platform run to a pi session — the Constructive db tools bound to pi's tool shape, the run gate, the run log, the metering gateway and usage reporting — for any host to register: Constructive Desktop, the [`agent` CLI](https://www.npmjs.com/package/@agentic-kit/cli), or your own pi-based agent.
 
 What a run *does* is harness-neutral and lives elsewhere; only its attachment to pi lives here.
 
 ```
 neutral contracts                      this package                pi
 ────────────────────────────────────   ─────────────────────────   ────────────────────
+@agentic-kit/db-tools (18 db tools)    toPiTool ─► ToolDefinition pi.registerTool
 @agentic-kit/harness  (gate, adapter)  tool_call ─► RunGate       pi.on('tool_call')
 @agentic-kit/metering (gateway, usage) MeteredGateway ─► provider  pi.registerProvider
 @agentic-kit/run-log  (append-only)    SessionMirror              pi's session manager
@@ -32,7 +33,7 @@ npm install @agentic-kit/pi
 
 ## What's inside
 
-- **16 typed db tools** — `provision_database`, `provision_blueprint`, `describe_schema`, `add_relation`, `delete_table`, `create_field` / `update_field` / `delete_field`, `add_policies`, `add_records`, `run_codegen`, and the template suite (`list` / `create` / `apply` / `update` / `delete`). They are neutral `HarnessTool`s from [`@agentic-kit/harness`](https://www.npmjs.com/package/@agentic-kit/harness) — zod parameters, `execute(params, { cwd, signal })`, no pi import — and `toPiTool()` binds each one to pi's `ToolDefinition`: JSON Schema parameters, pi's execute arity, `ctx.cwd` forwarded. That conversion is the whole of what pi asks of a tool, so `constructiveDbTools` binds to a second harness unchanged.
+- **The db tools, bound to pi** — the 18 typed Constructive tools live in [`@agentic-kit/db-tools`](https://www.npmjs.com/package/@agentic-kit/db-tools) as neutral `HarnessTool`s (zod parameters, `execute(params, { cwd, signal })`, no pi import); `toPiTool()` binds each one to pi's `ToolDefinition` — JSON Schema parameters, pi's execute arity, `ctx.cwd` forwarded — and `dbTools` registers the whole list plus the confirm gate. That conversion is the whole of what pi asks of a tool, so a sibling adapter writes its own `toXTool()` and registers the same tools unchanged. The tools' own surface (host contract, project context, provisioning) is re-exported here so a pi host keeps one import.
 - **Confirm gate** — the harness's host-neutral gate wired to pi's `tool_call` events. Hosts with a rich confirm surface (Desktop) expose `confirmTool`/`notifyToolSkipped` on `ctx.ui`; everyone else gets pi's built-in `ui.confirm` dialog.
 - **Run lanes** — `composeRun` / `startRun` build a pi session with the run's lanes attached: `createRunLogExtension` mirrors pi's session entries into the run log under `transcriptFormat: 'pi'`, `createMeteredModelExtension` points pi at the Constructive gateway so usage cannot be under-reported, `createUsageReportExtension` self-reports usage when the host owns the provider keys, and `createGateExtension` suspends a gated tool call until a human answers.
 - **`piHarness`** — the `HarnessAdapter` face of the above: an `id`, the `transcriptFormat` its entries are written under, and `startRun`.
@@ -90,7 +91,7 @@ For local development, the cold path and the warm pool depend on the backend's j
 
 ## Host contract
 
-`PiToolsHost` is the only integration surface:
+`ToolsHost` (from `@agentic-kit/db-tools`, re-exported here) is the only integration surface:
 
 | Member | Purpose |
 | --- | --- |
@@ -102,6 +103,7 @@ For local development, the cold path and the warm pool depend on the backend's j
 
 ## Related
 
+- [`@agentic-kit/db-tools`](https://www.npmjs.com/package/@agentic-kit/db-tools) — the Constructive db tools, harness-neutral
 - [`@agentic-kit/harness`](https://www.npmjs.com/package/@agentic-kit/harness) — host-neutral skills, gating, blueprint core, and the `HarnessAdapter` contract
 - [`@agentic-kit/metering`](https://www.npmjs.com/package/@agentic-kit/metering) — the metered gateway and usage reporting
 - [`@agentic-kit/run-log`](https://www.npmjs.com/package/@agentic-kit/run-log) — the append-only run log
