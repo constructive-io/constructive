@@ -1,4 +1,4 @@
-import type { ExtensionContext } from '@earendil-works/pi-coding-agent';
+import type { HarnessToolContext } from '@agentic-kit/harness';
 
 jest.mock('../src/context', () => ({
   resolveProjectContext: jest.fn(),
@@ -51,16 +51,10 @@ function useContext(modules: ReturnType<typeof makeModules>) {
   } as never);
 }
 
-const ctx = { cwd: '/tmp/project' } as unknown as ExtensionContext;
+const ctx: HarnessToolContext = { cwd: '/tmp/project' };
 
 function run(params: Record<string, unknown>) {
-  return manageEntityTypesTool.execute(
-    'tc-1',
-    params as never,
-    undefined as never,
-    undefined as never,
-    ctx,
-  );
+  return manageEntityTypesTool.execute(params as never, ctx);
 }
 
 afterEach(() => jest.clearAllMocks());

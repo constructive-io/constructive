@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
+import type { HarnessTool } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import {
@@ -16,13 +16,10 @@ import {
 import { getHost } from '../host';
 import { normalizeSdkBarrels } from '../run-codegen/barrels';
 import { codegenEndpointEnv, derivePlaneEndpoints, envLocalContent } from '../run-codegen/endpoints';
-import { toolSchema } from '../tool-schema';
 
 const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
 
 const RunCodegenZod = z.object({});
-const RunCodegenSchema = toolSchema(RunCodegenZod);
-
 type Params = z.infer<typeof RunCodegenZod>;
 
 export type RunCodegenDetails = {
@@ -87,15 +84,15 @@ async function runCodegenWithRetry(
   return last;
 }
 
-export const runCodegenTool: ToolDefinition<typeof RunCodegenSchema, RunCodegenDetails> = {
+export const runCodegenTool: HarnessTool<typeof RunCodegenZod, RunCodegenDetails> = {
   name: 'run_codegen',
   label: 'Run codegen',
   description:
     "Generate the typed GraphQL SDK for the project's Next.js app (packages/app). Runs the exact deterministic sequence — scaffold packages/app from the constructive-app template if it doesn't exist yet, hoist the graphql override to the root workspace so a single grafast resolves, pin codegen to latest, do one clean install, run codegen (retrying transient backend connection resets), and normalize SDK barrels for Turbopack. Run AFTER provisioning the database and creating schema; it scaffolds packages/app itself, so no separate `pgpm init` step is needed. The scaffold + install are usually prewarmed during provision_database, so this is fast.",
   promptSnippet:
     'run_codegen: scaffold packages/app (if missing) + regenerate the typed SDK (workspace-config + clean install + codegen-with-retry + barrel-normalize). Run after schema changes. Gated.',
-  parameters: RunCodegenSchema,
-  async execute(_id, _params: Params, _signal, _onUpdate, ctx): Promise<ToolResult> {
+  parameters: RunCodegenZod,
+  async execute(_params: Params, ctx): Promise<ToolResult> {
     const cwd = ctx.cwd;
     const appDir = path.join(cwd, 'packages', 'app');
 

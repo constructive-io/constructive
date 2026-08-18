@@ -1,9 +1,8 @@
-import { expandBlueprintDefaults } from '@agentic-kit/harness';
-import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
+import { expandBlueprintDefaults, type HarnessTool } from '@agentic-kit/harness';
 
 import { resolveProjectContext } from '../context';
 import { resolveSchema, resolveTable } from '../schema-resolve';
-import { type AddRelationParams as Params, AddRelationSchema, buildRelation } from './add-relation-schema';
+import { type AddRelationParams as Params, AddRelationZod, buildRelation } from './add-relation-schema';
 
 export type AddRelationDetails = {
   success: boolean;
@@ -19,15 +18,15 @@ function fail(message: string): ToolResult {
   return { content: [{ type: 'text', text: message }], details: { success: false, message } };
 }
 
-export const addRelationTool: ToolDefinition<typeof AddRelationSchema, AddRelationDetails> = {
+export const addRelationTool: HarnessTool<typeof AddRelationZod, AddRelationDetails> = {
   name: 'add_relation',
   label: 'Add relation',
   description:
     'Add a relation between two EXISTING tables without recreating them: belongs_to adds a foreign-key column on the source table; many_to_many creates a junction table. Use this for relations discovered after the tables were provisioned. For brand-new related tables, prefer a single provision_blueprint call.',
   promptSnippet:
     'add_relation: link two existing tables (belongs_to FK column, or many_to_many junction). Gated.',
-  parameters: AddRelationSchema,
-  async execute(_id, params: Params, _signal, _onUpdate, ctx): Promise<ToolResult> {
+  parameters: AddRelationZod,
+  async execute(params: Params, ctx): Promise<ToolResult> {
     const type = params.relation_type ?? 'belongs_to';
     if (type === 'belongs_to' && !params.field_name) {
       return fail('field_name is required for a belongs_to relation (the FK column name on the source table).');

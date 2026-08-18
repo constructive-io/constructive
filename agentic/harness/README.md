@@ -26,6 +26,7 @@ Code only: **no skills are bundled**. Skills are pulled at runtime from [`constr
 - **Ordered overlays** — layer skill sources (hardened base → team overlays → private known-gaps), last write wins by skill name, with include/exclude filters and transitive `requires:` expansion.
 - **Confirm gating** — a host-neutral gate for mutating db tools: per-run decline memory (equivalent-args retries are auto-blocked), short-circuits for runnable projects, and structured previews your UI renders.
 - **Run gate** — a policy (`allow` / `deny` / `ask`) plus an approval rendezvous, so a cloud run's `rm -rf` can be answered from a browser tab. The gate settles the decision and records it; an adapter only maps its harness's tool-call event onto it.
+- **Neutral tool contract** — `HarnessTool`: a name, a label, a description, zod parameters, and `execute(params, { cwd, signal })`. A tool states what it is and does; converting it to a vendor's tool shape is the adapter's job, so the same tools bind to a second harness untouched.
 - **Harness adapter contract** — `HarnessAdapter` / `HarnessRun`: a harness is identified by an `id`, the `transcriptFormat` its entries are recorded under, and `startRun`. Nothing in the platform names a vendor.
 - **Blueprint logic** — `expandBlueprintDefaults()`, the zod `BlueprintZod`/JSON-Schema `BlueprintSchema`, field type/default parsing, and policy-provisioning tables.
 - **Appstash state** — everything lives in the [`appstash`](https://www.npmjs.com/package/appstash) `~/.constructive/{config,cache,data,logs}` layout; project directories are untouched.
@@ -74,7 +75,8 @@ materializeSkills(dirs.materializedDir, skills, {
 - **Resolution** — `SkillsManifest`, `DirectorySkillSource` (agentskills.io layout: `<skill>/SKILL.md` + references/scripts), `resolveSkills()`, `materializeSkills()` with `{{VAR}}` substitution.
 - **Gating** — `createConfirmGate()`, `buildConfirmPrompt()`, `MUTATING_DB_TOOLS`, `ConfirmPreview`; adapters map host events onto `GateToolCallEvent`/`GateResult` 1:1.
 - **Run gate** — `createRunGate()`, `RunGatePolicy` / `RunGateRule` / `RunGateVerdict`, `ApprovalChannel` with `pollingApprovalChannel()` / `staticApprovalChannel()`, and `RunGateDecisionRecord` for the audit trail.
-- **Adapters** — `HarnessAdapter`, `HarnessRun`; [`@agentic-kit/pi`](https://www.npmjs.com/package/@agentic-kit/pi) is the first implementation.
+- **Tools** — `HarnessTool`, `AnyHarnessTool`, `HarnessToolContext`, `HarnessToolResult`, `HarnessToolContent`, `defineHarnessTool()` (identity, for param inference).
+- **Adapters** — `HarnessAdapter`, `HarnessRun`; [`@agentic-kit/pi`](https://www.npmjs.com/package/@agentic-kit/pi) is the first implementation, and its `toPiTool()` is the only place a tool meets a harness SDK.
 - **Blueprints** — `expandBlueprintDefaults()`, `BlueprintZod`/`BlueprintSchema`, field types/defaults, policy provisioning.
 
 ## Hosts
@@ -91,7 +93,7 @@ The same harness powers multiple hosts:
 
 ## Roadmap
 
-- Typed db-tools (`provision_database`, `provision_blueprint`, `run_codegen`, …) extracted from Constructive Desktop against `HarnessContext`.
+- Lift the Constructive db tools out of `@agentic-kit/pi` into their own harness-neutral package, now that nothing in them names a harness.
 - Shared host adapter package and `.claude`/MCP export surfaces.
 
 ## Related
