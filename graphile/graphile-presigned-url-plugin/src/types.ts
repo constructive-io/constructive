@@ -72,6 +72,12 @@ export interface StorageModuleConfig {
   cacheTtlSeconds: number;
   /** Whether this storage module uses ltree path + path shares (determines if path column exists on files) */
   hasPathShares: boolean;
+  /**
+   * Whether the files table carries the confirm-upload lifecycle (`status`,
+   * `promoted_at`). Only then can a row be told apart from the bytes it claims:
+   * without it every row is treated as live, because there is nothing to read.
+   */
+  hasConfirmUpload: boolean;
 
   // --- Bulk upload limits ---
 

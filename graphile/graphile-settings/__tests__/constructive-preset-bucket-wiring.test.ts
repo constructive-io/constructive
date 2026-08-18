@@ -52,13 +52,21 @@ describe('ConstructivePreset bucket-provisioner wiring', () => {
     expect(typeof options.resolveBucketName).toBe('function');
   });
 
-  it('the wired resolver mints the tenant-aware {prefix}-{bucketKey}-{databaseId} name', () => {
+  it('the wired resolver mints the tenant-aware {prefix}-{bucketKey}-{digest} name', () => {
     createConstructivePreset();
 
     const { resolveBucketName } = captured.bucketProvisionerOptions;
     // provisioner plugin signature: (bucketKey, databaseId)
-    expect(resolveBucketName('public', DATABASE_ID)).toBe(`${PREFIX}-public-${DATABASE_ID}`);
-    expect(resolveBucketName('private', DATABASE_ID)).toBe(`${PREFIX}-private-${DATABASE_ID}`);
+    expect(resolveBucketName('public', DATABASE_ID)).toMatch(
+      new RegExp(`^${PREFIX}-public-[a-f0-9]{12}$`),
+    );
+    expect(resolveBucketName('private', DATABASE_ID)).toMatch(
+      new RegExp(`^${PREFIX}-private-[a-f0-9]{12}$`),
+    );
+    // The digest is what carries the tenant, so two databases cannot collide.
+    expect(resolveBucketName('public', DATABASE_ID)).not.toBe(
+      resolveBucketName('public', '11111111-2222-3333-4444-555555555555'),
+    );
   });
 
   it('disables auto-provision-on-create so buckets are minted lazily / explicitly', () => {

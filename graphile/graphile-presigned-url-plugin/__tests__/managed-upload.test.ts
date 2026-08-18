@@ -471,6 +471,90 @@ describe('finalizeStagedUpload', () => {
     expect(s3.client.send).toHaveBeenCalledTimes(1);
   });
 
+  // With the confirm-upload lifecycle, a row is a claim on bytes rather than
+  // proof of them, so only a confirmed row may absorb an upload.
+  describe('with the confirm-upload lifecycle', () => {
+    const lifecycleTarget = {
+      ...target,
+      storageConfig: { ...storageConfig(), hasConfirmUpload: true } as StorageModuleConfig,
+    };
+
+    const existingRow = (status: string) => ({
+      id: FILE_ID,
+      key: staged.contentHash,
+      mime_type: 'image/png',
+      size: 16,
+      filename: 'original.png',
+      status,
+    });
+
+    it.each(['uploaded', 'processed'])('deduplicates against a %s row', async (status) => {
+      const { finalizeStagedUpload } = await import('../src/managed-upload');
+      const db = fakeDb([
+        SET_CONFIG,
+        { match: /SELECT id, key, mime_type/, rows: () => [existingRow(status)] },
+      ]);
+
+      const { projection, deduplicated } = await finalizeStagedUpload({
+        target: lifecycleTarget, withPgClient: db.withPgClient, pgSettings: null, staged,
+      });
+
+      expect(deduplicated).toBe(true);
+      expect(projection.id).toBe(FILE_ID);
+      expect(db.queries.some((q) => /INSERT|DELETE/.test(q.text))).toBe(false);
+    });
+
+    it.each(['requested', 'rejected', 'expired'])(
+      'drops the %s row and uploads afresh instead of reporting a dedup hit',
+      async (status) => {
+        const { finalizeStagedUpload } = await import('../src/managed-upload');
+        const NEW_FILE_ID = '55555555-5555-5555-5555-555555555555';
+        const db = fakeDb([
+          SET_CONFIG,
+          { match: /SELECT id, key, mime_type/, rows: () => [existingRow(status)] },
+          { match: /DELETE FROM storage_public\.app_files/, rows: () => [] },
+          { match: /INSERT INTO storage_public\.app_files/, rows: () => [{ id: NEW_FILE_ID }] },
+        ]);
+
+        const { projection, deduplicated } = await finalizeStagedUpload({
+          target: lifecycleTarget, withPgClient: db.withPgClient, pgSettings: null, staged,
+        });
+
+        expect(deduplicated).toBe(false);
+        // The caller is handed the row that actually names the promoted bytes.
+        expect(projection.id).toBe(NEW_FILE_ID);
+        const del = db.queries.find((q) => /DELETE/.test(q.text));
+        expect(del?.values).toEqual([FILE_ID]);
+        // Promote to the content key, then drop the staged object.
+        expect(s3.client.send).toHaveBeenCalledTimes(2);
+      },
+    );
+
+    it('asks for the status column only when the module has one', async () => {
+      const { finalizeStagedUpload } = await import('../src/managed-upload');
+      const withLifecycle = fakeDb([
+        SET_CONFIG,
+        { match: /SELECT id, key, mime_type/, rows: () => [existingRow('uploaded')] },
+      ]);
+      await finalizeStagedUpload({
+        target: lifecycleTarget, withPgClient: withLifecycle.withPgClient, pgSettings: null, staged,
+      });
+      expect(withLifecycle.queries.find((q) => /SELECT id, key/.test(q.text))!.text).toContain('status');
+
+      const without = fakeDb([
+        SET_CONFIG,
+        {
+          match: /SELECT id, key, mime_type/,
+          rows: () => [{ id: FILE_ID, key: staged.contentHash, mime_type: 'image/png', size: 16, filename: null }],
+        },
+      ]);
+      await finalizeStagedUpload({
+        target, withPgClient: without.withPgClient, pgSettings: null, staged,
+      });
+      expect(without.queries.find((q) => /SELECT id, key/.test(q.text))!.text).not.toContain('status');
+    });
+  });
+
   it('abandons both keys when the files row cannot be inserted', async () => {
     const { finalizeStagedUpload } = await import('../src/managed-upload');
     const db = fakeDb([

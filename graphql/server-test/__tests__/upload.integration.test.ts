@@ -506,9 +506,11 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
 
       const stored = await physicalNameFor('public');
       expect(stored).toBeTruthy();
-      // Matches the resolver contract: {prefix}-{bucketKey}-{databaseId}
+      // Matches the resolver contract: {prefix}-{bucketKey}-{digest}, bounded
+      // to S3's 63-character limit.
       expect(stored).toContain('public');
-      expect(stored).toContain(aliceDatabaseId);
+      expect(stored).toMatch(/-public-[a-f0-9]{12}$/);
+      expect(stored!.length).toBeLessThanOrEqual(63);
       // ...and is exactly the bucket the presigned PUT targets.
       expect(bucketFromPresignedUrl(payload.uploadUrl)).toBe(stored);
     });
@@ -571,7 +573,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   // 1c. Eager provisioning via the provisionBucket mutation (Alice)
   //
   // The explicit provisionBucket mutation must mint the SAME tenant-aware
-  // physical name the lazy first-upload path would (`{prefix}-{key}-{db}`) and
+  // physical name the lazy first-upload path would (`{prefix}-{key}-{digest}`) and
   // persist it on the bucket row — never the bare logical key. This is the
   // regression guard for BucketProvisionerPreset being wired without a
   // resolveBucketName.
@@ -600,7 +602,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       );
     };
 
-    it('mints {prefix}-{key}-{databaseId} and records it, matching what the lazy path would mint', async () => {
+    it('mints {prefix}-{key}-{digest} and records it, matching what the lazy path would mint', async () => {
       // 1. Derive the naming prefix from a bucket the LAZY path provisions.
       const lazyKey = 'eager-lazy';
       await seedBucket(lazyKey);
@@ -623,11 +625,11 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       // The lazy path records the exact bucket the presigned PUT targets.
       expect(bucketFromPresignedUrl(lazyUrl)).toBe(lazyPhysical);
 
-      // The shared convention: {prefix}-{key}-{databaseId}.
-      const suffix = `-${lazyKey}-${aliceDatabaseId}`;
-      expect(lazyPhysical!.endsWith(suffix)).toBe(true);
-      const prefix = lazyPhysical!.slice(0, -suffix.length);
-      expect(prefix.length).toBeGreaterThan(0);
+      // The shared convention: {prefix}-{key}-{digest}, bounded to S3's 63 chars.
+      const lazyMatch = new RegExp(`^(.+)-${lazyKey}-[a-f0-9]{12}$`).exec(lazyPhysical!);
+      expect(lazyMatch).not.toBeNull();
+      expect(lazyPhysical!.length).toBeLessThanOrEqual(63);
+      const prefix = lazyMatch![1];
 
       // 2. EAGER path: a fresh bucket row, provisioned via the mutation.
       const eagerKey = 'eager-prov';
@@ -642,12 +644,11 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       expect(payload.error).toBeNull();
       expect(payload.success).toBe(true);
 
-      const expected = `${prefix}-${eagerKey}-${aliceDatabaseId}`;
       // Eager mints the tenant-aware name — NOT the bare logical key.
-      expect(payload.bucketName).toBe(expected);
+      expect(payload.bucketName).toMatch(new RegExp(`^${prefix}-${eagerKey}-[a-f0-9]{12}$`));
       expect(payload.bucketName).not.toBe(eagerKey);
       // ...and persists it on the row (physical_name IS NULL-guarded record).
-      expect(await physicalNameFor(eagerKey)).toBe(expected);
+      expect(await physicalNameFor(eagerKey)).toBe(payload.bucketName);
     });
 
     it('does not clobber a physical_name recorded by a prior provision', async () => {
@@ -733,7 +734,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       expect(physical).toBeTruthy();
       // Lazy mints the same tenant-aware name the presigned PUT targets.
       expect(bucketFromPresignedUrl(uploadUrl)).toBe(physical);
-      expect(physical!.endsWith(`-${key}-${aliceDatabaseId}`)).toBe(true);
+      expect(physical).toMatch(new RegExp(`-${key}-[a-f0-9]{12}$`));
     });
   });
 
