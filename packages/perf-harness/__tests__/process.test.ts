@@ -1,6 +1,55 @@
 import { resolve } from 'node:path';
 
-import { runWorkerProcess } from '../src/process';
+import { parseWorkerProcessArgs, runWorkerProcess } from '../src/process';
+
+describe('worker CLI protocol', () => {
+  const encodedConfig = Buffer.from(
+    JSON.stringify({ caseName: 'baseline', workerConfig: { value: 1 } })
+  ).toString('base64url');
+
+  test('parses the database URL and worker envelope from CLI arguments', () => {
+    expect(
+      parseWorkerProcessArgs([
+        '--database-url',
+        'postgres:///benchmark',
+        '--worker-config',
+        encodedConfig,
+      ])
+    ).toEqual({
+      databaseUrl: 'postgres:///benchmark',
+      envelope: { caseName: 'baseline', workerConfig: { value: 1 } },
+    });
+  });
+
+  test('rejects missing, duplicate, and unsupported worker arguments', () => {
+    expect(() =>
+      parseWorkerProcessArgs(['--worker-config', encodedConfig])
+    ).toThrow('--database-url is required');
+    expect(() =>
+      parseWorkerProcessArgs(['--database-url', 'postgres:///benchmark'])
+    ).toThrow('--worker-config is required');
+    expect(() =>
+      parseWorkerProcessArgs([
+        '--database-url',
+        'postgres:///one',
+        '--database-url',
+        'postgres:///two',
+        '--worker-config',
+        encodedConfig,
+      ])
+    ).toThrow('--database-url may only be specified once');
+    expect(() =>
+      parseWorkerProcessArgs([
+        '--database-url',
+        'postgres:///benchmark',
+        '--worker-config',
+        encodedConfig,
+        '--unexpected',
+        'value',
+      ])
+    ).toThrow("unsupported worker argument '--unexpected'");
+  });
+});
 
 describe('fresh worker process', () => {
   test('uses distinct PIDs and does not expose the database URL', async () => {
