@@ -2,15 +2,15 @@
  * Tool and approval projection: run log records → the state a UI needs to know
  * what is running and what is waiting on a human.
  *
- * Approvals ride in the log as pi `custom` messages rather than a side channel,
- * because "the run is blocked on you" is part of the run's history: a surface
+ * Approvals ride in the log as transcript `custom` entries rather than a side
+ * channel, because "the run is blocked on you" is part of the run's history: a surface
  * that reconnects hours later must be able to see a pending request without
  * having been present when it was raised, and both placements then behave the
  * same — the cloud already treats the conversation as the approval UI.
  */
 
 import type { RunEventRecord } from '../record';
-import { contentText, isAssistantMessage, isPiMessageEntry, isToolResultMessage, toolCalls } from '../transcripts/pi-entry';
+import { type ProjectionOptions, toEvents } from './events';
 
 /** `customType` of an approval request written by the gate extension. */
 export const APPROVAL_REQUEST_TYPE = 'constructive.approval.request';
@@ -92,40 +92,38 @@ const at = (seq?: number): string => (seq === undefined ? '' : ` at seq ${String
 const details = (value: unknown): GateDetails =>
   typeof value === 'object' && value !== null ? (value as GateDetails) : {};
 
-export function projectToolState(records: readonly RunEventRecord[]): ToolStateProjection {
+export function projectToolState(
+  records: readonly RunEventRecord[],
+  options: ProjectionOptions = {}
+): ToolStateProjection {
   const tools: Record<string, ToolCallState> = {};
   const approvals = new Map<string, ApprovalState>();
   const gateDecisions: Record<string, GateDecisionState> = {};
 
-  for (const { entry, seq } of records) {
-    if (!isPiMessageEntry(entry)) continue;
-    const message = entry.message;
-
-    if (isAssistantMessage(message)) {
-      for (const call of toolCalls(message)) {
-        tools[call.id] = {
-          toolCallId: call.id,
-          name: call.name,
-          arguments: call.arguments ?? {},
-          status: 'requested',
-          requestedSeq: seq
-        };
-      }
+  for (const { seq, event } of toEvents(records, options)) {
+    if (event.kind === 'tool-call') {
+      tools[event.toolCallId] = {
+        toolCallId: event.toolCallId,
+        name: event.name,
+        arguments: event.arguments,
+        status: 'requested',
+        requestedSeq: seq
+      };
       continue;
     }
 
-    if (isToolResultMessage(message)) {
-      const state = tools[message.toolCallId];
+    if (event.kind === 'tool-result') {
+      const state = tools[event.toolCallId];
       const settled: Partial<ToolCallState> = {
-        status: message.isError ? 'failed' : 'completed',
+        status: event.failed ? 'failed' : 'completed',
         settledSeq: seq,
-        output: contentText(message.content)
+        output: event.output
       };
-      tools[message.toolCallId] = state
+      tools[event.toolCallId] = state
         ? { ...state, ...settled }
         : {
-          toolCallId: message.toolCallId,
-          name: message.toolName,
+          toolCallId: event.toolCallId,
+          name: event.name,
           arguments: {},
           requestedSeq: seq,
           status: settled.status as ToolCallStatus,
@@ -135,14 +133,14 @@ export function projectToolState(records: readonly RunEventRecord[]): ToolStateP
       continue;
     }
 
-    if (message.role !== 'custom') continue;
+    if (event.kind !== 'custom') continue;
 
-    if (message.customType === APPROVAL_REQUEST_TYPE) {
-      const { toolCallId } = assertApprovalRequestDetails(message.details, seq);
+    if (event.customType === APPROVAL_REQUEST_TYPE) {
+      const { toolCallId } = assertApprovalRequestDetails(event.details, seq);
       const approval: ApprovalState = {
         toolCallId,
         requestedSeq: seq,
-        prompt: contentText(message.content)
+        prompt: event.text
       };
       approvals.set(toolCallId, approval);
       const state = tools[toolCallId];
@@ -150,8 +148,8 @@ export function projectToolState(records: readonly RunEventRecord[]): ToolStateP
       continue;
     }
 
-    if (message.customType === APPROVAL_RESOLUTION_TYPE) {
-      const info = assertApprovalResolutionDetails(message.details, seq);
+    if (event.customType === APPROVAL_RESOLUTION_TYPE) {
+      const info = assertApprovalResolutionDetails(event.details, seq);
       const toolCallId = info.toolCallId;
       const approved = info.decision === 'approved';
       const existing = approvals.get(toolCallId);
@@ -172,8 +170,8 @@ export function projectToolState(records: readonly RunEventRecord[]): ToolStateP
       continue;
     }
 
-    if (message.customType === GATE_DECISION_TYPE) {
-      const decision = assertGateDecisionDetails(message.details, seq);
+    if (event.customType === GATE_DECISION_TYPE) {
+      const decision = assertGateDecisionDetails(event.details, seq);
       gateDecisions[decision.toolCallId] = { ...decision, seq };
       const state = tools[decision.toolCallId];
       // A blocked call never produces a tool result, so the gate's `deny` is the

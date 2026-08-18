@@ -20,8 +20,9 @@
 
 import type { RunEventRecord } from './record';
 import type { RunLogAppendStore } from './store';
-import type { TranscriptFormat } from './transcripts/format';
-import { assertPiSessionEntry, type PiSessionEntry } from './transcripts/pi-entry';
+import { type TranscriptEntry } from './transcripts/entry';
+import { PI_TRANSCRIPT_FORMAT, type TranscriptFormat } from './transcripts/format';
+import { transcriptReaders } from './transcripts/registry';
 
 /** The slice of a harness session manager the mirror needs. */
 export interface SessionEntrySource {
@@ -33,11 +34,11 @@ export interface SessionMirrorOptions {
   runId: string;
   store: RunLogAppendStore;
   /**
-   * Narrow each entry before it is appended. Defaults to the pi transcript
-   * reader, which is the only entry shape the record currently types; an adapter
-   * for another transcript supplies its own.
+   * Narrow each entry before it is appended. Defaults to the reader registered
+   * for `transcriptFormat`, so an adapter for another transcript gets its own
+   * validation by registering its reader.
    */
-  assertEntry?: (entry: unknown) => PiSessionEntry;
+  assertEntry?: (entry: unknown) => TranscriptEntry;
   /** Transcript format the entries are encoded in, e.g. `pi`. */
   transcriptFormat?: TranscriptFormat;
   /** Transcript format version the entries are produced under. */
@@ -47,7 +48,7 @@ export interface SessionMirrorOptions {
 export class SessionMirror {
   private readonly runId: string;
   private readonly store: RunLogAppendStore;
-  private readonly assertEntry: (entry: unknown) => PiSessionEntry;
+  private readonly assertEntry: (entry: unknown) => TranscriptEntry;
   private readonly transcriptFormat: TranscriptFormat | undefined;
   private readonly transcriptVersion: number | undefined;
 
@@ -60,7 +61,9 @@ export class SessionMirror {
   constructor(options: SessionMirrorOptions) {
     this.runId = options.runId;
     this.store = options.store;
-    this.assertEntry = options.assertEntry ?? assertPiSessionEntry;
+    this.assertEntry =
+      options.assertEntry ??
+      transcriptReaders.require(options.transcriptFormat ?? PI_TRANSCRIPT_FORMAT).assertEntry;
     this.transcriptFormat = options.transcriptFormat;
     this.transcriptVersion = options.transcriptVersion;
   }
@@ -95,7 +98,7 @@ export class SessionMirror {
       this.headerMirrored = false;
     }
 
-    const batch: PiSessionEntry[] = [];
+    const batch: TranscriptEntry[] = [];
     if (!this.headerMirrored && header !== null && header !== undefined) batch.push(this.assertEntry(header));
 
     const entries = source.getEntries();

@@ -20,6 +20,13 @@ export {
 } from './follow';
 export { type SessionEntrySource, SessionMirror, type SessionMirrorOptions } from './mirror';
 export {
+  type EventGroup,
+  type ProjectionOptions,
+  type SequencedEvent,
+  toEventGroups,
+  toEvents
+} from './projectors/events';
+export {
   type BashPart,
   type Conversation,
   type ConversationPart,
@@ -98,6 +105,25 @@ export {
   START
 } from './store';
 export {
+  assertTranscriptEntry,
+  type TranscriptEntry
+} from './transcripts/entry';
+export {
+  type BashEvent,
+  type CustomEvent,
+  type ModelResponseEvent,
+  type SessionStartEvent,
+  type SummaryEvent,
+  type TextEvent,
+  type ThinkingEvent,
+  type ToolCallEvent,
+  type ToolResultEvent,
+  type TranscriptEvent,
+  type TranscriptEventBase,
+  type TranscriptUsage,
+  type UnknownEvent
+} from './transcripts/event';
+export {
   assertTranscriptFormat,
   PI_TRANSCRIPT_FORMAT,
   SUPPORTED_PI_TRANSCRIPT_VERSION,
@@ -135,3 +161,10 @@ export {
   type PiUserMessage,
   toolCalls
 } from './transcripts/pi-entry';
+export { piEntryToEvents, piTranscriptReader } from './transcripts/pi-reader';
+export {
+  passthroughReader,
+  type TranscriptReader,
+  TranscriptReaderRegistry
+} from './transcripts/reader';
+export { defaultTranscriptReaders, transcriptReaders } from './transcripts/registry';

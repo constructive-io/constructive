@@ -9,12 +9,10 @@
  * that reader must migrate from.
  */
 
-import {
-  PI_TRANSCRIPT_FORMAT,
-  SUPPORTED_PI_TRANSCRIPT_VERSION,
-  type TranscriptFormat
-} from './transcripts/format';
-import { assertPiSessionEntry, type PiSessionEntry } from './transcripts/pi-entry';
+import { type TranscriptEntry } from './transcripts/entry';
+import { PI_TRANSCRIPT_FORMAT, type TranscriptFormat } from './transcripts/format';
+import type { TranscriptReaderRegistry } from './transcripts/reader';
+import { transcriptReaders } from './transcripts/registry';
 
 /** Version of the wrapper itself — bumped only if these fields change. */
 export const RUN_LOG_WRAPPER_VERSION = 1;
@@ -31,16 +29,18 @@ export interface RunEventRecord {
   /** That transcript's format version at write time. */
   transcriptVersion: number;
   /** The harness's session entry, byte-for-byte as it was produced. */
-  entry: PiSessionEntry;
+  entry: TranscriptEntry;
 }
 
 export interface WrapEntryOptions {
   runId: string;
   seq: number;
-  entry: PiSessionEntry;
+  entry: TranscriptEntry;
   recordedAt?: string;
   transcriptFormat?: TranscriptFormat;
   transcriptVersion?: number;
+  /** Readers used to validate the entry. Defaults to the process registry. */
+  readers?: TranscriptReaderRegistry;
 }
 
 export function wrapEntry(options: WrapEntryOptions): RunEventRecord {
@@ -48,13 +48,17 @@ export function wrapEntry(options: WrapEntryOptions): RunEventRecord {
   if (!Number.isInteger(options.seq) || options.seq < 1) {
     throw new TypeError(`run log seq must be a positive integer, received ${String(options.seq)}`);
   }
+  const format = options.transcriptFormat ?? PI_TRANSCRIPT_FORMAT;
+  const reader = (options.readers ?? transcriptReaders).require(format);
   return {
     runId: options.runId,
     seq: options.seq,
     recordedAt: options.recordedAt ?? new Date().toISOString(),
-    transcriptFormat: options.transcriptFormat ?? PI_TRANSCRIPT_FORMAT,
-    transcriptVersion: options.transcriptVersion ?? SUPPORTED_PI_TRANSCRIPT_VERSION,
-    entry: assertPiSessionEntry(options.entry)
+    transcriptFormat: format,
+    transcriptVersion: options.transcriptVersion ?? reader.version,
+    // The entry is validated by the format's own reader: what makes an entry
+    // well-formed is the transcript's rule, not the wrapper's.
+    entry: reader.assertEntry(options.entry)
   };
 }
 
@@ -63,7 +67,10 @@ export function wrapEntry(options: WrapEntryOptions): RunEventRecord {
  * unreadable — a log that cannot be parsed must fail loudly, never silently
  * render as an empty conversation.
  */
-export function assertRunEventRecord(value: unknown): RunEventRecord {
+export function assertRunEventRecord(
+  value: unknown,
+  readers: TranscriptReaderRegistry = transcriptReaders
+): RunEventRecord {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     throw new TypeError(`run log record must be an object, received ${typeof value}`);
   }
@@ -93,20 +100,19 @@ export function assertRunEventRecord(value: unknown): RunEventRecord {
     recordedAt: record.recordedAt,
     transcriptFormat: record.transcriptFormat,
     transcriptVersion: record.transcriptVersion as number,
-    entry: assertPiSessionEntry(record.entry)
+    entry: readers.require(record.transcriptFormat).assertEntry(record.entry)
   };
 }
 
 /**
- * The de-duplication key for an append. pi entry ids are unique within a
+ * The de-duplication key for an append. Transcript entry ids are unique within a
  * session, so a retried append (a Job restart re-emitting its tail, a
  * reconnecting writer) is recognised rather than duplicated.
  */
-export function idempotencyKey(runId: string, entry: PiSessionEntry): string {
-  const id = typeof (entry as { id?: unknown }).id === 'string' ? (entry as { id: string }).id : null;
-  if (id) return `${runId}:${entry.type}:${id}`;
-  // Session headers carry no tree id; there is exactly one per session file.
-  return `${runId}:${entry.type}:${String((entry as { id?: string }).id ?? 'header')}`;
+export function idempotencyKey(runId: string, entry: TranscriptEntry): string {
+  // An opening entry may carry no id; there is exactly one per session.
+  const id = typeof entry.id === 'string' && entry.id.length > 0 ? entry.id : 'header';
+  return `${runId}:${entry.type}:${id}`;
 }
 
 /** Records must be contiguous and in order before anything projects them. */
