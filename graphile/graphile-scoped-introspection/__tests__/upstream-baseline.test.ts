@@ -1,10 +1,7 @@
 import { PgIntrospectionPlugin as publishedPlugin } from 'graphile-build-pg';
 import { makeIntrospectionQuery as publishedQuery } from 'pg-introspection';
 
-import {
-  makeIntrospectionQuery,
-  PgIntrospectionPlugin,
-} from '../src';
+import { makeIntrospectionQuery, PgScopedIntrospectionPlugin } from '../src';
 
 describe('upstream introspection baseline', () => {
   it('starts with the published pg-introspection query unchanged', () => {
@@ -12,17 +9,19 @@ describe('upstream introspection baseline', () => {
   });
 
   it('preserves the published gather lifecycle contract', () => {
-    expect(PgIntrospectionPlugin).not.toBe(publishedPlugin);
-    expect(PgIntrospectionPlugin.name).toBe(publishedPlugin.name);
-    expect(PgIntrospectionPlugin.before).toEqual(publishedPlugin.before);
-    expect(PgIntrospectionPlugin.gather?.namespace).toBe(
+    expect(PgScopedIntrospectionPlugin).not.toBe(publishedPlugin);
+    expect(PgScopedIntrospectionPlugin.provides).toContain(
+      publishedPlugin.name
+    );
+    expect(PgScopedIntrospectionPlugin.before).toEqual(publishedPlugin.before);
+    expect(PgScopedIntrospectionPlugin.gather?.namespace).toBe(
       publishedPlugin.gather?.namespace
     );
-    expect(Object.keys(PgIntrospectionPlugin.gather?.helpers ?? {}).sort()).toEqual(
-      Object.keys(publishedPlugin.gather?.helpers ?? {}).sort()
-    );
-    expect(Object.keys(PgIntrospectionPlugin.gather?.hooks ?? {}).sort()).toEqual(
-      Object.keys(publishedPlugin.gather?.hooks ?? {}).sort()
-    );
+    expect(
+      Object.keys(PgScopedIntrospectionPlugin.gather?.helpers ?? {}).sort()
+    ).toEqual(Object.keys(publishedPlugin.gather?.helpers ?? {}).sort());
+    expect(
+      Object.keys(PgScopedIntrospectionPlugin.gather?.hooks ?? {}).sort()
+    ).toEqual(Object.keys(publishedPlugin.gather?.hooks ?? {}).sort());
   });
 });
