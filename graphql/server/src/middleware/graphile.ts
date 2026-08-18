@@ -10,7 +10,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
-import { createConstructivePreset, makePgService } from 'graphile-settings';
+import { createConstructivePreset } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -21,6 +21,7 @@ import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import type { DatabaseSettings } from '../types';
+import { makeIntrospectionWiring } from './graphile-introspection';
 import { maskError } from './mask-error';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
@@ -71,18 +72,20 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
  * plugin preset.  Without settings the default preset is used
  * (everything on except aggregates).
  */
-const buildPreset = (
+const buildPreset = async (
   pool: import('pg').Pool,
   schemas: string[],
   anonRole: string,
   roleName: string,
   introspectionRole: string | undefined,
+  graphileOptions: ConstructiveOptions['graphile'],
   databaseSettings?: DatabaseSettings,
   apiId?: string,
   compute?: ComputeConfig
-): GraphileConfig.Preset => {
+): Promise<GraphileConfig.Preset> => {
+  const introspection = await makeIntrospectionWiring(pool, schemas, graphileOptions, undefined, introspectionRole);
   return {
-    extends: [createConstructivePreset(databaseSettings)],
+    extends: [createConstructivePreset(databaseSettings), ...introspection.presets],
     plugins: [
       AuthCookiePlugin,
       RequestProtectionPlugin,
@@ -107,20 +110,7 @@ const buildPreset = (
         ]
         : [])
     ],
-    pgServices: [
-      makePgService({
-        pool,
-        schemas,
-        // Introspection runs outside any request, so it has no served role to
-        // inherit: unset, it reads the catalog as whatever role the pool
-        // connected as (a superuser in most deployments) and the schema
-        // advertises that role's reach. Naming the role keeps schema shape
-        // tied to a bounded role's grants.
-        ...(introspectionRole && {
-          pgSettingsForIntrospection: { role: introspectionRole }
-        })
-      })
-    ],
+    pgServices: [introspection.pgService],
     grafserv: {
       graphqlPath: '/graphql',
       graphiqlPath: '/graphiql',
@@ -358,12 +348,13 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(
+      const preset = await buildPreset(
         pool,
         schema || [],
         anonRole,
         roleName,
         opts.api?.introspectionRole,
+        opts.graphile,
         api.databaseSettings,
         api.apiId,
         compute

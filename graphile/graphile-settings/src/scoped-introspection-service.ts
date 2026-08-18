@@ -1,7 +1,4 @@
-import type {
-  GraphileIntrospectionMode,
-  ScopedIntrospectionServiceOptions,
-} from 'graphile-scoped-introspection';
+import type { ScopedIntrospectionServiceOptions } from 'graphile-scoped-introspection';
 
 import {
   normalizeIntrospectionDependencySchemas,
@@ -39,6 +36,11 @@ type UpstreamPgServiceOptions = {
     Record<string, string | undefined> | null | undefined;
 };
 
+export type ScopedIntrospectionOptions = Omit<
+  ScopedIntrospectionServiceOptions,
+  'introspectionMode'
+>;
+
 /**
  * Apply CNC's scoped-introspection settings around an upstream PgService
  * factory. The injected binding keeps configuration behavior independently
@@ -49,17 +51,14 @@ export function makeConfiguredPgService<
   TService extends object,
 >(
   makeUpstreamPgService: (options: TOptions) => TService,
-  options: TOptions & ScopedIntrospectionServiceOptions
+  options: TOptions & ScopedIntrospectionOptions
 ) {
   const {
-    introspectionMode: configuredIntrospectionMode,
     introspectionScopedCatalogTypes,
     introspectionAllowedDependencySchemas: configuredDependencySchemas,
     introspectionCapabilityExtensions: configuredCapabilityExtensions,
     ...upstreamOptions
   } = options;
-  const introspectionMode: GraphileIntrospectionMode =
-    configuredIntrospectionMode ?? 'stock';
   const introspectionCapabilityExtensions =
     normalizeIntrospectionCapabilityExtensions(configuredCapabilityExtensions);
 
@@ -72,27 +71,10 @@ export function makeConfiguredPgService<
       `Unsupported scoped catalog type policy '${introspectionScopedCatalogTypes}'`
     );
   }
-  if (
-    introspectionMode === 'stock' &&
-    introspectionScopedCatalogTypes !== undefined
-  ) {
-    throw new Error(
-      'introspectionScopedCatalogTypes requires scoped-required introspection'
-    );
-  }
-  if (
-    introspectionMode === 'stock' &&
-    configuredCapabilityExtensions !== undefined
-  ) {
-    throw new Error(
-      'introspectionCapabilityExtensions requires scoped-required introspection'
-    );
-  }
-
   const introspectionAllowedDependencySchemas =
     normalizeIntrospectionDependencySchemas(configuredDependencySchemas);
   const pgSettingsForIntrospection = resolveIntrospectionSettings(
-    introspectionMode,
+    'scoped-required',
     options.pgSettingsForIntrospection
   );
   const service = makeUpstreamPgService({
@@ -101,13 +83,10 @@ export function makeConfiguredPgService<
   } as TOptions);
 
   return Object.assign(service, {
-    introspectionMode,
-    ...(introspectionScopedCatalogTypes === undefined
-      ? {}
-      : { introspectionScopedCatalogTypes }),
+    introspectionMode: 'scoped-required' as const,
+    introspectionScopedCatalogTypes:
+      introspectionScopedCatalogTypes ?? 'dependency-closure',
     introspectionAllowedDependencySchemas,
-    ...(introspectionMode === 'scoped-required'
-      ? { introspectionCapabilityExtensions }
-      : {}),
+    introspectionCapabilityExtensions,
   });
 }

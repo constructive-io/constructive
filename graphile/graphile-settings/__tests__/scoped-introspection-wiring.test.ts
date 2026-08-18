@@ -1,5 +1,8 @@
 import { defaultPreset as graphileBuildPreset } from 'graphile-build';
-import { defaultPreset as graphileBuildPgPreset } from 'graphile-build-pg';
+import {
+  defaultPreset as graphileBuildPgPreset,
+  PgIntrospectionPlugin,
+} from 'graphile-build-pg';
 import { resolvePreset } from 'graphile-config';
 import {
   ConstructivePgIntrospectionPlugin,
@@ -21,8 +24,9 @@ const makeUpstreamPgService = jest.fn((options: TestUpstreamOptions) => ({
   ...options,
   upstream: true,
 }));
-const makePgService = (
-  options: TestUpstreamOptions & ScopedIntrospectionServiceOptions
+const makeScopedPgService = (
+  options: TestUpstreamOptions &
+    Omit<ScopedIntrospectionServiceOptions, 'introspectionMode'>
 ) => makeConfiguredPgService(makeUpstreamPgService, options);
 
 describe('scoped introspection settings wiring', () => {
@@ -31,10 +35,9 @@ describe('scoped introspection settings wiring', () => {
   });
 
   it('normalizes scoped service configuration without forwarding CNC fields upstream', () => {
-    const service = makePgService({
+    const service = makeScopedPgService({
       pubsub: false,
       schemas: ['tenant_a'],
-      introspectionMode: 'scoped-required',
       introspectionScopedCatalogTypes: 'dependency-closure',
       introspectionAllowedDependencySchemas: ['shared', 'shared'],
       introspectionCapabilityExtensions: ['pg_trgm', 'pg_trgm'],
@@ -64,46 +67,42 @@ describe('scoped introspection settings wiring', () => {
     });
   });
 
-  it('keeps stock as the default and omits scoped-only capability state', () => {
-    const service = makePgService({
-      pubsub: false,
-      schemas: ['tenant_a'],
-    });
-
-    expect(service.introspectionMode).toBe('stock');
-    expect(service.introspectionCapabilityExtensions).toBeUndefined();
-    expect(service.pgSettingsForIntrospection).toEqual({
-      statement_timeout: '120s',
-    });
-  });
-
   it('fails deterministically on invalid scoped configuration', () => {
     expect(() =>
-      makePgService({
+      makeScopedPgService({
         pubsub: false,
-        introspectionScopedCatalogTypes: 'dependency-closure',
+        introspectionScopedCatalogTypes: 'unsupported' as never,
+      })
+    ).toThrow("Unsupported scoped catalog type policy 'unsupported'");
+    expect(() =>
+      makeScopedPgService({
+        pubsub: false,
+        introspectionCapabilityExtensions: [' pg_trgm'],
       })
     ).toThrow(
-      'introspectionScopedCatalogTypes requires scoped-required introspection'
+      'introspectionCapabilityExtensions must contain exact non-empty extension names'
     );
     expect(() =>
-      makePgService({
+      makeScopedPgService({
         pubsub: false,
-        introspectionCapabilityExtensions: ['pg_trgm'],
-      })
-    ).toThrow(
-      'introspectionCapabilityExtensions requires scoped-required introspection'
-    );
-    expect(() =>
-      makePgService({
-        pubsub: false,
-        introspectionMode: 'scoped-required',
         introspectionAllowedDependencySchemas: ['pg_catalog'],
       })
     ).toThrow('must not be a system schema');
   });
 
-  it('ConstructivePreset explicitly installs the independent owner preset', () => {
+  it('keeps ConstructivePreset on the upstream introspection plugin', () => {
+    const constructive = resolvePreset(ConstructivePreset);
+
+    expect(constructive.plugins).toContain(PgIntrospectionPlugin);
+    expect(constructive.plugins).not.toContain(
+      ConstructivePgIntrospectionPlugin
+    );
+    expect(constructive.disablePlugins ?? []).not.toContain(
+      'PgIntrospectionPlugin'
+    );
+  });
+
+  it('installs the independent owner preset only when requested', () => {
     const scoped = resolvePreset({
       extends: [
         graphileBuildPreset,
@@ -111,10 +110,7 @@ describe('scoped introspection settings wiring', () => {
         ScopedIntrospectionPreset,
       ],
     });
-    const constructive = resolvePreset(ConstructivePreset);
-
     expect(scoped.plugins).toContain(ConstructivePgIntrospectionPlugin);
-    expect(constructive.plugins).toContain(ConstructivePgIntrospectionPlugin);
-    expect(constructive.disablePlugins).toContain('PgIntrospectionPlugin');
+    expect(scoped.disablePlugins).toContain('PgIntrospectionPlugin');
   });
 });

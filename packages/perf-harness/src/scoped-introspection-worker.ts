@@ -6,7 +6,7 @@ import {
 } from 'graphile-build';
 import { defaultPreset as graphileBuildPgPreset } from 'graphile-build-pg';
 import { ScopedIntrospectionPreset } from 'graphile-scoped-introspection';
-import { makePgService as makeConstructivePgService } from 'graphile-settings';
+import { makeScopedPgService } from 'graphile-settings';
 import { execute, lexicographicSortSchema, parse, printSchema } from 'graphql';
 import { makePgService as makePostGraphilePgService } from 'postgraphile/adaptors/pg';
 
@@ -59,15 +59,13 @@ const main = async (): Promise<void> => {
       schemas: config.schemas,
       pubsub: false,
     };
-    const scopedServiceOptions = {
-      ...serviceOptions,
-      introspectionMode: 'scoped-required' as const,
-      introspectionScopedCatalogTypes: 'dependency-closure' as const,
-    };
     const service =
       config.mode === 'stock'
         ? makePostGraphilePgService(serviceOptions)
-        : makeConstructivePgService(scopedServiceOptions);
+        : makeScopedPgService({
+            ...serviceOptions,
+            introspectionScopedCatalogTypes: 'dependency-closure',
+          });
     release = async () => {
       await service.release();
     };
