@@ -12,8 +12,8 @@ csdk route-binding list --where.<field>.<op> <value> --orderBy <values>
 csdk route-binding list --limit 10 --after <cursor>
 csdk route-binding find-first --where.<field>.<op> <value>
 csdk route-binding get --id <UUID>
-csdk route-binding create --domainId <UUID> --path <String> [--isActive <Boolean>] [--method <String>] [--priority <Int>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
-csdk route-binding update --id <UUID> [--domainId <UUID>] [--isActive <Boolean>] [--method <String>] [--path <String>] [--priority <Int>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
+csdk route-binding create --domainId <UUID> --path <String> [--isActive <Boolean>] [--method <String>] [--priority <Int>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetRedirectId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
+csdk route-binding update --id <UUID> [--domainId <UUID>] [--isActive <Boolean>] [--method <String>] [--path <String>] [--priority <Int>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetRedirectId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
 csdk route-binding delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk route-binding list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a routeBinding
 
 ```bash
-csdk route-binding create --domainId <UUID> --path <String> [--isActive <Boolean>] [--method <String>] [--priority <Int>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
+csdk route-binding create --domainId <UUID> --path <String> [--isActive <Boolean>] [--method <String>] [--priority <Int>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetRedirectId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
 ```
 
 ### Get a routeBinding by id

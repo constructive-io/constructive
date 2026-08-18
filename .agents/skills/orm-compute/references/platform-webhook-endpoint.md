@@ -9,7 +9,7 @@ Webhook route authority: (host, path) -> function task_identifier invoked throug
 ```typescript
 db.platformWebhookEndpoint.findMany({ select: { id: true } }).execute()
 db.platformWebhookEndpoint.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformWebhookEndpoint.create({ data: { active: '<Boolean>', createdBy: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>' }, select: { id: true } }).execute()
+db.platformWebhookEndpoint.create({ data: { active: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute()
 db.platformWebhookEndpoint.update({ where: { id: '<UUID>' }, data: { active: '<Boolean>' }, select: { id: true } }).execute()
 db.platformWebhookEndpoint.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.platformWebhookEndpoint.findMany({
 
 ```typescript
 const item = await db.platformWebhookEndpoint.create({
-  data: { active: '<Boolean>', createdBy: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>' },
+  data: { active: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

@@ -13,8 +13,11 @@ import refCmd from './commands/ref';
 import storeCmd from './commands/store';
 import initEmptyRepoCmd from './commands/init-empty-repo';
 import insertNodeAtPathCmd from './commands/insert-node-at-path';
+import insertNodesAtPathsCmd from './commands/insert-nodes-at-paths';
 import provisionBucketCmd from './commands/provision-bucket';
+import setAndCommitCmd from './commands/set-and-commit';
 import setDataAtPathCmd from './commands/set-data-at-path';
+import setManyAndCommitCmd from './commands/set-many-and-commit';
 const createCommandMap: () => Record<
   string,
   (
@@ -32,11 +35,14 @@ const createCommandMap: () => Record<
   store: storeCmd,
   'init-empty-repo': initEmptyRepoCmd,
   'insert-node-at-path': insertNodeAtPathCmd,
+  'insert-nodes-at-paths': insertNodesAtPathsCmd,
   'provision-bucket': provisionBucketCmd,
+  'set-and-commit': setAndCommitCmd,
   'set-data-at-path': setDataAtPathCmd,
+  'set-many-and-commit': setManyAndCommitCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  commit               commit CRUD operations\n  get-all-tree-nodes-record getAllTreeNodesRecord CRUD operations\n  object               object CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  init-empty-repo      initEmptyRepo\n  insert-node-at-path  insertNodeAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  set-data-at-path     setDataAtPath\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  commit               commit CRUD operations\n  get-all-tree-nodes-record getAllTreeNodesRecord CRUD operations\n  object               object CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  init-empty-repo      initEmptyRepo\n  insert-node-at-path  insertNodeAtPath\n  insert-nodes-at-paths insertNodesAtPaths\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  set-and-commit       setAndCommit\n  set-data-at-path     setDataAtPath\n  set-many-and-commit  setManyAndCommit\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

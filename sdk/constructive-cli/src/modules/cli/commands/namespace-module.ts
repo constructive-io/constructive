@@ -18,7 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   apiName: 'string',
   databaseId: 'uuid',
-  defaultPermissions: 'string',
+  defaultCapabilities: 'string',
   entityField: 'string',
   entityTableId: 'uuid',
   id: 'uuid',
@@ -89,7 +89,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       apiName: true,
       databaseId: true,
-      defaultPermissions: true,
+      defaultCapabilities: true,
       entityField: true,
       entityTableId: true,
       id: true,
@@ -128,7 +128,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       apiName: true,
       databaseId: true,
-      defaultPermissions: true,
+      defaultCapabilities: true,
       entityField: true,
       entityTableId: true,
       id: true,
@@ -179,7 +179,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           apiName: true,
           databaseId: true,
-          defaultPermissions: true,
+          defaultCapabilities: true,
           entityField: true,
           entityTableId: true,
           id: true,
@@ -226,8 +226,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'defaultPermissions',
-        message: 'defaultPermissions',
+        name: 'defaultCapabilities',
+        message: 'defaultCapabilities',
         required: false,
         skipPrompt: true,
       },
@@ -347,7 +347,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           apiName: cleanedData.apiName,
           databaseId: cleanedData.databaseId,
-          defaultPermissions: cleanedData.defaultPermissions,
+          defaultCapabilities: cleanedData.defaultCapabilities,
           entityField: cleanedData.entityField,
           entityTableId: cleanedData.entityTableId,
           namespaceEventsTableId: cleanedData.namespaceEventsTableId,
@@ -367,7 +367,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           apiName: true,
           databaseId: true,
-          defaultPermissions: true,
+          defaultCapabilities: true,
           entityField: true,
           entityTableId: true,
           id: true,
@@ -420,8 +420,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'defaultPermissions',
-        message: 'defaultPermissions',
+        name: 'defaultCapabilities',
+        message: 'defaultCapabilities',
         required: false,
         skipPrompt: true,
       },
@@ -541,7 +541,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           apiName: cleanedData.apiName,
           databaseId: cleanedData.databaseId,
-          defaultPermissions: cleanedData.defaultPermissions,
+          defaultCapabilities: cleanedData.defaultCapabilities,
           entityField: cleanedData.entityField,
           entityTableId: cleanedData.entityTableId,
           namespaceEventsTableId: cleanedData.namespaceEventsTableId,
@@ -561,7 +561,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           apiName: true,
           databaseId: true,
-          defaultPermissions: true,
+          defaultCapabilities: true,
           entityField: true,
           entityTableId: true,
           id: true,
