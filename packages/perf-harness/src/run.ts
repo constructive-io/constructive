@@ -2,7 +2,7 @@ import { mkdir, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
 import { prepareFixture } from './fixture';
-import { DATABASE_URL_ENV, redactSecret, runWorkerProcess } from './process';
+import { parseValueArgs, redactSecret, runWorkerProcess } from './process';
 import { summarizeCase, validateSchemaGroups } from './report';
 import { makeSchedule, validateCaseDefinitions } from './schedule';
 import type {
@@ -143,30 +143,6 @@ export const writeJsonAtomically = async (
   return absoluteOutput;
 };
 
-interface ParsedArgs {
-  values: Map<string, string>;
-}
-
-const parseArgs = (args: readonly string[]): ParsedArgs => {
-  const values = new Map<string, string>();
-  for (let index = 0; index < args.length; index += 2) {
-    const flag = args[index];
-    const value = args[index + 1];
-    if (
-      !flag?.startsWith('--') ||
-      value === undefined ||
-      value.startsWith('--')
-    ) {
-      throw new Error(`expected --name value near '${flag ?? '<end>'}'`);
-    }
-    const name = flag.slice(2);
-    if (values.has(name))
-      throw new Error(`--${name} may only be specified once`);
-    values.set(name, value);
-  }
-  return { values };
-};
-
 const positiveInteger = (
   value: string | undefined,
   name: string,
@@ -182,14 +158,9 @@ const positiveInteger = (
   return parsed;
 };
 
-const databaseUrl = (args: ParsedArgs): string => {
-  const value =
-    args.values.get('database-url') ?? process.env[DATABASE_URL_ENV];
-  if (!value) {
-    throw new Error(
-      `--database-url or the ${DATABASE_URL_ENV} environment variable is required`
-    );
-  }
+const databaseUrl = (args: ReturnType<typeof parseValueArgs>): string => {
+  const value = args.values.get('database-url');
+  if (!value) throw new Error('--database-url is required');
   return value;
 };
 
@@ -214,7 +185,7 @@ const parseCases = (encoded: string): BenchmarkCaseDefinition[] => {
 
 export const cliMain = async (args = process.argv.slice(2)): Promise<void> => {
   const [command, ...rest] = args;
-  const parsed = parseArgs(rest);
+  const parsed = parseValueArgs(rest);
   if (command === 'prepare') {
     const schema = parsed.values.get('schema');
     if (!schema) throw new Error('--schema is required');

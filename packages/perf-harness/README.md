@@ -32,8 +32,11 @@ await runBenchmarkSuite(suite, options, workerPath);
 entry rather than serializing functions across process boundaries.
 
 The package includes `stock-worker.js` as a minimal upstream Graphile baseline.
-Database credentials are supplied through `CPERF_DATABASE_URL` and are redacted
-from worker failures and JSON reports.
+The top-level commands require `--database-url`; the runner forwards it and the
+opaque case configuration to each short-lived worker as CLI arguments. Database
+credentials are redacted from worker failures and JSON reports. This harness is
+intended for local development on a trusted machine because command arguments
+may be visible to other local processes.
 
 The PostgreSQL fixture command only creates a previously absent schema whose
 name starts with `cperf_`; it never drops or replaces schemas.

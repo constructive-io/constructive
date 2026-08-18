@@ -1,8 +1,14 @@
 import { resolve } from 'node:path';
 
-import { runBenchmarkSuite } from '../src/run';
+import { cliMain, runBenchmarkSuite } from '../src/run';
 
 describe('generic suite runner', () => {
+  test('requires the database URL as an explicit CLI argument', async () => {
+    await expect(
+      cliMain(['prepare', '--schema', 'cperf_explicit_cli'])
+    ).rejects.toThrow('--database-url is required');
+  });
+
   test('validates fresh processes and schema groups without fixed case names', async () => {
     const report = await runBenchmarkSuite(
       {

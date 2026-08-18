@@ -7,8 +7,17 @@ import type {
 } from './types';
 
 export const WORKER_RESULT_PREFIX = 'CPERF_RESULT ';
-export const DATABASE_URL_ENV = 'CPERF_DATABASE_URL';
-export const WORKER_CONFIG_ENV = 'CPERF_WORKER_CONFIG';
+export const DATABASE_URL_ARGUMENT = 'database-url';
+export const WORKER_CONFIG_ARGUMENT = 'worker-config';
+
+export interface ParsedValueArgs {
+  values: Map<string, string>;
+}
+
+export interface WorkerProcessArgs {
+  databaseUrl: string;
+  envelope: WorkerConfigEnvelope;
+}
 
 export interface SpawnedWorkerResult {
   pid: number;
@@ -21,6 +30,43 @@ const lastLines = (value: string, count = 20): string =>
 export const redactSecret = (value: string, secret: string): string =>
   secret ? value.replaceAll(secret, '<redacted database URL>') : value;
 
+export const parseValueArgs = (args: readonly string[]): ParsedValueArgs => {
+  const values = new Map<string, string>();
+  for (let index = 0; index < args.length; index += 2) {
+    const flag = args[index];
+    const value = args[index + 1];
+    if (
+      !flag?.startsWith('--') ||
+      value === undefined ||
+      value.startsWith('--')
+    ) {
+      throw new Error(`expected --name value near '${flag ?? '<end>'}'`);
+    }
+    const name = flag.slice(2);
+    if (values.has(name))
+      throw new Error(`--${name} may only be specified once`);
+    values.set(name, value);
+  }
+  return { values };
+};
+
+export const parseWorkerProcessArgs = (
+  args: readonly string[]
+): WorkerProcessArgs => {
+  const parsed = parseValueArgs(args);
+  for (const name of parsed.values.keys()) {
+    if (name !== DATABASE_URL_ARGUMENT && name !== WORKER_CONFIG_ARGUMENT) {
+      throw new Error(`unsupported worker argument '--${name}'`);
+    }
+  }
+  const databaseUrl = parsed.values.get(DATABASE_URL_ARGUMENT);
+  if (!databaseUrl) throw new Error('--database-url is required');
+  return {
+    databaseUrl,
+    envelope: parseWorkerEnvelope(parsed.values.get(WORKER_CONFIG_ARGUMENT)),
+  };
+};
+
 export const runWorkerProcess = (
   workerPath: string,
   databaseUrl: string,
@@ -31,18 +77,25 @@ export const runWorkerProcess = (
       caseName: definition.name,
       workerConfig: definition.workerConfig,
     };
-    const child = spawn(process.execPath, ['--expose-gc', workerPath], {
-      env: {
-        ...process.env,
-        NODE_ENV: 'production',
-        GRAPHILE_ENV: 'production',
-        [DATABASE_URL_ENV]: databaseUrl,
-        [WORKER_CONFIG_ENV]: Buffer.from(JSON.stringify(config)).toString(
-          'base64url'
-        ),
-      },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    const child = spawn(
+      process.execPath,
+      [
+        '--expose-gc',
+        workerPath,
+        `--${DATABASE_URL_ARGUMENT}`,
+        databaseUrl,
+        `--${WORKER_CONFIG_ARGUMENT}`,
+        Buffer.from(JSON.stringify(config)).toString('base64url'),
+      ],
+      {
+        env: {
+          ...process.env,
+          NODE_ENV: 'production',
+          GRAPHILE_ENV: 'production',
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      }
+    );
     const pid = child.pid;
     let stdout = '';
     let stderr = '';
@@ -111,7 +164,7 @@ export const runWorkerProcess = (
 export const parseWorkerEnvelope = (
   encoded: string | undefined
 ): WorkerConfigEnvelope => {
-  if (!encoded) throw new Error(`${WORKER_CONFIG_ENV} is required`);
+  if (!encoded) throw new Error('--worker-config is required');
   const parsed = JSON.parse(
     Buffer.from(encoded, 'base64url').toString('utf8')
   ) as Partial<WorkerConfigEnvelope>;
