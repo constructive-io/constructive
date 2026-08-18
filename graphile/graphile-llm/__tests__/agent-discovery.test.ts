@@ -65,6 +65,19 @@ describe('getAgentDiscovery', () => {
     expect(calls).toHaveLength(2);
   });
 
+  it('does not share discovery across physical pool identities', async () => {
+    const first = fakePool(() => ({ rows: [row('physical_a')] }));
+    const second = fakePool(() => ({ rows: [row('physical_b')] }));
+
+    const fromFirst = await getAgentDiscovery(first.pool, DB_A);
+    const fromSecond = await getAgentDiscovery(second.pool, DB_A);
+
+    expect(fromFirst?.thread?.schemaName).toBe('physical_a_agent_public');
+    expect(fromSecond?.thread?.schemaName).toBe('physical_b_agent_public');
+    expect(first.calls).toHaveLength(1);
+    expect(second.calls).toHaveLength(1);
+  });
+
   it('treats an absent module as not provisioned', async () => {
     const { pool } = fakePool(() => {
       throw pgError('42P01');

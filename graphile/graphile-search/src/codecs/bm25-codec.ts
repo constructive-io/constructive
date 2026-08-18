@@ -14,6 +14,7 @@
 
 import 'graphile-build-pg';
 
+import { gatherConfig } from 'graphile-build';
 import type { GraphileConfig } from 'graphile-config';
 import sql from 'pg-sql2';
 
@@ -31,19 +32,48 @@ export interface Bm25IndexInfo {
   indexName: string;
 }
 
-/**
- * Module-level store for discovered BM25 indexes.
- * Populated during the gather phase, read during the schema build phase.
- *
- * Key: "schemaName.tableName.columnName"
- * Value: Bm25IndexInfo
- */
-export const bm25IndexStore = new Map<string, Bm25IndexInfo>();
+declare global {
+  namespace GraphileConfig {
+    interface GatherHelpers {
+      bm25Codec: Record<string, never>;
+    }
+  }
 
-/**
- * Whether pg_textsearch extension was detected in the database.
- */
-export let bm25ExtensionDetected = false;
+  namespace DataplanPg {
+    interface PgCodecAttributeExtensions {
+      /** BM25 index discovered for this attribute during this gather. */
+      bm25Index?: Bm25IndexInfo;
+    }
+  }
+}
+
+interface Bm25IndexRow {
+  class_id: string;
+  attribute_number: number;
+  schema_name: string;
+  table_name: string;
+  column_name: string;
+  index_name: string;
+}
+
+const attributeKey = (classId: string, attributeNumber: number): string =>
+  `${classId}:${attributeNumber}`;
+
+/** Convert one gather's query result into state owned by that gather only. */
+export function collectBm25Indexes(
+  rows: readonly Bm25IndexRow[]
+): Map<string, Bm25IndexInfo> {
+  const indexes = new Map<string, Bm25IndexInfo>();
+  for (const row of rows) {
+    indexes.set(attributeKey(row.class_id, row.attribute_number), {
+      schemaName: row.schema_name,
+      tableName: row.table_name,
+      columnName: row.column_name,
+      indexName: row.index_name
+    });
+  }
+  return indexes;
+}
 
 /**
  * The SQL query that discovers BM25 indexes in the database.
@@ -52,6 +82,8 @@ export let bm25ExtensionDetected = false;
  */
 const BM25_DISCOVERY_SQL = `
   SELECT
+    c.oid::text AS class_id,
+    a.attnum AS attribute_number,
     n.nspname  AS schema_name,
     c.relname  AS table_name,
     a.attname  AS column_name,
@@ -70,7 +102,12 @@ export const Bm25CodecPlugin: GraphileConfig.Plugin = {
   version: '1.0.0',
   description: 'Registers a codec for the pg_textsearch bm25query type and discovers BM25 indexes',
 
-  gather: {
+  gather: gatherConfig({
+    namespace: 'bm25Codec',
+    initialState: () => ({
+      indexesByService: new Map<string, Map<string, Bm25IndexInfo>>()
+    }),
+    helpers: {},
     hooks: {
       /**
        * Register the bm25query codec when detected during type introspection.
@@ -126,9 +163,6 @@ export const Bm25CodecPlugin: GraphileConfig.Plugin = {
         );
         if (!pgService) return;
 
-        // Clear previous entries for this introspection run
-        bm25IndexStore.clear();
-
         try {
           const adaptorSettings = (pgService as any).adaptorSettings;
           if (!adaptorSettings?.connectionString && !adaptorSettings?.pool) {
@@ -147,18 +181,10 @@ export const Bm25CodecPlugin: GraphileConfig.Plugin = {
           try {
             const result = await pool.query(BM25_DISCOVERY_SQL);
 
-            if (result.rows && result.rows.length > 0) {
-              bm25ExtensionDetected = true;
-              for (const row of result.rows) {
-                const key = `${row.schema_name}.${row.table_name}.${row.column_name}`;
-                bm25IndexStore.set(key, {
-                  schemaName: row.schema_name,
-                  tableName: row.table_name,
-                  columnName: row.column_name,
-                  indexName: row.index_name,
-                });
-              }
-            }
+            info.state.indexesByService.set(
+              serviceName,
+              collectBm25Indexes(result.rows as Bm25IndexRow[])
+            );
           } finally {
             if (isOwnPool) {
               await pool.end();
@@ -166,11 +192,20 @@ export const Bm25CodecPlugin: GraphileConfig.Plugin = {
           }
         } catch {
           // pg_textsearch not installed or query failed — gracefully skip
-          bm25ExtensionDetected = false;
+          info.state.indexesByService.set(serviceName, new Map());
         }
       },
+
+      pgCodecs_attribute(info, event) {
+        const index = info.state.indexesByService
+          .get(event.serviceName)
+          ?.get(attributeKey(event.pgClass._id, event.pgAttribute.attnum));
+        if (!index) return;
+        event.attribute.extensions ??= Object.create(null);
+        event.attribute.extensions.bm25Index = index;
+      },
     },
-  },
+  }),
 
   schema: {
     hooks: {

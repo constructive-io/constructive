@@ -63,6 +63,11 @@ function resolveAttrPgType(codec: any): string {
   return codec?.name ?? 'text';
 }
 
+interface I18nBuildState {
+  registry: WeakMap<PgCodecWithAttributes, I18nTableInfo>;
+  localeTypeCache: Map<string, any>;
+}
+
 // ─── Plugin Factory ──────────────────────────────────────────────────────────
 
 export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfig.Plugin {
@@ -73,9 +78,9 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
     defaultLanguages = ['en'],
   } = options;
 
-  // Closure-scoped state shared between init and field hooks
-  let i18nRegistry: Record<string, I18nTableInfo> = {};
-  const localeTypeCache: Record<string, any> = {};
+  // A preset/plugin instance may be reused for multiple schema builds. Keep
+  // discovery and GraphQL type state owned by the exact build that created it.
+  const stateByBuild = new WeakMap<object, I18nBuildState>();
 
   return {
     name: 'I18nPlugin',
@@ -85,7 +90,11 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
       hooks: {
         init: {
           callback(_, build) {
-            i18nRegistry = {};
+            const state: I18nBuildState = {
+              registry: new WeakMap(),
+              localeTypeCache: new Map()
+            };
+            stateByBuild.set(build, state);
 
             for (const [, codec] of Object.entries(build.input.pgRegistry.pgCodecs)) {
               const c = codec as PgCodecWithAttributes;
@@ -189,7 +198,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
 
               if (Object.keys(fields).length === 0) continue;
 
-              i18nRegistry[c.name] = {
+              state.registry.set(c, {
                 baseTable: c.name,
                 translationTable: translationTableName,
                 schemaName,
@@ -197,7 +206,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
                 pkColumn,
                 pkType,
                 fields,
-              };
+              });
             }
 
             return _;
@@ -210,8 +219,10 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
 
           if (!scope.pgCodec || !scope.isPgClassType) return fields;
 
+          const state = stateByBuild.get(build);
+          if (!state) return fields;
           const codec = scope.pgCodec as PgCodecWithAttributes;
-          const info = i18nRegistry[codec.name];
+          const info = state.registry.get(codec);
           if (!info) return fields;
 
           const localeFieldsConfig: Record<string, any> = {
@@ -225,13 +236,13 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
           }
 
           const localeTypeName = `${build.inflection.tableType(codec)}LocaleStrings`;
-          if (!localeTypeCache[localeTypeName]) {
-            localeTypeCache[localeTypeName] = new GraphQLObjectType({
+          if (!state.localeTypeCache.has(localeTypeName)) {
+            state.localeTypeCache.set(localeTypeName, new GraphQLObjectType({
               name: localeTypeName,
               fields: localeFieldsConfig,
-            });
+            }));
           }
-          const localeType = localeTypeCache[localeTypeName];
+          const localeType = state.localeTypeCache.get(localeTypeName);
 
           const { schemaName, baseTable, translationTable, fkColumn, pkColumn, pkType, fields: i18nFields } = info;
 

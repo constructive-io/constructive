@@ -68,7 +68,6 @@ export type {
 export {
   Bm25CodecPlugin,
   Bm25CodecPreset,
-  bm25IndexStore,
   createTsvectorCodecPlugin,
   TsvectorCodecPlugin,
   TsvectorCodecPreset,
