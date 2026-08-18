@@ -63,6 +63,7 @@ const APP_STORAGE_MODULE_QUERY = `
     sm.max_bulk_files,
     sm.max_bulk_total_size,
     sm.has_path_shares,
+    sm.has_confirm_upload,
     NULL AS entity_schema,
     NULL AS entity_table
   FROM metaschema_modules_public.storage_module sm
@@ -102,6 +103,7 @@ const ALL_STORAGE_MODULES_QUERY = `
     sm.max_bulk_files,
     sm.max_bulk_total_size,
     sm.has_path_shares,
+    sm.has_confirm_upload,
     es.schema_name AS entity_schema,
     et.name AS entity_table
   FROM metaschema_modules_public.storage_module sm
@@ -134,6 +136,7 @@ interface StorageModuleRow {
   max_bulk_files: number | null;
   max_bulk_total_size: number | null;
   has_path_shares: boolean;
+  has_confirm_upload: boolean;
   entity_schema: string | null;
   entity_table: string | null;
 }
@@ -165,6 +168,7 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
     maxFilenameLength: row.max_filename_length ?? DEFAULT_MAX_FILENAME_LENGTH,
     cacheTtlSeconds,
     hasPathShares: row.has_path_shares ?? false,
+    hasConfirmUpload: row.has_confirm_upload ?? false,
     maxBulkFiles: row.max_bulk_files ?? DEFAULT_MAX_BULK_FILES,
     maxBulkTotalSize: row.max_bulk_total_size ?? DEFAULT_MAX_BULK_TOTAL_SIZE,
   };

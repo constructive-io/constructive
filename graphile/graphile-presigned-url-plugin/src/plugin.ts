@@ -24,7 +24,9 @@ import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { checkTypeAgreement } from 'mime-bytes';
 
+import { validateCustomKey } from './custom-key';
 import { resolveDefaultBucket } from './default-bucket';
+import { isLiveFileRow, statusSelectFragment } from './file-lifecycle';
 import { buildFileProjection, type FileProjection } from './managed-upload';
 import { provisionAndRecordPhysicalBucket, resolveS3ForDatabase } from './physical-bucket';
 import { withRequestPgClient } from './request-pg-client';
@@ -38,9 +40,7 @@ const log = new Logger('graphile-presigned-url:plugin');
 
 const MAX_CONTENT_HASH_LENGTH = 128;
 const MAX_CONTENT_TYPE_LENGTH = 255;
-const MAX_CUSTOM_KEY_LENGTH = 1024;
 const SHA256_HEX_REGEX = /^[a-f0-9]{64}$/;
-const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9_.\-/]*$/;
 
 // --- Helpers ---
 
@@ -50,25 +50,6 @@ function isValidSha256(hash: string): boolean {
 
 function buildS3Key(contentHash: string): string {
   return contentHash;
-}
-
-function validateCustomKey(key: string): string | null {
-  if (key.length === 0 || key.length > MAX_CUSTOM_KEY_LENGTH) {
-    return 'INVALID_KEY_LENGTH: must be 1-1024 characters';
-  }
-  if (key.includes('..')) {
-    return 'INVALID_KEY: path traversal (..) not allowed';
-  }
-  if (key.startsWith('/')) {
-    return 'INVALID_KEY: leading slash not allowed';
-  }
-  if (key.includes('\0')) {
-    return 'INVALID_KEY: null bytes not allowed';
-  }
-  if (!CUSTOM_KEY_REGEX.test(key)) {
-    return 'INVALID_KEY: must start with alphanumeric and contain only alphanumeric, dots, hyphens, underscores, and slashes';
-  }
-  return null;
 }
 
 function derivePathFromKey(key: string): string | null {
@@ -717,9 +698,21 @@ async function processSingleFile(
   // Dedup / versioning check
   let previousVersionId: string | null = null;
 
+  // A row whose bytes never landed must not be reported as a dedup hit: the
+  // caller would store a reference to an object that is not in S3. Such a row is
+  // dropped instead, and the upload proceeds as a fresh one below — the insert is
+  // what enqueues the confirm-upload job, so restarting the lifecycle is the only
+  // way the retry can ever leave `requested`. Dropping it is also what keeps the
+  // retry insertable at all for a content-addressed key, where the key *is* the
+  // hash and a second row would collide on (bucket_id, key). The GC job the
+  // delete enqueues re-takes the reference count when it runs (≥5s later), by
+  // which point the replacement row exists, so it no-ops.
+  const statusColumn = statusSelectFragment(storageConfig);
+  let staleFileId: string | null = null;
+
   if (isCustomKey) {
     const existingResult = await txClient.query({
-      text: `SELECT id, content_hash
+      text: `SELECT id, content_hash${statusColumn}
        FROM ${storageConfig.filesQualifiedName}
        WHERE key = $1
          AND bucket_id = $2
@@ -731,23 +724,28 @@ async function processSingleFile(
     if (existingResult.rows.length > 0) {
       const existing = existingResult.rows[0];
       if (existing.content_hash === contentHash) {
-        log.info(`Dedup hit (custom key): file ${existing.id} for key ${s3Key}`);
-        return {
-          uploadUrl: null as string | null,
-          fileId: existing.id as string,
-          key: s3Key,
-          deduplicated: true,
-          expiresAt: null as string | null,
-          previousVersionId: null as string | null,
-          file: projectFile(existing.id as string, s3Key),
-        };
+        if (isLiveFileRow(storageConfig, existing)) {
+          log.info(`Dedup hit (custom key): file ${existing.id} for key ${s3Key}`);
+          return {
+            uploadUrl: null as string | null,
+            fileId: existing.id as string,
+            key: s3Key,
+            deduplicated: true,
+            expiresAt: null as string | null,
+            previousVersionId: null as string | null,
+            file: projectFile(existing.id as string, s3Key),
+          };
+        }
+        staleFileId = existing.id as string;
+        log.info(`Restarting upload of key ${s3Key}: file ${staleFileId} is ${existing.status}, so it carries no bytes`);
+      } else {
+        previousVersionId = existing.id;
+        log.info(`Versioning: new version of key ${s3Key}, previous=${previousVersionId}`);
       }
-      previousVersionId = existing.id;
-      log.info(`Versioning: new version of key ${s3Key}, previous=${previousVersionId}`);
     }
   } else {
     const dedupResult = await txClient.query({
-      text: `SELECT id
+      text: `SELECT id${statusColumn}
        FROM ${storageConfig.filesQualifiedName}
        WHERE content_hash = $1
          AND bucket_id = $2
@@ -757,18 +755,29 @@ async function processSingleFile(
 
     if (dedupResult.rows.length > 0) {
       const existingFile = dedupResult.rows[0];
-      log.info(`Dedup hit: file ${existingFile.id} for hash ${contentHash}`);
+      if (isLiveFileRow(storageConfig, existingFile)) {
+        log.info(`Dedup hit: file ${existingFile.id} for hash ${contentHash}`);
 
-      return {
-        uploadUrl: null as string | null,
-        fileId: existingFile.id as string,
-        key: s3Key,
-        deduplicated: true,
-        expiresAt: null as string | null,
-        previousVersionId: null as string | null,
-        file: projectFile(existingFile.id as string, s3Key),
-      };
+        return {
+          uploadUrl: null as string | null,
+          fileId: existingFile.id as string,
+          key: s3Key,
+          deduplicated: true,
+          expiresAt: null as string | null,
+          previousVersionId: null as string | null,
+          file: projectFile(existingFile.id as string, s3Key),
+        };
+      }
+      staleFileId = existingFile.id as string;
+      log.info(`Restarting upload of hash ${contentHash}: file ${staleFileId} is ${existingFile.status}, so it carries no bytes`);
     }
+  }
+
+  if (staleFileId !== null) {
+    await txClient.query({
+      text: `DELETE FROM ${storageConfig.filesQualifiedName} WHERE id = $1`,
+      values: [staleFileId],
+    });
   }
 
   // Auto-derive ltree path from custom key directory (only when has_path_shares)

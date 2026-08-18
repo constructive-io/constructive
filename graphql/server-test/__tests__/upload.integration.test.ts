@@ -600,7 +600,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       );
     };
 
-    it('mints {prefix}-{key}-{databaseId} and records it, matching what the lazy path would mint', async () => {
+    it('mints {prefix}-{key}-{digest} and records it, matching what the lazy path would mint', async () => {
       // 1. Derive the naming prefix from a bucket the LAZY path provisions.
       const lazyKey = 'eager-lazy';
       await seedBucket(lazyKey);
@@ -623,11 +623,11 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       // The lazy path records the exact bucket the presigned PUT targets.
       expect(bucketFromPresignedUrl(lazyUrl)).toBe(lazyPhysical);
 
-      // The shared convention: {prefix}-{key}-{databaseId}.
-      const suffix = `-${lazyKey}-${aliceDatabaseId}`;
-      expect(lazyPhysical!.endsWith(suffix)).toBe(true);
-      const prefix = lazyPhysical!.slice(0, -suffix.length);
-      expect(prefix.length).toBeGreaterThan(0);
+      // The shared convention: {prefix}-{key}-{digest}, bounded to S3's 63 chars.
+      const lazyMatch = new RegExp(`^(.+)-${lazyKey}-[a-f0-9]{12}$`).exec(lazyPhysical!);
+      expect(lazyMatch).not.toBeNull();
+      expect(lazyPhysical!.length).toBeLessThanOrEqual(63);
+      const prefix = lazyMatch![1];
 
       // 2. EAGER path: a fresh bucket row, provisioned via the mutation.
       const eagerKey = 'eager-prov';
@@ -642,12 +642,11 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       expect(payload.error).toBeNull();
       expect(payload.success).toBe(true);
 
-      const expected = `${prefix}-${eagerKey}-${aliceDatabaseId}`;
       // Eager mints the tenant-aware name — NOT the bare logical key.
-      expect(payload.bucketName).toBe(expected);
+      expect(payload.bucketName).toMatch(new RegExp(`^${prefix}-${eagerKey}-[a-f0-9]{12}$`));
       expect(payload.bucketName).not.toBe(eagerKey);
       // ...and persists it on the row (physical_name IS NULL-guarded record).
-      expect(await physicalNameFor(eagerKey)).toBe(expected);
+      expect(await physicalNameFor(eagerKey)).toBe(payload.bucketName);
     });
 
     it('does not clobber a physical_name recorded by a prior provision', async () => {

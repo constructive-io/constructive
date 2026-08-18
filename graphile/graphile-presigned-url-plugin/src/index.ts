@@ -33,6 +33,7 @@ export {
   type ConfirmUploadInput,
   type ConfirmUploadVerdict,
 } from './confirm-upload';
+export { validateCustomKey } from './custom-key';
 export type { ResolvedBucketCoordinate } from './default-bucket';
 export { resolveDefaultBucket } from './default-bucket';
 export { createDownloadUrlPlugin } from './download-url-field';

@@ -21,6 +21,7 @@
 import { Logger } from '@pgpmjs/logger';
 
 import { resolveDefaultBucket } from './default-bucket';
+import { isLiveFileRow, statusSelectFragment } from './file-lifecycle';
 import { type FileRefFieldBinding, getFileRefFieldBinding } from './file-ref-registry';
 import { provisionAndRecordPhysicalBucket, resolveS3ForDatabase } from './physical-bucket';
 import { type WithPgClient, withRequestPgClient } from './request-pg-client';
@@ -289,18 +290,41 @@ export async function finalizeStagedUpload(args: {
 
   const existing = await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
     const result = await pgClient.query({
-      text: `SELECT id, key, mime_type, size, filename
+      text: `SELECT id, key, mime_type, size, filename${statusSelectFragment(storageConfig)}
              FROM ${storageConfig.filesQualifiedName}
              WHERE content_hash = $1 AND bucket_id = $2
              LIMIT 1`,
       values: [staged.contentHash, bucket.id],
     });
     return result.rows[0] as
-      | { id: string; key: string; mime_type: string; size: number; filename: string | null }
+      | {
+          id: string;
+          key: string;
+          mime_type: string;
+          size: number;
+          filename: string | null;
+          status?: string;
+        }
       | undefined;
   });
 
-  if (existing) {
+  // Only a row that already stands for stored bytes may absorb this upload. One
+  // that never received them is dropped, and the staged object is promoted as a
+  // fresh file below — which is also what keeps the insert possible, since the
+  // final key is the content hash and (bucket_id, key) is unique. The GC job the
+  // delete enqueues re-takes the reference count when it runs, by which point
+  // the replacement row exists, so it no-ops.
+  if (existing && !isLiveFileRow(storageConfig, existing)) {
+    log.info(
+      `Restarting upload of hash ${staged.contentHash}: file ${existing.id} is ${existing.status}, so it carries no bytes`
+    );
+    await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
+      await pgClient.query({
+        text: `DELETE FROM ${storageConfig.filesQualifiedName} WHERE id = $1`,
+        values: [existing.id],
+      });
+    });
+  } else if (existing) {
     log.info(`Dedup hit: file ${existing.id} already carries hash ${staged.contentHash}`);
     await deleteS3Object(s3, staged.stagingKey);
 
