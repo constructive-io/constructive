@@ -1,3 +1,8 @@
+import type {
+  createTemplatePreviewTables,
+  resolveDataToken,
+  resolveProjectContext
+} from '@agentic-kit/db-tools';
 import type { ConfirmPreview } from '@agentic-kit/harness';
 import {
   type ConfirmGate as HarnessConfirmGate,
@@ -10,9 +15,6 @@ import type {
   ToolCallEvent,
   ToolCallEventResult,
 } from '@earendil-works/pi-coding-agent';
-
-import type { resolveDataToken, resolveProjectContext } from './context';
-import type { createTemplatePreviewTables } from './tools/templates';
 
 // Hosts with a rich confirm surface (e.g. Constructive Desktop's extension-ui)
 // extend pi's ExtensionUIContext with these members; when present they take

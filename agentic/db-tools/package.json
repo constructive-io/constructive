@@ -1,8 +1,8 @@
 {
-  "name": "@agentic-kit/pi",
-  "version": "0.17.1",
-  "author": "Dan Lynch <pyramation@gmail.com>",
-  "description": "the pi adapter for agentic-kit — Constructive's typed db tools, confirm gate, and the run-log/metering/gate lanes attached to a pi coding-agent session",
+  "name": "@agentic-kit/db-tools",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "harness-neutral Constructive database tools — provisioning, schema, policies, records, templates and codegen as HarnessTools any adapter can bind",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -29,22 +29,20 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@agentic-kit/db-tools": "workspace:^",
+    "12factor-env": "workspace:^",
     "@agentic-kit/harness": "workspace:^",
-    "@agentic-kit/metering": "workspace:^",
-    "@agentic-kit/run-log": "workspace:^",
+    "@constructive-io/graphql-query": "workspace:^",
+    "@constructive-io/sdk": "workspace:^",
+    "node-type-registry": "workspace:^",
     "zod": "^4.4.3"
   },
-  "peerDependencies": {
-    "@earendil-works/pi-coding-agent": ">=0.79.0"
-  },
   "devDependencies": {
-    "@earendil-works/pi-coding-agent": "0.79.6"
+    "typebox": "^1.0.0"
   },
   "keywords": [
     "agentic-kit",
-    "pi",
-    "coding-agent",
+    "tools",
+    "database",
     "constructive"
   ]
 }

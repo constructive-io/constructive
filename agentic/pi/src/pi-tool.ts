@@ -1,8 +1,7 @@
+import { toolSchema } from '@agentic-kit/db-tools';
 import type { AnyHarnessTool, HarnessTool, HarnessToolResult } from '@agentic-kit/harness';
 import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
 import type { z } from 'zod';
-
-import { toolSchema } from './tool-schema';
 
 /**
  * Bind a neutral `HarnessTool` to pi's `ToolDefinition`.
