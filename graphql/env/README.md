@@ -43,6 +43,8 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 
 ### GraphQL Schema
 - `GRAPHILE_SCHEMA` - Comma-separated list of PostgreSQL schemas to expose
+- `GRAPHILE_INTROSPECTION_MODE` - `stock` (default) or `scoped-required`;
+  invalid values fail during option resolution
 
 ### Feature Flags
 - `FEATURES_SIMPLE_INFLECTION` - Enable simple inflection plugin
@@ -63,7 +65,12 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
 
 ```typescript
 {
-  graphile: { schema: [] },
+  graphile: {
+    schema: [],
+    introspectionMode: 'stock',
+    introspectionDependencySchemas: [],
+    introspectionCapabilityExtensions: []
+  },
   features: {
     simpleInflection: true,
     oppositeBaseNames: true,

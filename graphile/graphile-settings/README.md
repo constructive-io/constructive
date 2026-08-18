@@ -183,6 +183,34 @@ const { schema } = await makeSchema(preset);
 const sdl = printSchema(schema);
 ```
 
+## Opt-in Scoped Introspection
+
+`ConstructivePreset` and `makePgService` retain PostGraphile's upstream
+introspection behavior. Applications that explicitly opt into CNC scoped
+introspection should install the independently owned preset and use the scoped
+service factory together:
+
+```typescript
+import { ScopedIntrospectionPreset } from 'graphile-scoped-introspection';
+import { ConstructivePreset, makeScopedPgService } from 'graphile-settings';
+
+const preset = {
+  extends: [ConstructivePreset, ScopedIntrospectionPreset],
+  pgServices: [
+    makeScopedPgService({
+      connectionString: 'postgres://user:pass@localhost/mydb',
+      schemas: ['app_public'],
+      introspectionAllowedDependencySchemas: ['shared'],
+      introspectionCapabilityExtensions: ['pg_trgm'],
+    }),
+  ],
+};
+```
+
+The Constructive GraphQL server performs this pairing when
+`GRAPHILE_INTROSPECTION_MODE=scoped-required`; when unset or set to `stock`, it
+does not load the scoped package.
+
 ## Smart Tags Reference
 
 Control schema generation with PostgreSQL comments:

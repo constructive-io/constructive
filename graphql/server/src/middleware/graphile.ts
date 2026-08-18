@@ -12,7 +12,7 @@ import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
-import { createConstructivePreset, makePgService } from 'graphile-settings';
+import { createConstructivePreset } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -21,6 +21,7 @@ import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import type { DatabaseSettings } from '../types';
+import { makeIntrospectionWiring } from './graphile-introspection';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
@@ -160,17 +161,26 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
  * plugin preset.  Without settings the default preset is used
  * (everything on except aggregates).
  */
-const buildPreset = (
+const buildPreset = async (
   pool: import('pg').Pool,
   schemas: string[],
   anonRole: string,
   roleName: string,
+  graphileOptions: ConstructiveOptions['graphile'],
   databaseSettings?: DatabaseSettings,
   apiId?: string,
   compute?: ComputeConfig
-): GraphileConfig.Preset => {
+): Promise<GraphileConfig.Preset> => {
+  const introspection = await makeIntrospectionWiring(
+    pool,
+    schemas,
+    graphileOptions
+  );
   return {
-    extends: [createConstructivePreset(databaseSettings)],
+    extends: [
+      createConstructivePreset(databaseSettings),
+      ...introspection.presets
+    ],
     plugins: [
       AuthCookiePlugin,
       // Only registered when the compute module is provisioned for this
@@ -193,12 +203,7 @@ const buildPreset = (
         ]
         : [])
     ],
-    pgServices: [
-      makePgService({
-        pool,
-        schemas
-      })
-    ],
+    pgServices: [introspection.pgService],
     grafserv: {
       graphqlPath: '/graphql',
       graphiqlPath: '/graphiql',
@@ -403,7 +408,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
+      const preset = await buildPreset(
+        pool,
+        schema || [],
+        anonRole,
+        roleName,
+        opts.graphile,
+        api.databaseSettings,
+        api.apiId,
+        compute
+      );
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,

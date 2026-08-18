@@ -1,14 +1,8 @@
+import type { ConstructiveAPIToken } from '@constructive-io/express-context';
+
 import type { ApiStructure } from '../types';
 
-export type ConstructiveAPIToken = {
-  id?: string;
-  user_id?: string;
-  principal_id?: string;
-  session_id?: string;
-  access_level?: string;
-  kind?: string;
-  [key: string]: unknown;
-};
+export type { ConstructiveAPIToken } from '@constructive-io/express-context';
 
 declare global {
   namespace Express {
