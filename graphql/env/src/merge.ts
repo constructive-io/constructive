@@ -51,7 +51,6 @@ export const getEnvOptions = (
   ], {
     arrayMerge: replaceArrays
   }) as ConstructiveOptions;
-
 };
 
 /**

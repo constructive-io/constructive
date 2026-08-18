@@ -177,10 +177,7 @@ const buildPreset = async (
     graphileOptions
   );
   return {
-    extends: [
-      createConstructivePreset(databaseSettings),
-      ...introspection.presets
-    ],
+    extends: [createConstructivePreset(databaseSettings), ...introspection.presets],
     plugins: [
       AuthCookiePlugin,
       // Only registered when the compute module is provisioned for this
@@ -203,7 +200,9 @@ const buildPreset = async (
         ]
         : [])
     ],
-    pgServices: [introspection.pgService],
+    pgServices: [
+      introspection.pgService
+    ],
     grafserv: {
       graphqlPath: '/graphql',
       graphiqlPath: '/graphiql',
@@ -408,16 +407,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = await buildPreset(
-        pool,
-        schema || [],
-        anonRole,
-        roleName,
-        opts.graphile,
-        api.databaseSettings,
-        api.apiId,
-        compute
-      );
+      const preset = await buildPreset(pool, schema || [], anonRole, roleName, opts.graphile, api.databaseSettings, api.apiId, compute);
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,
