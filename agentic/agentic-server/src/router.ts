@@ -6,6 +6,7 @@
  *   - Model-based routing: "anthropic/claude-3.5-sonnet" → anthropic provider
  *   - Header-based routing: X-LLM-Provider: ollama → ollama provider
  *   - Fire-and-forget inference metering via an injected InferenceSink
+ *   - Streaming chat completions relayed as server-sent events
  *   - /v1/usage reporting endpoint for external usage submission
  */
 
@@ -13,6 +14,7 @@ import { Logger } from '@pgpmjs/logger';
 import { Router } from 'express';
 
 import { buildProviderHeaders, resolveProvider, resolveUpstreamUrl } from './providers';
+import { relayEventStream, withUsageStreamOptions } from './streaming';
 import {
   transformChatRequest,
   transformChatResponse,
@@ -50,15 +52,41 @@ export const createRouter = (options: AgenticServerOptions): Router => {
       model: req.body?.model
     });
 
+    // Only the OpenAI-compatible wire carries stream frames the gateway can
+    // relay; translating Ollama's or Anthropic's stream formats is separate
+    // work, and answering a stream request with a whole JSON body would break
+    // the client silently.
+    const streaming = req.body?.stream === true;
+    if (streaming && provider.type !== 'openai') {
+      res.status(501).json({
+        error: {
+          message: `streaming is not supported for provider type '${provider.type}'`
+        }
+      });
+      return;
+    }
+
     try {
       const upstreamUrl = resolveUpstreamUrl(provider, '/v1/chat/completions');
-      const body = transformChatRequest(provider, req.body || {});
+      const transformed = transformChatRequest(provider, req.body || {});
+      const body = streaming ? withUsageStreamOptions(transformed) : transformed;
       const headers = buildProviderHeaders(provider);
+
+      const abort = new AbortController();
+      // A client that hangs up mid-stream stops the upstream read; the request
+      // stream's own 'close' fires as soon as the body is consumed, so the
+      // response is what reports the disconnect.
+      if (streaming) {
+        res.on('close', () => {
+          if (!res.writableEnded) abort.abort();
+        });
+      }
 
       const upstream = await fetch(upstreamUrl, {
         method: 'POST',
         headers,
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        ...(streaming ? { signal: abort.signal } : {})
       });
 
       const latencyMs = Number(process.hrtime.bigint() - startTime) / 1e6;
@@ -84,6 +112,37 @@ export const createRouter = (options: AgenticServerOptions): Router => {
         res.status(upstream.status).json({
           error: { message: `LLM provider error: ${upstream.status}`, upstream: text }
         });
+        return;
+      }
+
+      if (streaming) {
+        const streamUsage = await relayEventStream(upstream, res);
+        const streamLatencyMs = Number(process.hrtime.bigint() - startTime) / 1e6;
+
+        log.info('inference complete', {
+          databaseId,
+          provider: provider.type,
+          model: req.body?.model,
+          promptTokens: streamUsage?.prompt_tokens,
+          completionTokens: streamUsage?.completion_tokens,
+          streamed: true
+        });
+
+        if (sink) {
+          sink.logInference({
+            databaseId, entityId, actorId,
+            model: String(req.body?.model || body.model || ''),
+            provider: provider.type,
+            service: 'chat',
+            operation: 'chat/completions',
+            inputTokens: streamUsage?.prompt_tokens || 0,
+            outputTokens: streamUsage?.completion_tokens || 0,
+            totalTokens: streamUsage?.total_tokens || 0,
+            latencyMs: streamLatencyMs,
+            status: 'ok',
+            ...(streamUsage ? { rawUsage: streamUsage } : {})
+          });
+        }
         return;
       }
 
@@ -131,6 +190,13 @@ export const createRouter = (options: AgenticServerOptions): Router => {
           status: 'error',
           errorType: err.message
         });
+      }
+
+      // A stream that failed mid-relay has already sent its status and frames;
+      // the client sees the truncated stream rather than a JSON error.
+      if (res.headersSent) {
+        res.end();
+        return;
       }
 
       res.status(502).json({
