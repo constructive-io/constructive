@@ -1,0 +1,45 @@
+{
+  "name": "graphile-storage-registry",
+  "version": "0.0.1",
+  "description": "Registry-derived storage plane discovery for PostGraphile v5 — pairs @storageFiles/@storageBuckets codecs through their actual foreign-key relations and derives the canonical upload surface names, so no table name is ever load-bearing",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "makage": "^0.3.0"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "constructive",
+    "storage",
+    "registry",
+    "plugin",
+    "postgres",
+    "graphql"
+  ]
+}
