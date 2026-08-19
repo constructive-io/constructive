@@ -46,6 +46,10 @@ app.listen(3001, () => {
 | GET | `/v1/providers` | List configured providers |
 | GET | `/healthz` | Health check |
 
+## Streaming
+
+`POST /v1/chat/completions` with `stream: true` is relayed as a `text/event-stream`: the gateway forwards the provider's frames verbatim, so a client receives tokens as they are produced. It adds `stream_options: { include_usage: true }` unless the caller set `stream_options` itself, and meters the usage the final frame carries. Streaming is available for OpenAI-compatible providers; a provider whose stream would need translation (`ollama`, `anthropic`) is rejected `501` rather than answered with a non-streaming body.
+
 ## Identity & tenancy
 
 Requests carry tenant identity via headers: `X-Database-Id` (**required** — requests without it are rejected `400`), `X-Entity-Id`, and `X-Actor-Id`. Routing to a specific provider can be forced with `X-LLM-Provider`.
