@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.13.0...graphile-bucket-provisioner-plugin@1.14.0) (2026-08-19)
+
+### Features
+
+- **storage:** pair storage planes through registry FK relations, not table names ([186fd3d](https://github.com/constructive-io/constructive/commit/186fd3d85b31c7b6c13f1dd32649815e87e716ef))
+
 # [1.13.0](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.12.5...graphile-bucket-provisioner-plugin@1.13.0) (2026-08-18)
 
 **Note:** Version bump only for package graphile-bucket-provisioner-plugin

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.8.0...graphile-meta@1.9.0) (2026-08-19)
+
+### Features
+
+- **meta:** report each storage plane's full upload/download surface in _meta and add a dynamic storage client ([b88d592](https://github.com/constructive-io/constructive/commit/b88d592808b211ccd26c360137a34590eb55b303))
+
 # [1.8.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.7.1...graphile-meta@1.8.0) (2026-08-18)
 
 **Note:** Version bump only for package graphile-meta
