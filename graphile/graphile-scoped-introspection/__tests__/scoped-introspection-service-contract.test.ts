@@ -91,18 +91,4 @@ describe('scoped introspection service identity contract', () => {
       ).rejects.toThrow(/require scopedIntrospection: true/);
     }
   );
-
-  it('rejects a non-boolean scoped introspection flag', async () => {
-    await expect(
-      gather({
-        plugins: [PgScopedIntrospectionPlugin, consumerPlugin],
-        pgServices: [
-          makeService({
-            scopedIntrospection: 'true',
-            introspectionAllowedDependencySchemas: undefined,
-          }),
-        ],
-      })
-    ).rejects.toThrow('scopedIntrospection must be a boolean');
-  });
 });

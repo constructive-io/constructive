@@ -4,6 +4,17 @@ import deepmerge from 'deepmerge';
 
 import { getGraphQLEnvVars } from './env';
 
+type GraphileBooleanOption = 'scopedIntrospection' | 'introspectionJit';
+
+const validateGraphileBooleanOption = (
+  value: unknown,
+  option: GraphileBooleanOption
+): void => {
+  if (value !== undefined && typeof value !== 'boolean') {
+    throw new Error(`graphile.${option} must be a boolean`);
+  }
+};
+
 /**
  * Get Constructive environment options by merging:
  * 1. Core PGPM defaults (from @pgpmjs/env)
@@ -36,7 +47,7 @@ export const getEnvOptions = (
   const configOptions = loadConfigSync(cwd) as Partial<ConstructiveOptions>;
   
   // Merge in order: core -> graphql defaults -> config (for graphql keys) -> graphql env -> overrides
-  return deepmerge.all([
+  const options = deepmerge.all([
     coreOptions,
     constructiveGraphqlDefaults,
     // Only merge graphql-related keys from config (if present)
@@ -51,6 +62,17 @@ export const getEnvOptions = (
   ], {
     arrayMerge: replaceArrays
   }) as ConstructiveOptions;
+
+  validateGraphileBooleanOption(
+    options.graphile?.scopedIntrospection,
+    'scopedIntrospection'
+  );
+  validateGraphileBooleanOption(
+    options.graphile?.introspectionJit,
+    'introspectionJit'
+  );
+
+  return options;
 };
 
 /**

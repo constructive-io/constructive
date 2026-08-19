@@ -52,7 +52,7 @@ export function assertDependencyClosureTypes(
     )._lookups;
     const resolves =
       retainedTypeOids.has(normalizedOid) ||
-      introspectionLookups?.typeById?.has(normalizedOid) === true;
+      introspectionLookups?.typeById?.has(normalizedOid);
     if (!resolves) {
       throw new Error(
         `Dependency-closure introspection for service '${serviceName}' retained ${objectKind} '${objectContext}' field '${field}' referencing missing pg_type OID '${normalizedOid}'`

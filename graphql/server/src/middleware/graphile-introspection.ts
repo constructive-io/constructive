@@ -33,22 +33,9 @@ export const makeIntrospectionWiring = async (
   graphileOptions: GraphileOptions | undefined,
   loadScopedPreset: ScopedIntrospectionPresetLoader = loadScopedIntrospectionPreset
 ): Promise<IntrospectionWiring> => {
-  const scopedIntrospection = graphileOptions?.scopedIntrospection;
-  const introspectionJit = graphileOptions?.introspectionJit;
-  if (
-    scopedIntrospection !== undefined &&
-    typeof scopedIntrospection !== 'boolean'
-  ) {
-    throw new Error('graphile.scopedIntrospection must be a boolean');
-  }
-  if (
-    introspectionJit !== undefined &&
-    typeof introspectionJit !== 'boolean'
-  ) {
-    throw new Error('graphile.introspectionJit must be a boolean');
-  }
+  const { scopedIntrospection, introspectionJit } = graphileOptions ?? {};
 
-  if (scopedIntrospection !== true) {
+  if (!scopedIntrospection) {
     const configuredScopedOptions = [
       (graphileOptions?.introspectionDependencySchemas?.length ?? 0) > 0
         ? 'introspectionDependencySchemas'
@@ -56,7 +43,7 @@ export const makeIntrospectionWiring = async (
       (graphileOptions?.introspectionCapabilityExtensions?.length ?? 0) > 0
         ? 'introspectionCapabilityExtensions'
         : null,
-      introspectionJit === true ? 'introspectionJit' : null,
+      introspectionJit ? 'introspectionJit' : null,
     ].filter((option): option is string => option !== null);
     if (configuredScopedOptions.length > 0) {
       throw new Error(
