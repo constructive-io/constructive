@@ -36,6 +36,12 @@ beforeAll(async () => {
 
   llmApp.post('/api/chat', (req: any, res: any) => {
     llmRequests.push({ path: req.path, method: req.method, body: req.body });
+    if (req.body?.model === 'refuses') {
+      res.status(400).json({
+        error: 'json: cannot unmarshal array into Go struct field ChatRequest.messages.content of type string'
+      });
+      return;
+    }
     res.json({
       message: { role: 'assistant', content: 'Mock Ollama response' },
       prompt_eval_count: 12,
@@ -134,6 +140,46 @@ describe('POST /v1/chat/completions', () => {
       inputTokens: 12,
       outputTokens: 8
     });
+  });
+
+  it('flattens content parts into the single string ollama accepts', async () => {
+    // pi and every other harness send `content` as parts; ollama's chat api takes
+    // only a string, so the gateway is where the dialects meet.
+    const res = await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Database-Id': 'db-parts-1' },
+      body: JSON.stringify({
+        model: 'llama3',
+        messages: [
+          { role: 'system', content: [{ type: 'text', text: 'Be brief.' }] },
+          {
+            role: 'user',
+            content: [{ type: 'text', text: 'Hello' }, { type: 'text', text: 'world' }]
+          }
+        ]
+      })
+    });
+
+    expect(res.status).toBe(200);
+    expect(llmRequests[0].body.messages).toEqual([
+      { role: 'system', content: 'Be brief.' },
+      { role: 'user', content: 'Hello\nworld' }
+    ]);
+  });
+
+  it('names the upstream reason in the error message the harness reads', async () => {
+    const res = await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Database-Id': 'db-upstream-1' },
+      body: JSON.stringify({ model: 'refuses', messages: [{ role: 'user', content: 'hi' }] })
+    });
+
+    expect(res.status).toBe(400);
+    const data = (await res.json()) as any;
+    expect(data.error.message).toBe(
+      'ollama provider error 400: json: cannot unmarshal array into Go struct field ChatRequest.messages.content of type string'
+    );
+    expect(data.error.upstream).toContain('cannot unmarshal');
   });
 
   it('rejects the request (400) when no X-Database-Id header is present', async () => {

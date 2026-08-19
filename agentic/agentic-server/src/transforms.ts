@@ -1,5 +1,62 @@
 import type { ResolvedProvider, UsageResult } from './types';
 
+interface ContentPart {
+  type: string;
+  text?: string;
+  image_url?: { url?: string };
+}
+
+interface ChatMessage {
+  role: string;
+  content?: string | ContentPart[];
+  images?: string[];
+}
+
+/**
+ * Flatten OpenAI content parts into the single string Ollama's chat api takes.
+ *
+ * Harnesses send `content` as an array of parts — pi always does — and Ollama
+ * answers that with `json: cannot unmarshal array into Go struct field
+ * ChatRequest.messages.content of type string`, which reaches the harness as a
+ * bare `400` and reads as a broken model rather than a dialect mismatch. Image
+ * parts move to Ollama's own `images` field; a part this cannot express fails
+ * loudly rather than being dropped into a prompt the model never sees.
+ */
+function flattenContentParts(messages: unknown): unknown {
+  if (!Array.isArray(messages)) return messages;
+
+  return (messages as ChatMessage[]).map((message) => {
+    if (!Array.isArray(message.content)) return message;
+
+    const text: string[] = [];
+    const images: string[] = [];
+    for (const part of message.content) {
+      if (part.type === 'text' || part.type === 'input_text') {
+        text.push(part.text ?? '');
+        continue;
+      }
+      if (part.type === 'image_url') {
+        const url = part.image_url?.url;
+        if (!url) throw new Error('ollama: an image_url content part carries no url');
+        // Ollama takes base64 bytes, never a fetchable url.
+        const base64 = /^data:[^;]*;base64,(.*)$/.exec(url)?.[1];
+        if (!base64) {
+          throw new Error('ollama: an image content part must be a base64 data url');
+        }
+        images.push(base64);
+        continue;
+      }
+      throw new Error(`ollama: unsupported content part type '${part.type}'`);
+    }
+
+    return {
+      ...message,
+      content: text.join('\n'),
+      ...(images.length ? { images: [...(message.images ?? []), ...images] } : {})
+    };
+  });
+}
+
 export function transformChatRequest(
   provider: ResolvedProvider,
   body: Record<string, unknown>
@@ -15,7 +72,7 @@ export function transformChatRequest(
   if (provider.type === 'ollama') {
     return {
       model: model || 'llama3',
-      messages: body.messages,
+      messages: flattenContentParts(body.messages),
       stream: false,
       ...(body.temperature !== undefined && {
         options: { temperature: body.temperature }
