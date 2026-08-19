@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.1](https://github.com/constructive-io/constructive/compare/agentic-server@0.25.0...agentic-server@0.25.1) (2026-08-19)
+
+### Bug Fixes
+
+- **agentic-server:** speak ollama's dialect, and name an upstream refusal ([d9e2969](https://github.com/constructive-io/constructive/commit/d9e2969af1387fe1d2c16134360b485ff9e9bc23))
+
 # [0.25.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.24.0...agentic-server@0.25.0) (2026-08-19)
 
 ### Features
