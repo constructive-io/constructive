@@ -72,6 +72,35 @@ export interface CheckOneOfParams {
   /* Array of allowed values for the column */
   values: string[];
 }
+/** Declares that typed pointer columns may only reference rows owned by the same scope owner as the referencing row, proven through a link table that carries the owner (owner_scope, owner_key) — typically a catalog projection that must never be referenced structurally. Creates one BEFORE INSERT OR UPDATE trigger enforcing the declared arity over the pointers and requiring every pointer that is set to resolve to a same-owner row, so it covers belongs-to / has-one / has-many (key on the row being written) and has-and-belongs-to-many (both keys on the junction row, arity all). Visibility/publication flags are never an authorization input. */
+export interface CheckOwnedRelationParams {
+  /* Schema holding the link tables the ownership is proven through (e.g. catalog_private) */
+  link_schema_name: string;
+  /* Scope that owns the referencing rows; matched against the link row's owner_scope (e.g. database, platform) */
+  owner_scope: string;
+  /* Column on the referencing table carrying its scope key, matched against the link row's owner_key. NULL for a global scope, whose owner key is NULL by construction */
+  owner_key_field_name?: string;
+  /* Typed pointer columns to guard, each resolved through its own link table */
+  pointers: {
+    /* Pointer column on the referencing table */field_name: string;
+    /* Link table in link_schema_name whose ids this column points at */link_table_name: string;
+    /* Optional link column additionally restricted regardless of ownership (e.g. a bucket type) */target_type_field_name?: string;
+    /* Value target_type_field_name must equal */target_type_value?: string;
+    /* Admit the same database's global-scope rows (app/platform, ownerless by construction) for this column, for pointers whose legal target set is a scope hierarchy within one database */allow_owner_tier?: boolean;
+  }[];
+  /* How many pointers a row must set: exactly_one for a polymorphic target (route → api OR site OR bucket), all for a junction/join row of a has-and-belongs-to-many relation (and for a mandatory belongs-to), any for optional pointers that are only checked when set */
+  arity?: 'exactly_one' | 'all' | 'any';
+  /* Error code raised when the arity rule over the pointers is violated */
+  required_error?: string;
+  /* Error code raised when the target is not owned by the referencing row owner */
+  denied_error?: string;
+  /* Schema the guard trigger function is created in; defaults to the table schema */
+  trigger_function_schema?: string;
+  /* Guard trigger function name; defaults to tg_<table>_owned_relation_guard */
+  trigger_function_name?: string;
+  /* Guard trigger name; defaults to <table>_owned_relation_guard */
+  trigger_name?: string;
+}
 /**
  * ===========================================================================
  * Data node type parameters
@@ -2105,7 +2134,7 @@ export interface BlueprintEntityType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCapabilities' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataHistory' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataLock' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
+export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'CheckOwnedRelation' | 'DataArchivable' | 'DataBulk' | 'DataCapabilities' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataHistory' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataLock' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: 'AuthzAllowAll';
@@ -2200,6 +2229,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: 'CheckOneOf';
   data: CheckOneOfParams;
+} | {
+  $type: 'CheckOwnedRelation';
+  data: CheckOwnedRelationParams;
 } | {
   $type: 'DataArchivable';
   data: DataArchivableParams;
