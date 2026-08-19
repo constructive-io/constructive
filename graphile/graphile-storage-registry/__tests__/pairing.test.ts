@@ -167,6 +167,22 @@ describe('discoverStoragePlanes', () => {
     expect(() => discoverStoragePlanes(registry([buckets], []))).toThrow(/STORAGE_PLANE_UNPAIRED/);
   });
 
+  it('throws STORAGE_PLANE_AMBIGUOUS when two files tables reference one buckets table', () => {
+    const buckets = codec('buckets', { tags: { storageBuckets: true } });
+    const files = codec('files', { tags: { storageFiles: true } });
+    const otherFiles = codec('otherFiles', { tableName: 'other_files', tags: { storageFiles: true } });
+    const reg = registry(
+      [buckets, files, otherFiles],
+      [
+        { from: files, to: buckets, relationName: 'bucketsByMyBucketId' },
+        { from: otherFiles, to: buckets, relationName: 'bucketsByMyOtherBucketId' },
+      ],
+    );
+
+    expect(() => discoverStoragePlanes(reg)).toThrow(/STORAGE_PLANE_AMBIGUOUS/);
+    expect(() => discoverStoragePlanes(reg)).toThrow(/storage_public\.buckets/);
+  });
+
   it('throws (via pairing) when a tagged files table cannot be paired', () => {
     const buckets = codec('buckets', { tags: { storageBuckets: true } });
     const files = codec('files', { tags: { storageFiles: true } });

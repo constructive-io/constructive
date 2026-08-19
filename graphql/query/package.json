@@ -33,6 +33,7 @@
     "@constructive-io/errors": "workspace:^",
     "@constructive-io/fetch": "^1.2.0",
     "@constructive-io/graphql-types": "workspace:^",
+    "@constructive-io/upload-client": "workspace:^",
     "ajv": "^8.20.0",
     "gql-ast": "workspace:^",
     "grafast": "1.1.2",

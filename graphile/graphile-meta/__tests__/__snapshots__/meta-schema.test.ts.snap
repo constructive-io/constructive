@@ -124,8 +124,21 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "search.config.weights",
   "search.hasUnifiedSearch",
   "storage",
+  "storage.bucketsType",
+  "storage.downloadUrlField",
+  "storage.filesType",
   "storage.isBucketsTable",
   "storage.isFilesTable",
+  "storage.upload",
+  "storage.upload.bulkFileInputType",
+  "storage.upload.bulkFilePayloadType",
+  "storage.upload.bulkInputType",
+  "storage.upload.bulkMutation",
+  "storage.upload.bulkPayloadType",
+  "storage.upload.inputType",
+  "storage.upload.mutation",
+  "storage.upload.payloadType",
+  "storage.upload.requiresOwnerId",
   "tableName",
   "uniqueConstraints",
   "uniqueConstraints.name",
@@ -278,6 +291,20 @@ exports[`MetaSchemaPlugin _meta query contract has stable printed GraphQL text 1
       storage {
         isFilesTable
         isBucketsTable
+        filesType
+        bucketsType
+        downloadUrlField
+        upload {
+          mutation
+          inputType
+          payloadType
+          bulkMutation
+          bulkInputType
+          bulkPayloadType
+          bulkFileInputType
+          bulkFilePayloadType
+          requiresOwnerId
+        }
       }
       search {
         algorithms

@@ -66,9 +66,18 @@ function createMockBuild(
   schemas: string[] = ['app_public'],
   overrides: Record<string, any> = {}
 ) {
+  const resourceList = Object.values(resources).filter((resource: any) => resource.codec);
   const baseBuild = {
     input: {
-      pgRegistry: { pgResources: resources }
+      pgRegistry: {
+        pgResources: resources,
+        pgCodecs: Object.fromEntries(
+          resourceList.map((resource: any) => [resource.codec.name, resource.codec])
+        ),
+        pgRelations: Object.fromEntries(
+          resourceList.map((resource: any) => [resource.codec.name, resource.relations || {}])
+        )
+      }
     },
     inflection: {
       tableType: (codec: any) =>
@@ -390,7 +399,24 @@ query MetaContract {
           rightTable { name }
         }
       }
-      storage { isFilesTable isBucketsTable }
+      storage {
+        isFilesTable
+        isBucketsTable
+        filesType
+        bucketsType
+        downloadUrlField
+        upload {
+          mutation
+          inputType
+          payloadType
+          bulkMutation
+          bulkInputType
+          bulkPayloadType
+          bulkFileInputType
+          bulkFilePayloadType
+          requiresOwnerId
+        }
+      }
       search {
         algorithms
         columns { name algorithm }
@@ -479,6 +505,18 @@ const REQUIRED_META_QUERY_PATHS = [
   'relations.manyToMany.rightTable.name',
   'storage.isFilesTable',
   'storage.isBucketsTable',
+  'storage.filesType',
+  'storage.bucketsType',
+  'storage.downloadUrlField',
+  'storage.upload.mutation',
+  'storage.upload.inputType',
+  'storage.upload.payloadType',
+  'storage.upload.bulkMutation',
+  'storage.upload.bulkInputType',
+  'storage.upload.bulkPayloadType',
+  'storage.upload.bulkFileInputType',
+  'storage.upload.bulkFilePayloadType',
+  'storage.upload.requiresOwnerId',
   'search.algorithms',
   'search.columns.name',
   'search.columns.algorithm',
@@ -2182,7 +2220,106 @@ describe('MetaSchemaPlugin', () => {
       expect(tables[0].storage).toBeNull();
     });
 
-    it('detects @storageFiles tagged tables', () => {
+    function createStoragePlaneResources(
+      filesName: string,
+      bucketsName: string,
+      opts: { ownerId?: boolean } = {}
+    ): Record<string, any> {
+      const bucketsCodec = createMockCodec(bucketsName, {
+        id: createMockAttribute('uuid'),
+        key: createMockAttribute('text'),
+        ...(opts.ownerId ? { owner_id: createMockAttribute('uuid') } : {})
+      });
+      (bucketsCodec as any).extensions = {
+        ...bucketsCodec.extensions,
+        tags: { storageBuckets: true }
+      };
+      const filesCodec = createMockCodec(filesName, {
+        id: createMockAttribute('uuid'),
+        key: createMockAttribute('text'),
+        bucket_id: createMockAttribute('uuid')
+      });
+      (filesCodec as any).extensions = {
+        ...filesCodec.extensions,
+        tags: { storageFiles: true }
+      };
+      return {
+        [filesName]: {
+          codec: filesCodec,
+          uniques: [],
+          relations: {
+            [`${filesName}_bucket_fkey`]: {
+              isReferencee: false,
+              localAttributes: ['bucket_id'],
+              remoteAttributes: ['id'],
+              remoteResource: { codec: bucketsCodec }
+            }
+          }
+        },
+        [bucketsName]: { codec: bucketsCodec, uniques: [], relations: {} }
+      };
+    }
+
+    it('reports the full plane surface for @storageFiles tables', () => {
+      const build = createMockBuild(createStoragePlaneResources('app_file', 'app_bucket'));
+      const tables = callInitHook(build);
+      const files = tables.find((t: any) => t.tableName === 'app_file');
+      expect(files.storage).toEqual({
+        isFilesTable: true,
+        isBucketsTable: false,
+        filesType: 'AppFile',
+        bucketsType: 'AppBucket',
+        downloadUrlField: 'downloadUrl',
+        upload: {
+          mutation: 'uploadAppFile',
+          inputType: 'UploadAppFileInput',
+          payloadType: 'UploadAppFilePayload',
+          bulkMutation: 'uploadAppFiles',
+          bulkInputType: 'UploadAppFileBulkInput',
+          bulkPayloadType: 'UploadAppFileBulkPayload',
+          bulkFileInputType: 'UploadAppFileBulkFileInput',
+          bulkFilePayloadType: 'UploadAppFileBulkFilePayload',
+          requiresOwnerId: false
+        }
+      });
+    });
+
+    it('reports the same plane from the @storageBuckets side', () => {
+      const build = createMockBuild(createStoragePlaneResources('app_file', 'app_bucket'));
+      const tables = callInitHook(build);
+      const buckets = tables.find((t: any) => t.tableName === 'app_bucket');
+      expect(buckets.storage).toMatchObject({
+        isFilesTable: false,
+        isBucketsTable: true,
+        filesType: 'AppFile',
+        bucketsType: 'AppBucket',
+        downloadUrlField: null
+      });
+      expect(buckets.storage.upload.mutation).toBe('uploadAppFile');
+    });
+
+    it('pairs unprefixed files/buckets tables (database-scope planes)', () => {
+      const build = createMockBuild(createStoragePlaneResources('files', 'buckets'));
+      const tables = callInitHook(build);
+      const files = tables.find((t: any) => t.tableName === 'files');
+      expect(files.storage).toMatchObject({
+        isFilesTable: true,
+        filesType: 'Files',
+        bucketsType: 'Buckets'
+      });
+      expect(files.storage.upload.mutation).toBe('uploadFiles');
+    });
+
+    it('reports requiresOwnerId for entity-keyed planes', () => {
+      const build = createMockBuild(
+        createStoragePlaneResources('data_room_file', 'data_room_bucket', { ownerId: true })
+      );
+      const tables = callInitHook(build);
+      const files = tables.find((t: any) => t.tableName === 'data_room_file');
+      expect(files.storage.upload.requiresOwnerId).toBe(true);
+    });
+
+    it('throws for a @storageFiles table with no FK to a @storageBuckets table', () => {
       const codec = createMockCodec('app_file', {
         id: createMockAttribute('uuid'),
         key: createMockAttribute('text'),
@@ -2195,30 +2332,7 @@ describe('MetaSchemaPlugin', () => {
       const build = createMockBuild({
         app_file: { codec, uniques: [], relations: {} }
       });
-      const tables = callInitHook(build);
-      expect(tables[0].storage).toEqual({
-        isFilesTable: true,
-        isBucketsTable: false
-      });
-    });
-
-    it('detects @storageBuckets tagged tables', () => {
-      const codec = createMockCodec('app_bucket', {
-        id: createMockAttribute('uuid'),
-        key: createMockAttribute('text')
-      });
-      (codec as any).extensions = {
-        ...codec.extensions,
-        tags: { storageBuckets: true }
-      };
-      const build = createMockBuild({
-        app_bucket: { codec, uniques: [], relations: {} }
-      });
-      const tables = callInitHook(build);
-      expect(tables[0].storage).toEqual({
-        isFilesTable: false,
-        isBucketsTable: true
-      });
+      expect(() => callInitHook(build)).toThrow(/STORAGE_PLANE_UNPAIRED/);
     });
   });
 

@@ -238,12 +238,32 @@ function createMetaSchemaType(): GraphQLObjectType {
     })
   });
 
+  const MetaStorageUploadType = new GraphQLObjectType({
+    name: 'MetaStorageUpload',
+    description: 'The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from',
+    fields: () => ({
+      mutation: { type: nn(GraphQLString), description: 'Root mutation field for single-file upload (e.g. uploadAppFile)' },
+      inputType: { type: nn(GraphQLString), description: 'Input type of the single upload mutation' },
+      payloadType: { type: nn(GraphQLString), description: 'Payload type of the single upload mutation' },
+      bulkMutation: { type: nn(GraphQLString), description: 'Root mutation field for bulk upload' },
+      bulkInputType: { type: nn(GraphQLString), description: 'Input type of the bulk upload mutation' },
+      bulkPayloadType: { type: nn(GraphQLString), description: 'Payload type of the bulk upload mutation' },
+      bulkFileInputType: { type: nn(GraphQLString), description: 'Per-file input type inside the bulk input' },
+      bulkFilePayloadType: { type: nn(GraphQLString), description: 'Per-file payload type inside the bulk payload' },
+      requiresOwnerId: { type: nn(GraphQLBoolean), description: 'Whether the upload input requires ownerId (entity-keyed plane)' }
+    })
+  });
+
   const MetaStorageType = new GraphQLObjectType({
     name: 'MetaStorage',
     description: 'Storage metadata for a table',
     fields: () => ({
       isFilesTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage files table' },
-      isBucketsTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage buckets table' }
+      isBucketsTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage buckets table' },
+      filesType: { type: nn(GraphQLString), description: 'GraphQL type name of the plane\'s files table' },
+      bucketsType: { type: nn(GraphQLString), description: 'GraphQL type name of the plane\'s buckets table' },
+      downloadUrlField: { type: GraphQLString, description: 'Computed download-URL field on the files type; null on the buckets side' },
+      upload: { type: nn(MetaStorageUploadType), description: 'The plane\'s GraphQL upload surface' }
     })
   });
 

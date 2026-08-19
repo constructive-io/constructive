@@ -133,7 +133,7 @@ function buildTableMeta(
     manyToMany
   };
 
-  const storage = buildStorageMeta(codec);
+  const storage = buildStorageMeta(codec, context.build);
   const search = buildSearchMeta(codec, context.build, context.inflectAttr);
   const i18n = buildI18nMeta(codec, context.build, context.inflectAttr);
   const realtime = buildRealtimeMeta(codec, context.build);

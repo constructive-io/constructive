@@ -143,6 +143,23 @@ export function discoverStoragePlanes(pgRegistry: StoragePgRegistry): StoragePla
 
   const pairs = filesCodecs.map((filesCodec) => pairStoragePlane(filesCodec, pgRegistry));
 
+  const bucketsPairCounts = new Map<StorageCodec, StoragePlanePair[]>();
+  for (const pair of pairs) {
+    const existing = bucketsPairCounts.get(pair.bucketsCodec) ?? [];
+    existing.push(pair);
+    bucketsPairCounts.set(pair.bucketsCodec, existing);
+  }
+  for (const [bucketsCodec, bucketPairs] of bucketsPairCounts) {
+    if (bucketPairs.length > 1) {
+      const sources = bucketPairs.map((pair) => codecSqlName(pair.filesCodec)).join(', ');
+      throw new Error(
+        `STORAGE_PLANE_AMBIGUOUS: @storageBuckets table ${codecSqlName(bucketsCodec)} is ` +
+        `referenced by ${bucketPairs.length} @storageFiles tables (${sources}); every ` +
+        `buckets table must be the FK target of exactly one files table.`,
+      );
+    }
+  }
+
   const pairedBuckets = new Set(pairs.map((pair) => pair.bucketsCodec));
   const orphanBuckets = bucketsCodecs.filter((codec) => !pairedBuckets.has(codec));
   if (orphanBuckets.length > 0) {

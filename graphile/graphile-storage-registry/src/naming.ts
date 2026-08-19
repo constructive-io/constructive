@@ -10,6 +10,13 @@
 
 import type { StorageCodec } from './pairing';
 
+/**
+ * The computed field the download plugin adds to every files type. One
+ * definition so the emitter (download-url-field.ts) and the reporters
+ * (`_meta`, dynamic clients) cannot disagree.
+ */
+export const DOWNLOAD_URL_FIELD = 'downloadUrl';
+
 /** The slice of `build.inflection` the naming derivation reads. */
 export interface StorageInflection {
   tableType(codec: StorageCodec): string;
