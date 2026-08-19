@@ -14,6 +14,13 @@ const writeSkill = (root: string, name: string, body: string) => {
   );
 };
 
+/**
+ * The base layer is fetched over HTTP, and these cases are about what assembly
+ * does when it cannot be had — so the fetch is refused here rather than left to
+ * reach api.github.com, where a slow lookup read as a test timeout.
+ */
+const offline = () => Promise.reject(new Error('offline: no network in this test'));
+
 describe('agent skills assembly', () => {
   let home: string;
 
@@ -29,6 +36,7 @@ describe('agent skills assembly', () => {
     const config = loadConfig(home);
     config.skillsRepo = 'example/does-not-exist';
     config.skillsPin = 'v0.0.0';
+    config.skillsFetch = offline;
     const resolved = await assembleSkills(config);
     expect(fs.existsSync(config.overlayDir)).toBe(true);
     expect(resolved).toEqual([]);
@@ -38,6 +46,7 @@ describe('agent skills assembly', () => {
     const config = loadConfig(home);
     config.skillsRepo = 'example/does-not-exist';
     config.skillsPin = 'v9.9.9';
+    config.skillsFetch = offline;
     // Seed a fake cached release so the offline fallback picks it up.
     const releaseDir = path.join(config.dirs.skillsRoot, '9.9.9', '.agents', 'skills');
     writeSkill(releaseDir, 'alpha', 'base alpha');

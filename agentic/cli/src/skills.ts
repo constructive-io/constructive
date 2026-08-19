@@ -25,7 +25,8 @@ async function baseSource(config: AgentCliConfig, log: (msg: string) => void): P
       repo: config.skillsRepo,
       pin: config.skillsPin,
       skillsRoot: config.dirs.skillsRoot,
-      token: process.env.GITHUB_TOKEN
+      token: process.env.GITHUB_TOKEN,
+      ...(config.skillsFetch ? { fetchImpl: config.skillsFetch } : {})
     });
     log(`skills base: ${config.skillsRepo}@${release.version}${release.fromCache ? ' (cached)' : ''}`);
     return new DirectorySkillSource(BASE_LAYER, release.skillsDir);
