@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`buildDownloadUrlDocument() builds the query from the surface node field and download field 1`] = `
+"query FileDownloadUrlQuery($id: UUID!) {
+  file(id: $id) {
+    id
+    downloadUrl
+  }
+}"
+`;
+
+exports[`buildUploadDocument() builds the mutation entirely from the surface 1`] = `
+"mutation UploadFileMutation($input: UploadFileInput!) {
+  uploadFile(input: $input) {
+    uploadUrl
+    fileId
+    key
+    deduplicated
+    expiresAt
+    previousVersionId
+  }
+}"
+`;

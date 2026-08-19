@@ -1,3 +1,4 @@
+import type { StorageUploadSurface } from '../storage/types';
 import type { MetaFieldType } from '../types';  // resolves to types/index.ts
 
 // Input schema types (from _meta query response)
@@ -25,6 +26,15 @@ interface MetaSchemaRelations {
   belongsTo: MetaSchemaBelongsTo[];
 }
 
+interface MetaSchemaStorage {
+  isFilesTable: boolean;
+  isBucketsTable: boolean;
+  filesType: string;
+  bucketsType: string;
+  downloadUrlField: string | null;
+  upload: StorageUploadSurface;
+}
+
 interface MetaSchemaTable {
   name: string;
   fields: MetaSchemaField[];
@@ -32,6 +42,7 @@ interface MetaSchemaTable {
   uniqueConstraints: MetaSchemaConstraint[];
   foreignKeyConstraints: MetaSchemaForeignConstraint[];
   relations: MetaSchemaRelations;
+  storage?: MetaSchemaStorage | null;
 }
 
 interface MetaSchemaInput {
@@ -65,6 +76,7 @@ interface ConvertedTable {
   primaryConstraints: ConvertedConstraint[];
   uniqueConstraints: ConvertedConstraint[];
   foreignConstraints: ConvertedForeignConstraint[];
+  storage?: MetaSchemaStorage;
 }
 
 interface ConvertedMetaObject {
@@ -95,6 +107,7 @@ export function convertFromMetaSchema(
         table.foreignKeyConstraints,
         table.relations,
       ),
+      ...(table.storage ? { storage: table.storage } : {}),
     });
   }
 

@@ -24,6 +24,7 @@ import 'graphile-build';
 import { Logger } from '@pgpmjs/logger';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { DOWNLOAD_URL_FIELD } from 'graphile-storage-registry';
 
 import { withRequestPgClient } from './request-pg-client';
 import { generatePresignedGetUrl } from './s3-signer';
@@ -118,8 +119,8 @@ export function createDownloadUrlPlugin(
           return build.extend(
             fields,
             {
-              downloadUrl: context.fieldWithHooks(
-                { fieldName: 'downloadUrl' } as any,
+              [DOWNLOAD_URL_FIELD]: context.fieldWithHooks(
+                { fieldName: DOWNLOAD_URL_FIELD } as any,
                 {
                   description:
                     'URL to download this file. For public files, returns the public URL. ' +

@@ -1,5 +1,5 @@
 export type { StorageInflection, UploadSurfaceNames } from './naming';
-export { uploadSurfaceNames } from './naming';
+export { DOWNLOAD_URL_FIELD, uploadSurfaceNames } from './naming';
 export type {
   StorageCodec,
   StorageCodecAttributes,

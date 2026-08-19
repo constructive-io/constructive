@@ -28,6 +28,9 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
+  "dependencies": {
+    "graphile-storage-registry": "workspace:^"
+  },
   "devDependencies": {
     "@types/node": "^22.19.11",
     "makage": "^0.3.0"

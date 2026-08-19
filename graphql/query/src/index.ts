@@ -39,5 +39,8 @@ export * from './client';
 // Introspection utilities (infer-tables, transform, transform-schema, schema-query)
 export * from './introspect';
 
+// Dynamic storage client (discover planes from _meta, build upload documents)
+export * from './storage';
+
 // Utility functions
 export { parseSmartTags, stripSmartComments } from './utils';

@@ -1,6 +1,15 @@
+import {
+  discoverStoragePlanes,
+  DOWNLOAD_URL_FIELD,
+  type StoragePgRegistry,
+  type StoragePlanePair,
+  uploadSurfaceNames,
+} from 'graphile-storage-registry';
+
 import type {
   I18nFieldMeta,
   I18nMeta,
+  MetaBuild,
   PgCodec,
   RealtimeMeta,
   SearchColumnMeta,
@@ -9,11 +18,46 @@ import type {
   StorageMeta,
 } from './types';
 
+const planesCache = new WeakMap<object, StoragePlanePair[]>();
+
 /**
- * Detect storage metadata from a codec's smart tags.
- * Storage tables are identified by @storageFiles and @storageBuckets smart tags.
+ * Discover the registry's storage planes once per registry. Pairing comes from
+ * the registry's actual files→buckets FK relations (graphile-storage-registry),
+ * never from table names; a tagged table that cannot be paired throws.
  */
-export function buildStorageMeta(codec: PgCodec): StorageMeta | null {
+function storagePlanesForBuild(build: MetaBuild): StoragePlanePair[] {
+  const registry = build.input.pgRegistry;
+  const cached = planesCache.get(registry);
+  if (cached) return cached;
+
+  const pgCodecs =
+    registry.pgCodecs ??
+    Object.fromEntries(
+      Object.values(registry.pgResources)
+        .map((resource: any) => resource.codec)
+        .filter(Boolean)
+        .map((codec: any) => [codec.name, codec]),
+    );
+
+  const storageRegistry: StoragePgRegistry = {
+    pgCodecs: pgCodecs as StoragePgRegistry['pgCodecs'],
+    pgRelations: (registry.pgRelations ?? {}) as StoragePgRegistry['pgRelations'],
+  };
+
+  const planes = discoverStoragePlanes(storageRegistry);
+  planesCache.set(registry, planes);
+  return planes;
+}
+
+/**
+ * Build storage metadata for a codec tagged @storageFiles or @storageBuckets.
+ *
+ * The plane pairing and upload-surface names derive from the same registry
+ * facts and inflection the presigned-url plugin emits from, so `_meta` and the
+ * emitted schema cannot disagree. A tagged table with no valid plane is a
+ * provisioning bug and throws rather than reporting a partial surface.
+ */
+export function buildStorageMeta(codec: PgCodec, build: MetaBuild): StorageMeta | null {
   const tags = (codec as any).extensions?.tags;
   if (!tags) return null;
 
@@ -22,9 +66,37 @@ export function buildStorageMeta(codec: PgCodec): StorageMeta | null {
 
   if (!isFilesTable && !isBucketsTable) return null;
 
+  const planes = storagePlanesForBuild(build);
+  const plane = planes.find(
+    (candidate) => candidate.filesCodec === (codec as any) || candidate.bucketsCodec === (codec as any),
+  );
+  if (!plane) {
+    throw new Error(
+      `STORAGE_PLANE_UNPAIRED: storage-tagged table ${codec.name} belongs to no ` +
+      `discovered storage plane; check its @storageFiles/@storageBuckets smart tags ` +
+      `and the files table's FK to its buckets table.`,
+    );
+  }
+
+  const names = uploadSurfaceNames(build.inflection as any, plane.filesCodec);
+
   return {
     isFilesTable,
     isBucketsTable,
+    filesType: names.filesTypeName,
+    bucketsType: build.inflection.tableType(plane.bucketsCodec as any),
+    downloadUrlField: isFilesTable ? DOWNLOAD_URL_FIELD : null,
+    upload: {
+      mutation: names.uploadMutation,
+      inputType: names.uploadInputType,
+      payloadType: names.uploadPayloadType,
+      bulkMutation: names.bulkUploadMutation,
+      bulkInputType: names.bulkUploadInputType,
+      bulkPayloadType: names.bulkUploadPayloadType,
+      bulkFileInputType: names.bulkUploadFileInputType,
+      bulkFilePayloadType: names.bulkUploadFilePayloadType,
+      requiresOwnerId: plane.hasOwnerId,
+    },
   };
 }
 

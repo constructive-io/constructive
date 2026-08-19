@@ -36,11 +36,43 @@ export interface ScopeMeta {
   source: 'smartTag';
 }
 
+/** The GraphQL upload surface of a storage plane, derived from the same
+ * registry facts and inflection the presigned-url plugin emits from. */
+export interface StorageUploadMeta {
+  /** Root mutation field for single-file upload (e.g. `uploadAppFile`) */
+  mutation: string;
+  /** Input type of the single upload mutation (e.g. `UploadAppFileInput`) */
+  inputType: string;
+  /** Payload type of the single upload mutation (e.g. `UploadAppFilePayload`) */
+  payloadType: string;
+  /** Root mutation field for bulk upload (e.g. `uploadAppFiles`) */
+  bulkMutation: string;
+  /** Input type of the bulk upload mutation (e.g. `UploadAppFileBulkInput`) */
+  bulkInputType: string;
+  /** Payload type of the bulk upload mutation (e.g. `UploadAppFileBulkPayload`) */
+  bulkPayloadType: string;
+  /** Per-file input type inside the bulk input (e.g. `UploadAppFileBulkFileInput`) */
+  bulkFileInputType: string;
+  /** Per-file payload type inside the bulk payload (e.g. `UploadAppFileBulkFilePayload`) */
+  bulkFilePayloadType: string;
+  /** Whether the upload input requires `ownerId` (the plane is entity-keyed:
+   * its buckets table carries an `owner_id` column) */
+  requiresOwnerId: boolean;
+}
+
 export interface StorageMeta {
   /** Whether this table is tagged as a storage files table */
   isFilesTable: boolean;
   /** Whether this table is tagged as a storage buckets table */
   isBucketsTable: boolean;
+  /** GraphQL type name of the plane's files table (e.g. `AppFile`) */
+  filesType: string;
+  /** GraphQL type name of the plane's buckets table (e.g. `AppBucket`) */
+  bucketsType: string;
+  /** Computed download-URL field on the files type (`downloadUrl`); null on the buckets side */
+  downloadUrlField: string | null;
+  /** The plane's GraphQL upload surface */
+  upload: StorageUploadMeta;
 }
 
 export interface SearchColumnMeta {
@@ -396,6 +428,8 @@ export interface MetaBuild extends GqlTypeResolverBuild {
   input: {
     pgRegistry: {
       pgResources: Record<string, PgTableResource>;
+      pgCodecs?: Record<string, PgCodec>;
+      pgRelations?: Record<string, Record<string, unknown>>;
     };
   };
   inflection: MetaInflection;
