@@ -215,6 +215,22 @@ importers:
         version: 1.1.38
     publishDirectory: dist
 
+  agentic/dsh:
+    dependencies:
+      '@agentic-kit/db-tools':
+        specifier: workspace:^
+        version: link:../db-tools/dist
+      '@agentic-kit/harness':
+        specifier: workspace:^
+        version: link:../harness/dist
+      '@agentic-kit/run-log':
+        specifier: workspace:^
+        version: link:../run-log/dist
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    publishDirectory: dist
+
   agentic/harness:
     dependencies:
       appstash:

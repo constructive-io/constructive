@@ -67,6 +67,7 @@ export {
   resolveDataToken,
   resolveProjectContext,
 } from './context';
+export { constructiveGateDeps, type ConstructiveGateResolvers } from './gate';
 export {
   type ActiveDataToken,
   configureHost,

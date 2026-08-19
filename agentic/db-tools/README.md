@@ -31,6 +31,7 @@ npm install @agentic-kit/db-tools
 - **Host injection** — credentials, backend endpoints and data-plane tokens come from the host application, not from the package. Call `configureHost()` once at startup; the tools read it lazily per call.
 - **Project context** — `resolveProjectContext` / `resolveDataToken` resolve the database a tool acts on from the cwd's `.env` plus the host's session, and `deriveSubdomainEndpoint` derives its per-database endpoints.
 - **Provisioning model** — the pinned `node-type-registry` presets, the provision manifest, and overlay resolution (`resolveProvisionModules`).
+- **`constructiveGateDeps`** — the confirm gate's host capabilities (is the project runnable, is there a data token, what tables would a template copy) answered by these resolvers, so every adapter gates the same tools against the same project state instead of restating it.
 - **`toolSchema`** — a tool's zod parameters as plain JSON Schema, for adapters whose harness wants JSON Schema rather than zod.
 
 ## Usage

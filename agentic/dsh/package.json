@@ -1,0 +1,45 @@
+{
+  "name": "@agentic-kit/dsh",
+  "version": "0.1.0",
+  "author": "Dan Lynch <pyramation@gmail.com>",
+  "description": "the DeepSeek Harness adapter for agentic-kit — Constructive's typed db tools and confirm gate as a dsh plugin, plus a dsh transcript reader for the run log",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@agentic-kit/db-tools": "workspace:^",
+    "@agentic-kit/harness": "workspace:^",
+    "@agentic-kit/run-log": "workspace:^",
+    "zod": "^4.4.3"
+  },
+  "keywords": [
+    "agentic-kit",
+    "harness",
+    "adapter",
+    "dsh",
+    "deepseek",
+    "constructive"
+  ]
+}
