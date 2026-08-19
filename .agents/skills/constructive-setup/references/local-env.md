@@ -44,7 +44,7 @@ Sets `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, and `PGDATABASE` for the local 
 ### 4. Bootstrap database users
 
 ```bash
-pgpm admin-users bootstrap --yes
+pgpm admin-users bootstrap --client --yes
 pgpm admin-users add --test --yes
 ```
 
