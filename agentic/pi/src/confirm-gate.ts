@@ -3,6 +3,7 @@ import type {
   resolveDataToken,
   resolveProjectContext
 } from '@agentic-kit/db-tools';
+import { constructiveGateDeps } from '@agentic-kit/db-tools';
 import type { ConfirmPreview } from '@agentic-kit/harness';
 import {
   type ConfirmGate as HarnessConfirmGate,
@@ -31,9 +32,9 @@ type RichConfirmUi = {
 
 // Thin pi adapter over the host-neutral gate in @agentic-kit/harness: pi's
 // ToolCallEvent/ExtensionContext are mapped onto the package's
-// GateToolCallEvent/GateHost, and the host-backed resolvers below are
-// wrapped into its ConfirmGateDeps. index.ts wires the real resolvers, tests
-// substitute fakes.
+// GateToolCallEvent/GateHost, and the host-backed resolvers below become its
+// deps through db-tools' `constructiveGateDeps`. index.ts wires the real
+// resolvers, tests substitute fakes.
 export type ConfirmGateDeps = {
   resolveProjectContext: typeof resolveProjectContext;
   resolveDataToken: typeof resolveDataToken;
@@ -61,31 +62,7 @@ export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
   const gate: HarnessConfirmGate = createHarnessConfirmGate(
     'policy' in options
       ? options
-      : {
-        gatedTools: options.gatedTools,
-        isProjectRunnable: async (cwd) => {
-          const resolved = await options.resolveProjectContext(cwd);
-          return resolved.context !== null;
-        },
-        hasDataToken: async (cwd) => {
-          const resolved = await options.resolveProjectContext(cwd);
-          if (!resolved.context) return false;
-          const token = await options.resolveDataToken(resolved.context);
-          return Boolean(token.token);
-        },
-        resolveTemplatePreview: async (cwd, blueprintName, displayName) => {
-          const resolved = await options.resolveProjectContext(cwd);
-          if (!resolved.context) return undefined;
-          const result = await options.createTemplatePreviewTables(resolved.context, blueprintName);
-          if (result.tables.length === 0) return undefined;
-          return {
-            kind: 'template',
-            displayName,
-            blueprintName: result.blueprintName || undefined,
-            tables: result.tables,
-          };
-        },
-      },
+      : { gatedTools: options.gatedTools, ...constructiveGateDeps(options) },
   );
 
   return {
