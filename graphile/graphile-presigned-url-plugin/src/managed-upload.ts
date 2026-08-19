@@ -92,11 +92,19 @@ export interface ManagedUploadTarget {
  *   * a registered column names its storage module, and either a logical bucket
  *     key or the reserved default tag for its declared publicness;
  *   * an unregistered column (a bare `image`/`upload` on a database provisioned
- *     before the registry) falls back to the app-scope module and the same
- *     reserved default tag. That is a *tenant* default, not an environment one.
+ *     before the registry) falls back to the database's single global storage
+ *     plane and the same reserved default tag. That is a *tenant* default, not
+ *     an environment one.
  *
- * A database with no storage module raises: there is nowhere tenant-owned to put
- * the bytes, and the deployment's configured bucket is not an answer.
+ * The fallback is by shape, not by scope name: a global plane is one with no
+ * entity key (`entity_table_id IS NULL`), which is what a database-wide plane is
+ * whether it registered as 'database', 'platform', or 'app'. Matching the name
+ * instead sent every tenant whose plane registers as 'database' — i.e. every
+ * database-scope plane — to STORAGE_MODULE_NOT_FOUND.
+ *
+ * A database with no global plane raises, and so does one with several: there is
+ * nowhere unambiguously tenant-owned to put the bytes, and the deployment's
+ * configured bucket is not an answer.
  */
 export async function resolveManagedUploadTarget(args: {
   options: PresignedUrlPluginOptions;
@@ -116,7 +124,7 @@ export async function resolveManagedUploadTarget(args: {
       return await getFileRefFieldBinding(pgClient, databaseId, field);
     } catch (err: any) {
       // An unregistered column is a legitimate state (it predates the registry)
-      // and falls back to the tenant's app-scope default below. Any other
+      // and falls back to the tenant's global plane below. Any other
       // failure — a broken connection, a missing registry table — is not.
       if (err?.name === 'FileRefFieldNotRegisteredError') return null;
       throw err;
@@ -127,9 +135,22 @@ export async function resolveManagedUploadTarget(args: {
     loadAllStorageModules(pgClient, databaseId),
   );
 
+  const globalConfigs = allConfigs.filter((c) => c.entityTableId === null);
+
+  if (!binding && globalConfigs.length > 1) {
+    // Several global planes and no registry row to disambiguate: picking one is
+    // picking a tenant's bucket at random. Name them and refuse.
+    throw new Error(
+      `STORAGE_MODULE_AMBIGUOUS: ${field.schemaName}.${field.tableName}.${field.columnName} is an ` +
+      `unregistered upload column and database ${databaseId} has ${globalConfigs.length} global ` +
+      `storage planes (scopes: ${globalConfigs.map((c) => c.scope).join(', ')}); register the column ` +
+      'so it names the plane it writes to',
+    );
+  }
+
   const storageConfig = binding
     ? allConfigs.find((c) => c.id === binding.storageModuleId)
-    : allConfigs.find((c) => c.scope === 'app');
+    : globalConfigs[0];
 
   if (!storageConfig) {
     throw new Error(
@@ -137,7 +158,7 @@ export async function resolveManagedUploadTarget(args: {
         ? `STORAGE_MODULE_NOT_FOUND: file_ref_field ${binding.id} names storage module ` +
           `${binding.storageModuleId}, which database ${databaseId} does not have`
         : `STORAGE_MODULE_NOT_FOUND: ${field.schemaName}.${field.tableName}.${field.columnName} is an ` +
-          `unregistered upload column and database ${databaseId} has no app-scope storage module to ` +
+          `unregistered upload column and database ${databaseId} has no global storage plane to ` +
           'default to; there is no environment bucket to fall back to',
     );
   }

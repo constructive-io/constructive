@@ -310,6 +310,68 @@ describe('resolveManagedUploadTarget', () => {
     ).rejects.toThrow('STORAGE_MODULE_NOT_FOUND');
   });
 
+  // The fallback for an unregistered column selects the database's single
+  // global plane by shape (no entity key), not by the name its scope happens to
+  // carry: a database-scope plane registers as 'database', and matching 'app'
+  // sent every one of them to STORAGE_MODULE_NOT_FOUND.
+  it('defaults an unregistered column to a database-scope plane', async () => {
+    const { resolveManagedUploadTarget } = await import('../src/managed-upload');
+    const db = fakeDb([
+      SET_CONFIG,
+      NO_REGISTRY_ROW,
+      {
+        match: /FROM metaschema_modules_public\.storage_module/,
+        rows: () => [storageModuleRow({
+          scope: 'database',
+          buckets_table: 'buckets',
+          files_table: 'files',
+        })],
+      },
+      { match: /resolve_default_bucket/, rows: () => [{ bucket_id: BUCKET_ID, resolved_key: 'default-public', bucket_type: 'public', physical_name: 'myapp-default-public-db' }] },
+      { match: /FROM storage_public\.buckets/, rows: () => [bucketRow()] },
+    ]);
+
+    const target = await resolveManagedUploadTarget({
+      options: options(),
+      withPgClient: db.withPgClient,
+      pgSettings: null,
+      databaseId: DATABASE_ID,
+      field: FIELD,
+      defaultPublicAccess: true,
+    });
+
+    expect(target.storageConfig.scope).toBe('database');
+    expect(target.physicalName).toBe('myapp-default-public-db');
+    const resolveCall = db.queries.find((q) => /resolve_default_bucket/.test(q.text));
+    expect(resolveCall?.values).toEqual([DATABASE_ID, 'database', null, true, null]);
+  });
+
+  it('refuses to guess between two global planes for an unregistered column', async () => {
+    const { resolveManagedUploadTarget } = await import('../src/managed-upload');
+    const db = fakeDb([
+      SET_CONFIG,
+      NO_REGISTRY_ROW,
+      {
+        match: /FROM metaschema_modules_public\.storage_module/,
+        rows: () => [
+          storageModuleRow({ scope: 'database', buckets_table: 'buckets', files_table: 'files' }),
+          storageModuleRow({ id: OTHER_MODULE_ID, scope: 'platform', buckets_table: 'platform_buckets', files_table: 'platform_files' }),
+        ],
+      },
+    ]);
+
+    await expect(
+      resolveManagedUploadTarget({
+        options: options(),
+        withPgClient: db.withPgClient,
+        pgSettings: null,
+        databaseId: DATABASE_ID,
+        field: FIELD,
+        defaultPublicAccess: true,
+      }),
+    ).rejects.toThrow('STORAGE_MODULE_AMBIGUOUS');
+  });
+
   it('raises when the registry names a module the database does not have', async () => {
     const { resolveManagedUploadTarget } = await import('../src/managed-upload');
     const db = fakeDb([
