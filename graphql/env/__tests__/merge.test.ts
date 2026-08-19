@@ -142,9 +142,10 @@ describe('getEnvOptions', () => {
     const result = getEnvOptions({}, process.cwd(), {});
 
     expect(result.graphile?.scopedIntrospection).toBe(false);
+    expect(result.graphile?.introspectionJit).toBe(false);
   });
 
-  it('parses the scoped introspection environment boolean', () => {
+  it('parses the scoped introspection environment booleans', () => {
     expect(
       getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: 'true' }).graphile
         ?.scopedIntrospection
@@ -166,6 +167,18 @@ describe('getEnvOptions', () => {
       getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: '' }).graphile
         ?.scopedIntrospection
     ).toBeUndefined();
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION_JIT: 'true' }).graphile
+        ?.introspectionJit
+    ).toBe(true);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION_JIT: 'false' }).graphile
+        ?.introspectionJit
+    ).toBe(false);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION_JIT: '' }).graphile
+        ?.introspectionJit
+    ).toBeUndefined();
   });
 
   it('honors config, env, and runtime priority for scoped introspection', () => {
@@ -173,19 +186,26 @@ describe('getEnvOptions', () => {
       path.join(os.tmpdir(), 'graphql-env-introspection-')
     );
     writeConfig(tempDir, {
-      graphile: { scopedIntrospection: false }
+      graphile: { scopedIntrospection: false, introspectionJit: false }
     });
 
-    expect(
-      getEnvOptions({}, tempDir, {
-        GRAPHILE_SCOPED_INTROSPECTION: 'true'
-      }).graphile?.scopedIntrospection
-    ).toBe(true);
-    expect(
-      getEnvOptions({ graphile: { scopedIntrospection: false } }, tempDir, {
-        GRAPHILE_SCOPED_INTROSPECTION: 'true'
-      }).graphile?.scopedIntrospection
-    ).toBe(false);
+    const envOptions = getEnvOptions({}, tempDir, {
+      GRAPHILE_SCOPED_INTROSPECTION: 'true',
+      GRAPHILE_SCOPED_INTROSPECTION_JIT: 'true'
+    });
+    expect(envOptions.graphile?.scopedIntrospection).toBe(true);
+    expect(envOptions.graphile?.introspectionJit).toBe(true);
+
+    const runtimeOptions = getEnvOptions(
+      { graphile: { scopedIntrospection: false, introspectionJit: false } },
+      tempDir,
+      {
+        GRAPHILE_SCOPED_INTROSPECTION: 'true',
+        GRAPHILE_SCOPED_INTROSPECTION_JIT: 'true'
+      }
+    );
+    expect(runtimeOptions.graphile?.scopedIntrospection).toBe(false);
+    expect(runtimeOptions.graphile?.introspectionJit).toBe(false);
   });
 
   it('parses SMS environment variables into typed options', () => {

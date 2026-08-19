@@ -8,6 +8,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   const {
     GRAPHILE_SCHEMA,
     GRAPHILE_SCOPED_INTROSPECTION,
+    GRAPHILE_SCOPED_INTROSPECTION_JIT,
 
     FEATURES_SIMPLE_INFLECTION,
     FEATURES_OPPOSITE_BASE_NAMES,
@@ -42,6 +43,9 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   const scopedIntrospection = parseEnvBoolean(
     GRAPHILE_SCOPED_INTROSPECTION
   );
+  const introspectionJit = parseEnvBoolean(
+    GRAPHILE_SCOPED_INTROSPECTION_JIT
+  );
   const hasSmsEnvOverrides = Boolean(
     SMS_PROVIDER ||
     SMS_SENDER_ID ||
@@ -57,7 +61,8 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
           : GRAPHILE_SCHEMA
       }),
-      ...(scopedIntrospection !== undefined && { scopedIntrospection })
+      ...(scopedIntrospection !== undefined && { scopedIntrospection }),
+      ...(introspectionJit !== undefined && { introspectionJit })
     },
     features: {
       ...(FEATURES_SIMPLE_INFLECTION && { simpleInflection: parseEnvBoolean(FEATURES_SIMPLE_INFLECTION) }),

@@ -1,9 +1,11 @@
-import type { ScopedIntrospectionServiceOptions } from '@constructive-io/graphql-types';
 import { PgIntrospectionPlugin } from 'graphile-build-pg';
 import { resolvePreset } from 'graphile-config';
 
 import { ConstructivePreset } from '../src/presets/constructive-preset';
-import { makeConfiguredPgService } from '../src/scoped-introspection-service';
+import {
+  makeConfiguredPgService,
+  type ScopedIntrospectionOptions,
+} from '../src/scoped-introspection-service';
 
 type TestUpstreamOptions = {
   pubsub?: boolean;
@@ -17,8 +19,7 @@ const makeUpstreamPgService = jest.fn((options: TestUpstreamOptions) => ({
   upstream: true,
 }));
 const makeScopedPgService = (
-  options: TestUpstreamOptions &
-    Omit<ScopedIntrospectionServiceOptions, 'scopedIntrospection'>
+  options: TestUpstreamOptions & ScopedIntrospectionOptions
 ) => makeConfiguredPgService(makeUpstreamPgService, options);
 
 describe('scoped introspection settings wiring', () => {
@@ -33,7 +34,11 @@ describe('scoped introspection settings wiring', () => {
       introspectionScopedCatalogTypes: 'dependency-closure',
       introspectionAllowedDependencySchemas: ['shared', 'shared'],
       introspectionCapabilityExtensions: ['pg_trgm', 'pg_trgm'],
-      pgSettingsForIntrospection: { statement_timeout: '30s' },
+      pgSettingsForIntrospection: {
+        statement_timeout: '30s',
+        jit: 'on',
+        work_mem: '1MB',
+      },
     });
 
     expect(service).toMatchObject({
@@ -45,7 +50,7 @@ describe('scoped introspection settings wiring', () => {
       pgSettingsForIntrospection: {
         statement_timeout: '30s',
         jit: 'off',
-        work_mem: '512kB',
+        work_mem: '1MB',
       },
     });
     expect(makeUpstreamPgService).toHaveBeenCalledWith({
@@ -54,8 +59,21 @@ describe('scoped introspection settings wiring', () => {
       pgSettingsForIntrospection: {
         statement_timeout: '30s',
         jit: 'off',
-        work_mem: '512kB',
+        work_mem: '1MB',
       },
+    });
+  });
+
+  it('enables introspection JIT only when explicitly configured', () => {
+    const service = makeScopedPgService({
+      pubsub: false,
+      introspectionJit: true,
+    });
+
+    expect(service.pgSettingsForIntrospection).toEqual({ jit: 'on' });
+    expect(makeUpstreamPgService).toHaveBeenCalledWith({
+      pubsub: false,
+      pgSettingsForIntrospection: { jit: 'on' },
     });
   });
 

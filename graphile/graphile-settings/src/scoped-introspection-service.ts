@@ -39,7 +39,9 @@ type UpstreamPgServiceOptions = {
 export type ScopedIntrospectionOptions = Omit<
   ScopedIntrospectionServiceOptions,
   'scopedIntrospection'
->;
+> & {
+  introspectionJit?: boolean;
+};
 
 /**
  * Apply CNC's scoped-introspection settings around an upstream PgService
@@ -57,6 +59,7 @@ export function makeConfiguredPgService<
     introspectionScopedCatalogTypes,
     introspectionAllowedDependencySchemas: configuredDependencySchemas,
     introspectionCapabilityExtensions: configuredCapabilityExtensions,
+    introspectionJit = false,
     ...upstreamOptions
   } = options;
   const introspectionCapabilityExtensions =
@@ -74,7 +77,7 @@ export function makeConfiguredPgService<
   const introspectionAllowedDependencySchemas =
     normalizeIntrospectionDependencySchemas(configuredDependencySchemas);
   const pgSettingsForIntrospection = resolveIntrospectionSettings(
-    true,
+    introspectionJit,
     options.pgSettingsForIntrospection
   );
   const service = makeUpstreamPgService({

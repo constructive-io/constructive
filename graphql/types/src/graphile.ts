@@ -21,6 +21,8 @@ export interface GraphileOptions {
   schema?: string | string[];
   /** Use CNC schema-scoped PostgreSQL introspection. */
   scopedIntrospection?: boolean;
+  /** Enable PostgreSQL JIT while running scoped introspection queries. */
+  introspectionJit?: boolean;
   /** Additional schemas that scoped dependency closure may retain. */
   introspectionDependencySchemas?: string[];
   /** Installed extensions whose optional capability metadata must be retained. */
@@ -71,6 +73,7 @@ export interface ApiOptions {
 export const graphileDefaults: GraphileOptions = {
   schema: [],
   scopedIntrospection: false,
+  introspectionJit: false,
   introspectionDependencySchemas: [],
   introspectionCapabilityExtensions: [],
   extends: [],
