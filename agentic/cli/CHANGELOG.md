@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.5](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.11.4...@agentic-kit/cli@0.11.5) (2026-08-19)
+
+### Bug Fixes
+
+- **cli:** let the caller supply the skills fetch so an offline assembly stays offline ([25f8cba](https://github.com/constructive-io/constructive/commit/25f8cbaa829314a67524a7d1757c54df460d25fc))
+
 ## [0.11.4](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.11.3...@agentic-kit/cli@0.11.4) (2026-08-19)
 
 **Note:** Version bump only for package @agentic-kit/cli

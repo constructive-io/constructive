@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.18.0](https://github.com/constructive-io/constructive/compare/node-type-registry@1.17.0...node-type-registry@1.18.0) (2026-08-19)
+
+### Features
+
+- **node-type-registry:** sync the CheckOwnedRelation node type from constructive-db ([ac9f88b](https://github.com/constructive-io/constructive/commit/ac9f88b5a6ec93efed8bd50f54853b091dbc308a))
+
 # [1.17.0](https://github.com/constructive-io/constructive/compare/node-type-registry@1.16.0...node-type-registry@1.17.0) (2026-08-18)
 
 ### Features
