@@ -62,12 +62,4 @@ describe('CNC-owned scoped introspection SQL', () => {
       "or pg_type.typnamespace = 'pg_catalog'::regnamespace"
     );
   });
-
-  it('rejects unknown options at the runtime boundary', () => {
-    expect(() =>
-      makeSchemaScopedIntrospectionQuery(['tenant_a'], {
-        unexpected: true,
-      } as never)
-    ).toThrow('Unsupported schema-scoped introspection option(s): unexpected');
-  });
 });

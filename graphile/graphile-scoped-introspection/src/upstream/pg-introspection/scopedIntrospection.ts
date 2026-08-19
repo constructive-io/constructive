@@ -345,41 +345,15 @@ export const makeSchemaScopedIntrospectionQuery = (
   schemas: readonly string[],
   options: SchemaScopedIntrospectionOptions = {}
 ): SchemaScopedIntrospectionQuery => {
-  if (!Array.isArray(schemas) || schemas.length === 0) {
+  if (schemas.length === 0) {
     throw new Error('Schema-scoped introspection requires at least one schema');
   }
-  if (
-    options === null ||
-    typeof options !== 'object' ||
-    Array.isArray(options)
-  ) {
-    throw new Error('Schema-scoped introspection options must be an object');
-  }
-  const unsupportedOptions = Object.keys(options).filter(
-    (key) => key !== 'catalogTypes' && key !== 'capabilityExtensions'
-  );
-  if (unsupportedOptions.length > 0) {
-    throw new Error(
-      `Unsupported schema-scoped introspection option(s): ${unsupportedOptions.join(', ')}`
-    );
-  }
   const catalogTypes = options.catalogTypes ?? 'all';
-  if (catalogTypes !== 'all' && catalogTypes !== 'dependency-closure') {
-    throw new Error(
-      `Unsupported schema-scoped catalog type policy '${catalogTypes}'`
-    );
-  }
   const capabilityExtensions = options.capabilityExtensions ?? [];
-  if (!Array.isArray(capabilityExtensions)) {
-    throw new Error(
-      'Schema-scoped introspection capabilityExtensions must be an array'
-    );
-  }
   const normalizedCapabilityExtensions = Array.from(
     new Set(
       capabilityExtensions.map((extension) => {
         if (
-          typeof extension !== 'string' ||
           extension.length === 0 ||
           extension.trim() !== extension ||
           extension.includes('\0')
@@ -395,7 +369,7 @@ export const makeSchemaScopedIntrospectionQuery = (
   const normalized = Array.from(
     new Set(
       schemas.map((schema) => {
-        if (typeof schema !== 'string' || schema.length === 0) {
+        if (schema.length === 0) {
           throw new Error(
             'Schema-scoped introspection schemas must be non-empty strings'
           );

@@ -33,16 +33,15 @@ export function assertDependencyClosureTypes(
   if (scopedCatalogTypes !== 'dependency-closure') return;
 
   const retainedTypeOids = new Set(
-    introspection.types.map((type) => String(type._id))
+    introspection.types.map((type) => type._id)
   );
   const requireType = (
-    oid: unknown,
+    oid: string | null | undefined,
     objectKind: string,
     objectContext: string,
     field: string
   ): void => {
-    if (oid === null || oid === undefined || String(oid) === '0') return;
-    const normalizedOid = String(oid);
+    if (oid === null || oid === undefined || oid === '0') return;
     // pg-introspection removes extension-owned composite resources from its
     // public arrays after building lookups. Validate the runtime lookup too.
     const introspectionLookups = (
@@ -51,16 +50,15 @@ export function assertDependencyClosureTypes(
       }
     )._lookups;
     const resolves =
-      retainedTypeOids.has(normalizedOid) ||
-      introspectionLookups?.typeById?.has(normalizedOid);
+      retainedTypeOids.has(oid) || introspectionLookups?.typeById?.has(oid);
     if (!resolves) {
       throw new Error(
-        `Dependency-closure introspection for service '${serviceName}' retained ${objectKind} '${objectContext}' field '${field}' referencing missing pg_type OID '${normalizedOid}'`
+        `Dependency-closure introspection for service '${serviceName}' retained ${objectKind} '${objectContext}' field '${field}' referencing missing pg_type OID '${oid}'`
       );
     }
   };
   const requireTypes = (
-    oids: readonly unknown[] | null | undefined,
+    oids: readonly string[] | null | undefined,
     objectKind: string,
     objectContext: string,
     field: string

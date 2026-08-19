@@ -3,7 +3,7 @@ export const normalizeIntrospectionDependencySchemas = (
 ): string[] => [
   ...new Set(
     (schemas ?? []).map((schema) => {
-      if (typeof schema !== 'string' || schema.trim().length === 0) {
+      if (schema.trim().length === 0) {
         throw new Error(
           'Introspection dependency schemas must be non-empty strings'
         );

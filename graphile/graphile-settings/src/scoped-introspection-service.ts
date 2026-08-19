@@ -7,29 +7,22 @@ import {
 
 const normalizeIntrospectionCapabilityExtensions = (
   extensions: readonly string[] | undefined
-): readonly string[] => {
-  if (extensions === undefined) return [];
-  if (!Array.isArray(extensions)) {
-    throw new Error('introspectionCapabilityExtensions must be an array');
-  }
-  return [
-    ...new Set(
-      extensions.map((extension) => {
-        if (
-          typeof extension !== 'string' ||
-          extension.length === 0 ||
-          extension.trim() !== extension ||
-          extension.includes('\0')
-        ) {
-          throw new Error(
-            'introspectionCapabilityExtensions must contain exact non-empty extension names'
-          );
-        }
-        return extension;
-      })
-    ),
-  ];
-};
+): readonly string[] => [
+  ...new Set(
+    (extensions ?? []).map((extension) => {
+      if (
+        extension.length === 0 ||
+        extension.trim() !== extension ||
+        extension.includes('\0')
+      ) {
+        throw new Error(
+          'introspectionCapabilityExtensions must contain exact non-empty extension names'
+        );
+      }
+      return extension;
+    })
+  ),
+];
 
 type UpstreamPgServiceOptions = {
   pgSettingsForIntrospection?:
@@ -65,15 +58,6 @@ export function makeConfiguredPgService<
   const introspectionCapabilityExtensions =
     normalizeIntrospectionCapabilityExtensions(configuredCapabilityExtensions);
 
-  if (
-    introspectionScopedCatalogTypes !== undefined &&
-    introspectionScopedCatalogTypes !== 'all' &&
-    introspectionScopedCatalogTypes !== 'dependency-closure'
-  ) {
-    throw new Error(
-      `Unsupported scoped catalog type policy '${introspectionScopedCatalogTypes}'`
-    );
-  }
   const introspectionAllowedDependencySchemas =
     normalizeIntrospectionDependencySchemas(configuredDependencySchemas);
   const pgSettingsForIntrospection = resolveIntrospectionSettings(

@@ -5,6 +5,9 @@ import deepmerge from 'deepmerge';
 import { getGraphQLEnvVars } from './env';
 
 type GraphileBooleanOption = 'scopedIntrospection' | 'introspectionJit';
+type GraphileStringArrayOption =
+  | 'introspectionDependencySchemas'
+  | 'introspectionCapabilityExtensions';
 
 const validateGraphileBooleanOption = (
   value: unknown,
@@ -12,6 +15,18 @@ const validateGraphileBooleanOption = (
 ): void => {
   if (value !== undefined && typeof value !== 'boolean') {
     throw new Error(`graphile.${option} must be a boolean`);
+  }
+};
+
+const validateGraphileStringArrayOption = (
+  value: unknown,
+  option: GraphileStringArrayOption
+): void => {
+  if (
+    value !== undefined &&
+    (!Array.isArray(value) || value.some((item) => typeof item !== 'string'))
+  ) {
+    throw new Error(`graphile.${option} must be an array of strings`);
   }
 };
 
@@ -70,6 +85,14 @@ export const getEnvOptions = (
   validateGraphileBooleanOption(
     options.graphile?.introspectionJit,
     'introspectionJit'
+  );
+  validateGraphileStringArrayOption(
+    options.graphile?.introspectionDependencySchemas,
+    'introspectionDependencySchemas'
+  );
+  validateGraphileStringArrayOption(
+    options.graphile?.introspectionCapabilityExtensions,
+    'introspectionCapabilityExtensions'
   );
 
   return options;
