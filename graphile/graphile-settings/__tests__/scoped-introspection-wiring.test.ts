@@ -27,7 +27,7 @@ describe('scoped introspection settings wiring', () => {
     makeUpstreamPgService.mockClear();
   });
 
-  it('normalizes scoped service configuration without forwarding CNC fields upstream', () => {
+  it('forwards scoped service configuration without interpreting it', () => {
     const service = makeScopedPgService({
       pubsub: false,
       schemas: ['tenant_a'],
@@ -45,8 +45,8 @@ describe('scoped introspection settings wiring', () => {
       schemas: ['tenant_a'],
       scopedIntrospection: true,
       introspectionScopedCatalogTypes: 'dependency-closure',
-      introspectionAllowedDependencySchemas: ['shared'],
-      introspectionCapabilityExtensions: ['pg_trgm'],
+      introspectionAllowedDependencySchemas: ['shared', 'shared'],
+      introspectionCapabilityExtensions: ['pg_trgm', 'pg_trgm'],
       pgSettingsForIntrospection: {
         statement_timeout: '30s',
         jit: 'off',
@@ -75,23 +75,6 @@ describe('scoped introspection settings wiring', () => {
       pubsub: false,
       pgSettingsForIntrospection: { jit: 'on' },
     });
-  });
-
-  it('fails deterministically on invalid scoped configuration', () => {
-    expect(() =>
-      makeScopedPgService({
-        pubsub: false,
-        introspectionCapabilityExtensions: [' pg_trgm'],
-      })
-    ).toThrow(
-      'introspectionCapabilityExtensions must contain exact non-empty extension names'
-    );
-    expect(() =>
-      makeScopedPgService({
-        pubsub: false,
-        introspectionAllowedDependencySchemas: ['pg_catalog'],
-      })
-    ).toThrow('must not be a system schema');
   });
 
   it('keeps ConstructivePreset on the upstream introspection plugin', () => {

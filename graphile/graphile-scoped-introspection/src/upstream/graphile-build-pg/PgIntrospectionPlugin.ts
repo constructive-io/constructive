@@ -38,6 +38,7 @@ import {
 
 import type { ScopedIntrospectionServiceOptions } from "./scopedOptions";
 import {
+  assertAllowedDependencySchemas,
   assertDependencyClosureTypes,
   assertScopedNamespaces,
 } from "./scopedValidation";
@@ -315,6 +316,7 @@ function getIntrospectionQuery(
   }
   const requiredSchemas = pgService.schemas ?? [];
   const dependencySchemas = configuredDependencySchemas ?? [];
+  assertAllowedDependencySchemas(dependencySchemas);
   return {
     query: makeSchemaScopedIntrospectionQuery(requiredSchemas, {
       catalogTypes: scopedCatalogTypes,
