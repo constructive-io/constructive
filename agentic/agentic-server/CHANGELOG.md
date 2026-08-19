@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.25.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.24.0...agentic-server@0.25.0) (2026-08-19)
+
+### Features
+
+- **agentic-server:** relay streaming chat completions and meter their usage ([f81bd00](https://github.com/constructive-io/constructive/commit/f81bd00d62e786089a950c59b0768376349b593e))
+
 # [0.24.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.23.1...agentic-server@0.24.0) (2026-08-18)
 
 **Note:** Version bump only for package agentic-server

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.20.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.20.2...graphql-server-test@3.20.3) (2026-08-19)
+
+### Bug Fixes
+
+- **uploads:** default an unregistered upload column by plane shape, not scope name ([1e32120](https://github.com/constructive-io/constructive/commit/1e32120e423d0893fd73e5fc4bbfec66d95dd9f0))
+
 ## [3.20.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.20.1...graphql-server-test@3.20.2) (2026-08-19)
 
 **Note:** Version bump only for package graphql-server-test

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.15.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.15.0...graphile-presigned-url-plugin@1.15.1) (2026-08-19)
+
+### Bug Fixes
+
+- **uploads:** default an unregistered upload column by plane shape, not scope name ([1e32120](https://github.com/constructive-io/constructive/commit/1e32120e423d0893fd73e5fc4bbfec66d95dd9f0))
+
 # [1.15.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.14.1...graphile-presigned-url-plugin@1.15.0) (2026-08-19)
 
 ### Features
