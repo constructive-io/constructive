@@ -1,5 +1,3 @@
-export const DEFAULT_INTROSPECTION_STATEMENT_TIMEOUT = '120s';
-
 export const normalizeIntrospectionDependencySchemas = (
   schemas: readonly string[] | null | undefined
 ): string[] => [
@@ -27,19 +25,9 @@ export const normalizeIntrospectionDependencySchemas = (
 ];
 
 export const resolveIntrospectionSettings = (
-  scopedIntrospection: boolean,
+  introspectionJit: boolean,
   settings: Record<string, string | undefined> | null | undefined
-): Record<string, string | undefined> => {
-  const boundedSettings = { ...settings };
-  if (!boundedSettings.statement_timeout) {
-    boundedSettings.statement_timeout = DEFAULT_INTROSPECTION_STATEMENT_TIMEOUT;
-  }
-  if (scopedIntrospection) {
-    return {
-      ...boundedSettings,
-      jit: 'off',
-      work_mem: '512kB',
-    };
-  }
-  return boundedSettings;
-};
+): Record<string, string | undefined> => ({
+  ...settings,
+  jit: introspectionJit ? 'on' : 'off',
+});

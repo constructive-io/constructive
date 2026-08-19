@@ -200,6 +200,7 @@ const preset = {
     makeScopedPgService({
       connectionString: 'postgres://user:pass@localhost/mydb',
       schemas: ['app_public'],
+      introspectionJit: false,
       introspectionAllowedDependencySchemas: ['shared'],
       introspectionCapabilityExtensions: ['pg_trgm'],
     }),
@@ -209,7 +210,11 @@ const preset = {
 
 The Constructive GraphQL server performs this pairing when
 `GRAPHILE_SCOPED_INTROSPECTION=true`; when unset or `false`, it does not load
-the scoped package.
+the scoped package. Scoped introspection sets PostgreSQL `jit` to `off` by
+default; set `introspectionJit: true` or
+`GRAPHILE_SCOPED_INTROSPECTION_JIT=true` to enable it. Other
+`pgSettingsForIntrospection` values are preserved but are not supplied with
+CNC defaults.
 
 ## Smart Tags Reference
 

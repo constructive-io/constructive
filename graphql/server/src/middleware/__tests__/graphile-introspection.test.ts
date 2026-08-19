@@ -41,6 +41,7 @@ describe('Graphile introspection mode wiring', () => {
       ['tenant_a'],
       {
         scopedIntrospection: true,
+        introspectionJit: true,
         introspectionDependencySchemas: ['shared'],
         introspectionCapabilityExtensions: ['pg_trgm'],
       },
@@ -55,9 +56,7 @@ describe('Graphile introspection mode wiring', () => {
       introspectionAllowedDependencySchemas: ['shared'],
       introspectionCapabilityExtensions: ['pg_trgm'],
       pgSettingsForIntrospection: {
-        statement_timeout: '120s',
-        jit: 'off',
-        work_mem: '512kB',
+        jit: 'on',
       },
     });
   });
@@ -71,6 +70,7 @@ describe('Graphile introspection mode wiring', () => {
       'capability extensions',
       { introspectionCapabilityExtensions: ['pg_trgm'] },
     ],
+    ['enabled introspection JIT', { introspectionJit: true }],
   ])('fails closed on %s while scoped introspection is disabled', async (_label, option) => {
     const loadScopedPreset = jest.fn(async () => ({}));
 
@@ -94,5 +94,16 @@ describe('Graphile introspection mode wiring', () => {
         jest.fn()
       )
     ).rejects.toThrow('graphile.scopedIntrospection must be a boolean');
+  });
+
+  it('rejects a non-boolean introspection JIT flag', async () => {
+    await expect(
+      makeIntrospectionWiring(
+        pool,
+        ['tenant_a'],
+        { scopedIntrospection: true, introspectionJit: 'true' } as never,
+        jest.fn()
+      )
+    ).rejects.toThrow('graphile.introspectionJit must be a boolean');
   });
 });
