@@ -14,7 +14,7 @@ ssh:
 	docker exec -it postgres /bin/bash
 
 roles:
-	pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
+	pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --client --yes
 	pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
 
 install:

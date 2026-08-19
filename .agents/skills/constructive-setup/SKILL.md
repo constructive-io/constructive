@@ -29,7 +29,7 @@ pgpm docker start --image docker.io/constructiveio/postgres-plus:18 --recreate
 eval "$(pgpm env)"
 
 # 3. Bootstrap database users
-pgpm admin-users bootstrap --yes
+pgpm admin-users bootstrap --client --yes
 pgpm admin-users add --test --yes
 
 # 4. Build the monorepo
@@ -70,7 +70,7 @@ For environment variable details, see the **pgpm** skill: [references/env.md](..
 Create the required PostgreSQL roles for Constructive's security model:
 
 ```bash
-pgpm admin-users bootstrap --yes
+pgpm admin-users bootstrap --client --yes
 pgpm admin-users add --test --yes
 ```
 

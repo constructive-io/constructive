@@ -22,7 +22,7 @@ pgpm docker start --image docker.io/constructiveio/postgres-plus:18 --recreate
 eval "$(pgpm env)"
 
 # 4. Bootstrap admin users for testing
-pgpm admin-users bootstrap --yes
+pgpm admin-users bootstrap --client --yes
 pgpm admin-users add --test --yes
 
 # 5. Build the monorepo

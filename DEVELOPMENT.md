@@ -29,7 +29,7 @@ pnpm build
 Seed the `app_user` roles used by tests:
 
 ```sh
-pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
+pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --client --yes
 pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
 ```
 
