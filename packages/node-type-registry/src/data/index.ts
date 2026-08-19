@@ -2,6 +2,7 @@ export { CheckGreaterThan } from './check-greater-than';
 export { CheckLessThan } from './check-less-than';
 export { CheckNotEqual } from './check-not-equal';
 export { CheckOneOf } from './check-one-of';
+export { CheckOwnedRelation } from './check-owned-relation';
 export { DataArchivable } from './data-archivable';
 export { DataBulk } from './data-bulk';
 export { DataCapabilities } from './data-capabilities';
