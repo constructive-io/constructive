@@ -288,14 +288,6 @@ function getIntrospectionQuery(
   const scopedCatalogTypes = configuredCatalogTypes ?? 'all';
 
   if (
-    scopedIntrospection !== undefined &&
-    typeof scopedIntrospection !== "boolean"
-  ) {
-    throw new Error(
-      `scopedIntrospection must be a boolean for service '${pgService.name}'`,
-    );
-  }
-  if (
     scopedCatalogTypes !== 'all' &&
     scopedCatalogTypes !== 'dependency-closure'
   ) {
@@ -303,7 +295,7 @@ function getIntrospectionQuery(
       `Unsupported scoped catalog type policy '${scopedCatalogTypes}' for service '${pgService.name}'`
     );
   }
-  if (scopedIntrospection !== true) {
+  if (!scopedIntrospection) {
     const configuredScopedOptions = [
       configuredCatalogTypes !== undefined
         ? "introspectionScopedCatalogTypes"

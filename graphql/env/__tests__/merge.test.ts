@@ -181,6 +181,22 @@ describe('getEnvOptions', () => {
     ).toBeUndefined();
   });
 
+  it.each(['scopedIntrospection', 'introspectionJit'] as const)(
+    'rejects a non-boolean graphile.%s value at the configuration boundary',
+    (option) => {
+      tempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), 'graphql-env-invalid-introspection-')
+      );
+      writeConfig(tempDir, {
+        graphile: { [option]: 'true' }
+      });
+
+      expect(() => getEnvOptions({}, tempDir, {})).toThrow(
+        `graphile.${option} must be a boolean`
+      );
+    }
+  );
+
   it('honors config, env, and runtime priority for scoped introspection', () => {
     tempDir = fs.mkdtempSync(
       path.join(os.tmpdir(), 'graphql-env-introspection-')

@@ -84,26 +84,4 @@ describe('Graphile introspection mode wiring', () => {
     ).rejects.toThrow(/require scopedIntrospection: true/);
     expect(loadScopedPreset).not.toHaveBeenCalled();
   });
-
-  it('rejects a non-boolean scoped introspection flag', async () => {
-    await expect(
-      makeIntrospectionWiring(
-        pool,
-        ['tenant_a'],
-        { scopedIntrospection: 'true' } as never,
-        jest.fn()
-      )
-    ).rejects.toThrow('graphile.scopedIntrospection must be a boolean');
-  });
-
-  it('rejects a non-boolean introspection JIT flag', async () => {
-    await expect(
-      makeIntrospectionWiring(
-        pool,
-        ['tenant_a'],
-        { scopedIntrospection: true, introspectionJit: 'true' } as never,
-        jest.fn()
-      )
-    ).rejects.toThrow('graphile.introspectionJit must be a boolean');
-  });
 });
