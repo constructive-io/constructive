@@ -9,6 +9,7 @@
  */
 
 export {
+  completionsBaseUrl,
   DEFAULT_PROVIDER_NAME,
   GATEWAY_API,
   type MeteredGateway,

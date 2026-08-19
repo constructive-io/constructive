@@ -3,7 +3,7 @@
  *
  * `agentic-server` speaks OpenAI's `/v1/chat/completions`, so routing a harness
  * through it needs no custom streaming code — only an endpoint whose `baseUrl` is
- * the gateway and whose headers carry the run's identity. Every harness worth
+ * the gateway's OpenAI api root and whose headers carry the run's identity. Every harness worth
  * adapting can already talk to an OpenAI-compatible endpoint, which is why this
  * resolution is neutral and only the registration is vendor-specific: an adapter
  * turns `MeteredGateway` into whatever its harness calls a provider.
@@ -41,7 +41,7 @@ export interface MeteredModelSpec {
 }
 
 export interface MeteredGatewayOptions {
-  /** Gateway root, e.g. `https://agentic.example.com` — not a `/v1` path. */
+  /** Gateway root, e.g. `https://agentic.example.com`; a trailing `/v1` is tolerated. */
   gatewayUrl: string;
   identity: MeteredIdentity;
   models: readonly MeteredModelSpec[];
@@ -83,7 +83,13 @@ export interface MeteredModel {
 
 const ZERO_COST = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } as const;
 
-/** Normalize the gateway root: absolute http(s), no trailing slash, no `/v1`. */
+/**
+ * Normalize the gateway root: absolute http(s), no trailing slash, no `/v1`.
+ *
+ * A caller who names the api root instead is answered the root it hangs under,
+ * so a deployment that spells its gateway either way reaches the same routes
+ * rather than one of them 404ing on the first model turn.
+ */
 export function normalizeGatewayUrl(gatewayUrl: string): string {
   const raw = gatewayUrl?.trim();
   if (!raw) throw new Error('metered model: gatewayUrl is required');
@@ -98,12 +104,19 @@ export function normalizeGatewayUrl(gatewayUrl: string): string {
     throw new Error(`metered model: gatewayUrl must be http(s), got ${parsed.protocol}`);
   }
 
-  const path = parsed.pathname.replace(/\/+$/, '');
-  // An OpenAI-compatible client appends `/v1/chat/completions`, so a baseUrl that
-  // already ends in `/v1` would request `/v1/v1/chat/completions` and 404 at the
-  // first model turn.
-  if (/\/v1$/.test(path)) throw new Error(`metered model: gatewayUrl must be the gateway root, not ${raw} (drop the /v1)`);
+  const path = parsed.pathname.replace(/\/+$/, '').replace(/\/v1$/, '');
   return `${parsed.origin}${path}`;
+}
+
+/**
+ * The OpenAI api root under a gateway root.
+ *
+ * An `openai-completions` client (pi-ai, the OpenAI SDKs, any harness built on
+ * either) appends `/chat/completions` to its `baseUrl` and nothing else, so the
+ * `/v1` belongs here rather than in the caller's environment.
+ */
+export function completionsBaseUrl(gatewayUrl: string): string {
+  return `${normalizeGatewayUrl(gatewayUrl)}/v1`;
 }
 
 export function resolveMeteredModel(spec: MeteredModelSpec): MeteredModel {
@@ -133,7 +146,7 @@ export function resolveMeteredGateway(options: MeteredGatewayOptions): MeteredGa
   return {
     providerName: options.providerName ?? DEFAULT_PROVIDER_NAME,
     displayName: options.displayName ?? 'Constructive (metered)',
-    baseUrl: normalizeGatewayUrl(options.gatewayUrl),
+    baseUrl: completionsBaseUrl(options.gatewayUrl),
     api: GATEWAY_API,
     headers,
     // Harnesses typically require an apiKey once models are declared; the gateway

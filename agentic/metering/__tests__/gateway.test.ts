@@ -1,6 +1,7 @@
 import {
   ACTOR_ID_HEADER,
   buildIdentityHeaders,
+  completionsBaseUrl,
   DATABASE_ID_HEADER,
   ENTITY_ID_HEADER,
   GATEWAY_API,
@@ -48,8 +49,9 @@ describe('normalizeGatewayUrl', () => {
     expect(normalizeGatewayUrl('https://example.com/gateway/')).toBe('https://example.com/gateway');
   });
 
-  it('rejects a /v1 suffix, which an openai-compatible client would double up', () => {
-    expect(() => normalizeGatewayUrl('https://example.com/v1')).toThrow(/drop the \/v1/);
+  it('answers the root for a caller who named the api root instead', () => {
+    expect(normalizeGatewayUrl('https://example.com/v1')).toBe('https://example.com');
+    expect(normalizeGatewayUrl('https://example.com/gateway/v1/')).toBe('https://example.com/gateway');
   });
 
   it('rejects relative and non-http urls', () => {
@@ -91,6 +93,16 @@ describe('resolveMeteredModel', () => {
   });
 });
 
+describe('completionsBaseUrl', () => {
+  // An openai-completions client appends `/chat/completions` and nothing else, so
+  // a baseUrl at the gateway root 404s on the first model turn.
+  it('is the api root under the gateway root, however the root was spelled', () => {
+    expect(completionsBaseUrl('https://agentic.example.com')).toBe('https://agentic.example.com/v1');
+    expect(completionsBaseUrl('https://agentic.example.com/v1')).toBe('https://agentic.example.com/v1');
+    expect(completionsBaseUrl('https://example.com/gateway/')).toBe('https://example.com/gateway/v1');
+  });
+});
+
 describe('resolveMeteredGateway', () => {
   it('resolves the gateway endpoint over the openai-completions api', () => {
     const config = resolveMeteredGateway({
@@ -99,7 +111,7 @@ describe('resolveMeteredGateway', () => {
       models
     });
 
-    expect(config.baseUrl).toBe('https://agentic.example.com');
+    expect(config.baseUrl).toBe('https://agentic.example.com/v1');
     expect(config.api).toBe(GATEWAY_API);
     expect(config.models).toHaveLength(1);
     expect(config.headers?.[DATABASE_ID_HEADER]).toBe('db-1');
