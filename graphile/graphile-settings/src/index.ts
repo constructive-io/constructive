@@ -70,10 +70,7 @@ export { makePgService };
 export const makeScopedPgService = (options: ScopedPgServiceOptions) =>
   makeConfiguredPgService(makePgService, options);
 
-export {
-  normalizeIntrospectionDependencySchemas,
-  resolveIntrospectionSettings
-} from './introspection-settings';
+export { resolveIntrospectionSettings } from './introspection-settings';
 
 // Presigned URL utilities
 export { getPresignedUrlS3Config } from './presigned-url-resolver';

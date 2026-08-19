@@ -1,5 +1,27 @@
 import type { Introspection, ScopedCatalogTypes } from "../pg-introspection";
 
+export function assertAllowedDependencySchemas(
+  schemas: readonly string[]
+): void {
+  for (const schema of schemas) {
+    if (schema.length === 0 || schema.trim() !== schema) {
+      throw new Error(
+        'Introspection dependency schemas must contain exact non-empty schema names'
+      );
+    }
+    if (schema === 'information_schema' || schema.startsWith('pg_')) {
+      throw new Error(
+        `Introspection dependency schema '${schema}' must not be a system schema`
+      );
+    }
+    if (schema.includes('\0')) {
+      throw new Error(
+        'Introspection dependency schemas must not contain NUL bytes'
+      );
+    }
+  }
+}
+
 export function assertScopedNamespaces(
   introspection: Introspection,
   requiredSchemas: readonly string[] | null,

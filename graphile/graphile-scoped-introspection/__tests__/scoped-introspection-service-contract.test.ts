@@ -91,4 +91,20 @@ describe('scoped introspection service identity contract', () => {
       ).rejects.toThrow(/require scopedIntrospection: true/);
     }
   );
+
+  it.each([
+    ['empty', '', 'exact non-empty schema names'],
+    ['surrounding whitespace', ' shared', 'exact non-empty schema names'],
+    ['system', 'pg_catalog', 'must not be a system schema'],
+    ['NUL', 'tenant\0a', 'must not contain NUL bytes'],
+  ])('rejects %s dependency schema names', async (_label, schema, message) => {
+    await expect(
+      gather({
+        plugins: [PgScopedIntrospectionPlugin, consumerPlugin],
+        pgServices: [
+          makeService({ introspectionAllowedDependencySchemas: [schema] }),
+        ],
+      })
+    ).rejects.toThrow(message);
+  });
 });

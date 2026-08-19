@@ -1,28 +1,6 @@
 import type { ScopedIntrospectionServiceOptions } from '@constructive-io/graphql-types';
 
-import {
-  normalizeIntrospectionDependencySchemas,
-  resolveIntrospectionSettings,
-} from './introspection-settings';
-
-const normalizeIntrospectionCapabilityExtensions = (
-  extensions: readonly string[] | undefined
-): readonly string[] => [
-  ...new Set(
-    (extensions ?? []).map((extension) => {
-      if (
-        extension.length === 0 ||
-        extension.trim() !== extension ||
-        extension.includes('\0')
-      ) {
-        throw new Error(
-          'introspectionCapabilityExtensions must contain exact non-empty extension names'
-        );
-      }
-      return extension;
-    })
-  ),
-];
+import { resolveIntrospectionSettings } from './introspection-settings';
 
 type UpstreamPgServiceOptions = {
   pgSettingsForIntrospection?:
@@ -55,11 +33,6 @@ export function makeConfiguredPgService<
     introspectionJit = false,
     ...upstreamOptions
   } = options;
-  const introspectionCapabilityExtensions =
-    normalizeIntrospectionCapabilityExtensions(configuredCapabilityExtensions);
-
-  const introspectionAllowedDependencySchemas =
-    normalizeIntrospectionDependencySchemas(configuredDependencySchemas);
   const pgSettingsForIntrospection = resolveIntrospectionSettings(
     introspectionJit,
     options.pgSettingsForIntrospection
@@ -73,7 +46,7 @@ export function makeConfiguredPgService<
     scopedIntrospection: true as const,
     introspectionScopedCatalogTypes:
       introspectionScopedCatalogTypes ?? 'dependency-closure',
-    introspectionAllowedDependencySchemas,
-    introspectionCapabilityExtensions,
+    introspectionAllowedDependencySchemas: configuredDependencySchemas ?? [],
+    introspectionCapabilityExtensions: configuredCapabilityExtensions ?? [],
   });
 }
