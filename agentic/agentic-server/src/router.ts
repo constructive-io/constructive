@@ -21,9 +21,46 @@ import {
   transformEmbedRequest,
   transformEmbedResponse
 } from './transforms';
-import type { AgenticServerOptions } from './types';
+import type { AgenticServerOptions, ResolvedProvider } from './types';
 
 const log = new Logger('agentic-server');
+
+/** How long an upstream reason may be before it stops being a message. */
+const UPSTREAM_REASON_LIMIT = 300;
+
+/**
+ * Name the upstream reason in the message itself.
+ *
+ * Harnesses surface `error.message` and nothing else, so a bare
+ * `LLM provider error: 400` reached a run as an unattributable failure while the
+ * reason — a rejected request shape, a missing key, an unknown model — sat
+ * unread in `error.upstream`.
+ */
+function upstreamErrorMessage(
+  provider: ResolvedProvider,
+  status: number,
+  body: string
+): string {
+  const parsed = ((): string => {
+    try {
+      const error = (JSON.parse(body) as { error?: unknown }).error;
+      if (typeof error === 'string') return error;
+      const message = (error as { message?: unknown } | undefined)?.message;
+      return typeof message === 'string' ? message : body;
+    } catch {
+      // Not every provider answers an error with JSON; the raw body is the reason.
+      return body;
+    }
+  })().trim().replace(/\s+/g, ' ');
+
+  const reason = parsed.length > UPSTREAM_REASON_LIMIT
+    ? `${parsed.slice(0, UPSTREAM_REASON_LIMIT)}…`
+    : parsed;
+
+  return reason
+    ? `${provider.type} provider error ${status}: ${reason}`
+    : `${provider.type} provider error ${status}`;
+}
 
 export const createRouter = (options: AgenticServerOptions): Router => {
   const router = Router();
@@ -110,7 +147,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
         }
 
         res.status(upstream.status).json({
-          error: { message: `LLM provider error: ${upstream.status}`, upstream: text }
+          error: { message: upstreamErrorMessage(provider, upstream.status, text), upstream: text }
         });
         return;
       }
@@ -253,7 +290,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
         }
 
         res.status(upstream.status).json({
-          error: { message: `LLM provider error: ${upstream.status}`, upstream: text }
+          error: { message: upstreamErrorMessage(provider, upstream.status, text), upstream: text }
         });
         return;
       }
