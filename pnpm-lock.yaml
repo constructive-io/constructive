@@ -1182,6 +1182,12 @@ importers:
       pg-introspection:
         specifier: 1.0.1
         version: 1.0.1
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
+      postgraphile:
+        specifier: 5.1.4
+        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
     publishDirectory: dist
 
   graphile/graphile-search:

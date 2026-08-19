@@ -32,7 +32,9 @@
     "@types/node": "^22.19.11",
     "graphql": "16.13.0",
     "makage": "^0.3.0",
-    "pg-introspection": "^1.0.1"
+    "pg-introspection": "^1.0.1",
+    "pgsql-test": "workspace:^",
+    "postgraphile": "5.1.4"
   },
   "peerDependencies": {
     "@dataplan/pg": "^1.1.1",
