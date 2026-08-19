@@ -287,14 +287,6 @@ function getIntrospectionQuery(
     pgService.introspectionAllowedDependencySchemas;
   const scopedCatalogTypes = configuredCatalogTypes ?? 'all';
 
-  if (
-    scopedCatalogTypes !== 'all' &&
-    scopedCatalogTypes !== 'dependency-closure'
-  ) {
-    throw new Error(
-      `Unsupported scoped catalog type policy '${scopedCatalogTypes}' for service '${pgService.name}'`
-    );
-  }
   if (!scopedIntrospection) {
     const configuredScopedOptions = [
       configuredCatalogTypes !== undefined

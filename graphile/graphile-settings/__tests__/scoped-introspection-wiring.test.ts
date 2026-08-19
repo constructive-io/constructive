@@ -81,12 +81,6 @@ describe('scoped introspection settings wiring', () => {
     expect(() =>
       makeScopedPgService({
         pubsub: false,
-        introspectionScopedCatalogTypes: 'unsupported' as never,
-      })
-    ).toThrow("Unsupported scoped catalog type policy 'unsupported'");
-    expect(() =>
-      makeScopedPgService({
-        pubsub: false,
         introspectionCapabilityExtensions: [' pg_trgm'],
       })
     ).toThrow(

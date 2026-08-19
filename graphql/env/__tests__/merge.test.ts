@@ -197,6 +197,25 @@ describe('getEnvOptions', () => {
     }
   );
 
+  it.each([
+    ['introspectionDependencySchemas', 'shared'],
+    ['introspectionCapabilityExtensions', [42]],
+  ] as const)(
+    'rejects an invalid graphile.%s value at the configuration boundary',
+    (option, value) => {
+      tempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), 'graphql-env-invalid-introspection-')
+      );
+      writeConfig(tempDir, {
+        graphile: { [option]: value }
+      });
+
+      expect(() => getEnvOptions({}, tempDir, {})).toThrow(
+        `graphile.${option} must be an array of strings`
+      );
+    }
+  );
+
   it('honors config, env, and runtime priority for scoped introspection', () => {
     tempDir = fs.mkdtempSync(
       path.join(os.tmpdir(), 'graphql-env-introspection-')
