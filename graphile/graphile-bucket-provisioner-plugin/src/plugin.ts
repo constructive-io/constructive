@@ -50,9 +50,12 @@ const log = new Logger('graphile-bucket-provisioner:plugin');
 // --- Storage module queries ---
 
 /**
- * Resolve the app-level storage module (scope = 'app').
+ * Resolve the storage module whose buckets table is the one being addressed.
+ *
+ * The buckets table's identity (schema + table, from the codec being mutated or
+ * the module row) is the fact that names the plane — never a scope literal.
  */
-const APP_STORAGE_MODULE_QUERY = `
+const STORAGE_MODULE_BY_BUCKETS_TABLE_QUERY = `
   SELECT
     sm.id,
     sm.scope,
@@ -67,12 +70,13 @@ const APP_STORAGE_MODULE_QUERY = `
   JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
   JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
   WHERE sm.database_id = $1
-    AND sm.scope = 'app'
-  LIMIT 1
+    AND bs.schema_name = $2
+    AND bt.name = $3
 `;
 
 /**
- * Resolve ALL storage modules for a database (for ownerId-based resolution).
+ * Resolve ALL storage modules for a database (for bucket-key and ownerId-based
+ * resolution in the explicit provisionBucket mutation).
  */
 const ALL_STORAGE_MODULES_QUERY = `
   SELECT
@@ -126,39 +130,115 @@ function runQuery(
 }
 
 /**
- * Resolve the storage module for a given scope.
- * If ownerId is provided, probes entity tables to find the matching module.
- * Otherwise, returns the app-level module.
+ * Resolve the storage module whose buckets table is the one being addressed.
+ *
+ * This is the resolution the auto-provision/CORS hooks use: the codec being
+ * mutated names its table, and the table names its module. A `@storageBuckets`
+ * table with no module row (or with several) is a provisioning bug and throws.
  */
-async function resolveStorageModule(
+async function resolveStorageModuleByBucketsTable(
   pgClient: any,
   databaseId: string,
-  ownerId?: string,
-): Promise<StorageModuleRow | null> {
-  if (!ownerId) {
-    // App-level resolution
-    const result = await runQuery(pgClient, APP_STORAGE_MODULE_QUERY, [databaseId]);
-    return (result.rows[0] as StorageModuleRow) ?? null;
+  schemaName: string,
+  tableName: string,
+): Promise<StorageModuleRow> {
+  const result = await runQuery(pgClient, STORAGE_MODULE_BY_BUCKETS_TABLE_QUERY, [
+    databaseId,
+    schemaName,
+    tableName,
+  ]);
+  const rows = result.rows as StorageModuleRow[];
+  if (rows.length === 0) {
+    throw new Error(
+      `STORAGE_MODULE_NOT_FOUND: no storage module in database ${databaseId} records ` +
+      `${schemaName}.${tableName} as its buckets table`,
+    );
   }
+  if (rows.length > 1) {
+    throw new Error(
+      `STORAGE_MODULE_AMBIGUOUS: ${rows.length} storage modules in database ${databaseId} record ` +
+      `${schemaName}.${tableName} as their buckets table`,
+    );
+  }
+  return rows[0];
+}
 
-  // Entity-scoped: load all modules and probe entity tables
+/**
+ * The explicit provisionBucket mutation's resolution: find the plane that
+ * actually holds the named bucket row.
+ *
+ * With an ownerId, the owning entity row names the plane (probed through each
+ * entity-keyed module's recorded entity table). Without one, every
+ * non-entity-keyed plane's buckets table is probed for the key under RLS —
+ * exactly one plane may hold it; several is ambiguous and throws rather than
+ * silently picking.
+ */
+async function resolveBucketByKey(
+  pgClient: any,
+  databaseId: string,
+  bucketKey: string,
+  ownerId?: string,
+): Promise<{ storageModule: StorageModuleRow; bucket: BucketRow } | null> {
   const result = await runQuery(pgClient, ALL_STORAGE_MODULES_QUERY, [databaseId]);
   const modules = result.rows as StorageModuleRow[];
-  const entityModules = modules.filter((m) => m.entity_schema && m.entity_table);
 
-  for (const mod of entityModules) {
-    const entityTable = QuoteUtils.quoteQualifiedIdentifier(mod.entity_schema!, mod.entity_table!);
-    const probe = await runQuery(
-      pgClient,
-      `SELECT 1 FROM ${entityTable} WHERE id = $1 LIMIT 1`,
-      [ownerId],
+  if (modules.length === 0) {
+    throw new Error(
+      `STORAGE_MODULE_NOT_PROVISIONED: database ${databaseId} has no storage modules`,
     );
-    if (probe.rows.length > 0) {
-      return mod;
+  }
+
+  if (ownerId) {
+    const entityModules = modules.filter((m) => m.entity_table_id !== null && m.entity_schema && m.entity_table);
+    for (const mod of entityModules) {
+      const entityTable = QuoteUtils.quoteQualifiedIdentifier(mod.entity_schema!, mod.entity_table!);
+      const probe = await runQuery(
+        pgClient,
+        `SELECT 1 FROM ${entityTable} WHERE id = $1 LIMIT 1`,
+        [ownerId],
+      );
+      if (probe.rows.length === 0) continue;
+
+      const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(mod.buckets_schema, mod.buckets_table);
+      const bucketResult = await runQuery(
+        pgClient,
+        `SELECT id, key, type, is_public, allowed_origins, physical_name
+         FROM ${bucketsTable}
+         WHERE key = $1 AND owner_id = $2
+         LIMIT 1`,
+        [bucketKey, ownerId],
+      );
+      if (bucketResult.rows.length === 0) return null;
+      return { storageModule: mod, bucket: bucketResult.rows[0] as BucketRow };
+    }
+    return null;
+  }
+
+  const matches: { storageModule: StorageModuleRow; bucket: BucketRow }[] = [];
+  for (const mod of modules.filter((m) => m.entity_table_id === null)) {
+    const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(mod.buckets_schema, mod.buckets_table);
+    const bucketResult = await runQuery(
+      pgClient,
+      `SELECT id, key, type, is_public, allowed_origins, physical_name
+       FROM ${bucketsTable}
+       WHERE key = $1
+       LIMIT 1`,
+      [bucketKey],
+    );
+    if (bucketResult.rows.length > 0) {
+      matches.push({ storageModule: mod, bucket: bucketResult.rows[0] as BucketRow });
     }
   }
 
-  return null;
+  if (matches.length === 0) return null;
+  if (matches.length > 1) {
+    const scopes = matches.map((m) => `'${m.storageModule.scope}'`).join(', ');
+    throw new Error(
+      `BUCKET_KEY_AMBIGUOUS: bucket key "${bucketKey}" exists in ${matches.length} storage planes ` +
+      `(scopes ${scopes}); provide an ownerId or use a plane-unique key`,
+    );
+  }
+  return matches[0];
 }
 
 interface BucketRow {
@@ -299,7 +379,7 @@ function buildProvisioner(
  * auto-provisioning hook.
  */
 async function provisionBucketForRow(
-  pgClient: any,
+  storageModule: StorageModuleRow,
   databaseId: string,
   bucketKey: string,
   bucketType: string,
@@ -308,9 +388,6 @@ async function provisionBucketForRow(
   s3BucketName: string,
 ): Promise<ProvisionResult> {
   const accessType = bucketType as 'public' | 'private' | 'temp';
-
-  // Read storage module config to check for endpoint/provider/CORS overrides
-  const storageModule = await resolveStorageModule(pgClient, databaseId);
 
   // Resolve CORS origins using the 3-tier hierarchy
   const effectiveOrigins = resolveAllowedOrigins(
@@ -346,7 +423,7 @@ async function provisionBucketForRow(
  * Update CORS on an existing S3 bucket when allowed_origins changes.
  */
 async function updateBucketCors(
-  pgClient: any,
+  storageModule: StorageModuleRow,
   databaseId: string,
   bucketKey: string,
   bucketType: string,
@@ -355,8 +432,6 @@ async function updateBucketCors(
   s3BucketName: string,
 ): Promise<void> {
   const accessType = bucketType as 'public' | 'private' | 'temp';
-
-  const storageModule = await resolveStorageModule(pgClient, databaseId);
 
   const effectiveOrigins = resolveAllowedOrigins(
     bucketAllowedOrigins,
@@ -468,38 +543,14 @@ export function createBucketProvisionerPlugin(
                 throw new Error('DATABASE_NOT_FOUND');
               }
 
-              // Resolve storage module (app-level or entity-scoped via ownerId)
-              const storageModule = await resolveStorageModule(pgClient, databaseId, ownerId);
-              if (!storageModule) {
-                throw new Error(
-                  ownerId
-                    ? 'STORAGE_MODULE_NOT_FOUND_FOR_OWNER: no storage module found for the given ownerId'
-                    : 'STORAGE_MODULE_NOT_PROVISIONED',
-                );
-              }
-
-              // Look up the bucket row (RLS enforced via pgSettings)
-              const hasOwner = ownerId && storageModule.scope !== 'app';
-              const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
-              const bucketResult = await runQuery(
-                pgClient,
-                hasOwner
-                  ? `SELECT id, key, type, is_public, allowed_origins, physical_name
-                     FROM ${bucketsTable}
-                     WHERE key = $1 AND owner_id = $2
-                     LIMIT 1`
-                  : `SELECT id, key, type, is_public, allowed_origins, physical_name
-                     FROM ${bucketsTable}
-                     WHERE key = $1
-                     LIMIT 1`,
-                hasOwner ? [bucketKey, ownerId] : [bucketKey],
-              );
-
-              if (bucketResult.rows.length === 0) {
+              // Resolve the plane that actually holds the named bucket row
+              // (RLS enforced via pgSettings) — never a guessed scope.
+              const resolution = await resolveBucketByKey(pgClient, databaseId, bucketKey, ownerId);
+              if (!resolution) {
                 throw new Error('BUCKET_NOT_FOUND');
               }
-
-              const bucket = bucketResult.rows[0] as BucketRow;
+              const { storageModule, bucket } = resolution;
+              const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
 
               // First provision mints a name; afterwards the stored coordinate
               // is authoritative and the naming hook is never consulted again.
@@ -510,7 +561,7 @@ export function createBucketProvisionerPlugin(
 
               try {
                 const result = await provisionBucketForRow(
-                  pgClient,
+                  storageModule,
                   databaseId,
                   bucket.key,
                   bucket.type,
@@ -604,6 +655,11 @@ export function createBucketProvisionerPlugin(
 
           log.debug(`Wrapping mutation "${fieldName}" for ${isCreate ? 'auto-provisioning' : 'CORS update'} (codec: ${pgCodec.name})`);
 
+          // The codec being mutated names the buckets table — the hook always
+          // operates on the plane that table belongs to, never a guessed scope.
+          const codecSchemaName = pgCodec.extensions?.pg?.schemaName as string | undefined;
+          const codecTableName = pgCodec.extensions?.pg?.name as string | undefined;
+
           const defaultResolver = (obj: any) => obj[fieldName];
           const { resolve: oldResolve = defaultResolver, ...rest } = field;
 
@@ -637,6 +693,12 @@ export function createBucketProvisionerPlugin(
                     return result;
                   }
 
+                  if (!codecSchemaName || !codecTableName) {
+                    throw new Error(
+                      `Auto-provision failed for "${fieldName}": codec ${pgCodec.name} carries no pg schema/table identity`,
+                    );
+                  }
+
                   await withPgClient(pgSettings, async (pgClient: any) => {
                     const databaseId = await resolveDatabaseId(pgClient);
                     if (!databaseId) {
@@ -644,9 +706,15 @@ export function createBucketProvisionerPlugin(
                       return;
                     }
 
+                    // The mutated table names its module — the plane being written
+                    // is the plane that gets provisioned.
+                    const storageModule = await resolveStorageModuleByBucketsTable(
+                      pgClient, databaseId, codecSchemaName, codecTableName,
+                    );
+
                     // Newly-created row has no stored coordinate yet — mint on first provision.
                     const result = await provisionBucketForRow(
-                      pgClient,
+                      storageModule,
                       databaseId,
                       bucketInput.key,
                       bucketInput.type,
@@ -656,17 +724,17 @@ export function createBucketProvisionerPlugin(
                     );
 
                     // Record the provisioned name on the just-created row.
-                    const storageModule = await resolveStorageModule(pgClient, databaseId);
-                    if (storageModule) {
-                      const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
-                      const idResult = await runQuery(
-                        pgClient,
-                        `SELECT id FROM ${bucketsTable} WHERE key = $1 LIMIT 1`,
-                        [bucketInput.key],
-                      );
-                      const bucketId = idResult.rows[0]?.id;
-                      if (bucketId) await recordPhysicalName(withPgClient, bucketsTable, bucketId, result.bucketName);
-                    }
+                    const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
+                    const ownerId = bucketInput.ownerId ?? bucketInput.owner_id ?? null;
+                    const idResult = await runQuery(
+                      pgClient,
+                      ownerId
+                        ? `SELECT id FROM ${bucketsTable} WHERE key = $1 AND owner_id = $2 LIMIT 1`
+                        : `SELECT id FROM ${bucketsTable} WHERE key = $1 LIMIT 1`,
+                      ownerId ? [bucketInput.key, ownerId] : [bucketInput.key],
+                    );
+                    const bucketId = idResult.rows[0]?.id;
+                    if (bucketId) await recordPhysicalName(withPgClient, bucketsTable, bucketId, result.bucketName);
                   });
                 } else {
                   // --- UPDATE: re-apply CORS if allowed_origins is in the patch ---
@@ -678,6 +746,12 @@ export function createBucketProvisionerPlugin(
                     return result;
                   }
 
+                  if (!codecSchemaName || !codecTableName) {
+                    throw new Error(
+                      `CORS update failed for "${fieldName}": codec ${pgCodec.name} carries no pg schema/table identity`,
+                    );
+                  }
+
                   await withPgClient(pgSettings, async (pgClient: any) => {
                     const databaseId = await resolveDatabaseId(pgClient);
                     if (!databaseId) {
@@ -685,12 +759,11 @@ export function createBucketProvisionerPlugin(
                       return;
                     }
 
-                    // Read the storage module config (app-level; auto-hook doesn't have ownerId context)
-                    const storageModule = await resolveStorageModule(pgClient, databaseId);
-                    if (!storageModule) {
-                      log.warn('CORS update skipped: storage module not provisioned');
-                      return;
-                    }
+                    // The mutated table names its module — CORS applies to the
+                    // plane whose row was updated.
+                    const storageModule = await resolveStorageModuleByBucketsTable(
+                      pgClient, databaseId, codecSchemaName, codecTableName,
+                    );
 
                     // We need the bucket key — it may come from input or patch
                     // For updates, PostGraphile uses nodeId or the row's PK, so
@@ -728,7 +801,7 @@ export function createBucketProvisionerPlugin(
                     const recorded = storedPhysicalName(bucket);
 
                     await updateBucketCors(
-                      pgClient,
+                      storageModule,
                       databaseId,
                       bucket.key,
                       bucket.type,

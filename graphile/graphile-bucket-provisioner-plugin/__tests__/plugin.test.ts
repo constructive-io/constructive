@@ -103,12 +103,16 @@ function createMockPgClient(overrides: Record<string, any> = {}) {
     'metaschema_modules_public.storage_module': {
       rows: [{
         id: 'sm-uuid-456',
+        scope: 'app',
+        entity_table_id: null,
         buckets_schema: 'app_public',
         buckets_table: 'buckets',
         endpoint: null,
         public_url_prefix: null,
         provider: null,
         allowed_origins: null,
+        entity_schema: null,
+        entity_table: null,
       }],
     },
     app_public: {
@@ -527,11 +531,15 @@ describe('createBucketProvisionerPlugin', () => {
         'metaschema_modules_public.storage_module': {
           rows: [{
             id: 'sm-uuid-456',
+            scope: 'app',
+            entity_table_id: null,
             buckets_schema: 'app_public',
             buckets_table: 'buckets',
             endpoint: 'http://custom-minio:9000',
             public_url_prefix: 'https://cdn.example.com',
             provider: 'minio',
+            entity_schema: null,
+            entity_table: null,
           }],
         },
       });
@@ -584,11 +592,15 @@ describe('createBucketProvisionerPlugin', () => {
         'metaschema_modules_public.storage_module': {
           rows: [{
             id: 'sm-uuid-456',
+            scope: 'app',
+            entity_table_id: null,
             buckets_schema: 'app_public',
             buckets_table: 'buckets',
             endpoint: null,
             public_url_prefix: 'https://cdn.example.com',
             provider: null,
+            entity_schema: null,
+            entity_table: null,
           }],
         },
       });
@@ -726,7 +738,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -747,7 +762,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {}, allowed_origins: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -770,7 +788,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -795,7 +816,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -840,7 +864,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -883,7 +910,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -916,7 +946,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -945,7 +978,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -967,7 +1003,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {}, allowed_origins: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -999,7 +1038,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {}, allowed_origins: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -1052,7 +1094,10 @@ describe('createBucketProvisionerPlugin', () => {
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {}, type: {}, allowed_origins: {} },
-            extensions: { tags: { storageBuckets: true } },
+            extensions: {
+              tags: { storageBuckets: true },
+              pg: { schemaName: 'app_public', name: 'buckets' },
+            },
           },
         },
       };
@@ -1125,12 +1170,16 @@ describe('CORS resolution hierarchy', () => {
       'metaschema_modules_public.storage_module': {
         rows: [{
           id: 'sm-uuid-456',
+          scope: 'app',
+          entity_table_id: null,
           buckets_schema: 'app_public',
           buckets_table: 'buckets',
           endpoint: null,
           public_url_prefix: null,
           provider: null,
           allowed_origins: ['https://db-default.example.com'],
+          entity_schema: null,
+          entity_table: null,
         }],
       },
     });
@@ -1182,12 +1231,16 @@ describe('CORS resolution hierarchy', () => {
       'metaschema_modules_public.storage_module': {
         rows: [{
           id: 'sm-uuid-456',
+          scope: 'app',
+          entity_table_id: null,
           buckets_schema: 'app_public',
           buckets_table: 'buckets',
           endpoint: null,
           public_url_prefix: null,
           provider: null,
           allowed_origins: ['https://db-default.example.com'],
+          entity_schema: null,
+          entity_table: null,
         }],
       },
     });
@@ -1241,12 +1294,16 @@ describe('CORS resolution hierarchy', () => {
       'metaschema_modules_public.storage_module': {
         rows: [{
           id: 'sm-uuid-456',
+          scope: 'app',
+          entity_table_id: null,
           buckets_schema: 'app_public',
           buckets_table: 'buckets',
           endpoint: null,
           public_url_prefix: null,
           provider: null,
           allowed_origins: null,
+          entity_schema: null,
+          entity_table: null,
         }],
       },
     });

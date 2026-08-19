@@ -35,52 +35,9 @@ const storageModuleCache = new LRUCache<string, StorageModuleConfig>({
 });
 
 /**
- * SQL query to resolve the app-level storage module config for a database.
- *
- * Joins storage_module → table → schema to get fully-qualified table names.
- * Filters to app-level (scope = 'app') by default.
- *
- * Requires the multi-scope schema (scope column on storage_module).
- */
-const APP_STORAGE_MODULE_QUERY = `
-  SELECT
-    sm.id,
-    sm.scope,
-    sm.entity_table_id,
-    bs.schema_name AS buckets_schema,
-    bt.name AS buckets_table,
-    fs.schema_name AS files_schema,
-    ft.name AS files_table,
-    sm.endpoint,
-    sm.public_url_prefix,
-    sm.provider,
-    sm.allowed_origins,
-    sm.upload_url_expiry_seconds,
-    sm.download_url_expiry_seconds,
-    sm.default_max_file_size,
-    sm.max_filename_length,
-    sm.cache_ttl_seconds,
-    sm.max_bulk_files,
-    sm.max_bulk_total_size,
-    sm.has_path_shares,
-    sm.has_confirm_upload,
-    NULL AS entity_schema,
-    NULL AS entity_table
-  FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
-  JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
-  WHERE sm.database_id = $1
-    AND sm.scope = 'app'
-  LIMIT 1
-`;
-
-/**
- * SQL query to resolve ALL storage modules for a database (app-level + entity-scoped).
- *
- * Returns all storage modules with their entity table names for ownerId resolution.
- * Requires the multi-scope schema.
+ * SQL query to resolve ALL storage modules for a database, whatever their
+ * scope. Returns each module with its entity table names so callers can
+ * classify entity-keyed planes and resolve owners.
  */
 const ALL_STORAGE_MODULES_QUERY = `
   SELECT
@@ -175,116 +132,6 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
 }
 
 /**
- * Resolve the app-level storage module config for a database, using the LRU cache.
- *
- * This is the default path when no ownerId is provided. It returns the
- * storage module with scope = 'app' (app-level / database-wide).
- *
- * @param pgClient - A pg client from the Graphile context (withPgClient or pgClient)
- * @param databaseId - The metaschema database UUID
- * @returns StorageModuleConfig or null if no storage module is provisioned
- */
-export async function getStorageModuleConfig(
-  pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
-  databaseId: string,
-): Promise<StorageModuleConfig | null> {
-  const cacheKey = `storage:${databaseId}:app`;
-  const cached = storageModuleCache.get(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
-  log.debug(`Cache miss for app-level storage in database ${databaseId}, querying metaschema...`);
-
-  const result = await pgClient.query({ text: APP_STORAGE_MODULE_QUERY, values: [databaseId] });
-
-  if (result.rows.length === 0) {
-    log.warn(`No app-level storage module found for database ${databaseId}`);
-    return null;
-  }
-
-  const config = buildConfig(result.rows[0] as StorageModuleRow);
-  storageModuleCache.set(cacheKey, config);
-  log.debug(`Cached app-level storage config for database ${databaseId}: ${config.bucketsQualifiedName}`);
-
-  return config;
-}
-
-/**
- * Resolve the storage module config for a specific owner entity.
- *
- * When ownerId is provided, this function:
- * 1. Loads ALL storage modules for the database (cached)
- * 2. Finds which entity-scoped module contains the ownerId in its entity table
- * 3. Returns that module's config
- *
- * This is the core of Option C — the ownerId tells us which scope to use.
- *
- * @param pgClient - A pg client from the Graphile context
- * @param databaseId - The metaschema database UUID
- * @param ownerId - The entity instance UUID (e.g., a data room ID, team ID)
- * @returns StorageModuleConfig or null if no matching module found
- */
-export async function getStorageModuleConfigForOwner(
-  pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
-  databaseId: string,
-  ownerId: string,
-): Promise<StorageModuleConfig | null> {
-  // Check if we already have a cached mapping for this ownerId
-  const ownerCacheKey = `storage:${databaseId}:owner:${ownerId}`;
-  const cachedOwner = storageModuleCache.get(ownerCacheKey);
-  if (cachedOwner) {
-    return cachedOwner;
-  }
-
-  // Load all storage modules for this database
-  const allModulesCacheKey = `storage:${databaseId}:all`;
-  let allConfigs: StorageModuleConfig[];
-  const cachedAll = storageModuleCache.get(allModulesCacheKey);
-  if (cachedAll) {
-    // We stored a sentinel; re-derive from individual caches
-    // Actually, let's just query fresh — this is the cache-miss path
-    allConfigs = [];
-  } else {
-    allConfigs = [];
-  }
-
-  if (allConfigs.length === 0) {
-    log.debug(`Loading all storage modules for database ${databaseId} to resolve ownerId ${ownerId}`);
-    const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
-    allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
-
-    // Cache each individual config by its scope
-    for (const config of allConfigs) {
-      const key = `storage:${databaseId}:scope:${config.scope}`;
-      storageModuleCache.set(key, config);
-    }
-  }
-
-  // Find entity-scoped modules and probe their entity tables for the ownerId
-  const entityModules = allConfigs.filter((c) => c.entityQualifiedName !== null);
-
-  for (const mod of entityModules) {
-    const probeResult = await pgClient.query({
-      text: `SELECT 1 FROM ${mod.entityQualifiedName} WHERE id = $1 LIMIT 1`,
-      values: [ownerId],
-    });
-    if (probeResult.rows.length > 0) {
-      // Found the matching module — cache the ownerId→module mapping
-      storageModuleCache.set(ownerCacheKey, mod);
-      log.debug(
-        `Resolved ownerId ${ownerId} to storage module ${mod.id} ` +
-        `(scope=${mod.scope}, table=${mod.bucketsQualifiedName})`,
-      );
-      return mod;
-    }
-  }
-
-  log.warn(`No entity-scoped storage module found for ownerId ${ownerId} in database ${databaseId}`);
-  return null;
-}
-
-/**
  * Resolve the storage module that owns a specific file by probing all file tables.
  *
  * Since UUIDs are globally unique, exactly one table will contain the file.
@@ -343,12 +190,6 @@ export async function loadAllStorageModules(
   log.debug(`Loading all storage modules for database ${databaseId}`);
   const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
   const configs = (result.rows as StorageModuleRow[]).map(buildConfig);
-
-  // Cache each individual config by its scope
-  for (const config of configs) {
-    const key = `storage:${databaseId}:scope:${config.scope}`;
-    storageModuleCache.set(key, config);
-  }
 
   // Store the full list under a sentinel key (only if non-empty to avoid caching failed lookups)
   if (configs.length > 0) {
@@ -446,9 +287,9 @@ export async function getBucketConfig(
 
   log.debug(`Bucket cache miss for ${databaseId}:${bucketKey}${ownerId ? ` (owner=${ownerId})` : ''}, querying DB...`);
 
-  // Entity-scoped buckets use (owner_id, key) composite lookup;
-  // app-level buckets just use key.
-  const isEntityScoped = storageConfig.scope !== 'app';
+  // Entity-keyed planes (the module records an entity table) use the
+  // (owner_id, key) composite lookup; app- and database-scope planes just use key.
+  const isEntityScoped = storageConfig.entityTableId !== null;
   const hasOwner = ownerId && isEntityScoped;
   const result = await pgClient.query({
     text: hasOwner

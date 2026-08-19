@@ -142,8 +142,8 @@ export async function resolveManagedUploadTarget(args: {
     );
   }
 
-  if (storageConfig.scope !== 'app') {
-    // An entity-scoped module resolves its bucket per owning row, and a
+  if (storageConfig.entityTableId !== null) {
+    // An entity-keyed module resolves its bucket per owning row, and a
     // multipart column write does not carry one. Refuse rather than write a
     // tenant's file into whichever bucket happened to resolve.
     throw new Error(

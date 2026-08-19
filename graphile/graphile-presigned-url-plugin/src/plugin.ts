@@ -7,6 +7,8 @@
  *    on root Mutation for each @storageFiles/@storageBuckets pair. These combine
  *    bucket resolution + file INSERT + presigned URL generation in one step.
  *    E.g., `uploadAppFile(input: { bucketKey: "public", contentHash: "...", ... })`
+ *    Pairs are discovered from the registry's FK relations (see
+ *    graphile-storage-registry) — table naming carries no meaning here.
  *
  * 2. Delete middleware — wraps `delete*` mutations on `@storageFiles`-tagged tables
  *    with S3 object cleanup (sync + async GC fallback via AFTER DELETE trigger).
@@ -22,6 +24,7 @@ import 'graphile-build';
 import { Logger } from '@pgpmjs/logger';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { discoverStoragePlanes, uploadSurfaceNames } from 'graphile-storage-registry';
 import { checkTypeAgreement } from 'mime-bytes';
 
 import { validateCustomKey } from './custom-key';
@@ -143,49 +146,30 @@ export function createPresignedUrlPlugin(
             log.warn('No JSON scalar in this schema; upload payloads will omit the `file` projection');
           }
 
-          const bucketCodecs = Object.values((build.input as any).pgRegistry.pgCodecs).filter(
-            (codec: any) => codec.attributes && (codec.extensions as any)?.tags?.storageBuckets,
-          );
+          // Each @storageFiles table is paired with its @storageBuckets table
+          // through the registry's actual FK relation; a tagged table that cannot
+          // be paired is a provisioning bug and throws at schema build.
+          const planes = discoverStoragePlanes((build.input as any).pgRegistry as any);
 
-          if (bucketCodecs.length === 0) return fields;
+          if (planes.length === 0) return fields;
 
           const newFields: Record<string, any> = {};
 
           // --- File upload mutations (uploadAppFile, uploadDataRoomFile, etc.) ---
-          const fileCodecs = Object.values((build.input as any).pgRegistry.pgCodecs).filter(
-            (codec: any) => codec.attributes && (codec.extensions as any)?.tags?.storageFiles,
-          );
+          for (const plane of planes) {
+            const filesCodec = plane.filesCodec as any;
+            const matchingBucketCodec = plane.bucketsCodec as any;
+            const names = uploadSurfaceNames(build.inflection as any, plane.filesCodec);
+            const { filesTypeName, uploadMutation: mutationName } = names;
 
-          for (const filesCodec of fileCodecs as any[]) {
-            const filesTypeName = (build.inflection as any).tableType(filesCodec);
-
-            // Find the matching bucket codec by table name prefix.
-            // Schema-name matching is ambiguous when multiple storage modules share
-            // the same PG schema (e.g. app_files + data_room_files both in storage_public).
-            // Instead, derive the prefix from the raw SQL table name:
-            //   "data_room_files" → prefix "data_room" → matches "data_room_buckets"
-            //   "app_files"       → prefix "app"       → matches "app_buckets"
-            const filesRawName = filesCodec.extensions?.pg?.name as string | undefined;
-            const filesPrefix = filesRawName?.replace(/_files$/, '');
-            const matchingBucketCodec = (bucketCodecs as any[]).find((bc: any) => {
-              const bucketRawName = bc.extensions?.pg?.name as string | undefined;
-              const bucketPrefix = bucketRawName?.replace(/_buckets$/, '');
-              return bucketPrefix === filesPrefix;
-            });
-            if (!matchingBucketCodec) {
-              log.debug(`Skipping upload mutation for ${filesCodec.name}: no matching bucket codec with prefix "${filesPrefix}"`);
-              continue;
-            }
-
-            const hasOwnerId = !!matchingBucketCodec.attributes.owner_id;
-            const mutationName = `upload${filesTypeName}`;
+            const hasOwnerId = plane.hasOwnerId;
 
             const ownerIdGqlType = hasOwnerId
               ? (build as any).getGraphQLTypeByPgCodec(matchingBucketCodec.attributes.owner_id.codec, 'input')
               : null;
 
             const InputType = new GraphQLInputObjectType({
-              name: `Upload${filesTypeName}Input`,
+              name: names.uploadInputType,
               fields: {
                 bucketKey: { type: GraphQLString, description: 'Bucket key (e.g., "public", "private"). Omit to use the database\'s default bucket for the requested access.' },
                 isPublic: { type: GraphQLBoolean, description: 'Which default bucket to resolve when bucketKey is omitted: the public one (true) or the private one (default false). Ignored when bucketKey is given.' },
@@ -201,7 +185,7 @@ export function createPresignedUrlPlugin(
             });
 
             const PayloadType = new GraphQLObjectType({
-              name: `Upload${filesTypeName}Payload`,
+              name: names.uploadPayloadType,
               fields: {
                 uploadUrl: { type: GraphQLString, description: 'Presigned PUT URL (null if deduplicated)' },
                 fileId: { type: new GraphQLNonNull(GraphQLString), description: 'The file ID (UUID)' },
@@ -311,7 +295,7 @@ export function createPresignedUrlPlugin(
 
             // --- Bulk file upload mutation ---
             const BulkFileInputType = new GraphQLInputObjectType({
-              name: `Upload${filesTypeName}BulkFileInput`,
+              name: names.bulkUploadFileInputType,
               fields: {
                 contentHash: { type: new GraphQLNonNull(GraphQLString), description: 'SHA-256 content hash (hex-encoded, 64 chars)' },
                 contentType: { type: new GraphQLNonNull(GraphQLString), description: 'MIME type of the file' },
@@ -322,7 +306,7 @@ export function createPresignedUrlPlugin(
             });
 
             const BulkFilePayloadType = new GraphQLObjectType({
-              name: `Upload${filesTypeName}BulkFilePayload`,
+              name: names.bulkUploadFilePayloadType,
               fields: {
                 uploadUrl: { type: GraphQLString },
                 fileId: { type: new GraphQLNonNull(GraphQLString) },
@@ -335,7 +319,7 @@ export function createPresignedUrlPlugin(
             });
 
             const BulkInputType = new GraphQLInputObjectType({
-              name: `Upload${filesTypeName}BulkInput`,
+              name: names.bulkUploadInputType,
               fields: {
                 bucketKey: { type: GraphQLString, description: 'Bucket key (e.g., "public", "private"). Omit to use the database\'s default bucket for the requested access.' },
                 isPublic: { type: GraphQLBoolean, description: 'Which default bucket to resolve when bucketKey is omitted. Ignored when bucketKey is given.' },
@@ -347,13 +331,13 @@ export function createPresignedUrlPlugin(
             });
 
             const BulkPayloadType = new GraphQLObjectType({
-              name: `Upload${filesTypeName}BulkPayload`,
+              name: names.bulkUploadPayloadType,
               fields: {
                 files: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(BulkFilePayloadType))) },
               },
             });
 
-            const bulkMutationName = `upload${filesTypeName}s`;
+            const bulkMutationName = names.bulkUploadMutation;
             log.debug(`Adding bulk file upload mutation "${bulkMutationName}" for ${filesTypeName}`);
 
             newFields[bulkMutationName] = context.fieldWithHooks(
@@ -783,8 +767,9 @@ async function processSingleFile(
   // Auto-derive ltree path from custom key directory (only when has_path_shares)
   const derivedPath = isCustomKey && storageConfig.hasPathShares ? derivePathFromKey(s3Key) : null;
 
-  // Create file record
-  const hasOwnerColumn = storageConfig.scope !== 'app';
+  // Create file record. An entity-keyed plane (the module records an entity
+  // table) carries owner_id on its rows; app- and database-scope planes do not.
+  const hasOwnerColumn = storageConfig.entityTableId !== null;
   const columns = ['bucket_id', 'key', 'content_hash', 'mime_type', 'size', 'filename', 'is_public'];
   const values: any[] = [bucket.id, s3Key, contentHash, contentType, size, filename || null, bucket.is_public];
 

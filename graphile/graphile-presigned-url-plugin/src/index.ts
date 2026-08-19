@@ -52,7 +52,7 @@ export { createPresignedUrlPlugin,PresignedUrlPlugin } from './plugin';
 export { PresignedUrlPreset } from './preset';
 export { type WithPgClient, withRequestPgClient } from './request-pg-client';
 export { copyS3Object, deleteS3Object, generatePresignedGetUrl, generatePresignedPutUrl, headObject, readObjectPrefix } from './s3-signer';
-export { clearBucketCache, clearStorageModuleCache, getBucketConfig, getStorageModuleConfig, getStorageModuleConfigForOwner, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
+export { clearBucketCache, clearStorageModuleCache, getBucketConfig, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
 export type {
   BucketConfig,
   BucketNameResolver,
