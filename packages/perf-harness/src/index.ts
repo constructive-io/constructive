@@ -6,6 +6,8 @@ export * from './process';
 export * from './report';
 export * from './run';
 export * from './schedule';
+export * from './scoped-catalog-fixture';
+export * from './scoped-introspection-analysis';
 export * from './scoped-introspection-suite';
 export * from './types';
 

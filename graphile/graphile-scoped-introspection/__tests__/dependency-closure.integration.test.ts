@@ -238,6 +238,42 @@ describe('real PostgreSQL dependency closure', () => {
     ).toBe('integer_span_set');
   });
 
+  it('retains cross-schema foreign-key targets and required inheritance parents only', () => {
+    const closureItems = scoped.introspection.classes.find(
+      (entity) =>
+        entity.relname === 'closure_items' &&
+        entity.getNamespace()?.nspname === ROOT_SCHEMA
+    );
+    const foreignKey = closureItems
+      ?.getConstraints()
+      .find((constraint) => constraint.contype === 'f');
+    expect(foreignKey?.getForeignClass()?.relname).toBe('dependency_owners');
+    expect(foreignKey?.getForeignClass()?.getNamespace()?.nspname).toBe(
+      DEPENDENCY_SCHEMA
+    );
+
+    const inheritedItems = scoped.introspection.classes.find(
+      (entity) =>
+        entity.relname === 'inherited_items' &&
+        entity.getNamespace()?.nspname === ROOT_SCHEMA
+    );
+    const inherited = inheritedItems?.getInherited();
+    expect(inherited).toHaveLength(1);
+    expect(
+      scoped.introspection.classes.find(
+        (entity) => entity._id === inherited?.[0]?.inhparent
+      )?.relname
+    ).toBe('inherited_base');
+
+    expect(
+      scoped.introspection.classes.some(
+        (entity) =>
+          entity.relname === 'reverse_inherited_item' &&
+          entity.getNamespace()?.nspname === DEPENDENCY_SCHEMA
+      )
+    ).toBe(false);
+  });
+
   it('retains ordinary and pg_trgm index metadata without unrelated entities', async () => {
     const indexes = new Map(
       scoped.introspection.indexes.map((index) => [
