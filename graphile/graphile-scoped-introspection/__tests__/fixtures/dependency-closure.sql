@@ -25,14 +25,38 @@ CREATE TYPE "scope_dependency"."integer_span" AS RANGE (
   multirange_type_name = "scope_dependency"."integer_span_set"
 );
 
+CREATE TABLE "scope_dependency"."dependency_owners" (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  status "scope_dependency"."item_status" NOT NULL
+);
+
+CREATE TABLE "scope_dependency"."inherited_base" (
+  inherited_status "scope_dependency"."item_status" NOT NULL
+);
+
 CREATE TABLE "scope_root"."closure_items" (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  dependency_owner_id bigint NOT NULL
+    REFERENCES "scope_dependency"."dependency_owners" (id),
   title text NOT NULL,
   status "scope_dependency"."item_status" NOT NULL,
   score "scope_dependency"."positive_integer" NOT NULL,
   payload "scope_dependency"."item_payload" NOT NULL,
   active_span "scope_dependency"."integer_span"
 );
+
+CREATE TABLE "scope_root"."inherited_items" (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY
+) INHERITS ("scope_dependency"."inherited_base");
+
+CREATE TABLE "scope_root"."inheritance_root" (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  root_note text NOT NULL
+);
+
+CREATE TABLE "scope_dependency"."reverse_inherited_item" (
+  dependency_note text NOT NULL
+) INHERITS ("scope_root"."inheritance_root");
 
 CREATE INDEX "closure_items_status_idx"
   ON "scope_root"."closure_items" (status);
