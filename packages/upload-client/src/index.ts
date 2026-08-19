@@ -42,6 +42,10 @@ export { fetchFromUrl,putToPresignedUrl } from './put';
 // Orchestrator
 export { uploadFile } from './upload';
 
+// Adapter for the dynamic storage client's StorageTransport port
+export type { StorageTransportPort } from './storage-transport';
+export { createStorageTransport, storageTransport } from './storage-transport';
+
 // GraphQL query builders (for custom integrations)
 export { buildRequestUploadUrlQuery, DEFAULT_BUCKET_QUERY_FIELD,REQUEST_UPLOAD_URL_MUTATION, REQUEST_UPLOAD_URL_QUERY } from './queries';
 

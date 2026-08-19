@@ -1,6 +1,6 @@
-import type { GraphQLExecutor } from '@constructive-io/upload-client';
+import { createHash } from 'crypto';
 
-import type { StorageMetaResult } from '../src/storage';
+import type { GraphQLExecutor, StorageMetaResult, StorageTransport } from '../src/storage';
 import {
   buildDownloadUrlDocument,
   buildUploadDocument,
@@ -103,7 +103,22 @@ function fakeFile(content = 'hello world', name = 'hello.txt', type = 'text/plai
     size: bytes.byteLength,
     type,
     arrayBuffer: async () => bytes.buffer as ArrayBuffer,
-    slice: (start?: number, end?: number) => new Blob([bytes.slice(start, end)]),
+  };
+}
+
+interface PutCall {
+  url: string;
+  contentType: string;
+  size: number;
+}
+
+function fakeTransport(puts: PutCall[] = []): StorageTransport {
+  return {
+    hashFile: async (file) =>
+      createHash('sha256').update(Buffer.from(await file.arrayBuffer())).digest('hex'),
+    putObject: async (url, body, contentType) => {
+      puts.push({ url, contentType, size: body.byteLength });
+    },
   };
 }
 
@@ -221,13 +236,18 @@ describe('createStorageClient()', () => {
   function clientWith(
     uploadResponse: Record<string, unknown>,
     calls: Array<{ query: string; variables: Record<string, unknown> }> = [],
+    puts: PutCall[] = [],
   ) {
     const execute: GraphQLExecutor = async (query, variables) => {
       calls.push({ query, variables });
       if (query.includes('_meta')) return metaResult() as unknown as Record<string, unknown>;
       return uploadResponse;
     };
-    return { client: createStorageClient({ execute }), calls };
+    return {
+      client: createStorageClient({ execute, transport: fakeTransport(puts) }),
+      calls,
+      puts,
+    };
   }
 
   it('discovers surfaces through the storage meta query and caches them', async () => {
@@ -313,5 +333,34 @@ describe('createStorageClient()', () => {
     await expect(
       client.upload({ filesTable: 'files' }, { file: fakeFile('') }),
     ).rejects.toThrow(/File is empty/);
+  });
+
+  it('PUTs the bytes through the injected transport when not deduplicated', async () => {
+    const { client, puts } = clientWith({
+      uploadFile: {
+        uploadUrl: 'https://s3.example/presigned',
+        fileId: 'file-2',
+        key: 'def456',
+        deduplicated: false,
+        expiresAt: '2030-01-01T00:00:00Z',
+        previousVersionId: null,
+      },
+    });
+
+    const result = await client.upload({ filesTable: 'files' }, { file: fakeFile() });
+
+    expect(result.fileId).toBe('file-2');
+    expect(puts).toEqual([
+      { url: 'https://s3.example/presigned', contentType: 'text/plain', size: 11 },
+    ]);
+  });
+
+  it('refuses to upload without a transport adapter', async () => {
+    const execute: GraphQLExecutor = async () =>
+      metaResult() as unknown as Record<string, unknown>;
+    const client = createStorageClient({ execute });
+    await expect(
+      client.upload({ filesTable: 'files' }, { file: fakeFile() }),
+    ).rejects.toThrow(/STORAGE_TRANSPORT_MISSING/);
   });
 });

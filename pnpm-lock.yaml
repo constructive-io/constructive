@@ -1888,9 +1888,6 @@ importers:
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
-      '@constructive-io/upload-client':
-        specifier: workspace:^
-        version: link:../../packages/upload-client/dist
       ajv:
         specifier: ^8.20.0
         version: 8.20.0
