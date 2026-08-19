@@ -75,9 +75,9 @@ describe('composeRun', () => {
     expect(() =>
       composeRun({
         runId: 'run-1',
-        metering: { mode: 'gateway', gatewayUrl: `${gatewayUrl}/v1`, identity, models }
+        metering: { mode: 'gateway', gatewayUrl: 'ws://gateway.constructive.io', identity, models }
       })
-    ).toThrow();
+    ).toThrow(/http\(s\)/);
 
     // A policy that can ask needs somewhere to ask.
     expect(() => composeRun({ runId: 'run-1', gate: { policy: {} } })).toThrow(/approvals channel is required/);

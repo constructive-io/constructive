@@ -34,10 +34,13 @@ describe('httpUsageSink', () => {
     expect(JSON.parse(init.body)).toEqual(report);
   });
 
-  it('rejects a gateway URL that already includes /v1', () => {
-    expect(() =>
-      httpUsageSink({ gatewayUrl: 'https://gw.example.com/v1', identity, fetch: jest.fn() as never })
-    ).toThrow(/drop the \/v1/);
+  it('posts to the one usage route whether or not the caller named the api root', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, status: 202 });
+    const sink = httpUsageSink({ gatewayUrl: 'https://gw.example.com/v1', identity, fetch: fetchMock as never });
+
+    await sink(report);
+
+    expect(fetchMock.mock.calls[0][0]).toBe('https://gw.example.com/v1/usage');
   });
 
   it('requires a databaseId', () => {

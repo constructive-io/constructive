@@ -1,4 +1,4 @@
-import { HarnessDirs, harnessDirs, SkillsManifest } from '@agentic-kit/harness';
+import { FetchLike, HarnessDirs, harnessDirs, SkillsManifest } from '@agentic-kit/harness';
 import { ConfigStore, createConfigStore } from 'appstash';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -34,6 +34,12 @@ export interface AgentCliConfig {
   manifest: SkillsManifest;
   skillsRepo: string;
   skillsPin: string;
+  /**
+   * HTTP the skills fetch uses, so a caller that must not reach the network —
+   * a test, an air-gapped host — decides that rather than discovering it as a
+   * hang against api.github.com.
+   */
+  skillsFetch?: FetchLike;
 }
 
 interface ManifestFile {

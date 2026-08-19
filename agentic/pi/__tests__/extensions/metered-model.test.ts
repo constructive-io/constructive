@@ -44,7 +44,8 @@ describe('createMeteredModelExtension', () => {
 
     expect(pi.providers).toHaveLength(1);
     expect(pi.providers[0].name).toBe('constructive-gateway');
-    expect(pi.providers[0].config.baseUrl).toBe('https://agentic.example.com');
+    // pi-ai appends `/chat/completions`, so the registration must carry the /v1.
+    expect(pi.providers[0].config.baseUrl).toBe('https://agentic.example.com/v1');
   });
 
   it('honours a custom provider name', () => {
