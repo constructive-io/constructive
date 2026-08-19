@@ -15,8 +15,8 @@ import { BlueprintConstructionModel } from './models/blueprintConstruction';
 import { BlueprintTemplateModel } from './models/blueprintTemplate';
 import { CapabilitiesModuleModel } from './models/capabilitiesModule';
 import { CatalogModuleModel } from './models/catalogModule';
+import { ClusterModuleModel } from './models/clusterModule';
 import { ComputeLogModuleModel } from './models/computeLogModule';
-import { ConfigSecretsUserModuleModel } from './models/configSecretsUserModule';
 import { ConnectedAccountsModuleModel } from './models/connectedAccountsModule';
 import { ContentPresetModuleModel } from './models/contentPresetModule';
 import { CryptoAddressesModuleModel } from './models/cryptoAddressesModule';
@@ -43,16 +43,19 @@ import { FunctionModuleModel } from './models/functionModule';
 import { GraphExecutionModuleModel } from './models/graphExecutionModule';
 import { GraphModuleModel } from './models/graphModule';
 import { HierarchyModuleModel } from './models/hierarchyModule';
-import { HttpRouteModuleModel } from './models/httpRouteModule';
 import { I18NModuleModel } from './models/i18NModule';
 import { IdentityProvidersModuleModel } from './models/identityProvidersModule';
+import { ImageModuleModel } from './models/imageModule';
 import { InferenceLogModuleModel } from './models/inferenceLogModule';
 import { InfraConfigModuleModel } from './models/infraConfigModule';
 import { InfraSecretsModuleModel } from './models/infraSecretsModule';
 import { IntegrationProvidersModuleModel } from './models/integrationProvidersModule';
+import { InternalConfigModuleModel } from './models/internalConfigModule';
 import { InternalSecretsModuleModel } from './models/internalSecretsModule';
 import { InvitesModuleModel } from './models/invitesModule';
+import { K8sAdmissionModuleModel } from './models/k8sAdmissionModule';
 import { LimitsModuleModel } from './models/limitsModule';
+import { MachineModuleModel } from './models/machineModule';
 import { MembershipTypesModuleModel } from './models/membershipTypesModule';
 import { MembershipsModuleModel } from './models/membershipsModule';
 import { MerkleStoreModuleModel } from './models/merkleStoreModule';
@@ -68,6 +71,7 @@ import { RateLimitMetersModuleModel } from './models/rateLimitMetersModule';
 import { RateLimitsModuleModel } from './models/rateLimitsModule';
 import { RealtimeModuleModel } from './models/realtimeModule';
 import { RelationProvisionModel } from './models/relationProvision';
+import { RepositoryModuleModel } from './models/repositoryModule';
 import { ResourceModuleModel } from './models/resourceModule';
 import { RlsModuleModel } from './models/rlsModule';
 import { RouteModuleModel } from './models/routeModule';
@@ -131,8 +135,8 @@ export function createClient(config: OrmClientConfig) {
     blueprintTemplate: new BlueprintTemplateModel(client),
     capabilitiesModule: new CapabilitiesModuleModel(client),
     catalogModule: new CatalogModuleModel(client),
+    clusterModule: new ClusterModuleModel(client),
     computeLogModule: new ComputeLogModuleModel(client),
-    configSecretsUserModule: new ConfigSecretsUserModuleModel(client),
     connectedAccountsModule: new ConnectedAccountsModuleModel(client),
     contentPresetModule: new ContentPresetModuleModel(client),
     cryptoAddressesModule: new CryptoAddressesModuleModel(client),
@@ -159,16 +163,19 @@ export function createClient(config: OrmClientConfig) {
     graphExecutionModule: new GraphExecutionModuleModel(client),
     graphModule: new GraphModuleModel(client),
     hierarchyModule: new HierarchyModuleModel(client),
-    httpRouteModule: new HttpRouteModuleModel(client),
     i18NModule: new I18NModuleModel(client),
     identityProvidersModule: new IdentityProvidersModuleModel(client),
+    imageModule: new ImageModuleModel(client),
     inferenceLogModule: new InferenceLogModuleModel(client),
     infraConfigModule: new InfraConfigModuleModel(client),
     infraSecretsModule: new InfraSecretsModuleModel(client),
     integrationProvidersModule: new IntegrationProvidersModuleModel(client),
+    internalConfigModule: new InternalConfigModuleModel(client),
     internalSecretsModule: new InternalSecretsModuleModel(client),
     invitesModule: new InvitesModuleModel(client),
+    k8sAdmissionModule: new K8sAdmissionModuleModel(client),
     limitsModule: new LimitsModuleModel(client),
+    machineModule: new MachineModuleModel(client),
     membershipTypesModule: new MembershipTypesModuleModel(client),
     membershipsModule: new MembershipsModuleModel(client),
     merkleStoreModule: new MerkleStoreModuleModel(client),
@@ -184,6 +191,7 @@ export function createClient(config: OrmClientConfig) {
     rateLimitsModule: new RateLimitsModuleModel(client),
     realtimeModule: new RealtimeModuleModel(client),
     relationProvision: new RelationProvisionModel(client),
+    repositoryModule: new RepositoryModuleModel(client),
     resourceModule: new ResourceModuleModel(client),
     rlsModule: new RlsModuleModel(client),
     routeModule: new RouteModuleModel(client),

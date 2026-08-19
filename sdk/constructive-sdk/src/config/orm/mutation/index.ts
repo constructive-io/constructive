@@ -7,6 +7,10 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
+  _InternalSecretsDelInput,
+  _InternalSecretsRemoveArrayInput,
+  _InternalSecretsRotateInput,
+  _InternalSecretsSetInput,
   _SecretsDelInput,
   _SecretsRemoveArrayInput,
   _SecretsRotateInput,
@@ -20,6 +24,10 @@ import type {
   PlatformSecretsRotateInput,
   PlatformSecretsSetInput,
   ProvisionBucketInput,
+  _InternalSecretsDelPayload,
+  _InternalSecretsRemoveArrayPayload,
+  _InternalSecretsRotatePayload,
+  _InternalSecretsSetPayload,
   _SecretsDelPayload,
   _SecretsRemoveArrayPayload,
   _SecretsRotatePayload,
@@ -33,6 +41,10 @@ import type {
   PlatformSecretsRotatePayload,
   PlatformSecretsSetPayload,
   ProvisionBucketPayload,
+  _InternalSecretsDelPayloadSelect,
+  _InternalSecretsRemoveArrayPayloadSelect,
+  _InternalSecretsRotatePayloadSelect,
+  _InternalSecretsSetPayloadSelect,
   _SecretsDelPayloadSelect,
   _SecretsRemoveArrayPayloadSelect,
   _SecretsRotatePayloadSelect,
@@ -48,6 +60,18 @@ import type {
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
+export interface _internalSecretsDelVariables {
+  input: _InternalSecretsDelInput;
+}
+export interface _internalSecretsRemoveArrayVariables {
+  input: _InternalSecretsRemoveArrayInput;
+}
+export interface _internalSecretsRotateVariables {
+  input: _InternalSecretsRotateInput;
+}
+export interface _internalSecretsSetVariables {
+  input: _InternalSecretsSetInput;
+}
 export interface _secretsDelVariables {
   input: _SecretsDelInput;
 }
@@ -96,6 +120,125 @@ export interface ProvisionBucketVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
+    _internalSecretsDel: <S extends _InternalSecretsDelPayloadSelect>(
+      args: _internalSecretsDelVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, _InternalSecretsDelPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        _internalSecretsDel: InferSelectResult<_InternalSecretsDelPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: '_internalSecretsDel',
+        fieldName: '_internalSecretsDel',
+        ...buildCustomDocument(
+          'mutation',
+          '_internalSecretsDel',
+          '_internalSecretsDel',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: '_InternalSecretsDelInput!',
+            },
+          ],
+          connectionFieldsMap,
+          '_InternalSecretsDelPayload'
+        ),
+      }),
+    _internalSecretsRemoveArray: <S extends _InternalSecretsRemoveArrayPayloadSelect>(
+      args: _internalSecretsRemoveArrayVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, _InternalSecretsRemoveArrayPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        _internalSecretsRemoveArray: InferSelectResult<
+          _InternalSecretsRemoveArrayPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: '_internalSecretsRemoveArray',
+        fieldName: '_internalSecretsRemoveArray',
+        ...buildCustomDocument(
+          'mutation',
+          '_internalSecretsRemoveArray',
+          '_internalSecretsRemoveArray',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: '_InternalSecretsRemoveArrayInput!',
+            },
+          ],
+          connectionFieldsMap,
+          '_InternalSecretsRemoveArrayPayload'
+        ),
+      }),
+    _internalSecretsRotate: <S extends _InternalSecretsRotatePayloadSelect>(
+      args: _internalSecretsRotateVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, _InternalSecretsRotatePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        _internalSecretsRotate: InferSelectResult<_InternalSecretsRotatePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: '_internalSecretsRotate',
+        fieldName: '_internalSecretsRotate',
+        ...buildCustomDocument(
+          'mutation',
+          '_internalSecretsRotate',
+          '_internalSecretsRotate',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: '_InternalSecretsRotateInput!',
+            },
+          ],
+          connectionFieldsMap,
+          '_InternalSecretsRotatePayload'
+        ),
+      }),
+    _internalSecretsSet: <S extends _InternalSecretsSetPayloadSelect>(
+      args: _internalSecretsSetVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, _InternalSecretsSetPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        _internalSecretsSet: InferSelectResult<_InternalSecretsSetPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: '_internalSecretsSet',
+        fieldName: '_internalSecretsSet',
+        ...buildCustomDocument(
+          'mutation',
+          '_internalSecretsSet',
+          '_internalSecretsSet',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: '_InternalSecretsSetInput!',
+            },
+          ],
+          connectionFieldsMap,
+          '_InternalSecretsSetPayload'
+        ),
+      }),
     _secretsDel: <S extends _SecretsDelPayloadSelect>(
       args: _secretsDelVariables,
       options: {

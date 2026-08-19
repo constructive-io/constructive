@@ -15,6 +15,18 @@ import agentResourceChunkCmd from './commands/agent-resource-chunk';
 import agentResourceCmd from './commands/agent-resource';
 import agentTaskCmd from './commands/agent-task';
 import agentThreadCmd from './commands/agent-thread';
+import platformAgentCmd from './commands/platform-agent';
+import platformAgentEventCmd from './commands/platform-agent-event';
+import platformAgentMessageCmd from './commands/platform-agent-message';
+import platformAgentPersonaCmd from './commands/platform-agent-persona';
+import platformAgentPlanCmd from './commands/platform-agent-plan';
+import platformAgentPromptCmd from './commands/platform-agent-prompt';
+import platformAgentResourceChunkCmd from './commands/platform-agent-resource-chunk';
+import platformAgentResourceCmd from './commands/platform-agent-resource';
+import platformAgentRunCmd from './commands/platform-agent-run';
+import platformAgentRunWorkspaceCmd from './commands/platform-agent-run-workspace';
+import platformAgentTaskCmd from './commands/platform-agent-task';
+import platformAgentThreadCmd from './commands/platform-agent-thread';
 import provisionBucketCmd from './commands/provision-bucket';
 const createCommandMap: () => Record<
   string,
@@ -35,10 +47,22 @@ const createCommandMap: () => Record<
   'agent-resource': agentResourceCmd,
   'agent-task': agentTaskCmd,
   'agent-thread': agentThreadCmd,
+  'platform-agent': platformAgentCmd,
+  'platform-agent-event': platformAgentEventCmd,
+  'platform-agent-message': platformAgentMessageCmd,
+  'platform-agent-persona': platformAgentPersonaCmd,
+  'platform-agent-plan': platformAgentPlanCmd,
+  'platform-agent-prompt': platformAgentPromptCmd,
+  'platform-agent-resource-chunk': platformAgentResourceChunkCmd,
+  'platform-agent-resource': platformAgentResourceCmd,
+  'platform-agent-run': platformAgentRunCmd,
+  'platform-agent-run-workspace': platformAgentRunWorkspaceCmd,
+  'platform-agent-task': platformAgentTaskCmd,
+  'platform-agent-thread': platformAgentThreadCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  agent                agent CRUD operations\n  agent-message        agentMessage CRUD operations\n  agent-persona        agentPersona CRUD operations\n  agent-plan           agentPlan CRUD operations\n  agent-prompt         agentPrompt CRUD operations\n  agent-resource-chunk agentResourceChunk CRUD operations\n  agent-resource       agentResource CRUD operations\n  agent-task           agentTask CRUD operations\n  agent-thread         agentThread CRUD operations\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  agent                agent CRUD operations\n  agent-message        agentMessage CRUD operations\n  agent-persona        agentPersona CRUD operations\n  agent-plan           agentPlan CRUD operations\n  agent-prompt         agentPrompt CRUD operations\n  agent-resource-chunk agentResourceChunk CRUD operations\n  agent-resource       agentResource CRUD operations\n  agent-task           agentTask CRUD operations\n  agent-thread         agentThread CRUD operations\n  platform-agent       platformAgent CRUD operations\n  platform-agent-event platformAgentEvent CRUD operations\n  platform-agent-message platformAgentMessage CRUD operations\n  platform-agent-persona platformAgentPersona CRUD operations\n  platform-agent-plan  platformAgentPlan CRUD operations\n  platform-agent-prompt platformAgentPrompt CRUD operations\n  platform-agent-resource-chunk platformAgentResourceChunk CRUD operations\n  platform-agent-resource platformAgentResource CRUD operations\n  platform-agent-run   platformAgentRun CRUD operations\n  platform-agent-run-workspace platformAgentRunWorkspace CRUD operations\n  platform-agent-task  platformAgentTask CRUD operations\n  platform-agent-thread platformAgentThread CRUD operations\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
