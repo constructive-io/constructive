@@ -1,5 +1,6 @@
 import './types';
 
+import { ConstructiveError } from '@constructive-io/errors';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
@@ -39,6 +40,14 @@ const isCsrfError = (err: Error): boolean => {
 };
 
 const categorizeError = (err: Error): ErrorResponse => {
+  if (err instanceof ConstructiveError) {
+    return {
+      statusCode: err.http,
+      code: err.code,
+      message: err.isPublic ? err.message : 'An unexpected error occurred',
+      logLevel: err.http >= 500 ? 'error' : 'warn'
+    };
+  }
   if (isApiError(err)) {
     return {
       statusCode: err.statusCode,
@@ -79,7 +88,15 @@ const logError = (err: Error, req: Request, level: 'warn' | 'error'): void => {
     clientIp: req.clientIp,
   };
 
-  if (isApiError(err)) {
+  if (err instanceof ConstructiveError) {
+    log[level]({
+      event: 'constructive_error',
+      code: err.code,
+      statusCode: err.http,
+      message: err.message,
+      ...context
+    });
+  } else if (isApiError(err)) {
     log[level]({ event: 'api_error', code: err.code, statusCode: err.statusCode, message: err.message, ...context });
   } else {
     log[level]({ event: 'unexpected_error', name: err.name, message: err.message, stack: isDevelopment() ? err.stack : undefined, ...context });

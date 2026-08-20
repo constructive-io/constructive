@@ -57,6 +57,14 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 - `API_ANON_ROLE` - Anonymous role name
 - `API_ROLE_NAME` - Default role name
 
+### OAuth Server
+- `OAUTH_ENABLED` - Explicitly enable the unified-auth Provider flow (default: `false`)
+- `OAUTH_PROVIDER_REQUEST_TIMEOUT_MS` - Per-request Provider timeout in milliseconds (default: `10000`, maximum: `60000`)
+
+Provider endpoints, client IDs, secrets, scopes, and policy are Tenant data;
+they are not process environment variables. Explicit malformed OAuth values
+fail during option resolution instead of falling back silently.
+
 ## Defaults
 
 GraphQL defaults are provided by `@constructive-io/graphql-types`:
@@ -76,6 +84,10 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
     isPublic: true,
     metaSchemas: ['routing_public', 'metaschema_public', 'metaschema_modules_public'],
     routingSchema: 'routing_public'
+  },
+  oauth: {
+    enabled: false,
+    providerRequestTimeoutMs: 10000
   }
 }
 ```
