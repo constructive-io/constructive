@@ -2808,8 +2808,8 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1
       lru-cache:
-        specifier: ^11.2.7
-        version: 11.2.7
+        specifier: ^10.4.3
+        version: 10.4.3
     devDependencies:
       '@types/cors':
         specifier: ^2.8.17
@@ -3425,8 +3425,8 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       lru-cache:
-        specifier: ^11.2.7
-        version: 11.2.7
+        specifier: ^10.4.3
+        version: 10.4.3
       pg:
         specifier: ^8.21.0
         version: 8.21.0
