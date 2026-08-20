@@ -2,18 +2,18 @@ import { resolve } from 'node:path';
 
 import {
   CliError,
+  type CommandAdapterHookMap,
   CommandCatalogEntrySchema,
+  type CommandRegistry,
   CommandSchemaDocumentSchema,
-  HelpDocumentSchema,
   defineCommand,
   exportDocumentation,
   generateCompletion,
   generateDocumentation,
   getHelpDocument,
+  HelpDocumentSchema,
   renderHelp,
   Type,
-  type CommandAdapterHookMap,
-  type CommandRegistry,
 } from '@constructive-io/cli-runtime';
 
 export interface DiscoveryCommandOptions {
@@ -234,13 +234,13 @@ export const createDiscoveryCommands = ({
         },
         artifacts: exported.applied
           ? changes
-              .filter(
-                ({ action }) => action === 'create' || action === 'update'
-              )
-              .map(({ path }) => ({
-                type: 'agent-documentation',
-                path: resolve(exported.plan.target, path),
-              }))
+            .filter(
+              ({ action }) => action === 'create' || action === 'update'
+            )
+            .map(({ path }) => ({
+              type: 'agent-documentation',
+              path: resolve(exported.plan.target, path),
+            }))
           : [],
       };
     },

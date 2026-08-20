@@ -1,40 +1,16 @@
-import { stat } from 'node:fs/promises';
 import type { Server as HttpServer } from 'node:http';
-import { resolve } from 'node:path';
 
 import {
   CliError,
   defineCommand,
   isSensitiveKey,
-  Type,
-  type Static,
   type OperationContext,
+  type Static,
+  Type,
 } from '@constructive-io/cli-runtime';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { withLogsSuppressed } from '@pgpmjs/logger';
-
-import { withConsoleSuppressed } from '../console-isolation';
+import { withOperationOutputSuppressed } from '../console-isolation';
 import { importOptionalCapability } from './optional-capability';
-
-type FunctionName = 'send-email' | 'send-verification-link';
-
-interface FunctionServiceConfig {
-  name: FunctionName;
-  port?: number;
-}
-
-interface KnativeJobsSvcOptions {
-  functions?: {
-    enabled?: boolean;
-    services?: FunctionServiceConfig[];
-  };
-  jobs?: { enabled?: boolean };
-  runtime?: {
-    cwd?: string;
-    env?: NodeJS.ProcessEnv;
-    signal?: AbortSignal;
-  };
-}
 
 const ServiceEventSchema = Type.Union([
   Type.Object(
@@ -68,9 +44,6 @@ const ServiceEventSchema = Type.Union([
     { additionalProperties: false }
   ),
 ]);
-
-const suppressOperationOutput = <T>(callback: () => Promise<T>): Promise<T> =>
-  withConsoleSuppressed(() => withLogsSuppressed(callback));
 
 type ServiceEvent = Static<typeof ServiceEventSchema>;
 
@@ -274,7 +247,6 @@ const ServerInputSchema = Type.Object(
     simpleInflection: Type.Optional(Type.Boolean()),
     oppositeBaseNames: Type.Optional(Type.Boolean()),
     postgis: Type.Optional(Type.Boolean()),
-    servicesApi: Type.Optional(Type.Boolean()),
     schemas: Type.Optional(Type.String()),
     authRole: Type.Optional(Type.String({ minLength: 1 })),
     roleName: Type.Optional(Type.String({ minLength: 1 })),
@@ -294,15 +266,14 @@ const buildServerOverrides = (
     postgis: input.postgis ?? true,
   },
   api: {
-    enableServicesApi: input.servicesApi ?? true,
     ...(input.schemas === undefined
       ? {}
       : {
-          exposedSchemas: input.schemas
-            .split(',')
-            .map((schema) => schema.trim())
-            .filter(Boolean),
-        }),
+        exposedSchemas: input.schemas
+          .split(',')
+          .map((schema) => schema.trim())
+          .filter(Boolean),
+      }),
     ...(input.authRole === undefined ? {} : { anonRole: input.authRole }),
     ...(input.roleName === undefined ? {} : { roleName: input.roleName }),
   },
@@ -365,12 +336,6 @@ export const serverCommand = defineCommand({
       description: 'Enable PostGIS support.',
     },
     {
-      property: 'servicesApi',
-      sources: [booleanOption('services-api', 'servicesApi')],
-      valueType: 'boolean',
-      description: 'Enable the Services API.',
-    },
-    {
       property: 'schemas',
       sources: [{ kind: 'option', name: 'schemas' }],
       description: 'Comma-separated schemas when Services API is disabled.',
@@ -397,7 +362,7 @@ export const serverCommand = defineCommand({
   lifecycle: 'long-running',
   effect: 'service',
   async execute(input, context) {
-    return suppressOperationOutput(async () => {
+    return withOperationOutputSuppressed(async () => {
       const [
         { getEnvOptions },
         { Server: GraphQLServer, withServerEnvironment },
@@ -435,18 +400,6 @@ export const serverCommand = defineCommand({
             details: {
               acceptedSources: ['--database', 'PGDATABASE', 'pg.database'],
             },
-          });
-        }
-        if (
-          options.api.enableServicesApi === false &&
-          (options.api.exposedSchemas?.length ?? 0) === 0
-        ) {
-          throw new CliError({
-            code: 'SERVER_SCHEMAS_REQUIRED',
-            category: 'configuration',
-            message:
-              'At least one exposed schema is required when the Services API is disabled.',
-            path: '/schemas',
           });
         }
         const instance = new GraphQLServer(options, {
@@ -571,7 +524,7 @@ export const explorerCommand = defineCommand({
   lifecycle: 'long-running',
   effect: 'service',
   async execute(input, context) {
-    return suppressOperationOutput(async () => {
+    return withOperationOutputSuppressed(async () => {
       const [{ getEnvOptions }, { startGraphQLExplorer }] = await Promise.all([
         importOptionalCapability(
           'explorer',
@@ -664,248 +617,4 @@ export const explorerCommand = defineCommand({
   },
 });
 
-interface ParsedFunctions {
-  mode: 'all' | 'list';
-  services: FunctionServiceConfig[];
-}
-
-const SUPPORTED_FUNCTIONS = new Set<FunctionName>([
-  'send-email',
-  'send-verification-link',
-]);
-
-export const parseFunctions = (value?: string): ParsedFunctions | undefined => {
-  if (value === undefined) return undefined;
-  const tokens = value
-    .split(',')
-    .map((token) => token.trim())
-    .filter(Boolean);
-  if (tokens.length === 0) return { mode: 'list', services: [] };
-  if (tokens.some((token) => ['all', '*'].includes(token.toLowerCase()))) {
-    if (tokens.length !== 1) {
-      throw new CliError({
-        code: 'JOBS_FUNCTIONS_INVALID',
-        category: 'validation',
-        message: 'Use "all" without other function names.',
-      });
-    }
-    return { mode: 'all', services: [] };
-  }
-
-  const services = new Map<string, FunctionServiceConfig>();
-  for (const token of tokens) {
-    const [rawName, rawPort, ...surplus] = token.split(/[:=]/);
-    const name = rawName?.trim();
-    if (!name || surplus.length > 0) {
-      throw new CliError({
-        code: 'JOBS_FUNCTIONS_INVALID',
-        category: 'validation',
-        message: `Invalid function declaration "${token}".`,
-      });
-    }
-    if (!SUPPORTED_FUNCTIONS.has(name as FunctionName)) {
-      throw new CliError({
-        code: 'JOBS_FUNCTION_UNKNOWN',
-        category: 'validation',
-        message: `Unknown function "${name}".`,
-        path: '/functions',
-        details: { supported: [...SUPPORTED_FUNCTIONS] },
-      });
-    }
-    if (services.has(name)) {
-      throw new CliError({
-        code: 'JOBS_FUNCTION_DUPLICATE',
-        category: 'validation',
-        message: `Function "${name}" is declared more than once.`,
-        path: '/functions',
-      });
-    }
-    let port: number | undefined;
-    if (rawPort !== undefined) {
-      port = Number(rawPort.trim());
-      if (!Number.isInteger(port) || port < 1 || port > 65535) {
-        throw new CliError({
-          code: 'JOBS_FUNCTION_PORT_INVALID',
-          category: 'validation',
-          message: `Function "${name}" has an invalid port.`,
-          path: '/functions',
-        });
-      }
-    }
-    services.set(name, {
-      name: name as FunctionName,
-      ...(port === undefined ? {} : { port }),
-    });
-  }
-  return { mode: 'list', services: [...services.values()] };
-};
-
-const JobsInputSchema = Type.Object(
-  {
-    withJobsServer: Type.Optional(Type.Boolean()),
-    functions: Type.Optional(Type.String()),
-  },
-  { additionalProperties: false }
-);
-
-const JobsOutputSchema = Type.Object(
-  {
-    service: Type.Literal('jobs'),
-    status: Type.Literal('stopped'),
-    jobs: Type.Boolean(),
-    jobsPort: Type.Optional(Type.Integer({ minimum: 1, maximum: 65535 })),
-    functions: Type.Array(
-      Type.Object(
-        {
-          name: Type.String(),
-          port: Type.Integer({ minimum: 1, maximum: 65535 }),
-        },
-        { additionalProperties: false }
-      )
-    ),
-  },
-  { additionalProperties: false }
-);
-
-export const jobsCommand = defineCommand({
-  id: 'jobs.up',
-  path: ['jobs', 'up'],
-  summary: 'Start Constructive jobs and function services.',
-  input: JobsInputSchema,
-  output: JobsOutputSchema,
-  events: ServiceEventSchema,
-  bindings: [
-    {
-      property: 'withJobsServer',
-      sources: [booleanOption('with-jobs-server', 'withJobsServer')],
-      valueType: 'boolean',
-      description: 'Enable the jobs callback server, worker, and scheduler.',
-    },
-    {
-      property: 'functions',
-      sources: [{ kind: 'option', name: 'functions' }],
-      description: 'Comma-separated function names, optionally with ports.',
-    },
-  ],
-  examples: [
-    { argv: ['jobs', 'up', '--with-jobs-server'] },
-    { argv: ['jobs', 'up', '--functions', 'send-email=8081'] },
-  ],
-  lifecycle: 'long-running',
-  effect: 'service',
-  async execute(input, context) {
-    return suppressOperationOutput(async () => {
-      const { KnativeJobsSvc } = await importOptionalCapability(
-        'jobs',
-        '@constructive-io/knative-job-service',
-        () => import('@constructive-io/knative-job-service')
-      );
-      const cwd = resolve(context.cwd);
-      const cwdStat = await stat(cwd).catch((): undefined => undefined);
-      if (!cwdStat?.isDirectory()) {
-        throw new CliError({
-          code: 'CWD_NOT_FOUND',
-          category: 'configuration',
-          message: `Working directory does not exist: ${cwd}`,
-          path: '/cwd',
-        });
-      }
-
-      const parsedFunctions = parseFunctions(input.functions);
-      const options: KnativeJobsSvcOptions = {
-        jobs: { enabled: input.withJobsServer === true },
-        ...(parsedFunctions === undefined
-          ? {}
-          : parsedFunctions.mode === 'all'
-            ? { functions: { enabled: true } }
-            : parsedFunctions.services.length > 0
-              ? {
-                  functions: {
-                    enabled: true,
-                    services: parsedFunctions.services,
-                  },
-                }
-              : {}),
-        runtime: {
-          cwd,
-          env: toProcessEnv(context.env),
-          signal: context.signal,
-        },
-      };
-
-      if (!options.jobs?.enabled && !options.functions?.enabled) {
-        throw new CliError({
-          code: 'JOBS_NO_SERVICES_ENABLED',
-          category: 'validation',
-          message:
-            'Enable --with-jobs-server, provide --functions, or do both.',
-        });
-      }
-
-      const service = new KnativeJobsSvc(options);
-      let primaryError: unknown;
-      try {
-        await emit(context, { event: 'service.starting', service: 'jobs' });
-        let result: Awaited<ReturnType<typeof service.start>>;
-        try {
-          result = await raceWithAbort(context.signal, service.start());
-        } catch (error) {
-          if (context.signal.aborted) throw error;
-          throw serviceStartError('Jobs runtime', error);
-        }
-        if (result.jobs && result.jobsPort) {
-          await emit(context, {
-            event: 'service.ready',
-            service: 'jobs',
-            url: `http://localhost:${result.jobsPort}`,
-            port: result.jobsPort,
-          });
-        }
-        for (const fn of result.functions) {
-          await emit(context, {
-            event: 'service.ready',
-            service: `function:${fn.name}`,
-            url: `http://localhost:${fn.port}`,
-            port: fn.port,
-          });
-        }
-        try {
-          await Promise.race([
-            waitForAbortOrClose(context.signal),
-            service.waitForFailure(),
-          ]);
-        } catch (error) {
-          if (context.signal.aborted) throw error;
-          throw serviceStartError('Jobs runtime', error);
-        }
-        return {
-          data: {
-            service: 'jobs' as const,
-            status: 'stopped' as const,
-            jobs: result.jobs,
-            ...(result.jobsPort === undefined
-              ? {}
-              : { jobsPort: result.jobsPort }),
-            functions: result.functions,
-          },
-        };
-      } catch (error) {
-        primaryError = error;
-        throw error;
-      } finally {
-        await finalizeService(
-          context,
-          'jobs',
-          () => service.stop(),
-          primaryError
-        );
-      }
-    });
-  },
-});
-
-export const serviceCommands = [
-  serverCommand,
-  explorerCommand,
-  jobsCommand,
-] as const;
+export const serviceCommands = [serverCommand, explorerCommand] as const;

@@ -69,7 +69,7 @@ describe('CNC registry module purity', () => {
           executeCommand(
             registry,
             serverCommand,
-            { database: 'app', servicesApi: false, schemas: '' },
+            { database: 'app', port: 70000 },
             { cwd: ${JSON.stringify(packageRoot)}, mode: 'agent', env: {} },
           ).then((outcome) => {
             process.stdout.write(JSON.stringify({
@@ -90,7 +90,7 @@ describe('CNC registry module purity', () => {
     expect(child.stderr).toBe('');
     expect(JSON.parse(child.stdout)).toEqual({
       status: 'failed',
-      code: 'SERVER_SCHEMAS_REQUIRED',
+      code: 'CLI_INPUT_INVALID',
     });
   });
 

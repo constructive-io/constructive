@@ -4,7 +4,7 @@ The `@constructive-io/cli` package provides the user-facing CLI for the Construc
 
 - **Binaries:** `constructive` (full) and `cnc` (shorthand)
 - **What it covers:** contexts/authentication, raw GraphQL execution, codegen,
-  and GraphQL/jobs service lifecycles
+  and GraphQL server/explorer lifecycles
 
 **Note:** Database operations (init, add, deploy, revert, etc.) are handled by the separate `pgpm` CLI. Users should install both tools for the complete workflow.
 
@@ -24,7 +24,7 @@ The registry-backed command operations are:
 - `runtime/state-commands.ts` – context and authentication operations
 - `runtime/execute-command.ts` – guarded raw GraphQL execution
 - `runtime/codegen-command.ts` – ownership-aware codegen planning/application
-- `runtime/service-commands.ts` – server, explorer, and jobs lifecycles
+- `runtime/service-commands.ts` – server and explorer lifecycles
 - `runtime/discovery-commands.ts` – help, schemas, docs, and completions
 
 Files under `src/commands/` are retained legacy terminal handlers; new command

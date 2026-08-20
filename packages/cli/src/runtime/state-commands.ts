@@ -1,14 +1,17 @@
 import {
   CliError,
   defineCommand,
-  Type,
   type OperationContext,
   type OperationWarning,
+  Type,
 } from '@constructive-io/cli-runtime';
 
 import {
+  type CncState,
+  type ConfigStore,
   ConfigStoreError,
-  TokenSourceError,
+  type ContextConfig,
+  type ContextCredentials,
   createContextAndMaybeActivate,
   deleteContext,
   getContextCredentials,
@@ -20,10 +23,7 @@ import {
   resolveToken,
   setContextCredentials,
   setCurrentContext,
-  type ConfigStore,
-  type CncState,
-  type ContextConfig,
-  type ContextCredentials,
+  TokenSourceError,
 } from '../config';
 
 const ContextSchema = Type.Object(
@@ -154,16 +154,16 @@ const resolveTargetContext = (
   runStateOperation(() =>
     state
       ? resolveContextFromState(state, {
-          contextName,
-          env: context.env,
-          allowCurrentContext: context.mode === 'human',
-        })
+        contextName,
+        env: context.env,
+        allowCurrentContext: context.mode === 'human',
+      })
       : resolveContext({
-          contextName,
-          env: context.env,
-          allowCurrentContext: context.mode === 'human',
-          store,
-        })
+        contextName,
+        env: context.env,
+        allowCurrentContext: context.mode === 'human',
+        store,
+      })
   ).context;
 
 const ContextNameInputSchema = Type.Object(
@@ -532,12 +532,12 @@ export function createAuthCommands(dependencies: StateCommandDependencies) {
         input.legacyValue === undefined
           ? []
           : [
-              {
-                code: 'CLI_DEPRECATED',
-                message:
+            {
+              code: 'CLI_DEPRECATED',
+              message:
                   'Passing a token positionally is deprecated; use CNC_TOKEN or --token-stdin.',
-              },
-            ];
+            },
+          ];
       return {
         data: {
           contextName: target.name,

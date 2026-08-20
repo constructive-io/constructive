@@ -1,6 +1,3 @@
-export { Static, Type } from '@sinclair/typebox';
-export type { TSchema } from '@sinclair/typebox';
-
 export * from './bindings';
 export * from './contracts';
 export * from './discovery';
@@ -12,3 +9,5 @@ export * from './registry';
 export * from './render';
 export * from './schema';
 export * from './settings';
+export type { TSchema } from '@sinclair/typebox';
+export { Static, Type } from '@sinclair/typebox';

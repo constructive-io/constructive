@@ -189,14 +189,6 @@ jobs:
           npm_config_ignore_scripts=true pnpm --filter @constructive-io/graphql-query pack --pack-destination /tmp/cnc-package-artifacts
           npm_config_ignore_scripts=true pnpm --filter @constructive-io/graphql-server pack --pack-destination /tmp/cnc-package-artifacts
           npm_config_ignore_scripts=true pnpm --filter @constructive-io/express-context pack --pack-destination /tmp/cnc-package-artifacts
-          npm_config_ignore_scripts=true pnpm --filter @constructive-io/job-pg pack --pack-destination /tmp/cnc-package-artifacts
-          npm_config_ignore_scripts=true pnpm --filter @constructive-io/job-scheduler pack --pack-destination /tmp/cnc-package-artifacts
-          npm_config_ignore_scripts=true pnpm --filter @constructive-io/job-utils pack --pack-destination /tmp/cnc-package-artifacts
-          npm_config_ignore_scripts=true pnpm --filter @constructive-io/knative-job-fn pack --pack-destination /tmp/cnc-package-artifacts
-          npm_config_ignore_scripts=true pnpm --filter @constructive-io/knative-job-service pack --pack-destination /tmp/cnc-package-artifacts
-          npm_config_ignore_scripts=true pnpm --filter @constructive-io/knative-job-worker pack --pack-destination /tmp/cnc-package-artifacts
-          npm_config_ignore_scripts=true pnpm --filter @constructive-io/send-email-fn pack --pack-destination /tmp/cnc-package-artifacts
-          npm_config_ignore_scripts=true pnpm --filter @constructive-io/send-verification-link-fn pack --pack-destination /tmp/cnc-package-artifacts
           npm_config_ignore_scripts=true pnpm --filter @pgpmjs/env pack --pack-destination /tmp/cnc-package-artifacts
           npm_config_ignore_scripts=true pnpm --filter @pgpmjs/logger pack --pack-destination /tmp/cnc-package-artifacts
           npm_config_ignore_scripts=true pnpm --filter @pgpmjs/server-utils pack --pack-destination /tmp/cnc-package-artifacts

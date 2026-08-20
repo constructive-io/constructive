@@ -1588,6 +1588,9 @@ importers:
       oxfmt:
         specifier: ^0.51.0
         version: 0.51.0
+      pg:
+        specifier: ^8.21.0
+        version: 8.21.0
       pg-cache:
         specifier: workspace:^
         version: link:../../postgres/pg-cache/dist
@@ -2412,57 +2415,33 @@ importers:
 
   packages/cli:
     dependencies:
-      '@constructive-io/graphql-codegen':
+      '@constructive-io/cli-runtime':
         specifier: workspace:^
-        version: link:../../graphql/codegen/dist
-      '@constructive-io/graphql-env':
-        specifier: workspace:^
-        version: link:../../graphql/env/dist
-      '@constructive-io/graphql-explorer':
-        specifier: workspace:^
-        version: link:../../graphql/explorer/dist
-      '@constructive-io/graphql-server':
-        specifier: workspace:^
-        version: link:../../graphql/server/dist
-      '@constructive-io/graphql-types':
-        specifier: workspace:^
-        version: link:../../graphql/types/dist
+        version: link:../cli-runtime/dist
       '@inquirerer/utils':
         specifier: ^3.3.12
         version: 3.3.12
-      '@pgpmjs/core':
-        specifier: workspace:^
-        version: link:../../pgpm/core/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
-      '@pgpmjs/server-utils':
-        specifier: workspace:^
-        version: link:../server-utils/dist
-      '@pgpmjs/types':
-        specifier: workspace:^
-        version: link:../../pgpm/types/dist
+      '@sinclair/typebox':
+        specifier: ^0.34.49
+        version: 0.34.49
       appstash:
         specifier: ^0.8.0
         version: 0.8.0
       find-and-require-package-json:
         specifier: ^0.9.1
         version: 0.9.1
+      graphql:
+        specifier: 16.13.0
+        version: 16.13.0
       inquirerer:
         specifier: ^4.9.3
         version: 4.9.3
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
-      pg-cache:
-        specifier: workspace:^
-        version: link:../../postgres/pg-cache/dist
-      pg-env:
-        specifier: workspace:^
-        version: link:../../postgres/pg-env/dist
-      pgpm:
-        specifier: workspace:^
-        version: link:../../pgpm/cli/dist
       shelljs:
         specifier: ^0.10.0
         version: 0.10.0
@@ -2497,6 +2476,54 @@ importers:
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+    optionalDependencies:
+      '@constructive-io/graphql-codegen':
+        specifier: workspace:^
+        version: link:../../graphql/codegen/dist
+      '@constructive-io/graphql-env':
+        specifier: workspace:^
+        version: link:../../graphql/env/dist
+      '@constructive-io/graphql-explorer':
+        specifier: workspace:^
+        version: link:../../graphql/explorer/dist
+      '@constructive-io/graphql-server':
+        specifier: workspace:^
+        version: link:../../graphql/server/dist
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../../graphql/types/dist
+      '@pgpmjs/core':
+        specifier: workspace:^
+        version: link:../../pgpm/core/dist
+      '@pgpmjs/server-utils':
+        specifier: workspace:^
+        version: link:../server-utils/dist
+      '@pgpmjs/types':
+        specifier: workspace:^
+        version: link:../../pgpm/types/dist
+      pg-cache:
+        specifier: workspace:^
+        version: link:../../postgres/pg-cache/dist
+      pg-env:
+        specifier: workspace:^
+        version: link:../../postgres/pg-env/dist
+      pgpm:
+        specifier: workspace:^
+        version: link:../../pgpm/cli/dist
+    publishDirectory: dist
+
+  packages/cli-runtime:
+    dependencies:
+      '@sinclair/typebox':
+        specifier: ^0.34.49
+        version: 0.34.49
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
+    devDependencies:
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
     publishDirectory: dist
 
   packages/client:

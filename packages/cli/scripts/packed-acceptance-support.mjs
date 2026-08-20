@@ -99,30 +99,6 @@ export const parsePackedArguments = (argv) => {
     graphqlServer: archives.filter((name) =>
       /^constructive-io-graphql-server-[0-9].*\.tgz$/.test(name)
     ),
-    jobPg: archives.filter((name) =>
-      /^constructive-io-job-pg-[0-9].*\.tgz$/.test(name)
-    ),
-    jobScheduler: archives.filter((name) =>
-      /^constructive-io-job-scheduler-[0-9].*\.tgz$/.test(name)
-    ),
-    jobUtils: archives.filter((name) =>
-      /^constructive-io-job-utils-[0-9].*\.tgz$/.test(name)
-    ),
-    knativeJobFn: archives.filter((name) =>
-      /^constructive-io-knative-job-fn-[0-9].*\.tgz$/.test(name)
-    ),
-    knativeJobService: archives.filter((name) =>
-      /^constructive-io-knative-job-service-[0-9].*\.tgz$/.test(name)
-    ),
-    knativeJobWorker: archives.filter((name) =>
-      /^constructive-io-knative-job-worker-[0-9].*\.tgz$/.test(name)
-    ),
-    sendEmail: archives.filter((name) =>
-      /^constructive-io-send-email-fn-[0-9].*\.tgz$/.test(name)
-    ),
-    sendVerificationLink: archives.filter((name) =>
-      /^constructive-io-send-verification-link-fn-[0-9].*\.tgz$/.test(name)
-    ),
     pgpmEnv: archives.filter((name) => /^pgpmjs-env-[0-9].*\.tgz$/.test(name)),
     pgEnv: archives.filter((name) => /^pg-env-[0-9].*\.tgz$/.test(name)),
   };

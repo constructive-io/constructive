@@ -210,17 +210,4 @@ export const createServiceHooks = (
         explorerQuestions
       )) as never,
   },
-  'jobs.up': {
-    collectInteractiveInput: async (input) =>
-      (await prompter.prompt(input as Record<string, unknown>, [
-        {
-          name: 'withJobsServer',
-          message: 'Enable jobs server?',
-          type: 'confirm',
-          required: false,
-          default: false,
-          useDefault: true,
-        },
-      ])) as never,
-  },
 });

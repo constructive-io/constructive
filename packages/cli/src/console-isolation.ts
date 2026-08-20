@@ -1,5 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
+import { withLogsSuppressed } from '@pgpmjs/logger';
+
 const consoleMethods = ['debug', 'error', 'info', 'log', 'warn'] as const;
 type ConsoleMethod = (typeof consoleMethods)[number];
 
@@ -41,3 +43,8 @@ export const withConsoleSuppressed = async <T>(
     if (users === 0) uninstall();
   }
 };
+
+/** Suppress dependency loggers and console output within one operation. */
+export const withOperationOutputSuppressed = <T>(
+  callback: () => Promise<T>
+): Promise<T> => withLogsSuppressed(() => withConsoleSuppressed(callback));

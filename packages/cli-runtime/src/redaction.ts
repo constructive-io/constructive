@@ -28,9 +28,9 @@ export function isSensitiveKey(
     typeof matcher === 'string'
       ? matcher.toLowerCase() === key.toLowerCase()
       : (() => {
-          matcher.lastIndex = 0;
-          return matcher.test(key);
-        })()
+        matcher.lastIndex = 0;
+        return matcher.test(key);
+      })()
   );
 }
 

@@ -36,8 +36,7 @@ npm install -g @constructive-io/cli --omit=optional
 
 Feature commands remain discoverable in a core-only installation and fail
 with the typed `CAPABILITY_UNAVAILABLE` error instead of a module-loader or
-internal error. The jobs service is optional as well, so `jobs up` has the same
-behavior when optional packages are explicitly omitted.
+internal error.
 
 ## Command registry
 
@@ -61,7 +60,6 @@ The current command families are:
 - `codegen`
 - `server`
 - `explorer`
-- `jobs up`
 
 Run `cnc help <command>` for the exact, version-matched options. Canonical
 flags use kebab case; historical camel-case flags remain temporary deprecated
@@ -162,7 +160,6 @@ cnc codegen \
 ```bash
 cnc server --port 5555 --no-postgis
 cnc explorer --port 5556
-cnc jobs up --with-jobs-server --functions send-email=8081
 ```
 
 In JSONL mode, services emit `service.starting`, `service.ready`,

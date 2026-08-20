@@ -10,17 +10,11 @@ import {
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { startGraphQLExplorer } from '@constructive-io/graphql-explorer';
 import { Server as GraphQLServer } from '@constructive-io/graphql-server';
-import { KnativeJobsSvc } from '@constructive-io/knative-job-service';
 import { Logger } from '@pgpmjs/logger';
 import type { Inquirerer } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
 
-import {
-  explorerCommand,
-  jobsCommand,
-  parseFunctions,
-  serverCommand,
-} from '../src/runtime/service-commands';
+import { explorerCommand, serverCommand } from '../src/runtime/service-commands';
 import { createServiceHooks } from '../src/runtime/service-hooks';
 
 const mockPromptPoolClose = jest.fn(async (): Promise<void> => undefined);
@@ -37,9 +31,6 @@ jest.mock('@constructive-io/graphql-server', () => ({
     _environment: unknown,
     callback: () => Promise<unknown>
   ) => callback(),
-}));
-jest.mock('@constructive-io/knative-job-service', () => ({
-  KnativeJobsSvc: jest.fn(),
 }));
 jest.mock('pg-cache', () => ({
   getPgPool: jest.fn(),
@@ -74,13 +65,8 @@ class FakeHttpServer extends EventEmitter {
 const mockGetEnvOptions = jest.mocked(getEnvOptions);
 const mockStartExplorer = jest.mocked(startGraphQLExplorer);
 const MockGraphQLServer = jest.mocked(GraphQLServer);
-const MockJobsService = jest.mocked(KnativeJobsSvc);
 const mockGetPgPool = jest.mocked(getPgPool);
-const commands = createCommandRegistry([
-  serverCommand,
-  explorerCommand,
-  jobsCommand,
-]);
+const commands = createCommandRegistry([serverCommand, explorerCommand]);
 
 const unresolvedFailure = async (): Promise<never> =>
   new Promise<never>(() => undefined);
@@ -176,7 +162,7 @@ describe('service command operations', () => {
             oppositeBaseNames: false,
             postgis: true,
           },
-          api: expect.objectContaining({ enableServicesApi: true }),
+          api: {},
           server: expect.objectContaining({ port: 5555 }),
         }),
         expect.anything()
@@ -193,7 +179,7 @@ describe('service command operations', () => {
     mockGetEnvOptions.mockReturnValueOnce({
       pg: { database: 'postgres' },
       features: {},
-      api: { enableServicesApi: true, exposedSchemas: [] },
+      api: {},
       server: { host: '127.0.0.1', port: 5555 },
     } as never);
 
@@ -219,7 +205,7 @@ describe('service command operations', () => {
     expect(MockGraphQLServer).not.toHaveBeenCalled();
   });
 
-  it('maps direct-schema mode onto the server API contract', async () => {
+  it('maps explicit schemas onto the current server API contract', async () => {
     const controller = new AbortController();
     const server = new FakeHttpServer();
     MockGraphQLServer.mockImplementation(
@@ -237,7 +223,6 @@ describe('service command operations', () => {
       'server.start',
       {
         database: 'app',
-        servicesApi: false,
         schemas: 'public, app_public',
         authRole: 'anonymous',
         roleName: 'authenticated',
@@ -249,7 +234,6 @@ describe('service command operations', () => {
     expect(MockGraphQLServer).toHaveBeenCalledWith(
       expect.objectContaining({
         api: {
-          enableServicesApi: false,
           exposedSchemas: ['public', 'app_public'],
           anonRole: 'anonymous',
           roleName: 'authenticated',
@@ -354,7 +338,7 @@ describe('service command operations', () => {
         awsAccessKey: 'config-access-key',
         awsSecretKey: 'config-storage-secret',
       },
-      api: { enableServicesApi: true, exposedSchemas: [] },
+      api: { exposedSchemas: [] },
       features: {},
       server: { host: '127.0.0.1', port: 5555 },
     } as never);
@@ -534,105 +518,4 @@ describe('service command operations', () => {
     expect(close).toHaveBeenCalledTimes(1);
   });
 
-  it('passes only the operation cwd, environment, and signal into jobs', async () => {
-    const controller = new AbortController();
-    const stop = jest.fn(async (): Promise<void> => undefined);
-    const log = new Logger('jobs-service-command-test');
-    const stdout = jest
-      .spyOn(process.stdout, 'write')
-      .mockImplementation(() => true);
-    const stderr = jest
-      .spyOn(process.stderr, 'write')
-      .mockImplementation(() => true);
-    MockJobsService.mockImplementation(
-      () =>
-        ({
-          start: jest.fn(async () => {
-            log.info('this jobs log must not escape');
-            log.error('this jobs log must not escape');
-            return {
-              jobs: false,
-              functions: [{ name: 'send-email', port: 8081 }],
-            };
-          }),
-          waitForFailure: unresolvedFailure,
-          stop,
-        }) as never
-    );
-
-    try {
-      const { outcome } = await runUntilReady(
-        'jobs.up',
-        { functions: 'send-email=8081' },
-        controller,
-        { JOBS_SUPPORTED: 'send-email' }
-      );
-
-      expect(outcome.status).toBe('cancelled');
-      expect(MockJobsService).toHaveBeenCalledWith(
-        expect.objectContaining({
-          runtime: {
-            cwd: process.cwd(),
-            env: { JOBS_SUPPORTED: 'send-email' },
-            signal: controller.signal,
-          },
-        })
-      );
-      expect(stop).toHaveBeenCalledTimes(1);
-      expect(stdout).not.toHaveBeenCalled();
-      expect(stderr).not.toHaveBeenCalled();
-    } finally {
-      stdout.mockRestore();
-      stderr.mockRestore();
-    }
-  });
-
-  it('stops jobs when protocol event delivery fails', async () => {
-    const stop = jest.fn(async (): Promise<void> => undefined);
-    MockJobsService.mockImplementation(
-      () =>
-        ({
-          start: jest.fn(async () => ({
-            jobs: false,
-            functions: [{ name: 'send-email', port: 8081 }],
-          })),
-          waitForFailure: unresolvedFailure,
-          stop,
-        }) as never
-    );
-
-    const outcome = await executeCommand(
-      commands,
-      'jobs.up',
-      { functions: 'send-email=8081' },
-      {
-        cwd: process.cwd(),
-        mode: 'agent',
-        env: {},
-        sink: async (event) => {
-          if (event.event === 'service.ready') {
-            throw new Error('event transport unavailable');
-          }
-        },
-      }
-    );
-
-    expect(outcome).toMatchObject({
-      status: 'failed',
-      error: {
-        code: 'CLI_PROTOCOL_SINK_FAILED',
-        category: 'internal',
-      },
-    });
-    expect(stop).toHaveBeenCalledTimes(1);
-  });
-
-  it('rejects unknown and duplicate function declarations before startup', () => {
-    expect(() => parseFunctions('made-up=8081')).toThrow(
-      expect.objectContaining({ code: 'JOBS_FUNCTION_UNKNOWN' })
-    );
-    expect(() => parseFunctions('send-email=8081,send-email=8082')).toThrow(
-      expect.objectContaining({ code: 'JOBS_FUNCTION_DUPLICATE' })
-    );
-  });
 });

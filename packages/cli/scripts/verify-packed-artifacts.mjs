@@ -405,42 +405,6 @@ if (typeof codegen.generate !== 'function') process.exit(1);`,
 if (typeof codegen.generate !== 'function' && typeof codegen.default?.generate !== 'function') process.exit(1);`,
         ],
       ],
-      [
-        'send-email CommonJS require()',
-        [
-          '-e',
-          `const email = require('@constructive-io/send-email-fn');
-if (typeof email.default?.post !== 'function') process.exit(1);`,
-        ],
-      ],
-      [
-        'send-email ESM import()',
-        [
-          '--input-type=module',
-          '-e',
-          `const email = await import('@constructive-io/send-email-fn');
-const app = email.default?.default ?? email.default;
-if (typeof app?.post !== 'function') process.exit(1);`,
-        ],
-      ],
-      [
-        'send-verification-link CommonJS require()',
-        [
-          '-e',
-          `const email = require('@constructive-io/send-verification-link-fn');
-if (typeof email.default?.post !== 'function') process.exit(1);`,
-        ],
-      ],
-      [
-        'send-verification-link ESM import()',
-        [
-          '--input-type=module',
-          '-e',
-          `const email = await import('@constructive-io/send-verification-link-fn');
-const app = email.default?.default ?? email.default;
-if (typeof app?.post !== 'function') process.exit(1);`,
-        ],
-      ],
     ];
 
     if (suite === 'full') {
@@ -450,30 +414,9 @@ if (typeof app?.post !== 'function') process.exit(1);`,
         '@constructive-io',
         'graphql-codegen'
       );
-      const sendEmailPackageDirectory = join(
-        installationDirectory,
-        'node_modules',
-        '@constructive-io',
-        'send-email-fn'
-      );
-      const sendVerificationLinkPackageDirectory = join(
-        installationDirectory,
-        'node_modules',
-        '@constructive-io',
-        'send-verification-link-fn'
-      );
-
       assertPublishedEntrypoints(
         '@constructive-io/graphql-codegen',
         codegenPackageDirectory
-      );
-      assertPublishedEntrypoints(
-        '@constructive-io/send-email-fn',
-        sendEmailPackageDirectory
-      );
-      assertPublishedEntrypoints(
-        '@constructive-io/send-verification-link-fn',
-        sendVerificationLinkPackageDirectory
       );
 
       for (const [label, args] of packageImportChecks) {
@@ -537,6 +480,18 @@ if (typeof app?.post !== 'function') process.exit(1);`,
       }
     );
     assertInvalidInvocation('CLI invalid invocation', invalidInvocation);
+
+    const removedJobsInvocation = run(
+      process.execPath,
+      [join(cliPackageDirectory, 'index.js'), 'jobs', 'up', '--agent'],
+      {
+        cwd: installationDirectory,
+        env: cliEnvironment,
+        input: '',
+        label: 'removed jobs invocation',
+      }
+    );
+    assertInvalidInvocation('removed jobs invocation', removedJobsInvocation);
 
     const invalidOutputFixture = run(
       process.execPath,
@@ -665,7 +620,6 @@ const command = defineCommand({
           ['explorer', '--agent'],
           'explorer.start',
         ],
-        ['packed jobs capability', ['jobs', 'up', '--agent'], 'jobs.up'],
       ];
       for (const [label, args, commandId] of unavailableProbes) {
         const child = run(
@@ -705,29 +659,6 @@ for (const required of ['service.starting', 'service.ready', 'service.stopping',
         'packed explorer lifecycle adapter',
         `${serviceProbePrefix}
 const outcome = await executeCommand(bundle.registry, 'explorer.start', { port: 0 }, {
-  cwd: process.cwd(), mode: 'agent', env: { HOME: process.cwd() }, signal: controller.signal,
-  sink: async (event) => {
-    if (event.event === 'service.ready') {
-      sawReady = true;
-      controller.abort(new DOMException('service probe complete', 'AbortError'));
-    }
-  },
-});
-${serviceProbeSuffix}`,
-      ],
-      [
-        'packed jobs lifecycle adapter',
-        `${serviceProbePrefix}
-const net = require('node:net');
-const port = await new Promise((resolvePort, rejectPort) => {
-  const reservation = net.createServer();
-  reservation.once('error', rejectPort);
-  reservation.listen(0, '127.0.0.1', () => {
-    const address = reservation.address();
-    reservation.close((error) => error ? rejectPort(error) : resolvePort(address.port));
-  });
-});
-const outcome = await executeCommand(bundle.registry, 'jobs.up', { functions: 'send-email=' + port }, {
   cwd: process.cwd(), mode: 'agent', env: { HOME: process.cwd() }, signal: controller.signal,
   sink: async (event) => {
     if (event.event === 'service.ready') {

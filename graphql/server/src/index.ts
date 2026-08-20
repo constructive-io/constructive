@@ -1,3 +1,4 @@
+export * from './runtime-environment';
 export * from './server';
 
 // Export middleware for use in testing packages

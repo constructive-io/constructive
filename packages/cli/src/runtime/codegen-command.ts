@@ -1,49 +1,16 @@
 import {
   CliError,
-  defineCommand,
-  Type,
   type CommandAdapterHookMap,
+  defineCommand,
   type OperationContext,
+  Type,
 } from '@constructive-io/cli-runtime';
 import type { CodegenOperationResult } from '@constructive-io/graphql-codegen';
-import { withLogsSuppressed } from '@pgpmjs/logger';
 import type { Inquirerer } from 'inquirerer';
 
-import { withConsoleSuppressed } from '../console-isolation';
+import { withOperationOutputSuppressed } from '../console-isolation';
+import { inspectHttpEndpoint } from '../http-endpoint-policy';
 import { importOptionalCapability } from './optional-capability';
-
-const SENSITIVE_ENDPOINT_QUERY_PARTS = new Set([
-  'auth',
-  'authorization',
-  'bearer',
-  'cookie',
-  'credential',
-  'credentials',
-  'jwt',
-  'passwd',
-  'password',
-  'secret',
-  'session',
-  'signature',
-  'token',
-]);
-
-const isSensitiveEndpointQueryKey = (key: string): boolean => {
-  const separated = key
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter(Boolean);
-  const compact = separated.join('');
-  return (
-    separated.some((part) => SENSITIVE_ENDPOINT_QUERY_PARTS.has(part)) ||
-    compact.includes('apikey') ||
-    compact.includes('privatekey') ||
-    compact.includes('signingkey') ||
-    compact === 'key' ||
-    compact === 'sig'
-  );
-};
 
 /** Reject credential-bearing endpoint URLs before codegen can describe them in an event. */
 const assertSafeEndpoint = (
@@ -52,10 +19,11 @@ const assertSafeEndpoint = (
 ): void => {
   if (endpoint === undefined) return;
 
-  let parsed: URL;
-  try {
-    parsed = new URL(endpoint);
-  } catch {
+  const inspection = inspectHttpEndpoint(endpoint);
+  for (const value of inspection.sensitiveValues) {
+    context.registerSensitiveValue(value);
+  }
+  if (inspection.reason === 'invalid-url') {
     throw new CliError({
       code: 'CODEGEN_ENDPOINT_INVALID',
       category: 'validation',
@@ -64,23 +32,7 @@ const assertSafeEndpoint = (
     });
   }
 
-  context.registerSensitiveValue(parsed.username);
-  context.registerSensitiveValue(parsed.password);
-  let hasSensitiveQuery = false;
-  for (const [key, value] of parsed.searchParams) {
-    if (!isSensitiveEndpointQueryKey(key)) continue;
-    hasSensitiveQuery = true;
-    context.registerSensitiveValue(value);
-  }
-
-  if (
-    endpoint.trim() !== endpoint ||
-    (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') ||
-    parsed.username !== '' ||
-    parsed.password !== '' ||
-    parsed.hash !== '' ||
-    hasSensitiveQuery
-  ) {
+  if (inspection.reason === 'unsafe') {
     throw new CliError({
       code: 'CODEGEN_ENDPOINT_INVALID',
       category: 'validation',
@@ -90,9 +42,6 @@ const assertSafeEndpoint = (
     });
   }
 };
-
-const suppressOperationOutput = <T>(callback: () => Promise<T>): Promise<T> =>
-  withConsoleSuppressed(() => withLogsSuppressed(callback));
 
 const CodegenProgressSchema = Type.Object(
   {
@@ -344,7 +293,7 @@ export const codegenCommand = defineCommand({
       });
     }
 
-    return suppressOperationOutput(async () => {
+    return withOperationOutputSuppressed(async () => {
       const { CodegenOperationError, runCodegenOperation } =
         await importOptionalCapability(
           'codegen',
@@ -456,41 +405,41 @@ export const codegenCommand = defineCommand({
         ...(operation.warnings === undefined
           ? {}
           : {
-              warnings: operation.warnings.map((message) => ({
-                code:
+            warnings: operation.warnings.map((message) => ({
+              code:
                   operation.recoveryPath === undefined
                     ? 'CODEGEN_WARNING'
                     : 'CODEGEN_RECOVERY_RETAINED',
-                message,
-                ...(operation.recoveryPath === undefined
-                  ? {}
-                  : { path: operation.recoveryPath }),
-              })),
-            }),
+              message,
+              ...(operation.recoveryPath === undefined
+                ? {}
+                : { path: operation.recoveryPath }),
+            })),
+          }),
         artifacts: [
           ...(input.dryRun === true
             ? []
             : fileChanges
-                .filter(
-                  ({ action }) => action === 'create' || action === 'update'
-                )
-                .map(({ absolutePath, generatedHash }) => ({
-                  type: 'generated-file',
-                  path: absolutePath,
-                  ...(generatedHash === undefined
-                    ? {}
-                    : { digest: `sha256:${generatedHash}` }),
-                }))),
+              .filter(
+                ({ action }) => action === 'create' || action === 'update'
+              )
+              .map(({ absolutePath, generatedHash }) => ({
+                type: 'generated-file',
+                path: absolutePath,
+                ...(generatedHash === undefined
+                  ? {}
+                  : { digest: `sha256:${generatedHash}` }),
+              }))),
           ...(operation.recoveryPath === undefined
             ? []
             : [
-                {
-                  type: 'codegen-recovery',
-                  path: operation.recoveryPath,
-                  description:
+              {
+                type: 'codegen-recovery',
+                path: operation.recoveryPath,
+                description:
                     'Retained codegen transaction data requiring manual cleanup or recovery.',
-                },
-              ]),
+              },
+            ]),
         ],
       };
     });

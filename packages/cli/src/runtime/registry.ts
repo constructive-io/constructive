@@ -1,10 +1,10 @@
 import {
   CliError,
+  type CommandAdapterHookMap,
+  type CommandRegistry,
   createCommandRegistry,
   defineCommand,
   Type,
-  type CommandAdapterHookMap,
-  type CommandRegistry,
 } from '@constructive-io/cli-runtime';
 import type { Inquirerer } from 'inquirerer';
 
@@ -13,13 +13,17 @@ import {
   ConfigStoreError,
   createConfigStoreForEnvironment,
 } from '../config';
-import { createCodegenHooks, codegenCommand } from './codegen-command';
+import { codegenCommand,createCodegenHooks } from './codegen-command';
 import {
   createDiscoveryCommands,
   createDiscoveryHooks,
 } from './discovery-commands';
-import { createExecuteCommandDefinition } from './execute-command';
+import {
+  createExecuteCommandDefinition,
+  createExecuteHooks,
+} from './execute-command';
 import { serviceCommands } from './service-commands';
+import { createServiceHooks } from './service-hooks';
 import { createStateCommands } from './state-commands';
 
 export interface CncRegistryOptions {
@@ -37,6 +41,14 @@ export interface CncEnvironmentRegistryOptions {
 export interface CncRegistryBundle {
   registry: CommandRegistry;
   createHooks(prompter: Inquirerer): CommandAdapterHookMap;
+  prepareTerminalInput(options: {
+    commandId: string;
+    input: Record<string, unknown>;
+    readSecretFromStdin(): Promise<string>;
+  }): Promise<{
+    input: Record<string, unknown>;
+    sensitiveValues: string[];
+  }>;
 }
 
 export const createCncRegistry = ({
@@ -84,6 +96,16 @@ export const createCncRegistry = ({
 
   return {
     registry,
+    async prepareTerminalInput({ commandId, input, readSecretFromStdin }) {
+      if (commandId !== 'auth.set-token' || input.readFromStdin !== true) {
+        return { input, sensitiveValues: [] };
+      }
+      const stdinValue = await readSecretFromStdin();
+      return {
+        input: { ...input, stdinValue },
+        sensitiveValues: [stdinValue],
+      };
+    },
     createHooks(prompter) {
       const collectHumanContext = async (
         input: unknown,
@@ -144,6 +166,8 @@ export const createCncRegistry = ({
       return {
         ...createDiscoveryHooks(),
         ...createCodegenHooks(prompter),
+        ...createExecuteHooks(prompter),
+        ...createServiceHooks(prompter),
         'discovery.version': {
           renderHuman: (result) => (result.data as { version: string }).version,
         },
@@ -200,10 +224,6 @@ export const createCncRegistry = ({
         'auth.logout': {
           collectInteractiveInput: async (input, context) =>
             (await collectHumanContext(input, context)) as never,
-        },
-        execute: {
-          renderHuman: (result) =>
-            JSON.stringify((result.data as { data: unknown }).data, null, 2),
         },
       };
     },

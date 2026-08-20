@@ -163,82 +163,82 @@ export function parseGlobalArguments(
     };
 
     switch (name) {
-      case 'agent':
-        requireFlag('--agent');
-        options.agent = true;
-        break;
-      case 'interactive':
-        requireFlag('--interactive');
-        options.interactive = true;
-        break;
-      case 'non-interactive':
-        requireFlag('--non-interactive');
-        options.nonInteractive = true;
-        break;
-      case 'nonInteractive':
-        requireFlag('--nonInteractive');
-        options.nonInteractive = true;
-        warnings.push({
-          code: 'CLI_DEPRECATED',
-          message:
+    case 'agent':
+      requireFlag('--agent');
+      options.agent = true;
+      break;
+    case 'interactive':
+      requireFlag('--interactive');
+      options.interactive = true;
+      break;
+    case 'non-interactive':
+      requireFlag('--non-interactive');
+      options.nonInteractive = true;
+      break;
+    case 'nonInteractive':
+      requireFlag('--nonInteractive');
+      options.nonInteractive = true;
+      warnings.push({
+        code: 'CLI_DEPRECATED',
+        message:
             'Option "--nonInteractive" is deprecated; use "--non-interactive".',
-        });
-        break;
-      case 'format': {
-        const value = takeValue('--format');
-        if (!['human', 'json', 'jsonl'].includes(value)) {
+      });
+      break;
+    case 'format': {
+      const value = takeValue('--format');
+      if (!['human', 'json', 'jsonl'].includes(value)) {
+        throw new InvocationError(
+          'CLI_OPTION_VALUE_INVALID',
+          '--format must be human, json, or jsonl.'
+        );
+      }
+      options.format = value as OutputFormat;
+      break;
+    }
+    case 'cwd':
+      options.cwd = takeValue('--cwd');
+      break;
+    case 'yes':
+      requireFlag('--yes');
+      options.yes = true;
+      break;
+    case 'no-color':
+      requireFlag('--no-color');
+      options.noColor = true;
+      break;
+    case 'noColor':
+      requireFlag('--noColor');
+      options.noColor = true;
+      warnings.push({
+        code: 'CLI_DEPRECATED',
+        message: 'Option "--noColor" is deprecated; use "--no-color".',
+      });
+      break;
+    case 'debug':
+      requireFlag('--debug');
+      options.debug = true;
+      break;
+    case 'help':
+      requireFlag('--help');
+      options.help = true;
+      break;
+    case 'version':
+      requireFlag('--version');
+      options.version = true;
+      break;
+    default:
+      if (token === '-h') options.help = true;
+      else if (token === '-v') options.version = true;
+      else {
+        if (!commandStarted && token.startsWith('-')) {
           throw new InvocationError(
-            'CLI_OPTION_VALUE_INVALID',
-            '--format must be human, json, or jsonl.'
+            'CLI_OPTION_UNKNOWN',
+            `Unknown global option "${token.split('=')[0]}".`
           );
         }
-        options.format = value as OutputFormat;
-        break;
+        remaining.push(token);
+        if (!token.startsWith('-')) commandStarted = true;
       }
-      case 'cwd':
-        options.cwd = takeValue('--cwd');
-        break;
-      case 'yes':
-        requireFlag('--yes');
-        options.yes = true;
-        break;
-      case 'no-color':
-        requireFlag('--no-color');
-        options.noColor = true;
-        break;
-      case 'noColor':
-        requireFlag('--noColor');
-        options.noColor = true;
-        warnings.push({
-          code: 'CLI_DEPRECATED',
-          message: 'Option "--noColor" is deprecated; use "--no-color".',
-        });
-        break;
-      case 'debug':
-        requireFlag('--debug');
-        options.debug = true;
-        break;
-      case 'help':
-        requireFlag('--help');
-        options.help = true;
-        break;
-      case 'version':
-        requireFlag('--version');
-        options.version = true;
-        break;
-      default:
-        if (token === '-h') options.help = true;
-        else if (token === '-v') options.version = true;
-        else {
-          if (!commandStarted && token.startsWith('-')) {
-            throw new InvocationError(
-              'CLI_OPTION_UNKNOWN',
-              `Unknown global option "${token.split('=')[0]}".`
-            );
-          }
-          remaining.push(token);
-          if (!token.startsWith('-')) commandStarted = true;
-        }
     }
   }
 

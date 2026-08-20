@@ -3,21 +3,23 @@ import { isAbsolute, relative, resolve } from 'node:path';
 
 import {
   CliError,
+  type CommandAdapterHookMap,
   defineCommand,
   isSensitiveKey,
   Type,
 } from '@constructive-io/cli-runtime';
+import type { Inquirerer } from 'inquirerer';
 
-import { ConfigStoreError, redactSecrets, type ConfigStore } from '../config';
+import { type ConfigStore,ConfigStoreError, redactSecrets } from '../config';
 import {
-  GraphQLExecutionError,
   analyzeGraphQLDocument,
   assertMutationAllowed,
   execute,
-  getExecutionContext,
   type FetchImplementation,
+  getExecutionContext,
   type GraphQLClientError,
   type GraphQLError,
+  GraphQLExecutionError,
 } from '../sdk';
 
 const ExecuteInputSchema = Type.Object(
@@ -494,3 +496,26 @@ export function createExecuteCommandDefinition(
     },
   });
 }
+
+export const createExecuteHooks = (
+  prompter: Inquirerer
+): CommandAdapterHookMap => ({
+  execute: {
+    collectInteractiveInput: async (input) => {
+      const candidate = input as Record<string, unknown>;
+      if (candidate.query !== undefined || candidate.file !== undefined) {
+        return candidate as never;
+      }
+      return (await prompter.prompt(candidate, [
+        {
+          type: 'text',
+          name: 'query',
+          message: 'GraphQL query',
+          required: true,
+        },
+      ])) as never;
+    },
+    renderHuman: (result) =>
+      JSON.stringify((result.data as { data: unknown }).data, null, 2),
+  },
+});

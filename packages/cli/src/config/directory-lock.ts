@@ -108,29 +108,36 @@ const reclaimDeadOwner = (lockPath: string, expected: LockOwner): boolean => {
     throw error;
   }
 
+  let reclaimed = false;
+  let failure: unknown;
   try {
     const current = readOwner(lockPath);
     if (
-      !current ||
-      current.token !== expected.token ||
-      processIsAlive(current.pid)
+      current &&
+      current.token === expected.token &&
+      !processIsAlive(current.pid)
     ) {
-      return false;
+      fs.unlinkSync(path.join(lockPath, OWNER_FILENAME));
+      fs.closeSync(descriptor);
+      descriptor = undefined;
+      fs.unlinkSync(reaperPath);
+      fs.rmdirSync(lockPath);
+      reclaimed = true;
     }
-    fs.unlinkSync(path.join(lockPath, OWNER_FILENAME));
-    fs.closeSync(descriptor);
-    descriptor = undefined;
-    fs.unlinkSync(reaperPath);
-    fs.rmdirSync(lockPath);
-    return true;
+  } catch (error) {
+    failure = error;
   } finally {
     if (descriptor !== undefined) fs.closeSync(descriptor);
     try {
       fs.unlinkSync(reaperPath);
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        failure ??= error;
+      }
     }
   }
+  if (failure !== undefined) throw failure;
+  return reclaimed;
 };
 
 const release = (lockPath: string, token: string): void => {

@@ -41,29 +41,29 @@ function parseValue(
   label: string
 ): unknown {
   switch (binding.valueType ?? 'string') {
-    case 'string':
-      return value;
-    case 'number': {
-      const parsed = Number(value);
-      if (!Number.isFinite(parsed)) {
-        throw new InvocationError(
-          'CLI_OPTION_VALUE_INVALID',
-          `${label} expects a finite number.`
-        );
-      }
-      return parsed;
+  case 'string':
+    return value;
+  case 'number': {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      throw new InvocationError(
+        'CLI_OPTION_VALUE_INVALID',
+        `${label} expects a finite number.`
+      );
     }
-    case 'boolean':
-      return parseBoolean(value, label);
-    case 'json':
-      try {
-        return JSON.parse(value) as unknown;
-      } catch {
-        throw new InvocationError(
-          'CLI_OPTION_VALUE_INVALID',
-          `${label} expects valid JSON.`
-        );
-      }
+    return parsed;
+  }
+  case 'boolean':
+    return parseBoolean(value, label);
+  case 'json':
+    try {
+      return JSON.parse(value) as unknown;
+    } catch {
+      throw new InvocationError(
+        'CLI_OPTION_VALUE_INVALID',
+        `${label} expects valid JSON.`
+      );
+    }
   }
 }
 
@@ -298,9 +298,9 @@ export function bindArguments<
   const acceptedPositionals =
     variadic === undefined
       ? positionalSources.reduce(
-          (maximum, source) => Math.max(maximum, source.index + 1),
-          0
-        )
+        (maximum, source) => Math.max(maximum, source.index + 1),
+        0
+      )
       : Number.POSITIVE_INFINITY;
   if (strict && positionals.length > acceptedPositionals) {
     throw new InvocationError(
@@ -366,9 +366,9 @@ export function bindArguments<
     const issues =
       registry === undefined
         ? (() => {
-            const validator = compileSchema<Static<TInput>>(command.input);
-            return validator.validate(input) ? [] : validator.issues();
-          })()
+          const validator = compileSchema<Static<TInput>>(command.input);
+          return validator.validate(input) ? [] : validator.issues();
+        })()
         : registry.validateInput(command.id, input);
     if (issues.length > 0) throw validationMessage(command, issues);
   }
