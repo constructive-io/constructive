@@ -9,8 +9,6 @@ const makeService = (overrides: Record<string, unknown> = {}): never =>
   ({
     name: 'main',
     schemas: ['tenant_a'],
-    scopedIntrospection: true,
-    introspectionAllowedDependencySchemas: [],
     adaptor: {
       createWithPgClient: jest.fn(() => {
         throw new Error('query should not be reached');
@@ -64,33 +62,19 @@ describe('scoped introspection service identity contract', () => {
     ).rejects.toThrow(message);
   });
 
-  it.each([
-    ['catalog type policy', { introspectionScopedCatalogTypes: 'all' }],
-    [
-      'dependency schemas',
-      { introspectionAllowedDependencySchemas: ['shared'] },
-    ],
-    [
-      'capability extensions',
-      { introspectionCapabilityExtensions: ['pg_trgm'] },
-    ],
-  ])(
-    'rejects %s unless scoped introspection is enabled',
-    async (_label, option) => {
-      await expect(
-        gather({
-          plugins: [PgScopedIntrospectionPlugin, consumerPlugin],
-          pgServices: [
-            makeService({
-              scopedIntrospection: false,
-              introspectionAllowedDependencySchemas: undefined,
-              ...option,
-            }),
-          ],
-        })
-      ).rejects.toThrow(/require scopedIntrospection: true/);
-    }
-  );
+  it('rejects configuration for an unknown PostgreSQL service', async () => {
+    await expect(
+      gather({
+        plugins: [PgScopedIntrospectionPlugin, consumerPlugin],
+        pgServices: [makeService()],
+        gather: {
+          pgScopedIntrospection: {
+            analytics: {},
+          },
+        },
+      })
+    ).rejects.toThrow(/unknown PostgreSQL service\(s\): analytics/);
+  });
 
   it.each([
     ['empty', '', 'exact non-empty schema names'],
@@ -101,9 +85,12 @@ describe('scoped introspection service identity contract', () => {
     await expect(
       gather({
         plugins: [PgScopedIntrospectionPlugin, consumerPlugin],
-        pgServices: [
-          makeService({ introspectionAllowedDependencySchemas: [schema] }),
-        ],
+        pgServices: [makeService()],
+        gather: {
+          pgScopedIntrospection: {
+            main: { allowedDependencySchemas: [schema] },
+          },
+        },
       })
     ).rejects.toThrow(message);
   });

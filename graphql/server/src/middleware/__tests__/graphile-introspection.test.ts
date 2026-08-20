@@ -49,16 +49,29 @@ describe('Graphile introspection mode wiring', () => {
     );
 
     expect(loadScopedPreset).toHaveBeenCalledTimes(1);
-    expect(wiring.presets).toEqual([scopedPreset]);
+    expect(wiring.presets).toEqual([
+      scopedPreset,
+      {
+        gather: {
+          pgScopedIntrospection: {
+            main: {
+              catalogTypes: 'dependency-closure',
+              allowedDependencySchemas: ['shared'],
+              capabilityExtensions: ['pg_trgm'],
+            },
+          },
+        },
+      },
+    ]);
     expect(wiring.pgService).toMatchObject({
-      scopedIntrospection: true,
-      introspectionScopedCatalogTypes: 'dependency-closure',
-      introspectionAllowedDependencySchemas: ['shared'],
-      introspectionCapabilityExtensions: ['pg_trgm'],
       pgSettingsForIntrospection: {
         jit: 'on',
       },
     });
+    expect(wiring.pgService).not.toHaveProperty('scopedIntrospection');
+    expect(wiring.pgService).not.toHaveProperty(
+      'introspectionAllowedDependencySchemas'
+    );
   });
 
   it.each([

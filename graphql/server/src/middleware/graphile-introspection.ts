@@ -1,6 +1,7 @@
 import type { GraphileOptions } from '@constructive-io/graphql-types';
 import type { GraphileConfig } from 'graphile-config';
-import { makePgService, makeScopedPgService } from 'graphile-settings';
+import type { PgScopedIntrospectionOptions } from 'graphile-scoped-introspection';
+import { makePgService, resolveIntrospectionSettings } from 'graphile-settings';
 import type { Pool } from 'pg';
 
 export interface IntrospectionWiring {
@@ -61,18 +62,32 @@ export const makeIntrospectionWiring = async (
   }
 
   const scopedPreset = await loadScopedPreset();
+  const pgService = makePgService({
+    pool,
+    schemas,
+    pgSettingsForIntrospection: resolveIntrospectionSettings(
+      introspectionJit ?? false,
+      pgSettingsForIntrospection
+    ),
+  });
+  const scopedOptions: PgScopedIntrospectionOptions = {
+    catalogTypes: 'dependency-closure',
+    allowedDependencySchemas:
+      graphileOptions?.introspectionDependencySchemas ?? [],
+    capabilityExtensions:
+      graphileOptions?.introspectionCapabilityExtensions ?? [],
+  };
   return {
-    presets: [scopedPreset],
-    pgService: makeScopedPgService({
-      pool,
-      schemas,
-      pgSettingsForIntrospection,
-      introspectionScopedCatalogTypes: 'dependency-closure',
-      introspectionAllowedDependencySchemas:
-        graphileOptions?.introspectionDependencySchemas,
-      introspectionCapabilityExtensions:
-        graphileOptions?.introspectionCapabilityExtensions,
-      introspectionJit,
-    }),
+    presets: [
+      scopedPreset,
+      {
+        gather: {
+          pgScopedIntrospection: {
+            [pgService.name]: scopedOptions,
+          },
+        },
+      },
+    ],
+    pgService,
   };
 };

@@ -12,8 +12,8 @@ provenance and licensing.
 
 `ScopedIntrospectionPreset` atomically disables the stock
 `PgIntrospectionPlugin` and installs `PgScopedIntrospectionPlugin`. The
-replacement preserves the stock query unless a PG service explicitly selects
-`scopedIntrospection: true`. Scoped services use a parameterized
+replacement preserves the stock query unless `gather.pgScopedIntrospection`
+contains an entry for the PG service name. Scoped services use a parameterized
 catalog query, validate required and allowed namespaces after parsing, and can
 apply dependency-closure validation to retained PostgreSQL types.
 

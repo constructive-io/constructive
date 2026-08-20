@@ -37,11 +37,6 @@ import 'graphile-build';
 
 import { makePgService } from 'postgraphile/adaptors/pg';
 
-import {
-  makeConfiguredPgService,
-  type ScopedIntrospectionOptions
-} from './scoped-introspection-service';
-
 // ============================================================================
 // Re-export all plugins and presets
 // ============================================================================
@@ -60,15 +55,8 @@ export * from './presets/index';
 // Utilities
 // ============================================================================
 
-export type ScopedPgServiceOptions = Parameters<typeof makePgService>[0] &
-  ScopedIntrospectionOptions;
-
 // Keep the default service factory as the untouched upstream implementation.
 export { makePgService };
-
-/** Construct a PG service configured for CNC's opt-in scoped introspection. */
-export const makeScopedPgService = (options: ScopedPgServiceOptions) =>
-  makeConfiguredPgService(makePgService, options);
 
 export { resolveIntrospectionSettings } from './introspection-settings';
 

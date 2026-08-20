@@ -2,17 +2,6 @@ import type { GraphileConfig } from 'graphile-config';
 
 export type ScopedCatalogTypes = 'all' | 'dependency-closure';
 
-export interface ScopedIntrospectionServiceOptions {
-  /** Use CNC schema-scoped introspection for this service. */
-  scopedIntrospection?: boolean;
-  /** Catalog types retained by scoped introspection; defaults to all. */
-  introspectionScopedCatalogTypes?: ScopedCatalogTypes;
-  /** Non-root schemas that scoped dependency closure may retain. */
-  introspectionAllowedDependencySchemas?: readonly string[];
-  /** Installed extensions whose optional capability metadata is required. */
-  introspectionCapabilityExtensions?: readonly string[];
-}
-
 /**
  * PostGraphile/Graphile v5 configuration
  */

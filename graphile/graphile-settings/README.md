@@ -187,24 +187,32 @@ const sdl = printSchema(schema);
 
 `ConstructivePreset` and `makePgService` retain PostGraphile's upstream
 introspection behavior. Applications that explicitly opt into CNC scoped
-introspection should install the independently owned preset and use the scoped
-service factory together:
+introspection should install the independently owned preset and configure its
+gather options by PostgreSQL service name:
 
 ```typescript
 import { ScopedIntrospectionPreset } from 'graphile-scoped-introspection';
-import { ConstructivePreset, makeScopedPgService } from 'graphile-settings';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
 
 const preset = {
   extends: [ConstructivePreset, ScopedIntrospectionPreset],
   pgServices: [
-    makeScopedPgService({
+    makePgService({
+      name: 'main',
       connectionString: 'postgres://user:pass@localhost/mydb',
       schemas: ['app_public'],
-      introspectionJit: false,
-      introspectionAllowedDependencySchemas: ['shared'],
-      introspectionCapabilityExtensions: ['pg_trgm'],
+      pgSettingsForIntrospection: { jit: 'off' },
     }),
   ],
+  gather: {
+    pgScopedIntrospection: {
+      main: {
+        catalogTypes: 'dependency-closure',
+        allowedDependencySchemas: ['shared'],
+        capabilityExtensions: ['pg_trgm'],
+      },
+    },
+  },
 };
 ```
 

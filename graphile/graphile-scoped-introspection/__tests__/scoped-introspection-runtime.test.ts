@@ -44,20 +44,21 @@ describe('schema-scoped introspection runtime integration', () => {
             ScopedIntrospectionPreset,
           ],
           pgServices: [
-            Object.assign(
-              makePostGraphilePgService({
-                pool: pool as never,
-                schemas: ['tenant_a'],
-              }),
-              {
-                scopedIntrospection: true,
-                introspectionCapabilityExtensions: ['pg_trgm'],
+            makePostGraphilePgService({
+              pool: pool as never,
+              schemas: ['tenant_a'],
+            }) as never,
+          ],
+          gather: {
+            pgScopedIntrospection: {
+              main: {
+                capabilityExtensions: ['pg_trgm'],
                 ...(scopedCatalogTypes === undefined
                   ? {}
-                  : { introspectionScopedCatalogTypes: scopedCatalogTypes }),
-              }
-            ) as never,
-          ],
+                  : { catalogTypes: scopedCatalogTypes }),
+              },
+            },
+          },
         })
       ).rejects.toBe(marker);
 
@@ -140,17 +141,16 @@ describe('schema-scoped introspection runtime integration', () => {
           ScopedIntrospectionPreset,
         ],
         pgServices: [
-          Object.assign(
-            makePostGraphilePgService({
-              pool: pool as never,
-              schemas: ['tenant_a'],
-            }),
-            {
-              scopedIntrospection: true,
-              introspectionScopedCatalogTypes: 'dependency-closure',
-            }
-          ) as never,
+          makePostGraphilePgService({
+            pool: pool as never,
+            schemas: ['tenant_a'],
+          }) as never,
         ],
+        gather: {
+          pgScopedIntrospection: {
+            main: { catalogTypes: 'dependency-closure' },
+          },
+        },
       })
     ).rejects.toThrow(
       /service '.+' retained pg_class 'broken_items \(200\)' field 'reltype' referencing missing pg_type OID '999'/

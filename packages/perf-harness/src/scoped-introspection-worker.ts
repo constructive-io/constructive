@@ -11,7 +11,6 @@ import {
   type Introspection,
   ScopedIntrospectionPreset,
 } from 'graphile-scoped-introspection';
-import { makeScopedPgService } from 'graphile-settings';
 import { execute, lexicographicSortSchema, parse, printSchema } from 'graphql';
 import { makePgService as makePostGraphilePgService } from 'postgraphile/adaptors/pg';
 
@@ -113,19 +112,10 @@ const main = async (): Promise<void> => {
       schemas: config.schemas,
       pubsub: false,
     };
-    const scopedServiceOptions = {
+    const service = makePostGraphilePgService({
       ...serviceOptions,
-      introspectionScopedCatalogTypes: 'dependency-closure' as const,
-      introspectionAllowedDependencySchemas: config.allowedDependencySchemas,
-      introspectionJit: config.introspectionJit,
-    };
-    const service =
-      config.scopedIntrospection
-        ? makeScopedPgService(scopedServiceOptions)
-        : makePostGraphilePgService({
-          ...serviceOptions,
-          pgSettingsForIntrospection: { jit: expectedJit },
-        });
+      pgSettingsForIntrospection: { jit: expectedJit },
+    });
     release = async () => {
       await service.release();
     };
@@ -147,6 +137,18 @@ const main = async (): Promise<void> => {
             }),
           ],
           pgServices: [service],
+          ...(config.scopedIntrospection
+            ? {
+              gather: {
+                pgScopedIntrospection: {
+                  [service.name]: {
+                    catalogTypes: 'dependency-closure' as const,
+                    allowedDependencySchemas: config.allowedDependencySchemas,
+                  },
+                },
+              },
+            }
+            : {}),
         }),
       async ({ schema }) => {
         const execution = await execute({
