@@ -172,8 +172,6 @@ describe('scoped introspection raw-text lifecycle', () => {
     const pgService = {
       name: 'main',
       schemas: [SCHEMA],
-      scopedIntrospection: true,
-      introspectionAllowedDependencySchemas: [] as readonly string[],
       adaptor,
       adaptorSettings: {},
       withPgClientKey: 'withPgClient',
@@ -185,6 +183,11 @@ describe('scoped introspection raw-text lifecycle', () => {
       {
         plugins: [capturingIntrospectionPlugin, observerPlugin],
         pgServices: [pgService as never],
+        gather: {
+          pgScopedIntrospection: {
+            main: { allowedDependencySchemas: [] },
+          },
+        },
       },
       undefined,
       (input, error) => {

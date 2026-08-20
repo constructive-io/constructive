@@ -62,17 +62,7 @@ const buildSchema = async (
   rootSchema = ROOT_SCHEMA
 ): Promise<SchemaBuild> => {
   let introspection: Introspection | undefined;
-  const service = Object.assign(
-    makePgService({ pool, schemas: [rootSchema] }),
-    scoped
-      ? {
-        scopedIntrospection: true as const,
-        introspectionAllowedDependencySchemas: allowedDependencySchemas,
-        introspectionScopedCatalogTypes: 'dependency-closure' as const,
-        introspectionCapabilityExtensions: ['pg_trgm'],
-      }
-      : {}
-  );
+  const service = makePgService({ pool, schemas: [rootSchema] });
 
   try {
     const result = await makeSchema({
@@ -81,6 +71,19 @@ const buildSchema = async (
         graphileBuildPgPreset,
         ...(scoped ? [ScopedIntrospectionPreset] : []),
       ],
+      ...(scoped
+        ? {
+          gather: {
+            pgScopedIntrospection: {
+              [service.name]: {
+                allowedDependencySchemas,
+                catalogTypes: 'dependency-closure' as const,
+                capabilityExtensions: ['pg_trgm'],
+              },
+            },
+          },
+        }
+        : {}),
       plugins: [
         makeCapturePlugin(
           scoped
