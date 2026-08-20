@@ -8,7 +8,6 @@ import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import {
   createGraphileInstance,
   graphileCache,
@@ -18,6 +17,7 @@ import {
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
+import type { GraphQLError, GraphQLFormattedError } from 'graphql';
 import {
   getPgPool,
   getPgPoolCacheKey,
@@ -32,8 +32,8 @@ import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { getServerEnvironment } from '../runtime-environment';
 import type { DatabaseSettings } from '../types';
 import {
-  observeGraphileBuild,
   type GraphileBuildStatsManager,
+  observeGraphileBuild,
 } from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
@@ -402,7 +402,7 @@ export const graphile = (
         try {
           const instance = await inFlight;
           return instance.handler(req, res, next);
-        } catch (error) {
+        } catch {
           log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`);
           // Fall through to Phase C to retry creation
         }
