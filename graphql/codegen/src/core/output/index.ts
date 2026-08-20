@@ -3,16 +3,16 @@
  */
 
 export {
+  type FileChange,
+  type FileChangeAction,
   GENERATED_FILES_MANIFEST,
   type GeneratedFile,
   type GeneratedFilesManifest,
-  type GenerationPlan,
-  type FileChange,
-  type FileChangeAction,
   type GeneratedFileWriteJob,
+  type GenerationPlan,
+  planGeneratedFiles,
   type WriteBatchOptions,
   type WriteBatchResult,
-  planGeneratedFiles,
   writeGeneratedFileJobs,
   writeGeneratedFiles,
   type WriteOptions,

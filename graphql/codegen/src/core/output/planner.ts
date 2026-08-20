@@ -13,8 +13,8 @@ import {
   readManifest,
 } from './manifest';
 import {
-  GENERATED_FILES_MANIFEST,
   type FileChange,
+  GENERATED_FILES_MANIFEST,
   type GeneratedFile,
   type GenerationPlan,
   type ManifestFileEntry,

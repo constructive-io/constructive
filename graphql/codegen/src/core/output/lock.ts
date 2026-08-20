@@ -88,23 +88,32 @@ const reclaimDeadLock = (lockPath: string, expected: LockOwner): boolean => {
     throw error;
   }
 
+  let reclaimed = false;
+  let failure: unknown;
   try {
     const current = readOwner(lockPath);
-    if (!current || current.token !== expected.token) return false;
-    fs.unlinkSync(path.join(lockPath, OWNER_FILENAME));
-    fs.closeSync(descriptor);
-    descriptor = undefined;
-    fs.unlinkSync(reaperPath);
-    fs.rmdirSync(lockPath);
-    return true;
+    if (current && current.token === expected.token) {
+      fs.unlinkSync(path.join(lockPath, OWNER_FILENAME));
+      fs.closeSync(descriptor);
+      descriptor = undefined;
+      fs.unlinkSync(reaperPath);
+      fs.rmdirSync(lockPath);
+      reclaimed = true;
+    }
+  } catch (error) {
+    failure = error;
   } finally {
     if (descriptor !== undefined) fs.closeSync(descriptor);
     try {
       fs.unlinkSync(reaperPath);
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        failure ??= error;
+      }
     }
   }
+  if (failure !== undefined) throw failure;
+  return reclaimed;
 };
 
 const tryCreateLock = (lockPath: string, owner: LockOwner): boolean => {

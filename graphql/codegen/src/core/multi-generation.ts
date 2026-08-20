@@ -9,14 +9,15 @@ import type {
   SchemaConfig,
 } from '../types/config';
 import { getConfigOptions, mergeConfig } from '../types/config';
+import { throwIfAborted } from './cancellation';
 import { generateMultiTargetBarrel } from './codegen/barrel';
 import {
   generateMultiTargetCli,
   type MultiTargetCliTarget,
 } from './codegen/cli';
 import {
-  generateMultiTargetReadme,
   generateMultiTargetAgentsDocs,
+  generateMultiTargetReadme,
   generateMultiTargetSkills,
   type MultiTargetDocsInput,
 } from './codegen/cli/docs-generator';
@@ -25,7 +26,6 @@ import {
   generateRootRootReadme,
   type RootRootReadmeTarget,
 } from './codegen/target-docs-generator';
-import { throwIfAborted } from './cancellation';
 import type {
   FileChange,
   GeneratedFileWriteJob,
@@ -43,14 +43,14 @@ import {
   combinePlanFingerprint,
   completePreparedGeneration,
   failPreparedGeneration,
+  type GenerateProgressEvent,
+  type GenerateResult,
   planFields,
   planTargetGeneration,
+  type PreparedGeneration,
   recoveryFields,
   resolveSkillsOutputDir,
   resolveTargetPaths,
-  type GenerateProgressEvent,
-  type GenerateResult,
-  type PreparedGeneration,
 } from './target-generation';
 
 export { removeStaleTargetDirs, TARGETS_MANIFEST } from './stale-targets';
@@ -191,9 +191,9 @@ export async function generateMulti(
         },
         useUnifiedCli
           ? {
-              skipCli: true,
-              targetName: name,
-            }
+            skipCli: true,
+            targetName: name,
+          }
           : { targetName: name },
       );
       const result =
@@ -246,6 +246,7 @@ export async function generateMulti(
       const firstTargetConfig = configs[names[0]];
       const { files } = generateMultiTargetCli({
         toolName,
+        stashName: cliConfig.stashName,
         builtinNames: cliConfig.builtinNames,
         targets: cliTargets,
         entryPoint: cliConfig.entryPoint,

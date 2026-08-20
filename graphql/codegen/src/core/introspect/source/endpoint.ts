@@ -4,8 +4,8 @@
  * Fetches GraphQL schema via introspection from a live endpoint.
  * Wraps the existing fetchSchema() function with the SchemaSource interface.
  */
-import { fetchSchema } from '../fetch-schema';
 import { endpointForDisplay } from '../../sensitive-values';
+import { fetchSchema } from '../fetch-schema';
 import type { SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
 

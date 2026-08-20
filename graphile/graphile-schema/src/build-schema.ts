@@ -4,6 +4,7 @@ import type { GraphileConfig } from 'graphile-config';
 import type { TableMeta } from 'graphile-settings';
 import { ConstructivePreset, getTablesMetaForSchema, makePgService } from 'graphile-settings';
 import { graphql, lexicographicSortSchema, printSchema } from 'graphql';
+import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -11,6 +12,8 @@ export type BuildSchemaOptions = {
   database?: string;
   schemas: string[];
   graphile?: Partial<GraphileConfig.Preset>;
+  /** Operation-owned pool. When present, schema building never reads ambient PG state. */
+  pool?: Pool;
   /**
    * @internal Test-only. Awaited after the schema's `_meta` metadata has been
    * collected and before artifacts are returned, so regression tests can
@@ -45,7 +48,7 @@ export async function buildSchemaArtifacts(opts: BuildSchemaOptions): Promise<Bu
   // by callers via pgCache.delete(database) before dropping ephemeral databases.
   // Without this, makePgService creates its own internal pool that isn't released,
   // causing "database has active sessions" errors during ephemeral DB teardown.
-  const pool = getPgPool(config);
+  const pool = opts.pool ?? getPgPool(config);
 
   // Hybrid preset composition: use deepmerge for safe scalar/object keys
   // (plugins, disablePlugins, schema, gather, etc.) but pluck out `extends`
@@ -53,7 +56,12 @@ export async function buildSchemaArtifacts(opts: BuildSchemaOptions): Promise<Bu
   // deepmerge cannot deep-clone `extends` (contains the entire PostGraphile
   // preset tree) or `pgServices` (contains pg Pool / EventEmitter internals)
   // without overflowing the call stack.
-  const { extends: callerExtends, pgServices: _pgServices, ...callerRest } = opts.graphile ?? {};
+  const callerExtends = opts.graphile?.extends;
+  const callerRest = Object.fromEntries(
+    Object.entries(opts.graphile ?? {}).filter(
+      ([key]) => key !== 'extends' && key !== 'pgServices'
+    )
+  ) as GraphileConfig.Preset;
 
   const baseRest: GraphileConfig.Preset = {};
 

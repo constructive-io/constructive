@@ -2,9 +2,9 @@ import * as fs from 'node:fs';
 
 import { normalizeRelativePath } from './filesystem';
 import {
+  type GeneratedFilesManifest,
   GENERATOR_NAME,
   MANIFEST_VERSION,
-  type GeneratedFilesManifest,
   type ManifestFileEntry,
 } from './types';
 

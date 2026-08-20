@@ -15,6 +15,7 @@ export * from './pgpm-module';
 export * from './types';
 
 import type { DbConfig } from '../../../types/config';
+import { type DatabasePoolFactory,resolvePgConfig } from './api-schemas';
 import { DatabaseSchemaSource } from './database';
 import { EndpointSchemaSource } from './endpoint';
 import { FileSchemaSource } from './file';
@@ -98,6 +99,12 @@ export interface CreateSchemaSourceOptions {
    * Request timeout in milliseconds (for endpoint requests)
    */
   timeout?: number;
+
+  /** Explicit environment used to fill omitted PostgreSQL settings. */
+  env?: Readonly<Record<string, string | undefined>>;
+
+  /** @internal Test seam for creating operation-scoped pools. */
+  poolFactory?: DatabasePoolFactory;
 }
 
 /**
@@ -111,7 +118,7 @@ export type SourceMode =
   | 'pgpm-workspace';
 
 export function detectSourceMode(
-  options: CreateSchemaSourceOptions,
+  options: CreateSchemaSourceOptions
 ): SourceMode | null {
   if (options.endpoint) return 'endpoint';
   if (options.schemaFile) return 'schemaFile';
@@ -141,9 +148,12 @@ export function detectSourceMode(
  * @throws Error if no valid source is provided
  */
 export function createSchemaSource(
-  options: CreateSchemaSourceOptions,
+  options: CreateSchemaSourceOptions
 ): SchemaSource {
   const mode = detectSourceMode(options);
+  const pgConfig = options.db
+    ? resolvePgConfig(options.db.config, options.env ?? {})
+    : undefined;
 
   switch (mode) {
   case 'schemaFile':
@@ -160,12 +170,13 @@ export function createSchemaSource(
     });
 
   case 'database':
-    // Database mode uses db.config for connection (falls back to env vars)
-    // and db.schemas or db.apiNames for schema selection
+    // Database mode resolves db.config over the explicitly supplied env and
+    // passes one complete configuration into the operation-owned source.
     return new DatabaseSchemaSource({
-      database: options.db?.config?.database ?? '',
+      pgConfig: pgConfig!,
       schemas: options.db?.schemas,
       apiNames: options.db?.apiNames,
+      poolFactory: options.poolFactory,
     });
 
   case 'pgpm-module':
@@ -174,6 +185,8 @@ export function createSchemaSource(
       schemas: options.db?.schemas,
       apiNames: options.db?.apiNames,
       keepDb: options.db?.keepDb,
+      pgConfig: pgConfig!,
+      poolFactory: options.poolFactory,
     });
 
   case 'pgpm-workspace':
@@ -183,11 +196,13 @@ export function createSchemaSource(
       schemas: options.db?.schemas,
       apiNames: options.db?.apiNames,
       keepDb: options.db?.keepDb,
+      pgConfig: pgConfig!,
+      poolFactory: options.poolFactory,
     });
 
   default:
     throw new Error(
-      'No source specified. Use one of: endpoint, schemaFile, or db (with optional pgpm for module deployment).',
+      'No source specified. Use one of: endpoint, schemaFile, or db (with optional pgpm for module deployment).'
     );
   }
 }
@@ -201,7 +216,7 @@ export function validateSourceOptions(options: CreateSchemaSourceOptions): {
 } {
   // Count primary sources
   const sources = [options.endpoint, options.schemaFile, options.db].filter(
-    Boolean,
+    Boolean
   );
 
   if (sources.length === 0) {

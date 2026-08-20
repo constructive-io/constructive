@@ -10,6 +10,11 @@ import * as path from 'node:path';
 import { buildSchemaSDL } from 'graphile-schema';
 import type { PgConfig } from 'pg-env';
 
+import {
+  createDatabasePool,
+  resolvePgConfig,
+} from '../introspect/source/api-schemas';
+
 export interface BuildSchemaFromDatabaseOptions {
   /** Database name */
   database: string;
@@ -57,12 +62,13 @@ export async function buildSchemaFromDatabase(
   await fs.promises.mkdir(outDir, { recursive: true });
 
   // Build schema SDL from database (PostGraphile v5 preset-driven settings)
-  const sdl = await buildSchemaSDL({
-    database,
-    schemas,
-    pg,
-    env,
-  });
+  const pool = createDatabasePool(resolvePgConfig({ ...pg, database }, env));
+  let sdl: string;
+  try {
+    sdl = await buildSchemaSDL({ pool, schemas });
+  } finally {
+    await pool.end();
+  }
 
   // Write schema to file
   const schemaPath = path.join(outDir, filename);

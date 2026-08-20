@@ -8,7 +8,7 @@
 import { rethrowIfCancelled, throwIfAborted } from '../cancellation';
 import { canonicalizeOutputDir } from './filesystem';
 import { acquireOutputLocks } from './lock';
-import { planGeneratedFiles, prepareGenerationPlan } from './planner';
+import { prepareGenerationPlan } from './planner';
 import {
   applyPreparedPlans,
   conflictErrors,
@@ -26,9 +26,9 @@ import type {
 
 export { planGeneratedFiles } from './planner';
 export {
-  GENERATED_FILES_MANIFEST,
   type FileChange,
   type FileChangeAction,
+  GENERATED_FILES_MANIFEST,
   type GeneratedFile,
   type GeneratedFilesManifest,
   type GeneratedFileWriteJob,

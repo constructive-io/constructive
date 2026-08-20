@@ -5,8 +5,11 @@
  * by querying the routing_public.api_schemas table.
  */
 import { Pool } from 'pg';
-import { getPgPool } from 'pg-cache';
-import { getPgEnvOptions } from 'pg-env';
+import { getPgEnvOptions, type PgConfig } from 'pg-env';
+
+export type DatabasePoolFactory = (config: PgConfig) => Pool;
+
+export type ExplicitEnvironment = Readonly<Record<string, string | undefined>>;
 
 /**
  * Result of validating routing schema requirements
@@ -27,7 +30,7 @@ export interface RoutingSchemaValidation {
  * @returns Validation result
  */
 export async function validateRoutingSchemas(
-  pool: Pool,
+  pool: Pool
 ): Promise<RoutingSchemaValidation> {
   try {
     // Check for routing_public.apis table
@@ -94,7 +97,7 @@ export async function validateRoutingSchemas(
  */
 export async function resolveApiSchemas(
   pool: Pool,
-  apiNames: string[],
+  apiNames: string[]
 ): Promise<string[]> {
   // First validate that the required schemas exist
   const validation = await validateRoutingSchemas(pool);
@@ -112,13 +115,13 @@ export async function resolveApiSchemas(
     WHERE api.name = ANY($1)
     ORDER BY ms.schema_name
     `,
-    [apiNames],
+    [apiNames]
   );
 
   if (result.rows.length === 0) {
     throw new Error(
       `No schemas found for API names: ${apiNames.join(', ')}. ` +
-        'Ensure the APIs exist and have schemas assigned in routing_public.api_schemas.',
+        'Ensure the APIs exist and have schemas assigned in routing_public.api_schemas.'
     );
   }
 
@@ -126,31 +129,37 @@ export async function resolveApiSchemas(
 }
 
 /**
- * Create a database pool for the given database name or connection string
+ * Resolve a complete PostgreSQL configuration from explicit inputs.
  *
- * @param database - Database name or connection string
- * @returns Database connection pool
+ * Configuration values override the supplied environment. Ambient process
+ * environment is deliberately never consulted by this reusable boundary.
  */
-export function createDatabasePool(database: string): Pool {
-  // Check if it's a connection string or just a database name
+export function resolvePgConfig(
+  overrides: Partial<PgConfig> = {},
+  env: ExplicitEnvironment = {}
+): PgConfig {
+  const config = getPgEnvOptions(overrides, { ...env });
+  const database = config.database;
   const isConnectionString =
     database.startsWith('postgres://') || database.startsWith('postgresql://');
 
-  if (isConnectionString) {
-    // Parse connection string and extract database name
-    // Format: postgres://user:password@host:port/database
-    const url = new URL(database);
-    const dbName = url.pathname.slice(1); // Remove leading slash
-    return getPgPool({
-      host: url.hostname,
-      port: parseInt(url.port || '5432', 10),
-      user: url.username,
-      password: url.password,
-      database: dbName,
-    });
-  }
+  if (!isConnectionString) return config;
 
-  // Use environment variables for connection, just override database name
-  const config = getPgEnvOptions({ database });
-  return getPgPool(config);
+  const url = new URL(database);
+  const dbName = decodeURIComponent(url.pathname.slice(1));
+  return {
+    host: url.hostname,
+    port: Number.parseInt(url.port || '5432', 10),
+    user: decodeURIComponent(url.username),
+    password: decodeURIComponent(url.password),
+    database: dbName,
+  };
+}
+
+/** Create a caller-owned, operation-scoped PostgreSQL pool. */
+export function createDatabasePool(
+  config: PgConfig,
+  factory: DatabasePoolFactory = (poolConfig) => new Pool(poolConfig)
+): Pool {
+  return factory(config);
 }

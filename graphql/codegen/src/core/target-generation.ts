@@ -12,30 +12,30 @@ import { buildClientSchema, printSchema } from 'graphql';
 import type { GraphQLSDKConfigTarget } from '../types/config';
 import { getConfigOptions } from '../types/config';
 import type { Operation, Table, TypeRegistry } from '../types/schema';
+import { rethrowIfCancelled, throwIfAborted } from './cancellation';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateRootBarrel } from './codegen/barrel';
 import { generateCli as generateCliFiles } from './codegen/cli';
 import {
-  generateReadme as generateCliReadme,
   generateAgentsDocs as generateCliAgentsDocs,
+  generateReadme as generateCliReadme,
   generateSkills as generateCliSkills,
 } from './codegen/cli/docs-generator';
 import { resolveDocsConfig } from './codegen/docs-utils';
 import {
-  generateHooksReadme,
   generateHooksAgentsDocs,
+  generateHooksReadme,
   generateHooksSkills,
 } from './codegen/hooks-docs-generator';
 import { generateOrm as generateOrmFiles } from './codegen/orm';
 import {
-  generateOrmReadme,
   generateOrmAgentsDocs,
+  generateOrmReadme,
   generateOrmSkills,
 } from './codegen/orm/docs-generator';
 import { generateSharedTypes } from './codegen/shared';
 import { generateTargetReadme } from './codegen/target-docs-generator';
 import { createSchemaSource, validateSourceOptions } from './introspect';
-import { rethrowIfCancelled, throwIfAborted } from './cancellation';
 import type {
   FileChange,
   GeneratedFileWriteJob,
@@ -164,24 +164,24 @@ export function resolveTargetPaths(
     schemaDir: resolvePathFrom(cwd, target.schemaDir),
     schema: target.schema
       ? {
-          ...target.schema,
-          output: resolvePathFrom(cwd, target.schema.output),
-        }
+        ...target.schema,
+        output: resolvePathFrom(cwd, target.schema.output),
+      }
       : undefined,
     db: target.db
       ? {
-          ...target.db,
-          pgpm: target.db.pgpm
-            ? {
-                ...target.db.pgpm,
-                modulePath: resolvePathFrom(cwd, target.db.pgpm.modulePath),
-                workspacePath: resolvePathFrom(
-                  cwd,
-                  target.db.pgpm.workspacePath,
-                ),
-              }
-            : undefined,
-        }
+        ...target.db,
+        pgpm: target.db.pgpm
+          ? {
+            ...target.db.pgpm,
+            modulePath: resolvePathFrom(cwd, target.db.pgpm.modulePath),
+            workspacePath: resolvePathFrom(
+              cwd,
+              target.db.pgpm.workspacePath,
+            ),
+          }
+          : undefined,
+      }
       : undefined,
   };
 }
@@ -293,15 +293,13 @@ export async function planTargetGeneration(
 ): Promise<GenerationPreparation> {
   throwIfAborted(options.signal);
   const cwd = path.resolve(options.cwd ?? process.cwd());
-  const {
-    cwd: _cwd,
-    overwriteModifiedGenerated: _overwriteModifiedGenerated,
-    yes: _yes,
-    onProgress: _onProgress,
-    signal: _signal,
-    env: _env,
-    ...configOverrides
-  } = options;
+  const configOverrides = { ...options };
+  delete configOverrides.cwd;
+  delete configOverrides.overwriteModifiedGenerated;
+  delete configOverrides.yes;
+  delete configOverrides.onProgress;
+  delete configOverrides.signal;
+  delete configOverrides.env;
   const report = (event: GenerateProgressEvent): void => {
     if (options.onProgress) options.onProgress(event);
     else console.log(event.message);

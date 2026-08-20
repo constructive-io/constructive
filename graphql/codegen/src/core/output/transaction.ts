@@ -8,8 +8,8 @@ import {
   removeEmptyParents,
 } from './filesystem';
 import {
-  GENERATED_FILES_MANIFEST,
   type FileChange,
+  GENERATED_FILES_MANIFEST,
   type GenerationPlan,
   type PreparedPlan,
   type WriteBatchResult,
@@ -373,9 +373,9 @@ export async function applyPreparedPlans(
           ...(rollbackErrors.length === 0
             ? {}
             : {
-                rollbackErrors,
-                recoveryPath: transaction?.transactionRoot,
-              }),
+              rollbackErrors,
+              recoveryPath: transaction?.transactionRoot,
+            }),
         });
       }),
     };
@@ -436,9 +436,9 @@ export async function applyPreparedPlans(
         ...(warnings.length === 0
           ? {}
           : {
-              warnings,
-              recoveryPath: transaction?.transactionRoot,
-            }),
+            warnings,
+            recoveryPath: transaction?.transactionRoot,
+          }),
       });
     }),
   };
