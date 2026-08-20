@@ -7,6 +7,8 @@ import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial<ConstructiveOptions> => {
   const {
     GRAPHILE_SCHEMA,
+    GRAPHILE_SCOPED_INTROSPECTION,
+    GRAPHILE_SCOPED_INTROSPECTION_JIT,
 
     FEATURES_SIMPLE_INFLECTION,
     FEATURES_OPPOSITE_BASE_NAMES,
@@ -38,6 +40,12 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   // let an absent env var overwrite pgpm.json or consumer-specific values.
   const smsRequestTimeoutMs = parseEnvNumber(SMS_REQUEST_TIMEOUT_MS);
   const smsDryRun = parseEnvBoolean(SEND_SMS_DRY_RUN);
+  const scopedIntrospection = parseEnvBoolean(
+    GRAPHILE_SCOPED_INTROSPECTION
+  );
+  const introspectionJit = parseEnvBoolean(
+    GRAPHILE_SCOPED_INTROSPECTION_JIT
+  );
   const hasSmsEnvOverrides = Boolean(
     SMS_PROVIDER ||
     SMS_SENDER_ID ||
@@ -52,7 +60,9 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
         schema: GRAPHILE_SCHEMA.includes(',')
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
           : GRAPHILE_SCHEMA
-      })
+      }),
+      ...(scopedIntrospection !== undefined && { scopedIntrospection }),
+      ...(introspectionJit !== undefined && { introspectionJit })
     },
     features: {
       ...(FEATURES_SIMPLE_INFLECTION && { simpleInflection: parseEnvBoolean(FEATURES_SIMPLE_INFLECTION) }),
