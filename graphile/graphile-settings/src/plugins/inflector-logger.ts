@@ -1,4 +1,7 @@
 import type { GraphileConfig } from 'graphile-config';
+import { Logger } from '@pgpmjs/logger';
+
+import { getGraphileSettingsRuntime } from '../runtime-environment';
 
 /**
  * InflectorLoggerPlugin - Logs inflector calls during schema build for debugging.
@@ -35,12 +38,16 @@ import type { GraphileConfig } from 'graphile-config';
  * Set INFLECTOR_LOG=1 environment variable to enable logging.
  */
 
-const LOG_ENABLED = process.env.INFLECTOR_LOG === '1';
+const logger = new Logger('inflector');
 
-function log(category: string, message: string, details?: Record<string, unknown>) {
-  if (!LOG_ENABLED) return;
+function log(
+  category: string,
+  message: string,
+  details?: Record<string, unknown>
+) {
+  if (getGraphileSettingsRuntime().env.INFLECTOR_LOG !== '1') return;
   const detailsStr = details ? ` ${JSON.stringify(details)}` : '';
-  console.log(`[Inflector:${category}]${detailsStr} => ${message}`);
+  logger.info(`[Inflector:${category}]${detailsStr} => ${message}`);
 }
 
 export const InflectorLoggerPlugin: GraphileConfig.Plugin = {

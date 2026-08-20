@@ -32,7 +32,7 @@
     "12factor-env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "lru-cache": "^11.2.7",
+    "lru-cache": "^10.4.3",
     "pg": "^8.21.0",
     "pg-env": "workspace:^"
   },

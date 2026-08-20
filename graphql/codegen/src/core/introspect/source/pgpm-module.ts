@@ -8,15 +8,21 @@
  * 4. Cleaning up the ephemeral database (unless keepDb is true)
  */
 import { PgpmPackage } from '@pgpmjs/core';
-import { buildSchemaSDL } from 'graphile-schema';
+import { buildSchemaArtifacts } from 'graphile-schema';
 import { buildSchema, introspectionFromSchema } from 'graphql';
-import { getPgPool, pgCache } from 'pg-cache';
+import type { Pool } from 'pg';
+import { pgCache } from 'pg-cache';
+import type { PgConfig } from 'pg-env';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
-import { resolveApiSchemas, validateRoutingSchemas } from './api-schemas';
-import type { SchemaSource, SchemaSourceResult } from './types';
+import {
+  createDatabasePool,
+  type DatabasePoolFactory,
+  resolveApiSchemas,
+} from './api-schemas';
+import type { MetaTableInfo, SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
 
 /**
@@ -47,6 +53,12 @@ export interface PgpmModulePathOptions {
    * @default false
    */
   keepDb?: boolean;
+
+  /** Complete base connection used to create the ephemeral database. */
+  pgConfig: PgConfig;
+
+  /** @internal Test seam for creating operation-scoped pools. */
+  poolFactory?: DatabasePoolFactory;
 }
 
 /**
@@ -82,6 +94,12 @@ export interface PgpmWorkspaceOptions {
    * @default false
    */
   keepDb?: boolean;
+
+  /** Complete base connection used to create the ephemeral database. */
+  pgConfig: PgConfig;
+
+  /** @internal Test seam for creating operation-scoped pools. */
+  poolFactory?: DatabasePoolFactory;
 }
 
 export type PgpmModuleSchemaSourceOptions =
@@ -92,7 +110,7 @@ export type PgpmModuleSchemaSourceOptions =
  * Type guard to check if options use direct module path
  */
 export function isPgpmModulePathOptions(
-  options: PgpmModuleSchemaSourceOptions,
+  options: PgpmModuleSchemaSourceOptions
 ): options is PgpmModulePathOptions {
   return 'pgpmModulePath' in options;
 }
@@ -101,7 +119,7 @@ export function isPgpmModulePathOptions(
  * Type guard to check if options use workspace + module name
  */
 export function isPgpmWorkspaceOptions(
-  options: PgpmModuleSchemaSourceOptions,
+  options: PgpmModuleSchemaSourceOptions
 ): options is PgpmWorkspaceOptions {
   return 'pgpmWorkspacePath' in options && 'pgpmModuleName' in options;
 }
@@ -132,7 +150,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       throw new SchemaSourceError(
         `Failed to resolve module path: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined,
+        err instanceof Error ? err : undefined
       );
     }
 
@@ -141,7 +159,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
     if (!pkg.isInModule()) {
       throw new SchemaSourceError(
         `Not a valid PGPM module: ${modulePath}. Directory must contain pgpm.plan and .control files.`,
-        this.describe(),
+        this.describe()
       );
     }
 
@@ -150,18 +168,22 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       this.ephemeralDb = createEphemeralDb({
         prefix: 'codegen_pgpm_',
         verbose: false,
+        baseConfig: this.options.pgConfig,
       });
     } catch (err) {
       throw new SchemaSourceError(
         `Failed to create ephemeral database: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined,
+        err instanceof Error ? err : undefined
       );
     }
 
     const { config: dbConfig, teardown } = this.ephemeralDb;
+    let pool: Pool | undefined;
 
     try {
+      pool = createDatabasePool(dbConfig, this.options.poolFactory);
+
       // Deploy the module to the ephemeral database
       try {
         await deployPgpm(dbConfig, modulePath, false);
@@ -169,27 +191,21 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         throw new SchemaSourceError(
           `Failed to deploy PGPM module: ${err instanceof Error ? err.message : 'Unknown error'}`,
           this.describe(),
-          err instanceof Error ? err : undefined,
+          err instanceof Error ? err : undefined
         );
       }
 
       // Resolve schemas - either from explicit schemas option or from apiNames (after deployment)
       let schemas: string[];
       if (apiNames && apiNames.length > 0) {
-        // For PGPM mode, validate services schemas AFTER migration
-        const pool = getPgPool(dbConfig);
         try {
-          const validation = await validateRoutingSchemas(pool);
-          if (!validation.valid) {
-            throw new SchemaSourceError(validation.error!, this.describe());
-          }
           schemas = await resolveApiSchemas(pool, apiNames);
         } catch (err) {
           if (err instanceof SchemaSourceError) throw err;
           throw new SchemaSourceError(
             `Failed to resolve API schemas: ${err instanceof Error ? err.message : 'Unknown error'}`,
             this.describe(),
-            err instanceof Error ? err : undefined,
+            err instanceof Error ? err : undefined
           );
         }
       } else {
@@ -197,25 +213,22 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       }
 
       // Build SDL from the deployed database
-      let sdl: string;
+      let artifacts;
       try {
-        sdl = await buildSchemaSDL({
-          database: dbConfig.database,
-          schemas,
-        });
+        artifacts = await buildSchemaArtifacts({ pool, schemas });
       } catch (err) {
         throw new SchemaSourceError(
           `Failed to introspect database: ${err instanceof Error ? err.message : 'Unknown error'}`,
           this.describe(),
-          err instanceof Error ? err : undefined,
+          err instanceof Error ? err : undefined
         );
       }
 
-      // Validate non-empty
+      const { sdl, tablesMeta } = artifacts;
       if (!sdl.trim()) {
         throw new SchemaSourceError(
           'Database introspection returned empty schema',
-          this.describe(),
+          this.describe()
         );
       }
 
@@ -227,7 +240,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         throw new SchemaSourceError(
           `Invalid GraphQL SDL from database: ${err instanceof Error ? err.message : 'Unknown error'}`,
           this.describe(),
-          err instanceof Error ? err : undefined,
+          err instanceof Error ? err : undefined
         );
       }
 
@@ -239,29 +252,31 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         throw new SchemaSourceError(
           `Failed to generate introspection: ${err instanceof Error ? err.message : 'Unknown error'}`,
           this.describe(),
-          err instanceof Error ? err : undefined,
+          err instanceof Error ? err : undefined
         );
       }
 
       // Convert graphql-js introspection result to our mutable type
       const introspection: IntrospectionQueryResponse = JSON.parse(
-        JSON.stringify(introspectionResult),
+        JSON.stringify(introspectionResult)
       ) as IntrospectionQueryResponse;
 
-      return { introspection };
+      return {
+        introspection,
+        tablesMeta: tablesMeta as MetaTableInfo[],
+      };
     } finally {
-      // Release pg-cache pool for this ephemeral database before dropping
-      // deployPgpm() and getPgPool() cache connections that must be closed first
-      pgCache.delete(dbConfig.database);
-      await pgCache.waitForDisposals();
-
-      // Clean up the ephemeral database
-      teardown({ keepDb });
-
-      if (keepDb) {
-        console.log(
-          `[pgpm-module] Kept ephemeral database: ${dbConfig.database}`,
-        );
+      try {
+        if (pool) await pool.end();
+      } finally {
+        try {
+          // deployPgpm() may retain a pg-cache connection that must be closed
+          // before the ephemeral database can be dropped. Introspection never uses it.
+          pgCache.delete(dbConfig.database);
+          await pgCache.waitForDisposals();
+        } finally {
+          teardown({ keepDb });
+        }
       }
     }
   }

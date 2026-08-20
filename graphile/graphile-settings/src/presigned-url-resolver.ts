@@ -12,7 +12,6 @@
  */
 
 import { BucketProvisioner } from '@constructive-io/bucket-provisioner';
-import { getEnvOptions } from '@constructive-io/graphql-env';
 import { createS3Client } from '@constructive-io/s3-utils';
 import { Logger } from '@pgpmjs/logger';
 import { createHash } from 'crypto';
@@ -20,10 +19,15 @@ import type { BucketNameResolver as ProvisionerBucketNameResolver } from 'graphi
 import type { BucketNameResolver, EnsureBucketProvisioned,S3Config } from 'graphile-presigned-url-plugin';
 
 import { getBucketProvisionerConnection } from './bucket-provisioner-resolver';
+import { getGraphileSettingsRuntimeResource } from './runtime-environment';
+import { getGraphileSettingsRuntimeOptions } from './runtime-options';
 
 const log = new Logger('presigned-url-resolver');
 
-let s3Config: S3Config | null = null;
+const PRESIGNED_S3_CONFIG = Symbol('constructive.presigned-s3-config');
+const ENSURE_BUCKET_PROVISIONER = Symbol(
+  'constructive.ensure-bucket-provisioner'
+);
 
 /**
  * Lazily initialize and return the S3Config for the presigned URL plugin.
@@ -38,55 +42,57 @@ let s3Config: S3Config | null = null;
  * environment-global upload bucket.
  */
 export function getPresignedUrlS3Config(): S3Config {
-  if (s3Config) return s3Config;
+  return getGraphileSettingsRuntimeResource(
+    PRESIGNED_S3_CONFIG,
+    () => {
+      const { cdn } = getGraphileSettingsRuntimeOptions();
 
-  const { cdn } = getEnvOptions();
+      if (!cdn) {
+        throw new Error(
+          '[presigned-url-resolver] CDN config not found. ' +
+          'Ensure CDN environment variables (AWS_ACCESS_KEY, AWS_SECRET_KEY, etc.) ' +
+          'are set or that pgpmDefaults provides CDN fields.',
+        );
+      }
 
-  if (!cdn) {
-    throw new Error(
-      '[presigned-url-resolver] CDN config not found. ' +
-      'Ensure CDN environment variables (AWS_ACCESS_KEY, AWS_SECRET_KEY, etc.) ' +
-      'are set or that pgpmDefaults provides CDN fields.',
-    );
-  }
+      const { bucketName, awsRegion, awsAccessKey, awsSecretKey, endpoint, publicUrlPrefix } = cdn;
 
-  const { bucketName, awsRegion, awsAccessKey, awsSecretKey, endpoint, publicUrlPrefix } = cdn;
+      if (!awsAccessKey || !awsSecretKey) {
+        throw new Error(
+          '[presigned-url-resolver] Missing S3 credentials. ' +
+          'Set AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables.',
+        );
+      }
 
-  if (!awsAccessKey || !awsSecretKey) {
-    throw new Error(
-      '[presigned-url-resolver] Missing S3 credentials. ' +
-      'Set AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables.',
-    );
-  }
+      if (!bucketName) {
+        throw new Error(
+          '[presigned-url-resolver] Missing CDN bucket name. ' +
+          'Set CDN_BUCKET_NAME environment variable.',
+        );
+      }
 
-  if (!bucketName) {
-    throw new Error(
-      '[presigned-url-resolver] Missing CDN bucket name. ' +
-      'Set CDN_BUCKET_NAME environment variable.',
-    );
-  }
+      log.info(
+        `[presigned-url-resolver] Initializing: bucket=${bucketName} endpoint=${endpoint}`,
+      );
 
-  log.info(
-    `[presigned-url-resolver] Initializing: bucket=${bucketName} endpoint=${endpoint}`,
+      const client = createS3Client({
+        provider: (cdn.provider || 'minio') as any,
+        region: awsRegion,
+        accessKeyId: awsAccessKey,
+        secretAccessKey: awsSecretKey,
+        ...(endpoint ? { endpoint } : {}),
+      });
+
+      return {
+        client,
+        bucket: bucketName,
+        region: awsRegion,
+        publicUrlPrefix,
+        ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
+      };
+    },
+    ({ client }) => client.destroy()
   );
-
-  const client = createS3Client({
-    provider: (cdn.provider || 'minio') as any,
-    region: awsRegion,
-    accessKeyId: awsAccessKey,
-    secretAccessKey: awsSecretKey,
-    ...(endpoint ? { endpoint } : {}),
-  });
-
-  s3Config = {
-    client,
-    bucket: bucketName,
-    region: awsRegion,
-    publicUrlPrefix,
-    ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
-  };
-
-  return s3Config;
 }
 
 /**
@@ -96,7 +102,7 @@ export function getPresignedUrlS3Config(): S3Config {
  * getPresignedUrlS3Config, so an untenanted bucket name can never be minted.
  */
 function getBucketNamePrefix(): string {
-  const { cdn } = getEnvOptions();
+  const { cdn } = getGraphileSettingsRuntimeOptions();
   const prefix = cdn?.bucketName;
 
   if (!prefix) {
@@ -182,9 +188,8 @@ function mintPhysicalBucketName(prefix: string, databaseId: string, bucketKey: s
  * S3 buckets per logical bucket key.
  */
 export function createBucketNameResolver(): BucketNameResolver {
-  const prefix = getBucketNamePrefix();
   return (databaseId: string, bucketKey: string): string =>
-    mintPhysicalBucketName(prefix, databaseId, bucketKey);
+    mintPhysicalBucketName(getBucketNamePrefix(), databaseId, bucketKey);
 }
 
 /**
@@ -197,9 +202,8 @@ export function createBucketNameResolver(): BucketNameResolver {
  * path would. Throws on a missing prefix — no default bucket name.
  */
 export function createProvisionerBucketNameResolver(): ProvisionerBucketNameResolver {
-  const prefix = getBucketNamePrefix();
   return (bucketKey: string, databaseId: string): string =>
-    mintPhysicalBucketName(prefix, databaseId, bucketKey);
+    mintPhysicalBucketName(getBucketNamePrefix(), databaseId, bucketKey);
 }
 
 /**
@@ -210,7 +214,7 @@ export function createProvisionerBucketNameResolver(): ProvisionerBucketNameReso
  * Falls back to ['http://localhost:3000'] for local development.
  */
 export function getAllowedOrigins(): string[] {
-  const { server } = getEnvOptions();
+  const { server } = getGraphileSettingsRuntimeOptions();
   if (server?.origin) return [server.origin];
   return ['*'];
 }
@@ -227,8 +231,6 @@ export function getAllowedOrigins(): string[] {
  * SERVER_ORIGIN env var (falls back to localhost for local dev).
  */
 export function createEnsureBucketProvisioned(): EnsureBucketProvisioned {
-  let provisioner: BucketProvisioner | null = null;
-
   return async (
     bucketName: string,
     accessType: 'public' | 'private' | 'temp',
@@ -240,12 +242,14 @@ export function createEnsureBucketProvisioned(): EnsureBucketProvisioned {
       ? allowedOrigins
       : getAllowedOrigins();
 
-    if (!provisioner) {
-      provisioner = new BucketProvisioner({
+    const provisioner = getGraphileSettingsRuntimeResource(
+      ENSURE_BUCKET_PROVISIONER,
+      () => new BucketProvisioner({
         connection: getBucketProvisionerConnection(),
         allowedOrigins: effectiveOrigins,
-      });
-    }
+      }),
+      (resource) => resource.getClient().destroy()
+    );
 
     log.info(
       `[lazy-provision] Provisioning S3 bucket "${bucketName}" ` +

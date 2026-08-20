@@ -63,3 +63,7 @@ export { getPresignedUrlS3Config } from './presigned-url-resolver';
 
 // Bucket provisioner utilities
 export { getBucketProvisionerConnection } from './bucket-provisioner-resolver';
+
+// Explicit per-operation and per-server runtime boundaries
+export * from './runtime-environment';
+export { getGraphileSettingsRuntimeOptions } from './runtime-options';

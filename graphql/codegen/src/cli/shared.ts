@@ -149,17 +149,23 @@ const isTopLevel = (_key: string, path: string[]) => path.length === 0;
 const skipNonTopLevel = (key: string, path: string[]) =>
   !isTopLevel(key, path) || key === '_' || key.startsWith('_');
 
-export const camelizeArgv = (argv: Record<string, any>): Record<string, any> =>
-  inflektTree(argv, toCamelCase, { skip: skipNonTopLevel });
+export const camelizeArgv = (
+  argv: Record<string, unknown>
+): Record<string, unknown> =>
+  inflektTree(argv, toCamelCase, {
+    skip: skipNonTopLevel,
+  }) as Record<string, unknown>;
 
-export const hyphenateKeys = (obj: Record<string, any>): Record<string, any> =>
+export const hyphenateKeys = (
+  obj: Record<string, unknown>
+): Record<string, unknown> =>
   inflektTree(
     obj,
     (key) => key.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase()),
     {
       skip: skipNonTopLevel,
     },
-  );
+  ) as Record<string, unknown>;
 
 // ============================================================================
 // Config <-> CLI shape transforms

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 
 import type { AuthSettings } from '../types';
+import { getServerEnvironment } from '../runtime-environment';
 
 export const SESSION_COOKIE_NAME = 'constructive_session';
 export const DEVICE_TOKEN_COOKIE_NAME = 'constructive_device_token';
@@ -34,8 +35,11 @@ export const getSessionCookieConfig = (
   }
 
   return {
-    secure: authSettings?.cookieSecure ?? process.env.NODE_ENV === 'production',
-    sameSite: (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
+    secure:
+      authSettings?.cookieSecure ??
+      getServerEnvironment().NODE_ENV === 'production',
+    sameSite:
+      (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
     domain: authSettings?.cookieDomain ?? undefined,
     httpOnly: authSettings?.cookieHttponly ?? true,
     maxAge,
@@ -46,10 +50,15 @@ export const getSessionCookieConfig = (
 /**
  * Build cookie config for device token (long-lived, 90 days).
  */
-export const getDeviceTokenCookieConfig = (authSettings?: AuthSettings): CookieConfig => {
+export const getDeviceTokenCookieConfig = (
+  authSettings?: AuthSettings
+): CookieConfig => {
   return {
-    secure: authSettings?.cookieSecure ?? process.env.NODE_ENV === 'production',
-    sameSite: (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
+    secure:
+      authSettings?.cookieSecure ??
+      getServerEnvironment().NODE_ENV === 'production',
+    sameSite:
+      (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
     domain: authSettings?.cookieDomain ?? undefined,
     httpOnly: true,
     maxAge: DEVICE_TOKEN_MAX_AGE,
@@ -78,7 +87,10 @@ export const setSessionCookie = (
 /**
  * Clear the session cookie.
  */
-export const clearSessionCookie = (res: Response, config: CookieConfig): void => {
+export const clearSessionCookie = (
+  res: Response,
+  config: CookieConfig
+): void => {
   res.clearCookie(SESSION_COOKIE_NAME, {
     secure: config.secure,
     sameSite: config.sameSite,
@@ -109,7 +121,10 @@ export const setDeviceTokenCookie = (
 /**
  * Clear the device token cookie.
  */
-export const clearDeviceTokenCookie = (res: Response, config: CookieConfig): void => {
+export const clearDeviceTokenCookie = (
+  res: Response,
+  config: CookieConfig
+): void => {
   res.clearCookie(DEVICE_TOKEN_COOKIE_NAME, {
     secure: config.secure,
     sameSite: config.sameSite,
@@ -123,10 +138,15 @@ export const clearDeviceTokenCookie = (res: Response, config: CookieConfig): voi
  * Parse a cookie value from the raw Cookie header.
  * Avoids pulling in cookie-parser as a dependency.
  */
-export const parseCookieValue = (req: Request, cookieName: string): string | undefined => {
+export const parseCookieValue = (
+  req: Request,
+  cookieName: string
+): string | undefined => {
   const header = req.headers.cookie;
   if (!header) return undefined;
-  const match = header.split(';').find((c) => c.trim().startsWith(`${cookieName}=`));
+  const match = header
+    .split(';')
+    .find((c) => c.trim().startsWith(`${cookieName}=`));
   return match ? decodeURIComponent(match.split('=')[1].trim()) : undefined;
 };
 
@@ -140,6 +160,8 @@ export const getDeviceTokenFromRequest = (req: Request): string | undefined => {
 /**
  * Get the session token from the request cookie.
  */
-export const getSessionTokenFromRequest = (req: Request): string | undefined => {
+export const getSessionTokenFromRequest = (
+  req: Request
+): string | undefined => {
   return parseCookieValue(req, SESSION_COOKIE_NAME);
 };

@@ -6,6 +6,16 @@
  */
 import { DatabaseSchemaSource } from '../../core/introspect/source/database';
 
+const pgConfig = {
+  host: 'localhost',
+  port: 5432,
+  user: 'postgres',
+  password: '',
+  database: 'test_db',
+};
+const poolFactory = () =>
+  ({ end: jest.fn(async (): Promise<void> => undefined) }) as never;
+
 const SDL_A = `
 type Query {
   alphaItems: [AlphaItem!]
@@ -51,8 +61,9 @@ function typeNames(introspection: { __schema: { types: { name: string }[] } }): 
 describe('DatabaseSchemaSource result correlation', () => {
   it('returns introspection and tablesMeta belonging to the same schema', async () => {
     const source = new DatabaseSchemaSource({
-      database: 'test_db',
+      pgConfig,
       schemas: ['schema_a'],
+      poolFactory,
     });
 
     const result = await source.fetch();
@@ -63,14 +74,16 @@ describe('DatabaseSchemaSource result correlation', () => {
 
   it('is unaffected by another schema build completing mid-fetch (A write -> B write -> A read)', async () => {
     const sourceA = new DatabaseSchemaSource({
-      database: 'test_db',
+      pgConfig,
       schemas: ['schema_a'],
+      poolFactory,
       // Pause A after its metadata is collected so B can build and overwrite
       // the simulated process-global before A's fetch resumes.
       _onMetaCollected: async () => {
         const sourceB = new DatabaseSchemaSource({
-          database: 'test_db',
+          pgConfig,
           schemas: ['schema_b'],
+          poolFactory,
         });
         await sourceB.fetch();
         expect(lastBuildGlobal).toEqual([tableMetaB]);

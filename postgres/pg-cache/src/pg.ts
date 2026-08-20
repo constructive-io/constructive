@@ -1,10 +1,11 @@
-import { Logger } from '@pgpmjs/logger';
+import { createHash } from 'node:crypto';
 import { parseEnvNumber } from '12factor-env';
 import pg from 'pg';
 import { getPgEnvOptions, PgConfig, PgPoolConfig } from 'pg-env';
+import { Logger } from '@pgpmjs/logger';
 
 import { getActivePgPoolFactory, PgPoolFactory } from './driver';
-import { pgCache } from './lru';
+import { pgCache, PgPoolCacheManager } from './lru';
 
 const log = new Logger('pg-cache');
 
@@ -14,8 +15,7 @@ export const buildConnectionString = (
   host: string,
   port: string | number,
   database: string
-): string =>
-  `postgres://${user}:${password}@${host}:${port}/${database}`;
+): string => `postgres://${user}:${password}@${host}:${port}/${database}`;
 
 /**
  * Read per-pool configuration from environment variables.
@@ -25,12 +25,23 @@ export const buildConnectionString = (
  * - PG_POOL_IDLE_TIMEOUT_MS: Close idle clients after ms (default: 30000)
  * - PG_POOL_CONNECTION_TIMEOUT_MS: Fail connect() after ms (default: 5000)
  */
-export function getPgPoolConfig(overrides?: PgPoolConfig): pg.PoolConfig {
+export function getPgPoolConfig(
+  overrides?: PgPoolConfig,
+  environment: Readonly<Record<string, string | undefined>> = process.env
+): pg.PoolConfig {
   return {
-    max: overrides?.max ?? parseEnvNumber(process.env.PG_POOL_MAX) ?? 5,
-    idleTimeoutMillis: overrides?.idleTimeoutMillis ?? parseEnvNumber(process.env.PG_POOL_IDLE_TIMEOUT_MS) ?? 30000,
-    connectionTimeoutMillis: overrides?.connectionTimeoutMillis ?? parseEnvNumber(process.env.PG_POOL_CONNECTION_TIMEOUT_MS) ?? 5000,
-    ...(overrides?.allowExitOnIdle !== undefined && { allowExitOnIdle: overrides.allowExitOnIdle }),
+    max: overrides?.max ?? parseEnvNumber(environment.PG_POOL_MAX) ?? 5,
+    idleTimeoutMillis:
+      overrides?.idleTimeoutMillis ??
+      parseEnvNumber(environment.PG_POOL_IDLE_TIMEOUT_MS) ??
+      30000,
+    connectionTimeoutMillis:
+      overrides?.connectionTimeoutMillis ??
+      parseEnvNumber(environment.PG_POOL_CONNECTION_TIMEOUT_MS) ??
+      5000,
+    ...(overrides?.allowExitOnIdle !== undefined && {
+      allowExitOnIdle: overrides.allowExitOnIdle,
+    }),
   };
 }
 
@@ -41,7 +52,13 @@ export function getPgPoolConfig(overrides?: PgPoolConfig): pg.PoolConfig {
 export const defaultPgPoolFactory: PgPoolFactory = (pgConfig): pg.Pool => {
   const config = getPgEnvOptions(pgConfig);
   const { user, password, host, port, database } = config;
-  const connectionString = buildConnectionString(user, password, host, port, database);
+  const connectionString = buildConnectionString(
+    user,
+    password,
+    host,
+    port,
+    database
+  );
   const poolConfig = getPgPoolConfig(pgConfig.pool);
   const pgPool = new pg.Pool({ connectionString, ...poolConfig });
 
@@ -89,22 +106,57 @@ export const defaultPgPoolFactory: PgPoolFactory = (pgConfig): pg.Pool => {
   pgPool.on('error', (err: Error & { code?: string }) => {
     if (err.code === '57P01') {
       // Expected during database cleanup - log at debug level
-      log.debug(`Pool ${database} connection terminated (expected during cleanup): ${err.message}`);
+      log.debug(
+        `Pool ${database} connection terminated (expected during cleanup): ${err.message}`
+      );
     } else {
       // Unexpected pool error - log at error level for visibility
       // Note: This does NOT swallow query errors - those still throw via Promise rejection
-      log.error(`Pool ${database} unexpected idle connection error [${err.code || 'unknown'}]: ${err.message}`);
+      log.error(
+        `Pool ${database} unexpected idle connection error [${err.code || 'unknown'}]: ${err.message}`
+      );
     }
   });
 
   return pgPool;
 };
 
-export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig }): pg.Pool => {
-  const config = getPgEnvOptions(pgConfig);
-  const { database } = config;
-  if (pgCache.has(database)) {
-    const cached = pgCache.get(database);
+export interface PgPoolRuntimeOptions {
+  cache?: PgPoolCacheManager;
+  environment?: Readonly<Record<string, string | undefined>>;
+  namespace?: string;
+}
+
+const digest = (value: unknown): string =>
+  createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 24);
+
+export const getPgPoolCacheKey = (
+  pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig },
+  options: Omit<PgPoolRuntimeOptions, 'cache'> = {}
+): string => {
+  const environment = { ...(options.environment ?? process.env) };
+  const config = getPgEnvOptions(pgConfig, environment);
+  const pool = getPgPoolConfig(pgConfig.pool, environment);
+  const namespace = digest(options.namespace ?? 'default');
+  const connection = digest({ ...config, pool });
+  return `pg:${namespace}:${config.database}:${connection}`;
+};
+
+export const getPgPool = (
+  pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig },
+  options: PgPoolRuntimeOptions = {}
+): pg.Pool => {
+  const environment = { ...(options.environment ?? process.env) };
+  const config = getPgEnvOptions(pgConfig, environment);
+  const poolConfig = getPgPoolConfig(pgConfig.pool, environment);
+  const cache = options.cache ?? pgCache;
+  const cacheKey = getPgPoolCacheKey(
+    { ...config, pool: poolConfig },
+    { environment: {}, namespace: options.namespace }
+  );
+
+  if (cache.has(cacheKey)) {
+    const cached = cache.get(cacheKey);
     if (cached) return cached;
   }
 
@@ -112,8 +164,8 @@ export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig })
   // factory may return any QueryablePool (e.g. an in-process PGlite pool); it is
   // treated as a pg.Pool since that is the only surface consumers use.
   const factory = getActivePgPoolFactory() ?? defaultPgPoolFactory;
-  const pgPool = factory(pgConfig) as pg.Pool;
+  const pgPool = factory({ ...config, pool: poolConfig }) as pg.Pool;
 
-  pgCache.set(database, pgPool);
+  cache.set(cacheKey, pgPool);
   return pgPool;
 };

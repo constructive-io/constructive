@@ -20,6 +20,7 @@ export {
   createSchemaSource,
   EndpointSchemaSource,
   FileSchemaSource,
+  resolvePgConfig,
   SchemaSourceError,
   validateSourceOptions,
 } from './source';

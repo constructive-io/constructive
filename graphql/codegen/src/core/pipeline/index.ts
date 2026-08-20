@@ -9,11 +9,7 @@
  * - Filtering
  */
 import type { GraphQLSDKConfigTarget } from '../../types/config';
-import type {
-  Operation,
-  Table,
-  TypeRegistry,
-} from '../../types/schema';
+import type { Operation, Table, TypeRegistry } from '../../types/schema';
 import { enrichManyToManyRelations } from '../introspect/enrich-relations';
 import { inferTablesFromIntrospection } from '../introspect/infer-tables';
 import type { SchemaSource } from '../introspect/source';
@@ -24,6 +20,7 @@ import {
   getTableOperationNames,
   transformSchemaToOperations,
 } from '../introspect/transform-schema';
+import { throwIfAborted } from '../cancellation';
 
 // Re-export for convenience
 export type { SchemaSource } from '../introspect/source';
@@ -53,9 +50,18 @@ export interface CodegenPipelineOptions {
   verbose?: boolean;
 
   /**
+   * Receive verbose pipeline messages. The reusable pipeline never writes to
+   * the terminal; human adapters decide how these messages are rendered.
+   */
+  onLog?: (message: string) => void;
+
+  /**
    * Skip custom operations (only generate table CRUD)
    */
   skipCustomOperations?: boolean;
+
+  /** Cancels at source and CPU-stage boundaries. */
+  signal?: AbortSignal;
 }
 
 export interface CodegenPipelineResult {
@@ -101,24 +107,31 @@ export interface CodegenPipelineResult {
  * 5. Separate table operations from custom operations
  */
 export async function runCodegenPipeline(
-  options: CodegenPipelineOptions,
+  options: CodegenPipelineOptions
 ): Promise<CodegenPipelineResult> {
   const {
     source,
     config,
     verbose = false,
+    onLog,
     skipCustomOperations = false,
+    signal,
   } = options;
-  const log = verbose ? console.log : () => {};
+  const log = verbose && onLog ? onLog : () => {};
 
   // 1. Fetch introspection from source
   log(`Fetching schema from ${source.describe()}...`);
-  const { introspection, tablesMeta } = await source.fetch();
+  throwIfAborted(signal);
+  const { introspection, tablesMeta } = await source.fetch(signal);
+  throwIfAborted(signal);
 
   // 2. Infer tables from introspection (replaces _meta)
   log('Inferring table metadata from schema...');
   const commentsEnabled = config.codegen?.comments !== false;
-  let tables = inferTablesFromIntrospection(introspection, { comments: commentsEnabled });
+  let tables = inferTablesFromIntrospection(introspection, {
+    comments: commentsEnabled,
+  });
+  throwIfAborted(signal);
   const totalTables = tables.length;
   log(`  Found ${totalTables} tables`);
 
@@ -143,6 +156,7 @@ export async function runCodegenPipeline(
     mutations: allMutations,
     typeRegistry,
   } = transformSchemaToOperations(introspection);
+  throwIfAborted(signal);
 
   const totalQueries = allQueries.length;
   const totalMutations = allMutations.length;
@@ -160,27 +174,27 @@ export async function runCodegenPipeline(
     const filteredQueries = filterOperations(
       allQueries,
       config.queries.include,
-      [...config.queries.exclude, ...config.queries.systemExclude],
+      [...config.queries.exclude, ...config.queries.systemExclude]
     );
     const filteredMutations = filterOperations(
       allMutations,
       config.mutations.include,
-      [...config.mutations.exclude, ...config.mutations.systemExclude],
+      [...config.mutations.exclude, ...config.mutations.systemExclude]
     );
 
     log(
-      `  After config filtering: ${filteredQueries.length} queries, ${filteredMutations.length} mutations`,
+      `  After config filtering: ${filteredQueries.length} queries, ${filteredMutations.length} mutations`
     );
 
     // Remove table operations (already handled by table generators)
     customQueries = getCustomOperations(filteredQueries, tableOperationNames);
     customMutations = getCustomOperations(
       filteredMutations,
-      tableOperationNames,
+      tableOperationNames
     );
 
     log(
-      `  Custom operations: ${customQueries.length} queries, ${customMutations.length} mutations`,
+      `  Custom operations: ${customQueries.length} queries, ${customMutations.length} mutations`
     );
   }
 

@@ -21,14 +21,16 @@ const SAFE_CRYPTO_NETWORK = /^[a-z0-9_-]{1,64}$/i;
 
 function validateIdentifier(name: string, label: string): void {
   if (!SAFE_IDENTIFIER.test(name)) {
-    throw new Error(`PublicKeySignature: invalid ${label} "${name}" — must match /^[a-z_][a-z0-9_]*$/`);
+    throw new Error(
+      `PublicKeySignature: invalid ${label} "${name}" — must match /^[a-z_][a-z0-9_]*$/`
+    );
   }
 }
 
 function validateCryptoNetwork(name: string): void {
   if (!SAFE_CRYPTO_NETWORK.test(name)) {
     throw new Error(
-      'PublicKeySignature: invalid crypto_network — must match /^[a-z0-9_-]{1,64}$/i',
+      'PublicKeySignature: invalid crypto_network — must match /^[a-z0-9_-]{1,64}$/i'
     );
   }
 }
@@ -36,16 +38,17 @@ function validateCryptoNetwork(name: string): void {
 const MAX_PUBLIC_KEY_LENGTH = 256;
 const MAX_MESSAGE_LENGTH = 4096;
 const MAX_SIGNATURE_LENGTH = 1024;
-const ENABLE_SIGNATURE_VERIFICATION = process.env.ENABLE_SIGNATURE_VERIFICATION === 'true';
 
-export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): GraphileConfig.Plugin => {
+export const PublicKeySignature = (
+  pubkey_challenge: PublicKeyChallengeConfig
+): GraphileConfig.Plugin => {
   const {
     schema,
     crypto_network,
     sign_up_with_key,
     sign_in_request_challenge,
     sign_in_record_failure,
-    sign_in_with_challenge
+    sign_in_with_challenge,
   } = pubkey_challenge;
 
   validateIdentifier(schema, 'schema');
@@ -103,10 +106,17 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
         createUserAccountWithPublicKey(_$mutation: any, fieldArgs: any) {
           const $input = fieldArgs.getRaw('input');
           const $withPgClient = (grafastContext() as any).get('withPgClient');
-          const $combined = object({ input: $input, withPgClient: $withPgClient });
+          const $combined = object({
+            input: $input,
+            withPgClient: $withPgClient,
+          });
 
           return lambda($combined, async ({ input, withPgClient }: any) => {
-            if (!input.publicKey || typeof input.publicKey !== 'string' || input.publicKey.length > MAX_PUBLIC_KEY_LENGTH) {
+            if (
+              !input.publicKey ||
+              typeof input.publicKey !== 'string' ||
+              input.publicKey.length > MAX_PUBLIC_KEY_LENGTH
+            ) {
               throw new Error('INVALID_PUBLIC_KEY');
             }
 
@@ -118,17 +128,17 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                   context: { role: 'anonymous' },
                   query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_up_with_key)}($1)`,
                   variables: [input.publicKey],
-                  skipTransaction: true
+                  skipTransaction: true,
                 });
 
                 const {
-                  rows: [{ [sign_in_request_challenge]: message }]
+                  rows: [{ [sign_in_request_challenge]: message }],
                 } = await pgQueryWithContext({
                   client: pgClient,
                   context: { role: 'anonymous' },
                   query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
                   variables: [input.publicKey],
-                  skipTransaction: true
+                  skipTransaction: true,
                 });
 
                 await pgClient.query('COMMIT');
@@ -144,21 +154,28 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
         getMessageForSigning(_$mutation: any, fieldArgs: any) {
           const $input = fieldArgs.getRaw('input');
           const $withPgClient = (grafastContext() as any).get('withPgClient');
-          const $combined = object({ input: $input, withPgClient: $withPgClient });
+          const $combined = object({
+            input: $input,
+            withPgClient: $withPgClient,
+          });
 
           return lambda($combined, async ({ input, withPgClient }: any) => {
-            if (!input.publicKey || typeof input.publicKey !== 'string' || input.publicKey.length > MAX_PUBLIC_KEY_LENGTH) {
+            if (
+              !input.publicKey ||
+              typeof input.publicKey !== 'string' ||
+              input.publicKey.length > MAX_PUBLIC_KEY_LENGTH
+            ) {
               throw new Error('INVALID_PUBLIC_KEY');
             }
 
             return withPgClient(null, async (pgClient: any) => {
               const {
-                rows: [{ [sign_in_request_challenge]: message }]
+                rows: [{ [sign_in_request_challenge]: message }],
               } = await pgQueryWithContext({
                 client: pgClient,
                 context: { role: 'anonymous' },
                 query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
-                variables: [input.publicKey]
+                variables: [input.publicKey],
               });
 
               if (!message) throw new Error('NO_ACCOUNT_EXISTS');
@@ -168,62 +185,43 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
           });
         },
 
-        // NOTE: Verification remains behind a feature flag until crypto
-        // verification is re-implemented.
+        // Signature verification must remain fail-closed until a cryptographic
+        // verifier is implemented. A runtime flag cannot safely enable the old
+        // path because that path never used the submitted signature.
         verifyMessageForSigning(_$mutation: any, fieldArgs: any) {
           const $input = fieldArgs.getRaw('input');
-          const $withPgClient = (grafastContext() as any).get('withPgClient');
-          const $combined = object({ input: $input, withPgClient: $withPgClient });
+          const $combined = object({ input: $input });
 
-          return lambda($combined, async ({ input, withPgClient }: any) => {
-            const { publicKey, message, signature: _signature } = input;
+          return lambda($combined, async ({ input }: any) => {
+            const { publicKey, message, signature } = input;
 
-            if (!publicKey || typeof publicKey !== 'string' || publicKey.length > MAX_PUBLIC_KEY_LENGTH) {
+            if (
+              !publicKey ||
+              typeof publicKey !== 'string' ||
+              publicKey.length > MAX_PUBLIC_KEY_LENGTH
+            ) {
               throw new Error('INVALID_PUBLIC_KEY');
             }
-            if (!message || typeof message !== 'string' || message.length > MAX_MESSAGE_LENGTH) {
+            if (
+              !message ||
+              typeof message !== 'string' ||
+              message.length > MAX_MESSAGE_LENGTH
+            ) {
               throw new Error('INVALID_MESSAGE');
             }
-            if (!_signature || typeof _signature !== 'string' || _signature.length > MAX_SIGNATURE_LENGTH) {
+            if (
+              !signature ||
+              typeof signature !== 'string' ||
+              signature.length > MAX_SIGNATURE_LENGTH
+            ) {
               throw new Error('INVALID_SIGNATURE');
             }
 
-            if (!ENABLE_SIGNATURE_VERIFICATION) {
-              // Fail closed without mutating lockout counters while verification
-              // is disabled.
-              throw new Error('FEATURE_DISABLED');
-            }
-
-            return withPgClient(null, async (pgClient: any) => {
-              // Only the success path needs a transaction (multi-step)
-              await pgClient.query('BEGIN');
-              try {
-                const {
-                  rows: [token]
-                } = await pgQueryWithContext({
-                  client: pgClient,
-                  context: { role: 'anonymous' },
-                  query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_with_challenge)}($1, $2)`,
-                  variables: [publicKey, message],
-                  skipTransaction: true
-                });
-
-                if (!token?.access_token) throw new Error('BAD_SIGNIN');
-
-                await pgClient.query('COMMIT');
-                return {
-                  access_token: token.access_token,
-                  access_token_expires_at: token.access_token_expires_at
-                };
-              } catch (err) {
-                await pgClient.query('ROLLBACK');
-                throw err;
-              }
-            });
+            throw new Error('FEATURE_DISABLED');
           });
-        }
-      }
-    }
+        },
+      },
+    },
   }));
 };
 

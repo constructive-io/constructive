@@ -6,6 +6,44 @@
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./esm/index.js",
+      "require": "./index.js"
+    },
+    "./runtime": {
+      "types": "./runtime/index.d.ts",
+      "import": "./esm/runtime/index.js",
+      "require": "./runtime/index.js"
+    },
+    "./config": {
+      "types": "./config/index.d.ts",
+      "import": "./esm/config/index.js",
+      "require": "./config/index.js"
+    },
+    "./sdk": {
+      "types": "./sdk/index.d.ts",
+      "import": "./esm/sdk/index.js",
+      "require": "./sdk/index.js"
+    },
+    "./utils": {
+      "types": "./utils/index.d.ts",
+      "import": "./esm/utils/index.js",
+      "require": "./utils/index.js"
+    },
+    "./*.js": {
+      "types": "./*.d.ts",
+      "import": "./esm/*.js",
+      "require": "./*.js"
+    },
+    "./*": {
+      "types": "./*.d.ts",
+      "import": "./esm/*.js",
+      "require": "./*.js"
+    },
+    "./package.json": "./package.json"
+  },
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
   "publishConfig": {
@@ -23,14 +61,17 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
+  "engines": {
+    "node": ">=18.17.0"
+  },
   "scripts": {
     "clean": "makage clean",
     "prepack": "npm run build",
-    "build": "makage build",
-    "build:dev": "makage build --dev",
+    "build": "makage build && node ./scripts/finalize-esm.js",
+    "build:dev": "makage build --dev && node ./scripts/finalize-esm.js",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:watch": "jest --watch"
   },
   "devDependencies": {
@@ -45,25 +86,30 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "@constructive-io/cli-runtime": "workspace:^",
+    "@inquirerer/utils": "^3.3.12",
+    "@pgpmjs/logger": "workspace:^",
+    "@sinclair/typebox": "^0.34.49",
+    "appstash": "^0.8.0",
+    "find-and-require-package-json": "^0.9.1",
+    "graphql": "16.13.0",
+    "inquirerer": "^4.9.3",
+    "js-yaml": "^4.1.0",
+    "shelljs": "^0.10.0",
+    "yanse": "^0.2.2"
+  },
+  "optionalDependencies": {
     "@constructive-io/graphql-codegen": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-explorer": "workspace:^",
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "@inquirerer/utils": "^3.3.12",
     "@pgpmjs/core": "workspace:^",
-    "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "appstash": "^0.8.0",
-    "find-and-require-package-json": "^0.9.1",
-    "inquirerer": "^4.9.3",
-    "js-yaml": "^4.1.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgpm": "workspace:^",
-    "shelljs": "^0.10.0",
-    "yanse": "^0.2.2"
+    "pgpm": "workspace:^"
   },
   "keywords": [
     "cli",

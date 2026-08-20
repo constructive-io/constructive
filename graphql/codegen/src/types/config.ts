@@ -102,8 +102,8 @@ export interface PgpmConfig {
 export interface DbConfig {
   /**
    * PostgreSQL connection configuration
-   * Falls back to environment variables (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)
-   * via @pgpmjs/env when not specified
+   * Values omitted here may be filled from the explicit environment supplied
+   * to generate()/generateMulti(). Reusable APIs never read ambient process.env.
    */
   config?: Partial<PgConfig>;
 
@@ -460,6 +460,9 @@ export interface GraphQLSDKConfigTarget {
  */
 export type GraphQLSDKConfig = GraphQLSDKConfigTarget;
 
+/** Named targets accepted by multi-target codegen configuration files. */
+export type GraphQLSDKMultiConfig = Record<string, GraphQLSDKConfigTarget>;
+
 /**
  * Watch mode configuration options
  *
@@ -570,7 +573,7 @@ export function defineConfig(config: GraphQLSDKConfig): GraphQLSDKConfig {
  */
 export function mergeConfig(
   base: GraphQLSDKConfigTarget,
-  overrides: GraphQLSDKConfigTarget,
+  overrides: GraphQLSDKConfigTarget
 ): GraphQLSDKConfigTarget {
   return deepmerge(base, overrides, { arrayMerge: replaceArrays });
 }
@@ -580,7 +583,7 @@ export function mergeConfig(
  * Similar to getEnvOptions pattern from @pgpmjs/env.
  */
 export function getConfigOptions(
-  overrides: GraphQLSDKConfigTarget = {},
+  overrides: GraphQLSDKConfigTarget = {}
 ): GraphQLSDKConfigTarget {
   return deepmerge(DEFAULT_CONFIG, overrides, { arrayMerge: replaceArrays });
 }

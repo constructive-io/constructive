@@ -27,7 +27,7 @@
     "directory": "dist"
   },
   "main": "index.js",
-  "module": "index.mjs",
+  "module": "esm/index.js",
   "types": "index.d.ts",
   "bin": {
     "graphql-codegen": "cli/index.js"
@@ -70,6 +70,7 @@
     "inquirerer": "^4.9.3",
     "jiti": "^2.7.0",
     "oxfmt": "^0.51.0",
+    "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-client": "workspace:^",
