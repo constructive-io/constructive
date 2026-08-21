@@ -2595,6 +2595,9 @@ importers:
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
+      '@pgsql/quotes':
+        specifier: ^18.2.0
+        version: 18.2.1
       lru-cache:
         specifier: ^11.2.7
         version: 11.2.7

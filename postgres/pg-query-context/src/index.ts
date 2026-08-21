@@ -2,18 +2,54 @@ import { ClientBase, Pool, PoolClient, QueryResult } from 'pg';
 
 // --- Internal helpers ---
 
-function setContext(ctx: Record<string, string>): { query: string; values: string[] }[] {
-  return Object.keys(ctx || {}).reduce<{ query: string; values: string[] }[]>((m, el) => {
-    m.push({ query: 'SELECT set_config($1, $2, true)', values: [el, ctx[el]] });
-    return m;
-  }, []);
+export const UNSAFE_POOLED_CONTEXT_ERROR_CODE =
+  'PG_QUERY_CONTEXT_UNSAFE_POOLED_CONTEXT';
+
+export class UnsafePooledContextError extends Error {
+  readonly code = UNSAFE_POOLED_CONTEXT_ERROR_CODE;
+
+  constructor() {
+    super(
+      'Transaction-local PostgreSQL context cannot be applied through a pool '
+        + 'when skipTransaction is enabled'
+    );
+    this.name = 'UnsafePooledContextError';
+  }
+}
+
+function assertContextHasTransaction(
+  usesPool: boolean,
+  skipTransaction: boolean,
+  context: Record<string, string>
+): void {
+  if (usesPool && skipTransaction && Object.keys(context).length > 0) {
+    throw new UnsafePooledContextError();
+  }
 }
 
 async function execContext(client: ClientBase, ctx: Record<string, string>): Promise<void> {
-  const local = setContext(ctx);
-  for (const { query, values } of local) {
-    await client.query(query, values);
+  const entries = Object.entries(ctx || {});
+  if (entries.length === 0) return;
+
+  for (const [key, value] of entries) {
+    // This API establishes the request's security boundary. Runtime callers
+    // can still bypass TypeScript, so reject ambiguous null/object values
+    // instead of silently installing literal "null" or "[object Object]"
+    // session settings.
+    if (typeof value !== 'string') {
+      throw new TypeError(`PostgreSQL context setting '${key}' must be a string`);
+    }
   }
+
+  // Apply the complete request context in one parameterized round trip. The
+  // array preserves insertion order (including role, read-only, search_path,
+  // and every explicitly-empty security claim), while set_config(..., true)
+  // keeps every value transaction-local exactly as the former per-key loop did.
+  await client.query(
+    'SELECT pg_catalog.set_config(setting->>0, setting->>1, true) '
+      + 'FROM pg_catalog.json_array_elements($1::json) AS setting',
+    [JSON.stringify(entries)]
+  );
 }
 
 // --- Single-query API (original) ---
@@ -30,6 +66,8 @@ async function pgQueryContext({ client, context = {}, query = '', variables = []
   const isPool = 'connect' in client;
   const shouldRelease = isPool;
   let pgClient: ClientBase | PoolClient | null = null;
+
+  assertContextHasTransaction(isPool, skipTransaction, context);
 
   try {
     pgClient = isPool ? await (client as Pool).connect() : client as ClientBase;
@@ -80,6 +118,7 @@ export async function withPgClient<T>(
   fn: (client: PoolClient) => Promise<T>,
   opts: WithPgClientOptions = {},
 ): Promise<T> {
+  assertContextHasTransaction(true, opts.skipTransaction === true, context);
   const client = await pool.connect();
   try {
     if (!opts.skipTransaction) {

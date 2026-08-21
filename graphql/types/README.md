@@ -43,6 +43,14 @@ const config: ConstructiveOptions = {
     routingSchema: 'routing_public',
     exposedSchemas: ['public'],
   },
+  routingCache: {
+    maxEntries: 4096,
+  },
+  runtimePgResolver: async (route) => ({
+    database: route.databaseName,
+    user: await runtimeUsers.forRoute(route),
+    password: await runtimePasswords.forRoute(route),
+  }),
   features: {
     simpleInflection: true,
     postgis: true,
@@ -63,6 +71,27 @@ PostGraphile/Graphile configuration including schema, plugins, and build options
 ### ApiOptions
 
 Configuration for the Constructive API including meta API settings, exposed schemas, and role configuration.
+
+### RoutingCacheOptions
+
+Configuration for the process-wide routing/service-label metadata cache. This
+cache is independent from Graphile build identity and its `maxEntries` value
+must be at least the effective resident Graphile capacity.
+
+### RuntimePgResolver
+
+Production multi-tenant servers resolve a least-privilege login from the exact
+credential-free `RuntimePgResolverInput`: database id/name, API id, ordered
+schemas, and `[anonymous, authenticated]` roles. The resolver must return an
+explicit user, password, and matching database. A static `runtimePg` is accepted
+in production or scoped introspection only with `runtimePgStaticIdentity`, which
+binds it to one byte-exact route contract.
+
+`runtimePgResolver` is trusted infrastructure and should look up the login by
+immutable `databaseId`. Its normalized host, port, database, and TLS policy must
+match the control-plane tenant connection. Multi-cluster routing requires a
+future per-route resolver shared by both lanes; runtime-only endpoint divergence
+fails closed.
 
 ### GraphileFeatureOptions
 
