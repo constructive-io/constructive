@@ -14,7 +14,9 @@ const isDevelopment = (): boolean => getNodeEnv() === 'development';
 
 const wantsJson = (req: Request): boolean => {
   const accept = req.get('Accept') || '';
-  return accept.includes('application/json') || accept.includes('application/graphql-response+json');
+  return accept.includes('application/json')
+    || accept.includes('application/graphql-response+json')
+    || Boolean(req.is('json'));
 };
 
 const sanitizeMessage = (error: Error): string => {
