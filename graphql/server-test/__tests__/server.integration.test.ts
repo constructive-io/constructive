@@ -464,6 +464,129 @@ describe('Error paths', () => {
   });
 });
 
+describe('Cookie-authenticated GraphQL CSRF flow', () => {
+  let request: supertest.Agent;
+  let teardown: () => Promise<void>;
+
+  const host = 'app.test.constructive.io';
+  const query = { query: '{ __typename }' };
+
+  const getCsrfCookie = async () => {
+    const res = await request.get('/graphql').set('Host', host);
+    const setCookie = res.headers['set-cookie'];
+    const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+    const csrfCookie = cookies
+      .filter((cookie): cookie is string => typeof cookie === 'string')
+      .map((cookie) => cookie.split(';')[0])
+      .find((cookie) => cookie.startsWith('csrf_token='));
+
+    expect(csrfCookie).toBeDefined();
+    return csrfCookie!;
+  };
+
+  const postWithSession = async (csrfCookie?: string, csrfToken?: string) => {
+    const cookies = [
+      csrfCookie,
+      'constructive_session=test-session'
+    ].filter((cookie): cookie is string => Boolean(cookie));
+    let req = request
+      .post('/graphql')
+      .set('Host', host)
+      .set('Cookie', cookies.join('; '));
+
+    if (csrfToken) {
+      req = req.set('X-CSRF-Token', csrfToken);
+    }
+
+    return req.send(query);
+  };
+
+  beforeAll(async () => {
+    ({ request, teardown } = await getConnections(
+      {
+        schemas,
+        authRole: 'anonymous',
+        server: {
+          useRouting: true,
+          api: {
+            isPublic: true,
+            metaSchemas: scopedMetaSchemas
+          }
+        }
+      },
+      seedAdaptersFor('simple-seed-scoped')
+    ));
+    teardowns.push(teardown);
+  });
+
+  it('allows the documented token, session cookie, and header flow', async () => {
+    const csrfCookie = await getCsrfCookie();
+    const csrfToken = csrfCookie.slice('csrf_token='.length);
+
+    const res = await postWithSession(csrfCookie, csrfToken);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ data: { __typename: 'Query' } });
+  });
+
+  it('returns a JSON CSRF error when the submitted token is missing', async () => {
+    const csrfCookie = await getCsrfCookie();
+
+    const res = await postWithSession(csrfCookie);
+
+    expect(res.status).toBe(403);
+    expect(res.headers['content-type']).toMatch(/^application\/json/);
+    expect(res.body).toEqual({
+      error: {
+        code: 'CSRF_TOKEN_INVALID',
+        message: 'CSRF token validation failed',
+        requestId: expect.any(String)
+      }
+    });
+  });
+
+  it('returns a JSON CSRF error when the CSRF cookie is missing', async () => {
+    const res = await postWithSession();
+
+    expect(res.status).toBe(403);
+    expect(res.headers['content-type']).toMatch(/^application\/json/);
+    expect(res.body).toEqual({
+      error: {
+        code: 'CSRF_TOKEN_MISSING',
+        message: 'CSRF token missing from cookie',
+        requestId: expect.any(String)
+      }
+    });
+  });
+
+  it('returns the same JSON CSRF error when the submitted token is wrong', async () => {
+    const csrfCookie = await getCsrfCookie();
+
+    const res = await postWithSession(csrfCookie, 'wrong-token');
+
+    expect(res.status).toBe(403);
+    expect(res.headers['content-type']).toMatch(/^application\/json/);
+    expect(res.body).toEqual({
+      error: {
+        code: 'CSRF_TOKEN_INVALID',
+        message: 'CSRF token validation failed',
+        requestId: expect.any(String)
+      }
+    });
+  });
+
+  it('keeps genuinely unknown routes on the HTML 404 path', async () => {
+    const res = await request
+      .get('/this-route-does-not-exist')
+      .set('Host', host);
+
+    expect(res.status).toBe(404);
+    expect(res.headers['content-type']).toMatch(/^text\/html/);
+    expect(res.text).toContain('<title>Not Found</title>');
+    expect(res.text).toContain('The requested page was not found');
+  });
+});
+
 afterAll(async () => {
   for (const teardown of teardowns) {
     await teardown();
