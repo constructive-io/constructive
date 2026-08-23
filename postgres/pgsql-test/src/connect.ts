@@ -116,8 +116,14 @@ export const getConnections = async (
     } catch (error) {
       // Format the error with PostgreSQL extended fields for better debugging
       const formatted = formatPgError(error);
-      process.stderr.write(`[pgsql-test] Seed error (continuing):\n${formatted}\n`);
-      // continue without teardown to allow caller-managed lifecycle
+      process.stderr.write(`[pgsql-test] Seed failed:\n${formatted}\n`);
+      try {
+        await teardown();
+      } catch {
+        // Teardown of a database we are already abandoning: the seed error below
+        // is the actionable one, and hiding it behind a cleanup failure is worse.
+      }
+      throw new Error(`[pgsql-test] Seed failed:\n${formatted}`, { cause: error });
     }
   }
 
