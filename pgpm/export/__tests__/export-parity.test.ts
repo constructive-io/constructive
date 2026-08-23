@@ -676,7 +676,7 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
         }
 
         // Sanity: at least 105 deploy files were produced (one per sql_action)
-        const deployFiles = sqlPaths.filter(p => p.includes(EXTENSION_NAME) && p.includes('/deploy/'));
+        const deployFiles = sqlPaths.filter(p => p.startsWith(`${EXTENSION_NAME}/deploy/`));
         expect(deployFiles.length).toBe(TOTAL_ACTIONS);
 
         // Cleanup
