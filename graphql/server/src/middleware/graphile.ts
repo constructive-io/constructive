@@ -167,7 +167,8 @@ const buildPreset = (
   roleName: string,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
-  compute?: ComputeConfig
+  compute?: ComputeConfig,
+  apiEntityType?: string
 ): GraphileConfig.Preset => {
   return {
     extends: [createConstructivePreset(databaseSettings)],
@@ -214,6 +215,10 @@ const buildPreset = (
         const context: Record<string, string> = {};
 
         if (req) {
+          if (apiEntityType && req.databaseId) {
+            context['jwt.claims.entity_id'] = req.databaseId;
+            context['jwt.claims.entity_type'] = apiEntityType;
+          }
           if (req.databaseId) {
             context['jwt.claims.database_id'] = req.databaseId;
           }
@@ -403,7 +408,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
+      const preset = buildPreset(
+        pool,
+        schema || [],
+        anonRole,
+        roleName,
+        api.databaseSettings,
+        api.apiId,
+        compute,
+        opts.api?.entityType
+      );
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,

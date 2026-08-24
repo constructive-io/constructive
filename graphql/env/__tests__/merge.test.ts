@@ -158,6 +158,14 @@ describe('getEnvOptions', () => {
     });
   });
 
+  it('parses the API entity type environment variable', () => {
+    const result = getGraphQLEnvVars({
+      API_ENTITY_TYPE: 'platform'
+    });
+
+    expect(result.api?.entityType).toBe('platform');
+  });
+
   it('accepts custom SMS provider names', () => {
     const result = getGraphQLEnvVars({
       SMS_PROVIDER: 'custom-sms-gateway'

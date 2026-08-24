@@ -30,6 +30,8 @@ export interface GraphileFeatureOptions {
 export interface ApiOptions {
   /** Database schemas to expose through the API */
   exposedSchemas?: string[];
+  /** Entity type attributed to requests received through this API */
+  entityType?: string;
   /** Anonymous role name for unauthenticated requests */
   anonRole?: string;
   /** Default role name for authenticated requests */
