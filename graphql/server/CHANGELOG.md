@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.18.3...@constructive-io/graphql-server@5.19.0) (2026-08-24)
+
+### Bug Fixes
+
+- **graphql-server:** surface csrf errors as json ([4db3124](https://github.com/constructive-io/constructive/commit/4db3124dd737b04d2c406dee6b404d6fbdd8fee4))
+
 ## [5.18.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.18.2...@constructive-io/graphql-server@5.18.3) (2026-08-19)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

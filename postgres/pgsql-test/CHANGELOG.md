@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.13.0](https://github.com/constructive-io/constructive/compare/pgsql-test@5.12.0...pgsql-test@5.13.0) (2026-08-24)
+
+### Bug Fixes
+
+- **pgsql-test:** fail the harness when seeding fails ([2fcfd0c](https://github.com/constructive-io/constructive/commit/2fcfd0cb2e76c67b39e8497ad12d176198476eb2))
+
 # [5.12.0](https://github.com/constructive-io/constructive/compare/pgsql-test@5.11.1...pgsql-test@5.12.0) (2026-08-18)
 
 **Note:** Version bump only for package pgsql-test

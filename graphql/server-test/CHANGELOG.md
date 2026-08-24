@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.21.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.20.3...graphql-server-test@3.21.0) (2026-08-24)
+
+### Bug Fixes
+
+- **graphql-server:** surface csrf errors as json ([4db3124](https://github.com/constructive-io/constructive/commit/4db3124dd737b04d2c406dee6b404d6fbdd8fee4))
+
 ## [3.20.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.20.2...graphql-server-test@3.20.3) (2026-08-19)
 
 ### Bug Fixes
