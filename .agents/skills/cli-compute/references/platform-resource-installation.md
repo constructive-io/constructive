@@ -12,8 +12,8 @@ csdk platform-resource-installation list --where.<field>.<op> <value> --orderBy 
 csdk platform-resource-installation list --limit 10 --after <cursor>
 csdk platform-resource-installation find-first --where.<field>.<op> <value>
 csdk platform-resource-installation get --id <UUID>
-csdk platform-resource-installation create --name <String> --namespaceId <UUID> --slug <String> [--commitId <UUID>] [--createdBy <UUID>] [--params <JSON>] [--revision <Int>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>]
-csdk platform-resource-installation update --id <UUID> [--commitId <UUID>] [--createdBy <UUID>] [--name <String>] [--namespaceId <UUID>] [--params <JSON>] [--revision <Int>] [--slug <String>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>]
+csdk platform-resource-installation create --name <String> --namespaceId <UUID> --slug <String> [--commitId <UUID>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--params <JSON>] [--revision <Int>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk platform-resource-installation update --id <UUID> [--commitId <UUID>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--name <String>] [--namespaceId <UUID>] [--params <JSON>] [--revision <Int>] [--slug <String>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 csdk platform-resource-installation delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-resource-installation list --where.id.equalTo <value> --orderBy ID
 ### Create a platformResourceInstallation
 
 ```bash
-csdk platform-resource-installation create --name <String> --namespaceId <UUID> --slug <String> [--commitId <UUID>] [--createdBy <UUID>] [--params <JSON>] [--revision <Int>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>]
+csdk platform-resource-installation create --name <String> --namespaceId <UUID> --slug <String> [--commitId <UUID>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--params <JSON>] [--revision <Int>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a platformResourceInstallation by id

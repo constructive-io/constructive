@@ -12,8 +12,8 @@ csdk route list --where.<field>.<op> <value> --orderBy <values>
 csdk route list --limit 10 --after <cursor>
 csdk route find-first --where.<field>.<op> <value>
 csdk route get --id <UUID>
-csdk route create --databaseId <UUID> --domainId <UUID> [--config <JSON>] [--isActive <Boolean>] [--method <String>] [--path <String>] [--priority <Int>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
-csdk route update --id <UUID> [--config <JSON>] [--databaseId <UUID>] [--domainId <UUID>] [--isActive <Boolean>] [--method <String>] [--path <String>] [--priority <Int>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
+csdk route create --databaseId <UUID> --domainId <UUID> [--config <JSON>] [--isActive <Boolean>] [--method <String>] [--path <String>] [--previewRef <String>] [--priority <Int>] [--servingSiteId <UUID>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetRedirectId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
+csdk route update --id <UUID> [--config <JSON>] [--databaseId <UUID>] [--domainId <UUID>] [--isActive <Boolean>] [--method <String>] [--path <String>] [--previewRef <String>] [--priority <Int>] [--servingSiteId <UUID>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetRedirectId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
 csdk route delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk route list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a route
 
 ```bash
-csdk route create --databaseId <UUID> --domainId <UUID> [--config <JSON>] [--isActive <Boolean>] [--method <String>] [--path <String>] [--priority <Int>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
+csdk route create --databaseId <UUID> --domainId <UUID> [--config <JSON>] [--isActive <Boolean>] [--method <String>] [--path <String>] [--previewRef <String>] [--priority <Int>] [--servingSiteId <UUID>] [--targetApiId <UUID>] [--targetBucketId <UUID>] [--targetFunctionId <UUID>] [--targetRedirectId <UUID>] [--targetServiceId <UUID>] [--targetSiteId <UUID>]
 ```
 
 ### Get a route by id

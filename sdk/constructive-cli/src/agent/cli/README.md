@@ -35,6 +35,18 @@ csdk auth set-token <your-token>
 | `agent-resource` | agentResource CRUD operations |
 | `agent-task` | agentTask CRUD operations |
 | `agent-thread` | agentThread CRUD operations |
+| `platform-agent` | platformAgent CRUD operations |
+| `platform-agent-event` | platformAgentEvent CRUD operations |
+| `platform-agent-message` | platformAgentMessage CRUD operations |
+| `platform-agent-persona` | platformAgentPersona CRUD operations |
+| `platform-agent-plan` | platformAgentPlan CRUD operations |
+| `platform-agent-prompt` | platformAgentPrompt CRUD operations |
+| `platform-agent-resource-chunk` | platformAgentResourceChunk CRUD operations |
+| `platform-agent-resource` | platformAgentResource CRUD operations |
+| `platform-agent-run` | platformAgentRun CRUD operations |
+| `platform-agent-run-workspace` | platformAgentRunWorkspace CRUD operations |
+| `platform-agent-task` | platformAgentTask CRUD operations |
+| `platform-agent-thread` | platformAgentThread CRUD operations |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -137,13 +149,15 @@ CRUD operations for AgentMessage records.
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `id` | UUID |
+| `kind` | String |
 | `model` | String |
 | `parts` | JSON |
 | `threadId` | UUID |
 | `updatedAt` | Datetime |
+| `visibility` | String |
 
 **Required create fields:** `authorRole`, `databaseId`, `threadId`
-**Optional create fields (backend defaults):** `actorId`, `agentId`, `model`, `parts`
+**Optional create fields (backend defaults):** `actorId`, `agentId`, `kind`, `model`, `parts`, `visibility`
 
 ### `agent-persona`
 
@@ -165,6 +179,7 @@ CRUD operations for AgentPersona records.
 | `config` | JSON |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `description` | String |
 | `id` | UUID |
@@ -175,9 +190,10 @@ CRUD operations for AgentPersona records.
 | `systemPrompt` | String |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `databaseId`, `name`, `slug`
-**Optional create fields (backend defaults):** `config`, `createdBy`, `description`, `isActive`, `resources`, `systemPrompt`, `updatedBy`
+**Optional create fields (backend defaults):** `config`, `createdBy`, `createdByPrincipal`, `description`, `isActive`, `resources`, `systemPrompt`, `updatedBy`, `updatedByPrincipal`
 
 ### `agent-plan`
 
@@ -205,9 +221,10 @@ CRUD operations for AgentPlan records.
 | `threadId` | UUID |
 | `title` | String |
 | `updatedAt` | Datetime |
+| `visibility` | String |
 
 **Required create fields:** `databaseId`, `threadId`, `title`
-**Optional create fields (backend defaults):** `description`, `ownerId`, `status`
+**Optional create fields (backend defaults):** `description`, `ownerId`, `status`, `visibility`
 
 ### `agent-prompt`
 
@@ -229,6 +246,7 @@ CRUD operations for AgentPrompt records.
 | `content` | String |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `description` | String |
 | `id` | UUID |
@@ -237,9 +255,10 @@ CRUD operations for AgentPrompt records.
 | `name` | String |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `content`, `databaseId`, `name`
-**Optional create fields (backend defaults):** `createdBy`, `description`, `isDefault`, `metadata`, `updatedBy`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `description`, `isDefault`, `metadata`, `updatedBy`, `updatedByPrincipal`
 
 ### `agent-resource-chunk`
 
@@ -263,6 +282,7 @@ CRUD operations for AgentResourceChunk records.
 | `body` | String |
 | `chunkIndex` | Int |
 | `createdAt` | Datetime |
+| `databaseId` | UUID |
 | `embedding` | Vector |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -271,7 +291,7 @@ CRUD operations for AgentResourceChunk records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `agentResourceId`, `body`
-**Optional create fields (backend defaults):** `chunkIndex`, `embedding`, `metadata`
+**Optional create fields (backend defaults):** `chunkIndex`, `databaseId`, `embedding`, `metadata`
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
@@ -330,6 +350,7 @@ CRUD operations for AgentResource records.
 | `bodyTrgmSimilarity` | Float |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `description` | String |
 | `descriptionTrgmSimilarity` | Float |
@@ -351,9 +372,10 @@ CRUD operations for AgentResource records.
 | `titleTrgmSimilarity` | Float |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `body`, `databaseId`, `slug`, `title`
-**Optional create fields (backend defaults):** `archivedAt`, `createdBy`, `description`, `embedding`, `isActive`, `isArchived`, `keywords`, `kind`, `metadata`, `updatedBy`
+**Optional create fields (backend defaults):** `archivedAt`, `createdBy`, `createdByPrincipal`, `description`, `embedding`, `isActive`, `isArchived`, `keywords`, `kind`, `metadata`, `updatedBy`, `updatedByPrincipal`
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
@@ -452,9 +474,10 @@ CRUD operations for AgentTask records.
 | `source` | String |
 | `status` | String |
 | `updatedAt` | Datetime |
+| `visibility` | String |
 
 **Required create fields:** `databaseId`, `description`, `planId`
-**Optional create fields (backend defaults):** `actorId`, `approvalFeedback`, `approvalStatus`, `approvedAt`, `approvedBy`, `error`, `orderIndex`, `requiresApproval`, `source`, `status`
+**Optional create fields (backend defaults):** `actorId`, `approvalFeedback`, `approvalStatus`, `approvedAt`, `approvedBy`, `error`, `orderIndex`, `requiresApproval`, `source`, `status`, `visibility`
 
 ### `agent-thread`
 
@@ -489,9 +512,544 @@ CRUD operations for AgentThread records.
 | `tags` | String |
 | `title` | String |
 | `updatedAt` | Datetime |
+| `visibility` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `agentId`, `archivedAt`, `isArchived`, `mode`, `model`, `ownerId`, `parentThreadId`, `promptTemplateId`, `status`, `systemPrompt`, `tags`, `title`
+**Optional create fields (backend defaults):** `agentId`, `archivedAt`, `isArchived`, `mode`, `model`, `ownerId`, `parentThreadId`, `promptTemplateId`, `status`, `systemPrompt`, `tags`, `title`, `visibility`
+
+### `platform-agent`
+
+CRUD operations for PlatformAgent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgent records |
+| `find-first` | Find first matching platformAgent record |
+| `get` | Get a platformAgent by id |
+| `create` | Create a new platformAgent |
+| `update` | Update an existing platformAgent |
+| `delete` | Delete a platformAgent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `config` | JSON |
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `isEphemeral` | Boolean |
+| `name` | String |
+| `ownerId` | UUID |
+| `parentId` | UUID |
+| `personaId` | UUID |
+| `status` | String |
+| `systemPrompt` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `config`, `isEphemeral`, `ownerId`, `parentId`, `personaId`, `status`, `systemPrompt`
+
+### `platform-agent-event`
+
+CRUD operations for PlatformAgentEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentEvent records |
+| `find-first` | Find first matching platformAgentEvent record |
+| `get` | Get a platformAgentEvent by id |
+| `create` | Create a new platformAgentEvent |
+| `update` | Update an existing platformAgentEvent |
+| `delete` | Delete a platformAgentEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `createdAt` | Datetime |
+| `entry` | JSON |
+| `id` | UUID |
+| `recordedAt` | Datetime |
+| `runId` | UUID |
+| `seq` | Int |
+| `transcriptFormat` | String |
+| `transcriptVersion` | Int |
+| `updatedAt` | Datetime |
+| `visibility` | String |
+
+**Required create fields:** `entry`, `recordedAt`, `runId`, `seq`, `transcriptVersion`
+**Optional create fields (backend defaults):** `actorId`, `transcriptFormat`, `visibility`
+
+### `platform-agent-message`
+
+CRUD operations for PlatformAgentMessage records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentMessage records |
+| `find-first` | Find first matching platformAgentMessage record |
+| `get` | Get a platformAgentMessage by id |
+| `create` | Create a new platformAgentMessage |
+| `update` | Update an existing platformAgentMessage |
+| `delete` | Delete a platformAgentMessage |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `agentId` | UUID |
+| `authorRole` | String |
+| `createdAt` | Datetime |
+| `deliveredRunId` | UUID |
+| `id` | UUID |
+| `kind` | String |
+| `model` | String |
+| `parts` | JSON |
+| `threadId` | UUID |
+| `updatedAt` | Datetime |
+| `visibility` | String |
+
+**Required create fields:** `authorRole`, `threadId`
+**Optional create fields (backend defaults):** `actorId`, `agentId`, `deliveredRunId`, `kind`, `model`, `parts`, `visibility`
+
+### `platform-agent-persona`
+
+CRUD operations for PlatformAgentPersona records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentPersona records |
+| `find-first` | Find first matching platformAgentPersona record |
+| `get` | Get a platformAgentPersona by id |
+| `create` | Create a new platformAgentPersona |
+| `update` | Update an existing platformAgentPersona |
+| `delete` | Delete a platformAgentPersona |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `config` | JSON |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `description` | String |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `name` | String |
+| `resources` | String |
+| `slug` | String |
+| `systemPrompt` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `name`, `slug`
+**Optional create fields (backend defaults):** `config`, `createdBy`, `createdByPrincipal`, `description`, `isActive`, `resources`, `systemPrompt`, `updatedBy`, `updatedByPrincipal`
+
+### `platform-agent-plan`
+
+CRUD operations for PlatformAgentPlan records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentPlan records |
+| `find-first` | Find first matching platformAgentPlan record |
+| `get` | Get a platformAgentPlan by id |
+| `create` | Create a new platformAgentPlan |
+| `update` | Update an existing platformAgentPlan |
+| `delete` | Delete a platformAgentPlan |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `description` | String |
+| `id` | UUID |
+| `ownerId` | UUID |
+| `status` | String |
+| `threadId` | UUID |
+| `title` | String |
+| `updatedAt` | Datetime |
+| `visibility` | String |
+
+**Required create fields:** `threadId`, `title`
+**Optional create fields (backend defaults):** `description`, `ownerId`, `status`, `visibility`
+
+### `platform-agent-prompt`
+
+CRUD operations for PlatformAgentPrompt records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentPrompt records |
+| `find-first` | Find first matching platformAgentPrompt record |
+| `get` | Get a platformAgentPrompt by id |
+| `create` | Create a new platformAgentPrompt |
+| `update` | Update an existing platformAgentPrompt |
+| `delete` | Delete a platformAgentPrompt |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `content` | String |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `description` | String |
+| `id` | UUID |
+| `isDefault` | Boolean |
+| `metadata` | JSON |
+| `name` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `content`, `name`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `description`, `isDefault`, `metadata`, `updatedBy`, `updatedByPrincipal`
+
+### `platform-agent-resource-chunk`
+
+CRUD operations for PlatformAgentResourceChunk records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentResourceChunk records |
+| `find-first` | Find first matching platformAgentResourceChunk record |
+| `search <query>` | Search platformAgentResourceChunk records |
+| `get` | Get a platformAgentResourceChunk by id |
+| `create` | Create a new platformAgentResourceChunk |
+| `update` | Update an existing platformAgentResourceChunk |
+| `delete` | Delete a platformAgentResourceChunk |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `body` | String |
+| `chunkIndex` | Int |
+| `createdAt` | Datetime |
+| `embedding` | Vector |
+| `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `metadata` | JSON |
+| `platformAgentResourceId` | UUID |
+| `searchScore` | Float |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `body`, `platformAgentResourceId`
+**Optional create fields (backend defaults):** `chunkIndex`, `embedding`, `metadata`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `searchScore`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk platform-agent-resource-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource-chunk search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource-chunk list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource-chunk create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource-chunk update --embedding "new text to embed" --auto-embed
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk platform-agent-resource-chunk list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk platform-agent-resource-chunk search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `platform-agent-resource`
+
+CRUD operations for PlatformAgentResource records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentResource records |
+| `find-first` | Find first matching platformAgentResource record |
+| `search <query>` | Search platformAgentResource records |
+| `get` | Get a platformAgentResource by id |
+| `create` | Create a new platformAgentResource |
+| `update` | Update an existing platformAgentResource |
+| `delete` | Delete a platformAgentResource |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `archivedAt` | Datetime |
+| `body` | String |
+| `bodyTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `description` | String |
+| `descriptionTrgmSimilarity` | Float |
+| `embedding` | Vector |
+| `embeddingUpdatedAt` | Datetime |
+| `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `isArchived` | Boolean |
+| `keywords` | String |
+| `kind` | String |
+| `kindTrgmSimilarity` | Float |
+| `metadata` | JSON |
+| `search` | FullText |
+| `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `slug` | String |
+| `title` | String |
+| `titleTrgmSimilarity` | Float |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `body`, `slug`, `title`
+**Optional create fields (backend defaults):** `archivedAt`, `createdBy`, `createdByPrincipal`, `description`, `embedding`, `isActive`, `isArchived`, `keywords`, `kind`, `metadata`, `updatedBy`, `updatedByPrincipal`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `descriptionTrgmSimilarity`, `kindTrgmSimilarity`, `search`, `searchScore`, `titleTrgmSimilarity`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk platform-agent-resource list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource update --embedding "new text to embed" --auto-embed
+```
+
+*Fuzzy search via trigram similarity (`trgmBody`):*
+```bash
+csdk platform-agent-resource list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmDescription`):*
+```bash
+csdk platform-agent-resource list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmKind`):*
+```bash
+csdk platform-agent-resource list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk platform-agent-resource list --where.search "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmTitle`):*
+```bash
+csdk platform-agent-resource list --where.trgmTitle.value "approximate query" --where.trgmTitle.threshold 0.3 --select title,titleTrgmSimilarity
+```
+
+*Composite search (unifiedSearch dispatches to all text adapters):*
+```bash
+csdk platform-agent-resource list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,descriptionTrgmSimilarity,kindTrgmSimilarity,tsvRank,searchScore,titleTrgmSimilarity
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk platform-agent-resource list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk platform-agent-resource search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `platform-agent-run`
+
+CRUD operations for PlatformAgentRun records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentRun records |
+| `find-first` | Find first matching platformAgentRun record |
+| `get` | Get a platformAgentRun by id |
+| `create` | Create a new platformAgentRun |
+| `update` | Update an existing platformAgentRun |
+| `delete` | Delete a platformAgentRun |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `artifacts` | JSON |
+| `attempt` | Int |
+| `baseCommit` | String |
+| `branch` | String |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `deadlineAt` | Datetime |
+| `entityId` | UUID |
+| `error` | String |
+| `executionId` | UUID |
+| `finishedAt` | Datetime |
+| `headCommit` | String |
+| `id` | UUID |
+| `lastEventSeq` | Int |
+| `parentRunId` | UUID |
+| `placement` | String |
+| `principalId` | UUID |
+| `repoUrl` | String |
+| `startedAt` | Datetime |
+| `status` | String |
+| `threadId` | UUID |
+| `tokenUsage` | JSON |
+| `totalCost` | BigFloat |
+| `updatedAt` | Datetime |
+| `visibility` | String |
+
+**Required create fields:** `threadId`
+**Optional create fields (backend defaults):** `actorId`, `artifacts`, `attempt`, `baseCommit`, `branch`, `databaseId`, `deadlineAt`, `entityId`, `error`, `executionId`, `finishedAt`, `headCommit`, `lastEventSeq`, `parentRunId`, `placement`, `principalId`, `repoUrl`, `startedAt`, `status`, `tokenUsage`, `totalCost`, `visibility`
+
+### `platform-agent-run-workspace`
+
+CRUD operations for PlatformAgentRunWorkspace records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentRunWorkspace records |
+| `find-first` | Find first matching platformAgentRunWorkspace record |
+| `get` | Get a platformAgentRunWorkspace by id |
+| `create` | Create a new platformAgentRunWorkspace |
+| `update` | Update an existing platformAgentRunWorkspace |
+| `delete` | Delete a platformAgentRunWorkspace |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `artifacts` | JSON |
+| `baseBranch` | String |
+| `baseCommit` | String |
+| `branch` | String |
+| `clonedAt` | Datetime |
+| `createdAt` | Datetime |
+| `headCommit` | String |
+| `id` | UUID |
+| `lastUsedAt` | Datetime |
+| `ordinal` | Int |
+| `provider` | String |
+| `publication` | String |
+| `repo` | String |
+| `repositoryId` | UUID |
+| `runId` | UUID |
+| `state` | String |
+| `updatedAt` | Datetime |
+| `visibility` | String |
+
+**Required create fields:** `baseBranch`, `branch`, `provider`, `repo`, `runId`
+**Optional create fields (backend defaults):** `actorId`, `artifacts`, `baseCommit`, `clonedAt`, `headCommit`, `lastUsedAt`, `ordinal`, `publication`, `repositoryId`, `state`, `visibility`
+
+### `platform-agent-task`
+
+CRUD operations for PlatformAgentTask records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentTask records |
+| `find-first` | Find first matching platformAgentTask record |
+| `get` | Get a platformAgentTask by id |
+| `create` | Create a new platformAgentTask |
+| `update` | Update an existing platformAgentTask |
+| `delete` | Delete a platformAgentTask |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `approvalFeedback` | String |
+| `approvalStatus` | String |
+| `approvedAt` | Datetime |
+| `approvedBy` | UUID |
+| `createdAt` | Datetime |
+| `description` | String |
+| `error` | String |
+| `id` | UUID |
+| `orderIndex` | Int |
+| `planId` | UUID |
+| `requiresApproval` | Boolean |
+| `source` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `visibility` | String |
+
+**Required create fields:** `description`, `planId`
+**Optional create fields (backend defaults):** `actorId`, `approvalFeedback`, `approvalStatus`, `approvedAt`, `approvedBy`, `error`, `orderIndex`, `requiresApproval`, `source`, `status`, `visibility`
+
+### `platform-agent-thread`
+
+CRUD operations for PlatformAgentThread records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformAgentThread records |
+| `find-first` | Find first matching platformAgentThread record |
+| `get` | Get a platformAgentThread by id |
+| `create` | Create a new platformAgentThread |
+| `update` | Update an existing platformAgentThread |
+| `delete` | Delete a platformAgentThread |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `agentId` | UUID |
+| `archivedAt` | Datetime |
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `isArchived` | Boolean |
+| `mode` | String |
+| `model` | String |
+| `ownerId` | UUID |
+| `parentThreadId` | UUID |
+| `promptTemplateId` | UUID |
+| `status` | String |
+| `systemPrompt` | String |
+| `tags` | String |
+| `title` | String |
+| `updatedAt` | Datetime |
+| `visibility` | String |
+
+**Optional create fields (backend defaults):** `agentId`, `archivedAt`, `isArchived`, `mode`, `model`, `ownerId`, `parentThreadId`, `promptTemplateId`, `status`, `systemPrompt`, `tags`, `title`, `visibility`
 
 ## Custom Operations
 

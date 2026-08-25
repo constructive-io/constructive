@@ -1,25 +1,25 @@
 ---
 name: hooks-infra
-description: React Query hooks for the infra API — provides typed query and mutation hooks for 10 tables and 4 custom operations
+description: React Query hooks for the infra API — provides typed query and mutation hooks for 11 tables and 7 custom operations
 ---
 
 # hooks-infra
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the infra API — provides typed query and mutation hooks for 10 tables and 4 custom operations
+React Query hooks for the infra API — provides typed query and mutation hooks for 11 tables and 7 custom operations
 
 ## Usage
 
 ```typescript
 // Import hooks
-import { useDbPresetsQuery } from './hooks';
+import { useContentPresetsQuery } from './hooks';
 
 // Query hooks: use<Model>Query, use<Model>sQuery
 // Mutation hooks: useCreate<Model>Mutation, useUpdate<Model>Mutation, useDelete<Model>Mutation
 // Bulk mutation hooks (when enabled): useBulkCreate<Model>Mutation, useBulkUpsert<Model>Mutation, etc.
 
-const { data, isLoading } = useDbPresetsQuery({
+const { data, isLoading } = useContentPresetsQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -29,7 +29,7 @@ const { data, isLoading } = useDbPresetsQuery({
 ### Query records
 
 ```typescript
-const { data, isLoading } = useDbPresetsQuery({
+const { data, isLoading } = useContentPresetsQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -38,6 +38,7 @@ const { data, isLoading } = useDbPresetsQuery({
 
 See the `references/` directory for detailed per-entity API documentation:
 
+- [content-preset](references/content-preset.md)
 - [db-preset](references/db-preset.md)
 - [namespace](references/namespace.md)
 - [namespace-event](references/namespace-event.md)
@@ -50,5 +51,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [platform-namespace-event](references/platform-namespace-event.md)
 - [platform-infra-init-empty-repo](references/platform-infra-init-empty-repo.md)
 - [platform-infra-insert-node-at-path](references/platform-infra-insert-node-at-path.md)
+- [platform-infra-insert-nodes-at-paths](references/platform-infra-insert-nodes-at-paths.md)
+- [platform-infra-set-and-commit](references/platform-infra-set-and-commit.md)
 - [platform-infra-set-data-at-path](references/platform-infra-set-data-at-path.md)
+- [platform-infra-set-many-and-commit](references/platform-infra-set-many-and-commit.md)
 - [provision-bucket](references/provision-bucket.md)

@@ -9,7 +9,7 @@ Compiled route precedence index maintained by route sync triggers; carries typed
 ```typescript
 db.routeBinding.findMany({ select: { id: true } }).execute()
 db.routeBinding.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.routeBinding.create({ data: { domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' }, select: { id: true } }).execute()
+db.routeBinding.create({ data: { domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', servingSiteId: '<UUID>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetRedirectId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' }, select: { id: true } }).execute()
 db.routeBinding.update({ where: { id: '<UUID>' }, data: { domainId: '<UUID>' }, select: { id: true } }).execute()
 db.routeBinding.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.routeBinding.findMany({
 
 ```typescript
 const item = await db.routeBinding.create({
-  data: { domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' },
+  data: { domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', servingSiteId: '<UUID>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetRedirectId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

@@ -8,8 +8,7 @@ import type {
   Api,
   ApiSchema,
   ApiSetting,
-  App,
-  AppComponent,
+  AstMigration,
   CheckConstraint,
   CompositeType,
   CorsSetting,
@@ -34,8 +33,9 @@ import type {
   ForeignKeyConstraintBehavior,
   FullTextSearch,
   Function,
+  GetSitePreviewsRecord,
   HostnameBinding,
-  HttpRoute,
+  IdentityProviderRegistry,
   Index,
   ManagedDomain,
   NodeTypeRegistry,
@@ -51,6 +51,7 @@ import type {
   PlatformEmailIdentity,
   PlatformEmailProviderAccount,
   PlatformEmailSiteIdentity,
+  PlatformGetSitePreviewsRecord,
   PlatformManagedDomain,
   PlatformPage,
   PlatformSite,
@@ -59,11 +60,13 @@ import type {
   PlatformSiteErrorPage,
   PlatformSiteMetadatum,
   PlatformSiteModule,
+  PlatformSiteRelease,
   PlatformSiteTheme,
   PlatformSiteWebConfig,
   Policy,
   PrimaryKeyConstraint,
   PubkeySetting,
+  Redirect,
   RlsSetting,
   Route,
   RouteBinding,
@@ -75,9 +78,11 @@ import type {
   SiteErrorPage,
   SiteMetadatum,
   SiteModule,
+  SiteRelease,
   SiteTheme,
   SiteWebConfig,
   SpatialRelation,
+  SqlAction,
   Table,
   TableBehavior,
   TableGrant,
@@ -196,58 +201,35 @@ export type ApiSettingOrderBy =
   | 'STATEMENT_TIMEOUT_MS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `AppComponent`. */
-export type AppComponentOrderBy =
-  | 'APP_ID_ASC'
-  | 'APP_ID_DESC'
-  | 'COMPONENT_API_ID_ASC'
-  | 'COMPONENT_API_ID_DESC'
-  | 'COMPONENT_DOMAIN_ID_ASC'
-  | 'COMPONENT_DOMAIN_ID_DESC'
-  | 'COMPONENT_INSTALLATION_ID_ASC'
-  | 'COMPONENT_INSTALLATION_ID_DESC'
-  | 'COMPONENT_SITE_ID_ASC'
-  | 'COMPONENT_SITE_ID_DESC'
-  | 'COMPONENT_TYPE_ASC'
-  | 'COMPONENT_TYPE_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
+/** Methods to use when ordering `AstMigration`. */
+export type AstMigrationOrderBy =
+  | 'ACTION_ID_ASC'
+  | 'ACTION_ID_DESC'
+  | 'ACTION_NAME_ASC'
+  | 'ACTION_NAME_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DEPLOYS_ASC'
+  | 'DEPLOYS_DESC'
+  | 'DEPLOY_ASC'
+  | 'DEPLOY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `App`. */
-export type AppOrderBy =
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_PUBLISHED_ASC'
-  | 'IS_PUBLISHED_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'REQUIRES_ASC'
+  | 'REQUIRES_DESC'
+  | 'REVERT_ASC'
+  | 'REVERT_DESC'
+  | 'VERIFY_ASC'
+  | 'VERIFY_DESC';
 /** Methods to use when ordering `CheckConstraint`. */
 export type CheckConstraintOrderBy =
   | 'CATEGORY_ASC'
@@ -449,6 +431,8 @@ export type DeriveOrderBy =
   | 'DATABASE_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'INCLUDE_GRANTS_ASC'
+  | 'INCLUDE_GRANTS_DESC'
   | 'INCLUDE_MUTATIONS_ASC'
   | 'INCLUDE_MUTATIONS_DESC'
   | 'KIND_ASC'
@@ -497,6 +481,8 @@ export type DomainOrderBy =
   | 'CONFIG_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'HOSTNAME_ASC'
@@ -522,6 +508,8 @@ export type DomainOrderBy =
   | 'TLS_STATUS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
   | 'VERIFICATION_STATUS_ASC'
   | 'VERIFICATION_STATUS_DESC'
   | 'VERIFIED_AT_ASC'
@@ -991,37 +979,27 @@ export type HostnameBindingOrderBy =
   | 'UPDATED_AT_DESC'
   | 'VERIFICATION_STATUS_ASC'
   | 'VERIFICATION_STATUS_DESC';
-/** Methods to use when ordering `HttpRoute`. */
-export type HttpRouteOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DOMAIN_ID_ASC'
-  | 'DOMAIN_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'METHOD_ASC'
-  | 'METHOD_DESC'
+/** Methods to use when ordering `IdentityProviderRegistry`. */
+export type IdentityProviderRegistryOrderBy =
+  | 'AUTHORIZATION_URL_ASC'
+  | 'AUTHORIZATION_URL_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'ISSUER_URL_ASC'
+  | 'ISSUER_URL_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
   | 'NATURAL'
-  | 'PATH_ASC'
-  | 'PATH_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'PRIORITY_ASC'
-  | 'PRIORITY_DESC'
-  | 'TARGET_ID_ASC'
-  | 'TARGET_ID_DESC'
-  | 'TARGET_KIND_ASC'
-  | 'TARGET_KIND_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'SCOPES_ASC'
+  | 'SCOPES_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'TOKEN_URL_ASC'
+  | 'TOKEN_URL_DESC'
+  | 'USERINFO_URL_ASC'
+  | 'USERINFO_URL_DESC';
 /** Methods to use when ordering `Index`. */
 export type IndexOrderBy =
   | 'ACCESS_METHOD_ASC'
@@ -1071,6 +1049,8 @@ export type ManagedDomainOrderBy =
   | 'CERT_STATUS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DOMAIN_ASC'
@@ -1088,6 +1068,8 @@ export type ManagedDomainOrderBy =
   | 'TLS_STATUS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
   | 'VERIFICATION_STATUS_ASC'
   | 'VERIFICATION_STATUS_DESC'
   | 'VERIFIED_AT_ASC'
@@ -1127,6 +1109,8 @@ export type PageOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'SEEDED_FROM_ASC'
+  | 'SEEDED_FROM_DESC'
   | 'SITE_ID_ASC'
   | 'SITE_ID_DESC'
   | 'SLUG_ASC'
@@ -1291,6 +1275,8 @@ export type PlatformDomainOrderBy =
   | 'CONFIG_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'HOSTNAME_ASC'
   | 'HOSTNAME_DESC'
   | 'ID_ASC'
@@ -1314,6 +1300,8 @@ export type PlatformDomainOrderBy =
   | 'TLS_STATUS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
   | 'VERIFICATION_STATUS_ASC'
   | 'VERIFICATION_STATUS_DESC'
   | 'VERIFIED_AT_ASC'
@@ -1442,6 +1430,8 @@ export type PlatformManagedDomainOrderBy =
   | 'CERT_STATUS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DOMAIN_ASC'
   | 'DOMAIN_DESC'
   | 'ID_ASC'
@@ -1457,6 +1447,8 @@ export type PlatformManagedDomainOrderBy =
   | 'TLS_STATUS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
   | 'VERIFICATION_STATUS_ASC'
   | 'VERIFICATION_STATUS_DESC'
   | 'VERIFIED_AT_ASC'
@@ -1474,6 +1466,8 @@ export type PlatformPageOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'SEEDED_FROM_ASC'
+  | 'SEEDED_FROM_DESC'
   | 'SITE_ID_ASC'
   | 'SITE_ID_DESC'
   | 'SLUG_ASC'
@@ -1484,8 +1478,8 @@ export type PlatformPageOrderBy =
   | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformSiteAppLink`. */
 export type PlatformSiteAppLinkOrderBy =
-  | 'APP_IDENTIFIER_ASC'
-  | 'APP_IDENTIFIER_DESC'
+  | 'APP_STORE_IDENTITY_ID_ASC'
+  | 'APP_STORE_IDENTITY_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'ID_ASC'
@@ -1493,18 +1487,10 @@ export type PlatformSiteAppLinkOrderBy =
   | 'NATURAL'
   | 'PATH_COMPONENTS_ASC'
   | 'PATH_COMPONENTS_DESC'
-  | 'PLATFORM_ASC'
-  | 'PLATFORM_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'SHA256_CERT_FINGERPRINTS_ASC'
-  | 'SHA256_CERT_FINGERPRINTS_DESC'
   | 'SITE_ID_ASC'
   | 'SITE_ID_DESC'
-  | 'STORE_URL_ASC'
-  | 'STORE_URL_DESC'
-  | 'TEAM_ID_ASC'
-  | 'TEAM_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'WEBCREDENTIALS_ASC'
@@ -1522,6 +1508,8 @@ export type PlatformSiteDeepLinkOrderBy =
   | 'METADATA_ASC'
   | 'METADATA_DESC'
   | 'NATURAL'
+  | 'PAGE_ID_ASC'
+  | 'PAGE_ID_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'SITE_ID_ASC'
@@ -1574,6 +1562,8 @@ export type PlatformSiteMetadatumOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ROBOTS_ASC'
   | 'ROBOTS_DESC'
+  | 'ROBOTS_SEEDED_FROM_ASC'
+  | 'ROBOTS_SEEDED_FROM_DESC'
   | 'SITE_ID_ASC'
   | 'SITE_ID_DESC'
   | 'STORE_ID_ASC'
@@ -1611,6 +1601,8 @@ export type PlatformSiteOrderBy =
   | 'BUCKET_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC'
   | 'ID_ASC'
@@ -1630,6 +1622,27 @@ export type PlatformSiteOrderBy =
   | 'RESOURCE_ID_DESC'
   | 'TITLE_ASC'
   | 'TITLE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformSiteRelease`. */
+export type PlatformSiteReleaseOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MANIFEST_ASC'
+  | 'MANIFEST_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SITE_ID_ASC'
+  | 'SITE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformSiteTheme`. */
@@ -1680,6 +1693,8 @@ export type PlatformSiteWebConfigOrderBy =
 export type PolicyOrderBy =
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
+  | 'COLUMN_REFS_ASC'
+  | 'COLUMN_REFS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
@@ -1777,6 +1792,31 @@ export type PubkeySettingOrderBy =
   | 'UPDATED_AT_DESC'
   | 'USER_FIELD_ASC'
   | 'USER_FIELD_DESC';
+/** Methods to use when ordering `Redirect`. */
+export type RedirectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRESERVE_PATH_ASC'
+  | 'PRESERVE_PATH_DESC'
+  | 'PRESERVE_QUERY_ASC'
+  | 'PRESERVE_QUERY_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_CODE_ASC'
+  | 'STATUS_CODE_DESC'
+  | 'TO_HOST_ASC'
+  | 'TO_HOST_DESC'
+  | 'TO_PATH_ASC'
+  | 'TO_PATH_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `RlsSetting`. */
 export type RlsSettingOrderBy =
   | 'AUTHENTICATE_FUNCTION_ID_ASC'
@@ -1823,12 +1863,16 @@ export type RouteBindingOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PRIORITY_ASC'
   | 'PRIORITY_DESC'
+  | 'SERVING_SITE_ID_ASC'
+  | 'SERVING_SITE_ID_DESC'
   | 'TARGET_API_ID_ASC'
   | 'TARGET_API_ID_DESC'
   | 'TARGET_BUCKET_ID_ASC'
   | 'TARGET_BUCKET_ID_DESC'
   | 'TARGET_FUNCTION_ID_ASC'
   | 'TARGET_FUNCTION_ID_DESC'
+  | 'TARGET_REDIRECT_ID_ASC'
+  | 'TARGET_REDIRECT_ID_DESC'
   | 'TARGET_SERVICE_ID_ASC'
   | 'TARGET_SERVICE_ID_DESC'
   | 'TARGET_SITE_ID_ASC'
@@ -1854,16 +1898,22 @@ export type RouteOrderBy =
   | 'NATURAL'
   | 'PATH_ASC'
   | 'PATH_DESC'
+  | 'PREVIEW_REF_ASC'
+  | 'PREVIEW_REF_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'PRIORITY_ASC'
   | 'PRIORITY_DESC'
+  | 'SERVING_SITE_ID_ASC'
+  | 'SERVING_SITE_ID_DESC'
   | 'TARGET_API_ID_ASC'
   | 'TARGET_API_ID_DESC'
   | 'TARGET_BUCKET_ID_ASC'
   | 'TARGET_BUCKET_ID_DESC'
   | 'TARGET_FUNCTION_ID_ASC'
   | 'TARGET_FUNCTION_ID_DESC'
+  | 'TARGET_REDIRECT_ID_ASC'
+  | 'TARGET_REDIRECT_ID_DESC'
   | 'TARGET_SERVICE_ID_ASC'
   | 'TARGET_SERVICE_ID_DESC'
   | 'TARGET_SITE_ID_ASC'
@@ -1920,8 +1970,8 @@ export type SchemaOrderBy =
   | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `SiteAppLink`. */
 export type SiteAppLinkOrderBy =
-  | 'APP_IDENTIFIER_ASC'
-  | 'APP_IDENTIFIER_DESC'
+  | 'APP_STORE_IDENTITY_ID_ASC'
+  | 'APP_STORE_IDENTITY_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
@@ -1931,18 +1981,10 @@ export type SiteAppLinkOrderBy =
   | 'NATURAL'
   | 'PATH_COMPONENTS_ASC'
   | 'PATH_COMPONENTS_DESC'
-  | 'PLATFORM_ASC'
-  | 'PLATFORM_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'SHA256_CERT_FINGERPRINTS_ASC'
-  | 'SHA256_CERT_FINGERPRINTS_DESC'
   | 'SITE_ID_ASC'
   | 'SITE_ID_DESC'
-  | 'STORE_URL_ASC'
-  | 'STORE_URL_DESC'
-  | 'TEAM_ID_ASC'
-  | 'TEAM_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'WEBCREDENTIALS_ASC'
@@ -1962,6 +2004,8 @@ export type SiteDeepLinkOrderBy =
   | 'METADATA_ASC'
   | 'METADATA_DESC'
   | 'NATURAL'
+  | 'PAGE_ID_ASC'
+  | 'PAGE_ID_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'SITE_ID_ASC'
@@ -2018,6 +2062,8 @@ export type SiteMetadatumOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ROBOTS_ASC'
   | 'ROBOTS_DESC'
+  | 'ROBOTS_SEEDED_FROM_ASC'
+  | 'ROBOTS_SEEDED_FROM_DESC'
   | 'SITE_ID_ASC'
   | 'SITE_ID_DESC'
   | 'STORE_ID_ASC'
@@ -2057,6 +2103,8 @@ export type SiteOrderBy =
   | 'BUCKET_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
@@ -2078,6 +2126,29 @@ export type SiteOrderBy =
   | 'RESOURCE_ID_DESC'
   | 'TITLE_ASC'
   | 'TITLE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `SiteRelease`. */
+export type SiteReleaseOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MANIFEST_ASC'
+  | 'MANIFEST_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SITE_ID_ASC'
+  | 'SITE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `SiteTheme`. */
@@ -2159,6 +2230,35 @@ export type SpatialRelationOrderBy =
   | 'TAGS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `SqlAction`. */
+export type SqlActionOrderBy =
+  | 'ACTION_ID_ASC'
+  | 'ACTION_ID_DESC'
+  | 'ACTION_NAME_ASC'
+  | 'ACTION_NAME_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CONTENT_ASC'
+  | 'CONTENT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEPLOY_ASC'
+  | 'DEPLOY_DESC'
+  | 'DEPS_ASC'
+  | 'DEPS_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'REVERT_ASC'
+  | 'REVERT_DESC'
+  | 'VERIFY_ASC'
+  | 'VERIFY_DESC';
 /** Methods to use when ordering `TableBehavior`. */
 export type TableBehaviorOrderBy =
   | 'CREATED_AT_ASC'
@@ -2508,6 +2608,10 @@ export type WebauthnSettingOrderBy =
   | 'UPDATED_AT_DESC'
   | 'USER_FIELD_ID_ASC'
   | 'USER_FIELD_ID_DESC';
+export interface AcceptDatabaseTransferInput {
+  clientMutationId?: string;
+  transferId?: string;
+}
 /** A filter to be used against ApiExposureLevel fields. All fields are combined with a logical ‘and.’ */
 export interface ApiExposureLevelFilter {
   /** Not equal to the specified value, treating null like an ordinary value. */
@@ -2806,165 +2910,6 @@ export interface ApiToManyCorsSettingFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: CorsSettingFilter;
 }
-/** A filter to be used against `AppComponent` object types. All fields are combined with a logical ‘and.’ */
-export interface AppComponentFilter {
-  /** Checks for all expressions in this list. */
-  and?: AppComponentFilter[];
-  /** Filter by the object’s `app` relation. */
-  app?: AppFilter;
-  /** Filter by the object’s `appId` field. */
-  appId?: UUIDFilter;
-  /** Filter by the object’s `componentApiId` field. */
-  componentApiId?: UUIDFilter;
-  /** Filter by the object’s `componentDomainId` field. */
-  componentDomainId?: UUIDFilter;
-  /** Filter by the object’s `componentInstallationId` field. */
-  componentInstallationId?: UUIDFilter;
-  /** Filter by the object’s `componentSiteId` field. */
-  componentSiteId?: UUIDFilter;
-  /** Filter by the object’s `componentType` field. */
-  componentType?: StringFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Negates the expression. */
-  not?: AppComponentFilter;
-  /** Checks for any expressions in this list. */
-  or?: AppComponentFilter[];
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-/** An input for mutations affecting `AppComponent` */
-export interface AppComponentInput {
-  /** App this component belongs to */
-  appId: string;
-  /** Typed catalog api row of the component surface; must be owner-matched or visible cross-scope */
-  componentApiId?: string;
-  /** Typed catalog domain row of the component surface; must be owner-matched or visible cross-scope */
-  componentDomainId?: string;
-  /** Typed catalog resource installation row of the component release; must be owner-matched or visible cross-scope */
-  componentInstallationId?: string;
-  /** Typed catalog site row of the component surface; must be owner-matched or visible cross-scope */
-  componentSiteId?: string;
-  /** Which kind of catalog row this component binds (api, site, domain, installation) */
-  componentType?: string;
-  /** Component-specific configuration inside this app */
-  config?: unknown;
-  createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  id?: string;
-  updatedAt?: string;
-}
-/** Represents an update to a `AppComponent`. Fields that are set will be updated. */
-export interface AppComponentPatch {
-  /** App this component belongs to */
-  appId?: string;
-  /** Typed catalog api row of the component surface; must be owner-matched or visible cross-scope */
-  componentApiId?: string;
-  /** Typed catalog domain row of the component surface; must be owner-matched or visible cross-scope */
-  componentDomainId?: string;
-  /** Typed catalog resource installation row of the component release; must be owner-matched or visible cross-scope */
-  componentInstallationId?: string;
-  /** Typed catalog site row of the component surface; must be owner-matched or visible cross-scope */
-  componentSiteId?: string;
-  /** Which kind of catalog row this component binds (api, site, domain, installation) */
-  componentType?: string;
-  /** Component-specific configuration inside this app */
-  config?: unknown;
-  createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-  id?: string;
-  updatedAt?: string;
-}
-/** A filter to be used against `App` object types. All fields are combined with a logical ‘and.’ */
-export interface AppFilter {
-  /** Checks for all expressions in this list. */
-  and?: AppFilter[];
-  /** Filter by the object’s `appComponents` relation. */
-  appComponents?: AppToManyAppComponentFilter;
-  /** `appComponents` exist. */
-  appComponentsExist?: boolean;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isPublished` field. */
-  isPublished?: BooleanFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: AppFilter;
-  /** Checks for any expressions in this list. */
-  or?: AppFilter[];
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-/** An input for mutations affecting `App` */
-export interface AppInput {
-  /** Module-specific configuration for this app */
-  config?: unknown;
-  createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  /** Human-readable app description */
-  description?: string;
-  id?: string;
-  /** Whether other scopes may see and reference this app */
-  isPublished?: boolean;
-  /** Owner-local app name */
-  name: string;
-  /** App lifecycle status: active, suspended, archived */
-  status?: string;
-  /** Human-readable app title */
-  title?: string;
-  updatedAt?: string;
-}
-/** Represents an update to a `App`. Fields that are set will be updated. */
-export interface AppPatch {
-  /** Module-specific configuration for this app */
-  config?: unknown;
-  createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-  /** Human-readable app description */
-  description?: string;
-  id?: string;
-  /** Whether other scopes may see and reference this app */
-  isPublished?: boolean;
-  /** Owner-local app name */
-  name?: string;
-  /** App lifecycle status: active, suspended, archived */
-  status?: string;
-  /** Human-readable app title */
-  title?: string;
-  updatedAt?: string;
-}
-/** A filter to be used against many `AppComponent` object types. All fields are combined with a logical ‘and.’ */
-export interface AppToManyAppComponentFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: AppComponentFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AppComponentFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: AppComponentFilter;
-}
 export interface ApplyRlsInput {
   clientMutationId?: string;
   fieldIds?: string[];
@@ -2975,28 +2920,44 @@ export interface ApplyRlsInput {
   tableId?: string;
   vars?: unknown;
 }
-export interface AppsInstallAppInput {
-  apex?: string;
-  clientMutationId?: string;
-  config?: unknown;
-  definitionIds?: string[];
-  hostname?: string;
-  label?: string;
-  name?: string;
-  namespaceId?: string;
-  params?: unknown;
-  routePath?: string;
-  slug?: string;
-  title?: string;
+/** A filter to be used against `AstMigration` object types. All fields are combined with a logical ‘and.’ */
+export interface AstMigrationFilter {
+  /** Filter by the object’s `actionId` field. */
+  actionId?: UUIDFilter;
+  /** Filter by the object’s `actionName` field. */
+  actionName?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AstMigrationFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `deploy` field. */
+  deploy?: JSONFilter;
+  /** Filter by the object’s `deploys` field. */
+  deploys?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AstMigrationFilter;
+  /** Checks for any expressions in this list. */
+  or?: AstMigrationFilter[];
+  /** Filter by the object’s `payload` field. */
+  payload?: JSONFilter;
+  /** Filter by the object’s `requires` field. */
+  requires?: StringListFilter;
+  /** Filter by the object’s `revert` field. */
+  revert?: JSONFilter;
+  /** Filter by the object’s `verify` field. */
+  verify?: JSONFilter;
 }
-export interface AppsUninstallAppInput {
+export interface CancelDatabaseTransferInput {
   clientMutationId?: string;
-  targetAppId?: string;
-}
-export interface AppsUpgradeAppInput {
-  clientMutationId?: string;
-  newParams?: unknown;
-  targetAppId?: string;
+  transferId?: string;
 }
 /** A filter to be used against `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
 export interface CheckConstraintFilter {
@@ -3231,16 +3192,6 @@ export interface CreateApiSettingInput {
   apiSetting: ApiSettingInput;
   clientMutationId?: string;
 }
-export interface CreateAppComponentInput {
-  /** The `AppComponent` to be created by this mutation. */
-  appComponent: AppComponentInput;
-  clientMutationId?: string;
-}
-export interface CreateAppInput {
-  /** The `App` to be created by this mutation. */
-  app: AppInput;
-  clientMutationId?: string;
-}
 export interface CreateCheckConstraintInput {
   /** The `CheckConstraint` to be created by this mutation. */
   checkConstraint: CheckConstraintInput;
@@ -3366,10 +3317,10 @@ export interface CreateHostnameBindingInput {
   /** The `HostnameBinding` to be created by this mutation. */
   hostnameBinding: HostnameBindingInput;
 }
-export interface CreateHttpRouteInput {
+export interface CreateIdentityProviderRegistryInput {
   clientMutationId?: string;
-  /** The `HttpRoute` to be created by this mutation. */
-  httpRoute: HttpRouteInput;
+  /** The `IdentityProviderRegistry` to be created by this mutation. */
+  identityProviderRegistry: IdentityProviderRegistryInput;
 }
 export interface CreateIndexInput {
   clientMutationId?: string;
@@ -3486,6 +3437,11 @@ export interface CreatePlatformSiteModuleInput {
   /** The `PlatformSiteModule` to be created by this mutation. */
   platformSiteModule: PlatformSiteModuleInput;
 }
+export interface CreatePlatformSiteReleaseInput {
+  clientMutationId?: string;
+  /** The `PlatformSiteRelease` to be created by this mutation. */
+  platformSiteRelease: PlatformSiteReleaseInput;
+}
 export interface CreatePlatformSiteThemeInput {
   clientMutationId?: string;
   /** The `PlatformSiteTheme` to be created by this mutation. */
@@ -3510,6 +3466,11 @@ export interface CreatePubkeySettingInput {
   clientMutationId?: string;
   /** The `PubkeySetting` to be created by this mutation. */
   pubkeySetting: PubkeySettingInput;
+}
+export interface CreateRedirectInput {
+  clientMutationId?: string;
+  /** The `Redirect` to be created by this mutation. */
+  redirect: RedirectInput;
 }
 export interface CreateRlsSettingInput {
   clientMutationId?: string;
@@ -3565,6 +3526,11 @@ export interface CreateSiteModuleInput {
   clientMutationId?: string;
   /** The `SiteModule` to be created by this mutation. */
   siteModule: SiteModuleInput;
+}
+export interface CreateSiteReleaseInput {
+  clientMutationId?: string;
+  /** The `SiteRelease` to be created by this mutation. */
+  siteRelease: SiteReleaseInput;
 }
 export interface CreateSiteThemeInput {
   clientMutationId?: string;
@@ -4396,14 +4362,6 @@ export interface DeleteApiSettingInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAppComponentInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteCheckConstraintInput {
   clientMutationId?: string;
   id: string;
@@ -4504,9 +4462,9 @@ export interface DeleteHostnameBindingInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteHttpRouteInput {
+export interface DeleteIdentityProviderRegistryInput {
   clientMutationId?: string;
-  id: string;
+  slug: string;
 }
 export interface DeleteIndexInput {
   clientMutationId?: string;
@@ -4602,6 +4560,10 @@ export interface DeletePlatformSiteModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeletePlatformSiteReleaseInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeletePlatformSiteThemeInput {
   clientMutationId?: string;
   id: string;
@@ -4619,6 +4581,10 @@ export interface DeletePrimaryKeyConstraintInput {
   id: string;
 }
 export interface DeletePubkeySettingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteRedirectInput {
   clientMutationId?: string;
   id: string;
 }
@@ -4663,6 +4629,15 @@ export interface DeleteSiteMetadatumInput {
   id: string;
 }
 export interface DeleteSiteModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteSitePreviewInput {
+  clientMutationId?: string;
+  targetName?: string;
+  targetSiteId?: string;
+}
+export interface DeleteSiteReleaseInput {
   clientMutationId?: string;
   id: string;
 }
@@ -4742,6 +4717,8 @@ export interface DeriveFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `includeGrants` field. */
+  includeGrants?: BooleanFilter;
   /** Filter by the object’s `includeMutations` field. */
   includeMutations?: BooleanFilter;
   /** Filter by the object’s `kind` field. */
@@ -4768,6 +4745,7 @@ export interface DeriveInput {
   createdAt?: string;
   databaseId?: string;
   id?: string;
+  includeGrants?: boolean;
   includeMutations?: boolean;
   kind: string;
   policyPrefix?: string;
@@ -4780,6 +4758,7 @@ export interface DerivePatch {
   createdAt?: string;
   databaseId?: string;
   id?: string;
+  includeGrants?: boolean;
   includeMutations?: boolean;
   kind?: string;
   policyPrefix?: string;
@@ -4882,6 +4861,8 @@ export interface DomainFilter {
   config?: JSONFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `domainEvents` relation. */
@@ -4894,10 +4875,6 @@ export interface DomainFilter {
   domainVerificationsExist?: boolean;
   /** Filter by the object’s `hostname` field. */
   hostname?: StringFilter;
-  /** Filter by the object’s `httpRoutes` relation. */
-  httpRoutes?: DomainToManyHttpRouteFilter;
-  /** `httpRoutes` exist. */
-  httpRoutesExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isPublished` field. */
@@ -4924,6 +4901,8 @@ export interface DomainFilter {
   tlsStatus?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
   /** Filter by the object’s `verificationStatus` field. */
   verificationStatus?: StringFilter;
   /** Filter by the object’s `verifiedAt` field. */
@@ -4934,6 +4913,7 @@ export interface DomainInput {
   /** Module-specific configuration for this hostname */
   config?: unknown;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Lowercase fully-qualified hostname; wildcards use the *.parent form */
@@ -4954,6 +4934,7 @@ export interface DomainInput {
   /** Certificate lifecycle state for this hostname */
   tlsStatus?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** Ownership verification state of this hostname */
   verificationStatus?: string;
   /** When ownership verification last succeeded */
@@ -4964,6 +4945,7 @@ export interface DomainPatch {
   /** Module-specific configuration for this hostname */
   config?: unknown;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Lowercase fully-qualified hostname; wildcards use the *.parent form */
@@ -4984,6 +4966,7 @@ export interface DomainPatch {
   /** Certificate lifecycle state for this hostname */
   tlsStatus?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** Ownership verification state of this hostname */
   verificationStatus?: string;
   /** When ownership verification last succeeded */
@@ -5006,15 +4989,6 @@ export interface DomainToManyDomainVerificationFilter {
   none?: DomainVerificationFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: DomainVerificationFilter;
-}
-/** A filter to be used against many `HttpRoute` object types. All fields are combined with a logical ‘and.’ */
-export interface DomainToManyHttpRouteFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: HttpRouteFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: HttpRouteFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: HttpRouteFilter;
 }
 /** A filter to be used against many `Route` object types. All fields are combined with a logical ‘and.’ */
 export interface DomainToManyRouteFilter {
@@ -6301,90 +6275,52 @@ export interface HostnameBindingPatch {
   /** Ownership verification state compiled from the domain row */
   verificationStatus?: string;
 }
-/** A filter to be used against `HttpRoute` object types. All fields are combined with a logical ‘and.’ */
-export interface HttpRouteFilter {
+/** A filter to be used against `IdentityProviderRegistry` object types. All fields are combined with a logical ‘and.’ */
+export interface IdentityProviderRegistryFilter {
   /** Checks for all expressions in this list. */
-  and?: HttpRouteFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `domain` relation. */
-  domain?: DomainFilter;
-  /** Filter by the object’s `domainId` field. */
-  domainId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Filter by the object’s `method` field. */
-  method?: StringFilter;
+  and?: IdentityProviderRegistryFilter[];
+  /** Filter by the object’s `authorizationUrl` field. */
+  authorizationUrl?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `issuerUrl` field. */
+  issuerUrl?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
   /** Negates the expression. */
-  not?: HttpRouteFilter;
+  not?: IdentityProviderRegistryFilter;
   /** Checks for any expressions in this list. */
-  or?: HttpRouteFilter[];
-  /** Filter by the object’s `path` field. */
-  path?: StringFilter;
-  /** Filter by the object’s `priority` field. */
-  priority?: IntFilter;
-  /** Filter by the object’s `targetId` field. */
-  targetId?: UUIDFilter;
-  /** Filter by the object’s `targetKind` field. */
-  targetKind?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
+  or?: IdentityProviderRegistryFilter[];
+  /** Filter by the object’s `scopes` field. */
+  scopes?: StringListFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `tokenUrl` field. */
+  tokenUrl?: StringFilter;
+  /** Filter by the object’s `userinfoUrl` field. */
+  userinfoUrl?: StringFilter;
 }
-/** An input for mutations affecting `HttpRoute` */
-export interface HttpRouteInput {
-  createdAt?: string;
-  createdBy?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  /** Registered host in the scoped routing domains table */
-  domainId: string;
-  id?: string;
-  /** Whether the resolver may select this route */
-  isActive?: boolean;
-  /** Optional uppercase HTTP method; NULL matches every method */
-  method?: string;
-  /** Normalized request path prefix; longest matching prefix wins */
-  path?: string;
-  /** Tie-break precedence after path length and method specificity */
-  priority?: number;
-  /** Target row of the type named by target_kind; existence enforced by trigger */
-  targetId: string;
-  /** Discriminator selecting the type of target_id */
-  targetKind: string;
-  updatedAt?: string;
-  updatedBy?: string;
+/** An input for mutations affecting `IdentityProviderRegistry` */
+export interface IdentityProviderRegistryInput {
+  authorizationUrl?: string;
+  displayName: string;
+  issuerUrl?: string;
+  kind: string;
+  scopes?: string[];
+  slug: string;
+  tokenUrl?: string;
+  userinfoUrl?: string;
 }
-/** Represents an update to a `HttpRoute`. Fields that are set will be updated. */
-export interface HttpRoutePatch {
-  createdAt?: string;
-  createdBy?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-  /** Registered host in the scoped routing domains table */
-  domainId?: string;
-  id?: string;
-  /** Whether the resolver may select this route */
-  isActive?: boolean;
-  /** Optional uppercase HTTP method; NULL matches every method */
-  method?: string;
-  /** Normalized request path prefix; longest matching prefix wins */
-  path?: string;
-  /** Tie-break precedence after path length and method specificity */
-  priority?: number;
-  /** Target row of the type named by target_kind; existence enforced by trigger */
-  targetId?: string;
-  /** Discriminator selecting the type of target_id */
-  targetKind?: string;
-  updatedAt?: string;
-  updatedBy?: string;
+/** Represents an update to a `IdentityProviderRegistry`. Fields that are set will be updated. */
+export interface IdentityProviderRegistryPatch {
+  authorizationUrl?: string;
+  displayName?: string;
+  issuerUrl?: string;
+  kind?: string;
+  scopes?: string[];
+  slug?: string;
+  tokenUrl?: string;
+  userinfoUrl?: string;
 }
 /** A filter to be used against `Index` object types. All fields are combined with a logical ‘and.’ */
 export interface IndexFilter {
@@ -6485,6 +6421,8 @@ export interface ManagedDomainFilter {
   certStatus?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `domain` field. */
@@ -6511,6 +6449,8 @@ export interface ManagedDomainFilter {
   tlsStatus?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
   /** Filter by the object’s `verificationStatus` field. */
   verificationStatus?: StringFilter;
   /** Filter by the object’s `verifiedAt` field. */
@@ -6525,6 +6465,7 @@ export interface ManagedDomainInput {
   /** Certificate issuance state for this managed hostname */
   certStatus?: string;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Lowercase fully-qualified managed hostname; wildcards use the *.parent form */
@@ -6537,6 +6478,7 @@ export interface ManagedDomainInput {
   /** TLS provisioning state for this managed hostname */
   tlsStatus?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** DNS ownership verification state of this managed hostname */
   verificationStatus?: string;
   /** When ownership verification last succeeded */
@@ -6551,6 +6493,7 @@ export interface ManagedDomainPatch {
   /** Certificate issuance state for this managed hostname */
   certStatus?: string;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Lowercase fully-qualified managed hostname; wildcards use the *.parent form */
@@ -6563,6 +6506,7 @@ export interface ManagedDomainPatch {
   /** TLS provisioning state for this managed hostname */
   tlsStatus?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** DNS ownership verification state of this managed hostname */
   verificationStatus?: string;
   /** When ownership verification last succeeded */
@@ -6585,6 +6529,13 @@ export interface ManagedDomainToManyDomainVerificationFilter {
   none?: DomainVerificationFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: DomainVerificationFilter;
+}
+export interface MintSitePreviewTokenInput {
+  clientMutationId?: string;
+  siteId?: string;
+  target?: string;
+  targetKind?: string;
+  ttlSeconds?: number;
 }
 /** A filter to be used against `NodeTypeRegistry` object types. All fields are combined with a logical ‘and.’ */
 export interface NodeTypeRegistryFilter {
@@ -6672,6 +6623,8 @@ export interface PageFilter {
   not?: PageFilter;
   /** Checks for any expressions in this list. */
   or?: PageFilter[];
+  /** Filter by the object’s `seededFrom` field. */
+  seededFrom?: JSONFilter;
   /** Filter by the object’s `site` relation. */
   site?: SiteFilter;
   /** Filter by the object’s `siteId` field. */
@@ -6695,6 +6648,8 @@ export interface PageInput {
   databaseId: string;
   /** Unique page identifier */
   id?: string;
+  /** Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly */
+  seededFrom?: unknown;
   /** Site surface this page belongs to; each site owns its own infra store and pages live at path [page, slug] within it */
   siteId: string;
   /** Page slug (unique per site) */
@@ -6716,6 +6671,8 @@ export interface PagePatch {
   databaseId?: string;
   /** Unique page identifier */
   id?: string;
+  /** Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly */
+  seededFrom?: unknown;
   /** Site surface this page belongs to; each site owns its own infra store and pages live at path [page, slug] within it */
   siteId?: string;
   /** Page slug (unique per site) */
@@ -6724,6 +6681,12 @@ export interface PagePatch {
   storeId?: string;
   /** Timestamp of last modification */
   updatedAt?: string;
+}
+export interface PagesInstallPagesInput {
+  clientMutationId?: string;
+  entityId?: string;
+  pagesPreset?: string;
+  siteId?: string;
 }
 /** A filter to be used against `Partition` object types. All fields are combined with a logical ‘and.’ */
 export interface PartitionFilter {
@@ -7087,6 +7050,11 @@ export interface PlatformCorsSettingPatch {
   id?: string;
   updatedAt?: string;
 }
+export interface PlatformDeleteSitePreviewInput {
+  clientMutationId?: string;
+  targetName?: string;
+  targetSiteId?: string;
+}
 /** A filter to be used against `PlatformDomainEvent` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformDomainEventFilter {
   /** Filter by the object’s `actorId` field. */
@@ -7176,6 +7144,8 @@ export interface PlatformDomainFilter {
   config?: JSONFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `hostname` field. */
   hostname?: StringFilter;
   /** Filter by the object’s `id` field. */
@@ -7208,6 +7178,8 @@ export interface PlatformDomainFilter {
   tlsStatus?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
   /** Filter by the object’s `verificationStatus` field. */
   verificationStatus?: StringFilter;
   /** Filter by the object’s `verifiedAt` field. */
@@ -7218,6 +7190,7 @@ export interface PlatformDomainInput {
   /** Module-specific configuration for this hostname */
   config?: unknown;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Lowercase fully-qualified hostname; wildcards use the *.parent form */
   hostname: string;
   id?: string;
@@ -7236,6 +7209,7 @@ export interface PlatformDomainInput {
   /** Certificate lifecycle state for this hostname */
   tlsStatus?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** Ownership verification state of this hostname */
   verificationStatus?: string;
   /** When ownership verification last succeeded */
@@ -7246,6 +7220,7 @@ export interface PlatformDomainPatch {
   /** Module-specific configuration for this hostname */
   config?: unknown;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Lowercase fully-qualified hostname; wildcards use the *.parent form */
   hostname?: string;
   id?: string;
@@ -7264,6 +7239,7 @@ export interface PlatformDomainPatch {
   /** Certificate lifecycle state for this hostname */
   tlsStatus?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** Ownership verification state of this hostname */
   verificationStatus?: string;
   /** When ownership verification last succeeded */
@@ -7665,6 +7641,8 @@ export interface PlatformManagedDomainFilter {
   certStatus?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `domain` field. */
   domain?: StringFilter;
   /** Filter by the object’s `id` field. */
@@ -7689,6 +7667,8 @@ export interface PlatformManagedDomainFilter {
   tlsStatus?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
   /** Filter by the object’s `verificationStatus` field. */
   verificationStatus?: StringFilter;
   /** Filter by the object’s `verifiedAt` field. */
@@ -7703,6 +7683,7 @@ export interface PlatformManagedDomainInput {
   /** Certificate issuance state for this managed hostname */
   certStatus?: string;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Lowercase fully-qualified managed hostname; wildcards use the *.parent form */
   domain: string;
   id?: string;
@@ -7713,6 +7694,7 @@ export interface PlatformManagedDomainInput {
   /** TLS provisioning state for this managed hostname */
   tlsStatus?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** DNS ownership verification state of this managed hostname */
   verificationStatus?: string;
   /** When ownership verification last succeeded */
@@ -7727,6 +7709,7 @@ export interface PlatformManagedDomainPatch {
   /** Certificate issuance state for this managed hostname */
   certStatus?: string;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Lowercase fully-qualified managed hostname; wildcards use the *.parent form */
   domain?: string;
   id?: string;
@@ -7737,6 +7720,7 @@ export interface PlatformManagedDomainPatch {
   /** TLS provisioning state for this managed hostname */
   tlsStatus?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** DNS ownership verification state of this managed hostname */
   verificationStatus?: string;
   /** When ownership verification last succeeded */
@@ -7760,6 +7744,13 @@ export interface PlatformManagedDomainToManyPlatformDomainVerificationFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformDomainVerificationFilter;
 }
+export interface PlatformMintSitePreviewTokenInput {
+  clientMutationId?: string;
+  siteId?: string;
+  target?: string;
+  targetKind?: string;
+  ttlSeconds?: number;
+}
 /** A filter to be used against `PlatformPage` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformPageFilter {
   /** Checks for all expressions in this list. */
@@ -7776,6 +7767,8 @@ export interface PlatformPageFilter {
   not?: PlatformPageFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformPageFilter[];
+  /** Filter by the object’s `seededFrom` field. */
+  seededFrom?: JSONFilter;
   /** Filter by the object’s `site` relation. */
   site?: PlatformSiteFilter;
   /** Filter by the object’s `siteId` field. */
@@ -7797,6 +7790,8 @@ export interface PlatformPageInput {
   createdAt?: string;
   /** Unique page identifier */
   id?: string;
+  /** Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly */
+  seededFrom?: unknown;
   /** Site surface this page belongs to; each site owns its own infra store and pages live at path [page, slug] within it */
   siteId: string;
   /** Page slug (unique per site) */
@@ -7816,6 +7811,8 @@ export interface PlatformPagePatch {
   createdAt?: string;
   /** Unique page identifier */
   id?: string;
+  /** Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly */
+  seededFrom?: unknown;
   /** Site surface this page belongs to; each site owns its own infra store and pages live at path [page, slug] within it */
   siteId?: string;
   /** Page slug (unique per site) */
@@ -7825,12 +7822,31 @@ export interface PlatformPagePatch {
   /** Timestamp of last modification */
   updatedAt?: string;
 }
+export interface PlatformPagesInstallPagesInput {
+  clientMutationId?: string;
+  entityId?: string;
+  pagesPreset?: string;
+  siteId?: string;
+}
+export interface PlatformProvisionSitePreviewInput {
+  apex?: string;
+  clientMutationId?: string;
+  commitId?: string;
+  name?: string;
+  siteId?: string;
+}
+export interface PlatformSetSitePreviewInput {
+  clientMutationId?: string;
+  targetCommitId?: string;
+  targetName?: string;
+  targetSiteId?: string;
+}
 /** A filter to be used against `PlatformSiteAppLink` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformSiteAppLinkFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformSiteAppLinkFilter[];
-  /** Filter by the object’s `appIdentifier` field. */
-  appIdentifier?: StringFilter;
+  /** Filter by the object’s `appStoreIdentityId` field. */
+  appStoreIdentityId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -7841,18 +7857,10 @@ export interface PlatformSiteAppLinkFilter {
   or?: PlatformSiteAppLinkFilter[];
   /** Filter by the object’s `pathComponents` field. */
   pathComponents?: StringListFilter;
-  /** Filter by the object’s `platform` field. */
-  platform?: StringFilter;
-  /** Filter by the object’s `sha256CertFingerprints` field. */
-  sha256CertFingerprints?: StringListFilter;
   /** Filter by the object’s `site` relation. */
   site?: PlatformSiteFilter;
   /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
-  /** Filter by the object’s `storeUrl` field. */
-  storeUrl?: StringFilter;
-  /** Filter by the object’s `teamId` field. */
-  teamId?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `webcredentials` field. */
@@ -7860,44 +7868,28 @@ export interface PlatformSiteAppLinkFilter {
 }
 /** An input for mutations affecting `PlatformSiteAppLink` */
 export interface PlatformSiteAppLinkInput {
-  /** App identifier: iOS bundle id or Android package name */
-  appIdentifier: string;
+  /** App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own) */
+  appStoreIdentityId: string;
   createdAt?: string;
   id?: string;
   /** Path patterns this association applies to (AASA paths / Android intent-filter paths) */
   pathComponents?: string[];
-  /** Target platform for this association (ios, android) */
-  platform: string;
-  /** Android signing certificate SHA-256 fingerprints for assetlinks.json */
-  sha256CertFingerprints?: string[];
   /** Site surface this app-link association belongs to */
   siteId: string;
-  /** App/Play store URL for this app (used by install banners and fallbacks) */
-  storeUrl?: string;
-  /** Apple Developer team id (iOS); combined with app_identifier to form the AASA appID */
-  teamId?: string;
   updatedAt?: string;
   /** Whether to emit the webcredentials service (iOS shared-web-credentials / password autofill) */
   webcredentials?: boolean;
 }
 /** Represents an update to a `PlatformSiteAppLink`. Fields that are set will be updated. */
 export interface PlatformSiteAppLinkPatch {
-  /** App identifier: iOS bundle id or Android package name */
-  appIdentifier?: string;
+  /** App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own) */
+  appStoreIdentityId?: string;
   createdAt?: string;
   id?: string;
   /** Path patterns this association applies to (AASA paths / Android intent-filter paths) */
   pathComponents?: string[];
-  /** Target platform for this association (ios, android) */
-  platform?: string;
-  /** Android signing certificate SHA-256 fingerprints for assetlinks.json */
-  sha256CertFingerprints?: string[];
   /** Site surface this app-link association belongs to */
   siteId?: string;
-  /** App/Play store URL for this app (used by install banners and fallbacks) */
-  storeUrl?: string;
-  /** Apple Developer team id (iOS); combined with app_identifier to form the AASA appID */
-  teamId?: string;
   updatedAt?: string;
   /** Whether to emit the webcredentials service (iOS shared-web-credentials / password autofill) */
   webcredentials?: boolean;
@@ -7920,6 +7912,8 @@ export interface PlatformSiteDeepLinkFilter {
   not?: PlatformSiteDeepLinkFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformSiteDeepLinkFilter[];
+  /** Filter by the object’s `pageId` field. */
+  pageId?: UUIDFilter;
   /** Filter by the object’s `site` relation. */
   site?: PlatformSiteFilter;
   /** Filter by the object’s `siteId` field. */
@@ -7941,6 +7935,8 @@ export interface PlatformSiteDeepLinkInput {
   id?: string;
   /** Additional link metadata (campaign/UTM parameters, escape hatch) */
   metadata?: unknown;
+  /** Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets) */
+  pageId?: string;
   /** Site surface this deep link belongs to (the hostname plane that serves it) */
   siteId: string;
   /** Link name unique per site; addressed at the deep-link path prefix (e.g. /l/<slug>) */
@@ -7959,6 +7955,8 @@ export interface PlatformSiteDeepLinkPatch {
   id?: string;
   /** Additional link metadata (campaign/UTM parameters, escape hatch) */
   metadata?: unknown;
+  /** Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets) */
+  pageId?: string;
   /** Site surface this deep link belongs to (the hostname plane that serves it) */
   siteId?: string;
   /** Link name unique per site; addressed at the deep-link path prefix (e.g. /l/<slug>) */
@@ -8024,6 +8022,8 @@ export interface PlatformSiteFilter {
   bucketId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `id` field. */
@@ -8068,6 +8068,10 @@ export interface PlatformSiteFilter {
   platformSiteModulesBySiteId?: PlatformSiteToManyPlatformSiteModuleFilter;
   /** `platformSiteModulesBySiteId` exist. */
   platformSiteModulesBySiteIdExist?: boolean;
+  /** Filter by the object’s `platformSiteReleaseBySiteId` relation. */
+  platformSiteReleaseBySiteId?: PlatformSiteReleaseFilter;
+  /** A related `platformSiteReleaseBySiteId` exists. */
+  platformSiteReleaseBySiteIdExists?: boolean;
   /** Filter by the object’s `platformSiteThemesBySiteId` relation. */
   platformSiteThemesBySiteId?: PlatformSiteToManyPlatformSiteThemeFilter;
   /** `platformSiteThemesBySiteId` exist. */
@@ -8082,18 +8086,21 @@ export interface PlatformSiteFilter {
   title?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `PlatformSite` */
 export interface PlatformSiteInput {
   /** Infra-store commit pinned as the live page content for this site (manual publish pointer; NULL = nothing published yet) */
   activeCommitId?: string;
-  /** Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id) */
+  /** Bucket that backs this site (static content store; exactly one of bucket_id/resource_id) */
   bucketId?: string;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Human-readable site description */
   description?: string;
   id?: string;
-  /** Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id) */
+  /** Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id) */
   installationId?: string;
   /** Slug of the release member (a Service resource) that serves this site; set iff installation_id is set */
   installationMemberSlug?: string;
@@ -8101,11 +8108,18 @@ export interface PlatformSiteInput {
   isPublished?: boolean;
   /** Owner-local site surface name */
   name: string;
-  /** Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id) */
+  /** Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id) */
   resourceId?: string;
   /** Human-readable site title */
   title?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+export interface PlatformSiteMetadataInstallRobotsInput {
+  clientMutationId?: string;
+  entityId?: string;
+  robotsPreset?: string;
+  siteId?: string;
 }
 /** A filter to be used against `PlatformSiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformSiteMetadatumFilter {
@@ -8135,6 +8149,8 @@ export interface PlatformSiteMetadatumFilter {
   or?: PlatformSiteMetadatumFilter[];
   /** Filter by the object’s `robots` field. */
   robots?: StringFilter;
+  /** Filter by the object’s `robotsSeededFrom` field. */
+  robotsSeededFrom?: JSONFilter;
   /** Filter by the object’s `site` relation. */
   site?: PlatformSiteFilter;
   /** Filter by the object’s `siteId` field. */
@@ -8166,6 +8182,8 @@ export interface PlatformSiteMetadatumInput {
   ogImage?: ConstructiveInternalTypeImage;
   /** robots meta directive (e.g. index,follow / noindex,nofollow) */
   robots?: string;
+  /** Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly */
+  robotsSeededFrom?: unknown;
   /** Site surface this metadata belongs to */
   siteId: string;
   /** Infra Merkle store holding this row's history (stamped by the versioned trigger) */
@@ -8202,6 +8220,8 @@ export interface PlatformSiteMetadatumPatch {
   ogImageUpload?: File;
   /** robots meta directive (e.g. index,follow / noindex,nofollow) */
   robots?: string;
+  /** Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly */
+  robotsSeededFrom?: unknown;
   /** Site surface this metadata belongs to */
   siteId?: string;
   /** Infra Merkle store holding this row's history (stamped by the versioned trigger) */
@@ -8271,13 +8291,14 @@ export interface PlatformSiteModulePatch {
 export interface PlatformSitePatch {
   /** Infra-store commit pinned as the live page content for this site (manual publish pointer; NULL = nothing published yet) */
   activeCommitId?: string;
-  /** Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id) */
+  /** Bucket that backs this site (static content store; exactly one of bucket_id/resource_id) */
   bucketId?: string;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Human-readable site description */
   description?: string;
   id?: string;
-  /** Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id) */
+  /** Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id) */
   installationId?: string;
   /** Slug of the release member (a Service resource) that serves this site; set iff installation_id is set */
   installationMemberSlug?: string;
@@ -8285,10 +8306,64 @@ export interface PlatformSitePatch {
   isPublished?: boolean;
   /** Owner-local site surface name */
   name?: string;
-  /** Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id) */
+  /** Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id) */
   resourceId?: string;
   /** Human-readable site title */
   title?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against `PlatformSiteRelease` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformSiteReleaseFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformSiteReleaseFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `manifest` field. */
+  manifest?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformSiteReleaseFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformSiteReleaseFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: PlatformSiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformSiteRelease` */
+export interface PlatformSiteReleaseInput {
+  /** Infra store commit for the current content (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  createdAt?: string;
+  id?: string;
+  /** Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N} */
+  manifest: unknown;
+  /** Site surface this release manifest belongs to */
+  siteId: string;
+  /** Infra Merkle store holding this row's history (stamped by the versioned trigger) */
+  storeId?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformSiteRelease`. Fields that are set will be updated. */
+export interface PlatformSiteReleasePatch {
+  /** Infra store commit for the current content (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  createdAt?: string;
+  id?: string;
+  /** Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N} */
+  manifest?: unknown;
+  /** Site surface this release manifest belongs to */
+  siteId?: string;
+  /** Infra Merkle store holding this row's history (stamped by the versioned trigger) */
+  storeId?: string;
   updatedAt?: string;
 }
 /** A filter to be used against `PlatformSiteTheme` object types. All fields are combined with a logical ‘and.’ */
@@ -8469,6 +8544,19 @@ export interface PlatformSiteWebConfigPatch {
   spaFallback?: boolean;
   updatedAt?: string;
 }
+export interface PlatformSitesInstallContentPresetInput {
+  clientMutationId?: string;
+  entityId?: string;
+  presetKind?: string;
+  presetSlug?: string;
+  siteId?: string;
+}
+export interface PlatformSitesInstallMantraInput {
+  clientMutationId?: string;
+  entityId?: string;
+  routePreset?: string;
+  siteId?: string;
+}
 export interface PlatformSitesProvisionStaticSiteInput {
   apex?: string;
   clientMutationId?: string;
@@ -8484,6 +8572,8 @@ export interface PolicyFilter {
   and?: PolicyFilter[];
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
+  /** Filter by the object’s `columnRefs` field. */
+  columnRefs?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `data` field. */
@@ -8538,6 +8628,8 @@ export interface PolicyFilter {
 /** An input for mutations affecting `Policy` */
 export interface PolicyInput {
   category?: ObjectCategory;
+  /** Columns of this policy's table that its expression filters on. Stamped when the policy is derived onto a companion table, so a consumer needing those columns (e.g. a chunking worker copying them from the parent row) reads them here instead of re-walking the node type's parameter schema. */
+  columnRefs?: string[];
   createdAt?: string;
   data?: unknown;
   databaseId?: string;
@@ -8560,6 +8652,8 @@ export interface PolicyInput {
 /** Represents an update to a `Policy`. Fields that are set will be updated. */
 export interface PolicyPatch {
   category?: ObjectCategory;
+  /** Columns of this policy's table that its expression filters on. Stamped when the policy is derived onto a companion table, so a consumer needing those columns (e.g. a chunking worker copying them from the parent row) reads them here instead of re-walking the node type's parameter schema. */
+  columnRefs?: string[];
   createdAt?: string;
   data?: unknown;
   databaseId?: string;
@@ -8663,6 +8757,13 @@ export interface ProvisionBucketInput {
    */
   ownerId?: string;
 }
+export interface ProvisionSitePreviewInput {
+  apex?: string;
+  clientMutationId?: string;
+  commitId?: string;
+  name?: string;
+  siteId?: string;
+}
 /** A filter to be used against `PubkeySetting` object types. All fields are combined with a logical ‘and.’ */
 export interface PubkeySettingFilter {
   /** Checks for all expressions in this list. */
@@ -8758,12 +8859,99 @@ export interface PubkeySettingPatch {
   /** Field name used to identify the user in crypto auth functions */
   userField?: string;
 }
+/** A filter to be used against `Redirect` object types. All fields are combined with a logical ‘and.’ */
+export interface RedirectFilter {
+  /** Checks for all expressions in this list. */
+  and?: RedirectFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: RedirectFilter;
+  /** Checks for any expressions in this list. */
+  or?: RedirectFilter[];
+  /** Filter by the object’s `preservePath` field. */
+  preservePath?: BooleanFilter;
+  /** Filter by the object’s `preserveQuery` field. */
+  preserveQuery?: BooleanFilter;
+  /** Filter by the object’s `routesByTargetRedirectId` relation. */
+  routesByTargetRedirectId?: RedirectToManyRouteFilter;
+  /** `routesByTargetRedirectId` exist. */
+  routesByTargetRedirectIdExist?: boolean;
+  /** Filter by the object’s `statusCode` field. */
+  statusCode?: IntFilter;
+  /** Filter by the object’s `toHost` field. */
+  toHost?: StringFilter;
+  /** Filter by the object’s `toPath` field. */
+  toPath?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `Redirect` */
+export interface RedirectInput {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Owner-local name for this redirect */
+  name: string;
+  /** Whether the incoming path is appended to the destination */
+  preservePath?: boolean;
+  /** Whether the incoming query string is carried to the destination */
+  preserveQuery?: boolean;
+  /** HTTP redirect status the edge answers with (301, 302, 307 or 308) */
+  statusCode?: number;
+  /** Destination hostname the edge redirects to */
+  toHost: string;
+  /** Destination path; NULL keeps the incoming path (see preserve_path) */
+  toPath?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `Redirect`. Fields that are set will be updated. */
+export interface RedirectPatch {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** Owner-local name for this redirect */
+  name?: string;
+  /** Whether the incoming path is appended to the destination */
+  preservePath?: boolean;
+  /** Whether the incoming query string is carried to the destination */
+  preserveQuery?: boolean;
+  /** HTTP redirect status the edge answers with (301, 302, 307 or 308) */
+  statusCode?: number;
+  /** Destination hostname the edge redirects to */
+  toHost?: string;
+  /** Destination path; NULL keeps the incoming path (see preserve_path) */
+  toPath?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against many `Route` object types. All fields are combined with a logical ‘and.’ */
+export interface RedirectToManyRouteFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RouteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RouteFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RouteFilter;
+}
+export interface RejectDatabaseTransferInput {
+  clientMutationId?: string;
+  transferId?: string;
+}
 export interface RequestDatabaseInput {
   clientMutationId?: string;
   databaseName?: string;
   domain?: string;
   modules?: unknown;
   options?: unknown;
+  organizationId?: string;
   presetSlug?: string;
   subdomain?: string;
 }
@@ -8900,12 +9088,16 @@ export interface RouteBindingFilter {
   path?: StringFilter;
   /** Filter by the object’s `priority` field. */
   priority?: IntFilter;
+  /** Filter by the object’s `servingSiteId` field. */
+  servingSiteId?: UUIDFilter;
   /** Filter by the object’s `targetApiId` field. */
   targetApiId?: UUIDFilter;
   /** Filter by the object’s `targetBucketId` field. */
   targetBucketId?: UUIDFilter;
   /** Filter by the object’s `targetFunctionId` field. */
   targetFunctionId?: UUIDFilter;
+  /** Filter by the object’s `targetRedirectId` field. */
+  targetRedirectId?: UUIDFilter;
   /** Filter by the object’s `targetServiceId` field. */
   targetServiceId?: UUIDFilter;
   /** Filter by the object’s `targetSiteId` field. */
@@ -8926,12 +9118,16 @@ export interface RouteBindingInput {
   path: string;
   /** Priority compiled from the source route */
   priority?: number;
+  /** Site whose surface the source route serves; NULL when it serves no site */
+  servingSiteId?: string;
   /** Api catalog row the source route targets */
   targetApiId?: string;
   /** Bucket catalog row the source route targets */
   targetBucketId?: string;
   /** Function catalog row the source route targets */
   targetFunctionId?: string;
+  /** Redirect catalog row the source route targets */
+  targetRedirectId?: string;
   /** Resource catalog row (a Service resource) the source route targets */
   targetServiceId?: string;
   /** Site catalog row the source route targets */
@@ -8952,12 +9148,16 @@ export interface RouteBindingPatch {
   path?: string;
   /** Priority compiled from the source route */
   priority?: number;
+  /** Site whose surface the source route serves; NULL when it serves no site */
+  servingSiteId?: string;
   /** Api catalog row the source route targets */
   targetApiId?: string;
   /** Bucket catalog row the source route targets */
   targetBucketId?: string;
   /** Function catalog row the source route targets */
   targetFunctionId?: string;
+  /** Redirect catalog row the source route targets */
+  targetRedirectId?: string;
   /** Resource catalog row (a Service resource) the source route targets */
   targetServiceId?: string;
   /** Site catalog row the source route targets */
@@ -8991,16 +9191,38 @@ export interface RouteFilter {
   or?: RouteFilter[];
   /** Filter by the object’s `path` field. */
   path?: StringFilter;
+  /** Filter by the object’s `previewRef` field. */
+  previewRef?: StringFilter;
   /** Filter by the object’s `priority` field. */
   priority?: IntFilter;
+  /** Filter by the object’s `servingSite` relation. */
+  servingSite?: SiteFilter;
+  /** A related `servingSite` exists. */
+  servingSiteExists?: boolean;
+  /** Filter by the object’s `servingSiteId` field. */
+  servingSiteId?: UUIDFilter;
+  /** Filter by the object’s `targetApi` relation. */
+  targetApi?: ApiFilter;
+  /** A related `targetApi` exists. */
+  targetApiExists?: boolean;
   /** Filter by the object’s `targetApiId` field. */
   targetApiId?: UUIDFilter;
   /** Filter by the object’s `targetBucketId` field. */
   targetBucketId?: UUIDFilter;
   /** Filter by the object’s `targetFunctionId` field. */
   targetFunctionId?: UUIDFilter;
+  /** Filter by the object’s `targetRedirect` relation. */
+  targetRedirect?: RedirectFilter;
+  /** A related `targetRedirect` exists. */
+  targetRedirectExists?: boolean;
+  /** Filter by the object’s `targetRedirectId` field. */
+  targetRedirectId?: UUIDFilter;
   /** Filter by the object’s `targetServiceId` field. */
   targetServiceId?: UUIDFilter;
+  /** Filter by the object’s `targetSite` relation. */
+  targetSite?: SiteFilter;
+  /** A related `targetSite` exists. */
+  targetSiteExists?: boolean;
   /** Filter by the object’s `targetSiteId` field. */
   targetSiteId?: UUIDFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -9022,17 +9244,23 @@ export interface RouteInput {
   method?: string;
   /** Path prefix this route matches; must begin with / and carry no trailing slash */
   path?: string;
+  /** The site preview this route serves; NULL serves the site's published release */
+  previewRef?: string;
   /** Higher priority wins between otherwise-equal matches */
   priority?: number;
-  /** Api catalog row this route targets; must be owner-matched or visible cross-scope */
+  /** Site whose surface this route serves; the serving lane renders as this site. NULL when the route serves no site */
+  servingSiteId?: string;
+  /** Api surface this route targets; must be this scope's own api */
   targetApiId?: string;
-  /** Bucket catalog row this route targets; must be a public bucket that is owner-matched or visible cross-scope */
+  /** Bucket this route targets; must be a public bucket in this scope's own storage plane */
   targetBucketId?: string;
-  /** Function catalog row this route targets; must be owner-matched or visible cross-scope */
+  /** Function this route targets; must be this scope's own function */
   targetFunctionId?: string;
-  /** Resource catalog row (a Service resource) this route targets; must be owner-matched or visible cross-scope */
+  /** Redirect this route targets; the edge answers with a redirect status instead of proxying a backend */
+  targetRedirectId?: string;
+  /** Resource (a Service resource) this route targets; must be this scope's own resource */
   targetServiceId?: string;
-  /** Site catalog row this route targets; must be owner-matched or visible cross-scope */
+  /** Site surface this route targets; must be this scope's own site */
   targetSiteId?: string;
   updatedAt?: string;
 }
@@ -9052,17 +9280,23 @@ export interface RoutePatch {
   method?: string;
   /** Path prefix this route matches; must begin with / and carry no trailing slash */
   path?: string;
+  /** The site preview this route serves; NULL serves the site's published release */
+  previewRef?: string;
   /** Higher priority wins between otherwise-equal matches */
   priority?: number;
-  /** Api catalog row this route targets; must be owner-matched or visible cross-scope */
+  /** Site whose surface this route serves; the serving lane renders as this site. NULL when the route serves no site */
+  servingSiteId?: string;
+  /** Api surface this route targets; must be this scope's own api */
   targetApiId?: string;
-  /** Bucket catalog row this route targets; must be a public bucket that is owner-matched or visible cross-scope */
+  /** Bucket this route targets; must be a public bucket in this scope's own storage plane */
   targetBucketId?: string;
-  /** Function catalog row this route targets; must be owner-matched or visible cross-scope */
+  /** Function this route targets; must be this scope's own function */
   targetFunctionId?: string;
-  /** Resource catalog row (a Service resource) this route targets; must be owner-matched or visible cross-scope */
+  /** Redirect this route targets; the edge answers with a redirect status instead of proxying a backend */
+  targetRedirectId?: string;
+  /** Resource (a Service resource) this route targets; must be this scope's own resource */
   targetServiceId?: string;
-  /** Site catalog row this route targets; must be owner-matched or visible cross-scope */
+  /** Site surface this route targets; must be this scope's own site */
   targetSiteId?: string;
   updatedAt?: string;
 }
@@ -9312,12 +9546,18 @@ export interface SetFieldOrderInput {
   clientMutationId?: string;
   fieldIds?: string[];
 }
+export interface SetSitePreviewInput {
+  clientMutationId?: string;
+  targetCommitId?: string;
+  targetName?: string;
+  targetSiteId?: string;
+}
 /** A filter to be used against `SiteAppLink` object types. All fields are combined with a logical ‘and.’ */
 export interface SiteAppLinkFilter {
   /** Checks for all expressions in this list. */
   and?: SiteAppLinkFilter[];
-  /** Filter by the object’s `appIdentifier` field. */
-  appIdentifier?: StringFilter;
+  /** Filter by the object’s `appStoreIdentityId` field. */
+  appStoreIdentityId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -9330,18 +9570,10 @@ export interface SiteAppLinkFilter {
   or?: SiteAppLinkFilter[];
   /** Filter by the object’s `pathComponents` field. */
   pathComponents?: StringListFilter;
-  /** Filter by the object’s `platform` field. */
-  platform?: StringFilter;
-  /** Filter by the object’s `sha256CertFingerprints` field. */
-  sha256CertFingerprints?: StringListFilter;
   /** Filter by the object’s `site` relation. */
   site?: SiteFilter;
   /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
-  /** Filter by the object’s `storeUrl` field. */
-  storeUrl?: StringFilter;
-  /** Filter by the object’s `teamId` field. */
-  teamId?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `webcredentials` field. */
@@ -9349,48 +9581,32 @@ export interface SiteAppLinkFilter {
 }
 /** An input for mutations affecting `SiteAppLink` */
 export interface SiteAppLinkInput {
-  /** App identifier: iOS bundle id or Android package name */
-  appIdentifier: string;
+  /** App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own) */
+  appStoreIdentityId: string;
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   id?: string;
   /** Path patterns this association applies to (AASA paths / Android intent-filter paths) */
   pathComponents?: string[];
-  /** Target platform for this association (ios, android) */
-  platform: string;
-  /** Android signing certificate SHA-256 fingerprints for assetlinks.json */
-  sha256CertFingerprints?: string[];
   /** Site surface this app-link association belongs to */
   siteId: string;
-  /** App/Play store URL for this app (used by install banners and fallbacks) */
-  storeUrl?: string;
-  /** Apple Developer team id (iOS); combined with app_identifier to form the AASA appID */
-  teamId?: string;
   updatedAt?: string;
   /** Whether to emit the webcredentials service (iOS shared-web-credentials / password autofill) */
   webcredentials?: boolean;
 }
 /** Represents an update to a `SiteAppLink`. Fields that are set will be updated. */
 export interface SiteAppLinkPatch {
-  /** App identifier: iOS bundle id or Android package name */
-  appIdentifier?: string;
+  /** App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own) */
+  appStoreIdentityId?: string;
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   id?: string;
   /** Path patterns this association applies to (AASA paths / Android intent-filter paths) */
   pathComponents?: string[];
-  /** Target platform for this association (ios, android) */
-  platform?: string;
-  /** Android signing certificate SHA-256 fingerprints for assetlinks.json */
-  sha256CertFingerprints?: string[];
   /** Site surface this app-link association belongs to */
   siteId?: string;
-  /** App/Play store URL for this app (used by install banners and fallbacks) */
-  storeUrl?: string;
-  /** Apple Developer team id (iOS); combined with app_identifier to form the AASA appID */
-  teamId?: string;
   updatedAt?: string;
   /** Whether to emit the webcredentials service (iOS shared-web-credentials / password autofill) */
   webcredentials?: boolean;
@@ -9415,6 +9631,8 @@ export interface SiteDeepLinkFilter {
   not?: SiteDeepLinkFilter;
   /** Checks for any expressions in this list. */
   or?: SiteDeepLinkFilter[];
+  /** Filter by the object’s `pageId` field. */
+  pageId?: UUIDFilter;
   /** Filter by the object’s `site` relation. */
   site?: SiteFilter;
   /** Filter by the object’s `siteId` field. */
@@ -9438,6 +9656,8 @@ export interface SiteDeepLinkInput {
   id?: string;
   /** Additional link metadata (campaign/UTM parameters, escape hatch) */
   metadata?: unknown;
+  /** Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets) */
+  pageId?: string;
   /** Site surface this deep link belongs to (the hostname plane that serves it) */
   siteId: string;
   /** Link name unique per site; addressed at the deep-link path prefix (e.g. /l/<slug>) */
@@ -9458,6 +9678,8 @@ export interface SiteDeepLinkPatch {
   id?: string;
   /** Additional link metadata (campaign/UTM parameters, escape hatch) */
   metadata?: unknown;
+  /** Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets) */
+  pageId?: string;
   /** Site surface this deep link belongs to (the hostname plane that serves it) */
   siteId?: string;
   /** Link name unique per site; addressed at the deep-link path prefix (e.g. /l/<slug>) */
@@ -9529,6 +9751,8 @@ export interface SiteFilter {
   bucketId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
@@ -9557,6 +9781,10 @@ export interface SiteFilter {
   pagesExist?: boolean;
   /** Filter by the object’s `resourceId` field. */
   resourceId?: UUIDFilter;
+  /** Filter by the object’s `routesByServingSiteId` relation. */
+  routesByServingSiteId?: SiteToManyRouteFilter;
+  /** `routesByServingSiteId` exist. */
+  routesByServingSiteIdExist?: boolean;
   /** Filter by the object’s `siteAppLinks` relation. */
   siteAppLinks?: SiteToManySiteAppLinkFilter;
   /** `siteAppLinks` exist. */
@@ -9577,6 +9805,10 @@ export interface SiteFilter {
   siteModules?: SiteToManySiteModuleFilter;
   /** `siteModules` exist. */
   siteModulesExist?: boolean;
+  /** Filter by the object’s `siteRelease` relation. */
+  siteRelease?: SiteReleaseFilter;
+  /** A related `siteRelease` exists. */
+  siteReleaseExists?: boolean;
   /** Filter by the object’s `siteThemes` relation. */
   siteThemes?: SiteToManySiteThemeFilter;
   /** `siteThemes` exist. */
@@ -9589,20 +9821,23 @@ export interface SiteFilter {
   title?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `Site` */
 export interface SiteInput {
   /** Infra-store commit pinned as the live page content for this site (manual publish pointer; NULL = nothing published yet) */
   activeCommitId?: string;
-  /** Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id) */
+  /** Bucket that backs this site (static content store; exactly one of bucket_id/resource_id) */
   bucketId?: string;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Human-readable site description */
   description?: string;
   id?: string;
-  /** Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id) */
+  /** Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id) */
   installationId?: string;
   /** Slug of the release member (a Service resource) that serves this site; set iff installation_id is set */
   installationMemberSlug?: string;
@@ -9610,11 +9845,18 @@ export interface SiteInput {
   isPublished?: boolean;
   /** Owner-local site surface name */
   name: string;
-  /** Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id) */
+  /** Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id) */
   resourceId?: string;
   /** Human-readable site title */
   title?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+export interface SiteMetadataInstallRobotsInput {
+  clientMutationId?: string;
+  entityId?: string;
+  robotsPreset?: string;
+  siteId?: string;
 }
 /** A filter to be used against `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
 export interface SiteMetadatumFilter {
@@ -9646,6 +9888,8 @@ export interface SiteMetadatumFilter {
   or?: SiteMetadatumFilter[];
   /** Filter by the object’s `robots` field. */
   robots?: StringFilter;
+  /** Filter by the object’s `robotsSeededFrom` field. */
+  robotsSeededFrom?: JSONFilter;
   /** Filter by the object’s `site` relation. */
   site?: SiteFilter;
   /** Filter by the object’s `siteId` field. */
@@ -9679,6 +9923,8 @@ export interface SiteMetadatumInput {
   ogImage?: ConstructiveInternalTypeImage;
   /** robots meta directive (e.g. index,follow / noindex,nofollow) */
   robots?: string;
+  /** Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly */
+  robotsSeededFrom?: unknown;
   /** Site surface this metadata belongs to */
   siteId: string;
   /** Infra Merkle store holding this row's history (stamped by the versioned trigger) */
@@ -9717,6 +9963,8 @@ export interface SiteMetadatumPatch {
   ogImageUpload?: File;
   /** robots meta directive (e.g. index,follow / noindex,nofollow) */
   robots?: string;
+  /** Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly */
+  robotsSeededFrom?: unknown;
   /** Site surface this metadata belongs to */
   siteId?: string;
   /** Infra Merkle store holding this row's history (stamped by the versioned trigger) */
@@ -9792,15 +10040,16 @@ export interface SiteModulePatch {
 export interface SitePatch {
   /** Infra-store commit pinned as the live page content for this site (manual publish pointer; NULL = nothing published yet) */
   activeCommitId?: string;
-  /** Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id) */
+  /** Bucket that backs this site (static content store; exactly one of bucket_id/resource_id) */
   bucketId?: string;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Human-readable site description */
   description?: string;
   id?: string;
-  /** Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id) */
+  /** Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id) */
   installationId?: string;
   /** Slug of the release member (a Service resource) that serves this site; set iff installation_id is set */
   installationMemberSlug?: string;
@@ -9808,10 +10057,70 @@ export interface SitePatch {
   isPublished?: boolean;
   /** Owner-local site surface name */
   name?: string;
-  /** Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id) */
+  /** Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id) */
   resourceId?: string;
   /** Human-readable site title */
   title?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against `SiteRelease` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteReleaseFilter {
+  /** Checks for all expressions in this list. */
+  and?: SiteReleaseFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `manifest` field. */
+  manifest?: JSONFilter;
+  /** Negates the expression. */
+  not?: SiteReleaseFilter;
+  /** Checks for any expressions in this list. */
+  or?: SiteReleaseFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `SiteRelease` */
+export interface SiteReleaseInput {
+  /** Infra store commit for the current content (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N} */
+  manifest: unknown;
+  /** Site surface this release manifest belongs to */
+  siteId: string;
+  /** Infra Merkle store holding this row's history (stamped by the versioned trigger) */
+  storeId?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `SiteRelease`. Fields that are set will be updated. */
+export interface SiteReleasePatch {
+  /** Infra store commit for the current content (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N} */
+  manifest?: unknown;
+  /** Site surface this release manifest belongs to */
+  siteId?: string;
+  /** Infra Merkle store holding this row's history (stamped by the versioned trigger) */
+  storeId?: string;
   updatedAt?: string;
 }
 /** A filter to be used against `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
@@ -9893,6 +10202,15 @@ export interface SiteToManyPageFilter {
   none?: PageFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: PageFilter;
+}
+/** A filter to be used against many `Route` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteToManyRouteFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RouteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RouteFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RouteFilter;
 }
 /** A filter to be used against many `SiteAppLink` object types. All fields are combined with a logical ‘and.’ */
 export interface SiteToManySiteAppLinkFilter {
@@ -10004,6 +10322,19 @@ export interface SiteWebConfigPatch {
   spaFallback?: boolean;
   updatedAt?: string;
 }
+export interface SitesInstallContentPresetInput {
+  clientMutationId?: string;
+  entityId?: string;
+  presetKind?: string;
+  presetSlug?: string;
+  siteId?: string;
+}
+export interface SitesInstallMantraInput {
+  clientMutationId?: string;
+  entityId?: string;
+  routePreset?: string;
+  siteId?: string;
+}
 export interface SitesProvisionStaticSiteInput {
   apex?: string;
   clientMutationId?: string;
@@ -10089,6 +10420,39 @@ export interface SpatialRelationPatch {
   tableId?: string;
   tags?: string[];
   updatedAt?: string;
+}
+/** A filter to be used against `SqlAction` object types. All fields are combined with a logical ‘and.’ */
+export interface SqlActionFilter {
+  /** Filter by the object’s `actionId` field. */
+  actionId?: UUIDFilter;
+  /** Filter by the object’s `actionName` field. */
+  actionName?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: SqlActionFilter[];
+  /** Filter by the object’s `content` field. */
+  content?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `deploy` field. */
+  deploy?: StringFilter;
+  /** Filter by the object’s `deps` field. */
+  deps?: StringListFilter;
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: SqlActionFilter;
+  /** Checks for any expressions in this list. */
+  or?: SqlActionFilter[];
+  /** Filter by the object’s `revert` field. */
+  revert?: StringFilter;
+  /** Filter by the object’s `verify` field. */
+  verify?: StringFilter;
 }
 /** A filter to be used against `TableBehavior` object types. All fields are combined with a logical ‘and.’ */
 export interface TableBehaviorFilter {
@@ -10832,18 +11196,6 @@ export interface UpdateApiSettingInput {
   clientMutationId?: string;
   id: string;
 }
-export interface UpdateAppComponentInput {
-  /** An object where the defined keys will be set on the `AppComponent` being updated. */
-  appComponentPatch: AppComponentPatch;
-  clientMutationId?: string;
-  id: string;
-}
-export interface UpdateAppInput {
-  /** An object where the defined keys will be set on the `App` being updated. */
-  appPatch: AppPatch;
-  clientMutationId?: string;
-  id: string;
-}
 export interface UpdateCheckConstraintInput {
   /** An object where the defined keys will be set on the `CheckConstraint` being updated. */
   checkConstraintPatch: CheckConstraintPatch;
@@ -10994,11 +11346,11 @@ export interface UpdateHostnameBindingInput {
   hostnameBindingPatch: HostnameBindingPatch;
   id: string;
 }
-export interface UpdateHttpRouteInput {
+export interface UpdateIdentityProviderRegistryInput {
   clientMutationId?: string;
-  /** An object where the defined keys will be set on the `HttpRoute` being updated. */
-  httpRoutePatch: HttpRoutePatch;
-  id: string;
+  /** An object where the defined keys will be set on the `IdentityProviderRegistry` being updated. */
+  identityProviderRegistryPatch: IdentityProviderRegistryPatch;
+  slug: string;
 }
 export interface UpdateIndexInput {
   clientMutationId?: string;
@@ -11140,6 +11492,12 @@ export interface UpdatePlatformSiteModuleInput {
   /** An object where the defined keys will be set on the `PlatformSiteModule` being updated. */
   platformSiteModulePatch: PlatformSiteModulePatch;
 }
+export interface UpdatePlatformSiteReleaseInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformSiteRelease` being updated. */
+  platformSiteReleasePatch: PlatformSiteReleasePatch;
+}
 export interface UpdatePlatformSiteThemeInput {
   clientMutationId?: string;
   id: string;
@@ -11169,6 +11527,12 @@ export interface UpdatePubkeySettingInput {
   id: string;
   /** An object where the defined keys will be set on the `PubkeySetting` being updated. */
   pubkeySettingPatch: PubkeySettingPatch;
+}
+export interface UpdateRedirectInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Redirect` being updated. */
+  redirectPatch: RedirectPatch;
 }
 export interface UpdateRlsSettingInput {
   clientMutationId?: string;
@@ -11235,6 +11599,12 @@ export interface UpdateSiteModuleInput {
   id: string;
   /** An object where the defined keys will be set on the `SiteModule` being updated. */
   siteModulePatch: SiteModulePatch;
+}
+export interface UpdateSiteReleaseInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `SiteRelease` being updated. */
+  siteReleasePatch: SiteReleasePatch;
 }
 export interface UpdateSiteThemeInput {
   clientMutationId?: string;
@@ -11847,17 +12217,10 @@ export interface ApiConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `AppComponent` values. */
-export interface AppComponentConnection {
-  edges: AppComponentEdge[];
-  nodes: AppComponent[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `App` values. */
-export interface AppConnection {
-  edges: AppEdge[];
-  nodes: App[];
+/** A connection to a list of `AstMigration` values. */
+export interface AstMigrationConnection {
+  edges: AstMigrationEdge[];
+  nodes: AstMigration[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -12029,6 +12392,13 @@ export interface FunctionConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `GetSitePreviewsRecord` values. */
+export interface GetSitePreviewsConnection {
+  edges: GetSitePreviewsEdge[];
+  nodes: GetSitePreviewsRecord[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `HostnameBinding` values. */
 export interface HostnameBindingConnection {
   edges: HostnameBindingEdge[];
@@ -12036,10 +12406,10 @@ export interface HostnameBindingConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `HttpRoute` values. */
-export interface HttpRouteConnection {
-  edges: HttpRouteEdge[];
-  nodes: HttpRoute[];
+/** A connection to a list of `IdentityProviderRegistry` values. */
+export interface IdentityProviderRegistryConnection {
+  edges: IdentityProviderRegistryEdge[];
+  nodes: IdentityProviderRegistry[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -12148,6 +12518,13 @@ export interface PlatformEmailSiteIdentityConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `PlatformGetSitePreviewsRecord` values. */
+export interface PlatformGetSitePreviewsConnection {
+  edges: PlatformGetSitePreviewsEdge[];
+  nodes: PlatformGetSitePreviewsRecord[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `PlatformManagedDomain` values. */
 export interface PlatformManagedDomainConnection {
   edges: PlatformManagedDomainEdge[];
@@ -12197,6 +12574,13 @@ export interface PlatformSiteModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `PlatformSiteRelease` values. */
+export interface PlatformSiteReleaseConnection {
+  edges: PlatformSiteReleaseEdge[];
+  nodes: PlatformSiteRelease[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `PlatformSiteTheme` values. */
 export interface PlatformSiteThemeConnection {
   edges: PlatformSiteThemeEdge[];
@@ -12239,14 +12623,12 @@ export interface PubkeySettingConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-export interface ResolveHttpRouteRecord {
-  databaseId?: string | null;
-  domainId?: string | null;
-  matchedPath?: string | null;
-  method?: string | null;
-  routeId?: string | null;
-  targetId?: string | null;
-  targetKind?: string | null;
+/** A connection to a list of `Redirect` values. */
+export interface RedirectConnection {
+  edges: RedirectEdge[];
+  nodes: Redirect[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
 export interface ResolveRouteRecord {
   domainId?: string | null;
@@ -12337,6 +12719,13 @@ export interface SiteModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `SiteRelease` values. */
+export interface SiteReleaseConnection {
+  edges: SiteReleaseEdge[];
+  nodes: SiteRelease[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `SiteTheme` values. */
 export interface SiteThemeConnection {
   edges: SiteThemeEdge[];
@@ -12362,6 +12751,13 @@ export interface SiteConnection {
 export interface SpatialRelationConnection {
   edges: SpatialRelationEdge[];
   nodes: SpatialRelation[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `SqlAction` values. */
+export interface SqlActionConnection {
+  edges: SqlActionEdge[];
+  nodes: SqlAction[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -12456,19 +12852,16 @@ export interface WebauthnSettingConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+export interface AcceptDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
 export interface ApplyRlsPayload {
   clientMutationId?: string | null;
 }
-export interface AppsInstallAppPayload {
-  appEdge?: AppEdge | null;
+export interface CancelDatabaseTransferPayload {
   clientMutationId?: string | null;
-  result?: App | null;
-}
-export interface AppsUninstallAppPayload {
-  clientMutationId?: string | null;
-}
-export interface AppsUpgradeAppPayload {
-  clientMutationId?: string | null;
+  result?: boolean | null;
 }
 export interface CreateApiPayload {
   /** The `Api` that was created by this mutation. */
@@ -12486,18 +12879,6 @@ export interface CreateApiSettingPayload {
   /** The `ApiSetting` that was created by this mutation. */
   apiSetting?: ApiSetting | null;
   apiSettingEdge?: ApiSettingEdge | null;
-  clientMutationId?: string | null;
-}
-export interface CreateAppPayload {
-  /** The `App` that was created by this mutation. */
-  app?: App | null;
-  appEdge?: AppEdge | null;
-  clientMutationId?: string | null;
-}
-export interface CreateAppComponentPayload {
-  /** The `AppComponent` that was created by this mutation. */
-  appComponent?: AppComponent | null;
-  appComponentEdge?: AppComponentEdge | null;
   clientMutationId?: string | null;
 }
 export interface CreateCheckConstraintPayload {
@@ -12650,11 +13031,11 @@ export interface CreateHostnameBindingPayload {
   hostnameBinding?: HostnameBinding | null;
   hostnameBindingEdge?: HostnameBindingEdge | null;
 }
-export interface CreateHttpRoutePayload {
+export interface CreateIdentityProviderRegistryPayload {
   clientMutationId?: string | null;
-  /** The `HttpRoute` that was created by this mutation. */
-  httpRoute?: HttpRoute | null;
-  httpRouteEdge?: HttpRouteEdge | null;
+  /** The `IdentityProviderRegistry` that was created by this mutation. */
+  identityProviderRegistry?: IdentityProviderRegistry | null;
+  identityProviderRegistryEdge?: IdentityProviderRegistryEdge | null;
 }
 export interface CreateIndexPayload {
   clientMutationId?: string | null;
@@ -12794,6 +13175,12 @@ export interface CreatePlatformSiteModulePayload {
   platformSiteModule?: PlatformSiteModule | null;
   platformSiteModuleEdge?: PlatformSiteModuleEdge | null;
 }
+export interface CreatePlatformSiteReleasePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteRelease` that was created by this mutation. */
+  platformSiteRelease?: PlatformSiteRelease | null;
+  platformSiteReleaseEdge?: PlatformSiteReleaseEdge | null;
+}
 export interface CreatePlatformSiteThemePayload {
   clientMutationId?: string | null;
   /** The `PlatformSiteTheme` that was created by this mutation. */
@@ -12823,6 +13210,12 @@ export interface CreatePubkeySettingPayload {
   /** The `PubkeySetting` that was created by this mutation. */
   pubkeySetting?: PubkeySetting | null;
   pubkeySettingEdge?: PubkeySettingEdge | null;
+}
+export interface CreateRedirectPayload {
+  clientMutationId?: string | null;
+  /** The `Redirect` that was created by this mutation. */
+  redirect?: Redirect | null;
+  redirectEdge?: RedirectEdge | null;
 }
 export interface CreateRlsSettingPayload {
   clientMutationId?: string | null;
@@ -12889,6 +13282,12 @@ export interface CreateSiteModulePayload {
   /** The `SiteModule` that was created by this mutation. */
   siteModule?: SiteModule | null;
   siteModuleEdge?: SiteModuleEdge | null;
+}
+export interface CreateSiteReleasePayload {
+  clientMutationId?: string | null;
+  /** The `SiteRelease` that was created by this mutation. */
+  siteRelease?: SiteRelease | null;
+  siteReleaseEdge?: SiteReleaseEdge | null;
 }
 export interface CreateSiteThemePayload {
   clientMutationId?: string | null;
@@ -13002,18 +13401,6 @@ export interface DeleteApiSettingPayload {
   /** The `ApiSetting` that was deleted by this mutation. */
   apiSetting?: ApiSetting | null;
   apiSettingEdge?: ApiSettingEdge | null;
-  clientMutationId?: string | null;
-}
-export interface DeleteAppPayload {
-  /** The `App` that was deleted by this mutation. */
-  app?: App | null;
-  appEdge?: AppEdge | null;
-  clientMutationId?: string | null;
-}
-export interface DeleteAppComponentPayload {
-  /** The `AppComponent` that was deleted by this mutation. */
-  appComponent?: AppComponent | null;
-  appComponentEdge?: AppComponentEdge | null;
   clientMutationId?: string | null;
 }
 export interface DeleteCheckConstraintPayload {
@@ -13166,11 +13553,11 @@ export interface DeleteHostnameBindingPayload {
   hostnameBinding?: HostnameBinding | null;
   hostnameBindingEdge?: HostnameBindingEdge | null;
 }
-export interface DeleteHttpRoutePayload {
+export interface DeleteIdentityProviderRegistryPayload {
   clientMutationId?: string | null;
-  /** The `HttpRoute` that was deleted by this mutation. */
-  httpRoute?: HttpRoute | null;
-  httpRouteEdge?: HttpRouteEdge | null;
+  /** The `IdentityProviderRegistry` that was deleted by this mutation. */
+  identityProviderRegistry?: IdentityProviderRegistry | null;
+  identityProviderRegistryEdge?: IdentityProviderRegistryEdge | null;
 }
 export interface DeleteIndexPayload {
   clientMutationId?: string | null;
@@ -13310,6 +13697,12 @@ export interface DeletePlatformSiteModulePayload {
   platformSiteModule?: PlatformSiteModule | null;
   platformSiteModuleEdge?: PlatformSiteModuleEdge | null;
 }
+export interface DeletePlatformSiteReleasePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteRelease` that was deleted by this mutation. */
+  platformSiteRelease?: PlatformSiteRelease | null;
+  platformSiteReleaseEdge?: PlatformSiteReleaseEdge | null;
+}
 export interface DeletePlatformSiteThemePayload {
   clientMutationId?: string | null;
   /** The `PlatformSiteTheme` that was deleted by this mutation. */
@@ -13339,6 +13732,12 @@ export interface DeletePubkeySettingPayload {
   /** The `PubkeySetting` that was deleted by this mutation. */
   pubkeySetting?: PubkeySetting | null;
   pubkeySettingEdge?: PubkeySettingEdge | null;
+}
+export interface DeleteRedirectPayload {
+  clientMutationId?: string | null;
+  /** The `Redirect` that was deleted by this mutation. */
+  redirect?: Redirect | null;
+  redirectEdge?: RedirectEdge | null;
 }
 export interface DeleteRlsSettingPayload {
   clientMutationId?: string | null;
@@ -13405,6 +13804,15 @@ export interface DeleteSiteModulePayload {
   /** The `SiteModule` that was deleted by this mutation. */
   siteModule?: SiteModule | null;
   siteModuleEdge?: SiteModuleEdge | null;
+}
+export interface DeleteSitePreviewPayload {
+  clientMutationId?: string | null;
+}
+export interface DeleteSiteReleasePayload {
+  clientMutationId?: string | null;
+  /** The `SiteRelease` that was deleted by this mutation. */
+  siteRelease?: SiteRelease | null;
+  siteReleaseEdge?: SiteReleaseEdge | null;
 }
 export interface DeleteSiteThemePayload {
   clientMutationId?: string | null;
@@ -13507,10 +13915,50 @@ export interface DomainsAssignSubdomainPayload {
   domainEdge?: DomainEdge | null;
   result?: Domain | null;
 }
+export interface MintSitePreviewTokenPayload {
+  clientMutationId?: string | null;
+  result?: MintSitePreviewTokenRecord[] | null;
+}
+export interface PagesInstallPagesPayload {
+  clientMutationId?: string | null;
+  result?: unknown | null;
+}
+export interface PlatformDeleteSitePreviewPayload {
+  clientMutationId?: string | null;
+}
 export interface PlatformDomainsAssignSubdomainPayload {
   clientMutationId?: string | null;
   platformDomainEdge?: PlatformDomainEdge | null;
   result?: PlatformDomain | null;
+}
+export interface PlatformMintSitePreviewTokenPayload {
+  clientMutationId?: string | null;
+  result?: PlatformMintSitePreviewTokenRecord[] | null;
+}
+export interface PlatformPagesInstallPagesPayload {
+  clientMutationId?: string | null;
+  result?: unknown | null;
+}
+export interface PlatformProvisionSitePreviewPayload {
+  clientMutationId?: string | null;
+  result?: PlatformRoute | null;
+}
+export interface PlatformSetSitePreviewPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface PlatformSiteMetadataInstallRobotsPayload {
+  clientMutationId?: string | null;
+  result?: unknown | null;
+}
+export interface PlatformSitesInstallContentPresetPayload {
+  clientMutationId?: string | null;
+  result?: unknown | null;
+}
+export interface PlatformSitesInstallMantraPayload {
+  clientMutationId?: string | null;
+  platformSiteEdge?: PlatformSiteEdge | null;
+  result?: PlatformSite | null;
 }
 export interface PlatformSitesProvisionStaticSitePayload {
   clientMutationId?: string | null;
@@ -13530,6 +13978,15 @@ export interface ProvisionBucketPayload {
   /** Whether provisioning succeeded */
   success: boolean;
 }
+export interface ProvisionSitePreviewPayload {
+  clientMutationId?: string | null;
+  result?: Route | null;
+  routeEdge?: RouteEdge | null;
+}
+export interface RejectDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
 export interface RequestDatabasePayload {
   clientMutationId?: string | null;
   result?: DatabaseProvisionModule | null;
@@ -13537,9 +13994,27 @@ export interface RequestDatabasePayload {
 export interface SetFieldOrderPayload {
   clientMutationId?: string | null;
 }
+export interface SetSitePreviewPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface SiteMetadataInstallRobotsPayload {
+  clientMutationId?: string | null;
+  result?: unknown | null;
+}
+export interface SitesInstallContentPresetPayload {
+  clientMutationId?: string | null;
+  result?: unknown | null;
+}
+export interface SitesInstallMantraPayload {
+  clientMutationId?: string | null;
+  result?: Site | null;
+  siteEdge?: SiteEdge | null;
+}
 export interface SitesProvisionStaticSitePayload {
   clientMutationId?: string | null;
-  result?: PlatformRoute | null;
+  result?: Route | null;
+  routeEdge?: RouteEdge | null;
 }
 export interface UpdateApiPayload {
   /** The `Api` that was updated by this mutation. */
@@ -13557,18 +14032,6 @@ export interface UpdateApiSettingPayload {
   /** The `ApiSetting` that was updated by this mutation. */
   apiSetting?: ApiSetting | null;
   apiSettingEdge?: ApiSettingEdge | null;
-  clientMutationId?: string | null;
-}
-export interface UpdateAppPayload {
-  /** The `App` that was updated by this mutation. */
-  app?: App | null;
-  appEdge?: AppEdge | null;
-  clientMutationId?: string | null;
-}
-export interface UpdateAppComponentPayload {
-  /** The `AppComponent` that was updated by this mutation. */
-  appComponent?: AppComponent | null;
-  appComponentEdge?: AppComponentEdge | null;
   clientMutationId?: string | null;
 }
 export interface UpdateCheckConstraintPayload {
@@ -13721,11 +14184,11 @@ export interface UpdateHostnameBindingPayload {
   hostnameBinding?: HostnameBinding | null;
   hostnameBindingEdge?: HostnameBindingEdge | null;
 }
-export interface UpdateHttpRoutePayload {
+export interface UpdateIdentityProviderRegistryPayload {
   clientMutationId?: string | null;
-  /** The `HttpRoute` that was updated by this mutation. */
-  httpRoute?: HttpRoute | null;
-  httpRouteEdge?: HttpRouteEdge | null;
+  /** The `IdentityProviderRegistry` that was updated by this mutation. */
+  identityProviderRegistry?: IdentityProviderRegistry | null;
+  identityProviderRegistryEdge?: IdentityProviderRegistryEdge | null;
 }
 export interface UpdateIndexPayload {
   clientMutationId?: string | null;
@@ -13865,6 +14328,12 @@ export interface UpdatePlatformSiteModulePayload {
   platformSiteModule?: PlatformSiteModule | null;
   platformSiteModuleEdge?: PlatformSiteModuleEdge | null;
 }
+export interface UpdatePlatformSiteReleasePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteRelease` that was updated by this mutation. */
+  platformSiteRelease?: PlatformSiteRelease | null;
+  platformSiteReleaseEdge?: PlatformSiteReleaseEdge | null;
+}
 export interface UpdatePlatformSiteThemePayload {
   clientMutationId?: string | null;
   /** The `PlatformSiteTheme` that was updated by this mutation. */
@@ -13894,6 +14363,12 @@ export interface UpdatePubkeySettingPayload {
   /** The `PubkeySetting` that was updated by this mutation. */
   pubkeySetting?: PubkeySetting | null;
   pubkeySettingEdge?: PubkeySettingEdge | null;
+}
+export interface UpdateRedirectPayload {
+  clientMutationId?: string | null;
+  /** The `Redirect` that was updated by this mutation. */
+  redirect?: Redirect | null;
+  redirectEdge?: RedirectEdge | null;
 }
 export interface UpdateRlsSettingPayload {
   clientMutationId?: string | null;
@@ -13960,6 +14435,12 @@ export interface UpdateSiteModulePayload {
   /** The `SiteModule` that was updated by this mutation. */
   siteModule?: SiteModule | null;
   siteModuleEdge?: SiteModuleEdge | null;
+}
+export interface UpdateSiteReleasePayload {
+  clientMutationId?: string | null;
+  /** The `SiteRelease` that was updated by this mutation. */
+  siteRelease?: SiteRelease | null;
+  siteReleaseEdge?: SiteReleaseEdge | null;
 }
 export interface UpdateSiteThemePayload {
   clientMutationId?: string | null;
@@ -14113,17 +14594,11 @@ export interface ApiEdge {
   /** The `Api` at the end of the edge. */
   node?: Api | null;
 }
-/** A `AppComponent` edge in the connection. */
-export interface AppComponentEdge {
+/** A `AstMigration` edge in the connection. */
+export interface AstMigrationEdge {
   cursor?: string | null;
-  /** The `AppComponent` at the end of the edge. */
-  node?: AppComponent | null;
-}
-/** A `App` edge in the connection. */
-export interface AppEdge {
-  cursor?: string | null;
-  /** The `App` at the end of the edge. */
-  node?: App | null;
+  /** The `AstMigration` at the end of the edge. */
+  node?: AstMigration | null;
 }
 /** A `CheckConstraint` edge in the connection. */
 export interface CheckConstraintEdge {
@@ -14269,17 +14744,23 @@ export interface FunctionEdge {
   /** The `Function` at the end of the edge. */
   node?: Function | null;
 }
+/** A `GetSitePreviewsRecord` edge in the connection. */
+export interface GetSitePreviewsEdge {
+  cursor?: string | null;
+  /** The `GetSitePreviewsRecord` at the end of the edge. */
+  node?: GetSitePreviewsRecord | null;
+}
 /** A `HostnameBinding` edge in the connection. */
 export interface HostnameBindingEdge {
   cursor?: string | null;
   /** The `HostnameBinding` at the end of the edge. */
   node?: HostnameBinding | null;
 }
-/** A `HttpRoute` edge in the connection. */
-export interface HttpRouteEdge {
+/** A `IdentityProviderRegistry` edge in the connection. */
+export interface IdentityProviderRegistryEdge {
   cursor?: string | null;
-  /** The `HttpRoute` at the end of the edge. */
-  node?: HttpRoute | null;
+  /** The `IdentityProviderRegistry` at the end of the edge. */
+  node?: IdentityProviderRegistry | null;
 }
 /** A `Index` edge in the connection. */
 export interface IndexEdge {
@@ -14371,6 +14852,12 @@ export interface PlatformEmailSiteIdentityEdge {
   /** The `PlatformEmailSiteIdentity` at the end of the edge. */
   node?: PlatformEmailSiteIdentity | null;
 }
+/** A `PlatformGetSitePreviewsRecord` edge in the connection. */
+export interface PlatformGetSitePreviewsEdge {
+  cursor?: string | null;
+  /** The `PlatformGetSitePreviewsRecord` at the end of the edge. */
+  node?: PlatformGetSitePreviewsRecord | null;
+}
 /** A `PlatformManagedDomain` edge in the connection. */
 export interface PlatformManagedDomainEdge {
   cursor?: string | null;
@@ -14413,6 +14900,12 @@ export interface PlatformSiteModuleEdge {
   /** The `PlatformSiteModule` at the end of the edge. */
   node?: PlatformSiteModule | null;
 }
+/** A `PlatformSiteRelease` edge in the connection. */
+export interface PlatformSiteReleaseEdge {
+  cursor?: string | null;
+  /** The `PlatformSiteRelease` at the end of the edge. */
+  node?: PlatformSiteRelease | null;
+}
 /** A `PlatformSiteTheme` edge in the connection. */
 export interface PlatformSiteThemeEdge {
   cursor?: string | null;
@@ -14448,6 +14941,12 @@ export interface PubkeySettingEdge {
   cursor?: string | null;
   /** The `PubkeySetting` at the end of the edge. */
   node?: PubkeySetting | null;
+}
+/** A `Redirect` edge in the connection. */
+export interface RedirectEdge {
+  cursor?: string | null;
+  /** The `Redirect` at the end of the edge. */
+  node?: Redirect | null;
 }
 /** A `RlsSetting` edge in the connection. */
 export interface RlsSettingEdge {
@@ -14509,6 +15008,12 @@ export interface SiteModuleEdge {
   /** The `SiteModule` at the end of the edge. */
   node?: SiteModule | null;
 }
+/** A `SiteRelease` edge in the connection. */
+export interface SiteReleaseEdge {
+  cursor?: string | null;
+  /** The `SiteRelease` at the end of the edge. */
+  node?: SiteRelease | null;
+}
 /** A `SiteTheme` edge in the connection. */
 export interface SiteThemeEdge {
   cursor?: string | null;
@@ -14532,6 +15037,12 @@ export interface SpatialRelationEdge {
   cursor?: string | null;
   /** The `SpatialRelation` at the end of the edge. */
   node?: SpatialRelation | null;
+}
+/** A `SqlAction` edge in the connection. */
+export interface SqlActionEdge {
+  cursor?: string | null;
+  /** The `SqlAction` at the end of the edge. */
+  node?: SqlAction | null;
 }
 /** A `TableBehavior` edge in the connection. */
 export interface TableBehaviorEdge {
@@ -14611,6 +15122,14 @@ export interface WebauthnSettingEdge {
   /** The `WebauthnSetting` at the end of the edge. */
   node?: WebauthnSetting | null;
 }
+export interface MintSitePreviewTokenRecord {
+  expiresAt?: string | null;
+  token?: string | null;
+}
+export interface PlatformMintSitePreviewTokenRecord {
+  expiresAt?: string | null;
+  token?: string | null;
+}
 /** Routes binding a domain hostname and path to a typed catalog target */
 export interface PlatformRoute {
   /** Route metadata; target configuration is read live from the typed catalog, never copied here */
@@ -14625,17 +15144,23 @@ export interface PlatformRoute {
   method?: string | null;
   /** Path prefix this route matches; must begin with / and carry no trailing slash */
   path: string;
+  /** The site preview this route serves; NULL serves the site's published release */
+  previewRef?: string | null;
   /** Higher priority wins between otherwise-equal matches */
   priority: number;
-  /** Api catalog row this route targets; must be owner-matched or visible cross-scope */
+  /** Site whose surface this route serves; the serving lane renders as this site. NULL when the route serves no site */
+  servingSiteId?: string | null;
+  /** Api surface this route targets; must be this scope's own api */
   targetApiId?: string | null;
-  /** Bucket catalog row this route targets; must be a public bucket that is owner-matched or visible cross-scope */
+  /** Bucket this route targets; must be a public bucket in this scope's own storage plane */
   targetBucketId?: string | null;
-  /** Function catalog row this route targets; must be owner-matched or visible cross-scope */
+  /** Function this route targets; must be this scope's own function */
   targetFunctionId?: string | null;
-  /** Resource catalog row (a Service resource) this route targets; must be owner-matched or visible cross-scope */
+  /** Redirect this route targets; the edge answers with a redirect status instead of proxying a backend */
+  targetRedirectId?: string | null;
+  /** Resource (a Service resource) this route targets; must be this scope's own resource */
   targetServiceId?: string | null;
-  /** Site catalog row this route targets; must be owner-matched or visible cross-scope */
+  /** Site surface this route targets; must be this scope's own site */
   targetSiteId?: string | null;
   updatedAt?: string | null;
 }
@@ -14643,11 +15168,13 @@ export interface PlatformRoute {
 export interface DatabaseProvisionModule {
   /** When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger */
   async: boolean;
+  /** The user whose identity is copied into the new database. Defaults to owner_id when NULL; set explicitly when owner_id is an organization */
+  bootstrapActorId?: string | null;
   /** Error message from the most recent failed bootstrap attempt */
   bootstrapError?: string | null;
   /** Status of the deferred owner bootstrap job: not_requested, pending, completed, or failed */
   bootstrapStatus: string;
-  /** When true, copies the owner user and password hash from source database to the newly provisioned database */
+  /** When true, copies the bootstrap user and password hash from source database to the newly provisioned database */
   bootstrapUser: boolean;
   completedAt?: string | null;
   createdAt: string;
@@ -14665,7 +15192,7 @@ export interface DatabaseProvisionModule {
   modules: unknown;
   /** Additional configuration options for provisioning */
   options: unknown;
-  /** UUID of the user who owns this database */
+  /** UUID of the entity that owns this database: a user, or an organization for an org-owned request */
   ownerId: string;
   /** The database the owner user is copied from during bootstrap (captured from JWT context at provision time) */
   sourceDatabaseId?: string | null;
@@ -14787,10 +15314,18 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
+  /** GraphQL type name of the plane's buckets table */
+  bucketsType: string;
+  /** Computed download-URL field on the files type; null on the buckets side */
+  downloadUrlField?: string | null;
+  /** GraphQL type name of the plane's files table */
+  filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
+  /** The plane's GraphQL upload surface */
+  upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
 export interface MetaUniqueConstraint {
@@ -14872,6 +15407,27 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+export interface MetaStorageUpload {
+  /** Per-file input type inside the bulk input */
+  bulkFileInputType: string;
+  /** Per-file payload type inside the bulk payload */
+  bulkFilePayloadType: string;
+  /** Input type of the bulk upload mutation */
+  bulkInputType: string;
+  /** Root mutation field for bulk upload */
+  bulkMutation: string;
+  /** Payload type of the bulk upload mutation */
+  bulkPayloadType: string;
+  /** Input type of the single upload mutation */
+  inputType: string;
+  /** Root mutation field for single-file upload (e.g. uploadAppFile) */
+  mutation: string;
+  /** Payload type of the single upload mutation */
+  payloadType: string;
+  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  requiresOwnerId: boolean;
 }
 /** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {

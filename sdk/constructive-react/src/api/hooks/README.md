@@ -47,16 +47,11 @@ function App() {
 | `useCreateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useUpdateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useDeleteApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
-| `useAppComponentsQuery` | Query | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useAppComponentQuery` | Query | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useCreateAppComponentMutation` | Mutation | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useUpdateAppComponentMutation` | Mutation | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useDeleteAppComponentMutation` | Mutation | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useAppsQuery` | Query | App aggregates: thin identity rows whose components are global catalog references |
-| `useAppQuery` | Query | App aggregates: thin identity rows whose components are global catalog references |
-| `useCreateAppMutation` | Mutation | App aggregates: thin identity rows whose components are global catalog references |
-| `useUpdateAppMutation` | Mutation | App aggregates: thin identity rows whose components are global catalog references |
-| `useDeleteAppMutation` | Mutation | App aggregates: thin identity rows whose components are global catalog references |
+| `useAstMigrationsQuery` | Query | List all astMigrations |
+| `useAstMigrationQuery` | Query | Get one astMigration |
+| `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
+| `useUpdateAstMigrationMutation` | Mutation | Update a astMigration |
+| `useDeleteAstMigrationMutation` | Mutation | Delete a astMigration |
 | `useCheckConstraintsQuery` | Query | List all checkConstraints |
 | `useCheckConstraintQuery` | Query | Get one checkConstraint |
 | `useCreateCheckConstraintMutation` | Mutation | Create a checkConstraint |
@@ -177,16 +172,18 @@ function App() {
 | `useCreateFunctionMutation` | Mutation | Create a function |
 | `useUpdateFunctionMutation` | Mutation | Update a function |
 | `useDeleteFunctionMutation` | Mutation | Delete a function |
+| `useGetSitePreviewsQuery` | Query | List all getSitePreviews |
+| `useCreateGetSitePreviewsRecordMutation` | Mutation | Create a getSitePreviewsRecord |
 | `useHostnameBindingsQuery` | Query | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
 | `useHostnameBindingQuery` | Query | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
 | `useCreateHostnameBindingMutation` | Mutation | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
 | `useUpdateHostnameBindingMutation` | Mutation | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
 | `useDeleteHostnameBindingMutation` | Mutation | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
-| `useHttpRoutesQuery` | Query | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
-| `useHttpRouteQuery` | Query | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
-| `useCreateHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
-| `useUpdateHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
-| `useDeleteHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
+| `useIdentityProviderRegistriesQuery` | Query | List all identityProviderRegistries |
+| `useIdentityProviderRegistryQuery` | Query | Get one identityProviderRegistry |
+| `useCreateIdentityProviderRegistryMutation` | Mutation | Create a identityProviderRegistry |
+| `useUpdateIdentityProviderRegistryMutation` | Mutation | Update a identityProviderRegistry |
+| `useDeleteIdentityProviderRegistryMutation` | Mutation | Delete a identityProviderRegistry |
 | `useIndicesQuery` | Query | List all indices |
 | `useIndexQuery` | Query | Get one index |
 | `useCreateIndexMutation` | Mutation | Create a index |
@@ -262,6 +259,8 @@ function App() {
 | `useCreatePlatformEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
 | `useUpdatePlatformEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
 | `useDeletePlatformEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
+| `usePlatformGetSitePreviewsQuery` | Query | List all platformGetSitePreviews |
+| `useCreatePlatformGetSitePreviewsRecordMutation` | Mutation | Create a platformGetSitePreviewsRecord |
 | `usePlatformManagedDomainsQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
 | `usePlatformManagedDomainQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
 | `useCreatePlatformManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
@@ -272,11 +271,11 @@ function App() {
 | `useCreatePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
 | `useUpdatePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
 | `useDeletePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
-| `usePlatformSiteAppLinksQuery` | Query | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
-| `usePlatformSiteAppLinkQuery` | Query | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
-| `useCreatePlatformSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
-| `useUpdatePlatformSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
-| `useDeletePlatformSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `usePlatformSiteAppLinksQuery` | Query | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
+| `usePlatformSiteAppLinkQuery` | Query | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
+| `useCreatePlatformSiteAppLinkMutation` | Mutation | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
+| `useUpdatePlatformSiteAppLinkMutation` | Mutation | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
+| `useDeletePlatformSiteAppLinkMutation` | Mutation | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
 | `usePlatformSitesQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `usePlatformSiteQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useCreatePlatformSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
@@ -302,6 +301,11 @@ function App() {
 | `useCreatePlatformSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
 | `useUpdatePlatformSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
 | `useDeletePlatformSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `usePlatformSiteReleasesQuery` | Query | Immutable static-site release manifest head, versioned in the site-owned merkle store |
+| `usePlatformSiteReleaseQuery` | Query | Immutable static-site release manifest head, versioned in the site-owned merkle store |
+| `useCreatePlatformSiteReleaseMutation` | Mutation | Immutable static-site release manifest head, versioned in the site-owned merkle store |
+| `useUpdatePlatformSiteReleaseMutation` | Mutation | Immutable static-site release manifest head, versioned in the site-owned merkle store |
+| `useDeletePlatformSiteReleaseMutation` | Mutation | Immutable static-site release manifest head, versioned in the site-owned merkle store |
 | `usePlatformSiteThemesQuery` | Query | Theme (colors, fonts, design tokens) for a site surface |
 | `usePlatformSiteThemeQuery` | Query | Theme (colors, fonts, design tokens) for a site surface |
 | `useCreatePlatformSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
@@ -327,6 +331,11 @@ function App() {
 | `useCreatePubkeySettingMutation` | Mutation | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
 | `useUpdatePubkeySettingMutation` | Mutation | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
 | `useDeletePubkeySettingMutation` | Mutation | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
+| `useRedirectsQuery` | Query | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
+| `useRedirectQuery` | Query | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
+| `useCreateRedirectMutation` | Mutation | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
+| `useUpdateRedirectMutation` | Mutation | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
+| `useDeleteRedirectMutation` | Mutation | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
 | `useRlsSettingsQuery` | Query | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
 | `useRlsSettingQuery` | Query | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
 | `useCreateRlsSettingMutation` | Mutation | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
@@ -352,11 +361,11 @@ function App() {
 | `useCreateSchemaGrantMutation` | Mutation | Create a schemaGrant |
 | `useUpdateSchemaGrantMutation` | Mutation | Update a schemaGrant |
 | `useDeleteSchemaGrantMutation` | Mutation | Delete a schemaGrant |
-| `useSiteAppLinksQuery` | Query | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
-| `useSiteAppLinkQuery` | Query | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
-| `useCreateSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
-| `useUpdateSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
-| `useDeleteSiteAppLinkMutation` | Mutation | Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation) |
+| `useSiteAppLinksQuery` | Query | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
+| `useSiteAppLinkQuery` | Query | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
+| `useCreateSiteAppLinkMutation` | Mutation | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
+| `useUpdateSiteAppLinkMutation` | Mutation | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
+| `useDeleteSiteAppLinkMutation` | Mutation | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
 | `useSitesQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useSiteQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useCreateSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
@@ -382,6 +391,11 @@ function App() {
 | `useCreateSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
 | `useUpdateSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
 | `useDeleteSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `useSiteReleasesQuery` | Query | Immutable static-site release manifest head, versioned in the site-owned merkle store |
+| `useSiteReleaseQuery` | Query | Immutable static-site release manifest head, versioned in the site-owned merkle store |
+| `useCreateSiteReleaseMutation` | Mutation | Immutable static-site release manifest head, versioned in the site-owned merkle store |
+| `useUpdateSiteReleaseMutation` | Mutation | Immutable static-site release manifest head, versioned in the site-owned merkle store |
+| `useDeleteSiteReleaseMutation` | Mutation | Immutable static-site release manifest head, versioned in the site-owned merkle store |
 | `useSiteThemesQuery` | Query | Theme (colors, fonts, design tokens) for a site surface |
 | `useSiteThemeQuery` | Query | Theme (colors, fonts, design tokens) for a site surface |
 | `useCreateSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
@@ -397,6 +411,11 @@ function App() {
 | `useCreateSpatialRelationMutation` | Mutation | Create a spatialRelation |
 | `useUpdateSpatialRelationMutation` | Mutation | Update a spatialRelation |
 | `useDeleteSpatialRelationMutation` | Mutation | Delete a spatialRelation |
+| `useSqlActionsQuery` | Query | List all sqlActions |
+| `useSqlActionQuery` | Query | Get one sqlAction |
+| `useCreateSqlActionMutation` | Mutation | Create a sqlAction |
+| `useUpdateSqlActionMutation` | Mutation | Update a sqlAction |
+| `useDeleteSqlActionMutation` | Mutation | Delete a sqlAction |
 | `useTableBehaviorsQuery` | Query | List all tableBehaviors |
 | `useTableBehaviorQuery` | Query | Get one tableBehavior |
 | `useCreateTableBehaviorMutation` | Mutation | Create a tableBehavior |
@@ -464,29 +483,57 @@ function App() {
 | `useDeleteWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
 | `useApiSchemaNamesQuery` | Query | apiSchemaNames |
 | `useApplyRegistryDefaultsQuery` | Query | applyRegistryDefaults |
+| `useGetSitePreviewCommitQuery` | Query | getSitePreviewCommit |
+| `useGetSiteReleaseManifestQuery` | Query | getSiteReleaseManifest |
+| `usePagePublishedQuery` | Query | pagePublished |
+| `usePlatformGetSitePreviewCommitQuery` | Query | platformGetSitePreviewCommit |
+| `usePlatformGetSiteReleaseManifestQuery` | Query | platformGetSiteReleaseManifest |
+| `usePlatformPagePublishedQuery` | Query | platformPagePublished |
+| `usePlatformSitesDeepLinkUrlQuery` | Query | platformSitesDeepLinkUrl |
+| `usePlatformSitesSiteOriginQuery` | Query | platformSitesSiteOrigin |
+| `usePlatformVerifySitePreviewTokenQuery` | Query | platformVerifySitePreviewToken |
 | `useResolveDeepLinkQuery` | Query | resolveDeepLink |
-| `useResolveHttpRouteQuery` | Query | resolveHttpRoute |
 | `useResolveRouteQuery` | Query | resolveRoute |
 | `useResolveSiteAppLinksQuery` | Query | resolveSiteAppLinks |
+| `useSitesDeepLinkUrlQuery` | Query | sitesDeepLinkUrl |
+| `useSitesSiteOriginQuery` | Query | sitesSiteOrigin |
+| `useVerifySitePreviewTokenQuery` | Query | verifySitePreviewToken |
+| `useAcceptDatabaseTransferMutation` | Mutation | acceptDatabaseTransfer |
 | `useApplyRlsMutation` | Mutation | applyRls |
-| `useAppsInstallAppMutation` | Mutation | appsInstallApp |
-| `useAppsUninstallAppMutation` | Mutation | appsUninstallApp |
-| `useAppsUpgradeAppMutation` | Mutation | appsUpgradeApp |
+| `useCancelDatabaseTransferMutation` | Mutation | cancelDatabaseTransfer |
+| `useDeleteSitePreviewMutation` | Mutation | deleteSitePreview |
 | `useDomainsAssignSubdomainMutation` | Mutation | domainsAssignSubdomain |
+| `useMintSitePreviewTokenMutation` | Mutation | mintSitePreviewToken |
+| `usePagesInstallPagesMutation` | Mutation | pagesInstallPages |
+| `usePlatformDeleteSitePreviewMutation` | Mutation | platformDeleteSitePreview |
 | `usePlatformDomainsAssignSubdomainMutation` | Mutation | platformDomainsAssignSubdomain |
+| `usePlatformMintSitePreviewTokenMutation` | Mutation | platformMintSitePreviewToken |
+| `usePlatformPagesInstallPagesMutation` | Mutation | platformPagesInstallPages |
+| `usePlatformProvisionSitePreviewMutation` | Mutation | platformProvisionSitePreview |
+| `usePlatformSetSitePreviewMutation` | Mutation | platformSetSitePreview |
+| `usePlatformSiteMetadataInstallRobotsMutation` | Mutation | platformSiteMetadataInstallRobots |
+| `usePlatformSitesInstallContentPresetMutation` | Mutation | platformSitesInstallContentPreset |
+| `usePlatformSitesInstallMantraMutation` | Mutation | platformSitesInstallMantra |
 | `usePlatformSitesProvisionStaticSiteMutation` | Mutation | platformSitesProvisionStaticSite |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
+| `useProvisionSitePreviewMutation` | Mutation | provisionSitePreview |
+| `useRejectDatabaseTransferMutation` | Mutation | rejectDatabaseTransfer |
 | `useRequestDatabaseMutation` | Mutation | Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. Pass organization_id to have the organization own the database from the start (the caller must be an owner of that organization); the requesting user is still the identity bootstrapped into the new database. Omit it for a personal database. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
-  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb); |
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
+  SELECT * FROM metaschema_public.request_database('team_app', 'example.com', preset_slug := 'full', organization_id := '00000000-0000-0000-0000-000000000000'::uuid); |
 | `useSetFieldOrderMutation` | Mutation | setFieldOrder |
+| `useSetSitePreviewMutation` | Mutation | setSitePreview |
+| `useSiteMetadataInstallRobotsMutation` | Mutation | siteMetadataInstallRobots |
+| `useSitesInstallContentPresetMutation` | Mutation | sitesInstallContentPreset |
+| `useSitesInstallMantraMutation` | Mutation | sitesInstallMantra |
 | `useSitesProvisionStaticSiteMutation` | Mutation | sitesProvisionStaticSite |
 
 ## Table Hooks
@@ -554,46 +601,25 @@ const { mutate: create } = useCreateApiSettingMutation({
 create({ apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>', statementTimeoutMs: '<BigInt>' });
 ```
 
-### AppComponent
+### AstMigration
 
 ```typescript
-// List all appComponents
-const { data, isLoading } = useAppComponentsQuery({
-  selection: { fields: { appId: true, componentApiId: true, componentDomainId: true, componentInstallationId: true, componentSiteId: true, componentType: true, config: true, createdAt: true, databaseId: true, id: true, updatedAt: true } },
+// List all astMigrations
+const { data, isLoading } = useAstMigrationsQuery({
+  selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
 });
 
-// Get one appComponent
-const { data: item } = useAppComponentQuery({
-  id: '<UUID>',
-  selection: { fields: { appId: true, componentApiId: true, componentDomainId: true, componentInstallationId: true, componentSiteId: true, componentType: true, config: true, createdAt: true, databaseId: true, id: true, updatedAt: true } },
+// Get one astMigration
+const { data: item } = useAstMigrationQuery({
+  id: '<Int>',
+  selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
 });
 
-// Create a appComponent
-const { mutate: create } = useCreateAppComponentMutation({
+// Create a astMigration
+const { mutate: create } = useCreateAstMigrationMutation({
   selection: { fields: { id: true } },
 });
-create({ appId: '<UUID>', componentApiId: '<UUID>', componentDomainId: '<UUID>', componentInstallationId: '<UUID>', componentSiteId: '<UUID>', componentType: '<String>', config: '<JSON>', databaseId: '<UUID>' });
-```
-
-### App
-
-```typescript
-// List all apps
-const { data, isLoading } = useAppsQuery({
-  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, status: true, title: true, updatedAt: true } },
-});
-
-// Get one app
-const { data: item } = useAppQuery({
-  id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, status: true, title: true, updatedAt: true } },
-});
-
-// Create a app
-const { mutate: create } = useCreateAppMutation({
-  selection: { fields: { id: true } },
-});
-create({ config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPublished: '<Boolean>', name: '<String>', status: '<String>', title: '<String>' });
+create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' });
 ```
 
 ### CheckConstraint
@@ -748,20 +774,20 @@ create({ databaseId: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', ob
 ```typescript
 // List all derives
 const { data, isLoading } = useDerivesQuery({
-  selection: { fields: { createdAt: true, databaseId: true, id: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
 });
 
 // Get one derive
 const { data: item } = useDeriveQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, databaseId: true, id: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
 });
 
 // Create a derive
 const { mutate: create } = useCreateDeriveMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' });
+create({ databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' });
 ```
 
 ### Domain
@@ -769,20 +795,20 @@ create({ databaseId: '<UUID>', includeMutations: '<Boolean>', kind: '<String>', 
 ```typescript
 // List all domains
 const { data, isLoading } = useDomainsQuery({
-  selection: { fields: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one domain
 const { data: item } = useDomainQuery({
   id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a domain
 const { mutate: create } = useCreateDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ config: '<JSON>', databaseId: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ config: '<JSON>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', updatedByPrincipal: '<UUID>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### DomainEvent
@@ -1100,6 +1126,21 @@ const { mutate: create } = useCreateFunctionMutation({
 create({ databaseId: '<UUID>', name: '<String>', schemaId: '<UUID>' });
 ```
 
+### GetSitePreviewsRecord
+
+```typescript
+// List all getSitePreviews
+const { data, isLoading } = useGetSitePreviewsQuery({
+  selection: { fields: { commitId: true, name: true } },
+});
+
+// Create a getSitePreviewsRecord
+const { mutate: create } = useCreateGetSitePreviewsRecordMutation({
+  selection: { fields: { id: true } },
+});
+create({ commitId: '<UUID>', name: '<String>' });
+```
+
 ### HostnameBinding
 
 ```typescript
@@ -1121,25 +1162,25 @@ const { mutate: create } = useCreateHostnameBindingMutation({
 create({ domainId: '<UUID>', hostname: '<String>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>' });
 ```
 
-### HttpRoute
+### IdentityProviderRegistry
 
 ```typescript
-// List all httpRoutes
-const { data, isLoading } = useHttpRoutesQuery({
-  selection: { fields: { createdAt: true, createdBy: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetId: true, targetKind: true, updatedAt: true, updatedBy: true } },
+// List all identityProviderRegistries
+const { data, isLoading } = useIdentityProviderRegistriesQuery({
+  selection: { fields: { authorizationUrl: true, displayName: true, issuerUrl: true, kind: true, scopes: true, slug: true, tokenUrl: true, userinfoUrl: true } },
 });
 
-// Get one httpRoute
-const { data: item } = useHttpRouteQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, createdBy: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetId: true, targetKind: true, updatedAt: true, updatedBy: true } },
+// Get one identityProviderRegistry
+const { data: item } = useIdentityProviderRegistryQuery({
+  slug: '<String>',
+  selection: { fields: { authorizationUrl: true, displayName: true, issuerUrl: true, kind: true, scopes: true, slug: true, tokenUrl: true, userinfoUrl: true } },
 });
 
-// Create a httpRoute
-const { mutate: create } = useCreateHttpRouteMutation({
-  selection: { fields: { id: true } },
+// Create a identityProviderRegistry
+const { mutate: create } = useCreateIdentityProviderRegistryMutation({
+  selection: { fields: { slug: true } },
 });
-create({ createdBy: '<UUID>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetId: '<UUID>', targetKind: '<String>', updatedBy: '<UUID>' });
+create({ authorizationUrl: '<String>', displayName: '<String>', issuerUrl: '<String>', kind: '<String>', scopes: '<String>', tokenUrl: '<String>', userinfoUrl: '<String>' });
 ```
 
 ### Index
@@ -1168,20 +1209,20 @@ create({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<U
 ```typescript
 // List all managedDomains
 const { data, isLoading } = useManagedDomainsQuery({
-  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, createdByPrincipal: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one managedDomain
 const { data: item } = useManagedDomainQuery({
   id: '<UUID>',
-  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, createdByPrincipal: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a managedDomain
 const { mutate: create } = useCreateManagedDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', updatedByPrincipal: '<UUID>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### NodeTypeRegistry
@@ -1210,20 +1251,20 @@ create({ category: '<String>', description: '<String>', displayName: '<String>',
 ```typescript
 // List all pages
 const { data, isLoading } = usePagesQuery({
-  selection: { fields: { commitId: true, content: true, createdAt: true, databaseId: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
+  selection: { fields: { commitId: true, content: true, createdAt: true, databaseId: true, id: true, seededFrom: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
 });
 
 // Get one page
 const { data: item } = usePageQuery({
   id: '<UUID>',
-  selection: { fields: { commitId: true, content: true, createdAt: true, databaseId: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
+  selection: { fields: { commitId: true, content: true, createdAt: true, databaseId: true, id: true, seededFrom: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
 });
 
 // Create a page
 const { mutate: create } = useCreatePageMutation({
   selection: { fields: { id: true } },
 });
-create({ commitId: '<UUID>', content: '<JSON>', databaseId: '<UUID>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
+create({ commitId: '<UUID>', content: '<JSON>', databaseId: '<UUID>', seededFrom: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
 ```
 
 ### Partition
@@ -1336,20 +1377,20 @@ create({ allowedOrigins: '<String>', apiId: '<UUID>' });
 ```typescript
 // List all platformDomains
 const { data, isLoading } = usePlatformDomainsQuery({
-  selection: { fields: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one platformDomain
 const { data: item } = usePlatformDomainQuery({
   id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a platformDomain
 const { mutate: create } = useCreatePlatformDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ config: '<JSON>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ config: '<JSON>', createdByPrincipal: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', updatedByPrincipal: '<UUID>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### PlatformDomainEvent
@@ -1457,25 +1498,40 @@ const { mutate: create } = useCreatePlatformEmailSiteIdentityMutation({
 create({ emailIdentityId: '<UUID>', siteId: '<UUID>' });
 ```
 
+### PlatformGetSitePreviewsRecord
+
+```typescript
+// List all platformGetSitePreviews
+const { data, isLoading } = usePlatformGetSitePreviewsQuery({
+  selection: { fields: { commitId: true, name: true } },
+});
+
+// Create a platformGetSitePreviewsRecord
+const { mutate: create } = useCreatePlatformGetSitePreviewsRecordMutation({
+  selection: { fields: { id: true } },
+});
+create({ commitId: '<UUID>', name: '<String>' });
+```
+
 ### PlatformManagedDomain
 
 ```typescript
 // List all platformManagedDomains
 const { data, isLoading } = usePlatformManagedDomainsQuery({
-  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, createdByPrincipal: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one platformManagedDomain
 const { data: item } = usePlatformManagedDomainQuery({
   id: '<UUID>',
-  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, createdByPrincipal: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a platformManagedDomain
 const { mutate: create } = useCreatePlatformManagedDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', createdByPrincipal: '<UUID>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', updatedByPrincipal: '<UUID>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### PlatformPage
@@ -1483,20 +1539,20 @@ create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<Str
 ```typescript
 // List all platformPages
 const { data, isLoading } = usePlatformPagesQuery({
-  selection: { fields: { commitId: true, content: true, createdAt: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
+  selection: { fields: { commitId: true, content: true, createdAt: true, id: true, seededFrom: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
 });
 
 // Get one platformPage
 const { data: item } = usePlatformPageQuery({
   id: '<UUID>',
-  selection: { fields: { commitId: true, content: true, createdAt: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
+  selection: { fields: { commitId: true, content: true, createdAt: true, id: true, seededFrom: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
 });
 
 // Create a platformPage
 const { mutate: create } = useCreatePlatformPageMutation({
   selection: { fields: { id: true } },
 });
-create({ commitId: '<UUID>', content: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
+create({ commitId: '<UUID>', content: '<JSON>', seededFrom: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
 ```
 
 ### PlatformSiteAppLink
@@ -1504,20 +1560,20 @@ create({ commitId: '<UUID>', content: '<JSON>', siteId: '<UUID>', slug: '<String
 ```typescript
 // List all platformSiteAppLinks
 const { data, isLoading } = usePlatformSiteAppLinksQuery({
-  selection: { fields: { appIdentifier: true, createdAt: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } },
+  selection: { fields: { appStoreIdentityId: true, createdAt: true, id: true, pathComponents: true, siteId: true, updatedAt: true, webcredentials: true } },
 });
 
 // Get one platformSiteAppLink
 const { data: item } = usePlatformSiteAppLinkQuery({
   id: '<UUID>',
-  selection: { fields: { appIdentifier: true, createdAt: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } },
+  selection: { fields: { appStoreIdentityId: true, createdAt: true, id: true, pathComponents: true, siteId: true, updatedAt: true, webcredentials: true } },
 });
 
 // Create a platformSiteAppLink
 const { mutate: create } = useCreatePlatformSiteAppLinkMutation({
   selection: { fields: { id: true } },
 });
-create({ appIdentifier: '<String>', pathComponents: '<String>', platform: '<String>', sha256CertFingerprints: '<String>', siteId: '<UUID>', storeUrl: '<String>', teamId: '<String>', webcredentials: '<Boolean>' });
+create({ appStoreIdentityId: '<UUID>', pathComponents: '<String>', siteId: '<UUID>', webcredentials: '<Boolean>' });
 ```
 
 ### PlatformSite
@@ -1525,20 +1581,20 @@ create({ appIdentifier: '<String>', pathComponents: '<String>', platform: '<Stri
 ```typescript
 // List all platformSites
 const { data, isLoading } = usePlatformSitesQuery({
-  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Get one platformSite
 const { data: item } = usePlatformSiteQuery({
   id: '<UUID>',
-  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Create a platformSite
 const { mutate: create } = useCreatePlatformSiteMutation({
   selection: { fields: { id: true } },
 });
-create({ activeCommitId: '<UUID>', bucketId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>' });
+create({ activeCommitId: '<UUID>', bucketId: '<UUID>', createdByPrincipal: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformSiteDeepLink
@@ -1546,20 +1602,20 @@ create({ activeCommitId: '<UUID>', bucketId: '<UUID>', description: '<String>', 
 ```typescript
 // List all platformSiteDeepLinks
 const { data, isLoading } = usePlatformSiteDeepLinksQuery({
-  selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+  selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
 });
 
 // Get one platformSiteDeepLink
 const { data: item } = usePlatformSiteDeepLinkQuery({
   id: '<UUID>',
-  selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+  selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
 });
 
 // Create a platformSiteDeepLink
 const { mutate: create } = useCreatePlatformSiteDeepLinkMutation({
   selection: { fields: { id: true } },
 });
-create({ appPath: '<String>', fallbackUrl: '<String>', metadata: '<JSON>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
+create({ appPath: '<String>', fallbackUrl: '<String>', metadata: '<JSON>', pageId: '<UUID>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
 ```
 
 ### PlatformSiteErrorPage
@@ -1588,20 +1644,20 @@ create({ objectPath: '<String>', siteId: '<UUID>', statusCode: '<Int>' });
 ```typescript
 // List all platformSiteMetadata
 const { data, isLoading } = usePlatformSiteMetadataQuery({
-  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, siteId: true, storeId: true, title: true, updatedAt: true } },
+  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, robotsSeededFrom: true, siteId: true, storeId: true, title: true, updatedAt: true } },
 });
 
 // Get one platformSiteMetadatum
 const { data: item } = usePlatformSiteMetadatumQuery({
   id: '<UUID>',
-  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, siteId: true, storeId: true, title: true, updatedAt: true } },
+  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, robotsSeededFrom: true, siteId: true, storeId: true, title: true, updatedAt: true } },
 });
 
 // Create a platformSiteMetadatum
 const { mutate: create } = useCreatePlatformSiteMetadatumMutation({
   selection: { fields: { id: true } },
 });
-create({ appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' });
+create({ appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', robotsSeededFrom: '<JSON>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' });
 ```
 
 ### PlatformSiteModule
@@ -1623,6 +1679,27 @@ const { mutate: create } = useCreatePlatformSiteModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ data: '<JSON>', isEnabled: '<Boolean>', name: '<String>', position: '<Int>', siteId: '<UUID>' });
+```
+
+### PlatformSiteRelease
+
+```typescript
+// List all platformSiteReleases
+const { data, isLoading } = usePlatformSiteReleasesQuery({
+  selection: { fields: { commitId: true, createdAt: true, id: true, manifest: true, siteId: true, storeId: true, updatedAt: true } },
+});
+
+// Get one platformSiteRelease
+const { data: item } = usePlatformSiteReleaseQuery({
+  id: '<UUID>',
+  selection: { fields: { commitId: true, createdAt: true, id: true, manifest: true, siteId: true, storeId: true, updatedAt: true } },
+});
+
+// Create a platformSiteRelease
+const { mutate: create } = useCreatePlatformSiteReleaseMutation({
+  selection: { fields: { id: true } },
+});
+create({ commitId: '<UUID>', manifest: '<JSON>', siteId: '<UUID>', storeId: '<UUID>' });
 ```
 
 ### PlatformSiteTheme
@@ -1672,20 +1749,20 @@ create({ cleanUrls: '<Boolean>', indexDocument: '<String>', metadata: '<JSON>', 
 ```typescript
 // List all policies
 const { data, isLoading } = usePoliciesQuery({
-  selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
+  selection: { fields: { category: true, columnRefs: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
 });
 
 // Get one policy
 const { data: item } = usePolicyQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
+  selection: { fields: { category: true, columnRefs: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
 });
 
 // Create a policy
 const { mutate: create } = useCreatePolicyMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', derivedFromPolicyId: '<UUID>', derivedFromTableId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' });
+create({ category: '<ObjectCategory>', columnRefs: '<String>', data: '<JSON>', databaseId: '<UUID>', derivedFromPolicyId: '<UUID>', derivedFromTableId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' });
 ```
 
 ### PrimaryKeyConstraint
@@ -1730,6 +1807,27 @@ const { mutate: create } = useCreatePubkeySettingMutation({
 create({ cryptoNetwork: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', signInRecordFailureFunctionId: '<UUID>', signInRequestChallengeFunctionId: '<UUID>', signInWithChallengeFunctionId: '<UUID>', signUpWithKeyFunctionId: '<UUID>', userField: '<String>' });
 ```
 
+### Redirect
+
+```typescript
+// List all redirects
+const { data, isLoading } = useRedirectsQuery({
+  selection: { fields: { createdAt: true, databaseId: true, id: true, name: true, preservePath: true, preserveQuery: true, statusCode: true, toHost: true, toPath: true, updatedAt: true } },
+});
+
+// Get one redirect
+const { data: item } = useRedirectQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, id: true, name: true, preservePath: true, preserveQuery: true, statusCode: true, toHost: true, toPath: true, updatedAt: true } },
+});
+
+// Create a redirect
+const { mutate: create } = useCreateRedirectMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', name: '<String>', preservePath: '<Boolean>', preserveQuery: '<Boolean>', statusCode: '<Int>', toHost: '<String>', toPath: '<String>' });
+```
+
 ### RlsSetting
 
 ```typescript
@@ -1756,20 +1854,20 @@ create({ authenticateFunctionId: '<UUID>', authenticateSchemaId: '<UUID>', authe
 ```typescript
 // List all routeBindings
 const { data, isLoading } = useRouteBindingsQuery({
-  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, servingSiteId: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetRedirectId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Get one routeBinding
 const { data: item } = useRouteBindingQuery({
   id: '<UUID>',
-  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, servingSiteId: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetRedirectId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Create a routeBinding
 const { mutate: create } = useCreateRouteBindingMutation({
   selection: { fields: { id: true } },
 });
-create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
+create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', servingSiteId: '<UUID>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetRedirectId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
 ```
 
 ### Route
@@ -1777,20 +1875,20 @@ create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<
 ```typescript
 // List all routes
 const { data, isLoading } = useRoutesQuery({
-  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, previewRef: true, priority: true, servingSiteId: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetRedirectId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Get one route
 const { data: item } = useRouteQuery({
   id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, previewRef: true, priority: true, servingSiteId: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetRedirectId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Create a route
 const { mutate: create } = useCreateRouteMutation({
   selection: { fields: { id: true } },
 });
-create({ config: '<JSON>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
+create({ config: '<JSON>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', previewRef: '<String>', priority: '<Int>', servingSiteId: '<UUID>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetRedirectId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
 ```
 
 ### Schema
@@ -1840,20 +1938,20 @@ create({ databaseId: '<UUID>', granteeName: '<String>', schemaId: '<UUID>' });
 ```typescript
 // List all siteAppLinks
 const { data, isLoading } = useSiteAppLinksQuery({
-  selection: { fields: { appIdentifier: true, createdAt: true, databaseId: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } },
+  selection: { fields: { appStoreIdentityId: true, createdAt: true, databaseId: true, id: true, pathComponents: true, siteId: true, updatedAt: true, webcredentials: true } },
 });
 
 // Get one siteAppLink
 const { data: item } = useSiteAppLinkQuery({
   id: '<UUID>',
-  selection: { fields: { appIdentifier: true, createdAt: true, databaseId: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } },
+  selection: { fields: { appStoreIdentityId: true, createdAt: true, databaseId: true, id: true, pathComponents: true, siteId: true, updatedAt: true, webcredentials: true } },
 });
 
 // Create a siteAppLink
 const { mutate: create } = useCreateSiteAppLinkMutation({
   selection: { fields: { id: true } },
 });
-create({ appIdentifier: '<String>', databaseId: '<UUID>', pathComponents: '<String>', platform: '<String>', sha256CertFingerprints: '<String>', siteId: '<UUID>', storeUrl: '<String>', teamId: '<String>', webcredentials: '<Boolean>' });
+create({ appStoreIdentityId: '<UUID>', databaseId: '<UUID>', pathComponents: '<String>', siteId: '<UUID>', webcredentials: '<Boolean>' });
 ```
 
 ### Site
@@ -1861,20 +1959,20 @@ create({ appIdentifier: '<String>', databaseId: '<UUID>', pathComponents: '<Stri
 ```typescript
 // List all sites
 const { data, isLoading } = useSitesQuery({
-  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Get one site
 const { data: item } = useSiteQuery({
   id: '<UUID>',
-  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Create a site
 const { mutate: create } = useCreateSiteMutation({
   selection: { fields: { id: true } },
 });
-create({ activeCommitId: '<UUID>', bucketId: '<UUID>', databaseId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>' });
+create({ activeCommitId: '<UUID>', bucketId: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### SiteDeepLink
@@ -1882,20 +1980,20 @@ create({ activeCommitId: '<UUID>', bucketId: '<UUID>', databaseId: '<UUID>', des
 ```typescript
 // List all siteDeepLinks
 const { data, isLoading } = useSiteDeepLinksQuery({
-  selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+  selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
 });
 
 // Get one siteDeepLink
 const { data: item } = useSiteDeepLinkQuery({
   id: '<UUID>',
-  selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+  selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
 });
 
 // Create a siteDeepLink
 const { mutate: create } = useCreateSiteDeepLinkMutation({
   selection: { fields: { id: true } },
 });
-create({ appPath: '<String>', databaseId: '<UUID>', fallbackUrl: '<String>', metadata: '<JSON>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
+create({ appPath: '<String>', databaseId: '<UUID>', fallbackUrl: '<String>', metadata: '<JSON>', pageId: '<UUID>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
 ```
 
 ### SiteErrorPage
@@ -1924,20 +2022,20 @@ create({ databaseId: '<UUID>', objectPath: '<String>', siteId: '<UUID>', statusC
 ```typescript
 // List all siteMetadata
 const { data, isLoading } = useSiteMetadataQuery({
-  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, databaseId: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, siteId: true, storeId: true, title: true, updatedAt: true } },
+  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, databaseId: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, robotsSeededFrom: true, siteId: true, storeId: true, title: true, updatedAt: true } },
 });
 
 // Get one siteMetadatum
 const { data: item } = useSiteMetadatumQuery({
   id: '<UUID>',
-  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, databaseId: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, siteId: true, storeId: true, title: true, updatedAt: true } },
+  selection: { fields: { appleTouchIcon: true, canonicalUrl: true, commitId: true, createdAt: true, databaseId: true, description: true, favicon: true, id: true, logo: true, ogImage: true, robots: true, robotsSeededFrom: true, siteId: true, storeId: true, title: true, updatedAt: true } },
 });
 
 // Create a siteMetadatum
 const { mutate: create } = useCreateSiteMetadatumMutation({
   selection: { fields: { id: true } },
 });
-create({ appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', databaseId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' });
+create({ appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', databaseId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', robotsSeededFrom: '<JSON>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' });
 ```
 
 ### SiteModule
@@ -1959,6 +2057,27 @@ const { mutate: create } = useCreateSiteModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ data: '<JSON>', databaseId: '<UUID>', isEnabled: '<Boolean>', name: '<String>', position: '<Int>', siteId: '<UUID>' });
+```
+
+### SiteRelease
+
+```typescript
+// List all siteReleases
+const { data, isLoading } = useSiteReleasesQuery({
+  selection: { fields: { commitId: true, createdAt: true, databaseId: true, id: true, manifest: true, siteId: true, storeId: true, updatedAt: true } },
+});
+
+// Get one siteRelease
+const { data: item } = useSiteReleaseQuery({
+  id: '<UUID>',
+  selection: { fields: { commitId: true, createdAt: true, databaseId: true, id: true, manifest: true, siteId: true, storeId: true, updatedAt: true } },
+});
+
+// Create a siteRelease
+const { mutate: create } = useCreateSiteReleaseMutation({
+  selection: { fields: { id: true } },
+});
+create({ commitId: '<UUID>', databaseId: '<UUID>', manifest: '<JSON>', siteId: '<UUID>', storeId: '<UUID>' });
 ```
 
 ### SiteTheme
@@ -2022,6 +2141,27 @@ const { mutate: create } = useCreateSpatialRelationMutation({
   selection: { fields: { id: true } },
 });
 create({ category: '<ObjectCategory>', databaseId: '<UUID>', fieldId: '<UUID>', name: '<String>', operator: '<String>', paramName: '<String>', refFieldId: '<UUID>', refTableId: '<UUID>', tableId: '<UUID>', tags: '<String>' });
+```
+
+### SqlAction
+
+```typescript
+// List all sqlActions
+const { data, isLoading } = useSqlActionsQuery({
+  selection: { fields: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } },
+});
+
+// Get one sqlAction
+const { data: item } = useSqlActionQuery({
+  id: '<Int>',
+  selection: { fields: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } },
+});
+
+// Create a sqlAction
+const { mutate: create } = useCreateSqlActionMutation({
+  selection: { fields: { id: true } },
+});
+create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' });
 ```
 
 ### TableBehavior
@@ -2322,6 +2462,113 @@ applyRegistryDefaults
   | `data` | JSON |
   | `nodeType` | String |
 
+### `useGetSitePreviewCommitQuery`
+
+getSitePreviewCommit
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `targetName` | String |
+  | `targetSiteId` | UUID |
+
+### `useGetSiteReleaseManifestQuery`
+
+getSiteReleaseManifest
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `targetCommitId` | UUID |
+  | `targetSiteId` | UUID |
+
+### `usePagePublishedQuery`
+
+pagePublished
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `pageSlug` | String |
+  | `targetSiteId` | UUID |
+
+### `usePlatformGetSitePreviewCommitQuery`
+
+platformGetSitePreviewCommit
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `targetName` | String |
+  | `targetSiteId` | UUID |
+
+### `usePlatformGetSiteReleaseManifestQuery`
+
+platformGetSiteReleaseManifest
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `targetCommitId` | UUID |
+  | `targetSiteId` | UUID |
+
+### `usePlatformPagePublishedQuery`
+
+platformPagePublished
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `pageSlug` | String |
+  | `targetSiteId` | UUID |
+
+### `usePlatformSitesDeepLinkUrlQuery`
+
+platformSitesDeepLinkUrl
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `linkSlug` | String |
+  | `targetSiteId` | UUID |
+
+### `usePlatformSitesSiteOriginQuery`
+
+platformSitesSiteOrigin
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `targetSiteId` | UUID |
+
+### `usePlatformVerifySitePreviewTokenQuery`
+
+platformVerifySitePreviewToken
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `siteId` | UUID |
+  | `token` | String |
+
 ### `useResolveDeepLinkQuery`
 
 resolveDeepLink
@@ -2333,19 +2580,6 @@ resolveDeepLink
   |----------|------|
   | `linkSlug` | String |
   | `targetSiteId` | UUID |
-
-### `useResolveHttpRouteQuery`
-
-resolveHttpRoute
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `requestHost` | String |
-  | `requestMethod` | String |
-  | `requestPath` | String |
 
 ### `useResolveRouteQuery`
 
@@ -2371,6 +2605,52 @@ resolveSiteAppLinks
   |----------|------|
   | `targetSiteId` | UUID |
 
+### `useSitesDeepLinkUrlQuery`
+
+sitesDeepLinkUrl
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `linkSlug` | String |
+  | `targetSiteId` | UUID |
+
+### `useSitesSiteOriginQuery`
+
+sitesSiteOrigin
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `targetSiteId` | UUID |
+
+### `useVerifySitePreviewTokenQuery`
+
+verifySitePreviewToken
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `siteId` | UUID |
+  | `token` | String |
+
+### `useAcceptDatabaseTransferMutation`
+
+acceptDatabaseTransfer
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | AcceptDatabaseTransferInput (required) |
+
 ### `useApplyRlsMutation`
 
 applyRls
@@ -2382,38 +2662,27 @@ applyRls
   |----------|------|
   | `input` | ApplyRlsInput (required) |
 
-### `useAppsInstallAppMutation`
+### `useCancelDatabaseTransferMutation`
 
-appsInstallApp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | AppsInstallAppInput (required) |
-
-### `useAppsUninstallAppMutation`
-
-appsUninstallApp
+cancelDatabaseTransfer
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | AppsUninstallAppInput (required) |
+  | `input` | CancelDatabaseTransferInput (required) |
 
-### `useAppsUpgradeAppMutation`
+### `useDeleteSitePreviewMutation`
 
-appsUpgradeApp
+deleteSitePreview
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | AppsUpgradeAppInput (required) |
+  | `input` | DeleteSitePreviewInput (required) |
 
 ### `useDomainsAssignSubdomainMutation`
 
@@ -2426,6 +2695,39 @@ domainsAssignSubdomain
   |----------|------|
   | `input` | DomainsAssignSubdomainInput (required) |
 
+### `useMintSitePreviewTokenMutation`
+
+mintSitePreviewToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | MintSitePreviewTokenInput (required) |
+
+### `usePagesInstallPagesMutation`
+
+pagesInstallPages
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PagesInstallPagesInput (required) |
+
+### `usePlatformDeleteSitePreviewMutation`
+
+platformDeleteSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformDeleteSitePreviewInput (required) |
+
 ### `usePlatformDomainsAssignSubdomainMutation`
 
 platformDomainsAssignSubdomain
@@ -2436,6 +2738,83 @@ platformDomainsAssignSubdomain
   | Argument | Type |
   |----------|------|
   | `input` | PlatformDomainsAssignSubdomainInput (required) |
+
+### `usePlatformMintSitePreviewTokenMutation`
+
+platformMintSitePreviewToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformMintSitePreviewTokenInput (required) |
+
+### `usePlatformPagesInstallPagesMutation`
+
+platformPagesInstallPages
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformPagesInstallPagesInput (required) |
+
+### `usePlatformProvisionSitePreviewMutation`
+
+platformProvisionSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformProvisionSitePreviewInput (required) |
+
+### `usePlatformSetSitePreviewMutation`
+
+platformSetSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSetSitePreviewInput (required) |
+
+### `usePlatformSiteMetadataInstallRobotsMutation`
+
+platformSiteMetadataInstallRobots
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSiteMetadataInstallRobotsInput (required) |
+
+### `usePlatformSitesInstallContentPresetMutation`
+
+platformSitesInstallContentPreset
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSitesInstallContentPresetInput (required) |
+
+### `usePlatformSitesInstallMantraMutation`
+
+platformSitesInstallMantra
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSitesInstallMantraInput (required) |
 
 ### `usePlatformSitesProvisionStaticSiteMutation`
 
@@ -2462,15 +2841,38 @@ and lifecycle settings.
   |----------|------|
   | `input` | ProvisionBucketInput (required) |
 
+### `useProvisionSitePreviewMutation`
+
+provisionSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionSitePreviewInput (required) |
+
+### `useRejectDatabaseTransferMutation`
+
+rejectDatabaseTransfer
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RejectDatabaseTransferInput (required) |
+
 ### `useRequestDatabaseMutation`
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. Pass organization_id to have the organization own the database from the start (the caller must be an owner of that organization); the requesting user is still the identity bootstrapped into the new database. Omit it for a personal database. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
+  SELECT * FROM metaschema_public.request_database('team_app', 'example.com', preset_slug := 'full', organization_id := '00000000-0000-0000-0000-000000000000'::uuid);
 
 - **Type:** mutation
 - **Arguments:**
@@ -2489,6 +2891,50 @@ setFieldOrder
   | Argument | Type |
   |----------|------|
   | `input` | SetFieldOrderInput (required) |
+
+### `useSetSitePreviewMutation`
+
+setSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetSitePreviewInput (required) |
+
+### `useSiteMetadataInstallRobotsMutation`
+
+siteMetadataInstallRobots
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SiteMetadataInstallRobotsInput (required) |
+
+### `useSitesInstallContentPresetMutation`
+
+sitesInstallContentPreset
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SitesInstallContentPresetInput (required) |
+
+### `useSitesInstallMantraMutation`
+
+sitesInstallMantra
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SitesInstallMantraInput (required) |
 
 ### `useSitesProvisionStaticSiteMutation`
 

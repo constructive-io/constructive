@@ -26,9 +26,9 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
+| `api` | api CRUD operations |
 | `api-schema` | apiSchema CRUD operations |
 | `api-setting` | apiSetting CRUD operations |
-| `apis` | apis CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
 | `check-constraint` | checkConstraint CRUD operations |
 | `composite-type` | compositeType CRUD operations |
@@ -42,6 +42,9 @@ csdk auth set-token <your-token>
 | `domain-event` | domainEvent CRUD operations |
 | `domain-type` | domainType CRUD operations |
 | `domain-verification` | domainVerification CRUD operations |
+| `email-identity` | emailIdentity CRUD operations |
+| `email-provider-account` | emailProviderAccount CRUD operations |
+| `email-site-identity` | emailSiteIdentity CRUD operations |
 | `embedding-chunk` | embeddingChunk CRUD operations |
 | `enum` | enum CRUD operations |
 | `exclusion-constraint` | exclusionConstraint CRUD operations |
@@ -51,20 +54,25 @@ csdk auth set-token <your-token>
 | `foreign-key-constraint` | foreignKeyConstraint CRUD operations |
 | `full-text-search` | fullTextSearch CRUD operations |
 | `function` | function CRUD operations |
+| `get-site-previews-record` | getSitePreviewsRecord CRUD operations |
 | `hostname-binding` | hostnameBinding CRUD operations |
-| `http-route` | httpRoute CRUD operations |
+| `identity-provider-registry` | identityProviderRegistry CRUD operations |
 | `index` | index CRUD operations |
 | `managed-domain` | managedDomain CRUD operations |
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `page` | page CRUD operations |
 | `partition` | partition CRUD operations |
+| `platform-api` | platformApi CRUD operations |
 | `platform-api-schema` | platformApiSchema CRUD operations |
 | `platform-api-setting` | platformApiSetting CRUD operations |
-| `platform-apis` | platformApis CRUD operations |
 | `platform-cors-setting` | platformCorsSetting CRUD operations |
 | `platform-domain` | platformDomain CRUD operations |
 | `platform-domain-event` | platformDomainEvent CRUD operations |
 | `platform-domain-verification` | platformDomainVerification CRUD operations |
+| `platform-email-identity` | platformEmailIdentity CRUD operations |
+| `platform-email-provider-account` | platformEmailProviderAccount CRUD operations |
+| `platform-email-site-identity` | platformEmailSiteIdentity CRUD operations |
+| `platform-get-site-previews-record` | platformGetSitePreviewsRecord CRUD operations |
 | `platform-managed-domain` | platformManagedDomain CRUD operations |
 | `platform-page` | platformPage CRUD operations |
 | `platform-site-app-link` | platformSiteAppLink CRUD operations |
@@ -73,11 +81,13 @@ csdk auth set-token <your-token>
 | `platform-site-error-page` | platformSiteErrorPage CRUD operations |
 | `platform-site-metadatum` | platformSiteMetadatum CRUD operations |
 | `platform-site-module` | platformSiteModule CRUD operations |
+| `platform-site-release` | platformSiteRelease CRUD operations |
 | `platform-site-theme` | platformSiteTheme CRUD operations |
 | `platform-site-web-config` | platformSiteWebConfig CRUD operations |
 | `policy` | policy CRUD operations |
 | `primary-key-constraint` | primaryKeyConstraint CRUD operations |
 | `pubkey-setting` | pubkeySetting CRUD operations |
+| `redirect` | redirect CRUD operations |
 | `rls-setting` | rlsSetting CRUD operations |
 | `route-binding` | routeBinding CRUD operations |
 | `route` | route CRUD operations |
@@ -89,6 +99,7 @@ csdk auth set-token <your-token>
 | `site-error-page` | siteErrorPage CRUD operations |
 | `site-metadatum` | siteMetadatum CRUD operations |
 | `site-module` | siteModule CRUD operations |
+| `site-release` | siteRelease CRUD operations |
 | `site-theme` | siteTheme CRUD operations |
 | `site-web-config` | siteWebConfig CRUD operations |
 | `spatial-relation` | spatialRelation CRUD operations |
@@ -108,29 +119,57 @@ csdk auth set-token <your-token>
 | `webauthn-setting` | webauthnSetting CRUD operations |
 | `api-schema-names` | apiSchemaNames |
 | `apply-registry-defaults` | applyRegistryDefaults |
+| `get-site-preview-commit` | getSitePreviewCommit |
+| `get-site-release-manifest` | getSiteReleaseManifest |
+| `page-published` | pagePublished |
+| `platform-get-site-preview-commit` | platformGetSitePreviewCommit |
+| `platform-get-site-release-manifest` | platformGetSiteReleaseManifest |
+| `platform-page-published` | platformPagePublished |
+| `platform-sites-deep-link-url` | platformSitesDeepLinkUrl |
+| `platform-sites-site-origin` | platformSitesSiteOrigin |
+| `platform-verify-site-preview-token` | platformVerifySitePreviewToken |
 | `resolve-deep-link` | resolveDeepLink |
-| `resolve-http-route` | resolveHttpRoute |
 | `resolve-route` | resolveRoute |
 | `resolve-site-app-links` | resolveSiteAppLinks |
+| `sites-deep-link-url` | sitesDeepLinkUrl |
+| `sites-site-origin` | sitesSiteOrigin |
+| `verify-site-preview-token` | verifySitePreviewToken |
 | `accept-database-transfer` | acceptDatabaseTransfer |
 | `apply-rls` | applyRls |
 | `cancel-database-transfer` | cancelDatabaseTransfer |
+| `delete-site-preview` | deleteSitePreview |
 | `domains-assign-subdomain` | domainsAssignSubdomain |
+| `mint-site-preview-token` | mintSitePreviewToken |
+| `pages-install-pages` | pagesInstallPages |
+| `platform-delete-site-preview` | platformDeleteSitePreview |
 | `platform-domains-assign-subdomain` | platformDomainsAssignSubdomain |
+| `platform-mint-site-preview-token` | platformMintSitePreviewToken |
+| `platform-pages-install-pages` | platformPagesInstallPages |
+| `platform-provision-site-preview` | platformProvisionSitePreview |
+| `platform-set-site-preview` | platformSetSitePreview |
+| `platform-site-metadata-install-robots` | platformSiteMetadataInstallRobots |
+| `platform-sites-install-content-preset` | platformSitesInstallContentPreset |
+| `platform-sites-install-mantra` | platformSitesInstallMantra |
 | `platform-sites-provision-static-site` | platformSitesProvisionStaticSite |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
+| `provision-site-preview` | provisionSitePreview |
 | `reject-database-transfer` | rejectDatabaseTransfer |
 | `request-database` | Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. Pass organization_id to have the organization own the database from the start (the caller must be an owner of that organization); the requesting user is still the identity bootstrapped into the new database. Omit it for a personal database. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
-  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb); |
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
+  SELECT * FROM metaschema_public.request_database('team_app', 'example.com', preset_slug := 'full', organization_id := '00000000-0000-0000-0000-000000000000'::uuid); |
 | `set-field-order` | setFieldOrder |
+| `set-site-preview` | setSitePreview |
+| `site-metadata-install-robots` | siteMetadataInstallRobots |
+| `sites-install-content-preset` | sitesInstallContentPreset |
+| `sites-install-mantra` | sitesInstallMantra |
 | `sites-provision-static-site` | sitesProvisionStaticSite |
 
 ## Infrastructure Commands
@@ -173,6 +212,37 @@ Manage per-context key-value configuration variables.
 Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
+
+### `api`
+
+CRUD operations for Api records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all api records |
+| `find-first` | Find first matching api record |
+| `get` | Get a api by id |
+| `create` | Create a new api |
+| `update` | Update an existing api |
+| `delete` | Delete a api |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `anonRole` | String |
+| `config` | JSON |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `dbname` | String |
+| `id` | UUID |
+| `isPublished` | Boolean |
+| `name` | String |
+| `roleName` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `name`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
 
 ### `api-schema`
 
@@ -239,37 +309,6 @@ CRUD operations for ApiSetting records.
 
 **Required create fields:** `apiId`, `databaseId`
 **Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableDirectUploads`, `enableI18N`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `options`, `statementTimeoutMs`
-
-### `apis`
-
-CRUD operations for Apis records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all apis records |
-| `find-first` | Find first matching apis record |
-| `get` | Get a apis by id |
-| `create` | Create a new apis |
-| `update` | Update an existing apis |
-| `delete` | Delete a apis |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `anonRole` | String |
-| `config` | JSON |
-| `createdAt` | Datetime |
-| `databaseId` | UUID |
-| `dbname` | String |
-| `id` | UUID |
-| `isPublished` | Boolean |
-| `name` | String |
-| `roleName` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `databaseId`, `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
 
 ### `ast-migration`
 
@@ -549,6 +588,7 @@ CRUD operations for Derive records.
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `id` | UUID |
+| `includeGrants` | Boolean |
 | `includeMutations` | Boolean |
 | `kind` | String |
 | `policyPrefix` | String |
@@ -557,7 +597,7 @@ CRUD operations for Derive records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `kind`, `sourceTableId`, `tableId`
-**Optional create fields (backend defaults):** `databaseId`, `includeMutations`, `policyPrefix`
+**Optional create fields (backend defaults):** `databaseId`, `includeGrants`, `includeMutations`, `policyPrefix`
 
 ### `domain`
 
@@ -578,6 +618,7 @@ CRUD operations for Domain records.
 |-------|------|
 | `config` | JSON |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `hostname` | String |
 | `id` | UUID |
@@ -589,11 +630,12 @@ CRUD operations for Domain records.
 | `tlsSecretName` | String |
 | `tlsStatus` | String |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 | `verificationStatus` | String |
 | `verifiedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `hostname`
-**Optional create fields (backend defaults):** `config`, `isPublished`, `isWildcard`, `managed`, `parentHostname`, `tlsReadyAt`, `tlsSecretName`, `tlsStatus`, `verificationStatus`, `verifiedAt`
+**Optional create fields (backend defaults):** `config`, `createdByPrincipal`, `isPublished`, `isWildcard`, `managed`, `parentHostname`, `tlsReadyAt`, `tlsSecretName`, `tlsStatus`, `updatedByPrincipal`, `verificationStatus`, `verifiedAt`
 
 ### `domain-event`
 
@@ -697,6 +739,103 @@ CRUD operations for DomainVerification records.
 
 **Required create fields:** `databaseId`, `method`
 **Optional create fields (backend defaults):** `attempts`, `domainId`, `error`, `expiresAt`, `lastCheckedAt`, `managedDomainId`, `recordName`, `recordType`, `recordValue`, `status`, `verifiedAt`
+
+### `email-identity`
+
+CRUD operations for EmailIdentity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all emailIdentity records |
+| `find-first` | Find first matching emailIdentity record |
+| `get` | Get a emailIdentity by id |
+| `create` | Create a new emailIdentity |
+| `update` | Update an existing emailIdentity |
+| `delete` | Delete a emailIdentity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `fromAddress` | String |
+| `fromName` | String |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `isDefault` | Boolean |
+| `name` | String |
+| `providerAccountId` | UUID |
+| `replyToAddress` | String |
+| `supportAddress` | String |
+| `transportMode` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `fromAddress`, `name`
+**Optional create fields (backend defaults):** `fromName`, `isActive`, `isDefault`, `providerAccountId`, `replyToAddress`, `supportAddress`, `transportMode`
+
+### `email-provider-account`
+
+CRUD operations for EmailProviderAccount records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all emailProviderAccount records |
+| `find-first` | Find first matching emailProviderAccount record |
+| `get` | Get a emailProviderAccount by id |
+| `create` | Create a new emailProviderAccount |
+| `update` | Update an existing emailProviderAccount |
+| `delete` | Delete a emailProviderAccount |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiBaseUrl` | String |
+| `createdAt` | Datetime |
+| `credentialsSecretName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `name` | String |
+| `provider` | String |
+| `providerAccountName` | String |
+| `region` | String |
+| `smtpHost` | String |
+| `smtpPort` | Int |
+| `smtpSecure` | Boolean |
+| `smtpUser` | String |
+| `updatedAt` | Datetime |
+| `webhookSigningSecretName` | String |
+
+**Required create fields:** `credentialsSecretName`, `databaseId`, `name`, `provider`
+**Optional create fields (backend defaults):** `apiBaseUrl`, `isActive`, `providerAccountName`, `region`, `smtpHost`, `smtpPort`, `smtpSecure`, `smtpUser`, `webhookSigningSecretName`
+
+### `email-site-identity`
+
+CRUD operations for EmailSiteIdentity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all emailSiteIdentity records |
+| `find-first` | Find first matching emailSiteIdentity record |
+| `get` | Get a emailSiteIdentity by id |
+| `create` | Create a new emailSiteIdentity |
+| `update` | Update an existing emailSiteIdentity |
+| `delete` | Delete a emailSiteIdentity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `emailIdentityId` | UUID |
+| `id` | UUID |
+| `siteId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `emailIdentityId`, `siteId`
 
 ### `embedding-chunk`
 
@@ -1007,6 +1146,28 @@ CRUD operations for Function records.
 
 **Required create fields:** `databaseId`, `name`, `schemaId`
 
+### `get-site-previews-record`
+
+CRUD operations for GetSitePreviewsRecord records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all getSitePreviewsRecord records |
+| `find-first` | Find first matching getSitePreviewsRecord record |
+| `get` | Get a getSitePreviewsRecord by id |
+| `create` | Create a new getSitePreviewsRecord |
+| `update` | Update an existing getSitePreviewsRecord |
+| `delete` | Delete a getSitePreviewsRecord |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `commitId` | UUID |
+| `name` | String |
+
+**Required create fields:** `commitId`, `name`
+
 ### `hostname-binding`
 
 CRUD operations for HostnameBinding records.
@@ -1038,39 +1199,34 @@ CRUD operations for HostnameBinding records.
 **Required create fields:** `domainId`, `hostname`
 **Optional create fields (backend defaults):** `isWildcard`, `managed`, `parentHostname`, `tlsSecretName`, `tlsStatus`, `verificationStatus`
 
-### `http-route`
+### `identity-provider-registry`
 
-CRUD operations for HttpRoute records.
+CRUD operations for IdentityProviderRegistry records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all httpRoute records |
-| `find-first` | Find first matching httpRoute record |
-| `get` | Get a httpRoute by id |
-| `create` | Create a new httpRoute |
-| `update` | Update an existing httpRoute |
-| `delete` | Delete a httpRoute |
+| `list` | List all identityProviderRegistry records |
+| `find-first` | Find first matching identityProviderRegistry record |
+| `get` | Get a identityProviderRegistry by slug |
+| `create` | Create a new identityProviderRegistry |
+| `update` | Update an existing identityProviderRegistry |
+| `delete` | Delete a identityProviderRegistry |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `createdAt` | Datetime |
-| `createdBy` | UUID |
-| `databaseId` | UUID |
-| `domainId` | UUID |
-| `id` | UUID |
-| `isActive` | Boolean |
-| `method` | String |
-| `path` | String |
-| `priority` | Int |
-| `targetId` | UUID |
-| `targetKind` | String |
-| `updatedAt` | Datetime |
-| `updatedBy` | UUID |
+| `authorizationUrl` | String |
+| `displayName` | String |
+| `issuerUrl` | String |
+| `kind` | String |
+| `scopes` | String |
+| `slug` | String |
+| `tokenUrl` | String |
+| `userinfoUrl` | String |
 
-**Required create fields:** `databaseId`, `domainId`, `targetId`, `targetKind`
-**Optional create fields (backend defaults):** `createdBy`, `isActive`, `method`, `path`, `priority`, `updatedBy`
+**Required create fields:** `displayName`, `kind`
+**Optional create fields (backend defaults):** `authorizationUrl`, `issuerUrl`, `scopes`, `tokenUrl`, `userinfoUrl`
 
 ### `index`
 
@@ -1131,6 +1287,7 @@ CRUD operations for ManagedDomain records.
 | `annotations` | JSON |
 | `certStatus` | String |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `domain` | String |
 | `id` | UUID |
@@ -1138,11 +1295,12 @@ CRUD operations for ManagedDomain records.
 | `tlsReadyAt` | Datetime |
 | `tlsStatus` | String |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 | `verificationStatus` | String |
 | `verifiedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `domain`
-**Optional create fields (backend defaults):** `allowPublicUsage`, `annotations`, `certStatus`, `isWildcard`, `tlsReadyAt`, `tlsStatus`, `verificationStatus`, `verifiedAt`
+**Optional create fields (backend defaults):** `allowPublicUsage`, `annotations`, `certStatus`, `createdByPrincipal`, `isWildcard`, `tlsReadyAt`, `tlsStatus`, `updatedByPrincipal`, `verificationStatus`, `verifiedAt`
 
 ### `node-type-registry`
 
@@ -1194,13 +1352,14 @@ CRUD operations for Page records.
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `id` | UUID |
+| `seededFrom` | JSON |
 | `siteId` | UUID |
 | `slug` | String |
 | `storeId` | UUID |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `content`, `databaseId`, `siteId`, `slug`
-**Optional create fields (backend defaults):** `commitId`, `storeId`
+**Optional create fields (backend defaults):** `commitId`, `seededFrom`, `storeId`
 
 ### `partition`
 
@@ -1235,6 +1394,36 @@ CRUD operations for Partition records.
 
 **Required create fields:** `databaseId`, `partitionKeyId`, `strategy`, `tableId`
 **Optional create fields (backend defaults):** `interval`, `isParented`, `namingPattern`, `premake`, `retention`, `retentionKeepTable`
+
+### `platform-api`
+
+CRUD operations for PlatformApi records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformApi records |
+| `find-first` | Find first matching platformApi record |
+| `get` | Get a platformApi by id |
+| `create` | Create a new platformApi |
+| `update` | Update an existing platformApi |
+| `delete` | Delete a platformApi |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `anonRole` | String |
+| `config` | JSON |
+| `createdAt` | Datetime |
+| `dbname` | String |
+| `id` | UUID |
+| `isPublished` | Boolean |
+| `name` | String |
+| `roleName` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
 
 ### `platform-api-schema`
 
@@ -1300,36 +1489,6 @@ CRUD operations for PlatformApiSetting records.
 **Required create fields:** `apiId`
 **Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableDirectUploads`, `enableI18N`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `options`, `statementTimeoutMs`
 
-### `platform-apis`
-
-CRUD operations for PlatformApis records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformApis records |
-| `find-first` | Find first matching platformApis record |
-| `get` | Get a platformApis by id |
-| `create` | Create a new platformApis |
-| `update` | Update an existing platformApis |
-| `delete` | Delete a platformApis |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `anonRole` | String |
-| `config` | JSON |
-| `createdAt` | Datetime |
-| `dbname` | String |
-| `id` | UUID |
-| `isPublished` | Boolean |
-| `name` | String |
-| `roleName` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
-
 ### `platform-cors-setting`
 
 CRUD operations for PlatformCorsSetting records.
@@ -1374,6 +1533,7 @@ CRUD operations for PlatformDomain records.
 |-------|------|
 | `config` | JSON |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `hostname` | String |
 | `id` | UUID |
 | `isPublished` | Boolean |
@@ -1384,11 +1544,12 @@ CRUD operations for PlatformDomain records.
 | `tlsSecretName` | String |
 | `tlsStatus` | String |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 | `verificationStatus` | String |
 | `verifiedAt` | Datetime |
 
 **Required create fields:** `hostname`
-**Optional create fields (backend defaults):** `config`, `isPublished`, `isWildcard`, `managed`, `parentHostname`, `tlsReadyAt`, `tlsSecretName`, `tlsStatus`, `verificationStatus`, `verifiedAt`
+**Optional create fields (backend defaults):** `config`, `createdByPrincipal`, `isPublished`, `isWildcard`, `managed`, `parentHostname`, `tlsReadyAt`, `tlsSecretName`, `tlsStatus`, `updatedByPrincipal`, `verificationStatus`, `verifiedAt`
 
 ### `platform-domain-event`
 
@@ -1457,6 +1618,122 @@ CRUD operations for PlatformDomainVerification records.
 **Required create fields:** `method`
 **Optional create fields (backend defaults):** `attempts`, `domainId`, `error`, `expiresAt`, `lastCheckedAt`, `managedDomainId`, `recordName`, `recordType`, `recordValue`, `status`, `verifiedAt`
 
+### `platform-email-identity`
+
+CRUD operations for PlatformEmailIdentity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformEmailIdentity records |
+| `find-first` | Find first matching platformEmailIdentity record |
+| `get` | Get a platformEmailIdentity by id |
+| `create` | Create a new platformEmailIdentity |
+| `update` | Update an existing platformEmailIdentity |
+| `delete` | Delete a platformEmailIdentity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `fromAddress` | String |
+| `fromName` | String |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `isDefault` | Boolean |
+| `name` | String |
+| `providerAccountId` | UUID |
+| `replyToAddress` | String |
+| `supportAddress` | String |
+| `transportMode` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `fromAddress`, `name`
+**Optional create fields (backend defaults):** `fromName`, `isActive`, `isDefault`, `providerAccountId`, `replyToAddress`, `supportAddress`, `transportMode`
+
+### `platform-email-provider-account`
+
+CRUD operations for PlatformEmailProviderAccount records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformEmailProviderAccount records |
+| `find-first` | Find first matching platformEmailProviderAccount record |
+| `get` | Get a platformEmailProviderAccount by id |
+| `create` | Create a new platformEmailProviderAccount |
+| `update` | Update an existing platformEmailProviderAccount |
+| `delete` | Delete a platformEmailProviderAccount |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiBaseUrl` | String |
+| `createdAt` | Datetime |
+| `credentialsSecretName` | String |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `name` | String |
+| `provider` | String |
+| `providerAccountName` | String |
+| `region` | String |
+| `smtpHost` | String |
+| `smtpPort` | Int |
+| `smtpSecure` | Boolean |
+| `smtpUser` | String |
+| `updatedAt` | Datetime |
+| `webhookSigningSecretName` | String |
+
+**Required create fields:** `credentialsSecretName`, `name`, `provider`
+**Optional create fields (backend defaults):** `apiBaseUrl`, `isActive`, `providerAccountName`, `region`, `smtpHost`, `smtpPort`, `smtpSecure`, `smtpUser`, `webhookSigningSecretName`
+
+### `platform-email-site-identity`
+
+CRUD operations for PlatformEmailSiteIdentity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformEmailSiteIdentity records |
+| `find-first` | Find first matching platformEmailSiteIdentity record |
+| `get` | Get a platformEmailSiteIdentity by id |
+| `create` | Create a new platformEmailSiteIdentity |
+| `update` | Update an existing platformEmailSiteIdentity |
+| `delete` | Delete a platformEmailSiteIdentity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `emailIdentityId` | UUID |
+| `id` | UUID |
+| `siteId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `emailIdentityId`, `siteId`
+
+### `platform-get-site-previews-record`
+
+CRUD operations for PlatformGetSitePreviewsRecord records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformGetSitePreviewsRecord records |
+| `find-first` | Find first matching platformGetSitePreviewsRecord record |
+| `get` | Get a platformGetSitePreviewsRecord by id |
+| `create` | Create a new platformGetSitePreviewsRecord |
+| `update` | Update an existing platformGetSitePreviewsRecord |
+| `delete` | Delete a platformGetSitePreviewsRecord |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `commitId` | UUID |
+| `name` | String |
+
+**Required create fields:** `commitId`, `name`
+
 ### `platform-managed-domain`
 
 CRUD operations for PlatformManagedDomain records.
@@ -1478,17 +1755,19 @@ CRUD operations for PlatformManagedDomain records.
 | `annotations` | JSON |
 | `certStatus` | String |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `domain` | String |
 | `id` | UUID |
 | `isWildcard` | Boolean |
 | `tlsReadyAt` | Datetime |
 | `tlsStatus` | String |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 | `verificationStatus` | String |
 | `verifiedAt` | Datetime |
 
 **Required create fields:** `domain`
-**Optional create fields (backend defaults):** `allowPublicUsage`, `annotations`, `certStatus`, `isWildcard`, `tlsReadyAt`, `tlsStatus`, `verificationStatus`, `verifiedAt`
+**Optional create fields (backend defaults):** `allowPublicUsage`, `annotations`, `certStatus`, `createdByPrincipal`, `isWildcard`, `tlsReadyAt`, `tlsStatus`, `updatedByPrincipal`, `verificationStatus`, `verifiedAt`
 
 ### `platform-page`
 
@@ -1511,13 +1790,14 @@ CRUD operations for PlatformPage records.
 | `content` | JSON |
 | `createdAt` | Datetime |
 | `id` | UUID |
+| `seededFrom` | JSON |
 | `siteId` | UUID |
 | `slug` | String |
 | `storeId` | UUID |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `content`, `siteId`, `slug`
-**Optional create fields (backend defaults):** `commitId`, `storeId`
+**Optional create fields (backend defaults):** `commitId`, `seededFrom`, `storeId`
 
 ### `platform-site-app-link`
 
@@ -1536,20 +1816,16 @@ CRUD operations for PlatformSiteAppLink records.
 
 | Field | Type |
 |-------|------|
-| `appIdentifier` | String |
+| `appStoreIdentityId` | UUID |
 | `createdAt` | Datetime |
 | `id` | UUID |
 | `pathComponents` | String |
-| `platform` | String |
-| `sha256CertFingerprints` | String |
 | `siteId` | UUID |
-| `storeUrl` | String |
-| `teamId` | String |
 | `updatedAt` | Datetime |
 | `webcredentials` | Boolean |
 
-**Required create fields:** `appIdentifier`, `platform`, `siteId`
-**Optional create fields (backend defaults):** `pathComponents`, `sha256CertFingerprints`, `storeUrl`, `teamId`, `webcredentials`
+**Required create fields:** `appStoreIdentityId`, `siteId`
+**Optional create fields (backend defaults):** `pathComponents`, `webcredentials`
 
 ### `platform-site`
 
@@ -1571,6 +1847,7 @@ CRUD operations for PlatformSite records.
 | `activeCommitId` | UUID |
 | `bucketId` | UUID |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `description` | String |
 | `id` | UUID |
 | `installationId` | UUID |
@@ -1580,9 +1857,10 @@ CRUD operations for PlatformSite records.
 | `resourceId` | UUID |
 | `title` | String |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `name`
-**Optional create fields (backend defaults):** `activeCommitId`, `bucketId`, `description`, `installationId`, `installationMemberSlug`, `isPublished`, `resourceId`, `title`
+**Optional create fields (backend defaults):** `activeCommitId`, `bucketId`, `createdByPrincipal`, `description`, `installationId`, `installationMemberSlug`, `isPublished`, `resourceId`, `title`, `updatedByPrincipal`
 
 ### `platform-site-deep-link`
 
@@ -1606,13 +1884,14 @@ CRUD operations for PlatformSiteDeepLink records.
 | `fallbackUrl` | String |
 | `id` | UUID |
 | `metadata` | JSON |
+| `pageId` | UUID |
 | `siteId` | UUID |
 | `slug` | String |
 | `updatedAt` | Datetime |
 | `webPath` | String |
 
 **Required create fields:** `appPath`, `siteId`, `slug`
-**Optional create fields (backend defaults):** `fallbackUrl`, `metadata`, `webPath`
+**Optional create fields (backend defaults):** `fallbackUrl`, `metadata`, `pageId`, `webPath`
 
 ### `platform-site-error-page`
 
@@ -1667,13 +1946,14 @@ CRUD operations for PlatformSiteMetadatum records.
 | `logo` | Image |
 | `ogImage` | Image |
 | `robots` | String |
+| `robotsSeededFrom` | JSON |
 | `siteId` | UUID |
 | `storeId` | UUID |
 | `title` | String |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `siteId`
-**Optional create fields (backend defaults):** `appleTouchIcon`, `canonicalUrl`, `commitId`, `description`, `favicon`, `logo`, `ogImage`, `robots`, `storeId`, `title`
+**Optional create fields (backend defaults):** `appleTouchIcon`, `canonicalUrl`, `commitId`, `description`, `favicon`, `logo`, `ogImage`, `robots`, `robotsSeededFrom`, `storeId`, `title`
 
 ### `platform-site-module`
 
@@ -1703,6 +1983,34 @@ CRUD operations for PlatformSiteModule records.
 
 **Required create fields:** `data`, `name`, `siteId`
 **Optional create fields (backend defaults):** `isEnabled`, `position`
+
+### `platform-site-release`
+
+CRUD operations for PlatformSiteRelease records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformSiteRelease records |
+| `find-first` | Find first matching platformSiteRelease record |
+| `get` | Get a platformSiteRelease by id |
+| `create` | Create a new platformSiteRelease |
+| `update` | Update an existing platformSiteRelease |
+| `delete` | Delete a platformSiteRelease |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `commitId` | UUID |
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `manifest` | JSON |
+| `siteId` | UUID |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `manifest`, `siteId`
+**Optional create fields (backend defaults):** `commitId`, `storeId`
 
 ### `platform-site-theme`
 
@@ -1781,6 +2089,7 @@ CRUD operations for Policy records.
 | Field | Type |
 |-------|------|
 | `category` | ObjectCategory |
+| `columnRefs` | String |
 | `createdAt` | Datetime |
 | `data` | JSON |
 | `databaseId` | UUID |
@@ -1800,7 +2109,7 @@ CRUD operations for Policy records.
 | `withCheck` | JSON |
 
 **Required create fields:** `tableId`
-**Optional create fields (backend defaults):** `category`, `data`, `databaseId`, `derivedFromPolicyId`, `derivedFromTableId`, `disabled`, `granteeName`, `name`, `permissive`, `policyType`, `privilege`, `smartTags`, `tags`, `withCheck`
+**Optional create fields (backend defaults):** `category`, `columnRefs`, `data`, `databaseId`, `derivedFromPolicyId`, `derivedFromTableId`, `disabled`, `granteeName`, `name`, `permissive`, `policyType`, `privilege`, `smartTags`, `tags`, `withCheck`
 
 ### `primary-key-constraint`
 
@@ -1869,6 +2178,37 @@ CRUD operations for PubkeySetting records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `cryptoNetwork`, `schemaId`, `signInRecordFailureFunctionId`, `signInRequestChallengeFunctionId`, `signInWithChallengeFunctionId`, `signUpWithKeyFunctionId`, `userField`
 
+### `redirect`
+
+CRUD operations for Redirect records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all redirect records |
+| `find-first` | Find first matching redirect record |
+| `get` | Get a redirect by id |
+| `create` | Create a new redirect |
+| `update` | Update an existing redirect |
+| `delete` | Delete a redirect |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `preservePath` | Boolean |
+| `preserveQuery` | Boolean |
+| `statusCode` | Int |
+| `toHost` | String |
+| `toPath` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `name`, `toHost`
+**Optional create fields (backend defaults):** `preservePath`, `preserveQuery`, `statusCode`, `toPath`
+
 ### `rls-setting`
 
 CRUD operations for RlsSetting records.
@@ -1925,15 +2265,17 @@ CRUD operations for RouteBinding records.
 | `method` | String |
 | `path` | String |
 | `priority` | Int |
+| `servingSiteId` | UUID |
 | `targetApiId` | UUID |
 | `targetBucketId` | UUID |
 | `targetFunctionId` | UUID |
+| `targetRedirectId` | UUID |
 | `targetServiceId` | UUID |
 | `targetSiteId` | UUID |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `domainId`, `path`
-**Optional create fields (backend defaults):** `isActive`, `method`, `priority`, `targetApiId`, `targetBucketId`, `targetFunctionId`, `targetServiceId`, `targetSiteId`
+**Optional create fields (backend defaults):** `isActive`, `method`, `priority`, `servingSiteId`, `targetApiId`, `targetBucketId`, `targetFunctionId`, `targetRedirectId`, `targetServiceId`, `targetSiteId`
 
 ### `route`
 
@@ -1960,16 +2302,19 @@ CRUD operations for Route records.
 | `isActive` | Boolean |
 | `method` | String |
 | `path` | String |
+| `previewRef` | String |
 | `priority` | Int |
+| `servingSiteId` | UUID |
 | `targetApiId` | UUID |
 | `targetBucketId` | UUID |
 | `targetFunctionId` | UUID |
+| `targetRedirectId` | UUID |
 | `targetServiceId` | UUID |
 | `targetSiteId` | UUID |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `domainId`
-**Optional create fields (backend defaults):** `config`, `isActive`, `method`, `path`, `priority`, `targetApiId`, `targetBucketId`, `targetFunctionId`, `targetServiceId`, `targetSiteId`
+**Optional create fields (backend defaults):** `config`, `isActive`, `method`, `path`, `previewRef`, `priority`, `servingSiteId`, `targetApiId`, `targetBucketId`, `targetFunctionId`, `targetRedirectId`, `targetServiceId`, `targetSiteId`
 
 ### `schema`
 
@@ -2049,21 +2394,17 @@ CRUD operations for SiteAppLink records.
 
 | Field | Type |
 |-------|------|
-| `appIdentifier` | String |
+| `appStoreIdentityId` | UUID |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `id` | UUID |
 | `pathComponents` | String |
-| `platform` | String |
-| `sha256CertFingerprints` | String |
 | `siteId` | UUID |
-| `storeUrl` | String |
-| `teamId` | String |
 | `updatedAt` | Datetime |
 | `webcredentials` | Boolean |
 
-**Required create fields:** `appIdentifier`, `databaseId`, `platform`, `siteId`
-**Optional create fields (backend defaults):** `pathComponents`, `sha256CertFingerprints`, `storeUrl`, `teamId`, `webcredentials`
+**Required create fields:** `appStoreIdentityId`, `databaseId`, `siteId`
+**Optional create fields (backend defaults):** `pathComponents`, `webcredentials`
 
 ### `site`
 
@@ -2085,6 +2426,7 @@ CRUD operations for Site records.
 | `activeCommitId` | UUID |
 | `bucketId` | UUID |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `description` | String |
 | `id` | UUID |
@@ -2095,9 +2437,10 @@ CRUD operations for Site records.
 | `resourceId` | UUID |
 | `title` | String |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `databaseId`, `name`
-**Optional create fields (backend defaults):** `activeCommitId`, `bucketId`, `description`, `installationId`, `installationMemberSlug`, `isPublished`, `resourceId`, `title`
+**Optional create fields (backend defaults):** `activeCommitId`, `bucketId`, `createdByPrincipal`, `description`, `installationId`, `installationMemberSlug`, `isPublished`, `resourceId`, `title`, `updatedByPrincipal`
 
 ### `site-deep-link`
 
@@ -2122,13 +2465,14 @@ CRUD operations for SiteDeepLink records.
 | `fallbackUrl` | String |
 | `id` | UUID |
 | `metadata` | JSON |
+| `pageId` | UUID |
 | `siteId` | UUID |
 | `slug` | String |
 | `updatedAt` | Datetime |
 | `webPath` | String |
 
 **Required create fields:** `appPath`, `databaseId`, `siteId`, `slug`
-**Optional create fields (backend defaults):** `fallbackUrl`, `metadata`, `webPath`
+**Optional create fields (backend defaults):** `fallbackUrl`, `metadata`, `pageId`, `webPath`
 
 ### `site-error-page`
 
@@ -2185,13 +2529,14 @@ CRUD operations for SiteMetadatum records.
 | `logo` | Image |
 | `ogImage` | Image |
 | `robots` | String |
+| `robotsSeededFrom` | JSON |
 | `siteId` | UUID |
 | `storeId` | UUID |
 | `title` | String |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `siteId`
-**Optional create fields (backend defaults):** `appleTouchIcon`, `canonicalUrl`, `commitId`, `description`, `favicon`, `logo`, `ogImage`, `robots`, `storeId`, `title`
+**Optional create fields (backend defaults):** `appleTouchIcon`, `canonicalUrl`, `commitId`, `description`, `favicon`, `logo`, `ogImage`, `robots`, `robotsSeededFrom`, `storeId`, `title`
 
 ### `site-module`
 
@@ -2222,6 +2567,35 @@ CRUD operations for SiteModule records.
 
 **Required create fields:** `data`, `databaseId`, `name`, `siteId`
 **Optional create fields (backend defaults):** `isEnabled`, `position`
+
+### `site-release`
+
+CRUD operations for SiteRelease records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all siteRelease records |
+| `find-first` | Find first matching siteRelease record |
+| `get` | Get a siteRelease by id |
+| `create` | Create a new siteRelease |
+| `update` | Update an existing siteRelease |
+| `delete` | Delete a siteRelease |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `commitId` | UUID |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `manifest` | JSON |
+| `siteId` | UUID |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `manifest`, `siteId`
+**Optional create fields (backend defaults):** `commitId`, `storeId`
 
 ### `site-theme`
 
@@ -2791,6 +3165,113 @@ applyRegistryDefaults
   | `--data` | JSON |
   | `--nodeType` | String |
 
+### `get-site-preview-commit`
+
+getSitePreviewCommit
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--targetName` | String |
+  | `--targetSiteId` | UUID |
+
+### `get-site-release-manifest`
+
+getSiteReleaseManifest
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--targetCommitId` | UUID |
+  | `--targetSiteId` | UUID |
+
+### `page-published`
+
+pagePublished
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--pageSlug` | String |
+  | `--targetSiteId` | UUID |
+
+### `platform-get-site-preview-commit`
+
+platformGetSitePreviewCommit
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--targetName` | String |
+  | `--targetSiteId` | UUID |
+
+### `platform-get-site-release-manifest`
+
+platformGetSiteReleaseManifest
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--targetCommitId` | UUID |
+  | `--targetSiteId` | UUID |
+
+### `platform-page-published`
+
+platformPagePublished
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--pageSlug` | String |
+  | `--targetSiteId` | UUID |
+
+### `platform-sites-deep-link-url`
+
+platformSitesDeepLinkUrl
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--linkSlug` | String |
+  | `--targetSiteId` | UUID |
+
+### `platform-sites-site-origin`
+
+platformSitesSiteOrigin
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--targetSiteId` | UUID |
+
+### `platform-verify-site-preview-token`
+
+platformVerifySitePreviewToken
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--siteId` | UUID |
+  | `--token` | String |
+
 ### `resolve-deep-link`
 
 resolveDeepLink
@@ -2802,19 +3283,6 @@ resolveDeepLink
   |----------|------|
   | `--linkSlug` | String |
   | `--targetSiteId` | UUID |
-
-### `resolve-http-route`
-
-resolveHttpRoute
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--requestHost` | String |
-  | `--requestMethod` | String |
-  | `--requestPath` | String |
 
 ### `resolve-route`
 
@@ -2839,6 +3307,41 @@ resolveSiteAppLinks
   | Argument | Type |
   |----------|------|
   | `--targetSiteId` | UUID |
+
+### `sites-deep-link-url`
+
+sitesDeepLinkUrl
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--linkSlug` | String |
+  | `--targetSiteId` | UUID |
+
+### `sites-site-origin`
+
+sitesSiteOrigin
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--targetSiteId` | UUID |
+
+### `verify-site-preview-token`
+
+verifySitePreviewToken
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--siteId` | UUID |
+  | `--token` | String |
 
 ### `accept-database-transfer`
 
@@ -2882,6 +3385,19 @@ cancelDatabaseTransfer
   | `--input.clientMutationId` | String |
   | `--input.transferId` | UUID |
 
+### `delete-site-preview`
+
+deleteSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.targetName` | String |
+  | `--input.targetSiteId` | UUID |
+
 ### `domains-assign-subdomain`
 
 domainsAssignSubdomain
@@ -2896,6 +3412,48 @@ domainsAssignSubdomain
   | `--input.label` | String |
   | `--input.maxAttempts` | Int |
 
+### `mint-site-preview-token`
+
+mintSitePreviewToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.siteId` | UUID |
+  | `--input.target` | String |
+  | `--input.targetKind` | String |
+  | `--input.ttlSeconds` | Int |
+
+### `pages-install-pages`
+
+pagesInstallPages
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entityId` | UUID |
+  | `--input.pagesPreset` | String |
+  | `--input.siteId` | UUID |
+
+### `platform-delete-site-preview`
+
+platformDeleteSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.targetName` | String |
+  | `--input.targetSiteId` | UUID |
+
 ### `platform-domains-assign-subdomain`
 
 platformDomainsAssignSubdomain
@@ -2909,6 +3467,107 @@ platformDomainsAssignSubdomain
   | `--input.clientMutationId` | String |
   | `--input.label` | String |
   | `--input.maxAttempts` | Int |
+
+### `platform-mint-site-preview-token`
+
+platformMintSitePreviewToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.siteId` | UUID |
+  | `--input.target` | String |
+  | `--input.targetKind` | String |
+  | `--input.ttlSeconds` | Int |
+
+### `platform-pages-install-pages`
+
+platformPagesInstallPages
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entityId` | UUID |
+  | `--input.pagesPreset` | String |
+  | `--input.siteId` | UUID |
+
+### `platform-provision-site-preview`
+
+platformProvisionSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.apex` | String |
+  | `--input.clientMutationId` | String |
+  | `--input.commitId` | UUID |
+  | `--input.name` | String |
+  | `--input.siteId` | UUID |
+
+### `platform-set-site-preview`
+
+platformSetSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.targetCommitId` | UUID |
+  | `--input.targetName` | String |
+  | `--input.targetSiteId` | UUID |
+
+### `platform-site-metadata-install-robots`
+
+platformSiteMetadataInstallRobots
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entityId` | UUID |
+  | `--input.robotsPreset` | String |
+  | `--input.siteId` | UUID |
+
+### `platform-sites-install-content-preset`
+
+platformSitesInstallContentPreset
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entityId` | UUID |
+  | `--input.presetKind` | String |
+  | `--input.presetSlug` | String |
+  | `--input.siteId` | UUID |
+
+### `platform-sites-install-mantra`
+
+platformSitesInstallMantra
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entityId` | UUID |
+  | `--input.routePreset` | String |
+  | `--input.siteId` | UUID |
 
 ### `platform-sites-provision-static-site`
 
@@ -2942,6 +3601,21 @@ and lifecycle settings.
   | `--input.bucketKey` | String (required) |
   | `--input.ownerId` | UUID |
 
+### `provision-site-preview`
+
+provisionSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.apex` | String |
+  | `--input.clientMutationId` | String |
+  | `--input.commitId` | UUID |
+  | `--input.name` | String |
+  | `--input.siteId` | UUID |
+
 ### `reject-database-transfer`
 
 rejectDatabaseTransfer
@@ -2958,11 +3632,12 @@ rejectDatabaseTransfer
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. Pass organization_id to have the organization own the database from the start (the caller must be an owner of that organization); the requesting user is still the identity bootstrapped into the new database. Omit it for a personal database. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
+  SELECT * FROM metaschema_public.request_database('team_app', 'example.com', preset_slug := 'full', organization_id := '00000000-0000-0000-0000-000000000000'::uuid);
 
 - **Type:** mutation
 - **Arguments:**
@@ -2974,6 +3649,7 @@ Example usage:
   | `--input.domain` | String |
   | `--input.modules` | JSON |
   | `--input.options` | JSON |
+  | `--input.organizationId` | UUID |
   | `--input.presetSlug` | String |
   | `--input.subdomain` | String |
 
@@ -2988,6 +3664,63 @@ setFieldOrder
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.fieldIds` | UUID |
+
+### `set-site-preview`
+
+setSitePreview
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.targetCommitId` | UUID |
+  | `--input.targetName` | String |
+  | `--input.targetSiteId` | UUID |
+
+### `site-metadata-install-robots`
+
+siteMetadataInstallRobots
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entityId` | UUID |
+  | `--input.robotsPreset` | String |
+  | `--input.siteId` | UUID |
+
+### `sites-install-content-preset`
+
+sitesInstallContentPreset
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entityId` | UUID |
+  | `--input.presetKind` | String |
+  | `--input.presetSlug` | String |
+  | `--input.siteId` | UUID |
+
+### `sites-install-mantra`
+
+sitesInstallMantra
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entityId` | UUID |
+  | `--input.routePreset` | String |
+  | `--input.siteId` | UUID |
 
 ### `sites-provision-static-site`
 

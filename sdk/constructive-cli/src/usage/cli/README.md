@@ -44,6 +44,8 @@ csdk auth set-token <your-token>
 | `org-limit-default` | orgLimitDefault CRUD operations |
 | `org-limit-event` | orgLimitEvent CRUD operations |
 | `org-limit-warning` | orgLimitWarning CRUD operations |
+| `capture-app-limit-defaults` | captureAppLimitDefaults |
+| `capture-org-limit-defaults` | captureOrgLimitDefaults |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -600,6 +602,20 @@ CRUD operations for OrgLimitWarning records.
 **Optional create fields (backend defaults):** `entityId`
 
 ## Custom Operations
+
+### `capture-app-limit-defaults`
+
+captureAppLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
+
+### `capture-org-limit-defaults`
+
+captureOrgLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
 
 ### `provision-bucket`
 

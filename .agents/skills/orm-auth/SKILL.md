@@ -1,13 +1,13 @@
 ---
 name: orm-auth
-description: ORM client for the auth API — provides typed CRUD operations for 13 tables and 37 custom operations
+description: ORM client for the auth API — provides typed CRUD operations for 15 tables and 48 custom operations
 ---
 
 # orm-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the auth API — provides typed CRUD operations for 13 tables and 37 custom operations
+ORM client for the auth API — provides typed CRUD operations for 15 tables and 48 custom operations
 
 ## Usage
 
@@ -49,22 +49,35 @@ See the `references/` directory for detailed per-entity API documentation:
 - [role-type](references/role-type.md)
 - [user-connected-account](references/user-connected-account.md)
 - [user](references/user.md)
+- [user-setting](references/user-setting.md)
+- [user-settings-security](references/user-settings-security.md)
 - [webauthn-credential](references/webauthn-credential.md)
 - [current-ip-address](references/current-ip-address.md)
 - [current-user](references/current-user.md)
 - [current-user-agent](references/current-user-agent.md)
 - [current-user-id](references/current-user-id.md)
+- [get-mfa-status](references/get-mfa-status.md)
 - [require-step-up](references/require-step-up.md)
+- [approve-device](references/approve-device.md)
 - [check-password](references/check-password.md)
+- [complete-mfa-challenge](references/complete-mfa-challenge.md)
 - [confirm-delete-account](references/confirm-delete-account.md)
+- [confirm-totp-setup](references/confirm-totp-setup.md)
 - [create-api-key](references/create-api-key.md)
 - [create-org-api-key](references/create-org-api-key.md)
 - [create-org-principal](references/create-org-principal.md)
 - [delete-org-principal](references/delete-org-principal.md)
 - [delete-principal](references/delete-principal.md)
+- [disable-email-mfa](references/disable-email-mfa.md)
+- [disable-sms-mfa](references/disable-sms-mfa.md)
+- [disable-totp](references/disable-totp.md)
 - [disconnect-account](references/disconnect-account.md)
+- [enable-email-mfa](references/enable-email-mfa.md)
+- [enable-sms-mfa](references/enable-sms-mfa.md)
+- [enable-totp](references/enable-totp.md)
 - [extend-token-expires](references/extend-token-expires.md)
 - [forgot-password](references/forgot-password.md)
+- [generate-backup-codes](references/generate-backup-codes.md)
 - [link-identity](references/link-identity.md)
 - [provision-bucket](references/provision-bucket.md)
 - [provision-new-user](references/provision-new-user.md)
