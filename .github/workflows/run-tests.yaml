@@ -107,7 +107,7 @@ jobs:
           - batch: uploads
             packages: 'uploads/mime-bytes uploads/uuid-hash uploads/uuid-stream uploads/etag-hash uploads/etag-stream uploads/stream-to-etag uploads/content-type-stream uploads/upload-names uploads/s3-utils'
           - batch: packages-core
-            packages: 'packages/url-domains packages/coerce packages/csrf packages/oauth packages/12factor-env packages/orm packages/express-context packages/errors packages/llm-env packages/node-type-registry packages/query-spec packages/server-utils postgres/pg-cache postgres/pg-env'
+            packages: 'packages/url-domains packages/coerce packages/csrf packages/oauth packages/12factor-env packages/orm packages/express-context packages/errors packages/llm-env packages/node-type-registry packages/query-spec packages/server-utils packages/site-deploy postgres/pg-cache postgres/pg-env'
           - batch: packages-services
             packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli postgres/pgsql-client postgres/pg-ast'
           - batch: graphql
