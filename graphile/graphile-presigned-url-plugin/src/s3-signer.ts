@@ -8,6 +8,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Logger } from '@pgpmjs/logger';
 
+import { s3FailureError } from './s3-failure';
 import type { S3Config } from './types';
 
 const log = new Logger('graphile-presigned-url:s3');
@@ -40,7 +41,16 @@ export async function generatePresignedPutUrl(
     ContentLength: contentLength,
   });
 
-  const url = await getSignedUrl(s3Config.client as any, command, { expiresIn });
+  let url: string;
+  try {
+    url = await getSignedUrl(s3Config.client as any, command, { expiresIn });
+  } catch (err) {
+    throw s3FailureError(
+      'PRESIGN_PUT_FAILED',
+      { endpoint: s3Config.endpoint, bucket: s3Config.bucket, key, contentType },
+      err,
+    );
+  }
   log.debug(`Generated presigned PUT URL for key=${key}, contentType=${contentType}, expires=${expiresIn}s`);
   return url;
 }
@@ -74,7 +84,12 @@ export async function generatePresignedGetUrl(
   }
 
   const command = new GetObjectCommand(params as any);
-  const url = await getSignedUrl(s3Config.client as any, command, { expiresIn });
+  let url: string;
+  try {
+    url = await getSignedUrl(s3Config.client as any, command, { expiresIn });
+  } catch (err) {
+    throw s3FailureError('PRESIGN_GET_FAILED', { endpoint: s3Config.endpoint, bucket: s3Config.bucket, key }, err);
+  }
   log.debug(`Generated presigned GET URL for key=${key}, expires=${expiresIn}s`);
   return url;
 }

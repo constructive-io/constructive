@@ -12,6 +12,7 @@
 import { Logger } from '@pgpmjs/logger';
 
 import { type WithPgClient, withRequestPgClient } from './request-pg-client';
+import { s3FailureError } from './s3-failure';
 import { isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
 import type { BucketConfig, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
@@ -119,7 +120,18 @@ export async function provisionAndRecordPhysicalBucket(
 
   if (options.ensureBucketProvisioned && !isS3BucketProvisioned(s3BucketName)) {
     log.info(`Lazy-provisioning S3 bucket "${s3BucketName}" for database ${databaseId}`);
-    await options.ensureBucketProvisioned(s3BucketName, bucket.type, databaseId, allowedOrigins);
+    try {
+      await options.ensureBucketProvisioned(s3BucketName, bucket.type, databaseId, allowedOrigins);
+    } catch (err) {
+      // The first upload to a bucket is where an unreachable object store is
+      // discovered, and the transport's own message is routinely empty: name the
+      // endpoint it could not reach so the response says what is misconfigured.
+      throw s3FailureError(
+        'BUCKET_PROVISION_FAILED',
+        { endpoint: resolveS3(options).endpoint, bucket: s3BucketName, databaseId },
+        err,
+      );
+    }
     markS3BucketProvisioned(s3BucketName);
     log.info(`Lazy-provisioned S3 bucket "${s3BucketName}" successfully`);
   }
