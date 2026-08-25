@@ -1,15 +1,20 @@
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { RequestHandler } from 'express';
-
-import { getDebugDatabaseSnapshot } from '../../diagnostics/debug-db-snapshot';
+import {
+  getDebugDatabaseSnapshot,
+  type DebugDatabaseRuntimeOptions,
+} from '../../diagnostics/debug-db-snapshot';
 
 const log = new Logger('debug-db');
 
-export const createDebugDatabaseMiddleware = (opts: ConstructiveOptions): RequestHandler => {
+export const createDebugDatabaseMiddleware = (
+  opts: ConstructiveOptions,
+  runtime: DebugDatabaseRuntimeOptions = {}
+): RequestHandler => {
   return async (_req, res) => {
     try {
-      const response = await getDebugDatabaseSnapshot(opts);
+      const response = await getDebugDatabaseSnapshot(opts, runtime);
 
       log.debug('Database debug snapshot', {
         activeActivity: response.activeActivity.length,

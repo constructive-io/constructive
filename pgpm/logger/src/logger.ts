@@ -1,14 +1,31 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+
 import yanse from 'yanse';
 
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug' | 'success';
 export type LogFormat = 'pretty' | 'json';
+
+interface LogExecutionContext {
+  suppressed: boolean;
+}
+
+const logExecutionContext = new AsyncLocalStorage<LogExecutionContext>();
+
+/**
+ * Run work with PGPM logger output suppressed for the current async execution
+ * chain. This is intentionally async-context scoped rather than global so a
+ * machine-readable CLI operation cannot silence an unrelated human request in
+ * the same process.
+ */
+export const withLogsSuppressed = <T>(callback: () => T): T =>
+  logExecutionContext.run({ suppressed: true }, callback);
 
 const levelPriority: Record<LogLevel, number> = {
   debug: 0,
   info: 1,
   success: 2,
   warn: 3,
-  error: 4
+  error: 4,
 };
 
 const levelColors: Record<LogLevel, typeof yanse.cyan> = {
@@ -16,7 +33,7 @@ const levelColors: Record<LogLevel, typeof yanse.cyan> = {
   warn: yanse.yellow,
   error: yanse.red,
   debug: yanse.gray,
-  success: yanse.green
+  success: yanse.green,
 };
 
 const hasAnsi = (text: string): boolean => {
@@ -81,21 +98,26 @@ const parseScopeFilter = (env: string | undefined): ScopeFilter => {
   const include = new Set<string>();
   const exclude = new Set<string>();
 
-  (env ?? '').split(',').map(s => s.trim()).forEach(scope => {
-    if (!scope) return;
-    if (scope === '*') {
-      include.add('*');
-    } else if (scope.startsWith('^')) {
-      exclude.add(scope.slice(1));
-    } else {
-      include.add(scope);
-    }
-  });
+  (env ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .forEach((scope) => {
+      if (!scope) return;
+      if (scope === '*') {
+        include.add('*');
+      } else if (scope.startsWith('^')) {
+        exclude.add(scope.slice(1));
+      } else {
+        include.add(scope);
+      }
+    });
 
   return { include, exclude };
 };
 
-let { include: allowedScopes, exclude: blockedScopes } = parseScopeFilter(process.env.LOG_SCOPE);
+let { include: allowedScopes, exclude: blockedScopes } = parseScopeFilter(
+  process.env.LOG_SCOPE
+);
 
 // Update scopes at runtime
 export const setLogScopes = (scopes: string[]) => {
@@ -113,6 +135,8 @@ export class Logger {
   }
 
   private log(level: LogLevel, ...args: any[]) {
+    if (logExecutionContext.getStore()?.suppressed) return;
+
     // Respect log level
     if (levelPriority[level] < levelPriority[globalLogLevel]) return;
 
@@ -133,7 +157,7 @@ export class Logger {
       const entry: Record<string, unknown> = {
         timestamp: new Date().toISOString(),
         level,
-        scope: this.scope
+        scope: this.scope,
       };
 
       // Extract message and data from args
@@ -146,7 +170,7 @@ export class Logger {
             entry.error = {
               name: arg.name,
               message: arg.message,
-              stack: arg.stack
+              stack: arg.stack,
             };
           } else {
             // Preserve additional errors in the message string
@@ -172,7 +196,7 @@ export class Logger {
     const color = levelColors[level];
     const prefix = color(`${level.toUpperCase()}:`);
 
-    const formattedArgs = args.map(arg => {
+    const formattedArgs = args.map((arg) => {
       const normalized = formatArg(arg);
       return typeof normalized === 'string' && !hasAnsi(normalized)
         ? color(normalized)
@@ -180,11 +204,14 @@ export class Logger {
     });
 
     const outputParts = showTimestamp
-      ? [yanse.dim(`[${new Date().toISOString()}]`), tag, prefix, ...formattedArgs]
+      ? [
+          yanse.dim(`[${new Date().toISOString()}]`),
+          tag,
+          prefix,
+          ...formattedArgs,
+        ]
       : [tag, prefix, ...formattedArgs];
-    const output = outputParts
-      .map(arg => String(arg))
-      .join(' ') + '\n';
+    const output = outputParts.map((arg) => String(arg)).join(' ') + '\n';
 
     stream.write(output);
   }

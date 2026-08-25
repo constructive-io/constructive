@@ -33,7 +33,7 @@
     "@pgpmjs/types": "workspace:^",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "lru-cache": "^11.2.7"
+    "lru-cache": "^10.4.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

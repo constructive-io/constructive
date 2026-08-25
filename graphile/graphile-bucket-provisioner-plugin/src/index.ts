@@ -42,6 +42,7 @@ export { BucketProvisionerPlugin, createBucketProvisionerPlugin } from './plugin
 export { BucketProvisionerPreset } from './preset';
 export type {
   BucketAccessType,
+  AllowedOriginsOrGetter,
   BucketNameResolver,
   BucketProvisionerPluginOptions,
   ConnectionConfigOrGetter,

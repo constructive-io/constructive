@@ -340,7 +340,7 @@ async function resolveDatabaseId(pgClient: any): Promise<string | null> {
 function resolveAllowedOrigins(
   bucketOrigins: string[] | null | undefined,
   storageModuleOrigins: string[] | null | undefined,
-  pluginOrigins: string[],
+  pluginOrigins: string[] | (() => string[]),
 ): string[] {
   if (bucketOrigins && bucketOrigins.length > 0) {
     return bucketOrigins;
@@ -348,7 +348,7 @@ function resolveAllowedOrigins(
   if (storageModuleOrigins && storageModuleOrigins.length > 0) {
     return storageModuleOrigins;
   }
-  return pluginOrigins;
+  return typeof pluginOrigins === 'function' ? pluginOrigins() : pluginOrigins;
 }
 
 /**

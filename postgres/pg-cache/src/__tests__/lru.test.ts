@@ -1,11 +1,6 @@
-// Guards against the pg-cache close() resource leak fixed in feat/observability.
-//
-// Previously, close() reset this.closed = false after shutdown, allowing
-// set() to silently accept new pools that were never cleaned up. The module-
-// level closePromise also reset to null, enabling double-shutdown.
-//
-// These tests lock the fix: close() is final, set() rejects, and repeated
-// close() calls are idempotent. See pg-cache-close-leak.md for full details.
+// Locks cache ownership and shutdown behavior: disposal is awaited, concurrent
+// close callers share one cleanup, and a manager may be reused after a complete
+// close for explicit restart/provisioning flows.
 
 import pg from 'pg';
 
@@ -15,8 +10,12 @@ import { PgPoolCacheManager } from '../lru';
 const createMockPool = (): pg.Pool => {
   let ended = false;
   return {
-    get ended() { return ended; },
-    end: jest.fn(async () => { ended = true; }),
+    get ended() {
+      return ended;
+    },
+    end: jest.fn(async () => {
+      ended = true;
+    }),
   } as unknown as pg.Pool;
 };
 
@@ -29,7 +28,11 @@ describe('PgPoolCacheManager', () => {
 
   afterEach(async () => {
     // Ensure all pools are cleaned up even if a test fails mid-way
-    try { await cache.close(); } catch { /* already closed */ }
+    try {
+      await cache.close();
+    } catch {
+      /* already closed */
+    }
   });
 
   it('stores and retrieves a pool', () => {
@@ -122,6 +125,28 @@ describe('PgPoolCacheManager', () => {
       expect(pool.end).toHaveBeenCalledTimes(1);
     });
 
+    it('concurrent close callers await the same cleanup', async () => {
+      const pool = createMockPool();
+      let releaseCleanup!: () => void;
+      const cleanupGate = new Promise<void>((resolve) => {
+        releaseCleanup = resolve;
+      });
+      cache.set('key1', pool);
+      cache.registerCleanupCallback(() => cleanupGate);
+
+      let secondResolved = false;
+      const first = cache.close();
+      const second = cache.close().then(() => {
+        secondResolved = true;
+      });
+      await Promise.resolve();
+
+      expect(secondResolved).toBe(false);
+      releaseCleanup();
+      await Promise.all([first, second]);
+      expect(pool.end).toHaveBeenCalledTimes(1);
+    });
+
     it('close() disposes all pools', async () => {
       const pool1 = createMockPool();
       const pool2 = createMockPool();
@@ -174,6 +199,43 @@ describe('PgPoolCacheManager', () => {
       expect(callback).toHaveBeenCalledWith('a');
 
       await small.close();
+    });
+
+    it('awaits async cleanup before ending the backing pool', async () => {
+      const pool = createMockPool();
+      let releaseCleanup!: () => void;
+      const cleanupGate = new Promise<void>((resolve) => {
+        releaseCleanup = resolve;
+      });
+      cache.set('key1', pool);
+      cache.registerCleanupCallback(() => cleanupGate);
+
+      const closePromise = cache.close();
+      await Promise.resolve();
+
+      expect(pool.end).not.toHaveBeenCalled();
+      releaseCleanup();
+      await closePromise;
+      expect(pool.end).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('ownership isolation', () => {
+    it('closing one manager does not dispose another manager pools', async () => {
+      const first = new PgPoolCacheManager(undefined, {});
+      const second = new PgPoolCacheManager(undefined, {});
+      const firstPool = createMockPool();
+      const secondPool = createMockPool();
+      first.set('same-logical-key', firstPool);
+      second.set('same-logical-key', secondPool);
+
+      await first.close();
+
+      expect(firstPool.end).toHaveBeenCalledTimes(1);
+      expect(secondPool.end).not.toHaveBeenCalled();
+      expect(second.get('same-logical-key')).toBe(secondPool);
+
+      await second.close();
     });
   });
 });

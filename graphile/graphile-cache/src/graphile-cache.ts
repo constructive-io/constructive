@@ -1,12 +1,12 @@
-import { Logger } from '@pgpmjs/logger';
-import { parseEnvNumber } from '12factor-env';
 import { EventEmitter } from 'events';
-import type { Express } from 'express';
-import type { GrafservBase } from 'grafserv';
-import type { Server as HttpServer } from 'http';
+import { parseEnvNumber } from '12factor-env';
+import { Logger } from '@pgpmjs/logger';
 import { LRUCache } from 'lru-cache';
-import { pgCache } from 'pg-cache';
+import { pgCache, PgPoolCacheManager } from 'pg-cache';
+import type { Express } from 'express';
+import type { Server as HttpServer } from 'http';
 import type { PostGraphileInstance } from 'postgraphile';
+import type { GrafservBase } from 'grafserv';
 
 const log = new Logger('graphile-cache');
 
@@ -56,13 +56,15 @@ export interface CacheConfig {
  * NOTE: This value should be <= PG_CACHE_MAX (also default: 50) so that
  * every cached PostGraphile instance has a live pool backing it.
  */
-export function getCacheConfig(): CacheConfig {
-  const isDevelopment = process.env.NODE_ENV === 'development';
+export function getCacheConfig(
+  environment: Readonly<Record<string, string | undefined>> = process.env
+): CacheConfig {
+  const isDevelopment = environment.NODE_ENV === 'development';
 
-  const max = parseEnvNumber(process.env.GRAPHILE_CACHE_MAX) ?? 50;
+  const max = parseEnvNumber(environment.GRAPHILE_CACHE_MAX) ?? 50;
 
   const ttl =
-    parseEnvNumber(process.env.GRAPHILE_CACHE_TTL_MS) ??
+    parseEnvNumber(environment.GRAPHILE_CACHE_TTL_MS) ??
     (isDevelopment ? FIVE_MINUTES_MS : ONE_YEAR);
 
   return { max, ttl };
@@ -85,34 +87,17 @@ export interface GraphileCacheEntry {
   handler: Express;
   httpServer: HttpServer;
   cacheKey: string;
+  /** Exact pg-cache key backing this instance. */
+  pgPoolKey?: string;
   createdAt: number;
   /** Optional RealtimeManager for cursor-tracked subscription delivery */
   realtimeManager?: { stop(): Promise<void> } | null;
 }
 
-// Track disposed entries to prevent double-disposal
-const disposedKeys = new Set<string>();
-
-// Track keys that are being manually evicted for accurate eviction reason
-const manualEvictionKeys = new Set<string>();
-
-/**
- * Dispose a PostGraphile v5 cache entry
- *
- * Properly releases resources by:
- * 1. Closing the HTTP server if listening
- * 2. Releasing the PostGraphile instance (which internally releases grafserv)
- *
- * Uses disposedKeys set to prevent double-disposal when closeAllCaches()
- * explicitly disposes entries and then clear() triggers the dispose callback.
- */
-const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<void> => {
-  // Prevent double-disposal
-  if (disposedKeys.has(key)) {
-    return;
-  }
-  disposedKeys.add(key);
-
+const disposeEntry = async (
+  entry: GraphileCacheEntry,
+  key: string
+): Promise<void> => {
   log.debug(`Disposing PostGraphile[${key}]`);
   try {
     // Close HTTP server if it's listening
@@ -126,7 +111,10 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
       try {
         await entry.realtimeManager.stop();
       } catch (err) {
-        log.error(`Error stopping RealtimeManager for PostGraphile[${key}]:`, err);
+        log.error(
+          `Error stopping RealtimeManager for PostGraphile[${key}]:`,
+          err
+        );
       }
     }
     // Release PostGraphile instance (this also releases grafserv internally)
@@ -135,53 +123,163 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
     }
   } catch (err) {
     log.error(`Error disposing PostGraphile[${key}]:`, err);
-  } finally {
-    disposedKeys.delete(key);
   }
 };
 
-/**
- * Determine the eviction reason for a cache entry
- */
-const getEvictionReason = (key: string, entry: GraphileCacheEntry): EvictionReason => {
-  if (manualEvictionKeys.has(key)) {
-    manualEvictionKeys.delete(key);
-    return 'manual';
-  }
+export interface GraphileCacheManagerOptions {
+  config?: Partial<CacheConfig>;
+  environment?: Readonly<Record<string, string | undefined>>;
+  pgCache?: PgPoolCacheManager;
+  events?: CacheEventEmitter;
+}
 
-  // Check if TTL expired
-  const age = Date.now() - entry.createdAt;
-  const config = getCacheConfig();
-  if (age >= config.ttl) {
-    return 'ttl';
-  }
+/** An owned PostGraphile cache whose teardown cannot affect another server. */
+export class GraphileCacheManager {
+  private readonly cache: LRUCache<string, GraphileCacheEntry>;
+  private readonly manualEvictionKeys = new Set<string>();
+  private readonly disposalPromises = new Map<
+    GraphileCacheEntry,
+    Promise<void>
+  >();
+  private closePromise: Promise<void> | null = null;
+  private readonly pgPoolCache: PgPoolCacheManager;
+  readonly events: CacheEventEmitter;
+  readonly config: CacheConfig;
 
-  return 'lru';
-};
+  constructor(options: GraphileCacheManagerOptions = {}) {
+    this.config = {
+      ...getCacheConfig(options.environment),
+      ...options.config,
+    };
+    this.pgPoolCache = options.pgCache ?? pgCache;
+    this.events = options.events ?? new CacheEventEmitter();
+    this.cache = new LRUCache<string, GraphileCacheEntry>({
+      max: this.config.max,
+      ttl: this.config.ttl,
+      updateAgeOnGet: true,
+      dispose: (entry, key) => {
+        const reason = this.getEvictionReason(key, entry);
+        this.events.emitEviction({ key, reason, entry });
+        log.debug(`Evicting PostGraphile[${key}] (reason: ${reason})`);
+        this.scheduleDisposal(entry, key);
+      },
+    });
 
-// Get initial cache configuration
-const initialConfig = getCacheConfig();
-
-// --- Graphile Cache ---
-export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
-  max: initialConfig.max,
-  ttl: initialConfig.ttl,
-  updateAgeOnGet: true,
-  dispose: (entry, key) => {
-    // Determine eviction reason before disposal
-    const reason = getEvictionReason(key, entry);
-
-    // Emit eviction event
-    cacheEvents.emitEviction({ key, reason, entry });
-
-    log.debug(`Evicting PostGraphile[${key}] (reason: ${reason})`);
-
-    // LRU dispose is synchronous, but v5 disposal is async
-    // Fire and forget the async cleanup
-    disposeEntry(entry, key).catch((err) => {
-      log.error(`Failed to dispose PostGraphile[${key}]:`, err);
+    this.pgPoolCache.registerCleanupCallback(async (pgPoolKey) => {
+      const keys = [...this.cache.entries()]
+        .filter(([, entry]) => entry.pgPoolKey === pgPoolKey)
+        .map(([key]) => key);
+      for (const key of keys) this.delete(key);
+      await this.waitForDisposals();
     });
   }
+
+  get size(): number {
+    return this.cache.size;
+  }
+
+  get max(): number {
+    return this.cache.max;
+  }
+
+  get(key: string): GraphileCacheEntry | undefined {
+    return this.cache.get(key);
+  }
+
+  has(key: string): boolean {
+    return this.cache.has(key);
+  }
+
+  set(key: string, entry: GraphileCacheEntry): this {
+    this.cache.set(key, entry);
+    return this;
+  }
+
+  delete(key: string): boolean {
+    if (!this.cache.has(key)) return false;
+    this.manualEvictionKeys.add(key);
+    return this.cache.delete(key);
+  }
+
+  clear(): void {
+    for (const key of this.cache.keys()) this.manualEvictionKeys.add(key);
+    this.cache.clear();
+  }
+
+  entries(): IterableIterator<[string, GraphileCacheEntry]> {
+    return this.cache.entries();
+  }
+
+  keys(): IterableIterator<string> {
+    return this.cache.keys();
+  }
+
+  forEach(callback: (entry: GraphileCacheEntry, key: string) => void): void {
+    this.cache.forEach(callback);
+  }
+
+  getRemainingTTL(key: string): number {
+    return this.cache.getRemainingTTL(key);
+  }
+
+  async close(options: { closePools?: boolean } = {}): Promise<void> {
+    if (this.closePromise) return this.closePromise;
+    this.closePromise = (async () => {
+      try {
+        this.clear();
+        await this.waitForDisposals();
+        if (options.closePools) await this.pgPoolCache.close();
+      } finally {
+        this.closePromise = null;
+      }
+    })();
+    return this.closePromise;
+  }
+
+  async closeMatching(
+    predicate: (key: string, entry: GraphileCacheEntry) => boolean
+  ): Promise<number> {
+    const entries = [...this.cache.entries()].filter(([key, entry]) =>
+      predicate(key, entry)
+    );
+    for (const [key] of entries) this.delete(key);
+    await this.waitForDisposals();
+    return entries.length;
+  }
+
+  async waitForDisposals(): Promise<void> {
+    while (this.disposalPromises.size > 0) {
+      await Promise.allSettled([...this.disposalPromises.values()]);
+    }
+  }
+
+  private getEvictionReason(
+    key: string,
+    entry: GraphileCacheEntry
+  ): EvictionReason {
+    if (this.manualEvictionKeys.delete(key)) return 'manual';
+    return Date.now() - entry.createdAt >= this.config.ttl ? 'ttl' : 'lru';
+  }
+
+  private scheduleDisposal(entry: GraphileCacheEntry, key: string): void {
+    if (this.disposalPromises.has(entry)) return;
+    const promise = disposeEntry(entry, key);
+    this.disposalPromises.set(entry, promise);
+    void promise.catch((): void => {});
+    void promise.then(
+      (): void => {
+        this.disposalPromises.delete(entry);
+      },
+      (): void => {
+        this.disposalPromises.delete(entry);
+      }
+    );
+  }
+}
+
+export const graphileCache = new GraphileCacheManager({
+  pgCache,
+  events: cacheEvents,
 });
 
 // --- Cache Stats ---
@@ -195,13 +293,14 @@ export interface CacheStats {
 /**
  * Get current cache statistics
  */
-export function getCacheStats(): CacheStats {
-  const config = getCacheConfig();
+export function getCacheStats(
+  cache: GraphileCacheManager = graphileCache
+): CacheStats {
   return {
-    size: graphileCache.size,
-    max: config.max,
-    ttl: config.ttl,
-    keys: [...graphileCache.keys()]
+    size: cache.size,
+    max: cache.max,
+    ttl: cache.config.ttl,
+    keys: [...cache.keys()],
   };
 }
 
@@ -212,14 +311,15 @@ export function getCacheStats(): CacheStats {
  * @param pattern - RegExp to match against cache keys
  * @returns Number of entries cleared
  */
-export function clearMatchingEntries(pattern: RegExp): number {
+export function clearMatchingEntries(
+  pattern: RegExp,
+  cache: GraphileCacheManager = graphileCache
+): number {
   let cleared = 0;
 
-  for (const key of graphileCache.keys()) {
+  for (const key of cache.keys()) {
     if (pattern.test(key)) {
-      // Mark as manual eviction before deleting
-      manualEvictionKeys.add(key);
-      graphileCache.delete(key);
+      cache.delete(key);
       cleared++;
     }
   }
@@ -227,22 +327,6 @@ export function clearMatchingEntries(pattern: RegExp): number {
   return cleared;
 }
 
-// Register cleanup callback with pgCache
-// When a pg pool is disposed, clean up any graphile instances using it
-const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
-  log.debug(`pgPool[${pgPoolKey}] disposed - checking graphile entries`);
-
-  // Remove graphile entries that reference this pool key
-  graphileCache.forEach((entry, k) => {
-    if (entry.cacheKey.includes(pgPoolKey)) {
-      log.debug(`Removing graphileCache[${k}] due to pgPool[${pgPoolKey}] disposal`);
-      manualEvictionKeys.add(k);
-      graphileCache.delete(k);
-    }
-  });
-});
-
-// Enhanced close function that handles all caches
 const closePromise: { promise: Promise<void> | null } = { promise: null };
 
 /**
@@ -263,30 +347,7 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
     try {
       if (verbose) log.info('Closing all server caches...');
 
-      // Collect all entries and dispose them properly
-      const entries = [...graphileCache.entries()];
-
-      // Mark all as manual evictions
-      for (const [key] of entries) {
-        manualEvictionKeys.add(key);
-      }
-
-      const disposePromises = entries.map(([key, entry]) =>
-        disposeEntry(entry, key)
-      );
-
-      // Wait for all disposals to complete
-      await Promise.allSettled(disposePromises);
-
-      // Clear the cache after disposal (dispose callback will no-op due to disposedKeys)
-      graphileCache.clear();
-
-      // Clear disposed keys tracking after full cleanup
-      disposedKeys.clear();
-      manualEvictionKeys.clear();
-
-      // Close pg pools
-      await pgCache.close();
+      await graphileCache.close({ closePools: true });
 
       if (verbose) log.success('All caches disposed.');
     } finally {

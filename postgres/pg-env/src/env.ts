@@ -1,15 +1,11 @@
 import { parseEnvNumber } from '12factor-env';
 
-import { defaultPgConfig,PgConfig } from './pg-config';
+import { defaultPgConfig, PgConfig } from './pg-config';
 
-export const getPgEnvVars = (): Partial<PgConfig> => {
-  const {
-    PGHOST,
-    PGPORT,
-    PGUSER,
-    PGPASSWORD,
-    PGDATABASE
-  } = process.env;
+export const getPgEnvVars = (
+  env: NodeJS.ProcessEnv = process.env
+): Partial<PgConfig> => {
+  const { PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE } = env;
 
   return {
     ...(PGHOST && { host: PGHOST }),
@@ -20,8 +16,11 @@ export const getPgEnvVars = (): Partial<PgConfig> => {
   };
 };
 
-export const getPgEnvOptions = (overrides: Partial<PgConfig> = {}): PgConfig => {
-  const envOpts = getPgEnvVars();
+export const getPgEnvOptions = (
+  overrides: Partial<PgConfig> = {},
+  env: NodeJS.ProcessEnv = process.env
+): PgConfig => {
+  const envOpts = getPgEnvVars(env);
   const merged = { ...defaultPgConfig, ...envOpts, ...overrides };
   return merged;
 };
@@ -43,6 +42,6 @@ export function getSpawnEnvWithPg(
 ): NodeJS.ProcessEnv {
   return {
     ...baseEnv,
-    ...toPgEnvVars(config)
+    ...toPgEnvVars(config),
   };
 }

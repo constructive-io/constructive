@@ -1,40 +1,58 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
-
-import { getDebugDatabaseSnapshot } from './debug-db-snapshot';
-import { getDebugMemorySnapshot } from './debug-memory-snapshot';
+import {
+  getDebugDatabaseSnapshot,
+  type DebugDatabaseRuntimeOptions,
+} from './debug-db-snapshot';
+import {
+  getDebugMemorySnapshot,
+  type DebugMemoryRuntimeOptions,
+} from './debug-memory-snapshot';
 import { isGraphqlDebugSamplerEnabled } from './observability';
+import { getServerEnvironment } from '../runtime-environment';
 
 const log = new Logger('debug-sampler');
 
 const MAX_TOTAL_BYTES = 1024 * 1024 * 1024; // 1 GB
 
-const getSamplerIntervalMs = (): number => {
-  const raw = process.env.GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS;
+export interface DebugSamplerRuntimeOptions
+  extends DebugDatabaseRuntimeOptions, DebugMemoryRuntimeOptions {}
+
+const getSamplerEnvironment = (
+  runtime: DebugSamplerRuntimeOptions
+): Readonly<Record<string, string | undefined>> =>
+  runtime.environment ?? getServerEnvironment();
+
+const getSamplerIntervalMs = (runtime: DebugSamplerRuntimeOptions): number => {
+  const raw = getSamplerEnvironment(runtime).GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS;
   const parsed = raw ? Number.parseInt(raw, 10) : 10_000;
   return Number.isFinite(parsed) && parsed >= 1_000 ? parsed : 10_000;
 };
 
-const getSamplerRootDir = (): string => {
-  if (process.env.GRAPHQL_DEBUG_SAMPLER_DIR) {
-    return path.resolve(process.env.GRAPHQL_DEBUG_SAMPLER_DIR);
+const getSamplerRootDir = (runtime: DebugSamplerRuntimeOptions): string => {
+  const configured = getSamplerEnvironment(runtime).GRAPHQL_DEBUG_SAMPLER_DIR;
+  if (configured) {
+    return path.resolve(configured);
   }
 
   return path.resolve(__dirname, '../..', 'logs');
 };
 
-const createSessionLogDir = (): string => {
-  const rootDir = getSamplerRootDir();
+const createSessionLogDir = (runtime: DebugSamplerRuntimeOptions): string => {
+  const environment = getSamplerEnvironment(runtime);
+  const rootDir = getSamplerRootDir(runtime);
   const sessionName = `run-${new Date().toISOString().replace(/[:.]/g, '-')}-pid${process.pid}`;
-  return process.env.GRAPHQL_DEBUG_SAMPLER_DIR
+  return environment.GRAPHQL_DEBUG_SAMPLER_DIR
     ? rootDir
     : path.join(rootDir, sessionName);
 };
 
-const appendJsonLine = async (filePath: string, payload: unknown): Promise<void> => {
+const appendJsonLine = async (
+  filePath: string,
+  payload: unknown
+): Promise<void> => {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.appendFile(filePath, `${JSON.stringify(payload)}\n`, 'utf8');
 };
@@ -54,7 +72,10 @@ const getDirSize = async (dirPath: string): Promise<number> => {
   return total;
 };
 
-const enforceMaxSize = async (rootDir: string, currentSessionDir: string): Promise<void> => {
+const enforceMaxSize = async (
+  rootDir: string,
+  currentSessionDir: string
+): Promise<void> => {
   try {
     const totalSize = await getDirSize(rootDir);
     if (totalSize <= MAX_TOTAL_BYTES) {
@@ -69,7 +90,7 @@ const enforceMaxSize = async (rootDir: string, currentSessionDir: string): Promi
           const fullPath = path.join(rootDir, e.name);
           const stat = await fs.stat(fullPath);
           return { path: fullPath, mtimeMs: stat.mtimeMs };
-        }),
+        })
     );
 
     sessionDirs.sort((a, b) => a.mtimeMs - b.mtimeMs);
@@ -94,13 +115,21 @@ export interface DebugSamplerHandle {
   stop(): Promise<void>;
 }
 
-export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle | null => {
-  if (!isGraphqlDebugSamplerEnabled(opts.server?.host)) {
+export const startDebugSampler = (
+  opts: ConstructiveOptions,
+  runtime: DebugSamplerRuntimeOptions = {}
+): DebugSamplerHandle | null => {
+  if (
+    !isGraphqlDebugSamplerEnabled(
+      opts.server?.host,
+      getSamplerEnvironment(runtime)
+    )
+  ) {
     return null;
   }
 
-  const intervalMs = getSamplerIntervalMs();
-  const logDir = createSessionLogDir();
+  const intervalMs = getSamplerIntervalMs(runtime);
+  const logDir = createSessionLogDir(runtime);
   const memoryLogPath = path.join(logDir, 'debug-memory.ndjson');
   const dbLogPath = path.join(logDir, 'debug-db.ndjson');
   const errorLogPath = path.join(logDir, 'debug-sampler-errors.ndjson');
@@ -110,7 +139,10 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
   let inFlight: Promise<void> | null = null;
   let writeFailureLogged = false;
 
-  const runBackgroundWrite = (promise: Promise<unknown>, scope: string): void => {
+  const runBackgroundWrite = (
+    promise: Promise<unknown>,
+    scope: string
+  ): void => {
     promise.catch((error) => {
       // Avoid recursive attempts to write additional error files when the
       // underlying storage path is broken or unavailable.
@@ -121,18 +153,24 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
     });
   };
 
-  const recordError = async (scope: 'memory' | 'db' | 'sampler', error: unknown): Promise<void> => {
+  const recordError = async (
+    scope: 'memory' | 'db' | 'sampler',
+    error: unknown
+  ): Promise<void> => {
     const payload = {
       scope,
       timestamp: new Date().toISOString(),
       pid: process.pid,
-      error: error instanceof Error ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      } : {
-        message: String(error),
-      },
+      error:
+        error instanceof Error
+          ? {
+              name: error.name,
+              message: error.message,
+              stack: error.stack,
+            }
+          : {
+              message: String(error),
+            },
     };
     await appendJsonLine(errorLogPath, payload);
   };
@@ -143,20 +181,23 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
     }
 
     try {
-      await appendJsonLine(memoryLogPath, getDebugMemorySnapshot());
+      await appendJsonLine(memoryLogPath, getDebugMemorySnapshot(runtime));
     } catch (error) {
       log.error('Failed to capture debug memory snapshot', error);
       await recordError('memory', error);
     }
 
     try {
-      await appendJsonLine(dbLogPath, await getDebugDatabaseSnapshot(opts));
+      await appendJsonLine(
+        dbLogPath,
+        await getDebugDatabaseSnapshot(opts, runtime)
+      );
     } catch (error) {
       log.error('Failed to capture debug DB snapshot', error);
       await recordError('db', error);
     }
 
-    await enforceMaxSize(getSamplerRootDir(), logDir);
+    await enforceMaxSize(getSamplerRootDir(runtime), logDir);
   };
 
   const tick = (): void => {
@@ -166,8 +207,13 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
 
     if (inFlight) {
       runBackgroundWrite(
-        recordError('sampler', new Error('Skipped debug sample because previous sample is still running')),
-        'record-skip',
+        recordError(
+          'sampler',
+          new Error(
+            'Skipped debug sample because previous sample is still running'
+          )
+        ),
+        'record-skip'
       );
       return;
     }
@@ -189,10 +235,18 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
     pid: process.pid,
     timestamp: new Date().toISOString(),
   };
-  runBackgroundWrite(appendJsonLine(memoryLogPath, lifecyclePayload), 'lifecycle-memory-start');
-  runBackgroundWrite(appendJsonLine(dbLogPath, lifecyclePayload), 'lifecycle-db-start');
+  runBackgroundWrite(
+    appendJsonLine(memoryLogPath, lifecyclePayload),
+    'lifecycle-memory-start'
+  );
+  runBackgroundWrite(
+    appendJsonLine(dbLogPath, lifecyclePayload),
+    'lifecycle-db-start'
+  );
 
-  log.info(`Debug sampler writing snapshots every ${intervalMs}ms to ${logDir}`);
+  log.info(
+    `Debug sampler writing snapshots every ${intervalMs}ms to ${logDir}`
+  );
   tick();
   timer = setInterval(tick, intervalMs);
   timer.unref();

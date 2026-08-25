@@ -5,13 +5,16 @@ import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { getPgPool } from 'pg-cache';
+import { getPgPool, type PgPoolCacheManager } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
 
 const log = new Logger('auth');
-const isDev = () => getNodeEnv() === 'development';
+export interface AuthRuntimeOptions {
+  pgCache?: PgPoolCacheManager;
+  environment?: Readonly<Record<string, string | undefined>>;
+}
 
 /** Default cookie name for session tokens. */
 const SESSION_COOKIE_NAME = 'constructive_session';
@@ -31,7 +34,8 @@ const parseCookieToken = (req: Request, cookieName: string): string | undefined 
 };
 
 export const createAuthenticateMiddleware = (
-  opts: PgpmOptions
+  opts: PgpmOptions,
+  runtime: AuthRuntimeOptions = {}
 ): RequestHandler => {
   return async (
     req: Request,
@@ -45,10 +49,13 @@ export const createAuthenticateMiddleware = (
       return;
     }
 
-    const pool = getPgPool({
-      ...opts.pg,
-      database: api.dbname,
-    });
+    const pool = getPgPool(
+      {
+        ...opts.pg,
+        database: api.dbname,
+      },
+      { cache: runtime.pgCache, environment: runtime.environment }
+    );
     const rlsModule = api.rlsModule;
 
     log.info(
@@ -127,7 +134,10 @@ export const createAuthenticateMiddleware = (
           respondWithGraphQLError(
             res,
             errors.INTERNAL_FAILURE({
-              details: isDev() ? e.message : 'authentication failed',
+              details:
+                getNodeEnv(runtime.environment) === 'development'
+                  ? e.message
+                  : 'authentication failed',
             })
           );
           return;

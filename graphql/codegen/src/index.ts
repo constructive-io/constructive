@@ -22,14 +22,35 @@ export * from './client';
 export { defineConfig } from './types/config';
 
 // Main generate function (orchestrates the entire pipeline)
-export type { GenerateMultiOptions, GenerateMultiResult,GenerateOptions, GenerateResult } from './core/generate';
-export { expandApiNamesToMultiTarget, expandSchemaDirToMultiTarget, generate, generateMulti, removeStaleTargetDirs, TARGETS_MANIFEST } from './core/generate';
+export type {
+  GenerateOptions,
+  GenerateResult,
+  GenerateMultiOptions,
+  GenerateMultiResult,
+} from './core/generate';
+export {
+  generate,
+  generateMulti,
+  expandApiNamesToMultiTarget,
+  expandSchemaDirToMultiTarget,
+  removeStaleTargetDirs,
+  TARGETS_MANIFEST,
+} from './core/generate';
 
 // Config utilities
 export { findConfigFile, loadConfigFile } from './core/config';
 
 // CLI shared utilities (for packages/cli to import)
-export { runCodegenHandler } from './cli/handler';
+export {
+  runCodegenHandler,
+  runCodegenOperation,
+  CodegenOperationError,
+} from './cli/handler';
+export type {
+  CodegenOperationResult,
+  RunCodegenOperationOptions,
+} from './cli/handler';
+export type { SensitiveValueReporter } from './core/sensitive-values';
 export type { CodegenAnswers } from './cli/shared';
 export {
   buildDbConfig,

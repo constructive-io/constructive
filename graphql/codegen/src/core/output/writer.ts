@@ -1,227 +1,173 @@
 /**
- * File writing utilities
+ * Safe output planning and application for generated files.
  *
- * Pure functions for writing generated files to disk and formatting them.
- * These are core utilities that can be used programmatically or by the CLI.
+ * Generation is deliberately split into a read-only planning phase and a
+ * transactional apply phase. This module is the public orchestration facade;
+ * path, manifest, planning, and transaction details live beside it.
  */
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+import { rethrowIfCancelled, throwIfAborted } from '../cancellation';
+import { canonicalizeOutputDir } from './filesystem';
+import { acquireOutputLocks } from './lock';
+import { prepareGenerationPlan } from './planner';
+import {
+  applyPreparedPlans,
+  conflictErrors,
+  resultForPrepared,
+} from './transaction';
+import type {
+  GeneratedFile,
+  GeneratedFileWriteJob,
+  PreparedPlan,
+  WriteBatchOptions,
+  WriteBatchResult,
+  WriteOptions,
+  WriteResult,
+} from './types';
 
-import type { GeneratedFile } from '../codegen';
-
-export type { GeneratedFile };
+export { planGeneratedFiles } from './planner';
+export {
+  type FileChange,
+  type FileChangeAction,
+  GENERATED_FILES_MANIFEST,
+  type GeneratedFile,
+  type GeneratedFilesManifest,
+  type GeneratedFileWriteJob,
+  type GenerationPlan,
+  type WriteBatchOptions,
+  type WriteBatchResult,
+  type WriteOptions,
+  type WriteResult,
+} from './types';
 
 /**
- * Result of writing files
- */
-export interface WriteResult {
-  success: boolean;
-  filesWritten?: string[];
-  filesRemoved?: string[];
-  errors?: string[];
-}
-
-/**
- * Options for writing files
- */
-export interface WriteOptions {
-  /** Show progress output (default: true) */
-  showProgress?: boolean;
-  /** Format files with oxfmt after writing (default: true) */
-  formatFiles?: boolean;
-  /** Remove stale .ts files in outputDir that are not in current file list (default: false) */
-  pruneStaleFiles?: boolean;
-}
-
-type OxfmtFormatFn = (
-  fileName: string,
-  sourceText: string,
-  options?: Record<string, unknown>,
-) => Promise<{ code: string; errors: unknown[] }>;
-
-/**
- * Dynamically import oxfmt's format function
- * Returns null if oxfmt is not available
- */
-async function getOxfmtFormat(): Promise<OxfmtFormatFn | null> {
-  try {
-    const oxfmt = await import('oxfmt');
-    return oxfmt.format;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Format a single file's content using oxfmt programmatically
- */
-async function formatFileContent(
-  fileName: string,
-  content: string,
-  formatFn: OxfmtFormatFn,
-): Promise<string> {
-  try {
-    const result = await formatFn(fileName, content, {
-      singleQuote: true,
-      trailingComma: 'es5',
-      tabWidth: 2,
-      semi: true,
-    });
-    return result.code;
-  } catch {
-    // If formatting fails, return original content
-    return content;
-  }
-}
-
-/**
- * Write generated files to disk
+ * Plan and optionally apply generated files.
  *
- * @param files - Array of files to write
- * @param outputDir - Base output directory
- * @param subdirs - Subdirectories to create
- * @param options - Write options
+ * Dry runs execute the same formatting, ownership, conflict, and pruning
+ * decisions as a real write, but never create the output or transaction dirs.
  */
 export async function writeGeneratedFiles(
   files: GeneratedFile[],
   outputDir: string,
-  subdirs: string[],
+  _subdirs: string[],
   options: WriteOptions = {},
 ): Promise<WriteResult> {
-  const {
-    showProgress = true,
-    formatFiles = true,
-    pruneStaleFiles = false,
-  } = options;
-  const errors: string[] = [];
-  const written: string[] = [];
-  const removed: string[] = [];
-  const total = files.length;
-  const isTTY = process.stdout.isTTY;
-
-  // Ensure output directory exists
-  try {
-    fs.mkdirSync(outputDir, { recursive: true });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return {
+  const { dryRun, ...jobOptions } = options;
+  const batch = await writeGeneratedFileJobs(
+    [
+      {
+        files,
+        outputDir,
+        options: jobOptions,
+      },
+    ],
+    {
+      dryRun,
+      showProgress: options.showProgress,
+    },
+  );
+  return (
+    batch.results[0] ?? {
       success: false,
-      errors: [`Failed to create output directory: ${message}`],
+      errors: batch.errors ?? ['Failed to prepare generated files.'],
+    }
+  );
+}
+
+function mergeWriteJobs(
+  jobs: GeneratedFileWriteJob[],
+): GeneratedFileWriteJob[] {
+  const grouped = new Map<string, GeneratedFileWriteJob>();
+  for (const job of jobs) {
+    const outputDir = canonicalizeOutputDir(job.outputDir);
+    const current = grouped.get(outputDir);
+    if (!current) {
+      grouped.set(outputDir, {
+        files: [...job.files],
+        outputDir,
+        options: {
+          ...(job.options ?? {}),
+          adoptUnownedPaths: [...(job.options?.adoptUnownedPaths ?? [])],
+        },
+      });
+      continue;
+    }
+
+    current.files.push(...job.files);
+    current.options = {
+      ...current.options,
+      ...job.options,
+      pruneStaleFiles:
+        current.options?.pruneStaleFiles === true ||
+        job.options?.pruneStaleFiles === true,
+      removeManifestWhenEmpty:
+        current.options?.removeManifestWhenEmpty === true ||
+        job.options?.removeManifestWhenEmpty === true,
+      adoptUnownedPaths: [
+        ...(current.options?.adoptUnownedPaths ?? []),
+        ...(job.options?.adoptUnownedPaths ?? []),
+      ],
     };
   }
-
-  // Create subdirectories
-  for (const subdir of subdirs) {
-    const subdirPath = path.join(outputDir, subdir);
-    try {
-      fs.mkdirSync(subdirPath, { recursive: true });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      errors.push(`Failed to create directory ${subdirPath}: ${message}`);
-    }
-  }
-
-  if (errors.length > 0) {
-    return { success: false, errors };
-  }
-
-  if (pruneStaleFiles) {
-    const expectedFiles = new Set(
-      files.map((file) => path.resolve(outputDir, file.path)),
-    );
-    const existingTsFiles = findTsFiles(outputDir);
-
-    for (const existingFile of existingTsFiles) {
-      const absolutePath = path.resolve(existingFile);
-      if (expectedFiles.has(absolutePath)) continue;
-      try {
-        fs.rmSync(absolutePath, { force: true });
-        removed.push(absolutePath);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unknown error';
-        errors.push(`Failed to remove stale file ${absolutePath}: ${message}`);
-      }
-    }
-  }
-
-  // Get oxfmt format function if formatting is enabled
-  const formatFn = formatFiles ? await getOxfmtFormat() : null;
-  if (formatFiles && !formatFn && showProgress) {
-    console.warn('Warning: oxfmt not available, files will not be formatted');
-  }
-
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const filePath = path.join(outputDir, file.path);
-
-    // Show progress
-    if (showProgress) {
-      const progress = Math.round(((i + 1) / total) * 100);
-      if (isTTY) {
-        process.stdout.write(
-          `\rWriting files: ${i + 1}/${total} (${progress}%)`,
-        );
-      } else if (i % 100 === 0 || i === total - 1) {
-        // Non-TTY: periodic updates for CI/CD
-        console.log(`Writing files: ${i + 1}/${total}`);
-      }
-    }
-
-    // Ensure parent directory exists
-    const parentDir = path.dirname(filePath);
-    try {
-      fs.mkdirSync(parentDir, { recursive: true });
-    } catch {
-      // Ignore if already exists
-    }
-
-    // Format content if oxfmt is available and file is TypeScript
-    let content = file.content;
-    if (formatFn && file.path.endsWith('.ts')) {
-      content = await formatFileContent(file.path, content, formatFn);
-    }
-
-    try {
-      fs.writeFileSync(filePath, content, 'utf-8');
-      written.push(filePath);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      errors.push(`Failed to write ${filePath}: ${message}`);
-    }
-  }
-
-  // Clear progress line
-  if (showProgress && isTTY) {
-    process.stdout.write('\r' + ' '.repeat(40) + '\r');
-  }
-
-  return {
-    success: errors.length === 0,
-    filesWritten: written,
-    filesRemoved: removed,
-    errors: errors.length > 0 ? errors : undefined,
-  };
+  return [...grouped.values()];
 }
 
 /**
- * Recursively find all .ts files in a directory
+ * Plan all output roots before mutating any of them, then stage and commit them
+ * as one recoverable operation. Output roots may live on different filesystems;
+ * each root stages locally and every committed root is rolled back if a later
+ * root fails.
  */
-function findTsFiles(dir: string): string[] {
-  const files: string[] = [];
-
-  try {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        files.push(...findTsFiles(fullPath));
-      } else if (entry.isFile() && entry.name.endsWith('.ts')) {
-        files.push(fullPath);
-      }
+export async function writeGeneratedFileJobs(
+  jobs: GeneratedFileWriteJob[],
+  options: WriteBatchOptions = {},
+): Promise<WriteBatchResult> {
+  throwIfAborted(options.signal);
+  const mergedJobs = mergeWriteJobs(jobs);
+  const preparePlans = async (): Promise<PreparedPlan[]> =>
+    Promise.all(
+      mergedJobs.map((job) =>
+        prepareGenerationPlan(job.files, job.outputDir, job.options ?? {}),
+      ),
+    );
+  if (options.dryRun) {
+    let preparedPlans: PreparedPlan[];
+    try {
+      preparedPlans = await preparePlans();
+      throwIfAborted(options.signal);
+    } catch (error) {
+      rethrowIfCancelled(error, options.signal);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, results: [], errors: [message] };
     }
-  } catch {
-    // Ignore errors reading directories
+    const results = preparedPlans.map((prepared) => {
+      const errors = conflictErrors(prepared.publicPlan);
+      return resultForPrepared(prepared, {
+        success: errors.length === 0,
+        ...(errors.length === 0 ? {} : { errors }),
+      });
+    });
+    const errors = results.flatMap((result) => result.errors ?? []);
+    return {
+      success: errors.length === 0,
+      results,
+      ...(errors.length === 0 ? {} : { errors }),
+    };
   }
 
-  return files;
+  let locks: Awaited<ReturnType<typeof acquireOutputLocks>> | undefined;
+  try {
+    locks = await acquireOutputLocks(
+      mergedJobs.map((job) => job.outputDir),
+      options.signal,
+    );
+    const preparedPlans = await preparePlans();
+    throwIfAborted(options.signal);
+    return applyPreparedPlans(preparedPlans, options.showProgress ?? true);
+  } catch (error) {
+    rethrowIfCancelled(error, options.signal);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return { success: false, results: [], errors: [message] };
+  } finally {
+    await locks?.release();
+  }
 }

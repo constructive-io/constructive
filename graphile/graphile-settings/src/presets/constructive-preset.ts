@@ -206,7 +206,7 @@ export function createConstructivePreset(
       }),
       BucketProvisionerPreset({
         connection: getBucketProvisionerConnection,
-        allowedOrigins: getAllowedOrigins(),
+        allowedOrigins: getAllowedOrigins,
         // Same tenant-aware naming policy as the presigned (lazy) path, so the
         // eager provisionBucket mutation mints the identical physical name
         // (`{prefix}-{bucketKey}-{databaseId}`) instead of falling back to the

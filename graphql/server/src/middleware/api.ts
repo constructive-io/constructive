@@ -7,10 +7,10 @@ import {
 } from '@constructive-io/express-context';
 import { parseUrl } from '@constructive-io/url-domains';
 import { Logger } from '@pgpmjs/logger';
-import { svcCache } from '@pgpmjs/server-utils';
+import { svcCache, type ServiceCache } from '@pgpmjs/server-utils';
 import { NextFunction, Request, Response } from 'express';
 import { Pool } from 'pg';
-import { getPgPool } from 'pg-cache';
+import { getPgPool, type PgPoolCacheManager } from 'pg-cache';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
@@ -24,6 +24,13 @@ const log = new Logger('api');
 // =============================================================================
 
 const defaultRegistry: LoaderRegistry = createDefaultRegistry();
+
+export interface ApiRuntimeOptions {
+  serviceCache?: ServiceCache;
+  pgCache?: PgPoolCacheManager;
+  loaders?: LoaderRegistry;
+  environment?: Readonly<Record<string, string | undefined>>;
+}
 
 // =============================================================================
 // SQL Queries (API resolution only — module queries now live in loaders)
@@ -74,6 +81,8 @@ interface ResolveContext {
   cacheKey: string;
   headers: RoutingHeaders;
   host: string;
+  runtime: Required<Pick<ApiRuntimeOptions, 'serviceCache' | 'loaders'>> &
+    Pick<ApiRuntimeOptions, 'pgCache' | 'environment'>;
 }
 
 type ResolutionMode = 
@@ -111,7 +120,8 @@ interface ResolvedModuleSettings {
 const buildLoaderContext = (
   routingPool: Pool,
   opts: ApiOptions,
-  row: ApiRow
+  row: ApiRow,
+  runtime: ApiRuntimeOptions
 ): LoaderContext => {
   // Scoped APIs leave dbname NULL when their schemas live in the serving
   // database (pooled tenants); fall back to the server's own database.
@@ -119,7 +129,10 @@ const buildLoaderContext = (
   return {
     routingPool,
     routingSchema: getRoutingSchema(opts),
-    tenantPool: getPgPool({ ...opts.pg, database: dbname }),
+    tenantPool: getPgPool(
+      { ...opts.pg, database: dbname },
+      { cache: runtime.pgCache, environment: runtime.environment }
+    ),
     databaseId: row.database_id,
     apiId: row.api_id,
     dbname
@@ -331,8 +344,8 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
     return null;
   }
 
-  const loaderCtx = buildLoaderContext(pool, opts, row);
-  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
+  const loaderCtx = buildLoaderContext(pool, opts, row, ctx.runtime);
+  const settings = await resolveModuleSettings(ctx.runtime.loaders, loaderCtx);
   log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${settings.rlsModule ? 'found' : 'none'}, authSettings: ${settings.authSettings ? 'found' : 'none'}`);
   return toApiStructure(row, opts, settings);
 };
@@ -374,8 +387,8 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
     anon_role: structure.anonRole,
     is_public: structure.isPublic ?? false,
     schemas: structure.schema
-  });
-  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
+  }, ctx.runtime);
+  const settings = await resolveModuleSettings(ctx.runtime.loaders, loaderCtx);
   return {
     ...structure,
     rlsModule: settings.rlsModule,
@@ -393,9 +406,19 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
 
 export const getApiConfig = async (
   opts: ApiOptions,
-  req: Request
+  req: Request,
+  runtime: ApiRuntimeOptions = {}
 ): Promise<ApiConfigResult> => {
-  const pool = getPgPool(opts.pg);
+  const effectiveRuntime = {
+    serviceCache: runtime.serviceCache ?? svcCache,
+    loaders: runtime.loaders ?? defaultRegistry,
+    pgCache: runtime.pgCache,
+    environment: runtime.environment,
+  };
+  const pool = getPgPool(opts.pg, {
+    cache: effectiveRuntime.pgCache,
+    environment: effectiveRuntime.environment,
+  });
   const { domain, subdomains } = getUrlDomains(req);
   const subdomain = getSubdomain(subdomains);
   const cacheKey = getSvcKey(opts, req);
@@ -403,9 +426,9 @@ export const getApiConfig = async (
   req.svc_key = cacheKey;
 
   // Check cache first
-  if (svcCache.has(cacheKey)) {
+  if (effectiveRuntime.serviceCache.has(cacheKey)) {
     log.debug(`Cache HIT for key=${cacheKey}`);
-    return svcCache.get(cacheKey) as ApiStructure;
+    return effectiveRuntime.serviceCache.get(cacheKey) as ApiStructure;
   }
 
   log.debug(`Cache MISS for key=${cacheKey}, resolving API`);
@@ -417,7 +440,8 @@ export const getApiConfig = async (
     subdomain,
     cacheKey,
     headers: getRoutingHeaders(req),
-    host: req.get('host') || ''
+    host: req.get('host') || '',
+    runtime: effectiveRuntime,
   };
 
   // Validate schemas upfront for modes that need them
@@ -463,7 +487,7 @@ export const getApiConfig = async (
   // Cache successful results
   if (result && !isApiError(result)) {
     assertDatabaseId(result);
-    svcCache.set(cacheKey, result);
+    effectiveRuntime.serviceCache.set(cacheKey, result);
   }
 
   return result;
@@ -473,12 +497,15 @@ export const getApiConfig = async (
 // Express Middleware
 // =============================================================================
 
-export const createApiMiddleware = (opts: ApiOptions) => {
+export const createApiMiddleware = (
+  opts: ApiOptions,
+  runtime: ApiRuntimeOptions = {}
+) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     log.debug(`[api-middleware] ${req.method} ${req.path}`);
 
     try {
-      const apiConfig = await getApiConfig(opts, req);
+      const apiConfig = await getApiConfig(opts, req, runtime);
 
       if (isApiError(apiConfig)) {
         res.status(404).send(errorPage404Message('API not found', apiConfig.errorHtml));

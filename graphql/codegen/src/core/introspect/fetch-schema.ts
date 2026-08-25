@@ -6,6 +6,12 @@ import http from 'node:http';
 import https from 'node:https';
 
 import type { IntrospectionQueryResponse } from '../../types/introspection';
+import {
+  getAbortReason,
+  rethrowIfCancelled,
+  throwIfAborted,
+} from '../cancellation';
+import { endpointForDisplay } from '../sensitive-values';
 import { SCHEMA_INTROSPECTION_QUERY } from './schema-query';
 
 interface HttpResponse {
@@ -22,18 +28,47 @@ function makeRequest(
   options: http.RequestOptions,
   body: string,
   timeout: number,
+  signal?: AbortSignal
 ): Promise<HttpResponse> {
+  throwIfAborted(signal);
+
   return new Promise((resolve, reject) => {
     const protocol = url.protocol === 'https:' ? https : http;
+    let settled = false;
+    let req!: http.ClientRequest;
 
-    const req = protocol.request(url, options, (res) => {
+    const cleanup = (): void => {
+      signal?.removeEventListener('abort', onAbort);
+    };
+    const succeed = (value: HttpResponse): void => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(value);
+    };
+    const fail = (reason: unknown): void => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(reason);
+    };
+
+    const onAbort = (): void => {
+      const reason = getAbortReason(signal!);
+      // Destroy the request/socket immediately, while rejecting with the exact
+      // caller-owned reason (which is not necessarily an Error instance).
+      req.destroy(reason instanceof Error ? reason : undefined);
+      fail(reason);
+    };
+
+    req = protocol.request(url, options, (res) => {
       let data = '';
       res.setEncoding('utf8');
       res.on('data', (chunk: string) => {
         data += chunk;
       });
       res.on('end', () => {
-        resolve({
+        succeed({
           statusCode: res.statusCode || 0,
           statusMessage: res.statusMessage || '',
           data,
@@ -41,11 +76,20 @@ function makeRequest(
       });
     });
 
-    req.on('error', reject);
+    req.on('error', (error) => {
+      fail(signal?.aborted ? getAbortReason(signal) : error);
+    });
+
+    signal?.addEventListener('abort', onAbort, { once: true });
+    if (signal?.aborted) {
+      onAbort();
+      return;
+    }
 
     req.setTimeout(timeout, () => {
-      req.destroy();
-      reject(new Error(`Request timeout after ${timeout}ms`));
+      const error = new Error(`Request timeout after ${timeout}ms`);
+      req.destroy(error);
+      fail(error);
     });
 
     req.write(body);
@@ -62,6 +106,8 @@ export interface FetchSchemaOptions {
   headers?: Record<string, string>;
   /** Request timeout in milliseconds (default: 30000) */
   timeout?: number;
+  /** Cancels an in-flight introspection request and destroys its socket. */
+  signal?: AbortSignal;
 }
 
 export interface FetchSchemaResult {
@@ -75,9 +121,18 @@ export interface FetchSchemaResult {
  * Fetch the full schema introspection from a GraphQL endpoint
  */
 export async function fetchSchema(
-  options: FetchSchemaOptions,
+  options: FetchSchemaOptions
 ): Promise<FetchSchemaResult> {
-  const { endpoint, authorization, headers = {}, timeout = 30000 } = options;
+  const {
+    endpoint,
+    authorization,
+    headers = {},
+    timeout = 30000,
+    signal,
+  } = options;
+  const displayEndpoint = endpointForDisplay(endpoint);
+
+  throwIfAborted(signal);
 
   const url = new URL(endpoint);
 
@@ -102,7 +157,13 @@ export async function fetchSchema(
   };
 
   try {
-    const response = await makeRequest(url, requestOptions, body, timeout);
+    const response = await makeRequest(
+      url,
+      requestOptions,
+      body,
+      timeout,
+      signal
+    );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       return {
@@ -141,6 +202,7 @@ export async function fetchSchema(
       statusCode: response.statusCode,
     };
   } catch (err) {
+    rethrowIfCancelled(err, signal);
     if (err instanceof Error) {
       if (err.message.includes('timeout')) {
         return {
@@ -153,7 +215,7 @@ export async function fetchSchema(
       if (errorCode === 'ECONNREFUSED') {
         return {
           success: false,
-          error: `Connection refused - is the server running at ${endpoint}?`,
+          error: `Connection refused - is the server running at ${displayEndpoint}?`,
         };
       }
       if (errorCode === 'ENOTFOUND') {
@@ -165,7 +227,7 @@ export async function fetchSchema(
       if (errorCode === 'ECONNRESET') {
         return {
           success: false,
-          error: `Connection reset by server at ${endpoint}`,
+          error: `Connection reset by server at ${displayEndpoint}`,
         };
       }
 

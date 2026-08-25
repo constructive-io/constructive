@@ -55,7 +55,7 @@ export interface SchemaSource {
    * Fetch or load the GraphQL introspection data
    * @throws SchemaSourceError if fetching fails
    */
-  fetch(): Promise<SchemaSourceResult>;
+  fetch(signal?: AbortSignal): Promise<SchemaSourceResult>;
 
   /**
    * Human-readable description of the source (for logging)
@@ -78,7 +78,7 @@ export class SchemaSourceError extends Error {
     /**
      * Original error that caused the failure
      */
-    public readonly cause?: Error,
+    public readonly cause?: Error
   ) {
     super(`${message} (source: ${source})`);
     this.name = 'SchemaSourceError';

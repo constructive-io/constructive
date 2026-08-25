@@ -12,10 +12,10 @@ const ONE_YEAR = ONE_DAY * 366;
 // Kubernetes sends only SIGTERM on pod shutdown
 const SYS_EVENTS = ['SIGTERM'];
 
-type PgPoolKey = string;
+export type PgPoolKey = string;
 
 // Cleanup callback type - called when a pg pool is disposed
-export type PoolCleanupCallback = (pgPoolKey: string) => void;
+export type PoolCleanupCallback = (pgPoolKey: string) => void | Promise<void>;
 
 // --- Cache Configuration ---
 
@@ -33,10 +33,12 @@ export interface PgCacheConfig {
  * - PG_CACHE_MAX: Maximum number of pools (default: 50)
  * - PG_CACHE_TTL_MS: TTL in milliseconds (default: ONE_YEAR)
  */
-export function getPgCacheConfig(): PgCacheConfig {
+export function getPgCacheConfig(
+  environment: Readonly<Record<string, string | undefined>> = process.env
+): PgCacheConfig {
   return {
-    max: parseEnvNumber(process.env.PG_CACHE_MAX) ?? 50,
-    ttl: parseEnvNumber(process.env.PG_CACHE_TTL_MS) ?? ONE_YEAR,
+    max: parseEnvNumber(environment.PG_CACHE_MAX) ?? 50,
+    ttl: parseEnvNumber(environment.PG_CACHE_TTL_MS) ?? ONE_YEAR,
   };
 }
 
@@ -44,7 +46,10 @@ class ManagedPgPool {
   public isDisposed = false;
   private disposePromise: Promise<void> | null = null;
 
-  constructor(public readonly pool: pg.Pool, public readonly key: string) {}
+  constructor(
+    public readonly pool: pg.Pool,
+    public readonly key: string
+  ) {}
 
   async dispose(): Promise<void> {
     if (this.isDisposed) return this.disposePromise;
@@ -59,7 +64,9 @@ class ManagedPgPool {
           log.info(`pg.Pool ${this.key} already ended.`);
         }
       } catch (err) {
-        log.error(`Error ending pg.Pool ${this.key}: ${(err as Error).message}`);
+        log.error(
+          `Error ending pg.Pool ${this.key}: ${(err as Error).message}`
+        );
         throw err;
       }
     })();
@@ -69,15 +76,20 @@ class ManagedPgPool {
 }
 
 export class PgPoolCacheManager {
-  private cleanupTasks: Promise<void>[] = [];
+  private cleanupTasks = new Set<Promise<void>>();
+  private scheduledPools = new WeakSet<ManagedPgPool>();
   private closed = false;
+  private closePromise: Promise<void> | null = null;
   private cleanupCallbacks: Set<PoolCleanupCallback> = new Set();
   readonly config: PgCacheConfig;
 
   private readonly pgCache: LRUCache<PgPoolKey, ManagedPgPool>;
 
-  constructor(config?: Partial<PgCacheConfig>) {
-    const defaults = getPgCacheConfig();
+  constructor(
+    config?: Partial<PgCacheConfig>,
+    environment: Readonly<Record<string, string | undefined>> = process.env
+  ) {
+    const defaults = getPgCacheConfig(environment);
     this.config = { ...defaults, ...config };
 
     this.pgCache = new LRUCache<PgPoolKey, ManagedPgPool>({
@@ -86,9 +98,8 @@ export class PgPoolCacheManager {
       updateAgeOnGet: true,
       dispose: (managedPool, key, reason) => {
         log.debug(`Disposing pg pool [${key}] (${reason})`);
-        this.notifyCleanup(key);
-        this.disposePool(managedPool);
-      }
+        this.scheduleDisposal(key, managedPool);
+      },
     });
   }
 
@@ -114,59 +125,90 @@ export class PgPoolCacheManager {
   }
 
   set(key: PgPoolKey, pool: pg.Pool): void {
-    if (this.closed) throw new Error(`Cannot add to cache after it has been closed (key: ${key})`);
+    if (this.closed)
+      throw new Error(
+        `Cannot add to cache after it has been closed (key: ${key})`
+      );
     this.pgCache.set(key, new ManagedPgPool(pool, key));
   }
 
   delete(key: PgPoolKey): void {
-    const managedPool = this.pgCache.get(key);
-    const existed = this.pgCache.delete(key);
-    if (!existed && managedPool) {
-      this.notifyCleanup(key);
-      this.disposePool(managedPool);
-    }
+    this.pgCache.delete(key);
   }
 
   clear(): void {
-    const entries = [...this.pgCache.entries()];
     this.pgCache.clear();
-    for (const [key, managedPool] of entries) {
-      this.notifyCleanup(key);
-      this.disposePool(managedPool);
-    }
+  }
+
+  keys(): IterableIterator<PgPoolKey> {
+    return this.pgCache.keys();
+  }
+
+  async closeMatching(predicate: (key: PgPoolKey) => boolean): Promise<number> {
+    const keys = [...this.pgCache.keys()].filter(predicate);
+    for (const key of keys) this.pgCache.delete(key);
+    await this.waitForDisposals();
+    return keys.length;
   }
 
   async close(): Promise<void> {
-    if (this.closed) return;
-    this.closed = true;
-    this.clear();
-    await this.waitForDisposals();
-    // Re-open the cache so it can accept new entries if the process
-    // survives the shutdown signal (e.g. during provisioning or restart).
-    this.closed = false;
+    if (this.closePromise) return this.closePromise;
+    this.closePromise = (async () => {
+      this.closed = true;
+      try {
+        this.clear();
+        await this.waitForDisposals();
+      } finally {
+        // Re-open the cache so it can accept new entries if the process
+        // survives shutdown (for example during provisioning or restart).
+        this.closed = false;
+        this.closePromise = null;
+      }
+    })();
+    return this.closePromise;
   }
 
   async waitForDisposals(): Promise<void> {
-    if (this.cleanupTasks.length === 0) return;
-    const tasks = [...this.cleanupTasks];
-    this.cleanupTasks = [];
-    await Promise.allSettled(tasks);
+    while (this.cleanupTasks.size > 0) {
+      await Promise.allSettled([...this.cleanupTasks]);
+    }
   }
 
-  private notifyCleanup(pgPoolKey: string): void {
-    this.cleanupCallbacks.forEach(callback => {
-      try {
-        callback(pgPoolKey);
-      } catch (err) {
-        log.error(`Error in cleanup callback for pool ${pgPoolKey}: ${(err as Error).message}`);
+  private async notifyCleanup(pgPoolKey: string): Promise<void> {
+    const results = await Promise.allSettled(
+      [...this.cleanupCallbacks].map((callback) => callback(pgPoolKey))
+    );
+    for (const result of results) {
+      if (result.status === 'rejected') {
+        log.error(
+          `Error in cleanup callback for pool ${pgPoolKey}: ${
+            result.reason instanceof Error
+              ? result.reason.message
+              : String(result.reason)
+          }`
+        );
       }
-    });
+    }
   }
 
-  private disposePool(managedPool: ManagedPgPool): void {
-    if (managedPool.isDisposed) return;
-    const task = managedPool.dispose();
-    this.cleanupTasks.push(task);
+  private scheduleDisposal(key: PgPoolKey, managedPool: ManagedPgPool): void {
+    if (this.scheduledPools.has(managedPool)) return;
+    this.scheduledPools.add(managedPool);
+
+    const task = (async () => {
+      await this.notifyCleanup(key);
+      await managedPool.dispose();
+    })();
+    this.cleanupTasks.add(task);
+    void task.catch((): void => {});
+    void task.then(
+      (): void => {
+        this.cleanupTasks.delete(task);
+      },
+      (): void => {
+        this.cleanupTasks.delete(task);
+      }
+    );
   }
 }
 
@@ -193,7 +235,7 @@ export const close = async (verbose = false): Promise<void> => {
   return closePromise.promise;
 };
 
-SYS_EVENTS.forEach(event => {
+SYS_EVENTS.forEach((event) => {
   process.on(event, () => {
     log.info(`Received ${event}`);
     close();
