@@ -1,0 +1,34 @@
+{
+  "name": "@constructive-io/examples-site-deploy-ssg",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Example: a tiny static site generator deployed as an immutable Constructive release, with a `play` preview and rollback.",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "keywords": [
+    "static-site",
+    "ssg",
+    "deploy",
+    "preview",
+    "constructive",
+    "example"
+  ],
+  "scripts": {
+    "build:site": "tsx src/build.ts",
+    "deploy": "tsx src/deploy.ts",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@constructive-io/site-deploy": "workspace:^"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.3",
+    "typescript": "^5.1.6"
+  }
+}

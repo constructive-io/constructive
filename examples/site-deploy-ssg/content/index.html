@@ -1,0 +1,11 @@
+# Constructive SSG example
+<p>
+  A static site built by a 100-line generator and deployed as one immutable
+  release with <code>@constructive-io/site-deploy</code>.
+</p>
+<p>
+  Every file's bytes live in the site bucket at <code>cas/sha256/&lt;hash&gt;</code>;
+  one release manifest maps served paths to those hashes. Writing the manifest
+  commits it into the site's merkle store, so the returned commit id <em>is</em>
+  the release.
+</p>

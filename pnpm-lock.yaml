@@ -400,6 +400,19 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/cli/dist
 
+  examples/site-deploy-ssg:
+    dependencies:
+      '@constructive-io/site-deploy':
+        specifier: workspace:^
+        version: link:../../packages/site-deploy/dist
+    devDependencies:
+      tsx:
+        specifier: ^4.20.3
+        version: 4.21.0
+      typescript:
+        specifier: ^5.1.6
+        version: 5.9.3
+
   graphile/graphile-bucket-provisioner-plugin:
     dependencies:
       '@constructive-io/bucket-provisioner':
