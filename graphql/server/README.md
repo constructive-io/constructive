@@ -113,7 +113,7 @@ This is a production-only server: every request is resolved through the scoped-r
 
 ### Database access policy
 
-Set `API_DATABASE_ACCESS_POLICY_FUNCTION` to a lowercase, schema-qualified PostgreSQL function when new requests must pass a control-plane access decision. The server calls the function through its configured routing database after route identity resolution and before tenant settings, tenant authentication, or request context, including for private `X-Api-Name`, `X-Schemata`, and `X-Meta-Schema` routes. The option is disabled when unset; when configured, errors and malformed decisions fail closed and decisions are never cached.
+Set `API_DATABASE_ACCESS_POLICY_FUNCTION` to a lowercase, schema-qualified PostgreSQL function when new requests must pass a control-plane access decision. The server calls the function through its configured routing database after route identity resolution and before tenant settings, tenant authentication, or request context, including for private `X-Api-Name`, `X-Schemata`, and `X-Meta-Schema` routes. When the policy is configured, private `X-Schemata` requests also verify every selected schema belongs to the supplied `X-Database-Id` before consulting either the identity cache or the policy, while `X-Meta-Schema` remains the explicit platform-management surface. The option is disabled when unset, which preserves physical-schema-only private routing for standalone tenant installations; when configured, errors and malformed decisions fail closed and decisions are never cached.
 
 The function accepts one UUID database id and returns exactly one row:
 

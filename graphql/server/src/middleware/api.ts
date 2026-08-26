@@ -313,6 +313,39 @@ const validateSchemata = async (pool: Pool, schemas: string[]): Promise<string[]
   return result.rows.map((row: { schema_name: string }) => row.schema_name);
 };
 
+/**
+ * Resolve only physical schemas owned by the supplied logical database.
+ *
+ * Private X-Schemata requests run with the administrator role, so physical
+ * schema existence alone is not an ownership boundary. This lookup binds every
+ * requested schema to the same database identity that the live access policy
+ * will evaluate.
+ */
+const validateDatabaseSchemata = async (
+  pool: Pool,
+  schemas: string[],
+  databaseId: string
+): Promise<string[]> => {
+  const result = await pool.query<{ schema_name: string }>(
+    `SELECT DISTINCT scoped_schema.schema_name
+       FROM metaschema_public.schema scoped_schema
+       JOIN information_schema.schemata physical_schema
+         ON physical_schema.schema_name = scoped_schema.schema_name
+      WHERE scoped_schema.schema_name = ANY($1::text[])
+        AND scoped_schema.database_id = $2::uuid`,
+    [schemas, databaseId]
+  );
+  return result.rows.map((row) => row.schema_name);
+};
+
+const containsEverySchema = (requested: string[], resolved: string[]): boolean => {
+  const requestedSet = new Set(requested);
+  const resolvedSet = new Set(resolved);
+  return requestedSet.size > 0 &&
+    requestedSet.size === resolvedSet.size &&
+    [...requestedSet].every((schema) => resolvedSet.has(schema));
+};
+
 const queryByApiName = async (
   pool: Pool,
   opts: ApiOptions,
@@ -417,14 +450,6 @@ export const getApiIdentity = async (
 
   req.svc_key = cacheKey;
 
-  // Check cache first
-  if (svcCache.has(cacheKey)) {
-    log.debug(`Cache HIT for key=${cacheKey}`);
-    return svcCache.get(cacheKey) as ApiStructure;
-  }
-
-  log.debug(`Cache MISS for key=${cacheKey}, resolving API`);
-
   const ctx: ResolveContext = {
     opts,
     pool,
@@ -434,16 +459,52 @@ export const getApiIdentity = async (
     headers: getRoutingHeaders(req),
     host: req.get('host') || ''
   };
+  const mode = determineMode(ctx);
+  const headerSchemas = ctx.headers.schemata
+    ? [...new Set(parseCommaSeparatedHeader(ctx.headers.schemata))]
+    : [];
+  let databaseSchemas: string[] | null = null;
+  const liveAccessPolicyConfigured = !!opts.api?.databaseAccessPolicyFunction?.trim();
+
+  // X-Schemata creates an administrator API over caller-selected schemas. Its
+  // database binding therefore remains a live routing-plane check, including
+  // on cache hits, and runs before the billing policy or Graphile can use it.
+  // Keep this coupled to the optional policy so standalone tenant installs
+  // retain their existing physical-schema-only routing contract.
+  if (
+    liveAccessPolicyConfigured &&
+    mode === 'schemata-header' &&
+    ctx.headers.databaseId
+  ) {
+    const resolvedSchemas = await validateDatabaseSchemata(
+      pool,
+      headerSchemas,
+      ctx.headers.databaseId
+    );
+    if (!containsEverySchema(headerSchemas, resolvedSchemas)) {
+      svcCache.delete(cacheKey);
+      return { errorHtml: 'No valid schemas found for the supplied X-Schemata header.' };
+    }
+    const resolvedSet = new Set(resolvedSchemas);
+    databaseSchemas = headerSchemas.filter((schema) => resolvedSet.has(schema));
+  }
+
+  // Check cache only after the live X-Schemata ownership assertion.
+  if (svcCache.has(cacheKey)) {
+    log.debug(`Cache HIT for key=${cacheKey}`);
+    return svcCache.get(cacheKey) as ApiStructure;
+  }
+
+  log.debug(`Cache MISS for key=${cacheKey}, resolving API`);
 
   // Validate schemas upfront for modes that need them
   const apiOpts = opts.api || {};
-  const headerSchemas = ctx.headers.schemata ? parseCommaSeparatedHeader(ctx.headers.schemata) : [];
   const candidateSchemas =
     apiOpts.isPublic === false && headerSchemas.length
       ? [...new Set([...(apiOpts.metaSchemas || []), ...headerSchemas])]
       : apiOpts.metaSchemas || [];
-  
-  const validatedSchemas = await validateSchemata(pool, candidateSchemas);
+
+  const validatedSchemas = databaseSchemas ?? await validateSchemata(pool, candidateSchemas);
 
   if (validatedSchemas.length === 0) {
     const source = headerSchemas.length ? headerSchemas : apiOpts.metaSchemas || [];
@@ -454,7 +515,6 @@ export const getApiIdentity = async (
   }
 
   // Route to appropriate resolver based on mode
-  const mode = determineMode(ctx);
   let result: ApiConfigResult;
 
   switch (mode) {

@@ -33,6 +33,7 @@ const mockRegistryResolve = (
 ).resolve;
 
 const DATABASE_ID = '11111111-1111-4111-8111-111111111111';
+const PLATFORM_DATABASE_ID = '22222222-2222-4222-8222-222222222222';
 const TENANT_DATABASE = 'customer_database';
 
 interface PolicyRow {
@@ -80,7 +81,12 @@ const matchedRoute = () => ({
   }
 });
 
-function setupPools(policyRows: PolicyRow[]) {
+function setupPools(
+  policyRows: PolicyRow[],
+  schemaBindings: Record<string, string> = {
+    app_public: DATABASE_ID
+  }
+) {
   const events: string[] = [];
   const tenantQuery = jest.fn(async () => {
     events.push('tenant');
@@ -88,6 +94,16 @@ function setupPools(policyRows: PolicyRow[]) {
   });
   const policyQueue = [...policyRows];
   const routingQuery = jest.fn(async (sql: string, params: unknown[]) => {
+    if (sql.includes('FROM metaschema_public.schema scoped_schema')) {
+      events.push('schema-binding');
+      const requested = params[0] as string[];
+      const databaseId = params[1] as string;
+      return {
+        rows: requested
+          .filter((schema_name) => schemaBindings[schema_name] === databaseId)
+          .map((schema_name) => ({ schema_name }))
+      };
+    }
     if (sql.includes('information_schema.schemata')) {
       events.push('schema-resolution');
       return {
@@ -185,6 +201,117 @@ describe('database access policy pipeline ordering', () => {
     expect(events.indexOf('tenant')).toBeGreaterThan(events.indexOf('policy'));
   });
 
+  it('rejects a cold X-Schemata request whose schema belongs to a suspended database but whose id names the platform database', async () => {
+    const { routingQuery, tenantQuery } = setupPools([allowRow]);
+
+    const response = await request(pipelineApp())
+      .post('/graphql')
+      .set('Host', 'admin.example.com')
+      .set('X-Database-Id', PLATFORM_DATABASE_ID)
+      .set('X-Schemata', 'app_public')
+      .send({ query: '{ __typename }' });
+
+    expect(response.status).toBe(404);
+    expect(response.text).toContain('No valid schemas found for the supplied X-Schemata header');
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('platform_private"."database_access')
+    )).toHaveLength(0);
+    expect(tenantQuery).not.toHaveBeenCalled();
+    expect(mockRegistryResolve).not.toHaveBeenCalled();
+    expect(svcCache.has(`schemata:${PLATFORM_DATABASE_ID}:app_public`)).toBe(false);
+  });
+
+  it('rejects the whole X-Schemata surface when any requested schema belongs to another database', async () => {
+    const { routingQuery } = setupPools([allowRow], {
+      app_public: DATABASE_ID,
+      platform_public: PLATFORM_DATABASE_ID
+    });
+
+    const response = await request(pipelineApp())
+      .post('/graphql')
+      .set('Host', 'admin.example.com')
+      .set('X-Database-Id', DATABASE_ID)
+      .set('X-Schemata', 'app_public,platform_public')
+      .send({ query: '{ __typename }' });
+
+    expect(response.status).toBe(404);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('platform_private"."database_access')
+    )).toHaveLength(0);
+  });
+
+  it('revalidates a warm X-Schemata identity and evicts a cross-database binding before policy', async () => {
+    const cacheKey = `schemata:${PLATFORM_DATABASE_ID}:app_public`;
+    svcCache.set(cacheKey, {
+      dbname: 'routing_database',
+      anonRole: 'administrator',
+      roleName: 'administrator',
+      schema: ['app_public'],
+      domains: [],
+      databaseId: PLATFORM_DATABASE_ID,
+      isPublic: false
+    });
+    const { routingQuery, tenantQuery } = setupPools([allowRow]);
+
+    const response = await request(pipelineApp())
+      .post('/graphql')
+      .set('Host', 'admin.example.com')
+      .set('X-Database-Id', PLATFORM_DATABASE_ID)
+      .set('X-Schemata', 'app_public')
+      .send({ query: '{ __typename }' });
+
+    expect(response.status).toBe(404);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('FROM metaschema_public.schema scoped_schema')
+    )).toHaveLength(1);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('platform_private"."database_access')
+    )).toHaveLength(0);
+    expect(tenantQuery).not.toHaveBeenCalled();
+    expect(mockRegistryResolve).not.toHaveBeenCalled();
+    expect(svcCache.has(cacheKey)).toBe(false);
+  });
+
+  it('keeps X-Meta-Schema as a platform-management surface without applying tenant-schema binding', async () => {
+    const { routingQuery } = setupPools([allowRow]);
+
+    const response = await request(pipelineApp())
+      .post('/graphql')
+      .set('Host', 'admin.example.com')
+      .set('X-Database-Id', PLATFORM_DATABASE_ID)
+      .set('X-Meta-Schema', 'true')
+      .send({ query: '{ __typename }' });
+
+    expect(response.status).toBe(204);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('FROM metaschema_public.schema scoped_schema')
+    )).toHaveLength(0);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('platform_private"."database_access')
+    )).toHaveLength(1);
+  });
+
+  it('preserves physical-schema-only X-Schemata routing when the optional access policy is unset', async () => {
+    const tenantOptions = options();
+    delete tenantOptions.api?.databaseAccessPolicyFunction;
+    const { routingQuery } = setupPools([allowRow], {});
+
+    const response = await request(pipelineApp(tenantOptions))
+      .post('/graphql')
+      .set('Host', 'admin.example.com')
+      .set('X-Database-Id', PLATFORM_DATABASE_ID)
+      .set('X-Schemata', 'app_public')
+      .send({ query: '{ __typename }' });
+
+    expect(response.status).toBe(204);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('FROM metaschema_public.schema scoped_schema')
+    )).toHaveLength(0);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('platform_private"."database_access')
+    )).toHaveLength(0);
+  });
+
   it.each([
     ['scoped route', {}, 'resolve_route'],
     [
@@ -195,7 +322,7 @@ describe('database access policy pipeline ordering', () => {
     [
       'X-Schemata',
       { 'X-Database-Id': DATABASE_ID, 'X-Schemata': 'app_public' },
-      'information_schema.schemata'
+      'FROM metaschema_public.schema scoped_schema'
     ],
     [
       'X-Meta-Schema',
@@ -230,7 +357,8 @@ describe('database access policy pipeline ordering', () => {
       code: 'DATABASE_BILLING_SUSPENDED',
       http: 402
     });
-    expect(routingQuery.mock.calls.filter(([sql]) => String(sql).includes(identitySql))).toHaveLength(1);
+    expect(routingQuery.mock.calls.filter(([sql]) => String(sql).includes(identitySql)))
+      .toHaveLength(_label === 'X-Schemata' ? 2 : 1);
     expect(routingQuery.mock.calls.filter(([sql]) => String(sql).includes('database_access'))).toHaveLength(2);
     expect(tenantQuery).toHaveBeenCalledTimes(tenantQueriesAfterAllow);
     expect(mockRegistryResolve).toHaveBeenCalledTimes(settingsAfterAllow);
