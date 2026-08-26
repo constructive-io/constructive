@@ -160,6 +160,43 @@ const resolveModuleSettings = async (
   };
 };
 
+/**
+ * Hydrate a resolved API identity with tenant-owned module settings.
+ *
+ * This must run only after any configured database access policy has allowed
+ * the request. Building the loader context creates the tenant pool used by
+ * settings loaders, so doing this during route resolution would let a denied
+ * request reach the tenant database.
+ */
+const hydrateApiStructure = async (
+  pool: Pool,
+  opts: ApiOptions,
+  structure: ApiStructure
+): Promise<ApiStructure> => {
+  if (!structure.databaseId || !structure.apiId) return structure;
+
+  const loaderCtx = buildLoaderContext(pool, opts, {
+    api_id: structure.apiId,
+    database_id: structure.databaseId,
+    dbname: structure.dbname,
+    role_name: structure.roleName,
+    anon_role: structure.anonRole,
+    is_public: structure.isPublic ?? false,
+    schemas: structure.schema
+  });
+  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
+
+  return {
+    ...structure,
+    rlsModule: settings.rlsModule,
+    authSettings: settings.authSettings,
+    corsOrigins: settings.corsOrigins,
+    databaseSettings: settings.databaseSettings,
+    pubkeyChallengeSettings: settings.pubkeyChallengeSettings,
+    webauthnSettings: settings.webauthnSettings
+  };
+};
+
 // =============================================================================
 // Helpers
 // =============================================================================
@@ -331,10 +368,8 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
     return null;
   }
 
-  const loaderCtx = buildLoaderContext(pool, opts, row);
-  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
-  log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${settings.rlsModule ? 'found' : 'none'}, authSettings: ${settings.authSettings ? 'found' : 'none'}`);
-  return toApiStructure(row, opts, settings);
+  log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}]`);
+  return toApiStructure(row, opts);
 };
 
 const resolveMetaSchemaHeader = (
@@ -364,34 +399,14 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
 
   log.debug(`[scoped-routing] resolved host=${host} → api=${structure.apiId} db=${structure.dbname}`);
 
-  if (!structure.databaseId || !structure.apiId) return structure;
-
-  const loaderCtx = buildLoaderContext(pool, opts, {
-    api_id: structure.apiId,
-    database_id: structure.databaseId,
-    dbname: structure.dbname,
-    role_name: structure.roleName,
-    anon_role: structure.anonRole,
-    is_public: structure.isPublic ?? false,
-    schemas: structure.schema
-  });
-  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
-  return {
-    ...structure,
-    rlsModule: settings.rlsModule,
-    authSettings: settings.authSettings,
-    corsOrigins: settings.corsOrigins,
-    databaseSettings: settings.databaseSettings,
-    pubkeyChallengeSettings: settings.pubkeyChallengeSettings,
-    webauthnSettings: settings.webauthnSettings
-  };
+  return structure;
 };
 
 // =============================================================================
 // Main Resolution Function
 // =============================================================================
 
-export const getApiConfig = async (
+export const getApiIdentity = async (
   opts: ApiOptions,
   req: Request
 ): Promise<ApiConfigResult> => {
@@ -460,12 +475,31 @@ export const getApiConfig = async (
     break;
   }
 
-  // Cache successful results
+  // Cache only route identity. Tenant module settings are resolved after the
+  // live access policy, so a warm service cache cannot bypass that policy.
   if (result && !isApiError(result)) {
-    assertDatabaseId(result);
-    svcCache.set(cacheKey, result);
+    if (result.databaseId) svcCache.set(cacheKey, result);
   }
 
+  return result;
+};
+
+/**
+ * Resolve API identity for callers that use this helper directly.
+ *
+ * The server middleware uses `getApiIdentity` so a configured live policy can
+ * turn a missing identity into its stable fail-closed response. Direct callers
+ * keep the historical no-default-database assertion.
+ */
+export const getApiConfig = async (
+  opts: ApiOptions,
+  req: Request
+): Promise<ApiConfigResult> => {
+  const result = await getApiIdentity(opts, req);
+  if (result && !isApiError(result)) {
+    assertDatabaseId(result);
+    return hydrateApiStructure(getPgPool(opts.pg), opts, result);
+  }
   return result;
 };
 
@@ -478,7 +512,7 @@ export const createApiMiddleware = (opts: ApiOptions) => {
     log.debug(`[api-middleware] ${req.method} ${req.path}`);
 
     try {
-      const apiConfig = await getApiConfig(opts, req);
+      const apiConfig = await getApiIdentity(opts, req);
 
       if (isApiError(apiConfig)) {
         res.status(404).send(errorPage404Message('API not found', apiConfig.errorHtml));
@@ -492,6 +526,9 @@ export const createApiMiddleware = (opts: ApiOptions) => {
 
       req.api = apiConfig;
       req.databaseId = apiConfig.databaseId;
+      if (!req.databaseId && !opts.api?.databaseAccessPolicyFunction?.trim()) {
+        assertDatabaseId(apiConfig);
+      }
       log.debug(`Resolved API: db=${apiConfig.dbname}, schemas=[${apiConfig.schema?.join(', ')}]`);
       next();
     } catch (error: unknown) {
@@ -514,6 +551,32 @@ export const createApiMiddleware = (opts: ApiOptions) => {
       }
 
       log.error('API middleware error:', err);
+      res.status(500).send(errorPage50x);
+    }
+  };
+};
+
+/**
+ * Resolve tenant-owned API settings after the request's database identity has
+ * passed the optional live access policy.
+ */
+export const createApiSettingsMiddleware = (opts: ApiOptions) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.api || !req.databaseId) {
+      log.error('[api-settings-middleware] API identity was not resolved before settings hydration');
+      res.status(500).send(errorPage50x);
+      return;
+    }
+
+    try {
+      const pool = getPgPool(opts.pg);
+      req.api = await hydrateApiStructure(pool, opts, req.api);
+      log.debug(
+        `Hydrated API settings: db=${req.api.dbname}, rlsModule=${req.api.rlsModule ? 'found' : 'none'}, authSettings=${req.api.authSettings ? 'found' : 'none'}`
+      );
+      next();
+    } catch (error: unknown) {
+      log.error('[api-settings-middleware] API settings hydration failed:', error);
       res.status(500).send(errorPage50x);
     }
   };

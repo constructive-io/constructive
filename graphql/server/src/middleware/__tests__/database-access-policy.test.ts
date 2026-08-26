@@ -118,7 +118,7 @@ describe('database access policy middleware', () => {
     expect(next).toHaveBeenCalledWith();
   });
 
-  it('returns a GraphQL error envelope with the policy HTTP hint when access is denied', async () => {
+  it('returns the exact GraphQL 402 contract when access is denied', async () => {
     const query = jest.fn().mockResolvedValue({ rows: [denyRow] });
     mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
     const middleware = createDatabaseAccessPolicyMiddleware(
@@ -129,7 +129,7 @@ describe('database access policy middleware', () => {
 
     await middleware(createRequest('/graphql'), res, next);
 
-    expect(status).toHaveBeenCalledWith(200);
+    expect(status).toHaveBeenCalledWith(402);
     expect(json).toHaveBeenCalledWith({
       errors: [{
         message: denyRow.message,
@@ -183,7 +183,7 @@ describe('database access policy middleware', () => {
     await middleware(createRequest('/graphql'), res, next);
 
     expect(mockGetPgPool).not.toHaveBeenCalled();
-    expect(status).toHaveBeenCalledWith(200);
+    expect(status).toHaveBeenCalledWith(503);
     const error = json.mock.calls[0][0].errors[0];
     expect(error.message).toBe('Database access policy is temporarily unavailable.');
     expect(error.extensions).toEqual({
@@ -208,7 +208,7 @@ describe('database access policy middleware', () => {
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );
-    const { res, json } = createResponse();
+    const { res, status, json } = createResponse();
     const next = jest.fn();
 
     await middleware(createRequest('/graphql'), res, next);
@@ -217,6 +217,7 @@ describe('database access policy middleware', () => {
       code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
       http: 503
     });
+    expect(status).toHaveBeenCalledWith(503);
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -226,13 +227,14 @@ describe('database access policy middleware', () => {
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );
-    const { res, json } = createResponse();
+    const { res, status, json } = createResponse();
     const next = jest.fn();
 
     await middleware(createRequest('/graphql'), res, next);
 
     expect(json.mock.calls[0][0].errors[0].extensions.code)
       .toBe('DATABASE_ACCESS_POLICY_UNAVAILABLE');
+    expect(status).toHaveBeenCalledWith(503);
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -242,7 +244,7 @@ describe('database access policy middleware', () => {
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );
-    const { res, json } = createResponse();
+    const { res, status, json } = createResponse();
     const next = jest.fn();
     const req = createRequest('/graphql');
     req.databaseId = undefined;
@@ -252,6 +254,7 @@ describe('database access policy middleware', () => {
     expect(query).not.toHaveBeenCalled();
     expect(json.mock.calls[0][0].errors[0].extensions.code)
       .toBe('DATABASE_ACCESS_POLICY_UNAVAILABLE');
+    expect(status).toHaveBeenCalledWith(503);
     expect(next).not.toHaveBeenCalled();
   });
 

@@ -17,14 +17,16 @@ import type { Response } from 'express';
 /**
  * Send a {@link ConstructiveError} as a GraphQL error response.
  *
- * Uses HTTP 200 per the GraphQL-over-HTTP convention: transport succeeded, the
- * operation did not. The error's own `http` hint travels in `extensions`.
+ * Uses HTTP 200 by default per the GraphQL-over-HTTP convention. Boundary
+ * policies with an explicit transport contract may supply a different status;
+ * the error's own `http` hint still travels in `extensions`.
  */
 export function respondWithGraphQLError(
   res: Response,
-  error: ConstructiveError
+  error: ConstructiveError,
+  status = 200
 ): void {
-  res.status(200).json({
+  res.status(status).json({
     errors: [{ message: error.message, extensions: error.toExtensions() }],
   });
 }

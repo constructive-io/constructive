@@ -112,7 +112,8 @@ const rejectRequest = (
         message: decision.message,
         errorClass,
         http: decision.httpStatus
-      })
+      }),
+      decision.httpStatus
     );
     return;
   }

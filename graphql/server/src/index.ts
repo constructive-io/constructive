@@ -1,7 +1,13 @@
 export * from './server';
 
 // Export middleware for use in testing packages
-export { createApiMiddleware, getApiConfig,getSubdomain } from './middleware/api';
+export {
+  createApiMiddleware,
+  createApiSettingsMiddleware,
+  getApiConfig,
+  getApiIdentity,
+  getSubdomain
+} from './middleware/api';
 export { createAuthenticateMiddleware } from './middleware/auth';
 export { cors } from './middleware/cors';
 export { flush, flushService } from './middleware/flush';

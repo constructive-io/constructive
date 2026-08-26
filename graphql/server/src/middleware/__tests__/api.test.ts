@@ -14,7 +14,7 @@ import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 
 import type { ApiOptions } from '../../types';
-import { getApiConfig, getSvcKey } from '../api';
+import { getApiIdentity, getSvcKey } from '../api';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
 
@@ -61,7 +61,7 @@ describe('api middleware routing priority', () => {
     expect(getSvcKey(createPrivateOptions(), req)).toBe('api:db-123:customer-api');
   });
 
-  it('uses the same X-Api-Name priority when resolving and caching API config', async () => {
+  it('uses the same X-Api-Name priority when resolving and caching API identity', async () => {
     const query = jest.fn(async (_sql: string, params: unknown[]) => {
       if (Array.isArray(params[0])) {
         return {
@@ -97,7 +97,7 @@ describe('api middleware routing priority', () => {
       'X-Schemata': 'app_public'
     });
 
-    const result = await getApiConfig(createPrivateOptions(), req);
+    const result = await getApiIdentity(createPrivateOptions(), req);
 
     expect(req.svc_key).toBe('api:db-123:customer-api');
     expect(result).toMatchObject({

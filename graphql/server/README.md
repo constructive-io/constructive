@@ -109,11 +109,11 @@ This is a production-only server: every request is resolved through the scoped-r
   - `X-Api-Name` + `X-Database-Id`
   - `X-Schemata` + `X-Database-Id`
   - `X-Meta-Schema` + `X-Database-Id`
-- A resolved database id is always required. There is no default database, so a request that resolves without a database id is rejected (`NO_DATABASE_ID` → HTTP 500).
+- A resolved database id is always required. There is no default database, so a request that resolves without one is rejected as `NO_DATABASE_ID` (HTTP 500) when no access policy is configured, or `DATABASE_ACCESS_POLICY_UNAVAILABLE` (HTTP 503) when the live policy must fail closed.
 
 ### Database access policy
 
-Set `API_DATABASE_ACCESS_POLICY_FUNCTION` to a lowercase, schema-qualified PostgreSQL function when new requests must pass a control-plane access decision. The server calls the function through its configured routing database after route resolution and before tenant authentication, including for private `X-Api-Name`, `X-Schemata`, and `X-Meta-Schema` routes. The option is disabled when unset; when configured, errors and malformed decisions fail closed and decisions are never cached.
+Set `API_DATABASE_ACCESS_POLICY_FUNCTION` to a lowercase, schema-qualified PostgreSQL function when new requests must pass a control-plane access decision. The server calls the function through its configured routing database after route identity resolution and before tenant settings, tenant authentication, or request context, including for private `X-Api-Name`, `X-Schemata`, and `X-Meta-Schema` routes. The option is disabled when unset; when configured, errors and malformed decisions fail closed and decisions are never cached.
 
 The function accepts one UUID database id and returns exactly one row:
 
@@ -127,7 +127,7 @@ returns table (
 )
 ```
 
-An allowed row must set the three denial fields to `NULL`. A denied row must provide an uppercase machine code, a non-empty client-safe message of at most 512 characters, and an HTTP status from 400 through 599. GraphQL denials use HTTP 200 with that status in `errors[].extensions.http`; REST denials use the returned HTTP status.
+An allowed row must set the three denial fields to `NULL`. A denied row must provide an uppercase machine code, a non-empty client-safe message of at most 512 characters, and an HTTP status from 400 through 599. GraphQL denials keep a GraphQL error envelope and use the returned HTTP status, which is also present in `errors[].extensions.http`; REST denials use the same status.
 
 ## Configuration
 
