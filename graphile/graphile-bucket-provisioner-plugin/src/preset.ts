@@ -35,7 +35,6 @@ import type { BucketProvisionerPluginOptions } from './types';
  *     BucketProvisionerPreset({
  *       connection: getConnection, // pass function ref, NOT getConnection()
  *       allowedOrigins: ['https://app.example.com'],
- *       bucketNamePrefix: 'myapp',
  *     }),
  *   ],
  * };

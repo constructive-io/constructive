@@ -67,7 +67,6 @@ describe('BucketProvisionerPreset', () => {
         secretAccessKey: 'secret',
       },
       allowedOrigins: ['https://app.example.com'],
-      bucketNamePrefix: 'myapp',
       versioning: true,
     });
 

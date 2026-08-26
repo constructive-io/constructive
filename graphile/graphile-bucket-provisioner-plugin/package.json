@@ -1,7 +1,7 @@
 {
   "name": "graphile-bucket-provisioner-plugin",
   "version": "1.14.0",
-  "description": "Bucket provisioning plugin for PostGraphile v5 — auto-provisions S3 buckets on bucket table mutations",
+  "description": "Bucket provisioning plugin for PostGraphile v5 — explicitly provisions S3 buckets via a GraphQL mutation",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
@@ -42,7 +42,8 @@
   "dependencies": {
     "@constructive-io/bucket-provisioner": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/quotes": "^18.2.4"
+    "@pgsql/quotes": "^18.2.4",
+    "graphile-storage-registry": "workspace:^"
   },
   "peerDependencies": {
     "grafast": "^1.1.1",

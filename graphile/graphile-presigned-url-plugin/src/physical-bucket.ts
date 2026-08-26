@@ -10,6 +10,7 @@
  */
 
 import { Logger } from '@pgpmjs/logger';
+import { recordPhysicalName } from 'graphile-storage-registry';
 
 import { type WithPgClient, withRequestPgClient } from './request-pg-client';
 import { s3FailureError } from './s3-failure';
@@ -140,13 +141,16 @@ export async function provisionAndRecordPhysicalBucket(
   // guard keeps this idempotent and race-safe across concurrent first uploads.
   // The catalog-sync trigger on this UPDATE needs `jwt.claims.database_id`, so the
   // write runs under the resolved database claim (privileged role preserved).
-  await withRequestPgClient(withPgClient, { 'jwt.claims.database_id': databaseId }, (client) =>
-    client.query({
-      text: `UPDATE ${storageConfig.bucketsQualifiedName}
-             SET physical_name = $1
-             WHERE id = $2 AND physical_name IS NULL`,
-      values: [s3BucketName, bucket.id],
-    }),
+  await withRequestPgClient(
+    withPgClient,
+    { 'jwt.claims.database_id': databaseId },
+    (client) =>
+      recordPhysicalName(
+        (query) => client.query(query),
+        storageConfig.bucketsQualifiedName,
+        bucket.id,
+        s3BucketName,
+      ),
   );
   bucket.physical_name = s3BucketName;
   log.info(`Recorded physical_name="${s3BucketName}" on bucket ${bucket.id}`);

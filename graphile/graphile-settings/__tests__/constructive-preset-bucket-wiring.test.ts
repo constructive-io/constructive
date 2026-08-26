@@ -56,22 +56,17 @@ describe('ConstructivePreset bucket-provisioner wiring', () => {
     createConstructivePreset();
 
     const { resolveBucketName } = captured.bucketProvisionerOptions;
-    // provisioner plugin signature: (bucketKey, databaseId)
-    expect(resolveBucketName('public', DATABASE_ID)).toMatch(
+    // Both plugins use the signature: (databaseId, bucketKey)
+    expect(resolveBucketName(DATABASE_ID, 'public')).toMatch(
       new RegExp(`^${PREFIX}-public-[a-f0-9]{12}$`),
     );
-    expect(resolveBucketName('private', DATABASE_ID)).toMatch(
+    expect(resolveBucketName(DATABASE_ID, 'private')).toMatch(
       new RegExp(`^${PREFIX}-private-[a-f0-9]{12}$`),
     );
     // The digest is what carries the tenant, so two databases cannot collide.
-    expect(resolveBucketName('public', DATABASE_ID)).not.toBe(
-      resolveBucketName('public', '11111111-2222-3333-4444-555555555555'),
+    expect(resolveBucketName(DATABASE_ID, 'public')).not.toBe(
+      resolveBucketName('11111111-2222-3333-4444-555555555555', 'public'),
     );
-  });
-
-  it('disables auto-provision-on-create so buckets are minted lazily / explicitly', () => {
-    createConstructivePreset();
-    expect(captured.bucketProvisionerOptions.autoProvision).toBe(false);
   });
 
   it('does not wire the provisioner preset when presigned uploads are disabled', () => {

@@ -26,7 +26,7 @@ import {
   PgTypeMappingsPreset,
   RequiredInputPreset
 } from '../plugins';
-import { createBucketNameResolver, createEnsureBucketProvisioned, createProvisionerBucketNameResolver, getAllowedOrigins,getPresignedUrlS3Config } from '../presigned-url-resolver';
+import { createBucketNameResolver, createEnsureBucketProvisioned, getAllowedOrigins,getPresignedUrlS3Config } from '../presigned-url-resolver';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';
 
 /**
@@ -207,16 +207,7 @@ export function createConstructivePreset(
       BucketProvisionerPreset({
         connection: getBucketProvisionerConnection,
         allowedOrigins: getAllowedOrigins(),
-        // Same tenant-aware naming policy as the presigned (lazy) path, so the
-        // eager provisionBucket mutation mints the identical physical name
-        // (`{prefix}-{bucketKey}-{databaseId}`) instead of falling back to the
-        // bare logical bucket key.
-        resolveBucketName: createProvisionerBucketNameResolver(),
-        // S3 buckets are provisioned lazily (on first upload) or explicitly via
-        // the provisionBucket mutation. Disable the auto-provision-on-create
-        // hook so a createBucket GraphQL mutation records the row without
-        // eagerly minting an S3 bucket that may never receive an upload.
-        autoProvision: false
+        resolveBucketName: createBucketNameResolver()
       })
     );
   }

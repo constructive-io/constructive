@@ -1,27 +1,14 @@
 /**
- * Tests for the bucket provisioner plugin.
- *
- * Covers:
- * - provisionBucket mutation (explicit provisioning)
- * - Auto-provisioning hook on bucket create mutations
- * - CORS update hook on bucket update mutations
- * - CORS resolution hierarchy (bucket > storage_module > plugin)
- * - Wildcard CORS handling (['*'])
- * - Error handling and graceful degradation
- * - Connection config resolution (lazy getter, static)
- * - Bucket name resolution (prefix, custom resolver)
- * - Storage module config reading
+ * Tests for the explicit bucket provisioning mutation.
  */
 
-// Mock @constructive-io/bucket-provisioner before any imports
 const mockProvision = jest.fn();
-const mockUpdateCors = jest.fn();
 const mockBucketProvisionerConstructor = jest.fn();
 
 jest.mock('@constructive-io/bucket-provisioner', () => ({
   BucketProvisioner: jest.fn().mockImplementation((opts: any) => {
     mockBucketProvisionerConstructor(opts);
-    return { provision: mockProvision, updateCors: mockUpdateCors };
+    return { provision: mockProvision };
   }),
 }));
 
@@ -34,7 +21,6 @@ jest.mock('@pgpmjs/logger', () => ({
   })),
 }));
 
-// Mock grafast
 let capturedLambdaCallback: Function | null = null;
 jest.mock('grafast', () => ({
   context: jest.fn(() => ({
@@ -47,26 +33,16 @@ jest.mock('grafast', () => ({
   object: jest.fn((obj: any) => obj),
 }));
 
-// Mock graphile-utils
-// The extendSchema mock must invoke the plan function so that `lambda` gets
-// called and capturedLambdaCallback is set.
 const mockGetRaw = jest.fn(() => 'mock-input');
 jest.mock('graphile-utils', () => ({
   extendSchema: jest.fn((factory: any) => {
     const schema = factory();
-    // Invoke the provisionBucket plan to trigger the lambda mock,
-    // which captures the callback into capturedLambdaCallback.
     if (schema.plans?.Mutation?.provisionBucket) {
-      schema.plans.Mutation.provisionBucket(
-        null,
-        { getRaw: mockGetRaw },
-      );
+      schema.plans.Mutation.provisionBucket(null, { getRaw: mockGetRaw });
     }
     return {
       name: 'ExtendSchemaPlugin',
-      schema: {
-        hooks: {},
-      },
+      schema: { hooks: {} },
       _typeDefs: schema.typeDefs,
       _plans: schema.plans,
     };
@@ -76,8 +52,6 @@ jest.mock('graphile-utils', () => ({
 
 import { createBucketProvisionerPlugin } from '../src/plugin';
 import type { BucketProvisionerPluginOptions } from '../src/types';
-
-// --- Test helpers ---
 
 function createDefaultOptions(
   overrides: Partial<BucketProvisionerPluginOptions> = {},
@@ -91,6 +65,7 @@ function createDefaultOptions(
       secretAccessKey: 'minioadmin',
     },
     allowedOrigins: ['https://app.example.com'],
+    resolveBucketName: (databaseId, bucketKey) => `tenant-${databaseId}-${bucketKey}`,
     ...overrides,
   };
 }
@@ -122,26 +97,21 @@ function createMockPgClient(overrides: Record<string, any> = {}) {
         type: 'public',
         is_public: true,
         allowed_origins: null,
+        physical_name: null,
       }],
     },
   };
 
-  // The grafast `withPgClient` client takes the `{ text, values }` object form
-  // (mirrored here), not node-pg's positional `(text, params)` args.
   return {
     query: jest.fn((arg: any) => {
       const sql: string = typeof arg === 'string' ? arg : arg.text;
       for (const [key, value] of Object.entries({ ...defaultQueries, ...overrides })) {
-        if (sql.includes(key)) {
-          return Promise.resolve(value);
-        }
+        if (sql.includes(key)) return Promise.resolve(value);
       }
       return Promise.resolve({ rows: [] });
     }),
   };
 }
-
-// --- Tests ---
 
 describe('createBucketProvisionerPlugin', () => {
   beforeEach(() => {
@@ -149,9 +119,8 @@ describe('createBucketProvisionerPlugin', () => {
     mockProvision.mockReset();
     mockBucketProvisionerConstructor.mockReset();
     capturedLambdaCallback = null;
-
     mockProvision.mockResolvedValue({
-      bucketName: 'public',
+      bucketName: 'tenant-db-uuid-123-public',
       accessType: 'public',
       endpoint: 'http://minio:9000',
       provider: 'minio',
@@ -164,1307 +133,43 @@ describe('createBucketProvisionerPlugin', () => {
     });
   });
 
-  describe('plugin structure', () => {
-    it('returns a plugin object with name and schema hooks', () => {
-      const plugin = createBucketProvisionerPlugin(createDefaultOptions());
+  it('returns a mutation-only plugin', () => {
+    const plugin = createBucketProvisionerPlugin(createDefaultOptions());
 
-      expect(plugin).toBeDefined();
-      expect(plugin.name).toBe('BucketProvisionerPlugin');
-      expect(plugin.version).toBe('0.1.0');
-      expect(plugin.schema).toBeDefined();
-      expect(plugin.schema!.hooks).toBeDefined();
-    });
-
-    it('includes GraphQLObjectType_fields_field hook when autoProvision is true', () => {
-      const plugin = createBucketProvisionerPlugin(createDefaultOptions());
-
-      expect(plugin.schema!.hooks!.GraphQLObjectType_fields_field).toBeDefined();
-      expect(typeof plugin.schema!.hooks!.GraphQLObjectType_fields_field).toBe('function');
-    });
-
-    it('does not include fields_field hook when autoProvision is false', () => {
-      const plugin = createBucketProvisionerPlugin(
-        createDefaultOptions({ autoProvision: false }),
-      );
-
-      // When autoProvision is false, the plugin is just the extendSchema result
-      // which doesn't have the GraphQLObjectType_fields_field hook
-      const hooks = plugin.schema?.hooks ?? {};
-      expect(hooks.GraphQLObjectType_fields_field).toBeUndefined();
-    });
-
-    it('sets after dependencies for correct hook ordering', () => {
-      const plugin = createBucketProvisionerPlugin(createDefaultOptions());
-
-      expect(plugin.after).toContain('PgAttributesPlugin');
-      expect(plugin.after).toContain('PgMutationCreatePlugin');
-    });
+    expect(plugin).toBeDefined();
+    expect(plugin.name).toBe('ExtendSchemaPlugin');
+    expect(plugin.schema).toBeDefined();
+    expect(plugin.schema!.hooks).toEqual({});
   });
 
-  describe('provisionBucket mutation (via lambda callback)', () => {
-    it('provisions a public bucket successfully', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const result = await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: { role: 'admin' },
-      });
-
-      expect(result.success).toBe(true);
-      expect(result.bucketName).toBe('public');
-      expect(result.accessType).toBe('public');
-      expect(result.provider).toBe('minio');
-      expect(result.error).toBeNull();
-    });
-
-    it('provisions a private bucket', async () => {
-      const privateBucketOverrides = {
-        app_public: {
-          rows: [{
-            id: 'bucket-uuid-private',
-            key: 'private',
-            type: 'private',
-            is_public: false,
-          }],
-        },
-      };
-
-      mockProvision.mockResolvedValue({
-        bucketName: 'private',
-        accessType: 'private',
-        endpoint: 'http://minio:9000',
-        provider: 'minio',
-        region: 'us-east-1',
-        publicUrlPrefix: null,
-        blockPublicAccess: true,
-        versioning: false,
-        corsRules: [],
-        lifecycleRules: [],
-      });
-
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient(privateBucketOverrides);
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const result = await capturedLambdaCallback!({
-        input: { bucketKey: 'private' },
-        withPgClient: mockWithPgClient,
-        pgSettings: { role: 'admin' },
-      });
-
-      expect(result.success).toBe(true);
-      expect(result.bucketName).toBe('private');
-      expect(result.accessType).toBe('private');
-    });
-
-    it('uses bucketNamePrefix when set', async () => {
-      createBucketProvisionerPlugin(
-        createDefaultOptions({ bucketNamePrefix: 'myapp' }),
-      );
-
-      mockProvision.mockResolvedValue({
-        bucketName: 'myapp-public',
-        accessType: 'public',
-        endpoint: 'http://minio:9000',
-        provider: 'minio',
-        region: 'us-east-1',
-        publicUrlPrefix: null,
-        blockPublicAccess: false,
-        versioning: false,
-        corsRules: [],
-        lifecycleRules: [],
-      });
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const result = await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: { role: 'admin' },
-      });
-
-      // The provision call should have the prefixed name
-      expect(mockProvision).toHaveBeenCalledWith(
-        expect.objectContaining({ bucketName: 'myapp-public' }),
-      );
-      expect(result.success).toBe(true);
-    });
-
-    it('uses custom resolveBucketName when provided', async () => {
-      const customResolver = jest.fn(
-        (bucketKey: string, databaseId: string) => `org-${databaseId}-${bucketKey}`,
-      );
-
-      createBucketProvisionerPlugin(
-        createDefaultOptions({ resolveBucketName: customResolver }),
-      );
-
-      mockProvision.mockResolvedValue({
-        bucketName: 'org-db-uuid-123-public',
-        accessType: 'public',
-        endpoint: 'http://minio:9000',
-        provider: 'minio',
-        region: 'us-east-1',
-        publicUrlPrefix: null,
-        blockPublicAccess: false,
-        versioning: false,
-        corsRules: [],
-        lifecycleRules: [],
-      });
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: { role: 'admin' },
-      });
-
-      expect(customResolver).toHaveBeenCalledWith('public', 'db-uuid-123');
-      expect(mockProvision).toHaveBeenCalledWith(
-        expect.objectContaining({ bucketName: 'org-db-uuid-123-public' }),
-      );
-    });
-
-    it('throws INVALID_BUCKET_KEY for empty key', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      await expect(
-        capturedLambdaCallback!({
-          input: { bucketKey: '' },
-          withPgClient: jest.fn(),
-          pgSettings: {},
-        }),
-      ).rejects.toThrow('INVALID_BUCKET_KEY');
-    });
-
-    it('throws DATABASE_NOT_FOUND when database_id is null', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient({
-        'jwt_private.current_database_id': { rows: [{ id: null }] },
-      });
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      await expect(
-        capturedLambdaCallback!({
-          input: { bucketKey: 'public' },
-          withPgClient: mockWithPgClient,
-          pgSettings: {},
-        }),
-      ).rejects.toThrow('DATABASE_NOT_FOUND');
-    });
-
-    it('throws STORAGE_MODULE_NOT_PROVISIONED when no storage module exists', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient({
-        'metaschema_modules_public.storage_module': { rows: [] },
-      });
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      await expect(
-        capturedLambdaCallback!({
-          input: { bucketKey: 'public' },
-          withPgClient: mockWithPgClient,
-          pgSettings: {},
-        }),
-      ).rejects.toThrow('STORAGE_MODULE_NOT_PROVISIONED');
-    });
-
-    it('throws BUCKET_NOT_FOUND when bucket does not exist', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient({
-        app_public: { rows: [] },
-      });
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      await expect(
-        capturedLambdaCallback!({
-          input: { bucketKey: 'nonexistent' },
-          withPgClient: mockWithPgClient,
-          pgSettings: {},
-        }),
-      ).rejects.toThrow('BUCKET_NOT_FOUND');
-    });
-
-    it('returns error payload when provisioning fails', async () => {
-      mockProvision.mockRejectedValue(new Error('S3 connection refused'));
-
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const result = await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      });
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('S3 connection refused');
-      expect(result.bucketName).toBe('public');
-    });
-
-    it('records physical_name on the bucket row after successful provisioning', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const result = await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: { role: 'admin' },
-      });
-
-      expect(result.success).toBe(true);
-
-      const update = pgClient.query.mock.calls.find(
-        (c: any[]) => c[0]?.text?.includes('SET physical_name'),
-      );
-      expect(update).toBeDefined();
-      // Guarded so a re-provision never clobbers an already-recorded coordinate.
-      expect(update![0].text).toContain('physical_name IS NULL');
-      // Records the exact name returned by the provisioner against the row id.
-      expect(update![0].values).toEqual(['public', 'bucket-uuid-789']);
-    });
-
-    it('provisions the stored physical_name verbatim when already recorded', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient({
-        app_public: {
-          rows: [{
-            id: 'bucket-uuid-789',
-            key: 'public',
-            type: 'public',
-            is_public: true,
-            allowed_origins: null,
-            physical_name: 'preexisting-cdn-bucket',
-          }],
-        },
-      });
-      mockProvision.mockResolvedValue({
-        bucketName: 'preexisting-cdn-bucket',
-        accessType: 'public',
-        endpoint: 'http://minio:9000',
-        provider: 'minio',
-        region: 'us-east-1',
-        publicUrlPrefix: null,
-        blockPublicAccess: false,
-        versioning: false,
-        corsRules: [],
-        lifecycleRules: [],
-      });
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const result = await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: { role: 'admin' },
-      });
-
-      expect(result.success).toBe(true);
-      // The stored coordinate is provisioned as-is; no prefix/resolver name is minted.
-      expect(mockProvision).toHaveBeenCalledWith(
-        expect.objectContaining({ bucketName: 'preexisting-cdn-bucket' }),
-      );
-    });
-
-    it('does not record physical_name when provisioning fails', async () => {
-      mockProvision.mockRejectedValue(new Error('S3 connection refused'));
-
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const result = await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      });
-
-      expect(result.success).toBe(false);
-      const update = pgClient.query.mock.calls.find(
-        (c: any[]) => c[0]?.text?.includes('SET physical_name'),
-      );
-      expect(update).toBeUndefined();
-    });
-
-    it('applies per-database endpoint override from storage module', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient({
-        'metaschema_modules_public.storage_module': {
-          rows: [{
-            id: 'sm-uuid-456',
-            scope: 'app',
-            entity_table_id: null,
-            buckets_schema: 'app_public',
-            buckets_table: 'buckets',
-            endpoint: 'http://custom-minio:9000',
-            public_url_prefix: 'https://cdn.example.com',
-            provider: 'minio',
-            entity_schema: null,
-            entity_table: null,
-          }],
-        },
-      });
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      });
-
-      // Check that the provisioner was created with the overridden endpoint
-      expect(mockBucketProvisionerConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          connection: expect.objectContaining({
-            endpoint: 'http://custom-minio:9000',
-            provider: 'minio',
-          }),
-        }),
-      );
-    });
-
-    it('passes versioning option to provision call', async () => {
-      createBucketProvisionerPlugin(
-        createDefaultOptions({ versioning: true }),
-      );
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      });
-
-      expect(mockProvision).toHaveBeenCalledWith(
-        expect.objectContaining({ versioning: true }),
-      );
-    });
-
-    it('passes publicUrlPrefix from storage module to provision call', async () => {
-      createBucketProvisionerPlugin(createDefaultOptions());
-
-      const pgClient = createMockPgClient({
-        'metaschema_modules_public.storage_module': {
-          rows: [{
-            id: 'sm-uuid-456',
-            scope: 'app',
-            entity_table_id: null,
-            buckets_schema: 'app_public',
-            buckets_table: 'buckets',
-            endpoint: null,
-            public_url_prefix: 'https://cdn.example.com',
-            provider: null,
-            entity_schema: null,
-            entity_table: null,
-          }],
-        },
-      });
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      });
-
-      expect(mockProvision).toHaveBeenCalledWith(
-        expect.objectContaining({
-          publicUrlPrefix: 'https://cdn.example.com',
-        }),
-      );
-    });
-  });
-
-  describe('connection config resolution', () => {
-    it('resolves static connection config', () => {
-      const options = createDefaultOptions();
-      createBucketProvisionerPlugin(options);
-
-      // The connection should remain as-is (static object)
-      expect(typeof options.connection).toBe('object');
-    });
-
-    it('resolves lazy getter connection config on first use', async () => {
-      const connectionConfig = {
-        provider: 'minio' as const,
-        region: 'us-east-1',
-        endpoint: 'http://minio:9000',
-        accessKeyId: 'minioadmin',
-        secretAccessKey: 'minioadmin',
-      };
-      const getter = jest.fn(() => connectionConfig);
-
-      const options = createDefaultOptions({ connection: getter });
-      createBucketProvisionerPlugin(options);
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      });
-
-      expect(getter).toHaveBeenCalledTimes(1);
-
-      // Second call should use cached value
-      await capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      });
-
-      // Still only 1 call because it was cached
-      expect(getter).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('auto-provisioning hook (GraphQLObjectType_fields_field)', () => {
-    function getFieldsFieldHook(options?: Partial<BucketProvisionerPluginOptions>) {
-      const plugin = createBucketProvisionerPlugin(createDefaultOptions(options));
-      return plugin.schema!.hooks!.GraphQLObjectType_fields_field as Function;
-    }
-
-    it('skips non-mutation fields', () => {
-      const hook = getFieldsFieldHook();
-      const field = { resolve: jest.fn() };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: false,
-          fieldName: 'buckets',
-          pgCodec: { name: 'Bucket', attributes: {} },
-        },
-      };
-
-      const result = hook(field, build, context);
-      expect(result).toBe(field);
-    });
-
-    it('skips when pgCodec is missing', () => {
-      const hook = getFieldsFieldHook();
-      const field = { resolve: jest.fn() };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'createBucket',
-          pgCodec: null as any,
-        },
-      };
-
-      const result = hook(field, build, context);
-      expect(result).toBe(field);
-    });
-
-    it('skips when pgCodec has no @storageBuckets tag', () => {
-      const hook = getFieldsFieldHook();
-      const field = { resolve: jest.fn() };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'createBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {} },
-            extensions: { tags: {} },
-          },
-        },
-      };
-
-      const result = hook(field, build, context);
-      expect(result).toBe(field);
-    });
-
-    it('skips delete mutations (only wraps create and update)', () => {
-      const hook = getFieldsFieldHook();
-      const field = { resolve: jest.fn() };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'deleteBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const result = hook(field, build, context);
-      expect(result).toBe(field);
-    });
-
-    it('wraps update mutations on @storageBuckets-tagged tables', () => {
-      const hook = getFieldsFieldHook();
-      const originalResolve = jest.fn().mockResolvedValue({ data: { id: 'updated' } });
-      const field = { resolve: originalResolve };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'updateBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {}, allowed_origins: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const result = hook(field, build, context);
-      expect(result).not.toBe(field);
-      expect(result.resolve).toBeDefined();
-      expect(typeof result.resolve).toBe('function');
-    });
-
-    it('wraps create mutations on @storageBuckets-tagged tables', () => {
-      const hook = getFieldsFieldHook();
-      const originalResolve = jest.fn().mockResolvedValue({ data: { id: 'new-bucket' } });
-      const field = { resolve: originalResolve };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'createBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const result = hook(field, build, context);
-
-      expect(result).not.toBe(field);
-      expect(result.resolve).toBeDefined();
-      expect(typeof result.resolve).toBe('function');
-    });
-
-    it('calls original resolver first then provisions', async () => {
-      const hook = getFieldsFieldHook();
-      const mutationResult = { data: { id: 'new-bucket' } };
-      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
-      const field = { resolve: originalResolve };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'createBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const wrapped = hook(field, build, context);
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const graphqlContext = {
-        withPgClient: mockWithPgClient,
-        pgSettings: { role: 'admin' },
-      };
-
-      const result = await wrapped.resolve(
-        null,
-        { input: { bucket: { key: 'public', type: 'public' } } },
-        graphqlContext,
-        {},
-      );
-
-      // Original resolver should be called
-      expect(originalResolve).toHaveBeenCalled();
-      // The mutation result should be returned
-      expect(result).toBe(mutationResult);
-      // Provisioning should have been called
-      expect(mockProvision).toHaveBeenCalled();
-    });
-
-    it('returns mutation result even if provisioning fails', async () => {
-      const hook = getFieldsFieldHook();
-      const mutationResult = { data: { id: 'new-bucket' } };
-      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
-      const field = { resolve: originalResolve };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'createBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      mockProvision.mockRejectedValue(new Error('S3 connection refused'));
-
-      const wrapped = hook(field, build, context);
-
-      const pgClient = createMockPgClient();
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const graphqlContext = {
-        withPgClient: mockWithPgClient,
-        pgSettings: { role: 'admin' },
-      };
-
-      // Should NOT throw — provisioning errors are logged, not thrown
-      const result = await wrapped.resolve(
-        null,
-        { input: { bucket: { key: 'public', type: 'public' } } },
-        graphqlContext,
-        {},
-      );
-
-      expect(result).toBe(mutationResult);
-    });
-
-    it('skips provisioning when key/type not in mutation input', async () => {
-      const hook = getFieldsFieldHook();
-      const mutationResult = { data: { id: 'new-bucket' } };
-      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
-      const field = { resolve: originalResolve };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'createBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const wrapped = hook(field, build, context);
-
-      const result = await wrapped.resolve(
-        null,
-        { input: { bucket: { name: 'test' } } }, // Missing key and type
-        { withPgClient: jest.fn(), pgSettings: {} },
-        {},
-      );
-
-      // Should still return the mutation result
-      expect(result).toBe(mutationResult);
-      // Should NOT call provision
-      expect(mockProvision).not.toHaveBeenCalled();
-    });
-
-    it('skips provisioning when withPgClient not in context', async () => {
-      const hook = getFieldsFieldHook();
-      const mutationResult = { data: { id: 'new-bucket' } };
-      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
-      const field = { resolve: originalResolve };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'createBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const wrapped = hook(field, build, context);
-
-      const result = await wrapped.resolve(
-        null,
-        { input: { bucket: { key: 'public', type: 'public' } } },
-        { pgSettings: {} }, // No withPgClient
-        {},
-      );
-
-      expect(result).toBe(mutationResult);
-      expect(mockProvision).not.toHaveBeenCalled();
-    });
-
-    it('uses default resolver when field has no resolve', () => {
-      const hook = getFieldsFieldHook();
-      const field = {}; // No resolve function
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'createBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const wrapped = hook(field, build, context);
-      expect(wrapped.resolve).toBeDefined();
-    });
-
-    it('update mutation skips CORS update when allowed_origins not in input', async () => {
-      const hook = getFieldsFieldHook();
-      const mutationResult = { data: { id: 'updated' } };
-      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
-      const field = { resolve: originalResolve };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'updateBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {}, allowed_origins: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const wrapped = hook(field, build, context);
-
-      const result = await wrapped.resolve(
-        null,
-        { input: { bucket: { key: 'public', type: 'public' } } }, // No allowed_origins
-        { withPgClient: jest.fn(), pgSettings: {} },
-        {},
-      );
-
-      expect(result).toBe(mutationResult);
-      expect(mockUpdateCors).not.toHaveBeenCalled();
-    });
-
-    it('update mutation calls updateCors when allowed_origins is in input', async () => {
-      mockUpdateCors.mockResolvedValue([]);
-      const hook = getFieldsFieldHook();
-      const mutationResult = { data: { id: 'updated' } };
-      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
-      const field = { resolve: originalResolve };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'updateBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {}, allowed_origins: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const wrapped = hook(field, build, context);
-
-      const pgClient = createMockPgClient({
-        app_public: {
-          rows: [{
-            id: 'bucket-uuid-789',
-            key: 'public',
-            type: 'public',
-            is_public: true,
-            allowed_origins: ['https://new-origin.example.com'],
-          }],
-        },
-      });
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      const result = await wrapped.resolve(
-        null,
-        { input: { bucket: { key: 'public', allowed_origins: ['https://new-origin.example.com'] } } },
-        { withPgClient: mockWithPgClient, pgSettings: {} },
-        {},
-      );
-
-      expect(result).toBe(mutationResult);
-      expect(mockUpdateCors).toHaveBeenCalledWith(
-        expect.objectContaining({
-          bucketName: 'public',
-          accessType: 'public',
-          allowedOrigins: ['https://new-origin.example.com'],
-        }),
-      );
-    });
-
-    it('update mutation returns result even if CORS update fails', async () => {
-      mockUpdateCors.mockRejectedValue(new Error('S3 CORS update failed'));
-      const hook = getFieldsFieldHook();
-      const mutationResult = { data: { id: 'updated' } };
-      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
-      const field = { resolve: originalResolve };
-      const build = {};
-      const context = {
-        scope: {
-          isRootMutation: true,
-          fieldName: 'updateBucket',
-          pgCodec: {
-            name: 'Bucket',
-            attributes: { key: {}, type: {}, allowed_origins: {} },
-            extensions: {
-              tags: { storageBuckets: true },
-              pg: { schemaName: 'app_public', name: 'buckets' },
-            },
-          },
-        },
-      };
-
-      const wrapped = hook(field, build, context);
-
-      const pgClient = createMockPgClient({
-        app_public: {
-          rows: [{
-            id: 'bucket-uuid-789',
-            key: 'public',
-            type: 'public',
-            is_public: true,
-            allowed_origins: ['https://bad-origin.com'],
-          }],
-        },
-      });
-      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-        callback(pgClient),
-      );
-
-      // Should NOT throw
-      const result = await wrapped.resolve(
-        null,
-        { input: { bucket: { key: 'public', allowed_origins: ['https://bad-origin.com'] } } },
-        { withPgClient: mockWithPgClient, pgSettings: {} },
-        {},
-      );
-
-      expect(result).toBe(mutationResult);
-    });
-  });
-});
-
-describe('CORS resolution hierarchy', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockProvision.mockReset();
-    mockUpdateCors.mockReset();
-    mockBucketProvisionerConstructor.mockReset();
-    capturedLambdaCallback = null;
-  });
-
-  it('uses bucket-level allowed_origins when set', async () => {
-    mockProvision.mockResolvedValue({
-      bucketName: 'cdn-assets',
-      accessType: 'public',
-      endpoint: 'http://minio:9000',
-      provider: 'minio',
-      region: 'us-east-1',
-      publicUrlPrefix: null,
-      blockPublicAccess: false,
-      versioning: false,
-      corsRules: [],
-      lifecycleRules: [],
-    });
-
+  it('provisions a public bucket successfully', async () => {
     createBucketProvisionerPlugin(createDefaultOptions());
-
-    const pgClient = createMockPgClient({
-      app_public: {
-        rows: [{
-          id: 'bucket-uuid-cdn',
-          key: 'cdn-assets',
-          type: 'public',
-          is_public: true,
-          allowed_origins: ['*'],
-        }],
-      },
-      'metaschema_modules_public.storage_module': {
-        rows: [{
-          id: 'sm-uuid-456',
-          scope: 'app',
-          entity_table_id: null,
-          buckets_schema: 'app_public',
-          buckets_table: 'buckets',
-          endpoint: null,
-          public_url_prefix: null,
-          provider: null,
-          allowed_origins: ['https://db-default.example.com'],
-          entity_schema: null,
-          entity_table: null,
-        }],
-      },
-    });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-      callback(pgClient),
-    );
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'cdn-assets' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    // Bucket-level ['*'] should take precedence over storage_module and plugin defaults
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({
-        bucketName: 'cdn-assets',
-        allowedOrigins: ['*'],
-      }),
-    );
-  });
-
-  it('falls back to storage_module allowed_origins when bucket has none', async () => {
-    mockProvision.mockResolvedValue({
-      bucketName: 'uploads',
-      accessType: 'public',
-      endpoint: 'http://minio:9000',
-      provider: 'minio',
-      region: 'us-east-1',
-      publicUrlPrefix: null,
-      blockPublicAccess: false,
-      versioning: false,
-      corsRules: [],
-      lifecycleRules: [],
-    });
-
-    createBucketProvisionerPlugin(createDefaultOptions());
-
-    const pgClient = createMockPgClient({
-      app_public: {
-        rows: [{
-          id: 'bucket-uuid-uploads',
-          key: 'uploads',
-          type: 'public',
-          is_public: true,
-          allowed_origins: null, // No bucket-level override
-        }],
-      },
-      'metaschema_modules_public.storage_module': {
-        rows: [{
-          id: 'sm-uuid-456',
-          scope: 'app',
-          entity_table_id: null,
-          buckets_schema: 'app_public',
-          buckets_table: 'buckets',
-          endpoint: null,
-          public_url_prefix: null,
-          provider: null,
-          allowed_origins: ['https://db-default.example.com'],
-          entity_schema: null,
-          entity_table: null,
-        }],
-      },
-    });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-      callback(pgClient),
-    );
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'uploads' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    // Should fall back to storage_module level
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({
-        bucketName: 'uploads',
-        allowedOrigins: ['https://db-default.example.com'],
-      }),
-    );
-  });
-
-  it('falls back to plugin config allowedOrigins when both bucket and storage_module are null', async () => {
-    mockProvision.mockResolvedValue({
-      bucketName: 'docs',
-      accessType: 'private',
-      endpoint: 'http://minio:9000',
-      provider: 'minio',
-      region: 'us-east-1',
-      publicUrlPrefix: null,
-      blockPublicAccess: true,
-      versioning: false,
-      corsRules: [],
-      lifecycleRules: [],
-    });
-
-    createBucketProvisionerPlugin(createDefaultOptions({
-      allowedOrigins: ['https://plugin-default.example.com'],
-    }));
-
-    const pgClient = createMockPgClient({
-      app_public: {
-        rows: [{
-          id: 'bucket-uuid-docs',
-          key: 'docs',
-          type: 'private',
-          is_public: false,
-          allowed_origins: null,
-        }],
-      },
-      'metaschema_modules_public.storage_module': {
-        rows: [{
-          id: 'sm-uuid-456',
-          scope: 'app',
-          entity_table_id: null,
-          buckets_schema: 'app_public',
-          buckets_table: 'buckets',
-          endpoint: null,
-          public_url_prefix: null,
-          provider: null,
-          allowed_origins: null,
-          entity_schema: null,
-          entity_table: null,
-        }],
-      },
-    });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-      callback(pgClient),
-    );
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'docs' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    // Should fall back to plugin config
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({
-        bucketName: 'docs',
-        allowedOrigins: ['https://plugin-default.example.com'],
-      }),
-    );
-  });
-
-  it('wildcard CORS (["*"]) passes through correctly for CDN buckets', async () => {
-    mockProvision.mockResolvedValue({
-      bucketName: 'cdn-public',
-      accessType: 'public',
-      endpoint: 'http://minio:9000',
-      provider: 'minio',
-      region: 'us-east-1',
-      publicUrlPrefix: 'https://cdn.example.com',
-      blockPublicAccess: false,
-      versioning: false,
-      corsRules: [],
-      lifecycleRules: [],
-    });
-
-    createBucketProvisionerPlugin(createDefaultOptions());
-
-    const pgClient = createMockPgClient({
-      app_public: {
-        rows: [{
-          id: 'bucket-uuid-cdn',
-          key: 'cdn-public',
-          type: 'public',
-          is_public: true,
-          allowed_origins: ['*'],
-        }],
-      },
-    });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-      callback(pgClient),
-    );
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'cdn-public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({
-        allowedOrigins: ['*'],
-      }),
-    );
-  });
-});
-
-describe('bucket name resolution', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockProvision.mockReset();
-    mockUpdateCors.mockReset();
-    mockBucketProvisionerConstructor.mockReset();
-    capturedLambdaCallback = null;
-  });
-
-  it('uses plain bucket key when no prefix or resolver', async () => {
-    mockProvision.mockResolvedValue({
-      bucketName: 'private',
-      accessType: 'private',
-      endpoint: 'http://minio:9000',
-      provider: 'minio',
-      region: 'us-east-1',
-      publicUrlPrefix: null,
-      blockPublicAccess: true,
-      versioning: false,
-      corsRules: [],
-      lifecycleRules: [],
-    });
-
-    createBucketProvisionerPlugin({
-      connection: {
-        provider: 'minio',
-        region: 'us-east-1',
-        endpoint: 'http://minio:9000',
-        accessKeyId: 'test',
-        secretAccessKey: 'test',
-      },
-      allowedOrigins: ['https://app.example.com'],
-    });
-
-    const pgClient = createMockPgClient({
-      app_public: {
-        rows: [{
-          id: 'bucket-uuid',
-          key: 'private',
-          type: 'private',
-          is_public: false,
-        }],
-      },
-    });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-      callback(pgClient),
-    );
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'private' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({ bucketName: 'private' }),
-    );
-  });
-
-  it('resolveBucketName takes precedence over bucketNamePrefix', async () => {
-    mockProvision.mockResolvedValue({
-      bucketName: 'custom-public',
-      accessType: 'public',
-      endpoint: 'http://minio:9000',
-      provider: 'minio',
-      region: 'us-east-1',
-      publicUrlPrefix: null,
-      blockPublicAccess: false,
-      versioning: false,
-      corsRules: [],
-      lifecycleRules: [],
-    });
-
-    const customResolver = jest.fn(
-      (bucketKey: string) => `custom-${bucketKey}`,
-    );
-
-    createBucketProvisionerPlugin({
-      connection: {
-        provider: 'minio',
-        region: 'us-east-1',
-        endpoint: 'http://minio:9000',
-        accessKeyId: 'test',
-        secretAccessKey: 'test',
-      },
-      allowedOrigins: ['https://app.example.com'],
-      bucketNamePrefix: 'should-be-ignored',
-      resolveBucketName: customResolver,
-    });
-
     const pgClient = createMockPgClient();
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
-      callback(pgClient),
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    const result = await capturedLambdaCallback!({
+      input: { bucketKey: 'public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: { role: 'admin' },
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.bucketName).toBe('tenant-db-uuid-123-public');
+    expect(result.accessType).toBe('public');
+    expect(result.provider).toBe('minio');
+    expect(result.error).toBeNull();
+    expect(mockProvision).toHaveBeenCalledWith(
+      expect.objectContaining({ bucketName: 'tenant-db-uuid-123-public' }),
     );
+  });
+
+  it('uses the database-first resolver order and never passes the bare key', async () => {
+    const resolveBucketName = jest.fn(
+      (databaseId: string, bucketKey: string) => `physical-${databaseId}-${bucketKey}`,
+    );
+    createBucketProvisionerPlugin(createDefaultOptions({ resolveBucketName }));
+    const pgClient = createMockPgClient();
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
 
     await capturedLambdaCallback!({
       input: { bucketKey: 'public' },
@@ -1472,9 +177,307 @@ describe('bucket name resolution', () => {
       pgSettings: {},
     });
 
-    expect(customResolver).toHaveBeenCalled();
+    expect(resolveBucketName).toHaveBeenCalledWith('db-uuid-123', 'public');
     expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({ bucketName: 'custom-public' }),
+      expect.objectContaining({ bucketName: 'physical-db-uuid-123-public' }),
     );
+    expect(mockProvision).not.toHaveBeenCalledWith(
+      expect.objectContaining({ bucketName: 'public' }),
+    );
+  });
+
+  it('throws when no physical bucket naming policy is configured', async () => {
+    createBucketProvisionerPlugin(createDefaultOptions({ resolveBucketName: undefined }));
+    const pgClient = createMockPgClient();
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    await expect(
+      capturedLambdaCallback!({
+        input: { bucketKey: 'public' },
+        withPgClient: mockWithPgClient,
+        pgSettings: {},
+      }),
+    ).rejects.toThrow('STORAGE_BUCKET_NAME_POLICY_MISSING');
+    expect(mockProvision).not.toHaveBeenCalled();
+  });
+
+  it('provisions a private bucket', async () => {
+    mockProvision.mockResolvedValue({
+      bucketName: 'tenant-db-uuid-123-private',
+      accessType: 'private',
+      endpoint: 'http://minio:9000',
+      provider: 'minio',
+      region: 'us-east-1',
+      publicUrlPrefix: null,
+      blockPublicAccess: true,
+      versioning: false,
+      corsRules: [],
+      lifecycleRules: [],
+    });
+    createBucketProvisionerPlugin(createDefaultOptions());
+    const pgClient = createMockPgClient({
+      app_public: {
+        rows: [{
+          id: 'bucket-uuid-private',
+          key: 'private',
+          type: 'private',
+          is_public: false,
+          allowed_origins: null,
+          physical_name: null,
+        }],
+      },
+    });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    const result = await capturedLambdaCallback!({
+      input: { bucketKey: 'private' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.accessType).toBe('private');
+  });
+
+  it('throws INVALID_BUCKET_KEY for an empty key', async () => {
+    createBucketProvisionerPlugin(createDefaultOptions());
+
+    await expect(
+      capturedLambdaCallback!({
+        input: { bucketKey: '' },
+        withPgClient: jest.fn(),
+        pgSettings: {},
+      }),
+    ).rejects.toThrow('INVALID_BUCKET_KEY');
+  });
+
+  it('throws DATABASE_NOT_FOUND when database_id is null', async () => {
+    createBucketProvisionerPlugin(createDefaultOptions());
+    const pgClient = createMockPgClient({
+      'jwt_private.current_database_id': { rows: [{ id: null }] },
+    });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    await expect(
+      capturedLambdaCallback!({
+        input: { bucketKey: 'public' },
+        withPgClient: mockWithPgClient,
+        pgSettings: {},
+      }),
+    ).rejects.toThrow('DATABASE_NOT_FOUND');
+  });
+
+  it('throws STORAGE_MODULE_NOT_PROVISIONED when no storage modules exist', async () => {
+    createBucketProvisionerPlugin(createDefaultOptions());
+    const pgClient = createMockPgClient({
+      'metaschema_modules_public.storage_module': { rows: [] },
+    });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    await expect(
+      capturedLambdaCallback!({
+        input: { bucketKey: 'public' },
+        withPgClient: mockWithPgClient,
+        pgSettings: {},
+      }),
+    ).rejects.toThrow('STORAGE_MODULE_NOT_PROVISIONED');
+  });
+
+  it('throws BUCKET_NOT_FOUND when the bucket does not exist', async () => {
+    createBucketProvisionerPlugin(createDefaultOptions());
+    const pgClient = createMockPgClient({ app_public: { rows: [] } });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    await expect(
+      capturedLambdaCallback!({
+        input: { bucketKey: 'missing' },
+        withPgClient: mockWithPgClient,
+        pgSettings: {},
+      }),
+    ).rejects.toThrow('BUCKET_NOT_FOUND');
+  });
+
+  it('returns an error payload when provisioning fails', async () => {
+    mockProvision.mockRejectedValue(new Error('S3 connection refused'));
+    createBucketProvisionerPlugin(createDefaultOptions());
+    const pgClient = createMockPgClient();
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    const result = await capturedLambdaCallback!({
+      input: { bucketKey: 'public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('S3 connection refused');
+    expect(result.bucketName).toBe('tenant-db-uuid-123-public');
+  });
+
+  it('records the physical name with the record-once guard', async () => {
+    createBucketProvisionerPlugin(createDefaultOptions());
+    const pgClient = createMockPgClient();
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: { role: 'admin' },
+    });
+
+    const update = pgClient.query.mock.calls.find(
+      (call: any[]) => call[0]?.text?.includes('SET physical_name'),
+    );
+    expect(update).toBeDefined();
+    expect(update![0].text).toContain('physical_name IS NULL');
+    expect(update![0].values).toEqual(['tenant-db-uuid-123-public', 'bucket-uuid-789']);
+    expect(mockWithPgClient).toHaveBeenCalledWith(null, expect.any(Function));
+  });
+
+  it('provisions the stored physical name verbatim', async () => {
+    createBucketProvisionerPlugin(createDefaultOptions());
+    const pgClient = createMockPgClient({
+      app_public: {
+        rows: [{
+          id: 'bucket-uuid-789',
+          key: 'public',
+          type: 'public',
+          is_public: true,
+          allowed_origins: null,
+          physical_name: 'preexisting-cdn-bucket',
+        }],
+      },
+    });
+    mockProvision.mockResolvedValue({
+      bucketName: 'preexisting-cdn-bucket',
+      accessType: 'public',
+      endpoint: 'http://minio:9000',
+      provider: 'minio',
+      region: 'us-east-1',
+      publicUrlPrefix: null,
+      blockPublicAccess: false,
+      versioning: false,
+      corsRules: [],
+      lifecycleRules: [],
+    });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    const result = await capturedLambdaCallback!({
+      input: { bucketKey: 'public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    expect(result.success).toBe(true);
+    expect(mockProvision).toHaveBeenCalledWith(
+      expect.objectContaining({ bucketName: 'preexisting-cdn-bucket' }),
+    );
+    const update = pgClient.query.mock.calls.find(
+      (call: any[]) => call[0]?.text?.includes('SET physical_name'),
+    );
+    expect(update).toBeDefined();
+    expect(update![0].text).toContain('physical_name IS NULL');
+  });
+
+  it('does not record a name when provisioning fails', async () => {
+    mockProvision.mockRejectedValue(new Error('S3 connection refused'));
+    createBucketProvisionerPlugin(createDefaultOptions());
+    const pgClient = createMockPgClient();
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    const update = pgClient.query.mock.calls.find(
+      (call: any[]) => call[0]?.text?.includes('SET physical_name'),
+    );
+    expect(update).toBeUndefined();
+  });
+
+  it('applies storage-module endpoint and public URL overrides', async () => {
+    createBucketProvisionerPlugin(createDefaultOptions());
+    const pgClient = createMockPgClient({
+      'metaschema_modules_public.storage_module': {
+        rows: [{
+          id: 'sm-uuid-456',
+          scope: 'app',
+          entity_table_id: null,
+          buckets_schema: 'app_public',
+          buckets_table: 'buckets',
+          endpoint: 'http://custom-minio:9000',
+          public_url_prefix: 'https://cdn.example.com',
+          provider: 'minio',
+          allowed_origins: null,
+          entity_schema: null,
+          entity_table: null,
+        }],
+      },
+    });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    expect(mockBucketProvisionerConstructor).toHaveBeenCalledWith(
+      expect.objectContaining({
+        connection: expect.objectContaining({
+          endpoint: 'http://custom-minio:9000',
+          provider: 'minio',
+        }),
+      }),
+    );
+    expect(mockProvision).toHaveBeenCalledWith(
+      expect.objectContaining({ publicUrlPrefix: 'https://cdn.example.com' }),
+    );
+  });
+
+  it('passes the versioning option to the provisioner', async () => {
+    createBucketProvisionerPlugin(createDefaultOptions({ versioning: true }));
+    const pgClient = createMockPgClient();
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    expect(mockProvision).toHaveBeenCalledWith(
+      expect.objectContaining({ versioning: true }),
+    );
+  });
+
+  it('caches a lazy connection getter', async () => {
+    const connection = {
+      provider: 'minio' as const,
+      region: 'us-east-1',
+      endpoint: 'http://minio:9000',
+      accessKeyId: 'minioadmin',
+      secretAccessKey: 'minioadmin',
+    };
+    const getter = jest.fn(() => connection);
+    const options = createDefaultOptions({ connection: getter });
+    createBucketProvisionerPlugin(options);
+    const pgClient = createMockPgClient();
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    expect(getter).toHaveBeenCalledTimes(1);
   });
 });

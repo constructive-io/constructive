@@ -15,7 +15,6 @@ import { BucketProvisioner, mintPhysicalBucketName } from '@constructive-io/buck
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { createS3Client } from '@constructive-io/s3-utils';
 import { Logger } from '@pgpmjs/logger';
-import type { BucketNameResolver as ProvisionerBucketNameResolver } from 'graphile-bucket-provisioner-plugin';
 import type { BucketNameResolver, EnsureBucketProvisioned,S3Config } from 'graphile-presigned-url-plugin';
 
 import { getBucketProvisionerConnection } from './bucket-provisioner-resolver';
@@ -121,21 +120,6 @@ function getBucketNamePrefix(): string {
 export function createBucketNameResolver(): BucketNameResolver {
   const prefix = getBucketNamePrefix();
   return (databaseId: string, bucketKey: string): string =>
-    mintPhysicalBucketName(prefix, databaseId, bucketKey);
-}
-
-/**
- * Create the bucket name resolver for the bucket provisioner plugin
- * (argument order: `(bucketKey, databaseId)`).
- *
- * Produces the exact same physical name as createBucketNameResolver()
- * (`{prefix}-{bucketKey}-{digest}`) so the eager `provisionBucket`
- * mutation mints the identical tenant-aware name that the lazy first-upload
- * path would. Throws on a missing prefix — no default bucket name.
- */
-export function createProvisionerBucketNameResolver(): ProvisionerBucketNameResolver {
-  const prefix = getBucketNamePrefix();
-  return (bucketKey: string, databaseId: string): string =>
     mintPhysicalBucketName(prefix, databaseId, bucketKey);
 }
 

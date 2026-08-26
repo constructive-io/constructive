@@ -57,16 +57,12 @@ describe('BucketProvisionerPluginOptions', () => {
         secretAccessKey: 'secret',
       },
       allowedOrigins: ['https://app.example.com', 'http://localhost:3000'],
-      bucketNamePrefix: 'myapp',
-      resolveBucketName: (key, dbId) => `${dbId}-${key}`,
+      resolveBucketName: (dbId, key) => `${dbId}-${key}`,
       versioning: true,
-      autoProvision: false,
     };
 
-    expect(options.bucketNamePrefix).toBe('myapp');
     expect(options.resolveBucketName).toBeDefined();
     expect(options.versioning).toBe(true);
-    expect(options.autoProvision).toBe(false);
   });
 });
 
@@ -98,12 +94,12 @@ describe('ConnectionConfigOrGetter', () => {
 });
 
 describe('BucketNameResolver', () => {
-  it('takes bucketKey and databaseId and returns a string', () => {
-    const resolver: BucketNameResolver = (bucketKey, databaseId) =>
+  it('takes databaseId and bucketKey and returns a string', () => {
+    const resolver: BucketNameResolver = (databaseId, bucketKey) =>
       `org-${databaseId}-${bucketKey}`;
 
-    expect(resolver('public', 'db-123')).toBe('org-db-123-public');
-    expect(resolver('private', 'db-456')).toBe('org-db-456-private');
+    expect(resolver('db-123', 'public')).toBe('org-db-123-public');
+    expect(resolver('db-456', 'private')).toBe('org-db-456-private');
   });
 });
 
