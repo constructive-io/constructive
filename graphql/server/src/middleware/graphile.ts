@@ -20,6 +20,7 @@ import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+import { createGraphQLErrorHttpStatusPlugin } from '../plugins/graphql-error-http-status-plugin';
 import type { DatabaseSettings } from '../types';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
@@ -167,12 +168,16 @@ const buildPreset = (
   roleName: string,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
-  compute?: ComputeConfig
+  compute?: ComputeConfig,
+  graphqlErrorHttpStatusCodes?: string[]
 ): GraphileConfig.Preset => {
   return {
     extends: [createConstructivePreset(databaseSettings)],
     plugins: [
       AuthCookiePlugin,
+      ...(graphqlErrorHttpStatusCodes?.length
+        ? [createGraphQLErrorHttpStatusPlugin(graphqlErrorHttpStatusCodes)]
+        : []),
       // Only registered when the compute module is provisioned for this
       // database — all schema/table names come from the constructive
       // metaschema (express-context compute module loader); the plugin has
@@ -403,7 +408,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
+      const preset = buildPreset(
+        pool,
+        schema || [],
+        anonRole,
+        roleName,
+        api.databaseSettings,
+        api.apiId,
+        compute,
+        opts.api?.graphqlErrorHttpStatusCodes
+      );
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,

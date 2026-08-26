@@ -41,6 +41,11 @@ export interface ApiOptions {
    * resolved database may accept a new request.
    */
   databaseAccessPolicyFunction?: string;
+  /**
+   * Optional registry codes whose GraphQL execution errors should set the HTTP
+   * response status. Unset preserves the standard HTTP 200 execution response.
+   */
+  graphqlErrorHttpStatusCodes?: string[];
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
   /**

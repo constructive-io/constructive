@@ -288,6 +288,18 @@ export const registry = {
     message: 'You have reached a plan limit for this resource.',
     positional: ['resource', 'limit']
   }),
+  DATABASE_BILLING_SUSPENDED: defineError({
+    code: 'DATABASE_BILLING_SUSPENDED',
+    class: 'public',
+    http: 402,
+    message: 'Database access is paused until billing is restored.'
+  }),
+  DATABASE_ACCESS_POLICY_UNAVAILABLE: defineError({
+    code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
+    class: 'public',
+    http: 503,
+    message: 'Database access could not be verified. Please try again.'
+  }),
   RATE_LIMITED: defineError({
     code: 'RATE_LIMITED',
     class: 'public',

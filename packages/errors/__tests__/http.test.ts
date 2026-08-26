@@ -23,6 +23,8 @@ describe('httpStatusFor', () => {
     expect(httpStatusFor('ACCOUNT_DISABLED')).toEqual({ status: 403, mapped: true });
     expect(httpStatusFor('ACCOUNT_EXISTS')).toEqual({ status: 409, mapped: true });
     expect(httpStatusFor('INVALID_CREDENTIALS')).toEqual({ status: 401, mapped: true });
+    expect(httpStatusFor('DATABASE_BILLING_SUSPENDED')).toEqual({ status: 402, mapped: true });
+    expect(httpStatusFor('DATABASE_ACCESS_POLICY_UNAVAILABLE')).toEqual({ status: 503, mapped: true });
     expect(reported).toEqual([]);
   });
 

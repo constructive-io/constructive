@@ -148,6 +148,20 @@ describe('getEnvOptions', () => {
     }).api?.databaseAccessPolicyFunction).toBeUndefined();
   });
 
+  it('parses the opt-in GraphQL execution-error HTTP status codes', () => {
+    expect(getGraphQLEnvVars({
+      API_GRAPHQL_ERROR_HTTP_STATUS_CODES:
+        ' DATABASE_BILLING_SUSPENDED, DATABASE_ACCESS_POLICY_UNAVAILABLE, '
+    }).api?.graphqlErrorHttpStatusCodes).toEqual([
+      'DATABASE_BILLING_SUSPENDED',
+      'DATABASE_ACCESS_POLICY_UNAVAILABLE'
+    ]);
+
+    expect(getGraphQLEnvVars({
+      API_GRAPHQL_ERROR_HTTP_STATUS_CODES: ' , '
+    }).api?.graphqlErrorHttpStatusCodes).toBeUndefined();
+  });
+
   it('parses SMS environment variables into typed options', () => {
     const result = getGraphQLEnvVars({
       SMS_PROVIDER: 'devsms',
