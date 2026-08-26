@@ -48,9 +48,9 @@ describe('mintPhysicalBucketName', () => {
     expect(name).not.toMatch(/^-|-$/);
   });
 
-  it('throws when a component cannot be sanitized', () => {
-    expect(() =>
-      mintPhysicalBucketName(PREFIX, DATABASE_ID, undefined as unknown as string),
-    ).toThrow();
+  it('falls back to the digest alone when both components sanitize away', () => {
+    const name = mintPhysicalBucketName('!!!', DATABASE_ID, '???');
+
+    expect(name).toMatch(/^[a-f0-9]{12}$/);
   });
 });
