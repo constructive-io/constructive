@@ -31,6 +31,7 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { createCaptchaMiddleware } from './middleware/captcha';
 import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { cors } from './middleware/cors';
+import { createDatabaseAccessPolicyMiddleware } from './middleware/database-access-policy';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
 import { flush, flushService } from './middleware/flush';
@@ -91,6 +92,7 @@ class Server {
 
     const app = express();
     const api = createApiMiddleware(effectiveOpts);
+    const databaseAccessPolicy = createDatabaseAccessPolicyMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
     const requestLogger = createRequestLogger({ observabilityEnabled });
 
@@ -162,6 +164,7 @@ class Server {
     app.use(requestIdMiddleware());
     app.use(requestLogger);
     app.use(api);
+    app.use(databaseAccessPolicy);
     app.use(authenticate);
     app.use(createContextMiddleware({
       pg: effectiveOpts.pg,

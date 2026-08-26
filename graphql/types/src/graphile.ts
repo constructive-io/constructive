@@ -36,6 +36,11 @@ export interface ApiOptions {
   roleName?: string;
   /** Whether the API is publicly accessible */
   isPublic?: boolean;
+  /**
+   * Optional schema-qualified PostgreSQL function that decides whether the
+   * resolved database may accept a new request.
+   */
+  databaseAccessPolicyFunction?: string;
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
   /**

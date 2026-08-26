@@ -111,6 +111,24 @@ This is a production-only server: every request is resolved through the scoped-r
   - `X-Meta-Schema` + `X-Database-Id`
 - A resolved database id is always required. There is no default database, so a request that resolves without a database id is rejected (`NO_DATABASE_ID` → HTTP 500).
 
+### Database access policy
+
+Set `API_DATABASE_ACCESS_POLICY_FUNCTION` to a lowercase, schema-qualified PostgreSQL function when new requests must pass a control-plane access decision. The server calls the function through its configured routing database after route resolution and before tenant authentication, including for private `X-Api-Name`, `X-Schemata`, and `X-Meta-Schema` routes. The option is disabled when unset; when configured, errors and malformed decisions fail closed and decisions are never cached.
+
+The function accepts one UUID database id and returns exactly one row:
+
+```sql
+schema.function(p_database_id uuid)
+returns table (
+  allowed boolean,
+  code text,
+  message text,
+  http_status integer
+)
+```
+
+An allowed row must set the three denial fields to `NULL`. A denied row must provide an uppercase machine code, a non-empty client-safe message of at most 512 characters, and an HTTP status from 400 through 599. GraphQL denials use HTTP 200 with that status in `errors[].extensions.http`; REST denials use the returned HTTP status.
+
 ## Configuration
 
 Configuration is merged from defaults, config files, and env vars via `@constructive-io/graphql-env`. See `graphql/env/README.md` for the full list and examples.
@@ -127,6 +145,7 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
 | `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |
 | `API_ROUTING_SCHEMA`    | Schema containing `resolve_route()`   | `routing_public`                                 |
+| `API_DATABASE_ACCESS_POLICY_FUNCTION` | Schema-qualified resolved-database policy function | unset |
 | `API_IS_PUBLIC`                | Serve public APIs only                | `true`                                                        |
 | `API_EXPOSED_SCHEMAS`          | Additional schemas to expose          | empty                                                         |
 | `API_META_SCHEMAS`             | Meta schemas to query                 | `routing_public,metaschema_public,metaschema_modules_public` |

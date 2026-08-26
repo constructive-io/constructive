@@ -138,6 +138,16 @@ describe('getEnvOptions', () => {
     expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
   });
 
+  it('parses and trims the optional database access policy function', () => {
+    expect(getGraphQLEnvVars({
+      API_DATABASE_ACCESS_POLICY_FUNCTION: ' platform_private.database_access '
+    }).api?.databaseAccessPolicyFunction).toBe('platform_private.database_access');
+
+    expect(getGraphQLEnvVars({
+      API_DATABASE_ACCESS_POLICY_FUNCTION: '   '
+    }).api?.databaseAccessPolicyFunction).toBeUndefined();
+  });
+
   it('parses SMS environment variables into typed options', () => {
     const result = getGraphQLEnvVars({
       SMS_PROVIDER: 'devsms',

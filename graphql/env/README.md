@@ -51,6 +51,7 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 
 ### API Configuration
 - `API_ROUTING_SCHEMA` - Schema containing the compiled `resolve_route()` resolver (production routing always resolves through it)
+- `API_DATABASE_ACCESS_POLICY_FUNCTION` - Optional schema-qualified function that authorizes requests for the resolved database
 - `API_IS_PUBLIC` - Whether API is public
 - `API_EXPOSED_SCHEMAS` - Comma-separated list of exposed schemas
 - `API_META_SCHEMAS` - Comma-separated list of meta schemas
