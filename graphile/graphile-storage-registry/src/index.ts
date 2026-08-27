@@ -8,3 +8,4 @@ export type {
   StoragePlanePair,
 } from './pairing';
 export { discoverStoragePlanes, pairStoragePlane } from './pairing';
+export { recordPhysicalName } from './physical-bucket';

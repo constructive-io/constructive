@@ -12,19 +12,16 @@
    <a href="https://www.npmjs.com/package/graphile-bucket-provisioner-plugin"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphile%2Fgraphile-bucket-provisioner-plugin%2Fpackage.json"/></a>
 </p>
 
-PostGraphile v5 plugin that automatically provisions S3-compatible buckets when bucket rows are created in the database. Wraps bucket creation mutations to call [`@constructive-io/bucket-provisioner`](../packages/bucket-provisioner) after the database row is inserted.
+PostGraphile v5 plugin that explicitly provisions S3-compatible buckets through a GraphQL mutation using [`@constructive-io/bucket-provisioner`](../packages/bucket-provisioner).
 
 ## Features
 
-- **Auto-provisioning hook** — Wraps `create*` mutations on tables tagged with `@storageBuckets` to automatically provision S3 buckets after row creation
-- **CORS update hook** — Wraps `update*` mutations to detect `allowed_origins` changes and re-apply CORS rules to the S3 bucket
+- **Explicit `provisionBucket` mutation** — GraphQL mutation for manual/retry provisioning of any bucket
 - **3-tier CORS resolution** — Bucket-level `allowed_origins` → storage module-level `allowed_origins` → plugin config `allowedOrigins`
 - **Wildcard CORS** — Set `allowed_origins = ['*']` on a bucket for fully open CDN/public deployments
-- **Explicit `provisionBucket` mutation** — GraphQL mutation for manual/retry provisioning of any bucket
 - **Per-database overrides** — Reads `endpoint`, `provider`, `public_url_prefix`, and `allowed_origins` from the `storage_module` table for multi-tenant setups
 - **Lazy S3 config** — Connection config can be a function (evaluated once, cached) to avoid eager env-var reads at import time
-- **Graceful error handling** — Provisioning and CORS update failures are logged but never fail the mutation (admin can retry via `provisionBucket`)
-- **Custom bucket naming** — Supports prefix-based naming or a fully custom `resolveBucketName` function
+- **Deployment-controlled naming** — Requires a `resolveBucketName` policy for tenant-aware physical bucket names
 
 ## Installation
 
@@ -120,10 +117,8 @@ Creates the plugin instance. Returns a `GraphileConfig.Plugin`.
 |--------|------|-------------|
 | `connection` | `StorageConnectionConfig \| () => StorageConnectionConfig` | S3 connection config (static or lazy getter) |
 | `allowedOrigins` | `string[]` | CORS allowed origins for bucket configuration |
-| `bucketNamePrefix` | `string?` | Prefix for S3 bucket names (e.g., `"myapp"` → `"myapp-public"`) |
-| `resolveBucketName` | `(bucketKey, databaseId) => string` | Custom bucket name resolver (takes precedence over prefix) |
+| `resolveBucketName` | `(databaseId, bucketKey) => string` | Deployment policy for deriving a tenant-aware physical bucket name |
 | `versioning` | `boolean?` | Enable S3 versioning on provisioned buckets (default: `false`) |
-| `autoProvision` | `boolean?` | Enable auto-provisioning hook on create mutations (default: `true`) |
 
 ### `BucketProvisionerPreset(options)`
 

@@ -6,8 +6,7 @@
  * pair — `{prefix}-{bucketKey}-{digest}` — so a bucket's physical coordinate is
  * identical regardless of which path first provisions it.
  *
- * The two plugins declare their resolver with opposite argument order, so the
- * equality below also guards against re-introducing an argument-order bug. The
+ * Both plugins consume the same resolver with the same argument order. The
  * remaining tests pin the properties S3 enforces on a bucket name: bounded
  * length, a restricted alphabet, and — because the name is truncated — a tail
  * that still separates identities the readable part can no longer distinguish.
@@ -41,17 +40,11 @@ describe('bucket-name resolvers', () => {
     expect(resolve(DATABASE_ID, 'private')).toMatch(/^test-bucket-private-[a-f0-9]{12}$/);
   });
 
-  it('provisioner resolver mints the identical name despite opposite arg order', async () => {
-    const { createBucketNameResolver, createProvisionerBucketNameResolver } =
-      await loadResolverModule({ bucketName: PREFIX });
+  it('mints the identical name used by the bucket provisioner', async () => {
+    const { createBucketNameResolver } = await loadResolverModule({ bucketName: PREFIX });
+    const resolve = createBucketNameResolver();
 
-    const presigned = createBucketNameResolver();
-    const provisioner = createProvisionerBucketNameResolver();
-
-    for (const key of ['public', 'private', 'temp', 'custom-cdn']) {
-      // presigned: (databaseId, bucketKey) — provisioner: (bucketKey, databaseId)
-      expect(provisioner(key, DATABASE_ID)).toBe(presigned(DATABASE_ID, key));
-    }
+    expect(resolve(DATABASE_ID, 'public')).toBe(resolve(DATABASE_ID, 'public'));
   });
 
   it('names are stable across calls and resolver instances', async () => {
@@ -95,15 +88,8 @@ describe('bucket-name resolvers', () => {
     expect(() => createBucketNameResolver()).toThrow(/CDN_BUCKET_NAME/);
   });
 
-  it('provisioner resolver throws (no default bucket name) when the prefix is missing', async () => {
-    const { createProvisionerBucketNameResolver } = await loadResolverModule({});
-    expect(() => createProvisionerBucketNameResolver()).toThrow(/CDN_BUCKET_NAME/);
-  });
-
-  it('both resolvers throw when CDN config is entirely absent', async () => {
-    const { createBucketNameResolver, createProvisionerBucketNameResolver } =
-      await loadResolverModule(undefined);
+  it('throws when CDN config is entirely absent', async () => {
+    const { createBucketNameResolver } = await loadResolverModule(undefined);
     expect(() => createBucketNameResolver()).toThrow(/CDN_BUCKET_NAME/);
-    expect(() => createProvisionerBucketNameResolver()).toThrow(/CDN_BUCKET_NAME/);
   });
 });

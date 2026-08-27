@@ -1,13 +1,7 @@
 /**
  * Bucket Provisioner Plugin for PostGraphile v5
  *
- * Provides automatic S3 bucket provisioning for PostGraphile v5.
- * When bucket rows are created via GraphQL mutations, this plugin
- * automatically provisions the corresponding S3 bucket with the
- * correct privacy policies, CORS rules, and lifecycle settings.
- *
- * Also provides an explicit `provisionBucket` mutation for manual
- * provisioning or re-provisioning of S3 buckets.
+ * Provides an explicit `provisionBucket` mutation for PostGraphile v5.
  *
  * @example
  * ```typescript
@@ -31,7 +25,6 @@
  *     BucketProvisionerPreset({
  *       connection: getConnection, // pass function ref, NOT getConnection()
  *       allowedOrigins: ['https://app.example.com'],
- *       bucketNamePrefix: 'myapp',
  *     }),
  *   ],
  * };

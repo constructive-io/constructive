@@ -7,21 +7,7 @@
  *    logical bucket row in the database. Reads the bucket config via RLS,
  *    then calls BucketProvisioner to create and configure the S3 bucket.
  *
- * 2. Auto-provisioning hook — wraps `create*` mutations on tables tagged
- *    with `@storageBuckets` to automatically provision the S3 bucket after
- *    the database row is created.
- *
- * 3. CORS update hook — wraps `update*` mutations on `@storageBuckets` tables
- *    to detect changes to `allowed_origins` and re-apply CORS rules to the
- *    S3 bucket.
- *
- * CORS resolution hierarchy (most specific wins):
- *   1. Bucket-level `allowed_origins` column (per-bucket override)
- *   2. Storage-module-level `allowed_origins` column (per-database default)
- *   3. Plugin config `allowedOrigins` (global fallback)
- * Supports `['*']` for open/CDN mode (wildcard CORS).
- *
- * Both pathways use `@constructive-io/bucket-provisioner` for the actual
+ * This plugin uses `@constructive-io/bucket-provisioner` for the actual
  * S3 operations (bucket creation, Block Public Access, CORS, policies,
  * versioning, lifecycle rules).
  *
@@ -39,6 +25,7 @@ import { Logger } from '@pgpmjs/logger';
 import { QuoteUtils } from '@pgsql/quotes';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { recordPhysicalName as recordPhysicalBucketName } from 'graphile-storage-registry';
 import { extendSchema, gql } from 'graphile-utils';
 
 import type {
@@ -48,31 +35,6 @@ import type {
 const log = new Logger('graphile-bucket-provisioner:plugin');
 
 // --- Storage module queries ---
-
-/**
- * Resolve the storage module whose buckets table is the one being addressed.
- *
- * The buckets table's identity (schema + table, from the codec being mutated or
- * the module row) is the fact that names the plane — never a scope literal.
- */
-const STORAGE_MODULE_BY_BUCKETS_TABLE_QUERY = `
-  SELECT
-    sm.id,
-    sm.scope,
-    sm.entity_table_id,
-    bs.schema_name AS buckets_schema,
-    bt.name AS buckets_table,
-    sm.endpoint,
-    sm.public_url_prefix,
-    sm.provider,
-    sm.allowed_origins
-  FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  WHERE sm.database_id = $1
-    AND bs.schema_name = $2
-    AND bt.name = $3
-`;
 
 /**
  * Resolve ALL storage modules for a database (for bucket-key and ownerId-based
@@ -127,40 +89,6 @@ function runQuery(
   values?: unknown[],
 ): Promise<{ rows: any[] }> {
   return pgClient.query(values === undefined ? { text } : { text, values });
-}
-
-/**
- * Resolve the storage module whose buckets table is the one being addressed.
- *
- * This is the resolution the auto-provision/CORS hooks use: the codec being
- * mutated names its table, and the table names its module. A `@storageBuckets`
- * table with no module row (or with several) is a provisioning bug and throws.
- */
-async function resolveStorageModuleByBucketsTable(
-  pgClient: any,
-  databaseId: string,
-  schemaName: string,
-  tableName: string,
-): Promise<StorageModuleRow> {
-  const result = await runQuery(pgClient, STORAGE_MODULE_BY_BUCKETS_TABLE_QUERY, [
-    databaseId,
-    schemaName,
-    tableName,
-  ]);
-  const rows = result.rows as StorageModuleRow[];
-  if (rows.length === 0) {
-    throw new Error(
-      `STORAGE_MODULE_NOT_FOUND: no storage module in database ${databaseId} records ` +
-      `${schemaName}.${tableName} as its buckets table`,
-    );
-  }
-  if (rows.length > 1) {
-    throw new Error(
-      `STORAGE_MODULE_AMBIGUOUS: ${rows.length} storage modules in database ${databaseId} record ` +
-      `${schemaName}.${tableName} as their buckets table`,
-    );
-  }
-  return rows[0];
 }
 
 /**
@@ -262,29 +190,6 @@ function storedPhysicalName(row: Pick<BucketRow, 'physical_name'>): string | nul
   return row.physical_name == null ? null : row.physical_name;
 }
 
-/**
- * Record the physical S3 bucket name on the source bucket row.
- *
- * Runs in the system lane (`withPgClient(null, ...)`) — server bookkeeping,
- * RLS-independent. Idempotent via the `physical_name IS NULL` guard so a
- * re-provision never clobbers an already-recorded coordinate.
- */
-async function recordPhysicalName(
-  withPgClient: (pgSettings: null, cb: (client: any) => Promise<unknown>) => Promise<unknown>,
-  bucketsTable: string,
-  bucketId: string,
-  physicalName: string,
-): Promise<void> {
-  await withPgClient(null, (client: any) =>
-    runQuery(
-      client,
-      `UPDATE ${bucketsTable} SET physical_name = $1 WHERE id = $2 AND physical_name IS NULL`,
-      [physicalName, bucketId],
-    ),
-  );
-  log.info(`Recorded physical_name="${physicalName}" on bucket ${bucketId}`);
-}
-
 // --- Helpers ---
 
 /**
@@ -307,17 +212,19 @@ function resolveConnection(
  * Resolve the S3 bucket name from a logical bucket key.
  */
 function resolveBucketName(
-  bucketKey: string,
   databaseId: string,
+  bucketKey: string,
   options: BucketProvisionerPluginOptions,
 ): string {
-  if (options.resolveBucketName) {
-    return options.resolveBucketName(bucketKey, databaseId);
+  if (!options.resolveBucketName) {
+    throw new Error(
+      'STORAGE_BUCKET_NAME_POLICY_MISSING: no resolveBucketName was configured, so there is ' +
+      `no name to provision for bucket "${bucketKey}" of database ${databaseId}. ` +
+      'Physical bucket naming is a deployment policy; the configured s3.bucket is a ' +
+      'connection default and is never a tenant bucket.',
+    );
   }
-  if (options.bucketNamePrefix) {
-    return `${options.bucketNamePrefix}-${bucketKey}`;
-  }
-  return bucketKey;
+  return options.resolveBucketName(databaseId, bucketKey);
 }
 
 /**
@@ -375,8 +282,7 @@ function buildProvisioner(
 }
 
 /**
- * Core provisioning logic shared by both the explicit mutation and the
- * auto-provisioning hook.
+ * Core provisioning logic for the explicit mutation.
  */
 async function provisionBucketForRow(
   storageModule: StorageModuleRow,
@@ -419,64 +325,22 @@ async function provisionBucketForRow(
   return result;
 }
 
-/**
- * Update CORS on an existing S3 bucket when allowed_origins changes.
- */
-async function updateBucketCors(
-  storageModule: StorageModuleRow,
-  databaseId: string,
-  bucketKey: string,
-  bucketType: string,
-  bucketAllowedOrigins: string[] | null | undefined,
-  options: BucketProvisionerPluginOptions,
-  s3BucketName: string,
-): Promise<void> {
-  const accessType = bucketType as 'public' | 'private' | 'temp';
-
-  const effectiveOrigins = resolveAllowedOrigins(
-    bucketAllowedOrigins,
-    storageModule?.allowed_origins,
-    options.allowedOrigins,
-  );
-
-  const provisioner = buildProvisioner(options, storageModule, effectiveOrigins);
-
-  log.info(
-    `Updating CORS on S3 bucket "${s3BucketName}" ` +
-    `(origins=${JSON.stringify(effectiveOrigins)}) for database ${databaseId}`,
-  );
-
-  await provisioner.updateCors({
-    bucketName: s3BucketName,
-    accessType,
-    allowedOrigins: effectiveOrigins,
-  });
-
-  log.info(`Successfully updated CORS on S3 bucket "${s3BucketName}"`);
-}
-
 // --- Plugin factory ---
 
 /**
  * Creates the bucket provisioner plugin.
  *
- * This plugin provides two provisioning pathways:
+ * This plugin provides one provisioning pathway:
  *
  * 1. **Explicit `provisionBucket` mutation** — Call this mutation with a
  *    bucket key to provision (or re-provision) the S3 bucket. Protected
  *    by RLS on the buckets table.
- *
- * 2. **Auto-provisioning hook** — When `autoProvision` is true (default),
- *    wraps `create*` mutation resolvers on tables tagged with `@storageBuckets`
- *    to automatically provision the S3 bucket after the row is created.
  *
  * @param options - Plugin configuration (S3 credentials, CORS origins, naming)
  */
 export function createBucketProvisionerPlugin(
   options: BucketProvisionerPluginOptions,
 ): GraphileConfig.Plugin {
-  const autoProvision = options.autoProvision ?? true;
-
   // The extendSchema plugin adds the explicit provisionBucket mutation
   const mutationPlugin = extendSchema(() => ({
     typeDefs: gql`
@@ -556,7 +420,7 @@ export function createBucketProvisionerPlugin(
               // is authoritative and the naming hook is never consulted again.
               const recorded = storedPhysicalName(bucket);
               const s3BucketName = recorded === null
-                ? resolveBucketName(bucket.key, databaseId, options)
+                ? resolveBucketName(databaseId, bucket.key, options)
                 : recorded;
 
               try {
@@ -571,7 +435,15 @@ export function createBucketProvisionerPlugin(
                 );
 
                 // Record the exact provisioned name on the source row.
-                await recordPhysicalName(withPgClient, bucketsTable, bucket.id, result.bucketName);
+                await withPgClient(null, (client: any) =>
+                  recordPhysicalBucketName(
+                    (query) => runQuery(client, query.text, query.values),
+                    bucketsTable,
+                    bucket.id,
+                    result.bucketName,
+                  ),
+                );
+                log.info(`Recorded physical_name="${result.bucketName}" on bucket ${bucket.id}`);
 
                 return {
                   success: true,
@@ -599,236 +471,7 @@ export function createBucketProvisionerPlugin(
     },
   }));
 
-  // If autoProvision is disabled, return only the mutation plugin
-  if (!autoProvision) {
-    return mutationPlugin;
-  }
-
-  // Build a composite plugin that includes both the mutation and the hook
-  return {
-    ...mutationPlugin,
-    name: 'BucketProvisionerPlugin',
-    version: '0.1.0',
-    description:
-      'Auto-provisions S3 buckets when bucket rows are created, ' +
-      'updates CORS when allowed_origins changes on update, ' +
-      'and provides a provisionBucket mutation for explicit provisioning',
-    after: ['PgAttributesPlugin', 'PgMutationCreatePlugin', 'PgMutationUpdateDeletePlugin'],
-
-    schema: {
-      ...mutationPlugin.schema,
-      hooks: {
-        ...((mutationPlugin.schema as any)?.hooks ?? {}),
-
-        /**
-         * Wrap create and update mutation resolvers on tables tagged with @storageBuckets.
-         *
-         * - create*: After the row is created, provision the S3 bucket.
-         * - update*: After the row is updated, re-apply CORS if allowed_origins changed.
-         *
-         * If provisioning/CORS update fails, the DB row still exists (the mutation
-         * already committed), and the error is logged. Admin can retry via provisionBucket.
-         */
-        GraphQLObjectType_fields_field(field: any, build: any, context: any) {
-          const {
-            scope: { isRootMutation, fieldName, pgCodec },
-          } = context;
-
-          // Only wrap root mutation fields
-          if (!isRootMutation || !pgCodec || !pgCodec.attributes) {
-            return field;
-          }
-
-          // Check for @storageBuckets smart tag
-          const tags = pgCodec.extensions?.tags;
-          if (!tags?.storageBuckets) {
-            return field;
-          }
-
-          const isCreate = fieldName.startsWith('create');
-          const isUpdate = fieldName.startsWith('update');
-
-          // Only wrap create and update mutations (not delete)
-          if (!isCreate && !isUpdate) {
-            return field;
-          }
-
-          log.debug(`Wrapping mutation "${fieldName}" for ${isCreate ? 'auto-provisioning' : 'CORS update'} (codec: ${pgCodec.name})`);
-
-          // The codec being mutated names the buckets table — the hook always
-          // operates on the plane that table belongs to, never a guessed scope.
-          const codecSchemaName = pgCodec.extensions?.pg?.schemaName as string | undefined;
-          const codecTableName = pgCodec.extensions?.pg?.name as string | undefined;
-
-          const defaultResolver = (obj: any) => obj[fieldName];
-          const { resolve: oldResolve = defaultResolver, ...rest } = field;
-
-          return {
-            ...rest,
-            async resolve(source: any, args: any, graphqlContext: any, info: any) {
-              // Call the original resolver first (creates/updates the DB row)
-              const result = await oldResolve(source, args, graphqlContext, info);
-
-              try {
-                const inputKey = Object.keys(args.input || {}).find(
-                  (k) => k !== 'clientMutationId',
-                );
-                const bucketInput = inputKey ? args.input[inputKey] : null;
-
-                const withPgClient = graphqlContext.withPgClient;
-                const pgSettings = graphqlContext.pgSettings;
-
-                if (!withPgClient) {
-                  log.warn(`${isCreate ? 'Auto-provision' : 'CORS update'} skipped: withPgClient not available in context`);
-                  return result;
-                }
-
-                if (isCreate) {
-                  // --- CREATE: full provisioning ---
-                  if (!bucketInput?.key || !bucketInput?.type) {
-                    log.warn(
-                      `Auto-provision skipped for "${fieldName}": ` +
-                      `could not extract key/type from mutation input`,
-                    );
-                    return result;
-                  }
-
-                  if (!codecSchemaName || !codecTableName) {
-                    throw new Error(
-                      `Auto-provision failed for "${fieldName}": codec ${pgCodec.name} carries no pg schema/table identity`,
-                    );
-                  }
-
-                  await withPgClient(pgSettings, async (pgClient: any) => {
-                    const databaseId = await resolveDatabaseId(pgClient);
-                    if (!databaseId) {
-                      log.warn('Auto-provision skipped: could not resolve database_id');
-                      return;
-                    }
-
-                    // The mutated table names its module — the plane being written
-                    // is the plane that gets provisioned.
-                    const storageModule = await resolveStorageModuleByBucketsTable(
-                      pgClient, databaseId, codecSchemaName, codecTableName,
-                    );
-
-                    // Newly-created row has no stored coordinate yet — mint on first provision.
-                    const result = await provisionBucketForRow(
-                      storageModule,
-                      databaseId,
-                      bucketInput.key,
-                      bucketInput.type,
-                      bucketInput.allowedOrigins ?? bucketInput.allowed_origins ?? null,
-                      options,
-                      resolveBucketName(bucketInput.key, databaseId, options),
-                    );
-
-                    // Record the provisioned name on the just-created row.
-                    const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
-                    const ownerId = bucketInput.ownerId ?? bucketInput.owner_id ?? null;
-                    const idResult = await runQuery(
-                      pgClient,
-                      ownerId
-                        ? `SELECT id FROM ${bucketsTable} WHERE key = $1 AND owner_id = $2 LIMIT 1`
-                        : `SELECT id FROM ${bucketsTable} WHERE key = $1 LIMIT 1`,
-                      ownerId ? [bucketInput.key, ownerId] : [bucketInput.key],
-                    );
-                    const bucketId = idResult.rows[0]?.id;
-                    if (bucketId) await recordPhysicalName(withPgClient, bucketsTable, bucketId, result.bucketName);
-                  });
-                } else {
-                  // --- UPDATE: re-apply CORS if allowed_origins is in the patch ---
-                  const hasOriginsUpdate = bucketInput &&
-                    ('allowedOrigins' in bucketInput || 'allowed_origins' in bucketInput);
-
-                  if (!hasOriginsUpdate) {
-                    // allowed_origins not being changed, nothing to do
-                    return result;
-                  }
-
-                  if (!codecSchemaName || !codecTableName) {
-                    throw new Error(
-                      `CORS update failed for "${fieldName}": codec ${pgCodec.name} carries no pg schema/table identity`,
-                    );
-                  }
-
-                  await withPgClient(pgSettings, async (pgClient: any) => {
-                    const databaseId = await resolveDatabaseId(pgClient);
-                    if (!databaseId) {
-                      log.warn('CORS update skipped: could not resolve database_id');
-                      return;
-                    }
-
-                    // The mutated table names its module — CORS applies to the
-                    // plane whose row was updated.
-                    const storageModule = await resolveStorageModuleByBucketsTable(
-                      pgClient, databaseId, codecSchemaName, codecTableName,
-                    );
-
-                    // We need the bucket key — it may come from input or patch
-                    // For updates, PostGraphile uses nodeId or the row's PK, so
-                    // we read the bucket from the patch's key or from the nodeId
-                    const patchKey = bucketInput?.key;
-                    if (!patchKey) {
-                      log.warn(
-                        `CORS update skipped for "${fieldName}": ` +
-                        `could not determine bucket key from mutation input`,
-                      );
-                      return;
-                    }
-
-                    // Read the full bucket row (post-update) to get type + origins
-                    const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
-                    const bucketResult = await runQuery(
-                      pgClient,
-                      `SELECT id, key, type, is_public, allowed_origins, physical_name
-                       FROM ${bucketsTable}
-                       WHERE key = $1
-                       LIMIT 1`,
-                      [patchKey],
-                    );
-
-                    if (bucketResult.rows.length === 0) {
-                      log.warn(`CORS update skipped: bucket "${patchKey}" not found`);
-                      return;
-                    }
-
-                    const bucket = bucketResult.rows[0] as BucketRow;
-
-                    // CORS applies to the recorded physical bucket; if the row was
-                    // never provisioned there is nothing to update yet, so mint the
-                    // conventional name the first provision would use.
-                    const recorded = storedPhysicalName(bucket);
-
-                    await updateBucketCors(
-                      storageModule,
-                      databaseId,
-                      bucket.key,
-                      bucket.type,
-                      bucket.allowed_origins,
-                      options,
-                      recorded === null
-                        ? resolveBucketName(bucket.key, databaseId, options)
-                        : recorded,
-                    );
-                  });
-                }
-              } catch (err: any) {
-                log.error(
-                  `${isCreate ? 'Auto-provision' : 'CORS update'} failed for "${fieldName}": ${err.message}. ` +
-                  (isCreate
-                    ? `The bucket row was created but the S3 bucket was not provisioned. Use the provisionBucket mutation to retry.`
-                    : `The bucket row was updated but CORS was not applied to the S3 bucket. Use the provisionBucket mutation to retry.`),
-                );
-              }
-
-              return result;
-            },
-          };
-        },
-      },
-    },
-  };
+  return mutationPlugin;
 }
 
 export const BucketProvisionerPlugin = createBucketProvisionerPlugin;

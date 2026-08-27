@@ -1,9 +1,5 @@
 /**
  * Types for the bucket provisioner plugin.
- *
- * Defines plugin options, connection configuration, and provisioning result
- * types used by the Graphile plugin to auto-provision S3 buckets when
- * bucket rows are created via GraphQL mutations.
  */
 
 import type {
@@ -30,11 +26,11 @@ export type ConnectionConfigOrGetter =
 /**
  * Function to derive the actual S3 bucket name from a logical bucket key.
  *
- * @param bucketKey - The logical bucket key from the database (e.g., "public", "private")
  * @param databaseId - The metaschema database UUID
+ * @param bucketKey - The logical bucket key from the database (e.g., "public", "private")
  * @returns The S3 bucket name to create/configure
  */
-export type BucketNameResolver = (bucketKey: string, databaseId: string) => string;
+export type BucketNameResolver = (databaseId: string, bucketKey: string) => string;
 
 /**
  * Plugin options for the bucket provisioner plugin.
@@ -54,15 +50,8 @@ export interface BucketProvisionerPluginOptions {
   allowedOrigins: string[];
 
   /**
-   * Optional prefix for S3 bucket names.
-   * When set, the S3 bucket name becomes `{prefix}-{bucketKey}`.
-   * Example: prefix "myapp" + key "public" → S3 bucket "myapp-public"
-   */
-  bucketNamePrefix?: string;
-
-  /**
    * Optional custom function to derive S3 bucket names from logical bucket keys.
-   * Takes precedence over `bucketNamePrefix` when provided.
+   * Naming is a deployment policy and must be supplied by the caller.
    */
   resolveBucketName?: BucketNameResolver;
 
@@ -71,16 +60,6 @@ export interface BucketProvisionerPluginOptions {
    * Default: false
    */
   versioning?: boolean;
-
-  /**
-   * Whether to auto-provision S3 buckets when bucket rows are created
-   * via GraphQL mutations. When true, the plugin wraps create mutations
-   * on tables tagged with `@storageBuckets` to trigger provisioning
-   * after the mutation succeeds.
-   *
-   * Default: true
-   */
-  autoProvision?: boolean;
 }
 
 /**
