@@ -46,13 +46,13 @@ describe('BucketProvisioner constructor', () => {
     expect(provisioner).toBeInstanceOf(BucketProvisioner);
   });
 
-  it('throws on empty allowedOrigins', () => {
+  it('accepts no allowed origins, for buckets no browser reaches', () => {
     expect(
       () => new BucketProvisioner({ ...defaultOptions, allowedOrigins: [] }),
-    ).toThrow(ProvisionerError);
+    ).not.toThrow();
     expect(
-      () => new BucketProvisioner({ ...defaultOptions, allowedOrigins: [] }),
-    ).toThrow('allowedOrigins must contain at least one origin');
+      () => new BucketProvisioner({ connection: defaultOptions.connection }),
+    ).not.toThrow();
   });
 
   it('exposes S3Client via getClient()', () => {
@@ -118,6 +118,65 @@ describe('BucketProvisioner.provision — private bucket', () => {
       (call: any[]) => call[0].constructor.name === 'DeleteBucketPolicyCommand',
     );
     expect(deletePolicyCall).toBeDefined();
+  });
+});
+
+describe('BucketProvisioner.provision — no browser origins', () => {
+  it('writes no CORS rule set for a bucket nothing browses', async () => {
+    const provisioner = new BucketProvisioner({
+      connection: defaultOptions.connection,
+      allowedOrigins: [],
+    });
+    const result = await provisioner.provision({
+      bucketName: 'test-build-logs',
+      accessType: 'private',
+    });
+
+    expect(result.corsRules).toEqual([]);
+    const commandNames = mockSend.mock.calls.map(
+      (call: any[]) => call[0].constructor.name,
+    );
+    expect(commandNames).toEqual([
+      'CreateBucketCommand',
+      'PutPublicAccessBlockCommand',
+      'DeleteBucketPolicyCommand',
+    ]);
+  });
+
+  it('still applies the lifecycle rule a temp bucket needs', async () => {
+    const provisioner = new BucketProvisioner({
+      connection: defaultOptions.connection,
+    });
+    const result = await provisioner.provision({
+      bucketName: 'test-temp-unbrowsed',
+      accessType: 'temp',
+    });
+
+    expect(result.corsRules).toEqual([]);
+    expect(result.lifecycleRules).toHaveLength(1);
+    const commandNames = mockSend.mock.calls.map(
+      (call: any[]) => call[0].constructor.name,
+    );
+    expect(commandNames).toContain('PutBucketLifecycleConfigurationCommand');
+    expect(commandNames).not.toContain('PutBucketCorsCommand');
+  });
+
+  it('honours a per-bucket origin even when the default is empty', async () => {
+    const provisioner = new BucketProvisioner({
+      connection: defaultOptions.connection,
+      allowedOrigins: [],
+    });
+    const result = await provisioner.provision({
+      bucketName: 'test-browsed',
+      accessType: 'private',
+      allowedOrigins: ['https://app.example.com'],
+    });
+
+    expect(result.corsRules).toHaveLength(1);
+    const commandNames = mockSend.mock.calls.map(
+      (call: any[]) => call[0].constructor.name,
+    );
+    expect(commandNames).toContain('PutBucketCorsCommand');
   });
 });
 

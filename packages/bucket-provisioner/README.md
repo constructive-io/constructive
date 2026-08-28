@@ -152,7 +152,7 @@ The main class that orchestrates bucket creation and configuration.
 | `connection.accessKeyId` | `string` | AWS access key ID |
 | `connection.secretAccessKey` | `string` | AWS secret access key |
 | `connection.forcePathStyle` | `boolean?` | Force path-style URLs (auto-detected per provider) |
-| `allowedOrigins` | `string[]` | Domains allowed for CORS (e.g., `['https://app.example.com']`) |
+| `allowedOrigins` | `string[]?` | Domains allowed for CORS (e.g., `['https://app.example.com']`). Empty or omitted means no browser origin may reach these buckets, and they are provisioned with no CORS rule set at all. |
 
 #### `provisioner.provision(options): Promise<ProvisionResult>`
 
@@ -161,7 +161,7 @@ Creates and configures a bucket. Steps:
 1. Creates the bucket (or verifies it exists)
 2. Configures Block Public Access
 3. Applies bucket policy (public-read or none)
-4. Sets CORS rules for presigned URL uploads
+4. Sets CORS rules for presigned URL uploads (skipped when no origins are allowed)
 5. Optionally enables versioning
 6. Adds lifecycle rules for temp buckets
 
@@ -172,6 +172,7 @@ Creates and configures a bucket. Steps:
 | `region` | `string?` | Override region for this bucket |
 | `versioning` | `boolean?` | Enable S3 versioning (default: `false`) |
 | `publicUrlPrefix` | `string?` | CDN/public URL for public buckets |
+| `allowedOrigins` | `string[]?` | Per-bucket CORS origins, overriding the constructor's |
 
 #### `provisioner.inspect(bucketName, accessType): Promise<ProvisionResult>`
 
@@ -184,6 +185,21 @@ Returns the underlying `@aws-sdk/client-s3` S3Client for advanced operations.
 #### `provisioner.bucketExists(bucketName): Promise<boolean>`
 
 Checks if a bucket exists and is accessible.
+
+### Naming
+
+#### `physicalBucketName({ scope, databaseId, bucketKey })`
+
+The physical name a platform-provisioned bucket gets from its own identity:
+`{scope}-{database label}-{bucketKey}-{digest}`. Takes no prefix — a bucket
+belongs to one database at one scope, and there is no global bucket namespace to
+prefix into. Each readable component has its own budget, so a long scope cannot
+crowd out the database label, and the digest covers the untruncated identity.
+
+#### `mintPhysicalBucketName(prefix, databaseId, bucketKey)`
+
+The prefixed policy — `{prefix}-{bucketKey}-{digest}` — for a deployment that
+names its own bucket namespace.
 
 ### Policy Builders
 

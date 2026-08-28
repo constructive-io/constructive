@@ -53,8 +53,13 @@ export interface BucketProvisionerOptions {
    * Default allowed origins for CORS rules.
    * These are the domains where your app runs (e.g., ["https://app.example.com"]).
    * Required for browser-based presigned URL uploads.
+   *
+   * Empty (or omitted) means no browser origin may reach these buckets — a
+   * build's log store, say, which only server-side code ever opens. Such a
+   * bucket is provisioned with no CORS rule set at all rather than with a
+   * fabricated origin.
    */
-  allowedOrigins: string[];
+  allowedOrigins?: string[];
 }
 
 /**
@@ -88,15 +93,8 @@ export class BucketProvisioner {
   private readonly allowedOrigins: string[];
 
   constructor(options: BucketProvisionerOptions) {
-    if (!options.allowedOrigins || options.allowedOrigins.length === 0) {
-      throw new ProvisionerError(
-        'INVALID_CONFIG',
-        'allowedOrigins must contain at least one origin for CORS configuration',
-      );
-    }
-
     this.config = options.connection;
-    this.allowedOrigins = options.allowedOrigins;
+    this.allowedOrigins = options.allowedOrigins ?? [];
     this.client = createS3Client(options.connection);
   }
 
@@ -142,12 +140,19 @@ export class BucketProvisioner {
       await this.deleteBucketPolicy(bucketName);
     }
 
-    // 4. Set CORS rules (per-bucket override takes precedence over default)
+    // 4. Set CORS rules (per-bucket override takes precedence over default).
+    // A bucket no browser origin may reach gets no rule set: cross-origin
+    // access is the bucket's own recorded data, and "none recorded" is a
+    // legitimate answer, not a missing setting to invent an origin for.
     const effectiveOrigins = options.allowedOrigins ?? this.allowedOrigins;
-    const corsRules = accessType === 'private'
-      ? buildPrivateCorsRules(effectiveOrigins)
-      : buildUploadCorsRules(effectiveOrigins);
-    await this.setCors(bucketName, corsRules);
+    const corsRules = effectiveOrigins.length === 0
+      ? []
+      : accessType === 'private'
+        ? buildPrivateCorsRules(effectiveOrigins)
+        : buildUploadCorsRules(effectiveOrigins);
+    if (corsRules.length > 0) {
+      await this.setCors(bucketName, corsRules);
+    }
 
     // 5. Versioning
     if (versioning) {
