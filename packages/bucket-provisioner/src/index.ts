@@ -32,7 +32,8 @@ export type { BucketProvisionerOptions } from './provisioner';
 export { BucketProvisioner } from './provisioner';
 
 // Physical naming policy
-export { mintPhysicalBucketName } from './naming';
+export type { PhysicalBucketIdentity } from './naming';
+export { mintPhysicalBucketName, physicalBucketName } from './naming';
 
 // S3 client factory
 export { createS3Client } from './client';
