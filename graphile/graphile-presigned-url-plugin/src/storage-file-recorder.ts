@@ -29,6 +29,18 @@ export async function recordManagedFile(
       `must expose ${storageConfig.filesTableName}_record_file in its private schema`,
     );
   }
+  if (input.previousVersionId != null && !storageConfig.hasVersioning) {
+    throw new Error(
+      `STORAGE_VERSIONING_UNSUPPORTED: storage module ${storageConfig.id} (${storageConfig.filesTableName}) ` +
+      'does not support previous_version_id',
+    );
+  }
+  if (input.path != null && !storageConfig.hasPathShares) {
+    throw new Error(
+      `STORAGE_PATH_SHARES_UNSUPPORTED: storage module ${storageConfig.id} (${storageConfig.filesTableName}) ` +
+      'does not support path',
+    );
+  }
 
   const args = [
     'bucket_id := $1::uuid',
@@ -49,11 +61,11 @@ export async function recordManagedFile(
     null,
   ];
 
-  if (storageConfig.hasVersioning && input.previousVersionId) {
+  if (storageConfig.hasVersioning && input.previousVersionId != null) {
     args.push(`previous_version_id := $${values.length + 1}::uuid`);
     values.push(input.previousVersionId);
   }
-  if (storageConfig.hasPathShares && input.path) {
+  if (storageConfig.hasPathShares && input.path != null) {
     args.push(`path := $${values.length + 1}::text`);
     values.push(input.path);
   }

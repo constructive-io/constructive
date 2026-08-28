@@ -103,21 +103,33 @@ describe('recordManagedFile', () => {
     });
   });
 
-  it('does not pass optional arguments unsupported by the module', async () => {
-    const query = jest.fn().mockResolvedValue({ rows: [{ id: 'file-id' }] });
+  it('fails loudly when a version chain is requested on a non-versioned module', async () => {
+    const query = jest.fn();
 
-    await recordManagedFile(
-      { query },
-      storageConfig(),
-      {
-        ...input(),
-        previousVersionId: '44444444-4444-4444-4444-444444444444',
-        path: 'assets',
-      },
+    await expect(
+      recordManagedFile(
+        { query },
+        storageConfig(),
+        {
+          ...input(),
+          previousVersionId: '44444444-4444-4444-4444-444444444444',
+        },
+      ),
+    ).rejects.toThrow(
+      'STORAGE_VERSIONING_UNSUPPORTED: storage module 11111111-1111-1111-1111-111111111111 (app_files)',
     );
+    expect(query).not.toHaveBeenCalled();
+  });
 
-    expect(query.mock.calls[0][0].text).not.toContain('previous_version_id');
-    expect(query.mock.calls[0][0].text).not.toContain('path :=');
+  it('fails loudly when a path is requested on a module without path shares', async () => {
+    const query = jest.fn();
+
+    await expect(
+      recordManagedFile({ query }, storageConfig(), { ...input(), path: 'assets' }),
+    ).rejects.toThrow(
+      'STORAGE_PATH_SHARES_UNSUPPORTED: storage module 11111111-1111-1111-1111-111111111111 (app_files)',
+    );
+    expect(query).not.toHaveBeenCalled();
   });
 
   it('fails before writing when no recorder is exposed', async () => {

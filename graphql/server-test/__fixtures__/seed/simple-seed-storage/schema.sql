@@ -26,7 +26,6 @@ BEGIN
        id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
        key text NOT NULL,
        type text NOT NULL DEFAULT ''private'',
-       owner_id uuid,
        is_public boolean NOT NULL DEFAULT false,
        allowed_mime_types text[] NULL,
        max_file_size bigint NULL,
@@ -94,7 +93,6 @@ BEGIN
         mime_type,
         size,
         filename,
-        owner_id,
         is_public,
         previous_version_id
       )
@@ -105,7 +103,6 @@ BEGIN
         $4,
         $5,
         $6,
-        b.owner_id,
         b.is_public,
         $9
       FROM %I.app_buckets b

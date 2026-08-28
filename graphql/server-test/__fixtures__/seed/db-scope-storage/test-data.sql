@@ -70,7 +70,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   provider,
   allowed_origins,
   scope,
-  private_schema_id
+  private_schema_id,
+  has_versioning
 )
 VALUES (
   'ce556000-0000-4000-8000-000000000001',
@@ -83,7 +84,8 @@ VALUES (
   'minio',
   ARRAY['*'],
   'database',
-  'ce552000-0000-4000-8000-000000000002'
+  'ce552000-0000-4000-8000-000000000002',
+  true
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO "tess-storage-public".buckets (id, key, type, is_public)
