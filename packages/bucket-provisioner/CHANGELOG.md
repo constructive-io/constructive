@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.26.0...@constructive-io/bucket-provisioner@0.27.0) (2026-08-28)
+
+### Features
+
+- **storage:** make reconciler sole bucket minting driver ([e15c7b5](https://github.com/constructive-io/constructive/commit/e15c7b58e46490e157542874c07de0adb2d96479))
+
 # [0.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.25.1...@constructive-io/bucket-provisioner@0.26.0) (2026-08-28)
 
 ### Features

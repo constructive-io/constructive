@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.18.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.17.0...graphile-presigned-url-plugin@1.18.0) (2026-08-28)
+
+### Bug Fixes
+
+- **storage:** mirror generated bucket job shapes ([2b15ea4](https://github.com/constructive-io/constructive/commit/2b15ea466cf406c122169b75f45f8460e109833e))
+
+### Features
+
+- **storage:** make reconciler sole bucket minting driver ([e15c7b5](https://github.com/constructive-io/constructive/commit/e15c7b58e46490e157542874c07de0adb2d96479))
+
 # [1.17.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.16.1...graphile-presigned-url-plugin@1.17.0) (2026-08-28)
 
 ### Bug Fixes

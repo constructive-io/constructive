@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.12.1](https://github.com/constructive-io/constructive/compare/graphile-cache@4.12.0...graphile-cache@4.12.1) (2026-08-28)
+
+**Note:** Version bump only for package graphile-cache
+
 # [4.12.0](https://github.com/constructive-io/constructive/compare/graphile-cache@4.11.1...graphile-cache@4.12.0) (2026-08-18)
 
 **Note:** Version bump only for package graphile-cache

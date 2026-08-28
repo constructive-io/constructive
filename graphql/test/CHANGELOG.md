@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@5.15.3...@constructive-io/graphql-test@5.16.0) (2026-08-28)
+
+### Bug Fixes
+
+- **storage:** align integration fixtures with reconciliation ([50c2322](https://github.com/constructive-io/constructive/commit/50c232207dc1377eac169d1ec7626e65999a9713))
+
+### Features
+
+- **storage:** make reconciler sole bucket minting driver ([e15c7b5](https://github.com/constructive-io/constructive/commit/e15c7b58e46490e157542874c07de0adb2d96479))
+
 ## [5.15.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@5.15.2...@constructive-io/graphql-test@5.15.3) (2026-08-28)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

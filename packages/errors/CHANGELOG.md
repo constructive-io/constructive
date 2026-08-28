@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.11.0...@constructive-io/errors@0.11.1) (2026-08-28)
+
+### Bug Fixes
+
+- **storage:** align integration fixtures with reconciliation ([50c2322](https://github.com/constructive-io/constructive/commit/50c232207dc1377eac169d1ec7626e65999a9713))
+
 # [0.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.10.0...@constructive-io/errors@0.11.0) (2026-08-18)
 
 **Note:** Version bump only for package @constructive-io/errors
