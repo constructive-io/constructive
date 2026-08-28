@@ -24,6 +24,16 @@ VALUES (
   true
 ) ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description, is_public)
+VALUES (
+  'ce552000-0000-4000-8000-000000000002',
+  'ce551000-0000-4000-8000-000000000001',
+  'private',
+  'tess-storage-private',
+  NULL,
+  false
+) ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO metaschema_public.table (id, database_id, schema_id, name, description)
 VALUES
   ('ce553000-0000-4000-8000-000000000001', 'ce551000-0000-4000-8000-000000000001', 'ce552000-0000-4000-8000-000000000001', 'buckets', NULL),
@@ -59,7 +69,9 @@ INSERT INTO metaschema_modules_public.storage_module (
   public_url_prefix,
   provider,
   allowed_origins,
-  scope
+  scope,
+  private_schema_id,
+  has_versioning
 )
 VALUES (
   'ce556000-0000-4000-8000-000000000001',
@@ -71,7 +83,9 @@ VALUES (
   NULL,  -- use global CDN_PUBLIC_URL_PREFIX
   'minio',
   ARRAY['*'],
-  'database'
+  'database',
+  'ce552000-0000-4000-8000-000000000002',
+  true
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO "tess-storage-public".buckets (id, key, type, is_public)

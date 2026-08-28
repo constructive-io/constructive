@@ -37,6 +37,8 @@ export interface StorageModuleConfig {
   bucketsTableName: string;
   /** Files table name */
   filesTableName: string;
+  /** Qualified generated managed-file recorder, or null when unavailable */
+  recorderQualifiedName: string | null;
 
   // --- Scope identity ---
 
@@ -78,6 +80,8 @@ export interface StorageModuleConfig {
    * without it every row is treated as live, because there is nothing to read.
    */
   hasConfirmUpload: boolean;
+  /** Whether the files table carries the versioning chain. */
+  hasVersioning: boolean;
 
   // --- Bulk upload limits ---
 

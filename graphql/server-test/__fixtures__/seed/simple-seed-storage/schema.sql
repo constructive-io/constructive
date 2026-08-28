@@ -10,12 +10,15 @@ CREATE FUNCTION _test_create_storage_schema(schema_name text) RETURNS void
 LANGUAGE plpgsql AS $$
 BEGIN
   EXECUTE format('CREATE SCHEMA IF NOT EXISTS %I', schema_name);
+  EXECUTE format('CREATE SCHEMA IF NOT EXISTS %I', schema_name || '-private');
 
   EXECUTE format('GRANT USAGE ON SCHEMA %I TO administrator, authenticated, anonymous', schema_name);
+  EXECUTE format('GRANT USAGE ON SCHEMA %I TO administrator, authenticated, anonymous', schema_name || '-private');
 
   EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON TABLES TO administrator', schema_name);
   EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT USAGE ON SEQUENCES TO administrator, authenticated', schema_name);
   EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON FUNCTIONS TO administrator, authenticated, anonymous', schema_name);
+  EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON FUNCTIONS TO administrator, authenticated, anonymous', schema_name || '-private');
 
   -- Buckets table
   EXECUTE format(
@@ -63,6 +66,56 @@ BEGIN
   -- Grant CRUD to all roles
   EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON %I.app_buckets TO administrator, authenticated, anonymous', schema_name);
   EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON %I.app_files TO administrator, authenticated, anonymous', schema_name);
+
+  EXECUTE format($sql$
+    CREATE FUNCTION %I.app_files_record_file(
+      bucket_id uuid,
+      key text,
+      content_hash text,
+      mime_type text,
+      size bigint,
+      filename text,
+      upload jsonb,
+      status text DEFAULT 'requested',
+      previous_version_id uuid DEFAULT NULL
+    ) RETURNS %I.app_files
+    LANGUAGE plpgsql
+    SECURITY INVOKER
+    VOLATILE
+    AS $function$
+    DECLARE
+      v_row %I.app_files;
+    BEGIN
+      INSERT INTO %I.app_files (
+        bucket_id,
+        key,
+        content_hash,
+        mime_type,
+        size,
+        filename,
+        is_public,
+        previous_version_id
+      )
+      SELECT
+        $1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        b.is_public,
+        $9
+      FROM %I.app_buckets b
+      WHERE b.id = $1
+      RETURNING * INTO v_row;
+      RETURN v_row;
+    END;
+    $function$;
+  $sql$, schema_name || '-private', schema_name, schema_name, schema_name, schema_name);
+
+  EXECUTE format(
+    'GRANT EXECUTE ON FUNCTION %I.app_files_record_file(uuid, text, text, text, bigint, text, jsonb, text, uuid) TO administrator, authenticated, anonymous',
+    schema_name || '-private');
 END;
 $$;
 

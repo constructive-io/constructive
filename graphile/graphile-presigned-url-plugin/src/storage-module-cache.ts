@@ -48,6 +48,7 @@ const ALL_STORAGE_MODULES_QUERY = `
     bt.name AS buckets_table,
     fs.schema_name AS files_schema,
     ft.name AS files_table,
+    ps.schema_name AS private_schema,
     sm.endpoint,
     sm.public_url_prefix,
     sm.provider,
@@ -60,6 +61,7 @@ const ALL_STORAGE_MODULES_QUERY = `
     sm.max_bulk_files,
     sm.max_bulk_total_size,
     sm.has_path_shares,
+    sm.has_versioning,
     sm.has_confirm_upload,
     es.schema_name AS entity_schema,
     et.name AS entity_table
@@ -68,6 +70,7 @@ const ALL_STORAGE_MODULES_QUERY = `
   JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
   JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
   JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
+  LEFT JOIN metaschema_public.schema ps ON ps.id = sm.private_schema_id
   LEFT JOIN metaschema_public.table et ON et.id = sm.entity_table_id
   LEFT JOIN metaschema_public.schema es ON es.id = et.schema_id
   WHERE sm.database_id = $1
@@ -81,6 +84,7 @@ interface StorageModuleRow {
   buckets_table: string;
   files_schema: string;
   files_table: string;
+  private_schema: string | null;
   endpoint: string | null;
   public_url_prefix: string | null;
   provider: string | null;
@@ -93,6 +97,7 @@ interface StorageModuleRow {
   max_bulk_files: number | null;
   max_bulk_total_size: number | null;
   has_path_shares: boolean;
+  has_versioning: boolean;
   has_confirm_upload: boolean;
   entity_schema: string | null;
   entity_table: string | null;
@@ -107,6 +112,9 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
     id: row.id,
     bucketsQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.buckets_schema, row.buckets_table),
     filesQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.files_schema, row.files_table),
+    recorderQualifiedName: row.private_schema
+      ? QuoteUtils.quoteQualifiedIdentifier(row.private_schema, `${row.files_table}_record_file`)
+      : null,
     schemaName: row.buckets_schema,
     bucketsTableName: row.buckets_table,
     filesTableName: row.files_table,
@@ -125,6 +133,7 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
     maxFilenameLength: row.max_filename_length ?? DEFAULT_MAX_FILENAME_LENGTH,
     cacheTtlSeconds,
     hasPathShares: row.has_path_shares ?? false,
+    hasVersioning: row.has_versioning ?? false,
     hasConfirmUpload: row.has_confirm_upload ?? false,
     maxBulkFiles: row.max_bulk_files ?? DEFAULT_MAX_BULK_FILES,
     maxBulkTotalSize: row.max_bulk_total_size ?? DEFAULT_MAX_BULK_TOTAL_SIZE,

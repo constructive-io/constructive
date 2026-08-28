@@ -34,6 +34,7 @@ import { buildFileProjection, type FileProjection } from './managed-upload';
 import { provisionAndRecordPhysicalBucket, resolveS3ForDatabase } from './physical-bucket';
 import { withRequestPgClient } from './request-pg-client';
 import { deleteS3Object,generatePresignedPutUrl } from './s3-signer';
+import { recordManagedFile } from './storage-file-recorder';
 import { getBucketConfig, loadAllStorageModules, resolveStorageConfigFromCodec, storedPhysicalName } from './storage-module-cache';
 import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
@@ -767,35 +768,16 @@ async function processSingleFile(
   // Auto-derive ltree path from custom key directory (only when has_path_shares)
   const derivedPath = isCustomKey && storageConfig.hasPathShares ? derivePathFromKey(s3Key) : null;
 
-  // Create file record. An entity-keyed plane (the module records an entity
-  // table) carries owner_id on its rows; app- and database-scope planes do not.
-  const hasOwnerColumn = storageConfig.entityTableId !== null;
-  const columns = ['bucket_id', 'key', 'content_hash', 'mime_type', 'size', 'filename', 'is_public'];
-  const values: any[] = [bucket.id, s3Key, contentHash, contentType, size, filename || null, bucket.is_public];
-
-  if (hasOwnerColumn) {
-    columns.push('owner_id');
-    values.push(bucket.owner_id);
-  }
-  if (previousVersionId) {
-    columns.push('previous_version_id');
-    values.push(previousVersionId);
-  }
-  if (derivedPath) {
-    columns.push('path');
-    values.push(derivedPath);
-  }
-
-  const placeholders = values.map((_: any, i: number) => `$${i + 1}`).join(', ');
-  const fileResult = await txClient.query({
-    text: `INSERT INTO ${storageConfig.filesQualifiedName}
-           (${columns.join(', ')})
-           VALUES (${placeholders})
-           RETURNING id`,
-    values,
+  const fileId = await recordManagedFile(txClient, storageConfig, {
+    bucketId: bucket.id,
+    key: s3Key,
+    contentHash,
+    mimeType: contentType,
+    size,
+    filename: filename || null,
+    previousVersionId,
+    path: derivedPath,
   });
-
-  const fileId = fileResult.rows[0].id;
 
   // Generate presigned PUT URL
   const uploadUrl = await generatePresignedPutUrl(
