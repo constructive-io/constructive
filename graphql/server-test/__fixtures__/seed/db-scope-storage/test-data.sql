@@ -88,10 +88,10 @@ VALUES (
   true
 ) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO "tess-storage-public".buckets (id, key, type, is_public)
+INSERT INTO "tess-storage-public".buckets (id, key, type, is_public, physical_name)
 VALUES
-  ('ce557000-0000-4000-8000-000000000001', 'public', 'public', true),
-  ('ce557000-0000-4000-8000-000000000002', 'private', 'private', false)
+  ('ce557000-0000-4000-8000-000000000001', 'public', 'public', true, 'database-ce551000-public-d12a972ce5d3'),
+  ('ce557000-0000-4000-8000-000000000002', 'private', 'private', false, 'database-ce551000-private-5509785f9933')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO routing_public.database_settings (id, database_id)

@@ -1612,15 +1612,15 @@ input ProvisionBucketInput {
 type ProvisionBucketPayload {
   """The logical bucket row that was queued for reconciliation."""
   bucketId: UUID!
-
-  """The logical bucket key"""
   bucketKey: String!
-
-  """The physical bucket name already recorded, or null when reconciliation has not completed."""
-  physicalName: String
 
   """The reconciler job enqueued to provision this bucket."""
   jobId: UUID!
+
+  """
+  The physical bucket name already recorded, or null when reconciliation has not completed.
+  """
+  physicalName: String
 }
 
 """The root query type which gives access points into the data universe."""

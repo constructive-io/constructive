@@ -15,6 +15,7 @@
  *   pnpm test -- --testPathPattern=db-scope-upload
  */
 
+import { createS3Bucket, createS3Client } from '@constructive-io/s3-utils';
 import { hashContent, putToPresignedUrl } from '@constructive-io/upload-client';
 import path from 'path';
 import type { PgTestClient } from 'pgsql-test';
@@ -98,6 +99,13 @@ describe('database-scope upload surface', () => {
   let request: supertest.Agent;
   let pg: PgTestClient;
   let teardown: () => Promise<void>;
+  const s3Client = createS3Client({
+    provider: 'minio',
+    region: 'us-east-1',
+    endpoint: 'http://localhost:9000',
+    accessKeyId: 'minioadmin',
+    secretAccessKey: 'minioadmin'
+  });
 
   const post = (
     databaseId: string,
@@ -125,10 +133,19 @@ describe('database-scope upload surface', () => {
       },
       seedAdapters
     ));
+    const result = await createS3Bucket(
+      s3Client,
+      'database-ce551000-public-d12a972ce5d3',
+      { provider: 'minio' }
+    );
+    if (!result.success) {
+      throw new Error('Failed to create test S3 bucket "database-ce551000-public-d12a972ce5d3"');
+    }
   });
 
   afterAll(async () => {
     if (teardown) await teardown();
+    s3Client.destroy();
   });
 
   describe('mutation generation', () => {
@@ -193,7 +210,7 @@ describe('database-scope upload surface', () => {
       );
       const physicalName: string | null = stored.rows[0]?.physical_name ?? null;
       expect(physicalName).toBeTruthy();
-      expect(physicalName).toMatch(/-public-[a-f0-9]{12}$/);
+      expect(physicalName).toBe('database-ce551000-public-d12a972ce5d3');
       expect(bucketFromPresignedUrl(uploadUrl)).toBe(physicalName);
     });
 

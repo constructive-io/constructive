@@ -2229,6 +2229,9 @@ importers:
       '@constructive-io/graphql-query':
         specifier: workspace:^
         version: link:../query/dist
+      '@constructive-io/s3-utils':
+        specifier: workspace:^
+        version: link:../../uploads/s3-utils/dist
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6

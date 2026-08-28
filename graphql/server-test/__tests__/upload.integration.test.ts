@@ -28,6 +28,7 @@
  *   pnpm test -- --testPathPattern=upload.integration
  */
 
+import { createS3Bucket, createS3Client } from '@constructive-io/s3-utils';
 import { hashContent, putToPresignedUrl } from '@constructive-io/upload-client';
 import path from 'path';
 import type { PgTestClient } from 'pgsql-test';
@@ -279,6 +280,22 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   let request: supertest.Agent;
   let pg: PgTestClient;
   let teardown: () => Promise<void>;
+  const s3Client = createS3Client({
+    provider: 'minio',
+    region: 'us-east-1',
+    endpoint: 'http://localhost:9000',
+    accessKeyId: 'minioadmin',
+    secretAccessKey: 'minioadmin'
+  });
+
+  const ensureS3Buckets = async (bucketNames: string[]): Promise<void> => {
+    for (const bucketName of bucketNames) {
+      const result = await createS3Bucket(s3Client, bucketName, { provider: 'minio' });
+      if (!result.success) {
+        throw new Error(`Failed to create test S3 bucket "${bucketName}"`);
+      }
+    }
+  };
 
   const postGraphQL = (payload: {
     query: string;
@@ -337,10 +354,19 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       },
       seedAdapters
     ));
+    await ensureS3Buckets([
+      'app-80a2eaaf-public-c7156cb19fe3',
+      'app-80a2eaaf-private-cc079c527e7d',
+      'app-a1a1a1a1-public-4db6afbff1a2',
+      'app-a1a1a1a1-private-a83152dee184',
+      'app-fa11fa11-public-c1aac75adc22',
+      'app-fa11fa11-private-c8db3baa1b20'
+    ]);
   });
 
   afterAll(async () => {
     if (teardown) await teardown();
+    s3Client.destroy();
   });
 
   // ==========================================================================
@@ -469,7 +495,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   // recomputing it from a prefix convention.
   // ==========================================================================
 
-  describe('physical_name persistence (Alice)', () => {
+  describe('recorded physical_name usage (Alice)', () => {
     const aliceBucketsTable = `"${aliceSchemas[0]}".app_buckets`;
 
     const physicalNameFor = async (key: string): Promise<string | null> => {
@@ -484,7 +510,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     const bucketFromPresignedUrl = (url: string): string =>
       new URL(url).pathname.replace(/^\/+/, '').split('/')[0];
 
-    it('records physical_name on the row after upload, matching the presigned URL bucket', async () => {
+    it('uses the reconciler-recorded physical_name for the presigned URL bucket', async () => {
       const fileContent = 'physical-name coordinate check';
       const contentHash = await hashContent(fileContent);
 
@@ -505,10 +531,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
 
       const stored = await physicalNameFor('public');
       expect(stored).toBeTruthy();
-      // Matches the resolver contract: {prefix}-{bucketKey}-{digest}, bounded
-      // to S3's 63-character limit.
+      expect(stored).toBe('app-80a2eaaf-public-c7156cb19fe3');
       expect(stored).toContain('public');
-      expect(stored).toMatch(/-public-[a-f0-9]{12}$/);
       expect(stored!.length).toBeLessThanOrEqual(63);
       // ...and is exactly the bucket the presigned PUT targets.
       expect(bucketFromPresignedUrl(payload.uploadUrl)).toBe(stored);
@@ -539,6 +563,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
 
     it('honors a preexisting custom physical_name verbatim (resolver never consulted)', async () => {
       const customPhysical = 'preexisting-custom-cdn-bucket';
+      await ensureS3Buckets([customPhysical]);
       await pg.query(
         `INSERT INTO ${aliceBucketsTable} (key, type, is_public, physical_name)
          VALUES ($1, 'public', true, $2)`,
