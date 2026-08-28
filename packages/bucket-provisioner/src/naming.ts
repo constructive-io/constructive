@@ -6,10 +6,6 @@ const MAX_BUCKET_NAME_LENGTH = 63;
 const MIN_BUCKET_NAME_LENGTH = 3;
 /** Hex characters of the identity digest kept as the uniqueness tail. */
 const IDENTITY_DIGEST_LENGTH = 12;
-/** Readable budget: how much of the name the prefix and key may each occupy. */
-const PREFIX_BUDGET = 20;
-const BUCKET_KEY_BUDGET = 63 - IDENTITY_DIGEST_LENGTH - PREFIX_BUDGET - 3;
-
 /**
  * Readable budgets for a name minted from a bucket's own identity.
  *
@@ -100,10 +96,10 @@ function assembleBucketName(
  *
  * This is the policy for a platform-provisioned bucket, and it takes no prefix
  * because there is no global bucket namespace to prefix into: a bucket belongs
- * to one database at one scope, and that is what its name should say. Callers
- * derive names from here rather than composing a prefix of their own, so the
- * policy can change in one place — and an already-provisioned bucket never
- * consults it at all, since the row's recorded `physical_name` is authoritative.
+ * to one database at one scope, and that is what its name should say. The
+ * reconciler derives names from here rather than composing a prefix of its own,
+ * and consumers of a bucket row never consult this policy: the recorded
+ * `physical_name` is authoritative.
  *
  * The scope is part of the digested identity untruncated, so two scopes of one
  * database that declare the same bucket key stay distinct even when their
@@ -119,26 +115,5 @@ export function physicalBucketName(identity: PhysicalBucketIdentity): string {
     ],
     `${scope}/${databaseId}/${bucketKey}`,
     `key "${bucketKey}" at scope "${scope}"`,
-  );
-}
-
-/**
- * The prefixed physical-bucket naming policy:
- * `{prefix}-{bucketKey}-{digest}` (e.g. `myapp-public-3f9c1a2b7e04`).
- *
- * For a deployment that names its own bucket namespace — a single-app
- * installation, or the presigned-upload (lazy) path meeting a bucket an app
- * configured. A platform-provisioned bucket uses {@link physicalBucketName}
- * instead, whose components come from the bucket row rather than from
- * deployment config.
- */
-export function mintPhysicalBucketName(prefix: string, databaseId: string, bucketKey: string): string {
-  return assembleBucketName(
-    [
-      readableComponent(prefix, PREFIX_BUDGET),
-      readableComponent(bucketKey, BUCKET_KEY_BUDGET),
-    ],
-    `${prefix}/${databaseId}/${bucketKey}`,
-    `key "${bucketKey}"`,
   );
 }

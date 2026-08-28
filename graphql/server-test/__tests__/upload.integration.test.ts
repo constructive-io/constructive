@@ -4,8 +4,8 @@
  * Exercises the file-centric upload pipeline:
  *   uploadAppFile mutation -> presigned PUT URL -> PUT to S3
  *
- * Uses real MinIO (available in CI as minio_cdn service) and lazy bucket
- * provisioning.
+ * Uses real MinIO (available in CI as minio_cdn service) and reconciled
+ * physical bucket fixtures.
  *
  * Three actors (single beforeAll, single server -- stays fast):
  *   Alice  -- baseline tenant, no RLS (wide-open schema)
@@ -99,11 +99,10 @@ const UPLOAD_APP_FILE = `
 const PROVISION_BUCKET = `
   mutation ProvisionBucket($input: ProvisionBucketInput!) {
     provisionBucket(input: $input) {
-      success
-      bucketName
-      accessType
-      provider
-      error
+      bucketId
+      bucketKey
+      physicalName
+      jobId
     }
   }
 `;
@@ -465,9 +464,9 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   // ==========================================================================
   // 1b. physical_name persistence (Alice)
   //
-  // The provisioner records the exact physical S3 bucket name on the source
-  // bucket row at first-provision time; every later read uses that stored
-  // coordinate instead of recomputing it from a prefix convention.
+  // The reconciler records the exact physical S3 bucket name on the source
+  // bucket row; every later read uses that stored coordinate instead of
+  // recomputing it from a prefix convention.
   // ==========================================================================
 
   describe('physical_name persistence (Alice)', () => {
@@ -570,16 +569,10 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   });
 
   // ==========================================================================
-  // 1c. Eager provisioning via the provisionBucket mutation (Alice)
-  //
-  // The explicit provisionBucket mutation must mint the SAME tenant-aware
-  // physical name the lazy first-upload path would (`{prefix}-{key}-{digest}`) and
-  // persist it on the bucket row — never the bare logical key. This is the
-  // regression guard for BucketProvisionerPreset being wired without a
-  // resolveBucketName.
+  // 1c. Reconciliation enqueue via the provisionBucket mutation (Alice)
   // ==========================================================================
 
-  describe('Eager provisioning via provisionBucket (Alice)', () => {
+  describe('Reconciliation enqueue via provisionBucket (Alice)', () => {
     const aliceBucketsTable = `"${aliceSchemas[0]}".app_buckets`;
 
     const physicalNameFor = async (key: string): Promise<string | null> => {
@@ -590,10 +583,6 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       return res.rows[0]?.physical_name ?? null;
     };
 
-    // MinIO uses path-style URLs: http://host:9000/<bucket>/<key>?...
-    const bucketFromPresignedUrl = (url: string): string =>
-      new URL(url).pathname.replace(/^\/+/, '').split('/')[0];
-
     // Seed a fresh, never-provisioned bucket row (physical_name IS NULL).
     const seedBucket = async (key: string): Promise<void> => {
       await pg.query(
@@ -602,57 +591,24 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       );
     };
 
-    it('mints {prefix}-{key}-{digest} and records it, matching what the lazy path would mint', async () => {
-      // 1. Derive the naming prefix from a bucket the LAZY path provisions.
-      const lazyKey = 'eager-lazy';
-      await seedBucket(lazyKey);
-      const lazyRes = await postGraphQL({
-        query: UPLOAD_APP_FILE,
-        variables: {
-          input: {
-            bucketKey: lazyKey,
-            contentHash: await hashContent('eager-lazy-probe'),
-            contentType: 'text/plain',
-            size: 16,
-            filename: 'eager-lazy.txt'
-          }
-        }
-      });
-      const lazyUrl = expectSuccess(lazyRes).uploadAppFile.uploadUrl;
-      expect(lazyUrl).toBeTruthy();
-      const lazyPhysical = await physicalNameFor(lazyKey);
-      expect(lazyPhysical).toBeTruthy();
-      // The lazy path records the exact bucket the presigned PUT targets.
-      expect(bucketFromPresignedUrl(lazyUrl)).toBe(lazyPhysical);
-
-      // The shared convention: {prefix}-{key}-{digest}, bounded to S3's 63 chars.
-      const lazyMatch = new RegExp(`^(.+)-${lazyKey}-[a-f0-9]{12}$`).exec(lazyPhysical!);
-      expect(lazyMatch).not.toBeNull();
-      expect(lazyPhysical!.length).toBeLessThanOrEqual(63);
-      const prefix = lazyMatch![1];
-
-      // 2. EAGER path: a fresh bucket row, provisioned via the mutation.
-      const eagerKey = 'eager-prov';
-      await seedBucket(eagerKey);
-      expect(await physicalNameFor(eagerKey)).toBeNull();
+    it('enqueues reconciliation and leaves the physical name untouched', async () => {
+      const key = 'reconcile-now';
+      await seedBucket(key);
 
       const provRes = await postGraphQL({
         query: PROVISION_BUCKET,
-        variables: { input: { bucketKey: eagerKey } }
+        variables: { input: { bucketKey: key } }
       });
       const payload = expectSuccess(provRes).provisionBucket;
-      expect(payload.error).toBeNull();
-      expect(payload.success).toBe(true);
-
-      // Eager mints the tenant-aware name — NOT the bare logical key.
-      expect(payload.bucketName).toMatch(new RegExp(`^${prefix}-${eagerKey}-[a-f0-9]{12}$`));
-      expect(payload.bucketName).not.toBe(eagerKey);
-      // ...and persists it on the row (physical_name IS NULL-guarded record).
-      expect(await physicalNameFor(eagerKey)).toBe(payload.bucketName);
+      expect(payload.bucketKey).toBe(key);
+      expect(payload.bucketId).toBeTruthy();
+      expect(payload.physicalName).toBeNull();
+      expect(payload.jobId).toBeTruthy();
+      expect(await physicalNameFor(key)).toBeNull();
     });
 
-    it('does not clobber a physical_name recorded by a prior provision', async () => {
-      const key = 'eager-idem';
+    it('can enqueue reconciliation repeatedly without changing the recorded name', async () => {
+      const key = 'reconcile-idem';
       await seedBucket(key);
 
       const firstRes = await postGraphQL({
@@ -660,29 +616,23 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         variables: { input: { bucketKey: key } }
       });
       const firstPayload = expectSuccess(firstRes).provisionBucket;
-      expect(firstPayload.success).toBe(true);
-      const recorded = await physicalNameFor(key);
-      expect(recorded).toBe(firstPayload.bucketName);
+      expect(firstPayload.physicalName).toBeNull();
+      expect(firstPayload.jobId).toBeTruthy();
 
       const secondRes = await postGraphQL({
         query: PROVISION_BUCKET,
         variables: { input: { bucketKey: key } }
       });
       const secondPayload = expectSuccess(secondRes).provisionBucket;
-      expect(secondPayload.success).toBe(true);
-      // The stored coordinate is authoritative and left untouched.
-      expect(await physicalNameFor(key)).toBe(recorded);
+      expect(secondPayload.physicalName).toBeNull();
+      expect(secondPayload.jobId).toBeTruthy();
+      expect(secondPayload.jobId).not.toBe(firstPayload.jobId);
+      expect(await physicalNameFor(key)).toBeNull();
     });
   });
 
   // ==========================================================================
-  // 1d. Auto-provision-on-create is disabled (Alice)
-  //
-  // ConstructivePreset wires BucketProvisionerPreset with autoProvision:false,
-  // so creating a bucket row via the createAppBucket GraphQL mutation records
-  // the row WITHOUT eagerly minting an S3 bucket. Buckets are provisioned only
-  // lazily (first upload) or explicitly (provisionBucket) — no empty-bucket
-  // sprawl on every create call.
+  // 1d. Uploads require reconciliation (Alice)
   // ==========================================================================
 
   describe('Auto-provision on bucket create is disabled (Alice)', () => {
@@ -696,10 +646,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       return res.rows[0]?.physical_name ?? null;
     };
 
-    const bucketFromPresignedUrl = (url: string): string =>
-      new URL(url).pathname.replace(/^\/+/, '').split('/')[0];
-
-    it('createAppBucket records the row without minting an S3 bucket; first upload provisions lazily', async () => {
+    it('createAppBucket records an unreconciled row and uploads reject it', async () => {
       const key = 'no-eager';
 
       // Create the bucket ROW via the GraphQL mutation.
@@ -712,11 +659,10 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const created = expectSuccess(createRes).createAppBucket.appBucket;
       expect(created.key).toBe(key);
 
-      // autoProvision:false => the create hook never runs, so no S3 bucket is
-      // minted and nothing is recorded on the row.
+      // The logical row remains unreconciled until the job runs.
       expect(await physicalNameFor(key)).toBeNull();
 
-      // The lazy path still provisions the bucket on first upload.
+      // Uploads fail while reconciliation has not recorded a physical name.
       const uploadRes = await postGraphQL({
         query: UPLOAD_APP_FILE,
         variables: {
@@ -729,12 +675,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
           }
         }
       });
-      const uploadUrl = expectSuccess(uploadRes).uploadAppFile.uploadUrl;
-      const physical = await physicalNameFor(key);
-      expect(physical).toBeTruthy();
-      // Lazy mints the same tenant-aware name the presigned PUT targets.
-      expect(bucketFromPresignedUrl(uploadUrl)).toBe(physical);
-      expect(physical).toMatch(new RegExp(`-${key}-[a-f0-9]{12}$`));
+      expect(uploadRes.body.errors?.[0]?.message).toContain('STORAGE_BUCKET_NOT_RECONCILED');
+      expect(await physicalNameFor(key)).toBeNull();
     });
   });
 
@@ -1107,4 +1049,3 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     });
   });
 });
-

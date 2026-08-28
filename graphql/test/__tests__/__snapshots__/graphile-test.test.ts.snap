@@ -3874,10 +3874,11 @@ based pagination. May not be used with \`last\`.",
                 },
               ],
               "deprecationReason": null,
-              "description": "Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.",
+              "description": "Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.",
               "isDeprecated": false,
               "name": "provisionBucket",
               "type": {
@@ -4383,15 +4384,15 @@ Omit for app-level (database-wide) storage.",
             {
               "args": [],
               "deprecationReason": null,
-              "description": "Whether provisioning succeeded",
+              "description": "The logical bucket row that was queued for reconciliation",
               "isDeprecated": false,
-              "name": "success",
+              "name": "bucketId",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "Boolean",
+                  "name": "UUID",
                   "ofType": null,
                 },
               },
@@ -4399,25 +4400,9 @@ Omit for app-level (database-wide) storage.",
             {
               "args": [],
               "deprecationReason": null,
-              "description": "The S3 bucket name that was provisioned",
+              "description": "The logical bucket key",
               "isDeprecated": false,
-              "name": "bucketName",
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null,
-                },
-              },
-            },
-            {
-              "args": [],
-              "deprecationReason": null,
-              "description": "The access type applied",
-              "isDeprecated": false,
-              "name": "accessType",
+              "name": "bucketKey",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -4431,25 +4416,9 @@ Omit for app-level (database-wide) storage.",
             {
               "args": [],
               "deprecationReason": null,
-              "description": "The storage provider used",
+              "description": "The physical name already recorded, or null while reconciliation is pending",
               "isDeprecated": false,
-              "name": "provider",
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null,
-                },
-              },
-            },
-            {
-              "args": [],
-              "deprecationReason": null,
-              "description": "The S3 endpoint (null for AWS S3 default)",
-              "isDeprecated": false,
-              "name": "endpoint",
+              "name": "physicalName",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -4459,13 +4428,17 @@ Omit for app-level (database-wide) storage.",
             {
               "args": [],
               "deprecationReason": null,
-              "description": "Error message if provisioning failed",
+              "description": "The queued reconciler job",
               "isDeprecated": false,
-              "name": "error",
+              "name": "jobId",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null,
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "UUID",
+                  "ofType": null,
+                },
               },
             },
           ],

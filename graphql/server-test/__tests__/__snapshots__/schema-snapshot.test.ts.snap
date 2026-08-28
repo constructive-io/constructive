@@ -1118,10 +1118,11 @@ type Mutation {
   ): DeleteUserPayload
 
   """
-  Provision an S3 bucket for a logical bucket in the database.
-  Reads the bucket config via RLS, then creates and configures
-  the S3 bucket with the appropriate privacy policies, CORS rules,
-  and lifecycle settings.
+  Reconcile an S3 bucket for a logical bucket in the database.
+  Reads the bucket config via RLS, then enqueues the same
+  storage:provision_bucket job used by the INSERT trigger. This is
+  idempotent for an already-reconciled bucket; enqueue failures become
+  GraphQL errors.
   """
   provisionBucket(
     """
@@ -1609,23 +1610,17 @@ input ProvisionBucketInput {
 }
 
 type ProvisionBucketPayload {
-  """The access type applied"""
-  accessType: String!
+  """The logical bucket row that was queued for reconciliation."""
+  bucketId: UUID!
 
-  """The S3 bucket name that was provisioned"""
-  bucketName: String!
+  """The logical bucket key"""
+  bucketKey: String!
 
-  """The S3 endpoint (null for AWS S3 default)"""
-  endpoint: String
+  """The physical bucket name already recorded, or null when reconciliation has not completed."""
+  physicalName: String
 
-  """Error message if provisioning failed"""
-  error: String
-
-  """The storage provider used"""
-  provider: String!
-
-  """Whether provisioning succeeded"""
-  success: Boolean!
+  """The reconciler job enqueued to provision this bucket."""
+  jobId: UUID!
 }
 
 """The root query type which gives access points into the data universe."""

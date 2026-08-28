@@ -117,7 +117,6 @@ function options(): PresignedUrlPluginOptions {
       region: 'us-east-1',
       publicUrlPrefix: 'https://cdn.example.com',
     },
-    resolveBucketName: (databaseId: string, bucketKey: string) => `myapp-${bucketKey}-${databaseId}`,
   };
 }
 
@@ -265,33 +264,32 @@ describe('resolveManagedUploadTarget', () => {
     ).rejects.toThrow('BUCKET_PATH_KEYED');
   });
 
-  it('records the physical name on first provision instead of re-minting it', async () => {
+  it('rejects an unreconciled bucket without calling S3 or provisioning', async () => {
     const { resolveManagedUploadTarget } = await import('../src/managed-upload');
-    const ensureBucketProvisioned = jest.fn().mockResolvedValue(undefined);
+    const send = jest.fn();
+    const baseS3 = options().s3 as S3Config;
     const db = fakeDb([
       SET_CONFIG,
       NO_REGISTRY_ROW,
       STORAGE_MODULES,
       { match: /resolve_default_bucket/, rows: () => [{ bucket_id: BUCKET_ID, resolved_key: 'default-public', bucket_type: 'public', physical_name: null }] },
       { match: /SELECT id, key, type/, rows: () => [bucketRow({ physical_name: null })] },
-      { match: /UPDATE storage_public\.app_buckets/, rows: () => [] },
     ]);
 
-    const target = await resolveManagedUploadTarget({
-      options: { ...options(), ensureBucketProvisioned },
+    await expect(resolveManagedUploadTarget({
+      options: {
+        ...options(),
+        s3: { ...baseS3, client: { send } as any },
+      },
       withPgClient: db.withPgClient,
       pgSettings: null,
       databaseId: DATABASE_ID,
       field: FIELD,
       defaultPublicAccess: true,
-    });
+    })).rejects.toThrow('STORAGE_BUCKET_NOT_RECONCILED');
 
-    expect(target.physicalName).toBe(`myapp-default-public-${DATABASE_ID}`);
-    expect(ensureBucketProvisioned).toHaveBeenCalledWith(
-      `myapp-default-public-${DATABASE_ID}`, 'public', DATABASE_ID, null,
-    );
-    const update = db.queries.find((q) => /UPDATE/.test(q.text));
-    expect(update?.values).toEqual([`myapp-default-public-${DATABASE_ID}`, BUCKET_ID]);
+    expect(send).not.toHaveBeenCalled();
+    expect(db.queries.some((q) => /UPDATE/.test(q.text))).toBe(false);
   });
 
   it('raises when the database has no storage module to default to', async () => {

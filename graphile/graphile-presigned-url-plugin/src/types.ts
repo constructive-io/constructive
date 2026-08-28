@@ -13,10 +13,9 @@ export interface BucketConfig {
   max_file_size: number | null;
   allow_custom_keys: boolean;
   /**
-   * The physical S3/MinIO bucket name recorded when the physical bucket was
-   * first provisioned. NULL until the first upload provisions it. Once set,
-   * it is the source of truth for the physical bucket — reads never
-   * reconstruct the name from a prefix convention.
+   * The physical S3/MinIO bucket name recorded by reconciliation. NULL until
+   * reconciliation completes. Once set, it is the source of truth for the
+   * physical bucket — reads never reconstruct the name.
    */
   physical_name: string | null;
 }
@@ -199,59 +198,10 @@ export interface S3Config {
 export type S3ConfigOrGetter = S3Config | (() => S3Config);
 
 /**
- * Function to derive the actual S3 bucket name for a given database and bucket key.
- *
- * When provided, the presigned URL plugin calls this on every request
- * to determine which S3 bucket to use — enabling per-(database, bucketKey)
- * isolation. If not provided, falls back to `s3Config.bucket` (global).
- *
- * @param databaseId - The metaschema database UUID
- * @param bucketKey - The logical bucket key (e.g., "public", "private")
- * @returns The S3 bucket name for this database + bucket key
- */
-export type BucketNameResolver = (databaseId: string, bucketKey: string) => string;
-
-/**
- * Callback to lazily provision an S3 bucket on first use.
- *
- * Called by the presigned URL plugin before generating a presigned PUT URL
- * when the bucket has not been seen before (tracked in an in-memory cache).
- * The implementation should create and fully configure the S3 bucket
- * (privacy policies, CORS, lifecycle rules, etc.) — or no-op if the
- * bucket already exists.
- *
- * @param bucketName - The S3 bucket name to provision
- * @param accessType - The logical bucket type ('public', 'private', 'temp')
- * @param databaseId - The metaschema database UUID
- * @param allowedOrigins - Per-database CORS origins (from storage_module), or null to use global fallback
- */
-export type EnsureBucketProvisioned = (
-  bucketName: string,
-  accessType: 'public' | 'private' | 'temp',
-  databaseId: string,
-  allowedOrigins: string[] | null,
-) => Promise<void>;
-
-/**
  * Plugin options for the presigned URL plugin.
  */
 export interface PresignedUrlPluginOptions {
   /** S3 configuration (concrete or lazy getter) */
   s3: S3ConfigOrGetter;
 
-  /**
-   * Optional function to resolve S3 bucket name per-database.
-   * When set, each database gets its own S3 bucket instead of sharing
-   * the global `s3Config.bucket`. The S3 credentials (client) remain shared.
-   */
-  resolveBucketName?: BucketNameResolver;
-
-  /**
-   * Optional callback to lazily provision an S3 bucket on first upload.
-   * When set, the plugin calls this before generating a presigned PUT URL
-   * for any S3 bucket it hasn't seen yet (tracked in an in-memory cache).
-   * This enables graceful bucket creation without requiring buckets to
-   * exist at database provisioning time.
-   */
-  ensureBucketProvisioned?: EnsureBucketProvisioned;
 }

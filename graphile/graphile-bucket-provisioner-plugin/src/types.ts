@@ -2,65 +2,10 @@
  * Types for the bucket provisioner plugin.
  */
 
-import type {
-  BucketAccessType,
-  ProvisionResult,
-  StorageConnectionConfig,
-  StorageProvider,
-} from '@constructive-io/bucket-provisioner';
-
-// Re-export types that consumers will need
-export type { BucketAccessType, ProvisionResult,StorageConnectionConfig, StorageProvider };
-
-/**
- * S3 connection configuration or a lazy getter that returns it on first use.
- *
- * When a function is provided, it will only be called when the first
- * provisioning operation actually needs the S3 client — avoiding eager
- * env-var reads and S3Client creation at module import time.
- */
-export type ConnectionConfigOrGetter =
-  | StorageConnectionConfig
-  | (() => StorageConnectionConfig);
-
-/**
- * Function to derive the actual S3 bucket name from a logical bucket key.
- *
- * @param databaseId - The metaschema database UUID
- * @param bucketKey - The logical bucket key from the database (e.g., "public", "private")
- * @returns The S3 bucket name to create/configure
- */
-export type BucketNameResolver = (databaseId: string, bucketKey: string) => string;
-
 /**
  * Plugin options for the bucket provisioner plugin.
  */
-export interface BucketProvisionerPluginOptions {
-  /**
-   * S3 connection configuration (credentials, endpoint, provider).
-   * Can be a concrete object or a lazy getter function.
-   */
-  connection: ConnectionConfigOrGetter;
-
-  /**
-   * Allowed origins for CORS rules on provisioned buckets.
-   * These are the domains where your app runs (e.g., ["https://app.example.com"]).
-   * Required for browser-based presigned URL uploads.
-   */
-  allowedOrigins: string[];
-
-  /**
-   * Optional custom function to derive S3 bucket names from logical bucket keys.
-   * Naming is a deployment policy and must be supplied by the caller.
-   */
-  resolveBucketName?: BucketNameResolver;
-
-  /**
-   * Whether to enable versioning on provisioned buckets.
-   * Default: false
-   */
-  versioning?: boolean;
-}
+export type BucketProvisionerPluginOptions = Record<string, never>;
 
 /**
  * Input for the provisionBucket mutation.
@@ -76,19 +21,15 @@ export interface ProvisionBucketInput {
 }
 
 /**
- * Result of the provisionBucket mutation.
+ * Result of the provisionBucket reconciliation enqueue mutation.
  */
 export interface ProvisionBucketPayload {
-  /** Whether provisioning succeeded */
-  success: boolean;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The access type applied */
-  accessType: string;
-  /** The storage provider used */
-  provider: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint: string | null;
-  /** Error message if provisioning failed */
-  error: string | null;
+  /** The logical bucket row queued for reconciliation */
+  bucketId: string;
+  /** The logical bucket key */
+  bucketKey: string;
+  /** The physical name already recorded, or null while reconciliation is pending */
+  physicalName: string | null;
+  /** The queued reconciler job */
+  jobId: string;
 }

@@ -60,6 +60,3 @@ export { makePgService };
 
 // Presigned URL utilities
 export { getPresignedUrlS3Config } from './presigned-url-resolver';
-
-// Bucket provisioner utilities
-export { getBucketProvisionerConnection } from './bucket-provisioner-resolver';

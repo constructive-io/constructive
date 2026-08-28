@@ -23,7 +23,7 @@ import { Logger } from '@pgpmjs/logger';
 import { resolveDefaultBucket } from './default-bucket';
 import { isLiveFileRow, statusSelectFragment } from './file-lifecycle';
 import { type FileRefFieldBinding, getFileRefFieldBinding } from './file-ref-registry';
-import { provisionAndRecordPhysicalBucket, resolveS3ForDatabase } from './physical-bucket';
+import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
 import { type WithPgClient, withRequestPgClient } from './request-pg-client';
 import { copyS3Object, deleteS3Object } from './s3-signer';
 import { recordManagedFile } from './storage-file-recorder';
@@ -212,11 +212,7 @@ export async function resolveManagedUploadTarget(args: {
     );
   }
 
-  const physicalName = bucket.physical_name === null
-    ? await provisionAndRecordPhysicalBucket(
-      options, withPgClient, storageConfig, databaseId, bucket, storageConfig.allowedOrigins,
-    )
-    : bucket.physical_name;
+  const physicalName = assertBucketReconciled(bucket, databaseId);
 
   return {
     databaseId,

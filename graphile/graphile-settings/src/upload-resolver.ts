@@ -44,11 +44,7 @@ import type {
 import { checkTypeAgreement } from 'mime-bytes';
 import { Transform } from 'stream';
 
-import {
-  createBucketNameResolver,
-  createEnsureBucketProvisioned,
-  getPresignedUrlS3Config,
-} from './presigned-url-resolver';
+import { getPresignedUrlS3Config } from './presigned-url-resolver';
 
 const log = new Logger('upload-resolver');
 const DEFAULT_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml'];
@@ -87,12 +83,10 @@ function getStreamer(): Streamer {
 
 /**
  * The upload lane's view of the presigned plugin's options: the same S3
- * connection, physical-name policy, and provisioning hook the presigned lane
- * uses, so both transports resolve identical coordinates for a bucket.
+ * connection the presigned lane uses, so both transports resolve identical
+ * coordinates for a bucket.
  *
- * Built on first upload rather than at import time — `createBucketNameResolver`
- * throws on a missing name prefix, and that must surface as a failed upload, not
- * as a server that will not boot.
+ * Built on first upload rather than at import time.
  */
 let managedOptions: PresignedUrlPluginOptions | null = null;
 
@@ -100,8 +94,6 @@ function getManagedOptions(): PresignedUrlPluginOptions {
   if (!managedOptions) {
     managedOptions = {
       s3: getPresignedUrlS3Config,
-      resolveBucketName: createBucketNameResolver(),
-      ensureBucketProvisioned: createEnsureBucketProvisioned(),
     };
   }
   return managedOptions;

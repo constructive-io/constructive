@@ -9,11 +9,10 @@
  * reachable as `cause`.
  */
 
-import { provisionAndRecordPhysicalBucket } from '../src/physical-bucket';
+import { assertBucketReconciled } from '../src/physical-bucket';
 import { describeS3Failure, s3FailureError } from '../src/s3-failure';
 import { generatePresignedPutUrl } from '../src/s3-signer';
-import { clearStorageModuleCache } from '../src/storage-module-cache';
-import type { BucketConfig, PresignedUrlPluginOptions, StorageModuleConfig } from '../src/types';
+import type { BucketConfig } from '../src/types';
 
 /** An unreachable endpoint, as undici surfaces it: no message of its own. */
 function connectionRefused(): AggregateError {
@@ -113,36 +112,29 @@ describe('the upload lane', () => {
     ).rejects.toThrow(/PRESIGN_PUT_FAILED.*endpoint=http:\/\/localhost:9000/s);
   });
 
-  it('reports an unreachable object store when provisioning a bucket, naming the endpoint', async () => {
-    clearStorageModuleCache();
-    const cause = connectionRefused();
-    const options: PresignedUrlPluginOptions = {
-      s3: { client: {} as any, bucket: 'connection-default', endpoint: 'http://localhost:9000' },
-      resolveBucketName: () => 'app-public-abc',
-      ensureBucketProvisioned: () => Promise.reject(cause),
-    };
-    const withPgClient = jest.fn();
+  it('reports an unreconciled bucket with a retryable typed error', () => {
+    const bucket = {
+      id: 'bucket-1',
+      key: 'public',
+      physical_name: null,
+    } as BucketConfig;
 
-    let thrown: any;
+    expect(() => assertBucketReconciled(
+      bucket,
+      '00000000-0000-0000-0000-0000000000db',
+    )).toThrow('STORAGE_BUCKET_NOT_RECONCILED');
+
     try {
-      await provisionAndRecordPhysicalBucket(
-        options,
-        withPgClient as any,
-        { bucketsQualifiedName: 'app_public.buckets' } as StorageModuleConfig,
-        '00000000-0000-0000-0000-0000000000db',
-        { id: 'bucket-1', key: 'public', type: 'public', physical_name: null } as BucketConfig,
-        null,
-      );
-    } catch (err) {
-      thrown = err;
+      assertBucketReconciled(bucket, '00000000-0000-0000-0000-0000000000db');
+    } catch (err: any) {
+      expect(err.extensions).toEqual({
+        code: 'STORAGE_BUCKET_NOT_RECONCILED',
+        retryable: true,
+      });
+      expect(err.message).toContain('public');
+      expect(err.message).toContain('bucket-1');
+      expect(err.message).toContain('00000000-0000-0000-0000-0000000000db');
+      expect(err.message).toContain('reconciler has not yet recorded a physical name');
     }
-
-    expect(thrown?.message).toContain('BUCKET_PROVISION_FAILED');
-    expect(thrown?.message).toContain('endpoint=http://localhost:9000');
-    expect(thrown?.message).toContain('bucket=app-public-abc');
-    expect(thrown?.message).toContain('ECONNREFUSED');
-    expect(thrown?.cause).toBe(cause);
-    // A failed provision must not record a physical name.
-    expect(withPgClient).not.toHaveBeenCalled();
   });
 });
