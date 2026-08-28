@@ -31,6 +31,7 @@ function storageModuleRow(): Record<string, unknown> {
     buckets_table: 'app_buckets',
     files_schema: 'storage_public',
     files_table: 'app_files',
+    private_schema: 'storage_private',
     endpoint: null,
     public_url_prefix: 'https://cdn.example.com',
     provider: 'minio',
@@ -43,6 +44,8 @@ function storageModuleRow(): Record<string, unknown> {
     max_bulk_files: null,
     max_bulk_total_size: null,
     has_path_shares: false,
+    has_versioning: false,
+    has_confirm_upload: false,
     entity_schema: null,
     entity_table: null,
   };
@@ -88,7 +91,7 @@ function fakeContext(opts: { isPublic?: boolean; existingFile?: boolean; failIns
         : [],
     },
     {
-      match: /INSERT INTO storage_public\.app_files/,
+      match: /app_files_record_file/,
       rows: () => {
         if (opts.failInsert) throw new Error('insert boom');
         return [{ id: FILE_ID }];
@@ -232,8 +235,9 @@ describe('multipart upload resolver', () => {
     expect(call.bucket).toBe('myapp-default-public-db');
     expect(call.key).toMatch(/^\.staging\//);
 
-    const insert = queries.find((q) => /INSERT INTO storage_public\.app_files/.test(q.text));
-    expect(insert).toBeDefined();
+    const recorder = queries.find((q) => /app_files_record_file/.test(q.text));
+    expect(recorder).toBeDefined();
+    expect(recorder?.text).not.toContain('INSERT INTO');
   });
 
   it('deduplicates against an existing row rather than inserting a second one', async () => {
