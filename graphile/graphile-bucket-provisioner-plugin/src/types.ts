@@ -3,11 +3,6 @@
  */
 
 /**
- * Plugin options for the bucket provisioner plugin.
- */
-export type BucketProvisionerPluginOptions = Record<string, never>;
-
-/**
  * Input for the provisionBucket mutation.
  */
 export interface ProvisionBucketInput {

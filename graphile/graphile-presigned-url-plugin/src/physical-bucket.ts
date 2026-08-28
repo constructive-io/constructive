@@ -9,6 +9,24 @@
 
 import type { BucketConfig, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
+export class StorageBucketNotReconciledError extends Error {
+  readonly code = 'STORAGE_BUCKET_NOT_RECONCILED';
+  readonly retryable = true;
+  readonly extensions = {
+    code: 'STORAGE_BUCKET_NOT_RECONCILED',
+    retryable: true,
+  };
+
+  constructor(bucket: BucketConfig, databaseId: string) {
+    super(
+      `STORAGE_BUCKET_NOT_RECONCILED: bucket "${bucket.key}" (id=${bucket.id}) ` +
+      `for database ${databaseId} has not yet been reconciled; the reconciler has ` +
+      'not yet recorded a physical name',
+    );
+    this.name = 'StorageBucketNotReconciledError';
+  }
+}
+
 /**
  * Resolve the plugin's S3 connection (credentials, endpoint, region), memoizing
  * a lazy getter on first use.
@@ -60,18 +78,5 @@ export function resolveS3ForDatabase(
 export function assertBucketReconciled(bucket: BucketConfig, databaseId: string): string {
   if (bucket.physical_name !== null) return bucket.physical_name;
 
-  const message =
-    `STORAGE_BUCKET_NOT_RECONCILED: bucket "${bucket.key}" (id=${bucket.id}) ` +
-    `for database ${databaseId} has not yet been reconciled; the reconciler has ` +
-    'not yet recorded a physical name';
-  const error = new Error(message);
-  Object.assign(error, {
-    code: 'STORAGE_BUCKET_NOT_RECONCILED',
-    retryable: true,
-    extensions: {
-      code: 'STORAGE_BUCKET_NOT_RECONCILED',
-      retryable: true,
-    },
-  });
-  throw error;
+  throw new StorageBucketNotReconciledError(bucket, databaseId);
 }

@@ -8,16 +8,13 @@
 import type { GraphileConfig } from 'graphile-config';
 
 import { createBucketProvisionerPlugin } from './plugin';
-import type { BucketProvisionerPluginOptions } from './types';
 
 /**
  * Creates a preset that includes the bucket reconciliation plugin.
  */
-export function BucketProvisionerPreset(
-  options: BucketProvisionerPluginOptions = {},
-): GraphileConfig.Preset {
+export function BucketProvisionerPreset(): GraphileConfig.Preset {
   return {
-    plugins: [createBucketProvisionerPlugin(options)],
+    plugins: [createBucketProvisionerPlugin()],
   };
 }
 

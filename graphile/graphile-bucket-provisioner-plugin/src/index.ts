@@ -8,7 +8,6 @@
 export { BucketProvisionerPlugin, createBucketProvisionerPlugin } from './plugin';
 export { BucketProvisionerPreset } from './preset';
 export type {
-  BucketProvisionerPluginOptions,
   ProvisionBucketInput,
   ProvisionBucketPayload,
 } from './types';

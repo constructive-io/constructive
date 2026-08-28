@@ -9,7 +9,10 @@
  * reachable as `cause`.
  */
 
-import { assertBucketReconciled } from '../src/physical-bucket';
+import {
+  assertBucketReconciled,
+  StorageBucketNotReconciledError,
+} from '../src/physical-bucket';
 import { describeS3Failure, s3FailureError } from '../src/s3-failure';
 import { generatePresignedPutUrl } from '../src/s3-signer';
 import type { BucketConfig } from '../src/types';
@@ -127,6 +130,9 @@ describe('the upload lane', () => {
     try {
       assertBucketReconciled(bucket, '00000000-0000-0000-0000-0000000000db');
     } catch (err: any) {
+      expect(err).toBeInstanceOf(StorageBucketNotReconciledError);
+      expect(err.code).toBe('STORAGE_BUCKET_NOT_RECONCILED');
+      expect(err.retryable).toBe(true);
       expect(err.extensions).toEqual({
         code: 'STORAGE_BUCKET_NOT_RECONCILED',
         retryable: true,

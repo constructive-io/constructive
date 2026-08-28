@@ -47,7 +47,12 @@ export {
   type ManagedUploadTarget,
   resolveManagedUploadTarget,
 } from './managed-upload';
-export { assertBucketReconciled, resolveS3, resolveS3ForDatabase } from './physical-bucket';
+export {
+  assertBucketReconciled,
+  resolveS3,
+  resolveS3ForDatabase,
+  StorageBucketNotReconciledError,
+} from './physical-bucket';
 export { createPresignedUrlPlugin,PresignedUrlPlugin } from './plugin';
 export { PresignedUrlPreset } from './preset';
 export { type WithPgClient, withRequestPgClient } from './request-pg-client';

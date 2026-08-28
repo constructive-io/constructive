@@ -18,10 +18,6 @@ import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
 
-import type {
-  BucketProvisionerPluginOptions,
-} from './types';
-
 // --- Storage module queries ---
 
 /**
@@ -31,7 +27,10 @@ import type {
 const ALL_STORAGE_MODULES_QUERY = `
   SELECT
     sm.id,
+    sm.database_id,
+    sm.buckets_table_id,
     sm.scope,
+    sm.entity_field,
     sm.entity_table_id,
     bs.schema_name AS buckets_schema,
     bt.name AS buckets_table,
@@ -51,7 +50,10 @@ const ALL_STORAGE_MODULES_QUERY = `
 
 interface StorageModuleRow {
   id: string;
+  database_id: string;
+  buckets_table_id: string;
   scope: string;
+  entity_field: string | null;
   entity_table_id: string | null;
   buckets_schema: string;
   buckets_table: string;
@@ -77,6 +79,21 @@ function runQuery(
   values?: unknown[],
 ): Promise<{ rows: any[] }> {
   return pgClient.query(values === undefined ? { text } : { text, values });
+}
+
+function scopeKeySelect(storageModule: StorageModuleRow): string {
+  return storageModule.entity_field === null
+    ? ''
+    : `, ${QuoteUtils.quoteIdentifier(storageModule.entity_field)} AS scope_key`;
+}
+
+function scopeKeyColumn(storageModule: StorageModuleRow): string {
+  if (storageModule.entity_field === null) {
+    throw new Error(
+      `STORAGE_BUCKET_SCOPE_KEY_MISSING: storage module ${storageModule.id} has no entity field`,
+    );
+  }
+  return QuoteUtils.quoteIdentifier(storageModule.entity_field);
 }
 
 /**
@@ -118,9 +135,9 @@ async function resolveBucketByKey(
       const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(mod.buckets_schema, mod.buckets_table);
       const bucketResult = await runQuery(
         pgClient,
-        `SELECT id, key, type, is_public, allowed_origins, physical_name
+        `SELECT id, key, type, is_public, allowed_origins, physical_name${scopeKeySelect(mod)}
          FROM ${bucketsTable}
-         WHERE key = $1 AND owner_id = $2
+         WHERE key = $1 AND ${scopeKeyColumn(mod)} = $2
          LIMIT 1`,
         [bucketKey, ownerId],
       );
@@ -135,7 +152,7 @@ async function resolveBucketByKey(
     const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(mod.buckets_schema, mod.buckets_table);
     const bucketResult = await runQuery(
       pgClient,
-      `SELECT id, key, type, is_public, allowed_origins, physical_name
+      `SELECT id, key, type, is_public, allowed_origins, physical_name${scopeKeySelect(mod)}
        FROM ${bucketsTable}
        WHERE key = $1
        LIMIT 1`,
@@ -161,6 +178,7 @@ interface BucketRow {
   id: string;
   key: string;
   physical_name: string | null;
+  scope_key: string | null;
 }
 
 // --- Helpers ---
@@ -176,6 +194,113 @@ async function resolveDatabaseId(pgClient: any): Promise<string | null> {
   return result.rows[0]?.id ?? null;
 }
 
+async function resolveEntityContext(
+  pgClient: any,
+  storageModule: StorageModuleRow,
+): Promise<{ entity_type: string | null; get_org_fn_schema: string | null; get_org_fn: string | null }> {
+  const result = await runQuery(
+    pgClient,
+    `SELECT r.entity_type, r.get_org_fn_schema, r.get_org_fn
+     FROM metaschema.resolve_entity_context_by_field($1::uuid, $2::uuid, $3::text) r`,
+    [storageModule.database_id, storageModule.buckets_table_id, storageModule.entity_field],
+  );
+  return result.rows[0] ?? {
+    entity_type: null,
+    get_org_fn_schema: null,
+    get_org_fn: null,
+  };
+}
+
+/**
+ * Mirror the storage module generator's data_job_trigger shape from
+ * `packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/storage_module.sql`
+ * and the add_job argument assembly in
+ * `packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/job_trigger.sql`.
+ * A callable enqueue function beside the trigger would be the durable fix for
+ * this deliberate mirroring, but is out of scope here.
+ */
+async function enqueueReconciliationJob(
+  pgClient: any,
+  storageModule: StorageModuleRow,
+  bucket: BucketRow,
+): Promise<string> {
+  const scope = storageModule.scope;
+  const entityField = storageModule.entity_field;
+
+  let text: string;
+  let values: unknown[];
+
+  if (entityField === null) {
+    text = `SELECT (app_jobs.add_job(
+      identifier => 'storage:provision_bucket',
+      payload => json_build_object(
+        'id', $1::uuid,
+        'scope', $2::text
+      ),
+      queue_name => 'bucket:' || $1::text,
+      max_attempts => 25,
+      priority => 0
+    )).id AS id`;
+    values = [bucket.id, scope];
+  } else if (entityField === 'database_id') {
+    const databaseId = bucket.scope_key;
+    if (!databaseId) {
+      throw new Error(`STORAGE_BUCKET_SCOPE_KEY_MISSING: bucket ${bucket.id} has no database_id`);
+    }
+    text = `SELECT (app_jobs.add_job(
+      identifier => 'storage:provision_bucket',
+      payload => json_build_object(
+        'database_id', $2::uuid,
+        'id', $1::uuid,
+        'scope', $3::text
+      ),
+      db_id => $2,
+      queue_name => 'bucket:' || $1::text,
+      max_attempts => 25,
+      priority => 0,
+      entity_id => $2,
+      organization_id => NULL,
+      entity_type => $3
+    )).id AS id`;
+    values = [bucket.id, databaseId, scope];
+  } else if (entityField === 'owner_id') {
+    const ownerId = bucket.scope_key;
+    if (!ownerId) {
+      throw new Error(`STORAGE_BUCKET_SCOPE_KEY_MISSING: bucket ${bucket.id} has no owner_id`);
+    }
+    const context = await resolveEntityContext(pgClient, storageModule);
+    const orgFunction = context.get_org_fn_schema && context.get_org_fn
+      ? `${QuoteUtils.quoteQualifiedIdentifier(context.get_org_fn_schema, context.get_org_fn)}($3::text, $2::uuid)`
+      : 'NULL';
+    text = `SELECT (app_jobs.add_job(
+      identifier => 'storage:provision_bucket',
+      payload => json_build_object(
+        'id', $1::uuid,
+        'owner_id', $2::uuid,
+        'scope', $3::text
+      ),
+      queue_name => 'bucket:' || $1::text,
+      max_attempts => 25,
+      priority => 0,
+      entity_id => $2,
+      organization_id => ${orgFunction},
+      entity_type => $3
+    )).id AS id`;
+    values = [bucket.id, ownerId, scope];
+  } else {
+    throw new Error(
+      `STORAGE_BUCKET_ENTITY_FIELD_UNSUPPORTED: ${entityField}`,
+    );
+  }
+
+  const result = await runQuery(pgClient, text, values);
+  const jobId = result.rows[0]?.id;
+  if (!jobId) {
+    throw new Error(`STORAGE_BUCKET_JOB_ID_MISSING: bucket ${bucket.id}`);
+  }
+  return jobId;
+}
+
 // --- Plugin factory ---
 
 /**
@@ -187,11 +312,8 @@ async function resolveDatabaseId(pgClient: any): Promise<string | null> {
  *    bucket key to enqueue reconciliation (or re-reconciliation) for the
  *    bucket. Protected by RLS on the buckets table.
  *
- * @param options - Plugin configuration (reserved for compatibility)
  */
-export function createBucketProvisionerPlugin(
-  _options: BucketProvisionerPluginOptions = {},
-): GraphileConfig.Plugin {
+export function createBucketProvisionerPlugin(): GraphileConfig.Plugin {
   // The extendSchema plugin adds the explicit provisionBucket mutation
   const mutationPlugin = extendSchema(() => ({
     typeDefs: gql`
@@ -261,41 +383,7 @@ export function createBucketProvisionerPlugin(
                 throw new Error('BUCKET_NOT_FOUND');
               }
               const { storageModule, bucket } = resolution;
-              const databaseScope = storageModule.scope !== 'platform';
-              const jobResult = await runQuery(
-                pgClient,
-                databaseScope
-                  ? `SELECT (app_jobs.add_job(
-                       identifier => 'storage:provision_bucket',
-                       payload => json_build_object(
-                         'database_id', $2::uuid,
-                         'id', $1::uuid,
-                         'scope', 'database'
-                       ),
-                       db_id => $2,
-                       queue_name => 'bucket:' || $1::text,
-                       max_attempts => 25,
-                       priority => 0,
-                       entity_id => $2,
-                       organization_id => NULL,
-                       entity_type => 'database'
-                     )).id AS id`
-                  : `SELECT (app_jobs.add_job(
-                       identifier => 'storage:provision_bucket',
-                       payload => json_build_object(
-                         'id', $1::uuid,
-                         'scope', 'platform'
-                       ),
-                       queue_name => 'bucket:' || $1::text,
-                       max_attempts => 25,
-                       priority => 0
-                     )).id AS id`,
-                [bucket.id, ...(databaseScope ? [databaseId] : [])],
-              );
-              const jobId = jobResult.rows[0]?.id;
-              if (!jobId) {
-                throw new Error(`STORAGE_BUCKET_JOB_ID_MISSING: bucket ${bucket.id}`);
-              }
+              const jobId = await enqueueReconciliationJob(pgClient, storageModule, bucket);
 
               return {
                 bucketId: bucket.id,
