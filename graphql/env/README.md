@@ -52,6 +52,8 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 ### API Configuration
 - `API_ROUTING_SCHEMA` - Schema containing the compiled `resolve_route()` resolver (production routing always resolves through it)
 - `API_DATABASE_ACCESS_POLICY_FUNCTION` - Optional schema-qualified function that authorizes requests for the resolved database
+- `API_DATABASE_ACCESS_POLICY_POOL_MAX` - Maximum dedicated connections for access-policy checks (default `2`, maximum `8`)
+- `API_DATABASE_ACCESS_POLICY_TIMEOUT_MS` - Connection and query deadline for access-policy checks (default `1500`, range `100`-`30000`)
 - `API_IS_PUBLIC` - Whether API is public
 - `API_EXPOSED_SCHEMAS` - Comma-separated list of exposed schemas
 - `API_META_SCHEMAS` - Comma-separated list of meta schemas
@@ -75,6 +77,8 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
     anonRole: 'administrator',
     roleName: 'administrator',
     isPublic: true,
+    databaseAccessPolicyPoolMax: 2,
+    databaseAccessPolicyTimeoutMs: 1500,
     metaSchemas: ['routing_public', 'metaschema_public', 'metaschema_modules_public'],
     routingSchema: 'routing_public'
   }

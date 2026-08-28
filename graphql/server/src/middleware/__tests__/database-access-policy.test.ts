@@ -1,19 +1,16 @@
-jest.mock('pg-cache', () => ({
-  getPgPool: jest.fn()
-}));
-
 import { ConstructiveError } from '@constructive-io/errors';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import type { Pool } from 'pg';
-import { getPgPool } from 'pg-cache';
 import request from 'supertest';
 
 import { ApiError } from '../../errors/api-errors';
 import type { ApiOptions } from '../../types';
-import { createDatabaseAccessPolicyMiddleware } from '../database-access-policy';
+import { createDatabaseAccessPolicyMiddleware as createDatabaseAccessPolicyMiddlewareImpl } from '../database-access-policy';
 import { errorHandler } from '../error-handler';
 
-const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
+const mockCreatePool = jest.fn();
+const createDatabaseAccessPolicyMiddleware = (opts: ApiOptions) =>
+  createDatabaseAccessPolicyMiddlewareImpl(opts, { createPool: mockCreatePool });
 const DATABASE_ID = '11111111-1111-4111-8111-111111111111';
 
 interface TestPolicyRow {
@@ -79,25 +76,66 @@ describe('database access policy middleware', () => {
 
     await middleware(createRequest(), createResponse().res, next);
 
-    expect(mockGetPgPool).not.toHaveBeenCalled();
+    expect(mockCreatePool).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith();
   });
 
   it('queries the routing pool with the resolved database id and permits an allowed request', async () => {
     const query = jest.fn().mockResolvedValue({ rows: [allowRow] });
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
     const opts = options('platform_private.database_access');
     const middleware = createDatabaseAccessPolicyMiddleware(opts);
     const next = jest.fn();
 
     await middleware(createRequest(), createResponse().res, next);
 
-    expect(mockGetPgPool).toHaveBeenCalledWith(opts.pg);
+    expect(mockCreatePool).toHaveBeenCalledWith(expect.objectContaining({
+      database: 'routing_database',
+      max: 2,
+      connectionTimeoutMillis: 1500,
+      statement_timeout: 1500,
+      query_timeout: 1500
+    }));
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining('from "platform_private"."database_access"($1::uuid)'),
       [DATABASE_ID]
     );
     expect(next).toHaveBeenCalledWith();
+  });
+
+  it('applies configured pool and query bounds and closes the dedicated pool once', async () => {
+    const query = jest.fn().mockResolvedValue({ rows: [allowRow] });
+    const end = jest.fn().mockResolvedValue(undefined);
+    mockCreatePool.mockReturnValue({ query, end } as unknown as Pool);
+    const opts = options('platform_private.database_access');
+    opts.api!.databaseAccessPolicyPoolMax = 3;
+    opts.api!.databaseAccessPolicyTimeoutMs = 2400;
+    const middleware = createDatabaseAccessPolicyMiddleware(opts);
+
+    expect(mockCreatePool).toHaveBeenCalledWith(expect.objectContaining({
+      max: 3,
+      connectionTimeoutMillis: 2400,
+      statement_timeout: 2400,
+      query_timeout: 2400
+    }));
+
+    await middleware.close();
+    await middleware.close();
+    expect(end).toHaveBeenCalledTimes(1);
+  });
+
+  it('fails closed without creating a pool when policy resource bounds are invalid', async () => {
+    const opts = options('platform_private.database_access');
+    opts.api!.databaseAccessPolicyPoolMax = 0;
+    const middleware = createDatabaseAccessPolicyMiddleware(opts);
+    const { res, status, json } = createResponse();
+
+    await middleware(createRequest('/graphql'), res, jest.fn());
+
+    expect(mockCreatePool).not.toHaveBeenCalled();
+    expect(status).toHaveBeenCalledWith(503);
+    expect(json.mock.calls[0][0].errors[0].extensions.code)
+      .toBe('DATABASE_ACCESS_POLICY_UNAVAILABLE');
   });
 
   it.each([
@@ -106,7 +144,7 @@ describe('database access policy middleware', () => {
     ['X-Meta-Schema', { 'x-meta-schema': 'tenant_meta' }]
   ])('does not bypass a private %s request', async (_label, headers) => {
     const query = jest.fn().mockResolvedValue({ rows: [allowRow] });
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access', false)
     );
@@ -120,7 +158,7 @@ describe('database access policy middleware', () => {
 
   it('returns the exact GraphQL 402 contract when access is denied', async () => {
     const query = jest.fn().mockResolvedValue({ rows: [denyRow] });
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );
@@ -143,9 +181,12 @@ describe('database access policy middleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('uses the REST error handler status and envelope outside GraphQL', async () => {
+  it.each([
+    '/fn/invocations/invocation-1',
+    '/v1/threads/thread-1/messages'
+  ])('uses the stable REST JSON envelope for %s without an Accept header', async (path) => {
     const query = jest.fn().mockResolvedValue({ rows: [denyRow] });
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );
@@ -159,16 +200,45 @@ describe('database access policy middleware', () => {
     app.use((_req, res) => res.status(204).end());
     app.use(errorHandler);
 
-    const response = await request(app)
-      .post('/fn/example')
-      .set('Accept', 'application/json');
+    const response = await request(app).get(path);
 
     expect(response.status).toBe(402);
+    expect(response.type).toBe('application/json');
     expect(response.body).toEqual({
       error: {
         code: denyRow.code,
         message: denyRow.message,
         requestId: 'request-1'
+      }
+    });
+  });
+
+  it('uses the stable REST JSON 503 envelope when policy evaluation fails without an Accept header', async () => {
+    const query = jest.fn().mockRejectedValue(new Error('connection lost'));
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
+    const middleware = createDatabaseAccessPolicyMiddleware(
+      options('platform_private.database_access')
+    );
+    const app = express();
+    app.use((req: Request, _res: Response, next: NextFunction) => {
+      req.databaseId = DATABASE_ID;
+      req.requestId = 'request-503';
+      next();
+    });
+    app.use(middleware);
+    app.use((_req, res) => res.status(204).end());
+    app.use(errorHandler);
+
+    const response = await request(app)
+      .get('/fn/invocations/invocation-1');
+
+    expect(response.status).toBe(503);
+    expect(response.type).toBe('application/json');
+    expect(response.body).toEqual({
+      error: {
+        code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
+        message: 'Database access policy is temporarily unavailable.',
+        requestId: 'request-503'
       }
     });
   });
@@ -182,7 +252,7 @@ describe('database access policy middleware', () => {
 
     await middleware(createRequest('/graphql'), res, next);
 
-    expect(mockGetPgPool).not.toHaveBeenCalled();
+    expect(mockCreatePool).not.toHaveBeenCalled();
     expect(status).toHaveBeenCalledWith(503);
     const error = json.mock.calls[0][0].errors[0];
     expect(error.message).toBe('Database access policy is temporarily unavailable.');
@@ -204,7 +274,7 @@ describe('database access policy middleware', () => {
     ['an out-of-range status', [{ ...denyRow, http_status: 200 }]]
   ])('fails closed when the policy returns %s', async (_label, rows) => {
     const query = jest.fn().mockResolvedValue({ rows });
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );
@@ -223,7 +293,7 @@ describe('database access policy middleware', () => {
 
   it('fails closed when policy evaluation throws', async () => {
     const query = jest.fn().mockRejectedValue(new Error('connection lost'));
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );
@@ -238,9 +308,30 @@ describe('database access policy middleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
+  it('returns the stable 503 contract when the policy query reaches its deadline', async () => {
+    const query = jest.fn().mockRejectedValue(new Error('Query read timeout'));
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
+    const middleware = createDatabaseAccessPolicyMiddleware(
+      options('platform_private.database_access')
+    );
+    const { res, status, json } = createResponse();
+
+    await middleware(createRequest('/graphql'), res, jest.fn());
+
+    expect(status).toHaveBeenCalledWith(503);
+    expect(json.mock.calls[0][0].errors[0]).toMatchObject({
+      message: 'Database access policy is temporarily unavailable.',
+      extensions: {
+        code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
+        class: 'internal',
+        http: 503
+      }
+    });
+  });
+
   it('fails closed when API resolution did not supply a database id', async () => {
     const query = jest.fn();
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );
@@ -260,7 +351,7 @@ describe('database access policy middleware', () => {
 
   it('evaluates the policy again for every request', async () => {
     const query = jest.fn().mockResolvedValue({ rows: [allowRow] });
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );
@@ -275,7 +366,7 @@ describe('database access policy middleware', () => {
 
   it('passes a REST denial to the canonical typed error path', async () => {
     const query = jest.fn().mockResolvedValue({ rows: [denyRow] });
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
     const middleware = createDatabaseAccessPolicyMiddleware(
       options('platform_private.database_access')
     );

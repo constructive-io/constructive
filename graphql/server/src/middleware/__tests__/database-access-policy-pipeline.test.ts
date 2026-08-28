@@ -16,21 +16,26 @@ jest.mock('@constructive-io/express-context', () => ({
 
 import { createDefaultRegistry } from '@constructive-io/express-context';
 import { svcCache } from '@pgpmjs/server-utils';
-import express from 'express';
+import express, { type NextFunction, type Request, type Response } from 'express';
 import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import request from 'supertest';
 
 import type { ApiOptions } from '../../types';
 import { createApiMiddleware, createApiSettingsMiddleware } from '../api';
-import { createDatabaseAccessPolicyMiddleware } from '../database-access-policy';
+import { createDatabaseAccessPolicyMiddleware as createDatabaseAccessPolicyMiddlewareImpl } from '../database-access-policy';
 import { errorHandler } from '../error-handler';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
+let activePolicyPool: Pool;
+const mockCreatePolicyPool = jest.fn(() => activePolicyPool);
+const createDatabaseAccessPolicyMiddleware = (opts: ApiOptions) =>
+  createDatabaseAccessPolicyMiddlewareImpl(opts, { createPool: mockCreatePolicyPool });
 const mockCreateDefaultRegistry = createDefaultRegistry as jest.MockedFunction<typeof createDefaultRegistry>;
 const mockRegistryResolve = (
   mockCreateDefaultRegistry.mock.results[0]?.value as { resolve: jest.Mock }
 ).resolve;
+const multipartParser = jest.fn((_req: Request, _res: Response, next: NextFunction) => next());
 
 const DATABASE_ID = '11111111-1111-4111-8111-111111111111';
 const PLATFORM_DATABASE_ID = '22222222-2222-4222-8222-222222222222';
@@ -137,6 +142,7 @@ function setupPools(
 
   const routingPool = { query: routingQuery } as unknown as Pool;
   const tenantPool = { query: tenantQuery } as unknown as Pool;
+  activePolicyPool = routingPool;
   mockGetPgPool.mockImplementation((pgOptions) => (
     pgOptions?.database === TENANT_DATABASE ? tenantPool : routingPool
   ));
@@ -148,6 +154,7 @@ function pipelineApp(apiOptions = options()) {
   const app = express();
   app.use(createApiMiddleware(apiOptions));
   app.use(createDatabaseAccessPolicyMiddleware(apiOptions));
+  app.use('/graphql', multipartParser);
   app.use(createApiSettingsMiddleware(apiOptions));
   app.use((_req, res) => res.status(204).end());
   app.use(errorHandler);
@@ -185,6 +192,7 @@ describe('database access policy pipeline ordering', () => {
     });
     expect(tenantQuery).not.toHaveBeenCalled();
     expect(mockRegistryResolve).not.toHaveBeenCalled();
+    expect(multipartParser).not.toHaveBeenCalled();
   });
 
   it('hydrates tenant settings only after an allowed policy decision', async () => {
@@ -196,9 +204,76 @@ describe('database access policy pipeline ordering', () => {
       .send({ query: '{ __typename }' });
 
     expect(response.status).toBe(204);
+    expect(multipartParser).toHaveBeenCalledTimes(1);
     expect(tenantQuery).toHaveBeenCalled();
     expect(events.indexOf('policy')).toBeGreaterThan(events.indexOf('route-resolution'));
     expect(events.indexOf('tenant')).toBeGreaterThan(events.indexOf('policy'));
+  });
+
+  it('rejects malformed private database identity before PostgreSQL or multipart parsing', async () => {
+    const { routingQuery, tenantQuery } = setupPools([allowRow]);
+
+    const response = await request(pipelineApp())
+      .post('/graphql')
+      .set('Host', 'admin.example.com')
+      .set('X-Database-Id', 'not-a-uuid')
+      .set('X-Api-Name', 'customer')
+      .set('Content-Type', 'multipart/form-data; boundary=test-boundary')
+      .send('--test-boundary--');
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors[0]).toMatchObject({
+      extensions: {
+        code: 'INVALID_DATABASE_IDENTITY',
+        http: 400
+      }
+    });
+    expect(routingQuery).not.toHaveBeenCalled();
+    expect(tenantQuery).not.toHaveBeenCalled();
+    expect(mockRegistryResolve).not.toHaveBeenCalled();
+    expect(multipartParser).not.toHaveBeenCalled();
+  });
+
+  it('uses the stable REST JSON envelope for malformed identity without an Accept header', async () => {
+    const { routingQuery } = setupPools([allowRow]);
+
+    const response = await request(pipelineApp())
+      .get('/fn/invocations/invocation-1')
+      .set('Host', 'admin.example.com')
+      .set('X-Database-Id', 'not-a-uuid')
+      .set('X-Api-Name', 'customer');
+
+    expect(response.status).toBe(400);
+    expect(response.type).toBe('application/json');
+    expect(response.body.error).toMatchObject({
+      code: 'INVALID_DATABASE_IDENTITY',
+      message: 'X-Database-Id must be a valid UUID when private routing headers are used.'
+    });
+    expect(routingQuery).not.toHaveBeenCalled();
+  });
+
+  it('ignores spoofed private routing headers on the public API surface', async () => {
+    const publicOptions = options();
+    publicOptions.api!.isPublic = true;
+    const { routingQuery } = setupPools([allowRow]);
+
+    const response = await request(pipelineApp(publicOptions))
+      .post('/graphql')
+      .set('Host', 'api.example.com')
+      .set('X-Database-Id', PLATFORM_DATABASE_ID)
+      .set('X-Api-Name', 'customer')
+      .send({ query: '{ __typename }' });
+
+    expect(response.status).toBe(204);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('resolve_route')
+    )).toHaveLength(1);
+    expect(routingQuery.mock.calls.filter(([sql, params]) =>
+      String(sql).includes('database_access') && params?.[0] === DATABASE_ID
+    )).toHaveLength(1);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('FROM "routing_public".apis')
+    )).toHaveLength(0);
   });
 
   it('rejects a cold X-Schemata request whose schema belongs to a suspended database but whose id names the platform database', async () => {
@@ -364,7 +439,7 @@ describe('database access policy pipeline ordering', () => {
     expect(mockRegistryResolve).toHaveBeenCalledTimes(settingsAfterAllow);
   });
 
-  it('fails closed with the policy-unavailable contract when private routing omits database identity', async () => {
+  it('rejects private routing without database identity before PostgreSQL or multipart parsing', async () => {
     const { routingQuery, tenantQuery } = setupPools([allowRow]);
 
     const response = await request(pipelineApp())
@@ -373,13 +448,14 @@ describe('database access policy pipeline ordering', () => {
       .set('X-Schemata', 'app_public')
       .send({ query: '{ __typename }' });
 
-    expect(response.status).toBe(503);
+    expect(response.status).toBe(400);
     expect(response.body.errors[0].extensions).toMatchObject({
-      code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
-      http: 503
+      code: 'INVALID_DATABASE_IDENTITY',
+      http: 400
     });
-    expect(routingQuery.mock.calls.some(([sql]) => String(sql).includes('database_access'))).toBe(false);
+    expect(routingQuery).not.toHaveBeenCalled();
     expect(tenantQuery).not.toHaveBeenCalled();
     expect(mockRegistryResolve).not.toHaveBeenCalled();
+    expect(multipartParser).not.toHaveBeenCalled();
   });
 });

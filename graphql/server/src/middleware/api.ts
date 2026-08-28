@@ -1,5 +1,6 @@
 import './types';
 
+import { ConstructiveError,errors } from '@constructive-io/errors';
 import {
   createDefaultRegistry,
   LoaderContext,
@@ -14,6 +15,8 @@ import { getPgPool } from 'pg-cache';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
+import { ApiError as HttpApiError,isApiError as isHttpApiError } from '../errors/api-errors';
+import { respondWithGraphQLError } from '../errors/graphql-response';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
 import { getRoutingSchema, isValidSchemaName, resolveRoute, routeToApiStructure } from './routing';
 
@@ -222,6 +225,8 @@ const assertDatabaseId = (result: ApiStructure): void => {
 const parseCommaSeparatedHeader = (value: string): string[] =>
   value.split(',').map((s) => s.trim()).filter(Boolean);
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const getPrivateHeaderMode = (headers: RoutingHeaders): PrivateHeaderMode | null => {
   if (headers.apiName) return 'api-name-header';
   if (headers.schemata) return 'schemata-header';
@@ -229,12 +234,46 @@ const getPrivateHeaderMode = (headers: RoutingHeaders): PrivateHeaderMode | null
   return null;
 };
 
-const getRoutingHeaders = (req: Request): RoutingHeaders => ({
-  schemata: req.get('X-Schemata'),
-  apiName: req.get('X-Api-Name'),
-  metaSchema: req.get('X-Meta-Schema'),
-  databaseId: req.get('X-Database-Id')
-});
+const invalidDatabaseIdentity = (): HttpApiError => {
+  const error = errors.INVALID_DATABASE_IDENTITY();
+  return new HttpApiError(error.code, error.http, error.message);
+};
+
+const directConfigPolicyUnavailable = (): HttpApiError => {
+  const error = errors.DATABASE_ACCESS_POLICY_UNAVAILABLE();
+  return new HttpApiError(error.code, error.http, error.message);
+};
+
+/**
+ * Private routing selectors are trusted only when they carry a syntactically
+ * valid database identity. Validate this before route lookup, cache access, or
+ * request-body parsing so malformed selectors cannot reach PostgreSQL or the
+ * multipart parser.
+ */
+const validatePrivateDatabaseIdentity = (
+  opts: ApiOptions,
+  headers: RoutingHeaders
+): void => {
+  if (opts.api?.isPublic !== false || !getPrivateHeaderMode(headers)) return;
+  if (!headers.databaseId || !UUID_PATTERN.test(headers.databaseId)) {
+    throw invalidDatabaseIdentity();
+  }
+};
+
+const normalizedHeader = (value: string | undefined): string | undefined => {
+  const normalized = value?.trim();
+  return normalized || undefined;
+};
+
+const getRoutingHeaders = (req: Request): RoutingHeaders => {
+  const databaseId = normalizedHeader(req.get('X-Database-Id'));
+  return {
+    schemata: normalizedHeader(req.get('X-Schemata')),
+    apiName: normalizedHeader(req.get('X-Api-Name')),
+    metaSchema: normalizedHeader(req.get('X-Meta-Schema')),
+    databaseId: databaseId?.toLowerCase()
+  };
+};
 
 const getUrlDomains = (req: Request): { domain: string; subdomains: string[] } => {
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
@@ -443,6 +482,8 @@ export const getApiIdentity = async (
   opts: ApiOptions,
   req: Request
 ): Promise<ApiConfigResult> => {
+  const headers = getRoutingHeaders(req);
+  validatePrivateDatabaseIdentity(opts, headers);
   const pool = getPgPool(opts.pg);
   const { domain, subdomains } = getUrlDomains(req);
   const subdomain = getSubdomain(subdomains);
@@ -456,7 +497,7 @@ export const getApiIdentity = async (
     domain,
     subdomain,
     cacheKey,
-    headers: getRoutingHeaders(req),
+    headers,
     host: req.get('host') || ''
   };
   const mode = determineMode(ctx);
@@ -545,16 +586,21 @@ export const getApiIdentity = async (
 };
 
 /**
- * Resolve API identity for callers that use this helper directly.
+ * Resolve and hydrate an API for callers that use this helper directly.
  *
- * The server middleware uses `getApiIdentity` so a configured live policy can
- * turn a missing identity into its stable fail-closed response. Direct callers
- * keep the historical no-default-database assertion.
+ * This helper cannot evaluate request-bound access policy safely. It preserves
+ * its historical behavior when no policy is configured, but fails closed before
+ * PostgreSQL when a live policy is enabled. Policy-aware callers must use the
+ * server's identity -> policy -> settings middleware pipeline.
  */
 export const getApiConfig = async (
   opts: ApiOptions,
   req: Request
 ): Promise<ApiConfigResult> => {
+  if (opts.api?.databaseAccessPolicyFunction?.trim()) {
+    throw directConfigPolicyUnavailable();
+  }
+
   const result = await getApiIdentity(opts, req);
   if (result && !isApiError(result)) {
     assertDatabaseId(result);
@@ -566,6 +612,29 @@ export const getApiConfig = async (
 // =============================================================================
 // Express Middleware
 // =============================================================================
+
+const rejectApiError = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  error: HttpApiError
+): void => {
+  if (req.path === '/graphql' || req.path === '/graphql/') {
+    respondWithGraphQLError(
+      res,
+      new ConstructiveError({
+        code: error.code,
+        message: error.message,
+        errorClass: 'public',
+        http: error.statusCode
+      }),
+      error.statusCode
+    );
+    return;
+  }
+
+  next(error);
+};
 
 export const createApiMiddleware = (opts: ApiOptions) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -593,6 +662,11 @@ export const createApiMiddleware = (opts: ApiOptions) => {
       next();
     } catch (error: unknown) {
       const err = error as Error & { code?: string };
+
+      if (isHttpApiError(err)) {
+        rejectApiError(req, res, next, err);
+        return;
+      }
 
       if (err.code === 'NO_VALID_SCHEMAS') {
         res.status(404).send(errorPage404Message(err.message));

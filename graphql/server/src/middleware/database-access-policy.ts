@@ -3,7 +3,9 @@ import './types';
 import { ConstructiveError } from '@constructive-io/errors';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { getPgPool } from 'pg-cache';
+import type { PoolConfig, QueryResult, QueryResultRow } from 'pg';
+import { Pool } from 'pg';
+import { getPgEnvOptions } from 'pg-env';
 
 import { ApiError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
@@ -16,6 +18,11 @@ const POLICY_ERROR_CODE_PATTERN = /^[A-Z][A-Z0-9_]{2,63}$/;
 const MAX_POLICY_MESSAGE_LENGTH = 512;
 const POLICY_UNAVAILABLE_CODE = 'DATABASE_ACCESS_POLICY_UNAVAILABLE';
 const POLICY_UNAVAILABLE_MESSAGE = 'Database access policy is temporarily unavailable.';
+const DEFAULT_POLICY_POOL_MAX = 2;
+const DEFAULT_POLICY_TIMEOUT_MS = 1500;
+const MAX_POLICY_POOL_MAX = 8;
+const MAX_POLICY_TIMEOUT_MS = 30_000;
+const MIN_POLICY_TIMEOUT_MS = 100;
 
 interface PolicyFunction {
   schema: string;
@@ -37,6 +44,23 @@ interface DeniedDecision {
 }
 
 type PolicyDecision = { allowed: true } | DeniedDecision;
+
+interface PolicyPool {
+  query<R extends QueryResultRow = QueryResultRow>(
+    text: string,
+    values?: unknown[]
+  ): Promise<QueryResult<R>>;
+  end(): Promise<void>;
+  on?(event: 'error', listener: (error: Error & { code?: string }) => void): unknown;
+}
+
+interface DatabaseAccessPolicyDependencies {
+  createPool?: (config: PoolConfig) => PolicyPool;
+}
+
+export type DatabaseAccessPolicyMiddleware = RequestHandler & {
+  close: () => Promise<void>;
+};
 
 const parsePolicyFunction = (value: string): PolicyFunction | null => {
   const match = POLICY_FUNCTION_PATTERN.exec(value);
@@ -137,6 +161,55 @@ const rejectUnavailable = (
   'internal'
 );
 
+const withClose = (
+  middleware: RequestHandler,
+  pool?: PolicyPool
+): DatabaseAccessPolicyMiddleware => {
+  let closePromise: Promise<void> | null = null;
+  return Object.assign(middleware, {
+    close: (): Promise<void> => {
+      if (!pool) return Promise.resolve();
+      closePromise ??= pool.end();
+      return closePromise;
+    }
+  });
+};
+
+const validPoolMax = (value: number): boolean =>
+  Number.isInteger(value) && value >= 1 && value <= MAX_POLICY_POOL_MAX;
+
+const validTimeout = (value: number): boolean =>
+  Number.isInteger(value) &&
+  value >= MIN_POLICY_TIMEOUT_MS &&
+  value <= MAX_POLICY_TIMEOUT_MS;
+
+const createPolicyPool = (
+  opts: ApiOptions,
+  poolMax: number,
+  timeoutMs: number,
+  dependencies: DatabaseAccessPolicyDependencies
+): PolicyPool => {
+  const pg = getPgEnvOptions(opts.pg);
+  const config: PoolConfig = {
+    ...pg,
+    max: poolMax,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: timeoutMs,
+    statement_timeout: timeoutMs,
+    query_timeout: timeoutMs,
+    allowExitOnIdle: true,
+    application_name: 'constructive_database_access_policy'
+  };
+  const pool = dependencies.createPool?.(config) ?? new Pool(config);
+  pool.on?.('error', (error: Error & { code?: string }) => {
+    log.error('[database-access-policy] idle policy connection failed', {
+      code: error.code,
+      error: error.message
+    });
+  });
+  return pool;
+};
+
 /**
  * Check a resolved database against an optional control-plane access policy.
  *
@@ -146,11 +219,12 @@ const rejectUnavailable = (
  * route cannot cache an access decision.
  */
 export const createDatabaseAccessPolicyMiddleware = (
-  opts: ApiOptions
-): RequestHandler => {
+  opts: ApiOptions,
+  dependencies: DatabaseAccessPolicyDependencies = {}
+): DatabaseAccessPolicyMiddleware => {
   const configuredFunction = opts.api?.databaseAccessPolicyFunction?.trim();
   if (!configuredFunction) {
-    return (_req, _res, next): void => next();
+    return withClose((_req, _res, next): void => next());
   }
 
   const fn = parsePolicyFunction(configuredFunction);
@@ -158,13 +232,23 @@ export const createDatabaseAccessPolicyMiddleware = (
     log.error(
       '[database-access-policy] API_DATABASE_ACCESS_POLICY_FUNCTION must be two lowercase identifiers separated by a dot'
     );
-    return (req, res, next): void => rejectUnavailable(req, res, next);
+    return withClose((req, res, next): void => rejectUnavailable(req, res, next));
   }
 
-  const pool = getPgPool(opts.pg);
+  const poolMax = opts.api?.databaseAccessPolicyPoolMax ?? DEFAULT_POLICY_POOL_MAX;
+  const timeoutMs = opts.api?.databaseAccessPolicyTimeoutMs ?? DEFAULT_POLICY_TIMEOUT_MS;
+  if (!validPoolMax(poolMax) || !validTimeout(timeoutMs)) {
+    log.error(
+      '[database-access-policy] policy pool bounds are invalid',
+      { poolMax, timeoutMs }
+    );
+    return withClose((req, res, next): void => rejectUnavailable(req, res, next));
+  }
+
+  const pool = createPolicyPool(opts, poolMax, timeoutMs, dependencies);
   const query = policyQuery(fn);
 
-  return async (req, res, next): Promise<void> => {
+  const middleware: RequestHandler = async (req, res, next): Promise<void> => {
     if (!req.databaseId) {
       log.error('[database-access-policy] API resolution did not provide a database id');
       rejectUnavailable(req, res, next);
@@ -192,4 +276,5 @@ export const createDatabaseAccessPolicyMiddleware = (
 
     rejectRequest(req, res, next, decision, 'public');
   };
+  return withClose(middleware, pool);
 };

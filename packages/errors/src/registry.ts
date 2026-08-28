@@ -300,6 +300,12 @@ export const registry = {
     http: 503,
     message: 'Database access could not be verified. Please try again.'
   }),
+  INVALID_DATABASE_IDENTITY: defineError({
+    code: 'INVALID_DATABASE_IDENTITY',
+    class: 'public',
+    http: 400,
+    message: 'X-Database-Id must be a valid UUID when private routing headers are used.'
+  }),
   RATE_LIMITED: defineError({
     code: 'RATE_LIMITED',
     class: 'public',

@@ -83,6 +83,7 @@ class Server {
   private closed = false;
   private httpServer: HttpServer | null = null;
   private debugSampler: DebugSamplerHandle | null = null;
+  private databaseAccessPolicyClose: (() => Promise<void>) | null = null;
 
   constructor(opts: ConstructiveOptions) {
     this.opts = getEnvOptions(opts);
@@ -93,6 +94,7 @@ class Server {
     const app = express();
     const api = createApiMiddleware(effectiveOpts);
     const databaseAccessPolicy = createDatabaseAccessPolicyMiddleware(effectiveOpts);
+    this.databaseAccessPolicyClose = databaseAccessPolicy.close;
     const apiSettings = createApiSettingsMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
     const requestLogger = createRequestLogger({ observabilityEnabled });
@@ -153,6 +155,12 @@ class Server {
     app.use(poweredBy('constructive'));
     app.use(cookieParser());
     app.use(cors(fallbackOrigin));
+    app.use(parseDomains() as RequestHandler);
+    app.use(requestIp.mw());
+    app.use(requestIdMiddleware());
+    app.use(requestLogger);
+    app.use(api);
+    app.use(databaseAccessPolicy);
     app.use('/graphql', graphqlUpload.graphqlUploadExpress({
       maxFileSize: 10 * 1024 * 1024, // 10 MB
       maxFiles: 10
@@ -160,12 +168,6 @@ class Server {
 
     // Rewrite Content-Type after graphql-upload so grafserv accepts the request
     app.use('/graphql', multipartBridge);
-    app.use(parseDomains() as RequestHandler);
-    app.use(requestIp.mw());
-    app.use(requestIdMiddleware());
-    app.use(requestLogger);
-    app.use(api);
-    app.use(databaseAccessPolicy);
     app.use(apiSettings);
     app.use(authenticate);
     app.use(createContextMiddleware({
@@ -352,6 +354,8 @@ class Server {
     if (this.httpServer?.listening) {
       await new Promise<void>((resolve) => this.httpServer!.close(() => resolve()));
     }
+    await this.databaseAccessPolicyClose?.();
+    this.databaseAccessPolicyClose = null;
     await closeDebugDatabasePools();
     if (closeCaches) {
       await Server.closeCaches({ closePools: true });

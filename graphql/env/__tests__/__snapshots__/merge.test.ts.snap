@@ -4,6 +4,8 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
 {
   "api": {
     "anonRole": "env_anon",
+    "databaseAccessPolicyPoolMax": 2,
+    "databaseAccessPolicyTimeoutMs": 1500,
     "exposedSchemas": [
       "public",
       "app",

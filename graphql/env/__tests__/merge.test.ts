@@ -148,6 +148,16 @@ describe('getEnvOptions', () => {
     }).api?.databaseAccessPolicyFunction).toBeUndefined();
   });
 
+  it('parses database access policy resource bounds', () => {
+    const api = getGraphQLEnvVars({
+      API_DATABASE_ACCESS_POLICY_POOL_MAX: '3',
+      API_DATABASE_ACCESS_POLICY_TIMEOUT_MS: '2400'
+    }).api;
+
+    expect(api?.databaseAccessPolicyPoolMax).toBe(3);
+    expect(api?.databaseAccessPolicyTimeoutMs).toBe(2400);
+  });
+
   it('parses the opt-in GraphQL execution-error HTTP status codes', () => {
     expect(getGraphQLEnvVars({
       API_GRAPHQL_ERROR_HTTP_STATUS_CODES:

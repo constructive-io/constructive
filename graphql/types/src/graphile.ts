@@ -41,6 +41,10 @@ export interface ApiOptions {
    * resolved database may accept a new request.
    */
   databaseAccessPolicyFunction?: string;
+  /** Maximum connections reserved for database access-policy checks. */
+  databaseAccessPolicyPoolMax?: number;
+  /** Deadline in milliseconds for acquiring a policy connection and querying it. */
+  databaseAccessPolicyTimeoutMs?: number;
   /**
    * Optional registry codes whose GraphQL execution errors should set the HTTP
    * response status. Unset preserves the standard HTTP 200 execution response.
@@ -82,6 +86,8 @@ export const apiDefaults: ApiOptions = {
   anonRole: 'administrator',
   roleName: 'administrator',
   isPublic: true,
+  databaseAccessPolicyPoolMax: 2,
+  databaseAccessPolicyTimeoutMs: 1500,
   metaSchemas: [
     'routing_public',
     'metaschema_public',

@@ -14,9 +14,10 @@ import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 
 import type { ApiOptions } from '../../types';
-import { getApiIdentity, getSvcKey } from '../api';
+import { getApiConfig, getApiIdentity, getSvcKey } from '../api';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
+const DATABASE_ID = '11111111-1111-4111-8111-111111111111';
 
 const createRequest = (headers: Record<string, string>): Request => {
   const normalized = new Map(
@@ -53,12 +54,12 @@ describe('api middleware routing priority', () => {
   it('uses X-Api-Name before X-Schemata when building private service keys', () => {
     const req = createRequest({
       host: 'admin.localhost',
-      'X-Database-Id': 'db-123',
+      'X-Database-Id': DATABASE_ID,
       'X-Api-Name': 'customer-api',
       'X-Schemata': 'app_public'
     });
 
-    expect(getSvcKey(createPrivateOptions(), req)).toBe('api:db-123:customer-api');
+    expect(getSvcKey(createPrivateOptions(), req)).toBe(`api:${DATABASE_ID}:customer-api`);
   });
 
   it('uses the same X-Api-Name priority when resolving and caching API identity', async () => {
@@ -71,11 +72,11 @@ describe('api middleware routing priority', () => {
         };
       }
 
-      if (params[0] === 'db-123' && params[1] === 'customer-api') {
+      if (params[0] === DATABASE_ID && params[1] === 'customer-api') {
         return {
           rows: [{
             api_id: 'api-123',
-            database_id: 'db-123',
+            database_id: DATABASE_ID,
             dbname: 'tenant_db',
             role_name: 'api_role',
             anon_role: 'api_anon',
@@ -92,26 +93,42 @@ describe('api middleware routing priority', () => {
 
     const req = createRequest({
       host: 'admin.localhost',
-      'X-Database-Id': 'db-123',
+      'X-Database-Id': DATABASE_ID,
       'X-Api-Name': 'customer-api',
       'X-Schemata': 'app_public'
     });
 
     const result = await getApiIdentity(createPrivateOptions(), req);
 
-    expect(req.svc_key).toBe('api:db-123:customer-api');
+    expect(req.svc_key).toBe(`api:${DATABASE_ID}:customer-api`);
     expect(result).toMatchObject({
       apiId: 'api-123',
       dbname: 'tenant_db',
       anonRole: 'api_anon',
       roleName: 'api_role',
       schema: ['api_public'],
-      databaseId: 'db-123',
+      databaseId: DATABASE_ID,
       isPublic: false
     });
-    expect(svcCache.get('api:db-123:customer-api')).toBe(result);
+    expect(svcCache.get(`api:${DATABASE_ID}:customer-api`)).toBe(result);
     expect(query.mock.calls).toEqual(expect.arrayContaining([
-      [expect.stringContaining('FROM "routing_public".apis'), ['db-123', 'customer-api']]
+      [expect.stringContaining('FROM "routing_public".apis'), [DATABASE_ID, 'customer-api']]
     ]));
+  });
+
+  it('fails closed before PostgreSQL when the direct config helper cannot apply a configured policy', async () => {
+    const opts = createPrivateOptions();
+    opts.api!.databaseAccessPolicyFunction = 'platform_private.database_access';
+    const req = createRequest({
+      host: 'admin.localhost',
+      'X-Database-Id': DATABASE_ID,
+      'X-Api-Name': 'customer-api'
+    });
+
+    await expect(getApiConfig(opts, req)).rejects.toMatchObject({
+      code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
+      statusCode: 503
+    });
+    expect(mockGetPgPool).not.toHaveBeenCalled();
   });
 });
