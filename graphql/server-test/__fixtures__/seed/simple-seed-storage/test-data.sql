@@ -19,7 +19,8 @@ VALUES (
 -- Schema entries
 INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description, is_public)
 VALUES
-  ('6dbae92a-5450-401b-1ed5-d69e7754940d', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'public', 'simple-storage-public', NULL, true)
+  ('6dbae92a-5450-401b-1ed5-d69e7754940d', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'public', 'simple-storage-public', NULL, true),
+  ('6dbae92a-5450-401b-1ed5-d69e7754940e', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'private', 'simple-storage-public-private', NULL, false)
 ON CONFLICT (id) DO NOTHING;
 
 -- Table entries for storage tables
@@ -71,7 +72,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   public_url_prefix,
   provider,
   allowed_origins,
-  scope
+  scope,
+  private_schema_id
 )
 VALUES (
   'c0000001-0000-0000-0000-000000000001',
@@ -83,7 +85,8 @@ VALUES (
   NULL,  -- use global CDN_PUBLIC_URL_PREFIX
   'minio',
   ARRAY['*'],
-  'app'
+  'app',
+  '6dbae92a-5450-401b-1ed5-d69e7754940e'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
@@ -120,7 +123,8 @@ VALUES (
 
 INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description, is_public)
 VALUES
-  ('a2a2a2a2-b3b3-4c4c-d5d5-e6e6e6e6e6e6', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'public', 'bob-storage-public', NULL, true)
+  ('a2a2a2a2-b3b3-4c4c-d5d5-e6e6e6e6e6e6', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'public', 'bob-storage-public', NULL, true),
+  ('a2a2a2a2-b3b3-4c4c-d5d5-e6e6e6e6e6f', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'private', 'bob-storage-public-private', NULL, false)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO metaschema_public.table (id, database_id, schema_id, name, description)
@@ -165,7 +169,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   public_url_prefix,
   provider,
   allowed_origins,
-  scope
+  scope,
+  private_schema_id
 )
 VALUES (
   'c1c1c1c1-0000-0000-0000-000000000001',
@@ -177,7 +182,8 @@ VALUES (
   NULL,
   'minio',
   ARRAY['*'],
-  'app'
+  'app',
+  'a2a2a2a2-b3b3-4c4c-d5d5-e6e6e6e6e6f'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
@@ -252,7 +258,8 @@ VALUES (
 
 INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description, is_public)
 VALUES
-  ('fa22fa22-a3a3-4b4b-c5c5-d6d6d6d6d6d6', 'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5', 'public', 'mallory-storage-public', NULL, true)
+  ('fa22fa22-a3a3-4b4b-c5c5-d6d6d6d6d6d6', 'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5', 'public', 'mallory-storage-public', NULL, true),
+  ('fa22fa22-a3a3-4b4b-c5c5-d6d6d6d6d6d7', 'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5', 'private', 'mallory-storage-public-private', NULL, false)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO metaschema_public.table (id, database_id, schema_id, name, description)
@@ -289,7 +296,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   public_url_prefix,
   provider,
   allowed_origins,
-  scope
+  scope,
+  private_schema_id
 )
 VALUES (
   'fa66fa66-0000-0000-0000-000000000001',
@@ -301,7 +309,8 @@ VALUES (
   NULL,
   'minio',
   ARRAY['*'],
-  'app'
+  'app',
+  'fa22fa22-a3a3-4b4b-c5c5-d6d6d6d6d6d7'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================

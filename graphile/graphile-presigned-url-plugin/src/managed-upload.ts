@@ -26,6 +26,7 @@ import { type FileRefFieldBinding, getFileRefFieldBinding } from './file-ref-reg
 import { provisionAndRecordPhysicalBucket, resolveS3ForDatabase } from './physical-bucket';
 import { type WithPgClient, withRequestPgClient } from './request-pg-client';
 import { copyS3Object, deleteS3Object } from './s3-signer';
+import { recordManagedFile } from './storage-file-recorder';
 import { getBucketConfig, loadAllStorageModules } from './storage-module-cache';
 import type { BucketConfig, FileProjection, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
@@ -371,22 +372,14 @@ export async function finalizeStagedUpload(args: {
   let fileId: string;
   try {
     fileId = await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
-      const result = await pgClient.query({
-        text: `INSERT INTO ${storageConfig.filesQualifiedName}
-             (bucket_id, key, content_hash, mime_type, size, filename, is_public)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
-             RETURNING id`,
-        values: [
-          bucket.id,
-          finalKey,
-          staged.contentHash,
-          staged.contentType,
-          staged.size,
-          staged.filename ?? null,
-          bucket.is_public,
-        ],
+      return recordManagedFile(pgClient, storageConfig, {
+        bucketId: bucket.id,
+        key: finalKey,
+        contentHash: staged.contentHash,
+        mimeType: staged.contentType,
+        size: staged.size,
+        filename: staged.filename,
       });
-      return (result.rows[0] as { id: string }).id;
     });
   } catch (err) {
     // No row names either key, so both are unreachable to GC. Dropping the

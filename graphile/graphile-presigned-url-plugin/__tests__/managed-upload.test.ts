@@ -64,6 +64,7 @@ function storageModuleRow(overrides: Record<string, unknown> = {}): Record<strin
     buckets_table: 'app_buckets',
     files_schema: 'storage_public',
     files_table: 'app_files',
+    private_schema: 'storage_private',
     endpoint: null,
     public_url_prefix: 'https://cdn.example.com',
     provider: 'minio',
@@ -76,6 +77,7 @@ function storageModuleRow(overrides: Record<string, unknown> = {}): Record<strin
     max_bulk_files: null,
     max_bulk_total_size: null,
     has_path_shares: false,
+    has_versioning: false,
     entity_schema: null,
     entity_table: null,
     ...overrides,
@@ -125,6 +127,8 @@ function storageConfig(): StorageModuleConfig {
     scope: 'app',
     bucketsQualifiedName: 'storage_public.app_buckets',
     filesQualifiedName: 'storage_public.app_files',
+    filesTableName: 'app_files',
+    recorderQualifiedName: 'storage_private.app_files_record_file',
     defaultMaxFileSize: 1000,
     hasPathShares: false,
     allowedOrigins: null,
@@ -487,7 +491,7 @@ describe('finalizeStagedUpload', () => {
     const db = fakeDb([
       SET_CONFIG,
       { match: /SELECT id, key, mime_type/, rows: () => [] },
-      { match: /INSERT INTO storage_public\.app_files/, rows: () => [{ id: FILE_ID }] },
+      { match: /SELECT id FROM storage_private\.app_files_record_file/, rows: () => [{ id: FILE_ID }] },
     ]);
 
     const { projection, deduplicated } = await finalizeStagedUpload({
@@ -505,8 +509,14 @@ describe('finalizeStagedUpload', () => {
       url: `https://cdn.example.com/${staged.contentHash}`,
     });
 
-    const insert = db.queries.find((q) => /INSERT/.test(q.text));
-    expect(insert?.values).toEqual([BUCKET_ID, staged.contentHash, staged.contentHash, 'image/png', 16, 'hero.png', true]);
+    const recorder = db.queries.find((q) => /record_file/.test(q.text));
+    expect(recorder?.text).toContain('bucket_id :=');
+    expect(recorder?.text).toContain('upload :=');
+    expect(recorder?.text).not.toContain('owner_id');
+    expect(recorder?.text).not.toContain('is_public');
+    expect(recorder?.values).toEqual([
+      BUCKET_ID, staged.contentHash, staged.contentHash, 'image/png', 16, 'hero.png', null,
+    ]);
     // Copy to the content key, then drop the staged object.
     expect(s3.client.send).toHaveBeenCalledTimes(2);
   });
@@ -575,7 +585,7 @@ describe('finalizeStagedUpload', () => {
           SET_CONFIG,
           { match: /SELECT id, key, mime_type/, rows: () => [existingRow(status)] },
           { match: /DELETE FROM storage_public\.app_files/, rows: () => [] },
-          { match: /INSERT INTO storage_public\.app_files/, rows: () => [{ id: NEW_FILE_ID }] },
+          { match: /SELECT id FROM storage_private\.app_files_record_file/, rows: () => [{ id: NEW_FILE_ID }] },
         ]);
 
         const { projection, deduplicated } = await finalizeStagedUpload({
@@ -622,7 +632,7 @@ describe('finalizeStagedUpload', () => {
     const db = fakeDb([
       SET_CONFIG,
       { match: /SELECT id, key, mime_type/, rows: () => [] },
-      { match: /INSERT INTO storage_public\.app_files/, rows: () => { throw new Error('insert boom'); } },
+      { match: /SELECT id FROM storage_private\.app_files_record_file/, rows: () => { throw new Error('insert boom'); } },
     ]);
 
     await expect(
@@ -632,6 +642,29 @@ describe('finalizeStagedUpload', () => {
     // Copy + delete promoted + delete staged: bytes no row names are bytes GC
     // can never reach, so they do not outlive the failed call.
     expect(s3.client.send).toHaveBeenCalledTimes(3);
+  });
+
+  it('fails loudly when the storage module has no generated recorder', async () => {
+    const { finalizeStagedUpload } = await import('../src/managed-upload');
+    const db = fakeDb([
+      SET_CONFIG,
+      { match: /SELECT id, key, mime_type/, rows: () => [] },
+    ]);
+
+    await expect(
+      finalizeStagedUpload({
+        target: {
+          ...target,
+          storageConfig: { ...storageConfig(), recorderQualifiedName: null },
+        },
+        withPgClient: db.withPgClient,
+        pgSettings: null,
+        staged,
+      }),
+    ).rejects.toThrow(
+      `STORAGE_RECORDER_MISSING: storage module ${APP_MODULE_ID} (app_files)`,
+    );
+    expect(db.queries.some((q) => /INSERT INTO/.test(q.text))).toBe(false);
   });
 
   it('rejects bytes the bucket does not allow before writing anything', async () => {
