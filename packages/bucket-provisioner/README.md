@@ -196,11 +196,6 @@ belongs to one database at one scope, and there is no global bucket namespace to
 prefix into. Each readable component has its own budget, so a long scope cannot
 crowd out the database label, and the digest covers the untruncated identity.
 
-#### `mintPhysicalBucketName(prefix, databaseId, bucketKey)`
-
-The prefixed policy — `{prefix}-{bucketKey}-{digest}` — for a deployment that
-names its own bucket namespace.
-
 ### Policy Builders
 
 Standalone functions for generating S3 policy documents.

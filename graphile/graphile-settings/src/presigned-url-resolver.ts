@@ -5,19 +5,13 @@
  * (getEnvOptions → pgpmDefaults + config files + env vars) and lazily
  * initializes an S3Client on first use.
  *
- * Also provides a per-database bucket name resolver that derives the
- * S3 bucket name from the database UUID + a configurable prefix.
- *
  * Follows the same lazy-init pattern as upload-resolver.ts.
  */
 
-import { BucketProvisioner, mintPhysicalBucketName } from '@constructive-io/bucket-provisioner';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { createS3Client } from '@constructive-io/s3-utils';
 import { Logger } from '@pgpmjs/logger';
-import type { BucketNameResolver, EnsureBucketProvisioned,S3Config } from 'graphile-presigned-url-plugin';
-
-import { getBucketProvisionerConnection } from './bucket-provisioner-resolver';
+import type { S3Config } from 'graphile-presigned-url-plugin';
 
 const log = new Logger('presigned-url-resolver');
 
@@ -32,8 +26,8 @@ let s3Config: S3Config | null = null;
  *
  * NOTE: The `bucket` field here is only the connection's default and is never
  * uploaded to. Every managed upload names its bucket explicitly, resolved from
- * the tenant's logical bucket row via `resolveBucketName`; there is no
- * environment-global upload bucket.
+ * the tenant's logical bucket row; there is no environment-global upload
+ * bucket.
  */
 export function getPresignedUrlS3Config(): S3Config {
   if (s3Config) return s3Config;
@@ -85,101 +79,4 @@ export function getPresignedUrlS3Config(): S3Config {
   };
 
   return s3Config;
-}
-
-/**
- * Read the configured physical-bucket-name prefix (CDN_BUCKET_NAME).
- *
- * There is no default: a missing prefix throws, mirroring
- * getPresignedUrlS3Config, so an untenanted bucket name can never be minted.
- */
-function getBucketNamePrefix(): string {
-  const { cdn } = getEnvOptions();
-  const prefix = cdn?.bucketName;
-
-  if (!prefix) {
-    throw new Error(
-      '[presigned-url-resolver] Missing CDN bucket name prefix. ' +
-      'Set CDN_BUCKET_NAME environment variable; there is no default bucket name.',
-    );
-  }
-
-  return prefix;
-}
-
-/**
- * Create a per-(database, bucketKey) bucket name resolver for the presigned
- * URL plugin (argument order: `(databaseId, bucketKey)`).
- *
- * Uses CDN_BUCKET_NAME as a prefix. For each (database, bucketKey) pair, the
- * S3 bucket name becomes `{prefix}-{bucketKey}-{digest}`.
- *
- * This aligns with the bucket provisioner plugin which creates separate
- * S3 buckets per logical bucket key.
- */
-export function createBucketNameResolver(): BucketNameResolver {
-  const prefix = getBucketNamePrefix();
-  return (databaseId: string, bucketKey: string): string =>
-    mintPhysicalBucketName(prefix, databaseId, bucketKey);
-}
-
-/**
- * Resolve CORS allowed origins from the env/config system.
- *
- * Reads SERVER_ORIGIN from the standard env hierarchy
- * (pgpmDefaults → config file → env vars) and wraps it in an array.
- * Falls back to ['http://localhost:3000'] for local development.
- */
-export function getAllowedOrigins(): string[] {
-  const { server } = getEnvOptions();
-  if (server?.origin) return [server.origin];
-  return ['*'];
-}
-
-/**
- * Create a lazy bucket provisioner callback for the presigned URL plugin.
- *
- * On the first upload to an S3 bucket that doesn't exist yet, this callback
- * uses the BucketProvisioner to create and fully configure the bucket
- * (Block Public Access, CORS, policies, lifecycle rules for temp buckets).
- *
- * Uses the same S3 connection config as the bucket provisioner plugin
- * (getBucketProvisionerConnection) and reads CORS origins from
- * SERVER_ORIGIN env var (falls back to localhost for local dev).
- */
-export function createEnsureBucketProvisioned(): EnsureBucketProvisioned {
-  let provisioner: BucketProvisioner | null = null;
-
-  return async (
-    bucketName: string,
-    accessType: 'public' | 'private' | 'temp',
-    databaseId: string,
-    allowedOrigins: string[] | null,
-  ): Promise<void> => {
-    // Per-database origins from storage_module, falling back to global SERVER_ORIGIN
-    const effectiveOrigins = (allowedOrigins && allowedOrigins.length > 0)
-      ? allowedOrigins
-      : getAllowedOrigins();
-
-    if (!provisioner) {
-      provisioner = new BucketProvisioner({
-        connection: getBucketProvisionerConnection(),
-        allowedOrigins: effectiveOrigins,
-      });
-    }
-
-    log.info(
-      `[lazy-provision] Provisioning S3 bucket "${bucketName}" ` +
-      `(type=${accessType}) for database ${databaseId}`,
-    );
-
-    await provisioner.provision({
-      bucketName,
-      accessType,
-      versioning: false,
-      allowedOrigins: effectiveOrigins,
-    });
-
-    log.info(`[lazy-provision] S3 bucket "${bucketName}" provisioned successfully`);
-  };
 }

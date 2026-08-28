@@ -3,13 +3,9 @@
  *
  * Adds S3 bucket provisioning support to PostGraphile v5:
  *
- * 1. `provisionBucket` mutation — explicitly provision an S3 bucket for a
+ * 1. `provisionBucket` mutation — explicitly enqueue reconciliation for a
  *    logical bucket row in the database. Reads the bucket config via RLS,
- *    then calls BucketProvisioner to create and configure the S3 bucket.
- *
- * This plugin uses `@constructive-io/bucket-provisioner` for the actual
- * S3 operations (bucket creation, Block Public Access, CORS, policies,
- * versioning, lifecycle rules).
+ *    then queues the same storage reconciler job used by the INSERT trigger.
  *
  * Detection: Uses the `@storageBuckets` smart tag on the codec (table).
  * The storage module generator in constructive-db sets this tag on the
@@ -17,22 +13,10 @@
  *   COMMENT ON TABLE buckets IS E'@storageBuckets\nStorage buckets table';
  */
 
-import type { ProvisionResult,StorageConnectionConfig } from '@constructive-io/bucket-provisioner';
-import {
-  BucketProvisioner,
-} from '@constructive-io/bucket-provisioner';
-import { Logger } from '@pgpmjs/logger';
 import { QuoteUtils } from '@pgsql/quotes';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
-import { recordPhysicalName as recordPhysicalBucketName } from 'graphile-storage-registry';
 import { extendSchema, gql } from 'graphile-utils';
-
-import type {
-  BucketProvisionerPluginOptions,
-} from './types';
-
-const log = new Logger('graphile-bucket-provisioner:plugin');
 
 // --- Storage module queries ---
 
@@ -43,7 +27,10 @@ const log = new Logger('graphile-bucket-provisioner:plugin');
 const ALL_STORAGE_MODULES_QUERY = `
   SELECT
     sm.id,
+    sm.database_id,
+    sm.buckets_table_id,
     sm.scope,
+    sm.entity_field,
     sm.entity_table_id,
     bs.schema_name AS buckets_schema,
     bt.name AS buckets_table,
@@ -63,7 +50,10 @@ const ALL_STORAGE_MODULES_QUERY = `
 
 interface StorageModuleRow {
   id: string;
+  database_id: string;
+  buckets_table_id: string;
   scope: string;
+  entity_field: string | null;
   entity_table_id: string | null;
   buckets_schema: string;
   buckets_table: string;
@@ -89,6 +79,21 @@ function runQuery(
   values?: unknown[],
 ): Promise<{ rows: any[] }> {
   return pgClient.query(values === undefined ? { text } : { text, values });
+}
+
+function scopeKeySelect(storageModule: StorageModuleRow): string {
+  return storageModule.entity_field === null
+    ? ''
+    : `, ${QuoteUtils.quoteIdentifier(storageModule.entity_field)} AS scope_key`;
+}
+
+function scopeKeyColumn(storageModule: StorageModuleRow): string {
+  if (storageModule.entity_field === null) {
+    throw new Error(
+      `STORAGE_BUCKET_SCOPE_KEY_MISSING: storage module ${storageModule.id} has no entity field`,
+    );
+  }
+  return QuoteUtils.quoteIdentifier(storageModule.entity_field);
 }
 
 /**
@@ -130,9 +135,9 @@ async function resolveBucketByKey(
       const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(mod.buckets_schema, mod.buckets_table);
       const bucketResult = await runQuery(
         pgClient,
-        `SELECT id, key, type, is_public, allowed_origins, physical_name
+        `SELECT id, key, type, is_public, allowed_origins, physical_name${scopeKeySelect(mod)}
          FROM ${bucketsTable}
-         WHERE key = $1 AND owner_id = $2
+         WHERE key = $1 AND ${scopeKeyColumn(mod)} = $2
          LIMIT 1`,
         [bucketKey, ownerId],
       );
@@ -147,7 +152,7 @@ async function resolveBucketByKey(
     const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(mod.buckets_schema, mod.buckets_table);
     const bucketResult = await runQuery(
       pgClient,
-      `SELECT id, key, type, is_public, allowed_origins, physical_name
+      `SELECT id, key, type, is_public, allowed_origins, physical_name${scopeKeySelect(mod)}
        FROM ${bucketsTable}
        WHERE key = $1
        LIMIT 1`,
@@ -172,60 +177,11 @@ async function resolveBucketByKey(
 interface BucketRow {
   id: string;
   key: string;
-  type: string;
-  is_public: boolean;
-  allowed_origins: string[] | null;
   physical_name: string | null;
-}
-
-/**
- * Normalize the recorded physical coordinate at the DB boundary.
- *
- * A bucket row either carries a recorded coordinate or it does not; SQL nulls
- * and absent columns both mean "never provisioned". Collapsing them here is
- * the single place that shape is interpreted — callers branch on `string`
- * vs `null` and never coalesce a bucket name into existence.
- */
-function storedPhysicalName(row: Pick<BucketRow, 'physical_name'>): string | null {
-  return row.physical_name == null ? null : row.physical_name;
+  scope_key: string | null;
 }
 
 // --- Helpers ---
-
-/**
- * Resolve the connection config from the options. If the option is a lazy
- * getter function, call it (and cache the result).
- */
-function resolveConnection(
-  options: BucketProvisionerPluginOptions,
-): StorageConnectionConfig {
-  if (typeof options.connection === 'function') {
-    const resolved = options.connection();
-    // Cache so subsequent calls don't re-evaluate
-    options.connection = resolved;
-    return resolved;
-  }
-  return options.connection;
-}
-
-/**
- * Resolve the S3 bucket name from a logical bucket key.
- */
-function resolveBucketName(
-  databaseId: string,
-  bucketKey: string,
-  options: BucketProvisionerPluginOptions,
-): string {
-  if (!options.resolveBucketName) {
-    throw new Error(
-      'STORAGE_BUCKET_NAME_POLICY_MISSING: no resolveBucketName was configured, so there is ' +
-      `no name to provision for bucket "${bucketKey}" of database ${databaseId}. ` +
-      'Physical bucket naming is a deployment policy; the configured s3.bucket is a ' +
-      'connection default and is never a tenant bucket.',
-    );
-  }
-  return options.resolveBucketName(databaseId, bucketKey);
-}
 
 /**
  * Resolve the database_id from the JWT context.
@@ -238,91 +194,111 @@ async function resolveDatabaseId(pgClient: any): Promise<string | null> {
   return result.rows[0]?.id ?? null;
 }
 
-/**
- * Resolve the effective CORS allowed origins using the 3-tier hierarchy:
- *   1. Bucket-level allowed_origins (per-bucket override)
- *   2. Storage-module-level allowed_origins (per-database default)
- *   3. Plugin config allowedOrigins (global fallback)
- */
-function resolveAllowedOrigins(
-  bucketOrigins: string[] | null | undefined,
-  storageModuleOrigins: string[] | null | undefined,
-  pluginOrigins: string[],
-): string[] {
-  if (bucketOrigins && bucketOrigins.length > 0) {
-    return bucketOrigins;
-  }
-  if (storageModuleOrigins && storageModuleOrigins.length > 0) {
-    return storageModuleOrigins;
-  }
-  return pluginOrigins;
-}
-
-/**
- * Build a BucketProvisioner with per-database connection overrides.
- */
-function buildProvisioner(
-  options: BucketProvisionerPluginOptions,
-  storageModule: StorageModuleRow | null,
-  effectiveOrigins: string[],
-): BucketProvisioner {
-  const connection = resolveConnection(options);
-  const effectiveConnection: StorageConnectionConfig = {
-    ...connection,
-    ...(storageModule?.endpoint ? { endpoint: storageModule.endpoint } : {}),
-    ...(storageModule?.provider
-      ? { provider: storageModule.provider as StorageConnectionConfig['provider'] }
-      : {}),
-  };
-
-  return new BucketProvisioner({
-    connection: effectiveConnection,
-    allowedOrigins: effectiveOrigins,
-  });
-}
-
-/**
- * Core provisioning logic for the explicit mutation.
- */
-async function provisionBucketForRow(
+async function resolveEntityContext(
+  pgClient: any,
   storageModule: StorageModuleRow,
-  databaseId: string,
-  bucketKey: string,
-  bucketType: string,
-  bucketAllowedOrigins: string[] | null | undefined,
-  options: BucketProvisionerPluginOptions,
-  s3BucketName: string,
-): Promise<ProvisionResult> {
-  const accessType = bucketType as 'public' | 'private' | 'temp';
-
-  // Resolve CORS origins using the 3-tier hierarchy
-  const effectiveOrigins = resolveAllowedOrigins(
-    bucketAllowedOrigins,
-    storageModule?.allowed_origins,
-    options.allowedOrigins,
+): Promise<{ entity_type: string | null; get_org_fn_schema: string | null; get_org_fn: string | null }> {
+  const result = await runQuery(
+    pgClient,
+    `SELECT r.entity_type, r.get_org_fn_schema, r.get_org_fn
+     FROM metaschema.resolve_entity_context_by_field($1::uuid, $2::uuid, $3::text) r`,
+    [storageModule.database_id, storageModule.buckets_table_id, storageModule.entity_field],
   );
+  return result.rows[0] ?? {
+    entity_type: null,
+    get_org_fn_schema: null,
+    get_org_fn: null,
+  };
+}
 
-  const provisioner = buildProvisioner(options, storageModule, effectiveOrigins);
+/**
+ * Mirror the storage module generator's data_job_trigger shape from
+ * `packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/storage_module.sql`
+ * and the add_job argument assembly in
+ * `packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/job_trigger.sql`.
+ * A callable enqueue function beside the trigger would be the durable fix for
+ * this deliberate mirroring, but is out of scope here.
+ */
+async function enqueueReconciliationJob(
+  pgClient: any,
+  storageModule: StorageModuleRow,
+  bucket: BucketRow,
+): Promise<string> {
+  const scope = storageModule.scope;
+  const entityField = storageModule.entity_field;
 
-  log.info(
-    `Provisioning S3 bucket "${s3BucketName}" (key="${bucketKey}", type="${accessType}", ` +
-    `origins=${JSON.stringify(effectiveOrigins)}) for database ${databaseId}`,
-  );
+  let text: string;
+  let values: unknown[];
 
-  const result = await provisioner.provision({
-    bucketName: s3BucketName,
-    accessType,
-    versioning: options.versioning ?? false,
-    publicUrlPrefix: storageModule?.public_url_prefix ?? undefined,
-    allowedOrigins: effectiveOrigins,
-  });
+  if (entityField === null) {
+    text = `SELECT (app_jobs.add_job(
+      identifier => 'storage:provision_bucket',
+      payload => json_build_object(
+        'id', $1::uuid,
+        'scope', $2::text
+      ),
+      queue_name => 'bucket:' || $1::text,
+      max_attempts => 25,
+      priority => 0
+    )).id AS id`;
+    values = [bucket.id, scope];
+  } else if (entityField === 'database_id') {
+    const databaseId = bucket.scope_key;
+    if (!databaseId) {
+      throw new Error(`STORAGE_BUCKET_SCOPE_KEY_MISSING: bucket ${bucket.id} has no database_id`);
+    }
+    text = `SELECT (app_jobs.add_job(
+      identifier => 'storage:provision_bucket',
+      payload => json_build_object(
+        'database_id', $2::uuid,
+        'id', $1::uuid,
+        'scope', $3::text
+      ),
+      db_id => $2,
+      queue_name => 'bucket:' || $1::text,
+      max_attempts => 25,
+      priority => 0,
+      entity_id => $2,
+      organization_id => NULL,
+      entity_type => $3
+    )).id AS id`;
+    values = [bucket.id, databaseId, scope];
+  } else if (entityField === 'owner_id') {
+    const ownerId = bucket.scope_key;
+    if (!ownerId) {
+      throw new Error(`STORAGE_BUCKET_SCOPE_KEY_MISSING: bucket ${bucket.id} has no owner_id`);
+    }
+    const context = await resolveEntityContext(pgClient, storageModule);
+    const orgFunction = context.get_org_fn_schema && context.get_org_fn
+      ? `${QuoteUtils.quoteQualifiedIdentifier(context.get_org_fn_schema, context.get_org_fn)}($3::text, $2::uuid)`
+      : 'NULL';
+    text = `SELECT (app_jobs.add_job(
+      identifier => 'storage:provision_bucket',
+      payload => json_build_object(
+        'id', $1::uuid,
+        'owner_id', $2::uuid,
+        'scope', $3::text
+      ),
+      queue_name => 'bucket:' || $1::text,
+      max_attempts => 25,
+      priority => 0,
+      entity_id => $2,
+      organization_id => ${orgFunction},
+      entity_type => $3
+    )).id AS id`;
+    values = [bucket.id, ownerId, scope];
+  } else {
+    throw new Error(
+      `STORAGE_BUCKET_ENTITY_FIELD_UNSUPPORTED: ${entityField}`,
+    );
+  }
 
-  log.info(
-    `Successfully provisioned S3 bucket "${s3BucketName}" ` +
-    `(provider=${result.provider}, blockPublicAccess=${result.blockPublicAccess})`,
-  );
-
-  return result;
+  const result = await runQuery(pgClient, text, values);
+  const jobId = result.rows[0]?.id;
+  if (!jobId) {
+    throw new Error(`STORAGE_BUCKET_JOB_ID_MISSING: bucket ${bucket.id}`);
+  }
+  return jobId;
 }
 
 // --- Plugin factory ---
@@ -330,17 +306,14 @@ async function provisionBucketForRow(
 /**
  * Creates the bucket provisioner plugin.
  *
- * This plugin provides one provisioning pathway:
+ * This plugin provides one reconciliation pathway:
  *
  * 1. **Explicit `provisionBucket` mutation** — Call this mutation with a
- *    bucket key to provision (or re-provision) the S3 bucket. Protected
- *    by RLS on the buckets table.
+ *    bucket key to enqueue reconciliation (or re-reconciliation) for the
+ *    bucket. Protected by RLS on the buckets table.
  *
- * @param options - Plugin configuration (S3 credentials, CORS origins, naming)
  */
-export function createBucketProvisionerPlugin(
-  options: BucketProvisionerPluginOptions,
-): GraphileConfig.Plugin {
+export function createBucketProvisionerPlugin(): GraphileConfig.Plugin {
   // The extendSchema plugin adds the explicit provisionBucket mutation
   const mutationPlugin = extendSchema(() => ({
     typeDefs: gql`
@@ -355,26 +328,22 @@ export function createBucketProvisionerPlugin(
       }
 
       type ProvisionBucketPayload {
-        """Whether provisioning succeeded"""
-        success: Boolean!
-        """The S3 bucket name that was provisioned"""
-        bucketName: String!
-        """The access type applied"""
-        accessType: String!
-        """The storage provider used"""
-        provider: String!
-        """The S3 endpoint (null for AWS S3 default)"""
-        endpoint: String
-        """Error message if provisioning failed"""
-        error: String
+        """The logical bucket row that was queued for reconciliation."""
+        bucketId: UUID!
+        bucketKey: String!
+        """The physical bucket name already recorded, or null when reconciliation has not completed."""
+        physicalName: String
+        """The reconciler job enqueued to provision this bucket."""
+        jobId: UUID!
       }
 
       extend type Mutation {
         """
-        Provision an S3 bucket for a logical bucket in the database.
-        Reads the bucket config via RLS, then creates and configures
-        the S3 bucket with the appropriate privacy policies, CORS rules,
-        and lifecycle settings.
+        Reconcile an S3 bucket for a logical bucket in the database.
+        Reads the bucket config via RLS, then enqueues the same
+        storage:provision_bucket job used by the INSERT trigger. This is
+        idempotent for an already-reconciled bucket; enqueue failures become
+        GraphQL errors.
         """
         provisionBucket(
           input: ProvisionBucketInput!
@@ -414,56 +383,14 @@ export function createBucketProvisionerPlugin(
                 throw new Error('BUCKET_NOT_FOUND');
               }
               const { storageModule, bucket } = resolution;
-              const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
+              const jobId = await enqueueReconciliationJob(pgClient, storageModule, bucket);
 
-              // First provision mints a name; afterwards the stored coordinate
-              // is authoritative and the naming hook is never consulted again.
-              const recorded = storedPhysicalName(bucket);
-              const s3BucketName = recorded === null
-                ? resolveBucketName(databaseId, bucket.key, options)
-                : recorded;
-
-              try {
-                const result = await provisionBucketForRow(
-                  storageModule,
-                  databaseId,
-                  bucket.key,
-                  bucket.type,
-                  bucket.allowed_origins,
-                  options,
-                  s3BucketName,
-                );
-
-                // Record the exact provisioned name on the source row.
-                await withPgClient(null, (client: any) =>
-                  recordPhysicalBucketName(
-                    (query) => runQuery(client, query.text, query.values),
-                    bucketsTable,
-                    bucket.id,
-                    result.bucketName,
-                  ),
-                );
-                log.info(`Recorded physical_name="${result.bucketName}" on bucket ${bucket.id}`);
-
-                return {
-                  success: true,
-                  bucketName: result.bucketName,
-                  accessType: result.accessType,
-                  provider: result.provider,
-                  endpoint: result.endpoint,
-                  error: null,
-                };
-              } catch (err: any) {
-                log.error(`Failed to provision bucket "${bucketKey}": ${err.message}`);
-                return {
-                  success: false,
-                  bucketName: s3BucketName,
-                  accessType: bucket.type,
-                  provider: resolveConnection(options).provider,
-                  endpoint: resolveConnection(options).endpoint ?? null,
-                  error: err.message,
-                };
-              }
+              return {
+                bucketId: bucket.id,
+                bucketKey: bucket.key,
+                physicalName: bucket.physical_name,
+                jobId,
+              };
             });
           });
         },

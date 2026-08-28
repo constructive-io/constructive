@@ -13,7 +13,6 @@ import { RealtimeSubscriptionsPreset } from 'graphile-realtime-subscriptions';
 import { createMatchesOperatorFactory, createTrgmOperatorFactories,UnifiedSearchPreset } from 'graphile-search';
 import { UploadPreset } from 'graphile-upload-plugin';
 
-import { getBucketProvisionerConnection } from '../bucket-provisioner-resolver';
 import {
   ConflictDetectorPreset,
   EnableAllFilterColumnsPreset,
@@ -26,7 +25,7 @@ import {
   PgTypeMappingsPreset,
   RequiredInputPreset
 } from '../plugins';
-import { createBucketNameResolver, createEnsureBucketProvisioned, getAllowedOrigins,getPresignedUrlS3Config } from '../presigned-url-resolver';
+import { getPresignedUrlS3Config } from '../presigned-url-resolver';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';
 
 /**
@@ -201,14 +200,8 @@ export function createConstructivePreset(
     presets.push(
       PresignedUrlPreset({
         s3: getPresignedUrlS3Config,
-        resolveBucketName: createBucketNameResolver(),
-        ensureBucketProvisioned: createEnsureBucketProvisioned()
       }),
-      BucketProvisionerPreset({
-        connection: getBucketProvisionerConnection,
-        allowedOrigins: getAllowedOrigins(),
-        resolveBucketName: createBucketNameResolver()
-      })
+      BucketProvisionerPreset()
     );
   }
 

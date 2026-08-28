@@ -47,17 +47,20 @@ export {
   type ManagedUploadTarget,
   resolveManagedUploadTarget,
 } from './managed-upload';
-export { mintPhysicalBucketName, provisionAndRecordPhysicalBucket, resolveS3, resolveS3ForDatabase } from './physical-bucket';
+export {
+  assertBucketReconciled,
+  resolveS3,
+  resolveS3ForDatabase,
+  StorageBucketNotReconciledError,
+} from './physical-bucket';
 export { createPresignedUrlPlugin,PresignedUrlPlugin } from './plugin';
 export { PresignedUrlPreset } from './preset';
 export { type WithPgClient, withRequestPgClient } from './request-pg-client';
 export { describeS3Failure, s3FailureError } from './s3-failure';
 export { copyS3Object, deleteS3Object, generatePresignedGetUrl, generatePresignedPutUrl, headObject, readObjectPrefix } from './s3-signer';
-export { clearBucketCache, clearStorageModuleCache, getBucketConfig, isS3BucketProvisioned, loadAllStorageModules, markS3BucketProvisioned,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
+export { clearBucketCache, clearStorageModuleCache, getBucketConfig, loadAllStorageModules,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
 export type {
   BucketConfig,
-  BucketNameResolver,
-  EnsureBucketProvisioned,
   PresignedUrlPluginOptions,
   RequestUploadUrlInput,
   RequestUploadUrlPayload,

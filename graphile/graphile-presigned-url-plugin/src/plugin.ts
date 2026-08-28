@@ -31,7 +31,7 @@ import { validateCustomKey } from './custom-key';
 import { resolveDefaultBucket } from './default-bucket';
 import { isLiveFileRow, statusSelectFragment } from './file-lifecycle';
 import { buildFileProjection, type FileProjection } from './managed-upload';
-import { provisionAndRecordPhysicalBucket, resolveS3ForDatabase } from './physical-bucket';
+import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
 import { withRequestPgClient } from './request-pg-client';
 import { deleteS3Object,generatePresignedPutUrl } from './s3-signer';
 import { recordManagedFile } from './storage-file-recorder';
@@ -272,11 +272,9 @@ export function createPresignedUrlPlugin(
                       );
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
-                      // First provision mints + records the coordinate; afterwards the
-                      // stored physical_name is authoritative and nothing is recomputed.
-                      const physicalName = bucket.physical_name === null
-                        ? await provisionAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, storageConfig.allowedOrigins)
-                        : bucket.physical_name;
+                      // The reconciler records the coordinate; consumers never
+                      // recompute it from the logical bucket row.
+                      const physicalName = assertBucketReconciled(bucket, databaseId);
                       const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
 
                       // File row INSERT under the request role (RLS enforced).
@@ -407,11 +405,9 @@ export function createPresignedUrlPlugin(
                         );
                       }
 
-                      // First provision mints + records the coordinate; afterwards the
-                      // stored physical_name is authoritative and nothing is recomputed.
-                      const physicalName = bucket.physical_name === null
-                        ? await provisionAndRecordPhysicalBucket(options, vals.withPgClient, storageConfig, databaseId, bucket, storageConfig.allowedOrigins)
-                        : bucket.physical_name;
+                      // The reconciler records the coordinate; consumers never
+                      // recompute it from the logical bucket row.
+                      const physicalName = assertBucketReconciled(bucket, databaseId);
                       const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
 
                       // File row INSERTs under the request role (RLS enforced).

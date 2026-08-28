@@ -14,6 +14,13 @@ export { type DefinedError,defineError } from './define';
  * code is present via generation; these just refine a subset.
  */
 export const registry = {
+  STORAGE_BUCKET_NOT_RECONCILED: defineError({
+    code: 'STORAGE_BUCKET_NOT_RECONCILED',
+    class: 'public',
+    http: 409,
+    message: 'The storage bucket has not yet been reconciled.'
+  }),
+
   // ===========================================================================
   // Auth / account (public) — copy sourced from dashboard auth-errors.ts
   // ===========================================================================

@@ -1,27 +1,9 @@
 /**
- * Tests for the explicit bucket provisioning mutation.
+ * Tests for the explicit bucket reconciliation enqueue mutation.
  */
 
-const mockProvision = jest.fn();
-const mockBucketProvisionerConstructor = jest.fn();
-
-jest.mock('@constructive-io/bucket-provisioner', () => ({
-  BucketProvisioner: jest.fn().mockImplementation((opts: any) => {
-    mockBucketProvisionerConstructor(opts);
-    return { provision: mockProvision };
-  }),
-}));
-
-jest.mock('@pgpmjs/logger', () => ({
-  Logger: jest.fn().mockImplementation(() => ({
-    info: jest.fn(),
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-  })),
-}));
-
 let capturedLambdaCallback: Function | null = null;
+
 jest.mock('grafast', () => ({
   context: jest.fn(() => ({
     get: jest.fn((key: string) => `mock-${key}`),
@@ -51,433 +33,282 @@ jest.mock('graphile-utils', () => ({
 }));
 
 import { createBucketProvisionerPlugin } from '../src/plugin';
-import type { BucketProvisionerPluginOptions } from '../src/types';
 
-function createDefaultOptions(
-  overrides: Partial<BucketProvisionerPluginOptions> = {},
-): BucketProvisionerPluginOptions {
-  return {
-    connection: {
-      provider: 'minio',
-      region: 'us-east-1',
-      endpoint: 'http://minio:9000',
-      accessKeyId: 'minioadmin',
-      secretAccessKey: 'minioadmin',
-    },
-    allowedOrigins: ['https://app.example.com'],
-    resolveBucketName: (databaseId, bucketKey) => `tenant-${databaseId}-${bucketKey}`,
-    ...overrides,
-  };
+const DATABASE_ID = 'db-uuid-123';
+const BUCKET_ID = 'bucket-uuid-789';
+const BUCKETS_TABLE_ID = 'buckets-table-uuid';
+const OWNER_ID = 'owner-uuid-222';
+const JOB_ID = 'job-uuid-999';
+
+interface MockOptions {
+  scope: string;
+  entityField: string | null;
+  physicalName?: string | null;
+  scopeKey?: string | null;
+  orgResolver?: {
+    entity_type: string;
+    get_org_fn_schema: string;
+    get_org_fn: string;
+  } | null;
+  bucketFound?: boolean;
 }
 
-function createMockPgClient(overrides: Record<string, any> = {}) {
-  const defaultQueries: Record<string, any> = {
-    'jwt_private.current_database_id': {
-      rows: [{ id: 'db-uuid-123' }],
-    },
-    'metaschema_modules_public.storage_module': {
-      rows: [{
-        id: 'sm-uuid-456',
-        scope: 'app',
-        entity_table_id: null,
-        buckets_schema: 'app_public',
-        buckets_table: 'buckets',
-        endpoint: null,
-        public_url_prefix: null,
-        provider: null,
-        allowed_origins: null,
-        entity_schema: null,
-        entity_table: null,
-      }],
-    },
-    app_public: {
-      rows: [{
-        id: 'bucket-uuid-789',
-        key: 'public',
-        type: 'public',
-        is_public: true,
-        allowed_origins: null,
-        physical_name: null,
-      }],
-    },
-  };
+function createMockPgClient({
+  scope,
+  entityField,
+  physicalName = null,
+  scopeKey = null,
+  orgResolver = null,
+  bucketFound = true,
+}: MockOptions) {
+  const query = jest.fn((arg: any) => {
+    const sql: string = typeof arg === 'string' ? arg : arg.text;
+    if (sql.includes('jwt_private.current_database_id')) {
+      return Promise.resolve({ rows: [{ id: DATABASE_ID }] });
+    }
+    if (sql.includes('metaschema_modules_public.storage_module')) {
+      return Promise.resolve({
+        rows: [{
+          id: 'sm-uuid-456',
+          database_id: DATABASE_ID,
+          buckets_table_id: BUCKETS_TABLE_ID,
+          scope,
+          entity_field: entityField,
+          entity_table_id: entityField === 'owner_id' ? 'entity-table-uuid' : null,
+          buckets_schema: 'app_public',
+          buckets_table: 'buckets',
+          endpoint: null,
+          public_url_prefix: null,
+          provider: null,
+          allowed_origins: null,
+          entity_schema: entityField === 'owner_id' ? 'app_public' : null,
+          entity_table: entityField === 'owner_id' ? 'accounts' : null,
+        }],
+      });
+    }
+    if (sql.includes('FROM app_public.accounts')) {
+      return Promise.resolve({ rows: [{ id: OWNER_ID }] });
+    }
+    if (sql.includes('FROM app_public.buckets')) {
+      return Promise.resolve({
+        rows: bucketFound
+          ? [{
+            id: BUCKET_ID,
+            key: 'public',
+            physical_name: physicalName,
+            scope_key: scopeKey,
+          }]
+          : [],
+      });
+    }
+    if (sql.includes('metaschema.resolve_entity_context_by_field')) {
+      return Promise.resolve({ rows: orgResolver ? [orgResolver] : [{
+        entity_type: scope,
+        get_org_fn_schema: null,
+        get_org_fn: null,
+      }] });
+    }
+    if (sql.includes('app_jobs.add_job')) {
+      return Promise.resolve({ rows: [{ id: JOB_ID }] });
+    }
+    throw new Error(`unexpected query: ${sql}`);
+  });
+  return { query };
+}
 
-  return {
-    query: jest.fn((arg: any) => {
-      const sql: string = typeof arg === 'string' ? arg : arg.text;
-      for (const [key, value] of Object.entries({ ...defaultQueries, ...overrides })) {
-        if (sql.includes(key)) return Promise.resolve(value);
-      }
-      return Promise.resolve({ rows: [] });
-    }),
-  };
+async function invoke(pgClient: any, input: Record<string, string> = { bucketKey: 'public' }) {
+  const withPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+  return capturedLambdaCallback!({
+    input,
+    withPgClient,
+    pgSettings: { role: 'admin' },
+  });
+}
+
+function enqueueCall(pgClient: any): { text: string; values: unknown[] } {
+  const call = pgClient.query.mock.calls.find((args: any[]) =>
+    args[0]?.text?.includes('app_jobs.add_job'));
+  expect(call).toBeDefined();
+  return call[0];
 }
 
 describe('createBucketProvisionerPlugin', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockProvision.mockReset();
-    mockBucketProvisionerConstructor.mockReset();
     capturedLambdaCallback = null;
-    mockProvision.mockResolvedValue({
-      bucketName: 'tenant-db-uuid-123-public',
-      accessType: 'public',
-      endpoint: 'http://minio:9000',
-      provider: 'minio',
-      region: 'us-east-1',
-      publicUrlPrefix: null,
-      blockPublicAccess: false,
-      versioning: false,
-      corsRules: [],
-      lifecycleRules: [],
-    });
   });
 
   it('returns a mutation-only plugin', () => {
-    const plugin = createBucketProvisionerPlugin(createDefaultOptions());
+    const plugin = createBucketProvisionerPlugin();
 
     expect(plugin).toBeDefined();
     expect(plugin.name).toBe('ExtendSchemaPlugin');
     expect(plugin.schema).toBeDefined();
-    expect(plugin.schema!.hooks).toEqual({});
   });
 
-  it('provisions a public bucket successfully', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions());
-    const pgClient = createMockPgClient();
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+  it('enqueues the global-scope reconciliation job without entity attribution', async () => {
+    createBucketProvisionerPlugin();
+    const pgClient = createMockPgClient({ scope: 'app', entityField: null });
 
-    const result = await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: { role: 'admin' },
+    const result = await invoke(pgClient);
+    const enqueue = enqueueCall(pgClient);
+
+    expect(enqueue.text).toContain("identifier => 'storage:provision_bucket'");
+    expect(enqueue.text).toContain("'id', $1::uuid");
+    expect(enqueue.text).toContain("'scope', $2::text");
+    expect(enqueue.text).toContain("queue_name => 'bucket:' || $1::text");
+    expect(enqueue.text).toContain('max_attempts => 25');
+    expect(enqueue.text).toContain('priority => 0');
+    expect(enqueue.text).not.toContain('entity_id =>');
+    expect(enqueue.text).not.toContain('organization_id =>');
+    expect(enqueue.values).toEqual([BUCKET_ID, 'app']);
+    expect(result).toEqual({
+      bucketId: BUCKET_ID,
+      bucketKey: 'public',
+      physicalName: null,
+      jobId: JOB_ID,
     });
-
-    expect(result.success).toBe(true);
-    expect(result.bucketName).toBe('tenant-db-uuid-123-public');
-    expect(result.accessType).toBe('public');
-    expect(result.provider).toBe('minio');
-    expect(result.error).toBeNull();
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({ bucketName: 'tenant-db-uuid-123-public' }),
-    );
   });
 
-  it('uses the database-first resolver order and never passes the bare key', async () => {
-    const resolveBucketName = jest.fn(
-      (databaseId: string, bucketKey: string) => `physical-${databaseId}-${bucketKey}`,
-    );
-    createBucketProvisionerPlugin(createDefaultOptions({ resolveBucketName }));
-    const pgClient = createMockPgClient();
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    expect(resolveBucketName).toHaveBeenCalledWith('db-uuid-123', 'public');
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({ bucketName: 'physical-db-uuid-123-public' }),
-    );
-    expect(mockProvision).not.toHaveBeenCalledWith(
-      expect.objectContaining({ bucketName: 'public' }),
-    );
-  });
-
-  it('throws when no physical bucket naming policy is configured', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions({ resolveBucketName: undefined }));
-    const pgClient = createMockPgClient();
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    await expect(
-      capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      }),
-    ).rejects.toThrow('STORAGE_BUCKET_NAME_POLICY_MISSING');
-    expect(mockProvision).not.toHaveBeenCalled();
-  });
-
-  it('provisions a private bucket', async () => {
-    mockProvision.mockResolvedValue({
-      bucketName: 'tenant-db-uuid-123-private',
-      accessType: 'private',
-      endpoint: 'http://minio:9000',
-      provider: 'minio',
-      region: 'us-east-1',
-      publicUrlPrefix: null,
-      blockPublicAccess: true,
-      versioning: false,
-      corsRules: [],
-      lifecycleRules: [],
-    });
-    createBucketProvisionerPlugin(createDefaultOptions());
+  it('enqueues the platform global-scope reconciliation job', async () => {
+    createBucketProvisionerPlugin();
     const pgClient = createMockPgClient({
-      app_public: {
-        rows: [{
-          id: 'bucket-uuid-private',
-          key: 'private',
-          type: 'private',
-          is_public: false,
-          allowed_origins: null,
-          physical_name: null,
-        }],
+      scope: 'platform',
+      entityField: null,
+      physicalName: 'existing-physical-name',
+    });
+
+    const result = await invoke(pgClient);
+    const enqueue = enqueueCall(pgClient);
+
+    expect(enqueue.text).not.toContain('db_id =>');
+    expect(enqueue.text).not.toContain('entity_type =>');
+    expect(enqueue.values).toEqual([BUCKET_ID, 'platform']);
+    expect(result.physicalName).toBe('existing-physical-name');
+  });
+
+  it('enqueues the exact database-scope reconciliation job', async () => {
+    createBucketProvisionerPlugin();
+    const pgClient = createMockPgClient({
+      scope: 'database',
+      entityField: 'database_id',
+      scopeKey: DATABASE_ID,
+    });
+
+    const result = await invoke(pgClient);
+    const enqueue = enqueueCall(pgClient);
+    const bucketLookup = pgClient.query.mock.calls.find((args: any[]) =>
+      args[0]?.text?.includes('FROM app_public.buckets'));
+
+    expect(bucketLookup[0].text).toContain('database_id AS scope_key');
+    expect(bucketLookup[0].values).toEqual(['public']);
+    expect(enqueue.text).toContain("'database_id', $2::uuid");
+    expect(enqueue.text).toContain("'id', $1::uuid");
+    expect(enqueue.text).toContain("'scope', $3::text");
+    expect(enqueue.text).toContain('db_id => $2');
+    expect(enqueue.text).toContain('entity_id => $2');
+    expect(enqueue.text).toContain('organization_id => NULL');
+    expect(enqueue.text).toContain('entity_type => $3');
+    expect(enqueue.values).toEqual([BUCKET_ID, DATABASE_ID, 'database']);
+    expect(result.jobId).toBe(JOB_ID);
+  });
+
+  it('enqueues an entity-scope job with the resolved organization function', async () => {
+    createBucketProvisionerPlugin();
+    const pgClient = createMockPgClient({
+      scope: 'org',
+      entityField: 'owner_id',
+      scopeKey: OWNER_ID,
+      orgResolver: {
+        entity_type: 'org',
+        get_org_fn_schema: 'org_private',
+        get_org_fn: 'get_organization_id',
       },
     });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
 
-    const result = await capturedLambdaCallback!({
-      input: { bucketKey: 'private' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
+    await invoke(pgClient, { bucketKey: 'public', ownerId: OWNER_ID });
+    const enqueue = enqueueCall(pgClient);
+    const bucketLookup = pgClient.query.mock.calls.find((args: any[]) =>
+      args[0]?.text?.includes('FROM app_public.buckets'));
+    const resolverLookup = pgClient.query.mock.calls.find((args: any[]) =>
+      args[0]?.text?.includes('metaschema.resolve_entity_context_by_field'));
 
-    expect(result.success).toBe(true);
-    expect(result.accessType).toBe('private');
+    expect(bucketLookup[0].text).toContain('owner_id AS scope_key');
+    expect(bucketLookup[0].values).toEqual(['public', OWNER_ID]);
+    expect(resolverLookup[0].values).toEqual([
+      DATABASE_ID,
+      BUCKETS_TABLE_ID,
+      'owner_id',
+    ]);
+    expect(enqueue.text).toContain("'id', $1::uuid");
+    expect(enqueue.text).toContain("'owner_id', $2::uuid");
+    expect(enqueue.text).toContain("'scope', $3::text");
+    expect(enqueue.text).toContain('entity_id => $2');
+    expect(enqueue.text).toContain(
+      'organization_id => org_private.get_organization_id($3::text, $2::uuid)',
+    );
+    expect(enqueue.text).toContain('entity_type => $3');
+    expect(enqueue.values).toEqual([BUCKET_ID, OWNER_ID, 'org']);
   });
 
-  it('throws INVALID_BUCKET_KEY for an empty key', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions());
-
-    await expect(
-      capturedLambdaCallback!({
-        input: { bucketKey: '' },
-        withPgClient: jest.fn(),
-        pgSettings: {},
-      }),
-    ).rejects.toThrow('INVALID_BUCKET_KEY');
-  });
-
-  it('throws DATABASE_NOT_FOUND when database_id is null', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions());
+  it('enqueues an entity-scope job with NULL organization without a resolver', async () => {
+    createBucketProvisionerPlugin();
     const pgClient = createMockPgClient({
-      'jwt_private.current_database_id': { rows: [{ id: null }] },
+      scope: 'user',
+      entityField: 'owner_id',
+      scopeKey: OWNER_ID,
     });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
 
-    await expect(
-      capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      }),
-    ).rejects.toThrow('DATABASE_NOT_FOUND');
+    await invoke(pgClient, { bucketKey: 'public', ownerId: OWNER_ID });
+    const enqueue = enqueueCall(pgClient);
+    const resolverLookup = pgClient.query.mock.calls.find((args: any[]) =>
+      args[0]?.text?.includes('metaschema.resolve_entity_context_by_field'));
+
+    expect(resolverLookup[0].values).toEqual([
+      DATABASE_ID,
+      BUCKETS_TABLE_ID,
+      'owner_id',
+    ]);
+    expect(enqueue.text).toContain("'owner_id', $2::uuid");
+    expect(enqueue.text).toContain('entity_id => $2');
+    expect(enqueue.text).toContain('organization_id => NULL');
+    expect(enqueue.text).toContain('entity_type => $3');
+    expect(enqueue.values).toEqual([BUCKET_ID, OWNER_ID, 'user']);
   });
 
-  it('throws STORAGE_MODULE_NOT_PROVISIONED when no storage modules exist', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions());
+  it('propagates enqueue failures as GraphQL errors', async () => {
+    createBucketProvisionerPlugin();
     const pgClient = createMockPgClient({
-      'metaschema_modules_public.storage_module': { rows: [] },
+      scope: 'database',
+      entityField: 'database_id',
+      scopeKey: DATABASE_ID,
     });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    await expect(
-      capturedLambdaCallback!({
-        input: { bucketKey: 'public' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      }),
-    ).rejects.toThrow('STORAGE_MODULE_NOT_PROVISIONED');
-  });
-
-  it('throws BUCKET_NOT_FOUND when the bucket does not exist', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions());
-    const pgClient = createMockPgClient({ app_public: { rows: [] } });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    await expect(
-      capturedLambdaCallback!({
-        input: { bucketKey: 'missing' },
-        withPgClient: mockWithPgClient,
-        pgSettings: {},
-      }),
-    ).rejects.toThrow('BUCKET_NOT_FOUND');
-  });
-
-  it('returns an error payload when provisioning fails', async () => {
-    mockProvision.mockRejectedValue(new Error('S3 connection refused'));
-    createBucketProvisionerPlugin(createDefaultOptions());
-    const pgClient = createMockPgClient();
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    const result = await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
+    pgClient.query.mockImplementation((arg: any): Promise<any> => {
+      const sql: string = typeof arg === 'string' ? arg : arg.text;
+      if (sql.includes('app_jobs.add_job')) {
+        return Promise.reject(new Error('enqueue failed'));
+      }
+      return createMockPgClient({
+        scope: 'database',
+        entityField: 'database_id',
+        scopeKey: DATABASE_ID,
+      }).query(arg);
     });
 
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('S3 connection refused');
-    expect(result.bucketName).toBe('tenant-db-uuid-123-public');
+    await expect(invoke(pgClient)).rejects.toThrow('enqueue failed');
   });
 
-  it('records the physical name with the record-once guard', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions());
-    const pgClient = createMockPgClient();
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
+  it('throws for invalid and missing bucket inputs', async () => {
+    createBucketProvisionerPlugin();
 
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: { role: 'admin' },
-    });
+    await expect(invoke({ query: jest.fn() }, { bucketKey: '' }))
+      .rejects.toThrow('INVALID_BUCKET_KEY');
 
-    const update = pgClient.query.mock.calls.find(
-      (call: any[]) => call[0]?.text?.includes('SET physical_name'),
-    );
-    expect(update).toBeDefined();
-    expect(update![0].text).toContain('physical_name IS NULL');
-    expect(update![0].values).toEqual(['tenant-db-uuid-123-public', 'bucket-uuid-789']);
-    expect(mockWithPgClient).toHaveBeenCalledWith(null, expect.any(Function));
-  });
-
-  it('provisions the stored physical name verbatim', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions());
     const pgClient = createMockPgClient({
-      app_public: {
-        rows: [{
-          id: 'bucket-uuid-789',
-          key: 'public',
-          type: 'public',
-          is_public: true,
-          allowed_origins: null,
-          physical_name: 'preexisting-cdn-bucket',
-        }],
-      },
+      scope: 'app',
+      entityField: null,
+      bucketFound: false,
     });
-    mockProvision.mockResolvedValue({
-      bucketName: 'preexisting-cdn-bucket',
-      accessType: 'public',
-      endpoint: 'http://minio:9000',
-      provider: 'minio',
-      region: 'us-east-1',
-      publicUrlPrefix: null,
-      blockPublicAccess: false,
-      versioning: false,
-      corsRules: [],
-      lifecycleRules: [],
-    });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    const result = await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    expect(result.success).toBe(true);
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({ bucketName: 'preexisting-cdn-bucket' }),
-    );
-    const update = pgClient.query.mock.calls.find(
-      (call: any[]) => call[0]?.text?.includes('SET physical_name'),
-    );
-    expect(update).toBeDefined();
-    expect(update![0].text).toContain('physical_name IS NULL');
-  });
-
-  it('does not record a name when provisioning fails', async () => {
-    mockProvision.mockRejectedValue(new Error('S3 connection refused'));
-    createBucketProvisionerPlugin(createDefaultOptions());
-    const pgClient = createMockPgClient();
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    const update = pgClient.query.mock.calls.find(
-      (call: any[]) => call[0]?.text?.includes('SET physical_name'),
-    );
-    expect(update).toBeUndefined();
-  });
-
-  it('applies storage-module endpoint and public URL overrides', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions());
-    const pgClient = createMockPgClient({
-      'metaschema_modules_public.storage_module': {
-        rows: [{
-          id: 'sm-uuid-456',
-          scope: 'app',
-          entity_table_id: null,
-          buckets_schema: 'app_public',
-          buckets_table: 'buckets',
-          endpoint: 'http://custom-minio:9000',
-          public_url_prefix: 'https://cdn.example.com',
-          provider: 'minio',
-          allowed_origins: null,
-          entity_schema: null,
-          entity_table: null,
-        }],
-      },
-    });
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    expect(mockBucketProvisionerConstructor).toHaveBeenCalledWith(
-      expect.objectContaining({
-        connection: expect.objectContaining({
-          endpoint: 'http://custom-minio:9000',
-          provider: 'minio',
-        }),
-      }),
-    );
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({ publicUrlPrefix: 'https://cdn.example.com' }),
-    );
-  });
-
-  it('passes the versioning option to the provisioner', async () => {
-    createBucketProvisionerPlugin(createDefaultOptions({ versioning: true }));
-    const pgClient = createMockPgClient();
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    expect(mockProvision).toHaveBeenCalledWith(
-      expect.objectContaining({ versioning: true }),
-    );
-  });
-
-  it('caches a lazy connection getter', async () => {
-    const connection = {
-      provider: 'minio' as const,
-      region: 'us-east-1',
-      endpoint: 'http://minio:9000',
-      accessKeyId: 'minioadmin',
-      secretAccessKey: 'minioadmin',
-    };
-    const getter = jest.fn(() => connection);
-    const options = createDefaultOptions({ connection: getter });
-    createBucketProvisionerPlugin(options);
-    const pgClient = createMockPgClient();
-    const mockWithPgClient = jest.fn((_settings: any, callback: any) => callback(pgClient));
-
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-    await capturedLambdaCallback!({
-      input: { bucketKey: 'public' },
-      withPgClient: mockWithPgClient,
-      pgSettings: {},
-    });
-
-    expect(getter).toHaveBeenCalledTimes(1);
+    await expect(invoke(pgClient)).rejects.toThrow('BUCKET_NOT_FOUND');
   });
 });

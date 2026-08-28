@@ -95,10 +95,10 @@ VALUES (
 -- ALICE BUCKET SEED DATA
 -- =====================================================
 
-INSERT INTO "simple-storage-public".app_buckets (id, key, type, is_public)
+INSERT INTO "simple-storage-public".app_buckets (id, key, type, is_public, physical_name)
 VALUES
-  ('d0000001-0000-0000-0000-000000000001', 'public', 'public', true),
-  ('d0000001-0000-0000-0000-000000000002', 'private', 'private', false)
+  ('d0000001-0000-0000-0000-000000000001', 'public', 'public', true, 'app-80a2eaaf-public-c7156cb19fe3'),
+  ('d0000001-0000-0000-0000-000000000002', 'private', 'private', false, 'app-80a2eaaf-private-cc079c527e7d')
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
@@ -194,10 +194,10 @@ VALUES (
 -- BOB BUCKET SEED DATA
 -- =====================================================
 
-INSERT INTO "bob-storage-public".app_buckets (id, key, type, is_public)
+INSERT INTO "bob-storage-public".app_buckets (id, key, type, is_public, physical_name)
 VALUES
-  ('d2d2d2d2-0000-0000-0000-000000000001', 'public', 'public', true),
-  ('d2d2d2d2-0000-0000-0000-000000000002', 'private', 'private', false)
+  ('d2d2d2d2-0000-0000-0000-000000000001', 'public', 'public', true, 'app-a1a1a1a1-public-4db6afbff1a2'),
+  ('d2d2d2d2-0000-0000-0000-000000000002', 'private', 'private', false, 'app-a1a1a1a1-private-a83152dee184')
 ON CONFLICT (id) DO NOTHING;
 
 -- Pre-seed a file in Bob's public bucket for mutation attack testing
@@ -323,10 +323,10 @@ VALUES (
 -- MALLORY BUCKET SEED DATA
 -- =====================================================
 
-INSERT INTO "mallory-storage-public".app_buckets (id, key, type, is_public)
+INSERT INTO "mallory-storage-public".app_buckets (id, key, type, is_public, physical_name)
 VALUES
-  ('fa77fa77-0000-0000-0000-000000000001', 'public', 'public', true),
-  ('fa77fa77-0000-0000-0000-000000000002', 'private', 'private', false)
+  ('fa77fa77-0000-0000-0000-000000000001', 'public', 'public', true, 'app-fa11fa11-public-c1aac75adc22'),
+  ('fa77fa77-0000-0000-0000-000000000002', 'private', 'private', false, 'app-fa11fa11-private-c8db3baa1b20')
 ON CONFLICT (id) DO NOTHING;
 
 -- Pre-seed files in Mallory's buckets for RLS testing
