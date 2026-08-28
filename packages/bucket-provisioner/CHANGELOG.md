@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.25.1...@constructive-io/bucket-provisioner@0.26.0) (2026-08-28)
+
+### Features
+
+- **bucket-provisioner:** name a bucket from its own identity, and allow no browser origin ([1e87ff2](https://github.com/constructive-io/constructive/commit/1e87ff2adda67f7bfb95841f256610c0ab58d01a))
+
 ## [0.25.1](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.25.0...@constructive-io/bucket-provisioner@0.25.1) (2026-08-27)
 
 **Note:** Version bump only for package @constructive-io/bucket-provisioner
