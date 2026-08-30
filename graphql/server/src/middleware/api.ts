@@ -309,6 +309,15 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
   return baseKey;
 };
 
+const getScopedRouteSvcKey = (
+  hostKey: string,
+  structure: ApiStructure
+): string => {
+  if (!structure.databaseId) return hostKey;
+  const databaseKey = `${hostKey}:database:${structure.databaseId}`;
+  return structure.apiId ? `${databaseKey}:api:${structure.apiId}` : databaseKey;
+};
+
 const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleSettings = {}): ApiStructure => ({
   apiId: row.api_id,
   dbname: row.dbname || opts.pg?.database || '',
@@ -506,6 +515,25 @@ export const getApiIdentity = async (
     : [];
   let databaseSchemas: string[] | null = null;
   const liveAccessPolicyConfigured = !!opts.api?.databaseAccessPolicyFunction?.trim();
+
+  // A hostname is mutable routing state. Resolve it on every policy-protected
+  // request, then select caches by the resolved database/API identity so a
+  // warm handler for the previous binding cannot serve a rebound route.
+  if (liveAccessPolicyConfigured && mode === 'scoped-route') {
+    const result = await resolveScopedRoute(ctx);
+    if (!result) return result;
+
+    const resolvedCacheKey = getScopedRouteSvcKey(cacheKey, result);
+    req.svc_key = resolvedCacheKey;
+    const cached = svcCache.get(resolvedCacheKey) as ApiStructure | undefined;
+    if (cached) {
+      log.debug(`Cache HIT for live scoped-route key=${resolvedCacheKey}`);
+      return cached;
+    }
+
+    if (result.databaseId) svcCache.set(resolvedCacheKey, result);
+    return result;
+  }
 
   // X-Schemata creates an administrator API over caller-selected schemas. Its
   // database binding therefore remains a live routing-plane check, including

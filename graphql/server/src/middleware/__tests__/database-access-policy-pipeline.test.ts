@@ -39,8 +39,10 @@ const jsonParser = jest.fn(express.json());
 const multipartParser = jest.fn((_req: Request, _res: Response, next: NextFunction) => next());
 
 const DATABASE_ID = '11111111-1111-4111-8111-111111111111';
+const REBOUND_DATABASE_ID = '33333333-3333-4333-8333-333333333333';
 const PLATFORM_DATABASE_ID = '22222222-2222-4222-8222-222222222222';
 const TENANT_DATABASE = 'customer_database';
+const REBOUND_TENANT_DATABASE = 'rebound_customer_database';
 
 interface PolicyRow {
   allowed: boolean;
@@ -72,14 +74,18 @@ const options = (): ApiOptions => ({
   }
 } as ApiOptions);
 
-const matchedRoute = () => ({
-  route_binding_id: 'route-1',
+const matchedRoute = (
+  databaseId = DATABASE_ID,
+  apiId = 'api-1',
+  dbname = TENANT_DATABASE
+) => ({
+  route_binding_id: `route-${apiId}`,
   target_module: 'api',
-  target_source_id: 'api-1',
+  target_source_id: apiId,
   resolved_config: {
-    api_id: 'api-1',
-    database_id: DATABASE_ID,
-    dbname: TENANT_DATABASE,
+    api_id: apiId,
+    database_id: databaseId,
+    dbname,
     role_name: 'authenticated',
     anon_role: 'anonymous',
     is_public: false,
@@ -91,7 +97,8 @@ function setupPools(
   policyRows: PolicyRow[],
   schemaBindings: Record<string, string> = {
     app_public: DATABASE_ID
-  }
+  },
+  routeResults = [matchedRoute()]
 ) {
   const events: string[] = [];
   const tenantQuery = jest.fn(async () => {
@@ -99,6 +106,7 @@ function setupPools(
     return { rows: [] as unknown[] };
   });
   const policyQueue = [...policyRows];
+  const routeQueue = [...routeResults];
   const routingQuery = jest.fn(async (sql: string, params: unknown[]) => {
     if (sql.includes('FROM metaschema_public.schema scoped_schema')) {
       events.push('schema-binding');
@@ -132,7 +140,9 @@ function setupPools(
     }
     if (sql.includes('resolve_route')) {
       events.push('route-resolution');
-      return { rows: [matchedRoute()] };
+      return {
+        rows: [routeQueue.shift() ?? routeResults[routeResults.length - 1]]
+      };
     }
     if (sql.includes('platform_private"."database_access')) {
       events.push('policy');
@@ -145,7 +155,10 @@ function setupPools(
   const tenantPool = { query: tenantQuery } as unknown as Pool;
   activePolicyPool = routingPool;
   mockGetPgPool.mockImplementation((pgOptions) => (
-    pgOptions?.database === TENANT_DATABASE ? tenantPool : routingPool
+    pgOptions?.database === TENANT_DATABASE ||
+    pgOptions?.database === REBOUND_TENANT_DATABASE
+      ? tenantPool
+      : routingPool
   ));
 
   return { events, routingQuery, tenantQuery };
@@ -159,6 +172,24 @@ function pipelineApp(apiOptions = options()) {
   app.use('/graphql', multipartParser);
   app.use(createApiSettingsMiddleware(apiOptions));
   app.use((_req, res) => res.status(204).end());
+  app.use(errorHandler);
+  return app;
+}
+
+function graphileIdentityPipelineApp(
+  handlers: Map<string, jest.Mock>,
+  apiOptions = options()
+) {
+  const app = express();
+  app.use(createApiMiddleware(apiOptions));
+  app.use(createDatabaseAccessPolicyMiddleware(apiOptions));
+  app.use(createApiSettingsMiddleware(apiOptions));
+  // Graphile selects its cached handler from this exact request key.
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const handler = req.svc_key ? handlers.get(req.svc_key) : undefined;
+    if (!handler) return next(new Error('Missing Graphile identity'));
+    handler(req, res);
+  });
   app.use(errorHandler);
   return app;
 }
@@ -212,6 +243,66 @@ describe('database access policy pipeline ordering', () => {
     expect(tenantQuery).toHaveBeenCalled();
     expect(events.indexOf('policy')).toBeGreaterThan(events.indexOf('route-resolution'));
     expect(events.indexOf('tenant')).toBeGreaterThan(events.indexOf('policy'));
+  });
+
+  it('reselects the Graphile identity after a warm scoped route is rebound to another database', async () => {
+    const reboundApiId = 'api-2';
+    const { routingQuery } = setupPools(
+      [allowRow, allowRow],
+      { app_public: DATABASE_ID },
+      [
+        matchedRoute(),
+        matchedRoute(REBOUND_DATABASE_ID, reboundApiId, REBOUND_TENANT_DATABASE)
+      ]
+    );
+    const hostKey = 'api.example.com';
+    const firstKey = `${hostKey}:database:${DATABASE_ID}:api:api-1`;
+    const reboundKey = `${hostKey}:database:${REBOUND_DATABASE_ID}:api:${reboundApiId}`;
+    const firstGraphile = jest.fn((req: Request, res: Response) => {
+      res.status(200).json({
+        servedDatabaseId: DATABASE_ID,
+        requestDatabaseId: req.api?.databaseId
+      });
+    });
+    const reboundGraphile = jest.fn((req: Request, res: Response) => {
+      res.status(200).json({
+        servedDatabaseId: REBOUND_DATABASE_ID,
+        requestDatabaseId: req.api?.databaseId
+      });
+    });
+    const app = graphileIdentityPipelineApp(new Map([
+      [firstKey, firstGraphile],
+      [reboundKey, reboundGraphile]
+    ]));
+
+    const first = await request(app)
+      .get('/graphql')
+      .set('Host', hostKey);
+    const second = await request(app)
+      .get('/graphql')
+      .set('Host', hostKey);
+
+    expect(first.status).toBe(200);
+    expect(first.body).toEqual({
+      servedDatabaseId: DATABASE_ID,
+      requestDatabaseId: DATABASE_ID
+    });
+    expect(second.status).toBe(200);
+    expect(second.body).toEqual({
+      servedDatabaseId: REBOUND_DATABASE_ID,
+      requestDatabaseId: REBOUND_DATABASE_ID
+    });
+    expect(firstGraphile).toHaveBeenCalledTimes(1);
+    expect(reboundGraphile).toHaveBeenCalledTimes(1);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('resolve_route')
+    )).toHaveLength(2);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('database_access')
+    ).map(([, params]) => params[0])).toEqual([
+      DATABASE_ID,
+      REBOUND_DATABASE_ID
+    ]);
   });
 
   it('rejects malformed private database identity before PostgreSQL or multipart parsing', async () => {
@@ -438,10 +529,33 @@ describe('database access policy pipeline ordering', () => {
       http: 402
     });
     expect(routingQuery.mock.calls.filter(([sql]) => String(sql).includes(identitySql)))
-      .toHaveLength(_label === 'X-Schemata' ? 2 : 1);
+      .toHaveLength(_label === 'X-Schemata' || _label === 'scoped route' ? 2 : 1);
     expect(routingQuery.mock.calls.filter(([sql]) => String(sql).includes('database_access'))).toHaveLength(2);
     expect(tenantQuery).toHaveBeenCalledTimes(tenantQueriesAfterAllow);
     expect(mockRegistryResolve).toHaveBeenCalledTimes(settingsAfterAllow);
+  });
+
+  it('keeps the warm scoped-route cache behavior when the optional access policy is unset', async () => {
+    const tenantOptions = options();
+    delete tenantOptions.api?.databaseAccessPolicyFunction;
+    const { routingQuery } = setupPools([allowRow]);
+    const app = pipelineApp(tenantOptions);
+
+    const first = await request(app)
+      .get('/graphql')
+      .set('Host', 'api.example.com');
+    const second = await request(app)
+      .get('/graphql')
+      .set('Host', 'api.example.com');
+
+    expect(first.status).toBe(204);
+    expect(second.status).toBe(204);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('resolve_route')
+    )).toHaveLength(1);
+    expect(routingQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('database_access')
+    )).toHaveLength(0);
   });
 
   it('rejects private routing without database identity before PostgreSQL or multipart parsing', async () => {
