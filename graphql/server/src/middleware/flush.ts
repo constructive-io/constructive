@@ -20,6 +20,19 @@ const evictMatchingCaches = (matches: (key: string) => boolean): void => {
   }
 };
 
+const isScopedDatabaseIdentityKey = (key: string, databaseId: string): boolean => {
+  const marker = ':database:';
+  const markerIndex = key.indexOf(marker);
+  if (markerIndex <= 0) return false;
+  if (!/^[a-z0-9.-]+$/i.test(key.slice(0, markerIndex))) return false;
+
+  const identity = key.slice(markerIndex + marker.length);
+  const apiIndex = identity.indexOf(':api:');
+  if (apiIndex === -1) return identity === databaseId;
+  return identity.slice(0, apiIndex) === databaseId &&
+    identity.length > apiIndex + ':api:'.length;
+};
+
 export const flush = async (
   req: Request,
   res: Response,
@@ -50,6 +63,10 @@ export const flushService = async (
     evictMatchingCaches((key) => api.test(key) || schemata.test(key) || meta.test(key));
   }
 
+  // Scoped-route handlers are keyed by the concrete request host, which may
+  // be a child of a wildcard route. The database segment is the stable part.
+  evictMatchingCaches((key) => isScopedDatabaseIdentityKey(key, databaseId));
+
   const routingSchema = getRoutingSchema(opts);
   if (!isValidSchemaName(routingSchema)) {
     log.warn(`[flush] invalid routing schema name: ${routingSchema}`);
@@ -67,12 +84,8 @@ export const flushService = async (
   for (const row of svc.rows) {
     const key: string | undefined = row.hostname || undefined;
     if (key) {
-      const databaseKey = `${key}:database:${databaseId}`;
-      evictMatchingCaches((candidate) =>
-        candidate === key ||
-        candidate === databaseKey ||
-        candidate.startsWith(`${databaseKey}:api:`)
-      );
+      // Legacy policy-unset routes remain cached by their configured hostname.
+      evictMatchingCaches((candidate) => candidate === key);
     }
   }
 };
