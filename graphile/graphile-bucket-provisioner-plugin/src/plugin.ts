@@ -218,7 +218,21 @@ async function resolveEntityContext(
  * `packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/job_trigger.sql`.
  * A callable enqueue function beside the trigger would be the durable fix for
  * this deliberate mirroring, but is out of scope here.
+ *
+ * The three scope shapes differ only in the payload entries and the identity
+ * arguments, so those are the only parts a caller supplies — the identifier,
+ * queue, retry, and priority policy exist exactly once.
  */
+function addJobStatement(payloadEntries: string, identityArgs: string): string {
+  return `SELECT (app_jobs.add_job(
+      identifier => 'storage:provision_bucket',
+      payload => json_build_object(${payloadEntries}),
+      queue_name => 'bucket:' || $1::text,
+      max_attempts => 25,
+      priority => 0${identityArgs}
+    )).id AS id`;
+}
+
 async function enqueueReconciliationJob(
   pgClient: any,
   storageModule: StorageModuleRow,
@@ -231,37 +245,27 @@ async function enqueueReconciliationJob(
   let values: unknown[];
 
   if (entityField === null) {
-    text = `SELECT (app_jobs.add_job(
-      identifier => 'storage:provision_bucket',
-      payload => json_build_object(
-        'id', $1::uuid,
-        'scope', $2::text
-      ),
-      queue_name => 'bucket:' || $1::text,
-      max_attempts => 25,
-      priority => 0
-    )).id AS id`;
+    text = addJobStatement(
+      `'id', $1::uuid,
+        'scope', $2::text`,
+      '',
+    );
     values = [bucket.id, scope];
   } else if (entityField === 'database_id') {
     const databaseId = bucket.scope_key;
     if (!databaseId) {
       throw new Error(`STORAGE_BUCKET_SCOPE_KEY_MISSING: bucket ${bucket.id} has no database_id`);
     }
-    text = `SELECT (app_jobs.add_job(
-      identifier => 'storage:provision_bucket',
-      payload => json_build_object(
-        'database_id', $2::uuid,
+    text = addJobStatement(
+      `'database_id', $2::uuid,
         'id', $1::uuid,
-        'scope', $3::text
-      ),
+        'scope', $3::text`,
+      `,
       db_id => $2,
-      queue_name => 'bucket:' || $1::text,
-      max_attempts => 25,
-      priority => 0,
       entity_id => $2,
       organization_id => NULL,
-      entity_type => $3
-    )).id AS id`;
+      entity_type => $3`,
+    );
     values = [bucket.id, databaseId, scope];
   } else if (entityField === 'owner_id') {
     const ownerId = bucket.scope_key;
@@ -272,20 +276,15 @@ async function enqueueReconciliationJob(
     const orgFunction = context.get_org_fn_schema && context.get_org_fn
       ? `${QuoteUtils.quoteQualifiedIdentifier(context.get_org_fn_schema, context.get_org_fn)}($3::text, $2::uuid)`
       : 'NULL';
-    text = `SELECT (app_jobs.add_job(
-      identifier => 'storage:provision_bucket',
-      payload => json_build_object(
-        'id', $1::uuid,
+    text = addJobStatement(
+      `'id', $1::uuid,
         'owner_id', $2::uuid,
-        'scope', $3::text
-      ),
-      queue_name => 'bucket:' || $1::text,
-      max_attempts => 25,
-      priority => 0,
+        'scope', $3::text`,
+      `,
       entity_id => $2,
       organization_id => ${orgFunction},
-      entity_type => $3
-    )).id AS id`;
+      entity_type => $3`,
+    );
     values = [bucket.id, ownerId, scope];
   } else {
     throw new Error(
