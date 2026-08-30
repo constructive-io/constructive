@@ -11,6 +11,15 @@ import { getRoutingSchema, isValidSchemaName } from './routing';
 
 const log = new Logger('flush');
 
+const evictMatchingCaches = (matches: (key: string) => boolean): void => {
+  for (const key of graphileCache.keys()) {
+    if (matches(key)) graphileCache.delete(key);
+  }
+  for (const key of svcCache.keys()) {
+    if (matches(key)) svcCache.delete(key);
+  }
+};
+
 export const flush = async (
   req: Request,
   res: Response,
@@ -37,13 +46,8 @@ export const flushService = async (
   const schemata = new RegExp(`^schemata:${databaseId}:.*`);
   const meta = new RegExp(`^metaschema:api:${databaseId}`);
 
-  if (!opts.api.isPublic) {
-    graphileCache.forEach((_, k: string) => {
-      if (api.test(k) || schemata.test(k) || meta.test(k)) {
-        graphileCache.delete(k);
-        svcCache.delete(k);
-      }
-    });
+  if (opts.api?.isPublic === false) {
+    evictMatchingCaches((key) => api.test(key) || schemata.test(key) || meta.test(key));
   }
 
   const routingSchema = getRoutingSchema(opts);
@@ -63,8 +67,12 @@ export const flushService = async (
   for (const row of svc.rows) {
     const key: string | undefined = row.hostname || undefined;
     if (key) {
-      graphileCache.delete(key);
-      svcCache.delete(key);
+      const databaseKey = `${key}:database:${databaseId}`;
+      evictMatchingCaches((candidate) =>
+        candidate === key ||
+        candidate === databaseKey ||
+        candidate.startsWith(`${databaseKey}:api:`)
+      );
     }
   }
 };

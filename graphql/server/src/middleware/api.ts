@@ -517,21 +517,13 @@ export const getApiIdentity = async (
   const liveAccessPolicyConfigured = !!opts.api?.databaseAccessPolicyFunction?.trim();
 
   // A hostname is mutable routing state. Resolve it on every policy-protected
-  // request, then select caches by the resolved database/API identity so a
-  // warm handler for the previous binding cannot serve a rebound route.
+  // request, then select the downstream Graphile handler by the resolved
+  // database/API identity so a warm handler cannot serve a rebound route.
   if (liveAccessPolicyConfigured && mode === 'scoped-route') {
     const result = await resolveScopedRoute(ctx);
     if (!result) return result;
 
-    const resolvedCacheKey = getScopedRouteSvcKey(cacheKey, result);
-    req.svc_key = resolvedCacheKey;
-    const cached = svcCache.get(resolvedCacheKey) as ApiStructure | undefined;
-    if (cached) {
-      log.debug(`Cache HIT for live scoped-route key=${resolvedCacheKey}`);
-      return cached;
-    }
-
-    if (result.databaseId) svcCache.set(resolvedCacheKey, result);
+    req.svc_key = getScopedRouteSvcKey(cacheKey, result);
     return result;
   }
 
