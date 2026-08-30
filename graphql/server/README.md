@@ -129,7 +129,7 @@ returns table (
 )
 ```
 
-An allowed row must set the three denial fields to `NULL`. A denied row must provide an uppercase machine code, a non-empty client-safe message of at most 512 characters, and an HTTP status from 400 through 599. GraphQL denials keep a GraphQL error envelope and use the returned HTTP status, which is also present in `errors[].extensions.http`; REST denials use the same status.
+An allowed row must set the three denial fields to `NULL`. A denied row must provide a non-empty client-safe message of at most 512 characters and one exact code/status pair: `DATABASE_BILLING_SUSPENDED` with HTTP 402 for definitive non-payment, or `DATABASE_ACCESS_POLICY_UNAVAILABLE` with HTTP 503 when policy state is missing, malformed, or unavailable. Any other row fails closed as `DATABASE_ACCESS_POLICY_UNAVAILABLE` with HTTP 503. GraphQL denials keep a GraphQL error envelope and use the returned HTTP status, which is also present in `errors[].extensions.http`; REST denials use the same status.
 
 ## Configuration
 

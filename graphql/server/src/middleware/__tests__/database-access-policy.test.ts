@@ -65,6 +65,13 @@ const denyRow: TestPolicyRow = {
   http_status: 402
 };
 
+const unavailableRow: TestPolicyRow = {
+  allowed: false,
+  code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
+  message: 'Database access could not be verified. Please try again.',
+  http_status: 503
+};
+
 describe('database access policy middleware', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -181,6 +188,29 @@ describe('database access policy middleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
+  it('returns the exact GraphQL 503 contract for unavailable policy state', async () => {
+    const query = jest.fn().mockResolvedValue({ rows: [unavailableRow] });
+    mockCreatePool.mockReturnValue({ query } as unknown as Pool);
+    const middleware = createDatabaseAccessPolicyMiddleware(
+      options('platform_private.database_access')
+    );
+    const { res, status, json } = createResponse();
+
+    await middleware(createRequest('/graphql'), res, jest.fn());
+
+    expect(status).toHaveBeenCalledWith(503);
+    expect(json).toHaveBeenCalledWith({
+      errors: [{
+        message: unavailableRow.message,
+        extensions: {
+          code: unavailableRow.code,
+          class: 'public',
+          http: 503
+        }
+      }]
+    });
+  });
+
   it.each([
     '/fn/invocations/invocation-1',
     '/v1/threads/thread-1/messages'
@@ -237,7 +267,7 @@ describe('database access policy middleware', () => {
     expect(response.body).toEqual({
       error: {
         code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
-        message: 'Database access policy is temporarily unavailable.',
+        message: 'Database access could not be verified. Please try again.',
         requestId: 'request-503'
       }
     });
@@ -255,10 +285,10 @@ describe('database access policy middleware', () => {
     expect(mockCreatePool).not.toHaveBeenCalled();
     expect(status).toHaveBeenCalledWith(503);
     const error = json.mock.calls[0][0].errors[0];
-    expect(error.message).toBe('Database access policy is temporarily unavailable.');
+    expect(error.message).toBe('Database access could not be verified. Please try again.');
     expect(error.extensions).toEqual({
       code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
-      class: 'internal',
+      class: 'public',
       http: 503
     });
     expect(next).not.toHaveBeenCalled();
@@ -270,8 +300,10 @@ describe('database access policy middleware', () => {
     ['a non-boolean decision', [{ ...allowRow, allowed: 'true' }]],
     ['denial fields on allow', [{ ...allowRow, code: 'UNEXPECTED' }]],
     ['an unsafe denial code', [{ ...denyRow, code: 'bad-code' }]],
+    ['an unsupported denial code', [{ ...denyRow, code: 'DATABASE_PAYMENT_REQUIRED' }]],
     ['an empty denial message', [{ ...denyRow, message: '  ' }]],
-    ['an out-of-range status', [{ ...denyRow, http_status: 200 }]]
+    ['a mismatched suspension status', [{ ...denyRow, http_status: 503 }]],
+    ['a mismatched unavailable status', [{ ...unavailableRow, http_status: 402 }]]
   ])('fails closed when the policy returns %s', async (_label, rows) => {
     const query = jest.fn().mockResolvedValue({ rows });
     mockCreatePool.mockReturnValue({ query } as unknown as Pool);
@@ -320,10 +352,10 @@ describe('database access policy middleware', () => {
 
     expect(status).toHaveBeenCalledWith(503);
     expect(json.mock.calls[0][0].errors[0]).toMatchObject({
-      message: 'Database access policy is temporarily unavailable.',
+      message: 'Database access could not be verified. Please try again.',
       extensions: {
         code: 'DATABASE_ACCESS_POLICY_UNAVAILABLE',
-        class: 'internal',
+        class: 'public',
         http: 503
       }
     });

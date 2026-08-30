@@ -1,6 +1,6 @@
 import './types';
 
-import { ConstructiveError } from '@constructive-io/errors';
+import { ConstructiveError, errors } from '@constructive-io/errors';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { PoolConfig, QueryResult, QueryResultRow } from 'pg';
@@ -14,10 +14,11 @@ import type { ApiOptions } from '../types';
 const log = new Logger('database-access-policy');
 
 const POLICY_FUNCTION_PATTERN = /^([a-z_][a-z0-9_]*)\.([a-z_][a-z0-9_]*)$/;
-const POLICY_ERROR_CODE_PATTERN = /^[A-Z][A-Z0-9_]{2,63}$/;
 const MAX_POLICY_MESSAGE_LENGTH = 512;
-const POLICY_UNAVAILABLE_CODE = 'DATABASE_ACCESS_POLICY_UNAVAILABLE';
-const POLICY_UNAVAILABLE_MESSAGE = 'Database access policy is temporarily unavailable.';
+const POLICY_DENIAL_HTTP_STATUS = {
+  DATABASE_BILLING_SUSPENDED: 402,
+  DATABASE_ACCESS_POLICY_UNAVAILABLE: 503
+} as const;
 const DEFAULT_POLICY_POOL_MAX = 2;
 const DEFAULT_POLICY_TIMEOUT_MS = 1500;
 const MAX_POLICY_POOL_MAX = 8;
@@ -90,7 +91,10 @@ const parseDecision = (rows: PolicyDecisionRow[]): PolicyDecision => {
     throw new Error('policy decision allowed must be a boolean');
   }
 
-  if (typeof row.code !== 'string' || !POLICY_ERROR_CODE_PATTERN.test(row.code)) {
+  if (
+    row.code !== 'DATABASE_BILLING_SUSPENDED' &&
+    row.code !== 'DATABASE_ACCESS_POLICY_UNAVAILABLE'
+  ) {
     throw new Error('denied policy decision has an invalid code');
   }
 
@@ -102,11 +106,8 @@ const parseDecision = (rows: PolicyDecisionRow[]): PolicyDecision => {
     throw new Error('denied policy decision has an invalid message');
   }
 
-  if (
-    !Number.isInteger(row.http_status) ||
-    (row.http_status as number) < 400 ||
-    (row.http_status as number) > 599
-  ) {
+  const expectedHttpStatus = POLICY_DENIAL_HTTP_STATUS[row.code];
+  if (row.http_status !== expectedHttpStatus) {
     throw new Error('denied policy decision has an invalid HTTP status');
   }
 
@@ -114,7 +115,7 @@ const parseDecision = (rows: PolicyDecisionRow[]): PolicyDecision => {
     allowed: false,
     code: row.code,
     message,
-    httpStatus: row.http_status as number
+    httpStatus: expectedHttpStatus
   };
 };
 
@@ -149,17 +150,16 @@ const rejectUnavailable = (
   req: Request,
   res: Response,
   next: NextFunction
-): void => rejectRequest(
-  req,
-  res,
-  next,
-  {
-    code: POLICY_UNAVAILABLE_CODE,
-    message: POLICY_UNAVAILABLE_MESSAGE,
-    httpStatus: 503
-  },
-  'internal'
-);
+): void => {
+  const error = errors.DATABASE_ACCESS_POLICY_UNAVAILABLE();
+  rejectRequest(
+    req,
+    res,
+    next,
+    { code: error.code, message: error.message, httpStatus: error.http },
+    error.errorClass
+  );
+};
 
 const withClose = (
   middleware: RequestHandler,

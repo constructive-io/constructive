@@ -35,6 +35,7 @@ const mockCreateDefaultRegistry = createDefaultRegistry as jest.MockedFunction<t
 const mockRegistryResolve = (
   mockCreateDefaultRegistry.mock.results[0]?.value as { resolve: jest.Mock }
 ).resolve;
+const jsonParser = jest.fn(express.json());
 const multipartParser = jest.fn((_req: Request, _res: Response, next: NextFunction) => next());
 
 const DATABASE_ID = '11111111-1111-4111-8111-111111111111';
@@ -154,6 +155,7 @@ function pipelineApp(apiOptions = options()) {
   const app = express();
   app.use(createApiMiddleware(apiOptions));
   app.use(createDatabaseAccessPolicyMiddleware(apiOptions));
+  app.use(jsonParser);
   app.use('/graphql', multipartParser);
   app.use(createApiSettingsMiddleware(apiOptions));
   app.use((_req, res) => res.status(204).end());
@@ -192,6 +194,7 @@ describe('database access policy pipeline ordering', () => {
     });
     expect(tenantQuery).not.toHaveBeenCalled();
     expect(mockRegistryResolve).not.toHaveBeenCalled();
+    expect(jsonParser).not.toHaveBeenCalled();
     expect(multipartParser).not.toHaveBeenCalled();
   });
 
@@ -204,6 +207,7 @@ describe('database access policy pipeline ordering', () => {
       .send({ query: '{ __typename }' });
 
     expect(response.status).toBe(204);
+    expect(jsonParser).toHaveBeenCalledTimes(1);
     expect(multipartParser).toHaveBeenCalledTimes(1);
     expect(tenantQuery).toHaveBeenCalled();
     expect(events.indexOf('policy')).toBeGreaterThan(events.indexOf('route-resolution'));
@@ -231,6 +235,7 @@ describe('database access policy pipeline ordering', () => {
     expect(routingQuery).not.toHaveBeenCalled();
     expect(tenantQuery).not.toHaveBeenCalled();
     expect(mockRegistryResolve).not.toHaveBeenCalled();
+    expect(jsonParser).not.toHaveBeenCalled();
     expect(multipartParser).not.toHaveBeenCalled();
   });
 
@@ -456,6 +461,7 @@ describe('database access policy pipeline ordering', () => {
     expect(routingQuery).not.toHaveBeenCalled();
     expect(tenantQuery).not.toHaveBeenCalled();
     expect(mockRegistryResolve).not.toHaveBeenCalled();
+    expect(jsonParser).not.toHaveBeenCalled();
     expect(multipartParser).not.toHaveBeenCalled();
   });
 });
