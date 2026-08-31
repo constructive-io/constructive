@@ -2,6 +2,8 @@
 
 exports[`cmds:extension runs \`extension\` command after workspace and module setup: extension-update - files 1`] = `
 [
+  "safegres.config.js",
+  "safegres-perf-baseline.json",
   "pgpm.plan",
   "package.json",
   "my-module.control",

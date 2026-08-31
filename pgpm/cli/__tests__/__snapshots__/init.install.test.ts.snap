@@ -13,6 +13,7 @@ exports[`cmds:install - with initialized workspace and module installs a module 
   "devDependencies": {
     "makage": "<VERSION>",
     "pgsql-test": "<VERSION>",
+    "safegres": "<VERSION>",
   },
   "homepage": "https://github.com/tester/my-module",
   "keywords": [],
@@ -27,6 +28,8 @@ exports[`cmds:install - with initialized workspace and module installs a module 
     "url": "https://github.com/tester/my-module",
   },
   "scripts": {
+    "audit:db": "safegres audit",
+    "audit:db:baseline": "safegres audit --write-perf-baseline safegres-perf-baseline.json",
     "lint": "eslint . --fix",
     "test": "jest",
     "test:watch": "jest --watchAll",
@@ -152,6 +155,7 @@ exports[`cmds:install - with initialized workspace and module installs two modul
   "devDependencies": {
     "makage": "<VERSION>",
     "pgsql-test": "<VERSION>",
+    "safegres": "<VERSION>",
   },
   "homepage": "https://github.com/tester/my-module",
   "keywords": [],
@@ -166,6 +170,8 @@ exports[`cmds:install - with initialized workspace and module installs two modul
     "url": "https://github.com/tester/my-module",
   },
   "scripts": {
+    "audit:db": "safegres audit",
+    "audit:db:baseline": "safegres audit --write-perf-baseline safegres-perf-baseline.json",
     "lint": "eslint . --fix",
     "test": "jest",
     "test:watch": "jest --watchAll",

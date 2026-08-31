@@ -26,10 +26,11 @@ import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { DOWNLOAD_URL_FIELD } from 'graphile-storage-registry';
 
+import { resolveS3, resolveS3ForDatabase } from './physical-bucket';
 import { withRequestPgClient } from './request-pg-client';
 import { generatePresignedGetUrl } from './s3-signer';
 import { loadAllStorageModules, resolveStorageConfigFromCodec, storedPhysicalName } from './storage-module-cache';
-import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
+import type { PresignedUrlPluginOptions } from './types';
 
 const log = new Logger('graphile-presigned-url:download-url');
 
@@ -42,45 +43,6 @@ const log = new Logger('graphile-presigned-url:download-url');
  * the storage module's files table, which we discover at schema-build time
  * via the `@storageFiles` smart tag.
  */
-/**
- * Resolve the S3 config from the options. If the option is a lazy getter
- * function, call it (and cache the result).
- */
-function resolveS3(options: PresignedUrlPluginOptions): S3Config {
-  if (typeof options.s3 === 'function') {
-    const resolved = options.s3();
-    options.s3 = resolved;
-    return resolved;
-  }
-  return options.s3;
-}
-
-/**
- * Build a per-database S3Config for a *known* physical bucket. `physicalName`
- * is required — the stored coordinate on the bucket row is the only source;
- * no name is ever recomputed here. Same logic as plugin.ts resolveS3ForDatabase.
- */
-function resolveS3ForDatabase(
-  options: PresignedUrlPluginOptions,
-  storageConfig: StorageModuleConfig,
-  physicalName: string,
-): S3Config {
-  const globalS3 = resolveS3(options);
-  const publicUrlPrefix = storageConfig.publicUrlPrefix != null
-    ? storageConfig.publicUrlPrefix
-    : globalS3.publicUrlPrefix;
-
-  if (physicalName === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
-    return globalS3;
-  }
-
-  return {
-    ...globalS3,
-    bucket: physicalName,
-    ...(publicUrlPrefix != null ? { publicUrlPrefix } : {}),
-  };
-}
-
 export function createDownloadUrlPlugin(
   options: PresignedUrlPluginOptions,
 ): GraphileConfig.Plugin {
