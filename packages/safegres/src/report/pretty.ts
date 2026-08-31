@@ -3,7 +3,7 @@ import yanse from 'yanse';
 import type { Score, ScoreDeduction } from '../score/score';
 import type { Finding, PlaneReport, Report, Severity } from '../types';
 import { renderCallGraph, renderCallGraphDiff } from './callgraph';
-import { formatDelta, type ScoreDelta } from './compare';
+import { baselineLabel, describeBaseline, formatDelta, type ScoreDelta } from './compare';
 import { type ReportView, selectView, type ViewConfig } from './view';
 
 const SEV_LABEL: Record<Severity, string> = {
@@ -88,7 +88,7 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     lines.push(...scoreLines('score', score, colorEnabled));
     if (report.comparison?.security) {
       lines.push(
-        `  ${deltaLine(report.comparison.security, report.comparison.previous.ref, colorEnabled)}`
+        `  ${deltaLine(report.comparison.security, baselineLabel(report.comparison.previous), colorEnabled)}`
       );
     }
     lines.push('');
@@ -98,7 +98,7 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     lines.push(...scoreLines('perf score', report.perf.score, colorEnabled));
     if (report.comparison?.perf) {
       lines.push(
-        `  ${deltaLine(report.comparison.perf, report.comparison.previous.ref, colorEnabled)}`
+        `  ${deltaLine(report.comparison.perf, baselineLabel(report.comparison.previous), colorEnabled)}`
       );
     }
     lines.push('');
@@ -119,6 +119,17 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
       + `${paint('low', String(s.low))} low  `
       + `${paint('info', String(s.info))} info`
   );
+
+  // Which run the Δ above is against, or why there is none — a delta whose
+  // baseline the reader cannot see is a number they cannot check.
+  if (report.comparison) {
+    lines.push(`baseline: ${describeBaseline(report.comparison.previous, { link: false })}`);
+  } else if (report.comparisonSkipped) {
+    lines.push(
+      `no delta baseline: ${report.comparisonSkipped}`
+        + ' (absolute score and the perf baseline still gate this run)'
+    );
+  }
 
   // --summary: score + counts only, no per-finding lines.
   if (view.detail === 'summary') {

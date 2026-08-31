@@ -9,7 +9,11 @@ import { join } from 'path';
  * hazard that a composite step makes easy to reintroduce.
  */
 const action = readFileSync(join(__dirname, '..', 'action.yml'), 'utf8');
-const cli = readFileSync(join(__dirname, '..', 'src', 'cli', 'audit.ts'), 'utf8');
+// The action drives two commands — `baseline` picks the comparison, `audit`
+// runs it — so a flag it emits must exist in one of them.
+const cli = ['audit', 'baseline']
+  .map((cmd) => readFileSync(join(__dirname, '..', 'src', 'cli', `${cmd}.ts`), 'utf8'))
+  .join('\n');
 
 describe('action.yml', () => {
   it('passes only flags the CLI accepts', () => {

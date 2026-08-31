@@ -107,6 +107,16 @@ export {
   checkUncheckedViewWrite,
   checkViewRuleBypass
 } from './checks/view-writes';
+export type {
+  BaselineCandidate,
+  BaselineSelection,
+  ChosenBaseline,
+  RejectedCandidate,
+  SelectBaselineOptions
+} from './ci/baseline';
+export { CANDIDATE_LIMIT, MAX_BASELINE_AGE_MS, selectBaseline } from './ci/baseline';
+export type { GithubBaselineOptions, GithubBaselineResult } from './ci/github';
+export { selectGithubBaseline } from './ci/github';
 export type { AuditOptions } from './commands/audit';
 export { audit } from './commands/audit';
 export type { DoctorCheck, DoctorOptions, DoctorReport, DoctorStatus } from './commands/doctor';
@@ -242,6 +252,7 @@ export type {
 export { introspectStats } from './pg/stats';
 export { renderCallGraph, renderCallGraphDiff } from './report/callgraph';
 export type {
+  BaselineProvenance,
   DimensionSnapshot,
   ReportComparison,
   ReportSnapshot,
@@ -249,7 +260,10 @@ export type {
   ScoreDelta
 } from './report/compare';
 export {
+  baselineLabel,
   compareReports,
+  describeBaseline,
+  formatAge,
   formatDelta,
   parseSnapshot,
   serializeSnapshot,

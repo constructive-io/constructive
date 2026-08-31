@@ -63,13 +63,37 @@ inputs:
     required: false
     default: 'false'
   compare:
-    description: 'A previous run''s JSON report to diff this one against (renders the delta).'
+    description: >-
+      A previous run''s JSON report to diff this one against (renders the delta),
+      or `auto` (the default) to find one: on a pull request the action picks the
+      base branch''s most recent run that succeeded, is younger than
+      `compare-max-age-hours`, and audited a commit in this branch''s merge-base
+      history, then downloads its report. Needs `actions: read`. Nothing
+      qualifying is not a failure: the report renders with no deltas and says
+      why, and the gates still apply. `off` to skip the lookup entirely.
     required: false
-    default: ''
+    default: 'auto'
   compare-ref:
     description: 'What to call the previous run in the delta (e.g. "main", a commit sha).'
     required: false
     default: ''
+  compare-workflow:
+    description: >-
+      Workflow file whose runs uploaded the baseline artifacts, for
+      `compare: auto`. Default: the workflow this action runs in.
+    required: false
+    default: ''
+  compare-artifact:
+    description: 'Artifact holding the baseline safegres.json, for `compare: auto`.'
+    required: false
+    default: 'safegres-reports'
+  compare-max-age-hours:
+    description: >-
+      How stale a `compare: auto` baseline may be. The default clears the widest
+      quiet stretch a busy branch has (a weekend) while still being a comparison
+      against roughly this branch point rather than against last fortnight.
+    required: false
+    default: '48'
   upload-sarif:
     description: >-
       Upload the SARIF report to GitHub code scanning. Requires `out` (or an
@@ -98,6 +122,15 @@ outputs:
   report:
     description: 'Path to the JSON report, when the run wrote one.'
     value: ${{ steps.audit.outputs.report }}
+  baseline-run-id:
+    description: 'Run the delta was measured against, when `compare: auto` found one.'
+    value: ${{ steps.baseline.outputs.compare-run-id }}
+  baseline-sha:
+    description: 'Commit that run audited.'
+    value: ${{ steps.baseline.outputs.compare-sha }}
+  baseline-skipped:
+    description: 'Why there is no delta, when `compare: auto` found nothing usable.'
+    value: ${{ steps.baseline.outputs.compare-skipped }}
 
 runs:
   using: composite
@@ -105,6 +138,23 @@ runs:
     - name: Install safegres
       shell: bash
       run: npm install -g safegres@${{ inputs.version }}
+
+    # Which report the delta is measured against — validated and logged, because
+    # the usual `gh run list --limit 1` hands the audit whatever row the API
+    # returns first, and a stale one blames the PR for every merge since.
+    - name: Select the comparison baseline
+      id: baseline
+      if: ${{ inputs.compare == 'auto' && github.event_name == 'pull_request' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        args=(baseline --provider github --max-age-hours "${{ inputs.compare-max-age-hours }}")
+        add() { if [ -n "$2" ]; then args+=("$1" "$2"); fi; }
+        add --workflow "${{ inputs.compare-workflow }}"
+        add --artifact "${{ inputs.compare-artifact }}"
+        safegres "${args[@]}"
 
     - name: Audit
       id: audit
@@ -123,8 +173,18 @@ runs:
         add --preset        "${{ inputs.preset }}"
         add --out           "${{ inputs.out }}"
         add --fail-on-grade "${{ inputs.fail-on-grade }}"
-        add --compare       "${{ inputs.compare }}"
-        add --compare-ref   "${{ inputs.compare-ref }}"
+        if [ "${{ inputs.compare }}" = "auto" ]; then
+          add --compare         "${{ steps.baseline.outputs.compare }}"
+          add --compare-ref     "${{ inputs.compare-ref || steps.baseline.outputs.compare-ref }}"
+          add --compare-sha     "${{ steps.baseline.outputs.compare-sha }}"
+          add --compare-run-id  "${{ steps.baseline.outputs.compare-run-id }}"
+          add --compare-run-url "${{ steps.baseline.outputs.compare-run-url }}"
+          add --compare-age     "${{ steps.baseline.outputs.compare-age }}"
+          add --compare-skipped "${{ steps.baseline.outputs.compare-skipped }}"
+        elif [ "${{ inputs.compare }}" != "off" ]; then
+          add --compare       "${{ inputs.compare }}"
+          add --compare-ref   "${{ inputs.compare-ref }}"
+        fi
         if [ "${{ inputs.report-only }}" = "true" ]; then args+=(--report-only); fi
         if [ "${{ inputs.comment }}" = "true" ]; then args+=(--github-comment); fi
         # Unquoted on purpose: this is the verbatim-arguments escape hatch.

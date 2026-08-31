@@ -6,6 +6,7 @@
 - [Markdown for CI](#markdown-for-ci)
 - [GitHub Actions (`--github`)](#github-actions---github)
 - [What changed (`--compare`)](#what-changed---compare)
+- [The baseline (`compare: auto`)](#the-baseline-compare-auto)
 - [Code scanning (SARIF)](#code-scanning-sarif)
 
 ## Output and verbosity
@@ -149,7 +150,8 @@ audit with `--github`, and optionally posts the comment and uploads the SARIF:
 
 Its inputs are deliberately only the things that differ *between jobs sharing one config* —
 `database`/`pgpm` (what to audit), `fail-on-grade` and `report-only` (whether the gates bite),
-`out`/`comment`/`upload-sarif` (what leaves the runner), `compare`/`compare-ref` (the delta), plus
+`out`/`comment`/`upload-sarif` (what leaves the runner), the `compare*` inputs ([the
+delta](#the-baseline-compare-auto)), plus
 `version`, `config`, `preset`, `working-directory` and an `args` escape hatch. Everything a run
 repeats belongs in the committed config file, so the common case passes nothing at all.
 
@@ -168,7 +170,7 @@ is worth reading:
 ```
 
 Permissions are the caller's: `pull-requests: write` for `comment`, `security-events: write` for
-`upload-sarif`, `actions: read` if the job downloads a base-branch report for `compare`.
+`upload-sarif`, `actions: read` for the default `compare: auto` baseline lookup.
 
 ## What changed (`--compare`)
 
@@ -198,24 +200,83 @@ works as input. When keeping whole reports is too much, `--write-snapshot <file>
 aggregates the comparison reads — scores, grades, severity counts, per-rule counts — and `--compare`
 accepts either. `--compare-ref` labels the previous run in the output.
 
-The GitHub Actions pattern is to download the base branch's last successful report artifact:
-
-```yaml
-- name: Fetch the base branch's audit
-  if: github.event_name == 'pull_request'
-  continue-on-error: true
-  env: { GH_TOKEN: '${{ github.token }}', BASE: '${{ github.event.pull_request.base.ref }}' }
-  run: |
-    run_id=$(gh run list --workflow audit.yaml --branch "$BASE" --status success \
-      --limit 1 --json databaseId -q '.[0].databaseId')
-    [ -n "$run_id" ] || { echo "no successful $BASE run to compare against"; exit 0; }
-    gh run download "$run_id" -n safegres-reports -D previous
-```
-
-A missing artifact (new branch, expired retention) means no deltas — never a failure.
+In GitHub Actions the action finds that file for you — see [the baseline](#the-baseline-compare-auto),
+which is a lookup worth getting right rather than a `gh run list --limit 1`.
 
 Library callers get `compareReports(previous, report)`, with `toSnapshot` / `parseSnapshot` /
 `serializeSnapshot` for the file side; the result is carried in JSON output as `comparison`.
+
+## The baseline (`compare: auto`)
+
+A delta is only meaningful against the right previous run, and "the base branch's last successful
+run" is not that:
+
+```bash
+# The obvious query, and the bug.
+gh run list --workflow audit.yaml --branch main --status success --limit 1 --json databaseId
+```
+
+`--limit 1` is `per_page=1`, so one unvalidated API row decides the comparison. When the newest
+`main` run has not concluded yet, or its artifact never uploaded, the answer walks silently back to
+an arbitrarily old run — a real one was 13.6 days and ~150 merges stale, and every pull request was
+then billed for the accumulated backlog as its own delta. It went unnoticed for weeks because
+nothing said which run the Δ was against.
+
+So the action does the lookup instead, on by default (`compare: auto`) for pull requests. It walks
+the base branch's recent runs, newest first, and takes the first that survives four questions:
+
+1. did it conclude `success`?
+2. is it younger than `compare-max-age-hours` (default 48 — a quiet weekend, not a fortnight)?
+3. is its head commit in the history of this branch's **merge base** with the base branch? A run
+   from *after* the branch point measures other people's merges.
+4. does its artifact still download, and hold a report that parses?
+
+Every rejection is logged with its reason, and the chosen run — id, commit, age, link — is rendered
+in the job summary, the PR comment and the terminal, so the delta is checkable:
+
+```
+merge base with main: af904c90d
+rejected 33373361061 (fb3f9d10e): fb3f9d10e is not an ancestor of merge base af904c90d
+baseline: run 33373344814 main@af904c90d, 28 minutes old
+```
+
+> **Changes since main@af904c90d — [run 33373344814](…), 28 minutes old**
+
+Nothing qualifying is not a failure — it is the normal state of a new branch. The report renders
+with no deltas and says why, and the absolute gates (`failOn.grade`, the perf ratchet) still decide
+the job:
+
+> [!NOTE]
+> No delta baseline: no run within 2.0 days whose head is an ancestor of merge base af904c90d
+> (4 candidate(s) rejected). The absolute score and the perf baseline still gate this run.
+
+The lookup needs `permissions: actions: read` (list runs, download artifacts). `compare: <file>`
+still wins — an explicit baseline is never second-guessed — and `compare: off` skips the lookup.
+Outside a pull request there is no branch point to measure from, so there is no delta.
+
+Without the action, the same selection is one command:
+
+```yaml
+- id: baseline
+  run: npx safegres baseline --provider github    # writes compare* to $GITHUB_OUTPUT
+- run: |
+    npx safegres audit --github \
+      --compare "${{ steps.baseline.outputs.compare }}" \
+      --compare-ref "${{ steps.baseline.outputs.compare-ref }}" \
+      --compare-sha "${{ steps.baseline.outputs.compare-sha }}" \
+      --compare-run-id "${{ steps.baseline.outputs.compare-run-id }}" \
+      --compare-run-url "${{ steps.baseline.outputs.compare-run-url }}" \
+      --compare-age "${{ steps.baseline.outputs.compare-age }}" \
+      --compare-skipped "${{ steps.baseline.outputs.compare-skipped }}"
+```
+
+The provenance flags are what the renderers print; `--compare-skipped <why>` is the no-baseline
+case, and passing it is how an absent delta reads as "not measured" instead of "nothing changed".
+Library callers pass the same thing as `toSnapshot(report, { ref, provenance })` and get it back on
+`comparison.previous.provenance`; `describeBaseline(comparison.previous)` renders the line above.
+
+Other providers are not implemented — `--provider` exists so that stays a lookup rather than a
+fork of the guard, which is pure and provider-agnostic (`selectBaseline`).
 
 ## Code scanning (SARIF)
 

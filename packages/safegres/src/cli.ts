@@ -33,6 +33,11 @@ const options: Partial<CLIOptions> = {
       'write-baseline',
       'compare',
       'compare-ref',
+      'compare-sha',
+      'compare-run-id',
+      'compare-run-url',
+      'compare-age',
+      'compare-skipped',
       'write-snapshot',
       'connection',
       'host',
@@ -49,7 +54,14 @@ const options: Partial<CLIOptions> = {
       'out',
       'preset',
       'corpus',
-      'case'
+      'case',
+      'provider',
+      'repo',
+      'base',
+      'head',
+      'workflow',
+      'artifact',
+      'dir'
     ]
   }
 };
