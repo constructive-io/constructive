@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.20.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.20.6...@constructive-io/graphql-server@5.20.7) (2026-09-01)
+
+### Bug Fixes
+
+- a malformed graphql request is answered as bad input, not a server failure ([c1ae568](https://github.com/constructive-io/constructive/commit/c1ae568c2a99469eef1627ce103a662c93c0a59a))
+
 ## [5.20.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.20.5...@constructive-io/graphql-server@5.20.6) (2026-09-01)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

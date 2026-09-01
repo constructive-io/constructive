@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.25.0](https://github.com/constructive-io/constructive/compare/safegres@1.24.0...safegres@1.25.0) (2026-09-01)
+
+### Features
+
+- **safegres:** let the PR comment carry the report, capped and deduplicated ([532c3bf](https://github.com/constructive-io/constructive/commit/532c3bf18fbf12c5a7566ea842fdb4248710ae8b))
+
 # [1.24.0](https://github.com/constructive-io/constructive/compare/safegres@1.23.0...safegres@1.24.0) (2026-09-01)
 
 ### Features

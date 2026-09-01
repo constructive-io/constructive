@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.28.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.27.0...@constructive-io/bucket-provisioner@0.28.0) (2026-09-01)
+
+### Features
+
+- **storage:** add RustFS as an S3-compatible object store option ([e181767](https://github.com/constructive-io/constructive/commit/e181767e43783ac15a069ab991bb923c9e4630d9))
+
 # [0.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.26.0...@constructive-io/bucket-provisioner@0.27.0) (2026-08-28)
 
 ### Features

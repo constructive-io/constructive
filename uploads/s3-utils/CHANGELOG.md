@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.33.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-utils@2.32.0...@constructive-io/s3-utils@2.33.0) (2026-09-01)
+
+### Features
+
+- **storage:** add RustFS as an S3-compatible object store option ([e181767](https://github.com/constructive-io/constructive/commit/e181767e43783ac15a069ab991bb923c9e4630d9))
+
 # [2.32.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-utils@2.31.0...@constructive-io/s3-utils@2.32.0) (2026-08-18)
 
 **Note:** Version bump only for package @constructive-io/s3-utils

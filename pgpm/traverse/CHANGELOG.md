@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/traverse@0.13.1...@pgpmjs/traverse@0.13.2) (2026-09-01)
+
+**Note:** Version bump only for package @pgpmjs/traverse
+
 ## [0.13.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/traverse@0.13.0...@pgpmjs/traverse@0.13.1) (2026-08-28)
 
 **Note:** Version bump only for package @pgpmjs/traverse

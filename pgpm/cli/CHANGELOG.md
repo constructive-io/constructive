@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.30.0](https://github.com/constructive-io/constructive/compare/pgpm@5.29.6...pgpm@5.30.0) (2026-09-01)
+
+### Features
+
+- **storage:** add RustFS as an S3-compatible object store option ([e181767](https://github.com/constructive-io/constructive/commit/e181767e43783ac15a069ab991bb923c9e4630d9))
+
 ## [5.29.6](https://github.com/constructive-io/constructive/compare/pgpm@5.29.5...pgpm@5.29.6) (2026-09-01)
 
 ### Bug Fixes

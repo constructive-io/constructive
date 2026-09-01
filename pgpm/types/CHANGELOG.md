@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.53.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.52.1...@pgpmjs/types@2.53.0) (2026-09-01)
+
+### Features
+
+- **storage:** add RustFS as an S3-compatible object store option ([e181767](https://github.com/constructive-io/constructive/commit/e181767e43783ac15a069ab991bb923c9e4630d9))
+
 ## [2.52.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.52.0...@pgpmjs/types@2.52.1) (2026-08-28)
 
 **Note:** Version bump only for package @pgpmjs/types
