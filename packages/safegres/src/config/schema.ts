@@ -218,9 +218,15 @@ const FAIL_ON: Shape<FailOnConfig> = {
 const GITHUB_COMMENT: Shape<GithubCommentConfig> = {
   sticky: bool('Reuse one comment per PR instead of appending. Default true.'),
   sections: list(
-    'Sections to include. Default scores, delta, new-findings.',
-    str('Section', ['scores', 'delta', 'new-findings', 'findings', 'planes'])
-  )
+    'Sections to include. Default scores, delta, new-findings. `report` adds the '
+      + 'markdown report (`findings` is its old name).',
+    str('Section', ['scores', 'delta', 'new-findings', 'report', 'findings', 'planes'])
+  ),
+  detail: str('How much of the report the report section carries. Default summary.', [
+    'summary',
+    'normal',
+    'verbose'
+  ])
 };
 
 const GITHUB: Shape<GithubReportConfig> = {

@@ -124,13 +124,32 @@ What appears is configuration, not code:
   "report": {
     "github": {
       "summary": ["security", "perf", "planes:direct:*"],  // which scores get a badge, in order
-      "comment": { "sticky": true, "sections": ["scores", "delta", "new-findings"] },
+      "comment": {
+        "sticky": true,
+        "sections": ["scores", "delta", "new-findings", "report"],
+        "detail": "summary"                                 // how much report the comment carries
+      },
       "annotations": "gate-failures",                       // "all" | "gate-failures" | "none"
       "badges": true                                        // false → 🟢🟡🔴 text, no images
     }
   }
 }
 ```
+
+The comment's sections, in the order they render: `scores` (badges, and the exposure line),
+`planes`, `delta` (the movement, or why there is no baseline), `new-findings` (the perf ratchet's
+verdict — `Perf baseline: N new, N accepted, N resolved` — and the new findings themselves) and
+`report`, the same markdown report the job summary carries. `findings` is the old name for
+`report`.
+
+`report` is off by default: a comment is read on the way past, and the full report is a click away
+in the job summary and the reports artifact. Turn it on to review an audit without leaving the PR —
+`comment.detail` then decides how much of it lands. Default `summary` is the report *minus* the
+per-finding tables (scores, exposure, counts, the delta, the ratchet verdict); `normal`/`verbose`
+add the tables. GitHub rejects a comment body over 64 KB outright, so a body that would not fit
+degrades a step at a time — `verbose` → `normal` → `summary` → a line pointing at the artifact —
+rather than failing to post. When `report` is on, the sections above it stop repeating what it
+already says (the exposure line, the delta, the ratchet verdict), so each fact appears once.
 
 GitHub Markdown has no text color, so a genuinely colored score has to be an image; `badges: false`
 falls back to emoji for air-gapped runners that cannot reach shields.io.

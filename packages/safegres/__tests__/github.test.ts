@@ -1,5 +1,6 @@
 import {
   COMMENT_MARKER,
+  COMMENT_MAX_CHARS,
   renderAnnotations,
   renderGithubComment,
   renderGithubSummary,
@@ -154,7 +155,89 @@ describe('renderGithubComment', () => {
     });
     expect(out).toContain('| `direct:app` | role | 3 |');
   });
+
+  it('names the ratchet verdict even when nothing is new', () => {
+    const report = perfReport(0);
+    expect(renderGithubComment(report)).toContain(
+      'Perf baseline: **0 new**, 2 accepted, 1 resolved.'
+    );
+  });
+
+  it('carries the report at summary detail, without per-finding tables', () => {
+    const out = renderGithubComment(perfReport(0), {
+      config: { comment: { sections: ['scores', 'delta', 'new-findings', 'report'] } }
+    });
+    expect(out).toContain('## Report');
+    expect(out).toContain('| 0 | 1 | 0 | 0 | 0 |');
+    // The report says this once — the comment does not repeat it above.
+    expect(occurrences(out, 'Perf baseline: **0 new**')).toBe(1);
+    expect(occurrences(out, 'Exposure (config)')).toBe(1);
+    expect(out).not.toContain('### Security findings');
+  });
+
+  it('adds the finding tables at normal detail', () => {
+    const out = renderGithubComment(makeReport(), {
+      config: { comment: { sections: ['report'], detail: 'normal' } }
+    });
+    expect(out).toContain('### Security findings');
+    expect(out).toContain('app_public.widgets');
+  });
+
+  it('degrades to summary detail rather than exceeding what GitHub accepts', () => {
+    // GitHub rejects a body over 64 KB outright, so a database with thousands
+    // of findings must lose the tables, not the comment.
+    const findings = Array.from({ length: 4000 }, (_, i) =>
+      finding({ table: `widgets_${i}`, message: `grants exist on a table with RLS disabled (${i})` })
+    );
+    const out = renderGithubComment(makeReport({ findings }), {
+      config: { comment: { sections: ['report'], detail: 'normal' } }
+    });
+    expect(out.length).toBeLessThanOrEqual(COMMENT_MAX_CHARS);
+    expect(out).not.toContain('### Security findings');
+    expect(out).toContain('| 0 | 4000 | 0 | 0 | 0 |');
+  });
+
+  it('points at the artifact when even the summary does not fit', () => {
+    const unaddressable = Array.from({ length: 4000 }, (_, i) => ({
+      schema: 'app_private',
+      table: `hidden_${i}`,
+      reason: 'no primary key'
+    }));
+    const report = makeReport();
+    report.exposure = { ...report.exposure!, unaddressable };
+    const out = renderGithubComment(report, {
+      config: { comment: { sections: ['report'] } }
+    });
+    expect(out.length).toBeLessThanOrEqual(COMMENT_MAX_CHARS);
+    expect(out).toContain('too large for a PR comment');
+  });
+
+  it('accepts `findings` as the old name for the report section', () => {
+    const out = renderGithubComment(makeReport(), {
+      config: { comment: { sections: ['findings'] } }
+    });
+    expect(out).toContain('## Report');
+  });
 });
+
+function occurrences(haystack: string, needle: string): number {
+  return haystack.split(needle).length - 1;
+}
+
+/** A report whose perf ratchet ran, with `added` new findings. */
+function perfReport(added: number): Report {
+  const report = makeReport();
+  report.perf = {
+    score: computeScore([], undefined, { exposedTables: 10, exposureKnown: true }),
+    findings: [],
+    diff: {
+      added: Array.from({ length: added }, () => finding({ code: 'X1', dimension: 'perf' })),
+      accepted: [finding({ code: 'X1' }), finding({ code: 'X2' })],
+      removed: [finding({ code: 'X3' })]
+    }
+  } as never;
+  return report;
+}
 
 describe('renderAnnotations', () => {
   it('annotates only what failed a gate by default', () => {

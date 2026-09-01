@@ -1044,12 +1044,22 @@
                       "scores",
                       "delta",
                       "new-findings",
+                      "report",
                       "findings",
                       "planes"
                     ],
                     "description": "Section"
                   },
-                  "description": "Sections to include. Default scores, delta, new-findings."
+                  "description": "Sections to include. Default scores, delta, new-findings. `report` adds the markdown report (`findings` is its old name)."
+                },
+                "detail": {
+                  "type": "string",
+                  "enum": [
+                    "summary",
+                    "normal",
+                    "verbose"
+                  ],
+                  "description": "How much of the report the report section carries. Default summary."
                 }
               },
               "description": "Sticky PR comment"
