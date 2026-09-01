@@ -437,10 +437,13 @@ job summary, annotations and a sticky PR comment:
 ```yaml
       - uses: constructive-io/constructive/packages/safegres@main
         with:
-          out: safegres-reports
           comment: true          # sticky PR comment (needs pull-requests: write)
           upload-sarif: true     # code scanning (needs security-events: write)
 ```
+
+Auditing a pgpm workspace (`source.pgpm`) adds `version: local`, which runs the repo's own safegres
+rather than installing one: that path deploys through `pgsql-test`, an optional peer only the
+workspace has.
 
 On a pull request it also measures the delta for you: it picks the base branch's most recent run
 that *is* a sane comparison — succeeded, younger than 48 hours, and audited a commit in this
