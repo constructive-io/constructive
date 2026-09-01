@@ -51,7 +51,7 @@
     "appstash": "^0.8.0",
     "gql-ast": "workspace:^",
     "graphql": "16.13.0",
-    "inquirerer": "^4.9.3",
+    "inquirerer": "^4.9.4",
     "nested-obj": "^0.2.3",
     "yanse": "^0.2.2"
   },
