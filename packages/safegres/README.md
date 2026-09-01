@@ -442,6 +442,13 @@ job summary, annotations and a sticky PR comment:
           upload-sarif: true     # code scanning (needs security-events: write)
 ```
 
+On a pull request it also measures the delta for you: it picks the base branch's most recent run
+that *is* a sane comparison — succeeded, younger than 48 hours, and audited a commit in this
+branch's merge-base history — downloads its report, and names the run it chose in the summary and
+the comment (`actions: read`). "The last successful run" is not that: an unvalidated `gh run list
+--limit 1` once handed a PR a 13.6-day-old baseline and billed it for ~150 merges it never
+contained. Nothing qualifying is not a failure — no deltas, a line saying why, gates unchanged.
+
 It exposes `security-score`, `security-grade` and `perf-score` as step outputs — on a failing run
 too, which is when they get read. Everything else stays in the config file; see
 **[docs/reporting.md](https://github.com/constructive-io/constructive/blob/main/packages/safegres/docs/reporting.md#the-action)**.
@@ -781,6 +788,7 @@ safegres lint           # alias for audit, for a package.json script
 safegres perf           # audit + the performance dimension (= audit --perf)
 safegres doctor         # diagnose config, parser, connection, catalog visibility, exposure
 safegres eval           # grade the auditor against a corpus with known answers
+safegres baseline       # CI: pick the report this run's delta is measured against
 safegres print-config   # the resolved effective config (--explain for per-key provenance)
 ```
 
@@ -792,6 +800,7 @@ safegres print-config   # the resolved effective config (--explain for per-key p
 | Scope | `--schemas`, `--exclude-schemas`, `--roles`, `--exclude-roles`, `--ignore-extensions`, `--audit-extension-owned` |
 | Performance | `--perf`, `--stats`, `--explain`, `--perf-baseline <f>`, `--write-perf-baseline <f>`, `--fail-on-new-perf` |
 | Reporting | `--format pretty\|json\|json-pretty\|markdown\|sarif`, `--out <dir>`, `--sarif-sources <dir>`, `--summary`/`-q`, `--verbose`, `--compare <f>`, `--compare-ref <label>`, `--write-snapshot <f>` |
+| Delta provenance | `--compare-sha <sha>`, `--compare-run-id <id>`, `--compare-run-url <url>`, `--compare-age <age>`, `--compare-skipped <why>` |
 | Call graph | `--call-graph`, `--baseline <f>`, `--write-baseline <f>`, `--fail-on-new-boundaries` |
 | Gating | `--fail-on <severity>`, `--fail-on-score <n>`, `--fail-on-grade <g>`, `--fail-on-perf-score`, `--fail-on-perf-grade`, `--report-only` |
 | Misc | `--skip-ast`, `--no-color`, `--help`, `--version` |

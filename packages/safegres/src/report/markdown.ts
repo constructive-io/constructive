@@ -12,7 +12,13 @@
 import type { RoleAccessEntry } from '../checks/lattice';
 import type { Score, ScoreDeduction } from '../score/score';
 import type { Finding, PlaneReport, Report, Severity } from '../types';
-import { formatDelta, type ReportComparison, type RuleDelta, type ScoreDelta } from './compare';
+import {
+  describeBaseline,
+  formatDelta,
+  type ReportComparison,
+  type RuleDelta,
+  type ScoreDelta
+} from './compare';
 import { type ReportView, selectView, type ViewConfig } from './view';
 
 const SEV_ICON: Record<Severity, string> = {
@@ -81,6 +87,7 @@ export function renderMarkdown(report: Report, options: RenderMarkdownOptions = 
   out.push(countsTable(report), '');
 
   if (report.comparison) out.push(...comparisonSection(report.comparison), '');
+  else if (report.comparisonSkipped) out.push(...noBaselineSection(report.comparisonSkipped), '');
 
   if (view.detail === 'summary') {
     // The ratchet's verdict is the one perf number a summary reader needs:
@@ -311,7 +318,7 @@ function ruleDeltaCell(r: RuleDelta): string {
  * numbers are, then which way they moved.
  */
 function comparisonSection(cmp: ReportComparison): string[] {
-  const since = cmp.previous.ref ?? cmp.previous.generatedAt ?? 'the previous run';
+  const since = describeBaseline(cmp.previous);
   if (cmp.unchanged) return ['', `_No change since ${since}._`];
 
   const out = [
@@ -353,6 +360,19 @@ function comparisonSection(cmp: ReportComparison): string[] {
 
   out.push('</details>');
   return out;
+}
+
+/**
+ * A delta was asked for and none was trustworthy. Said out loud, because an
+ * absent delta is indistinguishable from "nothing changed" — and because the
+ * gates that do not read the comparison are still in force.
+ */
+function noBaselineSection(reason: string): string[] {
+  return [
+    '',
+    `> [!NOTE]`,
+    `> No delta baseline: ${reason}. The absolute score and the perf baseline still gate this run.`
+  ];
 }
 
 /**

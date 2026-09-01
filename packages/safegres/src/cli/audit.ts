@@ -8,7 +8,13 @@ import { audit, type AuditOptions } from '../commands/audit';
 import { configPathBase, loadConfig } from '../config/loader';
 import type { Grade } from '../config/types';
 import { diffPerf, parsePerfBaseline, serializePerfBaseline, toPerfBaseline } from '../perf/baseline';
-import { compareReports, parseSnapshot, serializeSnapshot, toSnapshot } from '../report/compare';
+import {
+  type BaselineProvenance,
+  compareReports,
+  parseSnapshot,
+  serializeSnapshot,
+  toSnapshot
+} from '../report/compare';
 import { emitGithub, postStickyComment, renderGithubComment, renderGithubSummary } from '../report/github';
 import { renderJson } from '../report/json';
 import { renderMarkdown } from '../report/markdown';
@@ -116,6 +122,14 @@ Comparison with a previous run (what changed, not just what is):
                            snapshot written by --write-snapshot
   --compare-ref <label>    How to name the previous run in the report
                            (e.g. "main", a commit sha). Default "previous run"
+  --compare-sha <sha>      Commit the previous run was produced from
+  --compare-run-id <id>    CI run that produced it
+  --compare-run-url <url>  Link to that run
+  --compare-age <age>      How old it is, pre-formatted ("10.2 hours").
+                           Defaults to the age of its generatedAt
+  --compare-skipped <why>  There is no baseline and this is the reason, shown
+                           in place of the delta so an absent delta does not
+                           read as "nothing changed"
   --write-snapshot <file>  Write the aggregate slice of this run (scores,
                            counts, per-rule counts) for a later --compare,
                            when keeping the whole report is too much
@@ -329,7 +343,11 @@ export default async (
       process.exit(2);
     }
     if (typeof argv['compare-ref'] === 'string') previous.ref = argv['compare-ref'];
+    const provenance = baselineProvenance(argv);
+    if (provenance) previous.provenance = { ...previous.provenance, ...provenance };
     report.comparison = compareReports(previous, report);
+  } else if (typeof argv['compare-skipped'] === 'string' && argv['compare-skipped'] !== '') {
+    report.comparisonSkipped = argv['compare-skipped'];
   }
 
   if (callGraphBaseline !== undefined && report.callGraph) {
@@ -555,6 +573,23 @@ export default async (
   if (failed && argv['report-only'] !== true) process.exit(1);
   if (failed) log.warn('--report-only: gates failed, exiting 0');
 };
+
+/**
+ * Where the baseline came from, as the provider reported it. A provider is
+ * whatever chose the file — a CI adapter, a script, a person — so every field
+ * is optional and none of them mean anything to safegres beyond being printed.
+ */
+function baselineProvenance(argv: ParsedArgs): BaselineProvenance | undefined {
+  const str = (flag: string): string | undefined =>
+    typeof argv[flag] === 'string' && argv[flag] !== '' ? (argv[flag] as string) : undefined;
+  const provenance: BaselineProvenance = {
+    ...(str('compare-sha') && { sha: str('compare-sha') }),
+    ...(str('compare-run-id') && { runId: str('compare-run-id') }),
+    ...(str('compare-run-url') && { runUrl: str('compare-run-url') }),
+    ...(str('compare-age') && { age: str('compare-age') })
+  };
+  return Object.keys(provenance).length > 0 ? provenance : undefined;
+}
 
 /** Write an output file, creating its directory: CI should not have to mkdir. */
 function writeOut(file: string, contents: string): void {

@@ -2,6 +2,7 @@ import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, extractFirst, Inquirerer, ParsedArgs } from 'inquirerer';
 
 import audit from './audit';
+import baseline from './baseline';
 import doctor from './doctor';
 import evalCommand from './eval';
 import printConfig from './print-config';
@@ -18,6 +19,7 @@ Commands:
   audit           Audit grants, RLS flags, policy coverage, and anti-patterns
   lint            Alias for audit, for a package.json script
   perf            Audit index hygiene and policy cost (audit --perf)
+  baseline        Choose the report a delta is measured against (CI)
   doctor          Diagnose environment, connection, and configuration
   eval            Grade the auditor against a corpus with known answers
   print-config    Show the resolved effective configuration
@@ -33,6 +35,7 @@ const commandMap: Record<
   audit,
   lint: audit,
   perf: (argv, prompter, options) => audit({ ...argv, perf: true }, prompter, options),
+  baseline,
   doctor,
   eval: evalCommand,
   'print-config': printConfig

@@ -299,6 +299,13 @@ export interface Report {
    * the only part that describes a change to one.
    */
   comparison?: import('./report/compare').ReportComparison;
+  /**
+   * Why there is no `comparison` (`--compare-skipped`): a baseline was looked
+   * for and none qualified. Silence would read as "nothing moved", which is
+   * how a delta nobody could see went wrong unnoticed; the absolute score and
+   * the perf ratchet still gate the run, and this line says so.
+   */
+  comparisonSkipped?: string;
 }
 
 export function newSummary(): Summary {

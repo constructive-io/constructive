@@ -17,6 +17,7 @@ import type { GithubReportConfig } from '../config/types';
 import type { Grade } from '../config/types';
 import type { Score } from '../score/score';
 import type { Finding, Report } from '../types';
+import { describeBaseline } from './compare';
 import { renderMarkdown } from './markdown';
 import { matchPlane, selectView, type ViewConfig, type ViewScore } from './view';
 
@@ -138,7 +139,7 @@ export function renderGithubComment(report: Report, options: GithubRenderOptions
 
   if (sections.has('delta') && report.comparison) {
     const cmp = report.comparison;
-    const since = cmp.previous.ref ?? 'the previous run';
+    const since = describeBaseline(cmp.previous);
     if (cmp.unchanged) {
       out.push(`_No change since ${since}._`, '');
     } else {
@@ -156,6 +157,12 @@ export function renderGithubComment(report: Report, options: GithubRenderOptions
       }
       out.push('');
     }
+  } else if (sections.has('delta') && report.comparisonSkipped) {
+    out.push(
+      `_No delta baseline: ${report.comparisonSkipped}. `
+        + 'The absolute score and the perf baseline still gate this run._',
+      ''
+    );
   }
 
   if (sections.has('new-findings')) {

@@ -26,9 +26,31 @@ export interface ReportSnapshot {
   generatedAt?: string;
   /** Free-form label for the run — a git ref, a commit sha, "main". */
   ref?: string;
+  /** Where the previous run came from, when CI knows. */
+  provenance?: BaselineProvenance;
   summary: Summary;
   security?: DimensionSnapshot;
   perf?: DimensionSnapshot;
+}
+
+/**
+ * Which run the delta is measured against.
+ *
+ * `ref` alone renders as "Changes since main", which is what a stale baseline
+ * hides behind: it is true of a report produced an hour ago and of one produced
+ * a fortnight and 150 merges ago, and the reader cannot tell. Every field is a
+ * plain string a provider fills in, so this stays provider-agnostic — a run id
+ * and a run URL are as meaningful on GitLab or Buildkite as on GitHub Actions.
+ */
+export interface BaselineProvenance {
+  /** The commit the baseline report was produced from. */
+  sha?: string;
+  /** The CI run that produced it. */
+  runId?: string;
+  /** A link to that run. */
+  runUrl?: string;
+  /** Pre-formatted age ("10.2 hours"), when the provider measured it. */
+  age?: string;
 }
 
 export interface DimensionSnapshot {
@@ -70,7 +92,12 @@ export interface RuleDelta {
 
 export interface ReportComparison {
   /** Where the previous numbers came from, for the reader. */
-  previous: { ref?: string; generatedAt?: string; version?: string };
+  previous: {
+    ref?: string;
+    generatedAt?: string;
+    version?: string;
+    provenance?: BaselineProvenance;
+  };
   security?: ScoreDelta;
   perf?: ScoreDelta;
   /** Severity counts, before → after. */
@@ -91,12 +118,16 @@ function dimensionSnapshot(score: Score | undefined, findings: number): Dimensio
 }
 
 /** Reduce a report to the aggregates a comparison needs. */
-export function toSnapshot(report: Report, meta: { ref?: string } = {}): ReportSnapshot {
+export function toSnapshot(
+  report: Report,
+  meta: { ref?: string; provenance?: BaselineProvenance } = {}
+): ReportSnapshot {
   const perfFindings = report.perf?.findings.length ?? 0;
   return {
     version: report.version,
     generatedAt: report.generatedAt,
     ...(meta.ref !== undefined && { ref: meta.ref }),
+    ...(meta.provenance !== undefined && { provenance: meta.provenance }),
     summary: report.summary,
     ...(report.score && {
       security: dimensionSnapshot(report.score, report.findings.length - perfFindings)
@@ -203,7 +234,8 @@ export function compareReports(previous: ReportSnapshot, current: Report): Repor
     previous: {
       ...(previous.ref !== undefined && { ref: previous.ref }),
       ...(previous.generatedAt !== undefined && { generatedAt: previous.generatedAt }),
-      ...(previous.version !== undefined && { version: previous.version })
+      ...(previous.version !== undefined && { version: previous.version }),
+      ...(previous.provenance !== undefined && { provenance: previous.provenance })
     },
     ...(security && { security }),
     ...(perf && { perf }),
@@ -226,4 +258,58 @@ export function formatDelta(delta: number, digits = 0): string {
   if (delta === 0) return '0';
   const magnitude = Math.abs(delta).toFixed(digits);
   return delta > 0 ? `+${magnitude}` : `−${magnitude}`;
+}
+
+/** `13.6 days` / `3.2 hours` / `41 minutes` — an age a human reads at a glance. */
+export function formatAge(ms: number): string {
+  const minutes = ms / 60000;
+  if (minutes < 90) {
+    const rounded = Math.round(minutes);
+    return `${rounded} minute${rounded === 1 ? '' : 's'}`;
+  }
+  const hours = minutes / 60;
+  if (hours < 48) return `${hours.toFixed(1)} hours`;
+  return `${(hours / 24).toFixed(1)} days`;
+}
+
+/**
+ * "main@af904c90d — [run 33373344814](…), 10.2 hours old" — the one line every
+ * renderer puts above a delta, so the job summary, the PR comment and the
+ * terminal cannot describe different baselines.
+ *
+ * The age falls back to `generatedAt` when the provider did not measure one:
+ * the report timestamp is what a scanner always has.
+ */
+export function describeBaseline(
+  previous: ReportComparison['previous'],
+  options: { link?: boolean; now?: number } = {}
+): string {
+  const p = previous.provenance ?? {};
+  const label = baselineLabel(previous);
+  const parts: string[] = [];
+  if (p.runId) {
+    parts.push(
+      p.runUrl && options.link !== false ? `[run ${p.runId}](${p.runUrl})` : `run ${p.runId}`
+    );
+  }
+  const age = p.age ?? ageOf(previous.generatedAt, options.now);
+  if (age) parts.push(`${age} old`);
+  const detail = parts.length > 0 ? ` — ${parts.join(', ')}` : '';
+  return `${label}${detail}`;
+}
+
+/**
+ * `main@af904c90d`, or just `main` when no commit is known — the short name of
+ * the baseline, for a place too narrow for the run and the age.
+ */
+export function baselineLabel(previous: ReportComparison['previous']): string {
+  const sha = previous.provenance?.sha;
+  const ref = previous.ref ?? previous.generatedAt ?? 'the previous run';
+  return sha ? `${previous.ref ?? 'previous'}@${sha.slice(0, 9)}` : ref;
+}
+
+function ageOf(generatedAt: string | undefined, now = Date.now()): string | undefined {
+  if (!generatedAt) return undefined;
+  const ms = now - Date.parse(generatedAt);
+  return ms >= 0 ? formatAge(ms) : undefined;
 }
