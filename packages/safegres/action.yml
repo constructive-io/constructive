@@ -13,7 +13,12 @@ branding:
 # bite, and which artifacts leave the runner.
 inputs:
   version:
-    description: 'npm version of the safegres CLI to install (dist-tag or exact version).'
+    description: >-
+      npm version of the safegres CLI to install (dist-tag or exact version), or
+      `local` to run the one already in the working directory's node_modules.
+      A pgpm-workspace audit (`source.pgpm`) needs `local`: that path deploys
+      through the optional peer `pgsql-test`, which a globally installed CLI
+      cannot resolve, and the repo already pins the two together.
     required: false
     default: 'latest'
   config:
@@ -122,6 +127,9 @@ outputs:
   report:
     description: 'Path to the JSON report, when the run wrote one.'
     value: ${{ steps.audit.outputs.report }}
+  out-dir:
+    description: 'Directory the reports were written to, from `out` or the config.'
+    value: ${{ steps.audit.outputs.out-dir }}
   baseline-run-id:
     description: 'Run the delta was measured against, when `compare: auto` found one.'
     value: ${{ steps.baseline.outputs.compare-run-id }}
@@ -136,8 +144,15 @@ runs:
   using: composite
   steps:
     - name: Install safegres
+      id: install
       shell: bash
-      run: npm install -g safegres@${{ inputs.version }}
+      run: |
+        if [ "${{ inputs.version }}" = "local" ]; then
+          echo 'bin=npx --no-install safegres' >> "$GITHUB_OUTPUT"
+        else
+          npm install -g "safegres@${{ inputs.version }}"
+          echo 'bin=safegres' >> "$GITHUB_OUTPUT"
+        fi
 
     # Which report the delta is measured against — validated and logged, because
     # the usual `gh run list --limit 1` hands the audit whatever row the API
@@ -154,7 +169,7 @@ runs:
         add() { if [ -n "$2" ]; then args+=("$1" "$2"); fi; }
         add --workflow "${{ inputs.compare-workflow }}"
         add --artifact "${{ inputs.compare-artifact }}"
-        safegres "${args[@]}"
+        ${{ steps.install.outputs.bin }} "${args[@]}"
 
     - name: Audit
       id: audit
@@ -185,6 +200,8 @@ runs:
           add --compare       "${{ inputs.compare }}"
           add --compare-ref   "${{ inputs.compare-ref }}"
         fi
+        config=()
+        if [ -n "${{ inputs.config }}" ]; then config=(--config "${{ inputs.config }}"); fi
         if [ "${{ inputs.report-only }}" = "true" ]; then args+=(--report-only); fi
         if [ "${{ inputs.comment }}" = "true" ]; then args+=(--github-comment); fi
         # Unquoted on purpose: this is the verbatim-arguments escape hatch.
@@ -192,11 +209,26 @@ runs:
         # The gate's exit code is the job's, but the outputs below are worth
         # having on a failing run too — that is when someone reads them.
         status=0
-        safegres "${args[@]}" "${extra[@]}" || status=$?
+        ${{ steps.install.outputs.bin }} "${args[@]}" "${extra[@]}" || status=$?
+
+        # Where the reports landed. `out` is the override; with a config-only
+        # job (the documented shape) the directory is `outputs.dir`, and asking
+        # the resolved config for it is the only way not to make every caller
+        # repeat the path in YAML just so the SARIF upload can find the file.
+        dir="${{ inputs.out }}"
+        if [ -z "$dir" ]; then
+          dir=$(${{ steps.install.outputs.bin }} print-config "${config[@]}" 2>/dev/null | node -e '
+            let s = "";
+            process.stdin.on("data", (d) => (s += d)).on("end", () => {
+              try { console.log(JSON.parse(s).config?.outputs?.dir ?? ""); } catch { console.log(""); }
+            });
+          ')
+        fi
+        echo "out-dir=$dir" >> "$GITHUB_OUTPUT"
 
         report=""
-        if [ -n "${{ inputs.out }}" ] && [ -f "${{ inputs.out }}/safegres.json" ]; then
-          report="${{ inputs.out }}/safegres.json"
+        if [ -n "$dir" ] && [ -f "$dir/safegres.json" ]; then
+          report="$dir/safegres.json"
         fi
         if [ -n "$report" ]; then
           node -e '
@@ -214,7 +246,7 @@ runs:
         exit $status
 
     - name: Upload SARIF
-      if: ${{ inputs.upload-sarif == 'true' && always() }}
+      if: ${{ inputs.upload-sarif == 'true' && always() && steps.audit.outputs.out-dir != '' }}
       uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: ${{ inputs.working-directory }}/${{ inputs.out }}/safegres.sarif
+        sarif_file: ${{ inputs.working-directory }}/${{ steps.audit.outputs.out-dir }}/safegres.sarif

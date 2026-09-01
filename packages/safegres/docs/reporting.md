@@ -143,14 +143,14 @@ audit with `--github`, and optionally posts the comment and uploads the SARIF:
 ```yaml
 - uses: constructive-io/constructive/packages/safegres@main
   with:
-    out: safegres-reports
     comment: true
     upload-sarif: true
 ```
 
 Its inputs are deliberately only the things that differ *between jobs sharing one config* —
 `database`/`pgpm` (what to audit), `fail-on-grade` and `report-only` (whether the gates bite),
-`out`/`comment`/`upload-sarif` (what leaves the runner), the `compare*` inputs ([the
+`out`/`comment`/`upload-sarif` (what leaves the runner; `out` only when the config's `outputs.dir`
+is not where this job wants them), the `compare*` inputs ([the
 delta](#the-baseline-compare-auto)), plus
 `version`, `config`, `preset`, `working-directory` and an `args` escape hatch. Everything a run
 repeats belongs in the committed config file, so the common case passes nothing at all.
@@ -164,13 +164,23 @@ is worth reading:
 ```yaml
 - uses: constructive-io/constructive/packages/safegres@main
   id: audit
-  with: { out: safegres-reports, fail-on-grade: B }
+  with: { fail-on-grade: B }
 - if: always()
   run: echo "graded ${{ steps.audit.outputs.security-grade }}"
 ```
 
 Permissions are the caller's: `pull-requests: write` for `comment`, `security-events: write` for
 `upload-sarif`, `actions: read` for the default `compare: auto` baseline lookup.
+
+`version` installs the CLI globally (a dist-tag or an exact version), with one exception:
+`version: local` runs the safegres already in `working-directory`'s `node_modules`. A `source.pgpm`
+audit needs that — deploying the workspace goes through `pgsql-test`, an optional peer a global
+install does not resolve, and a repo auditing its own module already pins the pair in its lockfile.
+The rest of the run is identical.
+
+The SARIF upload and the `report`/`out-dir` outputs read the directory the reports were actually
+written to: `out` when it is given, otherwise the resolved config's `outputs.dir` (the action asks
+`safegres print-config`), so a config-only job does not have to repeat the path in YAML.
 
 ## What changed (`--compare`)
 

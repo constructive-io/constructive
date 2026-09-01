@@ -35,6 +35,26 @@ describe('action.yml', () => {
     expect(action).toContain('perf?.score?.value');
   });
 
+  it('runs the CLI the install step resolved, not a bare global binary', () => {
+    // `version: local` exists because a pgpm-workspace audit deploys through
+    // pgsql-test, an optional peer that only the workspace has; a step that
+    // calls plain `safegres` would work everywhere except there.
+    const invocations = action.match(/^ *\S.*"\$\{args\[@\]\}"/gm) ?? [];
+    expect(invocations).toHaveLength(2);
+    for (const line of invocations) expect(line).toContain('steps.install.outputs.bin');
+    expect(action).toContain('bin=npx --no-install safegres');
+  });
+
+  it('finds the reports through the resolved directory, not the `out` input', () => {
+    // The documented shape puts the directory in the config (`outputs.dir`) and
+    // passes no `out`, so anything reading a written file off `inputs.out`
+    // silently points at the working directory for exactly those callers.
+    expect(action).toContain('print-config');
+    expect(action).toContain('outputs?.dir');
+    expect(action).toContain('sarif_file: ${{ inputs.working-directory }}/${{ steps.audit.outputs.out-dir }}');
+    expect(action).not.toMatch(/inputs\.out \}\}\/safegres\./);
+  });
+
   it('never appends an argument with a bare test, which `set -e` would abort on', () => {
     expect(action).not.toMatch(/^\s*\[[^\]]*\]\s*&&\s*args\+=/m);
   });
