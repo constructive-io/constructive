@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 
 import { classify, type ErrorContext, errors, parse } from '@constructive-io/errors';
 import type { ComputeConfig } from '@constructive-io/express-context';
+import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
@@ -20,6 +21,7 @@ import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import type { DatabaseSettings } from '../types';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
@@ -173,6 +175,7 @@ const buildPreset = (
     extends: [createConstructivePreset(databaseSettings)],
     plugins: [
       AuthCookiePlugin,
+      RequestProtectionPlugin,
       // Only registered when the compute module is provisioned for this
       // database — all schema/table names come from the constructive
       // metaschema (express-context compute module loader); the plugin has
@@ -213,6 +216,12 @@ const buildPreset = (
         const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
         const context: Record<string, string> = {};
 
+        // Timeouts travel with the transaction as GUCs, so they bound the work
+        // this request can do inside PostgreSQL whatever the plan turns out to
+        // be. Resolved per request (not baked into the cached preset) so a
+        // tenant lowering a timeout takes effect on the next request.
+        const timeouts = protectionPgSettings(req?.requestProtection ?? DEFAULT_REQUEST_PROTECTION);
+
         if (req) {
           if (req.databaseId) {
             context['jwt.claims.database_id'] = req.databaseId;
@@ -239,6 +248,7 @@ const buildPreset = (
 
           if (req.token?.user_id) {
             const pgSettings: Record<string, string> = {
+              ...timeouts,
               role: roleName,
               'jwt.claims.token_id': req.token.id,
               'jwt.claims.user_id': req.token.user_id,
@@ -283,6 +293,7 @@ const buildPreset = (
           const headerActorId = req.get('X-Actor-Id');
           if (req.api?.isPublic === false && headerActorId) {
             const pgSettings: Record<string, string> = {
+              ...timeouts,
               role: roleName,
               'jwt.claims.user_id': headerActorId,
               'jwt.claims.principal_id': headerActorId,
@@ -304,6 +315,7 @@ const buildPreset = (
         }
 
         const anonSettings: Record<string, string> = {
+          ...timeouts,
           role: anonRole,
           ...context
         };

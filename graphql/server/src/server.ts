@@ -41,6 +41,7 @@ import { createDebugDatabaseMiddleware } from './middleware/observability/debug-
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
+import { createRequestProtectionMiddleware } from './middleware/request-protection';
 import { getRoutingSchema } from './middleware/routing';
 
 const log = new Logger('server');
@@ -168,6 +169,9 @@ class Server {
       loaders: createDefaultRegistry(),
       routingSchema: getRoutingSchema(effectiveOpts)
     }));
+    // Resolve the tenant's protection bounds before anything can spend budget
+    // on the request (and before the GraphQL handler reads them for pgSettings).
+    app.use(createRequestProtectionMiddleware());
     app.use(createCaptchaMiddleware());
 
     // CSRF protection for cookie-authenticated requests

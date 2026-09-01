@@ -9,6 +9,7 @@
  *   - rlsModule       (routing-plane rls_settings)
  *   - corsOrigins     (routing-plane cors_settings)
  *   - databaseSettings(routing-plane database_settings)
+ *   - requestProtection (routing-plane database_settings/api_settings bounds)
  *   - pubkeyChallengeSettings (routing-plane pubkey_settings)
  *   - webauthnSettings(routing-plane webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
@@ -54,6 +55,7 @@ export { identityProvidersLoader, requireIdentityProvider } from './identity-pro
 export { inferenceLogLoader } from './inference-log';
 export { llmLoader } from './llm';
 export { pubkeyLoader } from './pubkey';
+export { requestProtectionLoader } from './request-protection';
 export { rlsLoader } from './rls';
 export { webauthnLoader } from './webauthn';
 
@@ -71,6 +73,7 @@ import { inferenceLogLoader } from './inference-log';
 import { llmLoader } from './llm';
 import { pubkeyLoader } from './pubkey';
 import { createLoaderRegistry } from './registry';
+import { requestProtectionLoader } from './request-protection';
 import { rlsLoader } from './rls';
 import { webauthnLoader } from './webauthn';
 
@@ -88,5 +91,6 @@ export function createDefaultRegistry() {
   registry.register(agentChatLoader);
   registry.register(llmLoader);
   registry.register(computeLoader);
+  registry.register(requestProtectionLoader);
   return registry;
 }
