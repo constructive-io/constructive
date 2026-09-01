@@ -109,13 +109,13 @@ export interface ServerOptions {
 /**
  * Storage provider type for CDN/bucket operations
  */
-export type BucketProvider = 's3' | 'minio' | 'gcs';
+export type BucketProvider = 's3' | 'minio' | 'rustfs' | 'gcs';
 
 /**
  * CDN and file storage configuration
  */
 export interface CDNOptions {
-    /** Storage provider type (s3, minio, gcs). Defaults to 'minio' for local dev */
+    /** Storage provider type (s3, minio, rustfs, gcs). Defaults to 'minio' for local dev */
     provider?: BucketProvider;
     /** S3 bucket name for file storage */
     bucketName?: string;

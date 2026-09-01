@@ -5,7 +5,7 @@ import {
   S3Client} from '@aws-sdk/client-s3';
 
 export interface CreateS3BucketOptions {
-  provider: 'minio' | 's3' | 'gcs';
+  provider: 'minio' | 'rustfs' | 's3' | 'gcs';
 }
 
 export async function createS3Bucket(

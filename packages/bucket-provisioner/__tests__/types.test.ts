@@ -54,8 +54,8 @@ describe('ProvisionerError', () => {
 
 describe('Type definitions', () => {
   it('StorageProvider accepts valid values', () => {
-    const providers: StorageProvider[] = ['s3', 'minio', 'r2', 'gcs', 'spaces'];
-    expect(providers).toHaveLength(5);
+    const providers: StorageProvider[] = ['s3', 'minio', 'rustfs', 'r2', 'gcs', 'spaces'];
+    expect(providers).toHaveLength(6);
   });
 
   it('BucketAccessType accepts valid values', () => {
