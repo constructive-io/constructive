@@ -33,7 +33,7 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@inquirerer/test": "^1.4.5",
+    "@inquirerer/test": "^1.4.6",
     "@types/cross-spawn": "^6.0.6",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.19.11",
@@ -46,7 +46,7 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "@inquirerer/utils": "^3.3.12",
+    "@inquirerer/utils": "^3.3.13",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/diff": "workspace:^",
     "@pgpmjs/env": "workspace:^",
@@ -60,8 +60,8 @@
     "appstash": "^0.8.0",
     "cross-spawn": "^7.0.6",
     "find-and-require-package-json": "^0.9.1",
-    "genomic": "^5.6.5",
-    "inquirerer": "^4.9.3",
+    "genomic": "^5.6.6",
+    "inquirerer": "^4.9.4",
     "js-yaml": "^4.1.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
