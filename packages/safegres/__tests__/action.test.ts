@@ -55,6 +55,26 @@ describe('action.yml', () => {
     expect(action).not.toMatch(/inputs\.out \}\}\/safegres\./);
   });
 
+  it('guards the SARIF upload on code scanning being available', () => {
+    // A composite action cannot mark a step `continue-on-error`, so an upload
+    // to a repository with code scanning off fails the whole audit job on
+    // "Code Security must be enabled" — a report channel killing a passed gate.
+    expect(action).toContain('code-scanning/analyses');
+    expect(action).toContain("steps.code-scanning.outputs.enabled == 'true'");
+    expect(action).toContain('::warning title=safegres::');
+  });
+
+  it('uploads the reports under the name the baseline lookup downloads', () => {
+    // `compare: auto` downloads `compare-artifact` from the base branch's run,
+    // so the two defaults are one contract: upload under a different name and
+    // every future PR silently loses its delta.
+    const defaults = (name: string) =>
+      action.match(new RegExp(`^  ${name}:[\\s\\S]*?default: '([^']*)'`, 'm'))?.[1];
+    expect(defaults('artifact-name')).toBe(defaults('compare-artifact'));
+    expect(defaults('upload-reports')).toBe('true');
+    expect(action).toContain('uses: actions/upload-artifact@v4');
+  });
+
   it('never appends an argument with a bare test, which `set -e` would abort on', () => {
     expect(action).not.toMatch(/^\s*\[[^\]]*\]\s*&&\s*args\+=/m);
   });
