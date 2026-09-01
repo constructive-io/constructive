@@ -38,7 +38,7 @@
   ],
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.3.0",
+    "makage": "^0.8.0",
     "ts-node": "^10.9.2"
   }
 }

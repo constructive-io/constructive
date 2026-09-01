@@ -46,7 +46,7 @@
     "@types/pg": "^8.20.4",
     "copyfiles": "^2.4.1",
     "inquirerer": "^4.9.4",
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   },
   "dependencies": {
     "@pgpmjs/ast": "workspace:^",

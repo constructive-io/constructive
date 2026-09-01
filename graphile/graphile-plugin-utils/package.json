@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   },
   "peerDependencies": {
     "@dataplan/pg": "^1.1.1",

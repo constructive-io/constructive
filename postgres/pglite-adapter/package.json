@@ -44,7 +44,7 @@
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "@types/pg": "^8.20.4",
-    "makage": "^0.3.0",
+    "makage": "^0.8.0",
     "pgpm": "workspace:^"
   },
   "dependencies": {

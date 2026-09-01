@@ -45,7 +45,7 @@
     "jest": "^30.4.2",
     "jest-in-case": "^1.0.2",
     "lerna": "^8.2.3",
-    "makage": "^0.3.0",
+    "makage": "^0.8.0",
     "pnpm-policy": "^0.4.0",
     "prettier": "^3.9.6",
     "rimraf": "^6.1.3",

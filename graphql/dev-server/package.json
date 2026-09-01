@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/pg": "^8.20.4",
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   },
   "dependencies": {
     "@constructive-io/graphql-env": "workspace:^",

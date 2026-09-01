@@ -43,7 +43,7 @@
   "devDependencies": {
     "@electric-sql/pglite": "0.5.4",
     "@types/pg": "^8.20.4",
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   },
   "dependencies": {
     "@pgpmjs/core": "workspace:^",

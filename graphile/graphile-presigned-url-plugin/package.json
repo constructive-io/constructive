@@ -60,6 +60,6 @@
   "devDependencies": {
     "@constructive-io/s3-utils": "workspace:^",
     "@types/node": "^22.19.11",
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   }
 }

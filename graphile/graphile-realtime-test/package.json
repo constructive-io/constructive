@@ -59,7 +59,7 @@
     "@types/ws": "^8.18.1",
     "express": "^5.2.1",
     "grafserv": "1.0.1",
-    "makage": "^0.3.0",
+    "makage": "^0.8.0",
     "pgsql-test": "workspace:^",
     "postgraphile": "5.1.4"
   }

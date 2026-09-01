@@ -38,7 +38,7 @@
     "migrations"
   ],
   "devDependencies": {
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   },
   "dependencies": {
     "@pgpmjs/ast": "workspace:^"
