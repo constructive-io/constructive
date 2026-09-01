@@ -204,12 +204,54 @@ export interface ComputeModuleConfig {
   invocationsEntityField: string | null;
 }
 
+export interface ComputeBindingConfig {
+  bindingId: string;
+  alias: string;
+  config: Record<string, unknown> | null;
+  functionDefinitionId: string;
+  taskIdentifier: string;
+  description: string | null;
+  payloadArgs: Array<{ name: string; type: string }> | null;
+  module: ComputeModuleConfig;
+}
+
 /**
  * All function modules provisioned on the database. A database may have one
  * per scope; every module is exposed and RLS governs access to each.
  */
 export interface ComputeConfig {
   modules: ComputeModuleConfig[];
+  /** API-scoped binding metadata loaded with the control-plane tenant pool. */
+  bindings: ComputeBindingConfig[];
+}
+
+/** Immutable storage-module routing metadata loaded through the control plane. */
+export interface StorageModuleConfig {
+  id: string;
+  bucketsQualifiedName: string;
+  filesQualifiedName: string;
+  schemaName: string;
+  bucketsTableName: string;
+  filesTableName: string;
+  scope: string;
+  entityTableId: string | null;
+  entityQualifiedName: string | null;
+  endpoint: string | null;
+  publicUrlPrefix: string | null;
+  provider: string | null;
+  allowedOrigins: string[] | null;
+  uploadUrlExpirySeconds: number;
+  downloadUrlExpirySeconds: number;
+  defaultMaxFileSize: number;
+  maxFilenameLength: number;
+  cacheTtlSeconds: number;
+  hasPathShares: boolean;
+  maxBulkFiles: number;
+  maxBulkTotalSize: number;
+}
+
+export interface StorageConfig {
+  modules: StorageModuleConfig[];
 }
 
 export interface LlmConfig {
@@ -249,6 +291,7 @@ export interface BuiltinModuleMap {
   agentChat: AgentChatConfig;
   llm: LlmConfig;
   compute: ComputeConfig;
+  storage: StorageConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────
@@ -280,14 +323,16 @@ export interface ConstructiveContext {
   requestId: string;
   /** Tenant database connection pool */
   pool: Pool;
+  /** Opaque exact identity of the tenant execution pool. */
+  runtimePoolIdentity: string;
   /** Execute a function within a tenant-scoped RLS transaction */
   withPgClient: WithPgClient;
 
   /**
-   * Resolve a per-database module on demand (lazy, cached).
+   * Resolve a per-database module on demand.
    *
-   * Only fires the SQL query on the first call per databaseId per TTL window.
-   * Subsequent calls return the cached result instantly.
+   * Each loader owns its freshness policy. Security-sensitive built-ins read
+   * authoritatively on every call; nonsecurity loaders may use a hard TTL.
    *
    * Built-in modules are typed:
    *   const rls = await ctx.useModule('rlsModule');     // RlsModule | undefined
@@ -340,6 +385,9 @@ declare global {
       clientIp?: string;
       requestId?: string;
       token?: ConstructiveAPIToken;
+      deviceToken?: string;
+      /** Set by the GraphQL ingress after authenticating reserved internal headers. */
+      internalTrusted?: boolean;
       constructive?: ConstructiveContext;
     }
   }

@@ -2,17 +2,30 @@
 export {
   apiDefaults,
   ApiOptions,
+  GrafastCacheLimits,
   graphileDefaults,
   graphileFeatureDefaults,
   GraphileFeatureOptions,
-  GraphileOptions} from './graphile';
+  GraphileIntrospectionClientReleaseMode,
+  GraphileIntrospectionMode,
+  GraphileOptions,
+  GraphileRealtimeNotificationMode,
+} from './graphile';
 
 // Export Constructive combined types
 export {
   constructiveDefaults,
   constructiveGraphqlDefaults,
   ConstructiveGraphQLOptions,
-  ConstructiveOptions} from './constructive';
+  ConstructiveOptions,
+  NotificationPgConfig,
+  NotificationPgResolver,
+  NotificationPgResolverInput,
+  RoutingCacheOptions,
+  RuntimePgConfig,
+  RuntimePgResolver,
+  RuntimePgResolverInput
+} from './constructive';
 
 // Export GraphQL adapter types
 export {

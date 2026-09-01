@@ -30,7 +30,6 @@ const databaseSettingsSql = (schema: string): string => `
   FROM "${schema}".database_settings ds
   LEFT JOIN "${schema}".api_settings aps ON ds.database_id = aps.database_id AND aps.api_id = $2
   WHERE ds.database_id = $1
-  LIMIT 1
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -50,11 +49,28 @@ interface DatabaseSettingsRow {
   resolved_enable_i18n: boolean;
 }
 
+const BOOLEAN_COLUMNS: readonly (keyof DatabaseSettingsRow)[] = [
+  'resolved_enable_aggregates',
+  'resolved_enable_postgis',
+  'resolved_enable_search',
+  'resolved_enable_direct_uploads',
+  'resolved_enable_presigned_uploads',
+  'resolved_enable_many_to_many',
+  'resolved_enable_connection_filter',
+  'resolved_enable_ltree',
+  'resolved_enable_llm',
+  'resolved_enable_realtime',
+  'resolved_enable_bulk',
+  'resolved_enable_i18n'
+];
+
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
 export const databaseSettingsLoader: ModuleLoader<DatabaseSettings> = createModuleLoader<DatabaseSettings>({
   name: 'databaseSettings',
-  ttlMs: 5 * 60_000,
+  // These flags select the executable Graphile/plugin surface and realtime
+  // admission, so a disable/revocation must alter the next build contract.
+  cache: false,
   async resolve(ctx: LoaderContext) {
     const { routingPool, databaseId, apiId } = ctx;
 
@@ -62,8 +78,18 @@ export const databaseSettingsLoader: ModuleLoader<DatabaseSettings> = createModu
       databaseSettingsSql(routingSchemaOf(ctx)),
       [databaseId, apiId ?? null]
     );
+    if (result.rows.length > 1) {
+      throw new Error(
+        `Ambiguous database feature configuration for database ${databaseId}`
+      );
+    }
     const row = result.rows[0];
     if (!row) return undefined;
+    if (BOOLEAN_COLUMNS.some((column) => typeof row[column] !== 'boolean')) {
+      throw new Error(
+        `Incomplete database feature configuration for database ${databaseId}`
+      );
+    }
 
     return {
       enableAggregates: row.resolved_enable_aggregates,

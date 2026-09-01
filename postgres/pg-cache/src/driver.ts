@@ -14,10 +14,15 @@ import type { PgConfig, PgPoolConfig } from 'pg-env';
  * `end()` (plus an `ended` flag for disposal), so a factory may return anything
  * implementing that subset — `QueryablePool`. A real `pg.Pool` structurally
  * satisfies it, so the default path is unchanged and fully backward-compatible.
+ * When checkout sanitation is requested, pg-cache replaces a custom pool's
+ * `query()` method so direct queries also use a sanitized `connect()`/`release()`
+ * cycle. Custom pools must therefore expose a replaceable `query()` property,
+ * and connected clients must implement the Promise-based contract below.
  */
 export interface QueryableClient {
   query(text: string, values?: any[]): Promise<any>;
-  release(...args: any[]): void;
+  /** A truthy error argument must permanently discard this client. */
+  release(error?: Error | boolean): void;
 }
 
 export interface QueryablePool {
@@ -27,10 +32,17 @@ export interface QueryablePool {
 }
 
 export type PgPoolFactory = (
-  config: Partial<PgConfig> & { pool?: PgPoolConfig }
+  config: Partial<PgConfig> & { pool?: PgPoolConfig },
+  options?: PgPoolFactoryOptions
 ) => pg.Pool | QueryablePool;
 
+export interface PgPoolFactoryOptions {
+  purpose: string;
+  sanitizeOnCheckout: boolean;
+}
+
 let activeFactory: PgPoolFactory | undefined;
+let driverGeneration = 0;
 
 /**
  * Register the factory `getPgPool` uses to build new pools. Pass `undefined`
@@ -42,6 +54,7 @@ let activeFactory: PgPoolFactory | undefined;
  */
 export const registerPgPoolFactory = (factory: PgPoolFactory | undefined): void => {
   activeFactory = factory;
+  driverGeneration++;
 };
 
 /** The currently-registered factory, or `undefined` when using the default. */
@@ -49,3 +62,7 @@ export const getActivePgPoolFactory = (): PgPoolFactory | undefined => activeFac
 
 /** Whether a non-default pool factory is currently registered. */
 export const hasPgPoolFactory = (): boolean => activeFactory !== undefined;
+
+/** Stable until the active factory registration changes. */
+export const getPgPoolDriverIdentity = (): string =>
+  activeFactory ? `registered:${driverGeneration}` : 'node-postgres';

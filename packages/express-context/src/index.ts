@@ -9,7 +9,7 @@
  *   - withPgClient (tenant-scoped RLS transaction helper)
  *   - requestId middleware (UUID correlation ID)
  *   - Context middleware (composes all of the above into req.constructive)
- *   - Module loaders (pluggable per-database cached lookups)
+ *   - Module loaders (pluggable authoritative or hard-TTL lookups)
  *
  * @example
  * ```typescript
@@ -28,8 +28,8 @@
  *
  * app.post('/v1/chat', async (req, res) => {
  *   const ctx = req.constructive;
- *   const rls = await ctx.useModule('rlsModule');       // only fires if not cached
- *   const auth = await ctx.useModule('authSettings');    // only fires if not cached
+ *   const rls = await ctx.useModule('rlsModule');        // authoritative read
+ *   const auth = await ctx.useModule('authSettings');    // authoritative read
  *   // webauthnSettings loader never fires if nobody asks for it
  * });
  * ```
@@ -45,6 +45,7 @@ export type {
   AuthSurface,
   BillingConfig,
   BuiltinModuleMap,
+  ComputeBindingConfig,
   ComputeConfig,
   ComputeModuleConfig,
   ConstructiveAPIToken,
@@ -56,6 +57,8 @@ export type {
   LlmConfig,
   PubkeyChallengeSettings,
   RlsModule,
+  StorageConfig,
+  StorageModuleConfig,
   WebauthnSettings,
   WithPgClient,
 } from './types';
@@ -65,8 +68,15 @@ export type { BillingClient, InferenceLogEntry } from './billing-client';
 export { createBillingClient } from './billing-client';
 
 // pgSettings builder
-export type { PgSettingsInput } from './pg-settings';
-export { buildPgSettings } from './pg-settings';
+export type { PgSettingsInput, SecurityGucKey } from './pg-settings';
+export { buildPgSettings, SECURITY_GUC_KEYS } from './pg-settings';
+
+// Safe interpolation for trusted metadata identifiers. Request values still
+// belong in query parameters.
+export {
+  quoteQualifiedSqlIdentifier,
+  quoteSqlIdentifier
+} from './sql-identifiers';
 
 // withPgClient helper
 export { withPgClient } from './pg-client';
@@ -75,7 +85,10 @@ export { withPgClient } from './pg-client';
 export { requestIdMiddleware } from './request-id';
 
 // Context middleware
-export type { ContextMiddlewareOptions } from './context';
+export type {
+  ContextMiddlewareOptions,
+  RuntimePgPoolResolution
+} from './context';
 export { buildContext, createContextMiddleware } from './context';
 
 // Module loaders
@@ -103,6 +116,7 @@ export {
   requireDatabaseId,
   requireIdentityProvider,
   rlsLoader,
+  storageLoader,
   webauthnLoader,
 } from './loaders';
 
