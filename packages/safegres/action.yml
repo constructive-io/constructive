@@ -103,8 +103,26 @@ inputs:
     description: >-
       Upload the SARIF report to GitHub code scanning. Requires `out` (or an
       `outputs.sarif`/`outputs.dir` in the config) and `security-events: write`.
+      A repository without code scanning enabled is a warning, not a failure.
     required: false
     default: 'false'
+  upload-reports:
+    description: >-
+      Upload the report directory as a workflow artifact. On by default because
+      `compare: auto` reads the base branch's artifact: a repository that never
+      uploads one can never show a delta.
+    required: false
+    default: 'true'
+  artifact-name:
+    description: >-
+      Name of that artifact. Must match `compare-artifact`, which is what the
+      baseline lookup downloads.
+    required: false
+    default: 'safegres-reports'
+  artifact-retention-days:
+    description: 'Retention for the uploaded artifact. Outlive `compare-max-age-hours`.'
+    required: false
+    default: '14'
   github-token:
     description: 'Token used for the PR comment. Defaults to the workflow token.'
     required: false
@@ -245,8 +263,39 @@ runs:
         fi
         exit $status
 
-    - name: Upload SARIF
+    # Whether code scanning will accept the SARIF at all. A composite action
+    # cannot mark a step `continue-on-error`, so the upload has to be guarded
+    # rather than tolerated: without this, a repository with code scanning
+    # switched off fails the audit job on "Code Security must be enabled" —
+    # a reporting channel taking down a gate that already passed.
+    - name: Check code scanning
+      id: code-scanning
       if: ${{ inputs.upload-sarif == 'true' && always() && steps.audit.outputs.out-dir != '' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        if gh api "repos/$GITHUB_REPOSITORY/code-scanning/analyses?per_page=1" >/dev/null 2>&1; then
+          echo 'enabled=true' >> "$GITHUB_OUTPUT"
+        else
+          echo 'enabled=false' >> "$GITHUB_OUTPUT"
+          echo "::warning title=safegres::upload-sarif is on but code scanning is not available for this repository (enable Code Security, or grant security-events: write) — the SARIF is still in the report directory."
+        fi
+
+    - name: Upload SARIF
+      if: ${{ steps.code-scanning.outputs.enabled == 'true' && always() }}
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: ${{ inputs.working-directory }}/${{ steps.audit.outputs.out-dir }}/safegres.sarif
+
+    # The reports are the next run's baseline, so this is not decoration: the
+    # artifact is the only thing `compare: auto` can download, and every
+    # consumer would otherwise repeat the same upload block in its workflow.
+    - name: Upload reports
+      if: ${{ inputs.upload-reports == 'true' && always() && steps.audit.outputs.out-dir != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.working-directory }}/${{ steps.audit.outputs.out-dir }}/
+        retention-days: ${{ inputs.artifact-retention-days }}
+        if-no-files-found: ignore

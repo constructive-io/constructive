@@ -141,16 +141,19 @@ falls back to emoji for air-gapped runners that cannot reach shields.io.
 audit with `--github`, and optionally posts the comment and uploads the SARIF:
 
 ```yaml
-- uses: constructive-io/constructive/packages/safegres@main
+- uses: constructive-io/constructive/packages/safegres@safegres-action-v1
   with:
     comment: true
     upload-sarif: true
 ```
 
+Pin `@safegres-action-v1` (a moving tag on the latest v1) rather than `@main`, which is the
+monorepo tip and moves with every merge.
+
 Its inputs are deliberately only the things that differ *between jobs sharing one config* —
 `database`/`pgpm` (what to audit), `fail-on-grade` and `report-only` (whether the gates bite),
-`out`/`comment`/`upload-sarif` (what leaves the runner; `out` only when the config's `outputs.dir`
-is not where this job wants them), the `compare*` inputs ([the
+`out`/`comment`/`upload-sarif`/`upload-reports` (what leaves the runner; `out` only when the
+config's `outputs.dir` is not where this job wants them), the `compare*` inputs ([the
 delta](#the-baseline-compare-auto)), plus
 `version`, `config`, `preset`, `working-directory` and an `args` escape hatch. Everything a run
 repeats belongs in the committed config file, so the common case passes nothing at all.
@@ -162,7 +165,7 @@ Two jobs can then share one config and differ only where they should: a gated me
 is worth reading:
 
 ```yaml
-- uses: constructive-io/constructive/packages/safegres@main
+- uses: constructive-io/constructive/packages/safegres@safegres-action-v1
   id: audit
   with: { fail-on-grade: B }
 - if: always()
@@ -170,7 +173,16 @@ is worth reading:
 ```
 
 Permissions are the caller's: `pull-requests: write` for `comment`, `security-events: write` for
-`upload-sarif`, `actions: read` for the default `compare: auto` baseline lookup.
+`upload-sarif`, `actions: read` for the default `compare: auto` baseline lookup. A repository with
+code scanning switched off cannot accept a SARIF at all, and a reporting channel should not take
+down a gate that already passed — so the action checks first and warns instead of failing (a
+composite action cannot mark its own step `continue-on-error`).
+
+The report directory is uploaded as the `safegres-reports` artifact (`upload-reports`,
+`artifact-name`, `artifact-retention-days`). This is not decoration: `compare: auto` downloads
+that artifact from the base branch, so a repository that never uploads one has no baseline to
+measure against. Turn it off only when the workflow uploads the directory itself — two uploads
+under one name is an error, not a merge.
 
 `version` installs the CLI globally (a dist-tag or an exact version), with one exception:
 `version: local` runs the safegres already in `working-directory`'s `node_modules`. A `source.pgpm`

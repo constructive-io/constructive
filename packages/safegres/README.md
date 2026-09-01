@@ -435,11 +435,15 @@ Or the first-party action, which installs the CLI, runs that config, and turns t
 job summary, annotations and a sticky PR comment:
 
 ```yaml
-      - uses: constructive-io/constructive/packages/safegres@main
+      - uses: constructive-io/constructive/packages/safegres@safegres-action-v1
         with:
           comment: true          # sticky PR comment (needs pull-requests: write)
           upload-sarif: true     # code scanning (needs security-events: write)
 ```
+
+`safegres-action-v1` is a moving tag on the action's latest v1; `@main` tracks the monorepo tip.
+The reports are uploaded as the `safegres-reports` artifact by default — that artifact *is* the
+next run's baseline, so a job that suppresses it (`upload-reports: false`) can never show a delta.
 
 Auditing a pgpm workspace (`source.pgpm`) adds `version: local`, which runs the repo's own safegres
 rather than installing one: that path deploys through `pgsql-test`, an optional peer only the
