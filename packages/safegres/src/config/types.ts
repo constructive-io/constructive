@@ -504,8 +504,23 @@ export interface GithubReportConfig {
 export interface GithubCommentConfig {
   /** Reuse one comment per PR instead of appending. Default `true`. */
   sticky?: boolean;
-  /** Sections to include. Default `['scores', 'delta', 'new-findings']`. */
-  sections?: Array<'scores' | 'delta' | 'new-findings' | 'findings' | 'planes'>;
+  /**
+   * Sections to include, in this order: `scores` (badges + exposure), `planes`,
+   * `delta`, `new-findings` (the perf ratchet verdict and what it caught), and
+   * `report` — the same markdown report the job summary carries, at `detail`.
+   * `findings` is the old name for `report`. Default
+   * `['scores', 'delta', 'new-findings']`; add `report` to review the audit
+   * without leaving the PR.
+   */
+  sections?: Array<'scores' | 'delta' | 'new-findings' | 'report' | 'findings' | 'planes'>;
+  /**
+   * How much of the report the `report` section carries. Default `summary` —
+   * scores, exposure, counts, the delta and the ratchet verdict, with no
+   * per-finding tables, because a comment is read on the way past and GitHub
+   * rejects a body over 64 KB. `normal`/`verbose` add the finding tables and
+   * degrade back to `summary` when the body would not fit.
+   */
+  detail?: 'summary' | 'normal' | 'verbose';
 }
 
 /**

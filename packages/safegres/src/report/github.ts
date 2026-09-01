@@ -92,16 +92,52 @@ export function renderGithubSummary(report: Report, options: GithubRenderOptions
 }
 
 /**
- * The sticky PR comment: shorter than the summary by design. A comment is read
- * on the way past, so it carries the scores, the movement, and what is new —
- * the full finding tables live in the job summary and the SARIF alerts.
+ * GitHub rejects an issue comment body over 65536 characters, and a comment
+ * that fails to post is worse than a short one — so a comment carrying the
+ * report degrades (verbose → normal → summary → a pointer at the job summary)
+ * rather than being truncated at a byte boundary by the API.
+ */
+export const COMMENT_MAX_CHARS = 65536;
+
+/**
+ * The sticky PR comment: shorter than the summary by default. A comment is read
+ * on the way past, so out of the box it carries the scores, the movement, and
+ * what is new, with the full finding tables in the job summary and the SARIF
+ * alerts.
+ *
+ * `comment.sections` chooses what it says. `report` puts the whole markdown
+ * report in the comment at `comment.detail` (default `summary`: scores,
+ * exposure, counts, the delta and the ratchet verdict — no per-finding tables),
+ * which is the same render the job summary uses, so the two cannot disagree.
  */
 export function renderGithubComment(report: Report, options: GithubRenderOptions = {}): string {
+  const wanted = options.config?.comment?.detail ?? 'summary';
+  const chain: Array<'verbose' | 'normal' | 'summary'> =
+    wanted === 'verbose' ? ['verbose', 'normal', 'summary'] : wanted === 'normal' ? ['normal', 'summary'] : ['summary'];
+  for (const detail of chain) {
+    const body = commentBody(report, options, detail);
+    if (body.length <= COMMENT_MAX_CHARS) return body;
+  }
+  return commentBody(report, options, null);
+}
+
+/**
+ * One comment body. `detail` is the report section's detail, or null to drop
+ * the report and say where it went — which is how the size cap is honored.
+ */
+function commentBody(
+  report: Report,
+  options: GithubRenderOptions,
+  detail: 'summary' | 'normal' | 'verbose' | null
+): string {
   const config = options.config ?? {};
   const badges = config.badges !== false;
   const sections = new Set(config.comment?.sections ?? ['scores', 'delta', 'new-findings']);
   const selectors = config.summary ?? ['security', 'perf'];
   const view = selectView(report, { planes: planePatterns(selectors), ...options.view });
+  // `findings` is the old name for `report`; both mean "the markdown report".
+  const wantsReport = sections.has('report') || sections.has('findings');
+  const withReport = wantsReport && detail != null;
 
   const out: string[] = [COMMENT_MARKER, '## safegres', ''];
 
@@ -112,7 +148,8 @@ export function renderGithubComment(report: Report, options: GithubRenderOptions
         .join(' '),
       ''
     );
-    if (report.exposure) {
+    // Everything below is in the report too, so it is said once.
+    if (report.exposure && !withReport) {
       out.push(
         report.exposure.known
           ? `Exposure (${report.exposure.source}): **${report.exposure.exposedTables}/`
@@ -137,7 +174,10 @@ export function renderGithubComment(report: Report, options: GithubRenderOptions
     );
   }
 
-  if (sections.has('delta') && report.comparison) {
+  // The report renders the comparison (or the reason there is none) itself.
+  const wantsDelta = sections.has('delta') && !withReport;
+
+  if (wantsDelta && report.comparison) {
     const cmp = report.comparison;
     const since = describeBaseline(cmp.previous);
     if (cmp.unchanged) {
@@ -157,7 +197,7 @@ export function renderGithubComment(report: Report, options: GithubRenderOptions
       }
       out.push('');
     }
-  } else if (sections.has('delta') && report.comparisonSkipped) {
+  } else if (wantsDelta && report.comparisonSkipped) {
     out.push(
       `_No delta baseline: ${report.comparisonSkipped}. `
         + 'The absolute score and the perf baseline still gate this run._',
@@ -166,7 +206,18 @@ export function renderGithubComment(report: Report, options: GithubRenderOptions
   }
 
   if (sections.has('new-findings')) {
-    const added = report.perf?.diff?.added ?? [];
+    const diff = report.perf?.diff;
+    // The ratchet's verdict, even when it is "nothing new": a comment that only
+    // speaks up on new debt cannot be distinguished from one that never ran.
+    // The report carries this line itself, so it is not repeated under it.
+    if (diff && !withReport) {
+      out.push(
+        `Perf baseline: **${diff.added.length} new**, ${diff.accepted.length} accepted, `
+          + `${diff.removed.length} resolved.`,
+        ''
+      );
+    }
+    const added = diff?.added ?? [];
     if (added.length > 0) {
       out.push(
         `**${added.length} new performance finding${added.length === 1 ? '' : 's'} since the baseline**`,
@@ -177,8 +228,14 @@ export function renderGithubComment(report: Report, options: GithubRenderOptions
     }
   }
 
-  if (sections.has('findings')) {
-    out.push(renderMarkdown(report, { title: 'Findings', view: options.view }), '');
+  if (withReport) {
+    out.push(renderMarkdown(report, { title: 'Report', view: { detail, ...options.view } }), '');
+  } else if (wantsReport) {
+    out.push(
+      '_The report is too large for a PR comment — it is in the job summary and the '
+        + 'reports artifact._',
+      ''
+    );
   }
 
   return out.join('\n');
