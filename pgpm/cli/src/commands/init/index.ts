@@ -9,10 +9,10 @@ import {
   scanBoilerplates,
   SkillInstaller,
   sluggify,
+  spawnSyncChecked,
 } from '@pgpmjs/core';
 import { resolveWorkspaceByType } from '@pgpmjs/env';
 import { errors } from '@pgpmjs/types';
-import { execFileSync } from 'child_process';
 import fs from 'fs';
 import { CLIOptions, Inquirerer, OptionValue, Question, registerDefaultResolver } from 'inquirerer';
 import path from 'path';
@@ -363,7 +363,7 @@ function installSkillsViaNpx(skills: BoilerplateSkill[], cwd: string): void {
 
     for (const skill of entry.skills) {
       try {
-        execFileSync(
+        spawnSyncChecked(
           'npx',
           ['--yes', 'skills', 'add', source, '--skill', skill, '--yes'],
           {

@@ -14,6 +14,7 @@ export * from './packaging/transform';
 export * from './rebundle';
 export * from './resolution/deps';
 export * from './resolution/resolve';
+export * from './utils/spawn';
 export * from './workspace/minimal';
 export * from './workspace/paths';
 export * from './workspace/utils';

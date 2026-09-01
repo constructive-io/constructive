@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@inquirerer/test": "^1.4.5",
+    "@types/cross-spawn": "^6.0.6",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.19.11",
     "@types/pg": "^8.20.4",
@@ -57,6 +58,7 @@
     "@pgpmjs/types": "workspace:^",
     "@pgsql/quotes": "^18.2.4",
     "appstash": "^0.8.0",
+    "cross-spawn": "^7.0.6",
     "find-and-require-package-json": "^0.9.1",
     "genomic": "^5.6.5",
     "inquirerer": "^4.9.3",
