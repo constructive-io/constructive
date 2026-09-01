@@ -71,6 +71,22 @@ export { buildPgSettings } from './pg-settings';
 // withPgClient helper
 export { withPgClient } from './pg-client';
 
+// Request protection (platform bounds + resolver)
+export type {
+  NumericProtectionKey,
+  ProtectionBound,
+  RequestProtection,
+  RequestProtectionInput,
+} from './request-protection';
+export {
+  ASSUMED_PAGE_SIZE,
+  DEFAULT_REQUEST_PROTECTION,
+  INTROSPECTION_BOUND,
+  PROTECTION_BOUNDS,
+  protectionPgSettings,
+  resolveRequestProtection,
+} from './request-protection';
+
 // Request ID middleware
 export { requestIdMiddleware } from './request-id';
 
@@ -100,6 +116,7 @@ export {
   inferenceLogLoader,
   llmLoader,
   pubkeyLoader,
+  requestProtectionLoader,
   requireDatabaseId,
   requireIdentityProvider,
   rlsLoader,

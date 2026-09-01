@@ -296,6 +296,47 @@ export const registry = {
   }),
 
   // ===========================================================================
+  // Request protection (public, dynamic) — raised by the GraphQL runtime when a
+  // request exceeds the bounds resolved from database_settings/api_settings.
+  // Each carries the limit that was in force so a client can adapt rather than
+  // guess.
+  // ===========================================================================
+  QUERY_TOO_DEEP: defineError<{ depth?: number; limit?: number }>({
+    code: 'QUERY_TOO_DEEP',
+    class: 'public',
+    http: 400,
+    message: 'The query is nested too deeply. Please request fewer nested levels.',
+    positional: ['depth', 'limit']
+  }),
+  QUERY_TOO_COSTLY: defineError<{ cost?: number; limit?: number }>({
+    code: 'QUERY_TOO_COSTLY',
+    class: 'public',
+    http: 400,
+    message: 'The query is too expensive. Please request fewer records or fewer nested lists.',
+    positional: ['cost', 'limit']
+  }),
+  PAGE_SIZE_TOO_LARGE: defineError<{ requested?: number; limit?: number }>({
+    code: 'PAGE_SIZE_TOO_LARGE',
+    class: 'public',
+    http: 400,
+    message: 'The requested page size is too large. Please request fewer records per page.',
+    positional: ['requested', 'limit']
+  }),
+  REQUEST_TOO_LARGE: defineError<{ bytes?: number; limit?: number }>({
+    code: 'REQUEST_TOO_LARGE',
+    class: 'public',
+    http: 413,
+    message: 'The request body is too large.',
+    positional: ['bytes', 'limit']
+  }),
+  INTROSPECTION_DISABLED: defineError({
+    code: 'INTROSPECTION_DISABLED',
+    class: 'public',
+    http: 403,
+    message: 'Schema introspection is disabled for this API.'
+  }),
+
+  // ===========================================================================
   // Client / transport (public) — synthesized client-side by the GraphQL client
   // for network, timeout, and HTTP-level failures (no DB/server origin).
   // ===========================================================================

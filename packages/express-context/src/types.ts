@@ -10,6 +10,7 @@
 import type { Pool, PoolClient } from 'pg';
 
 import type { BillingClient } from './billing-client';
+import type { RequestProtection } from './request-protection';
 
 // ─── API Structure ──────────────────────────────────────────────────────────
 
@@ -249,6 +250,7 @@ export interface BuiltinModuleMap {
   agentChat: AgentChatConfig;
   llm: LlmConfig;
   compute: ComputeConfig;
+  requestProtection: RequestProtection;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────

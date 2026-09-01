@@ -1,3 +1,5 @@
+import type { RequestProtection } from '@constructive-io/express-context';
+
 import type { ApiStructure } from '../types';
 
 export type ConstructiveAPIToken = {
@@ -21,6 +23,12 @@ declare global {
       token?: ConstructiveAPIToken;
       /** Device token from constructive_device_token cookie for trusted device tracking */
       deviceToken?: string;
+      /**
+       * Per-request protection bounds, resolved from the tenant's
+       * database/API settings and clamped by the platform. Set by
+       * `createRequestProtectionMiddleware`.
+       */
+      requestProtection?: RequestProtection;
     }
   }
 }
