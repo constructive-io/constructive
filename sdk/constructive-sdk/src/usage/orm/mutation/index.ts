@@ -7,59 +7,33 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
-  GrantAchievementInput,
   ProvisionBucketInput,
-  RecomputeCapabilitiesInput,
-  RevokeAchievementInput,
   SeedAppLimitCapsDefaultsInput,
   SeedAppLimitDefaultsInput,
-  SeedMeterDefaultsInput,
   SeedOrgLimitCapsDefaultsInput,
   SeedOrgLimitDefaultsInput,
-  SeedPlanInput,
-  SeedTrustLadderInput,
-  GrantAchievementPayload,
   ProvisionBucketPayload,
-  RecomputeCapabilitiesPayload,
-  RevokeAchievementPayload,
   SeedAppLimitCapsDefaultsPayload,
   SeedAppLimitDefaultsPayload,
-  SeedMeterDefaultsPayload,
   SeedOrgLimitCapsDefaultsPayload,
   SeedOrgLimitDefaultsPayload,
-  SeedPlanPayload,
-  SeedTrustLadderPayload,
-  GrantAchievementPayloadSelect,
   ProvisionBucketPayloadSelect,
-  RecomputeCapabilitiesPayloadSelect,
-  RevokeAchievementPayloadSelect,
   SeedAppLimitCapsDefaultsPayloadSelect,
   SeedAppLimitDefaultsPayloadSelect,
-  SeedMeterDefaultsPayloadSelect,
   SeedOrgLimitCapsDefaultsPayloadSelect,
   SeedOrgLimitDefaultsPayloadSelect,
-  SeedPlanPayloadSelect,
-  SeedTrustLadderPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface GrantAchievementVariables {
-  input: GrantAchievementInput;
-}
 /**
  * Variables for provisionBucket
- * Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+ * Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
-}
-export interface RecomputeCapabilitiesVariables {
-  input: RecomputeCapabilitiesInput;
-}
-export interface RevokeAchievementVariables {
-  input: RevokeAchievementInput;
 }
 export interface SeedAppLimitCapsDefaultsVariables {
   input: SeedAppLimitCapsDefaultsInput;
@@ -67,52 +41,14 @@ export interface SeedAppLimitCapsDefaultsVariables {
 export interface SeedAppLimitDefaultsVariables {
   input: SeedAppLimitDefaultsInput;
 }
-export interface SeedMeterDefaultsVariables {
-  input: SeedMeterDefaultsInput;
-}
 export interface SeedOrgLimitCapsDefaultsVariables {
   input: SeedOrgLimitCapsDefaultsInput;
 }
 export interface SeedOrgLimitDefaultsVariables {
   input: SeedOrgLimitDefaultsInput;
 }
-export interface SeedPlanVariables {
-  input: SeedPlanInput;
-}
-export interface SeedTrustLadderVariables {
-  input: SeedTrustLadderInput;
-}
 export function createMutationOperations(client: OrmClient) {
   return {
-    grantAchievement: <S extends GrantAchievementPayloadSelect>(
-      args: GrantAchievementVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, GrantAchievementPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        grantAchievement: InferSelectResult<GrantAchievementPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'GrantAchievement',
-        fieldName: 'grantAchievement',
-        ...buildCustomDocument(
-          'mutation',
-          'GrantAchievement',
-          'grantAchievement',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'GrantAchievementInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'GrantAchievementPayload'
-        ),
-      }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(
       args: ProvisionBucketVariables,
       options: {
@@ -140,64 +76,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionBucketPayload'
-        ),
-      }),
-    recomputeCapabilities: <S extends RecomputeCapabilitiesPayloadSelect>(
-      args: RecomputeCapabilitiesVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RecomputeCapabilitiesPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        recomputeCapabilities: InferSelectResult<RecomputeCapabilitiesPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RecomputeCapabilities',
-        fieldName: 'recomputeCapabilities',
-        ...buildCustomDocument(
-          'mutation',
-          'RecomputeCapabilities',
-          'recomputeCapabilities',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RecomputeCapabilitiesInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RecomputeCapabilitiesPayload'
-        ),
-      }),
-    revokeAchievement: <S extends RevokeAchievementPayloadSelect>(
-      args: RevokeAchievementVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RevokeAchievementPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        revokeAchievement: InferSelectResult<RevokeAchievementPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RevokeAchievement',
-        fieldName: 'revokeAchievement',
-        ...buildCustomDocument(
-          'mutation',
-          'RevokeAchievement',
-          'revokeAchievement',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RevokeAchievementInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RevokeAchievementPayload'
         ),
       }),
     seedAppLimitCapsDefaults: <S extends SeedAppLimitCapsDefaultsPayloadSelect>(
@@ -258,35 +136,6 @@ export function createMutationOperations(client: OrmClient) {
           'SeedAppLimitDefaultsPayload'
         ),
       }),
-    seedMeterDefaults: <S extends SeedMeterDefaultsPayloadSelect>(
-      args: SeedMeterDefaultsVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SeedMeterDefaultsPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        seedMeterDefaults: InferSelectResult<SeedMeterDefaultsPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SeedMeterDefaults',
-        fieldName: 'seedMeterDefaults',
-        ...buildCustomDocument(
-          'mutation',
-          'SeedMeterDefaults',
-          'seedMeterDefaults',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SeedMeterDefaultsInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SeedMeterDefaultsPayload'
-        ),
-      }),
     seedOrgLimitCapsDefaults: <S extends SeedOrgLimitCapsDefaultsPayloadSelect>(
       args: SeedOrgLimitCapsDefaultsVariables,
       options: {
@@ -343,64 +192,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SeedOrgLimitDefaultsPayload'
-        ),
-      }),
-    seedPlan: <S extends SeedPlanPayloadSelect>(
-      args: SeedPlanVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SeedPlanPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        seedPlan: InferSelectResult<SeedPlanPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SeedPlan',
-        fieldName: 'seedPlan',
-        ...buildCustomDocument(
-          'mutation',
-          'SeedPlan',
-          'seedPlan',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SeedPlanInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SeedPlanPayload'
-        ),
-      }),
-    seedTrustLadder: <S extends SeedTrustLadderPayloadSelect>(
-      args: SeedTrustLadderVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SeedTrustLadderPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        seedTrustLadder: InferSelectResult<SeedTrustLadderPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SeedTrustLadder',
-        fieldName: 'seedTrustLadder',
-        ...buildCustomDocument(
-          'mutation',
-          'SeedTrustLadder',
-          'seedTrustLadder',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SeedTrustLadderInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SeedTrustLadderPayload'
         ),
       }),
   };

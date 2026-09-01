@@ -89,6 +89,16 @@ function App() {
 | `useCreateUserMutation` | Mutation | Create a user |
 | `useUpdateUserMutation` | Mutation | Update a user |
 | `useDeleteUserMutation` | Mutation | Delete a user |
+| `useUserSettingsQuery` | Query | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useUserSettingQuery` | Query | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useCreateUserSettingMutation` | Mutation | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useUpdateUserSettingMutation` | Mutation | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useDeleteUserSettingMutation` | Mutation | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useUserSettingsSecuritiesQuery` | Query | Per-user security settings for MFA configuration (separate from user_settings preferences) |
+| `useUserSettingsSecurityQuery` | Query | Per-user security settings for MFA configuration (separate from user_settings preferences) |
+| `useCreateUserSettingsSecurityMutation` | Mutation | Per-user security settings for MFA configuration (separate from user_settings preferences) |
+| `useUpdateUserSettingsSecurityMutation` | Mutation | Per-user security settings for MFA configuration (separate from user_settings preferences) |
+| `useDeleteUserSettingsSecurityMutation` | Mutation | Per-user security settings for MFA configuration (separate from user_settings preferences) |
 | `useWebauthnCredentialsQuery` | Query | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
 | `useWebauthnCredentialQuery` | Query | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
 | `useCreateWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
@@ -98,22 +108,34 @@ function App() {
 | `useCurrentUserQuery` | Query | currentUser |
 | `useCurrentUserAgentQuery` | Query | currentUserAgent |
 | `useCurrentUserIdQuery` | Query | currentUserId |
+| `useGetMfaStatusQuery` | Query | getMfaStatus |
 | `useRequireStepUpQuery` | Query | requireStepUp |
+| `useApproveDeviceMutation` | Mutation | approveDevice |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
+| `useCompleteMfaChallengeMutation` | Mutation | completeMfaChallenge |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
+| `useConfirmTotpSetupMutation` | Mutation | confirmTotpSetup |
 | `useCreateApiKeyMutation` | Mutation | createApiKey |
 | `useCreateOrgApiKeyMutation` | Mutation | createOrgApiKey |
 | `useCreateOrgPrincipalMutation` | Mutation | createOrgPrincipal |
 | `useDeleteOrgPrincipalMutation` | Mutation | deleteOrgPrincipal |
 | `useDeletePrincipalMutation` | Mutation | deletePrincipal |
+| `useDisableEmailMfaMutation` | Mutation | disableEmailMfa |
+| `useDisableSmsMfaMutation` | Mutation | disableSmsMfa |
+| `useDisableTotpMutation` | Mutation | disableTotp |
 | `useDisconnectAccountMutation` | Mutation | disconnectAccount |
+| `useEnableEmailMfaMutation` | Mutation | enableEmailMfa |
+| `useEnableSmsMfaMutation` | Mutation | enableSmsMfa |
+| `useEnableTotpMutation` | Mutation | enableTotp |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
+| `useGenerateBackupCodesMutation` | Mutation | generateBackupCodes |
 | `useLinkIdentityMutation` | Mutation | linkIdentity |
-| `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `useProvisionBucketMutation` | Mutation | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
 | `useProvisionNewUserMutation` | Mutation | provisionNewUser |
 | `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
 | `useResetPasswordMutation` | Mutation | resetPassword |
@@ -383,6 +405,48 @@ const { mutate: create } = useCreateUserMutation({
 create({ displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' });
 ```
 
+### UserSetting
+
+```typescript
+// List all userSettings
+const { data, isLoading } = useUserSettingsQuery({
+  selection: { fields: { createdAt: true, id: true, ownerId: true, updatedAt: true } },
+});
+
+// Get one userSetting
+const { data: item } = useUserSettingQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, id: true, ownerId: true, updatedAt: true } },
+});
+
+// Create a userSetting
+const { mutate: create } = useCreateUserSettingMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<UUID>' });
+```
+
+### UserSettingsSecurity
+
+```typescript
+// List all userSettingsSecurities
+const { data, isLoading } = useUserSettingsSecuritiesQuery({
+  selection: { fields: { backupCodesCount: true, createdAt: true, emailMfaEnabled: true, id: true, mfaEnrolledAt: true, mfaLastUsedAt: true, ownerId: true, smsMfaEnabled: true, totpEnabled: true, updatedAt: true } },
+});
+
+// Get one userSettingsSecurity
+const { data: item } = useUserSettingsSecurityQuery({
+  id: '<UUID>',
+  selection: { fields: { backupCodesCount: true, createdAt: true, emailMfaEnabled: true, id: true, mfaEnrolledAt: true, mfaLastUsedAt: true, ownerId: true, smsMfaEnabled: true, totpEnabled: true, updatedAt: true } },
+});
+
+// Create a userSettingsSecurity
+const { mutate: create } = useCreateUserSettingsSecurityMutation({
+  selection: { fields: { id: true } },
+});
+create({ backupCodesCount: '<Int>', emailMfaEnabled: '<Boolean>', mfaEnrolledAt: '<Datetime>', mfaLastUsedAt: '<Datetime>', ownerId: '<UUID>', smsMfaEnabled: '<Boolean>', totpEnabled: '<Boolean>' });
+```
+
 ### WebauthnCredential
 
 ```typescript
@@ -434,6 +498,13 @@ currentUserId
 - **Type:** query
 - **Arguments:** none
 
+### `useGetMfaStatusQuery`
+
+getMfaStatus
+
+- **Type:** query
+- **Arguments:** none
+
 ### `useRequireStepUpQuery`
 
 requireStepUp
@@ -444,6 +515,17 @@ requireStepUp
   | Argument | Type |
   |----------|------|
   | `stepUpType` | String |
+
+### `useApproveDeviceMutation`
+
+approveDevice
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ApproveDeviceInput (required) |
 
 ### `useCheckPasswordMutation`
 
@@ -456,6 +538,17 @@ checkPassword
   |----------|------|
   | `input` | CheckPasswordInput (required) |
 
+### `useCompleteMfaChallengeMutation`
+
+completeMfaChallenge
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CompleteMfaChallengeInput (required) |
+
 ### `useConfirmDeleteAccountMutation`
 
 confirmDeleteAccount
@@ -466,6 +559,17 @@ confirmDeleteAccount
   | Argument | Type |
   |----------|------|
   | `input` | ConfirmDeleteAccountInput (required) |
+
+### `useConfirmTotpSetupMutation`
+
+confirmTotpSetup
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ConfirmTotpSetupInput (required) |
 
 ### `useCreateApiKeyMutation`
 
@@ -522,6 +626,39 @@ deletePrincipal
   |----------|------|
   | `input` | DeletePrincipalInput (required) |
 
+### `useDisableEmailMfaMutation`
+
+disableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableEmailMfaInput (required) |
+
+### `useDisableSmsMfaMutation`
+
+disableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableSmsMfaInput (required) |
+
+### `useDisableTotpMutation`
+
+disableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableTotpInput (required) |
+
 ### `useDisconnectAccountMutation`
 
 disconnectAccount
@@ -532,6 +669,39 @@ disconnectAccount
   | Argument | Type |
   |----------|------|
   | `input` | DisconnectAccountInput (required) |
+
+### `useEnableEmailMfaMutation`
+
+enableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableEmailMfaInput (required) |
+
+### `useEnableSmsMfaMutation`
+
+enableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableSmsMfaInput (required) |
+
+### `useEnableTotpMutation`
+
+enableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableTotpInput (required) |
 
 ### `useExtendTokenExpiresMutation`
 
@@ -555,6 +725,17 @@ forgotPassword
   |----------|------|
   | `input` | ForgotPasswordInput (required) |
 
+### `useGenerateBackupCodesMutation`
+
+generateBackupCodes
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | GenerateBackupCodesInput (required) |
+
 ### `useLinkIdentityMutation`
 
 linkIdentity
@@ -568,10 +749,11 @@ linkIdentity
 
 ### `useProvisionBucketMutation`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**

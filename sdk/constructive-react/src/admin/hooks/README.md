@@ -37,21 +37,11 @@ function App() {
 | `useCreateAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useUpdateAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useDeleteAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
-| `useAppCapabilitiesQuery` | Query | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
-| `useAppCapabilityQuery` | Query | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
-| `useCreateAppCapabilityMutation` | Mutation | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
-| `useUpdateAppCapabilityMutation` | Mutation | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
-| `useDeleteAppCapabilityMutation` | Mutation | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
 | `useAppCapabilityDefaultCapabilitiesQuery` | Query | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
 | `useAppCapabilityDefaultCapabilityQuery` | Query | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
 | `useCreateAppCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
 | `useUpdateAppCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
 | `useDeleteAppCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
-| `useAppCapabilityDefaultsQuery` | Query | Stores the default capability bitmask assigned to new members upon joining |
-| `useAppCapabilityDefaultQuery` | Query | Stores the default capability bitmask assigned to new members upon joining |
-| `useCreateAppCapabilityDefaultMutation` | Mutation | Stores the default capability bitmask assigned to new members upon joining |
-| `useUpdateAppCapabilityDefaultMutation` | Mutation | Stores the default capability bitmask assigned to new members upon joining |
-| `useDeleteAppCapabilityDefaultMutation` | Mutation | Stores the default capability bitmask assigned to new members upon joining |
 | `useAppCapabilityDefaultGrantsQuery` | Query | Audit log of capability additions and removals from the defaults bitmask |
 | `useAppCapabilityDefaultGrantQuery` | Query | Audit log of capability additions and removals from the defaults bitmask |
 | `useCreateAppCapabilityDefaultGrantMutation` | Mutation | Audit log of capability additions and removals from the defaults bitmask |
@@ -82,41 +72,11 @@ function App() {
 | `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useAppMembershipProfilesQuery` | Query | Every profile a membership holds; memberships.profile_id points at one of them |
-| `useAppMembershipProfileQuery` | Query | Every profile a membership holds; memberships.profile_id points at one of them |
-| `useCreateAppMembershipProfileMutation` | Mutation | Every profile a membership holds; memberships.profile_id points at one of them |
-| `useUpdateAppMembershipProfileMutation` | Mutation | Every profile a membership holds; memberships.profile_id points at one of them |
-| `useDeleteAppMembershipProfileMutation` | Mutation | Every profile a membership holds; memberships.profile_id points at one of them |
 | `useAppOwnerGrantsQuery` | Query | Records of ownership transfers and grants between members |
 | `useAppOwnerGrantQuery` | Query | Records of ownership transfers and grants between members |
 | `useCreateAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useUpdateAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useDeleteAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
-| `useAppProfileCapabilitiesQuery` | Query | Join table linking profiles to individual capabilities they include |
-| `useAppProfileCapabilityQuery` | Query | Join table linking profiles to individual capabilities they include |
-| `useCreateAppProfileCapabilityMutation` | Mutation | Join table linking profiles to individual capabilities they include |
-| `useUpdateAppProfileCapabilityMutation` | Mutation | Join table linking profiles to individual capabilities they include |
-| `useDeleteAppProfileCapabilityMutation` | Mutation | Join table linking profiles to individual capabilities they include |
-| `useAppProfilesQuery` | Query | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useAppProfileQuery` | Query | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useCreateAppProfileMutation` | Mutation | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useUpdateAppProfileMutation` | Mutation | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useDeleteAppProfileMutation` | Mutation | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useAppProfileDefinitionGrantsQuery` | Query | Audit log of capability additions and removals from profile definitions |
-| `useAppProfileDefinitionGrantQuery` | Query | Audit log of capability additions and removals from profile definitions |
-| `useCreateAppProfileDefinitionGrantMutation` | Mutation | Audit log of capability additions and removals from profile definitions |
-| `useUpdateAppProfileDefinitionGrantMutation` | Mutation | Audit log of capability additions and removals from profile definitions |
-| `useDeleteAppProfileDefinitionGrantMutation` | Mutation | Audit log of capability additions and removals from profile definitions |
-| `useAppProfileGrantsQuery` | Query | Audit log of profile assignments and revocations for members |
-| `useAppProfileGrantQuery` | Query | Audit log of profile assignments and revocations for members |
-| `useCreateAppProfileGrantMutation` | Mutation | Audit log of profile assignments and revocations for members |
-| `useUpdateAppProfileGrantMutation` | Mutation | Audit log of profile assignments and revocations for members |
-| `useDeleteAppProfileGrantMutation` | Mutation | Audit log of profile assignments and revocations for members |
-| `useAppProfileTemplatesQuery` | Query | Template profiles that are automatically seeded into new entities when created |
-| `useAppProfileTemplateQuery` | Query | Template profiles that are automatically seeded into new entities when created |
-| `useCreateAppProfileTemplateMutation` | Mutation | Template profiles that are automatically seeded into new entities when created |
-| `useUpdateAppProfileTemplateMutation` | Mutation | Template profiles that are automatically seeded into new entities when created |
-| `useDeleteAppProfileTemplateMutation` | Mutation | Template profiles that are automatically seeded into new entities when created |
 | `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
@@ -127,21 +87,11 @@ function App() {
 | `useCreateOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useUpdateOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useDeleteOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
-| `useOrgCapabilitiesQuery` | Query | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
-| `useOrgCapabilityQuery` | Query | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
-| `useCreateOrgCapabilityMutation` | Mutation | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
-| `useUpdateOrgCapabilityMutation` | Mutation | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
-| `useDeleteOrgCapabilityMutation` | Mutation | Defines available capabilities as named bits within a bitmask, used by the RBAC system for access control |
 | `useOrgCapabilityDefaultCapabilitiesQuery` | Query | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
 | `useOrgCapabilityDefaultCapabilityQuery` | Query | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
 | `useCreateOrgCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
 | `useUpdateOrgCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
 | `useDeleteOrgCapabilityDefaultCapabilityMutation` | Mutation | Join table linking capability defaults to individual capabilities; recompute trigger rebuilds the defaults bitmask |
-| `useOrgCapabilityDefaultsQuery` | Query | Stores the default capability bitmask assigned to new members upon joining |
-| `useOrgCapabilityDefaultQuery` | Query | Stores the default capability bitmask assigned to new members upon joining |
-| `useCreateOrgCapabilityDefaultMutation` | Mutation | Stores the default capability bitmask assigned to new members upon joining |
-| `useUpdateOrgCapabilityDefaultMutation` | Mutation | Stores the default capability bitmask assigned to new members upon joining |
-| `useDeleteOrgCapabilityDefaultMutation` | Mutation | Stores the default capability bitmask assigned to new members upon joining |
 | `useOrgCapabilityDefaultGrantsQuery` | Query | Audit log of capability additions and removals from the defaults bitmask |
 | `useOrgCapabilityDefaultGrantQuery` | Query | Audit log of capability additions and removals from the defaults bitmask |
 | `useCreateOrgCapabilityDefaultGrantMutation` | Mutation | Audit log of capability additions and removals from the defaults bitmask |
@@ -196,11 +146,6 @@ function App() {
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useOrgMembershipProfilesQuery` | Query | Every profile a membership holds; memberships.profile_id points at one of them |
-| `useOrgMembershipProfileQuery` | Query | Every profile a membership holds; memberships.profile_id points at one of them |
-| `useCreateOrgMembershipProfileMutation` | Mutation | Every profile a membership holds; memberships.profile_id points at one of them |
-| `useUpdateOrgMembershipProfileMutation` | Mutation | Every profile a membership holds; memberships.profile_id points at one of them |
-| `useDeleteOrgMembershipProfileMutation` | Mutation | Every profile a membership holds; memberships.profile_id points at one of them |
 | `useOrgMembershipSettingsQuery` | Query | Per-entity settings for the memberships module |
 | `useOrgMembershipSettingQuery` | Query | Per-entity settings for the memberships module |
 | `useCreateOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
@@ -211,44 +156,13 @@ function App() {
 | `useCreateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useUpdateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useDeleteOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
-| `useOrgProfileCapabilitiesQuery` | Query | Join table linking profiles to individual capabilities they include |
-| `useOrgProfileCapabilityQuery` | Query | Join table linking profiles to individual capabilities they include |
-| `useCreateOrgProfileCapabilityMutation` | Mutation | Join table linking profiles to individual capabilities they include |
-| `useUpdateOrgProfileCapabilityMutation` | Mutation | Join table linking profiles to individual capabilities they include |
-| `useDeleteOrgProfileCapabilityMutation` | Mutation | Join table linking profiles to individual capabilities they include |
-| `useOrgProfilesQuery` | Query | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useOrgProfileQuery` | Query | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useCreateOrgProfileMutation` | Mutation | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useUpdateOrgProfileMutation` | Mutation | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useDeleteOrgProfileMutation` | Mutation | Named capability bundles (roles) that group multiple capabilities into reusable profiles |
-| `useOrgProfileDefinitionGrantsQuery` | Query | Audit log of capability additions and removals from profile definitions |
-| `useOrgProfileDefinitionGrantQuery` | Query | Audit log of capability additions and removals from profile definitions |
-| `useCreateOrgProfileDefinitionGrantMutation` | Mutation | Audit log of capability additions and removals from profile definitions |
-| `useUpdateOrgProfileDefinitionGrantMutation` | Mutation | Audit log of capability additions and removals from profile definitions |
-| `useDeleteOrgProfileDefinitionGrantMutation` | Mutation | Audit log of capability additions and removals from profile definitions |
-| `useOrgProfileGrantsQuery` | Query | Audit log of profile assignments and revocations for members |
-| `useOrgProfileGrantQuery` | Query | Audit log of profile assignments and revocations for members |
-| `useCreateOrgProfileGrantMutation` | Mutation | Audit log of profile assignments and revocations for members |
-| `useUpdateOrgProfileGrantMutation` | Mutation | Audit log of profile assignments and revocations for members |
-| `useDeleteOrgProfileGrantMutation` | Mutation | Audit log of profile assignments and revocations for members |
-| `useOrgProfileTemplatesQuery` | Query | Template profiles that are automatically seeded into new entities when created |
-| `useOrgProfileTemplateQuery` | Query | Template profiles that are automatically seeded into new entities when created |
-| `useCreateOrgProfileTemplateMutation` | Mutation | Template profiles that are automatically seeded into new entities when created |
-| `useUpdateOrgProfileTemplateMutation` | Mutation | Template profiles that are automatically seeded into new entities when created |
-| `useDeleteOrgProfileTemplateMutation` | Mutation | Template profiles that are automatically seeded into new entities when created |
-| `useAppCapabilitiesGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppCapability`. |
-| `useAppCapabilitiesGetMaskQuery` | Query | appCapabilitiesGetMask |
-| `useAppCapabilitiesGetMaskByNamesQuery` | Query | appCapabilitiesGetMaskByNames |
-| `useAppCapabilitiesGetPaddedMaskQuery` | Query | appCapabilitiesGetPaddedMask |
-| `useOrgCapabilitiesGetByMaskQuery` | Query | Reads and enables pagination through a set of `OrgCapability`. |
-| `useOrgCapabilitiesGetMaskQuery` | Query | orgCapabilitiesGetMask |
-| `useOrgCapabilitiesGetMaskByNamesQuery` | Query | orgCapabilitiesGetMaskByNames |
-| `useOrgCapabilitiesGetPaddedMaskQuery` | Query | orgCapabilitiesGetPaddedMask |
+| `useGetOrganizationIdQuery` | Query | getOrganizationId |
 | `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
-| `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `useProvisionBucketMutation` | Mutation | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
 | `useSubmitAppInviteCodeMutation` | Mutation | submitAppInviteCode |
 | `useSubmitOrgInviteCodeMutation` | Mutation | submitOrgInviteCode |
 
@@ -275,27 +189,6 @@ const { mutate: create } = useCreateAppAdminGrantMutation({
 create({ actorId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
-### AppCapability
-
-```typescript
-// List all appCapabilities
-const { data, isLoading } = useAppCapabilitiesQuery({
-  selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, kind: true, name: true } },
-});
-
-// Get one appCapability
-const { data: item } = useAppCapabilityQuery({
-  id: '<UUID>',
-  selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, kind: true, name: true } },
-});
-
-// Create a appCapability
-const { mutate: create } = useCreateAppCapabilityMutation({
-  selection: { fields: { id: true } },
-});
-create({ bitnum: '<Int>', bitstr: '<BitString>', description: '<String>', kind: '<String>', name: '<String>' });
-```
-
 ### AppCapabilityDefaultCapability
 
 ```typescript
@@ -315,27 +208,6 @@ const { mutate: create } = useCreateAppCapabilityDefaultCapabilityMutation({
   selection: { fields: { id: true } },
 });
 create({ capabilityId: '<UUID>' });
-```
-
-### AppCapabilityDefault
-
-```typescript
-// List all appCapabilityDefaults
-const { data, isLoading } = useAppCapabilityDefaultsQuery({
-  selection: { fields: { capabilities: true, id: true } },
-});
-
-// Get one appCapabilityDefault
-const { data: item } = useAppCapabilityDefaultQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilities: true, id: true } },
-});
-
-// Create a appCapabilityDefault
-const { mutate: create } = useCreateAppCapabilityDefaultMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilities: '<BitString>' });
 ```
 
 ### AppCapabilityDefaultGrant
@@ -427,20 +299,20 @@ create({ channel: '<String>', data: '<JSON>', email: '<Email>', expiresAt: '<Dat
 ```typescript
 // List all appMemberships
 const { data, isLoading } = useAppMembershipsQuery({
-  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, profileId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, createdByPrincipal: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, profileId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one appMembership
 const { data: item } = useAppMembershipQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, profileId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, createdByPrincipal: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, profileId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a appMembership
 const { mutate: create } = useCreateAppMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isOwner: '<Boolean>', isVerified: '<Boolean>', profileId: '<UUID>', updatedBy: '<UUID>' });
+create({ actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isOwner: '<Boolean>', isVerified: '<Boolean>', profileId: '<UUID>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### AppMembershipDefault
@@ -448,41 +320,20 @@ create({ actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', gr
 ```typescript
 // List all appMembershipDefaults
 const { data, isLoading } = useAppMembershipDefaultsQuery({
-  selection: { fields: { createdAt: true, createdBy: true, id: true, isApproved: true, isVerified: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, isApproved: true, isVerified: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one appMembershipDefault
 const { data: item } = useAppMembershipDefaultQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, createdBy: true, id: true, isApproved: true, isVerified: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, isApproved: true, isVerified: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a appMembershipDefault
 const { mutate: create } = useCreateAppMembershipDefaultMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>', updatedBy: '<UUID>' });
-```
-
-### AppMembershipProfile
-
-```typescript
-// List all appMembershipProfiles
-const { data, isLoading } = useAppMembershipProfilesQuery({
-  selection: { fields: { actorId: true, createdAt: true, id: true, membershipId: true, profileId: true, updatedAt: true } },
-});
-
-// Get one appMembershipProfile
-const { data: item } = useAppMembershipProfileQuery({
-  id: '<UUID>',
-  selection: { fields: { actorId: true, createdAt: true, id: true, membershipId: true, profileId: true, updatedAt: true } },
-});
-
-// Create a appMembershipProfile
-const { mutate: create } = useCreateAppMembershipProfileMutation({
-  selection: { fields: { id: true } },
-});
-create({ actorId: '<UUID>', membershipId: '<UUID>', profileId: '<UUID>' });
+create({ createdBy: '<UUID>', createdByPrincipal: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### AppOwnerGrant
@@ -504,111 +355,6 @@ const { mutate: create } = useCreateAppOwnerGrantMutation({
   selection: { fields: { id: true } },
 });
 create({ actorId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
-```
-
-### AppProfileCapability
-
-```typescript
-// List all appProfileCapabilities
-const { data, isLoading } = useAppProfileCapabilitiesQuery({
-  selection: { fields: { capabilityId: true, createdAt: true, id: true, profileId: true, updatedAt: true } },
-});
-
-// Get one appProfileCapability
-const { data: item } = useAppProfileCapabilityQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilityId: true, createdAt: true, id: true, profileId: true, updatedAt: true } },
-});
-
-// Create a appProfileCapability
-const { mutate: create } = useCreateAppProfileCapabilityMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilityId: '<UUID>', profileId: '<UUID>' });
-```
-
-### AppProfile
-
-```typescript
-// List all appProfiles
-const { data, isLoading } = useAppProfilesQuery({
-  selection: { fields: { capabilities: true, createdAt: true, description: true, id: true, isDefault: true, isSystem: true, name: true, slug: true, updatedAt: true } },
-});
-
-// Get one appProfile
-const { data: item } = useAppProfileQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilities: true, createdAt: true, description: true, id: true, isDefault: true, isSystem: true, name: true, slug: true, updatedAt: true } },
-});
-
-// Create a appProfile
-const { mutate: create } = useCreateAppProfileMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilities: '<BitString>', description: '<String>', isDefault: '<Boolean>', isSystem: '<Boolean>', name: '<String>', slug: '<String>' });
-```
-
-### AppProfileDefinitionGrant
-
-```typescript
-// List all appProfileDefinitionGrants
-const { data, isLoading } = useAppProfileDefinitionGrantsQuery({
-  selection: { fields: { capabilityId: true, createdAt: true, grantorId: true, id: true, isGrant: true, profileId: true, updatedAt: true } },
-});
-
-// Get one appProfileDefinitionGrant
-const { data: item } = useAppProfileDefinitionGrantQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilityId: true, createdAt: true, grantorId: true, id: true, isGrant: true, profileId: true, updatedAt: true } },
-});
-
-// Create a appProfileDefinitionGrant
-const { mutate: create } = useCreateAppProfileDefinitionGrantMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', profileId: '<UUID>' });
-```
-
-### AppProfileGrant
-
-```typescript
-// List all appProfileGrants
-const { data, isLoading } = useAppProfileGrantsQuery({
-  selection: { fields: { createdAt: true, grantorId: true, id: true, isGrant: true, membershipId: true, profileId: true, updatedAt: true } },
-});
-
-// Get one appProfileGrant
-const { data: item } = useAppProfileGrantQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, grantorId: true, id: true, isGrant: true, membershipId: true, profileId: true, updatedAt: true } },
-});
-
-// Create a appProfileGrant
-const { mutate: create } = useCreateAppProfileGrantMutation({
-  selection: { fields: { id: true } },
-});
-create({ grantorId: '<UUID>', isGrant: '<Boolean>', membershipId: '<UUID>', profileId: '<UUID>' });
-```
-
-### AppProfileTemplate
-
-```typescript
-// List all appProfileTemplates
-const { data, isLoading } = useAppProfileTemplatesQuery({
-  selection: { fields: { capabilities: true, createdAt: true, description: true, id: true, isDefault: true, name: true, slug: true, updatedAt: true } },
-});
-
-// Get one appProfileTemplate
-const { data: item } = useAppProfileTemplateQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilities: true, createdAt: true, description: true, id: true, isDefault: true, name: true, slug: true, updatedAt: true } },
-});
-
-// Create a appProfileTemplate
-const { mutate: create } = useCreateAppProfileTemplateMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilities: '<BitString>', description: '<String>', isDefault: '<Boolean>', name: '<String>', slug: '<String>' });
 ```
 
 ### MembershipType
@@ -653,27 +399,6 @@ const { mutate: create } = useCreateOrgAdminGrantMutation({
 create({ actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
-### OrgCapability
-
-```typescript
-// List all orgCapabilities
-const { data, isLoading } = useOrgCapabilitiesQuery({
-  selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, kind: true, name: true } },
-});
-
-// Get one orgCapability
-const { data: item } = useOrgCapabilityQuery({
-  id: '<UUID>',
-  selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, kind: true, name: true } },
-});
-
-// Create a orgCapability
-const { mutate: create } = useCreateOrgCapabilityMutation({
-  selection: { fields: { id: true } },
-});
-create({ bitnum: '<Int>', bitstr: '<BitString>', description: '<String>', kind: '<String>', name: '<String>' });
-```
-
 ### OrgCapabilityDefaultCapability
 
 ```typescript
@@ -693,27 +418,6 @@ const { mutate: create } = useCreateOrgCapabilityDefaultCapabilityMutation({
   selection: { fields: { id: true } },
 });
 create({ capabilityId: '<UUID>', entityId: '<UUID>' });
-```
-
-### OrgCapabilityDefault
-
-```typescript
-// List all orgCapabilityDefaults
-const { data, isLoading } = useOrgCapabilityDefaultsQuery({
-  selection: { fields: { capabilities: true, entityId: true, id: true } },
-});
-
-// Get one orgCapabilityDefault
-const { data: item } = useOrgCapabilityDefaultQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilities: true, entityId: true, id: true } },
-});
-
-// Create a orgCapabilityDefault
-const { mutate: create } = useCreateOrgCapabilityDefaultMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilities: '<BitString>', entityId: '<UUID>' });
 ```
 
 ### OrgCapabilityDefaultGrant
@@ -919,20 +623,20 @@ create({ actorId: '<UUID>', bio: '<String>', displayName: '<String>', email: '<S
 ```typescript
 // List all orgMemberships
 const { data, isLoading } = useOrgMembershipsQuery({
-  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, entityId: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isExternal: true, isOwner: true, isReadOnly: true, profileId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, createdByPrincipal: true, entityId: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isExternal: true, isOwner: true, isReadOnly: true, profileId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one orgMembership
 const { data: item } = useOrgMembershipQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, entityId: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isExternal: true, isOwner: true, isReadOnly: true, profileId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { actorId: true, capabilities: true, createdAt: true, createdBy: true, createdByPrincipal: true, entityId: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isExternal: true, isOwner: true, isReadOnly: true, profileId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a orgMembership
 const { mutate: create } = useCreateOrgMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', entityId: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isReadOnly: '<Boolean>', profileId: '<UUID>', updatedBy: '<UUID>' });
+create({ actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', entityId: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isReadOnly: '<Boolean>', profileId: '<UUID>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### OrgMembershipDefault
@@ -940,41 +644,20 @@ create({ actorId: '<UUID>', capabilities: '<BitString>', createdBy: '<UUID>', en
 ```typescript
 // List all orgMembershipDefaults
 const { data, isLoading } = useOrgMembershipDefaultsQuery({
-  selection: { fields: { createdAt: true, createdBy: true, entityId: true, id: true, isApproved: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, entityId: true, id: true, isApproved: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one orgMembershipDefault
 const { data: item } = useOrgMembershipDefaultQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, createdBy: true, entityId: true, id: true, isApproved: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, entityId: true, id: true, isApproved: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a orgMembershipDefault
 const { mutate: create } = useCreateOrgMembershipDefaultMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', entityId: '<UUID>', isApproved: '<Boolean>', updatedBy: '<UUID>' });
-```
-
-### OrgMembershipProfile
-
-```typescript
-// List all orgMembershipProfiles
-const { data, isLoading } = useOrgMembershipProfilesQuery({
-  selection: { fields: { actorId: true, createdAt: true, id: true, membershipId: true, profileId: true, updatedAt: true } },
-});
-
-// Get one orgMembershipProfile
-const { data: item } = useOrgMembershipProfileQuery({
-  id: '<UUID>',
-  selection: { fields: { actorId: true, createdAt: true, id: true, membershipId: true, profileId: true, updatedAt: true } },
-});
-
-// Create a orgMembershipProfile
-const { mutate: create } = useCreateOrgMembershipProfileMutation({
-  selection: { fields: { id: true } },
-});
-create({ actorId: '<UUID>', membershipId: '<UUID>', profileId: '<UUID>' });
+create({ createdBy: '<UUID>', createdByPrincipal: '<UUID>', entityId: '<UUID>', isApproved: '<Boolean>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### OrgMembershipSetting
@@ -982,20 +665,20 @@ create({ actorId: '<UUID>', membershipId: '<UUID>', profileId: '<UUID>' });
 ```typescript
 // List all orgMembershipSettings
 const { data, isLoading } = useOrgMembershipSettingsQuery({
-  selection: { fields: { allowExternalMembers: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, createChildCascadeOwners: true, createdAt: true, createdBy: true, deleteMemberCascadeChildren: true, entityId: true, id: true, inviteProfileAssignmentMode: true, limitAllocationMode: true, populateMemberEmail: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { allowExternalMembers: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, createChildCascadeOwners: true, createdAt: true, createdBy: true, createdByPrincipal: true, deleteMemberCascadeChildren: true, entityId: true, id: true, inviteProfileAssignmentMode: true, limitAllocationMode: true, populateMemberEmail: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one orgMembershipSetting
 const { data: item } = useOrgMembershipSettingQuery({
   id: '<UUID>',
-  selection: { fields: { allowExternalMembers: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, createChildCascadeOwners: true, createdAt: true, createdBy: true, deleteMemberCascadeChildren: true, entityId: true, id: true, inviteProfileAssignmentMode: true, limitAllocationMode: true, populateMemberEmail: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { allowExternalMembers: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, createChildCascadeOwners: true, createdAt: true, createdBy: true, createdByPrincipal: true, deleteMemberCascadeChildren: true, entityId: true, id: true, inviteProfileAssignmentMode: true, limitAllocationMode: true, populateMemberEmail: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a orgMembershipSetting
 const { mutate: create } = useCreateOrgMembershipSettingMutation({
   selection: { fields: { id: true } },
 });
-create({ allowExternalMembers: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', createChildCascadeOwners: '<Boolean>', createdBy: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', entityId: '<UUID>', inviteProfileAssignmentMode: '<String>', limitAllocationMode: '<String>', populateMemberEmail: '<Boolean>', updatedBy: '<UUID>' });
+create({ allowExternalMembers: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', createChildCascadeOwners: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', entityId: '<UUID>', inviteProfileAssignmentMode: '<String>', limitAllocationMode: '<String>', populateMemberEmail: '<Boolean>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### OrgOwnerGrant
@@ -1019,206 +702,19 @@ const { mutate: create } = useCreateOrgOwnerGrantMutation({
 create({ actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
-### OrgProfileCapability
-
-```typescript
-// List all orgProfileCapabilities
-const { data, isLoading } = useOrgProfileCapabilitiesQuery({
-  selection: { fields: { capabilityId: true, createdAt: true, id: true, profileId: true, updatedAt: true } },
-});
-
-// Get one orgProfileCapability
-const { data: item } = useOrgProfileCapabilityQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilityId: true, createdAt: true, id: true, profileId: true, updatedAt: true } },
-});
-
-// Create a orgProfileCapability
-const { mutate: create } = useCreateOrgProfileCapabilityMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilityId: '<UUID>', profileId: '<UUID>' });
-```
-
-### OrgProfile
-
-```typescript
-// List all orgProfiles
-const { data, isLoading } = useOrgProfilesQuery({
-  selection: { fields: { capabilities: true, createdAt: true, description: true, entityId: true, id: true, isDefault: true, isSystem: true, name: true, slug: true, updatedAt: true } },
-});
-
-// Get one orgProfile
-const { data: item } = useOrgProfileQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilities: true, createdAt: true, description: true, entityId: true, id: true, isDefault: true, isSystem: true, name: true, slug: true, updatedAt: true } },
-});
-
-// Create a orgProfile
-const { mutate: create } = useCreateOrgProfileMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilities: '<BitString>', description: '<String>', entityId: '<UUID>', isDefault: '<Boolean>', isSystem: '<Boolean>', name: '<String>', slug: '<String>' });
-```
-
-### OrgProfileDefinitionGrant
-
-```typescript
-// List all orgProfileDefinitionGrants
-const { data, isLoading } = useOrgProfileDefinitionGrantsQuery({
-  selection: { fields: { capabilityId: true, createdAt: true, grantorId: true, id: true, isGrant: true, profileId: true, updatedAt: true } },
-});
-
-// Get one orgProfileDefinitionGrant
-const { data: item } = useOrgProfileDefinitionGrantQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilityId: true, createdAt: true, grantorId: true, id: true, isGrant: true, profileId: true, updatedAt: true } },
-});
-
-// Create a orgProfileDefinitionGrant
-const { mutate: create } = useCreateOrgProfileDefinitionGrantMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', profileId: '<UUID>' });
-```
-
-### OrgProfileGrant
-
-```typescript
-// List all orgProfileGrants
-const { data, isLoading } = useOrgProfileGrantsQuery({
-  selection: { fields: { createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, membershipId: true, profileId: true, updatedAt: true } },
-});
-
-// Get one orgProfileGrant
-const { data: item } = useOrgProfileGrantQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, membershipId: true, profileId: true, updatedAt: true } },
-});
-
-// Create a orgProfileGrant
-const { mutate: create } = useCreateOrgProfileGrantMutation({
-  selection: { fields: { id: true } },
-});
-create({ entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', membershipId: '<UUID>', profileId: '<UUID>' });
-```
-
-### OrgProfileTemplate
-
-```typescript
-// List all orgProfileTemplates
-const { data, isLoading } = useOrgProfileTemplatesQuery({
-  selection: { fields: { capabilities: true, createdAt: true, description: true, id: true, isDefault: true, name: true, slug: true, updatedAt: true } },
-});
-
-// Get one orgProfileTemplate
-const { data: item } = useOrgProfileTemplateQuery({
-  id: '<UUID>',
-  selection: { fields: { capabilities: true, createdAt: true, description: true, id: true, isDefault: true, name: true, slug: true, updatedAt: true } },
-});
-
-// Create a orgProfileTemplate
-const { mutate: create } = useCreateOrgProfileTemplateMutation({
-  selection: { fields: { id: true } },
-});
-create({ capabilities: '<BitString>', description: '<String>', isDefault: '<Boolean>', name: '<String>', slug: '<String>' });
-```
-
 ## Custom Operation Hooks
 
-### `useAppCapabilitiesGetByMaskQuery`
+### `useGetOrganizationIdQuery`
 
-Reads and enables pagination through a set of `AppCapability`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `after` | Cursor |
-  | `first` | Int |
-  | `mask` | BitString |
-  | `offset` | Int |
-
-### `useAppCapabilitiesGetMaskQuery`
-
-appCapabilitiesGetMask
+getOrganizationId
 
 - **Type:** query
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `ids` | [UUID] |
-
-### `useAppCapabilitiesGetMaskByNamesQuery`
-
-appCapabilitiesGetMaskByNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `names` | [String] |
-
-### `useAppCapabilitiesGetPaddedMaskQuery`
-
-appCapabilitiesGetPaddedMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
-
-### `useOrgCapabilitiesGetByMaskQuery`
-
-Reads and enables pagination through a set of `OrgCapability`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `after` | Cursor |
-  | `first` | Int |
-  | `mask` | BitString |
-  | `offset` | Int |
-
-### `useOrgCapabilitiesGetMaskQuery`
-
-orgCapabilitiesGetMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `ids` | [UUID] |
-
-### `useOrgCapabilitiesGetMaskByNamesQuery`
-
-orgCapabilitiesGetMaskByNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `names` | [String] |
-
-### `useOrgCapabilitiesGetPaddedMaskQuery`
-
-orgCapabilitiesGetPaddedMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
+  | `entityId` | UUID |
+  | `entityType` | String |
 
 ### `useOrgIsManagerOfQuery`
 
@@ -1236,10 +732,11 @@ orgIsManagerOf
 
 ### `useProvisionBucketMutation`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**

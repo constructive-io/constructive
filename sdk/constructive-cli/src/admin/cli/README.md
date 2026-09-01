@@ -27,18 +27,18 @@ csdk auth set-token <your-token>
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
 | `app-admin-grant` | appAdminGrant CRUD operations |
+| `app-capability-default-capability` | appCapabilityDefaultCapability CRUD operations |
+| `app-capability-default-grant` | appCapabilityDefaultGrant CRUD operations |
 | `app-claimed-invite` | appClaimedInvite CRUD operations |
 | `app-grant` | appGrant CRUD operations |
 | `app-invite` | appInvite CRUD operations |
 | `app-membership` | appMembership CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `app-owner-grant` | appOwnerGrant CRUD operations |
-| `app-permission` | appPermission CRUD operations |
-| `app-permission-default` | appPermissionDefault CRUD operations |
-| `app-permission-default-grant` | appPermissionDefaultGrant CRUD operations |
-| `app-permission-default-permission` | appPermissionDefaultPermission CRUD operations |
 | `membership-type` | membershipType CRUD operations |
 | `org-admin-grant` | orgAdminGrant CRUD operations |
+| `org-capability-default-capability` | orgCapabilityDefaultCapability CRUD operations |
+| `org-capability-default-grant` | orgCapabilityDefaultGrant CRUD operations |
 | `org-chart-edge` | orgChartEdge CRUD operations |
 | `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
 | `org-claimed-invite` | orgClaimedInvite CRUD operations |
@@ -52,23 +52,13 @@ csdk auth set-token <your-token>
 | `org-membership-default` | orgMembershipDefault CRUD operations |
 | `org-membership-setting` | orgMembershipSetting CRUD operations |
 | `org-owner-grant` | orgOwnerGrant CRUD operations |
-| `org-permission` | orgPermission CRUD operations |
-| `org-permission-default` | orgPermissionDefault CRUD operations |
-| `org-permission-default-grant` | orgPermissionDefaultGrant CRUD operations |
-| `org-permission-default-permission` | orgPermissionDefaultPermission CRUD operations |
-| `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
-| `app-permissions-get-mask` | appPermissionsGetMask |
-| `app-permissions-get-mask-by-names` | appPermissionsGetMaskByNames |
-| `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
+| `get-organization-id` | getOrganizationId |
 | `org-is-manager-of` | orgIsManagerOf |
-| `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
-| `org-permissions-get-mask` | orgPermissionsGetMask |
-| `org-permissions-get-mask-by-names` | orgPermissionsGetMaskByNames |
-| `org-permissions-get-padded-mask` | orgPermissionsGetPaddedMask |
-| `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `provision-bucket` | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
 | `submit-app-invite-code` | submitAppInviteCode |
 | `submit-org-invite-code` | submitOrgInviteCode |
 
@@ -139,6 +129,57 @@ CRUD operations for AppAdminGrant records.
 
 **Optional create fields (backend defaults):** `actorId`, `grantorId`, `isGrant`
 
+### `app-capability-default-capability`
+
+CRUD operations for AppCapabilityDefaultCapability records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appCapabilityDefaultCapability records |
+| `find-first` | Find first matching appCapabilityDefaultCapability record |
+| `get` | Get a appCapabilityDefaultCapability by id |
+| `create` | Create a new appCapabilityDefaultCapability |
+| `update` | Update an existing appCapabilityDefaultCapability |
+| `delete` | Delete a appCapabilityDefaultCapability |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `capabilityId` | UUID |
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `capabilityId`
+
+### `app-capability-default-grant`
+
+CRUD operations for AppCapabilityDefaultGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appCapabilityDefaultGrant records |
+| `find-first` | Find first matching appCapabilityDefaultGrant record |
+| `get` | Get a appCapabilityDefaultGrant by id |
+| `create` | Create a new appCapabilityDefaultGrant |
+| `update` | Update an existing appCapabilityDefaultGrant |
+| `delete` | Delete a appCapabilityDefaultGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `capabilityId` | UUID |
+| `createdAt` | Datetime |
+| `grantorId` | UUID |
+| `id` | UUID |
+| `isGrant` | Boolean |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `capabilityId`
+**Optional create fields (backend defaults):** `grantorId`, `isGrant`
+
 ### `app-claimed-invite`
 
 CRUD operations for AppClaimedInvite records.
@@ -183,14 +224,14 @@ CRUD operations for AppGrant records.
 | Field | Type |
 |-------|------|
 | `actorId` | UUID |
+| `capabilities` | BitString |
 | `createdAt` | Datetime |
 | `grantorId` | UUID |
 | `id` | UUID |
 | `isGrant` | Boolean |
-| `permissions` | BitString |
 | `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `actorId`, `grantorId`, `isGrant`, `permissions`
+**Optional create fields (backend defaults):** `actorId`, `capabilities`, `grantorId`, `isGrant`
 
 ### `app-invite`
 
@@ -245,8 +286,10 @@ CRUD operations for AppMembership records.
 | Field | Type |
 |-------|------|
 | `actorId` | UUID |
+| `capabilities` | BitString |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `granted` | BitString |
 | `id` | UUID |
 | `isActive` | Boolean |
@@ -256,13 +299,13 @@ CRUD operations for AppMembership records.
 | `isDisabled` | Boolean |
 | `isOwner` | Boolean |
 | `isVerified` | Boolean |
-| `permissions` | BitString |
 | `profileId` | UUID |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `createdBy`, `granted`, `isActive`, `isAdmin`, `isApproved`, `isBanned`, `isDisabled`, `isOwner`, `isVerified`, `permissions`, `profileId`, `updatedBy`
+**Optional create fields (backend defaults):** `capabilities`, `createdBy`, `createdByPrincipal`, `granted`, `isActive`, `isAdmin`, `isApproved`, `isBanned`, `isDisabled`, `isOwner`, `isVerified`, `profileId`, `updatedBy`, `updatedByPrincipal`
 
 ### `app-membership-default`
 
@@ -283,13 +326,15 @@ CRUD operations for AppMembershipDefault records.
 |-------|------|
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `id` | UUID |
 | `isApproved` | Boolean |
 | `isVerified` | Boolean |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
-**Optional create fields (backend defaults):** `createdBy`, `isApproved`, `isVerified`, `updatedBy`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `isApproved`, `isVerified`, `updatedBy`, `updatedByPrincipal`
 
 ### `app-owner-grant`
 
@@ -316,104 +361,6 @@ CRUD operations for AppOwnerGrant records.
 | `updatedAt` | Datetime |
 
 **Optional create fields (backend defaults):** `actorId`, `grantorId`, `isGrant`
-
-### `app-permission`
-
-CRUD operations for AppPermission records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appPermission records |
-| `find-first` | Find first matching appPermission record |
-| `get` | Get a appPermission by id |
-| `create` | Create a new appPermission |
-| `update` | Update an existing appPermission |
-| `delete` | Delete a appPermission |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `bitnum` | Int |
-| `bitstr` | BitString |
-| `description` | String |
-| `id` | UUID |
-| `name` | String |
-
-**Optional create fields (backend defaults):** `bitnum`, `bitstr`, `description`, `name`
-
-### `app-permission-default`
-
-CRUD operations for AppPermissionDefault records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appPermissionDefault records |
-| `find-first` | Find first matching appPermissionDefault record |
-| `get` | Get a appPermissionDefault by id |
-| `create` | Create a new appPermissionDefault |
-| `update` | Update an existing appPermissionDefault |
-| `delete` | Delete a appPermissionDefault |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `permissions` | BitString |
-
-**Optional create fields (backend defaults):** `permissions`
-
-### `app-permission-default-grant`
-
-CRUD operations for AppPermissionDefaultGrant records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appPermissionDefaultGrant records |
-| `find-first` | Find first matching appPermissionDefaultGrant record |
-| `get` | Get a appPermissionDefaultGrant by id |
-| `create` | Create a new appPermissionDefaultGrant |
-| `update` | Update an existing appPermissionDefaultGrant |
-| `delete` | Delete a appPermissionDefaultGrant |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `grantorId` | UUID |
-| `id` | UUID |
-| `isGrant` | Boolean |
-| `permissionId` | UUID |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `permissionId`
-**Optional create fields (backend defaults):** `grantorId`, `isGrant`
-
-### `app-permission-default-permission`
-
-CRUD operations for AppPermissionDefaultPermission records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appPermissionDefaultPermission records |
-| `find-first` | Find first matching appPermissionDefaultPermission record |
-| `get` | Get a appPermissionDefaultPermission by id |
-| `create` | Create a new appPermissionDefaultPermission |
-| `update` | Update an existing appPermissionDefaultPermission |
-| `delete` | Delete a appPermissionDefaultPermission |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `id` | UUID |
-| `permissionId` | UUID |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `permissionId`
 
 ### `membership-type`
 
@@ -469,6 +416,59 @@ CRUD operations for OrgAdminGrant records.
 
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `actorId`, `grantorId`, `isGrant`
+
+### `org-capability-default-capability`
+
+CRUD operations for OrgCapabilityDefaultCapability records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgCapabilityDefaultCapability records |
+| `find-first` | Find first matching orgCapabilityDefaultCapability record |
+| `get` | Get a orgCapabilityDefaultCapability by id |
+| `create` | Create a new orgCapabilityDefaultCapability |
+| `update` | Update an existing orgCapabilityDefaultCapability |
+| `delete` | Delete a orgCapabilityDefaultCapability |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `capabilityId` | UUID |
+| `createdAt` | Datetime |
+| `entityId` | UUID |
+| `id` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `capabilityId`, `entityId`
+
+### `org-capability-default-grant`
+
+CRUD operations for OrgCapabilityDefaultGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgCapabilityDefaultGrant records |
+| `find-first` | Find first matching orgCapabilityDefaultGrant record |
+| `get` | Get a orgCapabilityDefaultGrant by id |
+| `create` | Create a new orgCapabilityDefaultGrant |
+| `update` | Update an existing orgCapabilityDefaultGrant |
+| `delete` | Delete a orgCapabilityDefaultGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `capabilityId` | UUID |
+| `createdAt` | Datetime |
+| `entityId` | UUID |
+| `grantorId` | UUID |
+| `id` | UUID |
+| `isGrant` | Boolean |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `capabilityId`, `entityId`
+**Optional create fields (backend defaults):** `grantorId`, `isGrant`
 
 ### `org-chart-edge`
 
@@ -619,16 +619,16 @@ CRUD operations for OrgGrant records.
 | Field | Type |
 |-------|------|
 | `actorId` | UUID |
+| `capabilities` | BitString |
 | `createdAt` | Datetime |
 | `entityId` | UUID |
 | `grantorId` | UUID |
 | `id` | UUID |
 | `isGrant` | Boolean |
-| `permissions` | BitString |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `actorId`, `grantorId`, `isGrant`, `permissions`
+**Optional create fields (backend defaults):** `actorId`, `capabilities`, `grantorId`, `isGrant`
 
 ### `org-invite`
 
@@ -744,8 +744,10 @@ CRUD operations for OrgMembership records.
 | Field | Type |
 |-------|------|
 | `actorId` | UUID |
+| `capabilities` | BitString |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `entityId` | UUID |
 | `granted` | BitString |
 | `id` | UUID |
@@ -757,13 +759,13 @@ CRUD operations for OrgMembership records.
 | `isExternal` | Boolean |
 | `isOwner` | Boolean |
 | `isReadOnly` | Boolean |
-| `permissions` | BitString |
 | `profileId` | UUID |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `actorId`, `entityId`
-**Optional create fields (backend defaults):** `createdBy`, `granted`, `isActive`, `isAdmin`, `isApproved`, `isBanned`, `isDisabled`, `isExternal`, `isOwner`, `isReadOnly`, `permissions`, `profileId`, `updatedBy`
+**Optional create fields (backend defaults):** `capabilities`, `createdBy`, `createdByPrincipal`, `granted`, `isActive`, `isAdmin`, `isApproved`, `isBanned`, `isDisabled`, `isExternal`, `isOwner`, `isReadOnly`, `profileId`, `updatedBy`, `updatedByPrincipal`
 
 ### `org-membership-default`
 
@@ -784,14 +786,16 @@ CRUD operations for OrgMembershipDefault records.
 |-------|------|
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `entityId` | UUID |
 | `id` | UUID |
 | `isApproved` | Boolean |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `createdBy`, `isApproved`, `updatedBy`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `isApproved`, `updatedBy`, `updatedByPrincipal`
 
 ### `org-membership-setting`
 
@@ -816,6 +820,7 @@ CRUD operations for OrgMembershipSetting records.
 | `createChildCascadeOwners` | Boolean |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `deleteMemberCascadeChildren` | Boolean |
 | `entityId` | UUID |
 | `id` | UUID |
@@ -824,9 +829,10 @@ CRUD operations for OrgMembershipSetting records.
 | `populateMemberEmail` | Boolean |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `allowExternalMembers`, `createChildCascadeAdmins`, `createChildCascadeMembers`, `createChildCascadeOwners`, `createdBy`, `deleteMemberCascadeChildren`, `inviteProfileAssignmentMode`, `limitAllocationMode`, `populateMemberEmail`, `updatedBy`
+**Optional create fields (backend defaults):** `allowExternalMembers`, `createChildCascadeAdmins`, `createChildCascadeMembers`, `createChildCascadeOwners`, `createdBy`, `createdByPrincipal`, `deleteMemberCascadeChildren`, `inviteProfileAssignmentMode`, `limitAllocationMode`, `populateMemberEmail`, `updatedBy`, `updatedByPrincipal`
 
 ### `org-owner-grant`
 
@@ -856,156 +862,19 @@ CRUD operations for OrgOwnerGrant records.
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `actorId`, `grantorId`, `isGrant`
 
-### `org-permission`
-
-CRUD operations for OrgPermission records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgPermission records |
-| `find-first` | Find first matching orgPermission record |
-| `get` | Get a orgPermission by id |
-| `create` | Create a new orgPermission |
-| `update` | Update an existing orgPermission |
-| `delete` | Delete a orgPermission |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `bitnum` | Int |
-| `bitstr` | BitString |
-| `description` | String |
-| `id` | UUID |
-| `name` | String |
-
-**Optional create fields (backend defaults):** `bitnum`, `bitstr`, `description`, `name`
-
-### `org-permission-default`
-
-CRUD operations for OrgPermissionDefault records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgPermissionDefault records |
-| `find-first` | Find first matching orgPermissionDefault record |
-| `get` | Get a orgPermissionDefault by id |
-| `create` | Create a new orgPermissionDefault |
-| `update` | Update an existing orgPermissionDefault |
-| `delete` | Delete a orgPermissionDefault |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `entityId` | UUID |
-| `id` | UUID |
-| `permissions` | BitString |
-
-**Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `permissions`
-
-### `org-permission-default-grant`
-
-CRUD operations for OrgPermissionDefaultGrant records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgPermissionDefaultGrant records |
-| `find-first` | Find first matching orgPermissionDefaultGrant record |
-| `get` | Get a orgPermissionDefaultGrant by id |
-| `create` | Create a new orgPermissionDefaultGrant |
-| `update` | Update an existing orgPermissionDefaultGrant |
-| `delete` | Delete a orgPermissionDefaultGrant |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `entityId` | UUID |
-| `grantorId` | UUID |
-| `id` | UUID |
-| `isGrant` | Boolean |
-| `permissionId` | UUID |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `entityId`, `permissionId`
-**Optional create fields (backend defaults):** `grantorId`, `isGrant`
-
-### `org-permission-default-permission`
-
-CRUD operations for OrgPermissionDefaultPermission records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgPermissionDefaultPermission records |
-| `find-first` | Find first matching orgPermissionDefaultPermission record |
-| `get` | Get a orgPermissionDefaultPermission by id |
-| `create` | Create a new orgPermissionDefaultPermission |
-| `update` | Update an existing orgPermissionDefaultPermission |
-| `delete` | Delete a orgPermissionDefaultPermission |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `entityId` | UUID |
-| `id` | UUID |
-| `permissionId` | UUID |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `entityId`, `permissionId`
-
 ## Custom Operations
 
-### `app-permissions-get-by-mask`
+### `get-organization-id`
 
-Reads and enables pagination through a set of `AppPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--after` | Cursor |
-  | `--first` | Int |
-  | `--mask` | BitString |
-  | `--offset` | Int |
-
-### `app-permissions-get-mask`
-
-appPermissionsGetMask
+getOrganizationId
 
 - **Type:** query
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `--ids` | UUID |
-
-### `app-permissions-get-mask-by-names`
-
-appPermissionsGetMaskByNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--names` | String |
-
-### `app-permissions-get-padded-mask`
-
-appPermissionsGetPaddedMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--mask` | BitString |
+  | `--entityId` | UUID |
+  | `--entityType` | String |
 
 ### `org-is-manager-of`
 
@@ -1021,59 +890,13 @@ orgIsManagerOf
   | `--targetEntityId` | UUID |
   | `--userId` | UUID |
 
-### `org-permissions-get-by-mask`
-
-Reads and enables pagination through a set of `OrgPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--after` | Cursor |
-  | `--first` | Int |
-  | `--mask` | BitString |
-  | `--offset` | Int |
-
-### `org-permissions-get-mask`
-
-orgPermissionsGetMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--ids` | UUID |
-
-### `org-permissions-get-mask-by-names`
-
-orgPermissionsGetMaskByNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--names` | String |
-
-### `org-permissions-get-padded-mask`
-
-orgPermissionsGetPaddedMask
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--mask` | BitString |
-
 ### `provision-bucket`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**

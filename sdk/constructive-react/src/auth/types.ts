@@ -125,6 +125,24 @@ export interface User {
   updatedAt: string | null;
   username: string | null;
 }
+export interface UserSetting {
+  createdAt: string | null;
+  id: string | null;
+  ownerId: string | null;
+  updatedAt: string | null;
+}
+export interface UserSettingsSecurity {
+  backupCodesCount: number | null;
+  createdAt: string | null;
+  emailMfaEnabled: boolean | null;
+  id: string | null;
+  mfaEnrolledAt: string | null;
+  mfaLastUsedAt: string | null;
+  ownerId: string | null;
+  smsMfaEnabled: boolean | null;
+  totpEnabled: boolean | null;
+  updatedAt: string | null;
+}
 export interface WebauthnCredential {
   backupEligible: boolean | null;
   backupState: boolean | null;

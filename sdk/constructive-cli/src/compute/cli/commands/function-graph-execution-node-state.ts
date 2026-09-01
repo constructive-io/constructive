@@ -24,6 +24,9 @@ const fieldSchema: FieldSchema = {
   errorCode: 'string',
   errorMessage: 'string',
   executionId: 'uuid',
+  expiryDefaultOutput: 'json',
+  expiryEscalatedAt: 'string',
+  expiryPolicy: 'string',
   id: 'uuid',
   nodeName: 'string',
   nodePath: 'string',
@@ -31,6 +34,9 @@ const fieldSchema: FieldSchema = {
   scopeId: 'uuid',
   startedAt: 'string',
   status: 'string',
+  waitingDeadlineAt: 'string',
+  waitingOn: 'string',
+  waitingSince: 'string',
 };
 const usage =
   '\nfunction-graph-execution-node-state <command>\n\nCommands:\n  list                  List functionGraphExecutionNodeState records\n  find-first            Find first matching functionGraphExecutionNodeState record\n  get                   Get a functionGraphExecutionNodeState by ID\n  create                Create a new functionGraphExecutionNodeState\n  update                Update an existing functionGraphExecutionNodeState\n  delete                Delete a functionGraphExecutionNodeState\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -91,6 +97,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       errorCode: true,
       errorMessage: true,
       executionId: true,
+      expiryDefaultOutput: true,
+      expiryEscalatedAt: true,
+      expiryPolicy: true,
       id: true,
       nodeName: true,
       nodePath: true,
@@ -98,6 +107,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       scopeId: true,
       startedAt: true,
       status: true,
+      waitingDeadlineAt: true,
+      waitingOn: true,
+      waitingSince: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -130,6 +142,9 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       errorCode: true,
       errorMessage: true,
       executionId: true,
+      expiryDefaultOutput: true,
+      expiryEscalatedAt: true,
+      expiryPolicy: true,
       id: true,
       nodeName: true,
       nodePath: true,
@@ -137,6 +152,9 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       scopeId: true,
       startedAt: true,
       status: true,
+      waitingDeadlineAt: true,
+      waitingOn: true,
+      waitingSince: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -181,6 +199,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           errorCode: true,
           errorMessage: true,
           executionId: true,
+          expiryDefaultOutput: true,
+          expiryEscalatedAt: true,
+          expiryPolicy: true,
           id: true,
           nodeName: true,
           nodePath: true,
@@ -188,6 +209,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           scopeId: true,
           startedAt: true,
           status: true,
+          waitingDeadlineAt: true,
+          waitingOn: true,
+          waitingSince: true,
         },
       })
       .execute();
@@ -252,6 +276,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
+        type: 'json',
+        name: 'expiryDefaultOutput',
+        message: 'expiryDefaultOutput',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'expiryEscalatedAt',
+        message: 'expiryEscalatedAt',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'expiryPolicy',
+        message: 'expiryPolicy',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'nodeName',
         message: 'nodeName',
@@ -291,6 +336,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'waitingDeadlineAt',
+        message: 'waitingDeadlineAt',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'waitingOn',
+        message: 'waitingOn',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'waitingSince',
+        message: 'waitingSince',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -308,12 +374,18 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           errorCode: cleanedData.errorCode,
           errorMessage: cleanedData.errorMessage,
           executionId: cleanedData.executionId,
+          expiryDefaultOutput: cleanedData.expiryDefaultOutput,
+          expiryEscalatedAt: cleanedData.expiryEscalatedAt,
+          expiryPolicy: cleanedData.expiryPolicy,
           nodeName: cleanedData.nodeName,
           nodePath: cleanedData.nodePath,
           outputId: cleanedData.outputId,
           scopeId: cleanedData.scopeId,
           startedAt: cleanedData.startedAt,
           status: cleanedData.status,
+          waitingDeadlineAt: cleanedData.waitingDeadlineAt,
+          waitingOn: cleanedData.waitingOn,
+          waitingSince: cleanedData.waitingSince,
         },
         select: {
           callbackInputs: true,
@@ -324,6 +396,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           errorCode: true,
           errorMessage: true,
           executionId: true,
+          expiryDefaultOutput: true,
+          expiryEscalatedAt: true,
+          expiryPolicy: true,
           id: true,
           nodeName: true,
           nodePath: true,
@@ -331,6 +406,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           scopeId: true,
           startedAt: true,
           status: true,
+          waitingDeadlineAt: true,
+          waitingOn: true,
+          waitingSince: true,
         },
       })
       .execute();
@@ -407,6 +485,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
+        type: 'json',
+        name: 'expiryDefaultOutput',
+        message: 'expiryDefaultOutput',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'expiryEscalatedAt',
+        message: 'expiryEscalatedAt',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'expiryPolicy',
+        message: 'expiryPolicy',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'nodeName',
         message: 'nodeName',
@@ -446,6 +545,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'waitingDeadlineAt',
+        message: 'waitingDeadlineAt',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'waitingOn',
+        message: 'waitingOn',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'waitingSince',
+        message: 'waitingSince',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -467,12 +587,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           errorCode: cleanedData.errorCode,
           errorMessage: cleanedData.errorMessage,
           executionId: cleanedData.executionId,
+          expiryDefaultOutput: cleanedData.expiryDefaultOutput,
+          expiryEscalatedAt: cleanedData.expiryEscalatedAt,
+          expiryPolicy: cleanedData.expiryPolicy,
           nodeName: cleanedData.nodeName,
           nodePath: cleanedData.nodePath,
           outputId: cleanedData.outputId,
           scopeId: cleanedData.scopeId,
           startedAt: cleanedData.startedAt,
           status: cleanedData.status,
+          waitingDeadlineAt: cleanedData.waitingDeadlineAt,
+          waitingOn: cleanedData.waitingOn,
+          waitingSince: cleanedData.waitingSince,
         },
         select: {
           callbackInputs: true,
@@ -483,6 +609,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           errorCode: true,
           errorMessage: true,
           executionId: true,
+          expiryDefaultOutput: true,
+          expiryEscalatedAt: true,
+          expiryPolicy: true,
           id: true,
           nodeName: true,
           nodePath: true,
@@ -490,6 +619,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           scopeId: true,
           startedAt: true,
           status: true,
+          waitingDeadlineAt: true,
+          waitingOn: true,
+          waitingSince: true,
         },
       })
       .execute();

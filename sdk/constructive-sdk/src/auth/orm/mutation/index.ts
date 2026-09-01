@@ -7,16 +7,26 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
+  ApproveDeviceInput,
   CheckPasswordInput,
+  CompleteMfaChallengeInput,
   ConfirmDeleteAccountInput,
+  ConfirmTotpSetupInput,
   CreateApiKeyInput,
   CreateOrgApiKeyInput,
   CreateOrgPrincipalInput,
   DeleteOrgPrincipalInput,
   DeletePrincipalInput,
+  DisableEmailMfaInput,
+  DisableSmsMfaInput,
+  DisableTotpInput,
   DisconnectAccountInput,
+  EnableEmailMfaInput,
+  EnableSmsMfaInput,
+  EnableTotpInput,
   ExtendTokenExpiresInput,
   ForgotPasswordInput,
+  GenerateBackupCodesInput,
   LinkIdentityInput,
   ProvisionBucketInput,
   ProvisionNewUserInput,
@@ -39,16 +49,26 @@ import type {
   VerifyEmailInput,
   VerifyPasswordInput,
   VerifyTotpInput,
+  ApproveDevicePayload,
   CheckPasswordPayload,
+  CompleteMfaChallengePayload,
   ConfirmDeleteAccountPayload,
+  ConfirmTotpSetupPayload,
   CreateApiKeyPayload,
   CreateOrgApiKeyPayload,
   CreateOrgPrincipalPayload,
   DeleteOrgPrincipalPayload,
   DeletePrincipalPayload,
+  DisableEmailMfaPayload,
+  DisableSmsMfaPayload,
+  DisableTotpPayload,
   DisconnectAccountPayload,
+  EnableEmailMfaPayload,
+  EnableSmsMfaPayload,
+  EnableTotpPayload,
   ExtendTokenExpiresPayload,
   ForgotPasswordPayload,
+  GenerateBackupCodesPayload,
   LinkIdentityPayload,
   ProvisionBucketPayload,
   ProvisionNewUserPayload,
@@ -71,16 +91,26 @@ import type {
   VerifyEmailPayload,
   VerifyPasswordPayload,
   VerifyTotpPayload,
+  ApproveDevicePayloadSelect,
   CheckPasswordPayloadSelect,
+  CompleteMfaChallengePayloadSelect,
   ConfirmDeleteAccountPayloadSelect,
+  ConfirmTotpSetupPayloadSelect,
   CreateApiKeyPayloadSelect,
   CreateOrgApiKeyPayloadSelect,
   CreateOrgPrincipalPayloadSelect,
   DeleteOrgPrincipalPayloadSelect,
   DeletePrincipalPayloadSelect,
+  DisableEmailMfaPayloadSelect,
+  DisableSmsMfaPayloadSelect,
+  DisableTotpPayloadSelect,
   DisconnectAccountPayloadSelect,
+  EnableEmailMfaPayloadSelect,
+  EnableSmsMfaPayloadSelect,
+  EnableTotpPayloadSelect,
   ExtendTokenExpiresPayloadSelect,
   ForgotPasswordPayloadSelect,
+  GenerateBackupCodesPayloadSelect,
   LinkIdentityPayloadSelect,
   ProvisionBucketPayloadSelect,
   ProvisionNewUserPayloadSelect,
@@ -105,11 +135,20 @@ import type {
   VerifyTotpPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
+export interface ApproveDeviceVariables {
+  input: ApproveDeviceInput;
+}
 export interface CheckPasswordVariables {
   input: CheckPasswordInput;
 }
+export interface CompleteMfaChallengeVariables {
+  input: CompleteMfaChallengeInput;
+}
 export interface ConfirmDeleteAccountVariables {
   input: ConfirmDeleteAccountInput;
+}
+export interface ConfirmTotpSetupVariables {
+  input: ConfirmTotpSetupInput;
 }
 export interface CreateApiKeyVariables {
   input: CreateApiKeyInput;
@@ -126,8 +165,26 @@ export interface DeleteOrgPrincipalVariables {
 export interface DeletePrincipalVariables {
   input: DeletePrincipalInput;
 }
+export interface DisableEmailMfaVariables {
+  input: DisableEmailMfaInput;
+}
+export interface DisableSmsMfaVariables {
+  input: DisableSmsMfaInput;
+}
+export interface DisableTotpVariables {
+  input: DisableTotpInput;
+}
 export interface DisconnectAccountVariables {
   input: DisconnectAccountInput;
+}
+export interface EnableEmailMfaVariables {
+  input: EnableEmailMfaInput;
+}
+export interface EnableSmsMfaVariables {
+  input: EnableSmsMfaInput;
+}
+export interface EnableTotpVariables {
+  input: EnableTotpInput;
 }
 export interface ExtendTokenExpiresVariables {
   input: ExtendTokenExpiresInput;
@@ -135,15 +192,19 @@ export interface ExtendTokenExpiresVariables {
 export interface ForgotPasswordVariables {
   input: ForgotPasswordInput;
 }
+export interface GenerateBackupCodesVariables {
+  input: GenerateBackupCodesInput;
+}
 export interface LinkIdentityVariables {
   input: LinkIdentityInput;
 }
 /**
  * Variables for provisionBucket
- * Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+ * Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
@@ -210,6 +271,35 @@ export interface VerifyTotpVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
+    approveDevice: <S extends ApproveDevicePayloadSelect>(
+      args: ApproveDeviceVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ApproveDevicePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        approveDevice: InferSelectResult<ApproveDevicePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ApproveDevice',
+        fieldName: 'approveDevice',
+        ...buildCustomDocument(
+          'mutation',
+          'ApproveDevice',
+          'approveDevice',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ApproveDeviceInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ApproveDevicePayload'
+        ),
+      }),
     checkPassword: <S extends CheckPasswordPayloadSelect>(
       args: CheckPasswordVariables,
       options: {
@@ -239,6 +329,35 @@ export function createMutationOperations(client: OrmClient) {
           'CheckPasswordPayload'
         ),
       }),
+    completeMfaChallenge: <S extends CompleteMfaChallengePayloadSelect>(
+      args: CompleteMfaChallengeVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CompleteMfaChallengePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        completeMfaChallenge: InferSelectResult<CompleteMfaChallengePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CompleteMfaChallenge',
+        fieldName: 'completeMfaChallenge',
+        ...buildCustomDocument(
+          'mutation',
+          'CompleteMfaChallenge',
+          'completeMfaChallenge',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CompleteMfaChallengeInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CompleteMfaChallengePayload'
+        ),
+      }),
     confirmDeleteAccount: <S extends ConfirmDeleteAccountPayloadSelect>(
       args: ConfirmDeleteAccountVariables,
       options: {
@@ -266,6 +385,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ConfirmDeleteAccountPayload'
+        ),
+      }),
+    confirmTotpSetup: <S extends ConfirmTotpSetupPayloadSelect>(
+      args: ConfirmTotpSetupVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ConfirmTotpSetupPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        confirmTotpSetup: InferSelectResult<ConfirmTotpSetupPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ConfirmTotpSetup',
+        fieldName: 'confirmTotpSetup',
+        ...buildCustomDocument(
+          'mutation',
+          'ConfirmTotpSetup',
+          'confirmTotpSetup',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ConfirmTotpSetupInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ConfirmTotpSetupPayload'
         ),
       }),
     createApiKey: <S extends CreateApiKeyPayloadSelect>(
@@ -413,6 +561,93 @@ export function createMutationOperations(client: OrmClient) {
           'DeletePrincipalPayload'
         ),
       }),
+    disableEmailMfa: <S extends DisableEmailMfaPayloadSelect>(
+      args: DisableEmailMfaVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DisableEmailMfaPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        disableEmailMfa: InferSelectResult<DisableEmailMfaPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DisableEmailMfa',
+        fieldName: 'disableEmailMfa',
+        ...buildCustomDocument(
+          'mutation',
+          'DisableEmailMfa',
+          'disableEmailMfa',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DisableEmailMfaInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DisableEmailMfaPayload'
+        ),
+      }),
+    disableSmsMfa: <S extends DisableSmsMfaPayloadSelect>(
+      args: DisableSmsMfaVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DisableSmsMfaPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        disableSmsMfa: InferSelectResult<DisableSmsMfaPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DisableSmsMfa',
+        fieldName: 'disableSmsMfa',
+        ...buildCustomDocument(
+          'mutation',
+          'DisableSmsMfa',
+          'disableSmsMfa',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DisableSmsMfaInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DisableSmsMfaPayload'
+        ),
+      }),
+    disableTotp: <S extends DisableTotpPayloadSelect>(
+      args: DisableTotpVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DisableTotpPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        disableTotp: InferSelectResult<DisableTotpPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DisableTotp',
+        fieldName: 'disableTotp',
+        ...buildCustomDocument(
+          'mutation',
+          'DisableTotp',
+          'disableTotp',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DisableTotpInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DisableTotpPayload'
+        ),
+      }),
     disconnectAccount: <S extends DisconnectAccountPayloadSelect>(
       args: DisconnectAccountVariables,
       options: {
@@ -440,6 +675,93 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'DisconnectAccountPayload'
+        ),
+      }),
+    enableEmailMfa: <S extends EnableEmailMfaPayloadSelect>(
+      args: EnableEmailMfaVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, EnableEmailMfaPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        enableEmailMfa: InferSelectResult<EnableEmailMfaPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'EnableEmailMfa',
+        fieldName: 'enableEmailMfa',
+        ...buildCustomDocument(
+          'mutation',
+          'EnableEmailMfa',
+          'enableEmailMfa',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'EnableEmailMfaInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'EnableEmailMfaPayload'
+        ),
+      }),
+    enableSmsMfa: <S extends EnableSmsMfaPayloadSelect>(
+      args: EnableSmsMfaVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, EnableSmsMfaPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        enableSmsMfa: InferSelectResult<EnableSmsMfaPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'EnableSmsMfa',
+        fieldName: 'enableSmsMfa',
+        ...buildCustomDocument(
+          'mutation',
+          'EnableSmsMfa',
+          'enableSmsMfa',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'EnableSmsMfaInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'EnableSmsMfaPayload'
+        ),
+      }),
+    enableTotp: <S extends EnableTotpPayloadSelect>(
+      args: EnableTotpVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, EnableTotpPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        enableTotp: InferSelectResult<EnableTotpPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'EnableTotp',
+        fieldName: 'enableTotp',
+        ...buildCustomDocument(
+          'mutation',
+          'EnableTotp',
+          'enableTotp',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'EnableTotpInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'EnableTotpPayload'
         ),
       }),
     extendTokenExpires: <S extends ExtendTokenExpiresPayloadSelect>(
@@ -498,6 +820,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ForgotPasswordPayload'
+        ),
+      }),
+    generateBackupCodes: <S extends GenerateBackupCodesPayloadSelect>(
+      args: GenerateBackupCodesVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, GenerateBackupCodesPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        generateBackupCodes: InferSelectResult<GenerateBackupCodesPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'GenerateBackupCodes',
+        fieldName: 'generateBackupCodes',
+        ...buildCustomDocument(
+          'mutation',
+          'GenerateBackupCodes',
+          'generateBackupCodes',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'GenerateBackupCodesInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'GenerateBackupCodesPayload'
         ),
       }),
     linkIdentity: <S extends LinkIdentityPayloadSelect>(
