@@ -1,15 +1,12 @@
 import './types'; // for Request type
 
-import crypto from 'node:crypto';
-
-import { classify, type ErrorContext, errors, parse } from '@constructive-io/errors';
+import { errors } from '@constructive-io/errors';
 import type { ComputeConfig } from '@constructive-io/express-context';
 import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
@@ -23,99 +20,10 @@ import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import type { DatabaseSettings } from '../types';
+import { maskError } from './mask-error';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
-const maskErrorLog = new Logger('graphile:maskError');
-
 const isDev = (): boolean => getNodeEnv() === 'development';
-
-/**
- * GraphQL framework protocol codes. These originate in the GraphQL/grafast
- * transport layer (not in constructive-db), so they are not Constructive domain
- * codes in the `@constructive-io/errors` registry. They are always safe to
- * surface — they carry no sensitive detail. Everything else (auth, account,
- * resource, constraint, and every constructive-db code) is classified by the
- * registry, which is the single source of truth for public vs. internal.
- */
-const GRAPHQL_PROTOCOL_CODES = new Set([
-  'GRAPHQL_VALIDATION_FAILED',
-  'GRAPHQL_PARSE_FAILED',
-  'PERSISTED_QUERY_NOT_FOUND',
-  'PERSISTED_QUERY_NOT_SUPPORTED'
-]);
-
-/** A code is safe to surface when the registry classifies it public, or it is a
- * GraphQL framework protocol code. */
-const isPublicCode = (code: string | null | undefined): boolean =>
-  Boolean(code) && (classify(code) === 'public' || GRAPHQL_PROTOCOL_CODES.has(code as string));
-
-/**
- * Normalize any GraphQL/database error into a canonical Constructive shape.
- *
- * Database errors surface through Grafast without a populated `extensions.code`
- * (the semantic code lives in the message, and any SQLSTATE/DETAIL lives on the
- * underlying pg error at `originalError`). We parse `originalError` first so we
- * can recover the structured code, then fall back to the GraphQL error itself.
- */
-const normalizeError = (
-  error: GraphQLError,
-): { code: string | null; context: ErrorContext; class: 'public' | 'internal' } => {
-  const original = (error as { originalError?: unknown }).originalError;
-  const fromOriginal = original ? parse(original) : null;
-  const parsed = fromOriginal?.code ? fromOriginal : parse(error);
-  return { code: parsed.code, context: parsed.context, class: parsed.class };
-};
-
-/**
- * Production-aware error handling backed by `@constructive-io/errors`.
- *
- * 1. Enrich `extensions.code`/`class`/`context` from the parsed error so clients
- *    always receive a machine-readable code (fixing the gap where database
- *    errors reached clients as a bare message with empty `extensions`).
- * 2. Surface public (registered/allowlisted) errors as-is.
- * 3. In development, pass everything through (enriched) for debugging.
- * 4. In production, mask internal/unknown errors behind a reference ID and log
- *    the original.
- */
-const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedError => {
-  const { code, context, class: errorClass } = normalizeError(error);
-
-  // Lift the structured code onto extensions for every recognized error so
-  // clients always receive a machine-readable code (`extensions` is read-only
-  // on GraphQLError, so we build a formatted error rather than mutating it).
-  const extensions: Record<string, unknown> = { ...error.extensions };
-  if (code) {
-    extensions.code = code;
-    extensions.class = errorClass;
-    if (Object.keys(context).length > 0) {
-      extensions.context = context;
-    }
-  }
-
-  const effectiveCode = code ?? (error.extensions?.code as string | undefined);
-  if (isPublicCode(effectiveCode) || getNodeEnv() === 'development') {
-    // Note: grafserv strips originalError and internal extensions before
-    // serializing to the client, so returning the enriched error is safe.
-    return {
-      message: error.message,
-      ...(error.locations ? { locations: error.locations } : {}),
-      ...(error.path ? { path: error.path } : {}),
-      extensions,
-    } as GraphQLFormattedError;
-  }
-
-  // Mask internal/unknown errors with a reference ID.
-  const errorId = crypto.randomBytes(8).toString('hex');
-  maskErrorLog.error(`[masked-error:${errorId}]`, error);
-
-  return {
-    message: `An unexpected error occurred. Reference: ${errorId}`,
-    extensions: {
-      code: 'INTERNAL_SERVER_ERROR',
-      errorId
-    }
-  } as GraphQLFormattedError;
-};
 
 // =============================================================================
 // Single-Flight Pattern: In-Flight Tracking
