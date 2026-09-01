@@ -4,7 +4,7 @@ import {
 } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { PgTestConnectionOptions } from '@pgpmjs/types';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { existsSync } from 'fs';
 import { getPgEnvOptions, PgConfig } from 'pg-env';
 
@@ -12,6 +12,11 @@ import { getRoleName } from './roles';
 import { streamSql as stream } from './stream';
 
 const log = new Logger('db-admin');
+
+const sqlLiteral = (value: string): string => `'${value.replace(/'/g, "''")}'`;
+
+const quoteIdentifier = (value: string): string =>
+  `"${value.replace(/"/g, '""')}"`;
 
 export class DbAdmin {
   protected config: PgConfig;
@@ -28,6 +33,17 @@ export class DbAdmin {
     this.roleConfig = roleConfig;
   }
 
+  private connectionArgs(): string[] {
+    return [
+      '-U',
+      this.config.user,
+      '-h',
+      this.config.host,
+      '-p',
+      String(this.config.port)
+    ];
+  }
+
   private getEnv(): Record<string, string> {
     return {
       PGHOST: this.config.host,
@@ -37,9 +53,10 @@ export class DbAdmin {
     };
   }
 
-  private run(command: string): void {
+  private run(file: string, args: string[]): void {
+    const command = [file, ...args].join(' ');
     try {
-      execSync(command, {
+      execFileSync(file, args, {
         stdio: this.verbose ? 'inherit' : 'pipe',
         env: {
           ...process.env,
@@ -56,7 +73,7 @@ export class DbAdmin {
 
   private safeDropDb(name: string): void {
     try {
-      this.run(`dropdb "${name}"`);
+      this.run('dropdb', [name]);
     } catch (err: any) {
       if (err.message.includes('does not exist')) {
         return;
@@ -64,10 +81,11 @@ export class DbAdmin {
       if (err.message.includes('is being accessed by other users')) {
         log.warn(`Database ${name} has active sessions, terminating backends and retrying drop...`);
         try {
-          this.run(
-            `psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${name}' AND pid <> pg_backend_pid();"`
-          );
-          this.run(`dropdb "${name}"`);
+          this.run('psql', [
+            '-c',
+            `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = ${sqlLiteral(name)} AND pid <> pg_backend_pid();`
+          ]);
+          this.run('dropdb', [name]);
         } catch (retryErr: any) {
           log.warn(`Could not drop database ${name} after terminating backends: ${retryErr.message}`);
         }
@@ -82,18 +100,21 @@ export class DbAdmin {
   }
 
   dropTemplate(dbName: string): void {
-    this.run(`psql -c "UPDATE pg_database SET datistemplate='false' WHERE datname='${dbName}'"`);
+    this.run('psql', [
+      '-c',
+      `UPDATE pg_database SET datistemplate='false' WHERE datname=${sqlLiteral(dbName)}`
+    ]);
     this.drop(dbName);
   }
 
   create(dbName?: string): void {
     const db = dbName ?? this.config.database;
-    this.run(`createdb -U ${this.config.user} -h ${this.config.host} -p ${this.config.port} "${db}"`);
+    this.run('createdb', [...this.connectionArgs(), db]);
   }
 
   createFromTemplate(template: string, dbName?: string): void {
     const db = dbName ?? this.config.database;
-    this.run(`createdb -U ${this.config.user} -h ${this.config.host} -p ${this.config.port} -e "${db}" -T "${template}"`);
+    this.run('createdb', [...this.connectionArgs(), '-e', '-T', template, db]);
   }
 
   installExtensions(extensions: string[] | string, dbName?: string): void {
@@ -101,7 +122,12 @@ export class DbAdmin {
     const extList = typeof extensions === 'string' ? extensions.split(',') : extensions;
 
     for (const extension of extList) {
-      this.run(`psql --dbname "${db}" -c 'CREATE EXTENSION IF NOT EXISTS "${extension}" CASCADE;'`);
+      this.run('psql', [
+        '--dbname',
+        db,
+        '-c',
+        `CREATE EXTENSION IF NOT EXISTS ${quoteIdentifier(extension)} CASCADE;`
+      ]);
     }
   }
 
@@ -112,13 +138,19 @@ export class DbAdmin {
   }
 
   createTemplateFromBase(base: string, template: string): void {
-    this.run(`createdb -T "${base}" "${template}"`);
-    this.run(`psql -c "UPDATE pg_database SET datistemplate = true WHERE datname = '${template}';"`);
+    this.run('createdb', ['-T', base, template]);
+    this.run('psql', [
+      '-c',
+      `UPDATE pg_database SET datistemplate = true WHERE datname = ${sqlLiteral(template)};`
+    ]);
   }
 
   cleanupTemplate(template: string): void {
     try {
-      this.run(`psql -c "UPDATE pg_database SET datistemplate = false WHERE datname = '${template}'"`);
+      this.run('psql', [
+        '-c',
+        `UPDATE pg_database SET datistemplate = false WHERE datname = ${sqlLiteral(template)}`
+      ]);
     } catch {
       log.warn(`Skipping failed UPDATE of datistemplate for ${template}`);
     }
@@ -158,7 +190,7 @@ export class DbAdmin {
     if (!existsSync(file)) {
       throw new Error(`Missing SQL file: ${file}`);
     }
-    this.run(`psql -f ${file} ${dbName}`);
+    this.run('psql', ['-f', file, dbName]);
   }
 
   async streamSql(sql: string, dbName: string): Promise<void> {

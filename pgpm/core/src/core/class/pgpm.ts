@@ -16,7 +16,6 @@ import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '@pgp
 import { getExtensionsDir, loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { DEFAULT_EXTENSIONS_DIR,errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
-import { execSync } from 'child_process';
 import fs from 'fs';
 import * as glob from 'glob';
 import os from 'os';
@@ -45,6 +44,7 @@ import { syncModuleVersions, SyncVersionsOptions, SyncVersionsResult } from '../
 import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
 import { movePath } from '../../utils/fs';
 import { globPaths, globPattern, toPosixPath } from '../../utils/glob';
+import { spawnSyncChecked, spawnSyncOutput } from '../../utils/spawn';
 import { parseTarget } from '../../utils/target-utils';
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL_MS, scaffoldTemplate } from '../template-scaffold';
 
@@ -1109,9 +1109,19 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   
       try {
         process.chdir(tempDir);
-        execSync(`npm install ${pkgstr} --production --prefix ./${this.extensionsDir}`, {
-          stdio: 'inherit'
-        });
+        spawnSyncChecked(
+          'npm',
+          [
+            'install',
+            pkgstr,
+            '--production',
+            '--prefix',
+            `./${this.extensionsDir}`
+          ],
+          {
+            stdio: 'inherit'
+          }
+        );
   
         const matches = glob.sync(globPattern('.', this.extensionsDir, '**/pgpm.plan'));
         const installs = matches.map((conf) => {
@@ -1417,10 +1427,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       
       let newVersion: string | null = null;
       try {
-        const result = execSync(`npm view ${moduleName} version`, {
-          encoding: 'utf-8',
-          stdio: ['pipe', 'pipe', 'pipe']
-        }).trim();
+        const result = spawnSyncOutput('npm', ['view', moduleName, 'version']);
         newVersion = result || null;
       } catch {
         logger.warn(`Could not fetch latest version for ${moduleName}`);
