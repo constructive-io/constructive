@@ -18,6 +18,12 @@ export interface CreateLoaderOptions<T> {
   ttlMs?: number;
   /** Max cache entries before LRU eviction (default: 100) */
   max?: number;
+  /**
+   * Whether cache hits refresh the TTL.
+   * Defaults to false so ttlMs is a bounded staleness window.
+   * Set true only for intentionally sliding caches.
+   */
+  updateAgeOnGet?: boolean;
   /** The actual resolution function. Called on cache miss. */
   resolve: (ctx: LoaderContext) => Promise<T | undefined>;
 }
@@ -30,7 +36,7 @@ export function createModuleLoader<T>(opts: CreateLoaderOptions<T>): ModuleLoade
   const cache = new LRUCache<string, T | undefined>({
     max: opts.max ?? DEFAULT_MAX,
     ttl: opts.ttlMs ?? DEFAULT_TTL_MS,
-    updateAgeOnGet: true,
+    updateAgeOnGet: opts.updateAgeOnGet ?? false,
     allowStale: false,
   });
 
