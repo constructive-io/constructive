@@ -12,7 +12,7 @@ import {
 } from '@pgpmjs/core';
 import { resolveWorkspaceByType } from '@pgpmjs/env';
 import { errors } from '@pgpmjs/types';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import fs from 'fs';
 import { CLIOptions, Inquirerer, OptionValue, Question, registerDefaultResolver } from 'inquirerer';
 import path from 'path';
@@ -362,13 +362,16 @@ function installSkillsViaNpx(skills: BoilerplateSkill[], cwd: string): void {
       : `https://github.com/${entry.source}`;
 
     for (const skill of entry.skills) {
-      const cmd = `npx --yes skills add ${source} --skill ${skill} --yes`;
       try {
-        execSync(cmd, {
-          cwd,
-          stdio: ['pipe', 'inherit', 'inherit'],
-          timeout: 120_000,
-        });
+        execFileSync(
+          'npx',
+          ['--yes', 'skills', 'add', source, '--skill', skill, '--yes'],
+          {
+            cwd,
+            stdio: ['pipe', 'inherit', 'inherit'],
+            timeout: 120_000,
+          }
+        );
       } catch {
         failed.push(`  npx skills add ${source} --skill ${skill}`);
       }

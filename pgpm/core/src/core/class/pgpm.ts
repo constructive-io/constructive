@@ -16,7 +16,7 @@ import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '@pgp
 import { getExtensionsDir, loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { DEFAULT_EXTENSIONS_DIR,errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import fs from 'fs';
 import * as glob from 'glob';
 import os from 'os';
@@ -1109,9 +1109,19 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   
       try {
         process.chdir(tempDir);
-        execSync(`npm install ${pkgstr} --production --prefix ./${this.extensionsDir}`, {
-          stdio: 'inherit'
-        });
+        execFileSync(
+          'npm',
+          [
+            'install',
+            pkgstr,
+            '--production',
+            '--prefix',
+            `./${this.extensionsDir}`
+          ],
+          {
+            stdio: 'inherit'
+          }
+        );
   
         const matches = glob.sync(globPattern('.', this.extensionsDir, '**/pgpm.plan'));
         const installs = matches.map((conf) => {
@@ -1417,7 +1427,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       
       let newVersion: string | null = null;
       try {
-        const result = execSync(`npm view ${moduleName} version`, {
+        const result = execFileSync('npm', ['view', moduleName, 'version'], {
           encoding: 'utf-8',
           stdio: ['pipe', 'pipe', 'pipe']
         }).trim();
