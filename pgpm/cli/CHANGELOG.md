@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.29.6](https://github.com/constructive-io/constructive/compare/pgpm@5.29.5...pgpm@5.29.6) (2026-09-01)
+
+### Bug Fixes
+
+- execute npm/psql subcommands with argv arrays ([1b31e7a](https://github.com/constructive-io/constructive/commit/1b31e7adce47d4ad9cbd845a1cb8910071c1fdd4))
+- spawn npm/npx through cross-spawn for Windows shim resolution ([b1893d4](https://github.com/constructive-io/constructive/commit/b1893d4b99dc297fabbac408c6970dc35783fa4c))
+
 ## [5.29.5](https://github.com/constructive-io/constructive/compare/pgpm@5.29.4...pgpm@5.29.5) (2026-08-31)
 
 **Note:** Version bump only for package pgpm

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.27.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.27.1...@pgpmjs/core@7.27.2) (2026-09-01)
+
+### Bug Fixes
+
+- execute npm/psql subcommands with argv arrays ([1b31e7a](https://github.com/constructive-io/constructive/commit/1b31e7adce47d4ad9cbd845a1cb8910071c1fdd4))
+- spawn npm/npx through cross-spawn for Windows shim resolution ([b1893d4](https://github.com/constructive-io/constructive/commit/b1893d4b99dc297fabbac408c6970dc35783fa4c))
+
 ## [7.27.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.27.0...@pgpmjs/core@7.27.1) (2026-08-28)
 
 **Note:** Version bump only for package @pgpmjs/core

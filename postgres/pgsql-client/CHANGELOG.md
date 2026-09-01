@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.2](https://github.com/constructive-io/constructive/compare/pgsql-client@4.13.1...pgsql-client@4.13.2) (2026-09-01)
+
+### Bug Fixes
+
+- execute npm/psql subcommands with argv arrays ([1b31e7a](https://github.com/constructive-io/constructive/commit/1b31e7adce47d4ad9cbd845a1cb8910071c1fdd4))
+
 ## [4.13.1](https://github.com/constructive-io/constructive/compare/pgsql-client@4.13.0...pgsql-client@4.13.1) (2026-08-28)
 
 **Note:** Version bump only for package pgsql-client

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.24.0](https://github.com/constructive-io/constructive/compare/safegres@1.23.0...safegres@1.24.0) (2026-09-01)
+
+### Features
+
+- **safegres:** action uploads the reports and survives code scanning being off ([b3704d4](https://github.com/constructive-io/constructive/commit/b3704d4d7646d49a1d343923b34663ed45e1ba9d))
+- **safegres:** run the workspace CLI and find the reports from the config ([ab8a4c8](https://github.com/constructive-io/constructive/commit/ab8a4c8040771b6e4693cc48e908baf47f768657))
+
 # [1.23.0](https://github.com/constructive-io/constructive/compare/safegres@1.22.1...safegres@1.23.0) (2026-09-01)
 
 ### Features
