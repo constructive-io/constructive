@@ -3,12 +3,9 @@ import './types'; // for Request type
 import { errors } from '@constructive-io/errors';
 import type { RequestProtection } from '@constructive-io/express-context';
 import { DEFAULT_REQUEST_PROTECTION } from '@constructive-io/express-context';
-import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
-
-const log = new Logger('request-protection');
 
 /**
  * Resolve the bounds this request runs under and attach them to it.
@@ -46,14 +43,15 @@ const isMultipart = (req: Request): boolean =>
  */
 export const createRequestProtectionMiddleware = (): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    // A lookup failure is neither "unlimited" nor "the defaults": the request
+    // has no known bounds, so it is handed to the error handler rather than
+    // served under numbers nobody chose.
     let protection: RequestProtection;
     try {
       protection = await resolveProtection(req);
-    } catch (e: any) {
-      // A settings lookup failure must not open the gate: fall back to the
-      // platform defaults and say so, rather than serving the request unbounded.
-      log.warn(`Failed to resolve request protection, using platform defaults: ${e?.message ?? e}`);
-      protection = DEFAULT_REQUEST_PROTECTION;
+    } catch (e) {
+      next(e);
+      return;
     }
 
     req.requestProtection = protection;

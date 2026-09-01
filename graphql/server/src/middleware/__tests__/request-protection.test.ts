@@ -61,13 +61,16 @@ describe('createRequestProtectionMiddleware', () => {
     expect(req.requestProtection).toEqual(DEFAULT_REQUEST_PROTECTION);
   });
 
-  it('falls back to the platform defaults rather than opening the gate on a lookup failure', async () => {
-    const req = fakeReq({}, jest.fn().mockRejectedValue(new Error('routing pool down')));
+  it('fails the request when the bounds cannot be looked up', async () => {
+    // Serving on defaults would hide a broken routing plane behind numbers
+    // nobody chose, so the failure is surfaced instead.
+    const failure = new Error('routing pool down');
+    const req = fakeReq({}, jest.fn().mockRejectedValue(failure));
 
     const { next } = await run(req);
 
-    expect(next).toHaveBeenCalled();
-    expect(req.requestProtection).toEqual(DEFAULT_REQUEST_PROTECTION);
+    expect(next).toHaveBeenCalledWith(failure);
+    expect(req.requestProtection).toBeUndefined();
   });
 
   it('still bounds a request that arrived without a resolved context', async () => {

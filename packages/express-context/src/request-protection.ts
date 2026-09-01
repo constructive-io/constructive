@@ -93,11 +93,18 @@ export const PROTECTION_BOUNDS: Record<NumericProtectionKey, ProtectionBound> = 
 export const ASSUMED_PAGE_SIZE = 100;
 
 /**
- * Introspection is off unless a tenant turns it on, and `PLATFORM_ALLOWS`
- * is the kill switch that keeps it off cluster-wide regardless.
+ * Introspection stays on until metadata says otherwise, and `platformAllows`
+ * is the kill switch that takes it away cluster-wide regardless.
+ *
+ * The platform default is permissive here where the metadata default is not
+ * (`database_settings.enable_introspection` is `NOT NULL DEFAULT false`) on
+ * purpose: this value applies to a database that has expressed *no*
+ * preference — typically one whose routing plane predates the column — and
+ * silently disabling introspection for it would break GraphiQL and codegen for
+ * every tenant the moment this code deployed, without anyone opting in.
  */
 export const INTROSPECTION_BOUND = {
-  default: false,
+  default: true,
   platformAllows: true
 };
 
@@ -162,11 +169,15 @@ export function resolveRequestProtection(
     resolved[name] = clamp(preferred ?? bound.default, bound);
   }
 
-  // An API override may switch introspection either way within its database;
-  // the platform switch can only ever take it away.
-  const requested = api?.enableIntrospection ?? database?.enableIntrospection ?? INTROSPECTION_BOUND.default;
+  // Lower-only applies to the flag too: an API may switch introspection off
+  // for itself, never back on for a database that turned it off, and the
+  // platform switch can only ever take it away.
+  const enableIntrospection =
+    (database?.enableIntrospection ?? INTROSPECTION_BOUND.default) &&
+    (api?.enableIntrospection ?? true) &&
+    INTROSPECTION_BOUND.platformAllows;
 
-  return { ...resolved, enableIntrospection: requested && INTROSPECTION_BOUND.platformAllows };
+  return { ...resolved, enableIntrospection };
 }
 
 /**

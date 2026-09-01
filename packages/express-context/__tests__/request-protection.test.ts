@@ -1,6 +1,9 @@
 import type { Pool } from 'pg';
 
-import { requestProtectionLoader } from '../src/loaders/request-protection';
+import {
+  forgetProtectionColumns,
+  requestProtectionLoader
+} from '../src/loaders/request-protection';
 import type { LoaderContext } from '../src/loaders/types';
 import {
   DEFAULT_REQUEST_PROTECTION,
@@ -56,18 +59,20 @@ describe('resolveRequestProtection', () => {
     expect(resolved.maxPageSize).toBe(10);
   });
 
-  it('keeps introspection off by default and lets either scope turn it on', () => {
-    expect(resolveRequestProtection(null, null).enableIntrospection).toBe(false);
-    expect(resolveRequestProtection({ enableIntrospection: true }, {}).enableIntrospection).toBe(
-      true
+  it('leaves introspection on until metadata takes it away, and never puts it back', () => {
+    // A database that has expressed no preference — a routing plane older than
+    // the column — keeps the introspection its clients already rely on.
+    expect(resolveRequestProtection(null, null).enableIntrospection).toBe(true);
+    expect(resolveRequestProtection({ enableIntrospection: false }, {}).enableIntrospection).toBe(
+      false
     );
-    // Unlike the numeric bounds, an API may re-enable introspection for itself.
-    expect(
-      resolveRequestProtection({ enableIntrospection: false }, { enableIntrospection: true })
-        .enableIntrospection
-    ).toBe(true);
+    // Lower-only: an API may switch it off for itself, never back on.
     expect(
       resolveRequestProtection({ enableIntrospection: true }, { enableIntrospection: false })
+        .enableIntrospection
+    ).toBe(false);
+    expect(
+      resolveRequestProtection({ enableIntrospection: false }, { enableIntrospection: true })
         .enableIntrospection
     ).toBe(false);
   });
@@ -108,17 +113,47 @@ interface Call {
   values?: unknown[];
 }
 
-const fakePool = (rows: unknown[][]) => {
+/**
+ * A routing pool that answers the column probe with a fully-migrated plane
+ * (unless `columns` says otherwise) and then the settings rows in order.
+ */
+const fakePool = (rows: unknown[][], columns?: { database: string[]; api: string[] }) => {
   const calls: Call[] = [];
   let i = 0;
+  const probeRows = columns
+    ? [
+      ...columns.database.map((c) => ({ table_name: 'database_settings', column_name: c })),
+      ...columns.api.map((c) => ({ table_name: 'api_settings', column_name: c }))
+    ]
+    : ALL_PROTECTION_COLUMNS.flatMap((c) => [
+      { table_name: 'database_settings', column_name: c },
+      { table_name: 'api_settings', column_name: c }
+    ]);
+
   const pool = {
     query: jest.fn(async (text: string, values?: unknown[]) => {
+      if (text.includes('information_schema.columns')) return { rows: probeRows };
       calls.push({ text, values });
       return { rows: rows[i++] ?? [] };
     })
   } as unknown as Pool;
   return { pool, calls };
 };
+
+const ALL_PROTECTION_COLUMNS = [
+  'statement_timeout_ms',
+  'idle_in_transaction_timeout_ms',
+  'lock_timeout_ms',
+  'max_concurrent_requests',
+  'max_queue_wait_ms',
+  'rate_limit_rpm',
+  'rate_limit_burst',
+  'max_query_depth',
+  'max_query_cost',
+  'max_page_size',
+  'max_request_bytes',
+  'enable_introspection'
+];
 
 const ctx = (routingPool: Pool, databaseId = 'db-1', apiId?: string): LoaderContext =>
   ({
@@ -188,5 +223,22 @@ describe('requestProtectionLoader', () => {
   it('returns nothing when the database has no settings row, so the caller uses the defaults', async () => {
     const { pool } = fakePool([[]]);
     expect(await requestProtectionLoader.resolve(ctx(pool))).toBeUndefined();
+  });
+
+  it('selects only the columns a routing plane actually has', async () => {
+    // A plane published before these columns existed must resolve to the
+    // platform defaults, not fail every request with `column … does not exist`.
+    const { pool, calls } = fakePool([[{ db_statement_timeout_ms: '5000' }]], {
+      database: ['statement_timeout_ms'],
+      api: []
+    });
+
+    const resolved = await requestProtectionLoader.resolve(ctx(pool, 'db-old'));
+
+    expect(calls[0].text).not.toMatch(/idle_in_transaction_timeout_ms/);
+    expect(calls[0].text).not.toMatch(/aps\./);
+    expect(resolved?.statementTimeoutMs).toBe(5_000);
+    expect(resolved?.lockTimeoutMs).toBe(PROTECTION_BOUNDS.lockTimeoutMs.default);
+    forgetProtectionColumns(pool);
   });
 });

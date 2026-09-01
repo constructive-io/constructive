@@ -61,7 +61,9 @@ const codeOf = (fn: () => unknown): string | undefined => {
     fn();
     return undefined;
   } catch (e: any) {
-    return e.code;
+    // The gate rejects with grafast's SafeError, which carries the registered
+    // code in `extensions` so grafserv can surface it to the client.
+    return e.extensions?.code;
   }
 };
 
@@ -164,25 +166,25 @@ describe('cost', () => {
 
 describe('introspection', () => {
   it('rejects __schema when the tenant has introspection off', () => {
-    expect(codeOf(() => enforce('{ __schema { queryType { name } } }'))).toBe(
-      'INTROSPECTION_DISABLED'
-    );
+    expect(
+      codeOf(() => enforce('{ __schema { queryType { name } } }', { enableIntrospection: false }))
+    ).toBe('INTROSPECTION_DISABLED');
   });
 
   it('rejects __type as well', () => {
-    expect(codeOf(() => enforce('{ __type(name: "User") { name } }'))).toBe(
-      'INTROSPECTION_DISABLED'
-    );
+    expect(
+      codeOf(() => enforce('{ __type(name: "User") { name } }', { enableIntrospection: false }))
+    ).toBe('INTROSPECTION_DISABLED');
   });
 
-  it('allows introspection when the tenant enabled it', () => {
-    expect(() =>
-      enforce('{ __schema { queryType { name } } }', { enableIntrospection: true })
-    ).not.toThrow();
+  it('allows introspection when the tenant has not turned it off', () => {
+    expect(() => enforce('{ __schema { queryType { name } } }')).not.toThrow();
   });
 
   it('never blocks __typename, which is not introspection of the schema', () => {
-    expect(() => enforce('{ user(id: "1") { __typename name } }')).not.toThrow();
+    expect(() =>
+      enforce('{ user(id: "1") { __typename name } }', { enableIntrospection: false })
+    ).not.toThrow();
   });
 });
 

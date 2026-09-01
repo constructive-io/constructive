@@ -18,8 +18,10 @@
  * fragments) and the visitor does not follow them.
  */
 
+import type { ConstructiveError } from '@constructive-io/errors';
 import { errors } from '@constructive-io/errors';
 import { ASSUMED_PAGE_SIZE, type RequestProtection } from '@constructive-io/express-context';
+import { SafeError } from 'grafast';
 import type {
   DocumentNode,
   FragmentDefinitionNode,
@@ -29,6 +31,22 @@ import type {
   SelectionSetNode
 } from 'graphql';
 import { getNamedType, isObjectType, Kind, typeFromAST } from 'graphql';
+
+/**
+ * Reject the request with an error the client can act on.
+ *
+ * The gate runs inside grafast's `prepareArgs`, before execution, where a
+ * plain throw is reported as an unknown handler failure: HTTP 500 with the
+ * `extensions` dropped. `SafeError` is grafserv's contract for "this message
+ * and these extensions are meant for the client", so the registered code,
+ * class and HTTP status survive the trip.
+ */
+const reject = (error: ConstructiveError): never => {
+  throw new SafeError(error.message, {
+    ...error.toExtensions(),
+    statusCode: error.http
+  });
+};
 
 /** Arguments a connection field uses to size its page. */
 const PAGE_SIZE_ARGS = ['first', 'last'] as const;
@@ -92,14 +110,14 @@ function walkSelectionSet(
 ): void {
   if (depth > walk.maxDepth) walk.maxDepth = depth;
   if (depth > walk.protection.maxQueryDepth) {
-    throw errors.QUERY_TOO_DEEP({ depth, limit: walk.protection.maxQueryDepth });
+    reject(errors.QUERY_TOO_DEEP({ depth, limit: walk.protection.maxQueryDepth }));
   }
 
   for (const selection of selectionSet.selections) {
     if (selection.kind === Kind.FIELD) {
       if (selection.name.value === '__schema' || selection.name.value === '__type') {
         if (!walk.protection.enableIntrospection) {
-          throw errors.INTROSPECTION_DISABLED();
+          reject(errors.INTROSPECTION_DISABLED());
         }
       }
 
@@ -111,10 +129,12 @@ function walkSelectionSet(
 
       const pageSize = requestedPageSize(selection.arguments, walk.variableValues);
       if (pageSize !== null && pageSize > walk.protection.maxPageSize) {
-        throw errors.PAGE_SIZE_TOO_LARGE({
-          requested: pageSize,
-          limit: walk.protection.maxPageSize
-        });
+        reject(
+          errors.PAGE_SIZE_TOO_LARGE({
+            requested: pageSize,
+            limit: walk.protection.maxPageSize
+          })
+        );
       }
 
       // A connection charges rows; every other field is free, so a wide but
@@ -124,10 +144,12 @@ function walkSelectionSet(
         childMultiplier = multiplier * (pageSize ?? ASSUMED_PAGE_SIZE);
         walk.cost += childMultiplier;
         if (walk.cost > walk.protection.maxQueryCost) {
-          throw errors.QUERY_TOO_COSTLY({
-            cost: walk.cost,
-            limit: walk.protection.maxQueryCost
-          });
+          reject(
+            errors.QUERY_TOO_COSTLY({
+              cost: walk.cost,
+              limit: walk.protection.maxQueryCost
+            })
+          );
         }
       }
 
