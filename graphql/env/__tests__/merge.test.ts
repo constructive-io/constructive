@@ -138,6 +138,40 @@ describe('getEnvOptions', () => {
     expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
   });
 
+  it('parses and trims the optional database access policy function', () => {
+    expect(getGraphQLEnvVars({
+      API_DATABASE_ACCESS_POLICY_FUNCTION: ' platform_private.database_access '
+    }).api?.databaseAccessPolicyFunction).toBe('platform_private.database_access');
+
+    expect(getGraphQLEnvVars({
+      API_DATABASE_ACCESS_POLICY_FUNCTION: '   '
+    }).api?.databaseAccessPolicyFunction).toBeUndefined();
+  });
+
+  it('parses database access policy resource bounds', () => {
+    const api = getGraphQLEnvVars({
+      API_DATABASE_ACCESS_POLICY_POOL_MAX: '3',
+      API_DATABASE_ACCESS_POLICY_TIMEOUT_MS: '2400'
+    }).api;
+
+    expect(api?.databaseAccessPolicyPoolMax).toBe(3);
+    expect(api?.databaseAccessPolicyTimeoutMs).toBe(2400);
+  });
+
+  it('parses the opt-in GraphQL execution-error HTTP status codes', () => {
+    expect(getGraphQLEnvVars({
+      API_GRAPHQL_ERROR_HTTP_STATUS_CODES:
+        ' DATABASE_BILLING_SUSPENDED, DATABASE_ACCESS_POLICY_UNAVAILABLE, '
+    }).api?.graphqlErrorHttpStatusCodes).toEqual([
+      'DATABASE_BILLING_SUSPENDED',
+      'DATABASE_ACCESS_POLICY_UNAVAILABLE'
+    ]);
+
+    expect(getGraphQLEnvVars({
+      API_GRAPHQL_ERROR_HTTP_STATUS_CODES: ' , '
+    }).api?.graphqlErrorHttpStatusCodes).toBeUndefined();
+  });
+
   it('parses SMS environment variables into typed options', () => {
     const result = getGraphQLEnvVars({
       SMS_PROVIDER: 'devsms',

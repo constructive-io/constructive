@@ -1,5 +1,6 @@
 import './types';
 
+import { ConstructiveError,errors } from '@constructive-io/errors';
 import {
   createDefaultRegistry,
   LoaderContext,
@@ -14,6 +15,8 @@ import { getPgPool } from 'pg-cache';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
+import { ApiError as HttpApiError,isApiError as isHttpApiError } from '../errors/api-errors';
+import { respondWithGraphQLError } from '../errors/graphql-response';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
 import { getRoutingSchema, isValidSchemaName, resolveRoute, routeToApiStructure } from './routing';
 
@@ -160,6 +163,43 @@ const resolveModuleSettings = async (
   };
 };
 
+/**
+ * Hydrate a resolved API identity with tenant-owned module settings.
+ *
+ * This must run only after any configured database access policy has allowed
+ * the request. Building the loader context creates the tenant pool used by
+ * settings loaders, so doing this during route resolution would let a denied
+ * request reach the tenant database.
+ */
+const hydrateApiStructure = async (
+  pool: Pool,
+  opts: ApiOptions,
+  structure: ApiStructure
+): Promise<ApiStructure> => {
+  if (!structure.databaseId || !structure.apiId) return structure;
+
+  const loaderCtx = buildLoaderContext(pool, opts, {
+    api_id: structure.apiId,
+    database_id: structure.databaseId,
+    dbname: structure.dbname,
+    role_name: structure.roleName,
+    anon_role: structure.anonRole,
+    is_public: structure.isPublic ?? false,
+    schemas: structure.schema
+  });
+  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
+
+  return {
+    ...structure,
+    rlsModule: settings.rlsModule,
+    authSettings: settings.authSettings,
+    corsOrigins: settings.corsOrigins,
+    databaseSettings: settings.databaseSettings,
+    pubkeyChallengeSettings: settings.pubkeyChallengeSettings,
+    webauthnSettings: settings.webauthnSettings
+  };
+};
+
 // =============================================================================
 // Helpers
 // =============================================================================
@@ -185,6 +225,8 @@ const assertDatabaseId = (result: ApiStructure): void => {
 const parseCommaSeparatedHeader = (value: string): string[] =>
   value.split(',').map((s) => s.trim()).filter(Boolean);
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const getPrivateHeaderMode = (headers: RoutingHeaders): PrivateHeaderMode | null => {
   if (headers.apiName) return 'api-name-header';
   if (headers.schemata) return 'schemata-header';
@@ -192,12 +234,46 @@ const getPrivateHeaderMode = (headers: RoutingHeaders): PrivateHeaderMode | null
   return null;
 };
 
-const getRoutingHeaders = (req: Request): RoutingHeaders => ({
-  schemata: req.get('X-Schemata'),
-  apiName: req.get('X-Api-Name'),
-  metaSchema: req.get('X-Meta-Schema'),
-  databaseId: req.get('X-Database-Id')
-});
+const invalidDatabaseIdentity = (): HttpApiError => {
+  const error = errors.INVALID_DATABASE_IDENTITY();
+  return new HttpApiError(error.code, error.http, error.message);
+};
+
+const directConfigPolicyUnavailable = (): HttpApiError => {
+  const error = errors.DATABASE_ACCESS_POLICY_UNAVAILABLE();
+  return new HttpApiError(error.code, error.http, error.message);
+};
+
+/**
+ * Private routing selectors are trusted only when they carry a syntactically
+ * valid database identity. Validate this before route lookup, cache access, or
+ * request-body parsing so malformed selectors cannot reach PostgreSQL or the
+ * multipart parser.
+ */
+const validatePrivateDatabaseIdentity = (
+  opts: ApiOptions,
+  headers: RoutingHeaders
+): void => {
+  if (opts.api?.isPublic !== false || !getPrivateHeaderMode(headers)) return;
+  if (!headers.databaseId || !UUID_PATTERN.test(headers.databaseId)) {
+    throw invalidDatabaseIdentity();
+  }
+};
+
+const normalizedHeader = (value: string | undefined): string | undefined => {
+  const normalized = value?.trim();
+  return normalized || undefined;
+};
+
+const getRoutingHeaders = (req: Request): RoutingHeaders => {
+  const databaseId = normalizedHeader(req.get('X-Database-Id'));
+  return {
+    schemata: normalizedHeader(req.get('X-Schemata')),
+    apiName: normalizedHeader(req.get('X-Api-Name')),
+    metaSchema: normalizedHeader(req.get('X-Meta-Schema')),
+    databaseId: databaseId?.toLowerCase()
+  };
+};
 
 const getUrlDomains = (req: Request): { domain: string; subdomains: string[] } => {
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
@@ -231,6 +307,15 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
     }
   }
   return baseKey;
+};
+
+const getScopedRouteSvcKey = (
+  hostKey: string,
+  structure: ApiStructure
+): string => {
+  if (!structure.databaseId) return hostKey;
+  const databaseKey = `${hostKey}:database:${structure.databaseId}`;
+  return structure.apiId ? `${databaseKey}:api:${structure.apiId}` : databaseKey;
 };
 
 const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleSettings = {}): ApiStructure => ({
@@ -274,6 +359,39 @@ const validateSchemata = async (pool: Pool, schemas: string[]): Promise<string[]
     [schemas]
   );
   return result.rows.map((row: { schema_name: string }) => row.schema_name);
+};
+
+/**
+ * Resolve only physical schemas owned by the supplied logical database.
+ *
+ * Private X-Schemata requests run with the administrator role, so physical
+ * schema existence alone is not an ownership boundary. This lookup binds every
+ * requested schema to the same database identity that the live access policy
+ * will evaluate.
+ */
+const validateDatabaseSchemata = async (
+  pool: Pool,
+  schemas: string[],
+  databaseId: string
+): Promise<string[]> => {
+  const result = await pool.query<{ schema_name: string }>(
+    `SELECT DISTINCT scoped_schema.schema_name
+       FROM metaschema_public.schema scoped_schema
+       JOIN information_schema.schemata physical_schema
+         ON physical_schema.schema_name = scoped_schema.schema_name
+      WHERE scoped_schema.schema_name = ANY($1::text[])
+        AND scoped_schema.database_id = $2::uuid`,
+    [schemas, databaseId]
+  );
+  return result.rows.map((row) => row.schema_name);
+};
+
+const containsEverySchema = (requested: string[], resolved: string[]): boolean => {
+  const requestedSet = new Set(requested);
+  const resolvedSet = new Set(resolved);
+  return requestedSet.size > 0 &&
+    requestedSet.size === resolvedSet.size &&
+    [...requestedSet].every((schema) => resolvedSet.has(schema));
 };
 
 const queryByApiName = async (
@@ -331,10 +449,8 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
     return null;
   }
 
-  const loaderCtx = buildLoaderContext(pool, opts, row);
-  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
-  log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${settings.rlsModule ? 'found' : 'none'}, authSettings: ${settings.authSettings ? 'found' : 'none'}`);
-  return toApiStructure(row, opts, settings);
+  log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}]`);
+  return toApiStructure(row, opts);
 };
 
 const resolveMetaSchemaHeader = (
@@ -364,37 +480,19 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
 
   log.debug(`[scoped-routing] resolved host=${host} → api=${structure.apiId} db=${structure.dbname}`);
 
-  if (!structure.databaseId || !structure.apiId) return structure;
-
-  const loaderCtx = buildLoaderContext(pool, opts, {
-    api_id: structure.apiId,
-    database_id: structure.databaseId,
-    dbname: structure.dbname,
-    role_name: structure.roleName,
-    anon_role: structure.anonRole,
-    is_public: structure.isPublic ?? false,
-    schemas: structure.schema
-  });
-  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
-  return {
-    ...structure,
-    rlsModule: settings.rlsModule,
-    authSettings: settings.authSettings,
-    corsOrigins: settings.corsOrigins,
-    databaseSettings: settings.databaseSettings,
-    pubkeyChallengeSettings: settings.pubkeyChallengeSettings,
-    webauthnSettings: settings.webauthnSettings
-  };
+  return structure;
 };
 
 // =============================================================================
 // Main Resolution Function
 // =============================================================================
 
-export const getApiConfig = async (
+export const getApiIdentity = async (
   opts: ApiOptions,
   req: Request
 ): Promise<ApiConfigResult> => {
+  const headers = getRoutingHeaders(req);
+  validatePrivateDatabaseIdentity(opts, headers);
   const pool = getPgPool(opts.pg);
   const { domain, subdomains } = getUrlDomains(req);
   const subdomain = getSubdomain(subdomains);
@@ -402,7 +500,57 @@ export const getApiConfig = async (
 
   req.svc_key = cacheKey;
 
-  // Check cache first
+  const ctx: ResolveContext = {
+    opts,
+    pool,
+    domain,
+    subdomain,
+    cacheKey,
+    headers,
+    host: req.get('host') || ''
+  };
+  const mode = determineMode(ctx);
+  const headerSchemas = ctx.headers.schemata
+    ? [...new Set(parseCommaSeparatedHeader(ctx.headers.schemata))]
+    : [];
+  let databaseSchemas: string[] | null = null;
+  const liveAccessPolicyConfigured = !!opts.api?.databaseAccessPolicyFunction?.trim();
+
+  // A hostname is mutable routing state. Resolve it on every policy-protected
+  // request, then select the downstream Graphile handler by the resolved
+  // database/API identity so a warm handler cannot serve a rebound route.
+  if (liveAccessPolicyConfigured && mode === 'scoped-route') {
+    const result = await resolveScopedRoute(ctx);
+    if (!result) return result;
+
+    req.svc_key = getScopedRouteSvcKey(cacheKey, result);
+    return result;
+  }
+
+  // X-Schemata creates an administrator API over caller-selected schemas. Its
+  // database binding therefore remains a live routing-plane check, including
+  // on cache hits, and runs before the billing policy or Graphile can use it.
+  // Keep this coupled to the optional policy so standalone tenant installs
+  // retain their existing physical-schema-only routing contract.
+  if (
+    liveAccessPolicyConfigured &&
+    mode === 'schemata-header' &&
+    ctx.headers.databaseId
+  ) {
+    const resolvedSchemas = await validateDatabaseSchemata(
+      pool,
+      headerSchemas,
+      ctx.headers.databaseId
+    );
+    if (!containsEverySchema(headerSchemas, resolvedSchemas)) {
+      svcCache.delete(cacheKey);
+      return { errorHtml: 'No valid schemas found for the supplied X-Schemata header.' };
+    }
+    const resolvedSet = new Set(resolvedSchemas);
+    databaseSchemas = headerSchemas.filter((schema) => resolvedSet.has(schema));
+  }
+
+  // Check cache only after the live X-Schemata ownership assertion.
   if (svcCache.has(cacheKey)) {
     log.debug(`Cache HIT for key=${cacheKey}`);
     return svcCache.get(cacheKey) as ApiStructure;
@@ -410,25 +558,14 @@ export const getApiConfig = async (
 
   log.debug(`Cache MISS for key=${cacheKey}, resolving API`);
 
-  const ctx: ResolveContext = {
-    opts,
-    pool,
-    domain,
-    subdomain,
-    cacheKey,
-    headers: getRoutingHeaders(req),
-    host: req.get('host') || ''
-  };
-
   // Validate schemas upfront for modes that need them
   const apiOpts = opts.api || {};
-  const headerSchemas = ctx.headers.schemata ? parseCommaSeparatedHeader(ctx.headers.schemata) : [];
   const candidateSchemas =
     apiOpts.isPublic === false && headerSchemas.length
       ? [...new Set([...(apiOpts.metaSchemas || []), ...headerSchemas])]
       : apiOpts.metaSchemas || [];
-  
-  const validatedSchemas = await validateSchemata(pool, candidateSchemas);
+
+  const validatedSchemas = databaseSchemas ?? await validateSchemata(pool, candidateSchemas);
 
   if (validatedSchemas.length === 0) {
     const source = headerSchemas.length ? headerSchemas : apiOpts.metaSchemas || [];
@@ -439,7 +576,6 @@ export const getApiConfig = async (
   }
 
   // Route to appropriate resolver based on mode
-  const mode = determineMode(ctx);
   let result: ApiConfigResult;
 
   switch (mode) {
@@ -460,12 +596,36 @@ export const getApiConfig = async (
     break;
   }
 
-  // Cache successful results
+  // Cache only route identity. Tenant module settings are resolved after the
+  // live access policy, so a warm service cache cannot bypass that policy.
   if (result && !isApiError(result)) {
-    assertDatabaseId(result);
-    svcCache.set(cacheKey, result);
+    if (result.databaseId) svcCache.set(cacheKey, result);
   }
 
+  return result;
+};
+
+/**
+ * Resolve and hydrate an API for callers that use this helper directly.
+ *
+ * This helper cannot evaluate request-bound access policy safely. It preserves
+ * its historical behavior when no policy is configured, but fails closed before
+ * PostgreSQL when a live policy is enabled. Policy-aware callers must use the
+ * server's identity -> policy -> settings middleware pipeline.
+ */
+export const getApiConfig = async (
+  opts: ApiOptions,
+  req: Request
+): Promise<ApiConfigResult> => {
+  if (opts.api?.databaseAccessPolicyFunction?.trim()) {
+    throw directConfigPolicyUnavailable();
+  }
+
+  const result = await getApiIdentity(opts, req);
+  if (result && !isApiError(result)) {
+    assertDatabaseId(result);
+    return hydrateApiStructure(getPgPool(opts.pg), opts, result);
+  }
   return result;
 };
 
@@ -473,12 +633,35 @@ export const getApiConfig = async (
 // Express Middleware
 // =============================================================================
 
+const rejectApiError = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  error: HttpApiError
+): void => {
+  if (req.path === '/graphql' || req.path === '/graphql/') {
+    respondWithGraphQLError(
+      res,
+      new ConstructiveError({
+        code: error.code,
+        message: error.message,
+        errorClass: 'public',
+        http: error.statusCode
+      }),
+      error.statusCode
+    );
+    return;
+  }
+
+  next(error);
+};
+
 export const createApiMiddleware = (opts: ApiOptions) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     log.debug(`[api-middleware] ${req.method} ${req.path}`);
 
     try {
-      const apiConfig = await getApiConfig(opts, req);
+      const apiConfig = await getApiIdentity(opts, req);
 
       if (isApiError(apiConfig)) {
         res.status(404).send(errorPage404Message('API not found', apiConfig.errorHtml));
@@ -492,10 +675,18 @@ export const createApiMiddleware = (opts: ApiOptions) => {
 
       req.api = apiConfig;
       req.databaseId = apiConfig.databaseId;
+      if (!req.databaseId && !opts.api?.databaseAccessPolicyFunction?.trim()) {
+        assertDatabaseId(apiConfig);
+      }
       log.debug(`Resolved API: db=${apiConfig.dbname}, schemas=[${apiConfig.schema?.join(', ')}]`);
       next();
     } catch (error: unknown) {
       const err = error as Error & { code?: string };
+
+      if (isHttpApiError(err)) {
+        rejectApiError(req, res, next, err);
+        return;
+      }
 
       if (err.code === 'NO_VALID_SCHEMAS') {
         res.status(404).send(errorPage404Message(err.message));
@@ -514,6 +705,32 @@ export const createApiMiddleware = (opts: ApiOptions) => {
       }
 
       log.error('API middleware error:', err);
+      res.status(500).send(errorPage50x);
+    }
+  };
+};
+
+/**
+ * Resolve tenant-owned API settings after the request's database identity has
+ * passed the optional live access policy.
+ */
+export const createApiSettingsMiddleware = (opts: ApiOptions) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.api || !req.databaseId) {
+      log.error('[api-settings-middleware] API identity was not resolved before settings hydration');
+      res.status(500).send(errorPage50x);
+      return;
+    }
+
+    try {
+      const pool = getPgPool(opts.pg);
+      req.api = await hydrateApiStructure(pool, opts, req.api);
+      log.debug(
+        `Hydrated API settings: db=${req.api.dbname}, rlsModule=${req.api.rlsModule ? 'found' : 'none'}, authSettings=${req.api.authSettings ? 'found' : 'none'}`
+      );
+      next();
+    } catch (error: unknown) {
+      log.error('[api-settings-middleware] API settings hydration failed:', error);
       res.status(500).send(errorPage50x);
     }
   };

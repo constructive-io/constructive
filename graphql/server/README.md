@@ -109,7 +109,27 @@ This is a production-only server: every request is resolved through the scoped-r
   - `X-Api-Name` + `X-Database-Id`
   - `X-Schemata` + `X-Database-Id`
   - `X-Meta-Schema` + `X-Database-Id`
-- A resolved database id is always required. There is no default database, so a request that resolves without a database id is rejected (`NO_DATABASE_ID` → HTTP 500).
+- A resolved database id is always required. Private routing selectors require a valid UUID in `X-Database-Id`; missing or malformed identities are rejected as `INVALID_DATABASE_IDENTITY` (HTTP 400) before PostgreSQL lookup or body parsing. A scoped route that resolves without an identity is rejected as `NO_DATABASE_ID` (HTTP 500) when no access policy is configured, or `DATABASE_ACCESS_POLICY_UNAVAILABLE` (HTTP 503) when the live policy must fail closed.
+
+### Database access policy
+
+Set `API_DATABASE_ACCESS_POLICY_FUNCTION` to a lowercase, schema-qualified PostgreSQL function when new requests must pass a control-plane access decision. The server calls the function through a dedicated pool after route identity resolution and before multipart parsing, tenant settings, tenant authentication, or request context, including for private `X-Api-Name`, `X-Schemata`, and `X-Meta-Schema` routes. The pool defaults to two connections and applies a 1500 ms connection, client-query, and PostgreSQL statement deadline. When the policy is configured, private `X-Schemata` requests also verify every selected schema belongs to the supplied `X-Database-Id` before consulting either the identity cache or the policy, while `X-Meta-Schema` remains the explicit platform-management surface. The option is disabled when unset, which preserves physical-schema-only private routing for standalone tenant installations; when configured, errors, timeouts, and malformed decisions fail closed and decisions are never cached.
+
+The exported `getApiConfig()` compatibility helper does not own an HTTP policy lifecycle, so it fails closed before PostgreSQL whenever `API_DATABASE_ACCESS_POLICY_FUNCTION` is configured. Policy-aware servers must use the ordered identity, policy, and settings middleware pipeline; behavior without a configured policy is unchanged.
+
+The function accepts one UUID database id and returns exactly one row:
+
+```sql
+schema.function(p_database_id uuid)
+returns table (
+  allowed boolean,
+  code text,
+  message text,
+  http_status integer
+)
+```
+
+An allowed row must set the three denial fields to `NULL`. A denied row must provide a non-empty client-safe message of at most 512 characters and one exact code/status pair: `DATABASE_BILLING_SUSPENDED` with HTTP 402 for definitive non-payment, or `DATABASE_ACCESS_POLICY_UNAVAILABLE` with HTTP 503 when policy state is missing, malformed, or unavailable. Any other row fails closed as `DATABASE_ACCESS_POLICY_UNAVAILABLE` with HTTP 503. GraphQL denials keep a GraphQL error envelope and use the returned HTTP status, which is also present in `errors[].extensions.http`; REST denials use the same status.
 
 ## Configuration
 
@@ -127,6 +147,9 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
 | `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |
 | `API_ROUTING_SCHEMA`    | Schema containing `resolve_route()`   | `routing_public`                                 |
+| `API_DATABASE_ACCESS_POLICY_FUNCTION` | Schema-qualified resolved-database policy function | unset |
+| `API_DATABASE_ACCESS_POLICY_POOL_MAX` | Dedicated policy-pool connection limit (`1`-`8`) | `2` |
+| `API_DATABASE_ACCESS_POLICY_TIMEOUT_MS` | Policy connection/query deadline in ms (`100`-`30000`) | `1500` |
 | `API_IS_PUBLIC`                | Serve public APIs only                | `true`                                                        |
 | `API_EXPOSED_SCHEMAS`          | Additional schemas to expose          | empty                                                         |
 | `API_META_SCHEMAS`             | Meta schemas to query                 | `routing_public,metaschema_public,metaschema_modules_public` |

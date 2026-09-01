@@ -13,6 +13,10 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     FEATURES_POSTGIS,
 
     API_ROUTING_SCHEMA,
+    API_DATABASE_ACCESS_POLICY_FUNCTION,
+    API_DATABASE_ACCESS_POLICY_POOL_MAX,
+    API_DATABASE_ACCESS_POLICY_TIMEOUT_MS,
+    API_GRAPHQL_ERROR_HTTP_STATUS_CODES,
     API_IS_PUBLIC,
     API_EXPOSED_SCHEMAS,
     API_META_SCHEMAS,
@@ -38,6 +42,13 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   // let an absent env var overwrite pgpm.json or consumer-specific values.
   const smsRequestTimeoutMs = parseEnvNumber(SMS_REQUEST_TIMEOUT_MS);
   const smsDryRun = parseEnvBoolean(SEND_SMS_DRY_RUN);
+  const databaseAccessPolicyFunction = API_DATABASE_ACCESS_POLICY_FUNCTION?.trim();
+  const databaseAccessPolicyPoolMax = parseEnvNumber(API_DATABASE_ACCESS_POLICY_POOL_MAX);
+  const databaseAccessPolicyTimeoutMs = parseEnvNumber(API_DATABASE_ACCESS_POLICY_TIMEOUT_MS);
+  const graphqlErrorHttpStatusCodes = API_GRAPHQL_ERROR_HTTP_STATUS_CODES
+    ?.split(',')
+    .map(code => code.trim())
+    .filter(Boolean);
   const hasSmsEnvOverrides = Boolean(
     SMS_PROVIDER ||
     SMS_SENDER_ID ||
@@ -61,6 +72,10 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     },
     api: {
       ...(API_ROUTING_SCHEMA && { routingSchema: API_ROUTING_SCHEMA }),
+      ...(databaseAccessPolicyFunction && { databaseAccessPolicyFunction }),
+      ...(databaseAccessPolicyPoolMax !== undefined && { databaseAccessPolicyPoolMax }),
+      ...(databaseAccessPolicyTimeoutMs !== undefined && { databaseAccessPolicyTimeoutMs }),
+      ...(graphqlErrorHttpStatusCodes?.length && { graphqlErrorHttpStatusCodes }),
       ...(API_IS_PUBLIC && { isPublic: parseEnvBoolean(API_IS_PUBLIC) }),
       ...(API_EXPOSED_SCHEMAS && { exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map(s => s.trim()) }),
       ...(API_META_SCHEMAS && { metaSchemas: API_META_SCHEMAS.split(',').map(s => s.trim()) }),

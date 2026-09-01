@@ -20,7 +20,9 @@ import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+import { createGraphQLErrorHttpStatusPlugin } from '../plugins/graphql-error-http-status-plugin';
 import type { DatabaseSettings } from '../types';
+import { buildInternalIdentityContext, trustsInternalIdentityHeaders } from './internal-identity';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
@@ -165,14 +167,19 @@ const buildPreset = (
   schemas: string[],
   anonRole: string,
   roleName: string,
+  trustInternalIdentityHeaders: boolean,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
-  compute?: ComputeConfig
+  compute?: ComputeConfig,
+  graphqlErrorHttpStatusCodes?: string[]
 ): GraphileConfig.Preset => {
   return {
     extends: [createConstructivePreset(databaseSettings)],
     plugins: [
       AuthCookiePlugin,
+      ...(graphqlErrorHttpStatusCodes?.length
+        ? [createGraphQLErrorHttpStatusPlugin(graphqlErrorHttpStatusCodes)]
+        : []),
       // Only registered when the compute module is provisioned for this
       // database — all schema/table names come from the constructive
       // metaschema (express-context compute module loader); the plugin has
@@ -273,33 +280,22 @@ const buildPreset = (
             return { pgSettings };
           }
 
-          // Private (in-cluster) surface: there is no token — identity
+          // Private (in-cluster) deployment surface: there is no token — identity
           // arrives on the trusted internal X-* headers stamped by the
           // dispatching worker/sync gateway (the same vocabulary as
           // X-Database-Id above). Map it into per-request claims so writes
           // made through this surface carry actor attribution. Never applied
-          // on the public surface, where client-supplied identity headers
-          // must not assert identity.
-          const headerActorId = req.get('X-Actor-Id');
-          if (req.api?.isPublic === false && headerActorId) {
-            const pgSettings: Record<string, string> = {
-              role: roleName,
-              'jwt.claims.user_id': headerActorId,
-              'jwt.claims.principal_id': headerActorId,
-              ...context
-            };
-            const headerEntityId = req.get('X-Entity-Id');
-            if (headerEntityId) {
-              pgSettings['jwt.claims.entity_id'] = headerEntityId;
-            }
-            const headerOrganizationId = req.get('X-Organization-Id');
-            if (headerOrganizationId) {
-              pgSettings['jwt.claims.organization_id'] = headerOrganizationId;
-            }
-            if (req.requestId) {
-              pgSettings['request.id'] = req.requestId;
-            }
-            return { pgSettings };
+          // on a public server, where client-supplied identity headers must
+          // not assert identity. Route/API publication metadata is deliberately
+          // excluded from this trust decision.
+          const internalIdentityContext = buildInternalIdentityContext(
+            req,
+            roleName,
+            context,
+            trustInternalIdentityHeaders
+          );
+          if (internalIdentityContext) {
+            return internalIdentityContext;
           }
         }
 
@@ -321,6 +317,7 @@ const buildPreset = (
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+  const allowInternalIdentityHeaders = trustsInternalIdentityHeaders(opts.api);
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const label = reqLabel(req);
@@ -403,7 +400,17 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
+      const preset = buildPreset(
+        pool,
+        schema || [],
+        anonRole,
+        roleName,
+        allowInternalIdentityHeaders,
+        api.databaseSettings,
+        api.apiId,
+        compute,
+        opts.api?.graphqlErrorHttpStatusCodes
+      );
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,

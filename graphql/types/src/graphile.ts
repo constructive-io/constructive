@@ -36,6 +36,20 @@ export interface ApiOptions {
   roleName?: string;
   /** Whether the API is publicly accessible */
   isPublic?: boolean;
+  /**
+   * Optional schema-qualified PostgreSQL function that decides whether the
+   * resolved database may accept a new request.
+   */
+  databaseAccessPolicyFunction?: string;
+  /** Maximum connections reserved for database access-policy checks. */
+  databaseAccessPolicyPoolMax?: number;
+  /** Deadline in milliseconds for acquiring a policy connection and querying it. */
+  databaseAccessPolicyTimeoutMs?: number;
+  /**
+   * Optional registry codes whose GraphQL execution errors should set the HTTP
+   * response status. Unset preserves the standard HTTP 200 execution response.
+   */
+  graphqlErrorHttpStatusCodes?: string[];
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
   /**
@@ -72,6 +86,8 @@ export const apiDefaults: ApiOptions = {
   anonRole: 'administrator',
   roleName: 'administrator',
   isPublic: true,
+  databaseAccessPolicyPoolMax: 2,
+  databaseAccessPolicyTimeoutMs: 1500,
   metaSchemas: [
     'routing_public',
     'metaschema_public',

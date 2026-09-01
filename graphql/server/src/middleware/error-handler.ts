@@ -12,9 +12,16 @@ const log = new Logger('error-handler');
 
 const isDevelopment = (): boolean => getNodeEnv() === 'development';
 
+const isJsonApiPath = (path: string): boolean =>
+  path === '/fn' ||
+  path.startsWith('/fn/') ||
+  path === '/v1' ||
+  path.startsWith('/v1/');
+
 const wantsJson = (req: Request): boolean => {
   const accept = req.get('Accept') || '';
-  return accept.includes('application/json')
+  return isJsonApiPath(req.path)
+    || accept.includes('application/json')
     || accept.includes('application/graphql-response+json')
     || Boolean(req.is('json'));
 };
