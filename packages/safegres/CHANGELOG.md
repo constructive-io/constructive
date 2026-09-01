@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.23.0](https://github.com/constructive-io/constructive/compare/safegres@1.22.1...safegres@1.23.0) (2026-09-01)
+
+### Features
+
+- **safegres:** choose and name the comparison baseline ([bf2ec0c](https://github.com/constructive-io/constructive/commit/bf2ec0cc5f482e5603c9b5d5ceee69f635380e0f))
+
 ## [1.22.1](https://github.com/constructive-io/constructive/compare/safegres@1.22.0...safegres@1.22.1) (2026-08-28)
 
 **Note:** Version bump only for package safegres
