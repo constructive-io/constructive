@@ -38,7 +38,7 @@
     "pg-env": "workspace:^"
   },
   "devDependencies": {
-    "makage": "^0.3.0",
+    "makage": "^0.8.0",
     "pgsql-test": "workspace:^",
     "ts-node": "^10.9.2"
   },

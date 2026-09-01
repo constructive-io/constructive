@@ -79,8 +79,8 @@ importers:
         specifier: ^8.2.3
         version: 8.2.4(@types/node@22.19.11)(encoding@0.1.13)
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pnpm-policy:
         specifier: ^0.4.0
         version: 0.4.0
@@ -140,8 +140,8 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   agentic/anthropic:
@@ -452,8 +452,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.15
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphile/graphile-bulk-mutations:
@@ -490,8 +490,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -528,8 +528,8 @@ importers:
         specifier: ^5.0.6
         version: 5.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
@@ -572,8 +572,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -625,8 +625,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -669,8 +669,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -722,8 +722,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -787,8 +787,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -831,8 +831,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -863,8 +863,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.19
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphile/graphile-pg-aggregates:
@@ -907,8 +907,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -942,8 +942,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.19
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphile/graphile-postgis:
@@ -986,8 +986,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -1045,8 +1045,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.15
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphile/graphile-query:
@@ -1080,8 +1080,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -1121,8 +1121,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.15
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphile/graphile-realtime-test:
@@ -1174,8 +1174,8 @@ importers:
         specifier: 1.0.1
         version: 1.0.1(@types/node@25.9.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -1209,8 +1209,8 @@ importers:
         version: link:../../postgres/pg-env/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -1259,8 +1259,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -1423,8 +1423,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
@@ -1461,8 +1461,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.11
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphile/graphile-storage-registry:
@@ -1471,8 +1471,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.19
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphile/graphile-test:
@@ -1521,8 +1521,8 @@ importers:
         specifier: 2.12.6
         version: 2.12.6(graphql@16.13.0)
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphile/graphile-upload-plugin:
@@ -1547,8 +1547,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.11
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphql/codegen:
@@ -1722,8 +1722,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphql/env:
@@ -1742,8 +1742,8 @@ importers:
         version: 4.3.1
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphql/explorer:
@@ -1792,8 +1792,8 @@ importers:
         specifier: ^5.0.6
         version: 5.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
@@ -1809,8 +1809,8 @@ importers:
         version: 16.13.0
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphql/orm-test:
@@ -1901,8 +1901,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphql/query:
@@ -1954,8 +1954,8 @@ importers:
         version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphql/realtime-test:
@@ -2007,8 +2007,8 @@ importers:
         specifier: ^8.18.1
         version: 8.18.1
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -2162,8 +2162,8 @@ importers:
         specifier: workspace:*
         version: link:../../graphile/graphile-test/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
@@ -2251,8 +2251,8 @@ importers:
         specifier: ^4.9.4
         version: 4.9.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       nested-obj:
         specifier: ^0.2.3
         version: 0.2.3
@@ -2319,8 +2319,8 @@ importers:
         specifier: 2.12.6
         version: 2.12.6(graphql@16.13.0)
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   graphql/test-app:
@@ -2391,8 +2391,8 @@ importers:
         version: link:../../postgres/pg-env/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/12factor-env:
@@ -2408,8 +2408,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.11
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
@@ -2425,8 +2425,8 @@ importers:
         version: link:../../uploads/s3-utils/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/cli:
@@ -2508,8 +2508,8 @@ importers:
         specifier: ^13.0.6
         version: 13.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -2528,15 +2528,15 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/coerce:
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/csrf:
@@ -2545,8 +2545,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.11
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
@@ -2577,8 +2577,8 @@ importers:
         specifier: ^4.0.9
         version: 4.0.9
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-parser:
         specifier: ^18.2.6
         version: 18.2.6
@@ -2590,8 +2590,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.11
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
@@ -2637,15 +2637,15 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/llm-env:
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/node-type-registry:
@@ -2670,8 +2670,8 @@ importers:
         version: 0.14.4
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/oauth:
@@ -2684,8 +2684,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.11
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
@@ -2701,8 +2701,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/postmaster:
@@ -2718,15 +2718,15 @@ importers:
         version: 10.4.0
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/query-spec:
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/safegres:
@@ -2778,8 +2778,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -2810,8 +2810,8 @@ importers:
         specifier: ^5.0.6
         version: 5.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)
@@ -2827,8 +2827,8 @@ importers:
         version: 0.4.0
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/smtppostmaster:
@@ -2850,8 +2850,8 @@ importers:
         specifier: ^3.5.13
         version: 3.5.13
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       smtp-server:
         specifier: ^3.18.4
         version: 3.18.4
@@ -2870,8 +2870,8 @@ importers:
         version: 0.4.0
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   packages/url-domains:
@@ -2884,8 +2884,8 @@ importers:
         specifier: ^5.0.6
         version: 5.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/ast:
@@ -2898,8 +2898,8 @@ importers:
         version: link:../types/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/bundle:
@@ -2912,8 +2912,8 @@ importers:
         version: link:../traverse/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/cli:
@@ -3013,8 +3013,8 @@ importers:
         specifier: ^13.0.6
         version: 13.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -3105,8 +3105,8 @@ importers:
         specifier: ^4.9.4
         version: 4.9.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/diff:
@@ -3122,8 +3122,8 @@ importers:
         version: link:../transform/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/env:
@@ -3139,8 +3139,8 @@ importers:
         version: 4.3.1
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/export:
@@ -3192,8 +3192,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -3212,8 +3212,8 @@ importers:
         version: link:../transform/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/logger:
@@ -3223,15 +3223,15 @@ importers:
         version: 0.2.2
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/naming-spec:
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/portability:
@@ -3250,8 +3250,8 @@ importers:
         version: link:../../postgres/pg-env/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -3273,8 +3273,8 @@ importers:
         version: 18.5.7
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/transform:
@@ -3302,8 +3302,8 @@ importers:
         specifier: workspace:^
         version: link:../bundle/dist
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/traverse:
@@ -3313,8 +3313,8 @@ importers:
         version: link:../ast/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   pgpm/types:
@@ -3327,8 +3327,8 @@ importers:
         version: link:../../postgres/pg-env/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/constructive-test:
@@ -3338,8 +3338,8 @@ importers:
         version: link:../pgsql-test/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/drizzle-orm-test:
@@ -3358,8 +3358,8 @@ importers:
         specifier: ^0.45.2
         version: 0.45.2(@electric-sql/pglite@0.5.4)(@opentelemetry/api@1.9.0)(@types/pg@8.20.4)(pg@8.21.0)
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/insforge-test:
@@ -3378,8 +3378,8 @@ importers:
         version: link:../pgsql-test/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/introspectron:
@@ -3404,8 +3404,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../pgsql-test/dist
@@ -3421,8 +3421,8 @@ importers:
         version: 0.2.3
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pg-proto-parser:
         specifier: ^1.32.5
         version: 1.32.5
@@ -3456,8 +3456,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/pg-codegen:
@@ -3494,8 +3494,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../pgsql-test/dist
@@ -3508,8 +3508,8 @@ importers:
         version: link:../../packages/12factor-env/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/pg-query-context:
@@ -3522,8 +3522,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/pg-seed:
@@ -3545,8 +3545,8 @@ importers:
         specifier: ^1.2.5
         version: 1.2.5
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/pglite-adapter:
@@ -3568,8 +3568,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgpm:
         specifier: workspace:^
         version: link:../../pgpm/cli/dist
@@ -3606,8 +3606,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/pgsql-client:
@@ -3632,8 +3632,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/pgsql-seed:
@@ -3658,8 +3658,8 @@ importers:
         specifier: ^8.20.4
         version: 8.20.4
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/pgsql-test:
@@ -3702,8 +3702,8 @@ importers:
         specifier: ^1.2.5
         version: 1.2.5
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   postgres/query-builder:
@@ -3722,8 +3722,8 @@ importers:
         version: link:../../packages/query-spec/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pgsql-test:
         specifier: workspace:^
         version: link:../pgsql-test/dist
@@ -3745,8 +3745,8 @@ importers:
         version: link:../pgsql-test/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   sdk/constructive-cli:
@@ -3789,8 +3789,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.11
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       tsx:
         specifier: ^4.19.0
         version: 4.21.0
@@ -3830,8 +3830,8 @@ importers:
         specifier: ^19.2.18
         version: 19.2.18
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -3868,8 +3868,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.11
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       tsx:
         specifier: ^4.19.0
         version: 4.21.0
@@ -3900,8 +3900,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.15
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -3920,15 +3920,15 @@ importers:
         version: link:../uuid-hash/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   uploads/etag-hash:
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   uploads/etag-stream:
@@ -3941,8 +3941,8 @@ importers:
         specifier: ^13.0.6
         version: 13.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   uploads/mime-bytes:
@@ -3951,8 +3951,8 @@ importers:
         specifier: ^13.0.6
         version: 13.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   uploads/s3-streamer:
@@ -3980,8 +3980,8 @@ importers:
         specifier: ^13.0.6
         version: 13.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   uploads/s3-utils:
@@ -4000,8 +4000,8 @@ importers:
         specifier: ^22.19.11
         version: 22.19.11
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   uploads/stream-to-etag:
@@ -4014,8 +4014,8 @@ importers:
         specifier: ^13.0.6
         version: 13.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   uploads/upload-names:
@@ -4024,15 +4024,15 @@ importers:
         specifier: ^13.0.6
         version: 13.0.6
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   uploads/uuid-hash:
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
   uploads/uuid-stream:
@@ -4042,8 +4042,8 @@ importers:
         version: link:../uuid-hash/dist
     devDependencies:
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
     publishDirectory: dist
 
 packages:
@@ -12183,10 +12183,10 @@ packages:
       }
     engines: { node: '>=18.0.0' }
 
-  makage@0.3.0:
+  makage@0.8.0:
     resolution:
       {
-        integrity: sha512-HiBTpSy6iLnI+apv91QTWgBlFiePOCAUXmdYwlVzqkfwtUc0aM1FNu70CLs8xvc2u/R43m3J1SuWprMcKpV+vw==,
+        integrity: sha512-GY2cNOoz1/KCJ12WFgCBjGmSka6oLgaBpPvl2ApWLO3DxpAd+caf36UKhYNfE2Kk8LlEu4w7aRxzIYCPMtRIVA==,
       }
     hasBin: true
 
@@ -21631,7 +21631,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  makage@0.3.0:
+  makage@0.8.0:
     dependencies:
       glob: 11.1.0
       yaml: 2.9.0

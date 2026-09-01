@@ -48,7 +48,7 @@
   "devDependencies": {
     "@types/pg": "^8.20.4",
     "drizzle-orm": "^0.45.2",
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   },
   "dependencies": {
     "pgsql-test": "workspace:^"

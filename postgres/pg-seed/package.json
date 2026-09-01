@@ -44,7 +44,7 @@
   "devDependencies": {
     "@types/pg": "^8.20.4",
     "@types/pg-copy-streams": "^1.2.5",
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   },
   "dependencies": {
     "csv-parse": "^6.2.1",

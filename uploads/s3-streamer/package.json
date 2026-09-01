@@ -31,7 +31,7 @@
   "devDependencies": {
     "@pgpmjs/env": "workspace:^",
     "glob": "^13.0.6",
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1052.0",

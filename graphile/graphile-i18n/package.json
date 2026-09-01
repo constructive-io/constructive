@@ -46,7 +46,7 @@
     "@types/node": "^22.19.11",
     "@types/pg": "^8.20.4",
     "graphile-test": "workspace:^",
-    "makage": "^0.3.0",
+    "makage": "^0.8.0",
     "pg": "^8.21.0",
     "pgsql-test": "workspace:^"
   },
