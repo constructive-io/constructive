@@ -26,6 +26,7 @@ PostgreSQL Options:
 
 Additional Services:
   --minio            Include MinIO S3-compatible object storage (API: 9000, Console: 9001)
+  --rustfs           Include RustFS S3-compatible object storage (API: 9000, Console: 9001)
   --ollama           Include Ollama LLM inference server (API: 11434)
   --gpu              Enable NVIDIA GPU passthrough for Ollama (requires NVIDIA Container Toolkit)
 
@@ -36,6 +37,7 @@ General Options:
 Examples:
   pgpm docker start                           Start PostgreSQL only
   pgpm docker start --minio                   Start PostgreSQL + MinIO
+  pgpm docker start --rustfs                  Start PostgreSQL + RustFS
   pgpm docker start --ollama                  Start PostgreSQL + Ollama (CPU)
   pgpm docker start --ollama --gpu            Start PostgreSQL + Ollama (NVIDIA GPU)
   pgpm docker start --port 5433               Start on custom port
@@ -44,6 +46,7 @@ Examples:
   pgpm docker start --recreate --minio        Recreate PostgreSQL + MinIO
   pgpm docker stop                            Stop PostgreSQL
   pgpm docker stop --minio                    Stop PostgreSQL + MinIO
+  pgpm docker stop --rustfs                   Stop PostgreSQL + RustFS
   pgpm docker stop --ollama                   Stop PostgreSQL + Ollama
   pgpm docker ls                              List services and status
 `;
@@ -92,6 +95,23 @@ const ADDITIONAL_SERVICES: Record<string, ServiceDefinition> = {
     },
     command: ['server', '/data', '--console-address', ':9001'],
     volumes: [{ name: 'minio-data', containerPath: '/data' }]
+  },
+  rustfs: {
+    name: 'rustfs',
+    image: 'rustfs/rustfs',
+    ports: [
+      { host: 9000, container: 9000 },
+      { host: 9001, container: 9001 }
+    ],
+    env: {
+      RUSTFS_ACCESS_KEY: 'minioadmin',
+      RUSTFS_SECRET_KEY: 'minioadmin',
+      RUSTFS_ADDRESS: ':9000',
+      RUSTFS_CONSOLE_ADDRESS: ':9001',
+      RUSTFS_CONSOLE_ENABLE: 'true'
+    },
+    command: ['/data'],
+    volumes: [{ name: 'rustfs-data', containerPath: '/data' }]
   },
   ollama: {
     name: 'ollama',
@@ -349,6 +369,20 @@ function resolveServiceFlags(args: Partial<Record<string, any>>): ServiceDefinit
   return services;
 }
 
+function findPortConflict(services: ServiceDefinition[]): string | null {
+  const owners = new Map<number, string>();
+  for (const service of services) {
+    for (const { host } of service.ports) {
+      const owner = owners.get(host);
+      if (owner) {
+        return `Services "${owner}" and "${service.name}" both bind host port ${host}. Start only one of them.`;
+      }
+      owners.set(host, service.name);
+    }
+  }
+  return null;
+}
+
 async function listServices(): Promise<void> {
   const dockerStatus = await getDockerStatus();
   const dockerAvailable = dockerStatus.binary && dockerStatus.daemon;
@@ -410,12 +444,18 @@ export default async (
   const includedServices = resolveServiceFlags(args);
 
   switch (subcommand) {
-  case 'start':
+  case 'start': {
+    const conflict = findPortConflict(includedServices);
+    if (conflict) {
+      await cliExitWithError(conflict);
+      return;
+    }
     await startContainer({ name, image, port, user, password, shmSize, recreate });
     for (const service of includedServices) {
       await startService(service, recreate, gpu);
     }
     break;
+  }
 
   case 'stop':
     await stopContainer(name);

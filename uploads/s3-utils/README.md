@@ -16,7 +16,7 @@ Unified S3 utilities for the Constructive ecosystem — client factory, file ope
 
 ## Features
 
-- **Multi-provider support** — AWS S3, MinIO, Cloudflare R2, Google Cloud Storage, DigitalOcean Spaces
+- **Multi-provider support** — AWS S3, MinIO, RustFS, Cloudflare R2, Google Cloud Storage, DigitalOcean Spaces
 - **Presigned URLs** — generate secure PUT and GET URLs with configurable expiry
 - **File operations** — streaming upload, download, existence checks, and metadata retrieval
 - **Bucket management** — create buckets with provider-appropriate policies and CORS
@@ -88,14 +88,14 @@ const client = createS3Client({
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `provider` | `'s3' \| 'minio' \| 'r2' \| 'gcs' \| 'spaces'` | yes | Storage provider |
+| `provider` | `'s3' \| 'minio' \| 'rustfs' \| 'r2' \| 'gcs' \| 'spaces'` | yes | Storage provider |
 | `region` | `string` | yes | S3 region (e.g. `"us-east-1"`) |
 | `endpoint` | `string` | non-AWS | Endpoint URL (required for all providers except `s3`) |
 | `accessKeyId` | `string` | yes | Access key ID |
 | `secretAccessKey` | `string` | yes | Secret access key |
 | `forcePathStyle` | `boolean` | no | Override path-style URL behavior |
 
-Path-style URLs are enabled automatically for `minio`, `r2`, and `gcs`. Virtual-hosted style is used for `s3` and `spaces`.
+Path-style URLs are enabled automatically for `minio`, `rustfs`, `r2`, and `gcs`. Virtual-hosted style is used for `s3` and `spaces`.
 
 Throws `S3ConfigError` on invalid configuration.
 
@@ -199,7 +199,7 @@ someReadable.pipe(pass);
 Creates a bucket with provider-appropriate policies and CORS configuration.
 
 - **MinIO**: read-only public access policy (list + get)
-- **S3/GCS**: full-access policy with CORS rules for browser uploads
+- **RustFS/S3/GCS**: full-access policy with CORS rules for browser uploads
 
 ```typescript
 const { success } = await createS3Bucket(client, 'my-bucket', {

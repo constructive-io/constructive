@@ -146,7 +146,7 @@ The main class that orchestrates bucket creation and configuration.
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `connection.provider` | `'s3' \| 'minio' \| 'r2' \| 'gcs' \| 'spaces'` | Storage provider type |
+| `connection.provider` | `'s3' \| 'minio' \| 'rustfs' \| 'r2' \| 'gcs' \| 'spaces'` | Storage provider type |
 | `connection.region` | `string` | S3 region (e.g., `'us-east-1'`) |
 | `connection.endpoint` | `string?` | S3-compatible endpoint URL. Required for non-AWS providers. |
 | `connection.accessKeyId` | `string` | AWS access key ID |

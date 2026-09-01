@@ -15,6 +15,7 @@ Database Profiles:
 
 Additional Services:
   --minio            Include MinIO/S3 environment variables
+  --rustfs           Include RustFS/S3 environment variables (same vars as --minio)
 
 Modes:
   No command         Print export statements for shell evaluation
@@ -24,11 +25,13 @@ Options:
   --help, -h         Show this help message
   --supabase         Use Supabase profile instead of default Postgres
   --minio            Include CDN_ENDPOINT, AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION
+  --rustfs           Alias for --minio (RustFS serves the same S3 API on :9000)
 
 Examples:
   pgpm env                                    Print default Postgres env exports
   pgpm env --supabase                         Print Supabase env exports
   pgpm env --minio                            Print Postgres + MinIO env exports
+  pgpm env --rustfs                           Print Postgres + RustFS env exports
   pgpm env --supabase --minio                 Print Supabase + MinIO env exports
   eval "$(pgpm env)"                          Load default Postgres env into shell
   eval "$(pgpm env --minio)"                  Load Postgres + MinIO env into shell
@@ -49,21 +52,21 @@ const DEFAULT_PROFILE: PgConfig = {
   ...defaultPgConfig
 };
 
-interface MinioConfig {
+interface ObjectStoreConfig {
   endpoint: string;
   accessKey: string;
   secretKey: string;
   region: string;
 }
 
-const MINIO_PROFILE: MinioConfig = {
+const OBJECT_STORE_PROFILE: ObjectStoreConfig = {
   endpoint: 'http://localhost:9000',
   accessKey: 'minioadmin',
   secretKey: 'minioadmin',
   region: 'us-east-1',
 };
 
-function configToEnvVars(config: PgConfig, minio?: MinioConfig): Record<string, string> {
+function configToEnvVars(config: PgConfig, objectStore?: ObjectStoreConfig): Record<string, string> {
   const vars: Record<string, string> = {
     PGHOST: config.host,
     PGPORT: String(config.port),
@@ -72,26 +75,26 @@ function configToEnvVars(config: PgConfig, minio?: MinioConfig): Record<string, 
     PGDATABASE: config.database
   };
 
-  if (minio) {
-    vars.CDN_ENDPOINT = minio.endpoint;
-    vars.AWS_ACCESS_KEY = minio.accessKey;
-    vars.AWS_SECRET_KEY = minio.secretKey;
-    vars.AWS_REGION = minio.region;
+  if (objectStore) {
+    vars.CDN_ENDPOINT = objectStore.endpoint;
+    vars.AWS_ACCESS_KEY = objectStore.accessKey;
+    vars.AWS_SECRET_KEY = objectStore.secretKey;
+    vars.AWS_REGION = objectStore.region;
   }
 
   return vars;
 }
 
-function printExports(config: PgConfig, minio?: MinioConfig): void {
-  const envVars = configToEnvVars(config, minio);
+function printExports(config: PgConfig, objectStore?: ObjectStoreConfig): void {
+  const envVars = configToEnvVars(config, objectStore);
   for (const [key, value] of Object.entries(envVars)) {
     console.log(`export ${key}=${value}`);
   }
 }
 
-function executeCommand(config: PgConfig, command: string, args: string[], minio?: MinioConfig): Promise<number> {
+function executeCommand(config: PgConfig, command: string, args: string[], objectStore?: ObjectStoreConfig): Promise<number> {
   return new Promise((resolve, reject) => {
-    const envVars = configToEnvVars(config, minio);
+    const envVars = configToEnvVars(config, objectStore);
     const env = {
       ...process.env,
       ...envVars
@@ -123,11 +126,13 @@ export default async (
   }
 
   const useSupabase = argv.supabase === true || typeof argv.supabase === 'string';
-  const useMinio = argv.minio === true || typeof argv.minio === 'string';
+  const useObjectStore =
+    argv.minio === true || typeof argv.minio === 'string' ||
+    argv.rustfs === true || typeof argv.rustfs === 'string';
   const profile = useSupabase ? SUPABASE_PROFILE : DEFAULT_PROFILE;
-  const minioProfile = useMinio ? MINIO_PROFILE : undefined;
+  const objectStoreProfile = useObjectStore ? OBJECT_STORE_PROFILE : undefined;
 
-  const knownFlags = ['--supabase', '--minio'];
+  const knownFlags = ['--supabase', '--minio', '--rustfs'];
 
   const rawArgs = process.argv.slice(2);
   
@@ -148,14 +153,14 @@ export default async (
   }
 
   if (commandArgs.length === 0) {
-    printExports(profile, minioProfile);
+    printExports(profile, objectStoreProfile);
     return;
   }
 
   const [command, ...args] = commandArgs;
   
   try {
-    const exitCode = await executeCommand(profile, command, args, minioProfile);
+    const exitCode = await executeCommand(profile, command, args, objectStoreProfile);
     process.exit(exitCode);
   } catch (error) {
     if (error instanceof Error) {

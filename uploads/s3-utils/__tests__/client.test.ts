@@ -28,6 +28,15 @@ describe('createS3Client', () => {
     expect(client).toBeDefined();
   });
 
+  it('creates client for RustFS with endpoint', () => {
+    const client = createS3Client({
+      ...baseConfig,
+      provider: 'rustfs',
+      endpoint: 'http://rustfs:9000',
+    });
+    expect(client).toBeDefined();
+  });
+
   it('creates client for R2 with endpoint', () => {
     const client = createS3Client({
       ...baseConfig,

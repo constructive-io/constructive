@@ -13,14 +13,14 @@
  * Used to select provider-specific behavior (e.g., path-style URLs for MinIO,
  * jurisdiction headers for R2).
  */
-export type StorageProvider = 's3' | 'minio' | 'r2' | 'gcs' | 'spaces';
+export type StorageProvider = 's3' | 'minio' | 'rustfs' | 'r2' | 'gcs' | 'spaces';
 
 /**
  * Connection configuration for an S3-compatible storage backend.
  *
  * This is the input you provide to connect to your storage provider.
  * For AWS S3, only `region` and credentials are needed.
- * For MinIO/R2/etc., also provide `endpoint`.
+ * For MinIO/RustFS/R2/etc., also provide `endpoint`.
  */
 export interface StorageConnectionConfig {
   /** Storage provider type */
