@@ -226,8 +226,15 @@ describe('clientIpFrom', () => {
     expect(clientIpFrom(req('  ,  '), 1)).toBe('10.0.0.1');
   });
 
-  it('does not read past the start of a chain shorter than the hop count', () => {
-    expect(clientIpFrom(req('1.2.3.4'), 3)).toBe('1.2.3.4');
+  it('believes a chain exactly as long as the hop count', () => {
+    // One ingress, nothing forged: the chain is the single entry it appended.
+    expect(clientIpFrom(req('1.2.3.4'), 1)).toBe('1.2.3.4');
+  });
+
+  it('ignores a chain shorter than the hop count rather than reading its head', () => {
+    // Fewer proxies wrote this than we own, so no entry is attributable and the
+    // leftmost one is whatever a direct caller chose to send.
+    expect(clientIpFrom(req('1.2.3.4'), 3)).toBe('10.0.0.1');
   });
 
   it('joins a repeated header before splitting it', () => {

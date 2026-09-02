@@ -261,7 +261,8 @@ export class RateWindow {
  * `trustedProxyHops` is how many proxies of our own sit in front of the server:
  * 0 means none (only the socket peer is believed, and the header is ignored
  * outright), 1 means one ingress appended the client's address, and so on.
- * Anything the chain cannot supply falls back to the socket peer, which no
+ * Anything the chain cannot supply — an absent header, or a chain too short to
+ * have been written by all of them — falls back to the socket peer, which no
  * caller can forge.
  */
 export const clientIpFrom = (
@@ -282,13 +283,16 @@ export const clientIpFrom = (
     .split(',')
     .map((entry) => entry.trim())
     .filter(Boolean);
-  if (chain.length === 0) return socketIp;
+  // A chain with fewer entries than we own proxies cannot have been written by
+  // all of them, so the request did not travel the path this number describes
+  // and nothing in the header is attributable. Reading its leftmost entry would
+  // return exactly the value a direct caller chose.
+  if (chain.length < trustedProxyHops) return socketIp;
 
-  // Walk in from the right by the number of proxies we own; a chain shorter
-  // than that was not fully written by them, so believe its leftmost entry
-  // rather than an index that does not exist.
-  const index = Math.max(chain.length - trustedProxyHops, 0);
-  return chain[index];
+  // Otherwise walk in from the right by the number of proxies we own: with one
+  // ingress a legitimate chain is `[client]` and a forged one is
+  // `[forged, client]`, and both resolve to the entry the ingress appended.
+  return chain[chain.length - trustedProxyHops];
 };
 
 /**
