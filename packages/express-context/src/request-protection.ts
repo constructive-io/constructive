@@ -26,13 +26,13 @@ export interface RequestProtection {
   idleInTransactionTimeoutMs: number;
   /** `lock_timeout` for the request's transaction. */
   lockTimeoutMs: number;
-  /** In-flight requests allowed per tenant (not yet enforced). */
+  /** In-flight requests admitted per database, per replica. */
   maxConcurrentRequests: number;
-  /** How long a request may wait for a concurrency slot (not yet enforced). */
+  /** How long a request may wait for a concurrency slot. `0` never queues. */
   maxQueueWaitMs: number;
-  /** Sustained request rate per tenant (not yet enforced). */
+  /** Sustained request rate allowed one caller on one route. */
   rateLimitRpm: number;
-  /** Burst allowance above `rateLimitRpm` (not yet enforced). */
+  /** Burst allowance above `rateLimitRpm` within the same window. */
   rateLimitBurst: number;
   /** Deepest selection set accepted in an operation. */
   maxQueryDepth: number;

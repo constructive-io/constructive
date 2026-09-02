@@ -329,6 +329,13 @@ export const registry = {
     message: 'The request body is too large.',
     positional: ['bytes', 'limit']
   }),
+  CONCURRENCY_LIMIT_REACHED: defineError<{ limit?: number; waitedMs?: number }>({
+    code: 'CONCURRENCY_LIMIT_REACHED',
+    class: 'public',
+    http: 429,
+    message: 'Too many requests are in flight for this API. Please retry in a moment.',
+    positional: ['limit', 'waitedMs']
+  }),
   INTROSPECTION_DISABLED: defineError({
     code: 'INTROSPECTION_DISABLED',
     class: 'public',

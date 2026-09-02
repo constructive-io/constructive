@@ -25,6 +25,7 @@ import {
   isGraphqlObservabilityRequested,
   isLoopbackHost
 } from './diagnostics/observability';
+import { createAdmissionControlMiddleware } from './middleware/admission-control';
 import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware } from './middleware/auth';
 // Auth cookie handling is done via AuthCookiePlugin in grafserv
@@ -172,6 +173,13 @@ class Server {
     // Resolve the tenant's protection bounds before anything can spend budget
     // on the request (and before the GraphQL handler reads them for pgSettings).
     app.use(createRequestProtectionMiddleware());
+    // Spend the width and rate bounds the line above resolved, before a
+    // request can take a pool connection. Scoped to /graphql rather than
+    // mounted globally because a concurrency slot is held for as long as the
+    // handler runs: the SSE routes below are long-lived by design and would
+    // sit in the budget for the life of the stream. The other lanes need
+    // their own bound sized for streaming, not this one.
+    app.use('/graphql', createAdmissionControlMiddleware());
     app.use(createCaptchaMiddleware());
 
     // CSRF protection for cookie-authenticated requests
