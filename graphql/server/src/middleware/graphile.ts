@@ -207,9 +207,15 @@ const buildPreset = (
               'jwt.claims.principal_id': headerActorId,
               ...context
             };
+            // The entity pair travels together: the tenant's writers reject an
+            // entity id whose type they cannot interpret (`ENTITY_TYPE_REQUIRED`).
             const headerEntityId = req.get('X-Entity-Id');
+            const headerEntityType = req.get('X-Entity-Type');
             if (headerEntityId) {
               pgSettings['jwt.claims.entity_id'] = headerEntityId;
+            }
+            if (headerEntityType) {
+              pgSettings['jwt.claims.entity_type'] = headerEntityType;
             }
             const headerOrganizationId = req.get('X-Organization-Id');
             if (headerOrganizationId) {
@@ -222,11 +228,20 @@ const buildPreset = (
           }
         }
 
+        // No actor to name, so the tenant database the request addresses carries
+        // the attribution — the same rule the sync gateway applies to a request
+        // that arrives without a credential. Without it the tenant's own writers
+        // refuse the work an anonymous request legitimately does
+        // (`ATTRIBUTION_REQUIRED`), so a public mutation cannot enqueue a job.
         const anonSettings: Record<string, string> = {
           ...timeouts,
           role: anonRole,
           ...context
         };
+        if (req?.databaseId) {
+          anonSettings['jwt.claims.entity_id'] = req.databaseId;
+          anonSettings['jwt.claims.entity_type'] = 'database';
+        }
         if (req?.requestId) {
           anonSettings['request.id'] = req.requestId;
         }

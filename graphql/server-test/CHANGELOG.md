@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.24.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.24.3...graphql-server-test@3.24.4) (2026-09-02)
+
+### Bug Fixes
+
+- **server:** attribute anonymous requests to the database they address ([ba2c055](https://github.com/constructive-io/constructive/commit/ba2c055893980b3b196c1f7d63a6c95fd0041cd9))
+
 ## [3.24.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.24.2...graphql-server-test@3.24.3) (2026-09-01)
 
 **Note:** Version bump only for package graphql-server-test

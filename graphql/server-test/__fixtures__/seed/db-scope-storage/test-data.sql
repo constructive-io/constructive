@@ -94,10 +94,13 @@ VALUES
   ('ce557000-0000-4000-8000-000000000002', 'private', 'private', false, 'database-ce551000-private-5509785f9933')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO routing_public.database_settings (id, database_id)
+-- Introspection is opted into: the suite reads the exposed mutation set, and a
+-- database gets none until it asks (`enable_introspection` defaults off).
+INSERT INTO routing_public.database_settings (id, database_id, enable_introspection)
 VALUES (
   'ce558000-0000-4000-8000-000000000001',
-  'ce551000-0000-4000-8000-000000000001'
+  'ce551000-0000-4000-8000-000000000001',
+  true
 ) ON CONFLICT (database_id) DO NOTHING;
 
 SET session_replication_role TO DEFAULT;
