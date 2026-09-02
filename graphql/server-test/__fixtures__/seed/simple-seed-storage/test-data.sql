@@ -102,13 +102,16 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
--- ALICE DATABASE SETTINGS (all defaults — presigned uploads enabled)
+-- ALICE DATABASE SETTINGS (presigned uploads enabled by default; the suite
+-- reads the exposed mutation set, which is introspection the tenant must opt
+-- into — `enable_introspection` is off until a database asks for it)
 -- =====================================================
 
-INSERT INTO routing_public.database_settings (id, database_id)
+INSERT INTO routing_public.database_settings (id, database_id, enable_introspection)
 VALUES (
   'e0000001-0000-0000-0000-000000000001',
-  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9'
+  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
+  true
 ) ON CONFLICT (database_id) DO NOTHING;
 
 -- =====================================================
@@ -227,13 +230,15 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
--- BOB DATABASE SETTINGS (all defaults — presigned uploads enabled)
+-- BOB DATABASE SETTINGS (presigned uploads enabled by default; introspection
+-- opted into so the suite can read his exposed mutation set)
 -- =====================================================
 
-INSERT INTO routing_public.database_settings (id, database_id)
+INSERT INTO routing_public.database_settings (id, database_id, enable_introspection)
 VALUES (
   'e0000001-0000-0000-0000-000000000002',
-  'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5'
+  'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5',
+  true
 ) ON CONFLICT (database_id) DO NOTHING;
 
 -- =====================================================
@@ -355,13 +360,15 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
--- MALLORY DATABASE SETTINGS (all defaults — presigned uploads enabled)
+-- MALLORY DATABASE SETTINGS (presigned uploads enabled by default;
+-- introspection opted into so the suite can read her exposed mutation set)
 -- =====================================================
 
-INSERT INTO routing_public.database_settings (id, database_id)
+INSERT INTO routing_public.database_settings (id, database_id, enable_introspection)
 VALUES (
   'fa88fa88-0000-0000-0000-000000000001',
-  'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5'
+  'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5',
+  true
 ) ON CONFLICT (database_id) DO NOTHING;
 
 SET session_replication_role TO DEFAULT;
