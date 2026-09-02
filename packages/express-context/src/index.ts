@@ -87,6 +87,10 @@ export {
   resolveRequestProtection,
 } from './request-protection';
 
+// Admission control (in-process concurrency + per-caller rate)
+export type { AdmissionLease, AdmissionRefusal, AdmissionRequest } from './admission';
+export { clientIpFrom, ConcurrencyLimiter, RateWindow, trustedProxyHops } from './admission';
+
 // Request ID middleware
 export { requestIdMiddleware } from './request-id';
 
