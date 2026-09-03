@@ -19,6 +19,28 @@ const log = new Logger('routing');
 // Contract (constructive-db docs/architecture/scoped-domain-routing.md):
 // a single row is always returned; no match → route_binding_id IS NULL.
 
+/**
+ * The role an API row names is the role the server will SET ROLE to; a row
+ * that leaves one blank is a broken surface, not a request for a default.
+ * Throws (code MISSING_API_ROLE) rather than substituting a role.
+ */
+export const requireApiRole = (
+  column: 'role_name' | 'anon_role',
+  value: string | null | undefined,
+  apiId: string | undefined
+): string => {
+  if (typeof value !== 'string' || value.trim() === '') {
+    const error = new Error(
+      `API ${apiId ?? '<unknown>'} has no ${column}; a served role is required and there is no default.`
+    ) as Error & { code?: string; column?: string; apiId?: string };
+    error.code = 'MISSING_API_ROLE';
+    error.column = column;
+    error.apiId = apiId;
+    throw error;
+  }
+  return value;
+};
+
 /** Row shape returned by <schema>.resolve_route() — frozen DB↔server contract. */
 export interface ResolvedRoute {
   route_binding_id: string | null;
@@ -126,13 +148,15 @@ export const routeToApiStructure = (
     return null;
   }
 
+  const apiId = config.api_id ?? route.target_source_id ?? undefined;
+
   return {
-    apiId: config.api_id ?? route.target_source_id ?? undefined,
+    apiId,
     // Scoped APIs leave dbname NULL when their schemas live in the serving
     // database; fall back to the server's own database in that case.
     dbname: config.dbname || opts.pg?.database || '',
-    anonRole: config.anon_role || 'anon',
-    roleName: config.role_name || 'authenticated',
+    anonRole: requireApiRole('anon_role', config.anon_role, apiId),
+    roleName: requireApiRole('role_name', config.role_name, apiId),
     schema: config.schemas,
     domains: [],
     databaseId: config.database_id,

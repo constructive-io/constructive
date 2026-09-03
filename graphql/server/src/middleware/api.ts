@@ -15,7 +15,7 @@ import { getPgPool } from 'pg-cache';
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
-import { getRoutingSchema, isValidSchemaName, resolveRoute, routeToApiStructure } from './routing';
+import { getRoutingSchema, isValidSchemaName, requireApiRole, resolveRoute, routeToApiStructure } from './routing';
 
 const log = new Logger('api');
 
@@ -236,8 +236,8 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
 const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleSettings = {}): ApiStructure => ({
   apiId: row.api_id,
   dbname: row.dbname || opts.pg?.database || '',
-  anonRole: row.anon_role || 'anon',
-  roleName: row.role_name || 'authenticated',
+  anonRole: requireApiRole('anon_role', row.anon_role, row.api_id),
+  roleName: requireApiRole('role_name', row.role_name, row.api_id),
   schema: row.schemas || [],
   rlsModule: settings.rlsModule,
   domains: [],
@@ -499,6 +499,12 @@ export const createApiMiddleware = (opts: ApiOptions) => {
 
       if (err.code === 'NO_VALID_SCHEMAS') {
         res.status(404).send(errorPage404Message(err.message));
+        return;
+      }
+
+      if (err.code === 'MISSING_API_ROLE') {
+        log.error('[api-middleware] resolved API row has no served role:', err.message);
+        res.status(500).send(errorPage50x);
         return;
       }
 
