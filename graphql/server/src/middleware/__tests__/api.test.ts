@@ -77,8 +77,8 @@ describe('api middleware routing priority', () => {
             api_id: 'api-123',
             database_id: 'db-123',
             dbname: 'tenant_db',
-            role_name: 'api_role',
-            anon_role: 'api_anon',
+            role_name: 'authenticated',
+            anon_role: 'anonymous',
             is_public: false,
             schemas: ['api_public']
           }]
@@ -103,8 +103,8 @@ describe('api middleware routing priority', () => {
     expect(result).toMatchObject({
       apiId: 'api-123',
       dbname: 'tenant_db',
-      anonRole: 'api_anon',
-      roleName: 'api_role',
+      anonRole: 'anonymous',
+      roleName: 'authenticated',
       schema: ['api_public'],
       databaseId: 'db-123',
       isPublic: false
@@ -115,3 +115,81 @@ describe('api middleware routing priority', () => {
     ]));
   });
 });
+
+describe('servable-role door check (X-Api-Name lookup)', () => {
+  beforeEach(() => {
+    svcCache.clear();
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    svcCache.clear();
+  });
+
+  const poolWithApiRow = (row: Record<string, unknown>) => {
+    const query = jest.fn(async (_sql: string, params: unknown[]) => {
+      if (Array.isArray(params[0])) {
+        return { rows: (params[0] as string[]).map((schema_name) => ({ schema_name })) };
+      }
+      if (params[0] === 'db-123' && params[1] === 'customer-api') {
+        return {
+          rows: [{
+            api_id: 'api-123',
+            database_id: 'db-123',
+            dbname: 'tenant_db',
+            is_public: false,
+            schemas: ['api_public'],
+            ...row
+          }]
+        };
+      }
+      return { rows: [] };
+    });
+    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    return query;
+  };
+
+  const request = () => createRequest({
+    host: 'admin.localhost',
+    'X-Database-Id': 'db-123',
+    'X-Api-Name': 'customer-api'
+  });
+
+  it.each([
+    ['role_name', 'administrator'],
+    ['anon_role', 'administrator'],
+    ['role_name', 'postgres'],
+    ['anon_role', 'authenticated_client'],
+    ['role_name', 'anon'],
+    ['anon_role', null],
+    ['role_name', undefined]
+  ])('refuses a row whose %s is %p and caches nothing', async (column, role) => {
+    poolWithApiRow({ role_name: 'authenticated', anon_role: 'anonymous', [column]: role });
+
+    await expect(getApiConfig(createPrivateOptions(), request())).rejects.toMatchObject({
+      code: 'NON_SERVABLE_ROLE',
+      column,
+      message: expect.stringContaining(column)
+    });
+    expect(svcCache.has('api:db-123:customer-api')).toBe(false);
+  });
+
+  it('serves a row whose roles are both servable', async () => {
+    poolWithApiRow({ role_name: 'authenticated', anon_role: 'anonymous' });
+
+    const result = await getApiConfig(createPrivateOptions(), request());
+
+    expect(result).toMatchObject({ roleName: 'authenticated', anonRole: 'anonymous' });
+    expect(svcCache.get('api:db-123:customer-api')).toBe(result);
+  });
+
+  it('never invents a role when the row leaves one blank', async () => {
+    poolWithApiRow({ role_name: 'authenticated', anon_role: null });
+
+    await expect(getApiConfig(createPrivateOptions(), request())).rejects.toMatchObject({
+      code: 'NON_SERVABLE_ROLE',
+      role: null
+    });
+  });
+});
+

@@ -131,8 +131,8 @@ export const routeToApiStructure = (
     // Scoped APIs leave dbname NULL when their schemas live in the serving
     // database; fall back to the server's own database in that case.
     dbname: config.dbname || opts.pg?.database || '',
-    anonRole: config.anon_role || 'anon',
-    roleName: config.role_name || 'authenticated',
+    anonRole: config.anon_role,
+    roleName: config.role_name,
     schema: config.schemas,
     domains: [],
     databaseId: config.database_id,

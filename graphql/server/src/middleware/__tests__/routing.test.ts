@@ -36,8 +36,8 @@ const matchedRoute = (overrides: Partial<ResolvedRoute> = {}): ResolvedRoute => 
     api_id: 'api-1',
     database_id: 'db-1',
     dbname: 'tenant_db',
-    role_name: 'api_role',
-    anon_role: 'api_anon',
+    role_name: 'authenticated',
+    anon_role: 'anonymous',
     is_public: true,
     schemas: ['app_public']
   },
@@ -106,8 +106,8 @@ describe('routeToApiStructure', () => {
         apiId: 'api-1',
         databaseId: 'db-1',
         dbname: 'tenant_db',
-        roleName: 'api_role',
-        anonRole: 'api_anon',
+        roleName: 'authenticated',
+        anonRole: 'anonymous',
         schema: ['app_public'],
         isPublic: true
       })
@@ -120,6 +120,22 @@ describe('routeToApiStructure', () => {
 
   it('returns null when resolved_config lacks api essentials', () => {
     expect(routeToApiStructure(matchedRoute({ resolved_config: {} }), opts)).toBeNull();
+  });
+
+  it('carries the row roles through verbatim — no fallback role is invented', () => {
+    const structure = routeToApiStructure(
+      matchedRoute({
+        resolved_config: {
+          api_id: 'api-1',
+          database_id: 'db-1',
+          dbname: 'tenant_db',
+          is_public: true,
+          schemas: ['app_public']
+        }
+      }),
+      opts
+    );
+    expect(structure).toEqual(expect.objectContaining({ roleName: undefined, anonRole: undefined }));
   });
 });
 
@@ -194,8 +210,8 @@ describe('getApiConfig with scoped routing enabled', () => {
       resolved_config: {
         api_id: 'api-1',
         dbname: 'tenant_db',
-        role_name: 'api_role',
-        anon_role: 'api_anon',
+        role_name: 'authenticated',
+        anon_role: 'anonymous',
         is_public: true,
         schemas: ['app_public']
       }
@@ -210,5 +226,43 @@ describe('getApiConfig with scoped routing enabled', () => {
     await expect(
       getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }))
     ).rejects.toMatchObject({ code: 'NO_DATABASE_ID' });
+  });
+
+  it.each([
+    ['role_name', 'administrator'],
+    ['anon_role', 'administrator'],
+    ['role_name', 'authenticated_client'],
+    ['anon_role', 'anon'],
+    ['anon_role', undefined]
+  ])('refuses to serve a route whose %s is %p (NON_SERVABLE_ROLE, nothing cached)', async (column, role) => {
+    const route = matchedRoute({
+      resolved_config: {
+        api_id: 'api-1',
+        database_id: 'db-1',
+        dbname: 'tenant_db',
+        role_name: 'authenticated',
+        anon_role: 'anonymous',
+        is_public: true,
+        schemas: ['app_public'],
+        [column]: role
+      }
+    });
+    const query = jest.fn(async (sql: string, params: unknown[]) => {
+      if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
+      if (sql.includes('resolve_route')) return { rows: [route] };
+      throw new Error(`unexpected query: ${sql}`);
+    });
+    mockGetPgPool.mockReturnValue(createPool(query) as never);
+
+    const req = createRequest({ host: 'api.example.com' });
+    await expect(getApiConfig(createOptions(), req)).rejects.toMatchObject({
+      code: 'NON_SERVABLE_ROLE',
+      column
+    });
+    expect(svcCache.has(req.svc_key as string)).toBe(false);
+    // Nothing past the resolver ran: no module settings were loaded for a refused row.
+    expect(query.mock.calls.every(([sql]) =>
+      String(sql).includes('information_schema.schemata') || String(sql).includes('resolve_route')
+    )).toBe(true);
   });
 });

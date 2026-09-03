@@ -16,6 +16,7 @@ import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
 import { getRoutingSchema, isValidSchemaName, resolveRoute, routeToApiStructure } from './routing';
+import { assertServableRoles } from './servable-roles';
 
 const log = new Logger('api');
 
@@ -236,8 +237,8 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
 const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleSettings = {}): ApiStructure => ({
   apiId: row.api_id,
   dbname: row.dbname || opts.pg?.database || '',
-  anonRole: row.anon_role || 'anon',
-  roleName: row.role_name || 'authenticated',
+  anonRole: row.anon_role,
+  roleName: row.role_name,
   schema: row.schemas || [],
   rlsModule: settings.rlsModule,
   domains: [],
@@ -331,6 +332,8 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
     return null;
   }
 
+  assertServableRoles(toApiStructure(row, opts), 'api-name-lookup');
+
   const loaderCtx = buildLoaderContext(pool, opts, row);
   const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
   log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${settings.rlsModule ? 'found' : 'none'}, authSettings: ${settings.authSettings ? 'found' : 'none'}`);
@@ -361,6 +364,7 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
 
   const structure = routeToApiStructure(route, opts);
   if (!structure) return null;
+  assertServableRoles(structure, 'scoped-routing');
 
   log.debug(`[scoped-routing] resolved host=${host} → api=${structure.apiId} db=${structure.dbname}`);
 
@@ -499,6 +503,12 @@ export const createApiMiddleware = (opts: ApiOptions) => {
 
       if (err.code === 'NO_VALID_SCHEMAS') {
         res.status(404).send(errorPage404Message(err.message));
+        return;
+      }
+
+      if (err.code === 'NON_SERVABLE_ROLE') {
+        log.error('[api-middleware] non-servable role on resolved API, refusing to serve:', err.message);
+        res.status(500).send(errorPage50x);
         return;
       }
 
