@@ -1,4 +1,5 @@
 import { createCsrfMiddleware } from '@constructive-io/csrf';
+import type { RefusalRecorder } from '@constructive-io/express-context';
 import { createContextMiddleware, createDefaultRegistry, requestIdMiddleware } from '@constructive-io/express-context';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
@@ -44,6 +45,7 @@ import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createRequestProtectionMiddleware } from './middleware/request-protection';
 import { getRoutingSchema } from './middleware/routing';
+import { createPlatformRefusalRecorder, installRefusalRecorder } from './refusals/recorder';
 
 const log = new Logger('server');
 
@@ -84,6 +86,7 @@ class Server {
   private closed = false;
   private httpServer: HttpServer | null = null;
   private debugSampler: DebugSamplerHandle | null = null;
+  private refusalRecorder: RefusalRecorder | null = null;
 
   constructor(opts: ConstructiveOptions) {
     this.opts = getEnvOptions(opts);
@@ -227,6 +230,12 @@ class Server {
 
     this.app = app;
     this.debugSampler = observabilityEnabled ? startDebugSampler(effectiveOpts) : null;
+
+    // Refusals are counted in memory by the middleware above and flushed to
+    // the platform table on a timer; the request path never touches the pool.
+    this.refusalRecorder = createPlatformRefusalRecorder(effectiveOpts);
+    installRefusalRecorder(this.refusalRecorder);
+    this.refusalRecorder.start();
   }
 
   listen(): HttpServer {
@@ -352,6 +361,11 @@ class Server {
     this.closed = true;
     this.shuttingDown = true;
     await this.removeEventListener();
+    if (this.refusalRecorder) {
+      installRefusalRecorder(null);
+      await this.refusalRecorder.stop();
+      this.refusalRecorder = null;
+    }
     if (this.debugSampler) {
       await this.debugSampler.stop();
       this.debugSampler = null;

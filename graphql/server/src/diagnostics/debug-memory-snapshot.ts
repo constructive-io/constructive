@@ -6,6 +6,7 @@ import { getCacheStats } from 'graphile-cache';
 
 import { getInFlightCount, getInFlightKeys } from '../middleware/graphile';
 import { getGraphileBuildStats } from '../middleware/observability/graphile-build-stats';
+import { getRefusalRecorderStats } from '../refusals/recorder';
 
 const toMB = (bytes: number): string => `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 
@@ -55,6 +56,8 @@ export interface DebugMemorySnapshot {
     keys: string[];
   };
   graphileBuilds: ReturnType<typeof getGraphileBuildStats>;
+  /** In-memory refusal counter + flusher state; null when no recorder is installed. */
+  refusals: ReturnType<typeof getRefusalRecorderStats>;
   uptimeMinutes: number;
   timestamp: string;
 }
@@ -119,6 +122,7 @@ export const getDebugMemorySnapshot = (): DebugMemorySnapshot => {
       keys: getInFlightKeys(),
     },
     graphileBuilds: getGraphileBuildStats(),
+    refusals: getRefusalRecorderStats(),
     uptimeMinutes: process.uptime() / 60,
     timestamp: new Date().toISOString(),
   };

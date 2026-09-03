@@ -6,6 +6,7 @@ import { DEFAULT_REQUEST_PROTECTION } from '@constructive-io/express-context';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
+import { recordRefusal } from '../refusals/recorder';
 
 /**
  * Resolve the bounds this request runs under and attach them to it.
@@ -62,6 +63,7 @@ export const createRequestProtectionMiddleware = (): RequestHandler => {
       declaredLength > protection.maxRequestBytes &&
       !isMultipart(req)
     ) {
+      recordRefusal(req, 'request_too_large');
       respondWithGraphQLError(
         res,
         errors.REQUEST_TOO_LARGE({ bytes: declaredLength, limit: protection.maxRequestBytes })

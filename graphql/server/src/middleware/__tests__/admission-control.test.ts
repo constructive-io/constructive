@@ -1,8 +1,9 @@
 import type { RequestProtection } from '@constructive-io/express-context';
-import { DEFAULT_REQUEST_PROTECTION } from '@constructive-io/express-context';
+import { DEFAULT_REQUEST_PROTECTION, RefusalRecorder } from '@constructive-io/express-context';
 import { EventEmitter } from 'events';
 import type { NextFunction, Request, Response } from 'express';
 
+import { installRefusalRecorder } from '../../refusals/recorder';
 import { createAdmissionControlMiddleware } from '../admission-control';
 
 const protection = (overrides: Partial<RequestProtection>): RequestProtection => ({
@@ -289,6 +290,96 @@ describe('createAdmissionControlMiddleware', () => {
       const fourth = send(middleware, fakeReq({ protection: bounds, ip: '10.0.0.4' }));
       await fourth.done;
       expect(fourth.res.captured.status).toBe(429);
+    });
+  });
+
+  describe('refusal recording', () => {
+    let sink: jest.Mock;
+    let recorder: RefusalRecorder;
+
+    beforeEach(() => {
+      sink = jest.fn(async (): Promise<void> => undefined);
+      recorder = new RefusalRecorder({ sink, intervalMs: 60_000, jitterMs: 0 });
+      installRefusalRecorder(recorder);
+    });
+
+    afterEach(() => {
+      installRefusalRecorder(null);
+    });
+
+    it('counts a rate-limit refusal keyed by tenant, route and anonymised source', async () => {
+      const middleware = createAdmissionControlMiddleware({ trustedProxyHops: 0 });
+      const bounds = protection({ rateLimitRpm: 1, rateLimitBurst: 1 });
+      for (let i = 0; i < 2; i++) {
+        const admitted = send(middleware, fakeReq({ protection: bounds, ip: '203.0.113.7' }));
+        await admitted.done;
+        admitted.res.emit('finish');
+      }
+
+      const refused = send(middleware, fakeReq({ protection: bounds, ip: '203.0.113.7' }));
+      await refused.done;
+      expect(refused.res.captured.status).toBe(429);
+
+      await recorder.flush();
+      expect(sink).toHaveBeenCalledTimes(1);
+      expect(sink.mock.calls[0][0]).toEqual([
+        expect.objectContaining({
+          database_id: 'db-1',
+          lane: 'graphql',
+          reason: 'rate_limited',
+          route_key: 'POST /graphql',
+          source_bucket: '203.0.113.0/24',
+          count: 1
+        })
+      ]);
+    });
+
+    it('distinguishes an immediate concurrency refusal from a queue timeout', async () => {
+      const middleware = createAdmissionControlMiddleware({ trustedProxyHops: 0 });
+      const immediate = protection({ maxConcurrentRequests: 1, maxQueueWaitMs: 0 });
+      const held = send(middleware, fakeReq({ protection: immediate, ip: '10.0.0.1' }));
+      await held.done;
+      const refused = send(middleware, fakeReq({ protection: immediate, ip: '10.0.0.2' }));
+      await refused.done;
+      expect(refused.res.captured.status).toBe(429);
+
+      const waits = protection({ maxConcurrentRequests: 1, maxQueueWaitMs: 20 });
+      const timedOut = send(middleware, fakeReq({ protection: waits, ip: '10.0.0.3' }));
+      await timedOut.done;
+      expect(timedOut.res.captured.status).toBe(429);
+      held.res.emit('finish');
+
+      await recorder.flush();
+      const reasons = sink.mock.calls[0][0].map((r: { reason: string }) => r.reason).sort();
+      expect(reasons).toEqual(['concurrency_saturated', 'queue_timeout']);
+    });
+
+    it('still refuses when the recorder is broken', async () => {
+      installRefusalRecorder({
+        record: () => {
+          throw new Error('recorder exploded');
+        }
+      } as unknown as RefusalRecorder);
+      const middleware = createAdmissionControlMiddleware({ trustedProxyHops: 0 });
+      const bounds = protection({ rateLimitRpm: 1, rateLimitBurst: 1 });
+      for (let i = 0; i < 2; i++) {
+        const admitted = send(middleware, fakeReq({ protection: bounds }));
+        await admitted.done;
+        admitted.res.emit('finish');
+      }
+
+      const refused = send(middleware, fakeReq({ protection: bounds }));
+      await refused.done;
+      expect(refused.res.captured.status).toBe(429);
+      expect(refused.res.captured.body.errors[0].extensions.code).toBe('RATE_LIMITED');
+    });
+
+    it('does not record admitted requests', async () => {
+      const middleware = createAdmissionControlMiddleware({ trustedProxyHops: 0 });
+      const { done, res } = send(middleware, fakeReq());
+      await done;
+      res.emit('finish');
+      expect(recorder.stats().keys).toBe(0);
     });
   });
 });
