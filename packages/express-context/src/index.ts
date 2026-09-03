@@ -91,6 +91,42 @@ export {
 export type { AdmissionLease, AdmissionRefusal, AdmissionRequest } from './admission';
 export { clientIpFrom, ConcurrencyLimiter, RateWindow, trustedProxyHops } from './admission';
 
+// Shared in-memory counter + batch flush (refusal observability, page/request metering)
+export type {
+  RecordRefusalsSinkOptions,
+  Refusal,
+  RefusalKey,
+  RefusalLane,
+  RefusalReason,
+  RefusalRecorderOptions,
+  RefusalRecorderStats,
+  RefusalRow,
+  RefusalSink
+} from './refusals';
+export {
+  createRecordRefusalsSink,
+  DEFAULT_REFUSAL_FLUSH_INTERVAL_MS,
+  DEFAULT_REFUSAL_FLUSH_JITTER_MS,
+  DEFAULT_REFUSAL_MAX_KEYS,
+  OVERFLOW_ROUTE,
+  OVERFLOW_SOURCE,
+  REFUSAL_REASONS,
+  refusalKeyOf,
+  refusalOverflowKey,
+  RefusalRecorder,
+  refusalRows,
+  sourceBucket,
+  UNKNOWN_SOURCE
+} from './refusals';
+export type {
+  BoundedCounterOptions,
+  CounterEntry,
+  CounterFlusherOptions,
+  CounterFlusherStats,
+  CounterSink
+} from './usage-counter';
+export { BoundedCounter, CounterFlusher } from './usage-counter';
+
 // Request ID middleware
 export { requestIdMiddleware } from './request-id';
 

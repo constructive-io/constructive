@@ -13,6 +13,7 @@ import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
+import { recordRefusal } from '../refusals/recorder';
 
 const log = new Logger('admission');
 
@@ -109,10 +110,12 @@ export const createAdmissionControlMiddleware = (
     const databaseId = req.databaseId ?? UNKNOWN_DATABASE;
 
     // ─── Per-caller rate ────────────────────────────────────────────────────
-    const ip = clientIpFrom(req, resolveHops(req, options.trustedProxyHops));
+    const hops = resolveHops(req, options.trustedProxyHops);
+    const ip = clientIpFrom(req, hops);
     const rateKey = `${databaseId}\u0000${ip}\u0000${routeOf(req)}`;
     if (!rate.admit(rateKey, protection.rateLimitRpm, protection.rateLimitBurst)) {
       log.warn(`[admission] rate limit: database=${databaseId} ip=${ip} route=${routeOf(req)}`);
+      recordRefusal(req, 'rate_limited', { sourceIp: ip });
       respondWithGraphQLError(res, errors.RATE_LIMITED(), {
         status: 429,
         headers: { 'Retry-After': retryAfterSeconds(rate.retryAfterMs(rateKey)) }
@@ -137,6 +140,9 @@ export const createAdmissionControlMiddleware = (
         `[admission] concurrency refused: database=${databaseId} ` +
           `limit=${protection.maxConcurrentRequests} reason=${lease.refusal} waited=${lease.queuedMs}ms`
       );
+      recordRefusal(req, lease.refusal === 'queue_timeout' ? 'queue_timeout' : 'concurrency_saturated', {
+        sourceIp: ip
+      });
       respondWithGraphQLError(
         res,
         errors.CONCURRENCY_LIMIT_REACHED({
