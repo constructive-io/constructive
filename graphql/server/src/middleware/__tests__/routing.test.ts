@@ -121,6 +121,24 @@ describe('routeToApiStructure', () => {
   it('returns null when resolved_config lacks api essentials', () => {
     expect(routeToApiStructure(matchedRoute({ resolved_config: {} }), opts)).toBeNull();
   });
+
+  it.each([
+    ['role_name', null],
+    ['role_name', ''],
+    ['role_name', '   '],
+    ['role_name', undefined],
+    ['anon_role', null],
+    ['anon_role', ''],
+    ['anon_role', '   '],
+    ['anon_role', undefined]
+  ])('throws MISSING_API_ROLE when %s is %p instead of inventing a role', (column, value) => {
+    const route = matchedRoute({
+      resolved_config: { ...(matchedRoute().resolved_config as Record<string, unknown>), [column]: value }
+    });
+    expect(() => routeToApiStructure(route, opts)).toThrow(
+      expect.objectContaining({ code: 'MISSING_API_ROLE', column, apiId: 'api-1' })
+    );
+  });
 });
 
 describe('getApiConfig with scoped routing enabled', () => {

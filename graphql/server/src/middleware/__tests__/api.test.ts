@@ -115,3 +115,74 @@ describe('api middleware routing priority', () => {
     ]));
   });
 });
+
+describe('missing served role on an X-Api-Name row', () => {
+  beforeEach(() => {
+    svcCache.clear();
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    svcCache.clear();
+  });
+
+  const poolWithApiRow = (row: Record<string, unknown>): void => {
+    const query = jest.fn(async (_sql: string, params: unknown[]) => {
+      if (Array.isArray(params[0])) {
+        return { rows: (params[0] as string[]).map((schema_name) => ({ schema_name })) };
+      }
+      if (params[0] === 'db-123' && params[1] === 'customer-api') {
+        return {
+          rows: [{
+            api_id: 'api-123',
+            database_id: 'db-123',
+            dbname: 'tenant_db',
+            role_name: 'authenticated',
+            anon_role: 'anonymous',
+            is_public: false,
+            schemas: ['api_public'],
+            ...row
+          }]
+        };
+      }
+      return { rows: [] };
+    });
+    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+  };
+
+  const request = () => createRequest({
+    host: 'admin.localhost',
+    'X-Database-Id': 'db-123',
+    'X-Api-Name': 'customer-api'
+  });
+
+  it.each([
+    ['role_name', null],
+    ['role_name', ''],
+    ['role_name', '   '],
+    ['role_name', undefined],
+    ['anon_role', null],
+    ['anon_role', ''],
+    ['anon_role', '   '],
+    ['anon_role', undefined]
+  ])('throws MISSING_API_ROLE when %s is %p instead of inventing a role, and caches nothing', async (column, value) => {
+    poolWithApiRow({ [column]: value });
+
+    await expect(getApiConfig(createPrivateOptions(), request())).rejects.toMatchObject({
+      code: 'MISSING_API_ROLE',
+      column,
+      apiId: 'api-123',
+      message: expect.stringContaining(column)
+    });
+    expect(svcCache.has('api:db-123:customer-api')).toBe(false);
+  });
+
+  it('passes the row roles through verbatim when both are present', async () => {
+    poolWithApiRow({ role_name: 'administrator', anon_role: 'administrator' });
+
+    const result = await getApiConfig(createPrivateOptions(), request());
+
+    expect(result).toMatchObject({ roleName: 'administrator', anonRole: 'administrator' });
+    expect(svcCache.get('api:db-123:customer-api')).toBe(result);
+  });
+});
