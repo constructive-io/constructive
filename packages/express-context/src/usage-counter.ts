@@ -15,7 +15,7 @@
  *     unbounded one, and the counter is already accumulating the next window.
  *
  * Refusal observability instantiates these with a refusal key and a sink that
- * calls `constructive_limits_private.record_refusals` (see `refusals.ts`); the
+ * calls `constructive_usage_private.record_refusals` (see `refusals.ts`); the
  * page/request metering lane instantiates the same two classes with its own
  * `K`, `keyOf`, `overflowKey`, bound, interval and sink. The seam is the
  * constructor arguments — nothing in this file is specific to either.

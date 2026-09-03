@@ -30,8 +30,10 @@ const log = new Logger('refusals');
  * A flush runs outside any tenant request, so it establishes its own identity
  * at the top of its transaction: the `platform-bootstrap` service principal
  * (`jwt.claims.user_id` / `principal_id`) attributed to the platform database
- * (`jwt.claims.database_id`, `entity_id`, `entity_type`). Those are the claims
- * every other unattended platform write carries; resolving them is the
+ * (`jwt.claims.database_id`, `entity_id`, `entity_type`) as the platform
+ * `system` role type (`jwt.claims.role_type`), which the generated writer's
+ * guard and RESTRICTIVE insert policy require. Those are the claims every
+ * other unattended platform write carries; resolving them is the
  * claim-establishment step at the entry point, not a lookup inside the
  * function being called — `record_refusals` raises if the claims are missing.
  * Resolution is cached after the first success; a failure is reported by the
@@ -152,7 +154,8 @@ export const platformFlushClaims = (identity: PlatformFlushIdentity): Record<str
   'jwt.claims.user_id': identity.actorId,
   'jwt.claims.principal_id': identity.principalId,
   'jwt.claims.entity_id': identity.databaseId,
-  'jwt.claims.entity_type': 'database'
+  'jwt.claims.entity_type': 'database',
+  'jwt.claims.role_type': 'system'
 });
 
 export interface PlatformRefusalRecorderOptions {
@@ -164,7 +167,7 @@ export interface PlatformRefusalRecorderOptions {
 
 /**
  * The recorder the server runs: counts in memory, flushes into
- * `constructive_limits_private.record_refusals` on the platform pool under the
+ * `constructive_usage_private.record_refusals` on the platform pool under the
  * platform flush identity. Not started; the caller owns start/stop.
  */
 export const createPlatformRefusalRecorder = (

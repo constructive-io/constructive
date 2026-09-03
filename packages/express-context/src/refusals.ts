@@ -90,7 +90,7 @@ export const UNKNOWN_SOURCE = 'unknown';
 export const OVERFLOW_SOURCE = 'overflow';
 export const OVERFLOW_ROUTE = '*';
 
-/** A row as `constructive_limits_private.record_refusals(jsonb)` reads it. */
+/** A row as `constructive_usage_private.record_refusals(jsonb)` reads it. */
 export interface RefusalRow {
   minute_bucket: string;
   database_id: string | null;
@@ -309,7 +309,7 @@ export interface RecordRefusalsSinkOptions {
    * useful fails loudly at the first flush rather than writing unattributed.
    */
   claims: () => Promise<Record<string, string>>;
-  /** Default `constructive_limits_private.record_refusals`. */
+  /** Default `constructive_usage_private.record_refusals`. */
   functionName?: string;
 }
 
@@ -321,7 +321,7 @@ const FUNCTION_NAME = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*$/;
  * pool that was unreachable at startup does not leave the recorder wedged.
  */
 export const createRecordRefusalsSink = (opts: RecordRefusalsSinkOptions): RefusalSink => {
-  const fn = opts.functionName ?? 'constructive_limits_private.record_refusals';
+  const fn = opts.functionName ?? 'constructive_usage_private.record_refusals';
   if (!FUNCTION_NAME.test(fn)) {
     throw new Error(`createRecordRefusalsSink: invalid function name ${JSON.stringify(fn)}`);
   }

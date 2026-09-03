@@ -258,7 +258,7 @@ describe('createRecordRefusalsSink', () => {
     expect(texts.slice(1, 3)).toEqual(['SELECT set_config($1, $2, true)', 'SELECT set_config($1, $2, true)']);
     expect(queries[1].values).toEqual(['jwt.claims.user_id', 'u-platform']);
     expect(queries[2].values).toEqual(['jwt.claims.database_id', 'db-platform']);
-    expect(texts[3]).toBe('SELECT "constructive_limits_private"."record_refusals"($1::jsonb) AS recorded');
+    expect(texts[3]).toBe('SELECT "constructive_usage_private"."record_refusals"($1::jsonb) AS recorded');
     expect(JSON.parse(queries[3].values![0] as string)).toEqual(rows);
     expect(texts[4]).toBe('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
