@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.20.8...@constructive-io/graphql-server@5.21.0) (2026-09-03)
+
+### Bug Fixes
+
+- **refusals:** target generated constructive_usage_private.record_refusals, flush as system role type ([74c9ce2](https://github.com/constructive-io/constructive/commit/74c9ce24b7729dee9be544aff8363a31c01011cf))
+- **server:** a resolved API row with no served role is a visible failure, not a substituted default ([b82336b](https://github.com/constructive-io/constructive/commit/b82336b23898e5888d272457eda451cfd18895e2))
+
+### Features
+
+- **express-context:** bounded counter + batch flusher, RefusalRecorder; GraphQL refusal emitters ([#1950](https://github.com/constructive-io/constructive/issues/1950)) ([ede1788](https://github.com/constructive-io/constructive/commit/ede17888b4cd671e1cb3b9111a648178a1a3d521)), closes [#1947](https://github.com/constructive-io/constructive/issues/1947)
+- **graphql:** admit GraphQL requests against the tenant's concurrency and rate bounds ([745f137](https://github.com/constructive-io/constructive/commit/745f1377949a1b2e1c217bc87f39bd0c4b5b36e9))
+
 ## [5.20.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.20.7...@constructive-io/graphql-server@5.20.8) (2026-09-02)
 
 ### Bug Fixes

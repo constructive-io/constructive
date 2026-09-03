@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.26.2...@constructive-io/express-context@0.27.0) (2026-09-03)
+
+### Bug Fixes
+
+- **express-context:** fall back to the socket peer when the forwarded chain is too short ([6625613](https://github.com/constructive-io/constructive/commit/6625613e9c38dd786293fc171f7e40246b53ab97))
+- **refusals:** target generated constructive_usage_private.record_refusals, flush as system role type ([74c9ce2](https://github.com/constructive-io/constructive/commit/74c9ce24b7729dee9be544aff8363a31c01011cf))
+
+### Features
+
+- **express-context:** bounded counter + batch flusher, RefusalRecorder; GraphQL refusal emitters ([#1950](https://github.com/constructive-io/constructive/issues/1950)) ([ede1788](https://github.com/constructive-io/constructive/commit/ede17888b4cd671e1cb3b9111a648178a1a3d521)), closes [#1947](https://github.com/constructive-io/constructive/issues/1947)
+- **graphql:** admit GraphQL requests against the tenant's concurrency and rate bounds ([745f137](https://github.com/constructive-io/constructive/commit/745f1377949a1b2e1c217bc87f39bd0c4b5b36e9))
+
 ## [0.26.2](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.26.1...@constructive-io/express-context@0.26.2) (2026-09-01)
 
 **Note:** Version bump only for package @constructive-io/express-context

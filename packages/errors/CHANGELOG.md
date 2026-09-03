@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.11.2...@constructive-io/errors@0.12.0) (2026-09-03)
+
+### Features
+
+- **graphql:** admit GraphQL requests against the tenant's concurrency and rate bounds ([745f137](https://github.com/constructive-io/constructive/commit/745f1377949a1b2e1c217bc87f39bd0c4b5b36e9))
+
 ## [0.11.2](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.11.1...@constructive-io/errors@0.11.2) (2026-09-01)
 
 **Note:** Version bump only for package @constructive-io/errors
