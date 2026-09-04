@@ -16,7 +16,7 @@ export default async (
   try {
     if (argv.help || argv.h) {
       console.log(
-        'provision-bucket - Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\nUsage: provision-bucket [OPTIONS]\n'
+        'provision-bucket - Reconcile an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then enqueues the same\nstorage:provision_bucket job used by the INSERT trigger. This is\nidempotent for an already-reconciled bucket; enqueue failures become\nGraphQL errors.\n\nUsage: provision-bucket [OPTIONS]\n'
       );
       process.exit(0);
     }

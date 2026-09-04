@@ -21,7 +21,7 @@ const fieldSchema: FieldSchema = {
   bindingsTableName: 'string',
   capabilityBindingsTableId: 'uuid',
   databaseId: 'uuid',
-  defaultPermissions: 'string',
+  defaultCapabilities: 'string',
   definitionsTableId: 'uuid',
   definitionsTableName: 'string',
   entityField: 'string',
@@ -38,6 +38,7 @@ const fieldSchema: FieldSchema = {
   schedulesTableId: 'uuid',
   schemaId: 'uuid',
   scope: 'string',
+  storageKey: 'string',
 };
 const usage =
   '\nfunction-module <command>\n\nCommands:\n  list                  List functionModule records\n  find-first            Find first matching functionModule record\n  get                   Get a functionModule by ID\n  create                Create a new functionModule\n  update                Update an existing functionModule\n  delete                Delete a functionModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -95,7 +96,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       bindingsTableName: true,
       capabilityBindingsTableId: true,
       databaseId: true,
-      defaultPermissions: true,
+      defaultCapabilities: true,
       definitionsTableId: true,
       definitionsTableName: true,
       entityField: true,
@@ -112,6 +113,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       schedulesTableId: true,
       schemaId: true,
       scope: true,
+      storageKey: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<FunctionModuleSelect, FunctionModuleFilter, FunctionModuleOrderBy> & {
@@ -137,7 +139,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       bindingsTableName: true,
       capabilityBindingsTableId: true,
       databaseId: true,
-      defaultPermissions: true,
+      defaultCapabilities: true,
       definitionsTableId: true,
       definitionsTableName: true,
       entityField: true,
@@ -154,6 +156,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       schedulesTableId: true,
       schemaId: true,
       scope: true,
+      storageKey: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<FunctionModuleSelect, FunctionModuleFilter, FunctionModuleOrderBy> & {
@@ -191,7 +194,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           bindingsTableName: true,
           capabilityBindingsTableId: true,
           databaseId: true,
-          defaultPermissions: true,
+          defaultCapabilities: true,
           definitionsTableId: true,
           definitionsTableName: true,
           entityField: true,
@@ -208,6 +211,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           schedulesTableId: true,
           schemaId: true,
           scope: true,
+          storageKey: true,
         },
       })
       .execute();
@@ -259,8 +263,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'defaultPermissions',
-        message: 'defaultPermissions',
+        name: 'defaultCapabilities',
+        message: 'defaultCapabilities',
         required: false,
         skipPrompt: true,
       },
@@ -368,6 +372,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'scope',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'storageKey',
+        message: 'storageKey',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -383,7 +394,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           bindingsTableName: cleanedData.bindingsTableName,
           capabilityBindingsTableId: cleanedData.capabilityBindingsTableId,
           databaseId: cleanedData.databaseId,
-          defaultPermissions: cleanedData.defaultPermissions,
+          defaultCapabilities: cleanedData.defaultCapabilities,
           definitionsTableId: cleanedData.definitionsTableId,
           definitionsTableName: cleanedData.definitionsTableName,
           entityField: cleanedData.entityField,
@@ -399,6 +410,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           schedulesTableId: cleanedData.schedulesTableId,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
+          storageKey: cleanedData.storageKey,
         },
         select: {
           apiName: true,
@@ -406,7 +418,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           bindingsTableName: true,
           capabilityBindingsTableId: true,
           databaseId: true,
-          defaultPermissions: true,
+          defaultCapabilities: true,
           definitionsTableId: true,
           definitionsTableName: true,
           entityField: true,
@@ -423,6 +435,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           schedulesTableId: true,
           schemaId: true,
           scope: true,
+          storageKey: true,
         },
       })
       .execute();
@@ -480,8 +493,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'defaultPermissions',
-        message: 'defaultPermissions',
+        name: 'defaultCapabilities',
+        message: 'defaultCapabilities',
         required: false,
         skipPrompt: true,
       },
@@ -589,6 +602,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'scope',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'storageKey',
+        message: 'storageKey',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as FunctionModulePatch;
@@ -604,7 +624,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           bindingsTableName: cleanedData.bindingsTableName,
           capabilityBindingsTableId: cleanedData.capabilityBindingsTableId,
           databaseId: cleanedData.databaseId,
-          defaultPermissions: cleanedData.defaultPermissions,
+          defaultCapabilities: cleanedData.defaultCapabilities,
           definitionsTableId: cleanedData.definitionsTableId,
           definitionsTableName: cleanedData.definitionsTableName,
           entityField: cleanedData.entityField,
@@ -620,6 +640,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           schedulesTableId: cleanedData.schedulesTableId,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
+          storageKey: cleanedData.storageKey,
         },
         select: {
           apiName: true,
@@ -627,7 +648,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           bindingsTableName: true,
           capabilityBindingsTableId: true,
           databaseId: true,
-          defaultPermissions: true,
+          defaultCapabilities: true,
           definitionsTableId: true,
           definitionsTableName: true,
           entityField: true,
@@ -644,6 +665,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           schedulesTableId: true,
           schemaId: true,
           scope: true,
+          storageKey: true,
         },
       })
       .execute();

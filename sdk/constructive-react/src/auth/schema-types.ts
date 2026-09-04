@@ -17,6 +17,8 @@ import type {
   RoleType,
   User,
   UserConnectedAccount,
+  UserSetting,
+  UserSettingsSecurity,
   WebauthnCredential,
   BigFloatFilter,
   BigIntFilter,
@@ -282,6 +284,44 @@ export type UserOrderBy =
   | 'UPDATED_AT_DESC'
   | 'USERNAME_ASC'
   | 'USERNAME_DESC';
+/** Methods to use when ordering `UserSetting`. */
+export type UserSettingOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `UserSettingsSecurity`. */
+export type UserSettingsSecurityOrderBy =
+  | 'BACKUP_CODES_COUNT_ASC'
+  | 'BACKUP_CODES_COUNT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EMAIL_MFA_ENABLED_ASC'
+  | 'EMAIL_MFA_ENABLED_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MFA_ENROLLED_AT_ASC'
+  | 'MFA_ENROLLED_AT_DESC'
+  | 'MFA_LAST_USED_AT_ASC'
+  | 'MFA_LAST_USED_AT_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SMS_MFA_ENABLED_ASC'
+  | 'SMS_MFA_ENABLED_DESC'
+  | 'TOTP_ENABLED_ASC'
+  | 'TOTP_ENABLED_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `WebauthnCredential`. */
 export type WebauthnCredentialOrderBy =
   | 'BACKUP_ELIGIBLE_ASC'
@@ -315,6 +355,10 @@ export type WebauthnCredentialOrderBy =
   | 'UPDATED_AT_DESC'
   | 'WEBAUTHN_USER_ID_ASC'
   | 'WEBAUTHN_USER_ID_DESC';
+export interface ApproveDeviceInput {
+  approvalToken: string;
+  clientMutationId?: string;
+}
 /** A filter to be used against `AuditLogAuth` object types. All fields are combined with a logical ‘and.’ */
 export interface AuditLogAuthFilter {
   /** Filter by the object’s `actor` relation. */
@@ -401,10 +445,26 @@ export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
 }
+export interface CompleteMfaChallengeInput {
+  authMethod?: string;
+  clientMutationId?: string;
+  credentialKind?: string;
+  deviceToken?: string;
+  mfaChallengeToken?: string;
+  mfaMethod?: string;
+  rememberMe?: boolean;
+  totpCode?: string;
+  trustDevice?: boolean;
+  userId?: string;
+}
 export interface ConfirmDeleteAccountInput {
   clientMutationId?: string;
   token?: string;
   userId?: string;
+}
+export interface ConfirmTotpSetupInput {
+  clientMutationId?: string;
+  totpValue: string;
 }
 /** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeEmailFilter {
@@ -663,6 +723,16 @@ export interface CreateUserInput {
   /** The `User` to be created by this mutation. */
   user: UserInput;
 }
+export interface CreateUserSettingInput {
+  clientMutationId?: string;
+  /** The `UserSetting` to be created by this mutation. */
+  userSetting: UserSettingInput;
+}
+export interface CreateUserSettingsSecurityInput {
+  clientMutationId?: string;
+  /** The `UserSettingsSecurity` to be created by this mutation. */
+  userSettingsSecurity: UserSettingsSecurityInput;
+}
 export interface CreateWebauthnCredentialInput {
   clientMutationId?: string;
   /** The `WebauthnCredential` to be created by this mutation. */
@@ -763,9 +833,27 @@ export interface DeleteUserInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteUserSettingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteUserSettingsSecurityInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteWebauthnCredentialInput {
   clientMutationId?: string;
   id: string;
+}
+export interface DisableEmailMfaInput {
+  clientMutationId?: string;
+}
+export interface DisableSmsMfaInput {
+  clientMutationId?: string;
+}
+export interface DisableTotpInput {
+  clientMutationId?: string;
+  totpValue: string;
 }
 export interface DisconnectAccountInput {
   accountId: string;
@@ -828,6 +916,15 @@ export interface EmailPatch {
   ownerId?: string;
   updatedAt?: string;
 }
+export interface EnableEmailMfaInput {
+  clientMutationId?: string;
+}
+export interface EnableSmsMfaInput {
+  clientMutationId?: string;
+}
+export interface EnableTotpInput {
+  clientMutationId?: string;
+}
 export interface ExtendTokenExpiresInput {
   amount?: IntervalInput;
   clientMutationId?: string;
@@ -835,6 +932,9 @@ export interface ExtendTokenExpiresInput {
 export interface ForgotPasswordInput {
   clientMutationId?: string;
   email?: ConstructiveInternalTypeEmail;
+}
+export interface GenerateBackupCodesInput {
+  clientMutationId?: string;
 }
 /** A filter to be used against `IdentityProvider` object types. All fields are combined with a logical ‘and.’ */
 export interface IdentityProviderFilter {
@@ -1374,6 +1474,18 @@ export interface UpdateUserInput {
   /** An object where the defined keys will be set on the `User` being updated. */
   userPatch: UserPatch;
 }
+export interface UpdateUserSettingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `UserSetting` being updated. */
+  userSettingPatch: UserSettingPatch;
+}
+export interface UpdateUserSettingsSecurityInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `UserSettingsSecurity` being updated. */
+  userSettingsSecurityPatch: UserSettingsSecurityPatch;
+}
 export interface UpdateWebauthnCredentialInput {
   clientMutationId?: string;
   id: string;
@@ -1431,6 +1543,14 @@ export interface UserFilter {
   not?: UserFilter;
   /** Checks for any expressions in this list. */
   or?: UserFilter[];
+  /** Filter by the object’s `ownedUserSetting` relation. */
+  ownedUserSetting?: UserSettingFilter;
+  /** A related `ownedUserSetting` exists. */
+  ownedUserSettingExists?: boolean;
+  /** Filter by the object’s `ownedUserSettingsSecurity` relation. */
+  ownedUserSettingsSecurity?: UserSettingsSecurityFilter;
+  /** A related `ownedUserSettingsSecurity` exists. */
+  ownedUserSettingsSecurityExists?: boolean;
   /** Filter by the object’s `phoneNumbers` relation. */
   phoneNumbers?: UserToManyPhoneNumberFilter;
   /** `phoneNumbers` exist. */
@@ -1493,6 +1613,108 @@ export interface UserPatch {
   type?: number;
   updatedAt?: string;
   username?: string;
+}
+/** A filter to be used against `UserSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface UserSettingFilter {
+  /** Checks for all expressions in this list. */
+  and?: UserSettingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: UserSettingFilter;
+  /** Checks for any expressions in this list. */
+  or?: UserSettingFilter[];
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `UserSetting` */
+export interface UserSettingInput {
+  createdAt?: string;
+  id?: string;
+  ownerId?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `UserSetting`. Fields that are set will be updated. */
+export interface UserSettingPatch {
+  createdAt?: string;
+  id?: string;
+  ownerId?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `UserSettingsSecurity` object types. All fields are combined with a logical ‘and.’ */
+export interface UserSettingsSecurityFilter {
+  /** Checks for all expressions in this list. */
+  and?: UserSettingsSecurityFilter[];
+  /** Filter by the object’s `backupCodesCount` field. */
+  backupCodesCount?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `emailMfaEnabled` field. */
+  emailMfaEnabled?: BooleanFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `mfaEnrolledAt` field. */
+  mfaEnrolledAt?: DatetimeFilter;
+  /** Filter by the object’s `mfaLastUsedAt` field. */
+  mfaLastUsedAt?: DatetimeFilter;
+  /** Negates the expression. */
+  not?: UserSettingsSecurityFilter;
+  /** Checks for any expressions in this list. */
+  or?: UserSettingsSecurityFilter[];
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `smsMfaEnabled` field. */
+  smsMfaEnabled?: BooleanFilter;
+  /** Filter by the object’s `totpEnabled` field. */
+  totpEnabled?: BooleanFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `UserSettingsSecurity` */
+export interface UserSettingsSecurityInput {
+  /** Number of remaining unused backup codes */
+  backupCodesCount?: number;
+  createdAt?: string;
+  /** Whether email-based MFA codes are active for this user */
+  emailMfaEnabled?: boolean;
+  id?: string;
+  /** When the first MFA method was enabled */
+  mfaEnrolledAt?: string;
+  /** When MFA was last successfully verified */
+  mfaLastUsedAt?: string;
+  ownerId?: string;
+  /** Whether SMS-based MFA codes are active for this user */
+  smsMfaEnabled?: boolean;
+  /** Whether TOTP (authenticator app) MFA is active for this user */
+  totpEnabled?: boolean;
+  updatedAt?: string;
+}
+/** Represents an update to a `UserSettingsSecurity`. Fields that are set will be updated. */
+export interface UserSettingsSecurityPatch {
+  /** Number of remaining unused backup codes */
+  backupCodesCount?: number;
+  createdAt?: string;
+  /** Whether email-based MFA codes are active for this user */
+  emailMfaEnabled?: boolean;
+  id?: string;
+  /** When the first MFA method was enabled */
+  mfaEnrolledAt?: string;
+  /** When MFA was last successfully verified */
+  mfaLastUsedAt?: string;
+  ownerId?: string;
+  /** Whether SMS-based MFA codes are active for this user */
+  smsMfaEnabled?: boolean;
+  /** Whether TOTP (authenticator app) MFA is active for this user */
+  totpEnabled?: boolean;
+  updatedAt?: string;
 }
 /** A filter to be used against many `AuditLogAuth` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyAuditLogAuthFilter {
@@ -1688,6 +1910,12 @@ export interface EmailConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+export interface GetMfaStatusRecord {
+  backupCodesCount?: number | null;
+  emailMfaEnabled?: boolean | null;
+  smsMfaEnabled?: boolean | null;
+  totpEnabled?: boolean | null;
+}
 /** A connection to a list of `IdentityProvider` values. */
 export interface IdentityProviderConnection {
   edges: IdentityProviderEdge[];
@@ -1744,6 +1972,20 @@ export interface UserConnectedAccountConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `UserSetting` values. */
+export interface UserSettingConnection {
+  edges: UserSettingEdge[];
+  nodes: UserSetting[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `UserSettingsSecurity` values. */
+export interface UserSettingsSecurityConnection {
+  edges: UserSettingsSecurityEdge[];
+  nodes: UserSettingsSecurity[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `User` values. */
 export interface UserConnection {
   edges: UserEdge[];
@@ -1758,10 +2000,22 @@ export interface WebauthnCredentialConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+export interface ApproveDevicePayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
 export interface CheckPasswordPayload {
   clientMutationId?: string | null;
 }
+export interface CompleteMfaChallengePayload {
+  clientMutationId?: string | null;
+  result?: CompleteMfaChallengeRecord | null;
+}
 export interface ConfirmDeleteAccountPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface ConfirmTotpSetupPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -1823,6 +2077,18 @@ export interface CreateUserPayload {
   user?: User | null;
   userEdge?: UserEdge | null;
 }
+export interface CreateUserSettingPayload {
+  clientMutationId?: string | null;
+  /** The `UserSetting` that was created by this mutation. */
+  userSetting?: UserSetting | null;
+  userSettingEdge?: UserSettingEdge | null;
+}
+export interface CreateUserSettingsSecurityPayload {
+  clientMutationId?: string | null;
+  /** The `UserSettingsSecurity` that was created by this mutation. */
+  userSettingsSecurity?: UserSettingsSecurity | null;
+  userSettingsSecurityEdge?: UserSettingsSecurityEdge | null;
+}
 export interface CreateWebauthnCredentialPayload {
   clientMutationId?: string | null;
   /** The `WebauthnCredential` that was created by this mutation. */
@@ -1879,15 +2145,51 @@ export interface DeleteUserPayload {
   user?: User | null;
   userEdge?: UserEdge | null;
 }
+export interface DeleteUserSettingPayload {
+  clientMutationId?: string | null;
+  /** The `UserSetting` that was deleted by this mutation. */
+  userSetting?: UserSetting | null;
+  userSettingEdge?: UserSettingEdge | null;
+}
+export interface DeleteUserSettingsSecurityPayload {
+  clientMutationId?: string | null;
+  /** The `UserSettingsSecurity` that was deleted by this mutation. */
+  userSettingsSecurity?: UserSettingsSecurity | null;
+  userSettingsSecurityEdge?: UserSettingsSecurityEdge | null;
+}
 export interface DeleteWebauthnCredentialPayload {
   clientMutationId?: string | null;
   /** The `WebauthnCredential` that was deleted by this mutation. */
   webauthnCredential?: WebauthnCredential | null;
   webauthnCredentialEdge?: WebauthnCredentialEdge | null;
 }
+export interface DisableEmailMfaPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface DisableSmsMfaPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface DisableTotpPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
 export interface DisconnectAccountPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
+}
+export interface EnableEmailMfaPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface EnableSmsMfaPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface EnableTotpPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
 }
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
@@ -1896,23 +2198,22 @@ export interface ExtendTokenExpiresPayload {
 export interface ForgotPasswordPayload {
   clientMutationId?: string | null;
 }
+export interface GenerateBackupCodesPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
 export interface LinkIdentityPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
 }
 export interface ProvisionNewUserPayload {
   clientMutationId?: string | null;
@@ -2022,6 +2323,18 @@ export interface UpdateUserPayload {
   /** The `User` that was updated by this mutation. */
   user?: User | null;
   userEdge?: UserEdge | null;
+}
+export interface UpdateUserSettingPayload {
+  clientMutationId?: string | null;
+  /** The `UserSetting` that was updated by this mutation. */
+  userSetting?: UserSetting | null;
+  userSettingEdge?: UserSettingEdge | null;
+}
+export interface UpdateUserSettingsSecurityPayload {
+  clientMutationId?: string | null;
+  /** The `UserSettingsSecurity` that was updated by this mutation. */
+  userSettingsSecurity?: UserSettingsSecurity | null;
+  userSettingsSecurityEdge?: UserSettingsSecurityEdge | null;
 }
 export interface UpdateWebauthnCredentialPayload {
   clientMutationId?: string | null;
@@ -2145,6 +2458,18 @@ export interface UserConnectedAccountEdge {
   /** The `UserConnectedAccount` at the end of the edge. */
   node?: UserConnectedAccount | null;
 }
+/** A `UserSetting` edge in the connection. */
+export interface UserSettingEdge {
+  cursor?: string | null;
+  /** The `UserSetting` at the end of the edge. */
+  node?: UserSetting | null;
+}
+/** A `UserSettingsSecurity` edge in the connection. */
+export interface UserSettingsSecurityEdge {
+  cursor?: string | null;
+  /** The `UserSettingsSecurity` at the end of the edge. */
+  node?: UserSettingsSecurity | null;
+}
 /** A `User` edge in the connection. */
 export interface UserEdge {
   cursor?: string | null;
@@ -2156,6 +2481,15 @@ export interface WebauthnCredentialEdge {
   cursor?: string | null;
   /** The `WebauthnCredential` at the end of the edge. */
   node?: WebauthnCredential | null;
+}
+export interface CompleteMfaChallengeRecord {
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  deviceApprovalRequired?: boolean | null;
+  id?: string | null;
+  isVerified?: boolean | null;
+  outDeviceToken?: string | null;
+  outUserId?: string | null;
 }
 export interface CreateApiKeyRecord {
   apiKey?: string | null;
@@ -2175,10 +2509,12 @@ export interface ExtendTokenExpiresRecord {
 export interface SignInRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  deviceApprovalRequired?: boolean | null;
   id?: string | null;
   isVerified?: boolean | null;
   mfaChallengeToken?: string | null;
   mfaRequired?: boolean | null;
+  outDeviceToken?: string | null;
   totpEnabled?: boolean | null;
   userId?: string | null;
 }
@@ -2193,11 +2529,15 @@ export interface SignInCrossOriginRecord {
 export interface SignInMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  deviceApprovalRequired?: boolean | null;
+  outDeviceToken?: string | null;
   userId?: string | null;
 }
 export interface SignInSmsOtpRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  deviceApprovalRequired?: boolean | null;
+  outDeviceToken?: string | null;
   userId?: string | null;
 }
 export interface SignUpRecord {
@@ -2205,17 +2545,20 @@ export interface SignUpRecord {
   accessTokenExpiresAt?: string | null;
   id?: string | null;
   isVerified?: boolean | null;
+  outDeviceToken?: string | null;
   totpEnabled?: boolean | null;
   userId?: string | null;
 }
 export interface SignUpMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  outDeviceToken?: string | null;
   userId?: string | null;
 }
 export interface SignUpSmsRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  outDeviceToken?: string | null;
   userId?: string | null;
 }
 /** Table constraints */
@@ -2330,10 +2673,18 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
+  /** GraphQL type name of the plane's buckets table */
+  bucketsType: string;
+  /** Computed download-URL field on the files type; null on the buckets side */
+  downloadUrlField?: string | null;
+  /** GraphQL type name of the plane's files table */
+  filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
+  /** The plane's GraphQL upload surface */
+  upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
 export interface MetaUniqueConstraint {
@@ -2415,6 +2766,27 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+export interface MetaStorageUpload {
+  /** Per-file input type inside the bulk input */
+  bulkFileInputType: string;
+  /** Per-file payload type inside the bulk payload */
+  bulkFilePayloadType: string;
+  /** Input type of the bulk upload mutation */
+  bulkInputType: string;
+  /** Root mutation field for bulk upload */
+  bulkMutation: string;
+  /** Payload type of the bulk upload mutation */
+  bulkPayloadType: string;
+  /** Input type of the single upload mutation */
+  inputType: string;
+  /** Root mutation field for single-file upload (e.g. uploadAppFile) */
+  mutation: string;
+  /** Payload type of the single upload mutation */
+  payloadType: string;
+  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  requiresOwnerId: boolean;
 }
 /** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {

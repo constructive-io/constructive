@@ -109,6 +109,15 @@ export const catalogModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...catalogModuleKeys.details(), id] as const,
 } as const;
+export const clusterModuleKeys = {
+  /** All clusterModule queries */ all: ['clustermodule'] as const,
+  /** List query keys */ lists: () => [...clusterModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...clusterModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...clusterModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...clusterModuleKeys.details(), id] as const,
+} as const;
 export const computeLogModuleKeys = {
   /** All computeLogModule queries */ all: ['computelogmodule'] as const,
   /** List query keys */ lists: () => [...computeLogModuleKeys.all, 'list'] as const,
@@ -117,15 +126,6 @@ export const computeLogModuleKeys = {
   /** Detail query keys */ details: () => [...computeLogModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...computeLogModuleKeys.details(), id] as const,
-} as const;
-export const configSecretsUserModuleKeys = {
-  /** All configSecretsUserModule queries */ all: ['configsecretsusermodule'] as const,
-  /** List query keys */ lists: () => [...configSecretsUserModuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...configSecretsUserModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...configSecretsUserModuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...configSecretsUserModuleKeys.details(), id] as const,
 } as const;
 export const connectedAccountsModuleKeys = {
   /** All connectedAccountsModule queries */ all: ['connectedaccountsmodule'] as const,
@@ -361,15 +361,6 @@ export const hierarchyModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...hierarchyModuleKeys.details(), id] as const,
 } as const;
-export const httpRouteModuleKeys = {
-  /** All httpRouteModule queries */ all: ['httproutemodule'] as const,
-  /** List query keys */ lists: () => [...httpRouteModuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...httpRouteModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...httpRouteModuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...httpRouteModuleKeys.details(), id] as const,
-} as const;
 export const i18NModuleKeys = {
   /** All i18NModule queries */ all: ['i18nmodule'] as const,
   /** List query keys */ lists: () => [...i18NModuleKeys.all, 'list'] as const,
@@ -387,6 +378,15 @@ export const identityProvidersModuleKeys = {
   /** Detail query keys */ details: () => [...identityProvidersModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...identityProvidersModuleKeys.details(), id] as const,
+} as const;
+export const imageModuleKeys = {
+  /** All imageModule queries */ all: ['imagemodule'] as const,
+  /** List query keys */ lists: () => [...imageModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...imageModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...imageModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...imageModuleKeys.details(), id] as const,
 } as const;
 export const inferenceLogModuleKeys = {
   /** All inferenceLogModule queries */ all: ['inferencelogmodule'] as const,
@@ -425,6 +425,15 @@ export const integrationProvidersModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...integrationProvidersModuleKeys.details(), id] as const,
 } as const;
+export const internalConfigModuleKeys = {
+  /** All internalConfigModule queries */ all: ['internalconfigmodule'] as const,
+  /** List query keys */ lists: () => [...internalConfigModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...internalConfigModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...internalConfigModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...internalConfigModuleKeys.details(), id] as const,
+} as const;
 export const internalSecretsModuleKeys = {
   /** All internalSecretsModule queries */ all: ['internalsecretsmodule'] as const,
   /** List query keys */ lists: () => [...internalSecretsModuleKeys.all, 'list'] as const,
@@ -443,6 +452,15 @@ export const invitesModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...invitesModuleKeys.details(), id] as const,
 } as const;
+export const k8sAdmissionModuleKeys = {
+  /** All k8sAdmissionModule queries */ all: ['k8sadmissionmodule'] as const,
+  /** List query keys */ lists: () => [...k8sAdmissionModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...k8sAdmissionModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...k8sAdmissionModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...k8sAdmissionModuleKeys.details(), id] as const,
+} as const;
 export const limitsModuleKeys = {
   /** All limitsModule queries */ all: ['limitsmodule'] as const,
   /** List query keys */ lists: () => [...limitsModuleKeys.all, 'list'] as const,
@@ -451,6 +469,15 @@ export const limitsModuleKeys = {
   /** Detail query keys */ details: () => [...limitsModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...limitsModuleKeys.details(), id] as const,
+} as const;
+export const machineModuleKeys = {
+  /** All machineModule queries */ all: ['machinemodule'] as const,
+  /** List query keys */ lists: () => [...machineModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...machineModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...machineModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...machineModuleKeys.details(), id] as const,
 } as const;
 export const membershipTypesModuleKeys = {
   /** All membershipTypesModule queries */ all: ['membershiptypesmodule'] as const,
@@ -586,6 +613,15 @@ export const relationProvisionKeys = {
   /** Detail query keys */ details: () => [...relationProvisionKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...relationProvisionKeys.details(), id] as const,
+} as const;
+export const repositoryModuleKeys = {
+  /** All repositoryModule queries */ all: ['repositorymodule'] as const,
+  /** List query keys */ lists: () => [...repositoryModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...repositoryModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...repositoryModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...repositoryModuleKeys.details(), id] as const,
 } as const;
 export const resourceModuleKeys = {
   /** All resourceModule queries */ all: ['resourcemodule'] as const,
@@ -801,8 +837,8 @@ export const queryKeys = {
   blueprintTemplate: blueprintTemplateKeys,
   capabilitiesModule: capabilitiesModuleKeys,
   catalogModule: catalogModuleKeys,
+  clusterModule: clusterModuleKeys,
   computeLogModule: computeLogModuleKeys,
-  configSecretsUserModule: configSecretsUserModuleKeys,
   connectedAccountsModule: connectedAccountsModuleKeys,
   contentPresetModule: contentPresetModuleKeys,
   cryptoAddressesModule: cryptoAddressesModuleKeys,
@@ -829,16 +865,19 @@ export const queryKeys = {
   graphExecutionModule: graphExecutionModuleKeys,
   graphModule: graphModuleKeys,
   hierarchyModule: hierarchyModuleKeys,
-  httpRouteModule: httpRouteModuleKeys,
   i18NModule: i18NModuleKeys,
   identityProvidersModule: identityProvidersModuleKeys,
+  imageModule: imageModuleKeys,
   inferenceLogModule: inferenceLogModuleKeys,
   infraConfigModule: infraConfigModuleKeys,
   infraSecretsModule: infraSecretsModuleKeys,
   integrationProvidersModule: integrationProvidersModuleKeys,
+  internalConfigModule: internalConfigModuleKeys,
   internalSecretsModule: internalSecretsModuleKeys,
   invitesModule: invitesModuleKeys,
+  k8sAdmissionModule: k8sAdmissionModuleKeys,
   limitsModule: limitsModuleKeys,
+  machineModule: machineModuleKeys,
   membershipTypesModule: membershipTypesModuleKeys,
   membershipsModule: membershipsModuleKeys,
   merkleStoreModule: merkleStoreModuleKeys,
@@ -854,6 +893,7 @@ export const queryKeys = {
   rateLimitsModule: rateLimitsModuleKeys,
   realtimeModule: realtimeModuleKeys,
   relationProvision: relationProvisionKeys,
+  repositoryModule: repositoryModuleKeys,
   resourceModule: resourceModuleKeys,
   rlsModule: rlsModuleKeys,
   routeModule: routeModuleKeys,

@@ -266,7 +266,7 @@ export interface AppLimit {
   organizationId?: string | null;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string | null;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string | null;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string | null;
@@ -277,7 +277,7 @@ export interface AppLimit {
   /** Start of the current metering window; NULL means no time window */
   windowStart?: string | null;
 }
-/** Redeemable credit codes managed by admins with the add_credits permission */
+/** Redeemable credit codes managed by admins with the add_credits capability */
 export interface AppLimitCreditCode {
   /** Human-readable credit code (case-insensitive, unique) */
   code?: string | null;
@@ -394,7 +394,7 @@ export interface OrgLimitAggregate {
   organizationId?: string | null;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string | null;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this entity by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string | null;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string | null;
@@ -443,7 +443,7 @@ export interface OrgLimit {
   organizationId?: string | null;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string | null;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string | null;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string | null;
@@ -2229,7 +2229,7 @@ export interface AppLimitInput {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -2376,7 +2376,7 @@ export interface OrgLimitAggregateInput {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this entity by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -2425,7 +2425,7 @@ export interface OrgLimitInput {
   organizationId?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  /** Ceiling pinned for this actor by the active plan via apply_plan(). NULL means the ceiling follows the tenant default in the default-limits table, so raising a default reaches rows that already exist. Window reset does not change this value. */
   planMax?: string;
   /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
   purchasedCredits?: string;
@@ -2856,26 +2856,19 @@ export interface DatetimeFilter {
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
 }
 export type ProvisionBucketPayloadSelect = {
-  accessType?: boolean;
-  bucketName?: boolean;
-  endpoint?: boolean;
-  error?: boolean;
-  provider?: boolean;
-  success?: boolean;
+  bucketId?: boolean;
+  bucketKey?: boolean;
+  jobId?: boolean;
+  physicalName?: boolean;
 };
 export interface SeedAppLimitCapsDefaultsPayload {
   clientMutationId?: string | null;

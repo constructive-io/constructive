@@ -26,6 +26,19 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
+| `build` | build CRUD operations |
+| `build-step` | buildStep CRUD operations |
+| `builder-binding` | builderBinding CRUD operations |
+| `content-preset` | contentPreset CRUD operations |
+| `database-function-graph` | databaseFunctionGraph CRUD operations |
+| `database-function-graph-execution` | databaseFunctionGraphExecution CRUD operations |
+| `database-function-graph-execution-node-state` | databaseFunctionGraphExecutionNodeState CRUD operations |
+| `database-function-graph-execution-output` | databaseFunctionGraphExecutionOutput CRUD operations |
+| `database-graph-commit` | databaseGraphCommit CRUD operations |
+| `database-graph-get-all-tree-nodes-record` | databaseGraphGetAllTreeNodesRecord CRUD operations |
+| `database-graph-object` | databaseGraphObject CRUD operations |
+| `database-graph-ref` | databaseGraphRef CRUD operations |
+| `database-graph-store` | databaseGraphStore CRUD operations |
 | `db-preset` | dbPreset CRUD operations |
 | `function-api-binding` | functionApiBinding CRUD operations |
 | `function-capability-binding` | functionCapabilityBinding CRUD operations |
@@ -44,6 +57,8 @@ csdk auth set-token <your-token>
 | `function-invocation-attempt` | functionInvocationAttempt CRUD operations |
 | `function-invocation` | functionInvocation CRUD operations |
 | `get-all-tree-nodes-record` | getAllTreeNodesRecord CRUD operations |
+| `image` | image CRUD operations |
+| `image-grant` | imageGrant CRUD operations |
 | `infra-commit` | infraCommit CRUD operations |
 | `infra-get-all-tree-nodes-record` | infraGetAllTreeNodesRecord CRUD operations |
 | `infra-object` | infraObject CRUD operations |
@@ -52,6 +67,9 @@ csdk auth set-token <your-token>
 | `integration-provider` | integrationProvider CRUD operations |
 | `namespace` | namespace CRUD operations |
 | `namespace-event` | namespaceEvent CRUD operations |
+| `platform-build` | platformBuild CRUD operations |
+| `platform-build-step` | platformBuildStep CRUD operations |
+| `platform-builder-binding` | platformBuilderBinding CRUD operations |
 | `platform-function-api-binding` | platformFunctionApiBinding CRUD operations |
 | `platform-function-capability-binding` | platformFunctionCapabilityBinding CRUD operations |
 | `platform-function-definition` | platformFunctionDefinition CRUD operations |
@@ -60,18 +78,36 @@ csdk auth set-token <your-token>
 | `platform-function-execution-log` | platformFunctionExecutionLog CRUD operations |
 | `platform-function-invocation-attempt` | platformFunctionInvocationAttempt CRUD operations |
 | `platform-function-invocation` | platformFunctionInvocation CRUD operations |
+| `platform-image` | platformImage CRUD operations |
+| `platform-image-grant` | platformImageGrant CRUD operations |
 | `platform-infra-commit` | platformInfraCommit CRUD operations |
 | `platform-infra-get-all-tree-nodes-record` | platformInfraGetAllTreeNodesRecord CRUD operations |
 | `platform-infra-object` | platformInfraObject CRUD operations |
 | `platform-infra-ref` | platformInfraRef CRUD operations |
 | `platform-infra-store` | platformInfraStore CRUD operations |
+| `platform-k-8-s-resource-kind` | platformK8sResourceKind CRUD operations |
+| `platform-k-8-s-spec-rule` | platformK8sSpecRule CRUD operations |
 | `platform-namespace` | platformNamespace CRUD operations |
 | `platform-namespace-event` | platformNamespaceEvent CRUD operations |
+| `platform-proposal-comment` | platformProposalComment CRUD operations |
+| `platform-proposal` | platformProposal CRUD operations |
+| `platform-proposal-file-view` | platformProposalFileView CRUD operations |
+| `platform-proposal-reaction` | platformProposalReaction CRUD operations |
+| `platform-proposal-review` | platformProposalReview CRUD operations |
+| `platform-proposals-chunk` | platformProposalsChunk CRUD operations |
+| `platform-registry-binding` | platformRegistryBinding CRUD operations |
+| `platform-registry` | platformRegistry CRUD operations |
+| `platform-registry-grant` | platformRegistryGrant CRUD operations |
+| `platform-repository` | platformRepository CRUD operations |
+| `platform-repository-event` | platformRepositoryEvent CRUD operations |
+| `platform-repository-required-check` | platformRepositoryRequiredCheck CRUD operations |
+| `platform-repository-workflow` | platformRepositoryWorkflow CRUD operations |
 | `platform-resource` | platformResource CRUD operations |
 | `platform-resource-declared-capacity` | platformResourceDeclaredCapacity CRUD operations |
 | `platform-resource-definition` | platformResourceDefinition CRUD operations |
 | `platform-resource-event` | platformResourceEvent CRUD operations |
 | `platform-resource-installation` | platformResourceInstallation CRUD operations |
+| `platform-resource-observed-storage` | platformResourceObservedStorage CRUD operations |
 | `platform-resource-status-check` | platformResourceStatusCheck CRUD operations |
 | `platform-resource-usage-log` | platformResourceUsageLog CRUD operations |
 | `platform-resource-usage-summary` | platformResourceUsageSummary CRUD operations |
@@ -81,11 +117,25 @@ csdk auth set-token <your-token>
 | `platform-resources-resolved-requirement` | platformResourcesResolvedRequirement CRUD operations |
 | `platform-webhook-endpoint` | platformWebhookEndpoint CRUD operations |
 | `platform-webhook-event` | platformWebhookEvent CRUD operations |
+| `proposal-comment` | proposalComment CRUD operations |
+| `proposal` | proposal CRUD operations |
+| `proposal-file-view` | proposalFileView CRUD operations |
+| `proposal-reaction` | proposalReaction CRUD operations |
+| `proposal-review` | proposalReview CRUD operations |
+| `proposals-chunk` | proposalsChunk CRUD operations |
+| `registry-binding` | registryBinding CRUD operations |
+| `registry` | registry CRUD operations |
+| `registry-grant` | registryGrant CRUD operations |
+| `repository` | repository CRUD operations |
+| `repository-event` | repositoryEvent CRUD operations |
+| `repository-required-check` | repositoryRequiredCheck CRUD operations |
+| `repository-workflow` | repositoryWorkflow CRUD operations |
 | `resource` | resource CRUD operations |
 | `resource-declared-capacity` | resourceDeclaredCapacity CRUD operations |
 | `resource-definition` | resourceDefinition CRUD operations |
 | `resource-event` | resourceEvent CRUD operations |
 | `resource-installation` | resourceInstallation CRUD operations |
+| `resource-observed-storage` | resourceObservedStorage CRUD operations |
 | `resource-status-check` | resourceStatusCheck CRUD operations |
 | `resource-usage-log` | resourceUsageLog CRUD operations |
 | `resource-usage-summary` | resourceUsageSummary CRUD operations |
@@ -95,36 +145,66 @@ csdk auth set-token <your-token>
 | `resources-resolved-requirement` | resourcesResolvedRequirement CRUD operations |
 | `webhook-endpoint` | webhookEndpoint CRUD operations |
 | `webhook-event` | webhookEvent CRUD operations |
+| `database-read-function-graph` | databaseReadFunctionGraph |
 | `read-function-graph` | readFunctionGraph |
 | `add-edge` | addEdge |
 | `add-edge-and-save` | addEdgeAndSave |
 | `add-node` | addNode |
 | `add-node-and-save` | addNodeAndSave |
+| `approve-node` | approveNode |
 | `copy-graph` | copyGraph |
+| `database-add-edge` | databaseAddEdge |
+| `database-add-edge-and-save` | databaseAddEdgeAndSave |
+| `database-add-node` | databaseAddNode |
+| `database-add-node-and-save` | databaseAddNodeAndSave |
+| `database-approve-node` | databaseApproveNode |
+| `database-copy-graph` | databaseCopyGraph |
+| `database-create-function-graph` | databaseCreateFunctionGraph |
+| `database-graph-init-empty-repo` | databaseGraphInitEmptyRepo |
+| `database-graph-insert-node-at-path` | databaseGraphInsertNodeAtPath |
+| `database-graph-insert-nodes-at-paths` | databaseGraphInsertNodesAtPaths |
+| `database-graph-set-and-commit` | databaseGraphSetAndCommit |
+| `database-graph-set-data-at-path` | databaseGraphSetDataAtPath |
+| `database-graph-set-many-and-commit` | databaseGraphSetManyAndCommit |
+| `database-import-definitions` | databaseImportDefinitions |
+| `database-import-graph-json` | databaseImportGraphJson |
+| `database-save-graph` | databaseSaveGraph |
+| `database-start-execution` | databaseStartExecution |
+| `database-validate-function-graph` | databaseValidateFunctionGraph |
 | `import-definitions` | importDefinitions |
 | `import-graph-json` | importGraphJson |
 | `infra-init-empty-repo` | infraInitEmptyRepo |
 | `infra-insert-node-at-path` | infraInsertNodeAtPath |
+| `infra-insert-nodes-at-paths` | infraInsertNodesAtPaths |
+| `infra-set-and-commit` | infraSetAndCommit |
 | `infra-set-data-at-path` | infraSetDataAtPath |
+| `infra-set-many-and-commit` | infraSetManyAndCommit |
 | `init-empty-repo` | initEmptyRepo |
 | `insert-node-at-path` | insertNodeAtPath |
+| `insert-nodes-at-paths` | insertNodesAtPaths |
 | `platform-infra-init-empty-repo` | platformInfraInitEmptyRepo |
 | `platform-infra-insert-node-at-path` | platformInfraInsertNodeAtPath |
+| `platform-infra-insert-nodes-at-paths` | platformInfraInsertNodesAtPaths |
+| `platform-infra-set-and-commit` | platformInfraSetAndCommit |
 | `platform-infra-set-data-at-path` | platformInfraSetDataAtPath |
+| `platform-infra-set-many-and-commit` | platformInfraSetManyAndCommit |
 | `platform-resource-installations-install` | platformResourceInstallationsInstall |
 | `platform-resource-installations-rollback` | platformResourceInstallationsRollback |
 | `platform-resource-installations-uninstall` | platformResourceInstallationsUninstall |
 | `platform-resource-installations-upgrade` | platformResourceInstallationsUpgrade |
-| `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `provision-bucket` | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
 | `resource-installations-install` | resourceInstallationsInstall |
 | `resource-installations-rollback` | resourceInstallationsRollback |
 | `resource-installations-uninstall` | resourceInstallationsUninstall |
 | `resource-installations-upgrade` | resourceInstallationsUpgrade |
 | `save-graph` | saveGraph |
+| `set-and-commit` | setAndCommit |
 | `set-data-at-path` | setDataAtPath |
+| `set-many-and-commit` | setManyAndCommit |
 | `start-execution` | startExecution |
 | `validate-function-graph` | validateFunctionGraph |
 
@@ -168,6 +248,438 @@ Manage per-context key-value configuration variables.
 Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
+
+### `build`
+
+CRUD operations for Build records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all build records |
+| `find-first` | Find first matching build record |
+| `get` | Get a build by id |
+| `create` | Create a new build |
+| `update` | Update an existing build |
+| `delete` | Delete a build |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `attempt` | Int |
+| `commitSha` | String |
+| `conclusion` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `eventId` | UUID |
+| `finishedAt` | Datetime |
+| `id` | UUID |
+| `imageRef` | String |
+| `jobId` | BigInt |
+| `logs` | Upload |
+| `matrixKey` | String |
+| `metadata` | JSON |
+| `proposalId` | UUID |
+| `ref` | String |
+| `repositoryId` | UUID |
+| `startedAt` | Datetime |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+| `workflowId` | UUID |
+
+**Required create fields:** `databaseId`, `repositoryId`
+**Optional create fields (backend defaults):** `actorId`, `attempt`, `commitSha`, `conclusion`, `createdByPrincipal`, `eventId`, `finishedAt`, `imageRef`, `jobId`, `logs`, `matrixKey`, `metadata`, `proposalId`, `ref`, `startedAt`, `status`, `updatedByPrincipal`, `workflowId`
+
+### `build-step`
+
+CRUD operations for BuildStep records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all buildStep records |
+| `find-first` | Find first matching buildStep record |
+| `get` | Get a buildStep by id |
+| `create` | Create a new buildStep |
+| `update` | Update an existing buildStep |
+| `delete` | Delete a buildStep |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `buildId` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `exitCode` | Int |
+| `finishedAt` | Datetime |
+| `id` | UUID |
+| `kind` | String |
+| `logBytes` | BigInt |
+| `logOffset` | BigInt |
+| `name` | String |
+| `parentSeq` | Int |
+| `recordedAt` | Datetime |
+| `seq` | Int |
+| `startedAt` | Datetime |
+| `status` | String |
+| `summary` | JSON |
+
+**Required create fields:** `buildId`, `databaseId`, `name`, `seq`
+**Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
+
+### `builder-binding`
+
+CRUD operations for BuilderBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all builderBinding records |
+| `find-first` | Find first matching builderBinding record |
+| `get` | Get a builderBinding by id |
+| `create` | Create a new builderBinding |
+| `update` | Update an existing builderBinding |
+| `delete` | Delete a builderBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `installationId`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
+
+### `content-preset`
+
+CRUD operations for ContentPreset records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all contentPreset records |
+| `find-first` | Find first matching contentPreset record |
+| `get` | Get a contentPreset by id |
+| `create` | Create a new contentPreset |
+| `update` | Update an existing contentPreset |
+| `delete` | Delete a contentPreset |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `active` | Boolean |
+| `commitId` | UUID |
+| `createdAt` | Datetime |
+| `definition` | JSON |
+| `description` | String |
+| `id` | UUID |
+| `kind` | String |
+| `label` | String |
+| `slug` | String |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `definition`, `kind`, `slug`
+**Optional create fields (backend defaults):** `active`, `commitId`, `description`, `label`, `storeId`
+
+### `database-function-graph`
+
+CRUD operations for DatabaseFunctionGraph records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseFunctionGraph records |
+| `find-first` | Find first matching databaseFunctionGraph record |
+| `get` | Get a databaseFunctionGraph by id |
+| `create` | Create a new databaseFunctionGraph |
+| `update` | Update an existing databaseFunctionGraph |
+| `delete` | Delete a databaseFunctionGraph |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `context` | String |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `databaseId` | UUID |
+| `definitionsCommitId` | UUID |
+| `description` | String |
+| `id` | UUID |
+| `isValid` | Boolean |
+| `name` | String |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+| `validationErrors` | JSON |
+
+**Required create fields:** `context`, `createdBy`, `databaseId`, `definitionsCommitId`, `description`, `isValid`, `name`, `storeId`, `validationErrors`
+
+### `database-function-graph-execution`
+
+CRUD operations for DatabaseFunctionGraphExecution records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseFunctionGraphExecution records |
+| `find-first` | Find first matching databaseFunctionGraphExecution record |
+| `get` | Get a databaseFunctionGraphExecution by id |
+| `create` | Create a new databaseFunctionGraphExecution |
+| `update` | Update an existing databaseFunctionGraphExecution |
+| `delete` | Delete a databaseFunctionGraphExecution |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `completedAt` | Datetime |
+| `currentWave` | Int |
+| `databaseId` | UUID |
+| `definitionsCommitId` | UUID |
+| `entityId` | UUID |
+| `entityType` | String |
+| `errorCode` | String |
+| `errorMessage` | String |
+| `executionPlan` | JSON |
+| `graphId` | UUID |
+| `id` | UUID |
+| `inputPayload` | JSON |
+| `invocationCreatedAt` | Datetime |
+| `invocationId` | UUID |
+| `lastProgressAt` | Datetime |
+| `maxPendingJobs` | Int |
+| `maxTicks` | Int |
+| `nodeOutputs` | JSON |
+| `organizationId` | UUID |
+| `outputNames` | String |
+| `outputNode` | String |
+| `outputPayload` | JSON |
+| `outputPort` | String |
+| `parentExecutionId` | UUID |
+| `parentInvocationId` | UUID |
+| `parentNodeName` | String |
+| `principalId` | UUID |
+| `startedAt` | Datetime |
+| `status` | String |
+| `tickCount` | Int |
+| `timeoutAt` | Datetime |
+
+**Required create fields:** `databaseId`, `graphId`
+**Optional create fields (backend defaults):** `actorId`, `completedAt`, `currentWave`, `definitionsCommitId`, `entityId`, `entityType`, `errorCode`, `errorMessage`, `executionPlan`, `inputPayload`, `invocationCreatedAt`, `invocationId`, `lastProgressAt`, `maxPendingJobs`, `maxTicks`, `nodeOutputs`, `organizationId`, `outputNames`, `outputNode`, `outputPayload`, `outputPort`, `parentExecutionId`, `parentInvocationId`, `parentNodeName`, `principalId`, `startedAt`, `status`, `tickCount`, `timeoutAt`
+
+### `database-function-graph-execution-node-state`
+
+CRUD operations for DatabaseFunctionGraphExecutionNodeState records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseFunctionGraphExecutionNodeState records |
+| `find-first` | Find first matching databaseFunctionGraphExecutionNodeState record |
+| `get` | Get a databaseFunctionGraphExecutionNodeState by id |
+| `create` | Create a new databaseFunctionGraphExecutionNodeState |
+| `update` | Update an existing databaseFunctionGraphExecutionNodeState |
+| `delete` | Delete a databaseFunctionGraphExecutionNodeState |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `callbackInputs` | JSON |
+| `callbackMeta` | JSON |
+| `callbackTokenHash` | String |
+| `completedAt` | Datetime |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `errorCode` | String |
+| `errorMessage` | String |
+| `executionId` | UUID |
+| `expiryDefaultOutput` | JSON |
+| `expiryEscalatedAt` | Datetime |
+| `expiryPolicy` | String |
+| `id` | UUID |
+| `nodeName` | String |
+| `nodePath` | String |
+| `outputId` | UUID |
+| `startedAt` | Datetime |
+| `status` | String |
+| `waitingDeadlineAt` | Datetime |
+| `waitingOn` | String |
+| `waitingSince` | Datetime |
+
+**Required create fields:** `databaseId`, `executionId`, `nodeName`
+**Optional create fields (backend defaults):** `callbackInputs`, `callbackMeta`, `callbackTokenHash`, `completedAt`, `errorCode`, `errorMessage`, `expiryDefaultOutput`, `expiryEscalatedAt`, `expiryPolicy`, `nodePath`, `outputId`, `startedAt`, `status`, `waitingDeadlineAt`, `waitingOn`, `waitingSince`
+
+### `database-function-graph-execution-output`
+
+CRUD operations for DatabaseFunctionGraphExecutionOutput records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseFunctionGraphExecutionOutput records |
+| `find-first` | Find first matching databaseFunctionGraphExecutionOutput record |
+| `get` | Get a databaseFunctionGraphExecutionOutput by id |
+| `create` | Create a new databaseFunctionGraphExecutionOutput |
+| `update` | Update an existing databaseFunctionGraphExecutionOutput |
+| `delete` | Delete a databaseFunctionGraphExecutionOutput |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `data` | JSON |
+| `databaseId` | UUID |
+| `hash` | Base64EncodedBinary |
+| `id` | UUID |
+
+**Required create fields:** `data`, `databaseId`, `hash`
+
+### `database-graph-commit`
+
+CRUD operations for DatabaseGraphCommit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseGraphCommit records |
+| `find-first` | Find first matching databaseGraphCommit record |
+| `get` | Get a databaseGraphCommit by id |
+| `create` | Create a new databaseGraphCommit |
+| `update` | Update an existing databaseGraphCommit |
+| `delete` | Delete a databaseGraphCommit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `authorId` | UUID |
+| `committerId` | UUID |
+| `databaseId` | UUID |
+| `date` | Datetime |
+| `id` | UUID |
+| `message` | String |
+| `parentIds` | UUID |
+| `storeId` | UUID |
+| `treeId` | UUID |
+
+**Required create fields:** `databaseId`, `storeId`
+**Optional create fields (backend defaults):** `authorId`, `committerId`, `date`, `message`, `parentIds`, `treeId`
+
+### `database-graph-get-all-tree-nodes-record`
+
+CRUD operations for DatabaseGraphGetAllTreeNodesRecord records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseGraphGetAllTreeNodesRecord records |
+| `find-first` | Find first matching databaseGraphGetAllTreeNodesRecord record |
+| `get` | Get a databaseGraphGetAllTreeNodesRecord by id |
+| `create` | Create a new databaseGraphGetAllTreeNodesRecord |
+| `update` | Update an existing databaseGraphGetAllTreeNodesRecord |
+| `delete` | Delete a databaseGraphGetAllTreeNodesRecord |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `data` | JSON |
+| `path` | String |
+
+**Required create fields:** `data`, `path`
+
+### `database-graph-object`
+
+CRUD operations for DatabaseGraphObject records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseGraphObject records |
+| `find-first` | Find first matching databaseGraphObject record |
+| `get` | Get a databaseGraphObject by id |
+| `create` | Create a new databaseGraphObject |
+| `update` | Update an existing databaseGraphObject |
+| `delete` | Delete a databaseGraphObject |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `data` | JSON |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `kids` | UUID |
+| `ktree` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `data`, `kids`, `ktree`
+
+### `database-graph-ref`
+
+CRUD operations for DatabaseGraphRef records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseGraphRef records |
+| `find-first` | Find first matching databaseGraphRef record |
+| `get` | Get a databaseGraphRef by id |
+| `create` | Create a new databaseGraphRef |
+| `update` | Update an existing databaseGraphRef |
+| `delete` | Delete a databaseGraphRef |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `commitId` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `storeId` | UUID |
+
+**Required create fields:** `databaseId`, `name`, `storeId`
+**Optional create fields (backend defaults):** `commitId`
+
+### `database-graph-store`
+
+CRUD operations for DatabaseGraphStore records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseGraphStore records |
+| `find-first` | Find first matching databaseGraphStore record |
+| `get` | Get a databaseGraphStore by id |
+| `create` | Create a new databaseGraphStore |
+| `update` | Update an existing databaseGraphStore |
+| `delete` | Delete a databaseGraphStore |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `hash` | UUID |
+| `id` | UUID |
+| `name` | String |
+
+**Required create fields:** `databaseId`, `name`
+**Optional create fields (backend defaults):** `hash`
 
 ### `db-preset`
 
@@ -278,11 +790,13 @@ CRUD operations for FunctionDefinition records.
 | Field | Type |
 |-------|------|
 | `accessChannels` | String |
+| `anonymousCallable` | Boolean |
 | `category` | String |
 | `concurrency` | Int |
 | `cpuLimitMillicores` | BigInt |
 | `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `description` | String |
 | `fnCategory` | String |
@@ -309,6 +823,7 @@ CRUD operations for FunctionDefinition records.
 | `requiredBuckets` | String |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredModels` | String |
+| `requiredModules` | String |
 | `requiredSecrets` | ResourceRequirement |
 | `resources` | JSON |
 | `runtime` | String |
@@ -319,10 +834,11 @@ CRUD operations for FunctionDefinition records.
 | `taskIdentifier` | String |
 | `timeoutSeconds` | Int |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 | `volatile` | Boolean |
 
 **Required create fields:** `category`, `databaseId`, `name`
-**Optional create fields (backend defaults):** `accessChannels`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
+**Optional create fields (backend defaults):** `accessChannels`, `anonymousCallable`, `concurrency`, `createdByPrincipal`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredModules`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `updatedByPrincipal`, `volatile`
 
 ### `function-deployment`
 
@@ -344,6 +860,7 @@ CRUD operations for FunctionDeployment records.
 | `annotations` | JSON |
 | `concurrency` | Int |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `errorCount` | Int |
 | `handlerName` | String |
@@ -354,6 +871,7 @@ CRUD operations for FunctionDeployment records.
 | `lastError` | String |
 | `lastErrorAt` | Datetime |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `resources` | JSON |
 | `revision` | Int |
 | `scaleMax` | Int |
@@ -363,9 +881,10 @@ CRUD operations for FunctionDeployment records.
 | `status` | String |
 | `timeoutSeconds` | Int |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `databaseId`, `image`, `namespaceId`
-**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
+**Optional create fields (backend defaults):** `annotations`, `concurrency`, `createdByPrincipal`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `realm`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`, `updatedByPrincipal`
 
 ### `function-deployment-event`
 
@@ -566,6 +1085,9 @@ CRUD operations for FunctionGraphExecutionNodeState records.
 | `errorCode` | String |
 | `errorMessage` | String |
 | `executionId` | UUID |
+| `expiryDefaultOutput` | JSON |
+| `expiryEscalatedAt` | Datetime |
+| `expiryPolicy` | String |
 | `id` | UUID |
 | `nodeName` | String |
 | `nodePath` | String |
@@ -573,9 +1095,12 @@ CRUD operations for FunctionGraphExecutionNodeState records.
 | `scopeId` | UUID |
 | `startedAt` | Datetime |
 | `status` | String |
+| `waitingDeadlineAt` | Datetime |
+| `waitingOn` | String |
+| `waitingSince` | Datetime |
 
 **Required create fields:** `executionId`, `nodeName`, `scopeId`
-**Optional create fields (backend defaults):** `callbackInputs`, `callbackMeta`, `callbackTokenHash`, `completedAt`, `errorCode`, `errorMessage`, `nodePath`, `outputId`, `startedAt`, `status`
+**Optional create fields (backend defaults):** `callbackInputs`, `callbackMeta`, `callbackTokenHash`, `completedAt`, `errorCode`, `errorMessage`, `expiryDefaultOutput`, `expiryEscalatedAt`, `expiryPolicy`, `nodePath`, `outputId`, `startedAt`, `status`, `waitingDeadlineAt`, `waitingOn`, `waitingSince`
 
 ### `function-graph-execution-output`
 
@@ -737,24 +1262,29 @@ CRUD operations for FunctionInvocation records.
 | `channel` | String |
 | `completedAt` | Datetime |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `definitionScope` | String |
 | `durationMs` | Int |
+| `entityId` | UUID |
+| `entityType` | String |
 | `error` | String |
 | `functionDefinitionId` | UUID |
 | `graphExecutionId` | UUID |
 | `id` | UUID |
 | `jobId` | BigInt |
+| `organizationId` | UUID |
 | `parentInvocationId` | UUID |
 | `payload` | JSON |
+| `principalId` | UUID |
 | `provenance` | JSON |
 | `result` | JSON |
 | `startedAt` | Datetime |
 | `status` | String |
 | `taskIdentifier` | String |
 
-**Required create fields:** `databaseId`, `taskIdentifier`
-**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `channel`, `completedAt`, `definitionScope`, `durationMs`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `parentInvocationId`, `payload`, `provenance`, `result`, `startedAt`, `status`
+**Required create fields:** `channel`, `databaseId`, `taskIdentifier`
+**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `completedAt`, `createdByPrincipal`, `definitionScope`, `durationMs`, `entityId`, `entityType`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `organizationId`, `parentInvocationId`, `payload`, `principalId`, `provenance`, `result`, `startedAt`, `status`
 
 ### `get-all-tree-nodes-record`
 
@@ -777,6 +1307,79 @@ CRUD operations for GetAllTreeNodesRecord records.
 | `path` | String |
 
 **Required create fields:** `data`, `path`
+
+### `image`
+
+CRUD operations for Image records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all image records |
+| `find-first` | Find first matching image record |
+| `get` | Get a image by id |
+| `create` | Create a new image |
+| `update` | Update an existing image |
+| `delete` | Delete a image |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `description` | String |
+| `digest` | String |
+| `expiresAt` | Datetime |
+| `id` | UUID |
+| `isPublished` | Boolean |
+| `labels` | JSON |
+| `metadata` | JSON |
+| `name` | String |
+| `ownerId` | UUID |
+| `platformOnly` | Boolean |
+| `registryHost` | String |
+| `repository` | String |
+| `runtime` | String |
+| `tag` | String |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `name`, `repository`
+**Optional create fields (backend defaults):** `createdByPrincipal`, `description`, `digest`, `expiresAt`, `isPublished`, `labels`, `metadata`, `ownerId`, `platformOnly`, `registryHost`, `runtime`, `tag`, `updatedByPrincipal`
+
+### `image-grant`
+
+CRUD operations for ImageGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all imageGrant records |
+| `find-first` | Find first matching imageGrant record |
+| `get` | Get a imageGrant by id |
+| `create` | Create a new imageGrant |
+| `update` | Update an existing imageGrant |
+| `delete` | Delete a imageGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actions` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `expiresAt` | Datetime |
+| `grantedBy` | UUID |
+| `granteeKey` | UUID |
+| `granteeScope` | String |
+| `id` | UUID |
+| `imageId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `granteeKey`, `granteeScope`, `imageId`
+**Optional create fields (backend defaults):** `actions`, `createdByPrincipal`, `expiresAt`, `grantedBy`, `updatedByPrincipal`
 
 ### `infra-commit`
 
@@ -960,6 +1563,7 @@ CRUD operations for Namespace records.
 | Field | Type |
 |-------|------|
 | `annotations` | JSON |
+| `clusterId` | UUID |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `description` | String |
@@ -974,7 +1578,7 @@ CRUD operations for Namespace records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `name`, `namespaceName`
-**Optional create fields (backend defaults):** `annotations`, `description`, `isActive`, `isManaged`, `labels`, `lastError`, `status`
+**Optional create fields (backend defaults):** `annotations`, `clusterId`, `description`, `isActive`, `isManaged`, `labels`, `lastError`, `status`
 
 ### `namespace-event`
 
@@ -1004,6 +1608,120 @@ CRUD operations for NamespaceEvent records.
 
 **Required create fields:** `databaseId`, `eventType`, `namespaceId`
 **Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
+
+### `platform-build`
+
+CRUD operations for PlatformBuild records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformBuild records |
+| `find-first` | Find first matching platformBuild record |
+| `get` | Get a platformBuild by id |
+| `create` | Create a new platformBuild |
+| `update` | Update an existing platformBuild |
+| `delete` | Delete a platformBuild |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `attempt` | Int |
+| `commitSha` | String |
+| `conclusion` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `eventId` | UUID |
+| `finishedAt` | Datetime |
+| `id` | UUID |
+| `imageRef` | String |
+| `jobId` | BigInt |
+| `logs` | Upload |
+| `matrixKey` | String |
+| `metadata` | JSON |
+| `proposalId` | UUID |
+| `ref` | String |
+| `repositoryId` | UUID |
+| `startedAt` | Datetime |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+| `workflowId` | UUID |
+
+**Required create fields:** `repositoryId`
+**Optional create fields (backend defaults):** `actorId`, `attempt`, `commitSha`, `conclusion`, `createdByPrincipal`, `eventId`, `finishedAt`, `imageRef`, `jobId`, `logs`, `matrixKey`, `metadata`, `proposalId`, `ref`, `startedAt`, `status`, `updatedByPrincipal`, `workflowId`
+
+### `platform-build-step`
+
+CRUD operations for PlatformBuildStep records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformBuildStep records |
+| `find-first` | Find first matching platformBuildStep record |
+| `get` | Get a platformBuildStep by id |
+| `create` | Create a new platformBuildStep |
+| `update` | Update an existing platformBuildStep |
+| `delete` | Delete a platformBuildStep |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `buildId` | UUID |
+| `createdByPrincipal` | UUID |
+| `exitCode` | Int |
+| `finishedAt` | Datetime |
+| `id` | UUID |
+| `kind` | String |
+| `logBytes` | BigInt |
+| `logOffset` | BigInt |
+| `name` | String |
+| `parentSeq` | Int |
+| `recordedAt` | Datetime |
+| `seq` | Int |
+| `startedAt` | Datetime |
+| `status` | String |
+| `summary` | JSON |
+
+**Required create fields:** `buildId`, `name`, `seq`
+**Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
+
+### `platform-builder-binding`
+
+CRUD operations for PlatformBuilderBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformBuilderBinding records |
+| `find-first` | Find first matching platformBuilderBinding record |
+| `get` | Get a platformBuilderBinding by id |
+| `create` | Create a new platformBuilderBinding |
+| `update` | Update an existing platformBuilderBinding |
+| `delete` | Delete a platformBuilderBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `installationId`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-function-api-binding`
 
@@ -1081,12 +1799,14 @@ CRUD operations for PlatformFunctionDefinition records.
 | Field | Type |
 |-------|------|
 | `accessChannels` | String |
+| `anonymousCallable` | Boolean |
 | `billable` | Boolean |
 | `category` | String |
 | `concurrency` | Int |
 | `cpuLimitMillicores` | BigInt |
 | `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `description` | String |
 | `fnCategory` | String |
 | `functionColumns` | JSON |
@@ -1112,6 +1832,7 @@ CRUD operations for PlatformFunctionDefinition records.
 | `requiredBuckets` | String |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredModels` | String |
+| `requiredModules` | String |
 | `requiredSecrets` | ResourceRequirement |
 | `resources` | JSON |
 | `runtime` | String |
@@ -1123,10 +1844,11 @@ CRUD operations for PlatformFunctionDefinition records.
 | `taskIdentifier` | String |
 | `timeoutSeconds` | Int |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 | `volatile` | Boolean |
 
 **Required create fields:** `category`, `name`
-**Optional create fields (backend defaults):** `accessChannels`, `billable`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `system`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
+**Optional create fields (backend defaults):** `accessChannels`, `anonymousCallable`, `billable`, `concurrency`, `createdByPrincipal`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredModules`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `system`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `updatedByPrincipal`, `volatile`
 
 ### `platform-function-deployment`
 
@@ -1148,6 +1870,7 @@ CRUD operations for PlatformFunctionDeployment records.
 | `annotations` | JSON |
 | `concurrency` | Int |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `errorCount` | Int |
 | `handlerName` | String |
 | `id` | UUID |
@@ -1157,6 +1880,7 @@ CRUD operations for PlatformFunctionDeployment records.
 | `lastError` | String |
 | `lastErrorAt` | Datetime |
 | `namespaceId` | UUID |
+| `realm` | String |
 | `resources` | JSON |
 | `revision` | Int |
 | `scaleMax` | Int |
@@ -1166,9 +1890,10 @@ CRUD operations for PlatformFunctionDeployment records.
 | `status` | String |
 | `timeoutSeconds` | Int |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `image`, `namespaceId`
-**Optional create fields (backend defaults):** `annotations`, `concurrency`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`
+**Optional create fields (backend defaults):** `annotations`, `concurrency`, `createdByPrincipal`, `errorCount`, `handlerName`, `imageVersion`, `labels`, `lastError`, `lastErrorAt`, `realm`, `resources`, `revision`, `scaleMax`, `scaleMin`, `serviceName`, `serviceUrl`, `status`, `timeoutSeconds`, `updatedByPrincipal`
 
 ### `platform-function-deployment-event`
 
@@ -1282,24 +2007,100 @@ CRUD operations for PlatformFunctionInvocation records.
 | `channel` | String |
 | `completedAt` | Datetime |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `definitionScope` | String |
 | `durationMs` | Int |
+| `entityId` | UUID |
+| `entityType` | String |
 | `error` | String |
 | `functionDefinitionId` | UUID |
 | `graphExecutionId` | UUID |
 | `id` | UUID |
 | `jobId` | BigInt |
+| `organizationId` | UUID |
 | `parentInvocationId` | UUID |
 | `payload` | JSON |
+| `principalId` | UUID |
 | `provenance` | JSON |
 | `result` | JSON |
 | `startedAt` | Datetime |
 | `status` | String |
 | `taskIdentifier` | String |
 
-**Required create fields:** `taskIdentifier`
-**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `channel`, `completedAt`, `databaseId`, `definitionScope`, `durationMs`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `parentInvocationId`, `payload`, `provenance`, `result`, `startedAt`, `status`
+**Required create fields:** `channel`, `taskIdentifier`
+**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `completedAt`, `createdByPrincipal`, `databaseId`, `definitionScope`, `durationMs`, `entityId`, `entityType`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `organizationId`, `parentInvocationId`, `payload`, `principalId`, `provenance`, `result`, `startedAt`, `status`
+
+### `platform-image`
+
+CRUD operations for PlatformImage records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformImage records |
+| `find-first` | Find first matching platformImage record |
+| `get` | Get a platformImage by id |
+| `create` | Create a new platformImage |
+| `update` | Update an existing platformImage |
+| `delete` | Delete a platformImage |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `description` | String |
+| `digest` | String |
+| `expiresAt` | Datetime |
+| `id` | UUID |
+| `isPublished` | Boolean |
+| `labels` | JSON |
+| `metadata` | JSON |
+| `name` | String |
+| `ownerId` | UUID |
+| `platformOnly` | Boolean |
+| `registryHost` | String |
+| `repository` | String |
+| `runtime` | String |
+| `tag` | String |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `name`, `repository`
+**Optional create fields (backend defaults):** `createdByPrincipal`, `description`, `digest`, `expiresAt`, `isPublished`, `labels`, `metadata`, `ownerId`, `platformOnly`, `registryHost`, `runtime`, `tag`, `updatedByPrincipal`
+
+### `platform-image-grant`
+
+CRUD operations for PlatformImageGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformImageGrant records |
+| `find-first` | Find first matching platformImageGrant record |
+| `get` | Get a platformImageGrant by id |
+| `create` | Create a new platformImageGrant |
+| `update` | Update an existing platformImageGrant |
+| `delete` | Delete a platformImageGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actions` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `expiresAt` | Datetime |
+| `grantedBy` | UUID |
+| `granteeKey` | UUID |
+| `granteeScope` | String |
+| `id` | UUID |
+| `imageId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `granteeKey`, `granteeScope`, `imageId`
+**Optional create fields (backend defaults):** `actions`, `createdByPrincipal`, `expiresAt`, `grantedBy`, `updatedByPrincipal`
 
 ### `platform-infra-commit`
 
@@ -1432,6 +2233,68 @@ CRUD operations for PlatformInfraStore records.
 **Required create fields:** `name`, `scopeId`
 **Optional create fields (backend defaults):** `hash`
 
+### `platform-k-8-s-resource-kind`
+
+CRUD operations for PlatformK8sResourceKind records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformK8sResourceKind records |
+| `find-first` | Find first matching platformK8sResourceKind record |
+| `get` | Get a platformK8sResourceKind by id |
+| `create` | Create a new platformK8sResourceKind |
+| `update` | Update an existing platformK8sResourceKind |
+| `delete` | Delete a platformK8sResourceKind |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `active` | Boolean |
+| `commitId` | UUID |
+| `createdAt` | Datetime |
+| `definition` | JSON |
+| `description` | String |
+| `id` | UUID |
+| `label` | String |
+| `slug` | String |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `definition`, `slug`
+**Optional create fields (backend defaults):** `active`, `commitId`, `description`, `label`, `storeId`
+
+### `platform-k-8-s-spec-rule`
+
+CRUD operations for PlatformK8sSpecRule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformK8sSpecRule records |
+| `find-first` | Find first matching platformK8sSpecRule record |
+| `get` | Get a platformK8sSpecRule by id |
+| `create` | Create a new platformK8sSpecRule |
+| `update` | Update an existing platformK8sSpecRule |
+| `delete` | Delete a platformK8sSpecRule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `active` | Boolean |
+| `commitId` | UUID |
+| `createdAt` | Datetime |
+| `definition` | JSON |
+| `description` | String |
+| `id` | UUID |
+| `label` | String |
+| `slug` | String |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `definition`, `slug`
+**Optional create fields (backend defaults):** `active`, `commitId`, `description`, `label`, `storeId`
+
 ### `platform-namespace`
 
 CRUD operations for PlatformNamespace records.
@@ -1450,6 +2313,7 @@ CRUD operations for PlatformNamespace records.
 | Field | Type |
 |-------|------|
 | `annotations` | JSON |
+| `clusterId` | UUID |
 | `createdAt` | Datetime |
 | `description` | String |
 | `id` | UUID |
@@ -1463,7 +2327,7 @@ CRUD operations for PlatformNamespace records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `name`, `namespaceName`
-**Optional create fields (backend defaults):** `annotations`, `description`, `isActive`, `isManaged`, `labels`, `lastError`, `status`
+**Optional create fields (backend defaults):** `annotations`, `clusterId`, `description`, `isActive`, `isManaged`, `labels`, `lastError`, `status`
 
 ### `platform-namespace-event`
 
@@ -1493,6 +2357,811 @@ CRUD operations for PlatformNamespaceEvent records.
 **Required create fields:** `eventType`, `namespaceId`
 **Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
 
+### `platform-proposal-comment`
+
+CRUD operations for PlatformProposalComment records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformProposalComment records |
+| `find-first` | Find first matching platformProposalComment record |
+| `search <query>` | Search platformProposalComment records |
+| `get` | Get a platformProposalComment by id |
+| `create` | Create a new platformProposalComment |
+| `update` | Update an existing platformProposalComment |
+| `delete` | Delete a platformProposalComment |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `attachments` | Upload |
+| `body` | String |
+| `bodyTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `embedding` | Vector |
+| `embeddingUpdatedAt` | Datetime |
+| `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `line` | Int |
+| `outdatedAt` | Datetime |
+| `path` | String |
+| `pathTrgmSimilarity` | Float |
+| `proposalId` | UUID |
+| `resolvedAt` | Datetime |
+| `search` | FullText |
+| `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `body`, `proposalId`
+**Optional create fields (backend defaults):** `actorId`, `attachments`, `createdBy`, `createdByPrincipal`, `embedding`, `line`, `outdatedAt`, `path`, `resolvedAt`, `updatedBy`, `updatedByPrincipal`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk platform-proposal-comment list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment update --embedding "new text to embed" --auto-embed
+```
+
+*Fuzzy search via trigram similarity (`trgmBody`):*
+```bash
+csdk platform-proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmPath`):*
+```bash
+csdk platform-proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select title,pathTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk platform-proposal-comment list --where.search "search query" --select title,tsvRank
+```
+
+*Composite search (unifiedSearch dispatches to all text adapters):*
+```bash
+csdk platform-proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk platform-proposal-comment list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk platform-proposal-comment search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `platform-proposal`
+
+CRUD operations for PlatformProposal records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformProposal records |
+| `find-first` | Find first matching platformProposal record |
+| `search <query>` | Search platformProposal records |
+| `get` | Get a platformProposal by id |
+| `create` | Create a new platformProposal |
+| `update` | Update an existing platformProposal |
+| `delete` | Delete a platformProposal |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `body` | String |
+| `bodyTrgmSimilarity` | Float |
+| `closedReason` | String |
+| `closedReasonTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `decidedAt` | Datetime |
+| `dueAt` | Datetime |
+| `embedding` | Vector |
+| `embeddingUpdatedAt` | Datetime |
+| `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `kind` | String |
+| `kindTrgmSimilarity` | Float |
+| `labels` | String |
+| `mergeCommit` | String |
+| `mergeCommitTrgmSimilarity` | Float |
+| `mergeMethod` | String |
+| `mergeMethodTrgmSimilarity` | Float |
+| `mergeRequestedAt` | Datetime |
+| `mergedAt` | Datetime |
+| `metadata` | JSON |
+| `parentId` | UUID |
+| `priority` | BigFloat |
+| `repositoryId` | UUID |
+| `resolution` | String |
+| `resolutionTrgmSimilarity` | Float |
+| `search` | FullText |
+| `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `sourceRef` | String |
+| `sourceRefTrgmSimilarity` | Float |
+| `status` | String |
+| `statusTrgmSimilarity` | Float |
+| `targetRef` | String |
+| `targetRefTrgmSimilarity` | Float |
+| `title` | String |
+| `titleTrgmSimilarity` | Float |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `repositoryId`, `title`
+**Optional create fields (backend defaults):** `actorId`, `body`, `closedReason`, `createdBy`, `createdByPrincipal`, `decidedAt`, `dueAt`, `embedding`, `kind`, `labels`, `mergeCommit`, `mergeMethod`, `mergeRequestedAt`, `mergedAt`, `metadata`, `parentId`, `priority`, `resolution`, `sourceRef`, `status`, `targetRef`, `updatedBy`, `updatedByPrincipal`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk platform-proposal list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk platform-proposal search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-proposal list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk platform-proposal create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk platform-proposal update --embedding "new text to embed" --auto-embed
+```
+
+*Fuzzy search via trigram similarity (`trgmBody`):*
+```bash
+csdk platform-proposal list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmClosedReason`):*
+```bash
+csdk platform-proposal list --where.trgmClosedReason.value "approximate query" --where.trgmClosedReason.threshold 0.3 --select title,closedReasonTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmKind`):*
+```bash
+csdk platform-proposal list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmMergeCommit`):*
+```bash
+csdk platform-proposal list --where.trgmMergeCommit.value "approximate query" --where.trgmMergeCommit.threshold 0.3 --select title,mergeCommitTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmMergeMethod`):*
+```bash
+csdk platform-proposal list --where.trgmMergeMethod.value "approximate query" --where.trgmMergeMethod.threshold 0.3 --select title,mergeMethodTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmResolution`):*
+```bash
+csdk platform-proposal list --where.trgmResolution.value "approximate query" --where.trgmResolution.threshold 0.3 --select title,resolutionTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk platform-proposal list --where.search "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmSourceRef`):*
+```bash
+csdk platform-proposal list --where.trgmSourceRef.value "approximate query" --where.trgmSourceRef.threshold 0.3 --select title,sourceRefTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmStatus`):*
+```bash
+csdk platform-proposal list --where.trgmStatus.value "approximate query" --where.trgmStatus.threshold 0.3 --select title,statusTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmTargetRef`):*
+```bash
+csdk platform-proposal list --where.trgmTargetRef.value "approximate query" --where.trgmTargetRef.threshold 0.3 --select title,targetRefTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmTitle`):*
+```bash
+csdk platform-proposal list --where.trgmTitle.value "approximate query" --where.trgmTitle.threshold 0.3 --select title,titleTrgmSimilarity
+```
+
+*Composite search (unifiedSearch dispatches to all text adapters):*
+```bash
+csdk platform-proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,tsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk platform-proposal list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk platform-proposal search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `platform-proposal-file-view`
+
+CRUD operations for PlatformProposalFileView records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformProposalFileView records |
+| `find-first` | Find first matching platformProposalFileView record |
+| `get` | Get a platformProposalFileView by id |
+| `create` | Create a new platformProposalFileView |
+| `update` | Update an existing platformProposalFileView |
+| `delete` | Delete a platformProposalFileView |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `blobSha` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `path` | String |
+| `proposalId` | UUID |
+| `reviewerId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+| `viewedAt` | Datetime |
+
+**Required create fields:** `blobSha`, `path`, `proposalId`, `reviewerId`
+**Optional create fields (backend defaults):** `createdByPrincipal`, `updatedByPrincipal`, `viewedAt`
+
+### `platform-proposal-reaction`
+
+CRUD operations for PlatformProposalReaction records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformProposalReaction records |
+| `find-first` | Find first matching platformProposalReaction record |
+| `get` | Get a platformProposalReaction by id |
+| `create` | Create a new platformProposalReaction |
+| `update` | Update an existing platformProposalReaction |
+| `delete` | Delete a platformProposalReaction |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `commentId` | UUID |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `emoji` | String |
+| `id` | UUID |
+| `proposalId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `actorId`, `emoji`, `proposalId`
+**Optional create fields (backend defaults):** `commentId`, `createdByPrincipal`, `updatedByPrincipal`
+
+### `platform-proposal-review`
+
+CRUD operations for PlatformProposalReview records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformProposalReview records |
+| `find-first` | Find first matching platformProposalReview record |
+| `search <query>` | Search platformProposalReview records |
+| `get` | Get a platformProposalReview by id |
+| `create` | Create a new platformProposalReview |
+| `update` | Update an existing platformProposalReview |
+| `delete` | Delete a platformProposalReview |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `body` | String |
+| `bodyTrgmSimilarity` | Float |
+| `commitSha` | String |
+| `commitShaTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `proposalId` | UUID |
+| `reviewerId` | UUID |
+| `search` | FullText |
+| `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `submittedAt` | Datetime |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+| `verdict` | String |
+| `verdictTrgmSimilarity` | Float |
+
+**Required create fields:** `commitSha`, `proposalId`, `reviewerId`, `verdict`
+**Optional create fields (backend defaults):** `body`, `createdByPrincipal`, `submittedAt`, `updatedByPrincipal`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `commitShaTrgmSimilarity`, `search`, `searchScore`, `verdictTrgmSimilarity`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Fuzzy search via trigram similarity (`trgmBody`):*
+```bash
+csdk platform-proposal-review list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmCommitSha`):*
+```bash
+csdk platform-proposal-review list --where.trgmCommitSha.value "approximate query" --where.trgmCommitSha.threshold 0.3 --select title,commitShaTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk platform-proposal-review list --where.search "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmVerdict`):*
+```bash
+csdk platform-proposal-review list --where.trgmVerdict.value "approximate query" --where.trgmVerdict.threshold 0.3 --select title,verdictTrgmSimilarity
+```
+
+*Composite search (unifiedSearch dispatches to all text adapters):*
+```bash
+csdk platform-proposal-review list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,commitShaTrgmSimilarity,tsvRank,searchScore,verdictTrgmSimilarity
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk platform-proposal-review list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk platform-proposal-review search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `platform-proposals-chunk`
+
+CRUD operations for PlatformProposalsChunk records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformProposalsChunk records |
+| `find-first` | Find first matching platformProposalsChunk record |
+| `search <query>` | Search platformProposalsChunk records |
+| `get` | Get a platformProposalsChunk by id |
+| `create` | Create a new platformProposalsChunk |
+| `update` | Update an existing platformProposalsChunk |
+| `delete` | Delete a platformProposalsChunk |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `body` | String |
+| `chunkIndex` | Int |
+| `createdAt` | Datetime |
+| `embedding` | Vector |
+| `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `metadata` | JSON |
+| `platformProposalsId` | UUID |
+| `searchScore` | Float |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `body`, `platformProposalsId`
+**Optional create fields (backend defaults):** `actorId`, `chunkIndex`, `embedding`, `metadata`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `searchScore`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk platform-proposals-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk platform-proposals-chunk search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-proposals-chunk list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk platform-proposals-chunk create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk platform-proposals-chunk update --embedding "new text to embed" --auto-embed
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk platform-proposals-chunk list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk platform-proposals-chunk search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `platform-registry-binding`
+
+CRUD operations for PlatformRegistryBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformRegistryBinding records |
+| `find-first` | Find first matching platformRegistryBinding record |
+| `get` | Get a platformRegistryBinding by id |
+| `create` | Create a new platformRegistryBinding |
+| `update` | Update an existing platformRegistryBinding |
+| `delete` | Delete a platformRegistryBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedCredentialVersion` | String |
+| `pullSecretName` | String |
+| `realm` | String |
+| `registryHost` | String |
+| `registryId` | UUID |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `namespaceId`, `registryHost`, `registryId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `metadata`, `observedCredentialVersion`, `pullSecretName`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
+
+### `platform-registry`
+
+CRUD operations for PlatformRegistry records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformRegistry records |
+| `find-first` | Find first matching platformRegistry record |
+| `get` | Get a platformRegistry by id |
+| `create` | Create a new platformRegistry |
+| `update` | Update an existing platformRegistry |
+| `delete` | Delete a platformRegistry |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `authMode` | String |
+| `basePath` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `credentialSecretName` | String |
+| `host` | String |
+| `id` | UUID |
+| `installationId` | UUID |
+| `isPublished` | Boolean |
+| `kind` | String |
+| `labels` | JSON |
+| `lastError` | String |
+| `metadata` | JSON |
+| `name` | String |
+| `platformOnly` | Boolean |
+| `role` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `kind`, `name`
+**Optional create fields (backend defaults):** `authMode`, `basePath`, `createdByPrincipal`, `credentialSecretName`, `host`, `installationId`, `isPublished`, `labels`, `lastError`, `metadata`, `platformOnly`, `role`, `status`, `updatedByPrincipal`
+
+### `platform-registry-grant`
+
+CRUD operations for PlatformRegistryGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformRegistryGrant records |
+| `find-first` | Find first matching platformRegistryGrant record |
+| `get` | Get a platformRegistryGrant by id |
+| `create` | Create a new platformRegistryGrant |
+| `update` | Update an existing platformRegistryGrant |
+| `delete` | Delete a platformRegistryGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actions` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `expiresAt` | Datetime |
+| `grantedBy` | UUID |
+| `granteeKey` | UUID |
+| `granteeScope` | String |
+| `id` | UUID |
+| `registryId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `granteeKey`, `granteeScope`, `registryId`
+**Optional create fields (backend defaults):** `actions`, `createdByPrincipal`, `expiresAt`, `grantedBy`, `updatedByPrincipal`
+
+### `platform-repository`
+
+CRUD operations for PlatformRepository records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformRepository records |
+| `find-first` | Find first matching platformRepository record |
+| `search <query>` | Search platformRepository records |
+| `get` | Get a platformRepository by id |
+| `create` | Create a new platformRepository |
+| `update` | Update an existing platformRepository |
+| `delete` | Delete a platformRepository |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cloneUrl` | String |
+| `cloneUrlTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `defaultBranch` | String |
+| `defaultBranchTrgmSimilarity` | Float |
+| `description` | String |
+| `descriptionTrgmSimilarity` | Float |
+| `embedding` | Vector |
+| `embeddingUpdatedAt` | Datetime |
+| `embeddingVectorDistance` | Float |
+| `externalId` | String |
+| `externalIdTrgmSimilarity` | Float |
+| `id` | UUID |
+| `isArchived` | Boolean |
+| `metadata` | JSON |
+| `name` | String |
+| `nameTrgmSimilarity` | Float |
+| `ownerId` | UUID |
+| `provider` | String |
+| `providerTrgmSimilarity` | Float |
+| `search` | FullText |
+| `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `slug` | String |
+| `slugTrgmSimilarity` | Float |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+| `visibility` | String |
+| `visibilityTrgmSimilarity` | Float |
+
+**Required create fields:** `name`, `slug`
+**Optional create fields (backend defaults):** `cloneUrl`, `createdBy`, `createdByPrincipal`, `defaultBranch`, `description`, `embedding`, `externalId`, `isArchived`, `metadata`, `ownerId`, `provider`, `updatedBy`, `updatedByPrincipal`, `visibility`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk platform-repository list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk platform-repository search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-repository list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk platform-repository create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk platform-repository update --embedding "new text to embed" --auto-embed
+```
+
+*Fuzzy search via trigram similarity (`trgmCloneUrl`):*
+```bash
+csdk platform-repository list --where.trgmCloneUrl.value "approximate query" --where.trgmCloneUrl.threshold 0.3 --select title,cloneUrlTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmDefaultBranch`):*
+```bash
+csdk platform-repository list --where.trgmDefaultBranch.value "approximate query" --where.trgmDefaultBranch.threshold 0.3 --select title,defaultBranchTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmDescription`):*
+```bash
+csdk platform-repository list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmExternalId`):*
+```bash
+csdk platform-repository list --where.trgmExternalId.value "approximate query" --where.trgmExternalId.threshold 0.3 --select title,externalIdTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmName`):*
+```bash
+csdk platform-repository list --where.trgmName.value "approximate query" --where.trgmName.threshold 0.3 --select title,nameTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmProvider`):*
+```bash
+csdk platform-repository list --where.trgmProvider.value "approximate query" --where.trgmProvider.threshold 0.3 --select title,providerTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk platform-repository list --where.search "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmSlug`):*
+```bash
+csdk platform-repository list --where.trgmSlug.value "approximate query" --where.trgmSlug.threshold 0.3 --select title,slugTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmVisibility`):*
+```bash
+csdk platform-repository list --where.trgmVisibility.value "approximate query" --where.trgmVisibility.threshold 0.3 --select title,visibilityTrgmSimilarity
+```
+
+*Composite search (unifiedSearch dispatches to all text adapters):*
+```bash
+csdk platform-repository list --where.unifiedSearch "search query" --select title,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,tsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk platform-repository list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk platform-repository search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `platform-repository-event`
+
+CRUD operations for PlatformRepositoryEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformRepositoryEvent records |
+| `find-first` | Find first matching platformRepositoryEvent record |
+| `get` | Get a platformRepositoryEvent by id |
+| `create` | Create a new platformRepositoryEvent |
+| `update` | Update an existing platformRepositoryEvent |
+| `delete` | Delete a platformRepositoryEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `commitSha` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `deliveryId` | String |
+| `eventType` | String |
+| `id` | UUID |
+| `metadata` | JSON |
+| `payload` | JSON |
+| `ref` | String |
+| `repositoryId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `eventType`, `repositoryId`
+**Optional create fields (backend defaults):** `actorId`, `commitSha`, `createdByPrincipal`, `deliveryId`, `metadata`, `payload`, `ref`, `updatedByPrincipal`
+
+### `platform-repository-required-check`
+
+CRUD operations for PlatformRepositoryRequiredCheck records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformRepositoryRequiredCheck records |
+| `find-first` | Find first matching platformRepositoryRequiredCheck record |
+| `get` | Get a platformRepositoryRequiredCheck by id |
+| `create` | Create a new platformRepositoryRequiredCheck |
+| `update` | Update an existing platformRepositoryRequiredCheck |
+| `delete` | Delete a platformRepositoryRequiredCheck |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `repositoryId` | UUID |
+| `updatedAt` | Datetime |
+| `workflowId` | UUID |
+
+**Required create fields:** `repositoryId`, `workflowId`
+
+### `platform-repository-workflow`
+
+CRUD operations for PlatformRepositoryWorkflow records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformRepositoryWorkflow records |
+| `find-first` | Find first matching platformRepositoryWorkflow record |
+| `get` | Get a platformRepositoryWorkflow by id |
+| `create` | Create a new platformRepositoryWorkflow |
+| `update` | Update an existing platformRepositoryWorkflow |
+| `delete` | Delete a platformRepositoryWorkflow |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cancelInProgress` | Boolean |
+| `concurrencyKey` | String |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `eventType` | String |
+| `graphId` | UUID |
+| `id` | UUID |
+| `inputs` | JSON |
+| `isEnabled` | Boolean |
+| `name` | String |
+| `refPattern` | String |
+| `repositoryId` | UUID |
+| `requiredSecrets` | String |
+| `slug` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `eventType`, `name`, `repositoryId`, `slug`
+**Optional create fields (backend defaults):** `cancelInProgress`, `concurrencyKey`, `createdBy`, `createdByPrincipal`, `graphId`, `inputs`, `isEnabled`, `refPattern`, `requiredSecrets`, `updatedBy`, `updatedByPrincipal`
+
 ### `platform-resource`
 
 CRUD operations for PlatformResource records.
@@ -1515,8 +3184,10 @@ CRUD operations for PlatformResource records.
 | `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `errorCount` | Int |
 | `id` | UUID |
+| `imageRef` | String |
 | `installationId` | UUID |
 | `integrations` | String |
 | `kind` | String |
@@ -1538,11 +3209,13 @@ CRUD operations for PlatformResource records.
 | `statusObserved` | JSON |
 | `storageClass` | String |
 | `storageSizeBytes` | BigInt |
+| `storageTotalBytes` | BigInt |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `realm`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `createdByPrincipal`, `errorCount`, `imageRef`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `realm`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-resource-declared-capacity`
 
@@ -1574,8 +3247,9 @@ CRUD operations for PlatformResourceDeclaredCapacity records.
 | `source` | String |
 | `sourceId` | UUID |
 | `storageSizeBytes` | BigInt |
+| `storageTotalBytes` | BigInt |
 
-**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`
+**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`, `storageTotalBytes`
 
 ### `platform-resource-definition`
 
@@ -1597,6 +3271,7 @@ CRUD operations for PlatformResourceDefinition records.
 | `annotations` | JSON |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `defaultSpec` | JSON |
 | `description` | String |
 | `id` | UUID |
@@ -1612,9 +3287,10 @@ CRUD operations for PlatformResourceDefinition records.
 | `stepUpMinAge` | Interval |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `defaultSpec`, `description`, `integrations`, `labels`, `paramsSchema`, `requiredConfigs`, `requiredSecrets`, `stepUpMinAge`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `createdByPrincipal`, `defaultSpec`, `description`, `integrations`, `labels`, `paramsSchema`, `requiredConfigs`, `requiredSecrets`, `stepUpMinAge`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-resource-event`
 
@@ -1664,6 +3340,7 @@ CRUD operations for PlatformResourceInstallation records.
 | `commitId` | UUID |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `id` | UUID |
 | `name` | String |
 | `namespaceId` | UUID |
@@ -1674,9 +3351,48 @@ CRUD operations for PlatformResourceInstallation records.
 | `storeId` | UUID |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `commitId`, `createdBy`, `params`, `revision`, `status`, `storeId`, `updatedBy`
+**Optional create fields (backend defaults):** `commitId`, `createdBy`, `createdByPrincipal`, `params`, `revision`, `status`, `storeId`, `updatedBy`, `updatedByPrincipal`
+
+### `platform-resource-observed-storage`
+
+CRUD operations for PlatformResourceObservedStorage records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourceObservedStorage records |
+| `find-first` | Find first matching platformResourceObservedStorage record |
+| `get` | Get a platformResourceObservedStorage by id |
+| `create` | Create a new platformResourceObservedStorage |
+| `update` | Update an existing platformResourceObservedStorage |
+| `delete` | Delete a platformResourceObservedStorage |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `capacity` | String |
+| `capacityBytes` | BigInt |
+| `claimName` | String |
+| `declaredStorageClass` | String |
+| `declaredStorageSizeBytes` | BigInt |
+| `declaredStorageTotalBytes` | BigInt |
+| `installationId` | UUID |
+| `isBound` | Boolean |
+| `kind` | String |
+| `namespaceId` | UUID |
+| `phase` | String |
+| `requested` | String |
+| `requestedBytes` | BigInt |
+| `resourceId` | UUID |
+| `resourceStatus` | String |
+| `slug` | String |
+| `storageClass` | String |
+| `storageName` | String |
+
+**Required create fields:** `capacity`, `capacityBytes`, `claimName`, `declaredStorageClass`, `declaredStorageSizeBytes`, `declaredStorageTotalBytes`, `installationId`, `isBound`, `kind`, `namespaceId`, `phase`, `requested`, `requestedBytes`, `resourceId`, `resourceStatus`, `slug`, `storageClass`, `storageName`
 
 ### `platform-resource-status-check`
 
@@ -1827,8 +3543,10 @@ CRUD operations for PlatformResourcesHealth records.
 | `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `errorCount` | Int |
 | `id` | UUID |
+| `imageRef` | String |
 | `installationId` | UUID |
 | `integrations` | String |
 | `kind` | String |
@@ -1851,10 +3569,12 @@ CRUD operations for PlatformResourcesHealth records.
 | `statusObserved` | JSON |
 | `storageClass` | String |
 | `storageSizeBytes` | BigInt |
+| `storageTotalBytes` | BigInt |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
-**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `errorCount`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `realm`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `updatedBy`
+**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `createdByPrincipal`, `errorCount`, `imageRef`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `realm`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `storageTotalBytes`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-resources-requirements-state`
 
@@ -1934,6 +3654,7 @@ CRUD operations for PlatformWebhookEndpoint records.
 | `active` | Boolean |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `functionDefinitionId` | UUID |
 | `host` | String |
 | `id` | UUID |
@@ -1944,9 +3665,10 @@ CRUD operations for PlatformWebhookEndpoint records.
 | `signingSecretName` | String |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `functionDefinitionId`, `host`, `namespaceId`, `path`, `signingSecretName`
-**Optional create fields (backend defaults):** `active`, `createdBy`, `provider`, `replayWindowSeconds`, `updatedBy`
+**Optional create fields (backend defaults):** `active`, `createdBy`, `createdByPrincipal`, `provider`, `replayWindowSeconds`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-webhook-event`
 
@@ -1981,6 +3703,824 @@ CRUD operations for PlatformWebhookEvent records.
 **Required create fields:** `endpointId`, `externalEventId`, `provider`
 **Optional create fields (backend defaults):** `error`, `invocationCreatedAt`, `invocationId`, `payload`, `providerTimestamp`, `status`
 
+### `proposal-comment`
+
+CRUD operations for ProposalComment records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all proposalComment records |
+| `find-first` | Find first matching proposalComment record |
+| `search <query>` | Search proposalComment records |
+| `get` | Get a proposalComment by id |
+| `create` | Create a new proposalComment |
+| `update` | Update an existing proposalComment |
+| `delete` | Delete a proposalComment |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `attachments` | Upload |
+| `body` | String |
+| `bodyTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `embedding` | Vector |
+| `embeddingUpdatedAt` | Datetime |
+| `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `line` | Int |
+| `outdatedAt` | Datetime |
+| `path` | String |
+| `pathTrgmSimilarity` | Float |
+| `proposalId` | UUID |
+| `resolvedAt` | Datetime |
+| `search` | FullText |
+| `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `body`, `databaseId`, `proposalId`
+**Optional create fields (backend defaults):** `actorId`, `attachments`, `createdBy`, `createdByPrincipal`, `embedding`, `line`, `outdatedAt`, `path`, `resolvedAt`, `updatedBy`, `updatedByPrincipal`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk proposal-comment list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk proposal-comment search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk proposal-comment list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk proposal-comment create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk proposal-comment update --embedding "new text to embed" --auto-embed
+```
+
+*Fuzzy search via trigram similarity (`trgmBody`):*
+```bash
+csdk proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmPath`):*
+```bash
+csdk proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select title,pathTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk proposal-comment list --where.search "search query" --select title,tsvRank
+```
+
+*Composite search (unifiedSearch dispatches to all text adapters):*
+```bash
+csdk proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk proposal-comment list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk proposal-comment search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `proposal`
+
+CRUD operations for Proposal records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all proposal records |
+| `find-first` | Find first matching proposal record |
+| `search <query>` | Search proposal records |
+| `get` | Get a proposal by id |
+| `create` | Create a new proposal |
+| `update` | Update an existing proposal |
+| `delete` | Delete a proposal |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `body` | String |
+| `bodyTrgmSimilarity` | Float |
+| `closedReason` | String |
+| `closedReasonTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `decidedAt` | Datetime |
+| `dueAt` | Datetime |
+| `embedding` | Vector |
+| `embeddingUpdatedAt` | Datetime |
+| `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `kind` | String |
+| `kindTrgmSimilarity` | Float |
+| `labels` | String |
+| `mergeCommit` | String |
+| `mergeCommitTrgmSimilarity` | Float |
+| `mergeMethod` | String |
+| `mergeMethodTrgmSimilarity` | Float |
+| `mergeRequestedAt` | Datetime |
+| `mergedAt` | Datetime |
+| `metadata` | JSON |
+| `parentId` | UUID |
+| `priority` | BigFloat |
+| `repositoryId` | UUID |
+| `resolution` | String |
+| `resolutionTrgmSimilarity` | Float |
+| `search` | FullText |
+| `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `sourceRef` | String |
+| `sourceRefTrgmSimilarity` | Float |
+| `status` | String |
+| `statusTrgmSimilarity` | Float |
+| `targetRef` | String |
+| `targetRefTrgmSimilarity` | Float |
+| `title` | String |
+| `titleTrgmSimilarity` | Float |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `repositoryId`, `title`
+**Optional create fields (backend defaults):** `actorId`, `body`, `closedReason`, `createdBy`, `createdByPrincipal`, `decidedAt`, `dueAt`, `embedding`, `kind`, `labels`, `mergeCommit`, `mergeMethod`, `mergeRequestedAt`, `mergedAt`, `metadata`, `parentId`, `priority`, `resolution`, `sourceRef`, `status`, `targetRef`, `updatedBy`, `updatedByPrincipal`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk proposal list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk proposal search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk proposal list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk proposal create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk proposal update --embedding "new text to embed" --auto-embed
+```
+
+*Fuzzy search via trigram similarity (`trgmBody`):*
+```bash
+csdk proposal list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmClosedReason`):*
+```bash
+csdk proposal list --where.trgmClosedReason.value "approximate query" --where.trgmClosedReason.threshold 0.3 --select title,closedReasonTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmKind`):*
+```bash
+csdk proposal list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmMergeCommit`):*
+```bash
+csdk proposal list --where.trgmMergeCommit.value "approximate query" --where.trgmMergeCommit.threshold 0.3 --select title,mergeCommitTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmMergeMethod`):*
+```bash
+csdk proposal list --where.trgmMergeMethod.value "approximate query" --where.trgmMergeMethod.threshold 0.3 --select title,mergeMethodTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmResolution`):*
+```bash
+csdk proposal list --where.trgmResolution.value "approximate query" --where.trgmResolution.threshold 0.3 --select title,resolutionTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk proposal list --where.search "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmSourceRef`):*
+```bash
+csdk proposal list --where.trgmSourceRef.value "approximate query" --where.trgmSourceRef.threshold 0.3 --select title,sourceRefTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmStatus`):*
+```bash
+csdk proposal list --where.trgmStatus.value "approximate query" --where.trgmStatus.threshold 0.3 --select title,statusTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmTargetRef`):*
+```bash
+csdk proposal list --where.trgmTargetRef.value "approximate query" --where.trgmTargetRef.threshold 0.3 --select title,targetRefTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmTitle`):*
+```bash
+csdk proposal list --where.trgmTitle.value "approximate query" --where.trgmTitle.threshold 0.3 --select title,titleTrgmSimilarity
+```
+
+*Composite search (unifiedSearch dispatches to all text adapters):*
+```bash
+csdk proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,tsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk proposal list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk proposal search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `proposal-file-view`
+
+CRUD operations for ProposalFileView records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all proposalFileView records |
+| `find-first` | Find first matching proposalFileView record |
+| `get` | Get a proposalFileView by id |
+| `create` | Create a new proposalFileView |
+| `update` | Update an existing proposalFileView |
+| `delete` | Delete a proposalFileView |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `blobSha` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `path` | String |
+| `proposalId` | UUID |
+| `reviewerId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+| `viewedAt` | Datetime |
+
+**Required create fields:** `blobSha`, `databaseId`, `path`, `proposalId`, `reviewerId`
+**Optional create fields (backend defaults):** `createdByPrincipal`, `updatedByPrincipal`, `viewedAt`
+
+### `proposal-reaction`
+
+CRUD operations for ProposalReaction records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all proposalReaction records |
+| `find-first` | Find first matching proposalReaction record |
+| `get` | Get a proposalReaction by id |
+| `create` | Create a new proposalReaction |
+| `update` | Update an existing proposalReaction |
+| `delete` | Delete a proposalReaction |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `commentId` | UUID |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `emoji` | String |
+| `id` | UUID |
+| `proposalId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `actorId`, `databaseId`, `emoji`, `proposalId`
+**Optional create fields (backend defaults):** `commentId`, `createdByPrincipal`, `updatedByPrincipal`
+
+### `proposal-review`
+
+CRUD operations for ProposalReview records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all proposalReview records |
+| `find-first` | Find first matching proposalReview record |
+| `search <query>` | Search proposalReview records |
+| `get` | Get a proposalReview by id |
+| `create` | Create a new proposalReview |
+| `update` | Update an existing proposalReview |
+| `delete` | Delete a proposalReview |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `body` | String |
+| `bodyTrgmSimilarity` | Float |
+| `commitSha` | String |
+| `commitShaTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `proposalId` | UUID |
+| `reviewerId` | UUID |
+| `search` | FullText |
+| `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `submittedAt` | Datetime |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+| `verdict` | String |
+| `verdictTrgmSimilarity` | Float |
+
+**Required create fields:** `commitSha`, `databaseId`, `proposalId`, `reviewerId`, `verdict`
+**Optional create fields (backend defaults):** `body`, `createdByPrincipal`, `submittedAt`, `updatedByPrincipal`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `commitShaTrgmSimilarity`, `search`, `searchScore`, `verdictTrgmSimilarity`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Fuzzy search via trigram similarity (`trgmBody`):*
+```bash
+csdk proposal-review list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmCommitSha`):*
+```bash
+csdk proposal-review list --where.trgmCommitSha.value "approximate query" --where.trgmCommitSha.threshold 0.3 --select title,commitShaTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk proposal-review list --where.search "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmVerdict`):*
+```bash
+csdk proposal-review list --where.trgmVerdict.value "approximate query" --where.trgmVerdict.threshold 0.3 --select title,verdictTrgmSimilarity
+```
+
+*Composite search (unifiedSearch dispatches to all text adapters):*
+```bash
+csdk proposal-review list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,commitShaTrgmSimilarity,tsvRank,searchScore,verdictTrgmSimilarity
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk proposal-review list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk proposal-review search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `proposals-chunk`
+
+CRUD operations for ProposalsChunk records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all proposalsChunk records |
+| `find-first` | Find first matching proposalsChunk record |
+| `search <query>` | Search proposalsChunk records |
+| `get` | Get a proposalsChunk by id |
+| `create` | Create a new proposalsChunk |
+| `update` | Update an existing proposalsChunk |
+| `delete` | Delete a proposalsChunk |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `body` | String |
+| `chunkIndex` | Int |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `embedding` | Vector |
+| `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `metadata` | JSON |
+| `proposalsId` | UUID |
+| `searchScore` | Float |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `body`, `proposalsId`
+**Optional create fields (backend defaults):** `actorId`, `chunkIndex`, `databaseId`, `embedding`, `metadata`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `searchScore`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk proposals-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk proposals-chunk search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk proposals-chunk list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk proposals-chunk create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk proposals-chunk update --embedding "new text to embed" --auto-embed
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk proposals-chunk list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk proposals-chunk search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `registry-binding`
+
+CRUD operations for RegistryBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all registryBinding records |
+| `find-first` | Find first matching registryBinding record |
+| `get` | Get a registryBinding by id |
+| `create` | Create a new registryBinding |
+| `update` | Update an existing registryBinding |
+| `delete` | Delete a registryBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedCredentialVersion` | String |
+| `pullSecretName` | String |
+| `realm` | String |
+| `registryHost` | String |
+| `registryId` | UUID |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `namespaceId`, `registryHost`, `registryId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `metadata`, `observedCredentialVersion`, `pullSecretName`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
+
+### `registry`
+
+CRUD operations for Registry records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all registry records |
+| `find-first` | Find first matching registry record |
+| `get` | Get a registry by id |
+| `create` | Create a new registry |
+| `update` | Update an existing registry |
+| `delete` | Delete a registry |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `authMode` | String |
+| `basePath` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `credentialSecretName` | String |
+| `databaseId` | UUID |
+| `host` | String |
+| `id` | UUID |
+| `installationId` | UUID |
+| `isPublished` | Boolean |
+| `kind` | String |
+| `labels` | JSON |
+| `lastError` | String |
+| `metadata` | JSON |
+| `name` | String |
+| `platformOnly` | Boolean |
+| `role` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `kind`, `name`
+**Optional create fields (backend defaults):** `authMode`, `basePath`, `createdByPrincipal`, `credentialSecretName`, `host`, `installationId`, `isPublished`, `labels`, `lastError`, `metadata`, `platformOnly`, `role`, `status`, `updatedByPrincipal`
+
+### `registry-grant`
+
+CRUD operations for RegistryGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all registryGrant records |
+| `find-first` | Find first matching registryGrant record |
+| `get` | Get a registryGrant by id |
+| `create` | Create a new registryGrant |
+| `update` | Update an existing registryGrant |
+| `delete` | Delete a registryGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actions` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `expiresAt` | Datetime |
+| `grantedBy` | UUID |
+| `granteeKey` | UUID |
+| `granteeScope` | String |
+| `id` | UUID |
+| `registryId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `granteeKey`, `granteeScope`, `registryId`
+**Optional create fields (backend defaults):** `actions`, `createdByPrincipal`, `expiresAt`, `grantedBy`, `updatedByPrincipal`
+
+### `repository`
+
+CRUD operations for Repository records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all repository records |
+| `find-first` | Find first matching repository record |
+| `search <query>` | Search repository records |
+| `get` | Get a repository by id |
+| `create` | Create a new repository |
+| `update` | Update an existing repository |
+| `delete` | Delete a repository |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cloneUrl` | String |
+| `cloneUrlTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `defaultBranch` | String |
+| `defaultBranchTrgmSimilarity` | Float |
+| `description` | String |
+| `descriptionTrgmSimilarity` | Float |
+| `embedding` | Vector |
+| `embeddingUpdatedAt` | Datetime |
+| `embeddingVectorDistance` | Float |
+| `externalId` | String |
+| `externalIdTrgmSimilarity` | Float |
+| `id` | UUID |
+| `isArchived` | Boolean |
+| `metadata` | JSON |
+| `name` | String |
+| `nameTrgmSimilarity` | Float |
+| `ownerId` | UUID |
+| `provider` | String |
+| `providerTrgmSimilarity` | Float |
+| `search` | FullText |
+| `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `slug` | String |
+| `slugTrgmSimilarity` | Float |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+| `visibility` | String |
+| `visibilityTrgmSimilarity` | Float |
+
+**Required create fields:** `databaseId`, `name`, `slug`
+**Optional create fields (backend defaults):** `cloneUrl`, `createdBy`, `createdByPrincipal`, `defaultBranch`, `description`, `embedding`, `externalId`, `isArchived`, `metadata`, `ownerId`, `provider`, `updatedBy`, `updatedByPrincipal`, `visibility`
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
+
+> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Vector similarity search via `embedding` (manual vector):*
+```bash
+# Pass a pre-computed vector array via dot-notation
+csdk repository list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+```
+
+*Vector semantic search via `embedding` with --auto-embed:*
+```bash
+# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
+EMBEDDER_PROVIDER=ollama csdk repository search "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk repository list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+```
+
+*Create/update with auto-embedded `embedding` via --auto-embed:*
+```bash
+# --auto-embed on create/update converts text strings in vector fields to embeddings before saving
+EMBEDDER_PROVIDER=ollama csdk repository create --embedding "text to embed" --auto-embed
+EMBEDDER_PROVIDER=ollama csdk repository update --embedding "new text to embed" --auto-embed
+```
+
+*Fuzzy search via trigram similarity (`trgmCloneUrl`):*
+```bash
+csdk repository list --where.trgmCloneUrl.value "approximate query" --where.trgmCloneUrl.threshold 0.3 --select title,cloneUrlTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmDefaultBranch`):*
+```bash
+csdk repository list --where.trgmDefaultBranch.value "approximate query" --where.trgmDefaultBranch.threshold 0.3 --select title,defaultBranchTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmDescription`):*
+```bash
+csdk repository list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmExternalId`):*
+```bash
+csdk repository list --where.trgmExternalId.value "approximate query" --where.trgmExternalId.threshold 0.3 --select title,externalIdTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmName`):*
+```bash
+csdk repository list --where.trgmName.value "approximate query" --where.trgmName.threshold 0.3 --select title,nameTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmProvider`):*
+```bash
+csdk repository list --where.trgmProvider.value "approximate query" --where.trgmProvider.threshold 0.3 --select title,providerTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk repository list --where.search "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmSlug`):*
+```bash
+csdk repository list --where.trgmSlug.value "approximate query" --where.trgmSlug.threshold 0.3 --select title,slugTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmVisibility`):*
+```bash
+csdk repository list --where.trgmVisibility.value "approximate query" --where.trgmVisibility.threshold 0.3 --select title,visibilityTrgmSimilarity
+```
+
+*Composite search (unifiedSearch dispatches to all text adapters):*
+```bash
+csdk repository list --where.unifiedSearch "search query" --select title,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,tsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk repository list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
+csdk repository search "query" --limit 10 --select id,title,searchScore
+```
+
+
+### `repository-event`
+
+CRUD operations for RepositoryEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all repositoryEvent records |
+| `find-first` | Find first matching repositoryEvent record |
+| `get` | Get a repositoryEvent by id |
+| `create` | Create a new repositoryEvent |
+| `update` | Update an existing repositoryEvent |
+| `delete` | Delete a repositoryEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `commitSha` | String |
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `deliveryId` | String |
+| `eventType` | String |
+| `id` | UUID |
+| `metadata` | JSON |
+| `payload` | JSON |
+| `ref` | String |
+| `repositoryId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `eventType`, `repositoryId`
+**Optional create fields (backend defaults):** `actorId`, `commitSha`, `createdByPrincipal`, `deliveryId`, `metadata`, `payload`, `ref`, `updatedByPrincipal`
+
+### `repository-required-check`
+
+CRUD operations for RepositoryRequiredCheck records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all repositoryRequiredCheck records |
+| `find-first` | Find first matching repositoryRequiredCheck record |
+| `get` | Get a repositoryRequiredCheck by id |
+| `create` | Create a new repositoryRequiredCheck |
+| `update` | Update an existing repositoryRequiredCheck |
+| `delete` | Delete a repositoryRequiredCheck |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `repositoryId` | UUID |
+| `updatedAt` | Datetime |
+| `workflowId` | UUID |
+
+**Required create fields:** `databaseId`, `repositoryId`, `workflowId`
+
+### `repository-workflow`
+
+CRUD operations for RepositoryWorkflow records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all repositoryWorkflow records |
+| `find-first` | Find first matching repositoryWorkflow record |
+| `get` | Get a repositoryWorkflow by id |
+| `create` | Create a new repositoryWorkflow |
+| `update` | Update an existing repositoryWorkflow |
+| `delete` | Delete a repositoryWorkflow |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cancelInProgress` | Boolean |
+| `concurrencyKey` | String |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `eventType` | String |
+| `graphId` | UUID |
+| `id` | UUID |
+| `inputs` | JSON |
+| `isEnabled` | Boolean |
+| `name` | String |
+| `refPattern` | String |
+| `repositoryId` | UUID |
+| `requiredSecrets` | String |
+| `slug` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `eventType`, `name`, `repositoryId`, `slug`
+**Optional create fields (backend defaults):** `cancelInProgress`, `concurrencyKey`, `createdBy`, `createdByPrincipal`, `graphId`, `inputs`, `isEnabled`, `refPattern`, `requiredSecrets`, `updatedBy`, `updatedByPrincipal`
+
 ### `resource`
 
 CRUD operations for Resource records.
@@ -2003,9 +4543,11 @@ CRUD operations for Resource records.
 | `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `errorCount` | Int |
 | `id` | UUID |
+| `imageRef` | String |
 | `installationId` | UUID |
 | `integrations` | String |
 | `kind` | String |
@@ -2027,11 +4569,13 @@ CRUD operations for Resource records.
 | `statusObserved` | JSON |
 | `storageClass` | String |
 | `storageSizeBytes` | BigInt |
+| `storageTotalBytes` | BigInt |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `databaseId`, `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `realm`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `createdByPrincipal`, `errorCount`, `imageRef`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `realm`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`, `updatedByPrincipal`
 
 ### `resource-declared-capacity`
 
@@ -2063,8 +4607,9 @@ CRUD operations for ResourceDeclaredCapacity records.
 | `source` | String |
 | `sourceId` | UUID |
 | `storageSizeBytes` | BigInt |
+| `storageTotalBytes` | BigInt |
 
-**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`
+**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`, `storageTotalBytes`
 
 ### `resource-definition`
 
@@ -2086,6 +4631,7 @@ CRUD operations for ResourceDefinition records.
 | `annotations` | JSON |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `defaultSpec` | JSON |
 | `description` | String |
@@ -2102,9 +4648,10 @@ CRUD operations for ResourceDefinition records.
 | `stepUpMinAge` | Interval |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `databaseId`, `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `defaultSpec`, `description`, `integrations`, `labels`, `paramsSchema`, `requiredConfigs`, `requiredSecrets`, `stepUpMinAge`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `createdByPrincipal`, `defaultSpec`, `description`, `integrations`, `labels`, `paramsSchema`, `requiredConfigs`, `requiredSecrets`, `stepUpMinAge`, `updatedBy`, `updatedByPrincipal`
 
 ### `resource-event`
 
@@ -2155,6 +4702,7 @@ CRUD operations for ResourceInstallation records.
 | `commitId` | UUID |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `id` | UUID |
 | `name` | String |
@@ -2166,9 +4714,48 @@ CRUD operations for ResourceInstallation records.
 | `storeId` | UUID |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `databaseId`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `commitId`, `createdBy`, `params`, `revision`, `status`, `storeId`, `updatedBy`
+**Optional create fields (backend defaults):** `commitId`, `createdBy`, `createdByPrincipal`, `params`, `revision`, `status`, `storeId`, `updatedBy`, `updatedByPrincipal`
+
+### `resource-observed-storage`
+
+CRUD operations for ResourceObservedStorage records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourceObservedStorage records |
+| `find-first` | Find first matching resourceObservedStorage record |
+| `get` | Get a resourceObservedStorage by id |
+| `create` | Create a new resourceObservedStorage |
+| `update` | Update an existing resourceObservedStorage |
+| `delete` | Delete a resourceObservedStorage |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `capacity` | String |
+| `capacityBytes` | BigInt |
+| `claimName` | String |
+| `declaredStorageClass` | String |
+| `declaredStorageSizeBytes` | BigInt |
+| `declaredStorageTotalBytes` | BigInt |
+| `installationId` | UUID |
+| `isBound` | Boolean |
+| `kind` | String |
+| `namespaceId` | UUID |
+| `phase` | String |
+| `requested` | String |
+| `requestedBytes` | BigInt |
+| `resourceId` | UUID |
+| `resourceStatus` | String |
+| `slug` | String |
+| `storageClass` | String |
+| `storageName` | String |
+
+**Required create fields:** `capacity`, `capacityBytes`, `claimName`, `declaredStorageClass`, `declaredStorageSizeBytes`, `declaredStorageTotalBytes`, `installationId`, `isBound`, `kind`, `namespaceId`, `phase`, `requested`, `requestedBytes`, `resourceId`, `resourceStatus`, `slug`, `storageClass`, `storageName`
 
 ### `resource-status-check`
 
@@ -2322,9 +4909,11 @@ CRUD operations for ResourcesHealth records.
 | `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `errorCount` | Int |
 | `id` | UUID |
+| `imageRef` | String |
 | `installationId` | UUID |
 | `integrations` | String |
 | `kind` | String |
@@ -2347,10 +4936,12 @@ CRUD operations for ResourcesHealth records.
 | `statusObserved` | JSON |
 | `storageClass` | String |
 | `storageSizeBytes` | BigInt |
+| `storageTotalBytes` | BigInt |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
-**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `databaseId`, `errorCount`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `realm`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `updatedBy`
+**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `createdByPrincipal`, `databaseId`, `errorCount`, `imageRef`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `realm`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `storageTotalBytes`, `updatedBy`, `updatedByPrincipal`
 
 ### `resources-requirements-state`
 
@@ -2430,6 +5021,7 @@ CRUD operations for WebhookEndpoint records.
 | `active` | Boolean |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `functionDefinitionId` | UUID |
 | `host` | String |
@@ -2441,9 +5033,10 @@ CRUD operations for WebhookEndpoint records.
 | `signingSecretName` | String |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
 
 **Required create fields:** `databaseId`, `functionDefinitionId`, `host`, `namespaceId`, `path`, `signingSecretName`
-**Optional create fields (backend defaults):** `active`, `createdBy`, `provider`, `replayWindowSeconds`, `updatedBy`
+**Optional create fields (backend defaults):** `active`, `createdBy`, `createdByPrincipal`, `provider`, `replayWindowSeconds`, `updatedBy`, `updatedByPrincipal`
 
 ### `webhook-event`
 
@@ -2480,6 +5073,17 @@ CRUD operations for WebhookEvent records.
 **Optional create fields (backend defaults):** `error`, `invocationCreatedAt`, `invocationId`, `payload`, `providerTimestamp`, `status`
 
 ## Custom Operations
+
+### `database-read-function-graph`
+
+databaseReadFunctionGraph
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--graphId` | UUID |
 
 ### `read-function-graph`
 
@@ -2564,6 +5168,21 @@ addNodeAndSave
   | `--input.nodeType` | String |
   | `--input.props` | JSON |
 
+### `approve-node`
+
+approveNode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.approved` | Boolean |
+  | `--input.clientMutationId` | String |
+  | `--input.executionId` | UUID |
+  | `--input.feedback` | JSON |
+  | `--input.nodeName` | String |
+
 ### `copy-graph`
 
 copyGraph
@@ -2577,6 +5196,301 @@ copyGraph
   | `--input.graphId` | UUID |
   | `--input.name` | String |
   | `--input.scopeId` | UUID |
+
+### `database-add-edge`
+
+databaseAddEdge
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.context` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.dstNode` | String |
+  | `--input.dstPort` | String |
+  | `--input.graphName` | String |
+  | `--input.rootHash` | UUID |
+  | `--input.srcNode` | String |
+  | `--input.srcPort` | String |
+
+### `database-add-edge-and-save`
+
+databaseAddEdgeAndSave
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.dstNode` | String |
+  | `--input.dstPort` | String |
+  | `--input.graphId` | UUID |
+  | `--input.message` | String |
+  | `--input.srcNode` | String |
+  | `--input.srcPort` | String |
+
+### `database-add-node`
+
+databaseAddNode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.context` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.graphName` | String |
+  | `--input.meta` | JSON |
+  | `--input.nodeName` | String |
+  | `--input.nodeType` | String |
+  | `--input.props` | JSON |
+  | `--input.rootHash` | UUID |
+
+### `database-add-node-and-save`
+
+databaseAddNodeAndSave
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.graphId` | UUID |
+  | `--input.message` | String |
+  | `--input.meta` | JSON |
+  | `--input.nodeName` | String |
+  | `--input.nodeType` | String |
+  | `--input.props` | JSON |
+
+### `database-approve-node`
+
+databaseApproveNode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.approved` | Boolean |
+  | `--input.clientMutationId` | String |
+  | `--input.executionId` | UUID |
+  | `--input.feedback` | JSON |
+  | `--input.nodeName` | String |
+
+### `database-copy-graph`
+
+databaseCopyGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.graphId` | UUID |
+  | `--input.name` | String |
+
+### `database-create-function-graph`
+
+databaseCreateFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.context` | String |
+  | `--input.createdBy` | UUID |
+  | `--input.databaseId` | UUID |
+  | `--input.definitionsCommitId` | UUID |
+  | `--input.description` | String |
+  | `--input.name` | String |
+
+### `database-graph-init-empty-repo`
+
+databaseGraphInitEmptyRepo
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
+### `database-graph-insert-node-at-path`
+
+databaseGraphInsertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.path` | String |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `database-graph-insert-nodes-at-paths`
+
+databaseGraphInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `database-graph-set-and-commit`
+
+databaseGraphSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
+### `database-graph-set-data-at-path`
+
+databaseGraphSetDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.path` | String |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `database-graph-set-many-and-commit`
+
+databaseGraphSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
+### `database-import-definitions`
+
+databaseImportDefinitions
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.contexts` | String |
+  | `--input.graphId` | UUID |
+  | `--input.sourceCommitId` | UUID |
+  | `--input.sourceScopeId` | UUID |
+
+### `database-import-graph-json`
+
+databaseImportGraphJson
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.context` | String |
+  | `--input.createdBy` | UUID |
+  | `--input.databaseId` | UUID |
+  | `--input.definitionsCommitId` | UUID |
+  | `--input.description` | String |
+  | `--input.graphJson` | JSON |
+  | `--input.name` | String |
+
+### `database-save-graph`
+
+databaseSaveGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.graphId` | UUID |
+  | `--input.message` | String |
+  | `--input.rootHash` | UUID |
+
+### `database-start-execution`
+
+databaseStartExecution
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.graphId` | UUID |
+  | `--input.inputPayload` | JSON |
+  | `--input.maxPendingJobs` | Int |
+  | `--input.maxTicks` | Int |
+  | `--input.outputNames` | String |
+  | `--input.outputNode` | String |
+  | `--input.outputPort` | String |
+  | `--input.parentExecutionId` | UUID |
+  | `--input.parentNodeName` | String |
+  | `--input.timeoutInterval` | IntervalInput |
+
+### `database-validate-function-graph`
+
+databaseValidateFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.graphId` | UUID |
 
 ### `import-definitions`
 
@@ -2641,6 +5555,42 @@ infraInsertNodeAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
+### `infra-insert-nodes-at-paths`
+
+infraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `infra-set-and-commit`
+
+infraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `infra-set-data-at-path`
 
 infraSetDataAtPath
@@ -2655,6 +5605,22 @@ infraSetDataAtPath
   | `--input.path` | String |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
+
+### `infra-set-many-and-commit`
+
+infraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `init-empty-repo`
 
@@ -2683,6 +5649,23 @@ insertNodeAtPath
   | `--input.kids` | UUID |
   | `--input.ktree` | String |
   | `--input.path` | String |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `insert-nodes-at-paths`
+
+insertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
@@ -2716,6 +5699,42 @@ platformInfraInsertNodeAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
+### `platform-infra-insert-nodes-at-paths`
+
+platformInfraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `platform-infra-set-and-commit`
+
+platformInfraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `platform-infra-set-data-at-path`
 
 platformInfraSetDataAtPath
@@ -2730,6 +5749,22 @@ platformInfraSetDataAtPath
   | `--input.path` | String |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
+
+### `platform-infra-set-many-and-commit`
+
+platformInfraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `platform-resource-installations-install`
 
@@ -2787,10 +5822,11 @@ platformResourceInstallationsUpgrade
 
 ### `provision-bucket`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**
@@ -2868,6 +5904,25 @@ saveGraph
   | `--input.message` | String |
   | `--input.rootHash` | UUID |
 
+### `set-and-commit`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `set-data-at-path`
 
 setDataAtPath
@@ -2882,6 +5937,22 @@ setDataAtPath
   | `--input.path` | String |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
+
+### `set-many-and-commit`
+
+setManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `start-execution`
 

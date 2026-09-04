@@ -1,13 +1,13 @@
 ---
 name: orm-agent
-description: ORM client for the agent API — provides typed CRUD operations for 9 tables and 1 custom operations
+description: ORM client for the agent API — provides typed CRUD operations for 21 tables and 1 custom operations
 ---
 
 # orm-agent
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the agent API — provides typed CRUD operations for 9 tables and 1 custom operations
+ORM client for the agent API — provides typed CRUD operations for 21 tables and 1 custom operations
 
 ## Usage
 
@@ -46,4 +46,16 @@ See the `references/` directory for detailed per-entity API documentation:
 - [agent-resource](references/agent-resource.md)
 - [agent-task](references/agent-task.md)
 - [agent-thread](references/agent-thread.md)
+- [platform-agent](references/platform-agent.md)
+- [platform-agent-event](references/platform-agent-event.md)
+- [platform-agent-message](references/platform-agent-message.md)
+- [platform-agent-persona](references/platform-agent-persona.md)
+- [platform-agent-plan](references/platform-agent-plan.md)
+- [platform-agent-prompt](references/platform-agent-prompt.md)
+- [platform-agent-resource-chunk](references/platform-agent-resource-chunk.md)
+- [platform-agent-resource](references/platform-agent-resource.md)
+- [platform-agent-run](references/platform-agent-run.md)
+- [platform-agent-run-workspace](references/platform-agent-run-workspace.md)
+- [platform-agent-task](references/platform-agent-task.md)
+- [platform-agent-thread](references/platform-agent-thread.md)
 - [provision-bucket](references/provision-bucket.md)

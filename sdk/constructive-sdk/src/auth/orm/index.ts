@@ -17,6 +17,8 @@ import { PrincipalScopeOverrideModel } from './models/principalScopeOverride';
 import { RoleTypeModel } from './models/roleType';
 import { UserConnectedAccountModel } from './models/userConnectedAccount';
 import { UserModel } from './models/user';
+import { UserSettingModel } from './models/userSetting';
+import { UserSettingsSecurityModel } from './models/userSettingsSecurity';
 import { WebauthnCredentialModel } from './models/webauthnCredential';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
@@ -65,6 +67,8 @@ export function createClient(config: OrmClientConfig) {
     roleType: new RoleTypeModel(client),
     userConnectedAccount: new UserConnectedAccountModel(client),
     user: new UserModel(client),
+    userSetting: new UserSettingModel(client),
+    userSettingsSecurity: new UserSettingsSecurityModel(client),
     webauthnCredential: new WebauthnCredentialModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),

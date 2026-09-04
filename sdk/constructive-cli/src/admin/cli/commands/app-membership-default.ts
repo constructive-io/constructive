@@ -18,11 +18,13 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   createdAt: 'string',
   createdBy: 'uuid',
+  createdByPrincipal: 'uuid',
   id: 'uuid',
   isApproved: 'boolean',
   isVerified: 'boolean',
   updatedAt: 'string',
   updatedBy: 'uuid',
+  updatedByPrincipal: 'uuid',
 };
 const usage =
   '\napp-membership-default <command>\n\nCommands:\n  list                  List appMembershipDefault records\n  find-first            Find first matching appMembershipDefault record\n  get                   Get a appMembershipDefault by ID\n  create                Create a new appMembershipDefault\n  update                Update an existing appMembershipDefault\n  delete                Delete a appMembershipDefault\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -77,11 +79,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       id: true,
       isApproved: true,
       isVerified: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -108,11 +112,13 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       id: true,
       isApproved: true,
       isVerified: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -151,11 +157,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           id: true,
           isApproved: true,
           isVerified: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -175,6 +183,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'createdBy',
         message: 'createdBy',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -199,6 +214,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -210,18 +232,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           isApproved: cleanedData.isApproved,
           isVerified: cleanedData.isVerified,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           id: true,
           isApproved: true,
           isVerified: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -251,6 +277,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'boolean',
         name: 'isApproved',
         message: 'isApproved',
@@ -271,6 +304,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AppMembershipDefaultPatch;
@@ -282,18 +322,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           isApproved: cleanedData.isApproved,
           isVerified: cleanedData.isVerified,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           id: true,
           isApproved: true,
           isVerified: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();

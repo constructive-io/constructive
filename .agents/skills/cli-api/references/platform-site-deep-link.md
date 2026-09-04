@@ -12,8 +12,8 @@ csdk platform-site-deep-link list --where.<field>.<op> <value> --orderBy <values
 csdk platform-site-deep-link list --limit 10 --after <cursor>
 csdk platform-site-deep-link find-first --where.<field>.<op> <value>
 csdk platform-site-deep-link get --id <UUID>
-csdk platform-site-deep-link create --appPath <String> --siteId <UUID> --slug <String> [--fallbackUrl <String>] [--metadata <JSON>] [--webPath <String>]
-csdk platform-site-deep-link update --id <UUID> [--appPath <String>] [--fallbackUrl <String>] [--metadata <JSON>] [--siteId <UUID>] [--slug <String>] [--webPath <String>]
+csdk platform-site-deep-link create --appPath <String> --siteId <UUID> --slug <String> [--fallbackUrl <String>] [--metadata <JSON>] [--pageId <UUID>] [--webPath <String>]
+csdk platform-site-deep-link update --id <UUID> [--appPath <String>] [--fallbackUrl <String>] [--metadata <JSON>] [--pageId <UUID>] [--siteId <UUID>] [--slug <String>] [--webPath <String>]
 csdk platform-site-deep-link delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-site-deep-link list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformSiteDeepLink
 
 ```bash
-csdk platform-site-deep-link create --appPath <String> --siteId <UUID> --slug <String> [--fallbackUrl <String>] [--metadata <JSON>] [--webPath <String>]
+csdk platform-site-deep-link create --appPath <String> --siteId <UUID> --slug <String> [--fallbackUrl <String>] [--metadata <JSON>] [--pageId <UUID>] [--webPath <String>]
 ```
 
 ### Get a platformSiteDeepLink by id

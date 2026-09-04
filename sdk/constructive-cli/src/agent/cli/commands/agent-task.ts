@@ -32,6 +32,7 @@ const fieldSchema: FieldSchema = {
   source: 'string',
   status: 'string',
   updatedAt: 'string',
+  visibility: 'string',
 };
 const usage =
   '\nagent-task <command>\n\nCommands:\n  list                  List agentTask records\n  find-first            Find first matching agentTask record\n  get                   Get a agentTask by ID\n  create                Create a new agentTask\n  update                Update an existing agentTask\n  delete                Delete a agentTask\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -100,6 +101,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       source: true,
       status: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentTaskSelect, AgentTaskFilter, AgentTaskOrderBy> & {
@@ -136,6 +138,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       source: true,
       status: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentTaskSelect, AgentTaskFilter, AgentTaskOrderBy> & {
@@ -184,6 +187,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           source: true,
           status: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -287,6 +291,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateAgentTaskInput['agentTask'];
@@ -307,6 +318,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           requiresApproval: cleanedData.requiresApproval,
           source: cleanedData.source,
           status: cleanedData.status,
+          visibility: cleanedData.visibility,
         },
         select: {
           actorId: true,
@@ -325,6 +337,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           source: true,
           status: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -434,6 +447,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentTaskPatch;
@@ -457,6 +477,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           requiresApproval: cleanedData.requiresApproval,
           source: cleanedData.source,
           status: cleanedData.status,
+          visibility: cleanedData.visibility,
         },
         select: {
           actorId: true,
@@ -475,6 +496,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           source: true,
           status: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();

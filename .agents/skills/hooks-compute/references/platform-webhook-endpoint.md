@@ -7,8 +7,8 @@ Webhook route authority: (host, path) -> function task_identifier invoked throug
 ## Usage
 
 ```typescript
-usePlatformWebhookEndpointsQuery({ selection: { fields: { active: true, createdAt: true, createdBy: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } } })
-usePlatformWebhookEndpointQuery({ id: '<UUID>', selection: { fields: { active: true, createdAt: true, createdBy: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } } })
+usePlatformWebhookEndpointsQuery({ selection: { fields: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
+usePlatformWebhookEndpointQuery({ id: '<UUID>', selection: { fields: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
 useCreatePlatformWebhookEndpointMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformWebhookEndpointMutation({ selection: { fields: { id: true } } })
 useDeletePlatformWebhookEndpointMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformWebhookEndpointMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformWebhookEndpointsQuery({
-  selection: { fields: { active: true, createdAt: true, createdBy: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformWebhookEndpointsQuery({
 const { mutate } = useCreatePlatformWebhookEndpointMutation({
   selection: { fields: { id: true } },
 });
-mutate({ active: '<Boolean>', createdBy: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>' });
+mutate({ active: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```

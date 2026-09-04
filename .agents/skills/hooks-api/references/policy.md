@@ -7,8 +7,8 @@ React Query hooks for Policy data operations
 ## Usage
 
 ```typescript
-usePoliciesQuery({ selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } } })
-usePolicyQuery({ id: '<UUID>', selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } } })
+usePoliciesQuery({ selection: { fields: { category: true, columnRefs: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } } })
+usePolicyQuery({ id: '<UUID>', selection: { fields: { category: true, columnRefs: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } } })
 useCreatePolicyMutation({ selection: { fields: { id: true } } })
 useUpdatePolicyMutation({ selection: { fields: { id: true } } })
 useDeletePolicyMutation({})
@@ -20,7 +20,7 @@ useDeletePolicyMutation({})
 
 ```typescript
 const { data, isLoading } = usePoliciesQuery({
-  selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
+  selection: { fields: { category: true, columnRefs: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePoliciesQuery({
 const { mutate } = useCreatePolicyMutation({
   selection: { fields: { id: true } },
 });
-mutate({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', derivedFromPolicyId: '<UUID>', derivedFromTableId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' });
+mutate({ category: '<ObjectCategory>', columnRefs: '<String>', data: '<JSON>', databaseId: '<UUID>', derivedFromPolicyId: '<UUID>', derivedFromTableId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' });
 ```

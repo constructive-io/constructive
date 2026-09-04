@@ -38,27 +38,41 @@ csdk auth set-token <your-token>
 | `role-type` | roleType CRUD operations |
 | `user-connected-account` | userConnectedAccount CRUD operations |
 | `user` | user CRUD operations |
+| `user-setting` | userSetting CRUD operations |
+| `user-settings-security` | userSettingsSecurity CRUD operations |
 | `webauthn-credential` | webauthnCredential CRUD operations |
 | `current-ip-address` | currentIpAddress |
 | `current-user` | currentUser |
 | `current-user-agent` | currentUserAgent |
 | `current-user-id` | currentUserId |
+| `get-mfa-status` | getMfaStatus |
 | `require-step-up` | requireStepUp |
+| `approve-device` | approveDevice |
 | `check-password` | checkPassword |
+| `complete-mfa-challenge` | completeMfaChallenge |
 | `confirm-delete-account` | confirmDeleteAccount |
+| `confirm-totp-setup` | confirmTotpSetup |
 | `create-api-key` | createApiKey |
 | `create-org-api-key` | createOrgApiKey |
 | `create-org-principal` | createOrgPrincipal |
 | `delete-org-principal` | deleteOrgPrincipal |
 | `delete-principal` | deletePrincipal |
+| `disable-email-mfa` | disableEmailMfa |
+| `disable-sms-mfa` | disableSmsMfa |
+| `disable-totp` | disableTotp |
 | `disconnect-account` | disconnectAccount |
+| `enable-email-mfa` | enableEmailMfa |
+| `enable-sms-mfa` | enableSmsMfa |
+| `enable-totp` | enableTotp |
 | `extend-token-expires` | extendTokenExpires |
 | `forgot-password` | forgotPassword |
+| `generate-backup-codes` | generateBackupCodes |
 | `link-identity` | linkIdentity |
-| `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `provision-bucket` | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
 | `provision-new-user` | provisionNewUser |
 | `request-cross-origin-token` | requestCrossOriginToken |
 | `reset-password` | resetPassword |
@@ -70,9 +84,11 @@ and lifecycle settings. |
 | `set-password` | setPassword |
 | `sign-in` | signIn |
 | `sign-in-cross-origin` | signInCrossOrigin |
+| `sign-in-magic-link` | signInMagicLink |
 | `sign-in-sms-otp` | signInSmsOtp |
 | `sign-out` | signOut |
 | `sign-up` | signUp |
+| `sign-up-magic-link` | signUpMagicLink |
 | `sign-up-sms` | signUpSms |
 | `verify-email` | verifyEmail |
 | `verify-password` | verifyPassword |
@@ -484,6 +500,60 @@ csdk user search "query" --limit 10 --select id,title,searchScore
 ```
 
 
+### `user-setting`
+
+CRUD operations for UserSetting records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all userSetting records |
+| `find-first` | Find first matching userSetting record |
+| `get` | Get a userSetting by id |
+| `create` | Create a new userSetting |
+| `update` | Update an existing userSetting |
+| `delete` | Delete a userSetting |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `ownerId` | UUID |
+| `updatedAt` | Datetime |
+
+**Optional create fields (backend defaults):** `ownerId`
+
+### `user-settings-security`
+
+CRUD operations for UserSettingsSecurity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all userSettingsSecurity records |
+| `find-first` | Find first matching userSettingsSecurity record |
+| `get` | Get a userSettingsSecurity by id |
+| `create` | Create a new userSettingsSecurity |
+| `update` | Update an existing userSettingsSecurity |
+| `delete` | Delete a userSettingsSecurity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `backupCodesCount` | Int |
+| `createdAt` | Datetime |
+| `emailMfaEnabled` | Boolean |
+| `id` | UUID |
+| `mfaEnrolledAt` | Datetime |
+| `mfaLastUsedAt` | Datetime |
+| `ownerId` | UUID |
+| `smsMfaEnabled` | Boolean |
+| `totpEnabled` | Boolean |
+| `updatedAt` | Datetime |
+
+**Optional create fields (backend defaults):** `backupCodesCount`, `emailMfaEnabled`, `mfaEnrolledAt`, `mfaLastUsedAt`, `ownerId`, `smsMfaEnabled`, `totpEnabled`
+
 ### `webauthn-credential`
 
 CRUD operations for WebauthnCredential records.
@@ -549,6 +619,13 @@ currentUserId
 - **Type:** query
 - **Arguments:** none
 
+### `get-mfa-status`
+
+getMfaStatus
+
+- **Type:** query
+- **Arguments:** none
+
 ### `require-step-up`
 
 requireStepUp
@@ -559,6 +636,18 @@ requireStepUp
   | Argument | Type |
   |----------|------|
   | `--stepUpType` | String |
+
+### `approve-device`
+
+approveDevice
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.approvalToken` | String (required) |
+  | `--input.clientMutationId` | String |
 
 ### `check-password`
 
@@ -572,6 +661,26 @@ checkPassword
   | `--input.clientMutationId` | String |
   | `--input.password` | String |
 
+### `complete-mfa-challenge`
+
+completeMfaChallenge
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.authMethod` | String |
+  | `--input.clientMutationId` | String |
+  | `--input.credentialKind` | String |
+  | `--input.deviceToken` | String |
+  | `--input.mfaChallengeToken` | String |
+  | `--input.mfaMethod` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.totpCode` | String |
+  | `--input.trustDevice` | Boolean |
+  | `--input.userId` | UUID |
+
 ### `confirm-delete-account`
 
 confirmDeleteAccount
@@ -584,6 +693,18 @@ confirmDeleteAccount
   | `--input.clientMutationId` | String |
   | `--input.token` | String |
   | `--input.userId` | UUID |
+
+### `confirm-totp-setup`
+
+confirmTotpSetup
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.totpValue` | String (required) |
 
 ### `create-api-key`
 
@@ -658,6 +779,40 @@ deletePrincipal
   | `--input.clientMutationId` | String |
   | `--input.principalId` | UUID |
 
+### `disable-email-mfa`
+
+disableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+
+### `disable-sms-mfa`
+
+disableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+
+### `disable-totp`
+
+disableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.totpValue` | String (required) |
+
 ### `disconnect-account`
 
 disconnectAccount
@@ -668,6 +823,39 @@ disconnectAccount
   | Argument | Type |
   |----------|------|
   | `--input.accountId` | UUID (required) |
+  | `--input.clientMutationId` | String |
+
+### `enable-email-mfa`
+
+enableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+
+### `enable-sms-mfa`
+
+enableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+
+### `enable-totp`
+
+enableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
   | `--input.clientMutationId` | String |
 
 ### `extend-token-expires`
@@ -694,6 +882,17 @@ forgotPassword
   | `--input.clientMutationId` | String |
   | `--input.email` | Email |
 
+### `generate-backup-codes`
+
+generateBackupCodes
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+
 ### `link-identity`
 
 linkIdentity
@@ -710,10 +909,11 @@ linkIdentity
 
 ### `provision-bucket`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**
@@ -868,6 +1068,21 @@ signInCrossOrigin
   | `--input.credentialKind` | String |
   | `--input.token` | String |
 
+### `sign-in-magic-link`
+
+signInMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.credentialKind` | String |
+  | `--input.deviceToken` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.token` | String |
+
 ### `sign-in-sms-otp`
 
 signInSmsOtp
@@ -911,6 +1126,21 @@ signUp
   | `--input.email` | String |
   | `--input.password` | String |
   | `--input.rememberMe` | Boolean |
+
+### `sign-up-magic-link`
+
+signUpMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.credentialKind` | String |
+  | `--input.deviceToken` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.token` | String |
 
 ### `sign-up-sms`
 
