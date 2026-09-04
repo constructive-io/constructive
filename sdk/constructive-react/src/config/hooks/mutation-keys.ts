@@ -26,6 +26,24 @@ export const configMutationKeys = {
   /** Delete config mutation key */ delete: (id: string | number) =>
     ['mutation', 'config', 'delete', id] as const,
 } as const;
+export const internalConfigMutationKeys = {
+  /** All internalConfig mutation keys */ all: ['mutation', 'internalconfig'] as const,
+  /** Create internalConfig mutation key */ create: () =>
+    ['mutation', 'internalconfig', 'create'] as const,
+  /** Update internalConfig mutation key */ update: (id: string | number) =>
+    ['mutation', 'internalconfig', 'update', id] as const,
+  /** Delete internalConfig mutation key */ delete: (id: string | number) =>
+    ['mutation', 'internalconfig', 'delete', id] as const,
+} as const;
+export const internalSecretMutationKeys = {
+  /** All internalSecret mutation keys */ all: ['mutation', 'internalsecret'] as const,
+  /** Create internalSecret mutation key */ create: () =>
+    ['mutation', 'internalsecret', 'create'] as const,
+  /** Update internalSecret mutation key */ update: (id: string | number) =>
+    ['mutation', 'internalsecret', 'update', id] as const,
+  /** Delete internalSecret mutation key */ delete: (id: string | number) =>
+    ['mutation', 'internalsecret', 'delete', id] as const,
+} as const;
 export const platformConfigMutationKeys = {
   /** All platformConfig mutation keys */ all: ['mutation', 'platformconfig'] as const,
   /** Create platformConfig mutation key */ create: () =>
@@ -34,6 +52,18 @@ export const platformConfigMutationKeys = {
     ['mutation', 'platformconfig', 'update', id] as const,
   /** Delete platformConfig mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformconfig', 'delete', id] as const,
+} as const;
+export const platformInternalConfigMutationKeys = {
+  /** All platformInternalConfig mutation keys */ all: [
+    'mutation',
+    'platforminternalconfig',
+  ] as const,
+  /** Create platformInternalConfig mutation key */ create: () =>
+    ['mutation', 'platforminternalconfig', 'create'] as const,
+  /** Update platformInternalConfig mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminternalconfig', 'update', id] as const,
+  /** Delete platformInternalConfig mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminternalconfig', 'delete', id] as const,
 } as const;
 export const platformInternalSecretMutationKeys = {
   /** All platformInternalSecret mutation keys */ all: [
@@ -70,6 +100,24 @@ export const secretMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
+  /** Mutation key for _internalSecretsDel */ _internalSecretsDel: (identifier?: string) =>
+    identifier
+      ? (['mutation', '_internalSecretsDel', identifier] as const)
+      : (['mutation', '_internalSecretsDel'] as const),
+  /** Mutation key for _internalSecretsRemoveArray */ _internalSecretsRemoveArray: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', '_internalSecretsRemoveArray', identifier] as const)
+      : (['mutation', '_internalSecretsRemoveArray'] as const),
+  /** Mutation key for _internalSecretsRotate */ _internalSecretsRotate: (identifier?: string) =>
+    identifier
+      ? (['mutation', '_internalSecretsRotate', identifier] as const)
+      : (['mutation', '_internalSecretsRotate'] as const),
+  /** Mutation key for _internalSecretsSet */ _internalSecretsSet: (identifier?: string) =>
+    identifier
+      ? (['mutation', '_internalSecretsSet', identifier] as const)
+      : (['mutation', '_internalSecretsSet'] as const),
   /** Mutation key for _secretsDel */ _secretsDel: (identifier?: string) =>
     identifier
       ? (['mutation', '_secretsDel', identifier] as const)
@@ -157,7 +205,10 @@ export const customMutationKeys = {
  */
 export const mutationKeys = {
   config: configMutationKeys,
+  internalConfig: internalConfigMutationKeys,
+  internalSecret: internalSecretMutationKeys,
   platformConfig: platformConfigMutationKeys,
+  platformInternalConfig: platformInternalConfigMutationKeys,
   platformInternalSecret: platformInternalSecretMutationKeys,
   platformSecret: platformSecretMutationKeys,
   secret: secretMutationKeys,

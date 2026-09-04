@@ -9,7 +9,7 @@ Message within an agent thread with TextPart/ToolPart jsonb parts
 ```typescript
 db.agentMessage.findMany({ select: { id: true } }).execute()
 db.agentMessage.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.agentMessage.create({ data: { actorId: '<UUID>', agentId: '<UUID>', authorRole: '<String>', databaseId: '<UUID>', model: '<String>', parts: '<JSON>', threadId: '<UUID>' }, select: { id: true } }).execute()
+db.agentMessage.create({ data: { actorId: '<UUID>', agentId: '<UUID>', authorRole: '<String>', databaseId: '<UUID>', kind: '<String>', model: '<String>', parts: '<JSON>', threadId: '<UUID>', visibility: '<String>' }, select: { id: true } }).execute()
 db.agentMessage.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.agentMessage.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.agentMessage.findMany({
 
 ```typescript
 const item = await db.agentMessage.create({
-  data: { actorId: '<UUID>', agentId: '<UUID>', authorRole: '<String>', databaseId: '<UUID>', model: '<String>', parts: '<JSON>', threadId: '<UUID>' },
+  data: { actorId: '<UUID>', agentId: '<UUID>', authorRole: '<String>', databaseId: '<UUID>', kind: '<String>', model: '<String>', parts: '<JSON>', threadId: '<UUID>', visibility: '<String>' },
   select: { id: true }
 }).execute();
 ```

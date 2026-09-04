@@ -4,18 +4,18 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export { AppAdminGrantModel } from './appAdminGrant';
+export { AppCapabilityDefaultCapabilityModel } from './appCapabilityDefaultCapability';
+export { AppCapabilityDefaultGrantModel } from './appCapabilityDefaultGrant';
 export { AppClaimedInviteModel } from './appClaimedInvite';
 export { AppGrantModel } from './appGrant';
 export { AppInviteModel } from './appInvite';
 export { AppMembershipModel } from './appMembership';
 export { AppMembershipDefaultModel } from './appMembershipDefault';
 export { AppOwnerGrantModel } from './appOwnerGrant';
-export { AppPermissionModel } from './appPermission';
-export { AppPermissionDefaultModel } from './appPermissionDefault';
-export { AppPermissionDefaultGrantModel } from './appPermissionDefaultGrant';
-export { AppPermissionDefaultPermissionModel } from './appPermissionDefaultPermission';
 export { MembershipTypeModel } from './membershipType';
 export { OrgAdminGrantModel } from './orgAdminGrant';
+export { OrgCapabilityDefaultCapabilityModel } from './orgCapabilityDefaultCapability';
+export { OrgCapabilityDefaultGrantModel } from './orgCapabilityDefaultGrant';
 export { OrgChartEdgeModel } from './orgChartEdge';
 export { OrgChartEdgeGrantModel } from './orgChartEdgeGrant';
 export { OrgClaimedInviteModel } from './orgClaimedInvite';
@@ -29,7 +29,3 @@ export { OrgMembershipModel } from './orgMembership';
 export { OrgMembershipDefaultModel } from './orgMembershipDefault';
 export { OrgMembershipSettingModel } from './orgMembershipSetting';
 export { OrgOwnerGrantModel } from './orgOwnerGrant';
-export { OrgPermissionModel } from './orgPermission';
-export { OrgPermissionDefaultModel } from './orgPermissionDefault';
-export { OrgPermissionDefaultGrantModel } from './orgPermissionDefaultGrant';
-export { OrgPermissionDefaultPermissionModel } from './orgPermissionDefaultPermission';

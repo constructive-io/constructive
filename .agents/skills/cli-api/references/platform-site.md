@@ -12,8 +12,8 @@ csdk platform-site list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-site list --limit 10 --after <cursor>
 csdk platform-site find-first --where.<field>.<op> <value>
 csdk platform-site get --id <UUID>
-csdk platform-site create --name <String> [--activeCommitId <UUID>] [--bucketId <UUID>] [--description <String>] [--installationId <UUID>] [--installationMemberSlug <String>] [--isPublished <Boolean>] [--resourceId <UUID>] [--title <String>]
-csdk platform-site update --id <UUID> [--activeCommitId <UUID>] [--bucketId <UUID>] [--description <String>] [--installationId <UUID>] [--installationMemberSlug <String>] [--isPublished <Boolean>] [--name <String>] [--resourceId <UUID>] [--title <String>]
+csdk platform-site create --name <String> [--activeCommitId <UUID>] [--bucketId <UUID>] [--createdByPrincipal <UUID>] [--description <String>] [--installationId <UUID>] [--installationMemberSlug <String>] [--isPublished <Boolean>] [--resourceId <UUID>] [--title <String>] [--updatedByPrincipal <UUID>]
+csdk platform-site update --id <UUID> [--activeCommitId <UUID>] [--bucketId <UUID>] [--createdByPrincipal <UUID>] [--description <String>] [--installationId <UUID>] [--installationMemberSlug <String>] [--isPublished <Boolean>] [--name <String>] [--resourceId <UUID>] [--title <String>] [--updatedByPrincipal <UUID>]
 csdk platform-site delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-site list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformSite
 
 ```bash
-csdk platform-site create --name <String> [--activeCommitId <UUID>] [--bucketId <UUID>] [--description <String>] [--installationId <UUID>] [--installationMemberSlug <String>] [--isPublished <Boolean>] [--resourceId <UUID>] [--title <String>]
+csdk platform-site create --name <String> [--activeCommitId <UUID>] [--bucketId <UUID>] [--createdByPrincipal <UUID>] [--description <String>] [--installationId <UUID>] [--installationMemberSlug <String>] [--isPublished <Boolean>] [--resourceId <UUID>] [--title <String>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a platformSite by id

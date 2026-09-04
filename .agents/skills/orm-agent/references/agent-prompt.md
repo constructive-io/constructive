@@ -9,7 +9,7 @@ Shared system prompt templates for agent conversations
 ```typescript
 db.agentPrompt.findMany({ select: { id: true } }).execute()
 db.agentPrompt.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.agentPrompt.create({ data: { content: '<String>', createdBy: '<UUID>', databaseId: '<UUID>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>', name: '<String>', updatedBy: '<UUID>' }, select: { id: true } }).execute()
+db.agentPrompt.create({ data: { content: '<String>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>', name: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute()
 db.agentPrompt.update({ where: { id: '<UUID>' }, data: { content: '<String>' }, select: { id: true } }).execute()
 db.agentPrompt.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.agentPrompt.findMany({
 
 ```typescript
 const item = await db.agentPrompt.create({
-  data: { content: '<String>', createdBy: '<UUID>', databaseId: '<UUID>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>', name: '<String>', updatedBy: '<UUID>' },
+  data: { content: '<String>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>', name: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

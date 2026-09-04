@@ -42,22 +42,14 @@ export const apiSettingMutationKeys = {
   /** Delete apiSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'apisetting', 'delete', id] as const,
 } as const;
-export const appComponentMutationKeys = {
-  /** All appComponent mutation keys */ all: ['mutation', 'appcomponent'] as const,
-  /** Create appComponent mutation key */ create: () =>
-    ['mutation', 'appcomponent', 'create'] as const,
-  /** Update appComponent mutation key */ update: (id: string | number) =>
-    ['mutation', 'appcomponent', 'update', id] as const,
-  /** Delete appComponent mutation key */ delete: (id: string | number) =>
-    ['mutation', 'appcomponent', 'delete', id] as const,
-} as const;
-export const appMutationKeys = {
-  /** All app mutation keys */ all: ['mutation', 'app'] as const,
-  /** Create app mutation key */ create: () => ['mutation', 'app', 'create'] as const,
-  /** Update app mutation key */ update: (id: string | number) =>
-    ['mutation', 'app', 'update', id] as const,
-  /** Delete app mutation key */ delete: (id: string | number) =>
-    ['mutation', 'app', 'delete', id] as const,
+export const astMigrationMutationKeys = {
+  /** All astMigration mutation keys */ all: ['mutation', 'astmigration'] as const,
+  /** Create astMigration mutation key */ create: () =>
+    ['mutation', 'astmigration', 'create'] as const,
+  /** Update astMigration mutation key */ update: (id: string | number) =>
+    ['mutation', 'astmigration', 'update', id] as const,
+  /** Delete astMigration mutation key */ delete: (id: string | number) =>
+    ['mutation', 'astmigration', 'delete', id] as const,
 } as const;
 export const checkConstraintMutationKeys = {
   /** All checkConstraint mutation keys */ all: ['mutation', 'checkconstraint'] as const,
@@ -279,14 +271,6 @@ export const hostnameBindingMutationKeys = {
     ['mutation', 'hostnamebinding', 'update', id] as const,
   /** Delete hostnameBinding mutation key */ delete: (id: string | number) =>
     ['mutation', 'hostnamebinding', 'delete', id] as const,
-} as const;
-export const httpRouteMutationKeys = {
-  /** All httpRoute mutation keys */ all: ['mutation', 'httproute'] as const,
-  /** Create httpRoute mutation key */ create: () => ['mutation', 'httproute', 'create'] as const,
-  /** Update httpRoute mutation key */ update: (id: string | number) =>
-    ['mutation', 'httproute', 'update', id] as const,
-  /** Delete httpRoute mutation key */ delete: (id: string | number) =>
-    ['mutation', 'httproute', 'delete', id] as const,
 } as const;
 export const indexMutationKeys = {
   /** All index mutation keys */ all: ['mutation', 'index'] as const,
@@ -560,6 +544,14 @@ export const pubkeySettingMutationKeys = {
   /** Delete pubkeySetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'pubkeysetting', 'delete', id] as const,
 } as const;
+export const redirectMutationKeys = {
+  /** All redirect mutation keys */ all: ['mutation', 'redirect'] as const,
+  /** Create redirect mutation key */ create: () => ['mutation', 'redirect', 'create'] as const,
+  /** Update redirect mutation key */ update: (id: string | number) =>
+    ['mutation', 'redirect', 'update', id] as const,
+  /** Delete redirect mutation key */ delete: (id: string | number) =>
+    ['mutation', 'redirect', 'delete', id] as const,
+} as const;
 export const rlsSettingMutationKeys = {
   /** All rlsSetting mutation keys */ all: ['mutation', 'rlssetting'] as const,
   /** Create rlsSetting mutation key */ create: () => ['mutation', 'rlssetting', 'create'] as const,
@@ -680,6 +672,14 @@ export const spatialRelationMutationKeys = {
   /** Delete spatialRelation mutation key */ delete: (id: string | number) =>
     ['mutation', 'spatialrelation', 'delete', id] as const,
 } as const;
+export const sqlActionMutationKeys = {
+  /** All sqlAction mutation keys */ all: ['mutation', 'sqlaction'] as const,
+  /** Create sqlAction mutation key */ create: () => ['mutation', 'sqlaction', 'create'] as const,
+  /** Update sqlAction mutation key */ update: (id: string | number) =>
+    ['mutation', 'sqlaction', 'update', id] as const,
+  /** Delete sqlAction mutation key */ delete: (id: string | number) =>
+    ['mutation', 'sqlaction', 'delete', id] as const,
+} as const;
 export const tableBehaviorMutationKeys = {
   /** All tableBehavior mutation keys */ all: ['mutation', 'tablebehavior'] as const,
   /** Create tableBehavior mutation key */ create: () =>
@@ -799,22 +799,18 @@ export const webauthnSettingMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
+  /** Mutation key for acceptDatabaseTransfer */ acceptDatabaseTransfer: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'acceptDatabaseTransfer', identifier] as const)
+      : (['mutation', 'acceptDatabaseTransfer'] as const),
   /** Mutation key for applyRls */ applyRls: (identifier?: string) =>
     identifier
       ? (['mutation', 'applyRls', identifier] as const)
       : (['mutation', 'applyRls'] as const),
-  /** Mutation key for appsInstallApp */ appsInstallApp: (identifier?: string) =>
+  /** Mutation key for cancelDatabaseTransfer */ cancelDatabaseTransfer: (identifier?: string) =>
     identifier
-      ? (['mutation', 'appsInstallApp', identifier] as const)
-      : (['mutation', 'appsInstallApp'] as const),
-  /** Mutation key for appsUninstallApp */ appsUninstallApp: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'appsUninstallApp', identifier] as const)
-      : (['mutation', 'appsUninstallApp'] as const),
-  /** Mutation key for appsUpgradeApp */ appsUpgradeApp: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'appsUpgradeApp', identifier] as const)
-      : (['mutation', 'appsUpgradeApp'] as const),
+      ? (['mutation', 'cancelDatabaseTransfer', identifier] as const)
+      : (['mutation', 'cancelDatabaseTransfer'] as const),
   /** Mutation key for domainsAssignSubdomain */ domainsAssignSubdomain: (identifier?: string) =>
     identifier
       ? (['mutation', 'domainsAssignSubdomain', identifier] as const)
@@ -835,6 +831,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
       : (['mutation', 'provisionBucket'] as const),
+  /** Mutation key for rejectDatabaseTransfer */ rejectDatabaseTransfer: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'rejectDatabaseTransfer', identifier] as const)
+      : (['mutation', 'rejectDatabaseTransfer'] as const),
   /** Mutation key for requestDatabase */ requestDatabase: (identifier?: string) =>
     identifier
       ? (['mutation', 'requestDatabase', identifier] as const)
@@ -876,8 +876,7 @@ export const mutationKeys = {
   api: apiMutationKeys,
   apiSchema: apiSchemaMutationKeys,
   apiSetting: apiSettingMutationKeys,
-  appComponent: appComponentMutationKeys,
-  app: appMutationKeys,
+  astMigration: astMigrationMutationKeys,
   checkConstraint: checkConstraintMutationKeys,
   compositeType: compositeTypeMutationKeys,
   corsSetting: corsSettingMutationKeys,
@@ -903,7 +902,6 @@ export const mutationKeys = {
   fullTextSearch: fullTextSearchMutationKeys,
   function: functionMutationKeys,
   hostnameBinding: hostnameBindingMutationKeys,
-  httpRoute: httpRouteMutationKeys,
   index: indexMutationKeys,
   managedDomain: managedDomainMutationKeys,
   nodeTypeRegistry: nodeTypeRegistryMutationKeys,
@@ -932,6 +930,7 @@ export const mutationKeys = {
   policy: policyMutationKeys,
   primaryKeyConstraint: primaryKeyConstraintMutationKeys,
   pubkeySetting: pubkeySettingMutationKeys,
+  redirect: redirectMutationKeys,
   rlsSetting: rlsSettingMutationKeys,
   routeBinding: routeBindingMutationKeys,
   route: routeMutationKeys,
@@ -946,6 +945,7 @@ export const mutationKeys = {
   siteTheme: siteThemeMutationKeys,
   siteWebConfig: siteWebConfigMutationKeys,
   spatialRelation: spatialRelationMutationKeys,
+  sqlAction: sqlActionMutationKeys,
   tableBehavior: tableBehaviorMutationKeys,
   table: tableMutationKeys,
   tableGrant: tableGrantMutationKeys,
