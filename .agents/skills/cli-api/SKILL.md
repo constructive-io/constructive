@@ -1,13 +1,13 @@
 ---
 name: cli-api
-description: CLI tool (csdk) for the api API — provides CRUD commands for 80 tables and 17 custom operations
+description: CLI tool (csdk) for the api API — provides CRUD commands for 91 tables and 44 custom operations
 ---
 
 # cli-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the api API — provides CRUD commands for 80 tables and 17 custom operations
+CLI tool (csdk) for the api API — provides CRUD commands for 91 tables and 44 custom operations
 
 ## Usage
 
@@ -23,13 +23,13 @@ csdk auth set-token <token>
 csdk config set <key> <value>
 csdk config get <key>
 
-# CRUD for any table (e.g. api-schema)
-csdk api-schema list
-csdk api-schema get --id <value>
-csdk api-schema create --<field> <value>
+# CRUD for any table (e.g. api)
+csdk api list
+csdk api get --id <value>
+csdk api create --<field> <value>
 
 # Non-interactive mode (skip all prompts, use flags only)
-csdk --no-tty api-schema list
+csdk --no-tty api list
 ```
 
 ## Examples
@@ -40,13 +40,13 @@ csdk --no-tty api-schema list
 csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
-csdk api-schema list
+csdk api list
 ```
 
 ### Non-interactive mode (for scripts and CI)
 
 ```bash
-csdk --no-tty api-schema create --<field> <value>
+csdk --no-tty api create --<field> <value>
 ```
 
 ## References
@@ -56,9 +56,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [context](references/context.md)
 - [auth](references/auth.md)
 - [config](references/config.md)
+- [api](references/api.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
-- [apis](references/apis.md)
 - [ast-migration](references/ast-migration.md)
 - [check-constraint](references/check-constraint.md)
 - [composite-type](references/composite-type.md)
@@ -72,6 +72,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [domain-event](references/domain-event.md)
 - [domain-type](references/domain-type.md)
 - [domain-verification](references/domain-verification.md)
+- [email-identity](references/email-identity.md)
+- [email-provider-account](references/email-provider-account.md)
+- [email-site-identity](references/email-site-identity.md)
 - [embedding-chunk](references/embedding-chunk.md)
 - [enum](references/enum.md)
 - [exclusion-constraint](references/exclusion-constraint.md)
@@ -81,20 +84,25 @@ See the `references/` directory for detailed per-entity API documentation:
 - [foreign-key-constraint](references/foreign-key-constraint.md)
 - [full-text-search](references/full-text-search.md)
 - [function](references/function.md)
+- [get-site-previews-record](references/get-site-previews-record.md)
 - [hostname-binding](references/hostname-binding.md)
-- [http-route](references/http-route.md)
+- [identity-provider-registry](references/identity-provider-registry.md)
 - [index](references/index.md)
 - [managed-domain](references/managed-domain.md)
 - [node-type-registry](references/node-type-registry.md)
 - [page](references/page.md)
 - [partition](references/partition.md)
+- [platform-api](references/platform-api.md)
 - [platform-api-schema](references/platform-api-schema.md)
 - [platform-api-setting](references/platform-api-setting.md)
-- [platform-apis](references/platform-apis.md)
 - [platform-cors-setting](references/platform-cors-setting.md)
 - [platform-domain](references/platform-domain.md)
 - [platform-domain-event](references/platform-domain-event.md)
 - [platform-domain-verification](references/platform-domain-verification.md)
+- [platform-email-identity](references/platform-email-identity.md)
+- [platform-email-provider-account](references/platform-email-provider-account.md)
+- [platform-email-site-identity](references/platform-email-site-identity.md)
+- [platform-get-site-previews-record](references/platform-get-site-previews-record.md)
 - [platform-managed-domain](references/platform-managed-domain.md)
 - [platform-page](references/platform-page.md)
 - [platform-site-app-link](references/platform-site-app-link.md)
@@ -103,11 +111,13 @@ See the `references/` directory for detailed per-entity API documentation:
 - [platform-site-error-page](references/platform-site-error-page.md)
 - [platform-site-metadatum](references/platform-site-metadatum.md)
 - [platform-site-module](references/platform-site-module.md)
+- [platform-site-release](references/platform-site-release.md)
 - [platform-site-theme](references/platform-site-theme.md)
 - [platform-site-web-config](references/platform-site-web-config.md)
 - [policy](references/policy.md)
 - [primary-key-constraint](references/primary-key-constraint.md)
 - [pubkey-setting](references/pubkey-setting.md)
+- [redirect](references/redirect.md)
 - [rls-setting](references/rls-setting.md)
 - [route-binding](references/route-binding.md)
 - [route](references/route.md)
@@ -119,6 +129,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [site-error-page](references/site-error-page.md)
 - [site-metadatum](references/site-metadatum.md)
 - [site-module](references/site-module.md)
+- [site-release](references/site-release.md)
 - [site-theme](references/site-theme.md)
 - [site-web-config](references/site-web-config.md)
 - [spatial-relation](references/spatial-relation.md)
@@ -138,18 +149,45 @@ See the `references/` directory for detailed per-entity API documentation:
 - [webauthn-setting](references/webauthn-setting.md)
 - [api-schema-names](references/api-schema-names.md)
 - [apply-registry-defaults](references/apply-registry-defaults.md)
+- [get-site-preview-commit](references/get-site-preview-commit.md)
+- [get-site-release-manifest](references/get-site-release-manifest.md)
+- [page-published](references/page-published.md)
+- [platform-get-site-preview-commit](references/platform-get-site-preview-commit.md)
+- [platform-get-site-release-manifest](references/platform-get-site-release-manifest.md)
+- [platform-page-published](references/platform-page-published.md)
+- [platform-sites-deep-link-url](references/platform-sites-deep-link-url.md)
+- [platform-sites-site-origin](references/platform-sites-site-origin.md)
+- [platform-verify-site-preview-token](references/platform-verify-site-preview-token.md)
 - [resolve-deep-link](references/resolve-deep-link.md)
-- [resolve-http-route](references/resolve-http-route.md)
 - [resolve-route](references/resolve-route.md)
 - [resolve-site-app-links](references/resolve-site-app-links.md)
+- [sites-deep-link-url](references/sites-deep-link-url.md)
+- [sites-site-origin](references/sites-site-origin.md)
+- [verify-site-preview-token](references/verify-site-preview-token.md)
 - [accept-database-transfer](references/accept-database-transfer.md)
 - [apply-rls](references/apply-rls.md)
 - [cancel-database-transfer](references/cancel-database-transfer.md)
+- [delete-site-preview](references/delete-site-preview.md)
 - [domains-assign-subdomain](references/domains-assign-subdomain.md)
+- [mint-site-preview-token](references/mint-site-preview-token.md)
+- [pages-install-pages](references/pages-install-pages.md)
+- [platform-delete-site-preview](references/platform-delete-site-preview.md)
 - [platform-domains-assign-subdomain](references/platform-domains-assign-subdomain.md)
+- [platform-mint-site-preview-token](references/platform-mint-site-preview-token.md)
+- [platform-pages-install-pages](references/platform-pages-install-pages.md)
+- [platform-provision-site-preview](references/platform-provision-site-preview.md)
+- [platform-set-site-preview](references/platform-set-site-preview.md)
+- [platform-site-metadata-install-robots](references/platform-site-metadata-install-robots.md)
+- [platform-sites-install-content-preset](references/platform-sites-install-content-preset.md)
+- [platform-sites-install-mantra](references/platform-sites-install-mantra.md)
 - [platform-sites-provision-static-site](references/platform-sites-provision-static-site.md)
 - [provision-bucket](references/provision-bucket.md)
+- [provision-site-preview](references/provision-site-preview.md)
 - [reject-database-transfer](references/reject-database-transfer.md)
 - [request-database](references/request-database.md)
 - [set-field-order](references/set-field-order.md)
+- [set-site-preview](references/set-site-preview.md)
+- [site-metadata-install-robots](references/site-metadata-install-robots.md)
+- [sites-install-content-preset](references/sites-install-content-preset.md)
+- [sites-install-mantra](references/sites-install-mantra.md)
 - [sites-provision-static-site](references/sites-provision-static-site.md)

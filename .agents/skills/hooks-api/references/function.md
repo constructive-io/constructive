@@ -7,8 +7,8 @@ React Query hooks for Function data operations
 ## Usage
 
 ```typescript
-useFunctionsQuery({ selection: { fields: { databaseId: true, id: true, name: true, schemaId: true } } })
-useFunctionQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, name: true, schemaId: true } } })
+useFunctionsQuery({ selection: { fields: { apiExposed: true, arguments: true, bodyAst: true, category: true, data: true, databaseId: true, functionType: true, id: true, isStrict: true, kind: true, name: true, returns: true, schemaId: true, securityInvoker: true, smartTags: true, tags: true, volatility: true } } })
+useFunctionQuery({ id: '<UUID>', selection: { fields: { apiExposed: true, arguments: true, bodyAst: true, category: true, data: true, databaseId: true, functionType: true, id: true, isStrict: true, kind: true, name: true, returns: true, schemaId: true, securityInvoker: true, smartTags: true, tags: true, volatility: true } } })
 useCreateFunctionMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionsQuery({
-  selection: { fields: { databaseId: true, id: true, name: true, schemaId: true } },
+  selection: { fields: { apiExposed: true, arguments: true, bodyAst: true, category: true, data: true, databaseId: true, functionType: true, id: true, isStrict: true, kind: true, name: true, returns: true, schemaId: true, securityInvoker: true, smartTags: true, tags: true, volatility: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionsQuery({
 const { mutate } = useCreateFunctionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', name: '<String>', schemaId: '<UUID>' });
+mutate({ apiExposed: '<Boolean>', arguments: '<JSON>', bodyAst: '<JSON>', category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', functionType: '<String>', isStrict: '<Boolean>', kind: '<String>', name: '<String>', returns: '<JSON>', schemaId: '<UUID>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tags: '<String>', volatility: '<String>' });
 ```

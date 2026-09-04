@@ -9,7 +9,7 @@ Per-entity settings for the memberships module
 ```typescript
 db.orgMembershipSetting.findMany({ select: { id: true } }).execute()
 db.orgMembershipSetting.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgMembershipSetting.create({ data: { allowExternalMembers: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', createChildCascadeOwners: '<Boolean>', createdBy: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', entityId: '<UUID>', inviteProfileAssignmentMode: '<String>', limitAllocationMode: '<String>', populateMemberEmail: '<Boolean>', updatedBy: '<UUID>' }, select: { id: true } }).execute()
+db.orgMembershipSetting.create({ data: { allowExternalMembers: '<Boolean>', allowPrincipalOwnedApiKeys: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', createChildCascadeOwners: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', entityId: '<UUID>', inviteProfileAssignmentMode: '<String>', limitAllocationMode: '<String>', populateMemberEmail: '<Boolean>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute()
 db.orgMembershipSetting.update({ where: { id: '<UUID>' }, data: { allowExternalMembers: '<Boolean>' }, select: { id: true } }).execute()
 db.orgMembershipSetting.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.orgMembershipSetting.findMany({
 
 ```typescript
 const item = await db.orgMembershipSetting.create({
-  data: { allowExternalMembers: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', createChildCascadeOwners: '<Boolean>', createdBy: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', entityId: '<UUID>', inviteProfileAssignmentMode: '<String>', limitAllocationMode: '<String>', populateMemberEmail: '<Boolean>', updatedBy: '<UUID>' },
+  data: { allowExternalMembers: '<Boolean>', allowPrincipalOwnedApiKeys: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', createChildCascadeOwners: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', entityId: '<UUID>', inviteProfileAssignmentMode: '<String>', limitAllocationMode: '<String>', populateMemberEmail: '<Boolean>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

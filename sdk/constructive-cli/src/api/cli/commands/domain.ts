@@ -18,6 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   config: 'json',
   createdAt: 'string',
+  createdByPrincipal: 'uuid',
   databaseId: 'uuid',
   hostname: 'string',
   id: 'uuid',
@@ -29,6 +30,7 @@ const fieldSchema: FieldSchema = {
   tlsSecretName: 'string',
   tlsStatus: 'string',
   updatedAt: 'string',
+  updatedByPrincipal: 'uuid',
   verificationStatus: 'string',
   verifiedAt: 'string',
 };
@@ -85,6 +87,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       config: true,
       createdAt: true,
+      createdByPrincipal: true,
       databaseId: true,
       hostname: true,
       id: true,
@@ -96,6 +99,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       tlsSecretName: true,
       tlsStatus: true,
       updatedAt: true,
+      updatedByPrincipal: true,
       verificationStatus: true,
       verifiedAt: true,
     };
@@ -120,6 +124,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       config: true,
       createdAt: true,
+      createdByPrincipal: true,
       databaseId: true,
       hostname: true,
       id: true,
@@ -131,6 +136,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       tlsSecretName: true,
       tlsStatus: true,
       updatedAt: true,
+      updatedByPrincipal: true,
       verificationStatus: true,
       verifiedAt: true,
     };
@@ -167,6 +173,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           config: true,
           createdAt: true,
+          createdByPrincipal: true,
           databaseId: true,
           hostname: true,
           id: true,
@@ -178,6 +185,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           tlsSecretName: true,
           tlsStatus: true,
           updatedAt: true,
+          updatedByPrincipal: true,
           verificationStatus: true,
           verifiedAt: true,
         },
@@ -199,6 +207,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'json',
         name: 'config',
         message: 'config',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -265,6 +280,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'verificationStatus',
         message: 'verificationStatus',
         required: false,
@@ -285,6 +307,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           config: cleanedData.config,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           hostname: cleanedData.hostname,
           isPublished: cleanedData.isPublished,
@@ -294,12 +317,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           tlsReadyAt: cleanedData.tlsReadyAt,
           tlsSecretName: cleanedData.tlsSecretName,
           tlsStatus: cleanedData.tlsStatus,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
           verificationStatus: cleanedData.verificationStatus,
           verifiedAt: cleanedData.verifiedAt,
         },
         select: {
           config: true,
           createdAt: true,
+          createdByPrincipal: true,
           databaseId: true,
           hostname: true,
           id: true,
@@ -311,6 +336,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           tlsSecretName: true,
           tlsStatus: true,
           updatedAt: true,
+          updatedByPrincipal: true,
           verificationStatus: true,
           verifiedAt: true,
         },
@@ -343,6 +369,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
@@ -404,6 +437,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'verificationStatus',
         message: 'verificationStatus',
         required: false,
@@ -427,6 +467,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           config: cleanedData.config,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           hostname: cleanedData.hostname,
           isPublished: cleanedData.isPublished,
@@ -436,12 +477,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           tlsReadyAt: cleanedData.tlsReadyAt,
           tlsSecretName: cleanedData.tlsSecretName,
           tlsStatus: cleanedData.tlsStatus,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
           verificationStatus: cleanedData.verificationStatus,
           verifiedAt: cleanedData.verifiedAt,
         },
         select: {
           config: true,
           createdAt: true,
+          createdByPrincipal: true,
           databaseId: true,
           hostname: true,
           id: true,
@@ -453,6 +496,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           tlsSecretName: true,
           tlsStatus: true,
           updatedAt: true,
+          updatedByPrincipal: true,
           verificationStatus: true,
           verifiedAt: true,
         },

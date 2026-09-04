@@ -10,6 +10,7 @@ export type ConstructiveInternalTypeOrigin = unknown;
 export interface AuditLogAuth {
   actorId: string | null;
   createdAt: string | null;
+  details: unknown | null;
   event: string | null;
   id: string | null;
   ipAddress: string | null;
@@ -71,10 +72,14 @@ export interface PhoneNumber {
 export interface Principal {
   bypassStepUp: boolean | null;
   createdAt: string | null;
+  createdBySessionId: string | null;
+  depth: number | null;
+  expiresAt: string | null;
   id: string | null;
   isReadOnly: boolean | null;
   name: string | null;
   ownerId: string | null;
+  parentPrincipalId: string | null;
   updatedAt: string | null;
   useAdminOwner: boolean | null;
   userId: string | null;
@@ -124,6 +129,24 @@ export interface User {
   type: number | null;
   updatedAt: string | null;
   username: string | null;
+}
+export interface UserSetting {
+  createdAt: string | null;
+  id: string | null;
+  ownerId: string | null;
+  updatedAt: string | null;
+}
+export interface UserSettingsSecurity {
+  backupCodesCount: number | null;
+  createdAt: string | null;
+  emailMfaEnabled: boolean | null;
+  id: string | null;
+  mfaEnrolledAt: string | null;
+  mfaLastUsedAt: string | null;
+  ownerId: string | null;
+  smsMfaEnabled: boolean | null;
+  totpEnabled: boolean | null;
+  updatedAt: string | null;
 }
 export interface WebauthnCredential {
   backupEligible: boolean | null;

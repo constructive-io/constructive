@@ -11,17 +11,45 @@ import type {
   AddEdgeAndSaveInput,
   AddNodeInput,
   AddNodeAndSaveInput,
+  ApproveNodeInput,
   CopyGraphInput,
+  DatabaseAddEdgeInput,
+  DatabaseAddEdgeAndSaveInput,
+  DatabaseAddNodeInput,
+  DatabaseAddNodeAndSaveInput,
+  DatabaseApproveNodeInput,
+  DatabaseCopyGraphInput,
+  DatabaseCreateFunctionGraphInput,
+  DatabaseGraphInitEmptyRepoInput,
+  DatabaseGraphInsertNodeAtPathInput,
+  DatabaseGraphInsertNodesAtPathsInput,
+  DatabaseGraphSetAndCommitInput,
+  DatabaseGraphSetDataAtPathInput,
+  DatabaseGraphSetManyAndCommitInput,
+  DatabaseImportDefinitionsInput,
+  DatabaseImportGraphJsonInput,
+  DatabaseSaveGraphInput,
+  DatabaseStartExecutionInput,
+  DatabaseValidateFunctionGraphInput,
+  FunctionInvocationsCreateSyncInput,
   ImportDefinitionsInput,
   ImportGraphJsonInput,
   InfraInitEmptyRepoInput,
   InfraInsertNodeAtPathInput,
+  InfraInsertNodesAtPathsInput,
+  InfraSetAndCommitInput,
   InfraSetDataAtPathInput,
+  InfraSetManyAndCommitInput,
   InitEmptyRepoInput,
   InsertNodeAtPathInput,
+  InsertNodesAtPathsInput,
+  PlatformFunctionInvocationsCreateSyncInput,
   PlatformInfraInitEmptyRepoInput,
   PlatformInfraInsertNodeAtPathInput,
+  PlatformInfraInsertNodesAtPathsInput,
+  PlatformInfraSetAndCommitInput,
   PlatformInfraSetDataAtPathInput,
+  PlatformInfraSetManyAndCommitInput,
   PlatformResourceInstallationsInstallInput,
   PlatformResourceInstallationsRollbackInput,
   PlatformResourceInstallationsUninstallInput,
@@ -32,24 +60,54 @@ import type {
   ResourceInstallationsUninstallInput,
   ResourceInstallationsUpgradeInput,
   SaveGraphInput,
+  SetAndCommitInput,
   SetDataAtPathInput,
+  SetManyAndCommitInput,
   StartExecutionInput,
   ValidateFunctionGraphInput,
   AddEdgePayload,
   AddEdgeAndSavePayload,
   AddNodePayload,
   AddNodeAndSavePayload,
+  ApproveNodePayload,
   CopyGraphPayload,
+  DatabaseAddEdgePayload,
+  DatabaseAddEdgeAndSavePayload,
+  DatabaseAddNodePayload,
+  DatabaseAddNodeAndSavePayload,
+  DatabaseApproveNodePayload,
+  DatabaseCopyGraphPayload,
+  DatabaseCreateFunctionGraphPayload,
+  DatabaseGraphInitEmptyRepoPayload,
+  DatabaseGraphInsertNodeAtPathPayload,
+  DatabaseGraphInsertNodesAtPathsPayload,
+  DatabaseGraphSetAndCommitPayload,
+  DatabaseGraphSetDataAtPathPayload,
+  DatabaseGraphSetManyAndCommitPayload,
+  DatabaseImportDefinitionsPayload,
+  DatabaseImportGraphJsonPayload,
+  DatabaseSaveGraphPayload,
+  DatabaseStartExecutionPayload,
+  DatabaseValidateFunctionGraphPayload,
+  FunctionInvocationsCreateSyncPayload,
   ImportDefinitionsPayload,
   ImportGraphJsonPayload,
   InfraInitEmptyRepoPayload,
   InfraInsertNodeAtPathPayload,
+  InfraInsertNodesAtPathsPayload,
+  InfraSetAndCommitPayload,
   InfraSetDataAtPathPayload,
+  InfraSetManyAndCommitPayload,
   InitEmptyRepoPayload,
   InsertNodeAtPathPayload,
+  InsertNodesAtPathsPayload,
+  PlatformFunctionInvocationsCreateSyncPayload,
   PlatformInfraInitEmptyRepoPayload,
   PlatformInfraInsertNodeAtPathPayload,
+  PlatformInfraInsertNodesAtPathsPayload,
+  PlatformInfraSetAndCommitPayload,
   PlatformInfraSetDataAtPathPayload,
+  PlatformInfraSetManyAndCommitPayload,
   PlatformResourceInstallationsInstallPayload,
   PlatformResourceInstallationsRollbackPayload,
   PlatformResourceInstallationsUninstallPayload,
@@ -60,24 +118,54 @@ import type {
   ResourceInstallationsUninstallPayload,
   ResourceInstallationsUpgradePayload,
   SaveGraphPayload,
+  SetAndCommitPayload,
   SetDataAtPathPayload,
+  SetManyAndCommitPayload,
   StartExecutionPayload,
   ValidateFunctionGraphPayload,
   AddEdgePayloadSelect,
   AddEdgeAndSavePayloadSelect,
   AddNodePayloadSelect,
   AddNodeAndSavePayloadSelect,
+  ApproveNodePayloadSelect,
   CopyGraphPayloadSelect,
+  DatabaseAddEdgePayloadSelect,
+  DatabaseAddEdgeAndSavePayloadSelect,
+  DatabaseAddNodePayloadSelect,
+  DatabaseAddNodeAndSavePayloadSelect,
+  DatabaseApproveNodePayloadSelect,
+  DatabaseCopyGraphPayloadSelect,
+  DatabaseCreateFunctionGraphPayloadSelect,
+  DatabaseGraphInitEmptyRepoPayloadSelect,
+  DatabaseGraphInsertNodeAtPathPayloadSelect,
+  DatabaseGraphInsertNodesAtPathsPayloadSelect,
+  DatabaseGraphSetAndCommitPayloadSelect,
+  DatabaseGraphSetDataAtPathPayloadSelect,
+  DatabaseGraphSetManyAndCommitPayloadSelect,
+  DatabaseImportDefinitionsPayloadSelect,
+  DatabaseImportGraphJsonPayloadSelect,
+  DatabaseSaveGraphPayloadSelect,
+  DatabaseStartExecutionPayloadSelect,
+  DatabaseValidateFunctionGraphPayloadSelect,
+  FunctionInvocationsCreateSyncPayloadSelect,
   ImportDefinitionsPayloadSelect,
   ImportGraphJsonPayloadSelect,
   InfraInitEmptyRepoPayloadSelect,
   InfraInsertNodeAtPathPayloadSelect,
+  InfraInsertNodesAtPathsPayloadSelect,
+  InfraSetAndCommitPayloadSelect,
   InfraSetDataAtPathPayloadSelect,
+  InfraSetManyAndCommitPayloadSelect,
   InitEmptyRepoPayloadSelect,
   InsertNodeAtPathPayloadSelect,
+  InsertNodesAtPathsPayloadSelect,
+  PlatformFunctionInvocationsCreateSyncPayloadSelect,
   PlatformInfraInitEmptyRepoPayloadSelect,
   PlatformInfraInsertNodeAtPathPayloadSelect,
+  PlatformInfraInsertNodesAtPathsPayloadSelect,
+  PlatformInfraSetAndCommitPayloadSelect,
   PlatformInfraSetDataAtPathPayloadSelect,
+  PlatformInfraSetManyAndCommitPayloadSelect,
   PlatformResourceInstallationsInstallPayloadSelect,
   PlatformResourceInstallationsRollbackPayloadSelect,
   PlatformResourceInstallationsUninstallPayloadSelect,
@@ -88,7 +176,9 @@ import type {
   ResourceInstallationsUninstallPayloadSelect,
   ResourceInstallationsUpgradePayloadSelect,
   SaveGraphPayloadSelect,
+  SetAndCommitPayloadSelect,
   SetDataAtPathPayloadSelect,
+  SetManyAndCommitPayloadSelect,
   StartExecutionPayloadSelect,
   ValidateFunctionGraphPayloadSelect,
 } from '../input-types';
@@ -105,8 +195,68 @@ export interface AddNodeVariables {
 export interface AddNodeAndSaveVariables {
   input: AddNodeAndSaveInput;
 }
+export interface ApproveNodeVariables {
+  input: ApproveNodeInput;
+}
 export interface CopyGraphVariables {
   input: CopyGraphInput;
+}
+export interface DatabaseAddEdgeVariables {
+  input: DatabaseAddEdgeInput;
+}
+export interface DatabaseAddEdgeAndSaveVariables {
+  input: DatabaseAddEdgeAndSaveInput;
+}
+export interface DatabaseAddNodeVariables {
+  input: DatabaseAddNodeInput;
+}
+export interface DatabaseAddNodeAndSaveVariables {
+  input: DatabaseAddNodeAndSaveInput;
+}
+export interface DatabaseApproveNodeVariables {
+  input: DatabaseApproveNodeInput;
+}
+export interface DatabaseCopyGraphVariables {
+  input: DatabaseCopyGraphInput;
+}
+export interface DatabaseCreateFunctionGraphVariables {
+  input: DatabaseCreateFunctionGraphInput;
+}
+export interface DatabaseGraphInitEmptyRepoVariables {
+  input: DatabaseGraphInitEmptyRepoInput;
+}
+export interface DatabaseGraphInsertNodeAtPathVariables {
+  input: DatabaseGraphInsertNodeAtPathInput;
+}
+export interface DatabaseGraphInsertNodesAtPathsVariables {
+  input: DatabaseGraphInsertNodesAtPathsInput;
+}
+export interface DatabaseGraphSetAndCommitVariables {
+  input: DatabaseGraphSetAndCommitInput;
+}
+export interface DatabaseGraphSetDataAtPathVariables {
+  input: DatabaseGraphSetDataAtPathInput;
+}
+export interface DatabaseGraphSetManyAndCommitVariables {
+  input: DatabaseGraphSetManyAndCommitInput;
+}
+export interface DatabaseImportDefinitionsVariables {
+  input: DatabaseImportDefinitionsInput;
+}
+export interface DatabaseImportGraphJsonVariables {
+  input: DatabaseImportGraphJsonInput;
+}
+export interface DatabaseSaveGraphVariables {
+  input: DatabaseSaveGraphInput;
+}
+export interface DatabaseStartExecutionVariables {
+  input: DatabaseStartExecutionInput;
+}
+export interface DatabaseValidateFunctionGraphVariables {
+  input: DatabaseValidateFunctionGraphInput;
+}
+export interface FunctionInvocationsCreateSyncVariables {
+  input: FunctionInvocationsCreateSyncInput;
 }
 export interface ImportDefinitionsVariables {
   input: ImportDefinitionsInput;
@@ -120,8 +270,17 @@ export interface InfraInitEmptyRepoVariables {
 export interface InfraInsertNodeAtPathVariables {
   input: InfraInsertNodeAtPathInput;
 }
+export interface InfraInsertNodesAtPathsVariables {
+  input: InfraInsertNodesAtPathsInput;
+}
+export interface InfraSetAndCommitVariables {
+  input: InfraSetAndCommitInput;
+}
 export interface InfraSetDataAtPathVariables {
   input: InfraSetDataAtPathInput;
+}
+export interface InfraSetManyAndCommitVariables {
+  input: InfraSetManyAndCommitInput;
 }
 export interface InitEmptyRepoVariables {
   input: InitEmptyRepoInput;
@@ -129,14 +288,29 @@ export interface InitEmptyRepoVariables {
 export interface InsertNodeAtPathVariables {
   input: InsertNodeAtPathInput;
 }
+export interface InsertNodesAtPathsVariables {
+  input: InsertNodesAtPathsInput;
+}
+export interface PlatformFunctionInvocationsCreateSyncVariables {
+  input: PlatformFunctionInvocationsCreateSyncInput;
+}
 export interface PlatformInfraInitEmptyRepoVariables {
   input: PlatformInfraInitEmptyRepoInput;
 }
 export interface PlatformInfraInsertNodeAtPathVariables {
   input: PlatformInfraInsertNodeAtPathInput;
 }
+export interface PlatformInfraInsertNodesAtPathsVariables {
+  input: PlatformInfraInsertNodesAtPathsInput;
+}
+export interface PlatformInfraSetAndCommitVariables {
+  input: PlatformInfraSetAndCommitInput;
+}
 export interface PlatformInfraSetDataAtPathVariables {
   input: PlatformInfraSetDataAtPathInput;
+}
+export interface PlatformInfraSetManyAndCommitVariables {
+  input: PlatformInfraSetManyAndCommitInput;
 }
 export interface PlatformResourceInstallationsInstallVariables {
   input: PlatformResourceInstallationsInstallInput;
@@ -152,10 +326,11 @@ export interface PlatformResourceInstallationsUpgradeVariables {
 }
 /**
  * Variables for provisionBucket
- * Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+ * Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
@@ -175,8 +350,14 @@ export interface ResourceInstallationsUpgradeVariables {
 export interface SaveGraphVariables {
   input: SaveGraphInput;
 }
+export interface SetAndCommitVariables {
+  input: SetAndCommitInput;
+}
 export interface SetDataAtPathVariables {
   input: SetDataAtPathInput;
+}
+export interface SetManyAndCommitVariables {
+  input: SetManyAndCommitInput;
 }
 export interface StartExecutionVariables {
   input: StartExecutionInput;
@@ -302,6 +483,35 @@ export function createMutationOperations(client: OrmClient) {
           'AddNodeAndSavePayload'
         ),
       }),
+    approveNode: <S extends ApproveNodePayloadSelect>(
+      args: ApproveNodeVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ApproveNodePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        approveNode: InferSelectResult<ApproveNodePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ApproveNode',
+        fieldName: 'approveNode',
+        ...buildCustomDocument(
+          'mutation',
+          'ApproveNode',
+          'approveNode',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ApproveNodeInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ApproveNodePayload'
+        ),
+      }),
     copyGraph: <S extends CopyGraphPayloadSelect>(
       args: CopyGraphVariables,
       options: {
@@ -329,6 +539,575 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'CopyGraphPayload'
+        ),
+      }),
+    databaseAddEdge: <S extends DatabaseAddEdgePayloadSelect>(
+      args: DatabaseAddEdgeVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseAddEdgePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseAddEdge: InferSelectResult<DatabaseAddEdgePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseAddEdge',
+        fieldName: 'databaseAddEdge',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseAddEdge',
+          'databaseAddEdge',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseAddEdgeInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseAddEdgePayload'
+        ),
+      }),
+    databaseAddEdgeAndSave: <S extends DatabaseAddEdgeAndSavePayloadSelect>(
+      args: DatabaseAddEdgeAndSaveVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseAddEdgeAndSavePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseAddEdgeAndSave: InferSelectResult<DatabaseAddEdgeAndSavePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseAddEdgeAndSave',
+        fieldName: 'databaseAddEdgeAndSave',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseAddEdgeAndSave',
+          'databaseAddEdgeAndSave',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseAddEdgeAndSaveInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseAddEdgeAndSavePayload'
+        ),
+      }),
+    databaseAddNode: <S extends DatabaseAddNodePayloadSelect>(
+      args: DatabaseAddNodeVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseAddNodePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseAddNode: InferSelectResult<DatabaseAddNodePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseAddNode',
+        fieldName: 'databaseAddNode',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseAddNode',
+          'databaseAddNode',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseAddNodeInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseAddNodePayload'
+        ),
+      }),
+    databaseAddNodeAndSave: <S extends DatabaseAddNodeAndSavePayloadSelect>(
+      args: DatabaseAddNodeAndSaveVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseAddNodeAndSavePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseAddNodeAndSave: InferSelectResult<DatabaseAddNodeAndSavePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseAddNodeAndSave',
+        fieldName: 'databaseAddNodeAndSave',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseAddNodeAndSave',
+          'databaseAddNodeAndSave',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseAddNodeAndSaveInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseAddNodeAndSavePayload'
+        ),
+      }),
+    databaseApproveNode: <S extends DatabaseApproveNodePayloadSelect>(
+      args: DatabaseApproveNodeVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseApproveNodePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseApproveNode: InferSelectResult<DatabaseApproveNodePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseApproveNode',
+        fieldName: 'databaseApproveNode',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseApproveNode',
+          'databaseApproveNode',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseApproveNodeInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseApproveNodePayload'
+        ),
+      }),
+    databaseCopyGraph: <S extends DatabaseCopyGraphPayloadSelect>(
+      args: DatabaseCopyGraphVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseCopyGraphPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseCopyGraph: InferSelectResult<DatabaseCopyGraphPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseCopyGraph',
+        fieldName: 'databaseCopyGraph',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseCopyGraph',
+          'databaseCopyGraph',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseCopyGraphInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseCopyGraphPayload'
+        ),
+      }),
+    databaseCreateFunctionGraph: <S extends DatabaseCreateFunctionGraphPayloadSelect>(
+      args: DatabaseCreateFunctionGraphVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseCreateFunctionGraphPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseCreateFunctionGraph: InferSelectResult<
+          DatabaseCreateFunctionGraphPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseCreateFunctionGraph',
+        fieldName: 'databaseCreateFunctionGraph',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseCreateFunctionGraph',
+          'databaseCreateFunctionGraph',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseCreateFunctionGraphInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseCreateFunctionGraphPayload'
+        ),
+      }),
+    databaseGraphInitEmptyRepo: <S extends DatabaseGraphInitEmptyRepoPayloadSelect>(
+      args: DatabaseGraphInitEmptyRepoVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseGraphInitEmptyRepoPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseGraphInitEmptyRepo: InferSelectResult<DatabaseGraphInitEmptyRepoPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseGraphInitEmptyRepo',
+        fieldName: 'databaseGraphInitEmptyRepo',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseGraphInitEmptyRepo',
+          'databaseGraphInitEmptyRepo',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseGraphInitEmptyRepoInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseGraphInitEmptyRepoPayload'
+        ),
+      }),
+    databaseGraphInsertNodeAtPath: <S extends DatabaseGraphInsertNodeAtPathPayloadSelect>(
+      args: DatabaseGraphInsertNodeAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseGraphInsertNodeAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseGraphInsertNodeAtPath: InferSelectResult<
+          DatabaseGraphInsertNodeAtPathPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseGraphInsertNodeAtPath',
+        fieldName: 'databaseGraphInsertNodeAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseGraphInsertNodeAtPath',
+          'databaseGraphInsertNodeAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseGraphInsertNodeAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseGraphInsertNodeAtPathPayload'
+        ),
+      }),
+    databaseGraphInsertNodesAtPaths: <S extends DatabaseGraphInsertNodesAtPathsPayloadSelect>(
+      args: DatabaseGraphInsertNodesAtPathsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseGraphInsertNodesAtPathsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseGraphInsertNodesAtPaths: InferSelectResult<
+          DatabaseGraphInsertNodesAtPathsPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseGraphInsertNodesAtPaths',
+        fieldName: 'databaseGraphInsertNodesAtPaths',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseGraphInsertNodesAtPaths',
+          'databaseGraphInsertNodesAtPaths',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseGraphInsertNodesAtPathsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseGraphInsertNodesAtPathsPayload'
+        ),
+      }),
+    databaseGraphSetAndCommit: <S extends DatabaseGraphSetAndCommitPayloadSelect>(
+      args: DatabaseGraphSetAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseGraphSetAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseGraphSetAndCommit: InferSelectResult<DatabaseGraphSetAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseGraphSetAndCommit',
+        fieldName: 'databaseGraphSetAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseGraphSetAndCommit',
+          'databaseGraphSetAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseGraphSetAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseGraphSetAndCommitPayload'
+        ),
+      }),
+    databaseGraphSetDataAtPath: <S extends DatabaseGraphSetDataAtPathPayloadSelect>(
+      args: DatabaseGraphSetDataAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseGraphSetDataAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseGraphSetDataAtPath: InferSelectResult<DatabaseGraphSetDataAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseGraphSetDataAtPath',
+        fieldName: 'databaseGraphSetDataAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseGraphSetDataAtPath',
+          'databaseGraphSetDataAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseGraphSetDataAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseGraphSetDataAtPathPayload'
+        ),
+      }),
+    databaseGraphSetManyAndCommit: <S extends DatabaseGraphSetManyAndCommitPayloadSelect>(
+      args: DatabaseGraphSetManyAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseGraphSetManyAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseGraphSetManyAndCommit: InferSelectResult<
+          DatabaseGraphSetManyAndCommitPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseGraphSetManyAndCommit',
+        fieldName: 'databaseGraphSetManyAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseGraphSetManyAndCommit',
+          'databaseGraphSetManyAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseGraphSetManyAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseGraphSetManyAndCommitPayload'
+        ),
+      }),
+    databaseImportDefinitions: <S extends DatabaseImportDefinitionsPayloadSelect>(
+      args: DatabaseImportDefinitionsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseImportDefinitionsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseImportDefinitions: InferSelectResult<DatabaseImportDefinitionsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseImportDefinitions',
+        fieldName: 'databaseImportDefinitions',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseImportDefinitions',
+          'databaseImportDefinitions',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseImportDefinitionsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseImportDefinitionsPayload'
+        ),
+      }),
+    databaseImportGraphJson: <S extends DatabaseImportGraphJsonPayloadSelect>(
+      args: DatabaseImportGraphJsonVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseImportGraphJsonPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseImportGraphJson: InferSelectResult<DatabaseImportGraphJsonPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseImportGraphJson',
+        fieldName: 'databaseImportGraphJson',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseImportGraphJson',
+          'databaseImportGraphJson',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseImportGraphJsonInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseImportGraphJsonPayload'
+        ),
+      }),
+    databaseSaveGraph: <S extends DatabaseSaveGraphPayloadSelect>(
+      args: DatabaseSaveGraphVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseSaveGraphPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseSaveGraph: InferSelectResult<DatabaseSaveGraphPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseSaveGraph',
+        fieldName: 'databaseSaveGraph',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseSaveGraph',
+          'databaseSaveGraph',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseSaveGraphInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseSaveGraphPayload'
+        ),
+      }),
+    databaseStartExecution: <S extends DatabaseStartExecutionPayloadSelect>(
+      args: DatabaseStartExecutionVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseStartExecutionPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseStartExecution: InferSelectResult<DatabaseStartExecutionPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseStartExecution',
+        fieldName: 'databaseStartExecution',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseStartExecution',
+          'databaseStartExecution',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseStartExecutionInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseStartExecutionPayload'
+        ),
+      }),
+    databaseValidateFunctionGraph: <S extends DatabaseValidateFunctionGraphPayloadSelect>(
+      args: DatabaseValidateFunctionGraphVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DatabaseValidateFunctionGraphPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        databaseValidateFunctionGraph: InferSelectResult<
+          DatabaseValidateFunctionGraphPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DatabaseValidateFunctionGraph',
+        fieldName: 'databaseValidateFunctionGraph',
+        ...buildCustomDocument(
+          'mutation',
+          'DatabaseValidateFunctionGraph',
+          'databaseValidateFunctionGraph',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DatabaseValidateFunctionGraphInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DatabaseValidateFunctionGraphPayload'
+        ),
+      }),
+    functionInvocationsCreateSync: <S extends FunctionInvocationsCreateSyncPayloadSelect>(
+      args: FunctionInvocationsCreateSyncVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, FunctionInvocationsCreateSyncPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        functionInvocationsCreateSync: InferSelectResult<
+          FunctionInvocationsCreateSyncPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'FunctionInvocationsCreateSync',
+        fieldName: 'functionInvocationsCreateSync',
+        ...buildCustomDocument(
+          'mutation',
+          'FunctionInvocationsCreateSync',
+          'functionInvocationsCreateSync',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'FunctionInvocationsCreateSyncInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'FunctionInvocationsCreateSyncPayload'
         ),
       }),
     importDefinitions: <S extends ImportDefinitionsPayloadSelect>(
@@ -447,6 +1226,64 @@ export function createMutationOperations(client: OrmClient) {
           'InfraInsertNodeAtPathPayload'
         ),
       }),
+    infraInsertNodesAtPaths: <S extends InfraInsertNodesAtPathsPayloadSelect>(
+      args: InfraInsertNodesAtPathsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InfraInsertNodesAtPathsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        infraInsertNodesAtPaths: InferSelectResult<InfraInsertNodesAtPathsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InfraInsertNodesAtPaths',
+        fieldName: 'infraInsertNodesAtPaths',
+        ...buildCustomDocument(
+          'mutation',
+          'InfraInsertNodesAtPaths',
+          'infraInsertNodesAtPaths',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InfraInsertNodesAtPathsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InfraInsertNodesAtPathsPayload'
+        ),
+      }),
+    infraSetAndCommit: <S extends InfraSetAndCommitPayloadSelect>(
+      args: InfraSetAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InfraSetAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        infraSetAndCommit: InferSelectResult<InfraSetAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InfraSetAndCommit',
+        fieldName: 'infraSetAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'InfraSetAndCommit',
+          'infraSetAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InfraSetAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InfraSetAndCommitPayload'
+        ),
+      }),
     infraSetDataAtPath: <S extends InfraSetDataAtPathPayloadSelect>(
       args: InfraSetDataAtPathVariables,
       options: {
@@ -474,6 +1311,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'InfraSetDataAtPathPayload'
+        ),
+      }),
+    infraSetManyAndCommit: <S extends InfraSetManyAndCommitPayloadSelect>(
+      args: InfraSetManyAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InfraSetManyAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        infraSetManyAndCommit: InferSelectResult<InfraSetManyAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InfraSetManyAndCommit',
+        fieldName: 'infraSetManyAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'InfraSetManyAndCommit',
+          'infraSetManyAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InfraSetManyAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InfraSetManyAndCommitPayload'
         ),
       }),
     initEmptyRepo: <S extends InitEmptyRepoPayloadSelect>(
@@ -532,6 +1398,69 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'InsertNodeAtPathPayload'
+        ),
+      }),
+    insertNodesAtPaths: <S extends InsertNodesAtPathsPayloadSelect>(
+      args: InsertNodesAtPathsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InsertNodesAtPathsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        insertNodesAtPaths: InferSelectResult<InsertNodesAtPathsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InsertNodesAtPaths',
+        fieldName: 'insertNodesAtPaths',
+        ...buildCustomDocument(
+          'mutation',
+          'InsertNodesAtPaths',
+          'insertNodesAtPaths',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InsertNodesAtPathsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InsertNodesAtPathsPayload'
+        ),
+      }),
+    platformFunctionInvocationsCreateSync: <
+      S extends PlatformFunctionInvocationsCreateSyncPayloadSelect,
+    >(
+      args: PlatformFunctionInvocationsCreateSyncVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformFunctionInvocationsCreateSyncPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformFunctionInvocationsCreateSync: InferSelectResult<
+          PlatformFunctionInvocationsCreateSyncPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformFunctionInvocationsCreateSync',
+        fieldName: 'platformFunctionInvocationsCreateSync',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformFunctionInvocationsCreateSync',
+          'platformFunctionInvocationsCreateSync',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformFunctionInvocationsCreateSyncInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformFunctionInvocationsCreateSyncPayload'
         ),
       }),
     platformInfraInitEmptyRepo: <S extends PlatformInfraInitEmptyRepoPayloadSelect>(
@@ -595,6 +1524,67 @@ export function createMutationOperations(client: OrmClient) {
           'PlatformInfraInsertNodeAtPathPayload'
         ),
       }),
+    platformInfraInsertNodesAtPaths: <S extends PlatformInfraInsertNodesAtPathsPayloadSelect>(
+      args: PlatformInfraInsertNodesAtPathsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInfraInsertNodesAtPathsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInfraInsertNodesAtPaths: InferSelectResult<
+          PlatformInfraInsertNodesAtPathsPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInfraInsertNodesAtPaths',
+        fieldName: 'platformInfraInsertNodesAtPaths',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInfraInsertNodesAtPaths',
+          'platformInfraInsertNodesAtPaths',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInfraInsertNodesAtPathsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInfraInsertNodesAtPathsPayload'
+        ),
+      }),
+    platformInfraSetAndCommit: <S extends PlatformInfraSetAndCommitPayloadSelect>(
+      args: PlatformInfraSetAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInfraSetAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInfraSetAndCommit: InferSelectResult<PlatformInfraSetAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInfraSetAndCommit',
+        fieldName: 'platformInfraSetAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInfraSetAndCommit',
+          'platformInfraSetAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInfraSetAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInfraSetAndCommitPayload'
+        ),
+      }),
     platformInfraSetDataAtPath: <S extends PlatformInfraSetDataAtPathPayloadSelect>(
       args: PlatformInfraSetDataAtPathVariables,
       options: {
@@ -622,6 +1612,38 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'PlatformInfraSetDataAtPathPayload'
+        ),
+      }),
+    platformInfraSetManyAndCommit: <S extends PlatformInfraSetManyAndCommitPayloadSelect>(
+      args: PlatformInfraSetManyAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInfraSetManyAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInfraSetManyAndCommit: InferSelectResult<
+          PlatformInfraSetManyAndCommitPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInfraSetManyAndCommit',
+        fieldName: 'platformInfraSetManyAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInfraSetManyAndCommit',
+          'platformInfraSetManyAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInfraSetManyAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInfraSetManyAndCommitPayload'
         ),
       }),
     platformResourceInstallationsInstall: <
@@ -946,6 +1968,35 @@ export function createMutationOperations(client: OrmClient) {
           'SaveGraphPayload'
         ),
       }),
+    setAndCommit: <S extends SetAndCommitPayloadSelect>(
+      args: SetAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setAndCommit: InferSelectResult<SetAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetAndCommit',
+        fieldName: 'setAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'SetAndCommit',
+          'setAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetAndCommitPayload'
+        ),
+      }),
     setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
       args: SetDataAtPathVariables,
       options: {
@@ -973,6 +2024,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SetDataAtPathPayload'
+        ),
+      }),
+    setManyAndCommit: <S extends SetManyAndCommitPayloadSelect>(
+      args: SetManyAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetManyAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setManyAndCommit: InferSelectResult<SetManyAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetManyAndCommit',
+        fieldName: 'setManyAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'SetManyAndCommit',
+          'setManyAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetManyAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetManyAndCommitPayload'
         ),
       }),
     startExecution: <S extends StartExecutionPayloadSelect>(

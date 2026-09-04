@@ -21,9 +21,11 @@ const fieldSchema: FieldSchema = {
   cpuRequestMillicores: 'int',
   createdAt: 'string',
   createdBy: 'uuid',
+  createdByPrincipal: 'uuid',
   databaseId: 'uuid',
   errorCount: 'int',
   id: 'uuid',
+  imageRef: 'string',
   installationId: 'uuid',
   integrations: 'string',
   kind: 'string',
@@ -45,8 +47,10 @@ const fieldSchema: FieldSchema = {
   statusObserved: 'json',
   storageClass: 'string',
   storageSizeBytes: 'int',
+  storageTotalBytes: 'int',
   updatedAt: 'string',
   updatedBy: 'uuid',
+  updatedByPrincipal: 'uuid',
 };
 const usage =
   '\nresource <command>\n\nCommands:\n  list                  List resource records\n  find-first            Find first matching resource record\n  get                   Get a resource by ID\n  create                Create a new resource\n  update                Update an existing resource\n  delete                Delete a resource\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -102,9 +106,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       annotations: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       errorCount: true,
       id: true,
+      imageRef: true,
       installationId: true,
       integrations: true,
       kind: true,
@@ -123,6 +129,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       statusObserved: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ResourceSelect, ResourceFilter, ResourceOrderBy> & {
@@ -146,9 +153,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       annotations: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       errorCount: true,
       id: true,
+      imageRef: true,
       installationId: true,
       integrations: true,
       kind: true,
@@ -167,6 +176,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       statusObserved: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ResourceSelect, ResourceFilter, ResourceOrderBy> & {
@@ -202,9 +212,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           annotations: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           errorCount: true,
           id: true,
+          imageRef: true,
           installationId: true,
           integrations: true,
           kind: true,
@@ -223,6 +235,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           statusObserved: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -254,6 +267,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: true,
@@ -262,6 +282,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'errorCount',
         message: 'errorCount',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'imageRef',
+        message: 'imageRef',
         required: false,
         skipPrompt: true,
       },
@@ -380,6 +407,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateResourceInput['resource'];
@@ -389,8 +423,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           annotations: cleanedData.annotations,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           errorCount: cleanedData.errorCount,
+          imageRef: cleanedData.imageRef,
           installationId: cleanedData.installationId,
           integrations: cleanedData.integrations,
           kind: cleanedData.kind,
@@ -408,14 +444,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           status: cleanedData.status,
           statusObserved: cleanedData.statusObserved,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           errorCount: true,
           id: true,
+          imageRef: true,
           installationId: true,
           integrations: true,
           kind: true,
@@ -434,6 +473,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           statusObserved: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -471,6 +511,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
@@ -479,6 +526,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'errorCount',
         message: 'errorCount',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'imageRef',
+        message: 'imageRef',
         required: false,
         skipPrompt: true,
       },
@@ -597,6 +651,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as ResourcePatch;
@@ -609,8 +670,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           annotations: cleanedData.annotations,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           errorCount: cleanedData.errorCount,
+          imageRef: cleanedData.imageRef,
           installationId: cleanedData.installationId,
           integrations: cleanedData.integrations,
           kind: cleanedData.kind,
@@ -628,14 +691,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           status: cleanedData.status,
           statusObserved: cleanedData.statusObserved,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           errorCount: true,
           id: true,
+          imageRef: true,
           installationId: true,
           integrations: true,
           kind: true,
@@ -654,6 +720,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           statusObserved: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();

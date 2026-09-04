@@ -34,6 +34,7 @@ export interface ApiSetting {
   enableConnectionFilter: boolean | null;
   enableDirectUploads: boolean | null;
   enableI18N: boolean | null;
+  enableIntrospection: boolean | null;
   enableLlm: boolean | null;
   enableLtree: boolean | null;
   enableManyToMany: boolean | null;
@@ -42,34 +43,34 @@ export interface ApiSetting {
   enableRealtime: boolean | null;
   enableSearch: boolean | null;
   id: string | null;
+  idleInTransactionTimeoutMs: string | null;
+  lockTimeoutMs: string | null;
+  maxConcurrentRequests: number | null;
+  maxPageSize: number | null;
+  maxQueryCost: number | null;
+  maxQueryDepth: number | null;
+  maxQueueWaitMs: number | null;
+  maxRequestBytes: number | null;
   options: unknown | null;
+  rateLimitBurst: number | null;
+  rateLimitRpm: number | null;
   statementTimeoutMs: string | null;
   updatedAt: string | null;
 }
-export interface AppComponent {
-  appId: string | null;
-  componentApiId: string | null;
-  componentDomainId: string | null;
-  componentInstallationId: string | null;
-  componentSiteId: string | null;
-  componentType: string | null;
-  config: unknown | null;
+export interface AstMigration {
+  actionId: string | null;
+  actionName: string | null;
+  actorId: string | null;
   createdAt: string | null;
   databaseId: string | null;
-  id: string | null;
-  updatedAt: string | null;
-}
-export interface App {
-  config: unknown | null;
-  createdAt: string | null;
-  databaseId: string | null;
-  description: string | null;
-  id: string | null;
-  isPublished: boolean | null;
+  deploy: unknown | null;
+  deploys: string | null;
+  id: number | null;
   name: string | null;
-  status: string | null;
-  title: string | null;
-  updatedAt: string | null;
+  payload: unknown | null;
+  requires: string[] | null;
+  revert: unknown | null;
+  verify: unknown | null;
 }
 export interface CheckConstraint {
   category: ObjectCategory | null;
@@ -122,10 +123,12 @@ export interface DatabaseSetting {
   createdAt: string | null;
   databaseId: string | null;
   enableAggregates: boolean | null;
+  enableBilling: boolean | null;
   enableBulk: boolean | null;
   enableConnectionFilter: boolean | null;
   enableDirectUploads: boolean | null;
   enableI18N: boolean | null;
+  enableIntrospection: boolean | null;
   enableLlm: boolean | null;
   enableLtree: boolean | null;
   enableManyToMany: boolean | null;
@@ -134,8 +137,18 @@ export interface DatabaseSetting {
   enableRealtime: boolean | null;
   enableSearch: boolean | null;
   id: string | null;
+  idleInTransactionTimeoutMs: string | null;
   labels: unknown | null;
+  lockTimeoutMs: string | null;
+  maxConcurrentRequests: number | null;
+  maxPageSize: number | null;
+  maxQueryCost: number | null;
+  maxQueryDepth: number | null;
+  maxQueueWaitMs: number | null;
+  maxRequestBytes: number | null;
   options: unknown | null;
+  rateLimitBurst: number | null;
+  rateLimitRpm: number | null;
   statementTimeoutMs: string | null;
   updatedAt: string | null;
 }
@@ -168,6 +181,7 @@ export interface Derive {
   createdAt: string | null;
   databaseId: string | null;
   id: string | null;
+  includeGrants: boolean | null;
   includeMutations: boolean | null;
   kind: string | null;
   policyPrefix: string | null;
@@ -178,6 +192,7 @@ export interface Derive {
 export interface Domain {
   config: unknown | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   hostname: string | null;
   id: string | null;
@@ -189,6 +204,7 @@ export interface Domain {
   tlsSecretName: string | null;
   tlsStatus: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   verificationStatus: string | null;
   verifiedAt: string | null;
 }
@@ -413,10 +429,27 @@ export interface FullTextSearch {
   weights: string[] | null;
 }
 export interface Function {
+  apiExposed: boolean | null;
+  arguments: unknown | null;
+  bodyAst: unknown | null;
+  category: ObjectCategory | null;
+  data: unknown | null;
   databaseId: string | null;
+  functionType: string | null;
   id: string | null;
+  isStrict: boolean | null;
+  kind: string | null;
   name: string | null;
+  returns: unknown | null;
   schemaId: string | null;
+  securityInvoker: boolean | null;
+  smartTags: unknown | null;
+  tags: string[] | null;
+  volatility: string | null;
+}
+export interface GetSitePreviewsRecord {
+  commitId: string | null;
+  name: string | null;
 }
 export interface HostnameBinding {
   domainId: string | null;
@@ -430,20 +463,15 @@ export interface HostnameBinding {
   updatedAt: string | null;
   verificationStatus: string | null;
 }
-export interface HttpRoute {
-  createdAt: string | null;
-  createdBy: string | null;
-  databaseId: string | null;
-  domainId: string | null;
-  id: string | null;
-  isActive: boolean | null;
-  method: string | null;
-  path: string | null;
-  priority: number | null;
-  targetId: string | null;
-  targetKind: string | null;
-  updatedAt: string | null;
-  updatedBy: string | null;
+export interface IdentityProviderRegistry {
+  authorizationUrl: string | null;
+  displayName: string | null;
+  issuerUrl: string | null;
+  kind: string | null;
+  scopes: string[] | null;
+  slug: string | null;
+  tokenUrl: string | null;
+  userinfoUrl: string | null;
 }
 export interface Index {
   accessMethod: string | null;
@@ -456,6 +484,7 @@ export interface Index {
   indexParams: unknown | null;
   isUnique: boolean | null;
   name: string | null;
+  nullsNotDistinct: boolean | null;
   opClasses: string[] | null;
   options: unknown | null;
   smartTags: unknown | null;
@@ -469,6 +498,7 @@ export interface ManagedDomain {
   annotations: unknown | null;
   certStatus: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   domain: string | null;
   id: string | null;
@@ -476,6 +506,7 @@ export interface ManagedDomain {
   tlsReadyAt: string | null;
   tlsStatus: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   verificationStatus: string | null;
   verifiedAt: string | null;
 }
@@ -494,6 +525,7 @@ export interface Page {
   createdAt: string | null;
   databaseId: string | null;
   id: string | null;
+  seededFrom: unknown | null;
   siteId: string | null;
   slug: string | null;
   storeId: string | null;
@@ -540,6 +572,7 @@ export interface PlatformApiSetting {
   enableConnectionFilter: boolean | null;
   enableDirectUploads: boolean | null;
   enableI18N: boolean | null;
+  enableIntrospection: boolean | null;
   enableLlm: boolean | null;
   enableLtree: boolean | null;
   enableManyToMany: boolean | null;
@@ -548,7 +581,17 @@ export interface PlatformApiSetting {
   enableRealtime: boolean | null;
   enableSearch: boolean | null;
   id: string | null;
+  idleInTransactionTimeoutMs: string | null;
+  lockTimeoutMs: string | null;
+  maxConcurrentRequests: number | null;
+  maxPageSize: number | null;
+  maxQueryCost: number | null;
+  maxQueryDepth: number | null;
+  maxQueueWaitMs: number | null;
+  maxRequestBytes: number | null;
   options: unknown | null;
+  rateLimitBurst: number | null;
+  rateLimitRpm: number | null;
   statementTimeoutMs: string | null;
   updatedAt: string | null;
 }
@@ -562,6 +605,7 @@ export interface PlatformCorsSetting {
 export interface PlatformDomain {
   config: unknown | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   hostname: string | null;
   id: string | null;
   isPublished: boolean | null;
@@ -572,6 +616,7 @@ export interface PlatformDomain {
   tlsSecretName: string | null;
   tlsStatus: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   verificationStatus: string | null;
   verifiedAt: string | null;
 }
@@ -642,17 +687,23 @@ export interface PlatformEmailSiteIdentity {
   siteId: string | null;
   updatedAt: string | null;
 }
+export interface PlatformGetSitePreviewsRecord {
+  commitId: string | null;
+  name: string | null;
+}
 export interface PlatformManagedDomain {
   allowPublicUsage: boolean | null;
   annotations: unknown | null;
   certStatus: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   domain: string | null;
   id: string | null;
   isWildcard: boolean | null;
   tlsReadyAt: string | null;
   tlsStatus: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   verificationStatus: string | null;
   verifiedAt: string | null;
 }
@@ -661,21 +712,18 @@ export interface PlatformPage {
   content: unknown | null;
   createdAt: string | null;
   id: string | null;
+  seededFrom: unknown | null;
   siteId: string | null;
   slug: string | null;
   storeId: string | null;
   updatedAt: string | null;
 }
 export interface PlatformSiteAppLink {
-  appIdentifier: string | null;
+  appStoreIdentityId: string | null;
   createdAt: string | null;
   id: string | null;
   pathComponents: string[] | null;
-  platform: string | null;
-  sha256CertFingerprints: string[] | null;
   siteId: string | null;
-  storeUrl: string | null;
-  teamId: string | null;
   updatedAt: string | null;
   webcredentials: boolean | null;
 }
@@ -683,6 +731,7 @@ export interface PlatformSite {
   activeCommitId: string | null;
   bucketId: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   description: string | null;
   id: string | null;
   installationId: string | null;
@@ -692,6 +741,7 @@ export interface PlatformSite {
   resourceId: string | null;
   title: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformSiteDeepLink {
   appPath: string | null;
@@ -699,6 +749,7 @@ export interface PlatformSiteDeepLink {
   fallbackUrl: string | null;
   id: string | null;
   metadata: unknown | null;
+  pageId: string | null;
   siteId: string | null;
   slug: string | null;
   updatedAt: string | null;
@@ -723,6 +774,7 @@ export interface PlatformSiteMetadatum {
   logo: ConstructiveInternalTypeImage | null;
   ogImage: ConstructiveInternalTypeImage | null;
   robots: string | null;
+  robotsSeededFrom: unknown | null;
   siteId: string | null;
   storeId: string | null;
   title: string | null;
@@ -736,6 +788,15 @@ export interface PlatformSiteModule {
   name: string | null;
   position: number | null;
   siteId: string | null;
+  updatedAt: string | null;
+}
+export interface PlatformSiteRelease {
+  commitId: string | null;
+  createdAt: string | null;
+  id: string | null;
+  manifest: unknown | null;
+  siteId: string | null;
+  storeId: string | null;
   updatedAt: string | null;
 }
 export interface PlatformSiteTheme {
@@ -761,6 +822,7 @@ export interface PlatformSiteWebConfig {
 }
 export interface Policy {
   category: ObjectCategory | null;
+  columnRefs: string[] | null;
   createdAt: string | null;
   data: unknown | null;
   databaseId: string | null;
@@ -808,6 +870,18 @@ export interface PubkeySetting {
   updatedAt: string | null;
   userField: string | null;
 }
+export interface Redirect {
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  name: string | null;
+  preservePath: boolean | null;
+  preserveQuery: boolean | null;
+  statusCode: number | null;
+  toHost: string | null;
+  toPath: string | null;
+  updatedAt: string | null;
+}
 export interface RlsSetting {
   authenticateFunctionId: string | null;
   authenticateSchemaId: string | null;
@@ -829,14 +903,17 @@ export interface RouteBinding {
   method: string | null;
   path: string | null;
   priority: number | null;
+  servingSiteId: string | null;
   targetApiId: string | null;
   targetBucketId: string | null;
   targetFunctionId: string | null;
+  targetRedirectId: string | null;
   targetServiceId: string | null;
   targetSiteId: string | null;
   updatedAt: string | null;
 }
 export interface Route {
+  anonymous: boolean | null;
   config: unknown | null;
   createdAt: string | null;
   databaseId: string | null;
@@ -845,10 +922,13 @@ export interface Route {
   isActive: boolean | null;
   method: string | null;
   path: string | null;
+  previewRef: string | null;
   priority: number | null;
+  servingSiteId: string | null;
   targetApiId: string | null;
   targetBucketId: string | null;
   targetFunctionId: string | null;
+  targetRedirectId: string | null;
   targetServiceId: string | null;
   targetSiteId: string | null;
   updatedAt: string | null;
@@ -877,16 +957,12 @@ export interface SchemaGrant {
   updatedAt: string | null;
 }
 export interface SiteAppLink {
-  appIdentifier: string | null;
+  appStoreIdentityId: string | null;
   createdAt: string | null;
   databaseId: string | null;
   id: string | null;
   pathComponents: string[] | null;
-  platform: string | null;
-  sha256CertFingerprints: string[] | null;
   siteId: string | null;
-  storeUrl: string | null;
-  teamId: string | null;
   updatedAt: string | null;
   webcredentials: boolean | null;
 }
@@ -894,6 +970,7 @@ export interface Site {
   activeCommitId: string | null;
   bucketId: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   description: string | null;
   id: string | null;
@@ -904,6 +981,7 @@ export interface Site {
   resourceId: string | null;
   title: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface SiteDeepLink {
   appPath: string | null;
@@ -912,6 +990,7 @@ export interface SiteDeepLink {
   fallbackUrl: string | null;
   id: string | null;
   metadata: unknown | null;
+  pageId: string | null;
   siteId: string | null;
   slug: string | null;
   updatedAt: string | null;
@@ -938,6 +1017,7 @@ export interface SiteMetadatum {
   logo: ConstructiveInternalTypeImage | null;
   ogImage: ConstructiveInternalTypeImage | null;
   robots: string | null;
+  robotsSeededFrom: unknown | null;
   siteId: string | null;
   storeId: string | null;
   title: string | null;
@@ -952,6 +1032,16 @@ export interface SiteModule {
   name: string | null;
   position: number | null;
   siteId: string | null;
+  updatedAt: string | null;
+}
+export interface SiteRelease {
+  commitId: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  manifest: unknown | null;
+  siteId: string | null;
+  storeId: string | null;
   updatedAt: string | null;
 }
 export interface SiteTheme {
@@ -991,6 +1081,21 @@ export interface SpatialRelation {
   tableId: string | null;
   tags: string[] | null;
   updatedAt: string | null;
+}
+export interface SqlAction {
+  actionId: string | null;
+  actionName: string | null;
+  actorId: string | null;
+  content: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  deploy: string | null;
+  deps: string[] | null;
+  id: number | null;
+  name: string | null;
+  payload: unknown | null;
+  revert: string | null;
+  verify: string | null;
 }
 export interface TableBehavior {
   createdAt: string | null;
@@ -1043,13 +1148,19 @@ export interface Trigger {
   createdAt: string | null;
   databaseId: string | null;
   event: string | null;
+  events: string[] | null;
+  forEachRow: boolean | null;
+  functionId: string | null;
   functionName: string | null;
   id: string | null;
+  kind: string | null;
   name: string | null;
   smartTags: unknown | null;
   tableId: string | null;
   tags: string[] | null;
+  timing: string | null;
   updatedAt: string | null;
+  whenAst: unknown | null;
 }
 export interface TriggerFunction {
   code: string | null;

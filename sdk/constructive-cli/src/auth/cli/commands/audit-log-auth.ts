@@ -18,6 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   actorId: 'uuid',
   createdAt: 'string',
+  details: 'json',
   event: 'string',
   id: 'uuid',
   ipAddress: 'string',
@@ -78,6 +79,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       actorId: true,
       createdAt: true,
+      details: true,
       event: true,
       id: true,
       ipAddress: true,
@@ -106,6 +108,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       actorId: true,
       createdAt: true,
+      details: true,
       event: true,
       id: true,
       ipAddress: true,
@@ -146,6 +149,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           actorId: true,
           createdAt: true,
+          details: true,
           event: true,
           id: true,
           ipAddress: true,
@@ -171,6 +175,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'actorId',
         message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'details',
+        message: 'details',
         required: false,
         skipPrompt: true,
       },
@@ -218,6 +229,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           actorId: cleanedData.actorId,
+          details: cleanedData.details,
           event: cleanedData.event,
           ipAddress: cleanedData.ipAddress,
           origin: cleanedData.origin,
@@ -227,6 +239,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           actorId: true,
           createdAt: true,
+          details: true,
           event: true,
           id: true,
           ipAddress: true,
@@ -264,6 +277,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'actorId',
         message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'details',
+        message: 'details',
         required: false,
         skipPrompt: true,
       },
@@ -312,6 +332,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           actorId: cleanedData.actorId,
+          details: cleanedData.details,
           event: cleanedData.event,
           ipAddress: cleanedData.ipAddress,
           origin: cleanedData.origin,
@@ -321,6 +342,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           actorId: true,
           createdAt: true,
+          details: true,
           event: true,
           id: true,
           ipAddress: true,

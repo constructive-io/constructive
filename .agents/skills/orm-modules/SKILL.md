@@ -1,13 +1,13 @@
 ---
 name: orm-modules
-description: ORM client for the modules API — provides typed CRUD operations for 83 tables and 3 custom operations
+description: ORM client for the modules API — provides typed CRUD operations for 88 tables and 3 custom operations
 ---
 
 # orm-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the modules API — provides typed CRUD operations for 83 tables and 3 custom operations
+ORM client for the modules API — provides typed CRUD operations for 88 tables and 3 custom operations
 
 ## Usage
 
@@ -47,8 +47,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [blueprint-template](references/blueprint-template.md)
 - [capabilities-module](references/capabilities-module.md)
 - [catalog-module](references/catalog-module.md)
+- [cluster-module](references/cluster-module.md)
 - [compute-log-module](references/compute-log-module.md)
-- [config-secrets-user-module](references/config-secrets-user-module.md)
 - [connected-accounts-module](references/connected-accounts-module.md)
 - [content-preset-module](references/content-preset-module.md)
 - [crypto-addresses-module](references/crypto-addresses-module.md)
@@ -75,16 +75,19 @@ See the `references/` directory for detailed per-entity API documentation:
 - [graph-execution-module](references/graph-execution-module.md)
 - [graph-module](references/graph-module.md)
 - [hierarchy-module](references/hierarchy-module.md)
-- [http-route-module](references/http-route-module.md)
 - [i-18-n-module](references/i-18-n-module.md)
 - [identity-providers-module](references/identity-providers-module.md)
+- [image-module](references/image-module.md)
 - [inference-log-module](references/inference-log-module.md)
 - [infra-config-module](references/infra-config-module.md)
 - [infra-secrets-module](references/infra-secrets-module.md)
 - [integration-providers-module](references/integration-providers-module.md)
+- [internal-config-module](references/internal-config-module.md)
 - [internal-secrets-module](references/internal-secrets-module.md)
 - [invites-module](references/invites-module.md)
+- [k-8-s-admission-module](references/k-8-s-admission-module.md)
 - [limits-module](references/limits-module.md)
+- [machine-module](references/machine-module.md)
 - [membership-types-module](references/membership-types-module.md)
 - [memberships-module](references/memberships-module.md)
 - [merkle-store-module](references/merkle-store-module.md)
@@ -99,7 +102,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [rate-limit-meters-module](references/rate-limit-meters-module.md)
 - [rate-limits-module](references/rate-limits-module.md)
 - [realtime-module](references/realtime-module.md)
+- [refusal-log-module](references/refusal-log-module.md)
 - [relation-provision](references/relation-provision.md)
+- [repository-module](references/repository-module.md)
 - [resource-module](references/resource-module.md)
 - [rls-module](references/rls-module.md)
 - [route-module](references/route-module.md)

@@ -21,6 +21,19 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
+| `build` | findMany, findOne, create, update, delete |
+| `buildStep` | findMany, findOne, create, update, delete |
+| `builderBinding` | findMany, findOne, create, update, delete |
+| `contentPreset` | findMany, findOne, create, update, delete |
+| `databaseFunctionGraph` | findMany, findOne, create, update, delete |
+| `databaseFunctionGraphExecution` | findMany, findOne, create, update, delete |
+| `databaseFunctionGraphExecutionNodeState` | findMany, findOne, create, update, delete |
+| `databaseFunctionGraphExecutionOutput` | findMany, findOne, create, update, delete |
+| `databaseGraphCommit` | findMany, findOne, create, update, delete |
+| `databaseGraphGetAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `databaseGraphObject` | findMany, findOne, create, update, delete |
+| `databaseGraphRef` | findMany, findOne, create, update, delete |
+| `databaseGraphStore` | findMany, findOne, create, update, delete |
 | `dbPreset` | findMany, findOne, create, update, delete |
 | `functionApiBinding` | findMany, findOne, create, update, delete |
 | `functionCapabilityBinding` | findMany, findOne, create, update, delete |
@@ -39,6 +52,8 @@ const db = createClient({
 | `functionInvocationAttempt` | findMany, findOne, create, update, delete |
 | `functionInvocation` | findMany, findOne, create, update, delete |
 | `getAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `image` | findMany, findOne, create, update, delete |
+| `imageGrant` | findMany, findOne, create, update, delete |
 | `infraCommit` | findMany, findOne, create, update, delete |
 | `infraGetAllTreeNodesRecord` | findMany, findOne, create, update, delete |
 | `infraObject` | findMany, findOne, create, update, delete |
@@ -47,6 +62,9 @@ const db = createClient({
 | `integrationProvider` | findMany, findOne, create, update, delete |
 | `namespace` | findMany, findOne, create, update, delete |
 | `namespaceEvent` | findMany, findOne, create, update, delete |
+| `platformBuild` | findMany, findOne, create, update, delete |
+| `platformBuildStep` | findMany, findOne, create, update, delete |
+| `platformBuilderBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionApiBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionCapabilityBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionDefinition` | findMany, findOne, create, update, delete |
@@ -55,18 +73,36 @@ const db = createClient({
 | `platformFunctionExecutionLog` | findMany, findOne, create, update, delete |
 | `platformFunctionInvocationAttempt` | findMany, findOne, create, update, delete |
 | `platformFunctionInvocation` | findMany, findOne, create, update, delete |
+| `platformImage` | findMany, findOne, create, update, delete |
+| `platformImageGrant` | findMany, findOne, create, update, delete |
 | `platformInfraCommit` | findMany, findOne, create, update, delete |
 | `platformInfraGetAllTreeNodesRecord` | findMany, findOne, create, update, delete |
 | `platformInfraObject` | findMany, findOne, create, update, delete |
 | `platformInfraRef` | findMany, findOne, create, update, delete |
 | `platformInfraStore` | findMany, findOne, create, update, delete |
+| `platformK8sResourceKind` | findMany, findOne, create, update, delete |
+| `platformK8sSpecRule` | findMany, findOne, create, update, delete |
 | `platformNamespace` | findMany, findOne, create, update, delete |
 | `platformNamespaceEvent` | findMany, findOne, create, update, delete |
+| `platformProposalComment` | findMany, findOne, create, update, delete |
+| `platformProposal` | findMany, findOne, create, update, delete |
+| `platformProposalFileView` | findMany, findOne, create, update, delete |
+| `platformProposalReaction` | findMany, findOne, create, update, delete |
+| `platformProposalReview` | findMany, findOne, create, update, delete |
+| `platformProposalsChunk` | findMany, findOne, create, update, delete |
+| `platformRegistryBinding` | findMany, findOne, create, update, delete |
+| `platformRegistry` | findMany, findOne, create, update, delete |
+| `platformRegistryGrant` | findMany, findOne, create, update, delete |
+| `platformRepository` | findMany, findOne, create, update, delete |
+| `platformRepositoryEvent` | findMany, findOne, create, update, delete |
+| `platformRepositoryRequiredCheck` | findMany, findOne, create, update, delete |
+| `platformRepositoryWorkflow` | findMany, findOne, create, update, delete |
 | `platformResource` | findMany, findOne, create, update, delete |
 | `platformResourceDeclaredCapacity` | findMany, findOne, create, update, delete |
 | `platformResourceDefinition` | findMany, findOne, create, update, delete |
 | `platformResourceEvent` | findMany, findOne, create, update, delete |
 | `platformResourceInstallation` | findMany, findOne, create, update, delete |
+| `platformResourceObservedStorage` | findMany, findOne, create, update, delete |
 | `platformResourceStatusCheck` | findMany, findOne, create, update, delete |
 | `platformResourceUsageLog` | findMany, findOne, create, update, delete |
 | `platformResourceUsageSummary` | findMany, findOne, create, update, delete |
@@ -76,11 +112,25 @@ const db = createClient({
 | `platformResourcesResolvedRequirement` | findMany, findOne, create, update, delete |
 | `platformWebhookEndpoint` | findMany, findOne, create, update, delete |
 | `platformWebhookEvent` | findMany, findOne, create, update, delete |
+| `proposalComment` | findMany, findOne, create, update, delete |
+| `proposal` | findMany, findOne, create, update, delete |
+| `proposalFileView` | findMany, findOne, create, update, delete |
+| `proposalReaction` | findMany, findOne, create, update, delete |
+| `proposalReview` | findMany, findOne, create, update, delete |
+| `proposalsChunk` | findMany, findOne, create, update, delete |
+| `registryBinding` | findMany, findOne, create, update, delete |
+| `registry` | findMany, findOne, create, update, delete |
+| `registryGrant` | findMany, findOne, create, update, delete |
+| `repository` | findMany, findOne, create, update, delete |
+| `repositoryEvent` | findMany, findOne, create, update, delete |
+| `repositoryRequiredCheck` | findMany, findOne, create, update, delete |
+| `repositoryWorkflow` | findMany, findOne, create, update, delete |
 | `resource` | findMany, findOne, create, update, delete |
 | `resourceDeclaredCapacity` | findMany, findOne, create, update, delete |
 | `resourceDefinition` | findMany, findOne, create, update, delete |
 | `resourceEvent` | findMany, findOne, create, update, delete |
 | `resourceInstallation` | findMany, findOne, create, update, delete |
+| `resourceObservedStorage` | findMany, findOne, create, update, delete |
 | `resourceStatusCheck` | findMany, findOne, create, update, delete |
 | `resourceUsageLog` | findMany, findOne, create, update, delete |
 | `resourceUsageSummary` | findMany, findOne, create, update, delete |
@@ -92,6 +142,532 @@ const db = createClient({
 | `webhookEvent` | findMany, findOne, create, update, delete |
 
 ## Table Operations
+
+### `db.build`
+
+CRUD operations for Build records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `attempt` | Int | Yes |
+| `commitSha` | String | Yes |
+| `conclusion` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `eventId` | UUID | Yes |
+| `finishedAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `imageRef` | String | Yes |
+| `jobId` | BigInt | Yes |
+| `logs` | ConstructiveInternalTypeUpload | Yes |
+| `matrixKey` | String | Yes |
+| `metadata` | JSON | Yes |
+| `proposalId` | UUID | Yes |
+| `ref` | String | Yes |
+| `repositoryId` | UUID | Yes |
+| `startedAt` | Datetime | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+| `workflowId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all build records
+const items = await db.build.findMany({ select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, databaseId: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
+
+// Get one by id
+const item = await db.build.findOne({ id: '<UUID>', select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, databaseId: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
+
+// Create
+const created = await db.build.create({ data: { actorId: '<UUID>', attempt: '<Int>', commitSha: '<String>', conclusion: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', eventId: '<UUID>', finishedAt: '<Datetime>', imageRef: '<String>', jobId: '<BigInt>', logs: '<Upload>', matrixKey: '<String>', metadata: '<JSON>', proposalId: '<UUID>', ref: '<String>', repositoryId: '<UUID>', startedAt: '<Datetime>', status: '<String>', updatedByPrincipal: '<UUID>', workflowId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.build.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.build.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.buildStep`
+
+CRUD operations for BuildStep records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `buildId` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `exitCode` | Int | Yes |
+| `finishedAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `kind` | String | Yes |
+| `logBytes` | BigInt | Yes |
+| `logOffset` | BigInt | Yes |
+| `name` | String | Yes |
+| `parentSeq` | Int | Yes |
+| `recordedAt` | Datetime | Yes |
+| `seq` | Int | Yes |
+| `startedAt` | Datetime | Yes |
+| `status` | String | Yes |
+| `summary` | JSON | Yes |
+
+**Operations:**
+
+```typescript
+// List all buildStep records
+const items = await db.buildStep.findMany({ select: { buildId: true, createdByPrincipal: true, databaseId: true, exitCode: true, finishedAt: true, id: true, kind: true, logBytes: true, logOffset: true, name: true, parentSeq: true, recordedAt: true, seq: true, startedAt: true, status: true, summary: true } }).execute();
+
+// Get one by id
+const item = await db.buildStep.findOne({ id: '<UUID>', select: { buildId: true, createdByPrincipal: true, databaseId: true, exitCode: true, finishedAt: true, id: true, kind: true, logBytes: true, logOffset: true, name: true, parentSeq: true, recordedAt: true, seq: true, startedAt: true, status: true, summary: true } }).execute();
+
+// Create
+const created = await db.buildStep.create({ data: { buildId: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', exitCode: '<Int>', finishedAt: '<Datetime>', kind: '<String>', logBytes: '<BigInt>', logOffset: '<BigInt>', name: '<String>', parentSeq: '<Int>', recordedAt: '<Datetime>', seq: '<Int>', startedAt: '<Datetime>', status: '<String>', summary: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.buildStep.update({ where: { id: '<UUID>' }, data: { buildId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.buildStep.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.builderBinding`
+
+CRUD operations for BuilderBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `installationId` | UUID | Yes |
+| `lastError` | String | Yes |
+| `metadata` | JSON | Yes |
+| `namespaceId` | UUID | Yes |
+| `observedHost` | String | Yes |
+| `realm` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all builderBinding records
+const items = await db.builderBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.builderBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.builderBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', installationId: '<UUID>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.builderBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.builderBinding.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.contentPreset`
+
+CRUD operations for ContentPreset records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `active` | Boolean | Yes |
+| `commitId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `definition` | JSON | Yes |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `kind` | String | Yes |
+| `label` | String | Yes |
+| `slug` | String | Yes |
+| `storeId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all contentPreset records
+const items = await db.contentPreset.findMany({ select: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, kind: true, label: true, slug: true, storeId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.contentPreset.findOne({ id: '<UUID>', select: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, kind: true, label: true, slug: true, storeId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.contentPreset.create({ data: { active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', kind: '<String>', label: '<String>', slug: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.contentPreset.update({ where: { id: '<UUID>' }, data: { active: '<Boolean>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.contentPreset.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.databaseFunctionGraph`
+
+CRUD operations for DatabaseFunctionGraph records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `context` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `definitionsCommitId` | UUID | Yes |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `isValid` | Boolean | Yes |
+| `name` | String | Yes |
+| `storeId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `validationErrors` | JSON | Yes |
+
+**Operations:**
+
+```typescript
+// List all databaseFunctionGraph records
+const items = await db.databaseFunctionGraph.findMany({ select: { context: true, createdAt: true, createdBy: true, databaseId: true, definitionsCommitId: true, description: true, id: true, isValid: true, name: true, storeId: true, updatedAt: true, validationErrors: true } }).execute();
+
+// Get one by id
+const item = await db.databaseFunctionGraph.findOne({ id: '<UUID>', select: { context: true, createdAt: true, createdBy: true, databaseId: true, definitionsCommitId: true, description: true, id: true, isValid: true, name: true, storeId: true, updatedAt: true, validationErrors: true } }).execute();
+
+// Create
+const created = await db.databaseFunctionGraph.create({ data: { context: '<String>', createdBy: '<UUID>', databaseId: '<UUID>', definitionsCommitId: '<UUID>', description: '<String>', isValid: '<Boolean>', name: '<String>', storeId: '<UUID>', validationErrors: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseFunctionGraph.update({ where: { id: '<UUID>' }, data: { context: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseFunctionGraph.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.databaseFunctionGraphExecution`
+
+CRUD operations for DatabaseFunctionGraphExecution records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `completedAt` | Datetime | Yes |
+| `currentWave` | Int | Yes |
+| `databaseId` | UUID | Yes |
+| `definitionsCommitId` | UUID | Yes |
+| `entityId` | UUID | Yes |
+| `entityType` | String | Yes |
+| `errorCode` | String | Yes |
+| `errorMessage` | String | Yes |
+| `executionPlan` | JSON | Yes |
+| `graphId` | UUID | Yes |
+| `id` | UUID | No |
+| `inputPayload` | JSON | Yes |
+| `invocationCreatedAt` | Datetime | Yes |
+| `invocationId` | UUID | Yes |
+| `lastProgressAt` | Datetime | Yes |
+| `maxPendingJobs` | Int | Yes |
+| `maxTicks` | Int | Yes |
+| `nodeOutputs` | JSON | Yes |
+| `organizationId` | UUID | Yes |
+| `outputNames` | String | Yes |
+| `outputNode` | String | Yes |
+| `outputPayload` | JSON | Yes |
+| `outputPort` | String | Yes |
+| `parentExecutionId` | UUID | Yes |
+| `parentInvocationId` | UUID | Yes |
+| `parentNodeName` | String | Yes |
+| `principalId` | UUID | Yes |
+| `startedAt` | Datetime | Yes |
+| `status` | String | Yes |
+| `tickCount` | Int | Yes |
+| `timeoutAt` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all databaseFunctionGraphExecution records
+const items = await db.databaseFunctionGraphExecution.findMany({ select: { actorId: true, completedAt: true, currentWave: true, databaseId: true, definitionsCommitId: true, entityId: true, entityType: true, errorCode: true, errorMessage: true, executionPlan: true, graphId: true, id: true, inputPayload: true, invocationCreatedAt: true, invocationId: true, lastProgressAt: true, maxPendingJobs: true, maxTicks: true, nodeOutputs: true, organizationId: true, outputNames: true, outputNode: true, outputPayload: true, outputPort: true, parentExecutionId: true, parentInvocationId: true, parentNodeName: true, principalId: true, startedAt: true, status: true, tickCount: true, timeoutAt: true } }).execute();
+
+// Get one by id
+const item = await db.databaseFunctionGraphExecution.findOne({ id: '<UUID>', select: { actorId: true, completedAt: true, currentWave: true, databaseId: true, definitionsCommitId: true, entityId: true, entityType: true, errorCode: true, errorMessage: true, executionPlan: true, graphId: true, id: true, inputPayload: true, invocationCreatedAt: true, invocationId: true, lastProgressAt: true, maxPendingJobs: true, maxTicks: true, nodeOutputs: true, organizationId: true, outputNames: true, outputNode: true, outputPayload: true, outputPort: true, parentExecutionId: true, parentInvocationId: true, parentNodeName: true, principalId: true, startedAt: true, status: true, tickCount: true, timeoutAt: true } }).execute();
+
+// Create
+const created = await db.databaseFunctionGraphExecution.create({ data: { actorId: '<UUID>', completedAt: '<Datetime>', currentWave: '<Int>', databaseId: '<UUID>', definitionsCommitId: '<UUID>', entityId: '<UUID>', entityType: '<String>', errorCode: '<String>', errorMessage: '<String>', executionPlan: '<JSON>', graphId: '<UUID>', inputPayload: '<JSON>', invocationCreatedAt: '<Datetime>', invocationId: '<UUID>', lastProgressAt: '<Datetime>', maxPendingJobs: '<Int>', maxTicks: '<Int>', nodeOutputs: '<JSON>', organizationId: '<UUID>', outputNames: '<String>', outputNode: '<String>', outputPayload: '<JSON>', outputPort: '<String>', parentExecutionId: '<UUID>', parentInvocationId: '<UUID>', parentNodeName: '<String>', principalId: '<UUID>', startedAt: '<Datetime>', status: '<String>', tickCount: '<Int>', timeoutAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseFunctionGraphExecution.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseFunctionGraphExecution.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.databaseFunctionGraphExecutionNodeState`
+
+CRUD operations for DatabaseFunctionGraphExecutionNodeState records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `callbackInputs` | JSON | Yes |
+| `callbackMeta` | JSON | Yes |
+| `callbackTokenHash` | String | Yes |
+| `completedAt` | Datetime | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `errorCode` | String | Yes |
+| `errorMessage` | String | Yes |
+| `executionId` | UUID | Yes |
+| `expiryDefaultOutput` | JSON | Yes |
+| `expiryEscalatedAt` | Datetime | Yes |
+| `expiryPolicy` | String | Yes |
+| `id` | UUID | No |
+| `nodeName` | String | Yes |
+| `nodePath` | String | Yes |
+| `outputId` | UUID | Yes |
+| `startedAt` | Datetime | Yes |
+| `status` | String | Yes |
+| `waitingDeadlineAt` | Datetime | Yes |
+| `waitingOn` | String | Yes |
+| `waitingSince` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all databaseFunctionGraphExecutionNodeState records
+const items = await db.databaseFunctionGraphExecutionNodeState.findMany({ select: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, databaseId: true, errorCode: true, errorMessage: true, executionId: true, expiryDefaultOutput: true, expiryEscalatedAt: true, expiryPolicy: true, id: true, nodeName: true, nodePath: true, outputId: true, startedAt: true, status: true, waitingDeadlineAt: true, waitingOn: true, waitingSince: true } }).execute();
+
+// Get one by id
+const item = await db.databaseFunctionGraphExecutionNodeState.findOne({ id: '<UUID>', select: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, databaseId: true, errorCode: true, errorMessage: true, executionId: true, expiryDefaultOutput: true, expiryEscalatedAt: true, expiryPolicy: true, id: true, nodeName: true, nodePath: true, outputId: true, startedAt: true, status: true, waitingDeadlineAt: true, waitingOn: true, waitingSince: true } }).execute();
+
+// Create
+const created = await db.databaseFunctionGraphExecutionNodeState.create({ data: { callbackInputs: '<JSON>', callbackMeta: '<JSON>', callbackTokenHash: '<String>', completedAt: '<Datetime>', databaseId: '<UUID>', errorCode: '<String>', errorMessage: '<String>', executionId: '<UUID>', expiryDefaultOutput: '<JSON>', expiryEscalatedAt: '<Datetime>', expiryPolicy: '<String>', nodeName: '<String>', nodePath: '<String>', outputId: '<UUID>', startedAt: '<Datetime>', status: '<String>', waitingDeadlineAt: '<Datetime>', waitingOn: '<String>', waitingSince: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseFunctionGraphExecutionNodeState.update({ where: { id: '<UUID>' }, data: { callbackInputs: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseFunctionGraphExecutionNodeState.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.databaseFunctionGraphExecutionOutput`
+
+CRUD operations for DatabaseFunctionGraphExecutionOutput records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `data` | JSON | Yes |
+| `databaseId` | UUID | Yes |
+| `hash` | Base64EncodedBinary | Yes |
+| `id` | UUID | No |
+
+**Operations:**
+
+```typescript
+// List all databaseFunctionGraphExecutionOutput records
+const items = await db.databaseFunctionGraphExecutionOutput.findMany({ select: { createdAt: true, data: true, databaseId: true, hash: true, id: true } }).execute();
+
+// Get one by id
+const item = await db.databaseFunctionGraphExecutionOutput.findOne({ id: '<UUID>', select: { createdAt: true, data: true, databaseId: true, hash: true, id: true } }).execute();
+
+// Create
+const created = await db.databaseFunctionGraphExecutionOutput.create({ data: { data: '<JSON>', databaseId: '<UUID>', hash: '<Base64EncodedBinary>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseFunctionGraphExecutionOutput.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseFunctionGraphExecutionOutput.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.databaseGraphCommit`
+
+CRUD operations for DatabaseGraphCommit records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `authorId` | UUID | Yes |
+| `committerId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `date` | Datetime | Yes |
+| `id` | UUID | No |
+| `message` | String | Yes |
+| `parentIds` | UUID | Yes |
+| `storeId` | UUID | Yes |
+| `treeId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all databaseGraphCommit records
+const items = await db.databaseGraphCommit.findMany({ select: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } }).execute();
+
+// Get one by id
+const item = await db.databaseGraphCommit.findOne({ id: '<UUID>', select: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } }).execute();
+
+// Create
+const created = await db.databaseGraphCommit.create({ data: { authorId: '<UUID>', committerId: '<UUID>', databaseId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseGraphCommit.update({ where: { id: '<UUID>' }, data: { authorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseGraphCommit.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.databaseGraphGetAllTreeNodesRecord`
+
+CRUD operations for DatabaseGraphGetAllTreeNodesRecord records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `data` | JSON | Yes |
+| `path` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all databaseGraphGetAllTreeNodesRecord records
+const items = await db.databaseGraphGetAllTreeNodesRecord.findMany({ select: { data: true, path: true } }).execute();
+
+// Get one by id
+const item = await db.databaseGraphGetAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
+
+// Create
+const created = await db.databaseGraphGetAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseGraphGetAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseGraphGetAllTreeNodesRecord.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.databaseGraphObject`
+
+CRUD operations for DatabaseGraphObject records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `data` | JSON | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `kids` | UUID | Yes |
+| `ktree` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all databaseGraphObject records
+const items = await db.databaseGraphObject.findMany({ select: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } }).execute();
+
+// Get one by id
+const item = await db.databaseGraphObject.findOne({ id: '<UUID>', select: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } }).execute();
+
+// Create
+const created = await db.databaseGraphObject.create({ data: { data: '<JSON>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseGraphObject.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseGraphObject.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.databaseGraphRef`
+
+CRUD operations for DatabaseGraphRef records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `commitId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `storeId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all databaseGraphRef records
+const items = await db.databaseGraphRef.findMany({ select: { commitId: true, databaseId: true, id: true, name: true, storeId: true } }).execute();
+
+// Get one by id
+const item = await db.databaseGraphRef.findOne({ id: '<UUID>', select: { commitId: true, databaseId: true, id: true, name: true, storeId: true } }).execute();
+
+// Create
+const created = await db.databaseGraphRef.create({ data: { commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseGraphRef.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseGraphRef.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.databaseGraphStore`
+
+CRUD operations for DatabaseGraphStore records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `hash` | UUID | Yes |
+| `id` | UUID | No |
+| `name` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all databaseGraphStore records
+const items = await db.databaseGraphStore.findMany({ select: { createdAt: true, databaseId: true, hash: true, id: true, name: true } }).execute();
+
+// Get one by id
+const item = await db.databaseGraphStore.findOne({ id: '<UUID>', select: { createdAt: true, databaseId: true, hash: true, id: true, name: true } }).execute();
+
+// Create
+const created = await db.databaseGraphStore.create({ data: { databaseId: '<UUID>', hash: '<UUID>', name: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseGraphStore.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseGraphStore.delete({ where: { id: '<UUID>' } }).execute();
+```
 
 ### `db.dbPreset`
 
@@ -214,11 +790,13 @@ CRUD operations for FunctionDefinition records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `accessChannels` | String | Yes |
+| `anonymousCallable` | Boolean | Yes |
 | `category` | String | Yes |
 | `concurrency` | Int | Yes |
 | `cpuLimitMillicores` | BigInt | Yes |
 | `cpuRequestMillicores` | BigInt | Yes |
 | `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `description` | String | Yes |
 | `fnCategory` | String | Yes |
@@ -243,8 +821,10 @@ CRUD operations for FunctionDefinition records.
 | `publishedAt` | Datetime | Yes |
 | `queueName` | String | Yes |
 | `requiredBuckets` | String | Yes |
+| `requiredCapabilities` | JSON | Yes |
 | `requiredConfigs` | ResourceRequirement | Yes |
 | `requiredModels` | String | Yes |
+| `requiredModules` | String | Yes |
 | `requiredSecrets` | ResourceRequirement | Yes |
 | `resources` | JSON | Yes |
 | `runtime` | String | Yes |
@@ -255,19 +835,20 @@ CRUD operations for FunctionDefinition records.
 | `taskIdentifier` | String | Yes |
 | `timeoutSeconds` | Int | Yes |
 | `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
 | `volatile` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all functionDefinition records
-const items = await db.functionDefinition.findMany({ select: { accessChannels: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, databaseId: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } }).execute();
+const items = await db.functionDefinition.findMany({ select: { accessChannels: true, anonymousCallable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredCapabilities: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true, volatile: true } }).execute();
 
 // Get one by id
-const item = await db.functionDefinition.findOne({ id: '<UUID>', select: { accessChannels: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, databaseId: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } }).execute();
+const item = await db.functionDefinition.findOne({ id: '<UUID>', select: { accessChannels: true, anonymousCallable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredCapabilities: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true, volatile: true } }).execute();
 
 // Create
-const created = await db.functionDefinition.create({ data: { accessChannels: '<String>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', databaseId: '<UUID>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', volatile: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.functionDefinition.create({ data: { accessChannels: '<String>', anonymousCallable: '<Boolean>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredCapabilities: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredModules: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', updatedByPrincipal: '<UUID>', volatile: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.functionDefinition.update({ where: { id: '<UUID>' }, data: { accessChannels: '<String>' }, select: { id: true } }).execute();
@@ -287,6 +868,7 @@ CRUD operations for FunctionDeployment records.
 | `annotations` | JSON | Yes |
 | `concurrency` | Int | Yes |
 | `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `errorCount` | Int | Yes |
 | `handlerName` | String | Yes |
@@ -297,6 +879,7 @@ CRUD operations for FunctionDeployment records.
 | `lastError` | String | Yes |
 | `lastErrorAt` | Datetime | Yes |
 | `namespaceId` | UUID | Yes |
+| `realm` | String | Yes |
 | `resources` | JSON | Yes |
 | `revision` | Int | Yes |
 | `scaleMax` | Int | Yes |
@@ -306,18 +889,19 @@ CRUD operations for FunctionDeployment records.
 | `status` | String | Yes |
 | `timeoutSeconds` | Int | Yes |
 | `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all functionDeployment records
-const items = await db.functionDeployment.findMany({ select: { annotations: true, concurrency: true, createdAt: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } }).execute();
+const items = await db.functionDeployment.findMany({ select: { annotations: true, concurrency: true, createdAt: true, createdByPrincipal: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.functionDeployment.findOne({ id: '<UUID>', select: { annotations: true, concurrency: true, createdAt: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } }).execute();
+const item = await db.functionDeployment.findOne({ id: '<UUID>', select: { annotations: true, concurrency: true, createdAt: true, createdByPrincipal: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.functionDeployment.create({ data: { annotations: '<JSON>', concurrency: '<Int>', databaseId: '<UUID>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>' }, select: { id: true } }).execute();
+const created = await db.functionDeployment.create({ data: { annotations: '<JSON>', concurrency: '<Int>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', realm: '<String>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.functionDeployment.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -552,6 +1136,9 @@ CRUD operations for FunctionGraphExecutionNodeState records.
 | `errorCode` | String | Yes |
 | `errorMessage` | String | Yes |
 | `executionId` | UUID | Yes |
+| `expiryDefaultOutput` | JSON | Yes |
+| `expiryEscalatedAt` | Datetime | Yes |
+| `expiryPolicy` | String | Yes |
 | `id` | UUID | No |
 | `nodeName` | String | Yes |
 | `nodePath` | String | Yes |
@@ -559,18 +1146,21 @@ CRUD operations for FunctionGraphExecutionNodeState records.
 | `scopeId` | UUID | Yes |
 | `startedAt` | Datetime | Yes |
 | `status` | String | Yes |
+| `waitingDeadlineAt` | Datetime | Yes |
+| `waitingOn` | String | Yes |
+| `waitingSince` | Datetime | Yes |
 
 **Operations:**
 
 ```typescript
 // List all functionGraphExecutionNodeState records
-const items = await db.functionGraphExecutionNodeState.findMany({ select: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true } }).execute();
+const items = await db.functionGraphExecutionNodeState.findMany({ select: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, expiryDefaultOutput: true, expiryEscalatedAt: true, expiryPolicy: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true, waitingDeadlineAt: true, waitingOn: true, waitingSince: true } }).execute();
 
 // Get one by id
-const item = await db.functionGraphExecutionNodeState.findOne({ id: '<UUID>', select: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true } }).execute();
+const item = await db.functionGraphExecutionNodeState.findOne({ id: '<UUID>', select: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, expiryDefaultOutput: true, expiryEscalatedAt: true, expiryPolicy: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true, waitingDeadlineAt: true, waitingOn: true, waitingSince: true } }).execute();
 
 // Create
-const created = await db.functionGraphExecutionNodeState.create({ data: { callbackInputs: '<JSON>', callbackMeta: '<JSON>', callbackTokenHash: '<String>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', executionId: '<UUID>', nodeName: '<String>', nodePath: '<String>', outputId: '<UUID>', scopeId: '<UUID>', startedAt: '<Datetime>', status: '<String>' }, select: { id: true } }).execute();
+const created = await db.functionGraphExecutionNodeState.create({ data: { callbackInputs: '<JSON>', callbackMeta: '<JSON>', callbackTokenHash: '<String>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', executionId: '<UUID>', expiryDefaultOutput: '<JSON>', expiryEscalatedAt: '<Datetime>', expiryPolicy: '<String>', nodeName: '<String>', nodePath: '<String>', outputId: '<UUID>', scopeId: '<UUID>', startedAt: '<Datetime>', status: '<String>', waitingDeadlineAt: '<Datetime>', waitingOn: '<String>', waitingSince: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.functionGraphExecutionNodeState.update({ where: { id: '<UUID>' }, data: { callbackInputs: '<JSON>' }, select: { id: true } }).execute();
@@ -766,16 +1356,21 @@ CRUD operations for FunctionInvocation records.
 | `channel` | String | Yes |
 | `completedAt` | Datetime | Yes |
 | `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `definitionScope` | String | Yes |
 | `durationMs` | Int | Yes |
+| `entityId` | UUID | Yes |
+| `entityType` | String | Yes |
 | `error` | String | Yes |
 | `functionDefinitionId` | UUID | Yes |
 | `graphExecutionId` | UUID | Yes |
 | `id` | UUID | No |
 | `jobId` | BigInt | Yes |
+| `organizationId` | UUID | Yes |
 | `parentInvocationId` | UUID | Yes |
 | `payload` | JSON | Yes |
+| `principalId` | UUID | Yes |
 | `provenance` | JSON | Yes |
 | `result` | JSON | Yes |
 | `startedAt` | Datetime | Yes |
@@ -786,13 +1381,13 @@ CRUD operations for FunctionInvocation records.
 
 ```typescript
 // List all functionInvocation records
-const items = await db.functionInvocation.findMany({ select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
+const items = await db.functionInvocation.findMany({ select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, createdByPrincipal: true, databaseId: true, definitionScope: true, durationMs: true, entityId: true, entityType: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, organizationId: true, parentInvocationId: true, payload: true, principalId: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
 
 // Get one by id
-const item = await db.functionInvocation.findOne({ id: '<UUID>', select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
+const item = await db.functionInvocation.findOne({ id: '<UUID>', select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, createdByPrincipal: true, databaseId: true, definitionScope: true, durationMs: true, entityId: true, entityType: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, organizationId: true, parentInvocationId: true, payload: true, principalId: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
 
 // Create
-const created = await db.functionInvocation.create({ data: { actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', databaseId: '<UUID>', definitionScope: '<String>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' }, select: { id: true } }).execute();
+const created = await db.functionInvocation.create({ data: { actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', definitionScope: '<String>', durationMs: '<Int>', entityId: '<UUID>', entityType: '<String>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', organizationId: '<UUID>', parentInvocationId: '<UUID>', payload: '<JSON>', principalId: '<UUID>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.functionInvocation.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -829,6 +1424,93 @@ const updated = await db.getAllTreeNodesRecord.update({ where: { id: '<UUID>' },
 
 // Delete
 const deleted = await db.getAllTreeNodesRecord.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.image`
+
+CRUD operations for Image records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `description` | String | Yes |
+| `digest` | String | Yes |
+| `expiresAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `isPublished` | Boolean | Yes |
+| `labels` | JSON | Yes |
+| `metadata` | JSON | Yes |
+| `name` | String | Yes |
+| `ownerId` | UUID | Yes |
+| `platformOnly` | Boolean | Yes |
+| `registryHost` | String | Yes |
+| `repository` | String | Yes |
+| `runtime` | String | Yes |
+| `tag` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all image records
+const items = await db.image.findMany({ select: { createdAt: true, createdByPrincipal: true, databaseId: true, description: true, digest: true, expiresAt: true, id: true, isPublished: true, labels: true, metadata: true, name: true, ownerId: true, platformOnly: true, registryHost: true, repository: true, runtime: true, tag: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.image.findOne({ id: '<UUID>', select: { createdAt: true, createdByPrincipal: true, databaseId: true, description: true, digest: true, expiresAt: true, id: true, isPublished: true, labels: true, metadata: true, name: true, ownerId: true, platformOnly: true, registryHost: true, repository: true, runtime: true, tag: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.image.create({ data: { createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', digest: '<String>', expiresAt: '<Datetime>', isPublished: '<Boolean>', labels: '<JSON>', metadata: '<JSON>', name: '<String>', ownerId: '<UUID>', platformOnly: '<Boolean>', registryHost: '<String>', repository: '<String>', runtime: '<String>', tag: '<String>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.image.update({ where: { id: '<UUID>' }, data: { createdByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.image.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.imageGrant`
+
+CRUD operations for ImageGrant records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actions` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `expiresAt` | Datetime | Yes |
+| `grantedBy` | UUID | Yes |
+| `granteeKey` | UUID | Yes |
+| `granteeScope` | String | Yes |
+| `id` | UUID | No |
+| `imageId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all imageGrant records
+const items = await db.imageGrant.findMany({ select: { actions: true, createdAt: true, createdByPrincipal: true, databaseId: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, imageId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.imageGrant.findOne({ id: '<UUID>', select: { actions: true, createdAt: true, createdByPrincipal: true, databaseId: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, imageId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.imageGrant.create({ data: { actions: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', expiresAt: '<Datetime>', grantedBy: '<UUID>', granteeKey: '<UUID>', granteeScope: '<String>', imageId: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.imageGrant.update({ where: { id: '<UUID>' }, data: { actions: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.imageGrant.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.infraCommit`
@@ -1047,6 +1729,7 @@ CRUD operations for Namespace records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `annotations` | JSON | Yes |
+| `clusterId` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `description` | String | Yes |
@@ -1064,13 +1747,13 @@ CRUD operations for Namespace records.
 
 ```typescript
 // List all namespace records
-const items = await db.namespace.findMany({ select: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } }).execute();
+const items = await db.namespace.findMany({ select: { annotations: true, clusterId: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.namespace.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } }).execute();
+const item = await db.namespace.findOne({ id: '<UUID>', select: { annotations: true, clusterId: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.namespace.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' }, select: { id: true } }).execute();
+const created = await db.namespace.create({ data: { annotations: '<JSON>', clusterId: '<UUID>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.namespace.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -1113,6 +1796,141 @@ const updated = await db.namespaceEvent.update({ where: { id: '<UUID>' }, data: 
 
 // Delete
 const deleted = await db.namespaceEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformBuild`
+
+CRUD operations for PlatformBuild records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `attempt` | Int | Yes |
+| `commitSha` | String | Yes |
+| `conclusion` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `eventId` | UUID | Yes |
+| `finishedAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `imageRef` | String | Yes |
+| `jobId` | BigInt | Yes |
+| `logs` | ConstructiveInternalTypeUpload | Yes |
+| `matrixKey` | String | Yes |
+| `metadata` | JSON | Yes |
+| `proposalId` | UUID | Yes |
+| `ref` | String | Yes |
+| `repositoryId` | UUID | Yes |
+| `startedAt` | Datetime | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+| `workflowId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformBuild records
+const items = await db.platformBuild.findMany({ select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
+
+// Get one by id
+const item = await db.platformBuild.findOne({ id: '<UUID>', select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
+
+// Create
+const created = await db.platformBuild.create({ data: { actorId: '<UUID>', attempt: '<Int>', commitSha: '<String>', conclusion: '<String>', createdByPrincipal: '<UUID>', eventId: '<UUID>', finishedAt: '<Datetime>', imageRef: '<String>', jobId: '<BigInt>', logs: '<Upload>', matrixKey: '<String>', metadata: '<JSON>', proposalId: '<UUID>', ref: '<String>', repositoryId: '<UUID>', startedAt: '<Datetime>', status: '<String>', updatedByPrincipal: '<UUID>', workflowId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformBuild.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformBuild.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformBuildStep`
+
+CRUD operations for PlatformBuildStep records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `buildId` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `exitCode` | Int | Yes |
+| `finishedAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `kind` | String | Yes |
+| `logBytes` | BigInt | Yes |
+| `logOffset` | BigInt | Yes |
+| `name` | String | Yes |
+| `parentSeq` | Int | Yes |
+| `recordedAt` | Datetime | Yes |
+| `seq` | Int | Yes |
+| `startedAt` | Datetime | Yes |
+| `status` | String | Yes |
+| `summary` | JSON | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformBuildStep records
+const items = await db.platformBuildStep.findMany({ select: { buildId: true, createdByPrincipal: true, exitCode: true, finishedAt: true, id: true, kind: true, logBytes: true, logOffset: true, name: true, parentSeq: true, recordedAt: true, seq: true, startedAt: true, status: true, summary: true } }).execute();
+
+// Get one by id
+const item = await db.platformBuildStep.findOne({ id: '<UUID>', select: { buildId: true, createdByPrincipal: true, exitCode: true, finishedAt: true, id: true, kind: true, logBytes: true, logOffset: true, name: true, parentSeq: true, recordedAt: true, seq: true, startedAt: true, status: true, summary: true } }).execute();
+
+// Create
+const created = await db.platformBuildStep.create({ data: { buildId: '<UUID>', createdByPrincipal: '<UUID>', exitCode: '<Int>', finishedAt: '<Datetime>', kind: '<String>', logBytes: '<BigInt>', logOffset: '<BigInt>', name: '<String>', parentSeq: '<Int>', recordedAt: '<Datetime>', seq: '<Int>', startedAt: '<Datetime>', status: '<String>', summary: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformBuildStep.update({ where: { id: '<UUID>' }, data: { buildId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformBuildStep.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformBuilderBinding`
+
+CRUD operations for PlatformBuilderBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `id` | UUID | No |
+| `installationId` | UUID | Yes |
+| `lastError` | String | Yes |
+| `metadata` | JSON | Yes |
+| `namespaceId` | UUID | Yes |
+| `observedHost` | String | Yes |
+| `realm` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformBuilderBinding records
+const items = await db.platformBuilderBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformBuilderBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformBuilderBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', installationId: '<UUID>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformBuilderBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformBuilderBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformFunctionApiBinding`
@@ -1196,12 +2014,14 @@ CRUD operations for PlatformFunctionDefinition records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `accessChannels` | String | Yes |
+| `anonymousCallable` | Boolean | Yes |
 | `billable` | Boolean | Yes |
 | `category` | String | Yes |
 | `concurrency` | Int | Yes |
 | `cpuLimitMillicores` | BigInt | Yes |
 | `cpuRequestMillicores` | BigInt | Yes |
 | `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
 | `description` | String | Yes |
 | `fnCategory` | String | Yes |
 | `functionColumns` | JSON | Yes |
@@ -1225,8 +2045,10 @@ CRUD operations for PlatformFunctionDefinition records.
 | `publishedAt` | Datetime | Yes |
 | `queueName` | String | Yes |
 | `requiredBuckets` | String | Yes |
+| `requiredCapabilities` | JSON | Yes |
 | `requiredConfigs` | ResourceRequirement | Yes |
 | `requiredModels` | String | Yes |
+| `requiredModules` | String | Yes |
 | `requiredSecrets` | ResourceRequirement | Yes |
 | `resources` | JSON | Yes |
 | `runtime` | String | Yes |
@@ -1238,19 +2060,20 @@ CRUD operations for PlatformFunctionDefinition records.
 | `taskIdentifier` | String | Yes |
 | `timeoutSeconds` | Int | Yes |
 | `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
 | `volatile` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all platformFunctionDefinition records
-const items = await db.platformFunctionDefinition.findMany({ select: { accessChannels: true, billable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } }).execute();
+const items = await db.platformFunctionDefinition.findMany({ select: { accessChannels: true, anonymousCallable: true, billable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdByPrincipal: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredCapabilities: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true, volatile: true } }).execute();
 
 // Get one by id
-const item = await db.platformFunctionDefinition.findOne({ id: '<UUID>', select: { accessChannels: true, billable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } }).execute();
+const item = await db.platformFunctionDefinition.findOne({ id: '<UUID>', select: { accessChannels: true, anonymousCallable: true, billable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdByPrincipal: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredCapabilities: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true, volatile: true } }).execute();
 
 // Create
-const created = await db.platformFunctionDefinition.create({ data: { accessChannels: '<String>', billable: '<Boolean>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', system: '<Boolean>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', volatile: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.platformFunctionDefinition.create({ data: { accessChannels: '<String>', anonymousCallable: '<Boolean>', billable: '<Boolean>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdByPrincipal: '<UUID>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredCapabilities: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredModules: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', system: '<Boolean>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', updatedByPrincipal: '<UUID>', volatile: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformFunctionDefinition.update({ where: { id: '<UUID>' }, data: { accessChannels: '<String>' }, select: { id: true } }).execute();
@@ -1270,6 +2093,7 @@ CRUD operations for PlatformFunctionDeployment records.
 | `annotations` | JSON | Yes |
 | `concurrency` | Int | Yes |
 | `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
 | `errorCount` | Int | Yes |
 | `handlerName` | String | Yes |
 | `id` | UUID | No |
@@ -1279,6 +2103,7 @@ CRUD operations for PlatformFunctionDeployment records.
 | `lastError` | String | Yes |
 | `lastErrorAt` | Datetime | Yes |
 | `namespaceId` | UUID | Yes |
+| `realm` | String | Yes |
 | `resources` | JSON | Yes |
 | `revision` | Int | Yes |
 | `scaleMax` | Int | Yes |
@@ -1288,18 +2113,19 @@ CRUD operations for PlatformFunctionDeployment records.
 | `status` | String | Yes |
 | `timeoutSeconds` | Int | Yes |
 | `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all platformFunctionDeployment records
-const items = await db.platformFunctionDeployment.findMany({ select: { annotations: true, concurrency: true, createdAt: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } }).execute();
+const items = await db.platformFunctionDeployment.findMany({ select: { annotations: true, concurrency: true, createdAt: true, createdByPrincipal: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.platformFunctionDeployment.findOne({ id: '<UUID>', select: { annotations: true, concurrency: true, createdAt: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } }).execute();
+const item = await db.platformFunctionDeployment.findOne({ id: '<UUID>', select: { annotations: true, concurrency: true, createdAt: true, createdByPrincipal: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.platformFunctionDeployment.create({ data: { annotations: '<JSON>', concurrency: '<Int>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>' }, select: { id: true } }).execute();
+const created = await db.platformFunctionDeployment.create({ data: { annotations: '<JSON>', concurrency: '<Int>', createdByPrincipal: '<UUID>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', realm: '<String>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformFunctionDeployment.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -1432,16 +2258,21 @@ CRUD operations for PlatformFunctionInvocation records.
 | `channel` | String | Yes |
 | `completedAt` | Datetime | Yes |
 | `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `definitionScope` | String | Yes |
 | `durationMs` | Int | Yes |
+| `entityId` | UUID | Yes |
+| `entityType` | String | Yes |
 | `error` | String | Yes |
 | `functionDefinitionId` | UUID | Yes |
 | `graphExecutionId` | UUID | Yes |
 | `id` | UUID | No |
 | `jobId` | BigInt | Yes |
+| `organizationId` | UUID | Yes |
 | `parentInvocationId` | UUID | Yes |
 | `payload` | JSON | Yes |
+| `principalId` | UUID | Yes |
 | `provenance` | JSON | Yes |
 | `result` | JSON | Yes |
 | `startedAt` | Datetime | Yes |
@@ -1452,19 +2283,104 @@ CRUD operations for PlatformFunctionInvocation records.
 
 ```typescript
 // List all platformFunctionInvocation records
-const items = await db.platformFunctionInvocation.findMany({ select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
+const items = await db.platformFunctionInvocation.findMany({ select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, createdByPrincipal: true, databaseId: true, definitionScope: true, durationMs: true, entityId: true, entityType: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, organizationId: true, parentInvocationId: true, payload: true, principalId: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
 
 // Get one by id
-const item = await db.platformFunctionInvocation.findOne({ id: '<UUID>', select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
+const item = await db.platformFunctionInvocation.findOne({ id: '<UUID>', select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, createdByPrincipal: true, databaseId: true, definitionScope: true, durationMs: true, entityId: true, entityType: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, organizationId: true, parentInvocationId: true, payload: true, principalId: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
 
 // Create
-const created = await db.platformFunctionInvocation.create({ data: { actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', databaseId: '<UUID>', definitionScope: '<String>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' }, select: { id: true } }).execute();
+const created = await db.platformFunctionInvocation.create({ data: { actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', definitionScope: '<String>', durationMs: '<Int>', entityId: '<UUID>', entityType: '<String>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', organizationId: '<UUID>', parentInvocationId: '<UUID>', payload: '<JSON>', principalId: '<UUID>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformFunctionInvocation.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.platformFunctionInvocation.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformImage`
+
+CRUD operations for PlatformImage records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `description` | String | Yes |
+| `digest` | String | Yes |
+| `expiresAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `isPublished` | Boolean | Yes |
+| `labels` | JSON | Yes |
+| `metadata` | JSON | Yes |
+| `name` | String | Yes |
+| `ownerId` | UUID | Yes |
+| `platformOnly` | Boolean | Yes |
+| `registryHost` | String | Yes |
+| `repository` | String | Yes |
+| `runtime` | String | Yes |
+| `tag` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformImage records
+const items = await db.platformImage.findMany({ select: { createdAt: true, createdByPrincipal: true, description: true, digest: true, expiresAt: true, id: true, isPublished: true, labels: true, metadata: true, name: true, ownerId: true, platformOnly: true, registryHost: true, repository: true, runtime: true, tag: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformImage.findOne({ id: '<UUID>', select: { createdAt: true, createdByPrincipal: true, description: true, digest: true, expiresAt: true, id: true, isPublished: true, labels: true, metadata: true, name: true, ownerId: true, platformOnly: true, registryHost: true, repository: true, runtime: true, tag: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformImage.create({ data: { createdByPrincipal: '<UUID>', description: '<String>', digest: '<String>', expiresAt: '<Datetime>', isPublished: '<Boolean>', labels: '<JSON>', metadata: '<JSON>', name: '<String>', ownerId: '<UUID>', platformOnly: '<Boolean>', registryHost: '<String>', repository: '<String>', runtime: '<String>', tag: '<String>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformImage.update({ where: { id: '<UUID>' }, data: { createdByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformImage.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformImageGrant`
+
+CRUD operations for PlatformImageGrant records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actions` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `expiresAt` | Datetime | Yes |
+| `grantedBy` | UUID | Yes |
+| `granteeKey` | UUID | Yes |
+| `granteeScope` | String | Yes |
+| `id` | UUID | No |
+| `imageId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformImageGrant records
+const items = await db.platformImageGrant.findMany({ select: { actions: true, createdAt: true, createdByPrincipal: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, imageId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformImageGrant.findOne({ id: '<UUID>', select: { actions: true, createdAt: true, createdByPrincipal: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, imageId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformImageGrant.create({ data: { actions: '<String>', createdByPrincipal: '<UUID>', expiresAt: '<Datetime>', grantedBy: '<UUID>', granteeKey: '<UUID>', granteeScope: '<String>', imageId: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformImageGrant.update({ where: { id: '<UUID>' }, data: { actions: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformImageGrant.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformInfraCommit`
@@ -1634,6 +2550,82 @@ const updated = await db.platformInfraStore.update({ where: { id: '<UUID>' }, da
 const deleted = await db.platformInfraStore.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.platformK8sResourceKind`
+
+CRUD operations for PlatformK8sResourceKind records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `active` | Boolean | Yes |
+| `commitId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `definition` | JSON | Yes |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `label` | String | Yes |
+| `slug` | String | Yes |
+| `storeId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformK8sResourceKind records
+const items = await db.platformK8sResourceKind.findMany({ select: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, slug: true, storeId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformK8sResourceKind.findOne({ id: '<UUID>', select: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, slug: true, storeId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformK8sResourceKind.create({ data: { active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', label: '<String>', slug: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformK8sResourceKind.update({ where: { id: '<UUID>' }, data: { active: '<Boolean>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformK8sResourceKind.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformK8sSpecRule`
+
+CRUD operations for PlatformK8sSpecRule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `active` | Boolean | Yes |
+| `commitId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `definition` | JSON | Yes |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `label` | String | Yes |
+| `slug` | String | Yes |
+| `storeId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformK8sSpecRule records
+const items = await db.platformK8sSpecRule.findMany({ select: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, slug: true, storeId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformK8sSpecRule.findOne({ id: '<UUID>', select: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, slug: true, storeId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformK8sSpecRule.create({ data: { active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', label: '<String>', slug: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformK8sSpecRule.update({ where: { id: '<UUID>' }, data: { active: '<Boolean>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformK8sSpecRule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.platformNamespace`
 
 CRUD operations for PlatformNamespace records.
@@ -1643,6 +2635,7 @@ CRUD operations for PlatformNamespace records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `annotations` | JSON | Yes |
+| `clusterId` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `description` | String | Yes |
 | `id` | UUID | No |
@@ -1659,13 +2652,13 @@ CRUD operations for PlatformNamespace records.
 
 ```typescript
 // List all platformNamespace records
-const items = await db.platformNamespace.findMany({ select: { annotations: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } }).execute();
+const items = await db.platformNamespace.findMany({ select: { annotations: true, clusterId: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.platformNamespace.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } }).execute();
+const item = await db.platformNamespace.findOne({ id: '<UUID>', select: { annotations: true, clusterId: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.platformNamespace.create({ data: { annotations: '<JSON>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' }, select: { id: true } }).execute();
+const created = await db.platformNamespace.create({ data: { annotations: '<JSON>', clusterId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformNamespace.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -1709,6 +2702,620 @@ const updated = await db.platformNamespaceEvent.update({ where: { id: '<UUID>' }
 const deleted = await db.platformNamespaceEvent.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.platformProposalComment`
+
+CRUD operations for PlatformProposalComment records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `attachments` | ConstructiveInternalTypeUpload | Yes |
+| `body` | String | Yes |
+| `bodyTrgmSimilarity` | Float | Yes |
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `embedding` | Vector | Yes |
+| `embeddingUpdatedAt` | Datetime | Yes |
+| `embeddingVectorDistance` | Float | Yes |
+| `id` | UUID | No |
+| `line` | Int | Yes |
+| `outdatedAt` | Datetime | Yes |
+| `path` | String | Yes |
+| `pathTrgmSimilarity` | Float | Yes |
+| `proposalId` | UUID | Yes |
+| `resolvedAt` | Datetime | Yes |
+| `search` | FullText | Yes |
+| `searchScore` | Float | Yes |
+| `searchTsvRank` | Float | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformProposalComment records
+const items = await db.platformProposalComment.findMany({ select: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformProposalComment.findOne({ id: '<UUID>', select: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformProposalComment.create({ data: { actorId: '<UUID>', attachments: '<Upload>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', line: '<Int>', outdatedAt: '<Datetime>', path: '<String>', pathTrgmSimilarity: '<Float>', proposalId: '<UUID>', resolvedAt: '<Datetime>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformProposalComment.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformProposalComment.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.
+
+> **Unified Search API fields:** `search`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+### `db.platformProposal`
+
+CRUD operations for PlatformProposal records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `body` | String | Yes |
+| `bodyTrgmSimilarity` | Float | Yes |
+| `closedReason` | String | Yes |
+| `closedReasonTrgmSimilarity` | Float | Yes |
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `decidedAt` | Datetime | Yes |
+| `dueAt` | Datetime | Yes |
+| `embedding` | Vector | Yes |
+| `embeddingUpdatedAt` | Datetime | Yes |
+| `embeddingVectorDistance` | Float | Yes |
+| `id` | UUID | No |
+| `kind` | String | Yes |
+| `kindTrgmSimilarity` | Float | Yes |
+| `labels` | String | Yes |
+| `mergeCommit` | String | Yes |
+| `mergeCommitTrgmSimilarity` | Float | Yes |
+| `mergeMethod` | String | Yes |
+| `mergeMethodTrgmSimilarity` | Float | Yes |
+| `mergeRequestedAt` | Datetime | Yes |
+| `mergedAt` | Datetime | Yes |
+| `metadata` | JSON | Yes |
+| `parentId` | UUID | Yes |
+| `priority` | BigFloat | Yes |
+| `repositoryId` | UUID | Yes |
+| `resolution` | String | Yes |
+| `resolutionTrgmSimilarity` | Float | Yes |
+| `search` | FullText | Yes |
+| `searchScore` | Float | Yes |
+| `searchTsvRank` | Float | Yes |
+| `sourceRef` | String | Yes |
+| `sourceRefTrgmSimilarity` | Float | Yes |
+| `status` | String | Yes |
+| `statusTrgmSimilarity` | Float | Yes |
+| `targetRef` | String | Yes |
+| `targetRefTrgmSimilarity` | Float | Yes |
+| `title` | String | Yes |
+| `titleTrgmSimilarity` | Float | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformProposal records
+const items = await db.platformProposal.findMany({ select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformProposal.findOne({ id: '<UUID>', select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformProposal.create({ data: { actorId: '<UUID>', body: '<String>', bodyTrgmSimilarity: '<Float>', closedReason: '<String>', closedReasonTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', decidedAt: '<Datetime>', dueAt: '<Datetime>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', kind: '<String>', kindTrgmSimilarity: '<Float>', labels: '<String>', mergeCommit: '<String>', mergeCommitTrgmSimilarity: '<Float>', mergeMethod: '<String>', mergeMethodTrgmSimilarity: '<Float>', mergeRequestedAt: '<Datetime>', mergedAt: '<Datetime>', metadata: '<JSON>', parentId: '<UUID>', priority: '<BigFloat>', repositoryId: '<UUID>', resolution: '<String>', resolutionTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', sourceRef: '<String>', sourceRefTrgmSimilarity: '<Float>', status: '<String>', statusTrgmSimilarity: '<Float>', targetRef: '<String>', targetRefTrgmSimilarity: '<Float>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformProposal.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformProposal.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.
+
+> **Unified Search API fields:** `search`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+### `db.platformProposalFileView`
+
+CRUD operations for PlatformProposalFileView records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `blobSha` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `id` | UUID | No |
+| `path` | String | Yes |
+| `proposalId` | UUID | Yes |
+| `reviewerId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+| `viewedAt` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformProposalFileView records
+const items = await db.platformProposalFileView.findMany({ select: { blobSha: true, createdAt: true, createdByPrincipal: true, id: true, path: true, proposalId: true, reviewerId: true, updatedAt: true, updatedByPrincipal: true, viewedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformProposalFileView.findOne({ id: '<UUID>', select: { blobSha: true, createdAt: true, createdByPrincipal: true, id: true, path: true, proposalId: true, reviewerId: true, updatedAt: true, updatedByPrincipal: true, viewedAt: true } }).execute();
+
+// Create
+const created = await db.platformProposalFileView.create({ data: { blobSha: '<String>', createdByPrincipal: '<UUID>', path: '<String>', proposalId: '<UUID>', reviewerId: '<UUID>', updatedByPrincipal: '<UUID>', viewedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformProposalFileView.update({ where: { id: '<UUID>' }, data: { blobSha: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformProposalFileView.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformProposalReaction`
+
+CRUD operations for PlatformProposalReaction records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `commentId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `emoji` | String | Yes |
+| `id` | UUID | No |
+| `proposalId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformProposalReaction records
+const items = await db.platformProposalReaction.findMany({ select: { actorId: true, commentId: true, createdAt: true, createdByPrincipal: true, emoji: true, id: true, proposalId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformProposalReaction.findOne({ id: '<UUID>', select: { actorId: true, commentId: true, createdAt: true, createdByPrincipal: true, emoji: true, id: true, proposalId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformProposalReaction.create({ data: { actorId: '<UUID>', commentId: '<UUID>', createdByPrincipal: '<UUID>', emoji: '<String>', proposalId: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformProposalReaction.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformProposalReaction.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformProposalReview`
+
+CRUD operations for PlatformProposalReview records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `body` | String | Yes |
+| `bodyTrgmSimilarity` | Float | Yes |
+| `commitSha` | String | Yes |
+| `commitShaTrgmSimilarity` | Float | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `id` | UUID | No |
+| `proposalId` | UUID | Yes |
+| `reviewerId` | UUID | Yes |
+| `search` | FullText | Yes |
+| `searchScore` | Float | Yes |
+| `searchTsvRank` | Float | Yes |
+| `submittedAt` | Datetime | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+| `verdict` | String | Yes |
+| `verdictTrgmSimilarity` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformProposalReview records
+const items = await db.platformProposalReview.findMany({ select: { body: true, bodyTrgmSimilarity: true, commitSha: true, commitShaTrgmSimilarity: true, createdAt: true, createdByPrincipal: true, id: true, proposalId: true, reviewerId: true, search: true, searchScore: true, searchTsvRank: true, submittedAt: true, updatedAt: true, updatedByPrincipal: true, verdict: true, verdictTrgmSimilarity: true } }).execute();
+
+// Get one by id
+const item = await db.platformProposalReview.findOne({ id: '<UUID>', select: { body: true, bodyTrgmSimilarity: true, commitSha: true, commitShaTrgmSimilarity: true, createdAt: true, createdByPrincipal: true, id: true, proposalId: true, reviewerId: true, search: true, searchScore: true, searchTsvRank: true, submittedAt: true, updatedAt: true, updatedByPrincipal: true, verdict: true, verdictTrgmSimilarity: true } }).execute();
+
+// Create
+const created = await db.platformProposalReview.create({ data: { body: '<String>', bodyTrgmSimilarity: '<Float>', commitSha: '<String>', commitShaTrgmSimilarity: '<Float>', createdByPrincipal: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>', verdictTrgmSimilarity: '<Float>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformProposalReview.update({ where: { id: '<UUID>' }, data: { body: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformProposalReview.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **Unified Search API fields:** `search`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+### `db.platformProposalsChunk`
+
+CRUD operations for PlatformProposalsChunk records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `body` | String | Yes |
+| `chunkIndex` | Int | Yes |
+| `createdAt` | Datetime | No |
+| `embedding` | Vector | Yes |
+| `embeddingVectorDistance` | Float | Yes |
+| `id` | UUID | No |
+| `metadata` | JSON | Yes |
+| `platformProposalsId` | UUID | Yes |
+| `searchScore` | Float | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformProposalsChunk records
+const items = await db.platformProposalsChunk.findMany({ select: { actorId: true, body: true, chunkIndex: true, createdAt: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, platformProposalsId: true, searchScore: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformProposalsChunk.findOne({ id: '<UUID>', select: { actorId: true, body: true, chunkIndex: true, createdAt: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, platformProposalsId: true, searchScore: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformProposalsChunk.create({ data: { actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', platformProposalsId: '<UUID>', searchScore: '<Float>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformProposalsChunk.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformProposalsChunk.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.
+
+### `db.platformRegistryBinding`
+
+CRUD operations for PlatformRegistryBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `id` | UUID | No |
+| `metadata` | JSON | Yes |
+| `namespaceId` | UUID | Yes |
+| `observedCredentialVersion` | String | Yes |
+| `pullSecretName` | String | Yes |
+| `realm` | String | Yes |
+| `registryHost` | String | Yes |
+| `registryId` | UUID | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformRegistryBinding records
+const items = await db.platformRegistryBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, metadata: true, namespaceId: true, observedCredentialVersion: true, pullSecretName: true, realm: true, registryHost: true, registryId: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformRegistryBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, metadata: true, namespaceId: true, observedCredentialVersion: true, pullSecretName: true, realm: true, registryHost: true, registryId: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformRegistryBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', metadata: '<JSON>', namespaceId: '<UUID>', observedCredentialVersion: '<String>', pullSecretName: '<String>', realm: '<String>', registryHost: '<String>', registryId: '<UUID>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformRegistryBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformRegistryBinding.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformRegistry`
+
+CRUD operations for PlatformRegistry records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `authMode` | String | Yes |
+| `basePath` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `credentialSecretName` | String | Yes |
+| `host` | String | Yes |
+| `id` | UUID | No |
+| `installationId` | UUID | Yes |
+| `isPublished` | Boolean | Yes |
+| `kind` | String | Yes |
+| `labels` | JSON | Yes |
+| `lastError` | String | Yes |
+| `metadata` | JSON | Yes |
+| `name` | String | Yes |
+| `platformOnly` | Boolean | Yes |
+| `role` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformRegistry records
+const items = await db.platformRegistry.findMany({ select: { authMode: true, basePath: true, createdAt: true, createdByPrincipal: true, credentialSecretName: true, host: true, id: true, installationId: true, isPublished: true, kind: true, labels: true, lastError: true, metadata: true, name: true, platformOnly: true, role: true, status: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformRegistry.findOne({ id: '<UUID>', select: { authMode: true, basePath: true, createdAt: true, createdByPrincipal: true, credentialSecretName: true, host: true, id: true, installationId: true, isPublished: true, kind: true, labels: true, lastError: true, metadata: true, name: true, platformOnly: true, role: true, status: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformRegistry.create({ data: { authMode: '<String>', basePath: '<String>', createdByPrincipal: '<UUID>', credentialSecretName: '<String>', host: '<String>', installationId: '<UUID>', isPublished: '<Boolean>', kind: '<String>', labels: '<JSON>', lastError: '<String>', metadata: '<JSON>', name: '<String>', platformOnly: '<Boolean>', role: '<String>', status: '<String>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformRegistry.update({ where: { id: '<UUID>' }, data: { authMode: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformRegistry.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformRegistryGrant`
+
+CRUD operations for PlatformRegistryGrant records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actions` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `expiresAt` | Datetime | Yes |
+| `grantedBy` | UUID | Yes |
+| `granteeKey` | UUID | Yes |
+| `granteeScope` | String | Yes |
+| `id` | UUID | No |
+| `registryId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformRegistryGrant records
+const items = await db.platformRegistryGrant.findMany({ select: { actions: true, createdAt: true, createdByPrincipal: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, registryId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformRegistryGrant.findOne({ id: '<UUID>', select: { actions: true, createdAt: true, createdByPrincipal: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, registryId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformRegistryGrant.create({ data: { actions: '<String>', createdByPrincipal: '<UUID>', expiresAt: '<Datetime>', grantedBy: '<UUID>', granteeKey: '<UUID>', granteeScope: '<String>', registryId: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformRegistryGrant.update({ where: { id: '<UUID>' }, data: { actions: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformRegistryGrant.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformRepository`
+
+CRUD operations for PlatformRepository records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `cloneUrl` | String | Yes |
+| `cloneUrlTrgmSimilarity` | Float | Yes |
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `defaultBranch` | String | Yes |
+| `defaultBranchTrgmSimilarity` | Float | Yes |
+| `description` | String | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `embedding` | Vector | Yes |
+| `embeddingUpdatedAt` | Datetime | Yes |
+| `embeddingVectorDistance` | Float | Yes |
+| `externalId` | String | Yes |
+| `externalIdTrgmSimilarity` | Float | Yes |
+| `id` | UUID | No |
+| `isArchived` | Boolean | Yes |
+| `metadata` | JSON | Yes |
+| `name` | String | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `ownerId` | UUID | Yes |
+| `provider` | String | Yes |
+| `providerTrgmSimilarity` | Float | Yes |
+| `search` | FullText | Yes |
+| `searchScore` | Float | Yes |
+| `searchTsvRank` | Float | Yes |
+| `slug` | String | Yes |
+| `slugTrgmSimilarity` | Float | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+| `visibility` | String | Yes |
+| `visibilityTrgmSimilarity` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformRepository records
+const items = await db.platformRepository.findMany({ select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
+
+// Get one by id
+const item = await db.platformRepository.findOne({ id: '<UUID>', select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
+
+// Create
+const created = await db.platformRepository.create({ data: { cloneUrl: '<String>', cloneUrlTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', defaultBranch: '<String>', defaultBranchTrgmSimilarity: '<Float>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', externalId: '<String>', externalIdTrgmSimilarity: '<Float>', isArchived: '<Boolean>', metadata: '<JSON>', name: '<String>', nameTrgmSimilarity: '<Float>', ownerId: '<UUID>', provider: '<String>', providerTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', slugTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>', visibility: '<String>', visibilityTrgmSimilarity: '<Float>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformRepository.update({ where: { id: '<UUID>' }, data: { cloneUrl: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformRepository.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.
+
+> **Unified Search API fields:** `search`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+### `db.platformRepositoryEvent`
+
+CRUD operations for PlatformRepositoryEvent records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `commitSha` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `deliveryId` | String | Yes |
+| `eventType` | String | Yes |
+| `id` | UUID | No |
+| `metadata` | JSON | Yes |
+| `payload` | JSON | Yes |
+| `ref` | String | Yes |
+| `repositoryId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformRepositoryEvent records
+const items = await db.platformRepositoryEvent.findMany({ select: { actorId: true, commitSha: true, createdAt: true, createdByPrincipal: true, deliveryId: true, eventType: true, id: true, metadata: true, payload: true, ref: true, repositoryId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformRepositoryEvent.findOne({ id: '<UUID>', select: { actorId: true, commitSha: true, createdAt: true, createdByPrincipal: true, deliveryId: true, eventType: true, id: true, metadata: true, payload: true, ref: true, repositoryId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformRepositoryEvent.create({ data: { actorId: '<UUID>', commitSha: '<String>', createdByPrincipal: '<UUID>', deliveryId: '<String>', eventType: '<String>', metadata: '<JSON>', payload: '<JSON>', ref: '<String>', repositoryId: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformRepositoryEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformRepositoryEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformRepositoryRequiredCheck`
+
+CRUD operations for PlatformRepositoryRequiredCheck records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `id` | UUID | No |
+| `repositoryId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `workflowId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformRepositoryRequiredCheck records
+const items = await db.platformRepositoryRequiredCheck.findMany({ select: { createdAt: true, id: true, repositoryId: true, updatedAt: true, workflowId: true } }).execute();
+
+// Get one by id
+const item = await db.platformRepositoryRequiredCheck.findOne({ id: '<UUID>', select: { createdAt: true, id: true, repositoryId: true, updatedAt: true, workflowId: true } }).execute();
+
+// Create
+const created = await db.platformRepositoryRequiredCheck.create({ data: { repositoryId: '<UUID>', workflowId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformRepositoryRequiredCheck.update({ where: { id: '<UUID>' }, data: { repositoryId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformRepositoryRequiredCheck.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformRepositoryWorkflow`
+
+CRUD operations for PlatformRepositoryWorkflow records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `cancelInProgress` | Boolean | Yes |
+| `concurrencyKey` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `eventType` | String | Yes |
+| `graphId` | UUID | Yes |
+| `id` | UUID | No |
+| `inputs` | JSON | Yes |
+| `isEnabled` | Boolean | Yes |
+| `name` | String | Yes |
+| `refPattern` | String | Yes |
+| `repositoryId` | UUID | Yes |
+| `requiredSecrets` | String | Yes |
+| `slug` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformRepositoryWorkflow records
+const items = await db.platformRepositoryWorkflow.findMany({ select: { cancelInProgress: true, concurrencyKey: true, createdAt: true, createdBy: true, createdByPrincipal: true, eventType: true, graphId: true, id: true, inputs: true, isEnabled: true, name: true, refPattern: true, repositoryId: true, requiredSecrets: true, slug: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformRepositoryWorkflow.findOne({ id: '<UUID>', select: { cancelInProgress: true, concurrencyKey: true, createdAt: true, createdBy: true, createdByPrincipal: true, eventType: true, graphId: true, id: true, inputs: true, isEnabled: true, name: true, refPattern: true, repositoryId: true, requiredSecrets: true, slug: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformRepositoryWorkflow.create({ data: { cancelInProgress: '<Boolean>', concurrencyKey: '<String>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', eventType: '<String>', graphId: '<UUID>', inputs: '<JSON>', isEnabled: '<Boolean>', name: '<String>', refPattern: '<String>', repositoryId: '<UUID>', requiredSecrets: '<String>', slug: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformRepositoryWorkflow.update({ where: { id: '<UUID>' }, data: { cancelInProgress: '<Boolean>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformRepositoryWorkflow.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.platformResource`
 
 CRUD operations for PlatformResource records.
@@ -1722,8 +3329,10 @@ CRUD operations for PlatformResource records.
 | `cpuRequestMillicores` | BigInt | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `errorCount` | Int | Yes |
 | `id` | UUID | No |
+| `imageRef` | String | Yes |
 | `installationId` | UUID | Yes |
 | `integrations` | String | Yes |
 | `kind` | String | Yes |
@@ -1745,20 +3354,22 @@ CRUD operations for PlatformResource records.
 | `statusObserved` | JSON | Yes |
 | `storageClass` | String | Yes |
 | `storageSizeBytes` | BigInt | Yes |
+| `storageTotalBytes` | BigInt | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all platformResource records
-const items = await db.platformResource.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.platformResource.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.platformResource.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.platformResource.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.platformResource.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformResource.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', errorCount: '<Int>', imageRef: '<String>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResource.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -1788,18 +3399,19 @@ CRUD operations for PlatformResourceDeclaredCapacity records.
 | `source` | String | Yes |
 | `sourceId` | UUID | Yes |
 | `storageSizeBytes` | BigInt | Yes |
+| `storageTotalBytes` | BigInt | Yes |
 
 **Operations:**
 
 ```typescript
 // List all platformResourceDeclaredCapacity records
-const items = await db.platformResourceDeclaredCapacity.findMany({ select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true } }).execute();
+const items = await db.platformResourceDeclaredCapacity.findMany({ select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true, storageTotalBytes: true } }).execute();
 
 // Get one by id
-const item = await db.platformResourceDeclaredCapacity.findOne({ id: '<UUID>', select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true } }).execute();
+const item = await db.platformResourceDeclaredCapacity.findOne({ id: '<UUID>', select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true, storageTotalBytes: true } }).execute();
 
 // Create
-const created = await db.platformResourceDeclaredCapacity.create({ data: { cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>' }, select: { id: true } }).execute();
+const created = await db.platformResourceDeclaredCapacity.create({ data: { cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResourceDeclaredCapacity.update({ where: { id: '<UUID>' }, data: { cpuLimitMillicores: '<BigInt>' }, select: { id: true } }).execute();
@@ -1819,6 +3431,7 @@ CRUD operations for PlatformResourceDefinition records.
 | `annotations` | JSON | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `defaultSpec` | JSON | Yes |
 | `description` | String | Yes |
 | `id` | UUID | No |
@@ -1834,18 +3447,19 @@ CRUD operations for PlatformResourceDefinition records.
 | `stepUpMinAge` | Interval | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all platformResourceDefinition records
-const items = await db.platformResourceDefinition.findMany({ select: { annotations: true, createdAt: true, createdBy: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.platformResourceDefinition.findMany({ select: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.platformResourceDefinition.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, createdBy: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.platformResourceDefinition.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.platformResourceDefinition.create({ data: { annotations: '<JSON>', createdBy: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformResourceDefinition.create({ data: { annotations: '<JSON>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResourceDefinition.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -1900,6 +3514,7 @@ CRUD operations for PlatformResourceInstallation records.
 | `commitId` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `id` | UUID | No |
 | `name` | String | Yes |
 | `namespaceId` | UUID | Yes |
@@ -1910,24 +3525,71 @@ CRUD operations for PlatformResourceInstallation records.
 | `storeId` | UUID | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all platformResourceInstallation records
-const items = await db.platformResourceInstallation.findMany({ select: { commitId: true, createdAt: true, createdBy: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.platformResourceInstallation.findMany({ select: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.platformResourceInstallation.findOne({ id: '<UUID>', select: { commitId: true, createdAt: true, createdBy: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.platformResourceInstallation.findOne({ id: '<UUID>', select: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.platformResourceInstallation.create({ data: { commitId: '<UUID>', createdBy: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformResourceInstallation.create({ data: { commitId: '<UUID>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResourceInstallation.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.platformResourceInstallation.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformResourceObservedStorage`
+
+CRUD operations for PlatformResourceObservedStorage records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `capacity` | String | Yes |
+| `capacityBytes` | BigInt | Yes |
+| `claimName` | String | Yes |
+| `declaredStorageClass` | String | Yes |
+| `declaredStorageSizeBytes` | BigInt | Yes |
+| `declaredStorageTotalBytes` | BigInt | Yes |
+| `installationId` | UUID | Yes |
+| `isBound` | Boolean | Yes |
+| `kind` | String | Yes |
+| `namespaceId` | UUID | Yes |
+| `phase` | String | Yes |
+| `requested` | String | Yes |
+| `requestedBytes` | BigInt | Yes |
+| `resourceId` | UUID | Yes |
+| `resourceStatus` | String | Yes |
+| `slug` | String | Yes |
+| `storageClass` | String | Yes |
+| `storageName` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformResourceObservedStorage records
+const items = await db.platformResourceObservedStorage.findMany({ select: { capacity: true, capacityBytes: true, claimName: true, declaredStorageClass: true, declaredStorageSizeBytes: true, declaredStorageTotalBytes: true, installationId: true, isBound: true, kind: true, namespaceId: true, phase: true, requested: true, requestedBytes: true, resourceId: true, resourceStatus: true, slug: true, storageClass: true, storageName: true } }).execute();
+
+// Get one by id
+const item = await db.platformResourceObservedStorage.findOne({ id: '<UUID>', select: { capacity: true, capacityBytes: true, claimName: true, declaredStorageClass: true, declaredStorageSizeBytes: true, declaredStorageTotalBytes: true, installationId: true, isBound: true, kind: true, namespaceId: true, phase: true, requested: true, requestedBytes: true, resourceId: true, resourceStatus: true, slug: true, storageClass: true, storageName: true } }).execute();
+
+// Create
+const created = await db.platformResourceObservedStorage.create({ data: { capacity: '<String>', capacityBytes: '<BigInt>', claimName: '<String>', declaredStorageClass: '<String>', declaredStorageSizeBytes: '<BigInt>', declaredStorageTotalBytes: '<BigInt>', installationId: '<UUID>', isBound: '<Boolean>', kind: '<String>', namespaceId: '<UUID>', phase: '<String>', requested: '<String>', requestedBytes: '<BigInt>', resourceId: '<UUID>', resourceStatus: '<String>', slug: '<String>', storageClass: '<String>', storageName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformResourceObservedStorage.update({ where: { id: '<UUID>' }, data: { capacity: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformResourceObservedStorage.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformResourceStatusCheck`
@@ -2099,8 +3761,10 @@ CRUD operations for PlatformResourcesHealth records.
 | `cpuRequestMillicores` | BigInt | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `errorCount` | Int | Yes |
 | `id` | UUID | No |
+| `imageRef` | String | Yes |
 | `installationId` | UUID | Yes |
 | `integrations` | String | Yes |
 | `kind` | String | Yes |
@@ -2123,20 +3787,22 @@ CRUD operations for PlatformResourcesHealth records.
 | `statusObserved` | JSON | Yes |
 | `storageClass` | String | Yes |
 | `storageSizeBytes` | BigInt | Yes |
+| `storageTotalBytes` | BigInt | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all platformResourcesHealth records
-const items = await db.platformResourcesHealth.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.platformResourcesHealth.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.platformResourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.platformResourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.platformResourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformResourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', errorCount: '<Int>', imageRef: '<String>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResourcesHealth.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -2230,6 +3896,7 @@ CRUD operations for PlatformWebhookEndpoint records.
 | `active` | Boolean | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `functionDefinitionId` | UUID | Yes |
 | `host` | String | Yes |
 | `id` | UUID | No |
@@ -2240,18 +3907,19 @@ CRUD operations for PlatformWebhookEndpoint records.
 | `signingSecretName` | String | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all platformWebhookEndpoint records
-const items = await db.platformWebhookEndpoint.findMany({ select: { active: true, createdAt: true, createdBy: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.platformWebhookEndpoint.findMany({ select: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.platformWebhookEndpoint.findOne({ id: '<UUID>', select: { active: true, createdAt: true, createdBy: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.platformWebhookEndpoint.findOne({ id: '<UUID>', select: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.platformWebhookEndpoint.create({ data: { active: '<Boolean>', createdBy: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformWebhookEndpoint.create({ data: { active: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformWebhookEndpoint.update({ where: { id: '<UUID>' }, data: { active: '<Boolean>' }, select: { id: true } }).execute();
@@ -2300,6 +3968,633 @@ const updated = await db.platformWebhookEvent.update({ where: { id: '<UUID>' }, 
 const deleted = await db.platformWebhookEvent.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.proposalComment`
+
+CRUD operations for ProposalComment records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `attachments` | ConstructiveInternalTypeUpload | Yes |
+| `body` | String | Yes |
+| `bodyTrgmSimilarity` | Float | Yes |
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `embedding` | Vector | Yes |
+| `embeddingUpdatedAt` | Datetime | Yes |
+| `embeddingVectorDistance` | Float | Yes |
+| `id` | UUID | No |
+| `line` | Int | Yes |
+| `outdatedAt` | Datetime | Yes |
+| `path` | String | Yes |
+| `pathTrgmSimilarity` | Float | Yes |
+| `proposalId` | UUID | Yes |
+| `resolvedAt` | Datetime | Yes |
+| `search` | FullText | Yes |
+| `searchScore` | Float | Yes |
+| `searchTsvRank` | Float | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all proposalComment records
+const items = await db.proposalComment.findMany({ select: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.proposalComment.findOne({ id: '<UUID>', select: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.proposalComment.create({ data: { actorId: '<UUID>', attachments: '<Upload>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', line: '<Int>', outdatedAt: '<Datetime>', path: '<String>', pathTrgmSimilarity: '<Float>', proposalId: '<UUID>', resolvedAt: '<Datetime>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.proposalComment.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.proposalComment.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.
+
+> **Unified Search API fields:** `search`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+### `db.proposal`
+
+CRUD operations for Proposal records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `body` | String | Yes |
+| `bodyTrgmSimilarity` | Float | Yes |
+| `closedReason` | String | Yes |
+| `closedReasonTrgmSimilarity` | Float | Yes |
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `decidedAt` | Datetime | Yes |
+| `dueAt` | Datetime | Yes |
+| `embedding` | Vector | Yes |
+| `embeddingUpdatedAt` | Datetime | Yes |
+| `embeddingVectorDistance` | Float | Yes |
+| `id` | UUID | No |
+| `kind` | String | Yes |
+| `kindTrgmSimilarity` | Float | Yes |
+| `labels` | String | Yes |
+| `mergeCommit` | String | Yes |
+| `mergeCommitTrgmSimilarity` | Float | Yes |
+| `mergeMethod` | String | Yes |
+| `mergeMethodTrgmSimilarity` | Float | Yes |
+| `mergeRequestedAt` | Datetime | Yes |
+| `mergedAt` | Datetime | Yes |
+| `metadata` | JSON | Yes |
+| `parentId` | UUID | Yes |
+| `priority` | BigFloat | Yes |
+| `repositoryId` | UUID | Yes |
+| `resolution` | String | Yes |
+| `resolutionTrgmSimilarity` | Float | Yes |
+| `search` | FullText | Yes |
+| `searchScore` | Float | Yes |
+| `searchTsvRank` | Float | Yes |
+| `sourceRef` | String | Yes |
+| `sourceRefTrgmSimilarity` | Float | Yes |
+| `status` | String | Yes |
+| `statusTrgmSimilarity` | Float | Yes |
+| `targetRef` | String | Yes |
+| `targetRefTrgmSimilarity` | Float | Yes |
+| `title` | String | Yes |
+| `titleTrgmSimilarity` | Float | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all proposal records
+const items = await db.proposal.findMany({ select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.proposal.findOne({ id: '<UUID>', select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.proposal.create({ data: { actorId: '<UUID>', body: '<String>', bodyTrgmSimilarity: '<Float>', closedReason: '<String>', closedReasonTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', decidedAt: '<Datetime>', dueAt: '<Datetime>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', kind: '<String>', kindTrgmSimilarity: '<Float>', labels: '<String>', mergeCommit: '<String>', mergeCommitTrgmSimilarity: '<Float>', mergeMethod: '<String>', mergeMethodTrgmSimilarity: '<Float>', mergeRequestedAt: '<Datetime>', mergedAt: '<Datetime>', metadata: '<JSON>', parentId: '<UUID>', priority: '<BigFloat>', repositoryId: '<UUID>', resolution: '<String>', resolutionTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', sourceRef: '<String>', sourceRefTrgmSimilarity: '<Float>', status: '<String>', statusTrgmSimilarity: '<Float>', targetRef: '<String>', targetRefTrgmSimilarity: '<Float>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.proposal.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.proposal.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.
+
+> **Unified Search API fields:** `search`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+### `db.proposalFileView`
+
+CRUD operations for ProposalFileView records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `blobSha` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `path` | String | Yes |
+| `proposalId` | UUID | Yes |
+| `reviewerId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+| `viewedAt` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all proposalFileView records
+const items = await db.proposalFileView.findMany({ select: { blobSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, id: true, path: true, proposalId: true, reviewerId: true, updatedAt: true, updatedByPrincipal: true, viewedAt: true } }).execute();
+
+// Get one by id
+const item = await db.proposalFileView.findOne({ id: '<UUID>', select: { blobSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, id: true, path: true, proposalId: true, reviewerId: true, updatedAt: true, updatedByPrincipal: true, viewedAt: true } }).execute();
+
+// Create
+const created = await db.proposalFileView.create({ data: { blobSha: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', path: '<String>', proposalId: '<UUID>', reviewerId: '<UUID>', updatedByPrincipal: '<UUID>', viewedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.proposalFileView.update({ where: { id: '<UUID>' }, data: { blobSha: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.proposalFileView.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.proposalReaction`
+
+CRUD operations for ProposalReaction records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `commentId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `emoji` | String | Yes |
+| `id` | UUID | No |
+| `proposalId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all proposalReaction records
+const items = await db.proposalReaction.findMany({ select: { actorId: true, commentId: true, createdAt: true, createdByPrincipal: true, databaseId: true, emoji: true, id: true, proposalId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.proposalReaction.findOne({ id: '<UUID>', select: { actorId: true, commentId: true, createdAt: true, createdByPrincipal: true, databaseId: true, emoji: true, id: true, proposalId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.proposalReaction.create({ data: { actorId: '<UUID>', commentId: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', emoji: '<String>', proposalId: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.proposalReaction.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.proposalReaction.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.proposalReview`
+
+CRUD operations for ProposalReview records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `body` | String | Yes |
+| `bodyTrgmSimilarity` | Float | Yes |
+| `commitSha` | String | Yes |
+| `commitShaTrgmSimilarity` | Float | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `proposalId` | UUID | Yes |
+| `reviewerId` | UUID | Yes |
+| `search` | FullText | Yes |
+| `searchScore` | Float | Yes |
+| `searchTsvRank` | Float | Yes |
+| `submittedAt` | Datetime | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+| `verdict` | String | Yes |
+| `verdictTrgmSimilarity` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all proposalReview records
+const items = await db.proposalReview.findMany({ select: { body: true, bodyTrgmSimilarity: true, commitSha: true, commitShaTrgmSimilarity: true, createdAt: true, createdByPrincipal: true, databaseId: true, id: true, proposalId: true, reviewerId: true, search: true, searchScore: true, searchTsvRank: true, submittedAt: true, updatedAt: true, updatedByPrincipal: true, verdict: true, verdictTrgmSimilarity: true } }).execute();
+
+// Get one by id
+const item = await db.proposalReview.findOne({ id: '<UUID>', select: { body: true, bodyTrgmSimilarity: true, commitSha: true, commitShaTrgmSimilarity: true, createdAt: true, createdByPrincipal: true, databaseId: true, id: true, proposalId: true, reviewerId: true, search: true, searchScore: true, searchTsvRank: true, submittedAt: true, updatedAt: true, updatedByPrincipal: true, verdict: true, verdictTrgmSimilarity: true } }).execute();
+
+// Create
+const created = await db.proposalReview.create({ data: { body: '<String>', bodyTrgmSimilarity: '<Float>', commitSha: '<String>', commitShaTrgmSimilarity: '<Float>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>', verdictTrgmSimilarity: '<Float>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.proposalReview.update({ where: { id: '<UUID>' }, data: { body: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.proposalReview.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **Unified Search API fields:** `search`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+### `db.proposalsChunk`
+
+CRUD operations for ProposalsChunk records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `body` | String | Yes |
+| `chunkIndex` | Int | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `embedding` | Vector | Yes |
+| `embeddingVectorDistance` | Float | Yes |
+| `id` | UUID | No |
+| `metadata` | JSON | Yes |
+| `proposalsId` | UUID | Yes |
+| `searchScore` | Float | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all proposalsChunk records
+const items = await db.proposalsChunk.findMany({ select: { actorId: true, body: true, chunkIndex: true, createdAt: true, databaseId: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, proposalsId: true, searchScore: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.proposalsChunk.findOne({ id: '<UUID>', select: { actorId: true, body: true, chunkIndex: true, createdAt: true, databaseId: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, proposalsId: true, searchScore: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.proposalsChunk.create({ data: { actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', proposalsId: '<UUID>', searchScore: '<Float>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.proposalsChunk.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.proposalsChunk.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.
+
+### `db.registryBinding`
+
+CRUD operations for RegistryBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `metadata` | JSON | Yes |
+| `namespaceId` | UUID | Yes |
+| `observedCredentialVersion` | String | Yes |
+| `pullSecretName` | String | Yes |
+| `realm` | String | Yes |
+| `registryHost` | String | Yes |
+| `registryId` | UUID | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all registryBinding records
+const items = await db.registryBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, metadata: true, namespaceId: true, observedCredentialVersion: true, pullSecretName: true, realm: true, registryHost: true, registryId: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.registryBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, metadata: true, namespaceId: true, observedCredentialVersion: true, pullSecretName: true, realm: true, registryHost: true, registryId: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.registryBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', metadata: '<JSON>', namespaceId: '<UUID>', observedCredentialVersion: '<String>', pullSecretName: '<String>', realm: '<String>', registryHost: '<String>', registryId: '<UUID>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.registryBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.registryBinding.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.registry`
+
+CRUD operations for Registry records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `authMode` | String | Yes |
+| `basePath` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `credentialSecretName` | String | Yes |
+| `databaseId` | UUID | Yes |
+| `host` | String | Yes |
+| `id` | UUID | No |
+| `installationId` | UUID | Yes |
+| `isPublished` | Boolean | Yes |
+| `kind` | String | Yes |
+| `labels` | JSON | Yes |
+| `lastError` | String | Yes |
+| `metadata` | JSON | Yes |
+| `name` | String | Yes |
+| `platformOnly` | Boolean | Yes |
+| `role` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all registry records
+const items = await db.registry.findMany({ select: { authMode: true, basePath: true, createdAt: true, createdByPrincipal: true, credentialSecretName: true, databaseId: true, host: true, id: true, installationId: true, isPublished: true, kind: true, labels: true, lastError: true, metadata: true, name: true, platformOnly: true, role: true, status: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.registry.findOne({ id: '<UUID>', select: { authMode: true, basePath: true, createdAt: true, createdByPrincipal: true, credentialSecretName: true, databaseId: true, host: true, id: true, installationId: true, isPublished: true, kind: true, labels: true, lastError: true, metadata: true, name: true, platformOnly: true, role: true, status: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.registry.create({ data: { authMode: '<String>', basePath: '<String>', createdByPrincipal: '<UUID>', credentialSecretName: '<String>', databaseId: '<UUID>', host: '<String>', installationId: '<UUID>', isPublished: '<Boolean>', kind: '<String>', labels: '<JSON>', lastError: '<String>', metadata: '<JSON>', name: '<String>', platformOnly: '<Boolean>', role: '<String>', status: '<String>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.registry.update({ where: { id: '<UUID>' }, data: { authMode: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.registry.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.registryGrant`
+
+CRUD operations for RegistryGrant records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actions` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `expiresAt` | Datetime | Yes |
+| `grantedBy` | UUID | Yes |
+| `granteeKey` | UUID | Yes |
+| `granteeScope` | String | Yes |
+| `id` | UUID | No |
+| `registryId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all registryGrant records
+const items = await db.registryGrant.findMany({ select: { actions: true, createdAt: true, createdByPrincipal: true, databaseId: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, registryId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.registryGrant.findOne({ id: '<UUID>', select: { actions: true, createdAt: true, createdByPrincipal: true, databaseId: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, registryId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.registryGrant.create({ data: { actions: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', expiresAt: '<Datetime>', grantedBy: '<UUID>', granteeKey: '<UUID>', granteeScope: '<String>', registryId: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.registryGrant.update({ where: { id: '<UUID>' }, data: { actions: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.registryGrant.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.repository`
+
+CRUD operations for Repository records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `cloneUrl` | String | Yes |
+| `cloneUrlTrgmSimilarity` | Float | Yes |
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `defaultBranch` | String | Yes |
+| `defaultBranchTrgmSimilarity` | Float | Yes |
+| `description` | String | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `embedding` | Vector | Yes |
+| `embeddingUpdatedAt` | Datetime | Yes |
+| `embeddingVectorDistance` | Float | Yes |
+| `externalId` | String | Yes |
+| `externalIdTrgmSimilarity` | Float | Yes |
+| `id` | UUID | No |
+| `isArchived` | Boolean | Yes |
+| `metadata` | JSON | Yes |
+| `name` | String | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `ownerId` | UUID | Yes |
+| `provider` | String | Yes |
+| `providerTrgmSimilarity` | Float | Yes |
+| `search` | FullText | Yes |
+| `searchScore` | Float | Yes |
+| `searchTsvRank` | Float | Yes |
+| `slug` | String | Yes |
+| `slugTrgmSimilarity` | Float | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+| `visibility` | String | Yes |
+| `visibilityTrgmSimilarity` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all repository records
+const items = await db.repository.findMany({ select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
+
+// Get one by id
+const item = await db.repository.findOne({ id: '<UUID>', select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
+
+// Create
+const created = await db.repository.create({ data: { cloneUrl: '<String>', cloneUrlTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', defaultBranch: '<String>', defaultBranchTrgmSimilarity: '<Float>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', externalId: '<String>', externalIdTrgmSimilarity: '<Float>', isArchived: '<Boolean>', metadata: '<JSON>', name: '<String>', nameTrgmSimilarity: '<Float>', ownerId: '<UUID>', provider: '<String>', providerTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', slugTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>', visibility: '<String>', visibilityTrgmSimilarity: '<Float>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.repository.update({ where: { id: '<UUID>' }, data: { cloneUrl: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.repository.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+> **pgvector embedding fields:** `embedding`
+> High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.
+
+> **Unified Search API fields:** `search`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+### `db.repositoryEvent`
+
+CRUD operations for RepositoryEvent records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `commitSha` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `deliveryId` | String | Yes |
+| `eventType` | String | Yes |
+| `id` | UUID | No |
+| `metadata` | JSON | Yes |
+| `payload` | JSON | Yes |
+| `ref` | String | Yes |
+| `repositoryId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all repositoryEvent records
+const items = await db.repositoryEvent.findMany({ select: { actorId: true, commitSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, deliveryId: true, eventType: true, id: true, metadata: true, payload: true, ref: true, repositoryId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.repositoryEvent.findOne({ id: '<UUID>', select: { actorId: true, commitSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, deliveryId: true, eventType: true, id: true, metadata: true, payload: true, ref: true, repositoryId: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.repositoryEvent.create({ data: { actorId: '<UUID>', commitSha: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', deliveryId: '<String>', eventType: '<String>', metadata: '<JSON>', payload: '<JSON>', ref: '<String>', repositoryId: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.repositoryEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.repositoryEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.repositoryRequiredCheck`
+
+CRUD operations for RepositoryRequiredCheck records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `repositoryId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `workflowId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all repositoryRequiredCheck records
+const items = await db.repositoryRequiredCheck.findMany({ select: { createdAt: true, databaseId: true, id: true, repositoryId: true, updatedAt: true, workflowId: true } }).execute();
+
+// Get one by id
+const item = await db.repositoryRequiredCheck.findOne({ id: '<UUID>', select: { createdAt: true, databaseId: true, id: true, repositoryId: true, updatedAt: true, workflowId: true } }).execute();
+
+// Create
+const created = await db.repositoryRequiredCheck.create({ data: { databaseId: '<UUID>', repositoryId: '<UUID>', workflowId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.repositoryRequiredCheck.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.repositoryRequiredCheck.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.repositoryWorkflow`
+
+CRUD operations for RepositoryWorkflow records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `cancelInProgress` | Boolean | Yes |
+| `concurrencyKey` | String | Yes |
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `eventType` | String | Yes |
+| `graphId` | UUID | Yes |
+| `id` | UUID | No |
+| `inputs` | JSON | Yes |
+| `isEnabled` | Boolean | Yes |
+| `name` | String | Yes |
+| `refPattern` | String | Yes |
+| `repositoryId` | UUID | Yes |
+| `requiredSecrets` | String | Yes |
+| `slug` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all repositoryWorkflow records
+const items = await db.repositoryWorkflow.findMany({ select: { cancelInProgress: true, concurrencyKey: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, eventType: true, graphId: true, id: true, inputs: true, isEnabled: true, name: true, refPattern: true, repositoryId: true, requiredSecrets: true, slug: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.repositoryWorkflow.findOne({ id: '<UUID>', select: { cancelInProgress: true, concurrencyKey: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, eventType: true, graphId: true, id: true, inputs: true, isEnabled: true, name: true, refPattern: true, repositoryId: true, requiredSecrets: true, slug: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.repositoryWorkflow.create({ data: { cancelInProgress: '<Boolean>', concurrencyKey: '<String>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', eventType: '<String>', graphId: '<UUID>', inputs: '<JSON>', isEnabled: '<Boolean>', name: '<String>', refPattern: '<String>', repositoryId: '<UUID>', requiredSecrets: '<String>', slug: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.repositoryWorkflow.update({ where: { id: '<UUID>' }, data: { cancelInProgress: '<Boolean>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.repositoryWorkflow.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.resource`
 
 CRUD operations for Resource records.
@@ -2313,9 +4608,11 @@ CRUD operations for Resource records.
 | `cpuRequestMillicores` | BigInt | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `errorCount` | Int | Yes |
 | `id` | UUID | No |
+| `imageRef` | String | Yes |
 | `installationId` | UUID | Yes |
 | `integrations` | String | Yes |
 | `kind` | String | Yes |
@@ -2337,20 +4634,22 @@ CRUD operations for Resource records.
 | `statusObserved` | JSON | Yes |
 | `storageClass` | String | Yes |
 | `storageSizeBytes` | BigInt | Yes |
+| `storageTotalBytes` | BigInt | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all resource records
-const items = await db.resource.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.resource.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.resource.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.resource.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.resource.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.resource.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', imageRef: '<String>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resource.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -2380,18 +4679,19 @@ CRUD operations for ResourceDeclaredCapacity records.
 | `source` | String | Yes |
 | `sourceId` | UUID | Yes |
 | `storageSizeBytes` | BigInt | Yes |
+| `storageTotalBytes` | BigInt | Yes |
 
 **Operations:**
 
 ```typescript
 // List all resourceDeclaredCapacity records
-const items = await db.resourceDeclaredCapacity.findMany({ select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true } }).execute();
+const items = await db.resourceDeclaredCapacity.findMany({ select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true, storageTotalBytes: true } }).execute();
 
 // Get one by id
-const item = await db.resourceDeclaredCapacity.findOne({ id: '<UUID>', select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true } }).execute();
+const item = await db.resourceDeclaredCapacity.findOne({ id: '<UUID>', select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true, storageTotalBytes: true } }).execute();
 
 // Create
-const created = await db.resourceDeclaredCapacity.create({ data: { cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>' }, select: { id: true } }).execute();
+const created = await db.resourceDeclaredCapacity.create({ data: { cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resourceDeclaredCapacity.update({ where: { id: '<UUID>' }, data: { cpuLimitMillicores: '<BigInt>' }, select: { id: true } }).execute();
@@ -2411,6 +4711,7 @@ CRUD operations for ResourceDefinition records.
 | `annotations` | JSON | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `defaultSpec` | JSON | Yes |
 | `description` | String | Yes |
@@ -2427,18 +4728,19 @@ CRUD operations for ResourceDefinition records.
 | `stepUpMinAge` | Interval | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all resourceDefinition records
-const items = await db.resourceDefinition.findMany({ select: { annotations: true, createdAt: true, createdBy: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.resourceDefinition.findMany({ select: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.resourceDefinition.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, createdBy: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.resourceDefinition.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.resourceDefinition.create({ data: { annotations: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.resourceDefinition.create({ data: { annotations: '<JSON>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resourceDefinition.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -2494,6 +4796,7 @@ CRUD operations for ResourceInstallation records.
 | `commitId` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
 | `name` | String | Yes |
@@ -2505,24 +4808,71 @@ CRUD operations for ResourceInstallation records.
 | `storeId` | UUID | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all resourceInstallation records
-const items = await db.resourceInstallation.findMany({ select: { commitId: true, createdAt: true, createdBy: true, databaseId: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.resourceInstallation.findMany({ select: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.resourceInstallation.findOne({ id: '<UUID>', select: { commitId: true, createdAt: true, createdBy: true, databaseId: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.resourceInstallation.findOne({ id: '<UUID>', select: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.resourceInstallation.create({ data: { commitId: '<UUID>', createdBy: '<UUID>', databaseId: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.resourceInstallation.create({ data: { commitId: '<UUID>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resourceInstallation.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.resourceInstallation.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.resourceObservedStorage`
+
+CRUD operations for ResourceObservedStorage records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `capacity` | String | Yes |
+| `capacityBytes` | BigInt | Yes |
+| `claimName` | String | Yes |
+| `declaredStorageClass` | String | Yes |
+| `declaredStorageSizeBytes` | BigInt | Yes |
+| `declaredStorageTotalBytes` | BigInt | Yes |
+| `installationId` | UUID | Yes |
+| `isBound` | Boolean | Yes |
+| `kind` | String | Yes |
+| `namespaceId` | UUID | Yes |
+| `phase` | String | Yes |
+| `requested` | String | Yes |
+| `requestedBytes` | BigInt | Yes |
+| `resourceId` | UUID | Yes |
+| `resourceStatus` | String | Yes |
+| `slug` | String | Yes |
+| `storageClass` | String | Yes |
+| `storageName` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all resourceObservedStorage records
+const items = await db.resourceObservedStorage.findMany({ select: { capacity: true, capacityBytes: true, claimName: true, declaredStorageClass: true, declaredStorageSizeBytes: true, declaredStorageTotalBytes: true, installationId: true, isBound: true, kind: true, namespaceId: true, phase: true, requested: true, requestedBytes: true, resourceId: true, resourceStatus: true, slug: true, storageClass: true, storageName: true } }).execute();
+
+// Get one by id
+const item = await db.resourceObservedStorage.findOne({ id: '<UUID>', select: { capacity: true, capacityBytes: true, claimName: true, declaredStorageClass: true, declaredStorageSizeBytes: true, declaredStorageTotalBytes: true, installationId: true, isBound: true, kind: true, namespaceId: true, phase: true, requested: true, requestedBytes: true, resourceId: true, resourceStatus: true, slug: true, storageClass: true, storageName: true } }).execute();
+
+// Create
+const created = await db.resourceObservedStorage.create({ data: { capacity: '<String>', capacityBytes: '<BigInt>', claimName: '<String>', declaredStorageClass: '<String>', declaredStorageSizeBytes: '<BigInt>', declaredStorageTotalBytes: '<BigInt>', installationId: '<UUID>', isBound: '<Boolean>', kind: '<String>', namespaceId: '<UUID>', phase: '<String>', requested: '<String>', requestedBytes: '<BigInt>', resourceId: '<UUID>', resourceStatus: '<String>', slug: '<String>', storageClass: '<String>', storageName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.resourceObservedStorage.update({ where: { id: '<UUID>' }, data: { capacity: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.resourceObservedStorage.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.resourceStatusCheck`
@@ -2697,9 +5047,11 @@ CRUD operations for ResourcesHealth records.
 | `cpuRequestMillicores` | BigInt | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `errorCount` | Int | Yes |
 | `id` | UUID | No |
+| `imageRef` | String | Yes |
 | `installationId` | UUID | Yes |
 | `integrations` | String | Yes |
 | `kind` | String | Yes |
@@ -2722,20 +5074,22 @@ CRUD operations for ResourcesHealth records.
 | `statusObserved` | JSON | Yes |
 | `storageClass` | String | Yes |
 | `storageSizeBytes` | BigInt | Yes |
+| `storageTotalBytes` | BigInt | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all resourcesHealth records
-const items = await db.resourcesHealth.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.resourcesHealth.findMany({ select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.resourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.resourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.resourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.resourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', imageRef: '<String>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resourcesHealth.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -2829,6 +5183,7 @@ CRUD operations for WebhookEndpoint records.
 | `active` | Boolean | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `functionDefinitionId` | UUID | Yes |
 | `host` | String | Yes |
@@ -2840,18 +5195,19 @@ CRUD operations for WebhookEndpoint records.
 | `signingSecretName` | String | Yes |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all webhookEndpoint records
-const items = await db.webhookEndpoint.findMany({ select: { active: true, createdAt: true, createdBy: true, databaseId: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } }).execute();
+const items = await db.webhookEndpoint.findMany({ select: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.webhookEndpoint.findOne({ id: '<UUID>', select: { active: true, createdAt: true, createdBy: true, databaseId: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } }).execute();
+const item = await db.webhookEndpoint.findOne({ id: '<UUID>', select: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.webhookEndpoint.create({ data: { active: '<Boolean>', createdBy: '<UUID>', databaseId: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.webhookEndpoint.create({ data: { active: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.webhookEndpoint.update({ where: { id: '<UUID>' }, data: { active: '<Boolean>' }, select: { id: true } }).execute();
@@ -2902,6 +5258,21 @@ const deleted = await db.webhookEvent.delete({ where: { id: '<UUID>' } }).execut
 ```
 
 ## Custom Operations
+
+### `db.query.databaseReadFunctionGraph`
+
+databaseReadFunctionGraph
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `graphId` | UUID |
+
+```typescript
+const result = await db.query.databaseReadFunctionGraph({ graphId: '<UUID>' }).execute();
+```
 
 ### `db.query.readFunctionGraph`
 
@@ -2978,6 +5349,21 @@ addNodeAndSave
 const result = await db.mutation.addNodeAndSave({ input: '<AddNodeAndSaveInput>' }).execute();
 ```
 
+### `db.mutation.approveNode`
+
+approveNode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ApproveNodeInput (required) |
+
+```typescript
+const result = await db.mutation.approveNode({ input: { approved: '<Boolean>', executionId: '<UUID>', feedback: '<JSON>', nodeName: '<String>' } }).execute();
+```
+
 ### `db.mutation.copyGraph`
 
 copyGraph
@@ -2991,6 +5377,291 @@ copyGraph
 
 ```typescript
 const result = await db.mutation.copyGraph({ input: { graphId: '<UUID>', name: '<String>', scopeId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.databaseAddEdge`
+
+databaseAddEdge
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseAddEdgeInput (required) |
+
+```typescript
+const result = await db.mutation.databaseAddEdge({ input: '<DatabaseAddEdgeInput>' }).execute();
+```
+
+### `db.mutation.databaseAddEdgeAndSave`
+
+databaseAddEdgeAndSave
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseAddEdgeAndSaveInput (required) |
+
+```typescript
+const result = await db.mutation.databaseAddEdgeAndSave({ input: '<DatabaseAddEdgeAndSaveInput>' }).execute();
+```
+
+### `db.mutation.databaseAddNode`
+
+databaseAddNode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseAddNodeInput (required) |
+
+```typescript
+const result = await db.mutation.databaseAddNode({ input: '<DatabaseAddNodeInput>' }).execute();
+```
+
+### `db.mutation.databaseAddNodeAndSave`
+
+databaseAddNodeAndSave
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseAddNodeAndSaveInput (required) |
+
+```typescript
+const result = await db.mutation.databaseAddNodeAndSave({ input: '<DatabaseAddNodeAndSaveInput>' }).execute();
+```
+
+### `db.mutation.databaseApproveNode`
+
+databaseApproveNode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseApproveNodeInput (required) |
+
+```typescript
+const result = await db.mutation.databaseApproveNode({ input: { approved: '<Boolean>', executionId: '<UUID>', feedback: '<JSON>', nodeName: '<String>' } }).execute();
+```
+
+### `db.mutation.databaseCopyGraph`
+
+databaseCopyGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseCopyGraphInput (required) |
+
+```typescript
+const result = await db.mutation.databaseCopyGraph({ input: { databaseId: '<UUID>', graphId: '<UUID>', name: '<String>' } }).execute();
+```
+
+### `db.mutation.databaseCreateFunctionGraph`
+
+databaseCreateFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseCreateFunctionGraphInput (required) |
+
+```typescript
+const result = await db.mutation.databaseCreateFunctionGraph({ input: '<DatabaseCreateFunctionGraphInput>' }).execute();
+```
+
+### `db.mutation.databaseGraphInitEmptyRepo`
+
+databaseGraphInitEmptyRepo
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphInitEmptyRepoInput (required) |
+
+```typescript
+const result = await db.mutation.databaseGraphInitEmptyRepo({ input: { sId: '<UUID>', storeId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.databaseGraphInsertNodeAtPath`
+
+databaseGraphInsertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphInsertNodeAtPathInput (required) |
+
+```typescript
+const result = await db.mutation.databaseGraphInsertNodeAtPath({ input: '<DatabaseGraphInsertNodeAtPathInput>' }).execute();
+```
+
+### `db.mutation.databaseGraphInsertNodesAtPaths`
+
+databaseGraphInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphInsertNodesAtPathsInput (required) |
+
+```typescript
+const result = await db.mutation.databaseGraphInsertNodesAtPaths({ input: '<DatabaseGraphInsertNodesAtPathsInput>' }).execute();
+```
+
+### `db.mutation.databaseGraphSetAndCommit`
+
+databaseGraphSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphSetAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.databaseGraphSetAndCommit({ input: '<DatabaseGraphSetAndCommitInput>' }).execute();
+```
+
+### `db.mutation.databaseGraphSetDataAtPath`
+
+databaseGraphSetDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphSetDataAtPathInput (required) |
+
+```typescript
+const result = await db.mutation.databaseGraphSetDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.databaseGraphSetManyAndCommit`
+
+databaseGraphSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphSetManyAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.databaseGraphSetManyAndCommit({ input: { entries: '<JSON>', message: '<String>', refname: '<String>', sId: '<UUID>', storeId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.databaseImportDefinitions`
+
+databaseImportDefinitions
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseImportDefinitionsInput (required) |
+
+```typescript
+const result = await db.mutation.databaseImportDefinitions({ input: { contexts: '<String>', graphId: '<UUID>', sourceCommitId: '<UUID>', sourceScopeId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.databaseImportGraphJson`
+
+databaseImportGraphJson
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseImportGraphJsonInput (required) |
+
+```typescript
+const result = await db.mutation.databaseImportGraphJson({ input: '<DatabaseImportGraphJsonInput>' }).execute();
+```
+
+### `db.mutation.databaseSaveGraph`
+
+databaseSaveGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseSaveGraphInput (required) |
+
+```typescript
+const result = await db.mutation.databaseSaveGraph({ input: { graphId: '<UUID>', message: '<String>', rootHash: '<UUID>' } }).execute();
+```
+
+### `db.mutation.databaseStartExecution`
+
+databaseStartExecution
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseStartExecutionInput (required) |
+
+```typescript
+const result = await db.mutation.databaseStartExecution({ input: '<DatabaseStartExecutionInput>' }).execute();
+```
+
+### `db.mutation.databaseValidateFunctionGraph`
+
+databaseValidateFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseValidateFunctionGraphInput (required) |
+
+```typescript
+const result = await db.mutation.databaseValidateFunctionGraph({ input: { graphId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.functionInvocationsCreateSync`
+
+functionInvocationsCreateSync
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | FunctionInvocationsCreateSyncInput (required) |
+
+```typescript
+const result = await db.mutation.functionInvocationsCreateSync({ input: { entityId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', routeBindingId: '<UUID>', taskIdentifier: '<String>' } }).execute();
 ```
 
 ### `db.mutation.importDefinitions`
@@ -3053,6 +5724,36 @@ infraInsertNodeAtPath
 const result = await db.mutation.infraInsertNodeAtPath({ input: '<InfraInsertNodeAtPathInput>' }).execute();
 ```
 
+### `db.mutation.infraInsertNodesAtPaths`
+
+infraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | InfraInsertNodesAtPathsInput (required) |
+
+```typescript
+const result = await db.mutation.infraInsertNodesAtPaths({ input: '<InfraInsertNodesAtPathsInput>' }).execute();
+```
+
+### `db.mutation.infraSetAndCommit`
+
+infraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | InfraSetAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.infraSetAndCommit({ input: '<InfraSetAndCommitInput>' }).execute();
+```
+
 ### `db.mutation.infraSetDataAtPath`
 
 infraSetDataAtPath
@@ -3066,6 +5767,21 @@ infraSetDataAtPath
 
 ```typescript
 const result = await db.mutation.infraSetDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.infraSetManyAndCommit`
+
+infraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | InfraSetManyAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.infraSetManyAndCommit({ input: { entries: '<JSON>', message: '<String>', refname: '<String>', sId: '<UUID>', storeId: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.initEmptyRepo`
@@ -3098,6 +5814,36 @@ insertNodeAtPath
 const result = await db.mutation.insertNodeAtPath({ input: '<InsertNodeAtPathInput>' }).execute();
 ```
 
+### `db.mutation.insertNodesAtPaths`
+
+insertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | InsertNodesAtPathsInput (required) |
+
+```typescript
+const result = await db.mutation.insertNodesAtPaths({ input: '<InsertNodesAtPathsInput>' }).execute();
+```
+
+### `db.mutation.platformFunctionInvocationsCreateSync`
+
+platformFunctionInvocationsCreateSync
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformFunctionInvocationsCreateSyncInput (required) |
+
+```typescript
+const result = await db.mutation.platformFunctionInvocationsCreateSync({ input: { entityId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', routeBindingId: '<UUID>', taskIdentifier: '<String>' } }).execute();
+```
+
 ### `db.mutation.platformInfraInitEmptyRepo`
 
 platformInfraInitEmptyRepo
@@ -3128,6 +5874,36 @@ platformInfraInsertNodeAtPath
 const result = await db.mutation.platformInfraInsertNodeAtPath({ input: '<PlatformInfraInsertNodeAtPathInput>' }).execute();
 ```
 
+### `db.mutation.platformInfraInsertNodesAtPaths`
+
+platformInfraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraInsertNodesAtPathsInput (required) |
+
+```typescript
+const result = await db.mutation.platformInfraInsertNodesAtPaths({ input: '<PlatformInfraInsertNodesAtPathsInput>' }).execute();
+```
+
+### `db.mutation.platformInfraSetAndCommit`
+
+platformInfraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraSetAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.platformInfraSetAndCommit({ input: '<PlatformInfraSetAndCommitInput>' }).execute();
+```
+
 ### `db.mutation.platformInfraSetDataAtPath`
 
 platformInfraSetDataAtPath
@@ -3141,6 +5917,21 @@ platformInfraSetDataAtPath
 
 ```typescript
 const result = await db.mutation.platformInfraSetDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.platformInfraSetManyAndCommit`
+
+platformInfraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraSetManyAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.platformInfraSetManyAndCommit({ input: { entries: '<JSON>', message: '<String>', refname: '<String>', sId: '<UUID>', storeId: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.platformResourceInstallationsInstall`
@@ -3205,10 +5996,11 @@ const result = await db.mutation.platformResourceInstallationsUpgrade({ input: {
 
 ### `db.mutation.provisionBucket`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**
@@ -3296,6 +6088,21 @@ saveGraph
 const result = await db.mutation.saveGraph({ input: { graphId: '<UUID>', message: '<String>', rootHash: '<UUID>' } }).execute();
 ```
 
+### `db.mutation.setAndCommit`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.setAndCommit({ input: '<SetAndCommitInput>' }).execute();
+```
+
 ### `db.mutation.setDataAtPath`
 
 setDataAtPath
@@ -3309,6 +6116,21 @@ setDataAtPath
 
 ```typescript
 const result = await db.mutation.setDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.setManyAndCommit`
+
+setManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetManyAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.setManyAndCommit({ input: { entries: '<JSON>', message: '<String>', refname: '<String>', sId: '<UUID>', storeId: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.startExecution`

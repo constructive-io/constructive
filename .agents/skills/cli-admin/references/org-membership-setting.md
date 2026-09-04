@@ -12,8 +12,8 @@ csdk org-membership-setting list --where.<field>.<op> <value> --orderBy <values>
 csdk org-membership-setting list --limit 10 --after <cursor>
 csdk org-membership-setting find-first --where.<field>.<op> <value>
 csdk org-membership-setting get --id <UUID>
-csdk org-membership-setting create --entityId <UUID> [--allowExternalMembers <Boolean>] [--createChildCascadeAdmins <Boolean>] [--createChildCascadeMembers <Boolean>] [--createChildCascadeOwners <Boolean>] [--createdBy <UUID>] [--deleteMemberCascadeChildren <Boolean>] [--inviteProfileAssignmentMode <String>] [--limitAllocationMode <String>] [--populateMemberEmail <Boolean>] [--updatedBy <UUID>]
-csdk org-membership-setting update --id <UUID> [--allowExternalMembers <Boolean>] [--createChildCascadeAdmins <Boolean>] [--createChildCascadeMembers <Boolean>] [--createChildCascadeOwners <Boolean>] [--createdBy <UUID>] [--deleteMemberCascadeChildren <Boolean>] [--entityId <UUID>] [--inviteProfileAssignmentMode <String>] [--limitAllocationMode <String>] [--populateMemberEmail <Boolean>] [--updatedBy <UUID>]
+csdk org-membership-setting create --entityId <UUID> [--allowExternalMembers <Boolean>] [--allowPrincipalOwnedApiKeys <Boolean>] [--createChildCascadeAdmins <Boolean>] [--createChildCascadeMembers <Boolean>] [--createChildCascadeOwners <Boolean>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--deleteMemberCascadeChildren <Boolean>] [--inviteProfileAssignmentMode <String>] [--limitAllocationMode <String>] [--populateMemberEmail <Boolean>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk org-membership-setting update --id <UUID> [--allowExternalMembers <Boolean>] [--allowPrincipalOwnedApiKeys <Boolean>] [--createChildCascadeAdmins <Boolean>] [--createChildCascadeMembers <Boolean>] [--createChildCascadeOwners <Boolean>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--deleteMemberCascadeChildren <Boolean>] [--entityId <UUID>] [--inviteProfileAssignmentMode <String>] [--limitAllocationMode <String>] [--populateMemberEmail <Boolean>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 csdk org-membership-setting delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-membership-setting list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgMembershipSetting
 
 ```bash
-csdk org-membership-setting create --entityId <UUID> [--allowExternalMembers <Boolean>] [--createChildCascadeAdmins <Boolean>] [--createChildCascadeMembers <Boolean>] [--createChildCascadeOwners <Boolean>] [--createdBy <UUID>] [--deleteMemberCascadeChildren <Boolean>] [--inviteProfileAssignmentMode <String>] [--limitAllocationMode <String>] [--populateMemberEmail <Boolean>] [--updatedBy <UUID>]
+csdk org-membership-setting create --entityId <UUID> [--allowExternalMembers <Boolean>] [--allowPrincipalOwnedApiKeys <Boolean>] [--createChildCascadeAdmins <Boolean>] [--createChildCascadeMembers <Boolean>] [--createChildCascadeOwners <Boolean>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--deleteMemberCascadeChildren <Boolean>] [--inviteProfileAssignmentMode <String>] [--limitAllocationMode <String>] [--populateMemberEmail <Boolean>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a orgMembershipSetting by id

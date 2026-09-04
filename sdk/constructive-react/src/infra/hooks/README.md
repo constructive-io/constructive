@@ -32,6 +32,11 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
+| `useContentPresetsQuery` | Query | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
+| `useContentPresetQuery` | Query | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
+| `useCreateContentPresetMutation` | Mutation | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
+| `useUpdateContentPresetMutation` | Mutation | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
+| `useDeleteContentPresetMutation` | Mutation | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
 | `useDbPresetsQuery` | Query | Database provisioning preset catalog — merkle-versioned head over the infra store |
 | `useDbPresetQuery` | Query | Database provisioning preset catalog — merkle-versioned head over the infra store |
 | `useCreateDbPresetMutation` | Mutation | Database provisioning preset catalog — merkle-versioned head over the infra store |
@@ -81,13 +86,38 @@ function App() {
 | `useDeletePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `usePlatformInfraInitEmptyRepoMutation` | Mutation | platformInfraInitEmptyRepo |
 | `usePlatformInfraInsertNodeAtPathMutation` | Mutation | platformInfraInsertNodeAtPath |
+| `usePlatformInfraInsertNodesAtPathsMutation` | Mutation | platformInfraInsertNodesAtPaths |
+| `usePlatformInfraSetAndCommitMutation` | Mutation | platformInfraSetAndCommit |
 | `usePlatformInfraSetDataAtPathMutation` | Mutation | platformInfraSetDataAtPath |
-| `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `usePlatformInfraSetManyAndCommitMutation` | Mutation | platformInfraSetManyAndCommit |
+| `useProvisionBucketMutation` | Mutation | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
 
 ## Table Hooks
+
+### ContentPreset
+
+```typescript
+// List all contentPresets
+const { data, isLoading } = useContentPresetsQuery({
+  selection: { fields: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, kind: true, label: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Get one contentPreset
+const { data: item } = useContentPresetQuery({
+  id: '<UUID>',
+  selection: { fields: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, kind: true, label: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Create a contentPreset
+const { mutate: create } = useCreateContentPresetMutation({
+  selection: { fields: { id: true } },
+});
+create({ active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', kind: '<String>', label: '<String>', slug: '<String>', storeId: '<UUID>' });
+```
 
 ### DbPreset
 
@@ -115,20 +145,20 @@ create({ active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', descript
 ```typescript
 // List all namespaces
 const { data, isLoading } = useNamespacesQuery({
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
+  selection: { fields: { annotations: true, clusterId: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
 });
 
 // Get one namespace
 const { data: item } = useNamespaceQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
+  selection: { fields: { annotations: true, clusterId: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
 });
 
 // Create a namespace
 const { mutate: create } = useCreateNamespaceMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' });
+create({ annotations: '<JSON>', clusterId: '<UUID>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' });
 ```
 
 ### NamespaceEvent
@@ -256,20 +286,20 @@ create({ hash: '<UUID>', name: '<String>', scopeId: '<UUID>' });
 ```typescript
 // List all platformNamespaces
 const { data, isLoading } = usePlatformNamespacesQuery({
-  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
+  selection: { fields: { annotations: true, clusterId: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
 });
 
 // Get one platformNamespace
 const { data: item } = usePlatformNamespaceQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
+  selection: { fields: { annotations: true, clusterId: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
 });
 
 // Create a platformNamespace
 const { mutate: create } = useCreatePlatformNamespaceMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' });
+create({ annotations: '<JSON>', clusterId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' });
 ```
 
 ### PlatformNamespaceEvent
@@ -317,6 +347,28 @@ platformInfraInsertNodeAtPath
   |----------|------|
   | `input` | PlatformInfraInsertNodeAtPathInput (required) |
 
+### `usePlatformInfraInsertNodesAtPathsMutation`
+
+platformInfraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraInsertNodesAtPathsInput (required) |
+
+### `usePlatformInfraSetAndCommitMutation`
+
+platformInfraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraSetAndCommitInput (required) |
+
 ### `usePlatformInfraSetDataAtPathMutation`
 
 platformInfraSetDataAtPath
@@ -328,12 +380,24 @@ platformInfraSetDataAtPath
   |----------|------|
   | `input` | PlatformInfraSetDataAtPathInput (required) |
 
+### `usePlatformInfraSetManyAndCommitMutation`
+
+platformInfraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraSetManyAndCommitInput (required) |
+
 ### `useProvisionBucketMutation`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**

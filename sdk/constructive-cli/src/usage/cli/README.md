@@ -44,10 +44,13 @@ csdk auth set-token <your-token>
 | `org-limit-default` | orgLimitDefault CRUD operations |
 | `org-limit-event` | orgLimitEvent CRUD operations |
 | `org-limit-warning` | orgLimitWarning CRUD operations |
-| `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `capture-app-limit-defaults` | captureAppLimitDefaults |
+| `capture-org-limit-defaults` | captureOrgLimitDefaults |
+| `provision-bucket` | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
 | `seed-app-limit-caps-defaults` | seedAppLimitCapsDefaults |
 | `seed-app-limit-defaults` | seedAppLimitDefaults |
 | `seed-org-limit-caps-defaults` | seedOrgLimitCapsDefaults |
@@ -601,12 +604,27 @@ CRUD operations for OrgLimitWarning records.
 
 ## Custom Operations
 
+### `capture-app-limit-defaults`
+
+captureAppLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
+
+### `capture-org-limit-defaults`
+
+captureOrgLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
+
 ### `provision-bucket`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**

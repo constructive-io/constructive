@@ -7,8 +7,8 @@ React Query hooks for Index data operations
 ## Usage
 
 ```typescript
-useIndicesQuery({ selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, includeFieldIds: true, indexParams: true, isUnique: true, name: true, opClasses: true, options: true, smartTags: true, tableId: true, tags: true, updatedAt: true, whereClause: true } } })
-useIndexQuery({ id: '<UUID>', selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, includeFieldIds: true, indexParams: true, isUnique: true, name: true, opClasses: true, options: true, smartTags: true, tableId: true, tags: true, updatedAt: true, whereClause: true } } })
+useIndicesQuery({ selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, includeFieldIds: true, indexParams: true, isUnique: true, name: true, nullsNotDistinct: true, opClasses: true, options: true, smartTags: true, tableId: true, tags: true, updatedAt: true, whereClause: true } } })
+useIndexQuery({ id: '<UUID>', selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, includeFieldIds: true, indexParams: true, isUnique: true, name: true, nullsNotDistinct: true, opClasses: true, options: true, smartTags: true, tableId: true, tags: true, updatedAt: true, whereClause: true } } })
 useCreateIndexMutation({ selection: { fields: { id: true } } })
 useUpdateIndexMutation({ selection: { fields: { id: true } } })
 useDeleteIndexMutation({})
@@ -20,7 +20,7 @@ useDeleteIndexMutation({})
 
 ```typescript
 const { data, isLoading } = useIndicesQuery({
-  selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, includeFieldIds: true, indexParams: true, isUnique: true, name: true, opClasses: true, options: true, smartTags: true, tableId: true, tags: true, updatedAt: true, whereClause: true } },
+  selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, includeFieldIds: true, indexParams: true, isUnique: true, name: true, nullsNotDistinct: true, opClasses: true, options: true, smartTags: true, tableId: true, tags: true, updatedAt: true, whereClause: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useIndicesQuery({
 const { mutate } = useCreateIndexMutation({
   selection: { fields: { id: true } },
 });
-mutate({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', includeFieldIds: '<UUID>', indexParams: '<JSON>', isUnique: '<Boolean>', name: '<String>', opClasses: '<String>', options: '<JSON>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', whereClause: '<JSON>' });
+mutate({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', includeFieldIds: '<UUID>', indexParams: '<JSON>', isUnique: '<Boolean>', name: '<String>', nullsNotDistinct: '<Boolean>', opClasses: '<String>', options: '<JSON>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', whereClause: '<JSON>' });
 ```

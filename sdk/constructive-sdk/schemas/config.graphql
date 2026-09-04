@@ -1,3 +1,221 @@
+type AppInternalSecret {
+  annotations: JSON
+  createdAt: Datetime
+  description: String
+  id: UUID
+  labels: JSON
+  name: String
+  realm: String
+  retiredAt: Datetime
+  rotatedAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `AppInternalSecret` values."""
+type AppInternalSecretConnection {
+  """
+  A list of edges which contains the `AppInternalSecret` and cursor to aid in pagination.
+  """
+  edges: [AppInternalSecretEdge]!
+
+  """A list of `AppInternalSecret` objects."""
+  nodes: [AppInternalSecret]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AppInternalSecret` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `AppInternalSecret` edge in the connection."""
+type AppInternalSecretEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppInternalSecret` at the end of the edge."""
+  node: AppInternalSecret
+}
+
+"""
+A filter to be used against `AppInternalSecret` object types. All fields are combined with a logical ‘and.’
+"""
+input AppInternalSecretFilter {
+  """Checks for all expressions in this list."""
+  and: [AppInternalSecretFilter!]
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: AppInternalSecretFilter
+
+  """Checks for any expressions in this list."""
+  or: [AppInternalSecretFilter!]
+
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
+  """Filter by the object’s `retiredAt` field."""
+  retiredAt: DatetimeFilter
+
+  """Filter by the object’s `rotatedAt` field."""
+  rotatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""Methods to use when ordering `AppInternalSecret`."""
+enum AppInternalSecretOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  LABELS_ASC
+  LABELS_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  REALM_ASC
+  REALM_DESC
+  RETIRED_AT_ASC
+  RETIRED_AT_DESC
+  ROTATED_AT_ASC
+  ROTATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""All input for the `appInternalSecretsDel` mutation."""
+input AppInternalSecretsDelInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  realm: String
+  secretName: String
+}
+
+"""The output of our `appInternalSecretsDel` mutation."""
+type AppInternalSecretsDelPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `appInternalSecretsRemoveArray` mutation."""
+input AppInternalSecretsRemoveArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  realm: String
+  secretNames: [String]
+}
+
+"""The output of our `appInternalSecretsRemoveArray` mutation."""
+type AppInternalSecretsRemoveArrayPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `appInternalSecretsRotate` mutation."""
+input AppInternalSecretsRotateInput {
+  algo: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  realm: String
+  secretName: String
+  secretValue: String
+}
+
+"""The output of our `appInternalSecretsRotate` mutation."""
+type AppInternalSecretsRotatePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `appInternalSecretsSet` mutation."""
+input AppInternalSecretsSetInput {
+  algo: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  secretName: String
+  secretRealm: String
+  secretValue: String
+}
+
+"""The output of our `appInternalSecretsSet` mutation."""
+type AppInternalSecretsSetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
 """
 Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed
 """
@@ -5,6 +223,7 @@ type Config {
   """Freeform metadata for tooling and operational notes"""
   annotations: JSON!
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -37,6 +256,7 @@ type Config {
   """
   realm: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Plaintext config value"""
   value: String
@@ -81,6 +301,9 @@ input ConfigFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
@@ -117,6 +340,9 @@ input ConfigFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+
   """Filter by the object’s `value` field."""
   value: StringFilter
 }
@@ -126,6 +352,7 @@ input ConfigInput {
   """Freeform metadata for tooling and operational notes"""
   annotations: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -158,6 +385,7 @@ input ConfigInput {
   """
   realm: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Plaintext config value"""
   value: String
@@ -169,6 +397,8 @@ enum ConfigOrderBy {
   ANNOTATIONS_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DESCRIPTION_ASC
@@ -192,6 +422,8 @@ enum ConfigOrderBy {
   REALM_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
   VALUE_ASC
   VALUE_DESC
 }
@@ -203,6 +435,7 @@ input ConfigPatch {
   """Freeform metadata for tooling and operational notes"""
   annotations: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID
@@ -235,6 +468,7 @@ input ConfigPatch {
   """
   realm: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Plaintext config value"""
   value: String
@@ -275,6 +509,41 @@ type CreateConfigPayload {
   query: Query
 }
 
+"""All input for the create `InternalConfig` mutation."""
+input CreateInternalConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `InternalConfig` to be created by this mutation."""
+  internalConfig: InternalConfigInput!
+}
+
+"""The output of our create `InternalConfig` mutation."""
+type CreateInternalConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `InternalConfig` that was created by this mutation."""
+  internalConfig: InternalConfig
+
+  """An edge for our `InternalConfig`. May be used by Relay 1."""
+  internalConfigEdge(
+    """The method to use when ordering `InternalConfig`."""
+    orderBy: [InternalConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InternalConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `PlatformConfig` mutation."""
 input CreatePlatformConfigInput {
   """
@@ -303,6 +572,41 @@ type CreatePlatformConfigPayload {
     """The method to use when ordering `PlatformConfig`."""
     orderBy: [PlatformConfigOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformInternalConfig` mutation."""
+input CreatePlatformInternalConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformInternalConfig` to be created by this mutation."""
+  platformInternalConfig: PlatformInternalConfigInput!
+}
+
+"""The output of our create `PlatformInternalConfig` mutation."""
+type CreatePlatformInternalConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInternalConfig` that was created by this mutation."""
+  platformInternalConfig: PlatformInternalConfig
+
+  """An edge for our `PlatformInternalConfig`. May be used by Relay 1."""
+  platformInternalConfigEdge(
+    """The method to use when ordering `PlatformInternalConfig`."""
+    orderBy: [PlatformInternalConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInternalConfigEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -399,6 +703,41 @@ type DeleteConfigPayload {
   query: Query
 }
 
+"""All input for the `deleteInternalConfig` mutation."""
+input DeleteInternalConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this config entry"""
+  id: UUID!
+}
+
+"""The output of our delete `InternalConfig` mutation."""
+type DeleteInternalConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `InternalConfig` that was deleted by this mutation."""
+  internalConfig: InternalConfig
+
+  """An edge for our `InternalConfig`. May be used by Relay 1."""
+  internalConfigEdge(
+    """The method to use when ordering `InternalConfig`."""
+    orderBy: [InternalConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InternalConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deletePlatformConfig` mutation."""
 input DeletePlatformConfigInput {
   """
@@ -432,6 +771,383 @@ type DeletePlatformConfigPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""All input for the `deletePlatformInternalConfig` mutation."""
+input DeletePlatformInternalConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this config entry"""
+  id: UUID!
+}
+
+"""The output of our delete `PlatformInternalConfig` mutation."""
+type DeletePlatformInternalConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInternalConfig` that was deleted by this mutation."""
+  platformInternalConfig: PlatformInternalConfig
+
+  """An edge for our `PlatformInternalConfig`. May be used by Relay 1."""
+  platformInternalConfigEdge(
+    """The method to use when ordering `PlatformInternalConfig`."""
+    orderBy: [PlatformInternalConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInternalConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+-level plaintext key-value config store; database-resident, never projected into Kubernetes
+"""
+type InternalConfig {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Human-readable note about this config entry"""
+  description: String
+
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID!
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON!
+
+  """Key name identifying the config entry"""
+  name: String!
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+
+  """
+  Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row.
+  """
+  realm: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
+}
+
+"""A connection to a list of `InternalConfig` values."""
+type InternalConfigConnection {
+  """
+  A list of edges which contains the `InternalConfig` and cursor to aid in pagination.
+  """
+  edges: [InternalConfigEdge]!
+
+  """A list of `InternalConfig` objects."""
+  nodes: [InternalConfig]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `InternalConfig` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `InternalConfig` edge in the connection."""
+type InternalConfigEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `InternalConfig` at the end of the edge."""
+  node: InternalConfig
+}
+
+"""
+A filter to be used against `InternalConfig` object types. All fields are combined with a logical ‘and.’
+"""
+input InternalConfigFilter {
+  """Checks for all expressions in this list."""
+  and: [InternalConfigFilter!]
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `expiresAt` field."""
+  expiresAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: InternalConfigFilter
+
+  """Checks for any expressions in this list."""
+  or: [InternalConfigFilter!]
+
+  """Filter by the object’s `provider` field."""
+  provider: StringFilter
+
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `value` field."""
+  value: StringFilter
+}
+
+"""An input for mutations affecting `InternalConfig`"""
+input InternalConfigInput {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Human-readable note about this config entry"""
+  description: String
+
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON
+
+  """Key name identifying the config entry"""
+  name: String!
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+
+  """
+  Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row.
+  """
+  realm: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
+}
+
+"""Methods to use when ordering `InternalConfig`."""
+enum InternalConfigOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  EXPIRES_AT_ASC
+  EXPIRES_AT_DESC
+  ID_ASC
+  ID_DESC
+  LABELS_ASC
+  LABELS_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROVIDER_ASC
+  PROVIDER_DESC
+  REALM_ASC
+  REALM_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VALUE_ASC
+  VALUE_DESC
+}
+
+"""
+Represents an update to a `InternalConfig`. Fields that are set will be updated.
+"""
+input InternalConfigPatch {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """Human-readable note about this config entry"""
+  description: String
+
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON
+
+  """Key name identifying the config entry"""
+  name: String
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+
+  """
+  Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row.
+  """
+  realm: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
+}
+
+type InternalSecret {
+  annotations: JSON
+  createdAt: Datetime
+  databaseId: UUID
+  description: String
+  id: UUID
+  labels: JSON
+  name: String
+  realm: String
+  retiredAt: Datetime
+  rotatedAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `InternalSecret` values."""
+type InternalSecretConnection {
+  """
+  A list of edges which contains the `InternalSecret` and cursor to aid in pagination.
+  """
+  edges: [InternalSecretEdge]!
+
+  """A list of `InternalSecret` objects."""
+  nodes: [InternalSecret]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `InternalSecret` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `InternalSecret` edge in the connection."""
+type InternalSecretEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `InternalSecret` at the end of the edge."""
+  node: InternalSecret
+}
+
+"""
+A filter to be used against `InternalSecret` object types. All fields are combined with a logical ‘and.’
+"""
+input InternalSecretFilter {
+  """Checks for all expressions in this list."""
+  and: [InternalSecretFilter!]
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: InternalSecretFilter
+
+  """Checks for any expressions in this list."""
+  or: [InternalSecretFilter!]
+
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
+  """Filter by the object’s `retiredAt` field."""
+  retiredAt: DatetimeFilter
+
+  """Filter by the object’s `rotatedAt` field."""
+  rotatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""Methods to use when ordering `InternalSecret`."""
+enum InternalSecretOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  LABELS_ASC
+  LABELS_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  REALM_ASC
+  REALM_DESC
+  RETIRED_AT_ASC
+  RETIRED_AT_DESC
+  ROTATED_AT_ASC
+  ROTATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """
@@ -743,11 +1459,57 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
+  """GraphQL type name of the plane's buckets table"""
+  bucketsType: String!
+
+  """
+  Computed download-URL field on the files type; null on the buckets side
+  """
+  downloadUrlField: String
+
+  """GraphQL type name of the plane's files table"""
+  filesType: String!
+
   """Whether this table is a storage buckets table"""
   isBucketsTable: Boolean!
 
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
+
+  """The plane's GraphQL upload surface"""
+  upload: MetaStorageUpload!
+}
+
+"""
+The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
+"""
+type MetaStorageUpload {
+  """Per-file input type inside the bulk input"""
+  bulkFileInputType: String!
+
+  """Per-file payload type inside the bulk payload"""
+  bulkFilePayloadType: String!
+
+  """Input type of the bulk upload mutation"""
+  bulkInputType: String!
+
+  """Root mutation field for bulk upload"""
+  bulkMutation: String!
+
+  """Payload type of the bulk upload mutation"""
+  bulkPayloadType: String!
+
+  """Input type of the single upload mutation"""
+  inputType: String!
+
+  """Root mutation field for single-file upload (e.g. uploadAppFile)"""
+  mutation: String!
+
+  """Payload type of the single upload mutation"""
+  payloadType: String!
+
+  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  requiresOwnerId: Boolean!
 }
 
 """Information about a database table"""
@@ -807,6 +1569,30 @@ type MetaUniqueConstraint {
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
+  _internalSecretsDel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: _InternalSecretsDelInput!
+  ): _InternalSecretsDelPayload
+  _internalSecretsRemoveArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: _InternalSecretsRemoveArrayInput!
+  ): _InternalSecretsRemoveArrayPayload
+  _internalSecretsRotate(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: _InternalSecretsRotateInput!
+  ): _InternalSecretsRotatePayload
+  _internalSecretsSet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: _InternalSecretsSetInput!
+  ): _InternalSecretsSetPayload
   _secretsDel(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -831,6 +1617,30 @@ type Mutation {
     """
     input: _SecretsSetInput!
   ): _SecretsSetPayload
+  appInternalSecretsDel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: AppInternalSecretsDelInput!
+  ): AppInternalSecretsDelPayload
+  appInternalSecretsRemoveArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: AppInternalSecretsRemoveArrayInput!
+  ): AppInternalSecretsRemoveArrayPayload
+  appInternalSecretsRotate(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: AppInternalSecretsRotateInput!
+  ): AppInternalSecretsRotatePayload
+  appInternalSecretsSet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: AppInternalSecretsSetInput!
+  ): AppInternalSecretsSetPayload
 
   """Creates a single `Config`."""
   createConfig(
@@ -840,6 +1650,14 @@ type Mutation {
     input: CreateConfigInput!
   ): CreateConfigPayload
 
+  """Creates a single `InternalConfig`."""
+  createInternalConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateInternalConfigInput!
+  ): CreateInternalConfigPayload
+
   """Creates a single `PlatformConfig`."""
   createPlatformConfig(
     """
@@ -847,6 +1665,14 @@ type Mutation {
     """
     input: CreatePlatformConfigInput!
   ): CreatePlatformConfigPayload
+
+  """Creates a single `PlatformInternalConfig`."""
+  createPlatformInternalConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformInternalConfigInput!
+  ): CreatePlatformInternalConfigPayload
 
   """Deletes a single `Config` using a unique key."""
   deleteConfig(
@@ -856,6 +1682,14 @@ type Mutation {
     input: DeleteConfigInput!
   ): DeleteConfigPayload
 
+  """Deletes a single `InternalConfig` using a unique key."""
+  deleteInternalConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteInternalConfigInput!
+  ): DeleteInternalConfigPayload
+
   """Deletes a single `PlatformConfig` using a unique key."""
   deletePlatformConfig(
     """
@@ -863,6 +1697,14 @@ type Mutation {
     """
     input: DeletePlatformConfigInput!
   ): DeletePlatformConfigPayload
+
+  """Deletes a single `PlatformInternalConfig` using a unique key."""
+  deletePlatformInternalConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformInternalConfigInput!
+  ): DeletePlatformInternalConfigPayload
   platformInternalSecretsDel(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -913,10 +1755,11 @@ type Mutation {
   ): PlatformSecretsSetPayload
 
   """
-  Provision an S3 bucket for a logical bucket in the database.
-  Reads the bucket config via RLS, then creates and configures
-  the S3 bucket with the appropriate privacy policies, CORS rules,
-  and lifecycle settings.
+  Reconcile an S3 bucket for a logical bucket in the database.
+  Reads the bucket config via RLS, then enqueues the same
+  storage:provision_bucket job used by the INSERT trigger. This is
+  idempotent for an already-reconciled bucket; enqueue failures become
+  GraphQL errors.
   """
   provisionBucket(
     """
@@ -933,6 +1776,14 @@ type Mutation {
     input: UpdateConfigInput!
   ): UpdateConfigPayload
 
+  """Updates a single `InternalConfig` using a unique key and a patch."""
+  updateInternalConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateInternalConfigInput!
+  ): UpdateInternalConfigPayload
+
   """Updates a single `PlatformConfig` using a unique key and a patch."""
   updatePlatformConfig(
     """
@@ -940,6 +1791,16 @@ type Mutation {
     """
     input: UpdatePlatformConfigInput!
   ): UpdatePlatformConfigPayload
+
+  """
+  Updates a single `PlatformInternalConfig` using a unique key and a patch.
+  """
+  updatePlatformInternalConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformInternalConfigInput!
+  ): UpdatePlatformInternalConfigPayload
 }
 
 """Information about pagination in a connection."""
@@ -964,6 +1825,7 @@ type PlatformConfig {
   """Freeform metadata for tooling and operational notes"""
   annotations: JSON!
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Human-readable note about this config entry"""
   description: String
@@ -993,6 +1855,7 @@ type PlatformConfig {
   """
   realm: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Plaintext config value"""
   value: String
@@ -1037,6 +1900,9 @@ input PlatformConfigFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `description` field."""
   description: StringFilter
 
@@ -1070,6 +1936,9 @@ input PlatformConfigFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+
   """Filter by the object’s `value` field."""
   value: StringFilter
 }
@@ -1079,6 +1948,7 @@ input PlatformConfigInput {
   """Freeform metadata for tooling and operational notes"""
   annotations: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Human-readable note about this config entry"""
   description: String
@@ -1108,6 +1978,7 @@ input PlatformConfigInput {
   """
   realm: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Plaintext config value"""
   value: String
@@ -1119,6 +1990,8 @@ enum PlatformConfigOrderBy {
   ANNOTATIONS_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DESCRIPTION_ASC
   DESCRIPTION_DESC
   EXPIRES_AT_ASC
@@ -1140,6 +2013,8 @@ enum PlatformConfigOrderBy {
   REALM_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
   VALUE_ASC
   VALUE_DESC
 }
@@ -1151,6 +2026,7 @@ input PlatformConfigPatch {
   """Freeform metadata for tooling and operational notes"""
   annotations: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Human-readable note about this config entry"""
   description: String
@@ -1180,6 +2056,223 @@ input PlatformConfigPatch {
   """
   realm: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
+
+  """Plaintext config value"""
+  value: String
+}
+
+"""
+platform-level plaintext key-value config store; database-resident, never projected into Kubernetes
+"""
+type PlatformInternalConfig {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
+  createdAt: Datetime
+
+  """Human-readable note about this config entry"""
+  description: String
+
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID!
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON!
+
+  """Key name identifying the config entry"""
+  name: String!
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+
+  """
+  Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row.
+  """
+  realm: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
+}
+
+"""A connection to a list of `PlatformInternalConfig` values."""
+type PlatformInternalConfigConnection {
+  """
+  A list of edges which contains the `PlatformInternalConfig` and cursor to aid in pagination.
+  """
+  edges: [PlatformInternalConfigEdge]!
+
+  """A list of `PlatformInternalConfig` objects."""
+  nodes: [PlatformInternalConfig]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformInternalConfig` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformInternalConfig` edge in the connection."""
+type PlatformInternalConfigEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformInternalConfig` at the end of the edge."""
+  node: PlatformInternalConfig
+}
+
+"""
+A filter to be used against `PlatformInternalConfig` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformInternalConfigFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformInternalConfigFilter!]
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `expiresAt` field."""
+  expiresAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformInternalConfigFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformInternalConfigFilter!]
+
+  """Filter by the object’s `provider` field."""
+  provider: StringFilter
+
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `value` field."""
+  value: StringFilter
+}
+
+"""An input for mutations affecting `PlatformInternalConfig`"""
+input PlatformInternalConfigInput {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Human-readable note about this config entry"""
+  description: String
+
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON
+
+  """Key name identifying the config entry"""
+  name: String!
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+
+  """
+  Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row.
+  """
+  realm: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
+}
+
+"""Methods to use when ordering `PlatformInternalConfig`."""
+enum PlatformInternalConfigOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  EXPIRES_AT_ASC
+  EXPIRES_AT_DESC
+  ID_ASC
+  ID_DESC
+  LABELS_ASC
+  LABELS_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROVIDER_ASC
+  PROVIDER_DESC
+  REALM_ASC
+  REALM_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VALUE_ASC
+  VALUE_DESC
+}
+
+"""
+Represents an update to a `PlatformInternalConfig`. Fields that are set will be updated.
+"""
+input PlatformInternalConfigPatch {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Human-readable note about this config entry"""
+  description: String
+
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON
+
+  """Key name identifying the config entry"""
+  name: String
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+
+  """
+  Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row.
+  """
+  realm: String
+  updatedAt: Datetime
 
   """Plaintext config value"""
   value: String
@@ -1192,7 +2285,6 @@ type PlatformInternalSecret {
   id: UUID
   labels: JSON
   name: String
-  namespaceId: UUID
   realm: String
   retiredAt: Datetime
   rotatedAt: Datetime
@@ -1252,9 +2344,6 @@ input PlatformInternalSecretFilter {
   """Filter by the object’s `name` field."""
   name: StringFilter
 
-  """Filter by the object’s `namespaceId` field."""
-  namespaceId: UUIDFilter
-
   """Negates the expression."""
   not: PlatformInternalSecretFilter
 
@@ -1286,8 +2375,6 @@ enum PlatformInternalSecretOrderBy {
   ID_DESC
   LABELS_ASC
   LABELS_DESC
-  NAMESPACE_ID_ASC
-  NAMESPACE_ID_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -1308,7 +2395,6 @@ input PlatformInternalSecretsDelInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  namespaceId: UUID
   realm: String
   secretName: String
 }
@@ -1334,7 +2420,6 @@ input PlatformInternalSecretsRemoveArrayInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  namespaceId: UUID
   realm: String
   secretNames: [String]
 }
@@ -1362,7 +2447,6 @@ input PlatformInternalSecretsRotateInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  namespaceId: UUID
   realm: String
   secretName: String
   secretValue: String
@@ -1393,7 +2477,6 @@ input PlatformInternalSecretsSetInput {
   """
   clientMutationId: String
   secretName: String
-  secretNamespaceId: UUID
   secretRealm: String
   secretValue: String
 }
@@ -1658,23 +2741,17 @@ input ProvisionBucketInput {
 }
 
 type ProvisionBucketPayload {
-  """The access type applied"""
-  accessType: String!
+  """The logical bucket row that was queued for reconciliation."""
+  bucketId: UUID!
+  bucketKey: String!
 
-  """The S3 bucket name that was provisioned"""
-  bucketName: String!
+  """The reconciler job enqueued to provision this bucket."""
+  jobId: UUID!
 
-  """The S3 endpoint (null for AWS S3 default)"""
-  endpoint: String
-
-  """Error message if provisioning failed"""
-  error: String
-
-  """The storage provider used"""
-  provider: String!
-
-  """Whether provisioning succeeded"""
-  success: Boolean!
+  """
+  The physical bucket name already recorded, or null when reconciliation has not completed.
+  """
+  physicalName: String
 }
 
 """The root query type which gives access points into the data universe."""
@@ -1683,6 +2760,35 @@ type Query {
   Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
   """
   _meta: MetaSchema
+
+  """Reads and enables pagination through a set of `AppInternalSecret`."""
+  appInternalSecrets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AppInternalSecret`."""
+    orderBy: [AppInternalSecretOrderBy!] = [NATURAL]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppInternalSecretFilter
+  ): AppInternalSecretConnection
 
   """Reads and enables pagination through a set of `Config`."""
   configs(
@@ -1713,6 +2819,64 @@ type Query {
     where: ConfigFilter
   ): ConfigConnection
 
+  """Reads and enables pagination through a set of `InternalConfig`."""
+  internalConfigs(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `InternalConfig`."""
+    orderBy: [InternalConfigOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: InternalConfigFilter
+  ): InternalConfigConnection
+
+  """Reads and enables pagination through a set of `InternalSecret`."""
+  internalSecrets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `InternalSecret`."""
+    orderBy: [InternalSecretOrderBy!] = [NATURAL]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: InternalSecretFilter
+  ): InternalSecretConnection
+
   """Reads and enables pagination through a set of `PlatformConfig`."""
   platformConfigs(
     """Read all values in the set after (below) this cursor."""
@@ -1741,6 +2905,37 @@ type Query {
     """
     where: PlatformConfigFilter
   ): PlatformConfigConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformInternalConfig`.
+  """
+  platformInternalConfigs(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformInternalConfig`."""
+    orderBy: [PlatformInternalConfigOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformInternalConfigFilter
+  ): PlatformInternalConfigConnection
 
   """
   Reads and enables pagination through a set of `PlatformInternalSecret`.
@@ -2177,6 +3372,46 @@ type UpdateConfigPayload {
   query: Query
 }
 
+"""All input for the `updateInternalConfig` mutation."""
+input UpdateInternalConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this config entry"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `InternalConfig` being updated.
+  """
+  internalConfigPatch: InternalConfigPatch!
+}
+
+"""The output of our update `InternalConfig` mutation."""
+type UpdateInternalConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `InternalConfig` that was updated by this mutation."""
+  internalConfig: InternalConfig
+
+  """An edge for our `InternalConfig`. May be used by Relay 1."""
+  internalConfigEdge(
+    """The method to use when ordering `InternalConfig`."""
+    orderBy: [InternalConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InternalConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updatePlatformConfig` mutation."""
 input UpdatePlatformConfigInput {
   """
@@ -2215,6 +3450,158 @@ type UpdatePlatformConfigPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""All input for the `updatePlatformInternalConfig` mutation."""
+input UpdatePlatformInternalConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this config entry"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformInternalConfig` being updated.
+  """
+  platformInternalConfigPatch: PlatformInternalConfigPatch!
+}
+
+"""The output of our update `PlatformInternalConfig` mutation."""
+type UpdatePlatformInternalConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInternalConfig` that was updated by this mutation."""
+  platformInternalConfig: PlatformInternalConfig
+
+  """An edge for our `PlatformInternalConfig`. May be used by Relay 1."""
+  platformInternalConfigEdge(
+    """The method to use when ordering `PlatformInternalConfig`."""
+    orderBy: [PlatformInternalConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInternalConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `_internalSecretsDel` mutation."""
+input _InternalSecretsDelInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  realm: String
+  secretName: String
+}
+
+"""The output of our `_internalSecretsDel` mutation."""
+type _InternalSecretsDelPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `_internalSecretsRemoveArray` mutation."""
+input _InternalSecretsRemoveArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  realm: String
+  secretNames: [String]
+}
+
+"""The output of our `_internalSecretsRemoveArray` mutation."""
+type _InternalSecretsRemoveArrayPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `_internalSecretsRotate` mutation."""
+input _InternalSecretsRotateInput {
+  algo: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  realm: String
+  secretName: String
+  secretValue: String
+}
+
+"""The output of our `_internalSecretsRotate` mutation."""
+type _InternalSecretsRotatePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `_internalSecretsSet` mutation."""
+input _InternalSecretsSetInput {
+  algo: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  scopeDatabaseId: UUID
+  secretName: String
+  secretRealm: String
+  secretValue: String
+}
+
+"""The output of our `_internalSecretsSet` mutation."""
+type _InternalSecretsSetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
 }
 
 """All input for the `_secretsDel` mutation."""
