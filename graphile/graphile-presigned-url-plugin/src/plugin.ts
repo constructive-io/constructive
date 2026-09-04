@@ -24,9 +24,9 @@ import 'graphile-build';
 import { Logger } from '@pgpmjs/logger';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { withSystemLaneClient } from 'graphile-plugin-utils';
 import { discoverStoragePlanes, uploadSurfaceNames } from 'graphile-storage-registry';
 import { checkTypeAgreement } from 'mime-bytes';
-import { withSystemLaneClient } from 'pg-query-context';
 
 import { validateCustomKey } from './custom-key';
 import { resolveDefaultBucket } from './default-bucket';

@@ -19,7 +19,7 @@
  */
 
 import { Logger } from '@pgpmjs/logger';
-import { withSystemLaneClient } from 'pg-query-context';
+import { withSystemLaneClient } from 'graphile-plugin-utils';
 
 import { resolveDefaultBucket } from './default-bucket';
 import { isLiveFileRow, statusSelectFragment } from './file-lifecycle';

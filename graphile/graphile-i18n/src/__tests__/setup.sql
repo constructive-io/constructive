@@ -39,14 +39,3 @@ SELECT setval('i18n_test.posts_id_seq', 10);
 -- Grant access so withPgClient pool can query
 GRANT ALL ON ALL TABLES IN SCHEMA i18n_test TO PUBLIC;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA i18n_test TO PUBLIC;
-
--- Translation lookups run in the system lane, which sets role=administrator
--- for the transaction (see pg-query-context's withSystemLaneClient).
-DO $$
-BEGIN
-  CREATE ROLE administrator;
-EXCEPTION WHEN duplicate_object THEN
-  NULL;
-END
-$$;
-GRANT USAGE ON SCHEMA i18n_test TO administrator;

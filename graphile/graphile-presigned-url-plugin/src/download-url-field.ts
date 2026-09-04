@@ -24,8 +24,8 @@ import 'graphile-build';
 import { Logger } from '@pgpmjs/logger';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { withSystemLaneClient } from 'graphile-plugin-utils';
 import { DOWNLOAD_URL_FIELD } from 'graphile-storage-registry';
-import { withSystemLaneClient } from 'pg-query-context';
 
 import { resolveS3, resolveS3ForDatabase } from './physical-bucket';
 import { withRequestPgClient } from './request-pg-client';

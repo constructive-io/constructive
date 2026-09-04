@@ -1,7 +1,5 @@
 import { ClientBase, Pool, PoolClient, QueryResult } from 'pg';
 
-export * from './system-lane';
-
 // --- Internal helpers ---
 
 function setContext(ctx: Record<string, string>): { query: string; values: string[] }[] {

@@ -17,9 +17,9 @@
  * manual, multi-statement RLS work.
  */
 
-import { GrafastPgClient } from 'pg-query-context';
+import { SystemLanePgClient } from 'graphile-plugin-utils';
 
-export interface RequestPgClient extends GrafastPgClient {
+export interface RequestPgClient extends Omit<SystemLanePgClient, 'withTransaction'> {
   withTransaction<T>(cb: (tx: RequestPgClient) => Promise<T>): Promise<T>;
 }
 

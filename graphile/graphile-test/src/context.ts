@@ -261,6 +261,11 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
     ),
   };
 
+  // Check if we're in a transaction by looking at the test client's transaction state
+  // When useRoot is true, we might not be in a transaction
+  // pgsql-test's `db` client is in a transaction, but `pg` (root) client may not be
+  const isInTransaction = !input.useRoot;
+
   // Provide a custom withPgClient function that uses the test client
   // This ensures GraphQL operations run within the test transaction
   // instead of getting a new connection from the pool
@@ -270,9 +275,9 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
     callback: (client: Client) => T | Promise<T>
   ): Promise<T> => {
     // Augment the client with withTransaction if it doesn't already have it.
-    // In production, @dataplan/pg provides this method. In tests the raw pg
-    // Client lacks it, so we implement it via savepoints (which nest cleanly
-    // inside the test harness's outer transaction).
+    // In production @dataplan/pg provides this method; a raw pg Client lacks
+    // it. Like @dataplan/pg's client, nest with a savepoint when a transaction
+    // is already open and open a real one otherwise.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const client = pgClient as any;
     if (typeof client.withTransaction !== 'function') {
@@ -280,24 +285,19 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
         cb: (txClient: Client) => unknown | Promise<unknown>
       ) => {
         const sp = `wt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-        await client.query(`SAVEPOINT ${sp}`);
+        await client.query(isInTransaction ? `SAVEPOINT ${sp}` : 'BEGIN');
         try {
           const result = await cb(client);
-          await client.query(`RELEASE SAVEPOINT ${sp}`);
+          await client.query(isInTransaction ? `RELEASE SAVEPOINT ${sp}` : 'COMMIT');
           return result;
         } catch (err) {
-          await client.query(`ROLLBACK TO SAVEPOINT ${sp}`);
+          await client.query(isInTransaction ? `ROLLBACK TO SAVEPOINT ${sp}` : 'ROLLBACK');
           throw err;
         }
       };
     }
     return callback(pgClient);
   };
-
-  // Check if we're in a transaction by looking at the test client's transaction state
-  // When useRoot is true, we might not be in a transaction
-  // pgsql-test's `db` client is in a transaction, but `pg` (root) client may not be
-  const isInTransaction = !input.useRoot;
 
   // Wrap the entire query execution in a savepoint if we're in a transaction
   // This matches v4 PostGraphile behavior where each mutation is wrapped in a savepoint

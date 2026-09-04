@@ -1,7 +1,7 @@
 {
   "name": "graphile-i18n",
   "version": "2.14.4",
-  "description": "PostGraphile v5 i18n plugin \u2014 language-aware fields from @i18n translation tables with Accept-Language negotiation and fallback chains",
+  "description": "PostGraphile v5 i18n plugin — language-aware fields from @i18n translation tables with Accept-Language negotiation and fallback chains",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "accept-language-parser": "^1.5.0",
-    "pg-query-context": "workspace:^"
+    "graphile-plugin-utils": "workspace:^"
   },
   "peerDependencies": {
     "@dataplan/pg": "^1.1.1",

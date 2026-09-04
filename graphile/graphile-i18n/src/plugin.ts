@@ -24,7 +24,7 @@ import type { PgCodecWithAttributes } from '@dataplan/pg';
 import { TYPES } from '@dataplan/pg';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
-import { withSystemLaneClient } from 'pg-query-context';
+import { withSystemLaneClient } from 'graphile-plugin-utils';
 
 import type { I18nPluginOptions, I18nTableInfo, TranslatableField } from './types';
 

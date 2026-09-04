@@ -1,28 +1,46 @@
-import { GrafastPgClient, SYSTEM_LANE_ROLE, withSystemLaneClient } from '../system-lane';
+import { SYSTEM_LANE_ROLE, SystemLanePgClient, withSystemLaneClient } from '../system-lane';
 
 interface Call {
   text: string;
   values?: unknown[];
 }
 
-const makeClient = (): { client: GrafastPgClient; calls: Call[] } => {
+/**
+ * A client whose `withTransaction` behaves like grafast's: it brackets the
+ * callback with BEGIN and COMMIT, and rolls back when the callback throws.
+ */
+const makeClient = (): { client: SystemLanePgClient; calls: Call[] } => {
   const calls: Call[] = [];
-  const client: GrafastPgClient = {
+  const client: SystemLanePgClient = {
     query: async (opts) => {
       calls.push(opts);
       return { rows: [] };
+    },
+    withTransaction: async (cb) => {
+      calls.push({ text: 'BEGIN' });
+      try {
+        const result = await cb(client);
+        calls.push({ text: 'COMMIT' });
+        return result;
+      } catch (err) {
+        calls.push({ text: 'ROLLBACK' });
+        throw err;
+      }
     }
   };
   return { client, calls };
 };
 
-const makeWithPgClient = (client: GrafastPgClient, settings: Array<Record<string, string> | null>) =>
-  (<T,>(pgSettings: Record<string, string> | null, cb: (c: GrafastPgClient) => Promise<T>) => {
+const makeWithPgClient = (
+  client: SystemLanePgClient,
+  settings: Array<Record<string, string> | null>
+) =>
+  (<T,>(pgSettings: Record<string, string> | null, cb: (c: SystemLanePgClient) => Promise<T>) => {
     settings.push(pgSettings);
     return cb(client);
   }) as <T>(
     pgSettings: Record<string, string> | null,
-    cb: (c: GrafastPgClient) => Promise<T>
+    cb: (c: SystemLanePgClient) => Promise<T>
   ) => Promise<T>;
 
 describe('withSystemLaneClient', () => {
@@ -56,7 +74,7 @@ describe('withSystemLaneClient', () => {
     expect(calls[1].values).toEqual(['role', 'anonymous']);
   });
 
-  it('rolls back and rethrows when the callback fails', async () => {
+  it('leaves the rollback to the client and rethrows the callback failure', async () => {
     const { client, calls } = makeClient();
 
     await expect(
@@ -70,20 +88,5 @@ describe('withSystemLaneClient', () => {
       'SELECT set_config($1, $2, true)',
       'ROLLBACK'
     ]);
-  });
-
-  it('rethrows the original failure when the rollback itself fails', async () => {
-    const client: GrafastPgClient = {
-      query: async (opts) => {
-        if (opts.text === 'ROLLBACK') throw new Error('connection terminated');
-        return { rows: [] };
-      }
-    };
-
-    await expect(
-      withSystemLaneClient(makeWithPgClient(client, []), async () => {
-        throw new Error('boom');
-      })
-    ).rejects.toThrow('boom');
   });
 });
