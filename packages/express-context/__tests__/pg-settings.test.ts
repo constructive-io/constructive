@@ -49,3 +49,38 @@ describe('buildPgSettings — jwt.claims.api_id provenance', () => {
     expect(settings['jwt.claims.api_id']).toBe(api.apiId);
   });
 });
+
+describe('buildPgSettings — agent-auth claims (intent, session lineage)', () => {
+  it('maps intent, root_session_id and parent_session_id from the token', () => {
+    const token: ConstructiveAPIToken = {
+      user_id: 'u1',
+      session_id: 's-child',
+      root_session_id: 's-root',
+      parent_session_id: 's-parent',
+      intent: 'deploy:preview'
+    };
+    const settings = buildPgSettings({ api, token, requestId: 'r1' });
+
+    expect(settings['jwt.claims.session_id']).toBe('s-child');
+    expect(settings['jwt.claims.root_session_id']).toBe('s-root');
+    expect(settings['jwt.claims.parent_session_id']).toBe('s-parent');
+    expect(settings['jwt.claims.intent']).toBe('deploy:preview');
+  });
+
+  it('omits the lineage/intent GUCs when the token does not carry them', () => {
+    const token: ConstructiveAPIToken = { user_id: 'u1', session_id: 's1' };
+    const settings = buildPgSettings({ api, token, requestId: 'r1' });
+
+    expect(settings).not.toHaveProperty('jwt.claims.root_session_id');
+    expect(settings).not.toHaveProperty('jwt.claims.parent_session_id');
+    expect(settings).not.toHaveProperty('jwt.claims.intent');
+  });
+
+  it('omits them for anonymous requests', () => {
+    const settings = buildPgSettings({ api, token: null, requestId: 'r1' });
+
+    expect(settings).not.toHaveProperty('jwt.claims.root_session_id');
+    expect(settings).not.toHaveProperty('jwt.claims.parent_session_id');
+    expect(settings).not.toHaveProperty('jwt.claims.intent');
+  });
+});

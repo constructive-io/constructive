@@ -175,6 +175,15 @@ const buildPreset = (
             if (req.token.session_id) {
               pgSettings['jwt.claims.session_id'] = req.token.session_id;
             }
+            if (req.token.root_session_id) {
+              pgSettings['jwt.claims.root_session_id'] = req.token.root_session_id;
+            }
+            if (req.token.parent_session_id) {
+              pgSettings['jwt.claims.parent_session_id'] = req.token.parent_session_id;
+            }
+            if (req.token.intent) {
+              pgSettings['jwt.claims.intent'] = req.token.intent;
+            }
 
             // Propagate credential metadata as JWT claims so PG functions
             // can read them via current_setting('jwt.claims.access_level') etc.

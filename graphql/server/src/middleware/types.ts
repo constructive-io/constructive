@@ -9,6 +9,9 @@ export type ConstructiveAPIToken = {
   session_id?: string;
   access_level?: string;
   kind?: string;
+  root_session_id?: string;
+  parent_session_id?: string;
+  intent?: string;
   [key: string]: unknown;
 };
 
