@@ -30,9 +30,13 @@ Use this skill when:
 # 1. Install pgpm
 npm install -g pgpm
 
-# 2. Start a local PostgreSQL container
+# 2. Get a PostgreSQL to work against.
+#    Already running one (e.g. `pg_isready -h localhost -p 5432` answers)? Use it:
+#    export PGHOST/PGPORT/PGUSER/PGPASSWORD for a superuser and skip this step.
+#    Do not stop the developer's server or start Docker on top of it.
+#    Otherwise, start the pgpm container and load its connection vars:
 pgpm docker start
-eval "$(pgpm env)"
+eval "$(pgpm env)"   # keeps any PG* you already exported; --reset overwrites
 
 # 3. Create a workspace
 pgpm init workspace
@@ -152,7 +156,7 @@ pgpm handles extension creation during deploy. Declare extensions in your `.cont
 ## Essential Development Workflow
 
 ```bash
-# Start PostgreSQL and load environment
+# Start PostgreSQL and load environment (skip both if PG* already point at your own server)
 pgpm docker start
 eval "$(pgpm env)"
 
@@ -331,13 +335,15 @@ In `noTty` mode, `inquirerer` uses defaults where available and throws with the 
 
 | Issue | Quick Fix |
 |-------|-----------|
-| Can't connect to database | `pgpm docker start && eval "$(pgpm env)"` |
+| Can't connect to database | `pg_isready -h $PGHOST -p $PGPORT`; if nothing is listening, `pgpm docker start && eval "$(pgpm env)"` |
 | `PGHOST` not set | `eval "$(pgpm env)"` — must use `eval`, not run in subshell |
+| Developer already runs Postgres on 5432 | Use it: `export PGHOST=localhost PGPORT=5432 PGUSER=<superuser> PGPASSWORD=...` then `pgpm admin-users bootstrap --yes`. No Docker needed |
 | Transaction aborted in tests | Use `db.beforeEach()` / `db.afterEach()` savepoint pattern |
 | Tests interfere with each other | Ensure every test file has `beforeEach`/`afterEach` hooks |
 | Module not found during deploy | Verify `.control` file exists and workspace structure is correct |
 | Dependency not found | Check `.control` `requires` uses control names, not npm names |
-| Port 5432 already in use | `lsof -i :5432` then stop conflicting process |
+| Port 5432 already in use | If it's a Postgres, use it (row above) — never stop a developer's server. Want the pgpm container anyway? `pgpm docker start --port 5433` and `export PGPORT=5433` |
+| `pnpm install` fails with `ERR_PNPM_IGNORED_BUILDS` | Add the package to `pnpm-policy.yaml` (`allowBuilds` with a reason, or `false`) and `pnpm run policy`. Don't run `pnpm approve-builds` |
 | `Invalid line format` in pgpm.plan | Dependencies `[...]` must come right after change name, before timestamp |
 | `CREATE OR REPLACE` error | Remove `OR REPLACE` — pgpm is deterministic |
 | Container won't start | `pgpm docker start --recreate` for a fresh container |

@@ -14,6 +14,12 @@ Use this skill when:
 
 ## Quick Start
 
+Docker is optional. If a PostgreSQL server is already running (check with
+`pg_isready -h localhost -p 5432`), export `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD` for a
+superuser and skip this reference entirely — do not stop that server to make room for
+the container. If you want both, start the container on another port (`--port 5433`)
+and `export PGPORT=5433`.
+
 ### Start PostgreSQL Container
 
 ```bash
@@ -115,7 +121,7 @@ If you see errors like "unrecognized parameter security_invoker", ensure you're 
 | Issue | Solution |
 |-------|----------|
 | "Docker is not installed" | Install Docker Desktop or Docker Engine |
-| "Port already in use" | Use `--port` to specify a different port, or stop the conflicting container |
+| "Port already in use" | If it's a running Postgres, use it (export PG*) instead of Docker; otherwise `--port 5433` + `export PGPORT=5433`. Never stop a developer's own server |
 | Container won't start | Check `docker logs postgres` for errors |
 | "Container already exists" | Use `--recreate` to remove and recreate |
 | Permission denied | Ensure Docker daemon is running and user has permissions |

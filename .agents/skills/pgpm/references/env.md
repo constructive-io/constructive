@@ -26,6 +26,21 @@ This sets the following environment variables:
 - `PGPASSWORD=password`
 - `PGDATABASE=postgres`
 
+These are the `pgpm docker start` defaults. Any of them that your shell has *already*
+set are kept (the output starts with a `# keeping PGUSER, PGPASSWORD ...` comment), so a
+developer pointing at their own PostgreSQL is not silently switched to the container's
+credentials. Use `pgpm env --reset` to overwrite them on purpose. `--supabase` always
+overwrites, since it is an explicit profile switch.
+
+### Using Your Own PostgreSQL
+
+If PostgreSQL is already running locally, `pgpm docker start` is unnecessary:
+
+```bash
+export PGHOST=localhost PGPORT=5432 PGUSER=postgres PGPASSWORD=yourpassword
+pgpm admin-users bootstrap --yes   # once
+```
+
 ### Run Command with Environment
 
 ```bash

@@ -21,8 +21,14 @@ Modes:
   No command         Print export statements for shell evaluation
   With command       Execute command with environment variables applied
 
+Already running your own Postgres? PGHOST, PGPORT, PGUSER, PGPASSWORD and
+PGDATABASE that are already set in your shell are kept as-is; only the
+missing ones are filled in from the profile. Pass --reset to overwrite them
+(--supabase is an explicit profile switch and always overwrites).
+
 Options:
   --help, -h         Show this help message
+  --reset            Overwrite PG* variables that are already set
   --supabase         Use Supabase profile instead of default Postgres
   --minio            Include CDN_ENDPOINT, AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION
   --rustfs           Alias for --minio (RustFS serves the same S3 API on :9000)
@@ -34,6 +40,7 @@ Examples:
   pgpm env --rustfs                           Print Postgres + RustFS env exports
   pgpm env --supabase --minio                 Print Supabase + MinIO env exports
   eval "$(pgpm env)"                          Load default Postgres env into shell
+  eval "$(pgpm env --reset)"                  Same, replacing any PG* already set
   eval "$(pgpm env --minio)"                  Load Postgres + MinIO env into shell
   eval "$(pgpm env --supabase --minio)"       Load Supabase + MinIO env into shell
   pgpm env pgpm deploy --database db1         Run command with default Postgres env
@@ -66,14 +73,41 @@ const OBJECT_STORE_PROFILE: ObjectStoreConfig = {
   region: 'us-east-1',
 };
 
-function configToEnvVars(config: PgConfig, objectStore?: ObjectStoreConfig): Record<string, string> {
-  const vars: Record<string, string> = {
+export interface EnvResolution {
+  /** Variables to export or pass to the child process. */
+  vars: Record<string, string>;
+  /** PG* variables left untouched because the caller's shell already set them. */
+  kept: string[];
+}
+
+export interface ResolveEnvOptions {
+  objectStore?: ObjectStoreConfig;
+  /** Overwrite PG* variables even when the environment already has them. */
+  reset?: boolean;
+}
+
+export function resolveEnvVars(
+  config: PgConfig,
+  existing: NodeJS.ProcessEnv,
+  { objectStore, reset = false }: ResolveEnvOptions = {}
+): EnvResolution {
+  const profileVars: Record<string, string> = {
     PGHOST: config.host,
     PGPORT: String(config.port),
     PGUSER: config.user,
     PGPASSWORD: config.password,
     PGDATABASE: config.database
   };
+
+  const vars: Record<string, string> = {};
+  const kept: string[] = [];
+  for (const [key, value] of Object.entries(profileVars)) {
+    if (!reset && existing[key]) {
+      kept.push(key);
+    } else {
+      vars[key] = value;
+    }
+  }
 
   if (objectStore) {
     vars.CDN_ENDPOINT = objectStore.endpoint;
@@ -82,22 +116,23 @@ function configToEnvVars(config: PgConfig, objectStore?: ObjectStoreConfig): Rec
     vars.AWS_REGION = objectStore.region;
   }
 
-  return vars;
+  return { vars, kept };
 }
 
-function printExports(config: PgConfig, objectStore?: ObjectStoreConfig): void {
-  const envVars = configToEnvVars(config, objectStore);
-  for (const [key, value] of Object.entries(envVars)) {
+function printExports({ vars, kept }: EnvResolution): void {
+  if (kept.length > 0) {
+    console.log(`# keeping ${kept.join(', ')} from your environment (pass --reset to overwrite)`);
+  }
+  for (const [key, value] of Object.entries(vars)) {
     console.log(`export ${key}=${value}`);
   }
 }
 
-function executeCommand(config: PgConfig, command: string, args: string[], objectStore?: ObjectStoreConfig): Promise<number> {
+function executeCommand({ vars }: EnvResolution, command: string, args: string[]): Promise<number> {
   return new Promise((resolve, reject) => {
-    const envVars = configToEnvVars(config, objectStore);
     const env = {
       ...process.env,
-      ...envVars
+      ...vars
     };
 
     const child = spawn(command, args, {
@@ -129,10 +164,14 @@ export default async (
   const useObjectStore =
     argv.minio === true || typeof argv.minio === 'string' ||
     argv.rustfs === true || typeof argv.rustfs === 'string';
+  const reset = useSupabase || argv.reset === true || typeof argv.reset === 'string';
   const profile = useSupabase ? SUPABASE_PROFILE : DEFAULT_PROFILE;
-  const objectStoreProfile = useObjectStore ? OBJECT_STORE_PROFILE : undefined;
+  const resolution = resolveEnvVars(profile, process.env, {
+    objectStore: useObjectStore ? OBJECT_STORE_PROFILE : undefined,
+    reset
+  });
 
-  const knownFlags = ['--supabase', '--minio', '--rustfs'];
+  const knownFlags = ['--supabase', '--minio', '--rustfs', '--reset'];
 
   const rawArgs = process.argv.slice(2);
   
@@ -153,14 +192,14 @@ export default async (
   }
 
   if (commandArgs.length === 0) {
-    printExports(profile, objectStoreProfile);
+    printExports(resolution);
     return;
   }
 
   const [command, ...args] = commandArgs;
   
   try {
-    const exitCode = await executeCommand(profile, command, args, objectStoreProfile);
+    const exitCode = await executeCommand(resolution, command, args);
     process.exit(exitCode);
   } catch (error) {
     if (error instanceof Error) {
