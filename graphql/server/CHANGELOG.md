@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.21.0...@constructive-io/graphql-server@5.22.0) (2026-09-04)
+
+### Bug Fixes
+
+- **graphql-server:** make introspection role opt-in, keep original error on rollback failure ([ce9c06e](https://github.com/constructive-io/constructive/commit/ce9c06e50bae85e72d9521160c60732bbdcbf2c0))
+
+### Features
+
+- **auth:** agent-auth error codes + intent/session-lineage claims ([2f53a6b](https://github.com/constructive-io/constructive/commit/2f53a6bf0083a59a69fe28cced0f8f3e3babbade)), closes [#3668](https://github.com/constructive-io/constructive/issues/3668)
+- **graphql-server:** authenticate /flush, bound the system lane, name the introspection role ([6493c16](https://github.com/constructive-io/constructive/commit/6493c164479bcb8c75b27a8a10fa922b21a7260c))
+
 # [5.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.20.8...@constructive-io/graphql-server@5.21.0) (2026-09-03)
 
 ### Bug Fixes

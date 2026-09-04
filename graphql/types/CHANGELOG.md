@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.31.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.30.3...@constructive-io/graphql-types@3.31.0) (2026-09-04)
+
+### Bug Fixes
+
+- **graphql-server:** make introspection role opt-in, keep original error on rollback failure ([ce9c06e](https://github.com/constructive-io/constructive/commit/ce9c06e50bae85e72d9521160c60732bbdcbf2c0))
+
+### Features
+
+- **graphql-server:** authenticate /flush, bound the system lane, name the introspection role ([6493c16](https://github.com/constructive-io/constructive/commit/6493c164479bcb8c75b27a8a10fa922b21a7260c))
+
 ## [3.30.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.30.2...@constructive-io/graphql-types@3.30.3) (2026-09-03)
 
 **Note:** Version bump only for package @constructive-io/graphql-types

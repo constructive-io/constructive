@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.15.0](https://github.com/constructive-io/constructive/compare/graphile-i18n@2.14.4...graphile-i18n@2.15.0) (2026-09-04)
+
+### Features
+
+- **graphql-server:** authenticate /flush, bound the system lane, name the introspection role ([6493c16](https://github.com/constructive-io/constructive/commit/6493c164479bcb8c75b27a8a10fa922b21a7260c))
+
 ## [2.14.4](https://github.com/constructive-io/constructive/compare/graphile-i18n@2.14.3...graphile-i18n@2.14.4) (2026-09-03)
 
 **Note:** Version bump only for package graphile-i18n

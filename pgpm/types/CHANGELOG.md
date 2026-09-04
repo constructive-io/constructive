@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.53.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.53.1...@pgpmjs/types@2.53.2) (2026-09-04)
+
+**Note:** Version bump only for package @pgpmjs/types
+
 ## [2.53.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.53.0...@pgpmjs/types@2.53.1) (2026-09-03)
 
 **Note:** Version bump only for package @pgpmjs/types

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.19.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.18.2...graphile-presigned-url-plugin@1.19.0) (2026-09-04)
+
+### Features
+
+- **graphql-server:** authenticate /flush, bound the system lane, name the introspection role ([6493c16](https://github.com/constructive-io/constructive/commit/6493c164479bcb8c75b27a8a10fa922b21a7260c))
+
 ## [1.18.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.18.1...graphile-presigned-url-plugin@1.18.2) (2026-09-01)
 
 **Note:** Version bump only for package graphile-presigned-url-plugin

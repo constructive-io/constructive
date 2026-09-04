@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.28.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.27.0...@constructive-io/express-context@0.28.0) (2026-09-04)
+
+### Features
+
+- **auth:** agent-auth error codes + intent/session-lineage claims ([2f53a6b](https://github.com/constructive-io/constructive/commit/2f53a6bf0083a59a69fe28cced0f8f3e3babbade)), closes [#3668](https://github.com/constructive-io/constructive/issues/3668)
+
 # [0.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.26.2...@constructive-io/express-context@0.27.0) (2026-09-03)
 
 ### Bug Fixes

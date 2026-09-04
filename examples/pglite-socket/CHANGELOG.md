@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.12.5](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.12.4...@constructive-io/examples-pglite-socket@1.12.5) (2026-09-04)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
 ## [1.12.4](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.12.3...@constructive-io/examples-pglite-socket@1.12.4) (2026-09-03)
 
 **Note:** Version bump only for package @constructive-io/examples-pglite-socket

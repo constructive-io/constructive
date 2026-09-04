@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.15.5](https://github.com/constructive-io/constructive/compare/graphile-llm@1.15.4...graphile-llm@1.15.5) (2026-09-04)
+
+**Note:** Version bump only for package graphile-llm
+
 ## [1.15.4](https://github.com/constructive-io/constructive/compare/graphile-llm@1.15.3...graphile-llm@1.15.4) (2026-09-03)
 
 **Note:** Version bump only for package graphile-llm
