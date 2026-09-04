@@ -29,6 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@pgpmjs/logger": "workspace:^",
     "pg": "^8.21.0"
   },
   "devDependencies": {

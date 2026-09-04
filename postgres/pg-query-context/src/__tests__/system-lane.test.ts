@@ -71,4 +71,19 @@ describe('withSystemLaneClient', () => {
       'ROLLBACK'
     ]);
   });
+
+  it('rethrows the original failure when the rollback itself fails', async () => {
+    const client: GrafastPgClient = {
+      query: async (opts) => {
+        if (opts.text === 'ROLLBACK') throw new Error('connection terminated');
+        return { rows: [] };
+      }
+    };
+
+    await expect(
+      withSystemLaneClient(makeWithPgClient(client, []), async () => {
+        throw new Error('boom');
+      })
+    ).rejects.toThrow('boom');
+  });
 });

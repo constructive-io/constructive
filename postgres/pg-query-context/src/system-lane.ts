@@ -1,3 +1,5 @@
+import { Logger } from '@pgpmjs/logger';
+
 /**
  * The system lane: server-owned reads and writes that are not a tenant
  * session — schema metadata, module registration, storage config.
@@ -7,10 +9,20 @@
  * a superuser that bypasses RLS) and each statement lands in its own implicit
  * transaction. This helper names the role instead: one explicit transaction
  * with a transaction-local `role`, so the lane's reach is the grants of a
- * bounded role rather than the connection's.
+ * named role rather than the connection's.
  */
 
-/** Bounded role the system lane runs as. Non-superuser, no LOGIN. */
+const log = new Logger('pg-query-context');
+
+/**
+ * Role the system lane runs as: a named role instead of whatever the pool
+ * connected as.
+ *
+ * This is NOT an RLS-subject role. `ROLES.md` documents `administrator` as the
+ * BYPASSRLS role, so the lane still bypasses RLS — what changes is that it no
+ * longer inherits the connection's superuser and its work is one explicit
+ * transaction. Narrowing it further needs grants that do not exist yet.
+ */
 export const SYSTEM_LANE_ROLE = 'administrator';
 
 /** The subset of grafast's PgClient this module needs. */
@@ -56,7 +68,17 @@ export function withSystemLaneClient<T>(
       await client.query({ text: 'COMMIT' });
       return result;
     } catch (err) {
-      await client.query({ text: 'ROLLBACK' });
+      // A broken connection makes ROLLBACK throw too; that failure must not
+      // become what the caller sees in place of the real one.
+      try {
+        await client.query({ text: 'ROLLBACK' });
+      } catch (rollbackErr) {
+        log.error(
+          `[system-lane] ROLLBACK failed: ${
+            rollbackErr instanceof Error ? rollbackErr.message : String(rollbackErr)
+          }`,
+        );
+      }
       throw err;
     }
   });

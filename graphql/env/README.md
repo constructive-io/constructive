@@ -56,6 +56,8 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 - `API_META_SCHEMAS` - Comma-separated list of meta schemas
 - `API_ANON_ROLE` - Anonymous role name
 - `API_ROLE_NAME` - Default role name
+- `API_FLUSH_TOKEN` - Bearer token required by `POST /flush`; the route is not mounted when unset
+- `API_INTROSPECTION_ROLE` - Role PostGraphile introspects as; unset means the pool's connecting role
 
 ## Defaults
 

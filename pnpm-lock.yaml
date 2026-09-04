@@ -3520,6 +3520,9 @@ importers:
 
   postgres/pg-query-context:
     dependencies:
+      '@pgpmjs/logger':
+        specifier: workspace:^
+        version: link:../../pgpm/logger/dist
       pg:
         specifier: ^8.21.0
         version: 8.21.0
