@@ -102,6 +102,8 @@ function fakeContext(opts: { isPublic?: boolean; existingFile?: boolean; failIns
   const client = {
     async query(o: { text: string; values?: unknown[] }) {
       queries.push(o);
+      // Transaction control is not a data query, so it needs no handler.
+      if (/^(BEGIN|COMMIT|ROLLBACK)$/.test(o.text)) return { rows: [] };
       const handler = handlers.find((h) => h.match.test(o.text));
       if (!handler) throw new Error(`unexpected query: ${o.text}`);
       return { rows: handler.rows() };
