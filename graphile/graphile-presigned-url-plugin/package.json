@@ -44,6 +44,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1052.0",
     "@pgpmjs/logger": "workspace:^",
     "@pgsql/quotes": "^18.2.4",
+    "graphile-plugin-utils": "workspace:^",
     "graphile-storage-registry": "workspace:^",
     "lru-cache": "^11.2.7",
     "mime-bytes": "workspace:^"

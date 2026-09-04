@@ -35,7 +35,7 @@ import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
-import { flush, flushService } from './middleware/flush';
+import { createFlushMiddleware, flushService } from './middleware/flush';
 import { createFnRouter } from './middleware/fn';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
@@ -222,7 +222,7 @@ class Server {
     app.use(createFnRouter());
 
     app.use(graphile(effectiveOpts));
-    app.use(flush);
+    app.use(createFlushMiddleware(effectiveOpts));
 
     // Error handling - MUST be LAST
     app.use(notFoundHandler); // Catches unmatched routes (404)

@@ -95,7 +95,7 @@ For the operational workflow, sampler output, and heap snapshot usage, see [docs
 - `GET /graphiql` -> GraphiQL UI
 - `GET /graphql` / `POST /graphql` -> GraphQL endpoint
 - `POST /graphql` (multipart) -> file uploads
-- `POST /flush` -> clears cached Graphile schema for the current API
+- `POST /flush` -> clears cached Graphile schema for the current API; mounted only when `API_FLUSH_TOKEN` is set, and requires `Authorization: Bearer $API_FLUSH_TOKEN`. Without the variable the route is not served (404) — operators deploying a schema-cache flush must set it on the server and on every caller. The `LISTEN/NOTIFY` invalidation path is unaffected.
 - `GET /debug/memory` -> memory/process/Graphile debug snapshot when observability is enabled
 - `GET /debug/db` -> PostgreSQL activity/locks/pool debug snapshot when observability is enabled
 
@@ -132,6 +132,8 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `API_META_SCHEMAS`             | Meta schemas to query                 | `routing_public,metaschema_public,metaschema_modules_public` |
 | `API_ANON_ROLE`                | Anonymous role name                   | `administrator`                                               |
 | `API_ROLE_NAME`                | Authenticated role name               | `administrator`                                               |
+| `API_FLUSH_TOKEN`              | Bearer token required by `POST /flush`; route is not mounted when unset | empty                        |
+| `API_INTROSPECTION_ROLE`       | Role PostGraphile introspects as; unset means the pool's connecting role. Naming a role with fewer grants removes fields from the schema | empty |
 | `GRAPHQL_OBSERVABILITY_ENABLED` | Master switch for debug routes and sampler | `false`                                                  |
 | `GRAPHQL_DEBUG_SAMPLER_ENABLED` | Enables periodic NDJSON sampling when observability is on | `true`                                   |
 | `GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS` | Sampler interval in milliseconds | `10000`                                                       |

@@ -24,6 +24,7 @@ import type { PgCodecWithAttributes } from '@dataplan/pg';
 import { TYPES } from '@dataplan/pg';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { withSystemLaneClient } from 'graphile-plugin-utils';
 
 import type { I18nPluginOptions, I18nTableInfo, TranslatableField } from './types';
 
@@ -288,8 +289,11 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
                     return result;
                   }
 
-                  const row = await withPgClient(null, async (client: any) => {
-                    const { rows } = await client.query(sqlQuery, [id, langs]);
+                  // Translation lookup is a server-side read, so it runs in the
+                  // system lane's bounded role inside one transaction rather
+                  // than inheriting the pool's connecting role.
+                  const row = await withSystemLaneClient(withPgClient, async (client) => {
+                    const { rows } = await client.query({ text: sqlQuery, values: [id, langs] });
                     return rows[0] ?? null;
                   });
 

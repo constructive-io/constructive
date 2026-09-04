@@ -24,6 +24,7 @@ import 'graphile-build';
 import { Logger } from '@pgpmjs/logger';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { withSystemLaneClient } from 'graphile-plugin-utils';
 import { discoverStoragePlanes, uploadSurfaceNames } from 'graphile-storage-registry';
 import { checkTypeAgreement } from 'mime-bytes';
 
@@ -256,8 +257,8 @@ export function createPresignedUrlPlugin(
                       if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
 
                       // Module registration is server config, not user data:
-                      // resolve it without the request role's pgSettings.
-                      const allConfigs = await vals.withPgClient(null, (pgClient: any) =>
+                      // resolve it in the system lane's bounded role.
+                      const allConfigs = await withSystemLaneClient(vals.withPgClient, (pgClient) =>
                         loadAllStorageModules(pgClient, databaseId),
                       );
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
@@ -375,8 +376,8 @@ export function createPresignedUrlPlugin(
                       if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
 
                       // Module registration is server config, not user data:
-                      // resolve it without the request role's pgSettings.
-                      const allConfigs = await vals.withPgClient(null, (pgClient: any) =>
+                      // resolve it in the system lane's bounded role.
+                      const allConfigs = await withSystemLaneClient(vals.withPgClient, (pgClient) =>
                         loadAllStorageModules(pgClient, databaseId),
                       );
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
@@ -492,9 +493,9 @@ export function createPresignedUrlPlugin(
                   try {
                     const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
                     // Module registration is server config, not user data:
-                    // resolve it without the request role's pgSettings.
+                    // resolve it in the system lane's bounded role.
                     const allConfigs = databaseId
-                      ? await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId))
+                      ? await withSystemLaneClient(withPgClient, (pgClient) => loadAllStorageModules(pgClient, databaseId))
                       : [];
                     const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
 
@@ -528,9 +529,9 @@ export function createPresignedUrlPlugin(
                   try {
                     const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
                     // Module registration is server config, not user data:
-                    // resolve it without the request role's pgSettings.
+                    // resolve it in the system lane's bounded role.
                     const allConfigs = databaseId
-                      ? await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId))
+                      ? await withSystemLaneClient(withPgClient, (pgClient) => loadAllStorageModules(pgClient, databaseId))
                       : [];
                     const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
 

@@ -44,6 +44,24 @@ export interface ApiOptions {
    * <schema>.resolve_route() (host → tenant/api/db/role).
    */
   routingSchema?: string;
+  /**
+   * Shared secret required by the `/flush` cache-invalidation route, presented
+   * as `Authorization: Bearer <token>`. The route is disabled when unset.
+   */
+  flushToken?: string;
+  /**
+   * Role PostGraphile introspects the database as. Introspection runs outside
+   * any request, so it has no served role to inherit; without this it runs as
+   * the pool's connecting role and the schema advertises that role's reach
+   * rather than the served role's grants.
+   *
+   * Opt-in, and unset by default: introspection grants decide the *shape* of
+   * the schema, so a role with fewer grants than the connecting role silently
+   * drops fields. On a platform database `administrator` is missing UPDATE on
+   * three `metaschema_public` columns and loses their patch fields, so naming a
+   * role is only safe once its grants cover the served surface.
+   */
+  introspectionRole?: string;
 }
 
 /**
