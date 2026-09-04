@@ -42,22 +42,14 @@ export const apiSettingMutationKeys = {
   /** Delete apiSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'apisetting', 'delete', id] as const,
 } as const;
-export const appComponentMutationKeys = {
-  /** All appComponent mutation keys */ all: ['mutation', 'appcomponent'] as const,
-  /** Create appComponent mutation key */ create: () =>
-    ['mutation', 'appcomponent', 'create'] as const,
-  /** Update appComponent mutation key */ update: (id: string | number) =>
-    ['mutation', 'appcomponent', 'update', id] as const,
-  /** Delete appComponent mutation key */ delete: (id: string | number) =>
-    ['mutation', 'appcomponent', 'delete', id] as const,
-} as const;
-export const appMutationKeys = {
-  /** All app mutation keys */ all: ['mutation', 'app'] as const,
-  /** Create app mutation key */ create: () => ['mutation', 'app', 'create'] as const,
-  /** Update app mutation key */ update: (id: string | number) =>
-    ['mutation', 'app', 'update', id] as const,
-  /** Delete app mutation key */ delete: (id: string | number) =>
-    ['mutation', 'app', 'delete', id] as const,
+export const astMigrationMutationKeys = {
+  /** All astMigration mutation keys */ all: ['mutation', 'astmigration'] as const,
+  /** Create astMigration mutation key */ create: () =>
+    ['mutation', 'astmigration', 'create'] as const,
+  /** Update astMigration mutation key */ update: (id: string | number) =>
+    ['mutation', 'astmigration', 'update', id] as const,
+  /** Delete astMigration mutation key */ delete: (id: string | number) =>
+    ['mutation', 'astmigration', 'delete', id] as const,
 } as const;
 export const checkConstraintMutationKeys = {
   /** All checkConstraint mutation keys */ all: ['mutation', 'checkconstraint'] as const,
@@ -271,6 +263,18 @@ export const functionMutationKeys = {
   /** Delete function mutation key */ delete: (id: string | number) =>
     ['mutation', 'function', 'delete', id] as const,
 } as const;
+export const getSitePreviewsRecordMutationKeys = {
+  /** All getSitePreviewsRecord mutation keys */ all: [
+    'mutation',
+    'getsitepreviewsrecord',
+  ] as const,
+  /** Create getSitePreviewsRecord mutation key */ create: () =>
+    ['mutation', 'getsitepreviewsrecord', 'create'] as const,
+  /** Update getSitePreviewsRecord mutation key */ update: (id: string | number) =>
+    ['mutation', 'getsitepreviewsrecord', 'update', id] as const,
+  /** Delete getSitePreviewsRecord mutation key */ delete: (id: string | number) =>
+    ['mutation', 'getsitepreviewsrecord', 'delete', id] as const,
+} as const;
 export const hostnameBindingMutationKeys = {
   /** All hostnameBinding mutation keys */ all: ['mutation', 'hostnamebinding'] as const,
   /** Create hostnameBinding mutation key */ create: () =>
@@ -280,13 +284,17 @@ export const hostnameBindingMutationKeys = {
   /** Delete hostnameBinding mutation key */ delete: (id: string | number) =>
     ['mutation', 'hostnamebinding', 'delete', id] as const,
 } as const;
-export const httpRouteMutationKeys = {
-  /** All httpRoute mutation keys */ all: ['mutation', 'httproute'] as const,
-  /** Create httpRoute mutation key */ create: () => ['mutation', 'httproute', 'create'] as const,
-  /** Update httpRoute mutation key */ update: (id: string | number) =>
-    ['mutation', 'httproute', 'update', id] as const,
-  /** Delete httpRoute mutation key */ delete: (id: string | number) =>
-    ['mutation', 'httproute', 'delete', id] as const,
+export const identityProviderRegistryMutationKeys = {
+  /** All identityProviderRegistry mutation keys */ all: [
+    'mutation',
+    'identityproviderregistry',
+  ] as const,
+  /** Create identityProviderRegistry mutation key */ create: () =>
+    ['mutation', 'identityproviderregistry', 'create'] as const,
+  /** Update identityProviderRegistry mutation key */ update: (id: string | number) =>
+    ['mutation', 'identityproviderregistry', 'update', id] as const,
+  /** Delete identityProviderRegistry mutation key */ delete: (id: string | number) =>
+    ['mutation', 'identityproviderregistry', 'delete', id] as const,
 } as const;
 export const indexMutationKeys = {
   /** All index mutation keys */ all: ['mutation', 'index'] as const,
@@ -432,6 +440,18 @@ export const platformEmailSiteIdentityMutationKeys = {
   /** Delete platformEmailSiteIdentity mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformemailsiteidentity', 'delete', id] as const,
 } as const;
+export const platformGetSitePreviewsRecordMutationKeys = {
+  /** All platformGetSitePreviewsRecord mutation keys */ all: [
+    'mutation',
+    'platformgetsitepreviewsrecord',
+  ] as const,
+  /** Create platformGetSitePreviewsRecord mutation key */ create: () =>
+    ['mutation', 'platformgetsitepreviewsrecord', 'create'] as const,
+  /** Update platformGetSitePreviewsRecord mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformgetsitepreviewsrecord', 'update', id] as const,
+  /** Delete platformGetSitePreviewsRecord mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformgetsitepreviewsrecord', 'delete', id] as const,
+} as const;
 export const platformManagedDomainMutationKeys = {
   /** All platformManagedDomain mutation keys */ all: [
     'mutation',
@@ -513,6 +533,15 @@ export const platformSiteModuleMutationKeys = {
   /** Delete platformSiteModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformsitemodule', 'delete', id] as const,
 } as const;
+export const platformSiteReleaseMutationKeys = {
+  /** All platformSiteRelease mutation keys */ all: ['mutation', 'platformsiterelease'] as const,
+  /** Create platformSiteRelease mutation key */ create: () =>
+    ['mutation', 'platformsiterelease', 'create'] as const,
+  /** Update platformSiteRelease mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformsiterelease', 'update', id] as const,
+  /** Delete platformSiteRelease mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformsiterelease', 'delete', id] as const,
+} as const;
 export const platformSiteThemeMutationKeys = {
   /** All platformSiteTheme mutation keys */ all: ['mutation', 'platformsitetheme'] as const,
   /** Create platformSiteTheme mutation key */ create: () =>
@@ -559,6 +588,14 @@ export const pubkeySettingMutationKeys = {
     ['mutation', 'pubkeysetting', 'update', id] as const,
   /** Delete pubkeySetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'pubkeysetting', 'delete', id] as const,
+} as const;
+export const redirectMutationKeys = {
+  /** All redirect mutation keys */ all: ['mutation', 'redirect'] as const,
+  /** Create redirect mutation key */ create: () => ['mutation', 'redirect', 'create'] as const,
+  /** Update redirect mutation key */ update: (id: string | number) =>
+    ['mutation', 'redirect', 'update', id] as const,
+  /** Delete redirect mutation key */ delete: (id: string | number) =>
+    ['mutation', 'redirect', 'delete', id] as const,
 } as const;
 export const rlsSettingMutationKeys = {
   /** All rlsSetting mutation keys */ all: ['mutation', 'rlssetting'] as const,
@@ -654,6 +691,15 @@ export const siteModuleMutationKeys = {
   /** Delete siteModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'sitemodule', 'delete', id] as const,
 } as const;
+export const siteReleaseMutationKeys = {
+  /** All siteRelease mutation keys */ all: ['mutation', 'siterelease'] as const,
+  /** Create siteRelease mutation key */ create: () =>
+    ['mutation', 'siterelease', 'create'] as const,
+  /** Update siteRelease mutation key */ update: (id: string | number) =>
+    ['mutation', 'siterelease', 'update', id] as const,
+  /** Delete siteRelease mutation key */ delete: (id: string | number) =>
+    ['mutation', 'siterelease', 'delete', id] as const,
+} as const;
 export const siteThemeMutationKeys = {
   /** All siteTheme mutation keys */ all: ['mutation', 'sitetheme'] as const,
   /** Create siteTheme mutation key */ create: () => ['mutation', 'sitetheme', 'create'] as const,
@@ -679,6 +725,14 @@ export const spatialRelationMutationKeys = {
     ['mutation', 'spatialrelation', 'update', id] as const,
   /** Delete spatialRelation mutation key */ delete: (id: string | number) =>
     ['mutation', 'spatialrelation', 'delete', id] as const,
+} as const;
+export const sqlActionMutationKeys = {
+  /** All sqlAction mutation keys */ all: ['mutation', 'sqlaction'] as const,
+  /** Create sqlAction mutation key */ create: () => ['mutation', 'sqlaction', 'create'] as const,
+  /** Update sqlAction mutation key */ update: (id: string | number) =>
+    ['mutation', 'sqlaction', 'update', id] as const,
+  /** Delete sqlAction mutation key */ delete: (id: string | number) =>
+    ['mutation', 'sqlaction', 'delete', id] as const,
 } as const;
 export const tableBehaviorMutationKeys = {
   /** All tableBehavior mutation keys */ all: ['mutation', 'tablebehavior'] as const,
@@ -799,32 +853,86 @@ export const webauthnSettingMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
+  /** Mutation key for acceptDatabaseTransfer */ acceptDatabaseTransfer: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'acceptDatabaseTransfer', identifier] as const)
+      : (['mutation', 'acceptDatabaseTransfer'] as const),
   /** Mutation key for applyRls */ applyRls: (identifier?: string) =>
     identifier
       ? (['mutation', 'applyRls', identifier] as const)
       : (['mutation', 'applyRls'] as const),
-  /** Mutation key for appsInstallApp */ appsInstallApp: (identifier?: string) =>
+  /** Mutation key for cancelDatabaseTransfer */ cancelDatabaseTransfer: (identifier?: string) =>
     identifier
-      ? (['mutation', 'appsInstallApp', identifier] as const)
-      : (['mutation', 'appsInstallApp'] as const),
-  /** Mutation key for appsUninstallApp */ appsUninstallApp: (identifier?: string) =>
+      ? (['mutation', 'cancelDatabaseTransfer', identifier] as const)
+      : (['mutation', 'cancelDatabaseTransfer'] as const),
+  /** Mutation key for deleteSitePreview */ deleteSitePreview: (identifier?: string) =>
     identifier
-      ? (['mutation', 'appsUninstallApp', identifier] as const)
-      : (['mutation', 'appsUninstallApp'] as const),
-  /** Mutation key for appsUpgradeApp */ appsUpgradeApp: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'appsUpgradeApp', identifier] as const)
-      : (['mutation', 'appsUpgradeApp'] as const),
+      ? (['mutation', 'deleteSitePreview', identifier] as const)
+      : (['mutation', 'deleteSitePreview'] as const),
   /** Mutation key for domainsAssignSubdomain */ domainsAssignSubdomain: (identifier?: string) =>
     identifier
       ? (['mutation', 'domainsAssignSubdomain', identifier] as const)
       : (['mutation', 'domainsAssignSubdomain'] as const),
+  /** Mutation key for mintSitePreviewToken */ mintSitePreviewToken: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'mintSitePreviewToken', identifier] as const)
+      : (['mutation', 'mintSitePreviewToken'] as const),
+  /** Mutation key for pagesInstallPages */ pagesInstallPages: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'pagesInstallPages', identifier] as const)
+      : (['mutation', 'pagesInstallPages'] as const),
+  /** Mutation key for platformDeleteSitePreview */ platformDeleteSitePreview: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformDeleteSitePreview', identifier] as const)
+      : (['mutation', 'platformDeleteSitePreview'] as const),
   /** Mutation key for platformDomainsAssignSubdomain */ platformDomainsAssignSubdomain: (
     identifier?: string
   ) =>
     identifier
       ? (['mutation', 'platformDomainsAssignSubdomain', identifier] as const)
       : (['mutation', 'platformDomainsAssignSubdomain'] as const),
+  /** Mutation key for platformMintSitePreviewToken */ platformMintSitePreviewToken: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformMintSitePreviewToken', identifier] as const)
+      : (['mutation', 'platformMintSitePreviewToken'] as const),
+  /** Mutation key for platformPagesInstallPages */ platformPagesInstallPages: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformPagesInstallPages', identifier] as const)
+      : (['mutation', 'platformPagesInstallPages'] as const),
+  /** Mutation key for platformProvisionSitePreview */ platformProvisionSitePreview: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformProvisionSitePreview', identifier] as const)
+      : (['mutation', 'platformProvisionSitePreview'] as const),
+  /** Mutation key for platformSetSitePreview */ platformSetSitePreview: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'platformSetSitePreview', identifier] as const)
+      : (['mutation', 'platformSetSitePreview'] as const),
+  /** Mutation key for platformSiteMetadataInstallRobots */ platformSiteMetadataInstallRobots: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformSiteMetadataInstallRobots', identifier] as const)
+      : (['mutation', 'platformSiteMetadataInstallRobots'] as const),
+  /** Mutation key for platformSitesInstallContentPreset */ platformSitesInstallContentPreset: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformSitesInstallContentPreset', identifier] as const)
+      : (['mutation', 'platformSitesInstallContentPreset'] as const),
+  /** Mutation key for platformSitesInstallMantra */ platformSitesInstallMantra: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformSitesInstallMantra', identifier] as const)
+      : (['mutation', 'platformSitesInstallMantra'] as const),
   /** Mutation key for platformSitesProvisionStaticSite */ platformSitesProvisionStaticSite: (
     identifier?: string
   ) =>
@@ -835,6 +943,14 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
       : (['mutation', 'provisionBucket'] as const),
+  /** Mutation key for provisionSitePreview */ provisionSitePreview: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'provisionSitePreview', identifier] as const)
+      : (['mutation', 'provisionSitePreview'] as const),
+  /** Mutation key for rejectDatabaseTransfer */ rejectDatabaseTransfer: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'rejectDatabaseTransfer', identifier] as const)
+      : (['mutation', 'rejectDatabaseTransfer'] as const),
   /** Mutation key for requestDatabase */ requestDatabase: (identifier?: string) =>
     identifier
       ? (['mutation', 'requestDatabase', identifier] as const)
@@ -843,6 +959,26 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'setFieldOrder', identifier] as const)
       : (['mutation', 'setFieldOrder'] as const),
+  /** Mutation key for setSitePreview */ setSitePreview: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'setSitePreview', identifier] as const)
+      : (['mutation', 'setSitePreview'] as const),
+  /** Mutation key for siteMetadataInstallRobots */ siteMetadataInstallRobots: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'siteMetadataInstallRobots', identifier] as const)
+      : (['mutation', 'siteMetadataInstallRobots'] as const),
+  /** Mutation key for sitesInstallContentPreset */ sitesInstallContentPreset: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'sitesInstallContentPreset', identifier] as const)
+      : (['mutation', 'sitesInstallContentPreset'] as const),
+  /** Mutation key for sitesInstallMantra */ sitesInstallMantra: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'sitesInstallMantra', identifier] as const)
+      : (['mutation', 'sitesInstallMantra'] as const),
   /** Mutation key for sitesProvisionStaticSite */ sitesProvisionStaticSite: (
     identifier?: string
   ) =>
@@ -876,8 +1012,7 @@ export const mutationKeys = {
   api: apiMutationKeys,
   apiSchema: apiSchemaMutationKeys,
   apiSetting: apiSettingMutationKeys,
-  appComponent: appComponentMutationKeys,
-  app: appMutationKeys,
+  astMigration: astMigrationMutationKeys,
   checkConstraint: checkConstraintMutationKeys,
   compositeType: compositeTypeMutationKeys,
   corsSetting: corsSettingMutationKeys,
@@ -902,8 +1037,9 @@ export const mutationKeys = {
   foreignKeyConstraint: foreignKeyConstraintMutationKeys,
   fullTextSearch: fullTextSearchMutationKeys,
   function: functionMutationKeys,
+  getSitePreviewsRecord: getSitePreviewsRecordMutationKeys,
   hostnameBinding: hostnameBindingMutationKeys,
-  httpRoute: httpRouteMutationKeys,
+  identityProviderRegistry: identityProviderRegistryMutationKeys,
   index: indexMutationKeys,
   managedDomain: managedDomainMutationKeys,
   nodeTypeRegistry: nodeTypeRegistryMutationKeys,
@@ -919,6 +1055,7 @@ export const mutationKeys = {
   platformEmailIdentity: platformEmailIdentityMutationKeys,
   platformEmailProviderAccount: platformEmailProviderAccountMutationKeys,
   platformEmailSiteIdentity: platformEmailSiteIdentityMutationKeys,
+  platformGetSitePreviewsRecord: platformGetSitePreviewsRecordMutationKeys,
   platformManagedDomain: platformManagedDomainMutationKeys,
   platformPage: platformPageMutationKeys,
   platformSiteAppLink: platformSiteAppLinkMutationKeys,
@@ -927,11 +1064,13 @@ export const mutationKeys = {
   platformSiteErrorPage: platformSiteErrorPageMutationKeys,
   platformSiteMetadatum: platformSiteMetadatumMutationKeys,
   platformSiteModule: platformSiteModuleMutationKeys,
+  platformSiteRelease: platformSiteReleaseMutationKeys,
   platformSiteTheme: platformSiteThemeMutationKeys,
   platformSiteWebConfig: platformSiteWebConfigMutationKeys,
   policy: policyMutationKeys,
   primaryKeyConstraint: primaryKeyConstraintMutationKeys,
   pubkeySetting: pubkeySettingMutationKeys,
+  redirect: redirectMutationKeys,
   rlsSetting: rlsSettingMutationKeys,
   routeBinding: routeBindingMutationKeys,
   route: routeMutationKeys,
@@ -943,9 +1082,11 @@ export const mutationKeys = {
   siteErrorPage: siteErrorPageMutationKeys,
   siteMetadatum: siteMetadatumMutationKeys,
   siteModule: siteModuleMutationKeys,
+  siteRelease: siteReleaseMutationKeys,
   siteTheme: siteThemeMutationKeys,
   siteWebConfig: siteWebConfigMutationKeys,
   spatialRelation: spatialRelationMutationKeys,
+  sqlAction: sqlActionMutationKeys,
   tableBehavior: tableBehaviorMutationKeys,
   table: tableMutationKeys,
   tableGrant: tableGrantMutationKeys,

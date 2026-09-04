@@ -5,7 +5,19 @@
  */
 
 import type {
+  Build,
+  BuildStep,
+  BuilderBinding,
   ContentPreset,
+  DatabaseFunctionGraph,
+  DatabaseFunctionGraphExecution,
+  DatabaseFunctionGraphExecutionNodeState,
+  DatabaseFunctionGraphExecutionOutput,
+  DatabaseGraphCommit,
+  DatabaseGraphGetAllTreeNodesRecord,
+  DatabaseGraphObject,
+  DatabaseGraphRef,
+  DatabaseGraphStore,
   DbPreset,
   FunctionApiBinding,
   FunctionCapabilityBinding,
@@ -24,6 +36,8 @@ import type {
   FunctionInvocation,
   FunctionInvocationAttempt,
   GetAllTreeNodesRecord,
+  Image,
+  ImageGrant,
   InfraCommit,
   InfraGetAllTreeNodesRecord,
   InfraObject,
@@ -32,6 +46,9 @@ import type {
   IntegrationProvider,
   Namespace,
   NamespaceEvent,
+  PlatformBuild,
+  PlatformBuildStep,
+  PlatformBuilderBinding,
   PlatformFunctionApiBinding,
   PlatformFunctionCapabilityBinding,
   PlatformFunctionDefinition,
@@ -40,18 +57,36 @@ import type {
   PlatformFunctionExecutionLog,
   PlatformFunctionInvocation,
   PlatformFunctionInvocationAttempt,
+  PlatformImage,
+  PlatformImageGrant,
   PlatformInfraCommit,
   PlatformInfraGetAllTreeNodesRecord,
   PlatformInfraObject,
   PlatformInfraRef,
   PlatformInfraStore,
+  PlatformK8sResourceKind,
+  PlatformK8sSpecRule,
   PlatformNamespace,
   PlatformNamespaceEvent,
+  PlatformProposal,
+  PlatformProposalComment,
+  PlatformProposalFileView,
+  PlatformProposalReaction,
+  PlatformProposalReview,
+  PlatformProposalsChunk,
+  PlatformRegistry,
+  PlatformRegistryBinding,
+  PlatformRegistryGrant,
+  PlatformRepository,
+  PlatformRepositoryEvent,
+  PlatformRepositoryRequiredCheck,
+  PlatformRepositoryWorkflow,
   PlatformResource,
   PlatformResourceDeclaredCapacity,
   PlatformResourceDefinition,
   PlatformResourceEvent,
   PlatformResourceInstallation,
+  PlatformResourceObservedStorage,
   PlatformResourceStatusCheck,
   PlatformResourceUsageLog,
   PlatformResourceUsageSummary,
@@ -61,11 +96,25 @@ import type {
   PlatformResourcesResolvedRequirement,
   PlatformWebhookEndpoint,
   PlatformWebhookEvent,
+  Proposal,
+  ProposalComment,
+  ProposalFileView,
+  ProposalReaction,
+  ProposalReview,
+  ProposalsChunk,
+  Registry,
+  RegistryBinding,
+  RegistryGrant,
+  Repository,
+  RepositoryEvent,
+  RepositoryRequiredCheck,
+  RepositoryWorkflow,
   Resource,
   ResourceDeclaredCapacity,
   ResourceDefinition,
   ResourceEvent,
   ResourceInstallation,
+  ResourceObservedStorage,
   ResourceStatusCheck,
   ResourceUsageLog,
   ResourceUsageSummary,
@@ -95,6 +144,130 @@ import type {
 } from './types';
 export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeImage = unknown;
+export type ConstructiveInternalTypeUpload = unknown;
+/** Methods to use when ordering `Build`. */
+export type BuildOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ATTEMPT_ASC'
+  | 'ATTEMPT_DESC'
+  | 'COMMIT_SHA_ASC'
+  | 'COMMIT_SHA_DESC'
+  | 'CONCLUSION_ASC'
+  | 'CONCLUSION_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EVENT_ID_ASC'
+  | 'EVENT_ID_DESC'
+  | 'FINISHED_AT_ASC'
+  | 'FINISHED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_REF_ASC'
+  | 'IMAGE_REF_DESC'
+  | 'JOB_ID_ASC'
+  | 'JOB_ID_DESC'
+  | 'LOGS_ASC'
+  | 'LOGS_DESC'
+  | 'MATRIX_KEY_ASC'
+  | 'MATRIX_KEY_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'REF_ASC'
+  | 'REF_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
+  | 'WORKFLOW_ID_ASC'
+  | 'WORKFLOW_ID_DESC';
+/** Methods to use when ordering `BuildStep`. */
+export type BuildStepOrderBy =
+  | 'BUILD_ID_ASC'
+  | 'BUILD_ID_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EXIT_CODE_ASC'
+  | 'EXIT_CODE_DESC'
+  | 'FINISHED_AT_ASC'
+  | 'FINISHED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LOG_BYTES_ASC'
+  | 'LOG_BYTES_DESC'
+  | 'LOG_OFFSET_ASC'
+  | 'LOG_OFFSET_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PARENT_SEQ_ASC'
+  | 'PARENT_SEQ_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RECORDED_AT_ASC'
+  | 'RECORDED_AT_DESC'
+  | 'SEQ_ASC'
+  | 'SEQ_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'SUMMARY_ASC'
+  | 'SUMMARY_DESC';
+/** Methods to use when ordering `BuilderBinding`. */
+export type BuilderBindingOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'OBSERVED_HOST_ASC'
+  | 'OBSERVED_HOST_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `ContentPreset`. */
 export type ContentPresetOrderBy =
   | 'ACTIVE_ASC'
@@ -122,6 +295,236 @@ export type ContentPresetOrderBy =
   | 'STORE_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `DatabaseFunctionGraphExecutionNodeState`. */
+export type DatabaseFunctionGraphExecutionNodeStateOrderBy =
+  | 'CALLBACK_INPUTS_ASC'
+  | 'CALLBACK_INPUTS_DESC'
+  | 'CALLBACK_META_ASC'
+  | 'CALLBACK_META_DESC'
+  | 'CALLBACK_TOKEN_HASH_ASC'
+  | 'CALLBACK_TOKEN_HASH_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ERROR_CODE_ASC'
+  | 'ERROR_CODE_DESC'
+  | 'ERROR_MESSAGE_ASC'
+  | 'ERROR_MESSAGE_DESC'
+  | 'EXECUTION_ID_ASC'
+  | 'EXECUTION_ID_DESC'
+  | 'EXPIRY_DEFAULT_OUTPUT_ASC'
+  | 'EXPIRY_DEFAULT_OUTPUT_DESC'
+  | 'EXPIRY_ESCALATED_AT_ASC'
+  | 'EXPIRY_ESCALATED_AT_DESC'
+  | 'EXPIRY_POLICY_ASC'
+  | 'EXPIRY_POLICY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'NODE_NAME_ASC'
+  | 'NODE_NAME_DESC'
+  | 'NODE_PATH_ASC'
+  | 'NODE_PATH_DESC'
+  | 'OUTPUT_ID_ASC'
+  | 'OUTPUT_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'WAITING_DEADLINE_AT_ASC'
+  | 'WAITING_DEADLINE_AT_DESC'
+  | 'WAITING_ON_ASC'
+  | 'WAITING_ON_DESC'
+  | 'WAITING_SINCE_ASC'
+  | 'WAITING_SINCE_DESC';
+/** Methods to use when ordering `DatabaseFunctionGraphExecution`. */
+export type DatabaseFunctionGraphExecutionOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CURRENT_WAVE_ASC'
+  | 'CURRENT_WAVE_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFINITIONS_COMMIT_ID_ASC'
+  | 'DEFINITIONS_COMMIT_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ERROR_CODE_ASC'
+  | 'ERROR_CODE_DESC'
+  | 'ERROR_MESSAGE_ASC'
+  | 'ERROR_MESSAGE_DESC'
+  | 'EXECUTION_PLAN_ASC'
+  | 'EXECUTION_PLAN_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INPUT_PAYLOAD_ASC'
+  | 'INPUT_PAYLOAD_DESC'
+  | 'INVOCATION_CREATED_AT_ASC'
+  | 'INVOCATION_CREATED_AT_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'LAST_PROGRESS_AT_ASC'
+  | 'LAST_PROGRESS_AT_DESC'
+  | 'MAX_PENDING_JOBS_ASC'
+  | 'MAX_PENDING_JOBS_DESC'
+  | 'MAX_TICKS_ASC'
+  | 'MAX_TICKS_DESC'
+  | 'NATURAL'
+  | 'NODE_OUTPUTS_ASC'
+  | 'NODE_OUTPUTS_DESC'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'OUTPUT_NAMES_ASC'
+  | 'OUTPUT_NAMES_DESC'
+  | 'OUTPUT_NODE_ASC'
+  | 'OUTPUT_NODE_DESC'
+  | 'OUTPUT_PAYLOAD_ASC'
+  | 'OUTPUT_PAYLOAD_DESC'
+  | 'OUTPUT_PORT_ASC'
+  | 'OUTPUT_PORT_DESC'
+  | 'PARENT_EXECUTION_ID_ASC'
+  | 'PARENT_EXECUTION_ID_DESC'
+  | 'PARENT_INVOCATION_ID_ASC'
+  | 'PARENT_INVOCATION_ID_DESC'
+  | 'PARENT_NODE_NAME_ASC'
+  | 'PARENT_NODE_NAME_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TICK_COUNT_ASC'
+  | 'TICK_COUNT_DESC'
+  | 'TIMEOUT_AT_ASC'
+  | 'TIMEOUT_AT_DESC';
+/** Methods to use when ordering `DatabaseFunctionGraphExecutionOutput`. */
+export type DatabaseFunctionGraphExecutionOutputOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `DatabaseFunctionGraph`. */
+export type DatabaseFunctionGraphOrderBy =
+  | 'CONTEXT_ASC'
+  | 'CONTEXT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFINITIONS_COMMIT_ID_ASC'
+  | 'DEFINITIONS_COMMIT_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_VALID_ASC'
+  | 'IS_VALID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VALIDATION_ERRORS_ASC'
+  | 'VALIDATION_ERRORS_DESC';
+/** Methods to use when ordering `DatabaseGraphCommit`. */
+export type DatabaseGraphCommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
+/** Methods to use when ordering `DatabaseGraphObject`. */
+export type DatabaseGraphObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `DatabaseGraphRef`. */
+export type DatabaseGraphRefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+/** Methods to use when ordering `DatabaseGraphStore`. */
+export type DatabaseGraphStoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
 /** Methods to use when ordering `DbPreset`. */
 export type DbPresetOrderBy =
   | 'ACTIVE_ASC'
@@ -197,6 +600,8 @@ export type FunctionCapabilityBindingOrderBy =
 export type FunctionDefinitionOrderBy =
   | 'ACCESS_CHANNELS_ASC'
   | 'ACCESS_CHANNELS_DESC'
+  | 'ANONYMOUS_CALLABLE_ASC'
+  | 'ANONYMOUS_CALLABLE_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
   | 'CONCURRENCY_ASC'
@@ -207,6 +612,8 @@ export type FunctionDefinitionOrderBy =
   | 'CPU_REQUEST_MILLICORES_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
@@ -258,6 +665,8 @@ export type FunctionDefinitionOrderBy =
   | 'QUEUE_NAME_DESC'
   | 'REQUIRED_BUCKETS_ASC'
   | 'REQUIRED_BUCKETS_DESC'
+  | 'REQUIRED_CAPABILITIES_ASC'
+  | 'REQUIRED_CAPABILITIES_DESC'
   | 'REQUIRED_CONFIGS_ASC'
   | 'REQUIRED_CONFIGS_DESC'
   | 'REQUIRED_MODELS_ASC'
@@ -284,6 +693,8 @@ export type FunctionDefinitionOrderBy =
   | 'TIMEOUT_SECONDS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
   | 'VOLATILE_ASC'
   | 'VOLATILE_DESC';
 /** Methods to use when ordering `FunctionDeploymentEvent`. */
@@ -315,6 +726,8 @@ export type FunctionDeploymentOrderBy =
   | 'CONCURRENCY_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'ERROR_COUNT_ASC'
@@ -357,7 +770,9 @@ export type FunctionDeploymentOrderBy =
   | 'TIMEOUT_SECONDS_ASC'
   | 'TIMEOUT_SECONDS_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `FunctionExecutionLog`. */
 export type FunctionExecutionLogOrderBy =
   | 'ACTOR_ID_ASC'
@@ -422,6 +837,12 @@ export type FunctionGraphExecutionNodeStateOrderBy =
   | 'ERROR_MESSAGE_DESC'
   | 'EXECUTION_ID_ASC'
   | 'EXECUTION_ID_DESC'
+  | 'EXPIRY_DEFAULT_OUTPUT_ASC'
+  | 'EXPIRY_DEFAULT_OUTPUT_DESC'
+  | 'EXPIRY_ESCALATED_AT_ASC'
+  | 'EXPIRY_ESCALATED_AT_DESC'
+  | 'EXPIRY_POLICY_ASC'
+  | 'EXPIRY_POLICY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
@@ -438,7 +859,13 @@ export type FunctionGraphExecutionNodeStateOrderBy =
   | 'STARTED_AT_ASC'
   | 'STARTED_AT_DESC'
   | 'STATUS_ASC'
-  | 'STATUS_DESC';
+  | 'STATUS_DESC'
+  | 'WAITING_DEADLINE_AT_ASC'
+  | 'WAITING_DEADLINE_AT_DESC'
+  | 'WAITING_ON_ASC'
+  | 'WAITING_ON_DESC'
+  | 'WAITING_SINCE_ASC'
+  | 'WAITING_SINCE_DESC';
 /** Methods to use when ordering `FunctionGraphExecution`. */
 export type FunctionGraphExecutionOrderBy =
   | 'ACTOR_ID_ASC'
@@ -642,12 +1069,18 @@ export type FunctionInvocationOrderBy =
   | 'COMPLETED_AT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEFINITION_SCOPE_ASC'
   | 'DEFINITION_SCOPE_DESC'
   | 'DURATION_MS_ASC'
   | 'DURATION_MS_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
   | 'ERROR_ASC'
   | 'ERROR_DESC'
   | 'FUNCTION_DEFINITION_ID_ASC'
@@ -659,12 +1092,16 @@ export type FunctionInvocationOrderBy =
   | 'JOB_ID_ASC'
   | 'JOB_ID_DESC'
   | 'NATURAL'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
   | 'PARENT_INVOCATION_ID_ASC'
   | 'PARENT_INVOCATION_ID_DESC'
   | 'PAYLOAD_ASC'
   | 'PAYLOAD_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
   | 'PROVENANCE_ASC'
   | 'PROVENANCE_DESC'
   | 'RESULT_ASC'
@@ -675,6 +1112,78 @@ export type FunctionInvocationOrderBy =
   | 'STATUS_DESC'
   | 'TASK_IDENTIFIER_ASC'
   | 'TASK_IDENTIFIER_DESC';
+/** Methods to use when ordering `ImageGrant`. */
+export type ImageGrantOrderBy =
+  | 'ACTIONS_ASC'
+  | 'ACTIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'GRANTED_BY_ASC'
+  | 'GRANTED_BY_DESC'
+  | 'GRANTEE_KEY_ASC'
+  | 'GRANTEE_KEY_DESC'
+  | 'GRANTEE_SCOPE_ASC'
+  | 'GRANTEE_SCOPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ID_ASC'
+  | 'IMAGE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `Image`. */
+export type ImageOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DIGEST_ASC'
+  | 'DIGEST_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PLATFORM_ONLY_ASC'
+  | 'PLATFORM_ONLY_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REGISTRY_HOST_ASC'
+  | 'REGISTRY_HOST_DESC'
+  | 'REPOSITORY_ASC'
+  | 'REPOSITORY_DESC'
+  | 'RUNTIME_ASC'
+  | 'RUNTIME_DESC'
+  | 'TAG_ASC'
+  | 'TAG_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `InfraCommit`. */
 export type InfraCommitOrderBy =
   | 'AUTHOR_ID_ASC'
@@ -799,6 +1308,8 @@ export type NamespaceEventOrderBy =
 export type NamespaceOrderBy =
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
+  | 'CLUSTER_ID_ASC'
+  | 'CLUSTER_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
@@ -826,6 +1337,123 @@ export type NamespaceOrderBy =
   | 'STATUS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformBuild`. */
+export type PlatformBuildOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ATTEMPT_ASC'
+  | 'ATTEMPT_DESC'
+  | 'COMMIT_SHA_ASC'
+  | 'COMMIT_SHA_DESC'
+  | 'CONCLUSION_ASC'
+  | 'CONCLUSION_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'EVENT_ID_ASC'
+  | 'EVENT_ID_DESC'
+  | 'FINISHED_AT_ASC'
+  | 'FINISHED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_REF_ASC'
+  | 'IMAGE_REF_DESC'
+  | 'JOB_ID_ASC'
+  | 'JOB_ID_DESC'
+  | 'LOGS_ASC'
+  | 'LOGS_DESC'
+  | 'MATRIX_KEY_ASC'
+  | 'MATRIX_KEY_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'REF_ASC'
+  | 'REF_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
+  | 'WORKFLOW_ID_ASC'
+  | 'WORKFLOW_ID_DESC';
+/** Methods to use when ordering `PlatformBuildStep`. */
+export type PlatformBuildStepOrderBy =
+  | 'BUILD_ID_ASC'
+  | 'BUILD_ID_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'EXIT_CODE_ASC'
+  | 'EXIT_CODE_DESC'
+  | 'FINISHED_AT_ASC'
+  | 'FINISHED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LOG_BYTES_ASC'
+  | 'LOG_BYTES_DESC'
+  | 'LOG_OFFSET_ASC'
+  | 'LOG_OFFSET_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PARENT_SEQ_ASC'
+  | 'PARENT_SEQ_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RECORDED_AT_ASC'
+  | 'RECORDED_AT_DESC'
+  | 'SEQ_ASC'
+  | 'SEQ_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'SUMMARY_ASC'
+  | 'SUMMARY_DESC';
+/** Methods to use when ordering `PlatformBuilderBinding`. */
+export type PlatformBuilderBindingOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'OBSERVED_HOST_ASC'
+  | 'OBSERVED_HOST_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformFunctionApiBinding`. */
 export type PlatformFunctionApiBindingOrderBy =
   | 'ALIAS_ASC'
@@ -872,6 +1500,8 @@ export type PlatformFunctionCapabilityBindingOrderBy =
 export type PlatformFunctionDefinitionOrderBy =
   | 'ACCESS_CHANNELS_ASC'
   | 'ACCESS_CHANNELS_DESC'
+  | 'ANONYMOUS_CALLABLE_ASC'
+  | 'ANONYMOUS_CALLABLE_DESC'
   | 'BILLABLE_ASC'
   | 'BILLABLE_DESC'
   | 'CATEGORY_ASC'
@@ -884,6 +1514,8 @@ export type PlatformFunctionDefinitionOrderBy =
   | 'CPU_REQUEST_MILLICORES_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC'
   | 'FN_CATEGORY_ASC'
@@ -933,6 +1565,8 @@ export type PlatformFunctionDefinitionOrderBy =
   | 'QUEUE_NAME_DESC'
   | 'REQUIRED_BUCKETS_ASC'
   | 'REQUIRED_BUCKETS_DESC'
+  | 'REQUIRED_CAPABILITIES_ASC'
+  | 'REQUIRED_CAPABILITIES_DESC'
   | 'REQUIRED_CONFIGS_ASC'
   | 'REQUIRED_CONFIGS_DESC'
   | 'REQUIRED_MODELS_ASC'
@@ -961,6 +1595,8 @@ export type PlatformFunctionDefinitionOrderBy =
   | 'TIMEOUT_SECONDS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
   | 'VOLATILE_ASC'
   | 'VOLATILE_DESC';
 /** Methods to use when ordering `PlatformFunctionDeploymentEvent`. */
@@ -990,6 +1626,8 @@ export type PlatformFunctionDeploymentOrderBy =
   | 'CONCURRENCY_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'ERROR_COUNT_ASC'
   | 'ERROR_COUNT_DESC'
   | 'HANDLER_NAME_ASC'
@@ -1030,7 +1668,9 @@ export type PlatformFunctionDeploymentOrderBy =
   | 'TIMEOUT_SECONDS_ASC'
   | 'TIMEOUT_SECONDS_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformFunctionExecutionLog`. */
 export type PlatformFunctionExecutionLogOrderBy =
   | 'ACTOR_ID_ASC'
@@ -1093,12 +1733,18 @@ export type PlatformFunctionInvocationOrderBy =
   | 'COMPLETED_AT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEFINITION_SCOPE_ASC'
   | 'DEFINITION_SCOPE_DESC'
   | 'DURATION_MS_ASC'
   | 'DURATION_MS_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
   | 'ERROR_ASC'
   | 'ERROR_DESC'
   | 'FUNCTION_DEFINITION_ID_ASC'
@@ -1110,12 +1756,16 @@ export type PlatformFunctionInvocationOrderBy =
   | 'JOB_ID_ASC'
   | 'JOB_ID_DESC'
   | 'NATURAL'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
   | 'PARENT_INVOCATION_ID_ASC'
   | 'PARENT_INVOCATION_ID_DESC'
   | 'PAYLOAD_ASC'
   | 'PAYLOAD_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
   | 'PROVENANCE_ASC'
   | 'PROVENANCE_DESC'
   | 'RESULT_ASC'
@@ -1126,6 +1776,74 @@ export type PlatformFunctionInvocationOrderBy =
   | 'STATUS_DESC'
   | 'TASK_IDENTIFIER_ASC'
   | 'TASK_IDENTIFIER_DESC';
+/** Methods to use when ordering `PlatformImageGrant`. */
+export type PlatformImageGrantOrderBy =
+  | 'ACTIONS_ASC'
+  | 'ACTIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'GRANTED_BY_ASC'
+  | 'GRANTED_BY_DESC'
+  | 'GRANTEE_KEY_ASC'
+  | 'GRANTEE_KEY_DESC'
+  | 'GRANTEE_SCOPE_ASC'
+  | 'GRANTEE_SCOPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ID_ASC'
+  | 'IMAGE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformImage`. */
+export type PlatformImageOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DIGEST_ASC'
+  | 'DIGEST_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PLATFORM_ONLY_ASC'
+  | 'PLATFORM_ONLY_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REGISTRY_HOST_ASC'
+  | 'REGISTRY_HOST_DESC'
+  | 'REPOSITORY_ASC'
+  | 'REPOSITORY_DESC'
+  | 'RUNTIME_ASC'
+  | 'RUNTIME_DESC'
+  | 'TAG_ASC'
+  | 'TAG_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformInfraCommit`. */
 export type PlatformInfraCommitOrderBy =
   | 'AUTHOR_ID_ASC'
@@ -1196,6 +1914,56 @@ export type PlatformInfraStoreOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'SCOPE_ID_ASC'
   | 'SCOPE_ID_DESC';
+/** Methods to use when ordering `PlatformK8sResourceKind`. */
+export type PlatformK8sResourceKindOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEFINITION_ASC'
+  | 'DEFINITION_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformK8sSpecRule`. */
+export type PlatformK8sSpecRuleOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEFINITION_ASC'
+  | 'DEFINITION_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformNamespaceEvent`. */
 export type PlatformNamespaceEventOrderBy =
   | 'ACTOR_ID_ASC'
@@ -1219,6 +1987,8 @@ export type PlatformNamespaceEventOrderBy =
 export type PlatformNamespaceOrderBy =
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
+  | 'CLUSTER_ID_ASC'
+  | 'CLUSTER_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DESCRIPTION_ASC'
@@ -1244,6 +2014,523 @@ export type PlatformNamespaceOrderBy =
   | 'STATUS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformProposalComment`. */
+export type PlatformProposalCommentOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ATTACHMENTS_ASC'
+  | 'ATTACHMENTS_DESC'
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'BODY_TRGM_SIMILARITY_ASC'
+  | 'BODY_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_UPDATED_AT_ASC'
+  | 'EMBEDDING_UPDATED_AT_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LINE_ASC'
+  | 'LINE_DESC'
+  | 'NATURAL'
+  | 'OUTDATED_AT_ASC'
+  | 'OUTDATED_AT_DESC'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'PATH_TRGM_SIMILARITY_ASC'
+  | 'PATH_TRGM_SIMILARITY_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'RESOLVED_AT_ASC'
+  | 'RESOLVED_AT_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformProposalFileView`. */
+export type PlatformProposalFileViewOrderBy =
+  | 'BLOB_SHA_ASC'
+  | 'BLOB_SHA_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'REVIEWER_ID_ASC'
+  | 'REVIEWER_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
+  | 'VIEWED_AT_ASC'
+  | 'VIEWED_AT_DESC';
+/** Methods to use when ordering `PlatformProposal`. */
+export type PlatformProposalOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'BODY_TRGM_SIMILARITY_ASC'
+  | 'BODY_TRGM_SIMILARITY_DESC'
+  | 'CLOSED_REASON_ASC'
+  | 'CLOSED_REASON_DESC'
+  | 'CLOSED_REASON_TRGM_SIMILARITY_ASC'
+  | 'CLOSED_REASON_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DECIDED_AT_ASC'
+  | 'DECIDED_AT_DESC'
+  | 'DUE_AT_ASC'
+  | 'DUE_AT_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_UPDATED_AT_ASC'
+  | 'EMBEDDING_UPDATED_AT_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'KIND_TRGM_SIMILARITY_ASC'
+  | 'KIND_TRGM_SIMILARITY_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'MERGED_AT_ASC'
+  | 'MERGED_AT_DESC'
+  | 'MERGE_COMMIT_ASC'
+  | 'MERGE_COMMIT_DESC'
+  | 'MERGE_COMMIT_TRGM_SIMILARITY_ASC'
+  | 'MERGE_COMMIT_TRGM_SIMILARITY_DESC'
+  | 'MERGE_METHOD_ASC'
+  | 'MERGE_METHOD_DESC'
+  | 'MERGE_METHOD_TRGM_SIMILARITY_ASC'
+  | 'MERGE_METHOD_TRGM_SIMILARITY_DESC'
+  | 'MERGE_REQUESTED_AT_ASC'
+  | 'MERGE_REQUESTED_AT_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PARENT_ID_ASC'
+  | 'PARENT_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIORITY_ASC'
+  | 'PRIORITY_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'RESOLUTION_ASC'
+  | 'RESOLUTION_DESC'
+  | 'RESOLUTION_TRGM_SIMILARITY_ASC'
+  | 'RESOLUTION_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'SOURCE_REF_ASC'
+  | 'SOURCE_REF_DESC'
+  | 'SOURCE_REF_TRGM_SIMILARITY_ASC'
+  | 'SOURCE_REF_TRGM_SIMILARITY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STATUS_TRGM_SIMILARITY_ASC'
+  | 'STATUS_TRGM_SIMILARITY_DESC'
+  | 'TARGET_REF_ASC'
+  | 'TARGET_REF_DESC'
+  | 'TARGET_REF_TRGM_SIMILARITY_ASC'
+  | 'TARGET_REF_TRGM_SIMILARITY_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'TITLE_TRGM_SIMILARITY_ASC'
+  | 'TITLE_TRGM_SIMILARITY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformProposalReaction`. */
+export type PlatformProposalReactionOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'COMMENT_ID_ASC'
+  | 'COMMENT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'EMOJI_ASC'
+  | 'EMOJI_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformProposalReview`. */
+export type PlatformProposalReviewOrderBy =
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'BODY_TRGM_SIMILARITY_ASC'
+  | 'BODY_TRGM_SIMILARITY_DESC'
+  | 'COMMIT_SHA_ASC'
+  | 'COMMIT_SHA_DESC'
+  | 'COMMIT_SHA_TRGM_SIMILARITY_ASC'
+  | 'COMMIT_SHA_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'REVIEWER_ID_ASC'
+  | 'REVIEWER_ID_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'SUBMITTED_AT_ASC'
+  | 'SUBMITTED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
+  | 'VERDICT_ASC'
+  | 'VERDICT_DESC'
+  | 'VERDICT_TRGM_SIMILARITY_ASC'
+  | 'VERDICT_TRGM_SIMILARITY_DESC';
+/** Methods to use when ordering `PlatformProposalsChunk`. */
+export type PlatformProposalsChunkOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'CHUNK_INDEX_ASC'
+  | 'CHUNK_INDEX_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PLATFORM_PROPOSALS_ID_ASC'
+  | 'PLATFORM_PROPOSALS_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformRegistryBinding`. */
+export type PlatformRegistryBindingOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'OBSERVED_CREDENTIAL_VERSION_ASC'
+  | 'OBSERVED_CREDENTIAL_VERSION_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PULL_SECRET_NAME_ASC'
+  | 'PULL_SECRET_NAME_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'REGISTRY_HOST_ASC'
+  | 'REGISTRY_HOST_DESC'
+  | 'REGISTRY_ID_ASC'
+  | 'REGISTRY_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformRegistryGrant`. */
+export type PlatformRegistryGrantOrderBy =
+  | 'ACTIONS_ASC'
+  | 'ACTIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'GRANTED_BY_ASC'
+  | 'GRANTED_BY_DESC'
+  | 'GRANTEE_KEY_ASC'
+  | 'GRANTEE_KEY_DESC'
+  | 'GRANTEE_SCOPE_ASC'
+  | 'GRANTEE_SCOPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REGISTRY_ID_ASC'
+  | 'REGISTRY_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformRegistry`. */
+export type PlatformRegistryOrderBy =
+  | 'AUTH_MODE_ASC'
+  | 'AUTH_MODE_DESC'
+  | 'BASE_PATH_ASC'
+  | 'BASE_PATH_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'CREDENTIAL_SECRET_NAME_ASC'
+  | 'CREDENTIAL_SECRET_NAME_DESC'
+  | 'HOST_ASC'
+  | 'HOST_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PLATFORM_ONLY_ASC'
+  | 'PLATFORM_ONLY_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ROLE_ASC'
+  | 'ROLE_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformRepositoryEvent`. */
+export type PlatformRepositoryEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'COMMIT_SHA_ASC'
+  | 'COMMIT_SHA_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DELIVERY_ID_ASC'
+  | 'DELIVERY_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REF_ASC'
+  | 'REF_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformRepository`. */
+export type PlatformRepositoryOrderBy =
+  | 'CLONE_URL_ASC'
+  | 'CLONE_URL_DESC'
+  | 'CLONE_URL_TRGM_SIMILARITY_ASC'
+  | 'CLONE_URL_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DEFAULT_BRANCH_ASC'
+  | 'DEFAULT_BRANCH_DESC'
+  | 'DEFAULT_BRANCH_TRGM_SIMILARITY_ASC'
+  | 'DEFAULT_BRANCH_TRGM_SIMILARITY_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_UPDATED_AT_ASC'
+  | 'EMBEDDING_UPDATED_AT_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'EXTERNAL_ID_ASC'
+  | 'EXTERNAL_ID_DESC'
+  | 'EXTERNAL_ID_TRGM_SIMILARITY_ASC'
+  | 'EXTERNAL_ID_TRGM_SIMILARITY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ARCHIVED_ASC'
+  | 'IS_ARCHIVED_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NAME_TRGM_SIMILARITY_ASC'
+  | 'NAME_TRGM_SIMILARITY_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'PROVIDER_TRGM_SIMILARITY_ASC'
+  | 'PROVIDER_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SLUG_TRGM_SIMILARITY_ASC'
+  | 'SLUG_TRGM_SIMILARITY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC'
+  | 'VISIBILITY_TRGM_SIMILARITY_ASC'
+  | 'VISIBILITY_TRGM_SIMILARITY_DESC';
+/** Methods to use when ordering `PlatformRepositoryRequiredCheck`. */
+export type PlatformRepositoryRequiredCheckOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'WORKFLOW_ID_ASC'
+  | 'WORKFLOW_ID_DESC';
+/** Methods to use when ordering `PlatformRepositoryWorkflow`. */
+export type PlatformRepositoryWorkflowOrderBy =
+  | 'CANCEL_IN_PROGRESS_ASC'
+  | 'CANCEL_IN_PROGRESS_DESC'
+  | 'CONCURRENCY_KEY_ASC'
+  | 'CONCURRENCY_KEY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INPUTS_ASC'
+  | 'INPUTS_DESC'
+  | 'IS_ENABLED_ASC'
+  | 'IS_ENABLED_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REF_PATTERN_ASC'
+  | 'REF_PATTERN_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformResourceDeclaredCapacity`. */
 export type PlatformResourceDeclaredCapacityOrderBy =
   | 'CPU_LIMIT_MILLICORES_ASC'
@@ -1272,7 +2559,9 @@ export type PlatformResourceDeclaredCapacityOrderBy =
   | 'SOURCE_ID_ASC'
   | 'SOURCE_ID_DESC'
   | 'STORAGE_SIZE_BYTES_ASC'
-  | 'STORAGE_SIZE_BYTES_DESC';
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'STORAGE_TOTAL_BYTES_ASC'
+  | 'STORAGE_TOTAL_BYTES_DESC';
 /** Methods to use when ordering `PlatformResourceDefinition`. */
 export type PlatformResourceDefinitionOrderBy =
   | 'ANNOTATIONS_ASC'
@@ -1281,6 +2570,8 @@ export type PlatformResourceDefinitionOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DEFAULT_SPEC_ASC'
   | 'DEFAULT_SPEC_DESC'
   | 'DESCRIPTION_ASC'
@@ -1313,7 +2604,9 @@ export type PlatformResourceDefinitionOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformResourceEvent`. */
 export type PlatformResourceEventOrderBy =
   | 'ACTOR_ID_ASC'
@@ -1341,6 +2634,8 @@ export type PlatformResourceInstallationOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAMESPACE_ID_ASC'
@@ -1363,7 +2658,48 @@ export type PlatformResourceInstallationOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformResourceObservedStorage`. */
+export type PlatformResourceObservedStorageOrderBy =
+  | 'CAPACITY_ASC'
+  | 'CAPACITY_BYTES_ASC'
+  | 'CAPACITY_BYTES_DESC'
+  | 'CAPACITY_DESC'
+  | 'CLAIM_NAME_ASC'
+  | 'CLAIM_NAME_DESC'
+  | 'DECLARED_STORAGE_CLASS_ASC'
+  | 'DECLARED_STORAGE_CLASS_DESC'
+  | 'DECLARED_STORAGE_SIZE_BYTES_ASC'
+  | 'DECLARED_STORAGE_SIZE_BYTES_DESC'
+  | 'DECLARED_STORAGE_TOTAL_BYTES_ASC'
+  | 'DECLARED_STORAGE_TOTAL_BYTES_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'IS_BOUND_ASC'
+  | 'IS_BOUND_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PHASE_ASC'
+  | 'PHASE_DESC'
+  | 'REQUESTED_ASC'
+  | 'REQUESTED_BYTES_ASC'
+  | 'REQUESTED_BYTES_DESC'
+  | 'REQUESTED_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RESOURCE_STATUS_ASC'
+  | 'RESOURCE_STATUS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_NAME_ASC'
+  | 'STORAGE_NAME_DESC';
 /** Methods to use when ordering `PlatformResource`. */
 export type PlatformResourceOrderBy =
   | 'ANNOTATIONS_ASC'
@@ -1376,10 +2712,14 @@ export type PlatformResourceOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'ERROR_COUNT_ASC'
   | 'ERROR_COUNT_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'IMAGE_REF_ASC'
+  | 'IMAGE_REF_DESC'
   | 'INSTALLATION_ID_ASC'
   | 'INSTALLATION_ID_DESC'
   | 'INTEGRATIONS_ASC'
@@ -1425,10 +2765,14 @@ export type PlatformResourceOrderBy =
   | 'STORAGE_CLASS_DESC'
   | 'STORAGE_SIZE_BYTES_ASC'
   | 'STORAGE_SIZE_BYTES_DESC'
+  | 'STORAGE_TOTAL_BYTES_ASC'
+  | 'STORAGE_TOTAL_BYTES_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformResourceStatusCheck`. */
 export type PlatformResourceStatusCheckOrderBy =
   | 'COMPLETED_AT_ASC'
@@ -1547,10 +2891,14 @@ export type PlatformResourcesHealthOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'ERROR_COUNT_ASC'
   | 'ERROR_COUNT_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'IMAGE_REF_ASC'
+  | 'IMAGE_REF_DESC'
   | 'INSTALLATION_ID_ASC'
   | 'INSTALLATION_ID_DESC'
   | 'INTEGRATIONS_ASC'
@@ -1596,10 +2944,14 @@ export type PlatformResourcesHealthOrderBy =
   | 'STORAGE_CLASS_DESC'
   | 'STORAGE_SIZE_BYTES_ASC'
   | 'STORAGE_SIZE_BYTES_DESC'
+  | 'STORAGE_TOTAL_BYTES_ASC'
+  | 'STORAGE_TOTAL_BYTES_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformResourcesRequirementsState`. */
 export type PlatformResourcesRequirementsStateOrderBy =
   | 'CONFIG_HASH_ASC'
@@ -1650,6 +3002,8 @@ export type PlatformWebhookEndpointOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'FUNCTION_DEFINITION_ID_ASC'
   | 'FUNCTION_DEFINITION_ID_DESC'
   | 'HOST_ASC'
@@ -1672,7 +3026,9 @@ export type PlatformWebhookEndpointOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformWebhookEvent`. */
 export type PlatformWebhookEventOrderBy =
   | 'CREATED_AT_ASC'
@@ -1702,6 +3058,549 @@ export type PlatformWebhookEventOrderBy =
   | 'STATUS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `ProposalComment`. */
+export type ProposalCommentOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ATTACHMENTS_ASC'
+  | 'ATTACHMENTS_DESC'
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'BODY_TRGM_SIMILARITY_ASC'
+  | 'BODY_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_UPDATED_AT_ASC'
+  | 'EMBEDDING_UPDATED_AT_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LINE_ASC'
+  | 'LINE_DESC'
+  | 'NATURAL'
+  | 'OUTDATED_AT_ASC'
+  | 'OUTDATED_AT_DESC'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'PATH_TRGM_SIMILARITY_ASC'
+  | 'PATH_TRGM_SIMILARITY_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'RESOLVED_AT_ASC'
+  | 'RESOLVED_AT_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `ProposalFileView`. */
+export type ProposalFileViewOrderBy =
+  | 'BLOB_SHA_ASC'
+  | 'BLOB_SHA_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'REVIEWER_ID_ASC'
+  | 'REVIEWER_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
+  | 'VIEWED_AT_ASC'
+  | 'VIEWED_AT_DESC';
+/** Methods to use when ordering `Proposal`. */
+export type ProposalOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'BODY_TRGM_SIMILARITY_ASC'
+  | 'BODY_TRGM_SIMILARITY_DESC'
+  | 'CLOSED_REASON_ASC'
+  | 'CLOSED_REASON_DESC'
+  | 'CLOSED_REASON_TRGM_SIMILARITY_ASC'
+  | 'CLOSED_REASON_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DECIDED_AT_ASC'
+  | 'DECIDED_AT_DESC'
+  | 'DUE_AT_ASC'
+  | 'DUE_AT_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_UPDATED_AT_ASC'
+  | 'EMBEDDING_UPDATED_AT_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'KIND_TRGM_SIMILARITY_ASC'
+  | 'KIND_TRGM_SIMILARITY_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'MERGED_AT_ASC'
+  | 'MERGED_AT_DESC'
+  | 'MERGE_COMMIT_ASC'
+  | 'MERGE_COMMIT_DESC'
+  | 'MERGE_COMMIT_TRGM_SIMILARITY_ASC'
+  | 'MERGE_COMMIT_TRGM_SIMILARITY_DESC'
+  | 'MERGE_METHOD_ASC'
+  | 'MERGE_METHOD_DESC'
+  | 'MERGE_METHOD_TRGM_SIMILARITY_ASC'
+  | 'MERGE_METHOD_TRGM_SIMILARITY_DESC'
+  | 'MERGE_REQUESTED_AT_ASC'
+  | 'MERGE_REQUESTED_AT_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PARENT_ID_ASC'
+  | 'PARENT_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIORITY_ASC'
+  | 'PRIORITY_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'RESOLUTION_ASC'
+  | 'RESOLUTION_DESC'
+  | 'RESOLUTION_TRGM_SIMILARITY_ASC'
+  | 'RESOLUTION_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'SOURCE_REF_ASC'
+  | 'SOURCE_REF_DESC'
+  | 'SOURCE_REF_TRGM_SIMILARITY_ASC'
+  | 'SOURCE_REF_TRGM_SIMILARITY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STATUS_TRGM_SIMILARITY_ASC'
+  | 'STATUS_TRGM_SIMILARITY_DESC'
+  | 'TARGET_REF_ASC'
+  | 'TARGET_REF_DESC'
+  | 'TARGET_REF_TRGM_SIMILARITY_ASC'
+  | 'TARGET_REF_TRGM_SIMILARITY_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'TITLE_TRGM_SIMILARITY_ASC'
+  | 'TITLE_TRGM_SIMILARITY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `ProposalReaction`. */
+export type ProposalReactionOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'COMMENT_ID_ASC'
+  | 'COMMENT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EMOJI_ASC'
+  | 'EMOJI_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `ProposalReview`. */
+export type ProposalReviewOrderBy =
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'BODY_TRGM_SIMILARITY_ASC'
+  | 'BODY_TRGM_SIMILARITY_DESC'
+  | 'COMMIT_SHA_ASC'
+  | 'COMMIT_SHA_DESC'
+  | 'COMMIT_SHA_TRGM_SIMILARITY_ASC'
+  | 'COMMIT_SHA_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSAL_ID_ASC'
+  | 'PROPOSAL_ID_DESC'
+  | 'REVIEWER_ID_ASC'
+  | 'REVIEWER_ID_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'SUBMITTED_AT_ASC'
+  | 'SUBMITTED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
+  | 'VERDICT_ASC'
+  | 'VERDICT_DESC'
+  | 'VERDICT_TRGM_SIMILARITY_ASC'
+  | 'VERDICT_TRGM_SIMILARITY_DESC';
+/** Methods to use when ordering `ProposalsChunk`. */
+export type ProposalsChunkOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'CHUNK_INDEX_ASC'
+  | 'CHUNK_INDEX_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROPOSALS_ID_ASC'
+  | 'PROPOSALS_ID_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `RegistryBinding`. */
+export type RegistryBindingOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'OBSERVED_CREDENTIAL_VERSION_ASC'
+  | 'OBSERVED_CREDENTIAL_VERSION_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PULL_SECRET_NAME_ASC'
+  | 'PULL_SECRET_NAME_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'REGISTRY_HOST_ASC'
+  | 'REGISTRY_HOST_DESC'
+  | 'REGISTRY_ID_ASC'
+  | 'REGISTRY_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `RegistryGrant`. */
+export type RegistryGrantOrderBy =
+  | 'ACTIONS_ASC'
+  | 'ACTIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'GRANTED_BY_ASC'
+  | 'GRANTED_BY_DESC'
+  | 'GRANTEE_KEY_ASC'
+  | 'GRANTEE_KEY_DESC'
+  | 'GRANTEE_SCOPE_ASC'
+  | 'GRANTEE_SCOPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REGISTRY_ID_ASC'
+  | 'REGISTRY_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `Registry`. */
+export type RegistryOrderBy =
+  | 'AUTH_MODE_ASC'
+  | 'AUTH_MODE_DESC'
+  | 'BASE_PATH_ASC'
+  | 'BASE_PATH_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'CREDENTIAL_SECRET_NAME_ASC'
+  | 'CREDENTIAL_SECRET_NAME_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'HOST_ASC'
+  | 'HOST_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PLATFORM_ONLY_ASC'
+  | 'PLATFORM_ONLY_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ROLE_ASC'
+  | 'ROLE_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `RepositoryEvent`. */
+export type RepositoryEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'COMMIT_SHA_ASC'
+  | 'COMMIT_SHA_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DELIVERY_ID_ASC'
+  | 'DELIVERY_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REF_ASC'
+  | 'REF_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `Repository`. */
+export type RepositoryOrderBy =
+  | 'CLONE_URL_ASC'
+  | 'CLONE_URL_DESC'
+  | 'CLONE_URL_TRGM_SIMILARITY_ASC'
+  | 'CLONE_URL_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_BRANCH_ASC'
+  | 'DEFAULT_BRANCH_DESC'
+  | 'DEFAULT_BRANCH_TRGM_SIMILARITY_ASC'
+  | 'DEFAULT_BRANCH_TRGM_SIMILARITY_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_UPDATED_AT_ASC'
+  | 'EMBEDDING_UPDATED_AT_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'EXTERNAL_ID_ASC'
+  | 'EXTERNAL_ID_DESC'
+  | 'EXTERNAL_ID_TRGM_SIMILARITY_ASC'
+  | 'EXTERNAL_ID_TRGM_SIMILARITY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ARCHIVED_ASC'
+  | 'IS_ARCHIVED_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NAME_TRGM_SIMILARITY_ASC'
+  | 'NAME_TRGM_SIMILARITY_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'PROVIDER_TRGM_SIMILARITY_ASC'
+  | 'PROVIDER_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SLUG_TRGM_SIMILARITY_ASC'
+  | 'SLUG_TRGM_SIMILARITY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC'
+  | 'VISIBILITY_TRGM_SIMILARITY_ASC'
+  | 'VISIBILITY_TRGM_SIMILARITY_DESC';
+/** Methods to use when ordering `RepositoryRequiredCheck`. */
+export type RepositoryRequiredCheckOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'WORKFLOW_ID_ASC'
+  | 'WORKFLOW_ID_DESC';
+/** Methods to use when ordering `RepositoryWorkflow`. */
+export type RepositoryWorkflowOrderBy =
+  | 'CANCEL_IN_PROGRESS_ASC'
+  | 'CANCEL_IN_PROGRESS_DESC'
+  | 'CONCURRENCY_KEY_ASC'
+  | 'CONCURRENCY_KEY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INPUTS_ASC'
+  | 'INPUTS_DESC'
+  | 'IS_ENABLED_ASC'
+  | 'IS_ENABLED_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REF_PATTERN_ASC'
+  | 'REF_PATTERN_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `ResourceDeclaredCapacity`. */
 export type ResourceDeclaredCapacityOrderBy =
   | 'CPU_LIMIT_MILLICORES_ASC'
@@ -1730,7 +3629,9 @@ export type ResourceDeclaredCapacityOrderBy =
   | 'SOURCE_ID_ASC'
   | 'SOURCE_ID_DESC'
   | 'STORAGE_SIZE_BYTES_ASC'
-  | 'STORAGE_SIZE_BYTES_DESC';
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'STORAGE_TOTAL_BYTES_ASC'
+  | 'STORAGE_TOTAL_BYTES_DESC';
 /** Methods to use when ordering `ResourceDefinition`. */
 export type ResourceDefinitionOrderBy =
   | 'ANNOTATIONS_ASC'
@@ -1739,6 +3640,8 @@ export type ResourceDefinitionOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEFAULT_SPEC_ASC'
@@ -1773,7 +3676,9 @@ export type ResourceDefinitionOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `ResourceEvent`. */
 export type ResourceEventOrderBy =
   | 'ACTOR_ID_ASC'
@@ -1803,6 +3708,8 @@ export type ResourceInstallationOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'ID_ASC'
@@ -1827,7 +3734,48 @@ export type ResourceInstallationOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `ResourceObservedStorage`. */
+export type ResourceObservedStorageOrderBy =
+  | 'CAPACITY_ASC'
+  | 'CAPACITY_BYTES_ASC'
+  | 'CAPACITY_BYTES_DESC'
+  | 'CAPACITY_DESC'
+  | 'CLAIM_NAME_ASC'
+  | 'CLAIM_NAME_DESC'
+  | 'DECLARED_STORAGE_CLASS_ASC'
+  | 'DECLARED_STORAGE_CLASS_DESC'
+  | 'DECLARED_STORAGE_SIZE_BYTES_ASC'
+  | 'DECLARED_STORAGE_SIZE_BYTES_DESC'
+  | 'DECLARED_STORAGE_TOTAL_BYTES_ASC'
+  | 'DECLARED_STORAGE_TOTAL_BYTES_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'IS_BOUND_ASC'
+  | 'IS_BOUND_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PHASE_ASC'
+  | 'PHASE_DESC'
+  | 'REQUESTED_ASC'
+  | 'REQUESTED_BYTES_ASC'
+  | 'REQUESTED_BYTES_DESC'
+  | 'REQUESTED_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RESOURCE_STATUS_ASC'
+  | 'RESOURCE_STATUS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_NAME_ASC'
+  | 'STORAGE_NAME_DESC';
 /** Methods to use when ordering `Resource`. */
 export type ResourceOrderBy =
   | 'ANNOTATIONS_ASC'
@@ -1840,12 +3788,16 @@ export type ResourceOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'ERROR_COUNT_ASC'
   | 'ERROR_COUNT_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'IMAGE_REF_ASC'
+  | 'IMAGE_REF_DESC'
   | 'INSTALLATION_ID_ASC'
   | 'INSTALLATION_ID_DESC'
   | 'INTEGRATIONS_ASC'
@@ -1891,10 +3843,14 @@ export type ResourceOrderBy =
   | 'STORAGE_CLASS_DESC'
   | 'STORAGE_SIZE_BYTES_ASC'
   | 'STORAGE_SIZE_BYTES_DESC'
+  | 'STORAGE_TOTAL_BYTES_ASC'
+  | 'STORAGE_TOTAL_BYTES_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `ResourceStatusCheck`. */
 export type ResourceStatusCheckOrderBy =
   | 'COMPLETED_AT_ASC'
@@ -2019,12 +3975,16 @@ export type ResourcesHealthOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'ERROR_COUNT_ASC'
   | 'ERROR_COUNT_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'IMAGE_REF_ASC'
+  | 'IMAGE_REF_DESC'
   | 'INSTALLATION_ID_ASC'
   | 'INSTALLATION_ID_DESC'
   | 'INTEGRATIONS_ASC'
@@ -2070,10 +4030,14 @@ export type ResourcesHealthOrderBy =
   | 'STORAGE_CLASS_DESC'
   | 'STORAGE_SIZE_BYTES_ASC'
   | 'STORAGE_SIZE_BYTES_DESC'
+  | 'STORAGE_TOTAL_BYTES_ASC'
+  | 'STORAGE_TOTAL_BYTES_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `ResourcesRequirementsState`. */
 export type ResourcesRequirementsStateOrderBy =
   | 'CONFIG_HASH_ASC'
@@ -2116,6 +4080,8 @@ export type ResourcesResolvedRequirementOrderBy =
   | 'SECRETS_OBJECT_NAME_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC';
+/** Similarity metric for vector search */
+export type VectorMetric = 'COSINE' | 'IP' | 'L2';
 /** Methods to use when ordering `WebhookEndpoint`. */
 export type WebhookEndpointOrderBy =
   | 'ACTIVE_ASC'
@@ -2124,6 +4090,8 @@ export type WebhookEndpointOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'FUNCTION_DEFINITION_ID_ASC'
@@ -2148,7 +4116,9 @@ export type WebhookEndpointOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `WebhookEvent`. */
 export type WebhookEventOrderBy =
   | 'CREATED_AT_ASC'
@@ -2220,6 +4190,13 @@ export interface AddNodeInput {
   rootHash?: string;
   scopeId?: string;
 }
+export interface ApproveNodeInput {
+  approved?: boolean;
+  clientMutationId?: string;
+  executionId?: string;
+  feedback?: unknown;
+  nodeName?: string;
+}
 /** A filter to be used against Base64EncodedBinary fields. All fields are combined with a logical ‘and.’ */
 export interface Base64EncodedBinaryFilter {
   /** Not equal to the specified value, treating null like an ordinary value. */
@@ -2236,6 +4213,369 @@ export interface Base64EncodedBinaryFilter {
   notEqualTo?: Base64EncodedBinary;
   /** Not included in the specified list. */
   notIn?: Base64EncodedBinary[];
+}
+/** A filter to be used against `Build` object types. All fields are combined with a logical ‘and.’ */
+export interface BuildFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: BuildFilter[];
+  /** Filter by the object’s `attempt` field. */
+  attempt?: IntFilter;
+  /** Filter by the object’s `commitSha` field. */
+  commitSha?: StringFilter;
+  /** Filter by the object’s `conclusion` field. */
+  conclusion?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `event` relation. */
+  event?: RepositoryEventFilter;
+  /** A related `event` exists. */
+  eventExists?: boolean;
+  /** Filter by the object’s `eventId` field. */
+  eventId?: UUIDFilter;
+  /** Filter by the object’s `finishedAt` field. */
+  finishedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `imageRef` field. */
+  imageRef?: StringFilter;
+  /** Filter by the object’s `jobId` field. */
+  jobId?: BigIntFilter;
+  /** Filter by the object’s `logs` field. */
+  logs?: ConstructiveInternalTypeUploadFilter;
+  /** Filter by the object’s `matrixKey` field. */
+  matrixKey?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: BuildFilter;
+  /** Checks for any expressions in this list. */
+  or?: BuildFilter[];
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: ProposalFilter;
+  /** A related `proposal` exists. */
+  proposalExists?: boolean;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `ref` field. */
+  ref?: StringFilter;
+  /** Filter by the object’s `repository` relation. */
+  repository?: RepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `workflow` relation. */
+  workflow?: RepositoryWorkflowFilter;
+  /** A related `workflow` exists. */
+  workflowExists?: boolean;
+  /** Filter by the object’s `workflowId` field. */
+  workflowId?: UUIDFilter;
+}
+/** An input for mutations affecting `Build` */
+export interface BuildInput {
+  /** Authenticated actor this build is attributed to; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Retry attempt number for this workflow, commit, and matrix shard */
+  attempt?: number;
+  /** Commit this build built */
+  commitSha?: string;
+  /** Verdict: NULL while pending/running, then success, failure, neutral, cancelled, skipped, timed_out, or action_required */
+  conclusion?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Event that triggered this build (NULL for a manual build) */
+  eventId?: string;
+  /** When the build reached a terminal status */
+  finishedAt?: string;
+  id?: string;
+  /** Image reference this build produced (registry host/repository:tag; NULL when the build produced no image) */
+  imageRef?: string;
+  /** app_jobs row running this build */
+  jobId?: string;
+  /** Build log object in storage; step rows slice it by byte range */
+  logs?: ConstructiveInternalTypeUpload;
+  /** Matrix shard identity; NULL for a non-matrix build */
+  matrixKey?: string;
+  /** Build detail (step results, durations, failure reason) */
+  metadata?: unknown;
+  /** Proposal this build checks (NULL for builds not tied to a proposal) */
+  proposalId?: string;
+  /** Ref this build built */
+  ref?: string;
+  /** Repository this build is of */
+  repositoryId: string;
+  /** When the build began running */
+  startedAt?: string;
+  /** Lifecycle: pending, running, succeeded, failed, cancelled */
+  status?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** Workflow whose firing produced this build (NULL for a manual build) */
+  workflowId?: string;
+}
+/** Represents an update to a `Build`. Fields that are set will be updated. */
+export interface BuildPatch {
+  /** Authenticated actor this build is attributed to; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Retry attempt number for this workflow, commit, and matrix shard */
+  attempt?: number;
+  /** Commit this build built */
+  commitSha?: string;
+  /** Verdict: NULL while pending/running, then success, failure, neutral, cancelled, skipped, timed_out, or action_required */
+  conclusion?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Event that triggered this build (NULL for a manual build) */
+  eventId?: string;
+  /** When the build reached a terminal status */
+  finishedAt?: string;
+  id?: string;
+  /** Image reference this build produced (registry host/repository:tag; NULL when the build produced no image) */
+  imageRef?: string;
+  /** app_jobs row running this build */
+  jobId?: string;
+  /** Build log object in storage; step rows slice it by byte range */
+  logs?: ConstructiveInternalTypeUpload;
+  /** Upload for Build log object in storage; step rows slice it by byte range */
+  logsUpload?: File;
+  /** Matrix shard identity; NULL for a non-matrix build */
+  matrixKey?: string;
+  /** Build detail (step results, durations, failure reason) */
+  metadata?: unknown;
+  /** Proposal this build checks (NULL for builds not tied to a proposal) */
+  proposalId?: string;
+  /** Ref this build built */
+  ref?: string;
+  /** Repository this build is of */
+  repositoryId?: string;
+  /** When the build began running */
+  startedAt?: string;
+  /** Lifecycle: pending, running, succeeded, failed, cancelled */
+  status?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** Workflow whose firing produced this build (NULL for a manual build) */
+  workflowId?: string;
+}
+/** A filter to be used against `BuildStep` object types. All fields are combined with a logical ‘and.’ */
+export interface BuildStepFilter {
+  /** Checks for all expressions in this list. */
+  and?: BuildStepFilter[];
+  /** Filter by the object’s `buildId` field. */
+  buildId?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `exitCode` field. */
+  exitCode?: IntFilter;
+  /** Filter by the object’s `finishedAt` field. */
+  finishedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `logBytes` field. */
+  logBytes?: BigIntFilter;
+  /** Filter by the object’s `logOffset` field. */
+  logOffset?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: BuildStepFilter;
+  /** Checks for any expressions in this list. */
+  or?: BuildStepFilter[];
+  /** Filter by the object’s `parentSeq` field. */
+  parentSeq?: IntFilter;
+  /** Filter by the object’s `recordedAt` field. */
+  recordedAt?: DatetimeFilter;
+  /** Filter by the object’s `seq` field. */
+  seq?: IntFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `summary` field. */
+  summary?: JSONFilter;
+}
+/** An input for mutations affecting `BuildStep` */
+export interface BuildStepInput {
+  /** Build these results belong to */
+  buildId: string;
+  /** Acting principal (agent, API key, or user) who created this record */
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Process exit code of a step (NULL for a test result) */
+  exitCode?: number;
+  /** When this step or test finished */
+  finishedAt?: string;
+  /** Unique identifier (uuidv7 provides temporal ordering) */
+  id?: string;
+  /** What this row is: step, or test */
+  kind?: string;
+  /** Byte length of this row's output in the build log object */
+  logBytes?: string;
+  /** Byte offset of this row's output in the build log object */
+  logOffset?: string;
+  /** Step name, or the test's fully qualified name */
+  name: string;
+  /** Sequence of the step that reported this test (NULL for a step itself) */
+  parentSeq?: number;
+  /** When the result was recorded (partition key) */
+  recordedAt?: string;
+  /** Position within the build, monotonically increasing across steps and their tests */
+  seq: number;
+  /** When this step or test began */
+  startedAt?: string;
+  /** Outcome: running, succeeded, failed, skipped, cancelled */
+  status?: string;
+  /** Parsed detail: failure message, assertion diff, counts, annotations */
+  summary?: unknown;
+}
+/** Represents an update to a `BuildStep`. Fields that are set will be updated. */
+export interface BuildStepPatch {
+  /** Build these results belong to */
+  buildId?: string;
+  /** Acting principal (agent, API key, or user) who created this record */
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Process exit code of a step (NULL for a test result) */
+  exitCode?: number;
+  /** When this step or test finished */
+  finishedAt?: string;
+  /** Unique identifier (uuidv7 provides temporal ordering) */
+  id?: string;
+  /** What this row is: step, or test */
+  kind?: string;
+  /** Byte length of this row's output in the build log object */
+  logBytes?: string;
+  /** Byte offset of this row's output in the build log object */
+  logOffset?: string;
+  /** Step name, or the test's fully qualified name */
+  name?: string;
+  /** Sequence of the step that reported this test (NULL for a step itself) */
+  parentSeq?: number;
+  /** When the result was recorded (partition key) */
+  recordedAt?: string;
+  /** Position within the build, monotonically increasing across steps and their tests */
+  seq?: number;
+  /** When this step or test began */
+  startedAt?: string;
+  /** Outcome: running, succeeded, failed, skipped, cancelled */
+  status?: string;
+  /** Parsed detail: failure message, assertion diff, counts, annotations */
+  summary?: unknown;
+}
+/** A filter to be used against `BuilderBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface BuilderBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: BuilderBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: BuilderBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: BuilderBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `BuilderBinding` */
+export interface BuilderBindingInput {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** BuildKit resource installation serving this binding; may belong to another resource scope */
+  installationId: string;
+  /** Most recent projection failure */
+  lastError?: string;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: unknown;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId: string;
+  /** BuildKit address last projected into the namespace (NULL = never projected) */
+  observedHost?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Projection state of BUILDKIT_HOST: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `BuilderBinding`. Fields that are set will be updated. */
+export interface BuilderBindingPatch {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** BuildKit resource installation serving this binding; may belong to another resource scope */
+  installationId?: string;
+  /** Most recent projection failure */
+  lastError?: string;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: unknown;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId?: string;
+  /** BuildKit address last projected into the namespace (NULL = never projected) */
+  observedHost?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Projection state of BUILDKIT_HOST: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeImageFilter {
@@ -2271,6 +4611,80 @@ export interface ConstructiveInternalTypeImageFilter {
   notEqualTo?: ConstructiveInternalTypeImage;
   /** Not included in the specified list. */
   notIn?: ConstructiveInternalTypeImage[];
+}
+/** A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeUploadFilter {
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeUpload;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeUpload;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeUpload;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeUpload;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeUpload;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeUpload[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeUpload;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeUpload;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeUpload;
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeUpload[];
+}
+/** A filter to be used against ConstructiveInternalTypeUpload List fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeUploadListFilter {
+  /** Any array item is equal to the specified value. */
+  anyEqualTo?: ConstructiveInternalTypeUpload;
+  /** Any array item is greater than the specified value. */
+  anyGreaterThan?: ConstructiveInternalTypeUpload;
+  /** Any array item is greater than or equal to the specified value. */
+  anyGreaterThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Any array item is less than the specified value. */
+  anyLessThan?: ConstructiveInternalTypeUpload;
+  /** Any array item is less than or equal to the specified value. */
+  anyLessThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Any array item is not equal to the specified value. */
+  anyNotEqualTo?: ConstructiveInternalTypeUpload;
+  /** Contained by the specified list of values. */
+  containedBy?: ConstructiveInternalTypeUpload[];
+  /** Contains the specified list of values. */
+  contains?: ConstructiveInternalTypeUpload[];
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeUpload[];
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeUpload[];
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeUpload[];
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeUpload[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeUpload[];
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeUpload[];
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeUpload[];
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeUpload[];
+  /** Overlaps the specified list of values. */
+  overlaps?: ConstructiveInternalTypeUpload[];
 }
 /** A filter to be used against `ContentPreset` object types. All fields are combined with a logical ‘and.’ */
 export interface ContentPresetFilter {
@@ -2359,10 +4773,60 @@ export interface CopyGraphInput {
   name?: string;
   scopeId?: string;
 }
+export interface CreateBuildInput {
+  /** The `Build` to be created by this mutation. */
+  build: BuildInput;
+  clientMutationId?: string;
+}
+export interface CreateBuildStepInput {
+  /** The `BuildStep` to be created by this mutation. */
+  buildStep: BuildStepInput;
+  clientMutationId?: string;
+}
+export interface CreateBuilderBindingInput {
+  /** The `BuilderBinding` to be created by this mutation. */
+  builderBinding: BuilderBindingInput;
+  clientMutationId?: string;
+}
 export interface CreateContentPresetInput {
   clientMutationId?: string;
   /** The `ContentPreset` to be created by this mutation. */
   contentPreset: ContentPresetInput;
+}
+export interface CreateDatabaseFunctionGraphExecutionInput {
+  clientMutationId?: string;
+  /** The `DatabaseFunctionGraphExecution` to be created by this mutation. */
+  databaseFunctionGraphExecution: DatabaseFunctionGraphExecutionInput;
+}
+export interface CreateDatabaseFunctionGraphExecutionNodeStateInput {
+  clientMutationId?: string;
+  /** The `DatabaseFunctionGraphExecutionNodeState` to be created by this mutation. */
+  databaseFunctionGraphExecutionNodeState: DatabaseFunctionGraphExecutionNodeStateInput;
+}
+export interface CreateDatabaseFunctionGraphExecutionOutputInput {
+  clientMutationId?: string;
+  /** The `DatabaseFunctionGraphExecutionOutput` to be created by this mutation. */
+  databaseFunctionGraphExecutionOutput: DatabaseFunctionGraphExecutionOutputInput;
+}
+export interface CreateDatabaseGraphCommitInput {
+  clientMutationId?: string;
+  /** The `DatabaseGraphCommit` to be created by this mutation. */
+  databaseGraphCommit: DatabaseGraphCommitInput;
+}
+export interface CreateDatabaseGraphObjectInput {
+  clientMutationId?: string;
+  /** The `DatabaseGraphObject` to be created by this mutation. */
+  databaseGraphObject: DatabaseGraphObjectInput;
+}
+export interface CreateDatabaseGraphRefInput {
+  clientMutationId?: string;
+  /** The `DatabaseGraphRef` to be created by this mutation. */
+  databaseGraphRef: DatabaseGraphRefInput;
+}
+export interface CreateDatabaseGraphStoreInput {
+  clientMutationId?: string;
+  /** The `DatabaseGraphStore` to be created by this mutation. */
+  databaseGraphStore: DatabaseGraphStoreInput;
 }
 export interface CreateDbPresetInput {
   clientMutationId?: string;
@@ -2453,6 +4917,16 @@ export interface CreateFunctionInvocationInput {
   /** The `FunctionInvocation` to be created by this mutation. */
   functionInvocation: FunctionInvocationInput;
 }
+export interface CreateImageGrantInput {
+  clientMutationId?: string;
+  /** The `ImageGrant` to be created by this mutation. */
+  imageGrant: ImageGrantInput;
+}
+export interface CreateImageInput {
+  clientMutationId?: string;
+  /** The `Image` to be created by this mutation. */
+  image: ImageInput;
+}
 export interface CreateInfraCommitInput {
   clientMutationId?: string;
   /** The `InfraCommit` to be created by this mutation. */
@@ -2487,6 +4961,21 @@ export interface CreateNamespaceInput {
   clientMutationId?: string;
   /** The `Namespace` to be created by this mutation. */
   namespace: NamespaceInput;
+}
+export interface CreatePlatformBuildInput {
+  clientMutationId?: string;
+  /** The `PlatformBuild` to be created by this mutation. */
+  platformBuild: PlatformBuildInput;
+}
+export interface CreatePlatformBuildStepInput {
+  clientMutationId?: string;
+  /** The `PlatformBuildStep` to be created by this mutation. */
+  platformBuildStep: PlatformBuildStepInput;
+}
+export interface CreatePlatformBuilderBindingInput {
+  clientMutationId?: string;
+  /** The `PlatformBuilderBinding` to be created by this mutation. */
+  platformBuilderBinding: PlatformBuilderBindingInput;
 }
 export interface CreatePlatformFunctionApiBindingInput {
   clientMutationId?: string;
@@ -2528,6 +5017,16 @@ export interface CreatePlatformFunctionInvocationInput {
   /** The `PlatformFunctionInvocation` to be created by this mutation. */
   platformFunctionInvocation: PlatformFunctionInvocationInput;
 }
+export interface CreatePlatformImageGrantInput {
+  clientMutationId?: string;
+  /** The `PlatformImageGrant` to be created by this mutation. */
+  platformImageGrant: PlatformImageGrantInput;
+}
+export interface CreatePlatformImageInput {
+  clientMutationId?: string;
+  /** The `PlatformImage` to be created by this mutation. */
+  platformImage: PlatformImageInput;
+}
 export interface CreatePlatformInfraCommitInput {
   clientMutationId?: string;
   /** The `PlatformInfraCommit` to be created by this mutation. */
@@ -2548,6 +5047,16 @@ export interface CreatePlatformInfraStoreInput {
   /** The `PlatformInfraStore` to be created by this mutation. */
   platformInfraStore: PlatformInfraStoreInput;
 }
+export interface CreatePlatformK8sResourceKindInput {
+  clientMutationId?: string;
+  /** The `PlatformK8sResourceKind` to be created by this mutation. */
+  platformK8sResourceKind: PlatformK8sResourceKindInput;
+}
+export interface CreatePlatformK8sSpecRuleInput {
+  clientMutationId?: string;
+  /** The `PlatformK8sSpecRule` to be created by this mutation. */
+  platformK8sSpecRule: PlatformK8sSpecRuleInput;
+}
 export interface CreatePlatformNamespaceEventInput {
   clientMutationId?: string;
   /** The `PlatformNamespaceEvent` to be created by this mutation. */
@@ -2557,6 +5066,71 @@ export interface CreatePlatformNamespaceInput {
   clientMutationId?: string;
   /** The `PlatformNamespace` to be created by this mutation. */
   platformNamespace: PlatformNamespaceInput;
+}
+export interface CreatePlatformProposalCommentInput {
+  clientMutationId?: string;
+  /** The `PlatformProposalComment` to be created by this mutation. */
+  platformProposalComment: PlatformProposalCommentInput;
+}
+export interface CreatePlatformProposalFileViewInput {
+  clientMutationId?: string;
+  /** The `PlatformProposalFileView` to be created by this mutation. */
+  platformProposalFileView: PlatformProposalFileViewInput;
+}
+export interface CreatePlatformProposalInput {
+  clientMutationId?: string;
+  /** The `PlatformProposal` to be created by this mutation. */
+  platformProposal: PlatformProposalInput;
+}
+export interface CreatePlatformProposalReactionInput {
+  clientMutationId?: string;
+  /** The `PlatformProposalReaction` to be created by this mutation. */
+  platformProposalReaction: PlatformProposalReactionInput;
+}
+export interface CreatePlatformProposalReviewInput {
+  clientMutationId?: string;
+  /** The `PlatformProposalReview` to be created by this mutation. */
+  platformProposalReview: PlatformProposalReviewInput;
+}
+export interface CreatePlatformProposalsChunkInput {
+  clientMutationId?: string;
+  /** The `PlatformProposalsChunk` to be created by this mutation. */
+  platformProposalsChunk: PlatformProposalsChunkInput;
+}
+export interface CreatePlatformRegistryBindingInput {
+  clientMutationId?: string;
+  /** The `PlatformRegistryBinding` to be created by this mutation. */
+  platformRegistryBinding: PlatformRegistryBindingInput;
+}
+export interface CreatePlatformRegistryGrantInput {
+  clientMutationId?: string;
+  /** The `PlatformRegistryGrant` to be created by this mutation. */
+  platformRegistryGrant: PlatformRegistryGrantInput;
+}
+export interface CreatePlatformRegistryInput {
+  clientMutationId?: string;
+  /** The `PlatformRegistry` to be created by this mutation. */
+  platformRegistry: PlatformRegistryInput;
+}
+export interface CreatePlatformRepositoryEventInput {
+  clientMutationId?: string;
+  /** The `PlatformRepositoryEvent` to be created by this mutation. */
+  platformRepositoryEvent: PlatformRepositoryEventInput;
+}
+export interface CreatePlatformRepositoryInput {
+  clientMutationId?: string;
+  /** The `PlatformRepository` to be created by this mutation. */
+  platformRepository: PlatformRepositoryInput;
+}
+export interface CreatePlatformRepositoryRequiredCheckInput {
+  clientMutationId?: string;
+  /** The `PlatformRepositoryRequiredCheck` to be created by this mutation. */
+  platformRepositoryRequiredCheck: PlatformRepositoryRequiredCheckInput;
+}
+export interface CreatePlatformRepositoryWorkflowInput {
+  clientMutationId?: string;
+  /** The `PlatformRepositoryWorkflow` to be created by this mutation. */
+  platformRepositoryWorkflow: PlatformRepositoryWorkflowInput;
 }
 export interface CreatePlatformResourceDefinitionInput {
   clientMutationId?: string;
@@ -2603,6 +5177,71 @@ export interface CreatePlatformWebhookEventInput {
   /** The `PlatformWebhookEvent` to be created by this mutation. */
   platformWebhookEvent: PlatformWebhookEventInput;
 }
+export interface CreateProposalCommentInput {
+  clientMutationId?: string;
+  /** The `ProposalComment` to be created by this mutation. */
+  proposalComment: ProposalCommentInput;
+}
+export interface CreateProposalFileViewInput {
+  clientMutationId?: string;
+  /** The `ProposalFileView` to be created by this mutation. */
+  proposalFileView: ProposalFileViewInput;
+}
+export interface CreateProposalInput {
+  clientMutationId?: string;
+  /** The `Proposal` to be created by this mutation. */
+  proposal: ProposalInput;
+}
+export interface CreateProposalReactionInput {
+  clientMutationId?: string;
+  /** The `ProposalReaction` to be created by this mutation. */
+  proposalReaction: ProposalReactionInput;
+}
+export interface CreateProposalReviewInput {
+  clientMutationId?: string;
+  /** The `ProposalReview` to be created by this mutation. */
+  proposalReview: ProposalReviewInput;
+}
+export interface CreateProposalsChunkInput {
+  clientMutationId?: string;
+  /** The `ProposalsChunk` to be created by this mutation. */
+  proposalsChunk: ProposalsChunkInput;
+}
+export interface CreateRegistryBindingInput {
+  clientMutationId?: string;
+  /** The `RegistryBinding` to be created by this mutation. */
+  registryBinding: RegistryBindingInput;
+}
+export interface CreateRegistryGrantInput {
+  clientMutationId?: string;
+  /** The `RegistryGrant` to be created by this mutation. */
+  registryGrant: RegistryGrantInput;
+}
+export interface CreateRegistryInput {
+  clientMutationId?: string;
+  /** The `Registry` to be created by this mutation. */
+  registry: RegistryInput;
+}
+export interface CreateRepositoryEventInput {
+  clientMutationId?: string;
+  /** The `RepositoryEvent` to be created by this mutation. */
+  repositoryEvent: RepositoryEventInput;
+}
+export interface CreateRepositoryInput {
+  clientMutationId?: string;
+  /** The `Repository` to be created by this mutation. */
+  repository: RepositoryInput;
+}
+export interface CreateRepositoryRequiredCheckInput {
+  clientMutationId?: string;
+  /** The `RepositoryRequiredCheck` to be created by this mutation. */
+  repositoryRequiredCheck: RepositoryRequiredCheckInput;
+}
+export interface CreateRepositoryWorkflowInput {
+  clientMutationId?: string;
+  /** The `RepositoryWorkflow` to be created by this mutation. */
+  repositoryWorkflow: RepositoryWorkflowInput;
+}
 export interface CreateResourceDefinitionInput {
   clientMutationId?: string;
   /** The `ResourceDefinition` to be created by this mutation. */
@@ -2647,6 +5286,861 @@ export interface CreateWebhookEventInput {
   clientMutationId?: string;
   /** The `WebhookEvent` to be created by this mutation. */
   webhookEvent: WebhookEventInput;
+}
+export interface DatabaseAddEdgeAndSaveInput {
+  clientMutationId?: string;
+  dstNode?: string;
+  dstPort?: string;
+  graphId?: string;
+  message?: string;
+  srcNode?: string;
+  srcPort?: string;
+}
+export interface DatabaseAddEdgeInput {
+  clientMutationId?: string;
+  context?: string;
+  databaseId?: string;
+  dstNode?: string;
+  dstPort?: string;
+  graphName?: string;
+  rootHash?: string;
+  srcNode?: string;
+  srcPort?: string;
+}
+export interface DatabaseAddNodeAndSaveInput {
+  clientMutationId?: string;
+  graphId?: string;
+  message?: string;
+  meta?: unknown;
+  nodeName?: string;
+  nodeType?: string;
+  props?: unknown;
+}
+export interface DatabaseAddNodeInput {
+  clientMutationId?: string;
+  context?: string;
+  databaseId?: string;
+  graphName?: string;
+  meta?: unknown;
+  nodeName?: string;
+  nodeType?: string;
+  props?: unknown;
+  rootHash?: string;
+}
+export interface DatabaseApproveNodeInput {
+  approved?: boolean;
+  clientMutationId?: string;
+  executionId?: string;
+  feedback?: unknown;
+  nodeName?: string;
+}
+export interface DatabaseCopyGraphInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  graphId?: string;
+  name?: string;
+}
+export interface DatabaseCreateFunctionGraphInput {
+  clientMutationId?: string;
+  context?: string;
+  createdBy?: string;
+  databaseId?: string;
+  definitionsCommitId?: string;
+  description?: string;
+  name?: string;
+}
+/** A filter to be used against `DatabaseFunctionGraphExecution` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFunctionGraphExecutionFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseFunctionGraphExecutionFilter[];
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Filter by the object’s `currentWave` field. */
+  currentWave?: IntFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `definitionsCommitId` field. */
+  definitionsCommitId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `errorCode` field. */
+  errorCode?: StringFilter;
+  /** Filter by the object’s `errorMessage` field. */
+  errorMessage?: StringFilter;
+  /** Filter by the object’s `executionPlan` field. */
+  executionPlan?: JSONFilter;
+  /** Filter by the object’s `graph` relation. */
+  graph?: DatabaseFunctionGraphFilter;
+  /** Filter by the object’s `graphId` field. */
+  graphId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `inputPayload` field. */
+  inputPayload?: JSONFilter;
+  /** Filter by the object’s `invocationCreatedAt` field. */
+  invocationCreatedAt?: DatetimeFilter;
+  /** Filter by the object’s `invocationId` field. */
+  invocationId?: UUIDFilter;
+  /** Filter by the object’s `lastProgressAt` field. */
+  lastProgressAt?: DatetimeFilter;
+  /** Filter by the object’s `maxPendingJobs` field. */
+  maxPendingJobs?: IntFilter;
+  /** Filter by the object’s `maxTicks` field. */
+  maxTicks?: IntFilter;
+  /** Filter by the object’s `nodeOutputs` field. */
+  nodeOutputs?: JSONFilter;
+  /** Negates the expression. */
+  not?: DatabaseFunctionGraphExecutionFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseFunctionGraphExecutionFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `outputNames` field. */
+  outputNames?: StringListFilter;
+  /** Filter by the object’s `outputNode` field. */
+  outputNode?: StringFilter;
+  /** Filter by the object’s `outputPayload` field. */
+  outputPayload?: JSONFilter;
+  /** Filter by the object’s `outputPort` field. */
+  outputPort?: StringFilter;
+  /** Filter by the object’s `parentExecutionId` field. */
+  parentExecutionId?: UUIDFilter;
+  /** Filter by the object’s `parentInvocationId` field. */
+  parentInvocationId?: UUIDFilter;
+  /** Filter by the object’s `parentNodeName` field. */
+  parentNodeName?: StringFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `tickCount` field. */
+  tickCount?: IntFilter;
+  /** Filter by the object’s `timeoutAt` field. */
+  timeoutAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `DatabaseFunctionGraphExecution` */
+export interface DatabaseFunctionGraphExecutionInput {
+  /** User actor propagated to asynchronous graph jobs */
+  actorId?: string;
+  /** Execution completion timestamp */
+  completedAt?: string;
+  /** Index into execution_plan — tick only processes this wave */
+  currentWave?: number;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Pinned definitions store commit for deterministic evaluation */
+  definitionsCommitId?: string;
+  /** Entity context propagated to asynchronous graph jobs */
+  entityId?: string;
+  /** Scope discriminator propagated to asynchronous graph jobs */
+  entityType?: string;
+  /** Machine-readable error code when status = failed */
+  errorCode?: string;
+  /** Human-readable error description when status = failed */
+  errorMessage?: string;
+  /** Pre-computed topological sort as array of wave objects */
+  executionPlan?: unknown;
+  /** FK to the graph definition being executed */
+  graphId: string;
+  /** Unique execution identifier */
+  id?: string;
+  /** Initial inputs provided at invocation time */
+  inputPayload?: unknown;
+  /** Partition coordinate for the function invocation that launched this graph execution */
+  invocationCreatedAt?: string;
+  /** Function invocation that launched this top-level graph execution */
+  invocationId?: string;
+  /** Timestamp of the last real progress (node enqueue, node output, completion) — drives the activity-debounced watchdog */
+  lastProgressAt?: string;
+  /** Maximum pending jobs before execution is failed (default 50) */
+  maxPendingJobs?: number;
+  /** Maximum ticks before execution is failed (default 100) */
+  maxTicks?: number;
+  /** Map of node_name → execution output id (content-addressed hash reference) */
+  nodeOutputs?: unknown;
+  /** Organization context propagated to asynchronous graph jobs */
+  organizationId?: string;
+  /** Selected graphOutput portName values; NULL or empty returns all graph outputs */
+  outputNames?: string[];
+  /** Target output boundary node name to resolve; NULL derives completion from the graph's graphOutput nodes */
+  outputNode?: string;
+  /** Final result extracted from terminal output node */
+  outputPayload?: unknown;
+  /** Target output port name (default: value) */
+  outputPort?: string;
+  /** Parent execution when this is a sub-execution */
+  parentExecutionId?: string;
+  /** Function invocation parent assigned to node invocations spawned by this execution */
+  parentInvocationId?: string;
+  /** Node name in parent execution that spawned this sub-execution */
+  parentNodeName?: string;
+  /** Principal identity propagated to asynchronous graph jobs */
+  principalId?: string;
+  /** Execution start timestamp */
+  startedAt?: string;
+  /** Lifecycle: pending → running → completed/failed/cancelled */
+  status?: string;
+  /** Number of evaluate_step ticks executed */
+  tickCount?: number;
+  /** Absolute deadline — execution fails if still running after this time */
+  timeoutAt?: string;
+}
+/** A filter to be used against `DatabaseFunctionGraphExecutionNodeState` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFunctionGraphExecutionNodeStateFilter {
+  /** Checks for all expressions in this list. */
+  and?: DatabaseFunctionGraphExecutionNodeStateFilter[];
+  /** Filter by the object’s `callbackInputs` field. */
+  callbackInputs?: JSONFilter;
+  /** Filter by the object’s `callbackMeta` field. */
+  callbackMeta?: JSONFilter;
+  /** Filter by the object’s `callbackTokenHash` field. */
+  callbackTokenHash?: StringFilter;
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `errorCode` field. */
+  errorCode?: StringFilter;
+  /** Filter by the object’s `errorMessage` field. */
+  errorMessage?: StringFilter;
+  /** Filter by the object’s `executionId` field. */
+  executionId?: UUIDFilter;
+  /** Filter by the object’s `expiryDefaultOutput` field. */
+  expiryDefaultOutput?: JSONFilter;
+  /** Filter by the object’s `expiryEscalatedAt` field. */
+  expiryEscalatedAt?: DatetimeFilter;
+  /** Filter by the object’s `expiryPolicy` field. */
+  expiryPolicy?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `nodeName` field. */
+  nodeName?: StringFilter;
+  /** Filter by the object’s `nodePath` field. */
+  nodePath?: StringListFilter;
+  /** Negates the expression. */
+  not?: DatabaseFunctionGraphExecutionNodeStateFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseFunctionGraphExecutionNodeStateFilter[];
+  /** Filter by the object’s `outputId` field. */
+  outputId?: UUIDFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `waitingDeadlineAt` field. */
+  waitingDeadlineAt?: DatetimeFilter;
+  /** Filter by the object’s `waitingOn` field. */
+  waitingOn?: StringFilter;
+  /** Filter by the object’s `waitingSince` field. */
+  waitingSince?: DatetimeFilter;
+}
+/** An input for mutations affecting `DatabaseFunctionGraphExecutionNodeState` */
+export interface DatabaseFunctionGraphExecutionNodeStateInput {
+  /** Snapshot of the node's resolved inputs for resource-runtime nodes — served by the node gateway GET /inputs endpoint */
+  callbackInputs?: unknown;
+  /** Metering/attribution context stamped at resource dispatch (namespace_id, task_identifier, entity_id, scope, resource identity, dispatched_at, attempt) — lets the node gateway settle and attribute without extra lookups */
+  callbackMeta?: unknown;
+  /** SHA-256 hex digest of the node callback token — set for resource-runtime nodes so the node gateway can authenticate result/error/heartbeat callbacks */
+  callbackTokenHash?: string;
+  /** Timestamp when the node finished (success or failure) */
+  completedAt?: string;
+  /** Timestamp of node state creation (partition key) */
+  createdAt?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Machine-readable error code when status = failed */
+  errorCode?: string;
+  /** Human-readable error description when status = failed */
+  errorMessage?: string;
+  /** FK to the parent graph execution */
+  executionId: string;
+  /** Declared output applied by the default_answer expiry policy */
+  expiryDefaultOutput?: unknown;
+  /** When the escalate expiry policy fired — guards the one-time extension */
+  expiryEscalatedAt?: string;
+  /** Declared expiry behaviour when waiting_deadline_at passes unanswered: fail (fail the execution), default_answer (settle with expiry_default_output), or escalate (notify and extend once) */
+  expiryPolicy?: string;
+  /** Unique node state identifier */
+  id?: string;
+  /** Name of the node within the graph (e.g. send-email1) */
+  nodeName: string;
+  /** Full merkle tree path to this node (e.g. {function,graphs,myflow,nodes,send-email1}) — enables subnet hierarchy tracking */
+  nodePath?: string[];
+  /** FK to execution_outputs — content-addressed output blob for this node */
+  outputId?: string;
+  /** Timestamp when the node began executing */
+  startedAt?: string;
+  /** Node lifecycle: pending → queued → running → completed/failed/cancelled */
+  status?: string;
+  /** When the declared expiry policy applies to the still-unanswered node */
+  waitingDeadlineAt?: string;
+  /** What class of external reporter settles this node: human (a person answers) or external (webhook/adapter). NULL for nodes with an active workload */
+  waitingOn?: string;
+  /** When the node parked awaiting its external report */
+  waitingSince?: string;
+}
+/** Represents an update to a `DatabaseFunctionGraphExecutionNodeState`. Fields that are set will be updated. */
+export interface DatabaseFunctionGraphExecutionNodeStatePatch {
+  /** Snapshot of the node's resolved inputs for resource-runtime nodes — served by the node gateway GET /inputs endpoint */
+  callbackInputs?: unknown;
+  /** Metering/attribution context stamped at resource dispatch (namespace_id, task_identifier, entity_id, scope, resource identity, dispatched_at, attempt) — lets the node gateway settle and attribute without extra lookups */
+  callbackMeta?: unknown;
+  /** SHA-256 hex digest of the node callback token — set for resource-runtime nodes so the node gateway can authenticate result/error/heartbeat callbacks */
+  callbackTokenHash?: string;
+  /** Timestamp when the node finished (success or failure) */
+  completedAt?: string;
+  /** Timestamp of node state creation (partition key) */
+  createdAt?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Machine-readable error code when status = failed */
+  errorCode?: string;
+  /** Human-readable error description when status = failed */
+  errorMessage?: string;
+  /** FK to the parent graph execution */
+  executionId?: string;
+  /** Declared output applied by the default_answer expiry policy */
+  expiryDefaultOutput?: unknown;
+  /** When the escalate expiry policy fired — guards the one-time extension */
+  expiryEscalatedAt?: string;
+  /** Declared expiry behaviour when waiting_deadline_at passes unanswered: fail (fail the execution), default_answer (settle with expiry_default_output), or escalate (notify and extend once) */
+  expiryPolicy?: string;
+  /** Unique node state identifier */
+  id?: string;
+  /** Name of the node within the graph (e.g. send-email1) */
+  nodeName?: string;
+  /** Full merkle tree path to this node (e.g. {function,graphs,myflow,nodes,send-email1}) — enables subnet hierarchy tracking */
+  nodePath?: string[];
+  /** FK to execution_outputs — content-addressed output blob for this node */
+  outputId?: string;
+  /** Timestamp when the node began executing */
+  startedAt?: string;
+  /** Node lifecycle: pending → queued → running → completed/failed/cancelled */
+  status?: string;
+  /** When the declared expiry policy applies to the still-unanswered node */
+  waitingDeadlineAt?: string;
+  /** What class of external reporter settles this node: human (a person answers) or external (webhook/adapter). NULL for nodes with an active workload */
+  waitingOn?: string;
+  /** When the node parked awaiting its external report */
+  waitingSince?: string;
+}
+/** A filter to be used against `DatabaseFunctionGraphExecutionOutput` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFunctionGraphExecutionOutputFilter {
+  /** Checks for all expressions in this list. */
+  and?: DatabaseFunctionGraphExecutionOutputFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: Base64EncodedBinaryFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: DatabaseFunctionGraphExecutionOutputFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseFunctionGraphExecutionOutputFilter[];
+}
+/** An input for mutations affecting `DatabaseFunctionGraphExecutionOutput` */
+export interface DatabaseFunctionGraphExecutionOutputInput {
+  /** Timestamp of output creation */
+  createdAt?: string;
+  /** The actual output payload from a completed node */
+  data: unknown;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** SHA-256 hash of the data JSONB — content-addressed deduplication */
+  hash: Base64EncodedBinary;
+  /** Unique execution output identifier */
+  id?: string;
+}
+/** Represents an update to a `DatabaseFunctionGraphExecutionOutput`. Fields that are set will be updated. */
+export interface DatabaseFunctionGraphExecutionOutputPatch {
+  /** Timestamp of output creation */
+  createdAt?: string;
+  /** The actual output payload from a completed node */
+  data?: unknown;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** SHA-256 hash of the data JSONB — content-addressed deduplication */
+  hash?: Base64EncodedBinary;
+  /** Unique execution output identifier */
+  id?: string;
+}
+/** Represents an update to a `DatabaseFunctionGraphExecution`. Fields that are set will be updated. */
+export interface DatabaseFunctionGraphExecutionPatch {
+  /** User actor propagated to asynchronous graph jobs */
+  actorId?: string;
+  /** Execution completion timestamp */
+  completedAt?: string;
+  /** Index into execution_plan — tick only processes this wave */
+  currentWave?: number;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Pinned definitions store commit for deterministic evaluation */
+  definitionsCommitId?: string;
+  /** Entity context propagated to asynchronous graph jobs */
+  entityId?: string;
+  /** Scope discriminator propagated to asynchronous graph jobs */
+  entityType?: string;
+  /** Machine-readable error code when status = failed */
+  errorCode?: string;
+  /** Human-readable error description when status = failed */
+  errorMessage?: string;
+  /** Pre-computed topological sort as array of wave objects */
+  executionPlan?: unknown;
+  /** FK to the graph definition being executed */
+  graphId?: string;
+  /** Unique execution identifier */
+  id?: string;
+  /** Initial inputs provided at invocation time */
+  inputPayload?: unknown;
+  /** Partition coordinate for the function invocation that launched this graph execution */
+  invocationCreatedAt?: string;
+  /** Function invocation that launched this top-level graph execution */
+  invocationId?: string;
+  /** Timestamp of the last real progress (node enqueue, node output, completion) — drives the activity-debounced watchdog */
+  lastProgressAt?: string;
+  /** Maximum pending jobs before execution is failed (default 50) */
+  maxPendingJobs?: number;
+  /** Maximum ticks before execution is failed (default 100) */
+  maxTicks?: number;
+  /** Map of node_name → execution output id (content-addressed hash reference) */
+  nodeOutputs?: unknown;
+  /** Organization context propagated to asynchronous graph jobs */
+  organizationId?: string;
+  /** Selected graphOutput portName values; NULL or empty returns all graph outputs */
+  outputNames?: string[];
+  /** Target output boundary node name to resolve; NULL derives completion from the graph's graphOutput nodes */
+  outputNode?: string;
+  /** Final result extracted from terminal output node */
+  outputPayload?: unknown;
+  /** Target output port name (default: value) */
+  outputPort?: string;
+  /** Parent execution when this is a sub-execution */
+  parentExecutionId?: string;
+  /** Function invocation parent assigned to node invocations spawned by this execution */
+  parentInvocationId?: string;
+  /** Node name in parent execution that spawned this sub-execution */
+  parentNodeName?: string;
+  /** Principal identity propagated to asynchronous graph jobs */
+  principalId?: string;
+  /** Execution start timestamp */
+  startedAt?: string;
+  /** Lifecycle: pending → running → completed/failed/cancelled */
+  status?: string;
+  /** Number of evaluate_step ticks executed */
+  tickCount?: number;
+  /** Absolute deadline — execution fails if still running after this time */
+  timeoutAt?: string;
+}
+/** A filter to be used against `DatabaseFunctionGraph` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFunctionGraphFilter {
+  /** Checks for all expressions in this list. */
+  and?: DatabaseFunctionGraphFilter[];
+  /** Filter by the object’s `context` field. */
+  context?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseFunctionGraphExecutionsByGraphId` relation. */
+  databaseFunctionGraphExecutionsByGraphId?: DatabaseFunctionGraphToManyDatabaseFunctionGraphExecutionFilter;
+  /** `databaseFunctionGraphExecutionsByGraphId` exist. */
+  databaseFunctionGraphExecutionsByGraphIdExist?: boolean;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `definitionsCommitId` field. */
+  definitionsCommitId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `functionDefinitionsByGraphId` relation. */
+  functionDefinitionsByGraphId?: DatabaseFunctionGraphToManyFunctionDefinitionFilter;
+  /** `functionDefinitionsByGraphId` exist. */
+  functionDefinitionsByGraphIdExist?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isValid` field. */
+  isValid?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: DatabaseFunctionGraphFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseFunctionGraphFilter[];
+  /** Filter by the object’s `repositoryWorkflowsByGraphId` relation. */
+  repositoryWorkflowsByGraphId?: DatabaseFunctionGraphToManyRepositoryWorkflowFilter;
+  /** `repositoryWorkflowsByGraphId` exist. */
+  repositoryWorkflowsByGraphIdExist?: boolean;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `validationErrors` field. */
+  validationErrors?: JSONFilter;
+}
+/** Represents an update to a `DatabaseFunctionGraph`. Fields that are set will be updated. */
+export interface DatabaseFunctionGraphPatch {
+  /** Evaluator/runtime context (function, js, sql, system) */
+  context?: string;
+  /** Timestamp of graph creation */
+  createdAt?: string;
+  /** Actor who created this graph */
+  createdBy?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Pinned definitions store commit for deterministic evaluation */
+  definitionsCommitId?: string;
+  /** Human-readable description of the graph */
+  description?: string;
+  /** Unique graph identifier */
+  id?: string;
+  /** Whether graph passes structural validation */
+  isValid?: boolean;
+  /** Graph name (unique per database) */
+  name?: string;
+  /** Graph store (Merkle store) holding the graph definition */
+  storeId?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
+  /** Array of validation error objects when is_valid = false */
+  validationErrors?: unknown;
+}
+/** A filter to be used against many `DatabaseFunctionGraphExecution` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFunctionGraphToManyDatabaseFunctionGraphExecutionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DatabaseFunctionGraphExecutionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DatabaseFunctionGraphExecutionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DatabaseFunctionGraphExecutionFilter;
+}
+/** A filter to be used against many `FunctionDefinition` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFunctionGraphToManyFunctionDefinitionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionDefinitionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionDefinitionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionDefinitionFilter;
+}
+/** A filter to be used against many `RepositoryWorkflow` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFunctionGraphToManyRepositoryWorkflowFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RepositoryWorkflowFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RepositoryWorkflowFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RepositoryWorkflowFilter;
+}
+/** A filter to be used against `DatabaseGraphCommit` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseGraphCommitFilter {
+  /** Checks for all expressions in this list. */
+  and?: DatabaseGraphCommitFilter[];
+  /** Filter by the object’s `authorId` field. */
+  authorId?: UUIDFilter;
+  /** Filter by the object’s `committerId` field. */
+  committerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
+  date?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Negates the expression. */
+  not?: DatabaseGraphCommitFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseGraphCommitFilter[];
+  /** Filter by the object’s `parentIds` field. */
+  parentIds?: UUIDListFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
+  treeId?: UUIDFilter;
+}
+/** An input for mutations affecting `DatabaseGraphCommit` */
+export interface DatabaseGraphCommitInput {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Store this commit belongs to */
+  storeId: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+/** Represents an update to a `DatabaseGraphCommit`. Fields that are set will be updated. */
+export interface DatabaseGraphCommitPatch {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Store this commit belongs to */
+  storeId?: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+export interface DatabaseGraphInitEmptyRepoInput {
+  clientMutationId?: string;
+  sId?: string;
+  storeId?: string;
+}
+export interface DatabaseGraphInsertNodeAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+export interface DatabaseGraphInsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: unknown[];
+  kidsList?: unknown;
+  ktreeList?: unknown;
+  paths?: unknown;
+  root?: string;
+  sId?: string;
+}
+/** A filter to be used against `DatabaseGraphObject` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseGraphObjectFilter {
+  /** Checks for all expressions in this list. */
+  and?: DatabaseGraphObjectFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kids` field. */
+  kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
+  ktree?: StringListFilter;
+  /** Negates the expression. */
+  not?: DatabaseGraphObjectFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseGraphObjectFilter[];
+}
+/** An input for mutations affecting `DatabaseGraphObject` */
+export interface DatabaseGraphObjectInput {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+}
+/** Represents an update to a `DatabaseGraphObject`. Fields that are set will be updated. */
+export interface DatabaseGraphObjectPatch {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id?: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+}
+/** A filter to be used against `DatabaseGraphRef` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseGraphRefFilter {
+  /** Checks for all expressions in this list. */
+  and?: DatabaseGraphRefFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: DatabaseGraphRefFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseGraphRefFilter[];
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+}
+/** An input for mutations affecting `DatabaseGraphRef` */
+export interface DatabaseGraphRefInput {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name: string;
+  /** Store this ref belongs to */
+  storeId: string;
+}
+/** Represents an update to a `DatabaseGraphRef`. Fields that are set will be updated. */
+export interface DatabaseGraphRefPatch {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name?: string;
+  /** Store this ref belongs to */
+  storeId?: string;
+}
+export interface DatabaseGraphSetAndCommitInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
+export interface DatabaseGraphSetDataAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+export interface DatabaseGraphSetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: unknown;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
+/** A filter to be used against `DatabaseGraphStore` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseGraphStoreFilter {
+  /** Checks for all expressions in this list. */
+  and?: DatabaseGraphStoreFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: DatabaseGraphStoreFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseGraphStoreFilter[];
+}
+/** An input for mutations affecting `DatabaseGraphStore` */
+export interface DatabaseGraphStoreInput {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name: string;
+}
+/** Represents an update to a `DatabaseGraphStore`. Fields that are set will be updated. */
+export interface DatabaseGraphStorePatch {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name?: string;
+}
+export interface DatabaseImportDefinitionsInput {
+  clientMutationId?: string;
+  contexts?: string[];
+  graphId?: string;
+  sourceCommitId?: string;
+  sourceScopeId?: string;
+}
+export interface DatabaseImportGraphJsonInput {
+  clientMutationId?: string;
+  context?: string;
+  createdBy?: string;
+  databaseId?: string;
+  definitionsCommitId?: string;
+  description?: string;
+  graphJson?: unknown;
+  name?: string;
+}
+export interface DatabaseSaveGraphInput {
+  clientMutationId?: string;
+  graphId?: string;
+  message?: string;
+  rootHash?: string;
+}
+export interface DatabaseStartExecutionInput {
+  clientMutationId?: string;
+  graphId?: string;
+  inputPayload?: unknown;
+  maxPendingJobs?: number;
+  maxTicks?: number;
+  outputNames?: string[];
+  outputNode?: string;
+  outputPort?: string;
+  parentExecutionId?: string;
+  parentNodeName?: string;
+  timeoutInterval?: IntervalInput;
+}
+export interface DatabaseValidateFunctionGraphInput {
+  clientMutationId?: string;
+  graphId?: string;
 }
 /** A filter to be used against `DbPreset` object types. All fields are combined with a logical ‘and.’ */
 export interface DbPresetFilter {
@@ -2729,9 +6223,76 @@ export interface DbPresetPatch {
   /** Timestamp of last modification */
   updatedAt?: string;
 }
+export interface DeleteBuildInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteBuildStepInput {
+  clientMutationId?: string;
+  /** Unique identifier (uuidv7 provides temporal ordering) */
+  id: string;
+  /** When the result was recorded (partition key) */
+  recordedAt: string;
+}
+export interface DeleteBuilderBindingInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteContentPresetInput {
   clientMutationId?: string;
   /** Unique preset identifier */
+  id: string;
+}
+export interface DeleteDatabaseFunctionGraphExecutionInput {
+  clientMutationId?: string;
+  /** Unique execution identifier */
+  id: string;
+  /** Execution start timestamp */
+  startedAt: string;
+}
+export interface DeleteDatabaseFunctionGraphExecutionNodeStateInput {
+  clientMutationId?: string;
+  /** Timestamp of node state creation (partition key) */
+  createdAt: string;
+  /** Unique node state identifier */
+  id: string;
+}
+export interface DeleteDatabaseFunctionGraphExecutionOutputInput {
+  clientMutationId?: string;
+  /** Timestamp of output creation */
+  createdAt: string;
+  /** Unique execution output identifier */
+  id: string;
+}
+export interface DeleteDatabaseFunctionGraphInput {
+  clientMutationId?: string;
+  /** Unique graph identifier */
+  id: string;
+}
+export interface DeleteDatabaseGraphCommitInput {
+  clientMutationId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique commit identifier */
+  id: string;
+}
+export interface DeleteDatabaseGraphObjectInput {
+  clientMutationId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+}
+export interface DeleteDatabaseGraphRefInput {
+  clientMutationId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique ref identifier */
+  id: string;
+}
+export interface DeleteDatabaseGraphStoreInput {
+  clientMutationId?: string;
+  /** Unique store identifier */
   id: string;
 }
 export interface DeleteDbPresetInput {
@@ -2835,6 +6396,14 @@ export interface DeleteFunctionInvocationInput {
   /** Unique invocation identifier */
   id: string;
 }
+export interface DeleteImageGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteImageInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteInfraCommitInput {
   clientMutationId?: string;
   /** Database scope for multi-tenant isolation */
@@ -2873,6 +6442,21 @@ export interface DeleteNamespaceEventInput {
   id: string;
 }
 export interface DeleteNamespaceInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformBuildInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformBuildStepInput {
+  clientMutationId?: string;
+  /** Unique identifier (uuidv7 provides temporal ordering) */
+  id: string;
+  /** When the result was recorded (partition key) */
+  recordedAt: string;
+}
+export interface DeletePlatformBuilderBindingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2920,6 +6504,14 @@ export interface DeletePlatformFunctionInvocationInput {
   /** Unique invocation identifier */
   id: string;
 }
+export interface DeletePlatformImageGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformImageInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeletePlatformInfraCommitInput {
   clientMutationId?: string;
   /** Unique commit identifier */
@@ -2946,6 +6538,16 @@ export interface DeletePlatformInfraStoreInput {
   /** Unique store identifier */
   id: string;
 }
+export interface DeletePlatformK8sResourceKindInput {
+  clientMutationId?: string;
+  /** Unique kind policy identifier */
+  id: string;
+}
+export interface DeletePlatformK8sSpecRuleInput {
+  clientMutationId?: string;
+  /** Unique spec rule identifier */
+  id: string;
+}
 export interface DeletePlatformNamespaceEventInput {
   clientMutationId?: string;
   /** Event timestamp (partition key) */
@@ -2954,6 +6556,58 @@ export interface DeletePlatformNamespaceEventInput {
   id: string;
 }
 export interface DeletePlatformNamespaceInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformProposalCommentInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformProposalFileViewInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformProposalInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformProposalReactionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformProposalReviewInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformProposalsChunkInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformRegistryBindingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformRegistryGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformRegistryInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformRepositoryEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformRepositoryInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformRepositoryRequiredCheckInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformRepositoryWorkflowInput {
   clientMutationId?: string;
   id: string;
 }
@@ -3000,6 +6654,58 @@ export interface DeletePlatformWebhookEndpointInput {
   id: string;
 }
 export interface DeletePlatformWebhookEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteProposalCommentInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteProposalFileViewInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteProposalInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteProposalReactionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteProposalReviewInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteProposalsChunkInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteRegistryBindingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteRegistryGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteRegistryInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteRepositoryEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteRepositoryInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteRepositoryRequiredCheckInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteRepositoryWorkflowInput {
   clientMutationId?: string;
   id: string;
 }
@@ -3194,6 +6900,8 @@ export interface FunctionDefinitionFilter {
   accessChannels?: StringListFilter;
   /** Checks for all expressions in this list. */
   and?: FunctionDefinitionFilter[];
+  /** Filter by the object’s `anonymousCallable` field. */
+  anonymousCallable?: BooleanFilter;
   /** Filter by the object’s `category` field. */
   category?: StringFilter;
   /** Filter by the object’s `concurrency` field. */
@@ -3204,6 +6912,8 @@ export interface FunctionDefinitionFilter {
   cpuRequestMillicores?: BigIntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
@@ -3220,6 +6930,10 @@ export interface FunctionDefinitionFilter {
   functionCapabilityBindingsByFunctionIdExist?: boolean;
   /** Filter by the object’s `functionColumns` field. */
   functionColumns?: JSONFilter;
+  /** Filter by the object’s `graph` relation. */
+  graph?: DatabaseFunctionGraphFilter;
+  /** A related `graph` exists. */
+  graphExists?: boolean;
   /** Filter by the object’s `graphId` field. */
   graphId?: UUIDFilter;
   /** Filter by the object’s `icon` field. */
@@ -3264,6 +6978,8 @@ export interface FunctionDefinitionFilter {
   queueName?: StringFilter;
   /** Filter by the object’s `requiredBuckets` field. */
   requiredBuckets?: StringListFilter;
+  /** Filter by the object’s `requiredCapabilities` field. */
+  requiredCapabilities?: JSONFilter;
   /** Filter by the object’s `requiredModels` field. */
   requiredModels?: StringListFilter;
   /** Filter by the object’s `requiredModules` field. */
@@ -3286,6 +7002,8 @@ export interface FunctionDefinitionFilter {
   timeoutSeconds?: IntFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
   /** Filter by the object’s `volatile` field. */
   volatile?: BooleanFilter;
   /** Filter by the object’s `webhookEndpoints` relation. */
@@ -3297,11 +7015,14 @@ export interface FunctionDefinitionFilter {
 export interface FunctionDefinitionInput {
   /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
+  /** Whether this function consents to run for a caller with no identity (a sign-in surface, a public page). Anonymous execution additionally requires the matched route to declare anonymous access. Default false = an identity is required. */
+  anonymousCallable?: boolean;
   /** Function task category (e.g. email, embed, chunk, custom) */
   category: string;
   /** Knative containerConcurrency — max concurrent requests per pod instance */
   concurrency?: number;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Human-readable description of what this function does */
@@ -3345,6 +7066,8 @@ export interface FunctionDefinitionInput {
   queueName?: string;
   /** Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements. */
   requiredBuckets?: string[];
+  /** Capability providers the handler declared in handler.json requires.capabilities, as an array of {name, version, declaration}. NULL when the handler declares none, which mounts the full platform set. */
+  requiredCapabilities?: unknown;
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
@@ -3355,7 +7078,7 @@ export interface FunctionDefinitionInput {
   requiredSecrets?: ResourceRequirementInput[];
   /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
   resources?: unknown;
-  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), or graph (existing flow graph referenced by graph_id) */
+  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), graph (existing flow graph referenced by graph_id), or human (parks the node awaiting a person's answer through approve_node) */
   runtime?: string;
   /** Maximum pod count for Knative autoscaling (maxScale) */
   scaleMax?: number;
@@ -3368,6 +7091,7 @@ export interface FunctionDefinitionInput {
   /** Knative request timeout in seconds */
   timeoutSeconds?: number;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** Whether this function has side effects and cannot be cached or memoized */
   volatile?: boolean;
 }
@@ -3375,11 +7099,14 @@ export interface FunctionDefinitionInput {
 export interface FunctionDefinitionPatch {
   /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
+  /** Whether this function consents to run for a caller with no identity (a sign-in surface, a public page). Anonymous execution additionally requires the matched route to declare anonymous access. Default false = an identity is required. */
+  anonymousCallable?: boolean;
   /** Function task category (e.g. email, embed, chunk, custom) */
   category?: string;
   /** Knative containerConcurrency — max concurrent requests per pod instance */
   concurrency?: number;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Human-readable description of what this function does */
@@ -3423,6 +7150,8 @@ export interface FunctionDefinitionPatch {
   queueName?: string;
   /** Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements. */
   requiredBuckets?: string[];
+  /** Capability providers the handler declared in handler.json requires.capabilities, as an array of {name, version, declaration}. NULL when the handler declares none, which mounts the full platform set. */
+  requiredCapabilities?: unknown;
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
@@ -3433,7 +7162,7 @@ export interface FunctionDefinitionPatch {
   requiredSecrets?: ResourceRequirementInput[];
   /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
   resources?: unknown;
-  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), or graph (existing flow graph referenced by graph_id) */
+  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), graph (existing flow graph referenced by graph_id), or human (parks the node awaiting a person's answer through approve_node) */
   runtime?: string;
   /** Maximum pod count for Knative autoscaling (maxScale) */
   scaleMax?: number;
@@ -3446,6 +7175,7 @@ export interface FunctionDefinitionPatch {
   /** Knative request timeout in seconds */
   timeoutSeconds?: number;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** Whether this function has side effects and cannot be cached or memoized */
   volatile?: boolean;
 }
@@ -3503,7 +7233,7 @@ export interface FunctionDeploymentEventFilter {
 }
 /** An input for mutations affecting `FunctionDeploymentEvent` */
 export interface FunctionDeploymentEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -3522,7 +7252,7 @@ export interface FunctionDeploymentEventInput {
 }
 /** Represents an update to a `FunctionDeploymentEvent`. Fields that are set will be updated. */
 export interface FunctionDeploymentEventPatch {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -3549,6 +7279,8 @@ export interface FunctionDeploymentFilter {
   concurrency?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `errorCount` field. */
@@ -3595,6 +7327,8 @@ export interface FunctionDeploymentFilter {
   timeoutSeconds?: IntFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `FunctionDeployment` */
 export interface FunctionDeploymentInput {
@@ -3603,6 +7337,7 @@ export interface FunctionDeploymentInput {
   /** Max concurrent requests per pod (NULL = inherit from definition) */
   concurrency?: number;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Cumulative error count for this deployment */
@@ -3641,6 +7376,7 @@ export interface FunctionDeploymentInput {
   /** Request timeout override in seconds (NULL = inherit from definition) */
   timeoutSeconds?: number;
   updatedAt?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `FunctionDeployment`. Fields that are set will be updated. */
 export interface FunctionDeploymentPatch {
@@ -3649,6 +7385,7 @@ export interface FunctionDeploymentPatch {
   /** Max concurrent requests per pod (NULL = inherit from definition) */
   concurrency?: number;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Cumulative error count for this deployment */
@@ -3687,6 +7424,7 @@ export interface FunctionDeploymentPatch {
   /** Request timeout override in seconds (NULL = inherit from definition) */
   timeoutSeconds?: number;
   updatedAt?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against `FunctionExecutionLog` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionExecutionLogFilter {
@@ -3717,7 +7455,7 @@ export interface FunctionExecutionLogFilter {
 }
 /** An input for mutations affecting `FunctionExecutionLog` */
 export interface FunctionExecutionLogInput {
-  /** User who triggered the execution (NULL for system/cron) */
+  /** User who triggered the execution; NULL only when no human actor was proven */
   actorId?: string;
   /** Log entry timestamp (partition key) */
   createdAt?: string;
@@ -3738,7 +7476,7 @@ export interface FunctionExecutionLogInput {
 }
 /** Represents an update to a `FunctionExecutionLog`. Fields that are set will be updated. */
 export interface FunctionExecutionLogPatch {
-  /** User who triggered the execution (NULL for system/cron) */
+  /** User who triggered the execution; NULL only when no human actor was proven */
   actorId?: string;
   /** Log entry timestamp (partition key) */
   createdAt?: string;
@@ -3988,6 +7726,12 @@ export interface FunctionGraphExecutionNodeStateFilter {
   errorMessage?: StringFilter;
   /** Filter by the object’s `executionId` field. */
   executionId?: UUIDFilter;
+  /** Filter by the object’s `expiryDefaultOutput` field. */
+  expiryDefaultOutput?: JSONFilter;
+  /** Filter by the object’s `expiryEscalatedAt` field. */
+  expiryEscalatedAt?: DatetimeFilter;
+  /** Filter by the object’s `expiryPolicy` field. */
+  expiryPolicy?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `nodeName` field. */
@@ -4006,6 +7750,12 @@ export interface FunctionGraphExecutionNodeStateFilter {
   startedAt?: DatetimeFilter;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
+  /** Filter by the object’s `waitingDeadlineAt` field. */
+  waitingDeadlineAt?: DatetimeFilter;
+  /** Filter by the object’s `waitingOn` field. */
+  waitingOn?: StringFilter;
+  /** Filter by the object’s `waitingSince` field. */
+  waitingSince?: DatetimeFilter;
 }
 /** An input for mutations affecting `FunctionGraphExecutionNodeState` */
 export interface FunctionGraphExecutionNodeStateInput {
@@ -4025,6 +7775,12 @@ export interface FunctionGraphExecutionNodeStateInput {
   errorMessage?: string;
   /** FK to the parent graph execution */
   executionId: string;
+  /** Declared output applied by the default_answer expiry policy */
+  expiryDefaultOutput?: unknown;
+  /** When the escalate expiry policy fired — guards the one-time extension */
+  expiryEscalatedAt?: string;
+  /** Declared expiry behaviour when waiting_deadline_at passes unanswered: fail (fail the execution), default_answer (settle with expiry_default_output), or escalate (notify and extend once) */
+  expiryPolicy?: string;
   /** Unique node state identifier */
   id?: string;
   /** Name of the node within the graph (e.g. send-email1) */
@@ -4037,8 +7793,14 @@ export interface FunctionGraphExecutionNodeStateInput {
   scopeId: string;
   /** Timestamp when the node began executing */
   startedAt?: string;
-  /** Node lifecycle: pending → queued → running → completed/failed */
+  /** Node lifecycle: pending → queued → running → completed/failed/cancelled */
   status?: string;
+  /** When the declared expiry policy applies to the still-unanswered node */
+  waitingDeadlineAt?: string;
+  /** What class of external reporter settles this node: human (a person answers) or external (webhook/adapter). NULL for nodes with an active workload */
+  waitingOn?: string;
+  /** When the node parked awaiting its external report */
+  waitingSince?: string;
 }
 /** Represents an update to a `FunctionGraphExecutionNodeState`. Fields that are set will be updated. */
 export interface FunctionGraphExecutionNodeStatePatch {
@@ -4058,6 +7820,12 @@ export interface FunctionGraphExecutionNodeStatePatch {
   errorMessage?: string;
   /** FK to the parent graph execution */
   executionId?: string;
+  /** Declared output applied by the default_answer expiry policy */
+  expiryDefaultOutput?: unknown;
+  /** When the escalate expiry policy fired — guards the one-time extension */
+  expiryEscalatedAt?: string;
+  /** Declared expiry behaviour when waiting_deadline_at passes unanswered: fail (fail the execution), default_answer (settle with expiry_default_output), or escalate (notify and extend once) */
+  expiryPolicy?: string;
   /** Unique node state identifier */
   id?: string;
   /** Name of the node within the graph (e.g. send-email1) */
@@ -4070,8 +7838,14 @@ export interface FunctionGraphExecutionNodeStatePatch {
   scopeId?: string;
   /** Timestamp when the node began executing */
   startedAt?: string;
-  /** Node lifecycle: pending → queued → running → completed/failed */
+  /** Node lifecycle: pending → queued → running → completed/failed/cancelled */
   status?: string;
+  /** When the declared expiry policy applies to the still-unanswered node */
+  waitingDeadlineAt?: string;
+  /** What class of external reporter settles this node: human (a person answers) or external (webhook/adapter). NULL for nodes with an active workload */
+  waitingOn?: string;
+  /** When the node parked awaiting its external report */
+  waitingSince?: string;
 }
 /** A filter to be used against `FunctionGraphExecutionOutput` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionGraphExecutionOutputFilter {
@@ -4217,6 +7991,10 @@ export interface FunctionGraphFilter {
   platformFunctionDefinitionsByGraphId?: FunctionGraphToManyPlatformFunctionDefinitionFilter;
   /** `platformFunctionDefinitionsByGraphId` exist. */
   platformFunctionDefinitionsByGraphIdExist?: boolean;
+  /** Filter by the object’s `platformRepositoryWorkflowsByGraphId` relation. */
+  platformRepositoryWorkflowsByGraphId?: FunctionGraphToManyPlatformRepositoryWorkflowFilter;
+  /** `platformRepositoryWorkflowsByGraphId` exist. */
+  platformRepositoryWorkflowsByGraphIdExist?: boolean;
   /** Filter by the object’s `scopeId` field. */
   scopeId?: UUIDFilter;
   /** Filter by the object’s `storeId` field. */
@@ -4412,6 +8190,15 @@ export interface FunctionGraphToManyPlatformFunctionDefinitionFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformFunctionDefinitionFilter;
 }
+/** A filter to be used against many `PlatformRepositoryWorkflow` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphToManyPlatformRepositoryWorkflowFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformRepositoryWorkflowFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformRepositoryWorkflowFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformRepositoryWorkflowFilter;
+}
 /** A filter to be used against `FunctionInvocationAttempt` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionInvocationAttemptFilter {
   /** Filter by the object’s `actorId` field. */
@@ -4449,7 +8236,7 @@ export interface FunctionInvocationAttemptFilter {
 }
 /** An input for mutations affecting `FunctionInvocationAttempt` */
 export interface FunctionInvocationAttemptInput {
-  /** Who triggered the invocation (NULL for system/cron) */
+  /** Who triggered the invocation; NULL only when no human actor was proven */
   actorId?: string;
   /** 1-based attempt number for this invocation */
   attempt: number;
@@ -4478,7 +8265,7 @@ export interface FunctionInvocationAttemptInput {
 }
 /** Represents an update to a `FunctionInvocationAttempt`. Fields that are set will be updated. */
 export interface FunctionInvocationAttemptPatch {
-  /** Who triggered the invocation (NULL for system/cron) */
+  /** Who triggered the invocation; NULL only when no human actor was proven */
   actorId?: string;
   /** 1-based attempt number for this invocation */
   attempt?: number;
@@ -4523,12 +8310,18 @@ export interface FunctionInvocationFilter {
   completedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `definitionScope` field. */
   definitionScope?: StringFilter;
   /** Filter by the object’s `durationMs` field. */
   durationMs?: IntFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
   /** Filter by the object’s `error` field. */
   error?: StringFilter;
   /** Filter by the object’s `functionDefinitionId` field. */
@@ -4543,10 +8336,14 @@ export interface FunctionInvocationFilter {
   not?: FunctionInvocationFilter;
   /** Checks for any expressions in this list. */
   or?: FunctionInvocationFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
   /** Filter by the object’s `parentInvocationId` field. */
   parentInvocationId?: UUIDFilter;
   /** Filter by the object’s `payload` field. */
   payload?: JSONFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
   /** Filter by the object’s `provenance` field. */
   provenance?: JSONFilter;
   /** Filter by the object’s `result` field. */
@@ -4560,22 +8357,28 @@ export interface FunctionInvocationFilter {
 }
 /** An input for mutations affecting `FunctionInvocation` */
 export interface FunctionInvocationInput {
-  /** Who triggered the invocation (NULL for system/cron) */
+  /** Who triggered the invocation; NULL only when no human actor was proven */
   actorId?: string;
   /** API binding this invocation arrived through (NULL for cron/graph/system/worker paths) */
   apiBindingId?: string;
-  /** Invocation trigger channel: api, graph, cron, sync, webhook, or worker */
-  channel?: string;
+  /** Invocation trigger channel: api, graph, cron, sync, webhook, trigger, or worker */
+  channel: string;
   /** When execution completed */
   completedAt?: string;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string;
+  /** Acting principal (agent, API key, or user) who created this record */
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */
   durationMs?: number;
+  /** Entity identity propagated with the invocation */
+  entityId?: string;
+  /** Entity type propagated with the invocation */
+  entityType?: string;
   /** Error message when status is failed, or the reason the run was skipped when status is skipped */
   error?: string;
   /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
@@ -4586,10 +8389,14 @@ export interface FunctionInvocationInput {
   id?: string;
   /** FK to app_jobs.jobs — the underlying transport */
   jobId?: string;
+  /** Organization identity propagated with the invocation */
+  organizationId?: string;
   /** Parent invocation when this is a child node of a flow graph execution */
   parentInvocationId?: string;
   /** Function input payload */
   payload?: unknown;
+  /** Principal identity that triggered the invocation */
+  principalId?: string;
   /** Non-secret channel-specific invocation provenance (route/binding/event identifiers only) */
   provenance?: unknown;
   /** Function return value (success) or structured error (failure) */
@@ -4603,22 +8410,28 @@ export interface FunctionInvocationInput {
 }
 /** Represents an update to a `FunctionInvocation`. Fields that are set will be updated. */
 export interface FunctionInvocationPatch {
-  /** Who triggered the invocation (NULL for system/cron) */
+  /** Who triggered the invocation; NULL only when no human actor was proven */
   actorId?: string;
   /** API binding this invocation arrived through (NULL for cron/graph/system/worker paths) */
   apiBindingId?: string;
-  /** Invocation trigger channel: api, graph, cron, sync, webhook, or worker */
+  /** Invocation trigger channel: api, graph, cron, sync, webhook, trigger, or worker */
   channel?: string;
   /** When execution completed */
   completedAt?: string;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string;
+  /** Acting principal (agent, API key, or user) who created this record */
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */
   durationMs?: number;
+  /** Entity identity propagated with the invocation */
+  entityId?: string;
+  /** Entity type propagated with the invocation */
+  entityType?: string;
   /** Error message when status is failed, or the reason the run was skipped when status is skipped */
   error?: string;
   /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
@@ -4629,10 +8442,14 @@ export interface FunctionInvocationPatch {
   id?: string;
   /** FK to app_jobs.jobs — the underlying transport */
   jobId?: string;
+  /** Organization identity propagated with the invocation */
+  organizationId?: string;
   /** Parent invocation when this is a child node of a flow graph execution */
   parentInvocationId?: string;
   /** Function input payload */
   payload?: unknown;
+  /** Principal identity that triggered the invocation */
+  principalId?: string;
   /** Non-secret channel-specific invocation provenance (route/binding/event identifiers only) */
   provenance?: unknown;
   /** Function return value (success) or structured error (failure) */
@@ -4643,6 +8460,225 @@ export interface FunctionInvocationPatch {
   status?: string;
   /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
   taskIdentifier?: string;
+}
+export interface FunctionInvocationsCreateSyncInput {
+  clientMutationId?: string;
+  entityId?: string;
+  payload?: unknown;
+  provenance?: unknown;
+  routeBindingId?: string;
+  taskIdentifier?: string;
+}
+/** A filter to be used against `Image` object types. All fields are combined with a logical ‘and.’ */
+export interface ImageFilter {
+  /** Checks for all expressions in this list. */
+  and?: ImageFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `digest` field. */
+  digest?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `imageGrants` relation. */
+  imageGrants?: ImageToManyImageGrantFilter;
+  /** `imageGrants` exist. */
+  imageGrantsExist?: boolean;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: ImageFilter;
+  /** Checks for any expressions in this list. */
+  or?: ImageFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `platformOnly` field. */
+  platformOnly?: BooleanFilter;
+  /** Filter by the object’s `registryHost` field. */
+  registryHost?: StringFilter;
+  /** Filter by the object’s `repository` field. */
+  repository?: StringFilter;
+  /** Filter by the object’s `runtime` field. */
+  runtime?: StringFilter;
+  /** Filter by the object’s `tag` field. */
+  tag?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** A filter to be used against `ImageGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface ImageGrantFilter {
+  /** Filter by the object’s `actions` field. */
+  actions?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: ImageGrantFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `grantedBy` field. */
+  grantedBy?: UUIDFilter;
+  /** Filter by the object’s `granteeKey` field. */
+  granteeKey?: UUIDFilter;
+  /** Filter by the object’s `granteeScope` field. */
+  granteeScope?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `image` relation. */
+  image?: ImageFilter;
+  /** Filter by the object’s `imageId` field. */
+  imageId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ImageGrantFilter;
+  /** Checks for any expressions in this list. */
+  or?: ImageGrantFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `ImageGrant` */
+export interface ImageGrantInput {
+  /** Registry actions this grant allows (pull, push, delete) */
+  actions?: string[];
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** When this grant stops applying (NULL never expires) */
+  expiresAt?: string;
+  /** User who issued this grant */
+  grantedBy?: string;
+  /** Scope key of the grantee (a database_id or an entity_id) */
+  granteeKey: string;
+  /** Scope tier of the grantee (database, org, app, platform) */
+  granteeScope: string;
+  id?: string;
+  /** Catalog image this grant applies to */
+  imageId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `ImageGrant`. Fields that are set will be updated. */
+export interface ImageGrantPatch {
+  /** Registry actions this grant allows (pull, push, delete) */
+  actions?: string[];
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** When this grant stops applying (NULL never expires) */
+  expiresAt?: string;
+  /** User who issued this grant */
+  grantedBy?: string;
+  /** Scope key of the grantee (a database_id or an entity_id) */
+  granteeKey?: string;
+  /** Scope tier of the grantee (database, org, app, platform) */
+  granteeScope?: string;
+  id?: string;
+  /** Catalog image this grant applies to */
+  imageId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** An input for mutations affecting `Image` */
+export interface ImageInput {
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Human-readable description of what this image runs */
+  description?: string;
+  /** Content address (sha256:...) pinning this image, when known */
+  digest?: string;
+  /** When this catalog row becomes eligible for retention cleanup (NULL = kept forever) */
+  expiresAt?: string;
+  id?: string;
+  /** Whether this image is published for use by any scope */
+  isPublished?: boolean;
+  /** Labels for selecting images (architecture, capabilities, lane) */
+  labels?: unknown;
+  /** Freeform metadata (build provenance, source repository, SBOM pointer) */
+  metadata?: unknown;
+  /** Human-readable image name (e.g. node-runtime) */
+  name: string;
+  /** User who registered this catalog row */
+  ownerId?: string;
+  /** Whether this image is reserved for platform-internal use */
+  platformOnly?: boolean;
+  /** Registry host serving this image (NULL means the platform default registry) */
+  registryHost?: string;
+  /** Repository path within the registry (e.g. constructiveio/worker) */
+  repository: string;
+  /** Runtime this image implements (e.g. nodejs, python, custom) */
+  runtime?: string;
+  /** Mutable tag this row addresses */
+  tag?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `Image`. Fields that are set will be updated. */
+export interface ImagePatch {
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Human-readable description of what this image runs */
+  description?: string;
+  /** Content address (sha256:...) pinning this image, when known */
+  digest?: string;
+  /** When this catalog row becomes eligible for retention cleanup (NULL = kept forever) */
+  expiresAt?: string;
+  id?: string;
+  /** Whether this image is published for use by any scope */
+  isPublished?: boolean;
+  /** Labels for selecting images (architecture, capabilities, lane) */
+  labels?: unknown;
+  /** Freeform metadata (build provenance, source repository, SBOM pointer) */
+  metadata?: unknown;
+  /** Human-readable image name (e.g. node-runtime) */
+  name?: string;
+  /** User who registered this catalog row */
+  ownerId?: string;
+  /** Whether this image is reserved for platform-internal use */
+  platformOnly?: boolean;
+  /** Registry host serving this image (NULL means the platform default registry) */
+  registryHost?: string;
+  /** Repository path within the registry (e.g. constructiveio/worker) */
+  repository?: string;
+  /** Runtime this image implements (e.g. nodejs, python, custom) */
+  runtime?: string;
+  /** Mutable tag this row addresses */
+  tag?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `ImageGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface ImageToManyImageGrantFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ImageGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ImageGrantFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ImageGrantFilter;
 }
 export interface ImportDefinitionsInput {
   clientMutationId?: string;
@@ -5093,7 +9129,7 @@ export interface NamespaceEventFilter {
 }
 /** An input for mutations affecting `NamespaceEvent` */
 export interface NamespaceEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -5112,7 +9148,7 @@ export interface NamespaceEventInput {
 }
 /** Represents an update to a `NamespaceEvent`. Fields that are set will be updated. */
 export interface NamespaceEventPatch {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -5135,6 +9171,12 @@ export interface NamespaceFilter {
   and?: NamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `builderBindings` relation. */
+  builderBindings?: NamespaceToManyBuilderBindingFilter;
+  /** `builderBindings` exist. */
+  builderBindingsExist?: boolean;
+  /** Filter by the object’s `clusterId` field. */
+  clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -5163,6 +9205,10 @@ export interface NamespaceFilter {
   not?: NamespaceFilter;
   /** Checks for any expressions in this list. */
   or?: NamespaceFilter[];
+  /** Filter by the object’s `registryBindings` relation. */
+  registryBindings?: NamespaceToManyRegistryBindingFilter;
+  /** `registryBindings` exist. */
+  registryBindingsExist?: boolean;
   /** Filter by the object’s `resourceDefinitions` relation. */
   resourceDefinitions?: NamespaceToManyResourceDefinitionFilter;
   /** `resourceDefinitions` exist. */
@@ -5188,6 +9234,8 @@ export interface NamespaceFilter {
 export interface NamespaceInput {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
@@ -5214,6 +9262,8 @@ export interface NamespaceInput {
 export interface NamespacePatch {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
@@ -5236,6 +9286,15 @@ export interface NamespacePatch {
   status?: string;
   updatedAt?: string;
 }
+/** A filter to be used against many `BuilderBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceToManyBuilderBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: BuilderBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BuilderBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: BuilderBindingFilter;
+}
 /** A filter to be used against many `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
 export interface NamespaceToManyFunctionDeploymentFilter {
   /** Filters to entities where every related entity matches. */
@@ -5244,6 +9303,15 @@ export interface NamespaceToManyFunctionDeploymentFilter {
   none?: FunctionDeploymentFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: FunctionDeploymentFilter;
+}
+/** A filter to be used against many `RegistryBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceToManyRegistryBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RegistryBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RegistryBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RegistryBindingFilter;
 }
 /** A filter to be used against many `ResourceDefinition` object types. All fields are combined with a logical ‘and.’ */
 export interface NamespaceToManyResourceDefinitionFilter {
@@ -5280,6 +9348,351 @@ export interface NamespaceToManyWebhookEndpointFilter {
   none?: WebhookEndpointFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: WebhookEndpointFilter;
+}
+/** A filter to be used against `PlatformBuild` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformBuildFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformBuildFilter[];
+  /** Filter by the object’s `attempt` field. */
+  attempt?: IntFilter;
+  /** Filter by the object’s `commitSha` field. */
+  commitSha?: StringFilter;
+  /** Filter by the object’s `conclusion` field. */
+  conclusion?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `event` relation. */
+  event?: PlatformRepositoryEventFilter;
+  /** A related `event` exists. */
+  eventExists?: boolean;
+  /** Filter by the object’s `eventId` field. */
+  eventId?: UUIDFilter;
+  /** Filter by the object’s `finishedAt` field. */
+  finishedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `imageRef` field. */
+  imageRef?: StringFilter;
+  /** Filter by the object’s `jobId` field. */
+  jobId?: BigIntFilter;
+  /** Filter by the object’s `logs` field. */
+  logs?: ConstructiveInternalTypeUploadFilter;
+  /** Filter by the object’s `matrixKey` field. */
+  matrixKey?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformBuildFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformBuildFilter[];
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: PlatformProposalFilter;
+  /** A related `proposal` exists. */
+  proposalExists?: boolean;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `ref` field. */
+  ref?: StringFilter;
+  /** Filter by the object’s `repository` relation. */
+  repository?: PlatformRepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `workflow` relation. */
+  workflow?: PlatformRepositoryWorkflowFilter;
+  /** A related `workflow` exists. */
+  workflowExists?: boolean;
+  /** Filter by the object’s `workflowId` field. */
+  workflowId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformBuild` */
+export interface PlatformBuildInput {
+  /** Authenticated actor this build is attributed to; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Retry attempt number for this workflow, commit, and matrix shard */
+  attempt?: number;
+  /** Commit this build built */
+  commitSha?: string;
+  /** Verdict: NULL while pending/running, then success, failure, neutral, cancelled, skipped, timed_out, or action_required */
+  conclusion?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Event that triggered this build (NULL for a manual build) */
+  eventId?: string;
+  /** When the build reached a terminal status */
+  finishedAt?: string;
+  id?: string;
+  /** Image reference this build produced (registry host/repository:tag; NULL when the build produced no image) */
+  imageRef?: string;
+  /** app_jobs row running this build */
+  jobId?: string;
+  /** Build log object in storage; step rows slice it by byte range */
+  logs?: ConstructiveInternalTypeUpload;
+  /** Matrix shard identity; NULL for a non-matrix build */
+  matrixKey?: string;
+  /** Build detail (step results, durations, failure reason) */
+  metadata?: unknown;
+  /** Proposal this build checks (NULL for builds not tied to a proposal) */
+  proposalId?: string;
+  /** Ref this build built */
+  ref?: string;
+  /** Repository this build is of */
+  repositoryId: string;
+  /** When the build began running */
+  startedAt?: string;
+  /** Lifecycle: pending, running, succeeded, failed, cancelled */
+  status?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** Workflow whose firing produced this build (NULL for a manual build) */
+  workflowId?: string;
+}
+/** Represents an update to a `PlatformBuild`. Fields that are set will be updated. */
+export interface PlatformBuildPatch {
+  /** Authenticated actor this build is attributed to; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Retry attempt number for this workflow, commit, and matrix shard */
+  attempt?: number;
+  /** Commit this build built */
+  commitSha?: string;
+  /** Verdict: NULL while pending/running, then success, failure, neutral, cancelled, skipped, timed_out, or action_required */
+  conclusion?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Event that triggered this build (NULL for a manual build) */
+  eventId?: string;
+  /** When the build reached a terminal status */
+  finishedAt?: string;
+  id?: string;
+  /** Image reference this build produced (registry host/repository:tag; NULL when the build produced no image) */
+  imageRef?: string;
+  /** app_jobs row running this build */
+  jobId?: string;
+  /** Build log object in storage; step rows slice it by byte range */
+  logs?: ConstructiveInternalTypeUpload;
+  /** Upload for Build log object in storage; step rows slice it by byte range */
+  logsUpload?: File;
+  /** Matrix shard identity; NULL for a non-matrix build */
+  matrixKey?: string;
+  /** Build detail (step results, durations, failure reason) */
+  metadata?: unknown;
+  /** Proposal this build checks (NULL for builds not tied to a proposal) */
+  proposalId?: string;
+  /** Ref this build built */
+  ref?: string;
+  /** Repository this build is of */
+  repositoryId?: string;
+  /** When the build began running */
+  startedAt?: string;
+  /** Lifecycle: pending, running, succeeded, failed, cancelled */
+  status?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** Workflow whose firing produced this build (NULL for a manual build) */
+  workflowId?: string;
+}
+/** A filter to be used against `PlatformBuildStep` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformBuildStepFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformBuildStepFilter[];
+  /** Filter by the object’s `buildId` field. */
+  buildId?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `exitCode` field. */
+  exitCode?: IntFilter;
+  /** Filter by the object’s `finishedAt` field. */
+  finishedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `logBytes` field. */
+  logBytes?: BigIntFilter;
+  /** Filter by the object’s `logOffset` field. */
+  logOffset?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformBuildStepFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformBuildStepFilter[];
+  /** Filter by the object’s `parentSeq` field. */
+  parentSeq?: IntFilter;
+  /** Filter by the object’s `recordedAt` field. */
+  recordedAt?: DatetimeFilter;
+  /** Filter by the object’s `seq` field. */
+  seq?: IntFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `summary` field. */
+  summary?: JSONFilter;
+}
+/** An input for mutations affecting `PlatformBuildStep` */
+export interface PlatformBuildStepInput {
+  /** Build these results belong to */
+  buildId: string;
+  /** Acting principal (agent, API key, or user) who created this record */
+  createdByPrincipal?: string;
+  /** Process exit code of a step (NULL for a test result) */
+  exitCode?: number;
+  /** When this step or test finished */
+  finishedAt?: string;
+  /** Unique identifier (uuidv7 provides temporal ordering) */
+  id?: string;
+  /** What this row is: step, or test */
+  kind?: string;
+  /** Byte length of this row's output in the build log object */
+  logBytes?: string;
+  /** Byte offset of this row's output in the build log object */
+  logOffset?: string;
+  /** Step name, or the test's fully qualified name */
+  name: string;
+  /** Sequence of the step that reported this test (NULL for a step itself) */
+  parentSeq?: number;
+  /** When the result was recorded (partition key) */
+  recordedAt?: string;
+  /** Position within the build, monotonically increasing across steps and their tests */
+  seq: number;
+  /** When this step or test began */
+  startedAt?: string;
+  /** Outcome: running, succeeded, failed, skipped, cancelled */
+  status?: string;
+  /** Parsed detail: failure message, assertion diff, counts, annotations */
+  summary?: unknown;
+}
+/** Represents an update to a `PlatformBuildStep`. Fields that are set will be updated. */
+export interface PlatformBuildStepPatch {
+  /** Build these results belong to */
+  buildId?: string;
+  /** Acting principal (agent, API key, or user) who created this record */
+  createdByPrincipal?: string;
+  /** Process exit code of a step (NULL for a test result) */
+  exitCode?: number;
+  /** When this step or test finished */
+  finishedAt?: string;
+  /** Unique identifier (uuidv7 provides temporal ordering) */
+  id?: string;
+  /** What this row is: step, or test */
+  kind?: string;
+  /** Byte length of this row's output in the build log object */
+  logBytes?: string;
+  /** Byte offset of this row's output in the build log object */
+  logOffset?: string;
+  /** Step name, or the test's fully qualified name */
+  name?: string;
+  /** Sequence of the step that reported this test (NULL for a step itself) */
+  parentSeq?: number;
+  /** When the result was recorded (partition key) */
+  recordedAt?: string;
+  /** Position within the build, monotonically increasing across steps and their tests */
+  seq?: number;
+  /** When this step or test began */
+  startedAt?: string;
+  /** Outcome: running, succeeded, failed, skipped, cancelled */
+  status?: string;
+  /** Parsed detail: failure message, assertion diff, counts, annotations */
+  summary?: unknown;
+}
+/** A filter to be used against `PlatformBuilderBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformBuilderBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformBuilderBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformBuilderBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformBuilderBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformBuilderBinding` */
+export interface PlatformBuilderBindingInput {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** BuildKit resource installation serving this binding; may belong to another resource scope */
+  installationId: string;
+  /** Most recent projection failure */
+  lastError?: string;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: unknown;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId: string;
+  /** BuildKit address last projected into the namespace (NULL = never projected) */
+  observedHost?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Projection state of BUILDKIT_HOST: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformBuilderBinding`. Fields that are set will be updated. */
+export interface PlatformBuilderBindingPatch {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** BuildKit resource installation serving this binding; may belong to another resource scope */
+  installationId?: string;
+  /** Most recent projection failure */
+  lastError?: string;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: unknown;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId?: string;
+  /** BuildKit address last projected into the namespace (NULL = never projected) */
+  observedHost?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Projection state of BUILDKIT_HOST: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against `PlatformFunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformFunctionApiBindingFilter {
@@ -5420,6 +9833,8 @@ export interface PlatformFunctionDefinitionFilter {
   accessChannels?: StringListFilter;
   /** Checks for all expressions in this list. */
   and?: PlatformFunctionDefinitionFilter[];
+  /** Filter by the object’s `anonymousCallable` field. */
+  anonymousCallable?: BooleanFilter;
   /** Filter by the object’s `billable` field. */
   billable?: BooleanFilter;
   /** Filter by the object’s `category` field. */
@@ -5432,6 +9847,8 @@ export interface PlatformFunctionDefinitionFilter {
   cpuRequestMillicores?: BigIntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `fnCategory` field. */
@@ -5498,6 +9915,8 @@ export interface PlatformFunctionDefinitionFilter {
   queueName?: StringFilter;
   /** Filter by the object’s `requiredBuckets` field. */
   requiredBuckets?: StringListFilter;
+  /** Filter by the object’s `requiredCapabilities` field. */
+  requiredCapabilities?: JSONFilter;
   /** Filter by the object’s `requiredModels` field. */
   requiredModels?: StringListFilter;
   /** Filter by the object’s `requiredModules` field. */
@@ -5522,6 +9941,8 @@ export interface PlatformFunctionDefinitionFilter {
   timeoutSeconds?: IntFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
   /** Filter by the object’s `volatile` field. */
   volatile?: BooleanFilter;
 }
@@ -5529,6 +9950,8 @@ export interface PlatformFunctionDefinitionFilter {
 export interface PlatformFunctionDefinitionInput {
   /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
+  /** Whether this function consents to run for a caller with no identity (a sign-in surface, a public page). Anonymous execution additionally requires the matched route to declare anonymous access. Default false = an identity is required. */
+  anonymousCallable?: boolean;
   /** Whether executions are metered through the invocation ledger and billing quota gate */
   billable?: boolean;
   /** Function task category (e.g. email, embed, chunk, custom) */
@@ -5536,6 +9959,7 @@ export interface PlatformFunctionDefinitionInput {
   /** Knative containerConcurrency — max concurrent requests per pod instance */
   concurrency?: number;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Human-readable description of what this function does */
   description?: string;
   /** Palette grouping category (e.g. email, data, ai, custom) */
@@ -5577,6 +10001,8 @@ export interface PlatformFunctionDefinitionInput {
   queueName?: string;
   /** Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements. */
   requiredBuckets?: string[];
+  /** Capability providers the handler declared in handler.json requires.capabilities, as an array of {name, version, declaration}. NULL when the handler declares none, which mounts the full platform set. */
+  requiredCapabilities?: unknown;
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
@@ -5587,7 +10013,7 @@ export interface PlatformFunctionDefinitionInput {
   requiredSecrets?: ResourceRequirementInput[];
   /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
   resources?: unknown;
-  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), or graph (existing flow graph referenced by graph_id) */
+  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), graph (existing flow graph referenced by graph_id), or human (parks the node awaiting a person's answer through approve_node) */
   runtime?: string;
   /** Maximum pod count for Knative autoscaling (maxScale) */
   scaleMax?: number;
@@ -5602,6 +10028,7 @@ export interface PlatformFunctionDefinitionInput {
   /** Knative request timeout in seconds */
   timeoutSeconds?: number;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** Whether this function has side effects and cannot be cached or memoized */
   volatile?: boolean;
 }
@@ -5609,6 +10036,8 @@ export interface PlatformFunctionDefinitionInput {
 export interface PlatformFunctionDefinitionPatch {
   /** Invocation channels this function may be exposed through (api, graph, cron, sync, page, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
+  /** Whether this function consents to run for a caller with no identity (a sign-in surface, a public page). Anonymous execution additionally requires the matched route to declare anonymous access. Default false = an identity is required. */
+  anonymousCallable?: boolean;
   /** Whether executions are metered through the invocation ledger and billing quota gate */
   billable?: boolean;
   /** Function task category (e.g. email, embed, chunk, custom) */
@@ -5616,6 +10045,7 @@ export interface PlatformFunctionDefinitionPatch {
   /** Knative containerConcurrency — max concurrent requests per pod instance */
   concurrency?: number;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Human-readable description of what this function does */
   description?: string;
   /** Palette grouping category (e.g. email, data, ai, custom) */
@@ -5657,6 +10087,8 @@ export interface PlatformFunctionDefinitionPatch {
   queueName?: string;
   /** Bucket keys this function needs (e.g. uploads, exports). Tenant-agnostic: each key is resolved per invocation against the tenant's buckets by {tags, type}, or by an explicit capability binding row. Empty = no bucket requirements. */
   requiredBuckets?: string[];
+  /** Capability providers the handler declared in handler.json requires.capabilities, as an array of {name, version, declaration}. NULL when the handler declares none, which mounts the full platform set. */
+  requiredCapabilities?: unknown;
   /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
   requiredConfigs?: ResourceRequirementInput[];
   /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
@@ -5667,7 +10099,7 @@ export interface PlatformFunctionDefinitionPatch {
   requiredSecrets?: ResourceRequirementInput[];
   /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
   resources?: unknown;
-  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), or graph (existing flow graph referenced by graph_id) */
+  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), graph (existing flow graph referenced by graph_id), or human (parks the node awaiting a person's answer through approve_node) */
   runtime?: string;
   /** Maximum pod count for Knative autoscaling (maxScale) */
   scaleMax?: number;
@@ -5682,6 +10114,7 @@ export interface PlatformFunctionDefinitionPatch {
   /** Knative request timeout in seconds */
   timeoutSeconds?: number;
   updatedAt?: string;
+  updatedByPrincipal?: string;
   /** Whether this function has side effects and cannot be cached or memoized */
   volatile?: boolean;
 }
@@ -5737,7 +10170,7 @@ export interface PlatformFunctionDeploymentEventFilter {
 }
 /** An input for mutations affecting `PlatformFunctionDeploymentEvent` */
 export interface PlatformFunctionDeploymentEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -5754,7 +10187,7 @@ export interface PlatformFunctionDeploymentEventInput {
 }
 /** Represents an update to a `PlatformFunctionDeploymentEvent`. Fields that are set will be updated. */
 export interface PlatformFunctionDeploymentEventPatch {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -5779,6 +10212,8 @@ export interface PlatformFunctionDeploymentFilter {
   concurrency?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `errorCount` field. */
   errorCount?: IntFilter;
   /** Filter by the object’s `handlerName` field. */
@@ -5823,6 +10258,8 @@ export interface PlatformFunctionDeploymentFilter {
   timeoutSeconds?: IntFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `PlatformFunctionDeployment` */
 export interface PlatformFunctionDeploymentInput {
@@ -5831,6 +10268,7 @@ export interface PlatformFunctionDeploymentInput {
   /** Max concurrent requests per pod (NULL = inherit from definition) */
   concurrency?: number;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Cumulative error count for this deployment */
   errorCount?: number;
   /** Handler directory name (e.g. email, document) — used as FN_HANDLER_NAME in combined-image mode to select the entry point */
@@ -5867,6 +10305,7 @@ export interface PlatformFunctionDeploymentInput {
   /** Request timeout override in seconds (NULL = inherit from definition) */
   timeoutSeconds?: number;
   updatedAt?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `PlatformFunctionDeployment`. Fields that are set will be updated. */
 export interface PlatformFunctionDeploymentPatch {
@@ -5875,6 +10314,7 @@ export interface PlatformFunctionDeploymentPatch {
   /** Max concurrent requests per pod (NULL = inherit from definition) */
   concurrency?: number;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Cumulative error count for this deployment */
   errorCount?: number;
   /** Handler directory name (e.g. email, document) — used as FN_HANDLER_NAME in combined-image mode to select the entry point */
@@ -5911,6 +10351,7 @@ export interface PlatformFunctionDeploymentPatch {
   /** Request timeout override in seconds (NULL = inherit from definition) */
   timeoutSeconds?: number;
   updatedAt?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against `PlatformFunctionExecutionLog` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformFunctionExecutionLogFilter {
@@ -5939,7 +10380,7 @@ export interface PlatformFunctionExecutionLogFilter {
 }
 /** An input for mutations affecting `PlatformFunctionExecutionLog` */
 export interface PlatformFunctionExecutionLogInput {
-  /** User who triggered the execution (NULL for system/cron) */
+  /** User who triggered the execution; NULL only when no human actor was proven */
   actorId?: string;
   /** Log entry timestamp (partition key) */
   createdAt?: string;
@@ -5958,7 +10399,7 @@ export interface PlatformFunctionExecutionLogInput {
 }
 /** Represents an update to a `PlatformFunctionExecutionLog`. Fields that are set will be updated. */
 export interface PlatformFunctionExecutionLogPatch {
-  /** User who triggered the execution (NULL for system/cron) */
+  /** User who triggered the execution; NULL only when no human actor was proven */
   actorId?: string;
   /** Log entry timestamp (partition key) */
   createdAt?: string;
@@ -6010,7 +10451,7 @@ export interface PlatformFunctionInvocationAttemptFilter {
 }
 /** An input for mutations affecting `PlatformFunctionInvocationAttempt` */
 export interface PlatformFunctionInvocationAttemptInput {
-  /** Who triggered the invocation (NULL for system/cron) */
+  /** Who triggered the invocation; NULL only when no human actor was proven */
   actorId?: string;
   /** 1-based attempt number for this invocation */
   attempt: number;
@@ -6037,7 +10478,7 @@ export interface PlatformFunctionInvocationAttemptInput {
 }
 /** Represents an update to a `PlatformFunctionInvocationAttempt`. Fields that are set will be updated. */
 export interface PlatformFunctionInvocationAttemptPatch {
-  /** Who triggered the invocation (NULL for system/cron) */
+  /** Who triggered the invocation; NULL only when no human actor was proven */
   actorId?: string;
   /** 1-based attempt number for this invocation */
   attempt?: number;
@@ -6080,12 +10521,18 @@ export interface PlatformFunctionInvocationFilter {
   completedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `definitionScope` field. */
   definitionScope?: StringFilter;
   /** Filter by the object’s `durationMs` field. */
   durationMs?: IntFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
   /** Filter by the object’s `error` field. */
   error?: StringFilter;
   /** Filter by the object’s `functionDefinitionId` field. */
@@ -6100,10 +10547,14 @@ export interface PlatformFunctionInvocationFilter {
   not?: PlatformFunctionInvocationFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformFunctionInvocationFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
   /** Filter by the object’s `parentInvocationId` field. */
   parentInvocationId?: UUIDFilter;
   /** Filter by the object’s `payload` field. */
   payload?: JSONFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
   /** Filter by the object’s `provenance` field. */
   provenance?: JSONFilter;
   /** Filter by the object’s `result` field. */
@@ -6117,22 +10568,28 @@ export interface PlatformFunctionInvocationFilter {
 }
 /** An input for mutations affecting `PlatformFunctionInvocation` */
 export interface PlatformFunctionInvocationInput {
-  /** Who triggered the invocation (NULL for system/cron) */
+  /** Who triggered the invocation; NULL only when no human actor was proven */
   actorId?: string;
   /** API binding this invocation arrived through (NULL for cron/graph/system/worker paths) */
   apiBindingId?: string;
-  /** Invocation trigger channel: api, graph, cron, sync, webhook, or worker */
-  channel?: string;
+  /** Invocation trigger channel: api, graph, cron, sync, webhook, trigger, or worker */
+  channel: string;
   /** When execution completed */
   completedAt?: string;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string;
+  /** Acting principal (agent, API key, or user) who created this record */
+  createdByPrincipal?: string;
   /** Database this invocation is attributed to (usage/billing attribution) */
   databaseId?: string;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */
   durationMs?: number;
+  /** Entity identity propagated with the invocation */
+  entityId?: string;
+  /** Entity type propagated with the invocation */
+  entityType?: string;
   /** Error message when status is failed, or the reason the run was skipped when status is skipped */
   error?: string;
   /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
@@ -6143,10 +10600,14 @@ export interface PlatformFunctionInvocationInput {
   id?: string;
   /** FK to app_jobs.jobs — the underlying transport */
   jobId?: string;
+  /** Organization identity propagated with the invocation */
+  organizationId?: string;
   /** Parent invocation when this is a child node of a flow graph execution */
   parentInvocationId?: string;
   /** Function input payload */
   payload?: unknown;
+  /** Principal identity that triggered the invocation */
+  principalId?: string;
   /** Non-secret channel-specific invocation provenance (route/binding/event identifiers only) */
   provenance?: unknown;
   /** Function return value (success) or structured error (failure) */
@@ -6160,22 +10621,28 @@ export interface PlatformFunctionInvocationInput {
 }
 /** Represents an update to a `PlatformFunctionInvocation`. Fields that are set will be updated. */
 export interface PlatformFunctionInvocationPatch {
-  /** Who triggered the invocation (NULL for system/cron) */
+  /** Who triggered the invocation; NULL only when no human actor was proven */
   actorId?: string;
   /** API binding this invocation arrived through (NULL for cron/graph/system/worker paths) */
   apiBindingId?: string;
-  /** Invocation trigger channel: api, graph, cron, sync, webhook, or worker */
+  /** Invocation trigger channel: api, graph, cron, sync, webhook, trigger, or worker */
   channel?: string;
   /** When execution completed */
   completedAt?: string;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string;
+  /** Acting principal (agent, API key, or user) who created this record */
+  createdByPrincipal?: string;
   /** Database this invocation is attributed to (usage/billing attribution) */
   databaseId?: string;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */
   durationMs?: number;
+  /** Entity identity propagated with the invocation */
+  entityId?: string;
+  /** Entity type propagated with the invocation */
+  entityType?: string;
   /** Error message when status is failed, or the reason the run was skipped when status is skipped */
   error?: string;
   /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
@@ -6186,10 +10653,14 @@ export interface PlatformFunctionInvocationPatch {
   id?: string;
   /** FK to app_jobs.jobs — the underlying transport */
   jobId?: string;
+  /** Organization identity propagated with the invocation */
+  organizationId?: string;
   /** Parent invocation when this is a child node of a flow graph execution */
   parentInvocationId?: string;
   /** Function input payload */
   payload?: unknown;
+  /** Principal identity that triggered the invocation */
+  principalId?: string;
   /** Non-secret channel-specific invocation provenance (route/binding/event identifiers only) */
   provenance?: unknown;
   /** Function return value (success) or structured error (failure) */
@@ -6200,6 +10671,213 @@ export interface PlatformFunctionInvocationPatch {
   status?: string;
   /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
   taskIdentifier?: string;
+}
+export interface PlatformFunctionInvocationsCreateSyncInput {
+  clientMutationId?: string;
+  entityId?: string;
+  payload?: unknown;
+  provenance?: unknown;
+  routeBindingId?: string;
+  taskIdentifier?: string;
+}
+/** A filter to be used against `PlatformImage` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformImageFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformImageFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `digest` field. */
+  digest?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformImageFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformImageFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `platformImageGrantsByImageId` relation. */
+  platformImageGrantsByImageId?: PlatformImageToManyPlatformImageGrantFilter;
+  /** `platformImageGrantsByImageId` exist. */
+  platformImageGrantsByImageIdExist?: boolean;
+  /** Filter by the object’s `platformOnly` field. */
+  platformOnly?: BooleanFilter;
+  /** Filter by the object’s `registryHost` field. */
+  registryHost?: StringFilter;
+  /** Filter by the object’s `repository` field. */
+  repository?: StringFilter;
+  /** Filter by the object’s `runtime` field. */
+  runtime?: StringFilter;
+  /** Filter by the object’s `tag` field. */
+  tag?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** A filter to be used against `PlatformImageGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformImageGrantFilter {
+  /** Filter by the object’s `actions` field. */
+  actions?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformImageGrantFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `grantedBy` field. */
+  grantedBy?: UUIDFilter;
+  /** Filter by the object’s `granteeKey` field. */
+  granteeKey?: UUIDFilter;
+  /** Filter by the object’s `granteeScope` field. */
+  granteeScope?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `image` relation. */
+  image?: PlatformImageFilter;
+  /** Filter by the object’s `imageId` field. */
+  imageId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformImageGrantFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformImageGrantFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformImageGrant` */
+export interface PlatformImageGrantInput {
+  /** Registry actions this grant allows (pull, push, delete) */
+  actions?: string[];
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** When this grant stops applying (NULL never expires) */
+  expiresAt?: string;
+  /** User who issued this grant */
+  grantedBy?: string;
+  /** Scope key of the grantee (a database_id or an entity_id) */
+  granteeKey: string;
+  /** Scope tier of the grantee (database, org, app, platform) */
+  granteeScope: string;
+  id?: string;
+  /** Catalog image this grant applies to */
+  imageId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformImageGrant`. Fields that are set will be updated. */
+export interface PlatformImageGrantPatch {
+  /** Registry actions this grant allows (pull, push, delete) */
+  actions?: string[];
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** When this grant stops applying (NULL never expires) */
+  expiresAt?: string;
+  /** User who issued this grant */
+  grantedBy?: string;
+  /** Scope key of the grantee (a database_id or an entity_id) */
+  granteeKey?: string;
+  /** Scope tier of the grantee (database, org, app, platform) */
+  granteeScope?: string;
+  id?: string;
+  /** Catalog image this grant applies to */
+  imageId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** An input for mutations affecting `PlatformImage` */
+export interface PlatformImageInput {
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Human-readable description of what this image runs */
+  description?: string;
+  /** Content address (sha256:...) pinning this image, when known */
+  digest?: string;
+  /** When this catalog row becomes eligible for retention cleanup (NULL = kept forever) */
+  expiresAt?: string;
+  id?: string;
+  /** Whether this image is published for use by any scope */
+  isPublished?: boolean;
+  /** Labels for selecting images (architecture, capabilities, lane) */
+  labels?: unknown;
+  /** Freeform metadata (build provenance, source repository, SBOM pointer) */
+  metadata?: unknown;
+  /** Human-readable image name (e.g. node-runtime) */
+  name: string;
+  /** User who registered this catalog row */
+  ownerId?: string;
+  /** Whether this image is reserved for platform-internal use */
+  platformOnly?: boolean;
+  /** Registry host serving this image (NULL means the platform default registry) */
+  registryHost?: string;
+  /** Repository path within the registry (e.g. constructiveio/worker) */
+  repository: string;
+  /** Runtime this image implements (e.g. nodejs, python, custom) */
+  runtime?: string;
+  /** Mutable tag this row addresses */
+  tag?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformImage`. Fields that are set will be updated. */
+export interface PlatformImagePatch {
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Human-readable description of what this image runs */
+  description?: string;
+  /** Content address (sha256:...) pinning this image, when known */
+  digest?: string;
+  /** When this catalog row becomes eligible for retention cleanup (NULL = kept forever) */
+  expiresAt?: string;
+  id?: string;
+  /** Whether this image is published for use by any scope */
+  isPublished?: boolean;
+  /** Labels for selecting images (architecture, capabilities, lane) */
+  labels?: unknown;
+  /** Freeform metadata (build provenance, source repository, SBOM pointer) */
+  metadata?: unknown;
+  /** Human-readable image name (e.g. node-runtime) */
+  name?: string;
+  /** User who registered this catalog row */
+  ownerId?: string;
+  /** Whether this image is reserved for platform-internal use */
+  platformOnly?: boolean;
+  /** Registry host serving this image (NULL means the platform default registry) */
+  registryHost?: string;
+  /** Repository path within the registry (e.g. constructiveio/worker) */
+  repository?: string;
+  /** Runtime this image implements (e.g. nodejs, python, custom) */
+  runtime?: string;
+  /** Mutable tag this row addresses */
+  tag?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `PlatformImageGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformImageToManyPlatformImageGrantFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformImageGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformImageGrantFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformImageGrantFilter;
 }
 /** A filter to be used against `PlatformInfraCommit` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformInfraCommitFilter {
@@ -6460,6 +11138,156 @@ export interface PlatformInfraStorePatch {
   /** Opaque store partition key for the global tier */
   scopeId?: string;
 }
+/** A filter to be used against `PlatformK8sResourceKind` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformK8sResourceKindFilter {
+  /** Filter by the object’s `active` field. */
+  active?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformK8sResourceKindFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformK8sResourceKindFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformK8sResourceKindFilter[];
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformK8sResourceKind` */
+export interface PlatformK8sResourceKindInput {
+  /** Whether the admission gate consults this row; deactivating a kind row denies the kind (fail closed) */
+  active?: boolean;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  /** Timestamp of policy creation */
+  createdAt?: string;
+  /** Kind policy: {allowed, allowed_scopes?, notes} — the readily-cached head; history lives in the infra store */
+  definition: unknown;
+  /** Human-readable description of the kind policy */
+  description?: string;
+  /** Unique kind policy identifier */
+  id?: string;
+  /** Human-readable kind policy name */
+  label?: string;
+  /** Kubernetes kind this policy governs (e.g. Deployment); the policy's path in the infra tree is [k8s_resource_kind, slug] */
+  slug: string;
+  /** Infra Merkle store holding this policy's history (stamped by the versioned trigger) */
+  storeId?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformK8sResourceKind`. Fields that are set will be updated. */
+export interface PlatformK8sResourceKindPatch {
+  /** Whether the admission gate consults this row; deactivating a kind row denies the kind (fail closed) */
+  active?: boolean;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  /** Timestamp of policy creation */
+  createdAt?: string;
+  /** Kind policy: {allowed, allowed_scopes?, notes} — the readily-cached head; history lives in the infra store */
+  definition?: unknown;
+  /** Human-readable description of the kind policy */
+  description?: string;
+  /** Unique kind policy identifier */
+  id?: string;
+  /** Human-readable kind policy name */
+  label?: string;
+  /** Kubernetes kind this policy governs (e.g. Deployment); the policy's path in the infra tree is [k8s_resource_kind, slug] */
+  slug?: string;
+  /** Infra Merkle store holding this policy's history (stamped by the versioned trigger) */
+  storeId?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
+}
+/** A filter to be used against `PlatformK8sSpecRule` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformK8sSpecRuleFilter {
+  /** Filter by the object’s `active` field. */
+  active?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformK8sSpecRuleFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformK8sSpecRuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformK8sSpecRuleFilter[];
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformK8sSpecRule` */
+export interface PlatformK8sSpecRuleInput {
+  /** Whether the admission gate enforces this rule; rules are disabled here rather than deleted so history stays intact */
+  active?: boolean;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  /** Timestamp of rule creation */
+  createdAt?: string;
+  /** Rule definition: {rule_type, kind?, match, notes?} — the readily-cached head; history lives in the infra store */
+  definition: unknown;
+  /** Human-readable description of the rule */
+  description?: string;
+  /** Unique spec rule identifier */
+  id?: string;
+  /** Human-readable rule name */
+  label?: string;
+  /** Rule slug (unique per scope); the rule's path in the infra tree is [k8s_spec_rule, slug] */
+  slug: string;
+  /** Infra Merkle store holding this rule's history (stamped by the versioned trigger) */
+  storeId?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformK8sSpecRule`. Fields that are set will be updated. */
+export interface PlatformK8sSpecRulePatch {
+  /** Whether the admission gate enforces this rule; rules are disabled here rather than deleted so history stays intact */
+  active?: boolean;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  /** Timestamp of rule creation */
+  createdAt?: string;
+  /** Rule definition: {rule_type, kind?, match, notes?} — the readily-cached head; history lives in the infra store */
+  definition?: unknown;
+  /** Human-readable description of the rule */
+  description?: string;
+  /** Unique spec rule identifier */
+  id?: string;
+  /** Human-readable rule name */
+  label?: string;
+  /** Rule slug (unique per scope); the rule's path in the infra tree is [k8s_spec_rule, slug] */
+  slug?: string;
+  /** Infra Merkle store holding this rule's history (stamped by the versioned trigger) */
+  storeId?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
+}
 /** A filter to be used against `PlatformNamespaceEvent` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformNamespaceEventFilter {
   /** Filter by the object’s `actorId` field. */
@@ -6485,7 +11313,7 @@ export interface PlatformNamespaceEventFilter {
 }
 /** An input for mutations affecting `PlatformNamespaceEvent` */
 export interface PlatformNamespaceEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -6502,7 +11330,7 @@ export interface PlatformNamespaceEventInput {
 }
 /** Represents an update to a `PlatformNamespaceEvent`. Fields that are set will be updated. */
 export interface PlatformNamespaceEventPatch {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -6523,6 +11351,8 @@ export interface PlatformNamespaceFilter {
   and?: PlatformNamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `clusterId` field. */
+  clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `description` field. */
@@ -6545,10 +11375,18 @@ export interface PlatformNamespaceFilter {
   not?: PlatformNamespaceFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformNamespaceFilter[];
+  /** Filter by the object’s `platformBuilderBindingsByNamespaceId` relation. */
+  platformBuilderBindingsByNamespaceId?: PlatformNamespaceToManyPlatformBuilderBindingFilter;
+  /** `platformBuilderBindingsByNamespaceId` exist. */
+  platformBuilderBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformFunctionDeploymentsByNamespaceId` relation. */
   platformFunctionDeploymentsByNamespaceId?: PlatformNamespaceToManyPlatformFunctionDeploymentFilter;
   /** `platformFunctionDeploymentsByNamespaceId` exist. */
   platformFunctionDeploymentsByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `platformRegistryBindingsByNamespaceId` relation. */
+  platformRegistryBindingsByNamespaceId?: PlatformNamespaceToManyPlatformRegistryBindingFilter;
+  /** `platformRegistryBindingsByNamespaceId` exist. */
+  platformRegistryBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformResourceDefinitionsByNamespaceId` relation. */
   platformResourceDefinitionsByNamespaceId?: PlatformNamespaceToManyPlatformResourceDefinitionFilter;
   /** `platformResourceDefinitionsByNamespaceId` exist. */
@@ -6574,6 +11412,8 @@ export interface PlatformNamespaceFilter {
 export interface PlatformNamespaceInput {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Optional human-readable description of this namespace */
   description?: string;
@@ -6598,6 +11438,8 @@ export interface PlatformNamespaceInput {
 export interface PlatformNamespacePatch {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Optional human-readable description of this namespace */
   description?: string;
@@ -6618,6 +11460,15 @@ export interface PlatformNamespacePatch {
   status?: string;
   updatedAt?: string;
 }
+/** A filter to be used against many `PlatformBuilderBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyPlatformBuilderBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformBuilderBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformBuilderBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformBuilderBindingFilter;
+}
 /** A filter to be used against many `PlatformFunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformNamespaceToManyPlatformFunctionDeploymentFilter {
   /** Filters to entities where every related entity matches. */
@@ -6626,6 +11477,15 @@ export interface PlatformNamespaceToManyPlatformFunctionDeploymentFilter {
   none?: PlatformFunctionDeploymentFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformFunctionDeploymentFilter;
+}
+/** A filter to be used against many `PlatformRegistryBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyPlatformRegistryBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformRegistryBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformRegistryBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformRegistryBindingFilter;
 }
 /** A filter to be used against many `PlatformResourceDefinition` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformNamespaceToManyPlatformResourceDefinitionFilter {
@@ -6663,6 +11523,1541 @@ export interface PlatformNamespaceToManyPlatformWebhookEndpointFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformWebhookEndpointFilter;
 }
+/** A filter to be used against `PlatformProposalComment` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalCommentFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformProposalCommentFilter[];
+  /** Filter by the object’s `attachments` field. */
+  attachments?: ConstructiveInternalTypeUploadListFilter;
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `line` field. */
+  line?: IntFilter;
+  /** Negates the expression. */
+  not?: PlatformProposalCommentFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformProposalCommentFilter[];
+  /** Filter by the object’s `outdatedAt` field. */
+  outdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `path` field. */
+  path?: StringTrgmFilter;
+  /** Filter by the object’s `platformProposalReactionsByCommentId` relation. */
+  platformProposalReactionsByCommentId?: PlatformProposalCommentToManyPlatformProposalReactionFilter;
+  /** `platformProposalReactionsByCommentId` exist. */
+  platformProposalReactionsByCommentIdExist?: boolean;
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: PlatformProposalFilter;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `resolvedAt` field. */
+  resolvedAt?: DatetimeFilter;
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `path` column. */
+  trgmPath?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `PlatformProposalComment` */
+export interface PlatformProposalCommentInput {
+  /** Actor who wrote the comment; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Files referenced by the comment body, in the order they were attached */
+  attachments?: ConstructiveInternalTypeUpload[];
+  /** Comment text */
+  body: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** Line within path the comment is anchored to */
+  line?: number;
+  /** When the anchored range this comment pointed at vanished from the diff */
+  outdatedAt?: string;
+  /** File the comment is anchored to (NULL for a comment on the proposal) */
+  path?: string;
+  /** Proposal being commented on */
+  proposalId: string;
+  /** When this comment was marked resolved */
+  resolvedAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformProposalComment`. Fields that are set will be updated. */
+export interface PlatformProposalCommentPatch {
+  /** Actor who wrote the comment; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Files referenced by the comment body, in the order they were attached */
+  attachments?: ConstructiveInternalTypeUpload[];
+  /** Comment text */
+  body?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** Line within path the comment is anchored to */
+  line?: number;
+  /** When the anchored range this comment pointed at vanished from the diff */
+  outdatedAt?: string;
+  /** File the comment is anchored to (NULL for a comment on the proposal) */
+  path?: string;
+  /** Proposal being commented on */
+  proposalId?: string;
+  /** When this comment was marked resolved */
+  resolvedAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `PlatformProposalReaction` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalCommentToManyPlatformProposalReactionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformProposalReactionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformProposalReactionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformProposalReactionFilter;
+}
+/** A filter to be used against `PlatformProposalFileView` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalFileViewFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformProposalFileViewFilter[];
+  /** Filter by the object’s `blobSha` field. */
+  blobSha?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformProposalFileViewFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformProposalFileViewFilter[];
+  /** Filter by the object’s `path` field. */
+  path?: StringFilter;
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: PlatformProposalFilter;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `reviewerId` field. */
+  reviewerId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `viewedAt` field. */
+  viewedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformProposalFileView` */
+export interface PlatformProposalFileViewInput {
+  /** Blob the reviewer read, which is what makes the mark survive a rebase or go stale */
+  blobSha: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Path of the file as the diff named it */
+  path: string;
+  /** Proposal the file belongs to */
+  proposalId: string;
+  /** Actor who read the file */
+  reviewerId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** When the file was marked read */
+  viewedAt?: string;
+}
+/** Represents an update to a `PlatformProposalFileView`. Fields that are set will be updated. */
+export interface PlatformProposalFileViewPatch {
+  /** Blob the reviewer read, which is what makes the mark survive a rebase or go stale */
+  blobSha?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Path of the file as the diff named it */
+  path?: string;
+  /** Proposal the file belongs to */
+  proposalId?: string;
+  /** Actor who read the file */
+  reviewerId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** When the file was marked read */
+  viewedAt?: string;
+}
+/** A filter to be used against `PlatformProposal` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformProposalFilter[];
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `childPlatformProposals` relation. */
+  childPlatformProposals?: PlatformProposalToManyPlatformProposalFilter;
+  /** `childPlatformProposals` exist. */
+  childPlatformProposalsExist?: boolean;
+  /** Filter by the object’s `closedReason` field. */
+  closedReason?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `decidedAt` field. */
+  decidedAt?: DatetimeFilter;
+  /** Filter by the object’s `dueAt` field. */
+  dueAt?: DatetimeFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringTrgmFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: StringListFilter;
+  /** Filter by the object’s `mergeCommit` field. */
+  mergeCommit?: StringTrgmFilter;
+  /** Filter by the object’s `mergeMethod` field. */
+  mergeMethod?: StringTrgmFilter;
+  /** Filter by the object’s `mergeRequestedAt` field. */
+  mergeRequestedAt?: DatetimeFilter;
+  /** Filter by the object’s `mergedAt` field. */
+  mergedAt?: DatetimeFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformProposalFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformProposalFilter[];
+  /** Filter by the object’s `parent` relation. */
+  parent?: PlatformProposalFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `platformBuildsByProposalId` relation. */
+  platformBuildsByProposalId?: PlatformProposalToManyPlatformBuildFilter;
+  /** `platformBuildsByProposalId` exist. */
+  platformBuildsByProposalIdExist?: boolean;
+  /** Filter by the object’s `platformProposalCommentsByProposalId` relation. */
+  platformProposalCommentsByProposalId?: PlatformProposalToManyPlatformProposalCommentFilter;
+  /** `platformProposalCommentsByProposalId` exist. */
+  platformProposalCommentsByProposalIdExist?: boolean;
+  /** Filter by the object’s `platformProposalFileViewsByProposalId` relation. */
+  platformProposalFileViewsByProposalId?: PlatformProposalToManyPlatformProposalFileViewFilter;
+  /** `platformProposalFileViewsByProposalId` exist. */
+  platformProposalFileViewsByProposalIdExist?: boolean;
+  /** Filter by the object’s `platformProposalReactionsByProposalId` relation. */
+  platformProposalReactionsByProposalId?: PlatformProposalToManyPlatformProposalReactionFilter;
+  /** `platformProposalReactionsByProposalId` exist. */
+  platformProposalReactionsByProposalIdExist?: boolean;
+  /** Filter by the object’s `platformProposalReviewsByProposalId` relation. */
+  platformProposalReviewsByProposalId?: PlatformProposalToManyPlatformProposalReviewFilter;
+  /** `platformProposalReviewsByProposalId` exist. */
+  platformProposalReviewsByProposalIdExist?: boolean;
+  /** Filter by the object’s `platformProposalsChunksByPlatformProposalsId` relation. */
+  platformProposalsChunksByPlatformProposalsId?: PlatformProposalToManyPlatformProposalsChunkFilter;
+  /** `platformProposalsChunksByPlatformProposalsId` exist. */
+  platformProposalsChunksByPlatformProposalsIdExist?: boolean;
+  /** Filter by the object’s `priority` field. */
+  priority?: BigFloatFilter;
+  /** Filter by the object’s `repository` relation. */
+  repository?: PlatformRepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `resolution` field. */
+  resolution?: StringTrgmFilter;
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `sourceRef` field. */
+  sourceRef?: StringTrgmFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringTrgmFilter;
+  /** Filter by the object’s `targetRef` field. */
+  targetRef?: StringTrgmFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringTrgmFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `closed_reason` column. */
+  trgmClosedReason?: TrgmSearchInput;
+  /** TRGM search on the `kind` column. */
+  trgmKind?: TrgmSearchInput;
+  /** TRGM search on the `merge_commit` column. */
+  trgmMergeCommit?: TrgmSearchInput;
+  /** TRGM search on the `merge_method` column. */
+  trgmMergeMethod?: TrgmSearchInput;
+  /** TRGM search on the `resolution` column. */
+  trgmResolution?: TrgmSearchInput;
+  /** TRGM search on the `source_ref` column. */
+  trgmSourceRef?: TrgmSearchInput;
+  /** TRGM search on the `status` column. */
+  trgmStatus?: TrgmSearchInput;
+  /** TRGM search on the `target_ref` column. */
+  trgmTargetRef?: TrgmSearchInput;
+  /** TRGM search on the `title` column. */
+  trgmTitle?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `PlatformProposal` */
+export interface PlatformProposalInput {
+  /** Actor who opened the proposal; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Description of the proposed change */
+  body?: string;
+  /** Why this was closed: completed, not_planned, duplicate, superseded */
+  closedReason?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** When the decision was taken (NULL while the question is open) */
+  decidedAt?: string;
+  /** When this is wanted by (NULL when nothing is promised) */
+  dueAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** issue (a report or plan), change (merge one ref into another), discussion (an open question), decision (a question answered) */
+  kind?: string;
+  /** Labels for filtering and grouping (a board is a query over kind, status and these) */
+  labels?: string[];
+  /** Commit the merge produced */
+  mergeCommit?: string;
+  /** How to merge when eligible: merge, squash, rebase */
+  mergeMethod?: string;
+  /** When merge-when-green was requested (NULL when no merge is pending) */
+  mergeRequestedAt?: string;
+  /** When the merge completed */
+  mergedAt?: string;
+  /** Review detail (reviewers, labels, checks summary) */
+  metadata?: unknown;
+  /** Proposal this one hangs under: an epic, or the discussion a decision came out of */
+  parentId?: string;
+  /** Manual order within a board column, sparse so an insert between two rows moves one row (NULL when unranked) */
+  priority?: string;
+  /** Repository this proposal is against */
+  repositoryId: string;
+  /** What was decided (for kind = decision; NULL while the question is open) */
+  resolution?: string;
+  /** Ref holding the proposed commits (NULL unless kind is change) */
+  sourceRef?: string;
+  /** Lifecycle state: draft, open, merged, closed */
+  status?: string;
+  /** Ref the commits are proposed for (NULL unless kind is change) */
+  targetRef?: string;
+  /** What this proposal does */
+  title: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformProposal`. Fields that are set will be updated. */
+export interface PlatformProposalPatch {
+  /** Actor who opened the proposal; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Description of the proposed change */
+  body?: string;
+  /** Why this was closed: completed, not_planned, duplicate, superseded */
+  closedReason?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** When the decision was taken (NULL while the question is open) */
+  decidedAt?: string;
+  /** When this is wanted by (NULL when nothing is promised) */
+  dueAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** issue (a report or plan), change (merge one ref into another), discussion (an open question), decision (a question answered) */
+  kind?: string;
+  /** Labels for filtering and grouping (a board is a query over kind, status and these) */
+  labels?: string[];
+  /** Commit the merge produced */
+  mergeCommit?: string;
+  /** How to merge when eligible: merge, squash, rebase */
+  mergeMethod?: string;
+  /** When merge-when-green was requested (NULL when no merge is pending) */
+  mergeRequestedAt?: string;
+  /** When the merge completed */
+  mergedAt?: string;
+  /** Review detail (reviewers, labels, checks summary) */
+  metadata?: unknown;
+  /** Proposal this one hangs under: an epic, or the discussion a decision came out of */
+  parentId?: string;
+  /** Manual order within a board column, sparse so an insert between two rows moves one row (NULL when unranked) */
+  priority?: string;
+  /** Repository this proposal is against */
+  repositoryId?: string;
+  /** What was decided (for kind = decision; NULL while the question is open) */
+  resolution?: string;
+  /** Ref holding the proposed commits (NULL unless kind is change) */
+  sourceRef?: string;
+  /** Lifecycle state: draft, open, merged, closed */
+  status?: string;
+  /** Ref the commits are proposed for (NULL unless kind is change) */
+  targetRef?: string;
+  /** What this proposal does */
+  title?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against `PlatformProposalReaction` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalReactionFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformProposalReactionFilter[];
+  /** Filter by the object’s `comment` relation. */
+  comment?: PlatformProposalCommentFilter;
+  /** A related `comment` exists. */
+  commentExists?: boolean;
+  /** Filter by the object’s `commentId` field. */
+  commentId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `emoji` field. */
+  emoji?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformProposalReactionFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformProposalReactionFilter[];
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: PlatformProposalFilter;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformProposalReaction` */
+export interface PlatformProposalReactionInput {
+  /** Actor who reacted */
+  actorId: string;
+  /** Comment being reacted to (NULL for a reaction to the proposal itself) */
+  commentId?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Reaction shortcode (+1, eyes, rocket) */
+  emoji: string;
+  id?: string;
+  /** Proposal the reaction belongs to */
+  proposalId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformProposalReaction`. Fields that are set will be updated. */
+export interface PlatformProposalReactionPatch {
+  /** Actor who reacted */
+  actorId?: string;
+  /** Comment being reacted to (NULL for a reaction to the proposal itself) */
+  commentId?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Reaction shortcode (+1, eyes, rocket) */
+  emoji?: string;
+  id?: string;
+  /** Proposal the reaction belongs to */
+  proposalId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against `PlatformProposalReview` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalReviewFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformProposalReviewFilter[];
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `commitSha` field. */
+  commitSha?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformProposalReviewFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformProposalReviewFilter[];
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: PlatformProposalFilter;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `reviewerId` field. */
+  reviewerId?: UUIDFilter;
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `submittedAt` field. */
+  submittedAt?: DatetimeFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `commit_sha` column. */
+  trgmCommitSha?: TrgmSearchInput;
+  /** TRGM search on the `verdict` column. */
+  trgmVerdict?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `verdict` field. */
+  verdict?: StringTrgmFilter;
+}
+/** An input for mutations affecting `PlatformProposalReview` */
+export interface PlatformProposalReviewInput {
+  /** Summary the reviewer submitted with the verdict */
+  body?: string;
+  /** Head commit this verdict was submitted against */
+  commitSha: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Proposal being reviewed */
+  proposalId: string;
+  /** Actor who submitted the verdict */
+  reviewerId: string;
+  /** When the verdict was submitted */
+  submittedAt?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** approve, reject or comment (a review that gates nothing) */
+  verdict: string;
+}
+/** Represents an update to a `PlatformProposalReview`. Fields that are set will be updated. */
+export interface PlatformProposalReviewPatch {
+  /** Summary the reviewer submitted with the verdict */
+  body?: string;
+  /** Head commit this verdict was submitted against */
+  commitSha?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Proposal being reviewed */
+  proposalId?: string;
+  /** Actor who submitted the verdict */
+  reviewerId?: string;
+  /** When the verdict was submitted */
+  submittedAt?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** approve, reject or comment (a review that gates nothing) */
+  verdict?: string;
+}
+/** A filter to be used against many `PlatformBuild` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalToManyPlatformBuildFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformBuildFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformBuildFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformBuildFilter;
+}
+/** A filter to be used against many `PlatformProposalComment` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalToManyPlatformProposalCommentFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformProposalCommentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformProposalCommentFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformProposalCommentFilter;
+}
+/** A filter to be used against many `PlatformProposalFileView` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalToManyPlatformProposalFileViewFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformProposalFileViewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformProposalFileViewFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformProposalFileViewFilter;
+}
+/** A filter to be used against many `PlatformProposal` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalToManyPlatformProposalFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformProposalFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformProposalFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformProposalFilter;
+}
+/** A filter to be used against many `PlatformProposalReaction` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalToManyPlatformProposalReactionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformProposalReactionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformProposalReactionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformProposalReactionFilter;
+}
+/** A filter to be used against many `PlatformProposalReview` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalToManyPlatformProposalReviewFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformProposalReviewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformProposalReviewFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformProposalReviewFilter;
+}
+/** A filter to be used against many `PlatformProposalsChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalToManyPlatformProposalsChunkFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformProposalsChunkFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformProposalsChunkFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformProposalsChunkFilter;
+}
+/** A filter to be used against `PlatformProposalsChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformProposalsChunkFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformProposalsChunkFilter[];
+  /** Filter by the object’s `body` field. */
+  body?: StringFilter;
+  /** Filter by the object’s `chunkIndex` field. */
+  chunkIndex?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformProposalsChunkFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformProposalsChunkFilter[];
+  /** Filter by the object’s `platformProposals` relation. */
+  platformProposals?: PlatformProposalFilter;
+  /** Filter by the object’s `platformProposalsId` field. */
+  platformProposalsId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `PlatformProposalsChunk` */
+export interface PlatformProposalsChunkInput {
+  /** Policy-required field derived from source table (used by AuthzComposite) */
+  actorId?: string;
+  body: string;
+  chunkIndex?: number;
+  createdAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  metadata?: unknown;
+  platformProposalsId: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformProposalsChunk`. Fields that are set will be updated. */
+export interface PlatformProposalsChunkPatch {
+  /** Policy-required field derived from source table (used by AuthzComposite) */
+  actorId?: string;
+  body?: string;
+  chunkIndex?: number;
+  createdAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  metadata?: unknown;
+  platformProposalsId?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `PlatformRegistryBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRegistryBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformRegistryBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformRegistryBindingFilter;
+  /** Filter by the object’s `observedCredentialVersion` field. */
+  observedCredentialVersion?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformRegistryBindingFilter[];
+  /** Filter by the object’s `pullSecretName` field. */
+  pullSecretName?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `registry` relation. */
+  registry?: PlatformRegistryFilter;
+  /** Filter by the object’s `registryHost` field. */
+  registryHost?: StringFilter;
+  /** Filter by the object’s `registryId` field. */
+  registryId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformRegistryBinding` */
+export interface PlatformRegistryBindingInput {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Reconciler detail (last error, projection timestamps) */
+  metadata?: unknown;
+  /** Namespace the registry credentials are projected into */
+  namespaceId: string;
+  /** Registry credential version last projected into the namespace (NULL = never projected) */
+  observedCredentialVersion?: string;
+  /** Name of the image pull secret the reconciler writes into the namespace */
+  pullSecretName?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Registry host this binding's credentials authenticate to (what kubelet matches image references against) */
+  registryHost: string;
+  /** Registry endpoint (in this scope's registry catalog) the namespace pulls from */
+  registryId: string;
+  /** Projection state of the pull secret: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformRegistryBinding`. Fields that are set will be updated. */
+export interface PlatformRegistryBindingPatch {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Reconciler detail (last error, projection timestamps) */
+  metadata?: unknown;
+  /** Namespace the registry credentials are projected into */
+  namespaceId?: string;
+  /** Registry credential version last projected into the namespace (NULL = never projected) */
+  observedCredentialVersion?: string;
+  /** Name of the image pull secret the reconciler writes into the namespace */
+  pullSecretName?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Registry host this binding's credentials authenticate to (what kubelet matches image references against) */
+  registryHost?: string;
+  /** Registry endpoint (in this scope's registry catalog) the namespace pulls from */
+  registryId?: string;
+  /** Projection state of the pull secret: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against `PlatformRegistry` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRegistryFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformRegistryFilter[];
+  /** Filter by the object’s `authMode` field. */
+  authMode?: StringFilter;
+  /** Filter by the object’s `basePath` field. */
+  basePath?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `credentialSecretName` field. */
+  credentialSecretName?: StringFilter;
+  /** Filter by the object’s `host` field. */
+  host?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installation` relation. */
+  installation?: PlatformResourceInstallationFilter;
+  /** A related `installation` exists. */
+  installationExists?: boolean;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformRegistryFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformRegistryFilter[];
+  /** Filter by the object’s `platformOnly` field. */
+  platformOnly?: BooleanFilter;
+  /** Filter by the object’s `platformRegistryBindingsByRegistryId` relation. */
+  platformRegistryBindingsByRegistryId?: PlatformRegistryToManyPlatformRegistryBindingFilter;
+  /** `platformRegistryBindingsByRegistryId` exist. */
+  platformRegistryBindingsByRegistryIdExist?: boolean;
+  /** Filter by the object’s `platformRegistryGrantsByRegistryId` relation. */
+  platformRegistryGrantsByRegistryId?: PlatformRegistryToManyPlatformRegistryGrantFilter;
+  /** `platformRegistryGrantsByRegistryId` exist. */
+  platformRegistryGrantsByRegistryIdExist?: boolean;
+  /** Filter by the object’s `role` field. */
+  role?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** A filter to be used against `PlatformRegistryGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRegistryGrantFilter {
+  /** Filter by the object’s `actions` field. */
+  actions?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformRegistryGrantFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `grantedBy` field. */
+  grantedBy?: UUIDFilter;
+  /** Filter by the object’s `granteeKey` field. */
+  granteeKey?: UUIDFilter;
+  /** Filter by the object’s `granteeScope` field. */
+  granteeScope?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformRegistryGrantFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformRegistryGrantFilter[];
+  /** Filter by the object’s `registry` relation. */
+  registry?: PlatformRegistryFilter;
+  /** Filter by the object’s `registryId` field. */
+  registryId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformRegistryGrant` */
+export interface PlatformRegistryGrantInput {
+  /** Endpoint actions this grant allows (read, write) */
+  actions?: string[];
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** When this grant stops applying (NULL never expires) */
+  expiresAt?: string;
+  /** User who issued this grant */
+  grantedBy?: string;
+  /** Scope key of the grantee (a database_id or an entity_id) */
+  granteeKey: string;
+  /** Scope tier of the grantee (database, org, app, platform) */
+  granteeScope: string;
+  id?: string;
+  /** Registry this grant applies to */
+  registryId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformRegistryGrant`. Fields that are set will be updated. */
+export interface PlatformRegistryGrantPatch {
+  /** Endpoint actions this grant allows (read, write) */
+  actions?: string[];
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** When this grant stops applying (NULL never expires) */
+  expiresAt?: string;
+  /** User who issued this grant */
+  grantedBy?: string;
+  /** Scope key of the grantee (a database_id or an entity_id) */
+  granteeKey?: string;
+  /** Scope tier of the grantee (database, org, app, platform) */
+  granteeScope?: string;
+  id?: string;
+  /** Registry this grant applies to */
+  registryId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** An input for mutations affecting `PlatformRegistry` */
+export interface PlatformRegistryInput {
+  /** How a client authenticates to this registry (none, basic, token) */
+  authMode?: string;
+  /** Path prefix within the host (npm scope, OCI project); NULL = the host root */
+  basePath?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Name of the infra secret carrying this registry's credential (NULL when auth_mode = none) */
+  credentialSecretName?: string;
+  /** Registry host, without a scheme (e.g. ghcr.io, registry.npmjs.org); required unless role is source, where it is the optional requested host and is stamped with the provisioned one */
+  host?: string;
+  id?: string;
+  /** Resource installation running this registry (NULL for an external registry) */
+  installationId?: string;
+  /** Whether this registry is published for use by any scope */
+  isPublished?: boolean;
+  /** Artifact ecosystem this registry serves (oci, npm) */
+  kind: string;
+  /** Labels for selecting registries (lane, region, mirror role) */
+  labels?: unknown;
+  /** Message from the last failed provision/deprovision attempt (NULL when healthy) */
+  lastError?: string;
+  /** Freeform metadata (mirror-of pointer, rate limits, contact) */
+  metadata?: unknown;
+  /** Human-readable registry name (e.g. github-container-registry) */
+  name: string;
+  /** Whether this registry is reserved for platform-internal use */
+  platformOnly?: boolean;
+  /** Role in this scope: source (the push target), cache (read-through mirror), external (pull only) */
+  role?: string;
+  /** Provisioning state (pending, provisioning, active, failed); rows the platform does not create are active on insert */
+  status?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformRegistry`. Fields that are set will be updated. */
+export interface PlatformRegistryPatch {
+  /** How a client authenticates to this registry (none, basic, token) */
+  authMode?: string;
+  /** Path prefix within the host (npm scope, OCI project); NULL = the host root */
+  basePath?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Name of the infra secret carrying this registry's credential (NULL when auth_mode = none) */
+  credentialSecretName?: string;
+  /** Registry host, without a scheme (e.g. ghcr.io, registry.npmjs.org); required unless role is source, where it is the optional requested host and is stamped with the provisioned one */
+  host?: string;
+  id?: string;
+  /** Resource installation running this registry (NULL for an external registry) */
+  installationId?: string;
+  /** Whether this registry is published for use by any scope */
+  isPublished?: boolean;
+  /** Artifact ecosystem this registry serves (oci, npm) */
+  kind?: string;
+  /** Labels for selecting registries (lane, region, mirror role) */
+  labels?: unknown;
+  /** Message from the last failed provision/deprovision attempt (NULL when healthy) */
+  lastError?: string;
+  /** Freeform metadata (mirror-of pointer, rate limits, contact) */
+  metadata?: unknown;
+  /** Human-readable registry name (e.g. github-container-registry) */
+  name?: string;
+  /** Whether this registry is reserved for platform-internal use */
+  platformOnly?: boolean;
+  /** Role in this scope: source (the push target), cache (read-through mirror), external (pull only) */
+  role?: string;
+  /** Provisioning state (pending, provisioning, active, failed); rows the platform does not create are active on insert */
+  status?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `PlatformRegistryBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRegistryToManyPlatformRegistryBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformRegistryBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformRegistryBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformRegistryBindingFilter;
+}
+/** A filter to be used against many `PlatformRegistryGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRegistryToManyPlatformRegistryGrantFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformRegistryGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformRegistryGrantFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformRegistryGrantFilter;
+}
+/** A filter to be used against `PlatformRepositoryEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformRepositoryEventFilter[];
+  /** Filter by the object’s `commitSha` field. */
+  commitSha?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `deliveryId` field. */
+  deliveryId?: StringFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformRepositoryEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformRepositoryEventFilter[];
+  /** Filter by the object’s `payload` field. */
+  payload?: JSONFilter;
+  /** Filter by the object’s `platformBuildsByEventId` relation. */
+  platformBuildsByEventId?: PlatformRepositoryEventToManyPlatformBuildFilter;
+  /** `platformBuildsByEventId` exist. */
+  platformBuildsByEventIdExist?: boolean;
+  /** Filter by the object’s `ref` field. */
+  ref?: StringFilter;
+  /** Filter by the object’s `repository` relation. */
+  repository?: PlatformRepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformRepositoryEvent` */
+export interface PlatformRepositoryEventInput {
+  /** Authenticated actor behind the event (NULL when only the sending system was proven) */
+  actorId?: string;
+  /** Commit the ref points at after the event */
+  commitSha?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Provider delivery identifier, for redelivery dedupe (NULL for local hooks) */
+  deliveryId?: string;
+  /** What happened: push, tag, pr_open, pr_merge, proposal_comment, manual */
+  eventType: string;
+  id?: string;
+  /** Unverified provider detail (payload login, commit author, external URLs) */
+  metadata?: unknown;
+  /** Normalized event body the workflows read */
+  payload?: unknown;
+  /** Git ref the event concerns (refs/heads/main) */
+  ref?: string;
+  /** Repository this event happened to */
+  repositoryId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformRepositoryEvent`. Fields that are set will be updated. */
+export interface PlatformRepositoryEventPatch {
+  /** Authenticated actor behind the event (NULL when only the sending system was proven) */
+  actorId?: string;
+  /** Commit the ref points at after the event */
+  commitSha?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Provider delivery identifier, for redelivery dedupe (NULL for local hooks) */
+  deliveryId?: string;
+  /** What happened: push, tag, pr_open, pr_merge, proposal_comment, manual */
+  eventType?: string;
+  id?: string;
+  /** Unverified provider detail (payload login, commit author, external URLs) */
+  metadata?: unknown;
+  /** Normalized event body the workflows read */
+  payload?: unknown;
+  /** Git ref the event concerns (refs/heads/main) */
+  ref?: string;
+  /** Repository this event happened to */
+  repositoryId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `PlatformBuild` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryEventToManyPlatformBuildFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformBuildFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformBuildFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformBuildFilter;
+}
+/** A filter to be used against `PlatformRepository` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformRepositoryFilter[];
+  /** Filter by the object’s `cloneUrl` field. */
+  cloneUrl?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `defaultBranch` field. */
+  defaultBranch?: StringTrgmFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringTrgmFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `externalId` field. */
+  externalId?: StringTrgmFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringTrgmFilter;
+  /** Negates the expression. */
+  not?: PlatformRepositoryFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformRepositoryFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `platformBuildsByRepositoryId` relation. */
+  platformBuildsByRepositoryId?: PlatformRepositoryToManyPlatformBuildFilter;
+  /** `platformBuildsByRepositoryId` exist. */
+  platformBuildsByRepositoryIdExist?: boolean;
+  /** Filter by the object’s `platformProposalsByRepositoryId` relation. */
+  platformProposalsByRepositoryId?: PlatformRepositoryToManyPlatformProposalFilter;
+  /** `platformProposalsByRepositoryId` exist. */
+  platformProposalsByRepositoryIdExist?: boolean;
+  /** Filter by the object’s `platformRepositoryEventsByRepositoryId` relation. */
+  platformRepositoryEventsByRepositoryId?: PlatformRepositoryToManyPlatformRepositoryEventFilter;
+  /** `platformRepositoryEventsByRepositoryId` exist. */
+  platformRepositoryEventsByRepositoryIdExist?: boolean;
+  /** Filter by the object’s `platformRepositoryRequiredChecksByRepositoryId` relation. */
+  platformRepositoryRequiredChecksByRepositoryId?: PlatformRepositoryToManyPlatformRepositoryRequiredCheckFilter;
+  /** `platformRepositoryRequiredChecksByRepositoryId` exist. */
+  platformRepositoryRequiredChecksByRepositoryIdExist?: boolean;
+  /** Filter by the object’s `platformRepositoryWorkflowsByRepositoryId` relation. */
+  platformRepositoryWorkflowsByRepositoryId?: PlatformRepositoryToManyPlatformRepositoryWorkflowFilter;
+  /** `platformRepositoryWorkflowsByRepositoryId` exist. */
+  platformRepositoryWorkflowsByRepositoryIdExist?: boolean;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringTrgmFilter;
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringTrgmFilter;
+  /** TRGM search on the `clone_url` column. */
+  trgmCloneUrl?: TrgmSearchInput;
+  /** TRGM search on the `default_branch` column. */
+  trgmDefaultBranch?: TrgmSearchInput;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `external_id` column. */
+  trgmExternalId?: TrgmSearchInput;
+  /** TRGM search on the `name` column. */
+  trgmName?: TrgmSearchInput;
+  /** TRGM search on the `provider` column. */
+  trgmProvider?: TrgmSearchInput;
+  /** TRGM search on the `slug` column. */
+  trgmSlug?: TrgmSearchInput;
+  /** TRGM search on the `visibility` column. */
+  trgmVisibility?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringTrgmFilter;
+}
+/** An input for mutations affecting `PlatformRepository` */
+export interface PlatformRepositoryInput {
+  /** URL a workspace clones from (NULL until the repository is provisioned) */
+  cloneUrl?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Branch a clone checks out and a proposal targets by default */
+  defaultBranch?: string;
+  /** What this repository holds */
+  description?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  /** Identifier of this repository in the external provider (NULL for local) */
+  externalId?: string;
+  id?: string;
+  /** Whether this repository is retired: readable, not written to */
+  isArchived?: boolean;
+  /** Provider detail (installation id, topics, external URLs) */
+  metadata?: unknown;
+  /** Human-readable repository name */
+  name: string;
+  /** User who owns this repository */
+  ownerId?: string;
+  /** Where the repository lives: local (platform git server) or github */
+  provider?: string;
+  /** URL-safe identifier, unique within the owning scope */
+  slug: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+  /** Read reach: private (owner), internal (scope members), public (any authenticated actor) */
+  visibility?: string;
+}
+/** Represents an update to a `PlatformRepository`. Fields that are set will be updated. */
+export interface PlatformRepositoryPatch {
+  /** URL a workspace clones from (NULL until the repository is provisioned) */
+  cloneUrl?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Branch a clone checks out and a proposal targets by default */
+  defaultBranch?: string;
+  /** What this repository holds */
+  description?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  /** Identifier of this repository in the external provider (NULL for local) */
+  externalId?: string;
+  id?: string;
+  /** Whether this repository is retired: readable, not written to */
+  isArchived?: boolean;
+  /** Provider detail (installation id, topics, external URLs) */
+  metadata?: unknown;
+  /** Human-readable repository name */
+  name?: string;
+  /** User who owns this repository */
+  ownerId?: string;
+  /** Where the repository lives: local (platform git server) or github */
+  provider?: string;
+  /** URL-safe identifier, unique within the owning scope */
+  slug?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+  /** Read reach: private (owner), internal (scope members), public (any authenticated actor) */
+  visibility?: string;
+}
+/** A filter to be used against `PlatformRepositoryRequiredCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryRequiredCheckFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformRepositoryRequiredCheckFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformRepositoryRequiredCheckFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformRepositoryRequiredCheckFilter[];
+  /** Filter by the object’s `repository` relation. */
+  repository?: PlatformRepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `workflow` relation. */
+  workflow?: PlatformRepositoryWorkflowFilter;
+  /** Filter by the object’s `workflowId` field. */
+  workflowId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformRepositoryRequiredCheck` */
+export interface PlatformRepositoryRequiredCheckInput {
+  createdAt?: string;
+  id?: string;
+  /** Repository whose merge gate requires this workflow */
+  repositoryId: string;
+  updatedAt?: string;
+  /** Workflow identity required by this repository gate */
+  workflowId: string;
+}
+/** Represents an update to a `PlatformRepositoryRequiredCheck`. Fields that are set will be updated. */
+export interface PlatformRepositoryRequiredCheckPatch {
+  createdAt?: string;
+  id?: string;
+  /** Repository whose merge gate requires this workflow */
+  repositoryId?: string;
+  updatedAt?: string;
+  /** Workflow identity required by this repository gate */
+  workflowId?: string;
+}
+/** A filter to be used against many `PlatformBuild` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryToManyPlatformBuildFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformBuildFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformBuildFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformBuildFilter;
+}
+/** A filter to be used against many `PlatformProposal` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryToManyPlatformProposalFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformProposalFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformProposalFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformProposalFilter;
+}
+/** A filter to be used against many `PlatformRepositoryEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryToManyPlatformRepositoryEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformRepositoryEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformRepositoryEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformRepositoryEventFilter;
+}
+/** A filter to be used against many `PlatformRepositoryRequiredCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryToManyPlatformRepositoryRequiredCheckFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformRepositoryRequiredCheckFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformRepositoryRequiredCheckFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformRepositoryRequiredCheckFilter;
+}
+/** A filter to be used against many `PlatformRepositoryWorkflow` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryToManyPlatformRepositoryWorkflowFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformRepositoryWorkflowFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformRepositoryWorkflowFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformRepositoryWorkflowFilter;
+}
+/** A filter to be used against `PlatformRepositoryWorkflow` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryWorkflowFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformRepositoryWorkflowFilter[];
+  /** Filter by the object’s `cancelInProgress` field. */
+  cancelInProgress?: BooleanFilter;
+  /** Filter by the object’s `concurrencyKey` field. */
+  concurrencyKey?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `graph` relation. */
+  graph?: FunctionGraphFilter;
+  /** A related `graph` exists. */
+  graphExists?: boolean;
+  /** Filter by the object’s `graphId` field. */
+  graphId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `inputs` field. */
+  inputs?: JSONFilter;
+  /** Filter by the object’s `isEnabled` field. */
+  isEnabled?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformRepositoryWorkflowFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformRepositoryWorkflowFilter[];
+  /** Filter by the object’s `platformBuildsByWorkflowId` relation. */
+  platformBuildsByWorkflowId?: PlatformRepositoryWorkflowToManyPlatformBuildFilter;
+  /** `platformBuildsByWorkflowId` exist. */
+  platformBuildsByWorkflowIdExist?: boolean;
+  /** Filter by the object’s `platformRepositoryRequiredChecksByWorkflowId` relation. */
+  platformRepositoryRequiredChecksByWorkflowId?: PlatformRepositoryWorkflowToManyPlatformRepositoryRequiredCheckFilter;
+  /** `platformRepositoryRequiredChecksByWorkflowId` exist. */
+  platformRepositoryRequiredChecksByWorkflowIdExist?: boolean;
+  /** Filter by the object’s `refPattern` field. */
+  refPattern?: StringFilter;
+  /** Filter by the object’s `repository` relation. */
+  repository?: PlatformRepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `requiredSecrets` field. */
+  requiredSecrets?: StringListFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformRepositoryWorkflow` */
+export interface PlatformRepositoryWorkflowInput {
+  /** Whether a new build cancels a running build with the same concurrency key instead of queueing */
+  cancelInProgress?: boolean;
+  /** Builds of this workflow sharing this key run one at a time (NULL = unlimited) */
+  concurrencyKey?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Event type that fires this workflow */
+  eventType: string;
+  /** Flow graph to run when this workflow fires */
+  graphId?: string;
+  id?: string;
+  /** Static inputs merged into the graph run alongside the event */
+  inputs?: unknown;
+  /** Whether matching events fire this workflow */
+  isEnabled?: boolean;
+  /** Human-readable workflow name */
+  name: string;
+  /** Glob the event ref must match (NULL matches any ref) */
+  refPattern?: string;
+  /** Repository whose events this workflow listens to */
+  repositoryId: string;
+  /** Secret names this workflow's builds may resolve, intersected with the build lane's realm */
+  requiredSecrets?: string[];
+  /** URL-safe identifier, unique within the repository */
+  slug: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformRepositoryWorkflow`. Fields that are set will be updated. */
+export interface PlatformRepositoryWorkflowPatch {
+  /** Whether a new build cancels a running build with the same concurrency key instead of queueing */
+  cancelInProgress?: boolean;
+  /** Builds of this workflow sharing this key run one at a time (NULL = unlimited) */
+  concurrencyKey?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Event type that fires this workflow */
+  eventType?: string;
+  /** Flow graph to run when this workflow fires */
+  graphId?: string;
+  id?: string;
+  /** Static inputs merged into the graph run alongside the event */
+  inputs?: unknown;
+  /** Whether matching events fire this workflow */
+  isEnabled?: boolean;
+  /** Human-readable workflow name */
+  name?: string;
+  /** Glob the event ref must match (NULL matches any ref) */
+  refPattern?: string;
+  /** Repository whose events this workflow listens to */
+  repositoryId?: string;
+  /** Secret names this workflow's builds may resolve, intersected with the build lane's realm */
+  requiredSecrets?: string[];
+  /** URL-safe identifier, unique within the repository */
+  slug?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `PlatformBuild` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryWorkflowToManyPlatformBuildFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformBuildFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformBuildFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformBuildFilter;
+}
+/** A filter to be used against many `PlatformRepositoryRequiredCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformRepositoryWorkflowToManyPlatformRepositoryRequiredCheckFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformRepositoryRequiredCheckFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformRepositoryRequiredCheckFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformRepositoryRequiredCheckFilter;
+}
 /** A filter to be used against `PlatformResourceDeclaredCapacity` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformResourceDeclaredCapacityFilter {
   /** Checks for all expressions in this list. */
@@ -6697,6 +13092,8 @@ export interface PlatformResourceDeclaredCapacityFilter {
   sourceId?: UUIDFilter;
   /** Filter by the object’s `storageSizeBytes` field. */
   storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `storageTotalBytes` field. */
+  storageTotalBytes?: BigIntFilter;
 }
 /** A filter to be used against `PlatformResourceDefinition` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformResourceDefinitionFilter {
@@ -6708,6 +13105,8 @@ export interface PlatformResourceDefinitionFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `defaultSpec` field. */
   defaultSpec?: JSONFilter;
   /** Filter by the object’s `description` field. */
@@ -6744,6 +13143,8 @@ export interface PlatformResourceDefinitionFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `PlatformResourceDefinition` */
 export interface PlatformResourceDefinitionInput {
@@ -6751,6 +13152,7 @@ export interface PlatformResourceDefinitionInput {
   annotations?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Template spec for creating resource instances of this kind */
   defaultSpec?: unknown;
   /** What this resource definition provides */
@@ -6778,6 +13180,7 @@ export interface PlatformResourceDefinitionInput {
   stepUpMinAge?: IntervalInput;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `PlatformResourceDefinition`. Fields that are set will be updated. */
 export interface PlatformResourceDefinitionPatch {
@@ -6785,6 +13188,7 @@ export interface PlatformResourceDefinitionPatch {
   annotations?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Template spec for creating resource instances of this kind */
   defaultSpec?: unknown;
   /** What this resource definition provides */
@@ -6812,6 +13216,7 @@ export interface PlatformResourceDefinitionPatch {
   stepUpMinAge?: IntervalInput;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against many `PlatformResource` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformResourceDefinitionToManyPlatformResourceFilter {
@@ -6847,7 +13252,7 @@ export interface PlatformResourceEventFilter {
 }
 /** An input for mutations affecting `PlatformResourceEvent` */
 export interface PlatformResourceEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -6864,7 +13269,7 @@ export interface PlatformResourceEventInput {
 }
 /** Represents an update to a `PlatformResourceEvent`. Fields that are set will be updated. */
 export interface PlatformResourceEventPatch {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -6893,10 +13298,14 @@ export interface PlatformResourceFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `errorCount` field. */
   errorCount?: IntFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `imageRef` field. */
+  imageRef?: StringFilter;
   /** Filter by the object’s `installation` relation. */
   installation?: PlatformResourceInstallationFilter;
   /** A related `installation` exists. */
@@ -6953,10 +13362,14 @@ export interface PlatformResourceFilter {
   storageClass?: StringFilter;
   /** Filter by the object’s `storageSizeBytes` field. */
   storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `storageTotalBytes` field. */
+  storageTotalBytes?: BigIntFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `PlatformResource` */
 export interface PlatformResourceInput {
@@ -6964,9 +13377,12 @@ export interface PlatformResourceInput {
   annotations?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Cumulative error count for this resource */
   errorCount?: number;
   id?: string;
+  /** Pinned image reference this resource runs (registry host/repository:tag or @digest), written by promotion; NULL means spec.image decides */
+  imageRef?: string;
   /** Installation ("release") this resource belongs to (NULL for standalone resources) */
   installationId?: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
@@ -7001,6 +13417,7 @@ export interface PlatformResourceInput {
   statusObserved?: unknown;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against `PlatformResourceInstallation` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformResourceInstallationFilter {
@@ -7012,6 +13429,8 @@ export interface PlatformResourceInstallationFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `name` field. */
@@ -7026,6 +13445,10 @@ export interface PlatformResourceInstallationFilter {
   or?: PlatformResourceInstallationFilter[];
   /** Filter by the object’s `params` field. */
   params?: JSONFilter;
+  /** Filter by the object’s `platformRegistriesByInstallationId` relation. */
+  platformRegistriesByInstallationId?: PlatformResourceInstallationToManyPlatformRegistryFilter;
+  /** `platformRegistriesByInstallationId` exist. */
+  platformRegistriesByInstallationIdExist?: boolean;
   /** Filter by the object’s `platformResourcesByInstallationId` relation. */
   platformResourcesByInstallationId?: PlatformResourceInstallationToManyPlatformResourceFilter;
   /** `platformResourcesByInstallationId` exist. */
@@ -7042,6 +13465,8 @@ export interface PlatformResourceInstallationFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `PlatformResourceInstallation` */
 export interface PlatformResourceInstallationInput {
@@ -7049,6 +13474,7 @@ export interface PlatformResourceInstallationInput {
   commitId?: string;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   id?: string;
   /** Human-readable release name */
   name: string;
@@ -7066,6 +13492,7 @@ export interface PlatformResourceInstallationInput {
   storeId?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `PlatformResourceInstallation`. Fields that are set will be updated. */
 export interface PlatformResourceInstallationPatch {
@@ -7073,6 +13500,7 @@ export interface PlatformResourceInstallationPatch {
   commitId?: string;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   id?: string;
   /** Human-readable release name */
   name?: string;
@@ -7090,6 +13518,16 @@ export interface PlatformResourceInstallationPatch {
   storeId?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `PlatformRegistry` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceInstallationToManyPlatformRegistryFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformRegistryFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformRegistryFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformRegistryFilter;
 }
 /** A filter to be used against many `PlatformResource` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformResourceInstallationToManyPlatformResourceFilter {
@@ -7122,15 +13560,63 @@ export interface PlatformResourceInstallationsUpgradeInput {
   newParams?: unknown;
   targetInstallationId?: string;
 }
+/** A filter to be used against `PlatformResourceObservedStorage` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceObservedStorageFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceObservedStorageFilter[];
+  /** Filter by the object’s `capacity` field. */
+  capacity?: StringFilter;
+  /** Filter by the object’s `capacityBytes` field. */
+  capacityBytes?: BigIntFilter;
+  /** Filter by the object’s `claimName` field. */
+  claimName?: StringFilter;
+  /** Filter by the object’s `declaredStorageClass` field. */
+  declaredStorageClass?: StringFilter;
+  /** Filter by the object’s `declaredStorageSizeBytes` field. */
+  declaredStorageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `declaredStorageTotalBytes` field. */
+  declaredStorageTotalBytes?: BigIntFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `isBound` field. */
+  isBound?: BooleanFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceObservedStorageFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceObservedStorageFilter[];
+  /** Filter by the object’s `phase` field. */
+  phase?: StringFilter;
+  /** Filter by the object’s `requested` field. */
+  requested?: StringFilter;
+  /** Filter by the object’s `requestedBytes` field. */
+  requestedBytes?: BigIntFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `resourceStatus` field. */
+  resourceStatus?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `storageClass` field. */
+  storageClass?: StringFilter;
+  /** Filter by the object’s `storageName` field. */
+  storageName?: StringFilter;
+}
 /** Represents an update to a `PlatformResource`. Fields that are set will be updated. */
 export interface PlatformResourcePatch {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Cumulative error count for this resource */
   errorCount?: number;
   id?: string;
+  /** Pinned image reference this resource runs (registry host/repository:tag or @digest), written by promotion; NULL means spec.image decides */
+  imageRef?: string;
   /** Installation ("release") this resource belongs to (NULL for standalone resources) */
   installationId?: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
@@ -7165,6 +13651,7 @@ export interface PlatformResourcePatch {
   statusObserved?: unknown;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against `PlatformResourceStatusCheck` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformResourceStatusCheckFilter {
@@ -7433,10 +13920,14 @@ export interface PlatformResourcesHealthFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `errorCount` field. */
   errorCount?: IntFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `imageRef` field. */
+  imageRef?: StringFilter;
   /** Filter by the object’s `installationId` field. */
   installationId?: UUIDFilter;
   /** Filter by the object’s `integrations` field. */
@@ -7481,10 +13972,14 @@ export interface PlatformResourcesHealthFilter {
   storageClass?: StringFilter;
   /** Filter by the object’s `storageSizeBytes` field. */
   storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `storageTotalBytes` field. */
+  storageTotalBytes?: BigIntFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** A filter to be used against `PlatformResourcesRequirementsState` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformResourcesRequirementsStateFilter {
@@ -7550,6 +14045,8 @@ export interface PlatformWebhookEndpointFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `functionDefinition` relation. */
   functionDefinition?: PlatformFunctionDefinitionFilter;
   /** Filter by the object’s `functionDefinitionId` field. */
@@ -7582,6 +14079,8 @@ export interface PlatformWebhookEndpointFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `PlatformWebhookEndpoint` */
 export interface PlatformWebhookEndpointInput {
@@ -7589,6 +14088,7 @@ export interface PlatformWebhookEndpointInput {
   active?: boolean;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Same-scope function definition invoked on delivery. The function must list the webhook channel in access_channels. */
   functionDefinitionId: string;
   /** Inbound Host header this endpoint matches (normalized lower-case, no port) */
@@ -7606,6 +14106,7 @@ export interface PlatformWebhookEndpointInput {
   signingSecretName: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `PlatformWebhookEndpoint`. Fields that are set will be updated. */
 export interface PlatformWebhookEndpointPatch {
@@ -7613,6 +14114,7 @@ export interface PlatformWebhookEndpointPatch {
   active?: boolean;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Same-scope function definition invoked on delivery. The function must list the webhook channel in access_channels. */
   functionDefinitionId?: string;
   /** Inbound Host header this endpoint matches (normalized lower-case, no port) */
@@ -7630,6 +14132,7 @@ export interface PlatformWebhookEndpointPatch {
   signingSecretName?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against many `PlatformWebhookEvent` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformWebhookEndpointToManyPlatformWebhookEventFilter {
@@ -7723,6 +14226,764 @@ export interface PlatformWebhookEventPatch {
   status?: string;
   updatedAt?: string;
 }
+/** A filter to be used against `ProposalComment` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalCommentFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ProposalCommentFilter[];
+  /** Filter by the object’s `attachments` field. */
+  attachments?: ConstructiveInternalTypeUploadListFilter;
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `line` field. */
+  line?: IntFilter;
+  /** Negates the expression. */
+  not?: ProposalCommentFilter;
+  /** Checks for any expressions in this list. */
+  or?: ProposalCommentFilter[];
+  /** Filter by the object’s `outdatedAt` field. */
+  outdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `path` field. */
+  path?: StringTrgmFilter;
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: ProposalFilter;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `proposalReactionsByCommentId` relation. */
+  proposalReactionsByCommentId?: ProposalCommentToManyProposalReactionFilter;
+  /** `proposalReactionsByCommentId` exist. */
+  proposalReactionsByCommentIdExist?: boolean;
+  /** Filter by the object’s `resolvedAt` field. */
+  resolvedAt?: DatetimeFilter;
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `path` column. */
+  trgmPath?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `ProposalComment` */
+export interface ProposalCommentInput {
+  /** Actor who wrote the comment; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Files referenced by the comment body, in the order they were attached */
+  attachments?: ConstructiveInternalTypeUpload[];
+  /** Comment text */
+  body: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** Line within path the comment is anchored to */
+  line?: number;
+  /** When the anchored range this comment pointed at vanished from the diff */
+  outdatedAt?: string;
+  /** File the comment is anchored to (NULL for a comment on the proposal) */
+  path?: string;
+  /** Proposal being commented on */
+  proposalId: string;
+  /** When this comment was marked resolved */
+  resolvedAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `ProposalComment`. Fields that are set will be updated. */
+export interface ProposalCommentPatch {
+  /** Actor who wrote the comment; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Files referenced by the comment body, in the order they were attached */
+  attachments?: ConstructiveInternalTypeUpload[];
+  /** Comment text */
+  body?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** Line within path the comment is anchored to */
+  line?: number;
+  /** When the anchored range this comment pointed at vanished from the diff */
+  outdatedAt?: string;
+  /** File the comment is anchored to (NULL for a comment on the proposal) */
+  path?: string;
+  /** Proposal being commented on */
+  proposalId?: string;
+  /** When this comment was marked resolved */
+  resolvedAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `ProposalReaction` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalCommentToManyProposalReactionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ProposalReactionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProposalReactionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProposalReactionFilter;
+}
+/** A filter to be used against `ProposalFileView` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalFileViewFilter {
+  /** Checks for all expressions in this list. */
+  and?: ProposalFileViewFilter[];
+  /** Filter by the object’s `blobSha` field. */
+  blobSha?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ProposalFileViewFilter;
+  /** Checks for any expressions in this list. */
+  or?: ProposalFileViewFilter[];
+  /** Filter by the object’s `path` field. */
+  path?: StringFilter;
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: ProposalFilter;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `reviewerId` field. */
+  reviewerId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `viewedAt` field. */
+  viewedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `ProposalFileView` */
+export interface ProposalFileViewInput {
+  /** Blob the reviewer read, which is what makes the mark survive a rebase or go stale */
+  blobSha: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Path of the file as the diff named it */
+  path: string;
+  /** Proposal the file belongs to */
+  proposalId: string;
+  /** Actor who read the file */
+  reviewerId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** When the file was marked read */
+  viewedAt?: string;
+}
+/** Represents an update to a `ProposalFileView`. Fields that are set will be updated. */
+export interface ProposalFileViewPatch {
+  /** Blob the reviewer read, which is what makes the mark survive a rebase or go stale */
+  blobSha?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** Path of the file as the diff named it */
+  path?: string;
+  /** Proposal the file belongs to */
+  proposalId?: string;
+  /** Actor who read the file */
+  reviewerId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** When the file was marked read */
+  viewedAt?: string;
+}
+/** A filter to be used against `Proposal` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ProposalFilter[];
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `builds` relation. */
+  builds?: ProposalToManyBuildFilter;
+  /** `builds` exist. */
+  buildsExist?: boolean;
+  /** Filter by the object’s `childProposals` relation. */
+  childProposals?: ProposalToManyProposalFilter;
+  /** `childProposals` exist. */
+  childProposalsExist?: boolean;
+  /** Filter by the object’s `closedReason` field. */
+  closedReason?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `decidedAt` field. */
+  decidedAt?: DatetimeFilter;
+  /** Filter by the object’s `dueAt` field. */
+  dueAt?: DatetimeFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringTrgmFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: StringListFilter;
+  /** Filter by the object’s `mergeCommit` field. */
+  mergeCommit?: StringTrgmFilter;
+  /** Filter by the object’s `mergeMethod` field. */
+  mergeMethod?: StringTrgmFilter;
+  /** Filter by the object’s `mergeRequestedAt` field. */
+  mergeRequestedAt?: DatetimeFilter;
+  /** Filter by the object’s `mergedAt` field. */
+  mergedAt?: DatetimeFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: ProposalFilter;
+  /** Checks for any expressions in this list. */
+  or?: ProposalFilter[];
+  /** Filter by the object’s `parent` relation. */
+  parent?: ProposalFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `priority` field. */
+  priority?: BigFloatFilter;
+  /** Filter by the object’s `proposalComments` relation. */
+  proposalComments?: ProposalToManyProposalCommentFilter;
+  /** `proposalComments` exist. */
+  proposalCommentsExist?: boolean;
+  /** Filter by the object’s `proposalFileViews` relation. */
+  proposalFileViews?: ProposalToManyProposalFileViewFilter;
+  /** `proposalFileViews` exist. */
+  proposalFileViewsExist?: boolean;
+  /** Filter by the object’s `proposalReactions` relation. */
+  proposalReactions?: ProposalToManyProposalReactionFilter;
+  /** `proposalReactions` exist. */
+  proposalReactionsExist?: boolean;
+  /** Filter by the object’s `proposalReviews` relation. */
+  proposalReviews?: ProposalToManyProposalReviewFilter;
+  /** `proposalReviews` exist. */
+  proposalReviewsExist?: boolean;
+  /** Filter by the object’s `proposalsChunksByProposalsId` relation. */
+  proposalsChunksByProposalsId?: ProposalToManyProposalsChunkFilter;
+  /** `proposalsChunksByProposalsId` exist. */
+  proposalsChunksByProposalsIdExist?: boolean;
+  /** Filter by the object’s `repository` relation. */
+  repository?: RepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `resolution` field. */
+  resolution?: StringTrgmFilter;
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `sourceRef` field. */
+  sourceRef?: StringTrgmFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringTrgmFilter;
+  /** Filter by the object’s `targetRef` field. */
+  targetRef?: StringTrgmFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringTrgmFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `closed_reason` column. */
+  trgmClosedReason?: TrgmSearchInput;
+  /** TRGM search on the `kind` column. */
+  trgmKind?: TrgmSearchInput;
+  /** TRGM search on the `merge_commit` column. */
+  trgmMergeCommit?: TrgmSearchInput;
+  /** TRGM search on the `merge_method` column. */
+  trgmMergeMethod?: TrgmSearchInput;
+  /** TRGM search on the `resolution` column. */
+  trgmResolution?: TrgmSearchInput;
+  /** TRGM search on the `source_ref` column. */
+  trgmSourceRef?: TrgmSearchInput;
+  /** TRGM search on the `status` column. */
+  trgmStatus?: TrgmSearchInput;
+  /** TRGM search on the `target_ref` column. */
+  trgmTargetRef?: TrgmSearchInput;
+  /** TRGM search on the `title` column. */
+  trgmTitle?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `Proposal` */
+export interface ProposalInput {
+  /** Actor who opened the proposal; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Description of the proposed change */
+  body?: string;
+  /** Why this was closed: completed, not_planned, duplicate, superseded */
+  closedReason?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** When the decision was taken (NULL while the question is open) */
+  decidedAt?: string;
+  /** When this is wanted by (NULL when nothing is promised) */
+  dueAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** issue (a report or plan), change (merge one ref into another), discussion (an open question), decision (a question answered) */
+  kind?: string;
+  /** Labels for filtering and grouping (a board is a query over kind, status and these) */
+  labels?: string[];
+  /** Commit the merge produced */
+  mergeCommit?: string;
+  /** How to merge when eligible: merge, squash, rebase */
+  mergeMethod?: string;
+  /** When merge-when-green was requested (NULL when no merge is pending) */
+  mergeRequestedAt?: string;
+  /** When the merge completed */
+  mergedAt?: string;
+  /** Review detail (reviewers, labels, checks summary) */
+  metadata?: unknown;
+  /** Proposal this one hangs under: an epic, or the discussion a decision came out of */
+  parentId?: string;
+  /** Manual order within a board column, sparse so an insert between two rows moves one row (NULL when unranked) */
+  priority?: string;
+  /** Repository this proposal is against */
+  repositoryId: string;
+  /** What was decided (for kind = decision; NULL while the question is open) */
+  resolution?: string;
+  /** Ref holding the proposed commits (NULL unless kind is change) */
+  sourceRef?: string;
+  /** Lifecycle state: draft, open, merged, closed */
+  status?: string;
+  /** Ref the commits are proposed for (NULL unless kind is change) */
+  targetRef?: string;
+  /** What this proposal does */
+  title: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `Proposal`. Fields that are set will be updated. */
+export interface ProposalPatch {
+  /** Actor who opened the proposal; NULL only when no human actor was proven */
+  actorId?: string;
+  /** Description of the proposed change */
+  body?: string;
+  /** Why this was closed: completed, not_planned, duplicate, superseded */
+  closedReason?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** When the decision was taken (NULL while the question is open) */
+  decidedAt?: string;
+  /** When this is wanted by (NULL when nothing is promised) */
+  dueAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** issue (a report or plan), change (merge one ref into another), discussion (an open question), decision (a question answered) */
+  kind?: string;
+  /** Labels for filtering and grouping (a board is a query over kind, status and these) */
+  labels?: string[];
+  /** Commit the merge produced */
+  mergeCommit?: string;
+  /** How to merge when eligible: merge, squash, rebase */
+  mergeMethod?: string;
+  /** When merge-when-green was requested (NULL when no merge is pending) */
+  mergeRequestedAt?: string;
+  /** When the merge completed */
+  mergedAt?: string;
+  /** Review detail (reviewers, labels, checks summary) */
+  metadata?: unknown;
+  /** Proposal this one hangs under: an epic, or the discussion a decision came out of */
+  parentId?: string;
+  /** Manual order within a board column, sparse so an insert between two rows moves one row (NULL when unranked) */
+  priority?: string;
+  /** Repository this proposal is against */
+  repositoryId?: string;
+  /** What was decided (for kind = decision; NULL while the question is open) */
+  resolution?: string;
+  /** Ref holding the proposed commits (NULL unless kind is change) */
+  sourceRef?: string;
+  /** Lifecycle state: draft, open, merged, closed */
+  status?: string;
+  /** Ref the commits are proposed for (NULL unless kind is change) */
+  targetRef?: string;
+  /** What this proposal does */
+  title?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against `ProposalReaction` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalReactionFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ProposalReactionFilter[];
+  /** Filter by the object’s `comment` relation. */
+  comment?: ProposalCommentFilter;
+  /** A related `comment` exists. */
+  commentExists?: boolean;
+  /** Filter by the object’s `commentId` field. */
+  commentId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `emoji` field. */
+  emoji?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ProposalReactionFilter;
+  /** Checks for any expressions in this list. */
+  or?: ProposalReactionFilter[];
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: ProposalFilter;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `ProposalReaction` */
+export interface ProposalReactionInput {
+  /** Actor who reacted */
+  actorId: string;
+  /** Comment being reacted to (NULL for a reaction to the proposal itself) */
+  commentId?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Reaction shortcode (+1, eyes, rocket) */
+  emoji: string;
+  id?: string;
+  /** Proposal the reaction belongs to */
+  proposalId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `ProposalReaction`. Fields that are set will be updated. */
+export interface ProposalReactionPatch {
+  /** Actor who reacted */
+  actorId?: string;
+  /** Comment being reacted to (NULL for a reaction to the proposal itself) */
+  commentId?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Reaction shortcode (+1, eyes, rocket) */
+  emoji?: string;
+  id?: string;
+  /** Proposal the reaction belongs to */
+  proposalId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against `ProposalReview` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalReviewFilter {
+  /** Checks for all expressions in this list. */
+  and?: ProposalReviewFilter[];
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `commitSha` field. */
+  commitSha?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ProposalReviewFilter;
+  /** Checks for any expressions in this list. */
+  or?: ProposalReviewFilter[];
+  /** Filter by the object’s `proposal` relation. */
+  proposal?: ProposalFilter;
+  /** Filter by the object’s `proposalId` field. */
+  proposalId?: UUIDFilter;
+  /** Filter by the object’s `reviewerId` field. */
+  reviewerId?: UUIDFilter;
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `submittedAt` field. */
+  submittedAt?: DatetimeFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `commit_sha` column. */
+  trgmCommitSha?: TrgmSearchInput;
+  /** TRGM search on the `verdict` column. */
+  trgmVerdict?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `verdict` field. */
+  verdict?: StringTrgmFilter;
+}
+/** An input for mutations affecting `ProposalReview` */
+export interface ProposalReviewInput {
+  /** Summary the reviewer submitted with the verdict */
+  body?: string;
+  /** Head commit this verdict was submitted against */
+  commitSha: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Proposal being reviewed */
+  proposalId: string;
+  /** Actor who submitted the verdict */
+  reviewerId: string;
+  /** When the verdict was submitted */
+  submittedAt?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** approve, reject or comment (a review that gates nothing) */
+  verdict: string;
+}
+/** Represents an update to a `ProposalReview`. Fields that are set will be updated. */
+export interface ProposalReviewPatch {
+  /** Summary the reviewer submitted with the verdict */
+  body?: string;
+  /** Head commit this verdict was submitted against */
+  commitSha?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** Proposal being reviewed */
+  proposalId?: string;
+  /** Actor who submitted the verdict */
+  reviewerId?: string;
+  /** When the verdict was submitted */
+  submittedAt?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** approve, reject or comment (a review that gates nothing) */
+  verdict?: string;
+}
+/** A filter to be used against many `Build` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalToManyBuildFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: BuildFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BuildFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: BuildFilter;
+}
+/** A filter to be used against many `ProposalComment` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalToManyProposalCommentFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ProposalCommentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProposalCommentFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProposalCommentFilter;
+}
+/** A filter to be used against many `ProposalFileView` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalToManyProposalFileViewFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ProposalFileViewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProposalFileViewFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProposalFileViewFilter;
+}
+/** A filter to be used against many `Proposal` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalToManyProposalFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ProposalFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProposalFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProposalFilter;
+}
+/** A filter to be used against many `ProposalReaction` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalToManyProposalReactionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ProposalReactionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProposalReactionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProposalReactionFilter;
+}
+/** A filter to be used against many `ProposalReview` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalToManyProposalReviewFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ProposalReviewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProposalReviewFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProposalReviewFilter;
+}
+/** A filter to be used against many `ProposalsChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalToManyProposalsChunkFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ProposalsChunkFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProposalsChunkFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProposalsChunkFilter;
+}
+/** A filter to be used against `ProposalsChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface ProposalsChunkFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ProposalsChunkFilter[];
+  /** Filter by the object’s `body` field. */
+  body?: StringFilter;
+  /** Filter by the object’s `chunkIndex` field. */
+  chunkIndex?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: ProposalsChunkFilter;
+  /** Checks for any expressions in this list. */
+  or?: ProposalsChunkFilter[];
+  /** Filter by the object’s `proposals` relation. */
+  proposals?: ProposalFilter;
+  /** Filter by the object’s `proposalsId` field. */
+  proposalsId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `ProposalsChunk` */
+export interface ProposalsChunkInput {
+  /** Policy-required field derived from source table (used by AuthzComposite) */
+  actorId?: string;
+  body: string;
+  chunkIndex?: number;
+  createdAt?: string;
+  /** Policy-required field derived from source table (used by AuthzRelatedEntityMembership) */
+  databaseId?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  metadata?: unknown;
+  proposalsId: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `ProposalsChunk`. Fields that are set will be updated. */
+export interface ProposalsChunkPatch {
+  /** Policy-required field derived from source table (used by AuthzComposite) */
+  actorId?: string;
+  body?: string;
+  chunkIndex?: number;
+  createdAt?: string;
+  /** Policy-required field derived from source table (used by AuthzRelatedEntityMembership) */
+  databaseId?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  metadata?: unknown;
+  proposalsId?: string;
+  updatedAt?: string;
+}
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
   bucketKey: string;
@@ -7731,6 +14992,861 @@ export interface ProvisionBucketInput {
    * Omit for app-level (database-wide) storage.
    */
   ownerId?: string;
+}
+/** A filter to be used against `RegistryBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface RegistryBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: RegistryBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: RegistryBindingFilter;
+  /** Filter by the object’s `observedCredentialVersion` field. */
+  observedCredentialVersion?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: RegistryBindingFilter[];
+  /** Filter by the object’s `pullSecretName` field. */
+  pullSecretName?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `registry` relation. */
+  registry?: RegistryFilter;
+  /** Filter by the object’s `registryHost` field. */
+  registryHost?: StringFilter;
+  /** Filter by the object’s `registryId` field. */
+  registryId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `RegistryBinding` */
+export interface RegistryBindingInput {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Reconciler detail (last error, projection timestamps) */
+  metadata?: unknown;
+  /** Namespace the registry credentials are projected into */
+  namespaceId: string;
+  /** Registry credential version last projected into the namespace (NULL = never projected) */
+  observedCredentialVersion?: string;
+  /** Name of the image pull secret the reconciler writes into the namespace */
+  pullSecretName?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Registry host this binding's credentials authenticate to (what kubelet matches image references against) */
+  registryHost: string;
+  /** Registry endpoint (in this scope's registry catalog) the namespace pulls from */
+  registryId: string;
+  /** Projection state of the pull secret: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `RegistryBinding`. Fields that are set will be updated. */
+export interface RegistryBindingPatch {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** Reconciler detail (last error, projection timestamps) */
+  metadata?: unknown;
+  /** Namespace the registry credentials are projected into */
+  namespaceId?: string;
+  /** Registry credential version last projected into the namespace (NULL = never projected) */
+  observedCredentialVersion?: string;
+  /** Name of the image pull secret the reconciler writes into the namespace */
+  pullSecretName?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Registry host this binding's credentials authenticate to (what kubelet matches image references against) */
+  registryHost?: string;
+  /** Registry endpoint (in this scope's registry catalog) the namespace pulls from */
+  registryId?: string;
+  /** Projection state of the pull secret: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against `Registry` object types. All fields are combined with a logical ‘and.’ */
+export interface RegistryFilter {
+  /** Checks for all expressions in this list. */
+  and?: RegistryFilter[];
+  /** Filter by the object’s `authMode` field. */
+  authMode?: StringFilter;
+  /** Filter by the object’s `basePath` field. */
+  basePath?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `credentialSecretName` field. */
+  credentialSecretName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `host` field. */
+  host?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installation` relation. */
+  installation?: ResourceInstallationFilter;
+  /** A related `installation` exists. */
+  installationExists?: boolean;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: RegistryFilter;
+  /** Checks for any expressions in this list. */
+  or?: RegistryFilter[];
+  /** Filter by the object’s `platformOnly` field. */
+  platformOnly?: BooleanFilter;
+  /** Filter by the object’s `registryBindings` relation. */
+  registryBindings?: RegistryToManyRegistryBindingFilter;
+  /** `registryBindings` exist. */
+  registryBindingsExist?: boolean;
+  /** Filter by the object’s `registryGrants` relation. */
+  registryGrants?: RegistryToManyRegistryGrantFilter;
+  /** `registryGrants` exist. */
+  registryGrantsExist?: boolean;
+  /** Filter by the object’s `role` field. */
+  role?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** A filter to be used against `RegistryGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface RegistryGrantFilter {
+  /** Filter by the object’s `actions` field. */
+  actions?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: RegistryGrantFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `grantedBy` field. */
+  grantedBy?: UUIDFilter;
+  /** Filter by the object’s `granteeKey` field. */
+  granteeKey?: UUIDFilter;
+  /** Filter by the object’s `granteeScope` field. */
+  granteeScope?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: RegistryGrantFilter;
+  /** Checks for any expressions in this list. */
+  or?: RegistryGrantFilter[];
+  /** Filter by the object’s `registry` relation. */
+  registry?: RegistryFilter;
+  /** Filter by the object’s `registryId` field. */
+  registryId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `RegistryGrant` */
+export interface RegistryGrantInput {
+  /** Endpoint actions this grant allows (read, write) */
+  actions?: string[];
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** When this grant stops applying (NULL never expires) */
+  expiresAt?: string;
+  /** User who issued this grant */
+  grantedBy?: string;
+  /** Scope key of the grantee (a database_id or an entity_id) */
+  granteeKey: string;
+  /** Scope tier of the grantee (database, org, app, platform) */
+  granteeScope: string;
+  id?: string;
+  /** Registry this grant applies to */
+  registryId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `RegistryGrant`. Fields that are set will be updated. */
+export interface RegistryGrantPatch {
+  /** Endpoint actions this grant allows (read, write) */
+  actions?: string[];
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** When this grant stops applying (NULL never expires) */
+  expiresAt?: string;
+  /** User who issued this grant */
+  grantedBy?: string;
+  /** Scope key of the grantee (a database_id or an entity_id) */
+  granteeKey?: string;
+  /** Scope tier of the grantee (database, org, app, platform) */
+  granteeScope?: string;
+  id?: string;
+  /** Registry this grant applies to */
+  registryId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** An input for mutations affecting `Registry` */
+export interface RegistryInput {
+  /** How a client authenticates to this registry (none, basic, token) */
+  authMode?: string;
+  /** Path prefix within the host (npm scope, OCI project); NULL = the host root */
+  basePath?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Name of the infra secret carrying this registry's credential (NULL when auth_mode = none) */
+  credentialSecretName?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Registry host, without a scheme (e.g. ghcr.io, registry.npmjs.org); required unless role is source, where it is the optional requested host and is stamped with the provisioned one */
+  host?: string;
+  id?: string;
+  /** Resource installation running this registry (NULL for an external registry) */
+  installationId?: string;
+  /** Whether this registry is published for use by any scope */
+  isPublished?: boolean;
+  /** Artifact ecosystem this registry serves (oci, npm) */
+  kind: string;
+  /** Labels for selecting registries (lane, region, mirror role) */
+  labels?: unknown;
+  /** Message from the last failed provision/deprovision attempt (NULL when healthy) */
+  lastError?: string;
+  /** Freeform metadata (mirror-of pointer, rate limits, contact) */
+  metadata?: unknown;
+  /** Human-readable registry name (e.g. github-container-registry) */
+  name: string;
+  /** Whether this registry is reserved for platform-internal use */
+  platformOnly?: boolean;
+  /** Role in this scope: source (the push target), cache (read-through mirror), external (pull only) */
+  role?: string;
+  /** Provisioning state (pending, provisioning, active, failed); rows the platform does not create are active on insert */
+  status?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `Registry`. Fields that are set will be updated. */
+export interface RegistryPatch {
+  /** How a client authenticates to this registry (none, basic, token) */
+  authMode?: string;
+  /** Path prefix within the host (npm scope, OCI project); NULL = the host root */
+  basePath?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Name of the infra secret carrying this registry's credential (NULL when auth_mode = none) */
+  credentialSecretName?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Registry host, without a scheme (e.g. ghcr.io, registry.npmjs.org); required unless role is source, where it is the optional requested host and is stamped with the provisioned one */
+  host?: string;
+  id?: string;
+  /** Resource installation running this registry (NULL for an external registry) */
+  installationId?: string;
+  /** Whether this registry is published for use by any scope */
+  isPublished?: boolean;
+  /** Artifact ecosystem this registry serves (oci, npm) */
+  kind?: string;
+  /** Labels for selecting registries (lane, region, mirror role) */
+  labels?: unknown;
+  /** Message from the last failed provision/deprovision attempt (NULL when healthy) */
+  lastError?: string;
+  /** Freeform metadata (mirror-of pointer, rate limits, contact) */
+  metadata?: unknown;
+  /** Human-readable registry name (e.g. github-container-registry) */
+  name?: string;
+  /** Whether this registry is reserved for platform-internal use */
+  platformOnly?: boolean;
+  /** Role in this scope: source (the push target), cache (read-through mirror), external (pull only) */
+  role?: string;
+  /** Provisioning state (pending, provisioning, active, failed); rows the platform does not create are active on insert */
+  status?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `RegistryBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface RegistryToManyRegistryBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RegistryBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RegistryBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RegistryBindingFilter;
+}
+/** A filter to be used against many `RegistryGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface RegistryToManyRegistryGrantFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RegistryGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RegistryGrantFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RegistryGrantFilter;
+}
+/** A filter to be used against `RepositoryEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: RepositoryEventFilter[];
+  /** Filter by the object’s `buildsByEventId` relation. */
+  buildsByEventId?: RepositoryEventToManyBuildFilter;
+  /** `buildsByEventId` exist. */
+  buildsByEventIdExist?: boolean;
+  /** Filter by the object’s `commitSha` field. */
+  commitSha?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `deliveryId` field. */
+  deliveryId?: StringFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: RepositoryEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: RepositoryEventFilter[];
+  /** Filter by the object’s `payload` field. */
+  payload?: JSONFilter;
+  /** Filter by the object’s `ref` field. */
+  ref?: StringFilter;
+  /** Filter by the object’s `repository` relation. */
+  repository?: RepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `RepositoryEvent` */
+export interface RepositoryEventInput {
+  /** Authenticated actor behind the event (NULL when only the sending system was proven) */
+  actorId?: string;
+  /** Commit the ref points at after the event */
+  commitSha?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Provider delivery identifier, for redelivery dedupe (NULL for local hooks) */
+  deliveryId?: string;
+  /** What happened: push, tag, pr_open, pr_merge, proposal_comment, manual */
+  eventType: string;
+  id?: string;
+  /** Unverified provider detail (payload login, commit author, external URLs) */
+  metadata?: unknown;
+  /** Normalized event body the workflows read */
+  payload?: unknown;
+  /** Git ref the event concerns (refs/heads/main) */
+  ref?: string;
+  /** Repository this event happened to */
+  repositoryId: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `RepositoryEvent`. Fields that are set will be updated. */
+export interface RepositoryEventPatch {
+  /** Authenticated actor behind the event (NULL when only the sending system was proven) */
+  actorId?: string;
+  /** Commit the ref points at after the event */
+  commitSha?: string;
+  createdAt?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Provider delivery identifier, for redelivery dedupe (NULL for local hooks) */
+  deliveryId?: string;
+  /** What happened: push, tag, pr_open, pr_merge, proposal_comment, manual */
+  eventType?: string;
+  id?: string;
+  /** Unverified provider detail (payload login, commit author, external URLs) */
+  metadata?: unknown;
+  /** Normalized event body the workflows read */
+  payload?: unknown;
+  /** Git ref the event concerns (refs/heads/main) */
+  ref?: string;
+  /** Repository this event happened to */
+  repositoryId?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `Build` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryEventToManyBuildFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: BuildFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BuildFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: BuildFilter;
+}
+/** A filter to be used against `Repository` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryFilter {
+  /** Checks for all expressions in this list. */
+  and?: RepositoryFilter[];
+  /** Filter by the object’s `builds` relation. */
+  builds?: RepositoryToManyBuildFilter;
+  /** `builds` exist. */
+  buildsExist?: boolean;
+  /** Filter by the object’s `cloneUrl` field. */
+  cloneUrl?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultBranch` field. */
+  defaultBranch?: StringTrgmFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringTrgmFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `externalId` field. */
+  externalId?: StringTrgmFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringTrgmFilter;
+  /** Negates the expression. */
+  not?: RepositoryFilter;
+  /** Checks for any expressions in this list. */
+  or?: RepositoryFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `proposals` relation. */
+  proposals?: RepositoryToManyProposalFilter;
+  /** `proposals` exist. */
+  proposalsExist?: boolean;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringTrgmFilter;
+  /** Filter by the object’s `repositoryEvents` relation. */
+  repositoryEvents?: RepositoryToManyRepositoryEventFilter;
+  /** `repositoryEvents` exist. */
+  repositoryEventsExist?: boolean;
+  /** Filter by the object’s `repositoryRequiredChecks` relation. */
+  repositoryRequiredChecks?: RepositoryToManyRepositoryRequiredCheckFilter;
+  /** `repositoryRequiredChecks` exist. */
+  repositoryRequiredChecksExist?: boolean;
+  /** Filter by the object’s `repositoryWorkflows` relation. */
+  repositoryWorkflows?: RepositoryToManyRepositoryWorkflowFilter;
+  /** `repositoryWorkflows` exist. */
+  repositoryWorkflowsExist?: boolean;
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringTrgmFilter;
+  /** TRGM search on the `clone_url` column. */
+  trgmCloneUrl?: TrgmSearchInput;
+  /** TRGM search on the `default_branch` column. */
+  trgmDefaultBranch?: TrgmSearchInput;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `external_id` column. */
+  trgmExternalId?: TrgmSearchInput;
+  /** TRGM search on the `name` column. */
+  trgmName?: TrgmSearchInput;
+  /** TRGM search on the `provider` column. */
+  trgmProvider?: TrgmSearchInput;
+  /** TRGM search on the `slug` column. */
+  trgmSlug?: TrgmSearchInput;
+  /** TRGM search on the `visibility` column. */
+  trgmVisibility?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringTrgmFilter;
+}
+/** An input for mutations affecting `Repository` */
+export interface RepositoryInput {
+  /** URL a workspace clones from (NULL until the repository is provisioned) */
+  cloneUrl?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Branch a clone checks out and a proposal targets by default */
+  defaultBranch?: string;
+  /** What this repository holds */
+  description?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  /** Identifier of this repository in the external provider (NULL for local) */
+  externalId?: string;
+  id?: string;
+  /** Whether this repository is retired: readable, not written to */
+  isArchived?: boolean;
+  /** Provider detail (installation id, topics, external URLs) */
+  metadata?: unknown;
+  /** Human-readable repository name */
+  name: string;
+  /** User who owns this repository */
+  ownerId?: string;
+  /** Where the repository lives: local (platform git server) or github */
+  provider?: string;
+  /** URL-safe identifier, unique within the owning scope */
+  slug: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+  /** Read reach: private (owner), internal (scope members), public (any authenticated actor) */
+  visibility?: string;
+}
+/** Represents an update to a `Repository`. Fields that are set will be updated. */
+export interface RepositoryPatch {
+  /** URL a workspace clones from (NULL until the repository is provisioned) */
+  cloneUrl?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Branch a clone checks out and a proposal targets by default */
+  defaultBranch?: string;
+  /** What this repository holds */
+  description?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  /** Identifier of this repository in the external provider (NULL for local) */
+  externalId?: string;
+  id?: string;
+  /** Whether this repository is retired: readable, not written to */
+  isArchived?: boolean;
+  /** Provider detail (installation id, topics, external URLs) */
+  metadata?: unknown;
+  /** Human-readable repository name */
+  name?: string;
+  /** User who owns this repository */
+  ownerId?: string;
+  /** Where the repository lives: local (platform git server) or github */
+  provider?: string;
+  /** URL-safe identifier, unique within the owning scope */
+  slug?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+  /** Read reach: private (owner), internal (scope members), public (any authenticated actor) */
+  visibility?: string;
+}
+/** A filter to be used against `RepositoryRequiredCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryRequiredCheckFilter {
+  /** Checks for all expressions in this list. */
+  and?: RepositoryRequiredCheckFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: RepositoryRequiredCheckFilter;
+  /** Checks for any expressions in this list. */
+  or?: RepositoryRequiredCheckFilter[];
+  /** Filter by the object’s `repository` relation. */
+  repository?: RepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `workflow` relation. */
+  workflow?: RepositoryWorkflowFilter;
+  /** Filter by the object’s `workflowId` field. */
+  workflowId?: UUIDFilter;
+}
+/** An input for mutations affecting `RepositoryRequiredCheck` */
+export interface RepositoryRequiredCheckInput {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Repository whose merge gate requires this workflow */
+  repositoryId: string;
+  updatedAt?: string;
+  /** Workflow identity required by this repository gate */
+  workflowId: string;
+}
+/** Represents an update to a `RepositoryRequiredCheck`. Fields that are set will be updated. */
+export interface RepositoryRequiredCheckPatch {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** Repository whose merge gate requires this workflow */
+  repositoryId?: string;
+  updatedAt?: string;
+  /** Workflow identity required by this repository gate */
+  workflowId?: string;
+}
+/** A filter to be used against many `Build` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryToManyBuildFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: BuildFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BuildFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: BuildFilter;
+}
+/** A filter to be used against many `Proposal` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryToManyProposalFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ProposalFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProposalFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProposalFilter;
+}
+/** A filter to be used against many `RepositoryEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryToManyRepositoryEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RepositoryEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RepositoryEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RepositoryEventFilter;
+}
+/** A filter to be used against many `RepositoryRequiredCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryToManyRepositoryRequiredCheckFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RepositoryRequiredCheckFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RepositoryRequiredCheckFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RepositoryRequiredCheckFilter;
+}
+/** A filter to be used against many `RepositoryWorkflow` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryToManyRepositoryWorkflowFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RepositoryWorkflowFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RepositoryWorkflowFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RepositoryWorkflowFilter;
+}
+/** A filter to be used against `RepositoryWorkflow` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryWorkflowFilter {
+  /** Checks for all expressions in this list. */
+  and?: RepositoryWorkflowFilter[];
+  /** Filter by the object’s `buildsByWorkflowId` relation. */
+  buildsByWorkflowId?: RepositoryWorkflowToManyBuildFilter;
+  /** `buildsByWorkflowId` exist. */
+  buildsByWorkflowIdExist?: boolean;
+  /** Filter by the object’s `cancelInProgress` field. */
+  cancelInProgress?: BooleanFilter;
+  /** Filter by the object’s `concurrencyKey` field. */
+  concurrencyKey?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `graph` relation. */
+  graph?: DatabaseFunctionGraphFilter;
+  /** A related `graph` exists. */
+  graphExists?: boolean;
+  /** Filter by the object’s `graphId` field. */
+  graphId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `inputs` field. */
+  inputs?: JSONFilter;
+  /** Filter by the object’s `isEnabled` field. */
+  isEnabled?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: RepositoryWorkflowFilter;
+  /** Checks for any expressions in this list. */
+  or?: RepositoryWorkflowFilter[];
+  /** Filter by the object’s `refPattern` field. */
+  refPattern?: StringFilter;
+  /** Filter by the object’s `repository` relation. */
+  repository?: RepositoryFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `repositoryRequiredChecksByWorkflowId` relation. */
+  repositoryRequiredChecksByWorkflowId?: RepositoryWorkflowToManyRepositoryRequiredCheckFilter;
+  /** `repositoryRequiredChecksByWorkflowId` exist. */
+  repositoryRequiredChecksByWorkflowIdExist?: boolean;
+  /** Filter by the object’s `requiredSecrets` field. */
+  requiredSecrets?: StringListFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `RepositoryWorkflow` */
+export interface RepositoryWorkflowInput {
+  /** Whether a new build cancels a running build with the same concurrency key instead of queueing */
+  cancelInProgress?: boolean;
+  /** Builds of this workflow sharing this key run one at a time (NULL = unlimited) */
+  concurrencyKey?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Event type that fires this workflow */
+  eventType: string;
+  /** Flow graph to run when this workflow fires */
+  graphId?: string;
+  id?: string;
+  /** Static inputs merged into the graph run alongside the event */
+  inputs?: unknown;
+  /** Whether matching events fire this workflow */
+  isEnabled?: boolean;
+  /** Human-readable workflow name */
+  name: string;
+  /** Glob the event ref must match (NULL matches any ref) */
+  refPattern?: string;
+  /** Repository whose events this workflow listens to */
+  repositoryId: string;
+  /** Secret names this workflow's builds may resolve, intersected with the build lane's realm */
+  requiredSecrets?: string[];
+  /** URL-safe identifier, unique within the repository */
+  slug: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `RepositoryWorkflow`. Fields that are set will be updated. */
+export interface RepositoryWorkflowPatch {
+  /** Whether a new build cancels a running build with the same concurrency key instead of queueing */
+  cancelInProgress?: boolean;
+  /** Builds of this workflow sharing this key run one at a time (NULL = unlimited) */
+  concurrencyKey?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Event type that fires this workflow */
+  eventType?: string;
+  /** Flow graph to run when this workflow fires */
+  graphId?: string;
+  id?: string;
+  /** Static inputs merged into the graph run alongside the event */
+  inputs?: unknown;
+  /** Whether matching events fire this workflow */
+  isEnabled?: boolean;
+  /** Human-readable workflow name */
+  name?: string;
+  /** Glob the event ref must match (NULL matches any ref) */
+  refPattern?: string;
+  /** Repository whose events this workflow listens to */
+  repositoryId?: string;
+  /** Secret names this workflow's builds may resolve, intersected with the build lane's realm */
+  requiredSecrets?: string[];
+  /** URL-safe identifier, unique within the repository */
+  slug?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `Build` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryWorkflowToManyBuildFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: BuildFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BuildFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: BuildFilter;
+}
+/** A filter to be used against many `RepositoryRequiredCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface RepositoryWorkflowToManyRepositoryRequiredCheckFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RepositoryRequiredCheckFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RepositoryRequiredCheckFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RepositoryRequiredCheckFilter;
 }
 /** A filter to be used against `ResourceDeclaredCapacity` object types. All fields are combined with a logical ‘and.’ */
 export interface ResourceDeclaredCapacityFilter {
@@ -7766,6 +15882,8 @@ export interface ResourceDeclaredCapacityFilter {
   sourceId?: UUIDFilter;
   /** Filter by the object’s `storageSizeBytes` field. */
   storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `storageTotalBytes` field. */
+  storageTotalBytes?: BigIntFilter;
 }
 /** A filter to be used against `ResourceDefinition` object types. All fields are combined with a logical ‘and.’ */
 export interface ResourceDefinitionFilter {
@@ -7777,6 +15895,8 @@ export interface ResourceDefinitionFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultSpec` field. */
@@ -7815,6 +15935,8 @@ export interface ResourceDefinitionFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `ResourceDefinition` */
 export interface ResourceDefinitionInput {
@@ -7822,6 +15944,7 @@ export interface ResourceDefinitionInput {
   annotations?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Template spec for creating resource instances of this kind */
@@ -7851,6 +15974,7 @@ export interface ResourceDefinitionInput {
   stepUpMinAge?: IntervalInput;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `ResourceDefinition`. Fields that are set will be updated. */
 export interface ResourceDefinitionPatch {
@@ -7858,6 +15982,7 @@ export interface ResourceDefinitionPatch {
   annotations?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Template spec for creating resource instances of this kind */
@@ -7887,6 +16012,7 @@ export interface ResourceDefinitionPatch {
   stepUpMinAge?: IntervalInput;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against many `Resource` object types. All fields are combined with a logical ‘and.’ */
 export interface ResourceDefinitionToManyResourceFilter {
@@ -7924,7 +16050,7 @@ export interface ResourceEventFilter {
 }
 /** An input for mutations affecting `ResourceEvent` */
 export interface ResourceEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -7943,7 +16069,7 @@ export interface ResourceEventInput {
 }
 /** Represents an update to a `ResourceEvent`. Fields that are set will be updated. */
 export interface ResourceEventPatch {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -7974,12 +16100,16 @@ export interface ResourceFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `errorCount` field. */
   errorCount?: IntFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `imageRef` field. */
+  imageRef?: StringFilter;
   /** Filter by the object’s `installation` relation. */
   installation?: ResourceInstallationFilter;
   /** A related `installation` exists. */
@@ -8036,10 +16166,14 @@ export interface ResourceFilter {
   storageClass?: StringFilter;
   /** Filter by the object’s `storageSizeBytes` field. */
   storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `storageTotalBytes` field. */
+  storageTotalBytes?: BigIntFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `Resource` */
 export interface ResourceInput {
@@ -8047,11 +16181,14 @@ export interface ResourceInput {
   annotations?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Cumulative error count for this resource */
   errorCount?: number;
   id?: string;
+  /** Pinned image reference this resource runs (registry host/repository:tag or @digest), written by promotion; NULL means spec.image decides */
+  imageRef?: string;
   /** Installation ("release") this resource belongs to (NULL for standalone resources) */
   installationId?: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
@@ -8086,6 +16223,7 @@ export interface ResourceInput {
   statusObserved?: unknown;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against `ResourceInstallation` object types. All fields are combined with a logical ‘and.’ */
 export interface ResourceInstallationFilter {
@@ -8097,6 +16235,8 @@ export interface ResourceInstallationFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -8113,6 +16253,10 @@ export interface ResourceInstallationFilter {
   or?: ResourceInstallationFilter[];
   /** Filter by the object’s `params` field. */
   params?: JSONFilter;
+  /** Filter by the object’s `registriesByInstallationId` relation. */
+  registriesByInstallationId?: ResourceInstallationToManyRegistryFilter;
+  /** `registriesByInstallationId` exist. */
+  registriesByInstallationIdExist?: boolean;
   /** Filter by the object’s `resourcesByInstallationId` relation. */
   resourcesByInstallationId?: ResourceInstallationToManyResourceFilter;
   /** `resourcesByInstallationId` exist. */
@@ -8129,6 +16273,8 @@ export interface ResourceInstallationFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `ResourceInstallation` */
 export interface ResourceInstallationInput {
@@ -8136,6 +16282,7 @@ export interface ResourceInstallationInput {
   commitId?: string;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   id?: string;
@@ -8155,6 +16302,7 @@ export interface ResourceInstallationInput {
   storeId?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `ResourceInstallation`. Fields that are set will be updated. */
 export interface ResourceInstallationPatch {
@@ -8162,6 +16310,7 @@ export interface ResourceInstallationPatch {
   commitId?: string;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   id?: string;
@@ -8181,6 +16330,16 @@ export interface ResourceInstallationPatch {
   storeId?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `Registry` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceInstallationToManyRegistryFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RegistryFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RegistryFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RegistryFilter;
 }
 /** A filter to be used against many `Resource` object types. All fields are combined with a logical ‘and.’ */
 export interface ResourceInstallationToManyResourceFilter {
@@ -8213,17 +16372,65 @@ export interface ResourceInstallationsUpgradeInput {
   newParams?: unknown;
   targetInstallationId?: string;
 }
+/** A filter to be used against `ResourceObservedStorage` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceObservedStorageFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourceObservedStorageFilter[];
+  /** Filter by the object’s `capacity` field. */
+  capacity?: StringFilter;
+  /** Filter by the object’s `capacityBytes` field. */
+  capacityBytes?: BigIntFilter;
+  /** Filter by the object’s `claimName` field. */
+  claimName?: StringFilter;
+  /** Filter by the object’s `declaredStorageClass` field. */
+  declaredStorageClass?: StringFilter;
+  /** Filter by the object’s `declaredStorageSizeBytes` field. */
+  declaredStorageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `declaredStorageTotalBytes` field. */
+  declaredStorageTotalBytes?: BigIntFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `isBound` field. */
+  isBound?: BooleanFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourceObservedStorageFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceObservedStorageFilter[];
+  /** Filter by the object’s `phase` field. */
+  phase?: StringFilter;
+  /** Filter by the object’s `requested` field. */
+  requested?: StringFilter;
+  /** Filter by the object’s `requestedBytes` field. */
+  requestedBytes?: BigIntFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `resourceStatus` field. */
+  resourceStatus?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `storageClass` field. */
+  storageClass?: StringFilter;
+  /** Filter by the object’s `storageName` field. */
+  storageName?: StringFilter;
+}
 /** Represents an update to a `Resource`. Fields that are set will be updated. */
 export interface ResourcePatch {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Cumulative error count for this resource */
   errorCount?: number;
   id?: string;
+  /** Pinned image reference this resource runs (registry host/repository:tag or @digest), written by promotion; NULL means spec.image decides */
+  imageRef?: string;
   /** Installation ("release") this resource belongs to (NULL for standalone resources) */
   installationId?: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
@@ -8258,6 +16465,7 @@ export interface ResourcePatch {
   statusObserved?: unknown;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** An input for mutations affecting `ResourceRequirement` */
 export interface ResourceRequirementInput {
@@ -8550,12 +16758,16 @@ export interface ResourcesHealthFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `errorCount` field. */
   errorCount?: IntFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `imageRef` field. */
+  imageRef?: StringFilter;
   /** Filter by the object’s `installationId` field. */
   installationId?: UUIDFilter;
   /** Filter by the object’s `integrations` field. */
@@ -8600,10 +16812,14 @@ export interface ResourcesHealthFilter {
   storageClass?: StringFilter;
   /** Filter by the object’s `storageSizeBytes` field. */
   storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `storageTotalBytes` field. */
+  storageTotalBytes?: BigIntFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** A filter to be used against `ResourcesRequirementsState` object types. All fields are combined with a logical ‘and.’ */
 export interface ResourcesRequirementsStateFilter {
@@ -8704,11 +16920,188 @@ export interface StartExecutionInput {
   parentNodeName?: string;
   timeoutInterval?: IntervalInput;
 }
+/** A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’ */
+export interface StringTrgmFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings. */
+  similarTo?: TrgmSearchInput;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+  /** Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value. */
+  wordSimilarTo?: TrgmSearchInput;
+}
+/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
+export interface TrgmSearchInput {
+  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
+  threshold?: number;
+  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
+  value: string;
+}
+export interface UpdateBuildInput {
+  /** An object where the defined keys will be set on the `Build` being updated. */
+  buildPatch: BuildPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateBuildStepInput {
+  /** An object where the defined keys will be set on the `BuildStep` being updated. */
+  buildStepPatch: BuildStepPatch;
+  clientMutationId?: string;
+  /** Unique identifier (uuidv7 provides temporal ordering) */
+  id: string;
+  /** When the result was recorded (partition key) */
+  recordedAt: string;
+}
+export interface UpdateBuilderBindingInput {
+  /** An object where the defined keys will be set on the `BuilderBinding` being updated. */
+  builderBindingPatch: BuilderBindingPatch;
+  clientMutationId?: string;
+  id: string;
+}
 export interface UpdateContentPresetInput {
   clientMutationId?: string;
   /** An object where the defined keys will be set on the `ContentPreset` being updated. */
   contentPresetPatch: ContentPresetPatch;
   /** Unique preset identifier */
+  id: string;
+}
+export interface UpdateDatabaseFunctionGraphExecutionInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `DatabaseFunctionGraphExecution` being updated. */
+  databaseFunctionGraphExecutionPatch: DatabaseFunctionGraphExecutionPatch;
+  /** Unique execution identifier */
+  id: string;
+  /** Execution start timestamp */
+  startedAt: string;
+}
+export interface UpdateDatabaseFunctionGraphExecutionNodeStateInput {
+  clientMutationId?: string;
+  /** Timestamp of node state creation (partition key) */
+  createdAt: string;
+  /** An object where the defined keys will be set on the `DatabaseFunctionGraphExecutionNodeState` being updated. */
+  databaseFunctionGraphExecutionNodeStatePatch: DatabaseFunctionGraphExecutionNodeStatePatch;
+  /** Unique node state identifier */
+  id: string;
+}
+export interface UpdateDatabaseFunctionGraphExecutionOutputInput {
+  clientMutationId?: string;
+  /** Timestamp of output creation */
+  createdAt: string;
+  /** An object where the defined keys will be set on the `DatabaseFunctionGraphExecutionOutput` being updated. */
+  databaseFunctionGraphExecutionOutputPatch: DatabaseFunctionGraphExecutionOutputPatch;
+  /** Unique execution output identifier */
+  id: string;
+}
+export interface UpdateDatabaseFunctionGraphInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `DatabaseFunctionGraph` being updated. */
+  databaseFunctionGraphPatch: DatabaseFunctionGraphPatch;
+  /** Unique graph identifier */
+  id: string;
+}
+export interface UpdateDatabaseGraphCommitInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `DatabaseGraphCommit` being updated. */
+  databaseGraphCommitPatch: DatabaseGraphCommitPatch;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique commit identifier */
+  id: string;
+}
+export interface UpdateDatabaseGraphObjectInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `DatabaseGraphObject` being updated. */
+  databaseGraphObjectPatch: DatabaseGraphObjectPatch;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+}
+export interface UpdateDatabaseGraphRefInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `DatabaseGraphRef` being updated. */
+  databaseGraphRefPatch: DatabaseGraphRefPatch;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique ref identifier */
+  id: string;
+}
+export interface UpdateDatabaseGraphStoreInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `DatabaseGraphStore` being updated. */
+  databaseGraphStorePatch: DatabaseGraphStorePatch;
+  /** Unique store identifier */
   id: string;
 }
 export interface UpdateDbPresetInput {
@@ -8846,6 +17239,18 @@ export interface UpdateFunctionInvocationInput {
   /** Unique invocation identifier */
   id: string;
 }
+export interface UpdateImageGrantInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `ImageGrant` being updated. */
+  imageGrantPatch: ImageGrantPatch;
+}
+export interface UpdateImageInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Image` being updated. */
+  imagePatch: ImagePatch;
+}
 export interface UpdateInfraCommitInput {
   clientMutationId?: string;
   /** Database scope for multi-tenant isolation */
@@ -8900,6 +17305,27 @@ export interface UpdateNamespaceInput {
   id: string;
   /** An object where the defined keys will be set on the `Namespace` being updated. */
   namespacePatch: NamespacePatch;
+}
+export interface UpdatePlatformBuildInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformBuild` being updated. */
+  platformBuildPatch: PlatformBuildPatch;
+}
+export interface UpdatePlatformBuildStepInput {
+  clientMutationId?: string;
+  /** Unique identifier (uuidv7 provides temporal ordering) */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformBuildStep` being updated. */
+  platformBuildStepPatch: PlatformBuildStepPatch;
+  /** When the result was recorded (partition key) */
+  recordedAt: string;
+}
+export interface UpdatePlatformBuilderBindingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformBuilderBinding` being updated. */
+  platformBuilderBindingPatch: PlatformBuilderBindingPatch;
 }
 export interface UpdatePlatformFunctionApiBindingInput {
   clientMutationId?: string;
@@ -8961,6 +17387,18 @@ export interface UpdatePlatformFunctionInvocationInput {
   /** An object where the defined keys will be set on the `PlatformFunctionInvocation` being updated. */
   platformFunctionInvocationPatch: PlatformFunctionInvocationPatch;
 }
+export interface UpdatePlatformImageGrantInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformImageGrant` being updated. */
+  platformImageGrantPatch: PlatformImageGrantPatch;
+}
+export interface UpdatePlatformImageInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformImage` being updated. */
+  platformImagePatch: PlatformImagePatch;
+}
 export interface UpdatePlatformInfraCommitInput {
   clientMutationId?: string;
   /** Unique commit identifier */
@@ -8995,6 +17433,20 @@ export interface UpdatePlatformInfraStoreInput {
   /** An object where the defined keys will be set on the `PlatformInfraStore` being updated. */
   platformInfraStorePatch: PlatformInfraStorePatch;
 }
+export interface UpdatePlatformK8sResourceKindInput {
+  clientMutationId?: string;
+  /** Unique kind policy identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformK8sResourceKind` being updated. */
+  platformK8sResourceKindPatch: PlatformK8sResourceKindPatch;
+}
+export interface UpdatePlatformK8sSpecRuleInput {
+  clientMutationId?: string;
+  /** Unique spec rule identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformK8sSpecRule` being updated. */
+  platformK8sSpecRulePatch: PlatformK8sSpecRulePatch;
+}
 export interface UpdatePlatformNamespaceEventInput {
   clientMutationId?: string;
   /** Event timestamp (partition key) */
@@ -9009,6 +17461,84 @@ export interface UpdatePlatformNamespaceInput {
   id: string;
   /** An object where the defined keys will be set on the `PlatformNamespace` being updated. */
   platformNamespacePatch: PlatformNamespacePatch;
+}
+export interface UpdatePlatformProposalCommentInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformProposalComment` being updated. */
+  platformProposalCommentPatch: PlatformProposalCommentPatch;
+}
+export interface UpdatePlatformProposalFileViewInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformProposalFileView` being updated. */
+  platformProposalFileViewPatch: PlatformProposalFileViewPatch;
+}
+export interface UpdatePlatformProposalInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformProposal` being updated. */
+  platformProposalPatch: PlatformProposalPatch;
+}
+export interface UpdatePlatformProposalReactionInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformProposalReaction` being updated. */
+  platformProposalReactionPatch: PlatformProposalReactionPatch;
+}
+export interface UpdatePlatformProposalReviewInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformProposalReview` being updated. */
+  platformProposalReviewPatch: PlatformProposalReviewPatch;
+}
+export interface UpdatePlatformProposalsChunkInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformProposalsChunk` being updated. */
+  platformProposalsChunkPatch: PlatformProposalsChunkPatch;
+}
+export interface UpdatePlatformRegistryBindingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformRegistryBinding` being updated. */
+  platformRegistryBindingPatch: PlatformRegistryBindingPatch;
+}
+export interface UpdatePlatformRegistryGrantInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformRegistryGrant` being updated. */
+  platformRegistryGrantPatch: PlatformRegistryGrantPatch;
+}
+export interface UpdatePlatformRegistryInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformRegistry` being updated. */
+  platformRegistryPatch: PlatformRegistryPatch;
+}
+export interface UpdatePlatformRepositoryEventInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformRepositoryEvent` being updated. */
+  platformRepositoryEventPatch: PlatformRepositoryEventPatch;
+}
+export interface UpdatePlatformRepositoryInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformRepository` being updated. */
+  platformRepositoryPatch: PlatformRepositoryPatch;
+}
+export interface UpdatePlatformRepositoryRequiredCheckInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformRepositoryRequiredCheck` being updated. */
+  platformRepositoryRequiredCheckPatch: PlatformRepositoryRequiredCheckPatch;
+}
+export interface UpdatePlatformRepositoryWorkflowInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformRepositoryWorkflow` being updated. */
+  platformRepositoryWorkflowPatch: PlatformRepositoryWorkflowPatch;
 }
 export interface UpdatePlatformResourceDefinitionInput {
   clientMutationId?: string;
@@ -9073,6 +17603,84 @@ export interface UpdatePlatformWebhookEventInput {
   id: string;
   /** An object where the defined keys will be set on the `PlatformWebhookEvent` being updated. */
   platformWebhookEventPatch: PlatformWebhookEventPatch;
+}
+export interface UpdateProposalCommentInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `ProposalComment` being updated. */
+  proposalCommentPatch: ProposalCommentPatch;
+}
+export interface UpdateProposalFileViewInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `ProposalFileView` being updated. */
+  proposalFileViewPatch: ProposalFileViewPatch;
+}
+export interface UpdateProposalInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Proposal` being updated. */
+  proposalPatch: ProposalPatch;
+}
+export interface UpdateProposalReactionInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `ProposalReaction` being updated. */
+  proposalReactionPatch: ProposalReactionPatch;
+}
+export interface UpdateProposalReviewInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `ProposalReview` being updated. */
+  proposalReviewPatch: ProposalReviewPatch;
+}
+export interface UpdateProposalsChunkInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `ProposalsChunk` being updated. */
+  proposalsChunkPatch: ProposalsChunkPatch;
+}
+export interface UpdateRegistryBindingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `RegistryBinding` being updated. */
+  registryBindingPatch: RegistryBindingPatch;
+}
+export interface UpdateRegistryGrantInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `RegistryGrant` being updated. */
+  registryGrantPatch: RegistryGrantPatch;
+}
+export interface UpdateRegistryInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Registry` being updated. */
+  registryPatch: RegistryPatch;
+}
+export interface UpdateRepositoryEventInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `RepositoryEvent` being updated. */
+  repositoryEventPatch: RepositoryEventPatch;
+}
+export interface UpdateRepositoryInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Repository` being updated. */
+  repositoryPatch: RepositoryPatch;
+}
+export interface UpdateRepositoryRequiredCheckInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `RepositoryRequiredCheck` being updated. */
+  repositoryRequiredCheckPatch: RepositoryRequiredCheckPatch;
+}
+export interface UpdateRepositoryWorkflowInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `RepositoryWorkflow` being updated. */
+  repositoryWorkflowPatch: RepositoryWorkflowPatch;
 }
 export interface UpdateResourceDefinitionInput {
   clientMutationId?: string;
@@ -9142,6 +17750,19 @@ export interface ValidateFunctionGraphInput {
   clientMutationId?: string;
   graphId?: string;
 }
+/** Input for vector similarity search. Provide a query vector, optional metric, and optional max distance threshold. */
+export interface VectorNearbyInput {
+  /** Maximum distance threshold. Only rows within this distance are returned. */
+  distance?: number;
+  /** When true (default for tables with @hasChunks), transparently queries the chunks table and returns the minimum distance across parent + all chunks. Set to false to only search the parent embedding. */
+  includeChunks?: boolean;
+  /** Similarity metric to use (default: COSINE). */
+  metric?: VectorMetric;
+  /** Natural language text to embed server-side for similarity search. Mutually exclusive with `vector` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  text?: string;
+  /** Query vector for similarity search. */
+  vector: number[];
+}
 /** A filter to be used against `WebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
 export interface WebhookEndpointFilter {
   /** Filter by the object’s `active` field. */
@@ -9152,6 +17773,8 @@ export interface WebhookEndpointFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `functionDefinition` relation. */
@@ -9182,6 +17805,8 @@ export interface WebhookEndpointFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
   /** Filter by the object’s `webhookEventsByEndpointId` relation. */
   webhookEventsByEndpointId?: WebhookEndpointToManyWebhookEventFilter;
   /** `webhookEventsByEndpointId` exist. */
@@ -9193,6 +17818,7 @@ export interface WebhookEndpointInput {
   active?: boolean;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Same-scope function definition invoked on delivery. The function must list the webhook channel in access_channels. */
@@ -9212,6 +17838,7 @@ export interface WebhookEndpointInput {
   signingSecretName: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `WebhookEndpoint`. Fields that are set will be updated. */
 export interface WebhookEndpointPatch {
@@ -9219,6 +17846,7 @@ export interface WebhookEndpointPatch {
   active?: boolean;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Same-scope function definition invoked on delivery. The function must list the webhook channel in access_channels. */
@@ -9238,6 +17866,7 @@ export interface WebhookEndpointPatch {
   signingSecretName?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against many `WebhookEvent` object types. All fields are combined with a logical ‘and.’ */
 export interface WebhookEndpointToManyWebhookEventFilter {
@@ -9341,10 +17970,94 @@ export interface WebhookEventPatch {
 export interface MetaSchema {
   tables: MetaTable[];
 }
+/** A connection to a list of `BuildStep` values. */
+export interface BuildStepConnection {
+  edges: BuildStepEdge[];
+  nodes: BuildStep[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `BuilderBinding` values. */
+export interface BuilderBindingConnection {
+  edges: BuilderBindingEdge[];
+  nodes: BuilderBinding[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Build` values. */
+export interface BuildConnection {
+  edges: BuildEdge[];
+  nodes: Build[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `ContentPreset` values. */
 export interface ContentPresetConnection {
   edges: ContentPresetEdge[];
   nodes: ContentPreset[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseFunctionGraphExecutionNodeState` values. */
+export interface DatabaseFunctionGraphExecutionNodeStateConnection {
+  edges: DatabaseFunctionGraphExecutionNodeStateEdge[];
+  nodes: DatabaseFunctionGraphExecutionNodeState[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseFunctionGraphExecutionOutput` values. */
+export interface DatabaseFunctionGraphExecutionOutputConnection {
+  edges: DatabaseFunctionGraphExecutionOutputEdge[];
+  nodes: DatabaseFunctionGraphExecutionOutput[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseFunctionGraphExecution` values. */
+export interface DatabaseFunctionGraphExecutionConnection {
+  edges: DatabaseFunctionGraphExecutionEdge[];
+  nodes: DatabaseFunctionGraphExecution[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseFunctionGraph` values. */
+export interface DatabaseFunctionGraphConnection {
+  edges: DatabaseFunctionGraphEdge[];
+  nodes: DatabaseFunctionGraph[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseGraphCommit` values. */
+export interface DatabaseGraphCommitConnection {
+  edges: DatabaseGraphCommitEdge[];
+  nodes: DatabaseGraphCommit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseGraphGetAllTreeNodesRecord` values. */
+export interface DatabaseGraphGetAllTreeNodesConnection {
+  edges: DatabaseGraphGetAllTreeNodesEdge[];
+  nodes: DatabaseGraphGetAllTreeNodesRecord[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseGraphObject` values. */
+export interface DatabaseGraphObjectConnection {
+  edges: DatabaseGraphObjectEdge[];
+  nodes: DatabaseGraphObject[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseGraphRef` values. */
+export interface DatabaseGraphRefConnection {
+  edges: DatabaseGraphRefEdge[];
+  nodes: DatabaseGraphRef[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseGraphStore` values. */
+export interface DatabaseGraphStoreConnection {
+  edges: DatabaseGraphStoreEdge[];
+  nodes: DatabaseGraphStore[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9474,6 +18187,20 @@ export interface GetAllTreeNodesConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `ImageGrant` values. */
+export interface ImageGrantConnection {
+  edges: ImageGrantEdge[];
+  nodes: ImageGrant[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Image` values. */
+export interface ImageConnection {
+  edges: ImageEdge[];
+  nodes: Image[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `InfraCommit` values. */
 export interface InfraCommitConnection {
   edges: InfraCommitEdge[];
@@ -9527,6 +18254,27 @@ export interface NamespaceEventConnection {
 export interface NamespaceConnection {
   edges: NamespaceEdge[];
   nodes: Namespace[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformBuildStep` values. */
+export interface PlatformBuildStepConnection {
+  edges: PlatformBuildStepEdge[];
+  nodes: PlatformBuildStep[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformBuilderBinding` values. */
+export interface PlatformBuilderBindingConnection {
+  edges: PlatformBuilderBindingEdge[];
+  nodes: PlatformBuilderBinding[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformBuild` values. */
+export interface PlatformBuildConnection {
+  edges: PlatformBuildEdge[];
+  nodes: PlatformBuild[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9586,6 +18334,20 @@ export interface PlatformFunctionInvocationConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `PlatformImageGrant` values. */
+export interface PlatformImageGrantConnection {
+  edges: PlatformImageGrantEdge[];
+  nodes: PlatformImageGrant[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformImage` values. */
+export interface PlatformImageConnection {
+  edges: PlatformImageEdge[];
+  nodes: PlatformImage[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `PlatformInfraCommit` values. */
 export interface PlatformInfraCommitConnection {
   edges: PlatformInfraCommitEdge[];
@@ -9621,6 +18383,20 @@ export interface PlatformInfraStoreConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `PlatformK8sResourceKind` values. */
+export interface PlatformK8sResourceKindConnection {
+  edges: PlatformK8sResourceKindEdge[];
+  nodes: PlatformK8sResourceKind[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformK8sSpecRule` values. */
+export interface PlatformK8sSpecRuleConnection {
+  edges: PlatformK8sSpecRuleEdge[];
+  nodes: PlatformK8sSpecRule[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `PlatformNamespaceEvent` values. */
 export interface PlatformNamespaceEventConnection {
   edges: PlatformNamespaceEventEdge[];
@@ -9632,6 +18408,97 @@ export interface PlatformNamespaceEventConnection {
 export interface PlatformNamespaceConnection {
   edges: PlatformNamespaceEdge[];
   nodes: PlatformNamespace[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformProposalComment` values. */
+export interface PlatformProposalCommentConnection {
+  edges: PlatformProposalCommentEdge[];
+  nodes: PlatformProposalComment[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformProposalFileView` values. */
+export interface PlatformProposalFileViewConnection {
+  edges: PlatformProposalFileViewEdge[];
+  nodes: PlatformProposalFileView[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformProposalReaction` values. */
+export interface PlatformProposalReactionConnection {
+  edges: PlatformProposalReactionEdge[];
+  nodes: PlatformProposalReaction[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformProposalReview` values. */
+export interface PlatformProposalReviewConnection {
+  edges: PlatformProposalReviewEdge[];
+  nodes: PlatformProposalReview[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformProposal` values. */
+export interface PlatformProposalConnection {
+  edges: PlatformProposalEdge[];
+  nodes: PlatformProposal[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformProposalsChunk` values. */
+export interface PlatformProposalsChunkConnection {
+  edges: PlatformProposalsChunkEdge[];
+  nodes: PlatformProposalsChunk[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformRegistry` values. */
+export interface PlatformRegistryConnection {
+  edges: PlatformRegistryEdge[];
+  nodes: PlatformRegistry[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformRegistryBinding` values. */
+export interface PlatformRegistryBindingConnection {
+  edges: PlatformRegistryBindingEdge[];
+  nodes: PlatformRegistryBinding[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformRegistryGrant` values. */
+export interface PlatformRegistryGrantConnection {
+  edges: PlatformRegistryGrantEdge[];
+  nodes: PlatformRegistryGrant[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformRepository` values. */
+export interface PlatformRepositoryConnection {
+  edges: PlatformRepositoryEdge[];
+  nodes: PlatformRepository[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformRepositoryEvent` values. */
+export interface PlatformRepositoryEventConnection {
+  edges: PlatformRepositoryEventEdge[];
+  nodes: PlatformRepositoryEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformRepositoryRequiredCheck` values. */
+export interface PlatformRepositoryRequiredCheckConnection {
+  edges: PlatformRepositoryRequiredCheckEdge[];
+  nodes: PlatformRepositoryRequiredCheck[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformRepositoryWorkflow` values. */
+export interface PlatformRepositoryWorkflowConnection {
+  edges: PlatformRepositoryWorkflowEdge[];
+  nodes: PlatformRepositoryWorkflow[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9660,6 +18527,13 @@ export interface PlatformResourceEventConnection {
 export interface PlatformResourceInstallationConnection {
   edges: PlatformResourceInstallationEdge[];
   nodes: PlatformResourceInstallation[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourceObservedStorage` values. */
+export interface PlatformResourceObservedStorageConnection {
+  edges: PlatformResourceObservedStorageEdge[];
+  nodes: PlatformResourceObservedStorage[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9733,6 +18607,97 @@ export interface PlatformWebhookEventConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `ProposalComment` values. */
+export interface ProposalCommentConnection {
+  edges: ProposalCommentEdge[];
+  nodes: ProposalComment[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ProposalFileView` values. */
+export interface ProposalFileViewConnection {
+  edges: ProposalFileViewEdge[];
+  nodes: ProposalFileView[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ProposalReaction` values. */
+export interface ProposalReactionConnection {
+  edges: ProposalReactionEdge[];
+  nodes: ProposalReaction[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ProposalReview` values. */
+export interface ProposalReviewConnection {
+  edges: ProposalReviewEdge[];
+  nodes: ProposalReview[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Proposal` values. */
+export interface ProposalConnection {
+  edges: ProposalEdge[];
+  nodes: Proposal[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ProposalsChunk` values. */
+export interface ProposalsChunkConnection {
+  edges: ProposalsChunkEdge[];
+  nodes: ProposalsChunk[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Registry` values. */
+export interface RegistryConnection {
+  edges: RegistryEdge[];
+  nodes: Registry[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `RegistryBinding` values. */
+export interface RegistryBindingConnection {
+  edges: RegistryBindingEdge[];
+  nodes: RegistryBinding[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `RegistryGrant` values. */
+export interface RegistryGrantConnection {
+  edges: RegistryGrantEdge[];
+  nodes: RegistryGrant[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Repository` values. */
+export interface RepositoryConnection {
+  edges: RepositoryEdge[];
+  nodes: Repository[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `RepositoryEvent` values. */
+export interface RepositoryEventConnection {
+  edges: RepositoryEventEdge[];
+  nodes: RepositoryEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `RepositoryRequiredCheck` values. */
+export interface RepositoryRequiredCheckConnection {
+  edges: RepositoryRequiredCheckEdge[];
+  nodes: RepositoryRequiredCheck[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `RepositoryWorkflow` values. */
+export interface RepositoryWorkflowConnection {
+  edges: RepositoryWorkflowEdge[];
+  nodes: RepositoryWorkflow[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `ResourceDeclaredCapacity` values. */
 export interface ResourceDeclaredCapacityConnection {
   edges: ResourceDeclaredCapacityEdge[];
@@ -9758,6 +18723,13 @@ export interface ResourceEventConnection {
 export interface ResourceInstallationConnection {
   edges: ResourceInstallationEdge[];
   nodes: ResourceInstallation[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourceObservedStorage` values. */
+export interface ResourceObservedStorageConnection {
+  edges: ResourceObservedStorageEdge[];
+  nodes: ResourceObservedStorage[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9847,15 +18819,78 @@ export interface AddNodeAndSavePayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface ApproveNodePayload {
+  clientMutationId?: string | null;
+}
 export interface CopyGraphPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface CreateBuildPayload {
+  /** The `Build` that was created by this mutation. */
+  build?: Build | null;
+  buildEdge?: BuildEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateBuildStepPayload {
+  /** The `BuildStep` that was created by this mutation. */
+  buildStep?: BuildStep | null;
+  buildStepEdge?: BuildStepEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateBuilderBindingPayload {
+  /** The `BuilderBinding` that was created by this mutation. */
+  builderBinding?: BuilderBinding | null;
+  builderBindingEdge?: BuilderBindingEdge | null;
+  clientMutationId?: string | null;
 }
 export interface CreateContentPresetPayload {
   clientMutationId?: string | null;
   /** The `ContentPreset` that was created by this mutation. */
   contentPreset?: ContentPreset | null;
   contentPresetEdge?: ContentPresetEdge | null;
+}
+export interface CreateDatabaseFunctionGraphExecutionPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraphExecution` that was created by this mutation. */
+  databaseFunctionGraphExecution?: DatabaseFunctionGraphExecution | null;
+  databaseFunctionGraphExecutionEdge?: DatabaseFunctionGraphExecutionEdge | null;
+}
+export interface CreateDatabaseFunctionGraphExecutionNodeStatePayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraphExecutionNodeState` that was created by this mutation. */
+  databaseFunctionGraphExecutionNodeState?: DatabaseFunctionGraphExecutionNodeState | null;
+  databaseFunctionGraphExecutionNodeStateEdge?: DatabaseFunctionGraphExecutionNodeStateEdge | null;
+}
+export interface CreateDatabaseFunctionGraphExecutionOutputPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraphExecutionOutput` that was created by this mutation. */
+  databaseFunctionGraphExecutionOutput?: DatabaseFunctionGraphExecutionOutput | null;
+  databaseFunctionGraphExecutionOutputEdge?: DatabaseFunctionGraphExecutionOutputEdge | null;
+}
+export interface CreateDatabaseGraphCommitPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphCommit` that was created by this mutation. */
+  databaseGraphCommit?: DatabaseGraphCommit | null;
+  databaseGraphCommitEdge?: DatabaseGraphCommitEdge | null;
+}
+export interface CreateDatabaseGraphObjectPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphObject` that was created by this mutation. */
+  databaseGraphObject?: DatabaseGraphObject | null;
+  databaseGraphObjectEdge?: DatabaseGraphObjectEdge | null;
+}
+export interface CreateDatabaseGraphRefPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphRef` that was created by this mutation. */
+  databaseGraphRef?: DatabaseGraphRef | null;
+  databaseGraphRefEdge?: DatabaseGraphRefEdge | null;
+}
+export interface CreateDatabaseGraphStorePayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphStore` that was created by this mutation. */
+  databaseGraphStore?: DatabaseGraphStore | null;
+  databaseGraphStoreEdge?: DatabaseGraphStoreEdge | null;
 }
 export interface CreateDbPresetPayload {
   clientMutationId?: string | null;
@@ -9957,6 +18992,18 @@ export interface CreateFunctionInvocationAttemptPayload {
   functionInvocationAttempt?: FunctionInvocationAttempt | null;
   functionInvocationAttemptEdge?: FunctionInvocationAttemptEdge | null;
 }
+export interface CreateImagePayload {
+  clientMutationId?: string | null;
+  /** The `Image` that was created by this mutation. */
+  image?: Image | null;
+  imageEdge?: ImageEdge | null;
+}
+export interface CreateImageGrantPayload {
+  clientMutationId?: string | null;
+  /** The `ImageGrant` that was created by this mutation. */
+  imageGrant?: ImageGrant | null;
+  imageGrantEdge?: ImageGrantEdge | null;
+}
 export interface CreateInfraCommitPayload {
   clientMutationId?: string | null;
   /** The `InfraCommit` that was created by this mutation. */
@@ -9998,6 +19045,24 @@ export interface CreateNamespaceEventPayload {
   /** The `NamespaceEvent` that was created by this mutation. */
   namespaceEvent?: NamespaceEvent | null;
   namespaceEventEdge?: NamespaceEventEdge | null;
+}
+export interface CreatePlatformBuildPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformBuild` that was created by this mutation. */
+  platformBuild?: PlatformBuild | null;
+  platformBuildEdge?: PlatformBuildEdge | null;
+}
+export interface CreatePlatformBuildStepPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformBuildStep` that was created by this mutation. */
+  platformBuildStep?: PlatformBuildStep | null;
+  platformBuildStepEdge?: PlatformBuildStepEdge | null;
+}
+export interface CreatePlatformBuilderBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformBuilderBinding` that was created by this mutation. */
+  platformBuilderBinding?: PlatformBuilderBinding | null;
+  platformBuilderBindingEdge?: PlatformBuilderBindingEdge | null;
 }
 export interface CreatePlatformFunctionApiBindingPayload {
   clientMutationId?: string | null;
@@ -10047,6 +19112,18 @@ export interface CreatePlatformFunctionInvocationAttemptPayload {
   platformFunctionInvocationAttempt?: PlatformFunctionInvocationAttempt | null;
   platformFunctionInvocationAttemptEdge?: PlatformFunctionInvocationAttemptEdge | null;
 }
+export interface CreatePlatformImagePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformImage` that was created by this mutation. */
+  platformImage?: PlatformImage | null;
+  platformImageEdge?: PlatformImageEdge | null;
+}
+export interface CreatePlatformImageGrantPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformImageGrant` that was created by this mutation. */
+  platformImageGrant?: PlatformImageGrant | null;
+  platformImageGrantEdge?: PlatformImageGrantEdge | null;
+}
 export interface CreatePlatformInfraCommitPayload {
   clientMutationId?: string | null;
   /** The `PlatformInfraCommit` that was created by this mutation. */
@@ -10071,6 +19148,18 @@ export interface CreatePlatformInfraStorePayload {
   platformInfraStore?: PlatformInfraStore | null;
   platformInfraStoreEdge?: PlatformInfraStoreEdge | null;
 }
+export interface CreatePlatformK8sResourceKindPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformK8sResourceKind` that was created by this mutation. */
+  platformK8sResourceKind?: PlatformK8sResourceKind | null;
+  platformK8sResourceKindEdge?: PlatformK8sResourceKindEdge | null;
+}
+export interface CreatePlatformK8sSpecRulePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformK8sSpecRule` that was created by this mutation. */
+  platformK8sSpecRule?: PlatformK8sSpecRule | null;
+  platformK8sSpecRuleEdge?: PlatformK8sSpecRuleEdge | null;
+}
 export interface CreatePlatformNamespacePayload {
   clientMutationId?: string | null;
   /** The `PlatformNamespace` that was created by this mutation. */
@@ -10082,6 +19171,84 @@ export interface CreatePlatformNamespaceEventPayload {
   /** The `PlatformNamespaceEvent` that was created by this mutation. */
   platformNamespaceEvent?: PlatformNamespaceEvent | null;
   platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+}
+export interface CreatePlatformProposalPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposal` that was created by this mutation. */
+  platformProposal?: PlatformProposal | null;
+  platformProposalEdge?: PlatformProposalEdge | null;
+}
+export interface CreatePlatformProposalCommentPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalComment` that was created by this mutation. */
+  platformProposalComment?: PlatformProposalComment | null;
+  platformProposalCommentEdge?: PlatformProposalCommentEdge | null;
+}
+export interface CreatePlatformProposalFileViewPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalFileView` that was created by this mutation. */
+  platformProposalFileView?: PlatformProposalFileView | null;
+  platformProposalFileViewEdge?: PlatformProposalFileViewEdge | null;
+}
+export interface CreatePlatformProposalReactionPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalReaction` that was created by this mutation. */
+  platformProposalReaction?: PlatformProposalReaction | null;
+  platformProposalReactionEdge?: PlatformProposalReactionEdge | null;
+}
+export interface CreatePlatformProposalReviewPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalReview` that was created by this mutation. */
+  platformProposalReview?: PlatformProposalReview | null;
+  platformProposalReviewEdge?: PlatformProposalReviewEdge | null;
+}
+export interface CreatePlatformProposalsChunkPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalsChunk` that was created by this mutation. */
+  platformProposalsChunk?: PlatformProposalsChunk | null;
+  platformProposalsChunkEdge?: PlatformProposalsChunkEdge | null;
+}
+export interface CreatePlatformRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRegistry` that was created by this mutation. */
+  platformRegistry?: PlatformRegistry | null;
+  platformRegistryEdge?: PlatformRegistryEdge | null;
+}
+export interface CreatePlatformRegistryBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRegistryBinding` that was created by this mutation. */
+  platformRegistryBinding?: PlatformRegistryBinding | null;
+  platformRegistryBindingEdge?: PlatformRegistryBindingEdge | null;
+}
+export interface CreatePlatformRegistryGrantPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRegistryGrant` that was created by this mutation. */
+  platformRegistryGrant?: PlatformRegistryGrant | null;
+  platformRegistryGrantEdge?: PlatformRegistryGrantEdge | null;
+}
+export interface CreatePlatformRepositoryPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepository` that was created by this mutation. */
+  platformRepository?: PlatformRepository | null;
+  platformRepositoryEdge?: PlatformRepositoryEdge | null;
+}
+export interface CreatePlatformRepositoryEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepositoryEvent` that was created by this mutation. */
+  platformRepositoryEvent?: PlatformRepositoryEvent | null;
+  platformRepositoryEventEdge?: PlatformRepositoryEventEdge | null;
+}
+export interface CreatePlatformRepositoryRequiredCheckPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepositoryRequiredCheck` that was created by this mutation. */
+  platformRepositoryRequiredCheck?: PlatformRepositoryRequiredCheck | null;
+  platformRepositoryRequiredCheckEdge?: PlatformRepositoryRequiredCheckEdge | null;
+}
+export interface CreatePlatformRepositoryWorkflowPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepositoryWorkflow` that was created by this mutation. */
+  platformRepositoryWorkflow?: PlatformRepositoryWorkflow | null;
+  platformRepositoryWorkflowEdge?: PlatformRepositoryWorkflowEdge | null;
 }
 export interface CreatePlatformResourcePayload {
   clientMutationId?: string | null;
@@ -10137,6 +19304,84 @@ export interface CreatePlatformWebhookEventPayload {
   platformWebhookEvent?: PlatformWebhookEvent | null;
   platformWebhookEventEdge?: PlatformWebhookEventEdge | null;
 }
+export interface CreateProposalPayload {
+  clientMutationId?: string | null;
+  /** The `Proposal` that was created by this mutation. */
+  proposal?: Proposal | null;
+  proposalEdge?: ProposalEdge | null;
+}
+export interface CreateProposalCommentPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalComment` that was created by this mutation. */
+  proposalComment?: ProposalComment | null;
+  proposalCommentEdge?: ProposalCommentEdge | null;
+}
+export interface CreateProposalFileViewPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalFileView` that was created by this mutation. */
+  proposalFileView?: ProposalFileView | null;
+  proposalFileViewEdge?: ProposalFileViewEdge | null;
+}
+export interface CreateProposalReactionPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalReaction` that was created by this mutation. */
+  proposalReaction?: ProposalReaction | null;
+  proposalReactionEdge?: ProposalReactionEdge | null;
+}
+export interface CreateProposalReviewPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalReview` that was created by this mutation. */
+  proposalReview?: ProposalReview | null;
+  proposalReviewEdge?: ProposalReviewEdge | null;
+}
+export interface CreateProposalsChunkPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalsChunk` that was created by this mutation. */
+  proposalsChunk?: ProposalsChunk | null;
+  proposalsChunkEdge?: ProposalsChunkEdge | null;
+}
+export interface CreateRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `Registry` that was created by this mutation. */
+  registry?: Registry | null;
+  registryEdge?: RegistryEdge | null;
+}
+export interface CreateRegistryBindingPayload {
+  clientMutationId?: string | null;
+  /** The `RegistryBinding` that was created by this mutation. */
+  registryBinding?: RegistryBinding | null;
+  registryBindingEdge?: RegistryBindingEdge | null;
+}
+export interface CreateRegistryGrantPayload {
+  clientMutationId?: string | null;
+  /** The `RegistryGrant` that was created by this mutation. */
+  registryGrant?: RegistryGrant | null;
+  registryGrantEdge?: RegistryGrantEdge | null;
+}
+export interface CreateRepositoryPayload {
+  clientMutationId?: string | null;
+  /** The `Repository` that was created by this mutation. */
+  repository?: Repository | null;
+  repositoryEdge?: RepositoryEdge | null;
+}
+export interface CreateRepositoryEventPayload {
+  clientMutationId?: string | null;
+  /** The `RepositoryEvent` that was created by this mutation. */
+  repositoryEvent?: RepositoryEvent | null;
+  repositoryEventEdge?: RepositoryEventEdge | null;
+}
+export interface CreateRepositoryRequiredCheckPayload {
+  clientMutationId?: string | null;
+  /** The `RepositoryRequiredCheck` that was created by this mutation. */
+  repositoryRequiredCheck?: RepositoryRequiredCheck | null;
+  repositoryRequiredCheckEdge?: RepositoryRequiredCheckEdge | null;
+}
+export interface CreateRepositoryWorkflowPayload {
+  clientMutationId?: string | null;
+  /** The `RepositoryWorkflow` that was created by this mutation. */
+  repositoryWorkflow?: RepositoryWorkflow | null;
+  repositoryWorkflowEdge?: RepositoryWorkflowEdge | null;
+}
 export interface CreateResourcePayload {
   clientMutationId?: string | null;
   /** The `Resource` that was created by this mutation. */
@@ -10191,11 +19436,148 @@ export interface CreateWebhookEventPayload {
   webhookEvent?: WebhookEvent | null;
   webhookEventEdge?: WebhookEventEdge | null;
 }
+export interface DatabaseAddEdgePayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseAddEdgeAndSavePayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseAddNodePayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseAddNodeAndSavePayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseApproveNodePayload {
+  clientMutationId?: string | null;
+}
+export interface DatabaseCopyGraphPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseCreateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseGraphInitEmptyRepoPayload {
+  clientMutationId?: string | null;
+}
+export interface DatabaseGraphInsertNodeAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseGraphInsertNodesAtPathsPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseGraphSetAndCommitPayload {
+  clientMutationId?: string | null;
+  databaseGraphCommitEdge?: DatabaseGraphCommitEdge | null;
+  result?: DatabaseGraphCommit | null;
+}
+export interface DatabaseGraphSetDataAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseGraphSetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  databaseGraphCommitEdge?: DatabaseGraphCommitEdge | null;
+  result?: DatabaseGraphCommit | null;
+}
+export interface DatabaseImportDefinitionsPayload {
+  clientMutationId?: string | null;
+}
+export interface DatabaseImportGraphJsonPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseSaveGraphPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseStartExecutionPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface DatabaseValidateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface DeleteBuildPayload {
+  /** The `Build` that was deleted by this mutation. */
+  build?: Build | null;
+  buildEdge?: BuildEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteBuildStepPayload {
+  /** The `BuildStep` that was deleted by this mutation. */
+  buildStep?: BuildStep | null;
+  buildStepEdge?: BuildStepEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteBuilderBindingPayload {
+  /** The `BuilderBinding` that was deleted by this mutation. */
+  builderBinding?: BuilderBinding | null;
+  builderBindingEdge?: BuilderBindingEdge | null;
+  clientMutationId?: string | null;
+}
 export interface DeleteContentPresetPayload {
   clientMutationId?: string | null;
   /** The `ContentPreset` that was deleted by this mutation. */
   contentPreset?: ContentPreset | null;
   contentPresetEdge?: ContentPresetEdge | null;
+}
+export interface DeleteDatabaseFunctionGraphPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraph` that was deleted by this mutation. */
+  databaseFunctionGraph?: DatabaseFunctionGraph | null;
+  databaseFunctionGraphEdge?: DatabaseFunctionGraphEdge | null;
+}
+export interface DeleteDatabaseFunctionGraphExecutionPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraphExecution` that was deleted by this mutation. */
+  databaseFunctionGraphExecution?: DatabaseFunctionGraphExecution | null;
+  databaseFunctionGraphExecutionEdge?: DatabaseFunctionGraphExecutionEdge | null;
+}
+export interface DeleteDatabaseFunctionGraphExecutionNodeStatePayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraphExecutionNodeState` that was deleted by this mutation. */
+  databaseFunctionGraphExecutionNodeState?: DatabaseFunctionGraphExecutionNodeState | null;
+  databaseFunctionGraphExecutionNodeStateEdge?: DatabaseFunctionGraphExecutionNodeStateEdge | null;
+}
+export interface DeleteDatabaseFunctionGraphExecutionOutputPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraphExecutionOutput` that was deleted by this mutation. */
+  databaseFunctionGraphExecutionOutput?: DatabaseFunctionGraphExecutionOutput | null;
+  databaseFunctionGraphExecutionOutputEdge?: DatabaseFunctionGraphExecutionOutputEdge | null;
+}
+export interface DeleteDatabaseGraphCommitPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphCommit` that was deleted by this mutation. */
+  databaseGraphCommit?: DatabaseGraphCommit | null;
+  databaseGraphCommitEdge?: DatabaseGraphCommitEdge | null;
+}
+export interface DeleteDatabaseGraphObjectPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphObject` that was deleted by this mutation. */
+  databaseGraphObject?: DatabaseGraphObject | null;
+  databaseGraphObjectEdge?: DatabaseGraphObjectEdge | null;
+}
+export interface DeleteDatabaseGraphRefPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphRef` that was deleted by this mutation. */
+  databaseGraphRef?: DatabaseGraphRef | null;
+  databaseGraphRefEdge?: DatabaseGraphRefEdge | null;
+}
+export interface DeleteDatabaseGraphStorePayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphStore` that was deleted by this mutation. */
+  databaseGraphStore?: DatabaseGraphStore | null;
+  databaseGraphStoreEdge?: DatabaseGraphStoreEdge | null;
 }
 export interface DeleteDbPresetPayload {
   clientMutationId?: string | null;
@@ -10299,6 +19681,18 @@ export interface DeleteFunctionInvocationAttemptPayload {
   functionInvocationAttempt?: FunctionInvocationAttempt | null;
   functionInvocationAttemptEdge?: FunctionInvocationAttemptEdge | null;
 }
+export interface DeleteImagePayload {
+  clientMutationId?: string | null;
+  /** The `Image` that was deleted by this mutation. */
+  image?: Image | null;
+  imageEdge?: ImageEdge | null;
+}
+export interface DeleteImageGrantPayload {
+  clientMutationId?: string | null;
+  /** The `ImageGrant` that was deleted by this mutation. */
+  imageGrant?: ImageGrant | null;
+  imageGrantEdge?: ImageGrantEdge | null;
+}
 export interface DeleteInfraCommitPayload {
   clientMutationId?: string | null;
   /** The `InfraCommit` that was deleted by this mutation. */
@@ -10340,6 +19734,24 @@ export interface DeleteNamespaceEventPayload {
   /** The `NamespaceEvent` that was deleted by this mutation. */
   namespaceEvent?: NamespaceEvent | null;
   namespaceEventEdge?: NamespaceEventEdge | null;
+}
+export interface DeletePlatformBuildPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformBuild` that was deleted by this mutation. */
+  platformBuild?: PlatformBuild | null;
+  platformBuildEdge?: PlatformBuildEdge | null;
+}
+export interface DeletePlatformBuildStepPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformBuildStep` that was deleted by this mutation. */
+  platformBuildStep?: PlatformBuildStep | null;
+  platformBuildStepEdge?: PlatformBuildStepEdge | null;
+}
+export interface DeletePlatformBuilderBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformBuilderBinding` that was deleted by this mutation. */
+  platformBuilderBinding?: PlatformBuilderBinding | null;
+  platformBuilderBindingEdge?: PlatformBuilderBindingEdge | null;
 }
 export interface DeletePlatformFunctionApiBindingPayload {
   clientMutationId?: string | null;
@@ -10389,6 +19801,18 @@ export interface DeletePlatformFunctionInvocationAttemptPayload {
   platformFunctionInvocationAttempt?: PlatformFunctionInvocationAttempt | null;
   platformFunctionInvocationAttemptEdge?: PlatformFunctionInvocationAttemptEdge | null;
 }
+export interface DeletePlatformImagePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformImage` that was deleted by this mutation. */
+  platformImage?: PlatformImage | null;
+  platformImageEdge?: PlatformImageEdge | null;
+}
+export interface DeletePlatformImageGrantPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformImageGrant` that was deleted by this mutation. */
+  platformImageGrant?: PlatformImageGrant | null;
+  platformImageGrantEdge?: PlatformImageGrantEdge | null;
+}
 export interface DeletePlatformInfraCommitPayload {
   clientMutationId?: string | null;
   /** The `PlatformInfraCommit` that was deleted by this mutation. */
@@ -10413,6 +19837,18 @@ export interface DeletePlatformInfraStorePayload {
   platformInfraStore?: PlatformInfraStore | null;
   platformInfraStoreEdge?: PlatformInfraStoreEdge | null;
 }
+export interface DeletePlatformK8sResourceKindPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformK8sResourceKind` that was deleted by this mutation. */
+  platformK8sResourceKind?: PlatformK8sResourceKind | null;
+  platformK8sResourceKindEdge?: PlatformK8sResourceKindEdge | null;
+}
+export interface DeletePlatformK8sSpecRulePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformK8sSpecRule` that was deleted by this mutation. */
+  platformK8sSpecRule?: PlatformK8sSpecRule | null;
+  platformK8sSpecRuleEdge?: PlatformK8sSpecRuleEdge | null;
+}
 export interface DeletePlatformNamespacePayload {
   clientMutationId?: string | null;
   /** The `PlatformNamespace` that was deleted by this mutation. */
@@ -10424,6 +19860,84 @@ export interface DeletePlatformNamespaceEventPayload {
   /** The `PlatformNamespaceEvent` that was deleted by this mutation. */
   platformNamespaceEvent?: PlatformNamespaceEvent | null;
   platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+}
+export interface DeletePlatformProposalPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposal` that was deleted by this mutation. */
+  platformProposal?: PlatformProposal | null;
+  platformProposalEdge?: PlatformProposalEdge | null;
+}
+export interface DeletePlatformProposalCommentPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalComment` that was deleted by this mutation. */
+  platformProposalComment?: PlatformProposalComment | null;
+  platformProposalCommentEdge?: PlatformProposalCommentEdge | null;
+}
+export interface DeletePlatformProposalFileViewPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalFileView` that was deleted by this mutation. */
+  platformProposalFileView?: PlatformProposalFileView | null;
+  platformProposalFileViewEdge?: PlatformProposalFileViewEdge | null;
+}
+export interface DeletePlatformProposalReactionPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalReaction` that was deleted by this mutation. */
+  platformProposalReaction?: PlatformProposalReaction | null;
+  platformProposalReactionEdge?: PlatformProposalReactionEdge | null;
+}
+export interface DeletePlatformProposalReviewPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalReview` that was deleted by this mutation. */
+  platformProposalReview?: PlatformProposalReview | null;
+  platformProposalReviewEdge?: PlatformProposalReviewEdge | null;
+}
+export interface DeletePlatformProposalsChunkPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalsChunk` that was deleted by this mutation. */
+  platformProposalsChunk?: PlatformProposalsChunk | null;
+  platformProposalsChunkEdge?: PlatformProposalsChunkEdge | null;
+}
+export interface DeletePlatformRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRegistry` that was deleted by this mutation. */
+  platformRegistry?: PlatformRegistry | null;
+  platformRegistryEdge?: PlatformRegistryEdge | null;
+}
+export interface DeletePlatformRegistryBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRegistryBinding` that was deleted by this mutation. */
+  platformRegistryBinding?: PlatformRegistryBinding | null;
+  platformRegistryBindingEdge?: PlatformRegistryBindingEdge | null;
+}
+export interface DeletePlatformRegistryGrantPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRegistryGrant` that was deleted by this mutation. */
+  platformRegistryGrant?: PlatformRegistryGrant | null;
+  platformRegistryGrantEdge?: PlatformRegistryGrantEdge | null;
+}
+export interface DeletePlatformRepositoryPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepository` that was deleted by this mutation. */
+  platformRepository?: PlatformRepository | null;
+  platformRepositoryEdge?: PlatformRepositoryEdge | null;
+}
+export interface DeletePlatformRepositoryEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepositoryEvent` that was deleted by this mutation. */
+  platformRepositoryEvent?: PlatformRepositoryEvent | null;
+  platformRepositoryEventEdge?: PlatformRepositoryEventEdge | null;
+}
+export interface DeletePlatformRepositoryRequiredCheckPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepositoryRequiredCheck` that was deleted by this mutation. */
+  platformRepositoryRequiredCheck?: PlatformRepositoryRequiredCheck | null;
+  platformRepositoryRequiredCheckEdge?: PlatformRepositoryRequiredCheckEdge | null;
+}
+export interface DeletePlatformRepositoryWorkflowPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepositoryWorkflow` that was deleted by this mutation. */
+  platformRepositoryWorkflow?: PlatformRepositoryWorkflow | null;
+  platformRepositoryWorkflowEdge?: PlatformRepositoryWorkflowEdge | null;
 }
 export interface DeletePlatformResourcePayload {
   clientMutationId?: string | null;
@@ -10479,6 +19993,84 @@ export interface DeletePlatformWebhookEventPayload {
   platformWebhookEvent?: PlatformWebhookEvent | null;
   platformWebhookEventEdge?: PlatformWebhookEventEdge | null;
 }
+export interface DeleteProposalPayload {
+  clientMutationId?: string | null;
+  /** The `Proposal` that was deleted by this mutation. */
+  proposal?: Proposal | null;
+  proposalEdge?: ProposalEdge | null;
+}
+export interface DeleteProposalCommentPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalComment` that was deleted by this mutation. */
+  proposalComment?: ProposalComment | null;
+  proposalCommentEdge?: ProposalCommentEdge | null;
+}
+export interface DeleteProposalFileViewPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalFileView` that was deleted by this mutation. */
+  proposalFileView?: ProposalFileView | null;
+  proposalFileViewEdge?: ProposalFileViewEdge | null;
+}
+export interface DeleteProposalReactionPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalReaction` that was deleted by this mutation. */
+  proposalReaction?: ProposalReaction | null;
+  proposalReactionEdge?: ProposalReactionEdge | null;
+}
+export interface DeleteProposalReviewPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalReview` that was deleted by this mutation. */
+  proposalReview?: ProposalReview | null;
+  proposalReviewEdge?: ProposalReviewEdge | null;
+}
+export interface DeleteProposalsChunkPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalsChunk` that was deleted by this mutation. */
+  proposalsChunk?: ProposalsChunk | null;
+  proposalsChunkEdge?: ProposalsChunkEdge | null;
+}
+export interface DeleteRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `Registry` that was deleted by this mutation. */
+  registry?: Registry | null;
+  registryEdge?: RegistryEdge | null;
+}
+export interface DeleteRegistryBindingPayload {
+  clientMutationId?: string | null;
+  /** The `RegistryBinding` that was deleted by this mutation. */
+  registryBinding?: RegistryBinding | null;
+  registryBindingEdge?: RegistryBindingEdge | null;
+}
+export interface DeleteRegistryGrantPayload {
+  clientMutationId?: string | null;
+  /** The `RegistryGrant` that was deleted by this mutation. */
+  registryGrant?: RegistryGrant | null;
+  registryGrantEdge?: RegistryGrantEdge | null;
+}
+export interface DeleteRepositoryPayload {
+  clientMutationId?: string | null;
+  /** The `Repository` that was deleted by this mutation. */
+  repository?: Repository | null;
+  repositoryEdge?: RepositoryEdge | null;
+}
+export interface DeleteRepositoryEventPayload {
+  clientMutationId?: string | null;
+  /** The `RepositoryEvent` that was deleted by this mutation. */
+  repositoryEvent?: RepositoryEvent | null;
+  repositoryEventEdge?: RepositoryEventEdge | null;
+}
+export interface DeleteRepositoryRequiredCheckPayload {
+  clientMutationId?: string | null;
+  /** The `RepositoryRequiredCheck` that was deleted by this mutation. */
+  repositoryRequiredCheck?: RepositoryRequiredCheck | null;
+  repositoryRequiredCheckEdge?: RepositoryRequiredCheckEdge | null;
+}
+export interface DeleteRepositoryWorkflowPayload {
+  clientMutationId?: string | null;
+  /** The `RepositoryWorkflow` that was deleted by this mutation. */
+  repositoryWorkflow?: RepositoryWorkflow | null;
+  repositoryWorkflowEdge?: RepositoryWorkflowEdge | null;
+}
 export interface DeleteResourcePayload {
   clientMutationId?: string | null;
   /** The `Resource` that was deleted by this mutation. */
@@ -10533,6 +20125,11 @@ export interface DeleteWebhookEventPayload {
   webhookEvent?: WebhookEvent | null;
   webhookEventEdge?: WebhookEventEdge | null;
 }
+export interface FunctionInvocationsCreateSyncPayload {
+  clientMutationId?: string | null;
+  functionInvocationEdge?: FunctionInvocationEdge | null;
+  result?: FunctionInvocation | null;
+}
 export interface ImportDefinitionsPayload {
   clientMutationId?: string | null;
 }
@@ -10576,6 +20173,11 @@ export interface InsertNodesAtPathsPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface PlatformFunctionInvocationsCreateSyncPayload {
+  clientMutationId?: string | null;
+  platformFunctionInvocationEdge?: PlatformFunctionInvocationEdge | null;
+  result?: PlatformFunctionInvocation | null;
+}
 export interface PlatformInfraInitEmptyRepoPayload {
   clientMutationId?: string | null;
 }
@@ -10615,18 +20217,13 @@ export interface PlatformResourceInstallationsUpgradePayload {
   clientMutationId?: string | null;
 }
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
 }
 export interface ResourceInstallationsInstallPayload {
   clientMutationId?: string | null;
@@ -10663,11 +20260,77 @@ export interface StartExecutionPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface UpdateBuildPayload {
+  /** The `Build` that was updated by this mutation. */
+  build?: Build | null;
+  buildEdge?: BuildEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateBuildStepPayload {
+  /** The `BuildStep` that was updated by this mutation. */
+  buildStep?: BuildStep | null;
+  buildStepEdge?: BuildStepEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateBuilderBindingPayload {
+  /** The `BuilderBinding` that was updated by this mutation. */
+  builderBinding?: BuilderBinding | null;
+  builderBindingEdge?: BuilderBindingEdge | null;
+  clientMutationId?: string | null;
+}
 export interface UpdateContentPresetPayload {
   clientMutationId?: string | null;
   /** The `ContentPreset` that was updated by this mutation. */
   contentPreset?: ContentPreset | null;
   contentPresetEdge?: ContentPresetEdge | null;
+}
+export interface UpdateDatabaseFunctionGraphPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraph` that was updated by this mutation. */
+  databaseFunctionGraph?: DatabaseFunctionGraph | null;
+  databaseFunctionGraphEdge?: DatabaseFunctionGraphEdge | null;
+}
+export interface UpdateDatabaseFunctionGraphExecutionPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraphExecution` that was updated by this mutation. */
+  databaseFunctionGraphExecution?: DatabaseFunctionGraphExecution | null;
+  databaseFunctionGraphExecutionEdge?: DatabaseFunctionGraphExecutionEdge | null;
+}
+export interface UpdateDatabaseFunctionGraphExecutionNodeStatePayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraphExecutionNodeState` that was updated by this mutation. */
+  databaseFunctionGraphExecutionNodeState?: DatabaseFunctionGraphExecutionNodeState | null;
+  databaseFunctionGraphExecutionNodeStateEdge?: DatabaseFunctionGraphExecutionNodeStateEdge | null;
+}
+export interface UpdateDatabaseFunctionGraphExecutionOutputPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseFunctionGraphExecutionOutput` that was updated by this mutation. */
+  databaseFunctionGraphExecutionOutput?: DatabaseFunctionGraphExecutionOutput | null;
+  databaseFunctionGraphExecutionOutputEdge?: DatabaseFunctionGraphExecutionOutputEdge | null;
+}
+export interface UpdateDatabaseGraphCommitPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphCommit` that was updated by this mutation. */
+  databaseGraphCommit?: DatabaseGraphCommit | null;
+  databaseGraphCommitEdge?: DatabaseGraphCommitEdge | null;
+}
+export interface UpdateDatabaseGraphObjectPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphObject` that was updated by this mutation. */
+  databaseGraphObject?: DatabaseGraphObject | null;
+  databaseGraphObjectEdge?: DatabaseGraphObjectEdge | null;
+}
+export interface UpdateDatabaseGraphRefPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphRef` that was updated by this mutation. */
+  databaseGraphRef?: DatabaseGraphRef | null;
+  databaseGraphRefEdge?: DatabaseGraphRefEdge | null;
+}
+export interface UpdateDatabaseGraphStorePayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseGraphStore` that was updated by this mutation. */
+  databaseGraphStore?: DatabaseGraphStore | null;
+  databaseGraphStoreEdge?: DatabaseGraphStoreEdge | null;
 }
 export interface UpdateDbPresetPayload {
   clientMutationId?: string | null;
@@ -10771,6 +20434,18 @@ export interface UpdateFunctionInvocationAttemptPayload {
   functionInvocationAttempt?: FunctionInvocationAttempt | null;
   functionInvocationAttemptEdge?: FunctionInvocationAttemptEdge | null;
 }
+export interface UpdateImagePayload {
+  clientMutationId?: string | null;
+  /** The `Image` that was updated by this mutation. */
+  image?: Image | null;
+  imageEdge?: ImageEdge | null;
+}
+export interface UpdateImageGrantPayload {
+  clientMutationId?: string | null;
+  /** The `ImageGrant` that was updated by this mutation. */
+  imageGrant?: ImageGrant | null;
+  imageGrantEdge?: ImageGrantEdge | null;
+}
 export interface UpdateInfraCommitPayload {
   clientMutationId?: string | null;
   /** The `InfraCommit` that was updated by this mutation. */
@@ -10812,6 +20487,24 @@ export interface UpdateNamespaceEventPayload {
   /** The `NamespaceEvent` that was updated by this mutation. */
   namespaceEvent?: NamespaceEvent | null;
   namespaceEventEdge?: NamespaceEventEdge | null;
+}
+export interface UpdatePlatformBuildPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformBuild` that was updated by this mutation. */
+  platformBuild?: PlatformBuild | null;
+  platformBuildEdge?: PlatformBuildEdge | null;
+}
+export interface UpdatePlatformBuildStepPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformBuildStep` that was updated by this mutation. */
+  platformBuildStep?: PlatformBuildStep | null;
+  platformBuildStepEdge?: PlatformBuildStepEdge | null;
+}
+export interface UpdatePlatformBuilderBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformBuilderBinding` that was updated by this mutation. */
+  platformBuilderBinding?: PlatformBuilderBinding | null;
+  platformBuilderBindingEdge?: PlatformBuilderBindingEdge | null;
 }
 export interface UpdatePlatformFunctionApiBindingPayload {
   clientMutationId?: string | null;
@@ -10861,6 +20554,18 @@ export interface UpdatePlatformFunctionInvocationAttemptPayload {
   platformFunctionInvocationAttempt?: PlatformFunctionInvocationAttempt | null;
   platformFunctionInvocationAttemptEdge?: PlatformFunctionInvocationAttemptEdge | null;
 }
+export interface UpdatePlatformImagePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformImage` that was updated by this mutation. */
+  platformImage?: PlatformImage | null;
+  platformImageEdge?: PlatformImageEdge | null;
+}
+export interface UpdatePlatformImageGrantPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformImageGrant` that was updated by this mutation. */
+  platformImageGrant?: PlatformImageGrant | null;
+  platformImageGrantEdge?: PlatformImageGrantEdge | null;
+}
 export interface UpdatePlatformInfraCommitPayload {
   clientMutationId?: string | null;
   /** The `PlatformInfraCommit` that was updated by this mutation. */
@@ -10885,6 +20590,18 @@ export interface UpdatePlatformInfraStorePayload {
   platformInfraStore?: PlatformInfraStore | null;
   platformInfraStoreEdge?: PlatformInfraStoreEdge | null;
 }
+export interface UpdatePlatformK8sResourceKindPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformK8sResourceKind` that was updated by this mutation. */
+  platformK8sResourceKind?: PlatformK8sResourceKind | null;
+  platformK8sResourceKindEdge?: PlatformK8sResourceKindEdge | null;
+}
+export interface UpdatePlatformK8sSpecRulePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformK8sSpecRule` that was updated by this mutation. */
+  platformK8sSpecRule?: PlatformK8sSpecRule | null;
+  platformK8sSpecRuleEdge?: PlatformK8sSpecRuleEdge | null;
+}
 export interface UpdatePlatformNamespacePayload {
   clientMutationId?: string | null;
   /** The `PlatformNamespace` that was updated by this mutation. */
@@ -10896,6 +20613,84 @@ export interface UpdatePlatformNamespaceEventPayload {
   /** The `PlatformNamespaceEvent` that was updated by this mutation. */
   platformNamespaceEvent?: PlatformNamespaceEvent | null;
   platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+}
+export interface UpdatePlatformProposalPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposal` that was updated by this mutation. */
+  platformProposal?: PlatformProposal | null;
+  platformProposalEdge?: PlatformProposalEdge | null;
+}
+export interface UpdatePlatformProposalCommentPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalComment` that was updated by this mutation. */
+  platformProposalComment?: PlatformProposalComment | null;
+  platformProposalCommentEdge?: PlatformProposalCommentEdge | null;
+}
+export interface UpdatePlatformProposalFileViewPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalFileView` that was updated by this mutation. */
+  platformProposalFileView?: PlatformProposalFileView | null;
+  platformProposalFileViewEdge?: PlatformProposalFileViewEdge | null;
+}
+export interface UpdatePlatformProposalReactionPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalReaction` that was updated by this mutation. */
+  platformProposalReaction?: PlatformProposalReaction | null;
+  platformProposalReactionEdge?: PlatformProposalReactionEdge | null;
+}
+export interface UpdatePlatformProposalReviewPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalReview` that was updated by this mutation. */
+  platformProposalReview?: PlatformProposalReview | null;
+  platformProposalReviewEdge?: PlatformProposalReviewEdge | null;
+}
+export interface UpdatePlatformProposalsChunkPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformProposalsChunk` that was updated by this mutation. */
+  platformProposalsChunk?: PlatformProposalsChunk | null;
+  platformProposalsChunkEdge?: PlatformProposalsChunkEdge | null;
+}
+export interface UpdatePlatformRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRegistry` that was updated by this mutation. */
+  platformRegistry?: PlatformRegistry | null;
+  platformRegistryEdge?: PlatformRegistryEdge | null;
+}
+export interface UpdatePlatformRegistryBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRegistryBinding` that was updated by this mutation. */
+  platformRegistryBinding?: PlatformRegistryBinding | null;
+  platformRegistryBindingEdge?: PlatformRegistryBindingEdge | null;
+}
+export interface UpdatePlatformRegistryGrantPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRegistryGrant` that was updated by this mutation. */
+  platformRegistryGrant?: PlatformRegistryGrant | null;
+  platformRegistryGrantEdge?: PlatformRegistryGrantEdge | null;
+}
+export interface UpdatePlatformRepositoryPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepository` that was updated by this mutation. */
+  platformRepository?: PlatformRepository | null;
+  platformRepositoryEdge?: PlatformRepositoryEdge | null;
+}
+export interface UpdatePlatformRepositoryEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepositoryEvent` that was updated by this mutation. */
+  platformRepositoryEvent?: PlatformRepositoryEvent | null;
+  platformRepositoryEventEdge?: PlatformRepositoryEventEdge | null;
+}
+export interface UpdatePlatformRepositoryRequiredCheckPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepositoryRequiredCheck` that was updated by this mutation. */
+  platformRepositoryRequiredCheck?: PlatformRepositoryRequiredCheck | null;
+  platformRepositoryRequiredCheckEdge?: PlatformRepositoryRequiredCheckEdge | null;
+}
+export interface UpdatePlatformRepositoryWorkflowPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformRepositoryWorkflow` that was updated by this mutation. */
+  platformRepositoryWorkflow?: PlatformRepositoryWorkflow | null;
+  platformRepositoryWorkflowEdge?: PlatformRepositoryWorkflowEdge | null;
 }
 export interface UpdatePlatformResourcePayload {
   clientMutationId?: string | null;
@@ -10950,6 +20745,84 @@ export interface UpdatePlatformWebhookEventPayload {
   /** The `PlatformWebhookEvent` that was updated by this mutation. */
   platformWebhookEvent?: PlatformWebhookEvent | null;
   platformWebhookEventEdge?: PlatformWebhookEventEdge | null;
+}
+export interface UpdateProposalPayload {
+  clientMutationId?: string | null;
+  /** The `Proposal` that was updated by this mutation. */
+  proposal?: Proposal | null;
+  proposalEdge?: ProposalEdge | null;
+}
+export interface UpdateProposalCommentPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalComment` that was updated by this mutation. */
+  proposalComment?: ProposalComment | null;
+  proposalCommentEdge?: ProposalCommentEdge | null;
+}
+export interface UpdateProposalFileViewPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalFileView` that was updated by this mutation. */
+  proposalFileView?: ProposalFileView | null;
+  proposalFileViewEdge?: ProposalFileViewEdge | null;
+}
+export interface UpdateProposalReactionPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalReaction` that was updated by this mutation. */
+  proposalReaction?: ProposalReaction | null;
+  proposalReactionEdge?: ProposalReactionEdge | null;
+}
+export interface UpdateProposalReviewPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalReview` that was updated by this mutation. */
+  proposalReview?: ProposalReview | null;
+  proposalReviewEdge?: ProposalReviewEdge | null;
+}
+export interface UpdateProposalsChunkPayload {
+  clientMutationId?: string | null;
+  /** The `ProposalsChunk` that was updated by this mutation. */
+  proposalsChunk?: ProposalsChunk | null;
+  proposalsChunkEdge?: ProposalsChunkEdge | null;
+}
+export interface UpdateRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `Registry` that was updated by this mutation. */
+  registry?: Registry | null;
+  registryEdge?: RegistryEdge | null;
+}
+export interface UpdateRegistryBindingPayload {
+  clientMutationId?: string | null;
+  /** The `RegistryBinding` that was updated by this mutation. */
+  registryBinding?: RegistryBinding | null;
+  registryBindingEdge?: RegistryBindingEdge | null;
+}
+export interface UpdateRegistryGrantPayload {
+  clientMutationId?: string | null;
+  /** The `RegistryGrant` that was updated by this mutation. */
+  registryGrant?: RegistryGrant | null;
+  registryGrantEdge?: RegistryGrantEdge | null;
+}
+export interface UpdateRepositoryPayload {
+  clientMutationId?: string | null;
+  /** The `Repository` that was updated by this mutation. */
+  repository?: Repository | null;
+  repositoryEdge?: RepositoryEdge | null;
+}
+export interface UpdateRepositoryEventPayload {
+  clientMutationId?: string | null;
+  /** The `RepositoryEvent` that was updated by this mutation. */
+  repositoryEvent?: RepositoryEvent | null;
+  repositoryEventEdge?: RepositoryEventEdge | null;
+}
+export interface UpdateRepositoryRequiredCheckPayload {
+  clientMutationId?: string | null;
+  /** The `RepositoryRequiredCheck` that was updated by this mutation. */
+  repositoryRequiredCheck?: RepositoryRequiredCheck | null;
+  repositoryRequiredCheckEdge?: RepositoryRequiredCheckEdge | null;
+}
+export interface UpdateRepositoryWorkflowPayload {
+  clientMutationId?: string | null;
+  /** The `RepositoryWorkflow` that was updated by this mutation. */
+  repositoryWorkflow?: RepositoryWorkflow | null;
+  repositoryWorkflowEdge?: RepositoryWorkflowEdge | null;
 }
 export interface UpdateResourcePayload {
   clientMutationId?: string | null;
@@ -11036,11 +20909,11 @@ export interface MetaTable {
   tableName: string;
   uniqueConstraints: MetaUniqueConstraint[];
 }
-/** A `ContentPreset` edge in the connection. */
-export interface ContentPresetEdge {
+/** A `BuildStep` edge in the connection. */
+export interface BuildStepEdge {
   cursor?: string | null;
-  /** The `ContentPreset` at the end of the edge. */
-  node?: ContentPreset | null;
+  /** The `BuildStep` at the end of the edge. */
+  node?: BuildStep | null;
 }
 /** Information about pagination in a connection. */
 export interface PageInfo {
@@ -11052,6 +20925,78 @@ export interface PageInfo {
   hasPreviousPage: boolean;
   /** When paginating backwards, the cursor to continue. */
   startCursor?: string | null;
+}
+/** A `BuilderBinding` edge in the connection. */
+export interface BuilderBindingEdge {
+  cursor?: string | null;
+  /** The `BuilderBinding` at the end of the edge. */
+  node?: BuilderBinding | null;
+}
+/** A `Build` edge in the connection. */
+export interface BuildEdge {
+  cursor?: string | null;
+  /** The `Build` at the end of the edge. */
+  node?: Build | null;
+}
+/** A `ContentPreset` edge in the connection. */
+export interface ContentPresetEdge {
+  cursor?: string | null;
+  /** The `ContentPreset` at the end of the edge. */
+  node?: ContentPreset | null;
+}
+/** A `DatabaseFunctionGraphExecutionNodeState` edge in the connection. */
+export interface DatabaseFunctionGraphExecutionNodeStateEdge {
+  cursor?: string | null;
+  /** The `DatabaseFunctionGraphExecutionNodeState` at the end of the edge. */
+  node?: DatabaseFunctionGraphExecutionNodeState | null;
+}
+/** A `DatabaseFunctionGraphExecutionOutput` edge in the connection. */
+export interface DatabaseFunctionGraphExecutionOutputEdge {
+  cursor?: string | null;
+  /** The `DatabaseFunctionGraphExecutionOutput` at the end of the edge. */
+  node?: DatabaseFunctionGraphExecutionOutput | null;
+}
+/** A `DatabaseFunctionGraphExecution` edge in the connection. */
+export interface DatabaseFunctionGraphExecutionEdge {
+  cursor?: string | null;
+  /** The `DatabaseFunctionGraphExecution` at the end of the edge. */
+  node?: DatabaseFunctionGraphExecution | null;
+}
+/** A `DatabaseFunctionGraph` edge in the connection. */
+export interface DatabaseFunctionGraphEdge {
+  cursor?: string | null;
+  /** The `DatabaseFunctionGraph` at the end of the edge. */
+  node?: DatabaseFunctionGraph | null;
+}
+/** A `DatabaseGraphCommit` edge in the connection. */
+export interface DatabaseGraphCommitEdge {
+  cursor?: string | null;
+  /** The `DatabaseGraphCommit` at the end of the edge. */
+  node?: DatabaseGraphCommit | null;
+}
+/** A `DatabaseGraphGetAllTreeNodesRecord` edge in the connection. */
+export interface DatabaseGraphGetAllTreeNodesEdge {
+  cursor?: string | null;
+  /** The `DatabaseGraphGetAllTreeNodesRecord` at the end of the edge. */
+  node?: DatabaseGraphGetAllTreeNodesRecord | null;
+}
+/** A `DatabaseGraphObject` edge in the connection. */
+export interface DatabaseGraphObjectEdge {
+  cursor?: string | null;
+  /** The `DatabaseGraphObject` at the end of the edge. */
+  node?: DatabaseGraphObject | null;
+}
+/** A `DatabaseGraphRef` edge in the connection. */
+export interface DatabaseGraphRefEdge {
+  cursor?: string | null;
+  /** The `DatabaseGraphRef` at the end of the edge. */
+  node?: DatabaseGraphRef | null;
+}
+/** A `DatabaseGraphStore` edge in the connection. */
+export interface DatabaseGraphStoreEdge {
+  cursor?: string | null;
+  /** The `DatabaseGraphStore` at the end of the edge. */
+  node?: DatabaseGraphStore | null;
 }
 /** A `DbPreset` edge in the connection. */
 export interface DbPresetEdge {
@@ -11161,6 +21106,18 @@ export interface GetAllTreeNodesEdge {
   /** The `GetAllTreeNodesRecord` at the end of the edge. */
   node?: GetAllTreeNodesRecord | null;
 }
+/** A `ImageGrant` edge in the connection. */
+export interface ImageGrantEdge {
+  cursor?: string | null;
+  /** The `ImageGrant` at the end of the edge. */
+  node?: ImageGrant | null;
+}
+/** A `Image` edge in the connection. */
+export interface ImageEdge {
+  cursor?: string | null;
+  /** The `Image` at the end of the edge. */
+  node?: Image | null;
+}
 /** A `InfraCommit` edge in the connection. */
 export interface InfraCommitEdge {
   cursor?: string | null;
@@ -11208,6 +21165,24 @@ export interface NamespaceEdge {
   cursor?: string | null;
   /** The `Namespace` at the end of the edge. */
   node?: Namespace | null;
+}
+/** A `PlatformBuildStep` edge in the connection. */
+export interface PlatformBuildStepEdge {
+  cursor?: string | null;
+  /** The `PlatformBuildStep` at the end of the edge. */
+  node?: PlatformBuildStep | null;
+}
+/** A `PlatformBuilderBinding` edge in the connection. */
+export interface PlatformBuilderBindingEdge {
+  cursor?: string | null;
+  /** The `PlatformBuilderBinding` at the end of the edge. */
+  node?: PlatformBuilderBinding | null;
+}
+/** A `PlatformBuild` edge in the connection. */
+export interface PlatformBuildEdge {
+  cursor?: string | null;
+  /** The `PlatformBuild` at the end of the edge. */
+  node?: PlatformBuild | null;
 }
 /** A `PlatformFunctionApiBinding` edge in the connection. */
 export interface PlatformFunctionApiBindingEdge {
@@ -11257,6 +21232,18 @@ export interface PlatformFunctionInvocationEdge {
   /** The `PlatformFunctionInvocation` at the end of the edge. */
   node?: PlatformFunctionInvocation | null;
 }
+/** A `PlatformImageGrant` edge in the connection. */
+export interface PlatformImageGrantEdge {
+  cursor?: string | null;
+  /** The `PlatformImageGrant` at the end of the edge. */
+  node?: PlatformImageGrant | null;
+}
+/** A `PlatformImage` edge in the connection. */
+export interface PlatformImageEdge {
+  cursor?: string | null;
+  /** The `PlatformImage` at the end of the edge. */
+  node?: PlatformImage | null;
+}
 /** A `PlatformInfraCommit` edge in the connection. */
 export interface PlatformInfraCommitEdge {
   cursor?: string | null;
@@ -11287,6 +21274,18 @@ export interface PlatformInfraStoreEdge {
   /** The `PlatformInfraStore` at the end of the edge. */
   node?: PlatformInfraStore | null;
 }
+/** A `PlatformK8sResourceKind` edge in the connection. */
+export interface PlatformK8sResourceKindEdge {
+  cursor?: string | null;
+  /** The `PlatformK8sResourceKind` at the end of the edge. */
+  node?: PlatformK8sResourceKind | null;
+}
+/** A `PlatformK8sSpecRule` edge in the connection. */
+export interface PlatformK8sSpecRuleEdge {
+  cursor?: string | null;
+  /** The `PlatformK8sSpecRule` at the end of the edge. */
+  node?: PlatformK8sSpecRule | null;
+}
 /** A `PlatformNamespaceEvent` edge in the connection. */
 export interface PlatformNamespaceEventEdge {
   cursor?: string | null;
@@ -11298,6 +21297,84 @@ export interface PlatformNamespaceEdge {
   cursor?: string | null;
   /** The `PlatformNamespace` at the end of the edge. */
   node?: PlatformNamespace | null;
+}
+/** A `PlatformProposalComment` edge in the connection. */
+export interface PlatformProposalCommentEdge {
+  cursor?: string | null;
+  /** The `PlatformProposalComment` at the end of the edge. */
+  node?: PlatformProposalComment | null;
+}
+/** A `PlatformProposalFileView` edge in the connection. */
+export interface PlatformProposalFileViewEdge {
+  cursor?: string | null;
+  /** The `PlatformProposalFileView` at the end of the edge. */
+  node?: PlatformProposalFileView | null;
+}
+/** A `PlatformProposalReaction` edge in the connection. */
+export interface PlatformProposalReactionEdge {
+  cursor?: string | null;
+  /** The `PlatformProposalReaction` at the end of the edge. */
+  node?: PlatformProposalReaction | null;
+}
+/** A `PlatformProposalReview` edge in the connection. */
+export interface PlatformProposalReviewEdge {
+  cursor?: string | null;
+  /** The `PlatformProposalReview` at the end of the edge. */
+  node?: PlatformProposalReview | null;
+}
+/** A `PlatformProposal` edge in the connection. */
+export interface PlatformProposalEdge {
+  cursor?: string | null;
+  /** The `PlatformProposal` at the end of the edge. */
+  node?: PlatformProposal | null;
+}
+/** A `PlatformProposalsChunk` edge in the connection. */
+export interface PlatformProposalsChunkEdge {
+  cursor?: string | null;
+  /** The `PlatformProposalsChunk` at the end of the edge. */
+  node?: PlatformProposalsChunk | null;
+}
+/** A `PlatformRegistry` edge in the connection. */
+export interface PlatformRegistryEdge {
+  cursor?: string | null;
+  /** The `PlatformRegistry` at the end of the edge. */
+  node?: PlatformRegistry | null;
+}
+/** A `PlatformRegistryBinding` edge in the connection. */
+export interface PlatformRegistryBindingEdge {
+  cursor?: string | null;
+  /** The `PlatformRegistryBinding` at the end of the edge. */
+  node?: PlatformRegistryBinding | null;
+}
+/** A `PlatformRegistryGrant` edge in the connection. */
+export interface PlatformRegistryGrantEdge {
+  cursor?: string | null;
+  /** The `PlatformRegistryGrant` at the end of the edge. */
+  node?: PlatformRegistryGrant | null;
+}
+/** A `PlatformRepository` edge in the connection. */
+export interface PlatformRepositoryEdge {
+  cursor?: string | null;
+  /** The `PlatformRepository` at the end of the edge. */
+  node?: PlatformRepository | null;
+}
+/** A `PlatformRepositoryEvent` edge in the connection. */
+export interface PlatformRepositoryEventEdge {
+  cursor?: string | null;
+  /** The `PlatformRepositoryEvent` at the end of the edge. */
+  node?: PlatformRepositoryEvent | null;
+}
+/** A `PlatformRepositoryRequiredCheck` edge in the connection. */
+export interface PlatformRepositoryRequiredCheckEdge {
+  cursor?: string | null;
+  /** The `PlatformRepositoryRequiredCheck` at the end of the edge. */
+  node?: PlatformRepositoryRequiredCheck | null;
+}
+/** A `PlatformRepositoryWorkflow` edge in the connection. */
+export interface PlatformRepositoryWorkflowEdge {
+  cursor?: string | null;
+  /** The `PlatformRepositoryWorkflow` at the end of the edge. */
+  node?: PlatformRepositoryWorkflow | null;
 }
 /** A `PlatformResourceDeclaredCapacity` edge in the connection. */
 export interface PlatformResourceDeclaredCapacityEdge {
@@ -11322,6 +21399,12 @@ export interface PlatformResourceInstallationEdge {
   cursor?: string | null;
   /** The `PlatformResourceInstallation` at the end of the edge. */
   node?: PlatformResourceInstallation | null;
+}
+/** A `PlatformResourceObservedStorage` edge in the connection. */
+export interface PlatformResourceObservedStorageEdge {
+  cursor?: string | null;
+  /** The `PlatformResourceObservedStorage` at the end of the edge. */
+  node?: PlatformResourceObservedStorage | null;
 }
 /** A `PlatformResourceStatusCheck` edge in the connection. */
 export interface PlatformResourceStatusCheckEdge {
@@ -11383,6 +21466,84 @@ export interface PlatformWebhookEventEdge {
   /** The `PlatformWebhookEvent` at the end of the edge. */
   node?: PlatformWebhookEvent | null;
 }
+/** A `ProposalComment` edge in the connection. */
+export interface ProposalCommentEdge {
+  cursor?: string | null;
+  /** The `ProposalComment` at the end of the edge. */
+  node?: ProposalComment | null;
+}
+/** A `ProposalFileView` edge in the connection. */
+export interface ProposalFileViewEdge {
+  cursor?: string | null;
+  /** The `ProposalFileView` at the end of the edge. */
+  node?: ProposalFileView | null;
+}
+/** A `ProposalReaction` edge in the connection. */
+export interface ProposalReactionEdge {
+  cursor?: string | null;
+  /** The `ProposalReaction` at the end of the edge. */
+  node?: ProposalReaction | null;
+}
+/** A `ProposalReview` edge in the connection. */
+export interface ProposalReviewEdge {
+  cursor?: string | null;
+  /** The `ProposalReview` at the end of the edge. */
+  node?: ProposalReview | null;
+}
+/** A `Proposal` edge in the connection. */
+export interface ProposalEdge {
+  cursor?: string | null;
+  /** The `Proposal` at the end of the edge. */
+  node?: Proposal | null;
+}
+/** A `ProposalsChunk` edge in the connection. */
+export interface ProposalsChunkEdge {
+  cursor?: string | null;
+  /** The `ProposalsChunk` at the end of the edge. */
+  node?: ProposalsChunk | null;
+}
+/** A `Registry` edge in the connection. */
+export interface RegistryEdge {
+  cursor?: string | null;
+  /** The `Registry` at the end of the edge. */
+  node?: Registry | null;
+}
+/** A `RegistryBinding` edge in the connection. */
+export interface RegistryBindingEdge {
+  cursor?: string | null;
+  /** The `RegistryBinding` at the end of the edge. */
+  node?: RegistryBinding | null;
+}
+/** A `RegistryGrant` edge in the connection. */
+export interface RegistryGrantEdge {
+  cursor?: string | null;
+  /** The `RegistryGrant` at the end of the edge. */
+  node?: RegistryGrant | null;
+}
+/** A `Repository` edge in the connection. */
+export interface RepositoryEdge {
+  cursor?: string | null;
+  /** The `Repository` at the end of the edge. */
+  node?: Repository | null;
+}
+/** A `RepositoryEvent` edge in the connection. */
+export interface RepositoryEventEdge {
+  cursor?: string | null;
+  /** The `RepositoryEvent` at the end of the edge. */
+  node?: RepositoryEvent | null;
+}
+/** A `RepositoryRequiredCheck` edge in the connection. */
+export interface RepositoryRequiredCheckEdge {
+  cursor?: string | null;
+  /** The `RepositoryRequiredCheck` at the end of the edge. */
+  node?: RepositoryRequiredCheck | null;
+}
+/** A `RepositoryWorkflow` edge in the connection. */
+export interface RepositoryWorkflowEdge {
+  cursor?: string | null;
+  /** The `RepositoryWorkflow` at the end of the edge. */
+  node?: RepositoryWorkflow | null;
+}
 /** A `ResourceDeclaredCapacity` edge in the connection. */
 export interface ResourceDeclaredCapacityEdge {
   cursor?: string | null;
@@ -11406,6 +21567,12 @@ export interface ResourceInstallationEdge {
   cursor?: string | null;
   /** The `ResourceInstallation` at the end of the edge. */
   node?: ResourceInstallation | null;
+}
+/** A `ResourceObservedStorage` edge in the connection. */
+export interface ResourceObservedStorageEdge {
+  cursor?: string | null;
+  /** The `ResourceObservedStorage` at the end of the edge. */
+  node?: ResourceObservedStorage | null;
 }
 /** A `ResourceStatusCheck` edge in the connection. */
 export interface ResourceStatusCheckEdge {
@@ -11579,10 +21746,18 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
+  /** GraphQL type name of the plane's buckets table */
+  bucketsType: string;
+  /** Computed download-URL field on the files type; null on the buckets side */
+  downloadUrlField?: string | null;
+  /** GraphQL type name of the plane's files table */
+  filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
+  /** The plane's GraphQL upload surface */
+  upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
 export interface MetaUniqueConstraint {
@@ -11664,6 +21839,27 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+export interface MetaStorageUpload {
+  /** Per-file input type inside the bulk input */
+  bulkFileInputType: string;
+  /** Per-file payload type inside the bulk payload */
+  bulkFilePayloadType: string;
+  /** Input type of the bulk upload mutation */
+  bulkInputType: string;
+  /** Root mutation field for bulk upload */
+  bulkMutation: string;
+  /** Payload type of the bulk upload mutation */
+  bulkPayloadType: string;
+  /** Input type of the single upload mutation */
+  inputType: string;
+  /** Root mutation field for single-file upload (e.g. uploadAppFile) */
+  mutation: string;
+  /** Payload type of the single upload mutation */
+  payloadType: string;
+  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  requiresOwnerId: boolean;
 }
 /** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {

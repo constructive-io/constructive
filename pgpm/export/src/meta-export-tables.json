@@ -147,19 +147,24 @@
       "table": "billing_provider_module"
     },
     {
+      "key": "capabilities_module",
+      "schema": "metaschema_modules_public",
+      "table": "capabilities_module"
+    },
+    {
       "key": "catalog_module",
       "schema": "metaschema_modules_public",
       "table": "catalog_module"
     },
     {
+      "key": "cluster_module",
+      "schema": "metaschema_modules_public",
+      "table": "cluster_module"
+    },
+    {
       "key": "compute_log_module",
       "schema": "metaschema_modules_public",
       "table": "compute_log_module"
-    },
-    {
-      "key": "config_secrets_user_module",
-      "schema": "metaschema_modules_public",
-      "table": "config_secrets_user_module"
     },
     {
       "key": "connected_accounts_module",
@@ -227,6 +232,11 @@
       "table": "identity_providers_module"
     },
     {
+      "key": "image_module",
+      "schema": "metaschema_modules_public",
+      "table": "image_module"
+    },
+    {
       "key": "inference_log_module",
       "schema": "metaschema_modules_public",
       "table": "inference_log_module"
@@ -247,6 +257,11 @@
       "table": "integration_providers_module"
     },
     {
+      "key": "internal_config_module",
+      "schema": "metaschema_modules_public",
+      "table": "internal_config_module"
+    },
+    {
       "key": "internal_secrets_module",
       "schema": "metaschema_modules_public",
       "table": "internal_secrets_module"
@@ -260,6 +275,11 @@
       "key": "limits_module",
       "schema": "metaschema_modules_public",
       "table": "limits_module"
+    },
+    {
+      "key": "machine_module",
+      "schema": "metaschema_modules_public",
+      "table": "machine_module"
     },
     {
       "key": "membership_types_module",
@@ -282,9 +302,9 @@
       "table": "notifications_module"
     },
     {
-      "key": "permissions_module",
+      "key": "oauth_requests_module",
       "schema": "metaschema_modules_public",
-      "table": "permissions_module"
+      "table": "oauth_requests_module"
     },
     {
       "key": "phone_numbers_module",
@@ -322,9 +342,19 @@
       "table": "realtime_module"
     },
     {
+      "key": "refusal_log_module",
+      "schema": "metaschema_modules_public",
+      "table": "refusal_log_module"
+    },
+    {
       "key": "relation_provision",
       "schema": "metaschema_modules_public",
       "table": "relation_provision"
+    },
+    {
+      "key": "repository_module",
+      "schema": "metaschema_modules_public",
+      "table": "repository_module"
     },
     {
       "key": "rls_module",
@@ -380,6 +410,11 @@
       "key": "user_settings_module",
       "schema": "metaschema_modules_public",
       "table": "user_settings_module"
+    },
+    {
+      "key": "user_settings_security_module",
+      "schema": "metaschema_modules_public",
+      "table": "user_settings_security_module"
     },
     {
       "key": "user_state_module",
@@ -457,6 +492,16 @@
       "table": "app_module"
     },
     {
+      "key": "content_preset_module",
+      "schema": "metaschema_modules_public",
+      "table": "content_preset_module"
+    },
+    {
+      "key": "data_capabilities_field",
+      "schema": "metaschema_modules_public",
+      "table": "data_capabilities_field"
+    },
+    {
       "key": "db_preset_module",
       "schema": "metaschema_modules_public",
       "table": "db_preset_module"
@@ -472,6 +517,11 @@
       "table": "domain_module"
     },
     {
+      "key": "file_ref_field",
+      "schema": "metaschema_modules_public",
+      "table": "file_ref_field"
+    },
+    {
       "key": "function_deployment_module",
       "schema": "metaschema_modules_public",
       "table": "function_deployment_module"
@@ -480,6 +530,11 @@
       "key": "graph_module",
       "schema": "metaschema_modules_public",
       "table": "graph_module"
+    },
+    {
+      "key": "k8s_admission_module",
+      "schema": "metaschema_modules_public",
+      "table": "k8s_admission_module"
     },
     {
       "key": "memberships_module",
@@ -502,14 +557,14 @@
       "table": "webhook_module"
     },
     {
+      "key": "email_sender_module",
+      "schema": "metaschema_modules_public",
+      "table": "email_sender_module"
+    },
+    {
       "key": "graph_execution_module",
       "schema": "metaschema_modules_public",
       "table": "graph_execution_module"
-    },
-    {
-      "key": "http_route_module",
-      "schema": "metaschema_modules_public",
-      "table": "http_route_module"
     },
     {
       "key": "pages_module",
@@ -562,9 +617,19 @@
       "table": "domains"
     },
     {
-      "key": "http_routes",
+      "key": "email_identities",
       "schema": "routing_public",
-      "table": "http_routes"
+      "table": "email_identities"
+    },
+    {
+      "key": "email_provider_accounts",
+      "schema": "routing_public",
+      "table": "email_provider_accounts"
+    },
+    {
+      "key": "email_site_identities",
+      "schema": "routing_public",
+      "table": "email_site_identities"
     },
     {
       "key": "managed_domains",
@@ -582,6 +647,11 @@
       "table": "pubkey_settings"
     },
     {
+      "key": "redirects",
+      "schema": "routing_public",
+      "table": "redirects"
+    },
+    {
       "key": "rls_settings",
       "schema": "routing_public",
       "table": "rls_settings"
@@ -590,16 +660,6 @@
       "key": "routes",
       "schema": "routing_public",
       "table": "routes"
-    },
-    {
-      "key": "hostname_bindings",
-      "schema": "routing_public",
-      "table": "hostname_bindings"
-    },
-    {
-      "key": "route_bindings",
-      "schema": "routing_public",
-      "table": "route_bindings"
     },
     {
       "key": "site_app_links",
@@ -627,6 +687,11 @@
       "table": "site_modules"
     },
     {
+      "key": "site_releases",
+      "schema": "routing_public",
+      "table": "site_releases"
+    },
+    {
       "key": "site_themes",
       "schema": "routing_public",
       "table": "site_themes"
@@ -652,6 +717,11 @@
       "table": "app_components"
     },
     {
+      "key": "app_store_identities",
+      "schema": "apps_public",
+      "table": "app_store_identities"
+    },
+    {
       "key": "apps",
       "schema": "apps_public",
       "table": "apps"
@@ -660,6 +730,11 @@
       "key": "catalog_private.apis",
       "schema": "catalog_private",
       "table": "apis"
+    },
+    {
+      "key": "catalog_private.app_store_identities",
+      "schema": "catalog_private",
+      "table": "app_store_identities"
     },
     {
       "key": "catalog_private.apps",
@@ -682,9 +757,29 @@
       "table": "domains"
     },
     {
+      "key": "functions",
+      "schema": "catalog_private",
+      "table": "functions"
+    },
+    {
+      "key": "images",
+      "schema": "catalog_private",
+      "table": "images"
+    },
+    {
+      "key": "catalog_private.managed_domains",
+      "schema": "catalog_private",
+      "table": "managed_domains"
+    },
+    {
       "key": "namespaces",
       "schema": "catalog_private",
       "table": "namespaces"
+    },
+    {
+      "key": "catalog_private.redirects",
+      "schema": "catalog_private",
+      "table": "redirects"
     },
     {
       "key": "resource_definitions",
@@ -732,11 +827,19 @@
       "created_at",
       "updated_at"
     ],
+    "apps_public.app_store_identities": [
+      "created_at",
+      "updated_at"
+    ],
     "apps_public.apps": [
       "created_at",
       "updated_at"
     ],
     "catalog_private.apis": [
+      "created_at",
+      "updated_at"
+    ],
+    "catalog_private.app_store_identities": [
       "created_at",
       "updated_at"
     ],
@@ -760,7 +863,19 @@
       "created_at",
       "updated_at"
     ],
+    "catalog_private.images": [
+      "created_at",
+      "updated_at"
+    ],
+    "catalog_private.managed_domains": [
+      "created_at",
+      "updated_at"
+    ],
     "catalog_private.namespaces": [
+      "created_at",
+      "updated_at"
+    ],
+    "catalog_private.redirects": [
       "created_at",
       "updated_at"
     ],
@@ -796,6 +911,9 @@
       "created_at",
       "updated_at"
     ],
+    "metaschema_modules_public.content_preset_module": [
+      "created_at"
+    ],
     "metaschema_modules_public.db_preset_module": [
       "created_at"
     ],
@@ -806,6 +924,9 @@
       "created_at"
     ],
     "metaschema_modules_public.hierarchy_module": [
+      "created_at"
+    ],
+    "metaschema_modules_public.k8s_admission_module": [
       "created_at"
     ],
     "metaschema_modules_public.merkle_store_module": [
@@ -942,7 +1063,15 @@
       "created_at",
       "updated_at"
     ],
-    "routing_public.http_routes": [
+    "routing_public.email_identities": [
+      "created_at",
+      "updated_at"
+    ],
+    "routing_public.email_provider_accounts": [
+      "created_at",
+      "updated_at"
+    ],
+    "routing_public.email_site_identities": [
       "created_at",
       "updated_at"
     ],
@@ -954,18 +1083,16 @@
       "created_at",
       "updated_at"
     ],
+    "routing_public.redirects": [
+      "created_at",
+      "updated_at"
+    ],
     "routing_public.rls_settings": [
       "created_at",
       "updated_at"
     ],
     "routing_public.routes": [
       "created_at",
-      "updated_at"
-    ],
-    "routing_public.hostname_bindings": [
-      "updated_at"
-    ],
-    "routing_public.route_bindings": [
       "updated_at"
     ],
     "routing_public.site_app_links": [
@@ -985,6 +1112,10 @@
       "updated_at"
     ],
     "routing_public.site_modules": [
+      "created_at",
+      "updated_at"
+    ],
+    "routing_public.site_releases": [
       "created_at",
       "updated_at"
     ],

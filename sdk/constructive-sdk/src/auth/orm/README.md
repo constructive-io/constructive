@@ -33,6 +33,8 @@ const db = createClient({
 | `roleType` | findMany, findOne, create, update, delete |
 | `userConnectedAccount` | findMany, findOne, create, update, delete |
 | `user` | findMany, findOne, create, update, delete |
+| `userSetting` | findMany, findOne, create, update, delete |
+| `userSettingsSecurity` | findMany, findOne, create, update, delete |
 | `webauthnCredential` | findMany, findOne, create, update, delete |
 
 ## Table Operations
@@ -47,6 +49,7 @@ CRUD operations for AuditLogAuth records.
 |-------|------|----------|
 | `actorId` | UUID | Yes |
 | `createdAt` | Datetime | No |
+| `details` | JSON | Yes |
 | `event` | String | Yes |
 | `id` | UUID | No |
 | `ipAddress` | InternetAddress | Yes |
@@ -58,13 +61,13 @@ CRUD operations for AuditLogAuth records.
 
 ```typescript
 // List all auditLogAuth records
-const items = await db.auditLogAuth.findMany({ select: { actorId: true, createdAt: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } }).execute();
+const items = await db.auditLogAuth.findMany({ select: { actorId: true, createdAt: true, details: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } }).execute();
 
 // Get one by id
-const item = await db.auditLogAuth.findOne({ id: '<UUID>', select: { actorId: true, createdAt: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } }).execute();
+const item = await db.auditLogAuth.findOne({ id: '<UUID>', select: { actorId: true, createdAt: true, details: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } }).execute();
 
 // Create
-const created = await db.auditLogAuth.create({ data: { actorId: '<UUID>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' }, select: { id: true } }).execute();
+const created = await db.auditLogAuth.create({ data: { actorId: '<UUID>', details: '<JSON>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.auditLogAuth.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -264,10 +267,14 @@ CRUD operations for Principal records.
 |-------|------|----------|
 | `bypassStepUp` | Boolean | Yes |
 | `createdAt` | Datetime | No |
+| `createdBySessionId` | UUID | Yes |
+| `depth` | Int | Yes |
+| `expiresAt` | Datetime | Yes |
 | `id` | UUID | Yes |
 | `isReadOnly` | Boolean | Yes |
 | `name` | String | Yes |
 | `ownerId` | UUID | Yes |
+| `parentPrincipalId` | UUID | Yes |
 | `updatedAt` | Datetime | No |
 | `useAdminOwner` | Boolean | Yes |
 | `userId` | UUID | Yes |
@@ -276,13 +283,13 @@ CRUD operations for Principal records.
 
 ```typescript
 // List all principal records
-const items = await db.principal.findMany({ select: { bypassStepUp: true, createdAt: true, id: true, isReadOnly: true, name: true, ownerId: true, updatedAt: true, useAdminOwner: true, userId: true } }).execute();
+const items = await db.principal.findMany({ select: { bypassStepUp: true, createdAt: true, createdBySessionId: true, depth: true, expiresAt: true, id: true, isReadOnly: true, name: true, ownerId: true, parentPrincipalId: true, updatedAt: true, useAdminOwner: true, userId: true } }).execute();
 
 // Get one by principalId
-const item = await db.principal.findOne({ principalId: '<UUID>', select: { bypassStepUp: true, createdAt: true, id: true, isReadOnly: true, name: true, ownerId: true, updatedAt: true, useAdminOwner: true, userId: true } }).execute();
+const item = await db.principal.findOne({ principalId: '<UUID>', select: { bypassStepUp: true, createdAt: true, createdBySessionId: true, depth: true, expiresAt: true, id: true, isReadOnly: true, name: true, ownerId: true, parentPrincipalId: true, updatedAt: true, useAdminOwner: true, userId: true } }).execute();
 
 // Create
-const created = await db.principal.create({ data: { bypassStepUp: '<Boolean>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' }, select: { principalId: true } }).execute();
+const created = await db.principal.create({ data: { bypassStepUp: '<Boolean>', createdBySessionId: '<UUID>', depth: '<Int>', expiresAt: '<Datetime>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentPrincipalId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' }, select: { principalId: true } }).execute();
 
 // Update
 const updated = await db.principal.update({ where: { principalId: '<UUID>' }, data: { bypassStepUp: '<Boolean>' }, select: { principalId: true } }).execute();
@@ -470,6 +477,76 @@ const deleted = await db.user.delete({ where: { id: '<UUID>' } }).execute();
 > **Unified Search API fields:** `searchTsv`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
+### `db.userSetting`
+
+CRUD operations for UserSetting records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `id` | UUID | No |
+| `ownerId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all userSetting records
+const items = await db.userSetting.findMany({ select: { createdAt: true, id: true, ownerId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.userSetting.findOne({ id: '<UUID>', select: { createdAt: true, id: true, ownerId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.userSetting.create({ data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.userSetting.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.userSetting.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.userSettingsSecurity`
+
+CRUD operations for UserSettingsSecurity records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `backupCodesCount` | Int | Yes |
+| `createdAt` | Datetime | No |
+| `emailMfaEnabled` | Boolean | Yes |
+| `id` | UUID | No |
+| `mfaEnrolledAt` | Datetime | Yes |
+| `mfaLastUsedAt` | Datetime | Yes |
+| `ownerId` | UUID | Yes |
+| `smsMfaEnabled` | Boolean | Yes |
+| `totpEnabled` | Boolean | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all userSettingsSecurity records
+const items = await db.userSettingsSecurity.findMany({ select: { backupCodesCount: true, createdAt: true, emailMfaEnabled: true, id: true, mfaEnrolledAt: true, mfaLastUsedAt: true, ownerId: true, smsMfaEnabled: true, totpEnabled: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.userSettingsSecurity.findOne({ id: '<UUID>', select: { backupCodesCount: true, createdAt: true, emailMfaEnabled: true, id: true, mfaEnrolledAt: true, mfaLastUsedAt: true, ownerId: true, smsMfaEnabled: true, totpEnabled: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.userSettingsSecurity.create({ data: { backupCodesCount: '<Int>', emailMfaEnabled: '<Boolean>', mfaEnrolledAt: '<Datetime>', mfaLastUsedAt: '<Datetime>', ownerId: '<UUID>', smsMfaEnabled: '<Boolean>', totpEnabled: '<Boolean>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.userSettingsSecurity.update({ where: { id: '<UUID>' }, data: { backupCodesCount: '<Int>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.userSettingsSecurity.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.webauthnCredential`
 
 CRUD operations for WebauthnCredential records.
@@ -558,6 +635,17 @@ currentUserId
 const result = await db.query.currentUserId().execute();
 ```
 
+### `db.query.getMfaStatus`
+
+getMfaStatus
+
+- **Type:** query
+- **Arguments:** none
+
+```typescript
+const result = await db.query.getMfaStatus().execute();
+```
+
 ### `db.query.requireStepUp`
 
 requireStepUp
@@ -571,6 +659,21 @@ requireStepUp
 
 ```typescript
 const result = await db.query.requireStepUp({ stepUpType: '<String>' }).execute();
+```
+
+### `db.mutation.approveDevice`
+
+approveDevice
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ApproveDeviceInput (required) |
+
+```typescript
+const result = await db.mutation.approveDevice({ input: { approvalToken: '<String>' } }).execute();
 ```
 
 ### `db.mutation.checkPassword`
@@ -588,6 +691,21 @@ checkPassword
 const result = await db.mutation.checkPassword({ input: { password: '<String>' } }).execute();
 ```
 
+### `db.mutation.completeMfaChallenge`
+
+completeMfaChallenge
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CompleteMfaChallengeInput (required) |
+
+```typescript
+const result = await db.mutation.completeMfaChallenge({ input: '<CompleteMfaChallengeInput>' }).execute();
+```
+
 ### `db.mutation.confirmDeleteAccount`
 
 confirmDeleteAccount
@@ -603,6 +721,21 @@ confirmDeleteAccount
 const result = await db.mutation.confirmDeleteAccount({ input: { token: '<String>', userId: '<UUID>' } }).execute();
 ```
 
+### `db.mutation.confirmTotpSetup`
+
+confirmTotpSetup
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ConfirmTotpSetupInput (required) |
+
+```typescript
+const result = await db.mutation.confirmTotpSetup({ input: { totpValue: '<String>' } }).execute();
+```
+
 ### `db.mutation.createApiKey`
 
 createApiKey
@@ -616,6 +749,21 @@ createApiKey
 
 ```typescript
 const result = await db.mutation.createApiKey({ input: { accessLevel: '<String>', expiresIn: '<IntervalInput>', keyName: '<String>', mfaLevel: '<String>', principalId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.createChildPrincipal`
+
+createChildPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateChildPrincipalInput (required) |
+
+```typescript
+const result = await db.mutation.createChildPrincipal({ input: '<CreateChildPrincipalInput>' }).execute();
 ```
 
 ### `db.mutation.createOrgApiKey`
@@ -648,6 +796,21 @@ createOrgPrincipal
 const result = await db.mutation.createOrgPrincipal({ input: { bypassStepUp: '<Boolean>', isReadOnly: '<Boolean>', name: '<String>', orgId: '<UUID>', useAdminOwner: '<Boolean>' } }).execute();
 ```
 
+### `db.mutation.createPrincipalFromPreset`
+
+createPrincipalFromPreset
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreatePrincipalFromPresetInput (required) |
+
+```typescript
+const result = await db.mutation.createPrincipalFromPreset({ input: { entityIds: '<UUID>', name: '<String>', overrides: '<JSON>', slug: '<String>' } }).execute();
+```
+
 ### `db.mutation.deleteOrgPrincipal`
 
 deleteOrgPrincipal
@@ -678,6 +841,51 @@ deletePrincipal
 const result = await db.mutation.deletePrincipal({ input: { principalId: '<UUID>' } }).execute();
 ```
 
+### `db.mutation.disableEmailMfa`
+
+disableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableEmailMfaInput (required) |
+
+```typescript
+const result = await db.mutation.disableEmailMfa({ input: '<DisableEmailMfaInput>' }).execute();
+```
+
+### `db.mutation.disableSmsMfa`
+
+disableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableSmsMfaInput (required) |
+
+```typescript
+const result = await db.mutation.disableSmsMfa({ input: '<DisableSmsMfaInput>' }).execute();
+```
+
+### `db.mutation.disableTotp`
+
+disableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableTotpInput (required) |
+
+```typescript
+const result = await db.mutation.disableTotp({ input: { totpValue: '<String>' } }).execute();
+```
+
 ### `db.mutation.disconnectAccount`
 
 disconnectAccount
@@ -691,6 +899,51 @@ disconnectAccount
 
 ```typescript
 const result = await db.mutation.disconnectAccount({ input: { accountId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.enableEmailMfa`
+
+enableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableEmailMfaInput (required) |
+
+```typescript
+const result = await db.mutation.enableEmailMfa({ input: '<EnableEmailMfaInput>' }).execute();
+```
+
+### `db.mutation.enableSmsMfa`
+
+enableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableSmsMfaInput (required) |
+
+```typescript
+const result = await db.mutation.enableSmsMfa({ input: '<EnableSmsMfaInput>' }).execute();
+```
+
+### `db.mutation.enableTotp`
+
+enableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableTotpInput (required) |
+
+```typescript
+const result = await db.mutation.enableTotp({ input: '<EnableTotpInput>' }).execute();
 ```
 
 ### `db.mutation.extendTokenExpires`
@@ -723,6 +976,21 @@ forgotPassword
 const result = await db.mutation.forgotPassword({ input: { email: '<Email>' } }).execute();
 ```
 
+### `db.mutation.generateBackupCodes`
+
+generateBackupCodes
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | GenerateBackupCodesInput (required) |
+
+```typescript
+const result = await db.mutation.generateBackupCodes({ input: '<GenerateBackupCodesInput>' }).execute();
+```
+
 ### `db.mutation.linkIdentity`
 
 linkIdentity
@@ -738,12 +1006,28 @@ linkIdentity
 const result = await db.mutation.linkIdentity({ input: { details: '<JSON>', identifier: '<String>', service: '<String>' } }).execute();
 ```
 
+### `db.mutation.mintAccessToken`
+
+mintAccessToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | MintAccessTokenInput (required) |
+
+```typescript
+const result = await db.mutation.mintAccessToken({ input: { accessTtl: '<IntervalInput>', intent: '<String>', principalId: '<UUID>' } }).execute();
+```
+
 ### `db.mutation.provisionBucket`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**
@@ -769,6 +1053,21 @@ provisionNewUser
 
 ```typescript
 const result = await db.mutation.provisionNewUser({ input: { email: '<String>', password: '<String>' } }).execute();
+```
+
+### `db.mutation.refreshAccessToken`
+
+refreshAccessToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RefreshAccessTokenInput (required) |
+
+```typescript
+const result = await db.mutation.refreshAccessToken({ input: { token: '<String>' } }).execute();
 ```
 
 ### `db.mutation.requestCrossOriginToken`
@@ -891,6 +1190,36 @@ setPassword
 const result = await db.mutation.setPassword({ input: { currentPassword: '<String>', newPassword: '<String>' } }).execute();
 ```
 
+### `db.mutation.setPrincipalEntities`
+
+setPrincipalEntities
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetPrincipalEntitiesInput (required) |
+
+```typescript
+const result = await db.mutation.setPrincipalEntities({ input: { entityIds: '<UUID>', principalId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.setPrincipalScope`
+
+setPrincipalScope
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetPrincipalScopeInput (required) |
+
+```typescript
+const result = await db.mutation.setPrincipalScope({ input: '<SetPrincipalScopeInput>' }).execute();
+```
+
 ### `db.mutation.signIn`
 
 signIn
@@ -1009,6 +1338,21 @@ signUpSms
 
 ```typescript
 const result = await db.mutation.signUpSms({ input: { code: '<String>', credentialKind: '<String>', deviceToken: '<String>', phone: '<String>', rememberMe: '<Boolean>' } }).execute();
+```
+
+### `db.mutation.updatePrincipal`
+
+updatePrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | UpdatePrincipalInput (required) |
+
+```typescript
+const result = await db.mutation.updatePrincipal({ input: { bypassStepUp: '<Boolean>', isReadOnly: '<Boolean>', name: '<String>', principalId: '<UUID>', useAdminOwner: '<Boolean>' } }).execute();
 ```
 
 ### `db.mutation.verifyEmail`

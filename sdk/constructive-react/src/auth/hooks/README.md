@@ -89,6 +89,16 @@ function App() {
 | `useCreateUserMutation` | Mutation | Create a user |
 | `useUpdateUserMutation` | Mutation | Update a user |
 | `useDeleteUserMutation` | Mutation | Delete a user |
+| `useUserSettingsQuery` | Query | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useUserSettingQuery` | Query | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useCreateUserSettingMutation` | Mutation | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useUpdateUserSettingMutation` | Mutation | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useDeleteUserSettingMutation` | Mutation | Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field(). |
+| `useUserSettingsSecuritiesQuery` | Query | Per-user security settings for MFA configuration (separate from user_settings preferences) |
+| `useUserSettingsSecurityQuery` | Query | Per-user security settings for MFA configuration (separate from user_settings preferences) |
+| `useCreateUserSettingsSecurityMutation` | Mutation | Per-user security settings for MFA configuration (separate from user_settings preferences) |
+| `useUpdateUserSettingsSecurityMutation` | Mutation | Per-user security settings for MFA configuration (separate from user_settings preferences) |
+| `useDeleteUserSettingsSecurityMutation` | Mutation | Per-user security settings for MFA configuration (separate from user_settings preferences) |
 | `useWebauthnCredentialsQuery` | Query | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
 | `useWebauthnCredentialQuery` | Query | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
 | `useCreateWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
@@ -98,23 +108,39 @@ function App() {
 | `useCurrentUserQuery` | Query | currentUser |
 | `useCurrentUserAgentQuery` | Query | currentUserAgent |
 | `useCurrentUserIdQuery` | Query | currentUserId |
+| `useGetMfaStatusQuery` | Query | getMfaStatus |
 | `useRequireStepUpQuery` | Query | requireStepUp |
+| `useApproveDeviceMutation` | Mutation | approveDevice |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
+| `useCompleteMfaChallengeMutation` | Mutation | completeMfaChallenge |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
+| `useConfirmTotpSetupMutation` | Mutation | confirmTotpSetup |
 | `useCreateApiKeyMutation` | Mutation | createApiKey |
+| `useCreateChildPrincipalMutation` | Mutation | createChildPrincipal |
 | `useCreateOrgApiKeyMutation` | Mutation | createOrgApiKey |
 | `useCreateOrgPrincipalMutation` | Mutation | createOrgPrincipal |
+| `useCreatePrincipalFromPresetMutation` | Mutation | createPrincipalFromPreset |
 | `useDeleteOrgPrincipalMutation` | Mutation | deleteOrgPrincipal |
 | `useDeletePrincipalMutation` | Mutation | deletePrincipal |
+| `useDisableEmailMfaMutation` | Mutation | disableEmailMfa |
+| `useDisableSmsMfaMutation` | Mutation | disableSmsMfa |
+| `useDisableTotpMutation` | Mutation | disableTotp |
 | `useDisconnectAccountMutation` | Mutation | disconnectAccount |
+| `useEnableEmailMfaMutation` | Mutation | enableEmailMfa |
+| `useEnableSmsMfaMutation` | Mutation | enableSmsMfa |
+| `useEnableTotpMutation` | Mutation | enableTotp |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
+| `useGenerateBackupCodesMutation` | Mutation | generateBackupCodes |
 | `useLinkIdentityMutation` | Mutation | linkIdentity |
-| `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `useMintAccessTokenMutation` | Mutation | mintAccessToken |
+| `useProvisionBucketMutation` | Mutation | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
 | `useProvisionNewUserMutation` | Mutation | provisionNewUser |
+| `useRefreshAccessTokenMutation` | Mutation | refreshAccessToken |
 | `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
 | `useResetPasswordMutation` | Mutation | resetPassword |
 | `useRevokeApiKeyMutation` | Mutation | revokeApiKey |
@@ -123,6 +149,8 @@ and lifecycle settings. |
 | `useSendAccountDeletionEmailMutation` | Mutation | sendAccountDeletionEmail |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
 | `useSetPasswordMutation` | Mutation | setPassword |
+| `useSetPrincipalEntitiesMutation` | Mutation | setPrincipalEntities |
+| `useSetPrincipalScopeMutation` | Mutation | setPrincipalScope |
 | `useSignInMutation` | Mutation | signIn |
 | `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
 | `useSignInMagicLinkMutation` | Mutation | signInMagicLink |
@@ -131,6 +159,7 @@ and lifecycle settings. |
 | `useSignUpMutation` | Mutation | signUp |
 | `useSignUpMagicLinkMutation` | Mutation | signUpMagicLink |
 | `useSignUpSmsMutation` | Mutation | signUpSms |
+| `useUpdatePrincipalMutation` | Mutation | updatePrincipal |
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
 | `useVerifyPasswordMutation` | Mutation | verifyPassword |
 | `useVerifyTotpMutation` | Mutation | verifyTotp |
@@ -142,20 +171,20 @@ and lifecycle settings. |
 ```typescript
 // List all auditLogAuths
 const { data, isLoading } = useAuditLogAuthsQuery({
-  selection: { fields: { actorId: true, createdAt: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } },
+  selection: { fields: { actorId: true, createdAt: true, details: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } },
 });
 
 // Get one auditLogAuth
 const { data: item } = useAuditLogAuthQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, createdAt: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } },
+  selection: { fields: { actorId: true, createdAt: true, details: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } },
 });
 
 // Create a auditLogAuth
 const { mutate: create } = useCreateAuditLogAuthMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' });
+create({ actorId: '<UUID>', details: '<JSON>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' });
 ```
 
 ### CryptoAddress
@@ -262,20 +291,20 @@ create({ cc: '<String>', isPrimary: '<Boolean>', isVerified: '<Boolean>', name: 
 ```typescript
 // List all principals
 const { data, isLoading } = usePrincipalsQuery({
-  selection: { fields: { bypassStepUp: true, createdAt: true, id: true, isReadOnly: true, name: true, ownerId: true, updatedAt: true, useAdminOwner: true, userId: true } },
+  selection: { fields: { bypassStepUp: true, createdAt: true, createdBySessionId: true, depth: true, expiresAt: true, id: true, isReadOnly: true, name: true, ownerId: true, parentPrincipalId: true, updatedAt: true, useAdminOwner: true, userId: true } },
 });
 
 // Get one principal
 const { data: item } = usePrincipalQuery({
   principalId: '<UUID>',
-  selection: { fields: { bypassStepUp: true, createdAt: true, id: true, isReadOnly: true, name: true, ownerId: true, updatedAt: true, useAdminOwner: true, userId: true } },
+  selection: { fields: { bypassStepUp: true, createdAt: true, createdBySessionId: true, depth: true, expiresAt: true, id: true, isReadOnly: true, name: true, ownerId: true, parentPrincipalId: true, updatedAt: true, useAdminOwner: true, userId: true } },
 });
 
 // Create a principal
 const { mutate: create } = useCreatePrincipalMutation({
   selection: { fields: { principalId: true } },
 });
-create({ bypassStepUp: '<Boolean>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' });
+create({ bypassStepUp: '<Boolean>', createdBySessionId: '<UUID>', depth: '<Int>', expiresAt: '<Datetime>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentPrincipalId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' });
 ```
 
 ### PrincipalEntity
@@ -383,6 +412,48 @@ const { mutate: create } = useCreateUserMutation({
 create({ displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' });
 ```
 
+### UserSetting
+
+```typescript
+// List all userSettings
+const { data, isLoading } = useUserSettingsQuery({
+  selection: { fields: { createdAt: true, id: true, ownerId: true, updatedAt: true } },
+});
+
+// Get one userSetting
+const { data: item } = useUserSettingQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, id: true, ownerId: true, updatedAt: true } },
+});
+
+// Create a userSetting
+const { mutate: create } = useCreateUserSettingMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<UUID>' });
+```
+
+### UserSettingsSecurity
+
+```typescript
+// List all userSettingsSecurities
+const { data, isLoading } = useUserSettingsSecuritiesQuery({
+  selection: { fields: { backupCodesCount: true, createdAt: true, emailMfaEnabled: true, id: true, mfaEnrolledAt: true, mfaLastUsedAt: true, ownerId: true, smsMfaEnabled: true, totpEnabled: true, updatedAt: true } },
+});
+
+// Get one userSettingsSecurity
+const { data: item } = useUserSettingsSecurityQuery({
+  id: '<UUID>',
+  selection: { fields: { backupCodesCount: true, createdAt: true, emailMfaEnabled: true, id: true, mfaEnrolledAt: true, mfaLastUsedAt: true, ownerId: true, smsMfaEnabled: true, totpEnabled: true, updatedAt: true } },
+});
+
+// Create a userSettingsSecurity
+const { mutate: create } = useCreateUserSettingsSecurityMutation({
+  selection: { fields: { id: true } },
+});
+create({ backupCodesCount: '<Int>', emailMfaEnabled: '<Boolean>', mfaEnrolledAt: '<Datetime>', mfaLastUsedAt: '<Datetime>', ownerId: '<UUID>', smsMfaEnabled: '<Boolean>', totpEnabled: '<Boolean>' });
+```
+
 ### WebauthnCredential
 
 ```typescript
@@ -434,6 +505,13 @@ currentUserId
 - **Type:** query
 - **Arguments:** none
 
+### `useGetMfaStatusQuery`
+
+getMfaStatus
+
+- **Type:** query
+- **Arguments:** none
+
 ### `useRequireStepUpQuery`
 
 requireStepUp
@@ -444,6 +522,17 @@ requireStepUp
   | Argument | Type |
   |----------|------|
   | `stepUpType` | String |
+
+### `useApproveDeviceMutation`
+
+approveDevice
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ApproveDeviceInput (required) |
 
 ### `useCheckPasswordMutation`
 
@@ -456,6 +545,17 @@ checkPassword
   |----------|------|
   | `input` | CheckPasswordInput (required) |
 
+### `useCompleteMfaChallengeMutation`
+
+completeMfaChallenge
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CompleteMfaChallengeInput (required) |
+
 ### `useConfirmDeleteAccountMutation`
 
 confirmDeleteAccount
@@ -467,6 +567,17 @@ confirmDeleteAccount
   |----------|------|
   | `input` | ConfirmDeleteAccountInput (required) |
 
+### `useConfirmTotpSetupMutation`
+
+confirmTotpSetup
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ConfirmTotpSetupInput (required) |
+
 ### `useCreateApiKeyMutation`
 
 createApiKey
@@ -477,6 +588,17 @@ createApiKey
   | Argument | Type |
   |----------|------|
   | `input` | CreateApiKeyInput (required) |
+
+### `useCreateChildPrincipalMutation`
+
+createChildPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateChildPrincipalInput (required) |
 
 ### `useCreateOrgApiKeyMutation`
 
@@ -500,6 +622,17 @@ createOrgPrincipal
   |----------|------|
   | `input` | CreateOrgPrincipalInput (required) |
 
+### `useCreatePrincipalFromPresetMutation`
+
+createPrincipalFromPreset
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreatePrincipalFromPresetInput (required) |
+
 ### `useDeleteOrgPrincipalMutation`
 
 deleteOrgPrincipal
@@ -522,6 +655,39 @@ deletePrincipal
   |----------|------|
   | `input` | DeletePrincipalInput (required) |
 
+### `useDisableEmailMfaMutation`
+
+disableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableEmailMfaInput (required) |
+
+### `useDisableSmsMfaMutation`
+
+disableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableSmsMfaInput (required) |
+
+### `useDisableTotpMutation`
+
+disableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableTotpInput (required) |
+
 ### `useDisconnectAccountMutation`
 
 disconnectAccount
@@ -532,6 +698,39 @@ disconnectAccount
   | Argument | Type |
   |----------|------|
   | `input` | DisconnectAccountInput (required) |
+
+### `useEnableEmailMfaMutation`
+
+enableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableEmailMfaInput (required) |
+
+### `useEnableSmsMfaMutation`
+
+enableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableSmsMfaInput (required) |
+
+### `useEnableTotpMutation`
+
+enableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableTotpInput (required) |
 
 ### `useExtendTokenExpiresMutation`
 
@@ -555,6 +754,17 @@ forgotPassword
   |----------|------|
   | `input` | ForgotPasswordInput (required) |
 
+### `useGenerateBackupCodesMutation`
+
+generateBackupCodes
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | GenerateBackupCodesInput (required) |
+
 ### `useLinkIdentityMutation`
 
 linkIdentity
@@ -566,12 +776,24 @@ linkIdentity
   |----------|------|
   | `input` | LinkIdentityInput (required) |
 
+### `useMintAccessTokenMutation`
+
+mintAccessToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | MintAccessTokenInput (required) |
+
 ### `useProvisionBucketMutation`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**
@@ -590,6 +812,17 @@ provisionNewUser
   | Argument | Type |
   |----------|------|
   | `input` | ProvisionNewUserInput (required) |
+
+### `useRefreshAccessTokenMutation`
+
+refreshAccessToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RefreshAccessTokenInput (required) |
 
 ### `useRequestCrossOriginTokenMutation`
 
@@ -679,6 +912,28 @@ setPassword
   |----------|------|
   | `input` | SetPasswordInput (required) |
 
+### `useSetPrincipalEntitiesMutation`
+
+setPrincipalEntities
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetPrincipalEntitiesInput (required) |
+
+### `useSetPrincipalScopeMutation`
+
+setPrincipalScope
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetPrincipalScopeInput (required) |
+
 ### `useSignInMutation`
 
 signIn
@@ -766,6 +1021,17 @@ signUpSms
   | Argument | Type |
   |----------|------|
   | `input` | SignUpSmsInput (required) |
+
+### `useUpdatePrincipalMutation`
+
+updatePrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | UpdatePrincipalInput (required) |
 
 ### `useVerifyEmailMutation`
 

@@ -8,8 +8,7 @@ import type { OrmClientConfig } from './client';
 import { ApiModel } from './models/api';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiSettingModel } from './models/apiSetting';
-import { AppComponentModel } from './models/appComponent';
-import { AppModel } from './models/app';
+import { AstMigrationModel } from './models/astMigration';
 import { CheckConstraintModel } from './models/checkConstraint';
 import { CompositeTypeModel } from './models/compositeType';
 import { CorsSettingModel } from './models/corsSetting';
@@ -34,8 +33,9 @@ import { ForeignKeyConstraintBehaviorModel } from './models/foreignKeyConstraint
 import { ForeignKeyConstraintModel } from './models/foreignKeyConstraint';
 import { FullTextSearchModel } from './models/fullTextSearch';
 import { FunctionModel } from './models/function';
+import { GetSitePreviewsRecordModel } from './models/getSitePreviewsRecord';
 import { HostnameBindingModel } from './models/hostnameBinding';
-import { HttpRouteModel } from './models/httpRoute';
+import { IdentityProviderRegistryModel } from './models/identityProviderRegistry';
 import { IndexModel } from './models/index';
 import { ManagedDomainModel } from './models/managedDomain';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
@@ -51,6 +51,7 @@ import { PlatformDomainVerificationModel } from './models/platformDomainVerifica
 import { PlatformEmailIdentityModel } from './models/platformEmailIdentity';
 import { PlatformEmailProviderAccountModel } from './models/platformEmailProviderAccount';
 import { PlatformEmailSiteIdentityModel } from './models/platformEmailSiteIdentity';
+import { PlatformGetSitePreviewsRecordModel } from './models/platformGetSitePreviewsRecord';
 import { PlatformManagedDomainModel } from './models/platformManagedDomain';
 import { PlatformPageModel } from './models/platformPage';
 import { PlatformSiteAppLinkModel } from './models/platformSiteAppLink';
@@ -59,11 +60,13 @@ import { PlatformSiteDeepLinkModel } from './models/platformSiteDeepLink';
 import { PlatformSiteErrorPageModel } from './models/platformSiteErrorPage';
 import { PlatformSiteMetadatumModel } from './models/platformSiteMetadatum';
 import { PlatformSiteModuleModel } from './models/platformSiteModule';
+import { PlatformSiteReleaseModel } from './models/platformSiteRelease';
 import { PlatformSiteThemeModel } from './models/platformSiteTheme';
 import { PlatformSiteWebConfigModel } from './models/platformSiteWebConfig';
 import { PolicyModel } from './models/policy';
 import { PrimaryKeyConstraintModel } from './models/primaryKeyConstraint';
 import { PubkeySettingModel } from './models/pubkeySetting';
+import { RedirectModel } from './models/redirect';
 import { RlsSettingModel } from './models/rlsSetting';
 import { RouteBindingModel } from './models/routeBinding';
 import { RouteModel } from './models/route';
@@ -75,9 +78,11 @@ import { SiteDeepLinkModel } from './models/siteDeepLink';
 import { SiteErrorPageModel } from './models/siteErrorPage';
 import { SiteMetadatumModel } from './models/siteMetadatum';
 import { SiteModuleModel } from './models/siteModule';
+import { SiteReleaseModel } from './models/siteRelease';
 import { SiteThemeModel } from './models/siteTheme';
 import { SiteWebConfigModel } from './models/siteWebConfig';
 import { SpatialRelationModel } from './models/spatialRelation';
+import { SqlActionModel } from './models/sqlAction';
 import { TableBehaviorModel } from './models/tableBehavior';
 import { TableModel } from './models/table';
 import { TableGrantModel } from './models/tableGrant';
@@ -129,8 +134,7 @@ export function createClient(config: OrmClientConfig) {
     api: new ApiModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiSetting: new ApiSettingModel(client),
-    appComponent: new AppComponentModel(client),
-    app: new AppModel(client),
+    astMigration: new AstMigrationModel(client),
     checkConstraint: new CheckConstraintModel(client),
     compositeType: new CompositeTypeModel(client),
     corsSetting: new CorsSettingModel(client),
@@ -155,8 +159,9 @@ export function createClient(config: OrmClientConfig) {
     foreignKeyConstraint: new ForeignKeyConstraintModel(client),
     fullTextSearch: new FullTextSearchModel(client),
     function: new FunctionModel(client),
+    getSitePreviewsRecord: new GetSitePreviewsRecordModel(client),
     hostnameBinding: new HostnameBindingModel(client),
-    httpRoute: new HttpRouteModel(client),
+    identityProviderRegistry: new IdentityProviderRegistryModel(client),
     index: new IndexModel(client),
     managedDomain: new ManagedDomainModel(client),
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
@@ -172,6 +177,7 @@ export function createClient(config: OrmClientConfig) {
     platformEmailIdentity: new PlatformEmailIdentityModel(client),
     platformEmailProviderAccount: new PlatformEmailProviderAccountModel(client),
     platformEmailSiteIdentity: new PlatformEmailSiteIdentityModel(client),
+    platformGetSitePreviewsRecord: new PlatformGetSitePreviewsRecordModel(client),
     platformManagedDomain: new PlatformManagedDomainModel(client),
     platformPage: new PlatformPageModel(client),
     platformSiteAppLink: new PlatformSiteAppLinkModel(client),
@@ -180,11 +186,13 @@ export function createClient(config: OrmClientConfig) {
     platformSiteErrorPage: new PlatformSiteErrorPageModel(client),
     platformSiteMetadatum: new PlatformSiteMetadatumModel(client),
     platformSiteModule: new PlatformSiteModuleModel(client),
+    platformSiteRelease: new PlatformSiteReleaseModel(client),
     platformSiteTheme: new PlatformSiteThemeModel(client),
     platformSiteWebConfig: new PlatformSiteWebConfigModel(client),
     policy: new PolicyModel(client),
     primaryKeyConstraint: new PrimaryKeyConstraintModel(client),
     pubkeySetting: new PubkeySettingModel(client),
+    redirect: new RedirectModel(client),
     rlsSetting: new RlsSettingModel(client),
     routeBinding: new RouteBindingModel(client),
     route: new RouteModel(client),
@@ -196,9 +204,11 @@ export function createClient(config: OrmClientConfig) {
     siteErrorPage: new SiteErrorPageModel(client),
     siteMetadatum: new SiteMetadatumModel(client),
     siteModule: new SiteModuleModel(client),
+    siteRelease: new SiteReleaseModel(client),
     siteTheme: new SiteThemeModel(client),
     siteWebConfig: new SiteWebConfigModel(client),
     spatialRelation: new SpatialRelationModel(client),
+    sqlAction: new SqlActionModel(client),
     tableBehavior: new TableBehaviorModel(client),
     table: new TableModel(client),
     tableGrant: new TableGrantModel(client),

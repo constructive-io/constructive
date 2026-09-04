@@ -17,6 +17,7 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   annotations: 'json',
+  clusterId: 'uuid',
   createdAt: 'string',
   description: 'string',
   id: 'uuid',
@@ -81,6 +82,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       annotations: true,
+      clusterId: true,
       createdAt: true,
       description: true,
       id: true,
@@ -113,6 +115,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       annotations: true,
+      clusterId: true,
       createdAt: true,
       description: true,
       id: true,
@@ -157,6 +160,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           annotations: true,
+          clusterId: true,
           createdAt: true,
           description: true,
           id: true,
@@ -187,6 +191,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'json',
         name: 'annotations',
         message: 'annotations',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'clusterId',
+        message: 'clusterId',
         required: false,
         skipPrompt: true,
       },
@@ -255,6 +266,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           annotations: cleanedData.annotations,
+          clusterId: cleanedData.clusterId,
           description: cleanedData.description,
           isActive: cleanedData.isActive,
           isManaged: cleanedData.isManaged,
@@ -266,6 +278,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           annotations: true,
+          clusterId: true,
           createdAt: true,
           description: true,
           id: true,
@@ -302,6 +315,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'json',
         name: 'annotations',
         message: 'annotations',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'clusterId',
+        message: 'clusterId',
         required: false,
         skipPrompt: true,
       },
@@ -370,6 +390,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           annotations: cleanedData.annotations,
+          clusterId: cleanedData.clusterId,
           description: cleanedData.description,
           isActive: cleanedData.isActive,
           isManaged: cleanedData.isManaged,
@@ -381,6 +402,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           annotations: true,
+          clusterId: true,
           createdAt: true,
           description: true,
           id: true,

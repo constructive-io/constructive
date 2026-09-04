@@ -9,7 +9,7 @@ Named, retargetable deep links owned by a site surface (served at the deep-link 
 ```typescript
 db.platformSiteDeepLink.findMany({ select: { id: true } }).execute()
 db.platformSiteDeepLink.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformSiteDeepLink.create({ data: { appPath: '<String>', fallbackUrl: '<String>', metadata: '<JSON>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' }, select: { id: true } }).execute()
+db.platformSiteDeepLink.create({ data: { appPath: '<String>', fallbackUrl: '<String>', metadata: '<JSON>', pageId: '<UUID>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' }, select: { id: true } }).execute()
 db.platformSiteDeepLink.update({ where: { id: '<UUID>' }, data: { appPath: '<String>' }, select: { id: true } }).execute()
 db.platformSiteDeepLink.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.platformSiteDeepLink.findMany({
 
 ```typescript
 const item = await db.platformSiteDeepLink.create({
-  data: { appPath: '<String>', fallbackUrl: '<String>', metadata: '<JSON>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' },
+  data: { appPath: '<String>', fallbackUrl: '<String>', metadata: '<JSON>', pageId: '<UUID>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' },
   select: { id: true }
 }).execute();
 ```
