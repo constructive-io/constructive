@@ -19,6 +19,7 @@
  */
 
 import { Logger } from '@pgpmjs/logger';
+import { withSystemLaneClient } from 'pg-query-context';
 
 import { resolveDefaultBucket } from './default-bucket';
 import { isLiveFileRow, statusSelectFragment } from './file-lifecycle';
@@ -120,7 +121,7 @@ export async function resolveManagedUploadTarget(args: {
 
   // Registry and module registration are schema metadata, not tenant rows:
   // read them in the system lane, like every other config read here.
-  const binding = await withPgClient(null, async (pgClient: any): Promise<FileRefFieldBinding | null> => {
+  const binding = await withSystemLaneClient(withPgClient, async (pgClient): Promise<FileRefFieldBinding | null> => {
     try {
       return await getFileRefFieldBinding(pgClient, databaseId, field);
     } catch (err: any) {
@@ -132,7 +133,7 @@ export async function resolveManagedUploadTarget(args: {
     }
   });
 
-  const allConfigs = await withPgClient(null, (pgClient: any) =>
+  const allConfigs = await withSystemLaneClient(withPgClient, (pgClient) =>
     loadAllStorageModules(pgClient, databaseId),
   );
 

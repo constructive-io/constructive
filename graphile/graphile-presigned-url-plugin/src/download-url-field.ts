@@ -25,6 +25,7 @@ import { Logger } from '@pgpmjs/logger';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { DOWNLOAD_URL_FIELD } from 'graphile-storage-registry';
+import { withSystemLaneClient } from 'pg-query-context';
 
 import { resolveS3, resolveS3ForDatabase } from './physical-bucket';
 import { withRequestPgClient } from './request-pg-client';
@@ -120,11 +121,11 @@ export function createDownloadUrlPlugin(
                             return (dbResult.rows[0]?.id as string | undefined) ?? null;
                           });
                           // Module registration is server config, not user data:
-                          // resolve it without the request role's pgSettings.
+                          // resolve it in the system lane's bounded role.
                           const config = databaseId
                             ? resolveStorageConfigFromCodec(
                               capturedCodec,
-                              await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId)),
+                              await withSystemLaneClient(withPgClient, (pgClient) => loadAllStorageModules(pgClient, databaseId)),
                             )
                             : null;
                           const resolved = config && bucketId

@@ -8,6 +8,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
       "public",
       "app",
     ],
+    "introspectionRole": "administrator",
     "isPublic": false,
     "metaSchemas": [
       "env_meta1",

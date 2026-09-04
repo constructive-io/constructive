@@ -17,8 +17,9 @@
  * manual, multi-statement RLS work.
  */
 
-export interface RequestPgClient {
-  query(opts: { text: string; values?: unknown[] }): Promise<{ rows: Array<Record<string, unknown>> }>;
+import { GrafastPgClient } from 'pg-query-context';
+
+export interface RequestPgClient extends GrafastPgClient {
   withTransaction<T>(cb: (tx: RequestPgClient) => Promise<T>): Promise<T>;
 }
 

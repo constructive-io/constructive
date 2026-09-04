@@ -41,6 +41,8 @@ function fakeDb(handlers: QueryHandler[]): FakeDb {
   const client = {
     async query(opts: { text: string; values?: unknown[] }) {
       queries.push(opts);
+      // Transaction control is not a data query, so it needs no handler.
+      if (/^(BEGIN|COMMIT|ROLLBACK)$/.test(opts.text)) return { rows: [] };
       const handler = handlers.find((h) => h.match.test(opts.text));
       if (!handler) throw new Error(`unexpected query: ${opts.text}`);
       return { rows: handler.rows(opts.values ?? []) };

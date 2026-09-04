@@ -702,6 +702,9 @@ importers:
       graphql:
         specifier: 16.13.0
         version: 16.13.0
+      pg-query-context:
+        specifier: workspace:^
+        version: link:../../postgres/pg-query-context/dist
       pg-sql2:
         specifier: 5.0.1
         version: 5.0.1
@@ -1034,6 +1037,9 @@ importers:
       mime-bytes:
         specifier: workspace:^
         version: link:../../uploads/mime-bytes/dist
+      pg-query-context:
+        specifier: workspace:^
+        version: link:../../postgres/pg-query-context/dist
       postgraphile:
         specifier: 5.1.4
         version: 5.1.4(138876491c004694bff1843ee79c8872)

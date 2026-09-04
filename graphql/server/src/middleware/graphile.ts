@@ -75,6 +75,7 @@ const buildPreset = (
   schemas: string[],
   anonRole: string,
   roleName: string,
+  introspectionRole: string | undefined,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
   compute?: ComputeConfig
@@ -107,7 +108,15 @@ const buildPreset = (
     pgServices: [
       makePgService({
         pool,
-        schemas
+        schemas,
+        // Introspection runs outside any request, so it has no served role to
+        // inherit: unset, it reads the catalog as whatever role the pool
+        // connected as (a superuser in most deployments) and the schema
+        // advertises that role's reach. Naming the role keeps schema shape
+        // tied to a bounded role's grants.
+        ...(introspectionRole && {
+          pgSettingsForIntrospection: { role: introspectionRole }
+        })
       })
     ],
     grafserv: {
@@ -338,7 +347,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
+      const preset = buildPreset(
+        pool,
+        schema || [],
+        anonRole,
+        roleName,
+        opts.api?.introspectionRole,
+        api.databaseSettings,
+        api.apiId,
+        compute
+      );
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,
