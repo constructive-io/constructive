@@ -26,6 +26,18 @@ This sets the following environment variables:
 - `PGPASSWORD=password`
 - `PGDATABASE=postgres`
 
+These are the `pgpm docker start` defaults — `pgpm env` is for the pgpm container.
+
+### Using Your Own PostgreSQL
+
+If PostgreSQL is already running locally, skip both `pgpm docker start` and `pgpm env`
+(it would overwrite your connection vars with the container's). Just export your own:
+
+```bash
+export PGHOST=localhost PGPORT=5432 PGUSER=postgres PGPASSWORD=yourpassword
+pgpm admin-users bootstrap --yes   # once
+```
+
 ### Run Command with Environment
 
 ```bash

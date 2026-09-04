@@ -262,14 +262,33 @@ pgpm docker start
 port 5432 is already in use
 ```
 
-**Solution:**
-```bash
-# Find what's using the port
-lsof -i :5432
+**Solution:** first find out whether it is already a PostgreSQL server:
 
-# Either stop that process or use a different port
-# Edit docker-compose.yml to use different port
+```bash
+pg_isready -h localhost -p 5432
 ```
+
+If it answers, the developer runs their own Postgres — use it instead of Docker. Never
+stop or kill it to free the port. Ask for (or use) superuser credentials and skip
+`pgpm docker start`:
+
+```bash
+export PGHOST=localhost PGPORT=5432 PGUSER=postgres PGPASSWORD=yourpassword
+pgpm admin-users bootstrap --yes     # once: roles pgpm and pgsql-test expect
+```
+
+Do not run `eval "$(pgpm env)"` in this case — it emits the container's connection
+vars and would overwrite yours.
+
+If you want the pgpm container *alongside* an existing server, move it and match the port:
+
+```bash
+pgpm docker start --port 5433
+export PGPORT=5433
+```
+
+Only if `lsof -i :5432` shows something that is not Postgres should you consider
+stopping that process.
 
 ### Volume Permission Issues
 
@@ -296,7 +315,7 @@ pgpm docker start
 | Transaction aborted | Use savepoint pattern |
 | Tests interfere | Check beforeEach/afterEach hooks |
 | Module not found | Verify workspace structure |
-| Port in use | `lsof -i :5432` then stop conflicting process |
+| Port in use | `pg_isready -h localhost -p 5432` — if it's Postgres, use it (export PG*); else `pgpm docker start --port 5433` + `PGPORT=5433` |
 
 ## Getting Help
 
