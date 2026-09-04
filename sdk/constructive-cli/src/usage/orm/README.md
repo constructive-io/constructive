@@ -678,6 +678,28 @@ const deleted = await db.orgLimitWarning.delete({ where: { id: '<UUID>' } }).exe
 
 ## Custom Operations
 
+### `db.query.captureAppLimitDefaults`
+
+captureAppLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
+
+```typescript
+const result = await db.query.captureAppLimitDefaults().execute();
+```
+
+### `db.query.captureOrgLimitDefaults`
+
+captureOrgLimitDefaults
+
+- **Type:** query
+- **Arguments:** none
+
+```typescript
+const result = await db.query.captureOrgLimitDefaults().execute();
+```
+
 ### `db.mutation.provisionBucket`
 
 Provision an S3 bucket for a logical bucket in the database.

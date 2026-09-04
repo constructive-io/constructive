@@ -1,13 +1,13 @@
 ---
 name: cli-config
-description: CLI tool (csdk) for the config API — provides CRUD commands for 5 tables and 13 custom operations
+description: CLI tool (csdk) for the config API — provides CRUD commands for 8 tables and 17 custom operations
 ---
 
 # cli-config
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the config API — provides CRUD commands for 5 tables and 13 custom operations
+CLI tool (csdk) for the config API — provides CRUD commands for 8 tables and 17 custom operations
 
 ## Usage
 
@@ -57,10 +57,17 @@ See the `references/` directory for detailed per-entity API documentation:
 - [auth](references/auth.md)
 - [config](references/config.md)
 - [config](references/config.md)
+- [internal-config](references/internal-config.md)
+- [internal-secret](references/internal-secret.md)
 - [platform-config](references/platform-config.md)
+- [platform-internal-config](references/platform-internal-config.md)
 - [platform-internal-secret](references/platform-internal-secret.md)
 - [platform-secret](references/platform-secret.md)
 - [secret](references/secret.md)
+- [internal-secrets-del](references/internal-secrets-del.md)
+- [internal-secrets-remove-array](references/internal-secrets-remove-array.md)
+- [internal-secrets-rotate](references/internal-secrets-rotate.md)
+- [internal-secrets-set](references/internal-secrets-set.md)
 - [secrets-del](references/secrets-del.md)
 - [secrets-remove-array](references/secrets-remove-array.md)
 - [secrets-rotate](references/secrets-rotate.md)

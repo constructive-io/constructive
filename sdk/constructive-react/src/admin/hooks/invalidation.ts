@@ -16,27 +16,17 @@
 import type { QueryClient } from '@tanstack/react-query';
 import {
   appAdminGrantKeys,
-  appCapabilityKeys,
   appCapabilityDefaultCapabilityKeys,
-  appCapabilityDefaultKeys,
   appCapabilityDefaultGrantKeys,
   appClaimedInviteKeys,
   appGrantKeys,
   appInviteKeys,
   appMembershipKeys,
   appMembershipDefaultKeys,
-  appMembershipProfileKeys,
   appOwnerGrantKeys,
-  appProfileCapabilityKeys,
-  appProfileKeys,
-  appProfileDefinitionGrantKeys,
-  appProfileGrantKeys,
-  appProfileTemplateKeys,
   membershipTypeKeys,
   orgAdminGrantKeys,
-  orgCapabilityKeys,
   orgCapabilityDefaultCapabilityKeys,
-  orgCapabilityDefaultKeys,
   orgCapabilityDefaultGrantKeys,
   orgChartEdgeKeys,
   orgChartEdgeGrantKeys,
@@ -49,14 +39,8 @@ import {
   orgMemberProfileKeys,
   orgMembershipKeys,
   orgMembershipDefaultKeys,
-  orgMembershipProfileKeys,
   orgMembershipSettingKeys,
   orgOwnerGrantKeys,
-  orgProfileCapabilityKeys,
-  orgProfileKeys,
-  orgProfileDefinitionGrantKeys,
-  orgProfileGrantKeys,
-  orgProfileTemplateKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -95,23 +79,6 @@ export const invalidate = {
         queryKey: appAdminGrantKeys.detail(id),
       }),
   },
-  /** Invalidate appCapability queries */ appCapability: {
-    /** Invalidate all appCapability queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appCapabilityKeys.all,
-      }),
-    /** Invalidate appCapability list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appCapabilityKeys.lists(),
-      }),
-    /** Invalidate a specific appCapability */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appCapabilityKeys.detail(id),
-      }),
-  },
   /** Invalidate appCapabilityDefaultCapability queries */ appCapabilityDefaultCapability: {
     /** Invalidate all appCapabilityDefaultCapability queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -129,23 +96,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: appCapabilityDefaultCapabilityKeys.detail(id),
-      }),
-  },
-  /** Invalidate appCapabilityDefault queries */ appCapabilityDefault: {
-    /** Invalidate all appCapabilityDefault queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appCapabilityDefaultKeys.all,
-      }),
-    /** Invalidate appCapabilityDefault list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appCapabilityDefaultKeys.lists(),
-      }),
-    /** Invalidate a specific appCapabilityDefault */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appCapabilityDefaultKeys.detail(id),
       }),
   },
   /** Invalidate appCapabilityDefaultGrant queries */ appCapabilityDefaultGrant: {
@@ -247,23 +197,6 @@ export const invalidate = {
         queryKey: appMembershipDefaultKeys.detail(id),
       }),
   },
-  /** Invalidate appMembershipProfile queries */ appMembershipProfile: {
-    /** Invalidate all appMembershipProfile queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appMembershipProfileKeys.all,
-      }),
-    /** Invalidate appMembershipProfile list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appMembershipProfileKeys.lists(),
-      }),
-    /** Invalidate a specific appMembershipProfile */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appMembershipProfileKeys.detail(id),
-      }),
-  },
   /** Invalidate appOwnerGrant queries */ appOwnerGrant: {
     /** Invalidate all appOwnerGrant queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -279,91 +212,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: appOwnerGrantKeys.detail(id),
-      }),
-  },
-  /** Invalidate appProfileCapability queries */ appProfileCapability: {
-    /** Invalidate all appProfileCapability queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileCapabilityKeys.all,
-      }),
-    /** Invalidate appProfileCapability list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileCapabilityKeys.lists(),
-      }),
-    /** Invalidate a specific appProfileCapability */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileCapabilityKeys.detail(id),
-      }),
-  },
-  /** Invalidate appProfile queries */ appProfile: {
-    /** Invalidate all appProfile queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileKeys.all,
-      }),
-    /** Invalidate appProfile list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileKeys.lists(),
-      }),
-    /** Invalidate a specific appProfile */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileKeys.detail(id),
-      }),
-  },
-  /** Invalidate appProfileDefinitionGrant queries */ appProfileDefinitionGrant: {
-    /** Invalidate all appProfileDefinitionGrant queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileDefinitionGrantKeys.all,
-      }),
-    /** Invalidate appProfileDefinitionGrant list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileDefinitionGrantKeys.lists(),
-      }),
-    /** Invalidate a specific appProfileDefinitionGrant */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileDefinitionGrantKeys.detail(id),
-      }),
-  },
-  /** Invalidate appProfileGrant queries */ appProfileGrant: {
-    /** Invalidate all appProfileGrant queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileGrantKeys.all,
-      }),
-    /** Invalidate appProfileGrant list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileGrantKeys.lists(),
-      }),
-    /** Invalidate a specific appProfileGrant */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileGrantKeys.detail(id),
-      }),
-  },
-  /** Invalidate appProfileTemplate queries */ appProfileTemplate: {
-    /** Invalidate all appProfileTemplate queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileTemplateKeys.all,
-      }),
-    /** Invalidate appProfileTemplate list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileTemplateKeys.lists(),
-      }),
-    /** Invalidate a specific appProfileTemplate */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appProfileTemplateKeys.detail(id),
       }),
   },
   /** Invalidate membershipType queries */ membershipType: {
@@ -400,23 +248,6 @@ export const invalidate = {
         queryKey: orgAdminGrantKeys.detail(id),
       }),
   },
-  /** Invalidate orgCapability queries */ orgCapability: {
-    /** Invalidate all orgCapability queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgCapabilityKeys.all,
-      }),
-    /** Invalidate orgCapability list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgCapabilityKeys.lists(),
-      }),
-    /** Invalidate a specific orgCapability */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgCapabilityKeys.detail(id),
-      }),
-  },
   /** Invalidate orgCapabilityDefaultCapability queries */ orgCapabilityDefaultCapability: {
     /** Invalidate all orgCapabilityDefaultCapability queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -434,23 +265,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: orgCapabilityDefaultCapabilityKeys.detail(id),
-      }),
-  },
-  /** Invalidate orgCapabilityDefault queries */ orgCapabilityDefault: {
-    /** Invalidate all orgCapabilityDefault queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgCapabilityDefaultKeys.all,
-      }),
-    /** Invalidate orgCapabilityDefault list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgCapabilityDefaultKeys.lists(),
-      }),
-    /** Invalidate a specific orgCapabilityDefault */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgCapabilityDefaultKeys.detail(id),
       }),
   },
   /** Invalidate orgCapabilityDefaultGrant queries */ orgCapabilityDefaultGrant: {
@@ -654,23 +468,6 @@ export const invalidate = {
         queryKey: orgMembershipDefaultKeys.detail(id),
       }),
   },
-  /** Invalidate orgMembershipProfile queries */ orgMembershipProfile: {
-    /** Invalidate all orgMembershipProfile queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgMembershipProfileKeys.all,
-      }),
-    /** Invalidate orgMembershipProfile list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgMembershipProfileKeys.lists(),
-      }),
-    /** Invalidate a specific orgMembershipProfile */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgMembershipProfileKeys.detail(id),
-      }),
-  },
   /** Invalidate orgMembershipSetting queries */ orgMembershipSetting: {
     /** Invalidate all orgMembershipSetting queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -705,91 +502,6 @@ export const invalidate = {
         queryKey: orgOwnerGrantKeys.detail(id),
       }),
   },
-  /** Invalidate orgProfileCapability queries */ orgProfileCapability: {
-    /** Invalidate all orgProfileCapability queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileCapabilityKeys.all,
-      }),
-    /** Invalidate orgProfileCapability list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileCapabilityKeys.lists(),
-      }),
-    /** Invalidate a specific orgProfileCapability */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileCapabilityKeys.detail(id),
-      }),
-  },
-  /** Invalidate orgProfile queries */ orgProfile: {
-    /** Invalidate all orgProfile queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileKeys.all,
-      }),
-    /** Invalidate orgProfile list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileKeys.lists(),
-      }),
-    /** Invalidate a specific orgProfile */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileKeys.detail(id),
-      }),
-  },
-  /** Invalidate orgProfileDefinitionGrant queries */ orgProfileDefinitionGrant: {
-    /** Invalidate all orgProfileDefinitionGrant queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileDefinitionGrantKeys.all,
-      }),
-    /** Invalidate orgProfileDefinitionGrant list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileDefinitionGrantKeys.lists(),
-      }),
-    /** Invalidate a specific orgProfileDefinitionGrant */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileDefinitionGrantKeys.detail(id),
-      }),
-  },
-  /** Invalidate orgProfileGrant queries */ orgProfileGrant: {
-    /** Invalidate all orgProfileGrant queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileGrantKeys.all,
-      }),
-    /** Invalidate orgProfileGrant list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileGrantKeys.lists(),
-      }),
-    /** Invalidate a specific orgProfileGrant */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileGrantKeys.detail(id),
-      }),
-  },
-  /** Invalidate orgProfileTemplate queries */ orgProfileTemplate: {
-    /** Invalidate all orgProfileTemplate queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileTemplateKeys.all,
-      }),
-    /** Invalidate orgProfileTemplate list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileTemplateKeys.lists(),
-      }),
-    /** Invalidate a specific orgProfileTemplate */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgProfileTemplateKeys.detail(id),
-      }),
-  },
 } as const;
 /**
 
@@ -811,28 +523,12 @@ export const remove = {
       queryKey: appAdminGrantKeys.detail(id),
     });
   },
-  /** Remove appCapability from cache */ appCapability: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appCapabilityKeys.detail(id),
-    });
-  },
   /** Remove appCapabilityDefaultCapability from cache */ appCapabilityDefaultCapability: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: appCapabilityDefaultCapabilityKeys.detail(id),
-    });
-  },
-  /** Remove appCapabilityDefault from cache */ appCapabilityDefault: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appCapabilityDefaultKeys.detail(id),
     });
   },
   /** Remove appCapabilityDefaultGrant from cache */ appCapabilityDefaultGrant: (
@@ -877,60 +573,12 @@ export const remove = {
       queryKey: appMembershipDefaultKeys.detail(id),
     });
   },
-  /** Remove appMembershipProfile from cache */ appMembershipProfile: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appMembershipProfileKeys.detail(id),
-    });
-  },
   /** Remove appOwnerGrant from cache */ appOwnerGrant: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: appOwnerGrantKeys.detail(id),
-    });
-  },
-  /** Remove appProfileCapability from cache */ appProfileCapability: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appProfileCapabilityKeys.detail(id),
-    });
-  },
-  /** Remove appProfile from cache */ appProfile: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appProfileKeys.detail(id),
-    });
-  },
-  /** Remove appProfileDefinitionGrant from cache */ appProfileDefinitionGrant: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appProfileDefinitionGrantKeys.detail(id),
-    });
-  },
-  /** Remove appProfileGrant from cache */ appProfileGrant: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appProfileGrantKeys.detail(id),
-    });
-  },
-  /** Remove appProfileTemplate from cache */ appProfileTemplate: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appProfileTemplateKeys.detail(id),
     });
   },
   /** Remove membershipType from cache */ membershipType: (
@@ -949,28 +597,12 @@ export const remove = {
       queryKey: orgAdminGrantKeys.detail(id),
     });
   },
-  /** Remove orgCapability from cache */ orgCapability: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: orgCapabilityKeys.detail(id),
-    });
-  },
   /** Remove orgCapabilityDefaultCapability from cache */ orgCapabilityDefaultCapability: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: orgCapabilityDefaultCapabilityKeys.detail(id),
-    });
-  },
-  /** Remove orgCapabilityDefault from cache */ orgCapabilityDefault: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: orgCapabilityDefaultKeys.detail(id),
     });
   },
   /** Remove orgCapabilityDefaultGrant from cache */ orgCapabilityDefaultGrant: (
@@ -1060,14 +692,6 @@ export const remove = {
       queryKey: orgMembershipDefaultKeys.detail(id),
     });
   },
-  /** Remove orgMembershipProfile from cache */ orgMembershipProfile: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: orgMembershipProfileKeys.detail(id),
-    });
-  },
   /** Remove orgMembershipSetting from cache */ orgMembershipSetting: (
     queryClient: QueryClient,
     id: string | number
@@ -1082,46 +706,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: orgOwnerGrantKeys.detail(id),
-    });
-  },
-  /** Remove orgProfileCapability from cache */ orgProfileCapability: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: orgProfileCapabilityKeys.detail(id),
-    });
-  },
-  /** Remove orgProfile from cache */ orgProfile: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: orgProfileKeys.detail(id),
-    });
-  },
-  /** Remove orgProfileDefinitionGrant from cache */ orgProfileDefinitionGrant: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: orgProfileDefinitionGrantKeys.detail(id),
-    });
-  },
-  /** Remove orgProfileGrant from cache */ orgProfileGrant: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: orgProfileGrantKeys.detail(id),
-    });
-  },
-  /** Remove orgProfileTemplate from cache */ orgProfileTemplate: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: orgProfileTemplateKeys.detail(id),
     });
   },
 } as const;

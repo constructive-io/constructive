@@ -1,13 +1,13 @@
 ---
 name: orm-usage
-description: ORM client for the usage API — provides typed CRUD operations for 38 tables and 16 custom operations
+description: ORM client for the usage API — provides typed CRUD operations for 18 tables and 7 custom operations
 ---
 
 # orm-usage
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the usage API — provides typed CRUD operations for 38 tables and 16 custom operations
+ORM client for the usage API — provides typed CRUD operations for 18 tables and 7 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the usage API — provides typed CRUD operations for 38 tables an
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: appAchievementReward, appEventAggregate, appEvent, appEventType, appLevel, appLevelGrant, appLevelRequirement, appLimitCap, ...
+// Available models: appLimitCap, appLimitCapsDefault, appLimit, appLimitCreditCode, appLimitCreditCodeItem, appLimitCredit, appLimitCreditRedemption, appLimitDefault, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -28,7 +28,7 @@ db.<model>.delete({ where: { id: '<UUID>' } }).execute()
 ### Query records
 
 ```typescript
-const items = await db.appAchievementReward.findMany({
+const items = await db.appLimitCap.findMany({
   select: { id: true }
 }).execute();
 ```
@@ -37,13 +37,6 @@ const items = await db.appAchievementReward.findMany({
 
 See the `references/` directory for detailed per-entity API documentation:
 
-- [app-achievement-reward](references/app-achievement-reward.md)
-- [app-event-aggregate](references/app-event-aggregate.md)
-- [app-event](references/app-event.md)
-- [app-event-type](references/app-event-type.md)
-- [app-level](references/app-level.md)
-- [app-level-grant](references/app-level-grant.md)
-- [app-level-requirement](references/app-level-requirement.md)
 - [app-limit-cap](references/app-limit-cap.md)
 - [app-limit-caps-default](references/app-limit-caps-default.md)
 - [app-limit](references/app-limit.md)
@@ -54,12 +47,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-limit-default](references/app-limit-default.md)
 - [app-limit-event](references/app-limit-event.md)
 - [app-limit-warning](references/app-limit-warning.md)
-- [billing-usage-summary](references/billing-usage-summary.md)
-- [ledger](references/ledger.md)
-- [meter](references/meter.md)
-- [meter-credit](references/meter-credit.md)
-- [meter-default](references/meter-default.md)
-- [meter-source](references/meter-source.md)
 - [org-limit-aggregate](references/org-limit-aggregate.md)
 - [org-limit-cap](references/org-limit-cap.md)
 - [org-limit-caps-default](references/org-limit-caps-default.md)
@@ -68,26 +55,10 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-limit-default](references/org-limit-default.md)
 - [org-limit-event](references/org-limit-event.md)
 - [org-limit-warning](references/org-limit-warning.md)
-- [plan-cap](references/plan-cap.md)
-- [plan](references/plan.md)
-- [plan-limit](references/plan-limit.md)
-- [plan-meter-limit](references/plan-meter-limit.md)
-- [plan-override](references/plan-override.md)
-- [plan-pricing](references/plan-pricing.md)
-- [plan-subscription](references/plan-subscription.md)
 - [capture-app-limit-defaults](references/capture-app-limit-defaults.md)
 - [capture-org-limit-defaults](references/capture-org-limit-defaults.md)
-- [capture-trust-ladder](references/capture-trust-ladder.md)
-- [events-achieved](references/events-achieved.md)
-- [events-required](references/events-required.md)
-- [grant-achievement](references/grant-achievement.md)
 - [provision-bucket](references/provision-bucket.md)
-- [recompute-capabilities](references/recompute-capabilities.md)
-- [revoke-achievement](references/revoke-achievement.md)
 - [seed-app-limit-caps-defaults](references/seed-app-limit-caps-defaults.md)
 - [seed-app-limit-defaults](references/seed-app-limit-defaults.md)
-- [seed-meter-defaults](references/seed-meter-defaults.md)
 - [seed-org-limit-caps-defaults](references/seed-org-limit-caps-defaults.md)
 - [seed-org-limit-defaults](references/seed-org-limit-defaults.md)
-- [seed-plan](references/seed-plan.md)
-- [seed-trust-ladder](references/seed-trust-ladder.md)

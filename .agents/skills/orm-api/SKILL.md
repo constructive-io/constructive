@@ -1,13 +1,13 @@
 ---
 name: orm-api
-description: ORM client for the api API — provides typed CRUD operations for 86 tables and 17 custom operations
+description: ORM client for the api API — provides typed CRUD operations for 86 tables and 16 custom operations
 ---
 
 # orm-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the api API — provides typed CRUD operations for 86 tables and 17 custom operations
+ORM client for the api API — provides typed CRUD operations for 86 tables and 16 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the api API — provides typed CRUD operations for 86 tables and 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: api, apiSchema, apiSetting, appComponent, app, checkConstraint, compositeType, corsSetting, ...
+// Available models: api, apiSchema, apiSetting, astMigration, checkConstraint, compositeType, corsSetting, database, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -40,8 +40,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [api](references/api.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
-- [app-component](references/app-component.md)
-- [app](references/app.md)
+- [ast-migration](references/ast-migration.md)
 - [check-constraint](references/check-constraint.md)
 - [composite-type](references/composite-type.md)
 - [cors-setting](references/cors-setting.md)
@@ -67,7 +66,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [full-text-search](references/full-text-search.md)
 - [function](references/function.md)
 - [hostname-binding](references/hostname-binding.md)
-- [http-route](references/http-route.md)
 - [index](references/index.md)
 - [managed-domain](references/managed-domain.md)
 - [node-type-registry](references/node-type-registry.md)
@@ -96,6 +94,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [policy](references/policy.md)
 - [primary-key-constraint](references/primary-key-constraint.md)
 - [pubkey-setting](references/pubkey-setting.md)
+- [redirect](references/redirect.md)
 - [rls-setting](references/rls-setting.md)
 - [route-binding](references/route-binding.md)
 - [route](references/route.md)
@@ -110,6 +109,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [site-theme](references/site-theme.md)
 - [site-web-config](references/site-web-config.md)
 - [spatial-relation](references/spatial-relation.md)
+- [sql-action](references/sql-action.md)
 - [table-behavior](references/table-behavior.md)
 - [table](references/table.md)
 - [table-grant](references/table-grant.md)
@@ -126,17 +126,16 @@ See the `references/` directory for detailed per-entity API documentation:
 - [api-schema-names](references/api-schema-names.md)
 - [apply-registry-defaults](references/apply-registry-defaults.md)
 - [resolve-deep-link](references/resolve-deep-link.md)
-- [resolve-http-route](references/resolve-http-route.md)
 - [resolve-route](references/resolve-route.md)
 - [resolve-site-app-links](references/resolve-site-app-links.md)
+- [accept-database-transfer](references/accept-database-transfer.md)
 - [apply-rls](references/apply-rls.md)
-- [apps-install-app](references/apps-install-app.md)
-- [apps-uninstall-app](references/apps-uninstall-app.md)
-- [apps-upgrade-app](references/apps-upgrade-app.md)
+- [cancel-database-transfer](references/cancel-database-transfer.md)
 - [domains-assign-subdomain](references/domains-assign-subdomain.md)
 - [platform-domains-assign-subdomain](references/platform-domains-assign-subdomain.md)
 - [platform-sites-provision-static-site](references/platform-sites-provision-static-site.md)
 - [provision-bucket](references/provision-bucket.md)
+- [reject-database-transfer](references/reject-database-transfer.md)
 - [request-database](references/request-database.md)
 - [set-field-order](references/set-field-order.md)
 - [sites-provision-static-site](references/sites-provision-static-site.md)

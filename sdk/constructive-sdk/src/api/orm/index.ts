@@ -8,8 +8,7 @@ import type { OrmClientConfig } from './client';
 import { ApiModel } from './models/api';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiSettingModel } from './models/apiSetting';
-import { AppComponentModel } from './models/appComponent';
-import { AppModel } from './models/app';
+import { AstMigrationModel } from './models/astMigration';
 import { CheckConstraintModel } from './models/checkConstraint';
 import { CompositeTypeModel } from './models/compositeType';
 import { CorsSettingModel } from './models/corsSetting';
@@ -35,7 +34,6 @@ import { ForeignKeyConstraintModel } from './models/foreignKeyConstraint';
 import { FullTextSearchModel } from './models/fullTextSearch';
 import { FunctionModel } from './models/function';
 import { HostnameBindingModel } from './models/hostnameBinding';
-import { HttpRouteModel } from './models/httpRoute';
 import { IndexModel } from './models/index';
 import { ManagedDomainModel } from './models/managedDomain';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
@@ -64,6 +62,7 @@ import { PlatformSiteWebConfigModel } from './models/platformSiteWebConfig';
 import { PolicyModel } from './models/policy';
 import { PrimaryKeyConstraintModel } from './models/primaryKeyConstraint';
 import { PubkeySettingModel } from './models/pubkeySetting';
+import { RedirectModel } from './models/redirect';
 import { RlsSettingModel } from './models/rlsSetting';
 import { RouteBindingModel } from './models/routeBinding';
 import { RouteModel } from './models/route';
@@ -78,6 +77,7 @@ import { SiteModuleModel } from './models/siteModule';
 import { SiteThemeModel } from './models/siteTheme';
 import { SiteWebConfigModel } from './models/siteWebConfig';
 import { SpatialRelationModel } from './models/spatialRelation';
+import { SqlActionModel } from './models/sqlAction';
 import { TableBehaviorModel } from './models/tableBehavior';
 import { TableModel } from './models/table';
 import { TableGrantModel } from './models/tableGrant';
@@ -129,8 +129,7 @@ export function createClient(config: OrmClientConfig) {
     api: new ApiModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiSetting: new ApiSettingModel(client),
-    appComponent: new AppComponentModel(client),
-    app: new AppModel(client),
+    astMigration: new AstMigrationModel(client),
     checkConstraint: new CheckConstraintModel(client),
     compositeType: new CompositeTypeModel(client),
     corsSetting: new CorsSettingModel(client),
@@ -156,7 +155,6 @@ export function createClient(config: OrmClientConfig) {
     fullTextSearch: new FullTextSearchModel(client),
     function: new FunctionModel(client),
     hostnameBinding: new HostnameBindingModel(client),
-    httpRoute: new HttpRouteModel(client),
     index: new IndexModel(client),
     managedDomain: new ManagedDomainModel(client),
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
@@ -185,6 +183,7 @@ export function createClient(config: OrmClientConfig) {
     policy: new PolicyModel(client),
     primaryKeyConstraint: new PrimaryKeyConstraintModel(client),
     pubkeySetting: new PubkeySettingModel(client),
+    redirect: new RedirectModel(client),
     rlsSetting: new RlsSettingModel(client),
     routeBinding: new RouteBindingModel(client),
     route: new RouteModel(client),
@@ -199,6 +198,7 @@ export function createClient(config: OrmClientConfig) {
     siteTheme: new SiteThemeModel(client),
     siteWebConfig: new SiteWebConfigModel(client),
     spatialRelation: new SpatialRelationModel(client),
+    sqlAction: new SqlActionModel(client),
     tableBehavior: new TableBehaviorModel(client),
     table: new TableModel(client),
     tableGrant: new TableGrantModel(client),

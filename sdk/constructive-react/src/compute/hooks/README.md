@@ -32,11 +32,63 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
+| `useBuildsQuery` | Query | One run of a repository workflow: its commit, its job, and what it produced |
+| `useBuildQuery` | Query | One run of a repository workflow: its commit, its job, and what it produced |
+| `useCreateBuildMutation` | Mutation | One run of a repository workflow: its commit, its job, and what it produced |
+| `useUpdateBuildMutation` | Mutation | One run of a repository workflow: its commit, its job, and what it produced |
+| `useDeleteBuildMutation` | Mutation | One run of a repository workflow: its commit, its job, and what it produced |
+| `useBuildStepsQuery` | Query | Partitioned append-only step and test results of a build, keyed into its log object |
+| `useBuildStepQuery` | Query | Partitioned append-only step and test results of a build, keyed into its log object |
+| `useCreateBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
+| `useUpdateBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
+| `useDeleteBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
 | `useContentPresetsQuery` | Query | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
 | `useContentPresetQuery` | Query | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
 | `useCreateContentPresetMutation` | Mutation | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
 | `useUpdateContentPresetMutation` | Mutation | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
 | `useDeleteContentPresetMutation` | Mutation | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
+| `useDatabaseFunctionGraphsQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
+| `useDatabaseFunctionGraphQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
+| `useCreateDatabaseFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
+| `useUpdateDatabaseFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
+| `useDeleteDatabaseFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
+| `useDatabaseFunctionGraphExecutionsQuery` | Query | Ephemeral execution state for flow graph evaluation |
+| `useDatabaseFunctionGraphExecutionQuery` | Query | Ephemeral execution state for flow graph evaluation |
+| `useCreateDatabaseFunctionGraphExecutionMutation` | Mutation | Ephemeral execution state for flow graph evaluation |
+| `useUpdateDatabaseFunctionGraphExecutionMutation` | Mutation | Ephemeral execution state for flow graph evaluation |
+| `useDeleteDatabaseFunctionGraphExecutionMutation` | Mutation | Ephemeral execution state for flow graph evaluation |
+| `useDatabaseFunctionGraphExecutionNodeStatesQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useDatabaseFunctionGraphExecutionNodeStateQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useCreateDatabaseFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useUpdateDatabaseFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useDeleteDatabaseFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useDatabaseFunctionGraphExecutionOutputsQuery` | Query | Content-addressed store for execution outputs — hash-referenced from node_outputs |
+| `useDatabaseFunctionGraphExecutionOutputQuery` | Query | Content-addressed store for execution outputs — hash-referenced from node_outputs |
+| `useCreateDatabaseFunctionGraphExecutionOutputMutation` | Mutation | Content-addressed store for execution outputs — hash-referenced from node_outputs |
+| `useUpdateDatabaseFunctionGraphExecutionOutputMutation` | Mutation | Content-addressed store for execution outputs — hash-referenced from node_outputs |
+| `useDeleteDatabaseFunctionGraphExecutionOutputMutation` | Mutation | Content-addressed store for execution outputs — hash-referenced from node_outputs |
+| `useDatabaseGraphCommitsQuery` | Query | Commit history — each commit snapshots a tree root for a store |
+| `useDatabaseGraphCommitQuery` | Query | Commit history — each commit snapshots a tree root for a store |
+| `useCreateDatabaseGraphCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useUpdateDatabaseGraphCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useDeleteDatabaseGraphCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useDatabaseGraphGetAllTreeNodesQuery` | Query | List all databaseGraphGetAllTreeNodes |
+| `useCreateDatabaseGraphGetAllTreeNodesRecordMutation` | Mutation | Create a databaseGraphGetAllTreeNodesRecord |
+| `useDatabaseGraphObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useDatabaseGraphObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useCreateDatabaseGraphObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useUpdateDatabaseGraphObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useDeleteDatabaseGraphObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useDatabaseGraphRefsQuery` | Query | Branch heads — mutable pointers into the commit chain |
+| `useDatabaseGraphRefQuery` | Query | Branch heads — mutable pointers into the commit chain |
+| `useCreateDatabaseGraphRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
+| `useUpdateDatabaseGraphRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
+| `useDeleteDatabaseGraphRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
+| `useDatabaseGraphStoresQuery` | Query | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useDatabaseGraphStoreQuery` | Query | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useCreateDatabaseGraphStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useUpdateDatabaseGraphStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useDeleteDatabaseGraphStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `useDbPresetsQuery` | Query | Database provisioning preset catalog — merkle-versioned head over the infra store |
 | `useDbPresetQuery` | Query | Database provisioning preset catalog — merkle-versioned head over the infra store |
 | `useCreateDbPresetMutation` | Mutation | Database provisioning preset catalog — merkle-versioned head over the infra store |
@@ -124,6 +176,16 @@ function App() {
 | `useDeleteFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
 | `useGetAllTreeNodesQuery` | Query | List all getAllTreeNodes |
 | `useCreateGetAllTreeNodesRecordMutation` | Mutation | Create a getAllTreeNodesRecord |
+| `useImagesQuery` | Query | Container image catalog: images available to run as functions, resources, and builds |
+| `useImageQuery` | Query | Container image catalog: images available to run as functions, resources, and builds |
+| `useCreateImageMutation` | Mutation | Container image catalog: images available to run as functions, resources, and builds |
+| `useUpdateImageMutation` | Mutation | Container image catalog: images available to run as functions, resources, and builds |
+| `useDeleteImageMutation` | Mutation | Container image catalog: images available to run as functions, resources, and builds |
+| `useImageGrantsQuery` | Query | Grants that make a catalog image usable by one scope |
+| `useImageGrantQuery` | Query | Grants that make a catalog image usable by one scope |
+| `useCreateImageGrantMutation` | Mutation | Grants that make a catalog image usable by one scope |
+| `useUpdateImageGrantMutation` | Mutation | Grants that make a catalog image usable by one scope |
+| `useDeleteImageGrantMutation` | Mutation | Grants that make a catalog image usable by one scope |
 | `useInfraCommitsQuery` | Query | Commit history — each commit snapshots a tree root for a store |
 | `useInfraCommitQuery` | Query | Commit history — each commit snapshots a tree root for a store |
 | `useCreateInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
@@ -161,6 +223,16 @@ function App() {
 | `useCreateNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useUpdateNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useDeleteNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
+| `usePlatformBuildsQuery` | Query | One run of a repository workflow: its commit, its job, and what it produced |
+| `usePlatformBuildQuery` | Query | One run of a repository workflow: its commit, its job, and what it produced |
+| `useCreatePlatformBuildMutation` | Mutation | One run of a repository workflow: its commit, its job, and what it produced |
+| `useUpdatePlatformBuildMutation` | Mutation | One run of a repository workflow: its commit, its job, and what it produced |
+| `useDeletePlatformBuildMutation` | Mutation | One run of a repository workflow: its commit, its job, and what it produced |
+| `usePlatformBuildStepsQuery` | Query | Partitioned append-only step and test results of a build, keyed into its log object |
+| `usePlatformBuildStepQuery` | Query | Partitioned append-only step and test results of a build, keyed into its log object |
+| `useCreatePlatformBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
+| `useUpdatePlatformBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
+| `useDeletePlatformBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
 | `usePlatformFunctionApiBindingsQuery` | Query | Join table binding function definitions to API endpoints with per-binding alias and config |
 | `usePlatformFunctionApiBindingQuery` | Query | Join table binding function definitions to API endpoints with per-binding alias and config |
 | `useCreatePlatformFunctionApiBindingMutation` | Mutation | Join table binding function definitions to API endpoints with per-binding alias and config |
@@ -201,6 +273,16 @@ function App() {
 | `useCreatePlatformFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
 | `useUpdatePlatformFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
 | `useDeletePlatformFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
+| `usePlatformImagesQuery` | Query | Container image catalog: images available to run as functions, resources, and builds |
+| `usePlatformImageQuery` | Query | Container image catalog: images available to run as functions, resources, and builds |
+| `useCreatePlatformImageMutation` | Mutation | Container image catalog: images available to run as functions, resources, and builds |
+| `useUpdatePlatformImageMutation` | Mutation | Container image catalog: images available to run as functions, resources, and builds |
+| `useDeletePlatformImageMutation` | Mutation | Container image catalog: images available to run as functions, resources, and builds |
+| `usePlatformImageGrantsQuery` | Query | Grants that make a catalog image usable by one scope |
+| `usePlatformImageGrantQuery` | Query | Grants that make a catalog image usable by one scope |
+| `useCreatePlatformImageGrantMutation` | Mutation | Grants that make a catalog image usable by one scope |
+| `useUpdatePlatformImageGrantMutation` | Mutation | Grants that make a catalog image usable by one scope |
+| `useDeletePlatformImageGrantMutation` | Mutation | Grants that make a catalog image usable by one scope |
 | `usePlatformInfraCommitsQuery` | Query | Commit history — each commit snapshots a tree root for a store |
 | `usePlatformInfraCommitQuery` | Query | Commit history — each commit snapshots a tree root for a store |
 | `useCreatePlatformInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
@@ -223,6 +305,16 @@ function App() {
 | `useCreatePlatformInfraStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `useUpdatePlatformInfraStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `useDeletePlatformInfraStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `usePlatformK8sResourceKindsQuery` | Query | Kubernetes kind allow-list for DB-driven resources — merkle-versioned head over the infra store; the admission gate fails closed on kinds without an active row |
+| `usePlatformK8sResourceKindQuery` | Query | Kubernetes kind allow-list for DB-driven resources — merkle-versioned head over the infra store; the admission gate fails closed on kinds without an active row |
+| `useCreatePlatformK8sResourceKindMutation` | Mutation | Kubernetes kind allow-list for DB-driven resources — merkle-versioned head over the infra store; the admission gate fails closed on kinds without an active row |
+| `useUpdatePlatformK8sResourceKindMutation` | Mutation | Kubernetes kind allow-list for DB-driven resources — merkle-versioned head over the infra store; the admission gate fails closed on kinds without an active row |
+| `useDeletePlatformK8sResourceKindMutation` | Mutation | Kubernetes kind allow-list for DB-driven resources — merkle-versioned head over the infra store; the admission gate fails closed on kinds without an active row |
+| `usePlatformK8sSpecRulesQuery` | Query | Spec rulebook for DB-driven resources — merkle-versioned head over the infra store; enforced by the generated admission gate via infra_utils.check_resource_admission |
+| `usePlatformK8sSpecRuleQuery` | Query | Spec rulebook for DB-driven resources — merkle-versioned head over the infra store; enforced by the generated admission gate via infra_utils.check_resource_admission |
+| `useCreatePlatformK8sSpecRuleMutation` | Mutation | Spec rulebook for DB-driven resources — merkle-versioned head over the infra store; enforced by the generated admission gate via infra_utils.check_resource_admission |
+| `useUpdatePlatformK8sSpecRuleMutation` | Mutation | Spec rulebook for DB-driven resources — merkle-versioned head over the infra store; enforced by the generated admission gate via infra_utils.check_resource_admission |
+| `useDeletePlatformK8sSpecRuleMutation` | Mutation | Spec rulebook for DB-driven resources — merkle-versioned head over the infra store; enforced by the generated admission gate via infra_utils.check_resource_admission |
 | `usePlatformNamespacesQuery` | Query | Logical namespace containers for grouping secrets, config, functions, and other resources |
 | `usePlatformNamespaceQuery` | Query | Logical namespace containers for grouping secrets, config, functions, and other resources |
 | `useCreatePlatformNamespaceMutation` | Mutation | Logical namespace containers for grouping secrets, config, functions, and other resources |
@@ -233,6 +325,66 @@ function App() {
 | `useCreatePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useUpdatePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useDeletePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
+| `usePlatformProposalCommentsQuery` | Query | Comments on a local proposal, optionally anchored to a line |
+| `usePlatformProposalCommentQuery` | Query | Comments on a local proposal, optionally anchored to a line |
+| `useCreatePlatformProposalCommentMutation` | Mutation | Comments on a local proposal, optionally anchored to a line |
+| `useUpdatePlatformProposalCommentMutation` | Mutation | Comments on a local proposal, optionally anchored to a line |
+| `useDeletePlatformProposalCommentMutation` | Mutation | Comments on a local proposal, optionally anchored to a line |
+| `usePlatformProposalsQuery` | Query | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `usePlatformProposalQuery` | Query | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `useCreatePlatformProposalMutation` | Mutation | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `useUpdatePlatformProposalMutation` | Mutation | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `useDeletePlatformProposalMutation` | Mutation | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `usePlatformProposalFileViewsQuery` | Query | Files a reviewer has read, pinned to the blob they read |
+| `usePlatformProposalFileViewQuery` | Query | Files a reviewer has read, pinned to the blob they read |
+| `useCreatePlatformProposalFileViewMutation` | Mutation | Files a reviewer has read, pinned to the blob they read |
+| `useUpdatePlatformProposalFileViewMutation` | Mutation | Files a reviewer has read, pinned to the blob they read |
+| `useDeletePlatformProposalFileViewMutation` | Mutation | Files a reviewer has read, pinned to the blob they read |
+| `usePlatformProposalReactionsQuery` | Query | Emoji reactions to a local proposal or one of its comments |
+| `usePlatformProposalReactionQuery` | Query | Emoji reactions to a local proposal or one of its comments |
+| `useCreatePlatformProposalReactionMutation` | Mutation | Emoji reactions to a local proposal or one of its comments |
+| `useUpdatePlatformProposalReactionMutation` | Mutation | Emoji reactions to a local proposal or one of its comments |
+| `useDeletePlatformProposalReactionMutation` | Mutation | Emoji reactions to a local proposal or one of its comments |
+| `usePlatformProposalReviewsQuery` | Query | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `usePlatformProposalReviewQuery` | Query | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `useCreatePlatformProposalReviewMutation` | Mutation | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `useUpdatePlatformProposalReviewMutation` | Mutation | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `useDeletePlatformProposalReviewMutation` | Mutation | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `usePlatformProposalsChunksQuery` | Query | List all platformProposalsChunks |
+| `usePlatformProposalsChunkQuery` | Query | Get one platformProposalsChunk |
+| `useCreatePlatformProposalsChunkMutation` | Mutation | Create a platformProposalsChunk |
+| `useUpdatePlatformProposalsChunkMutation` | Mutation | Update a platformProposalsChunk |
+| `useDeletePlatformProposalsChunkMutation` | Mutation | Delete a platformProposalsChunk |
+| `usePlatformRegistryBindingsQuery` | Query | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `usePlatformRegistryBindingQuery` | Query | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `useCreatePlatformRegistryBindingMutation` | Mutation | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `useUpdatePlatformRegistryBindingMutation` | Mutation | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `useDeletePlatformRegistryBindingMutation` | Mutation | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `usePlatformRegistriesQuery` | Query | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `usePlatformRegistryQuery` | Query | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `useCreatePlatformRegistryMutation` | Mutation | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `useUpdatePlatformRegistryMutation` | Mutation | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `useDeletePlatformRegistryMutation` | Mutation | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `usePlatformRegistryGrantsQuery` | Query | Grants that make a registry usable by one scope |
+| `usePlatformRegistryGrantQuery` | Query | Grants that make a registry usable by one scope |
+| `useCreatePlatformRegistryGrantMutation` | Mutation | Grants that make a registry usable by one scope |
+| `useUpdatePlatformRegistryGrantMutation` | Mutation | Grants that make a registry usable by one scope |
+| `useDeletePlatformRegistryGrantMutation` | Mutation | Grants that make a registry usable by one scope |
+| `usePlatformRepositoriesQuery` | Query | Source repositories, hosted locally or on an external provider |
+| `usePlatformRepositoryQuery` | Query | Source repositories, hosted locally or on an external provider |
+| `useCreatePlatformRepositoryMutation` | Mutation | Source repositories, hosted locally or on an external provider |
+| `useUpdatePlatformRepositoryMutation` | Mutation | Source repositories, hosted locally or on an external provider |
+| `useDeletePlatformRepositoryMutation` | Mutation | Source repositories, hosted locally or on an external provider |
+| `usePlatformRepositoryEventsQuery` | Query | Normalized repository events from local hooks and external providers |
+| `usePlatformRepositoryEventQuery` | Query | Normalized repository events from local hooks and external providers |
+| `useCreatePlatformRepositoryEventMutation` | Mutation | Normalized repository events from local hooks and external providers |
+| `useUpdatePlatformRepositoryEventMutation` | Mutation | Normalized repository events from local hooks and external providers |
+| `useDeletePlatformRepositoryEventMutation` | Mutation | Normalized repository events from local hooks and external providers |
+| `usePlatformRepositoryWorkflowsQuery` | Query | Bindings from a repository event to the flow graph that should run |
+| `usePlatformRepositoryWorkflowQuery` | Query | Bindings from a repository event to the flow graph that should run |
+| `useCreatePlatformRepositoryWorkflowMutation` | Mutation | Bindings from a repository event to the flow graph that should run |
+| `useUpdatePlatformRepositoryWorkflowMutation` | Mutation | Bindings from a repository event to the flow graph that should run |
+| `useDeletePlatformRepositoryWorkflowMutation` | Mutation | Bindings from a repository event to the flow graph that should run |
 | `usePlatformResourcesQuery` | Query | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `usePlatformResourceQuery` | Query | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useCreatePlatformResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
@@ -291,6 +443,66 @@ function App() {
 | `useCreatePlatformWebhookEventMutation` | Mutation | Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued |
 | `useUpdatePlatformWebhookEventMutation` | Mutation | Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued |
 | `useDeletePlatformWebhookEventMutation` | Mutation | Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued |
+| `useProposalCommentsQuery` | Query | Comments on a local proposal, optionally anchored to a line |
+| `useProposalCommentQuery` | Query | Comments on a local proposal, optionally anchored to a line |
+| `useCreateProposalCommentMutation` | Mutation | Comments on a local proposal, optionally anchored to a line |
+| `useUpdateProposalCommentMutation` | Mutation | Comments on a local proposal, optionally anchored to a line |
+| `useDeleteProposalCommentMutation` | Mutation | Comments on a local proposal, optionally anchored to a line |
+| `useProposalsQuery` | Query | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `useProposalQuery` | Query | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `useCreateProposalMutation` | Mutation | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `useUpdateProposalMutation` | Mutation | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `useDeleteProposalMutation` | Mutation | Proposals against a repository: issues, changes to merge, discussions and decisions |
+| `useProposalFileViewsQuery` | Query | Files a reviewer has read, pinned to the blob they read |
+| `useProposalFileViewQuery` | Query | Files a reviewer has read, pinned to the blob they read |
+| `useCreateProposalFileViewMutation` | Mutation | Files a reviewer has read, pinned to the blob they read |
+| `useUpdateProposalFileViewMutation` | Mutation | Files a reviewer has read, pinned to the blob they read |
+| `useDeleteProposalFileViewMutation` | Mutation | Files a reviewer has read, pinned to the blob they read |
+| `useProposalReactionsQuery` | Query | Emoji reactions to a local proposal or one of its comments |
+| `useProposalReactionQuery` | Query | Emoji reactions to a local proposal or one of its comments |
+| `useCreateProposalReactionMutation` | Mutation | Emoji reactions to a local proposal or one of its comments |
+| `useUpdateProposalReactionMutation` | Mutation | Emoji reactions to a local proposal or one of its comments |
+| `useDeleteProposalReactionMutation` | Mutation | Emoji reactions to a local proposal or one of its comments |
+| `useProposalReviewsQuery` | Query | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `useProposalReviewQuery` | Query | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `useCreateProposalReviewMutation` | Mutation | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `useUpdateProposalReviewMutation` | Mutation | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `useDeleteProposalReviewMutation` | Mutation | Review verdicts on a proposal, each pinned to the commit reviewed |
+| `useProposalsChunksQuery` | Query | List all proposalsChunks |
+| `useProposalsChunkQuery` | Query | Get one proposalsChunk |
+| `useCreateProposalsChunkMutation` | Mutation | Create a proposalsChunk |
+| `useUpdateProposalsChunkMutation` | Mutation | Update a proposalsChunk |
+| `useDeleteProposalsChunkMutation` | Mutation | Delete a proposalsChunk |
+| `useRegistryBindingsQuery` | Query | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `useRegistryBindingQuery` | Query | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `useCreateRegistryBindingMutation` | Mutation | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `useUpdateRegistryBindingMutation` | Mutation | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `useDeleteRegistryBindingMutation` | Mutation | Binds a namespace to an installed container registry for a lane (realm) — the reconciler projects that registry's credentials into the namespace as an image pull secret |
+| `useRegistriesQuery` | Query | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `useRegistryQuery` | Query | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `useCreateRegistryMutation` | Mutation | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `useUpdateRegistryMutation` | Mutation | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `useDeleteRegistryMutation` | Mutation | Artifact registries this scope pulls from or pushes to (OCI images, npm packages), platform-run or external |
+| `useRegistryGrantsQuery` | Query | Grants that make a registry usable by one scope |
+| `useRegistryGrantQuery` | Query | Grants that make a registry usable by one scope |
+| `useCreateRegistryGrantMutation` | Mutation | Grants that make a registry usable by one scope |
+| `useUpdateRegistryGrantMutation` | Mutation | Grants that make a registry usable by one scope |
+| `useDeleteRegistryGrantMutation` | Mutation | Grants that make a registry usable by one scope |
+| `useRepositoriesQuery` | Query | Source repositories, hosted locally or on an external provider |
+| `useRepositoryQuery` | Query | Source repositories, hosted locally or on an external provider |
+| `useCreateRepositoryMutation` | Mutation | Source repositories, hosted locally or on an external provider |
+| `useUpdateRepositoryMutation` | Mutation | Source repositories, hosted locally or on an external provider |
+| `useDeleteRepositoryMutation` | Mutation | Source repositories, hosted locally or on an external provider |
+| `useRepositoryEventsQuery` | Query | Normalized repository events from local hooks and external providers |
+| `useRepositoryEventQuery` | Query | Normalized repository events from local hooks and external providers |
+| `useCreateRepositoryEventMutation` | Mutation | Normalized repository events from local hooks and external providers |
+| `useUpdateRepositoryEventMutation` | Mutation | Normalized repository events from local hooks and external providers |
+| `useDeleteRepositoryEventMutation` | Mutation | Normalized repository events from local hooks and external providers |
+| `useRepositoryWorkflowsQuery` | Query | Bindings from a repository event to the flow graph that should run |
+| `useRepositoryWorkflowQuery` | Query | Bindings from a repository event to the flow graph that should run |
+| `useCreateRepositoryWorkflowMutation` | Mutation | Bindings from a repository event to the flow graph that should run |
+| `useUpdateRepositoryWorkflowMutation` | Mutation | Bindings from a repository event to the flow graph that should run |
+| `useDeleteRepositoryWorkflowMutation` | Mutation | Bindings from a repository event to the flow graph that should run |
 | `useResourcesQuery` | Query | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useResourceQuery` | Query | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useCreateResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
@@ -349,12 +561,30 @@ function App() {
 | `useCreateWebhookEventMutation` | Mutation | Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued |
 | `useUpdateWebhookEventMutation` | Mutation | Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued |
 | `useDeleteWebhookEventMutation` | Mutation | Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued |
+| `useDatabaseReadFunctionGraphQuery` | Query | databaseReadFunctionGraph |
 | `useReadFunctionGraphQuery` | Query | readFunctionGraph |
 | `useAddEdgeMutation` | Mutation | addEdge |
 | `useAddEdgeAndSaveMutation` | Mutation | addEdgeAndSave |
 | `useAddNodeMutation` | Mutation | addNode |
 | `useAddNodeAndSaveMutation` | Mutation | addNodeAndSave |
 | `useCopyGraphMutation` | Mutation | copyGraph |
+| `useDatabaseAddEdgeMutation` | Mutation | databaseAddEdge |
+| `useDatabaseAddEdgeAndSaveMutation` | Mutation | databaseAddEdgeAndSave |
+| `useDatabaseAddNodeMutation` | Mutation | databaseAddNode |
+| `useDatabaseAddNodeAndSaveMutation` | Mutation | databaseAddNodeAndSave |
+| `useDatabaseCopyGraphMutation` | Mutation | databaseCopyGraph |
+| `useDatabaseCreateFunctionGraphMutation` | Mutation | databaseCreateFunctionGraph |
+| `useDatabaseGraphInitEmptyRepoMutation` | Mutation | databaseGraphInitEmptyRepo |
+| `useDatabaseGraphInsertNodeAtPathMutation` | Mutation | databaseGraphInsertNodeAtPath |
+| `useDatabaseGraphInsertNodesAtPathsMutation` | Mutation | databaseGraphInsertNodesAtPaths |
+| `useDatabaseGraphSetAndCommitMutation` | Mutation | databaseGraphSetAndCommit |
+| `useDatabaseGraphSetDataAtPathMutation` | Mutation | databaseGraphSetDataAtPath |
+| `useDatabaseGraphSetManyAndCommitMutation` | Mutation | databaseGraphSetManyAndCommit |
+| `useDatabaseImportDefinitionsMutation` | Mutation | databaseImportDefinitions |
+| `useDatabaseImportGraphJsonMutation` | Mutation | databaseImportGraphJson |
+| `useDatabaseSaveGraphMutation` | Mutation | databaseSaveGraph |
+| `useDatabaseStartExecutionMutation` | Mutation | databaseStartExecution |
+| `useDatabaseValidateFunctionGraphMutation` | Mutation | databaseValidateFunctionGraph |
 | `useImportDefinitionsMutation` | Mutation | importDefinitions |
 | `useImportGraphJsonMutation` | Mutation | importGraphJson |
 | `useInfraInitEmptyRepoMutation` | Mutation | infraInitEmptyRepo |
@@ -393,6 +623,48 @@ and lifecycle settings. |
 
 ## Table Hooks
 
+### Build
+
+```typescript
+// List all builds
+const { data, isLoading } = useBuildsQuery({
+  selection: { fields: { actorId: true, catalogImageId: true, commitSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, eventId: true, finishedAt: true, id: true, jobId: true, logs: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } },
+});
+
+// Get one build
+const { data: item } = useBuildQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, catalogImageId: true, commitSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, eventId: true, finishedAt: true, id: true, jobId: true, logs: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } },
+});
+
+// Create a build
+const { mutate: create } = useCreateBuildMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', catalogImageId: '<UUID>', commitSha: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', eventId: '<UUID>', finishedAt: '<Datetime>', jobId: '<BigInt>', logs: '<Upload>', metadata: '<JSON>', proposalId: '<UUID>', ref: '<String>', repositoryId: '<UUID>', startedAt: '<Datetime>', status: '<String>', updatedByPrincipal: '<UUID>', workflowId: '<UUID>' });
+```
+
+### BuildStep
+
+```typescript
+// List all buildSteps
+const { data, isLoading } = useBuildStepsQuery({
+  selection: { fields: { buildId: true, createdByPrincipal: true, databaseId: true, exitCode: true, finishedAt: true, id: true, kind: true, logBytes: true, logOffset: true, name: true, parentSeq: true, recordedAt: true, seq: true, startedAt: true, status: true, summary: true } },
+});
+
+// Get one buildStep
+const { data: item } = useBuildStepQuery({
+  id: '<UUID>',
+  selection: { fields: { buildId: true, createdByPrincipal: true, databaseId: true, exitCode: true, finishedAt: true, id: true, kind: true, logBytes: true, logOffset: true, name: true, parentSeq: true, recordedAt: true, seq: true, startedAt: true, status: true, summary: true } },
+});
+
+// Create a buildStep
+const { mutate: create } = useCreateBuildStepMutation({
+  selection: { fields: { id: true } },
+});
+create({ buildId: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', exitCode: '<Int>', finishedAt: '<Datetime>', kind: '<String>', logBytes: '<BigInt>', logOffset: '<BigInt>', name: '<String>', parentSeq: '<Int>', recordedAt: '<Datetime>', seq: '<Int>', startedAt: '<Datetime>', status: '<String>', summary: '<JSON>' });
+```
+
 ### ContentPreset
 
 ```typescript
@@ -412,6 +684,189 @@ const { mutate: create } = useCreateContentPresetMutation({
   selection: { fields: { id: true } },
 });
 create({ active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', kind: '<String>', label: '<String>', slug: '<String>', storeId: '<UUID>' });
+```
+
+### DatabaseFunctionGraph
+
+```typescript
+// List all databaseFunctionGraphs
+const { data, isLoading } = useDatabaseFunctionGraphsQuery({
+  selection: { fields: { context: true, createdAt: true, createdBy: true, databaseId: true, definitionsCommitId: true, description: true, id: true, isValid: true, name: true, storeId: true, updatedAt: true, validationErrors: true } },
+});
+
+// Get one databaseFunctionGraph
+const { data: item } = useDatabaseFunctionGraphQuery({
+  id: '<UUID>',
+  selection: { fields: { context: true, createdAt: true, createdBy: true, databaseId: true, definitionsCommitId: true, description: true, id: true, isValid: true, name: true, storeId: true, updatedAt: true, validationErrors: true } },
+});
+
+// Create a databaseFunctionGraph
+const { mutate: create } = useCreateDatabaseFunctionGraphMutation({
+  selection: { fields: { id: true } },
+});
+create({ context: '<String>', createdBy: '<UUID>', databaseId: '<UUID>', definitionsCommitId: '<UUID>', description: '<String>', isValid: '<Boolean>', name: '<String>', storeId: '<UUID>', validationErrors: '<JSON>' });
+```
+
+### DatabaseFunctionGraphExecution
+
+```typescript
+// List all databaseFunctionGraphExecutions
+const { data, isLoading } = useDatabaseFunctionGraphExecutionsQuery({
+  selection: { fields: { actorId: true, completedAt: true, currentWave: true, databaseId: true, definitionsCommitId: true, entityId: true, entityType: true, errorCode: true, errorMessage: true, executionPlan: true, graphId: true, id: true, inputPayload: true, invocationCreatedAt: true, invocationId: true, lastProgressAt: true, maxPendingJobs: true, maxTicks: true, nodeOutputs: true, organizationId: true, outputNames: true, outputNode: true, outputPayload: true, outputPort: true, parentExecutionId: true, parentInvocationId: true, parentNodeName: true, principalId: true, startedAt: true, status: true, tickCount: true, timeoutAt: true } },
+});
+
+// Get one databaseFunctionGraphExecution
+const { data: item } = useDatabaseFunctionGraphExecutionQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, completedAt: true, currentWave: true, databaseId: true, definitionsCommitId: true, entityId: true, entityType: true, errorCode: true, errorMessage: true, executionPlan: true, graphId: true, id: true, inputPayload: true, invocationCreatedAt: true, invocationId: true, lastProgressAt: true, maxPendingJobs: true, maxTicks: true, nodeOutputs: true, organizationId: true, outputNames: true, outputNode: true, outputPayload: true, outputPort: true, parentExecutionId: true, parentInvocationId: true, parentNodeName: true, principalId: true, startedAt: true, status: true, tickCount: true, timeoutAt: true } },
+});
+
+// Create a databaseFunctionGraphExecution
+const { mutate: create } = useCreateDatabaseFunctionGraphExecutionMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', completedAt: '<Datetime>', currentWave: '<Int>', databaseId: '<UUID>', definitionsCommitId: '<UUID>', entityId: '<UUID>', entityType: '<String>', errorCode: '<String>', errorMessage: '<String>', executionPlan: '<JSON>', graphId: '<UUID>', inputPayload: '<JSON>', invocationCreatedAt: '<Datetime>', invocationId: '<UUID>', lastProgressAt: '<Datetime>', maxPendingJobs: '<Int>', maxTicks: '<Int>', nodeOutputs: '<JSON>', organizationId: '<UUID>', outputNames: '<String>', outputNode: '<String>', outputPayload: '<JSON>', outputPort: '<String>', parentExecutionId: '<UUID>', parentInvocationId: '<UUID>', parentNodeName: '<String>', principalId: '<UUID>', startedAt: '<Datetime>', status: '<String>', tickCount: '<Int>', timeoutAt: '<Datetime>' });
+```
+
+### DatabaseFunctionGraphExecutionNodeState
+
+```typescript
+// List all databaseFunctionGraphExecutionNodeStates
+const { data, isLoading } = useDatabaseFunctionGraphExecutionNodeStatesQuery({
+  selection: { fields: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, databaseId: true, errorCode: true, errorMessage: true, executionId: true, id: true, nodeName: true, nodePath: true, outputId: true, startedAt: true, status: true } },
+});
+
+// Get one databaseFunctionGraphExecutionNodeState
+const { data: item } = useDatabaseFunctionGraphExecutionNodeStateQuery({
+  id: '<UUID>',
+  selection: { fields: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, databaseId: true, errorCode: true, errorMessage: true, executionId: true, id: true, nodeName: true, nodePath: true, outputId: true, startedAt: true, status: true } },
+});
+
+// Create a databaseFunctionGraphExecutionNodeState
+const { mutate: create } = useCreateDatabaseFunctionGraphExecutionNodeStateMutation({
+  selection: { fields: { id: true } },
+});
+create({ callbackInputs: '<JSON>', callbackMeta: '<JSON>', callbackTokenHash: '<String>', completedAt: '<Datetime>', databaseId: '<UUID>', errorCode: '<String>', errorMessage: '<String>', executionId: '<UUID>', nodeName: '<String>', nodePath: '<String>', outputId: '<UUID>', startedAt: '<Datetime>', status: '<String>' });
+```
+
+### DatabaseFunctionGraphExecutionOutput
+
+```typescript
+// List all databaseFunctionGraphExecutionOutputs
+const { data, isLoading } = useDatabaseFunctionGraphExecutionOutputsQuery({
+  selection: { fields: { createdAt: true, data: true, databaseId: true, hash: true, id: true } },
+});
+
+// Get one databaseFunctionGraphExecutionOutput
+const { data: item } = useDatabaseFunctionGraphExecutionOutputQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, data: true, databaseId: true, hash: true, id: true } },
+});
+
+// Create a databaseFunctionGraphExecutionOutput
+const { mutate: create } = useCreateDatabaseFunctionGraphExecutionOutputMutation({
+  selection: { fields: { id: true } },
+});
+create({ data: '<JSON>', databaseId: '<UUID>', hash: '<Base64EncodedBinary>' });
+```
+
+### DatabaseGraphCommit
+
+```typescript
+// List all databaseGraphCommits
+const { data, isLoading } = useDatabaseGraphCommitsQuery({
+  selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } },
+});
+
+// Get one databaseGraphCommit
+const { data: item } = useDatabaseGraphCommitQuery({
+  id: '<UUID>',
+  selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } },
+});
+
+// Create a databaseGraphCommit
+const { mutate: create } = useCreateDatabaseGraphCommitMutation({
+  selection: { fields: { id: true } },
+});
+create({ authorId: '<UUID>', committerId: '<UUID>', databaseId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' });
+```
+
+### DatabaseGraphGetAllTreeNodesRecord
+
+```typescript
+// List all databaseGraphGetAllTreeNodes
+const { data, isLoading } = useDatabaseGraphGetAllTreeNodesQuery({
+  selection: { fields: { data: true, path: true } },
+});
+
+// Create a databaseGraphGetAllTreeNodesRecord
+const { mutate: create } = useCreateDatabaseGraphGetAllTreeNodesRecordMutation({
+  selection: { fields: { id: true } },
+});
+create({ data: '<JSON>', path: '<String>' });
+```
+
+### DatabaseGraphObject
+
+```typescript
+// List all databaseGraphObjects
+const { data, isLoading } = useDatabaseGraphObjectsQuery({
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } },
+});
+
+// Get one databaseGraphObject
+const { data: item } = useDatabaseGraphObjectQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } },
+});
+
+// Create a databaseGraphObject
+const { mutate: create } = useCreateDatabaseGraphObjectMutation({
+  selection: { fields: { id: true } },
+});
+create({ data: '<JSON>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>' });
+```
+
+### DatabaseGraphRef
+
+```typescript
+// List all databaseGraphRefs
+const { data, isLoading } = useDatabaseGraphRefsQuery({
+  selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } },
+});
+
+// Get one databaseGraphRef
+const { data: item } = useDatabaseGraphRefQuery({
+  id: '<UUID>',
+  selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } },
+});
+
+// Create a databaseGraphRef
+const { mutate: create } = useCreateDatabaseGraphRefMutation({
+  selection: { fields: { id: true } },
+});
+create({ commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' });
+```
+
+### DatabaseGraphStore
+
+```typescript
+// List all databaseGraphStores
+const { data, isLoading } = useDatabaseGraphStoresQuery({
+  selection: { fields: { createdAt: true, databaseId: true, hash: true, id: true, name: true } },
+});
+
+// Get one databaseGraphStore
+const { data: item } = useDatabaseGraphStoreQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, hash: true, id: true, name: true } },
+});
+
+// Create a databaseGraphStore
+const { mutate: create } = useCreateDatabaseGraphStoreMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', hash: '<UUID>', name: '<String>' });
 ```
 
 ### DbPreset
@@ -482,20 +937,20 @@ create({ bucketId: '<UUID>', databaseId: '<UUID>', functionId: '<UUID>', graphId
 ```typescript
 // List all functionDefinitions
 const { data, isLoading } = useFunctionDefinitionsQuery({
-  selection: { fields: { accessChannels: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, databaseId: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } },
+  selection: { fields: { accessChannels: true, catalogImageId: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true, volatile: true } },
 });
 
 // Get one functionDefinition
 const { data: item } = useFunctionDefinitionQuery({
   id: '<UUID>',
-  selection: { fields: { accessChannels: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, databaseId: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } },
+  selection: { fields: { accessChannels: true, catalogImageId: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true, volatile: true } },
 });
 
 // Create a functionDefinition
 const { mutate: create } = useCreateFunctionDefinitionMutation({
   selection: { fields: { id: true } },
 });
-create({ accessChannels: '<String>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', databaseId: '<UUID>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredModules: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', volatile: '<Boolean>' });
+create({ accessChannels: '<String>', catalogImageId: '<UUID>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredModules: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', updatedByPrincipal: '<UUID>', volatile: '<Boolean>' });
 ```
 
 ### FunctionDeployment
@@ -503,20 +958,20 @@ create({ accessChannels: '<String>', category: '<String>', concurrency: '<Int>',
 ```typescript
 // List all functionDeployments
 const { data, isLoading } = useFunctionDeploymentsQuery({
-  selection: { fields: { annotations: true, concurrency: true, createdAt: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, concurrency: true, createdAt: true, createdByPrincipal: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Get one functionDeployment
 const { data: item } = useFunctionDeploymentQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, concurrency: true, createdAt: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, concurrency: true, createdAt: true, createdByPrincipal: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Create a functionDeployment
 const { mutate: create } = useCreateFunctionDeploymentMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', concurrency: '<Int>', databaseId: '<UUID>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', realm: '<String>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>' });
+create({ annotations: '<JSON>', catalogImageId: '<UUID>', concurrency: '<Int>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', realm: '<String>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### FunctionDeploymentEvent
@@ -755,20 +1210,20 @@ create({ actorId: '<UUID>', attempt: '<Int>', databaseId: '<UUID>', durationMs: 
 ```typescript
 // List all functionInvocations
 const { data, isLoading } = useFunctionInvocationsQuery({
-  selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
+  selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, createdByPrincipal: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
 });
 
 // Get one functionInvocation
 const { data: item } = useFunctionInvocationQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
+  selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, createdByPrincipal: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
 });
 
 // Create a functionInvocation
 const { mutate: create } = useCreateFunctionInvocationMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', databaseId: '<UUID>', definitionScope: '<String>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' });
+create({ actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', definitionScope: '<String>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' });
 ```
 
 ### GetAllTreeNodesRecord
@@ -784,6 +1239,48 @@ const { mutate: create } = useCreateGetAllTreeNodesRecordMutation({
   selection: { fields: { id: true } },
 });
 create({ data: '<JSON>', path: '<String>' });
+```
+
+### Image
+
+```typescript
+// List all images
+const { data, isLoading } = useImagesQuery({
+  selection: { fields: { createdAt: true, createdByPrincipal: true, databaseId: true, description: true, digest: true, expiresAt: true, id: true, isPublished: true, labels: true, metadata: true, name: true, ownerId: true, platformOnly: true, registryHost: true, repository: true, runtime: true, tag: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one image
+const { data: item } = useImageQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, createdByPrincipal: true, databaseId: true, description: true, digest: true, expiresAt: true, id: true, isPublished: true, labels: true, metadata: true, name: true, ownerId: true, platformOnly: true, registryHost: true, repository: true, runtime: true, tag: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a image
+const { mutate: create } = useCreateImageMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', digest: '<String>', expiresAt: '<Datetime>', isPublished: '<Boolean>', labels: '<JSON>', metadata: '<JSON>', name: '<String>', ownerId: '<UUID>', platformOnly: '<Boolean>', registryHost: '<String>', repository: '<String>', runtime: '<String>', tag: '<String>', updatedByPrincipal: '<UUID>' });
+```
+
+### ImageGrant
+
+```typescript
+// List all imageGrants
+const { data, isLoading } = useImageGrantsQuery({
+  selection: { fields: { actions: true, createdAt: true, createdByPrincipal: true, databaseId: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, imageId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one imageGrant
+const { data: item } = useImageGrantQuery({
+  id: '<UUID>',
+  selection: { fields: { actions: true, createdAt: true, createdByPrincipal: true, databaseId: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, imageId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a imageGrant
+const { mutate: create } = useCreateImageGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ actions: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', expiresAt: '<Datetime>', grantedBy: '<UUID>', granteeKey: '<UUID>', granteeScope: '<String>', imageId: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### InfraCommit
@@ -948,6 +1445,48 @@ const { mutate: create } = useCreateNamespaceEventMutation({
 create({ actorId: '<UUID>', databaseId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', namespaceId: '<UUID>' });
 ```
 
+### PlatformBuild
+
+```typescript
+// List all platformBuilds
+const { data, isLoading } = usePlatformBuildsQuery({
+  selection: { fields: { actorId: true, catalogImageId: true, commitSha: true, createdAt: true, createdByPrincipal: true, eventId: true, finishedAt: true, id: true, jobId: true, logs: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } },
+});
+
+// Get one platformBuild
+const { data: item } = usePlatformBuildQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, catalogImageId: true, commitSha: true, createdAt: true, createdByPrincipal: true, eventId: true, finishedAt: true, id: true, jobId: true, logs: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } },
+});
+
+// Create a platformBuild
+const { mutate: create } = useCreatePlatformBuildMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', catalogImageId: '<UUID>', commitSha: '<String>', createdByPrincipal: '<UUID>', eventId: '<UUID>', finishedAt: '<Datetime>', jobId: '<BigInt>', logs: '<Upload>', metadata: '<JSON>', proposalId: '<UUID>', ref: '<String>', repositoryId: '<UUID>', startedAt: '<Datetime>', status: '<String>', updatedByPrincipal: '<UUID>', workflowId: '<UUID>' });
+```
+
+### PlatformBuildStep
+
+```typescript
+// List all platformBuildSteps
+const { data, isLoading } = usePlatformBuildStepsQuery({
+  selection: { fields: { buildId: true, createdByPrincipal: true, exitCode: true, finishedAt: true, id: true, kind: true, logBytes: true, logOffset: true, name: true, parentSeq: true, recordedAt: true, seq: true, startedAt: true, status: true, summary: true } },
+});
+
+// Get one platformBuildStep
+const { data: item } = usePlatformBuildStepQuery({
+  id: '<UUID>',
+  selection: { fields: { buildId: true, createdByPrincipal: true, exitCode: true, finishedAt: true, id: true, kind: true, logBytes: true, logOffset: true, name: true, parentSeq: true, recordedAt: true, seq: true, startedAt: true, status: true, summary: true } },
+});
+
+// Create a platformBuildStep
+const { mutate: create } = useCreatePlatformBuildStepMutation({
+  selection: { fields: { id: true } },
+});
+create({ buildId: '<UUID>', createdByPrincipal: '<UUID>', exitCode: '<Int>', finishedAt: '<Datetime>', kind: '<String>', logBytes: '<BigInt>', logOffset: '<BigInt>', name: '<String>', parentSeq: '<Int>', recordedAt: '<Datetime>', seq: '<Int>', startedAt: '<Datetime>', status: '<String>', summary: '<JSON>' });
+```
+
 ### PlatformFunctionApiBinding
 
 ```typescript
@@ -995,20 +1534,20 @@ create({ bucketId: '<UUID>', functionId: '<UUID>', graphId: '<UUID>', key: '<Str
 ```typescript
 // List all platformFunctionDefinitions
 const { data, isLoading } = usePlatformFunctionDefinitionsQuery({
-  selection: { fields: { accessChannels: true, billable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } },
+  selection: { fields: { accessChannels: true, billable: true, catalogImageId: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdByPrincipal: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true, volatile: true } },
 });
 
 // Get one platformFunctionDefinition
 const { data: item } = usePlatformFunctionDefinitionQuery({
   id: '<UUID>',
-  selection: { fields: { accessChannels: true, billable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } },
+  selection: { fields: { accessChannels: true, billable: true, catalogImageId: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdByPrincipal: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredModules: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true, volatile: true } },
 });
 
 // Create a platformFunctionDefinition
 const { mutate: create } = useCreatePlatformFunctionDefinitionMutation({
   selection: { fields: { id: true } },
 });
-create({ accessChannels: '<String>', billable: '<Boolean>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredModules: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', system: '<Boolean>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', volatile: '<Boolean>' });
+create({ accessChannels: '<String>', billable: '<Boolean>', catalogImageId: '<UUID>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdByPrincipal: '<UUID>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredModules: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', system: '<Boolean>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', updatedByPrincipal: '<UUID>', volatile: '<Boolean>' });
 ```
 
 ### PlatformFunctionDeployment
@@ -1016,20 +1555,20 @@ create({ accessChannels: '<String>', billable: '<Boolean>', category: '<String>'
 ```typescript
 // List all platformFunctionDeployments
 const { data, isLoading } = usePlatformFunctionDeploymentsQuery({
-  selection: { fields: { annotations: true, concurrency: true, createdAt: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, concurrency: true, createdAt: true, createdByPrincipal: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Get one platformFunctionDeployment
 const { data: item } = usePlatformFunctionDeploymentQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, concurrency: true, createdAt: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, concurrency: true, createdAt: true, createdByPrincipal: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Create a platformFunctionDeployment
 const { mutate: create } = useCreatePlatformFunctionDeploymentMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', concurrency: '<Int>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', realm: '<String>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>' });
+create({ annotations: '<JSON>', catalogImageId: '<UUID>', concurrency: '<Int>', createdByPrincipal: '<UUID>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', realm: '<String>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformFunctionDeploymentEvent
@@ -1100,20 +1639,62 @@ create({ actorId: '<UUID>', attempt: '<Int>', durationMs: '<Int>', error: '<Stri
 ```typescript
 // List all platformFunctionInvocations
 const { data, isLoading } = usePlatformFunctionInvocationsQuery({
-  selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
+  selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, createdByPrincipal: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
 });
 
 // Get one platformFunctionInvocation
 const { data: item } = usePlatformFunctionInvocationQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
+  selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, createdByPrincipal: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
 });
 
 // Create a platformFunctionInvocation
 const { mutate: create } = useCreatePlatformFunctionInvocationMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', databaseId: '<UUID>', definitionScope: '<String>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' });
+create({ actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', definitionScope: '<String>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' });
+```
+
+### PlatformImage
+
+```typescript
+// List all platformImages
+const { data, isLoading } = usePlatformImagesQuery({
+  selection: { fields: { createdAt: true, createdByPrincipal: true, description: true, digest: true, expiresAt: true, id: true, isPublished: true, labels: true, metadata: true, name: true, ownerId: true, platformOnly: true, registryHost: true, repository: true, runtime: true, tag: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one platformImage
+const { data: item } = usePlatformImageQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, createdByPrincipal: true, description: true, digest: true, expiresAt: true, id: true, isPublished: true, labels: true, metadata: true, name: true, ownerId: true, platformOnly: true, registryHost: true, repository: true, runtime: true, tag: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a platformImage
+const { mutate: create } = useCreatePlatformImageMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdByPrincipal: '<UUID>', description: '<String>', digest: '<String>', expiresAt: '<Datetime>', isPublished: '<Boolean>', labels: '<JSON>', metadata: '<JSON>', name: '<String>', ownerId: '<UUID>', platformOnly: '<Boolean>', registryHost: '<String>', repository: '<String>', runtime: '<String>', tag: '<String>', updatedByPrincipal: '<UUID>' });
+```
+
+### PlatformImageGrant
+
+```typescript
+// List all platformImageGrants
+const { data, isLoading } = usePlatformImageGrantsQuery({
+  selection: { fields: { actions: true, createdAt: true, createdByPrincipal: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, imageId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one platformImageGrant
+const { data: item } = usePlatformImageGrantQuery({
+  id: '<UUID>',
+  selection: { fields: { actions: true, createdAt: true, createdByPrincipal: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, imageId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a platformImageGrant
+const { mutate: create } = useCreatePlatformImageGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ actions: '<String>', createdByPrincipal: '<UUID>', expiresAt: '<Datetime>', grantedBy: '<UUID>', granteeKey: '<UUID>', granteeScope: '<String>', imageId: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformInfraCommit
@@ -1215,6 +1796,48 @@ const { mutate: create } = useCreatePlatformInfraStoreMutation({
 create({ hash: '<UUID>', name: '<String>', scopeId: '<UUID>' });
 ```
 
+### PlatformK8sResourceKind
+
+```typescript
+// List all platformK8sResourceKinds
+const { data, isLoading } = usePlatformK8sResourceKindsQuery({
+  selection: { fields: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Get one platformK8sResourceKind
+const { data: item } = usePlatformK8sResourceKindQuery({
+  id: '<UUID>',
+  selection: { fields: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Create a platformK8sResourceKind
+const { mutate: create } = useCreatePlatformK8sResourceKindMutation({
+  selection: { fields: { id: true } },
+});
+create({ active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', label: '<String>', slug: '<String>', storeId: '<UUID>' });
+```
+
+### PlatformK8sSpecRule
+
+```typescript
+// List all platformK8sSpecRules
+const { data, isLoading } = usePlatformK8sSpecRulesQuery({
+  selection: { fields: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Get one platformK8sSpecRule
+const { data: item } = usePlatformK8sSpecRuleQuery({
+  id: '<UUID>',
+  selection: { fields: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, slug: true, storeId: true, updatedAt: true } },
+});
+
+// Create a platformK8sSpecRule
+const { mutate: create } = useCreatePlatformK8sSpecRuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', label: '<String>', slug: '<String>', storeId: '<UUID>' });
+```
+
 ### PlatformNamespace
 
 ```typescript
@@ -1257,25 +1880,277 @@ const { mutate: create } = useCreatePlatformNamespaceEventMutation({
 create({ actorId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', namespaceId: '<UUID>' });
 ```
 
+### PlatformProposalComment
+
+```typescript
+// List all platformProposalComments
+const { data, isLoading } = usePlatformProposalCommentsQuery({
+  selection: { fields: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one platformProposalComment
+const { data: item } = usePlatformProposalCommentQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a platformProposalComment
+const { mutate: create } = useCreatePlatformProposalCommentMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', attachments: '<Upload>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', line: '<Int>', outdatedAt: '<Datetime>', path: '<String>', pathTrgmSimilarity: '<Float>', proposalId: '<UUID>', resolvedAt: '<Datetime>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### PlatformProposal
+
+```typescript
+// List all platformProposals
+const { data, isLoading } = usePlatformProposalsQuery({
+  selection: { fields: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one platformProposal
+const { data: item } = usePlatformProposalQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a platformProposal
+const { mutate: create } = useCreatePlatformProposalMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', body: '<String>', bodyTrgmSimilarity: '<Float>', closedReason: '<String>', closedReasonTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', decidedAt: '<Datetime>', dueAt: '<Datetime>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', kind: '<String>', kindTrgmSimilarity: '<Float>', labels: '<String>', mergeCommit: '<String>', mergeCommitTrgmSimilarity: '<Float>', mergeMethod: '<String>', mergeMethodTrgmSimilarity: '<Float>', mergeRequestedAt: '<Datetime>', mergedAt: '<Datetime>', metadata: '<JSON>', parentId: '<UUID>', priority: '<BigFloat>', repositoryId: '<UUID>', resolution: '<String>', resolutionTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', sourceRef: '<String>', sourceRefTrgmSimilarity: '<Float>', status: '<String>', statusTrgmSimilarity: '<Float>', targetRef: '<String>', targetRefTrgmSimilarity: '<Float>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### PlatformProposalFileView
+
+```typescript
+// List all platformProposalFileViews
+const { data, isLoading } = usePlatformProposalFileViewsQuery({
+  selection: { fields: { blobSha: true, createdAt: true, createdByPrincipal: true, id: true, path: true, proposalId: true, reviewerId: true, updatedAt: true, updatedByPrincipal: true, viewedAt: true } },
+});
+
+// Get one platformProposalFileView
+const { data: item } = usePlatformProposalFileViewQuery({
+  id: '<UUID>',
+  selection: { fields: { blobSha: true, createdAt: true, createdByPrincipal: true, id: true, path: true, proposalId: true, reviewerId: true, updatedAt: true, updatedByPrincipal: true, viewedAt: true } },
+});
+
+// Create a platformProposalFileView
+const { mutate: create } = useCreatePlatformProposalFileViewMutation({
+  selection: { fields: { id: true } },
+});
+create({ blobSha: '<String>', createdByPrincipal: '<UUID>', path: '<String>', proposalId: '<UUID>', reviewerId: '<UUID>', updatedByPrincipal: '<UUID>', viewedAt: '<Datetime>' });
+```
+
+### PlatformProposalReaction
+
+```typescript
+// List all platformProposalReactions
+const { data, isLoading } = usePlatformProposalReactionsQuery({
+  selection: { fields: { actorId: true, commentId: true, createdAt: true, createdByPrincipal: true, emoji: true, id: true, proposalId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one platformProposalReaction
+const { data: item } = usePlatformProposalReactionQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, commentId: true, createdAt: true, createdByPrincipal: true, emoji: true, id: true, proposalId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a platformProposalReaction
+const { mutate: create } = useCreatePlatformProposalReactionMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', commentId: '<UUID>', createdByPrincipal: '<UUID>', emoji: '<String>', proposalId: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### PlatformProposalReview
+
+```typescript
+// List all platformProposalReviews
+const { data, isLoading } = usePlatformProposalReviewsQuery({
+  selection: { fields: { body: true, bodyTrgmSimilarity: true, commitSha: true, commitShaTrgmSimilarity: true, createdAt: true, createdByPrincipal: true, id: true, proposalId: true, reviewerId: true, search: true, searchScore: true, searchTsvRank: true, submittedAt: true, updatedAt: true, updatedByPrincipal: true, verdict: true, verdictTrgmSimilarity: true } },
+});
+
+// Get one platformProposalReview
+const { data: item } = usePlatformProposalReviewQuery({
+  id: '<UUID>',
+  selection: { fields: { body: true, bodyTrgmSimilarity: true, commitSha: true, commitShaTrgmSimilarity: true, createdAt: true, createdByPrincipal: true, id: true, proposalId: true, reviewerId: true, search: true, searchScore: true, searchTsvRank: true, submittedAt: true, updatedAt: true, updatedByPrincipal: true, verdict: true, verdictTrgmSimilarity: true } },
+});
+
+// Create a platformProposalReview
+const { mutate: create } = useCreatePlatformProposalReviewMutation({
+  selection: { fields: { id: true } },
+});
+create({ body: '<String>', bodyTrgmSimilarity: '<Float>', commitSha: '<String>', commitShaTrgmSimilarity: '<Float>', createdByPrincipal: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>', verdictTrgmSimilarity: '<Float>' });
+```
+
+### PlatformProposalsChunk
+
+```typescript
+// List all platformProposalsChunks
+const { data, isLoading } = usePlatformProposalsChunksQuery({
+  selection: { fields: { actorId: true, body: true, chunkIndex: true, createdAt: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, platformProposalsId: true, searchScore: true, updatedAt: true } },
+});
+
+// Get one platformProposalsChunk
+const { data: item } = usePlatformProposalsChunkQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, body: true, chunkIndex: true, createdAt: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, platformProposalsId: true, searchScore: true, updatedAt: true } },
+});
+
+// Create a platformProposalsChunk
+const { mutate: create } = useCreatePlatformProposalsChunkMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', platformProposalsId: '<UUID>', searchScore: '<Float>' });
+```
+
+### PlatformRegistryBinding
+
+```typescript
+// List all platformRegistryBindings
+const { data, isLoading } = usePlatformRegistryBindingsQuery({
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, metadata: true, namespaceId: true, observedCredentialVersion: true, pullSecretName: true, realm: true, registryHost: true, registryId: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one platformRegistryBinding
+const { data: item } = usePlatformRegistryBindingQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, metadata: true, namespaceId: true, observedCredentialVersion: true, pullSecretName: true, realm: true, registryHost: true, registryId: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a platformRegistryBinding
+const { mutate: create } = useCreatePlatformRegistryBindingMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', createdByPrincipal: '<UUID>', metadata: '<JSON>', namespaceId: '<UUID>', observedCredentialVersion: '<String>', pullSecretName: '<String>', realm: '<String>', registryHost: '<String>', registryId: '<UUID>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### PlatformRegistry
+
+```typescript
+// List all platformRegistries
+const { data, isLoading } = usePlatformRegistriesQuery({
+  selection: { fields: { authMode: true, basePath: true, createdAt: true, createdByPrincipal: true, credentialSecretName: true, host: true, id: true, installationId: true, isPublished: true, kind: true, labels: true, lastError: true, metadata: true, name: true, platformOnly: true, role: true, status: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one platformRegistry
+const { data: item } = usePlatformRegistryQuery({
+  id: '<UUID>',
+  selection: { fields: { authMode: true, basePath: true, createdAt: true, createdByPrincipal: true, credentialSecretName: true, host: true, id: true, installationId: true, isPublished: true, kind: true, labels: true, lastError: true, metadata: true, name: true, platformOnly: true, role: true, status: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a platformRegistry
+const { mutate: create } = useCreatePlatformRegistryMutation({
+  selection: { fields: { id: true } },
+});
+create({ authMode: '<String>', basePath: '<String>', createdByPrincipal: '<UUID>', credentialSecretName: '<String>', host: '<String>', installationId: '<UUID>', isPublished: '<Boolean>', kind: '<String>', labels: '<JSON>', lastError: '<String>', metadata: '<JSON>', name: '<String>', platformOnly: '<Boolean>', role: '<String>', status: '<String>', updatedByPrincipal: '<UUID>' });
+```
+
+### PlatformRegistryGrant
+
+```typescript
+// List all platformRegistryGrants
+const { data, isLoading } = usePlatformRegistryGrantsQuery({
+  selection: { fields: { actions: true, createdAt: true, createdByPrincipal: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, registryId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one platformRegistryGrant
+const { data: item } = usePlatformRegistryGrantQuery({
+  id: '<UUID>',
+  selection: { fields: { actions: true, createdAt: true, createdByPrincipal: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, registryId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a platformRegistryGrant
+const { mutate: create } = useCreatePlatformRegistryGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ actions: '<String>', createdByPrincipal: '<UUID>', expiresAt: '<Datetime>', grantedBy: '<UUID>', granteeKey: '<UUID>', granteeScope: '<String>', registryId: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### PlatformRepository
+
+```typescript
+// List all platformRepositories
+const { data, isLoading } = usePlatformRepositoriesQuery({
+  selection: { fields: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, requiredChecks: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } },
+});
+
+// Get one platformRepository
+const { data: item } = usePlatformRepositoryQuery({
+  id: '<UUID>',
+  selection: { fields: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, requiredChecks: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } },
+});
+
+// Create a platformRepository
+const { mutate: create } = useCreatePlatformRepositoryMutation({
+  selection: { fields: { id: true } },
+});
+create({ cloneUrl: '<String>', cloneUrlTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', defaultBranch: '<String>', defaultBranchTrgmSimilarity: '<Float>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', externalId: '<String>', externalIdTrgmSimilarity: '<Float>', isArchived: '<Boolean>', metadata: '<JSON>', name: '<String>', nameTrgmSimilarity: '<Float>', ownerId: '<UUID>', provider: '<String>', providerTrgmSimilarity: '<Float>', requiredChecks: '<String>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', slugTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>', visibility: '<String>', visibilityTrgmSimilarity: '<Float>' });
+```
+
+### PlatformRepositoryEvent
+
+```typescript
+// List all platformRepositoryEvents
+const { data, isLoading } = usePlatformRepositoryEventsQuery({
+  selection: { fields: { actorId: true, commitSha: true, createdAt: true, createdByPrincipal: true, deliveryId: true, eventType: true, id: true, metadata: true, payload: true, ref: true, repositoryId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one platformRepositoryEvent
+const { data: item } = usePlatformRepositoryEventQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, commitSha: true, createdAt: true, createdByPrincipal: true, deliveryId: true, eventType: true, id: true, metadata: true, payload: true, ref: true, repositoryId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a platformRepositoryEvent
+const { mutate: create } = useCreatePlatformRepositoryEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', commitSha: '<String>', createdByPrincipal: '<UUID>', deliveryId: '<String>', eventType: '<String>', metadata: '<JSON>', payload: '<JSON>', ref: '<String>', repositoryId: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### PlatformRepositoryWorkflow
+
+```typescript
+// List all platformRepositoryWorkflows
+const { data, isLoading } = usePlatformRepositoryWorkflowsQuery({
+  selection: { fields: { cancelInProgress: true, concurrencyKey: true, createdAt: true, createdBy: true, createdByPrincipal: true, eventType: true, graphId: true, id: true, inputs: true, isEnabled: true, name: true, refPattern: true, repositoryId: true, requiredSecrets: true, slug: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one platformRepositoryWorkflow
+const { data: item } = usePlatformRepositoryWorkflowQuery({
+  id: '<UUID>',
+  selection: { fields: { cancelInProgress: true, concurrencyKey: true, createdAt: true, createdBy: true, createdByPrincipal: true, eventType: true, graphId: true, id: true, inputs: true, isEnabled: true, name: true, refPattern: true, repositoryId: true, requiredSecrets: true, slug: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a platformRepositoryWorkflow
+const { mutate: create } = useCreatePlatformRepositoryWorkflowMutation({
+  selection: { fields: { id: true } },
+});
+create({ cancelInProgress: '<Boolean>', concurrencyKey: '<String>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', eventType: '<String>', graphId: '<UUID>', inputs: '<JSON>', isEnabled: '<Boolean>', name: '<String>', refPattern: '<String>', repositoryId: '<UUID>', requiredSecrets: '<String>', slug: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
 ### PlatformResource
 
 ```typescript
 // List all platformResources
 const { data, isLoading } = usePlatformResourcesQuery({
-  selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one platformResource
 const { data: item } = usePlatformResourceQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a platformResource
 const { mutate: create } = useCreatePlatformResourceMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' });
+create({ annotations: '<JSON>', catalogImageId: '<UUID>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformResourceDeclaredCapacity
@@ -1298,20 +2173,20 @@ create({ cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', insta
 ```typescript
 // List all platformResourceDefinitions
 const { data, isLoading } = usePlatformResourceDefinitionsQuery({
-  selection: { fields: { annotations: true, createdAt: true, createdBy: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one platformResourceDefinition
 const { data: item } = usePlatformResourceDefinitionQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, createdBy: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a platformResourceDefinition
 const { mutate: create } = useCreatePlatformResourceDefinitionMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', createdBy: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' });
+create({ annotations: '<JSON>', catalogImageId: '<UUID>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformResourceEvent
@@ -1340,20 +2215,20 @@ create({ actorId: '<UUID>', eventType: '<String>', message: '<String>', metadata
 ```typescript
 // List all platformResourceInstallations
 const { data, isLoading } = usePlatformResourceInstallationsQuery({
-  selection: { fields: { commitId: true, createdAt: true, createdBy: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one platformResourceInstallation
 const { data: item } = usePlatformResourceInstallationQuery({
   id: '<UUID>',
-  selection: { fields: { commitId: true, createdAt: true, createdBy: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a platformResourceInstallation
 const { mutate: create } = useCreatePlatformResourceInstallationMutation({
   selection: { fields: { id: true } },
 });
-create({ commitId: '<UUID>', createdBy: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>' });
+create({ commitId: '<UUID>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformResourceStatusCheck
@@ -1439,20 +2314,20 @@ create({ avgMemoryBytes: '<BigInt>', cpuLimitMillicores: '<BigInt>', cpuPeakUtil
 ```typescript
 // List all platformResourcesHealths
 const { data, isLoading } = usePlatformResourcesHealthsQuery({
-  selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one platformResourcesHealth
 const { data: item } = usePlatformResourcesHealthQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a platformResourcesHealth
 const { mutate: create } = useCreatePlatformResourcesHealthMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' });
+create({ annotations: '<JSON>', catalogImageId: '<UUID>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformResourcesRequirementsState
@@ -1490,20 +2365,20 @@ create({ atomId: '<UUID>', configObjectName: '<String>', name: '<String>', names
 ```typescript
 // List all platformWebhookEndpoints
 const { data, isLoading } = usePlatformWebhookEndpointsQuery({
-  selection: { fields: { active: true, createdAt: true, createdBy: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one platformWebhookEndpoint
 const { data: item } = usePlatformWebhookEndpointQuery({
   id: '<UUID>',
-  selection: { fields: { active: true, createdAt: true, createdBy: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a platformWebhookEndpoint
 const { mutate: create } = useCreatePlatformWebhookEndpointMutation({
   selection: { fields: { id: true } },
 });
-create({ active: '<Boolean>', createdBy: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>' });
+create({ active: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformWebhookEvent
@@ -1527,25 +2402,277 @@ const { mutate: create } = useCreatePlatformWebhookEventMutation({
 create({ endpointId: '<UUID>', error: '<String>', externalEventId: '<String>', invocationCreatedAt: '<Datetime>', invocationId: '<UUID>', payload: '<JSON>', provider: '<String>', providerTimestamp: '<Datetime>', status: '<String>' });
 ```
 
+### ProposalComment
+
+```typescript
+// List all proposalComments
+const { data, isLoading } = useProposalCommentsQuery({
+  selection: { fields: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one proposalComment
+const { data: item } = useProposalCommentQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a proposalComment
+const { mutate: create } = useCreateProposalCommentMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', attachments: '<Upload>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', line: '<Int>', outdatedAt: '<Datetime>', path: '<String>', pathTrgmSimilarity: '<Float>', proposalId: '<UUID>', resolvedAt: '<Datetime>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### Proposal
+
+```typescript
+// List all proposals
+const { data, isLoading } = useProposalsQuery({
+  selection: { fields: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one proposal
+const { data: item } = useProposalQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a proposal
+const { mutate: create } = useCreateProposalMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', body: '<String>', bodyTrgmSimilarity: '<Float>', closedReason: '<String>', closedReasonTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', decidedAt: '<Datetime>', dueAt: '<Datetime>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', kind: '<String>', kindTrgmSimilarity: '<Float>', labels: '<String>', mergeCommit: '<String>', mergeCommitTrgmSimilarity: '<Float>', mergeMethod: '<String>', mergeMethodTrgmSimilarity: '<Float>', mergeRequestedAt: '<Datetime>', mergedAt: '<Datetime>', metadata: '<JSON>', parentId: '<UUID>', priority: '<BigFloat>', repositoryId: '<UUID>', resolution: '<String>', resolutionTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', sourceRef: '<String>', sourceRefTrgmSimilarity: '<Float>', status: '<String>', statusTrgmSimilarity: '<Float>', targetRef: '<String>', targetRefTrgmSimilarity: '<Float>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### ProposalFileView
+
+```typescript
+// List all proposalFileViews
+const { data, isLoading } = useProposalFileViewsQuery({
+  selection: { fields: { blobSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, id: true, path: true, proposalId: true, reviewerId: true, updatedAt: true, updatedByPrincipal: true, viewedAt: true } },
+});
+
+// Get one proposalFileView
+const { data: item } = useProposalFileViewQuery({
+  id: '<UUID>',
+  selection: { fields: { blobSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, id: true, path: true, proposalId: true, reviewerId: true, updatedAt: true, updatedByPrincipal: true, viewedAt: true } },
+});
+
+// Create a proposalFileView
+const { mutate: create } = useCreateProposalFileViewMutation({
+  selection: { fields: { id: true } },
+});
+create({ blobSha: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', path: '<String>', proposalId: '<UUID>', reviewerId: '<UUID>', updatedByPrincipal: '<UUID>', viewedAt: '<Datetime>' });
+```
+
+### ProposalReaction
+
+```typescript
+// List all proposalReactions
+const { data, isLoading } = useProposalReactionsQuery({
+  selection: { fields: { actorId: true, commentId: true, createdAt: true, createdByPrincipal: true, databaseId: true, emoji: true, id: true, proposalId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one proposalReaction
+const { data: item } = useProposalReactionQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, commentId: true, createdAt: true, createdByPrincipal: true, databaseId: true, emoji: true, id: true, proposalId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a proposalReaction
+const { mutate: create } = useCreateProposalReactionMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', commentId: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', emoji: '<String>', proposalId: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### ProposalReview
+
+```typescript
+// List all proposalReviews
+const { data, isLoading } = useProposalReviewsQuery({
+  selection: { fields: { body: true, bodyTrgmSimilarity: true, commitSha: true, commitShaTrgmSimilarity: true, createdAt: true, createdByPrincipal: true, databaseId: true, id: true, proposalId: true, reviewerId: true, search: true, searchScore: true, searchTsvRank: true, submittedAt: true, updatedAt: true, updatedByPrincipal: true, verdict: true, verdictTrgmSimilarity: true } },
+});
+
+// Get one proposalReview
+const { data: item } = useProposalReviewQuery({
+  id: '<UUID>',
+  selection: { fields: { body: true, bodyTrgmSimilarity: true, commitSha: true, commitShaTrgmSimilarity: true, createdAt: true, createdByPrincipal: true, databaseId: true, id: true, proposalId: true, reviewerId: true, search: true, searchScore: true, searchTsvRank: true, submittedAt: true, updatedAt: true, updatedByPrincipal: true, verdict: true, verdictTrgmSimilarity: true } },
+});
+
+// Create a proposalReview
+const { mutate: create } = useCreateProposalReviewMutation({
+  selection: { fields: { id: true } },
+});
+create({ body: '<String>', bodyTrgmSimilarity: '<Float>', commitSha: '<String>', commitShaTrgmSimilarity: '<Float>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>', verdictTrgmSimilarity: '<Float>' });
+```
+
+### ProposalsChunk
+
+```typescript
+// List all proposalsChunks
+const { data, isLoading } = useProposalsChunksQuery({
+  selection: { fields: { actorId: true, body: true, chunkIndex: true, createdAt: true, databaseId: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, proposalsId: true, searchScore: true, updatedAt: true } },
+});
+
+// Get one proposalsChunk
+const { data: item } = useProposalsChunkQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, body: true, chunkIndex: true, createdAt: true, databaseId: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, proposalsId: true, searchScore: true, updatedAt: true } },
+});
+
+// Create a proposalsChunk
+const { mutate: create } = useCreateProposalsChunkMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', proposalsId: '<UUID>', searchScore: '<Float>' });
+```
+
+### RegistryBinding
+
+```typescript
+// List all registryBindings
+const { data, isLoading } = useRegistryBindingsQuery({
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, metadata: true, namespaceId: true, observedCredentialVersion: true, pullSecretName: true, realm: true, registryHost: true, registryId: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one registryBinding
+const { data: item } = useRegistryBindingQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, metadata: true, namespaceId: true, observedCredentialVersion: true, pullSecretName: true, realm: true, registryHost: true, registryId: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a registryBinding
+const { mutate: create } = useCreateRegistryBindingMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', metadata: '<JSON>', namespaceId: '<UUID>', observedCredentialVersion: '<String>', pullSecretName: '<String>', realm: '<String>', registryHost: '<String>', registryId: '<UUID>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### Registry
+
+```typescript
+// List all registries
+const { data, isLoading } = useRegistriesQuery({
+  selection: { fields: { authMode: true, basePath: true, createdAt: true, createdByPrincipal: true, credentialSecretName: true, databaseId: true, host: true, id: true, installationId: true, isPublished: true, kind: true, labels: true, lastError: true, metadata: true, name: true, platformOnly: true, role: true, status: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one registry
+const { data: item } = useRegistryQuery({
+  id: '<UUID>',
+  selection: { fields: { authMode: true, basePath: true, createdAt: true, createdByPrincipal: true, credentialSecretName: true, databaseId: true, host: true, id: true, installationId: true, isPublished: true, kind: true, labels: true, lastError: true, metadata: true, name: true, platformOnly: true, role: true, status: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a registry
+const { mutate: create } = useCreateRegistryMutation({
+  selection: { fields: { id: true } },
+});
+create({ authMode: '<String>', basePath: '<String>', createdByPrincipal: '<UUID>', credentialSecretName: '<String>', databaseId: '<UUID>', host: '<String>', installationId: '<UUID>', isPublished: '<Boolean>', kind: '<String>', labels: '<JSON>', lastError: '<String>', metadata: '<JSON>', name: '<String>', platformOnly: '<Boolean>', role: '<String>', status: '<String>', updatedByPrincipal: '<UUID>' });
+```
+
+### RegistryGrant
+
+```typescript
+// List all registryGrants
+const { data, isLoading } = useRegistryGrantsQuery({
+  selection: { fields: { actions: true, createdAt: true, createdByPrincipal: true, databaseId: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, registryId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one registryGrant
+const { data: item } = useRegistryGrantQuery({
+  id: '<UUID>',
+  selection: { fields: { actions: true, createdAt: true, createdByPrincipal: true, databaseId: true, expiresAt: true, grantedBy: true, granteeKey: true, granteeScope: true, id: true, registryId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a registryGrant
+const { mutate: create } = useCreateRegistryGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ actions: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', expiresAt: '<Datetime>', grantedBy: '<UUID>', granteeKey: '<UUID>', granteeScope: '<String>', registryId: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### Repository
+
+```typescript
+// List all repositories
+const { data, isLoading } = useRepositoriesQuery({
+  selection: { fields: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, requiredChecks: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } },
+});
+
+// Get one repository
+const { data: item } = useRepositoryQuery({
+  id: '<UUID>',
+  selection: { fields: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, requiredChecks: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } },
+});
+
+// Create a repository
+const { mutate: create } = useCreateRepositoryMutation({
+  selection: { fields: { id: true } },
+});
+create({ cloneUrl: '<String>', cloneUrlTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', defaultBranch: '<String>', defaultBranchTrgmSimilarity: '<Float>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', externalId: '<String>', externalIdTrgmSimilarity: '<Float>', isArchived: '<Boolean>', metadata: '<JSON>', name: '<String>', nameTrgmSimilarity: '<Float>', ownerId: '<UUID>', provider: '<String>', providerTrgmSimilarity: '<Float>', requiredChecks: '<String>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', slugTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>', visibility: '<String>', visibilityTrgmSimilarity: '<Float>' });
+```
+
+### RepositoryEvent
+
+```typescript
+// List all repositoryEvents
+const { data, isLoading } = useRepositoryEventsQuery({
+  selection: { fields: { actorId: true, commitSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, deliveryId: true, eventType: true, id: true, metadata: true, payload: true, ref: true, repositoryId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one repositoryEvent
+const { data: item } = useRepositoryEventQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, commitSha: true, createdAt: true, createdByPrincipal: true, databaseId: true, deliveryId: true, eventType: true, id: true, metadata: true, payload: true, ref: true, repositoryId: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a repositoryEvent
+const { mutate: create } = useCreateRepositoryEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', commitSha: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', deliveryId: '<String>', eventType: '<String>', metadata: '<JSON>', payload: '<JSON>', ref: '<String>', repositoryId: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
+### RepositoryWorkflow
+
+```typescript
+// List all repositoryWorkflows
+const { data, isLoading } = useRepositoryWorkflowsQuery({
+  selection: { fields: { cancelInProgress: true, concurrencyKey: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, eventType: true, graphId: true, id: true, inputs: true, isEnabled: true, name: true, refPattern: true, repositoryId: true, requiredSecrets: true, slug: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one repositoryWorkflow
+const { data: item } = useRepositoryWorkflowQuery({
+  id: '<UUID>',
+  selection: { fields: { cancelInProgress: true, concurrencyKey: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, eventType: true, graphId: true, id: true, inputs: true, isEnabled: true, name: true, refPattern: true, repositoryId: true, requiredSecrets: true, slug: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a repositoryWorkflow
+const { mutate: create } = useCreateRepositoryWorkflowMutation({
+  selection: { fields: { id: true } },
+});
+create({ cancelInProgress: '<Boolean>', concurrencyKey: '<String>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', eventType: '<String>', graphId: '<UUID>', inputs: '<JSON>', isEnabled: '<Boolean>', name: '<String>', refPattern: '<String>', repositoryId: '<UUID>', requiredSecrets: '<String>', slug: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
+```
+
 ### Resource
 
 ```typescript
 // List all resources
 const { data, isLoading } = useResourcesQuery({
-  selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one resource
 const { data: item } = useResourceQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a resource
 const { mutate: create } = useCreateResourceMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' });
+create({ annotations: '<JSON>', catalogImageId: '<UUID>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### ResourceDeclaredCapacity
@@ -1568,20 +2695,20 @@ create({ cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', insta
 ```typescript
 // List all resourceDefinitions
 const { data, isLoading } = useResourceDefinitionsQuery({
-  selection: { fields: { annotations: true, createdAt: true, createdBy: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one resourceDefinition
 const { data: item } = useResourceDefinitionQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, createdBy: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a resourceDefinition
 const { mutate: create } = useCreateResourceDefinitionMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' });
+create({ annotations: '<JSON>', catalogImageId: '<UUID>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', paramsSchema: '<JSON>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### ResourceEvent
@@ -1610,20 +2737,20 @@ create({ actorId: '<UUID>', databaseId: '<UUID>', eventType: '<String>', message
 ```typescript
 // List all resourceInstallations
 const { data, isLoading } = useResourceInstallationsQuery({
-  selection: { fields: { commitId: true, createdAt: true, createdBy: true, databaseId: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one resourceInstallation
 const { data: item } = useResourceInstallationQuery({
   id: '<UUID>',
-  selection: { fields: { commitId: true, createdAt: true, createdBy: true, databaseId: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a resourceInstallation
 const { mutate: create } = useCreateResourceInstallationMutation({
   selection: { fields: { id: true } },
 });
-create({ commitId: '<UUID>', createdBy: '<UUID>', databaseId: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>' });
+create({ commitId: '<UUID>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### ResourceStatusCheck
@@ -1709,20 +2836,20 @@ create({ avgMemoryBytes: '<BigInt>', cpuLimitMillicores: '<BigInt>', cpuPeakUtil
 ```typescript
 // List all resourcesHealths
 const { data, isLoading } = useResourcesHealthsQuery({
-  selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one resourcesHealth
 const { data: item } = useResourcesHealthQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { annotations: true, catalogImageId: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a resourcesHealth
 const { mutate: create } = useCreateResourcesHealthMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' });
+create({ annotations: '<JSON>', catalogImageId: '<UUID>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### ResourcesRequirementsState
@@ -1760,20 +2887,20 @@ create({ atomId: '<UUID>', configObjectName: '<String>', name: '<String>', names
 ```typescript
 // List all webhookEndpoints
 const { data, isLoading } = useWebhookEndpointsQuery({
-  selection: { fields: { active: true, createdAt: true, createdBy: true, databaseId: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Get one webhookEndpoint
 const { data: item } = useWebhookEndpointQuery({
   id: '<UUID>',
-  selection: { fields: { active: true, createdAt: true, createdBy: true, databaseId: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { active: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, functionDefinitionId: true, host: true, id: true, namespaceId: true, path: true, provider: true, replayWindowSeconds: true, signingSecretName: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
 // Create a webhookEndpoint
 const { mutate: create } = useCreateWebhookEndpointMutation({
   selection: { fields: { id: true } },
 });
-create({ active: '<Boolean>', createdBy: '<UUID>', databaseId: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>' });
+create({ active: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### WebhookEvent
@@ -1798,6 +2925,17 @@ create({ databaseId: '<UUID>', endpointId: '<UUID>', error: '<String>', external
 ```
 
 ## Custom Operation Hooks
+
+### `useDatabaseReadFunctionGraphQuery`
+
+databaseReadFunctionGraph
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `graphId` | UUID |
 
 ### `useReadFunctionGraphQuery`
 
@@ -1864,6 +3002,193 @@ copyGraph
   | Argument | Type |
   |----------|------|
   | `input` | CopyGraphInput (required) |
+
+### `useDatabaseAddEdgeMutation`
+
+databaseAddEdge
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseAddEdgeInput (required) |
+
+### `useDatabaseAddEdgeAndSaveMutation`
+
+databaseAddEdgeAndSave
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseAddEdgeAndSaveInput (required) |
+
+### `useDatabaseAddNodeMutation`
+
+databaseAddNode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseAddNodeInput (required) |
+
+### `useDatabaseAddNodeAndSaveMutation`
+
+databaseAddNodeAndSave
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseAddNodeAndSaveInput (required) |
+
+### `useDatabaseCopyGraphMutation`
+
+databaseCopyGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseCopyGraphInput (required) |
+
+### `useDatabaseCreateFunctionGraphMutation`
+
+databaseCreateFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseCreateFunctionGraphInput (required) |
+
+### `useDatabaseGraphInitEmptyRepoMutation`
+
+databaseGraphInitEmptyRepo
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphInitEmptyRepoInput (required) |
+
+### `useDatabaseGraphInsertNodeAtPathMutation`
+
+databaseGraphInsertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphInsertNodeAtPathInput (required) |
+
+### `useDatabaseGraphInsertNodesAtPathsMutation`
+
+databaseGraphInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphInsertNodesAtPathsInput (required) |
+
+### `useDatabaseGraphSetAndCommitMutation`
+
+databaseGraphSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphSetAndCommitInput (required) |
+
+### `useDatabaseGraphSetDataAtPathMutation`
+
+databaseGraphSetDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphSetDataAtPathInput (required) |
+
+### `useDatabaseGraphSetManyAndCommitMutation`
+
+databaseGraphSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseGraphSetManyAndCommitInput (required) |
+
+### `useDatabaseImportDefinitionsMutation`
+
+databaseImportDefinitions
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseImportDefinitionsInput (required) |
+
+### `useDatabaseImportGraphJsonMutation`
+
+databaseImportGraphJson
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseImportGraphJsonInput (required) |
+
+### `useDatabaseSaveGraphMutation`
+
+databaseSaveGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseSaveGraphInput (required) |
+
+### `useDatabaseStartExecutionMutation`
+
+databaseStartExecution
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseStartExecutionInput (required) |
+
+### `useDatabaseValidateFunctionGraphMutation`
+
+databaseValidateFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DatabaseValidateFunctionGraphInput (required) |
 
 ### `useImportDefinitionsMutation`
 
