@@ -1,3 +1,29 @@
+"""All input for the `approveDevice` mutation."""
+input ApproveDeviceInput {
+  approvalToken: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `approveDevice` mutation."""
+type ApproveDevicePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
 """
 Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.)
 """
@@ -378,6 +404,50 @@ type CheckPasswordPayload {
   query: Query
 }
 
+"""All input for the `completeMfaChallenge` mutation."""
+input CompleteMfaChallengeInput {
+  authMethod: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  credentialKind: String
+  deviceToken: String
+  mfaChallengeToken: String
+  mfaMethod: String
+  rememberMe: Boolean
+  totpCode: String
+  trustDevice: Boolean
+  userId: UUID
+}
+
+"""The output of our `completeMfaChallenge` mutation."""
+type CompleteMfaChallengePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: CompleteMfaChallengeRecord
+}
+
+type CompleteMfaChallengeRecord {
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+  deviceApprovalRequired: Boolean
+  id: UUID
+  isVerified: Boolean
+  outDeviceToken: String
+  outUserId: UUID
+}
+
 """All input for the `confirmDeleteAccount` mutation."""
 input ConfirmDeleteAccountInput {
   """
@@ -391,6 +461,31 @@ input ConfirmDeleteAccountInput {
 
 """The output of our `confirmDeleteAccount` mutation."""
 type ConfirmDeleteAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `confirmTotpSetup` mutation."""
+input ConfirmTotpSetupInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  totpValue: String!
+}
+
+"""The output of our `confirmTotpSetup` mutation."""
+type ConfirmTotpSetupPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -1109,6 +1204,76 @@ type CreateUserPayload {
   ): UserEdge
 }
 
+"""All input for the create `UserSetting` mutation."""
+input CreateUserSettingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `UserSetting` to be created by this mutation."""
+  userSetting: UserSettingInput!
+}
+
+"""The output of our create `UserSetting` mutation."""
+type CreateUserSettingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `UserSetting` that was created by this mutation."""
+  userSetting: UserSetting
+
+  """An edge for our `UserSetting`. May be used by Relay 1."""
+  userSettingEdge(
+    """The method to use when ordering `UserSetting`."""
+    orderBy: [UserSettingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserSettingEdge
+}
+
+"""All input for the create `UserSettingsSecurity` mutation."""
+input CreateUserSettingsSecurityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `UserSettingsSecurity` to be created by this mutation."""
+  userSettingsSecurity: UserSettingsSecurityInput!
+}
+
+"""The output of our create `UserSettingsSecurity` mutation."""
+type CreateUserSettingsSecurityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `UserSettingsSecurity` that was created by this mutation."""
+  userSettingsSecurity: UserSettingsSecurity
+
+  """An edge for our `UserSettingsSecurity`. May be used by Relay 1."""
+  userSettingsSecurityEdge(
+    """The method to use when ordering `UserSettingsSecurity`."""
+    orderBy: [UserSettingsSecurityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserSettingsSecurityEdge
+}
+
 """All input for the create `WebauthnCredential` mutation."""
 input CreateWebauthnCredentialInput {
   """
@@ -1650,6 +1815,72 @@ type DeleteUserPayload {
   ): UserEdge
 }
 
+"""All input for the `deleteUserSetting` mutation."""
+input DeleteUserSettingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `UserSetting` mutation."""
+type DeleteUserSettingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `UserSetting` that was deleted by this mutation."""
+  userSetting: UserSetting
+
+  """An edge for our `UserSetting`. May be used by Relay 1."""
+  userSettingEdge(
+    """The method to use when ordering `UserSetting`."""
+    orderBy: [UserSettingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserSettingEdge
+}
+
+"""All input for the `deleteUserSettingsSecurity` mutation."""
+input DeleteUserSettingsSecurityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `UserSettingsSecurity` mutation."""
+type DeleteUserSettingsSecurityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `UserSettingsSecurity` that was deleted by this mutation."""
+  userSettingsSecurity: UserSettingsSecurity
+
+  """An edge for our `UserSettingsSecurity`. May be used by Relay 1."""
+  userSettingsSecurityEdge(
+    """The method to use when ordering `UserSettingsSecurity`."""
+    orderBy: [UserSettingsSecurityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserSettingsSecurityEdge
+}
+
 """All input for the `deleteWebauthnCredential` mutation."""
 input DeleteWebauthnCredentialInput {
   """
@@ -1681,6 +1912,79 @@ type DeleteWebauthnCredentialPayload {
     """The method to use when ordering `WebauthnCredential`."""
     orderBy: [WebauthnCredentialOrderBy!]! = [PRIMARY_KEY_ASC]
   ): WebauthnCredentialEdge
+}
+
+"""All input for the `disableEmailMfa` mutation."""
+input DisableEmailMfaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `disableEmailMfa` mutation."""
+type DisableEmailMfaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `disableSmsMfa` mutation."""
+input DisableSmsMfaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `disableSmsMfa` mutation."""
+type DisableSmsMfaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `disableTotp` mutation."""
+input DisableTotpInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  totpValue: String!
+}
+
+"""The output of our `disableTotp` mutation."""
+type DisableTotpPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
 }
 
 """All input for the `disconnectAccount` mutation."""
@@ -1864,6 +2168,78 @@ input EmailPatch {
   updatedAt: Datetime
 }
 
+"""All input for the `enableEmailMfa` mutation."""
+input EnableEmailMfaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `enableEmailMfa` mutation."""
+type EnableEmailMfaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `enableSmsMfa` mutation."""
+input EnableSmsMfaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `enableSmsMfa` mutation."""
+type EnableSmsMfaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `enableTotp` mutation."""
+input EnableTotpInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `enableTotp` mutation."""
+type EnableTotpPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: String
+}
+
 """All input for the `extendTokenExpires` mutation."""
 input ExtendTokenExpiresInput {
   amount: IntervalInput
@@ -1954,6 +2330,37 @@ input FullTextFilter {
 
   """Not included in the specified list."""
   notIn: [FullText!]
+}
+
+"""All input for the `generateBackupCodes` mutation."""
+input GenerateBackupCodesInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `generateBackupCodes` mutation."""
+type GenerateBackupCodesPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: String
+}
+
+type GetMfaStatusRecord {
+  backupCodesCount: Int
+  emailMfaEnabled: Boolean
+  smsMfaEnabled: Boolean
+  totpEnabled: Boolean
 }
 
 type IdentityProvider {
@@ -2495,11 +2902,57 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
+  """GraphQL type name of the plane's buckets table"""
+  bucketsType: String!
+
+  """
+  Computed download-URL field on the files type; null on the buckets side
+  """
+  downloadUrlField: String
+
+  """GraphQL type name of the plane's files table"""
+  filesType: String!
+
   """Whether this table is a storage buckets table"""
   isBucketsTable: Boolean!
 
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
+
+  """The plane's GraphQL upload surface"""
+  upload: MetaStorageUpload!
+}
+
+"""
+The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
+"""
+type MetaStorageUpload {
+  """Per-file input type inside the bulk input"""
+  bulkFileInputType: String!
+
+  """Per-file payload type inside the bulk payload"""
+  bulkFilePayloadType: String!
+
+  """Input type of the bulk upload mutation"""
+  bulkInputType: String!
+
+  """Root mutation field for bulk upload"""
+  bulkMutation: String!
+
+  """Payload type of the bulk upload mutation"""
+  bulkPayloadType: String!
+
+  """Input type of the single upload mutation"""
+  inputType: String!
+
+  """Root mutation field for single-file upload (e.g. uploadAppFile)"""
+  mutation: String!
+
+  """Payload type of the single upload mutation"""
+  payloadType: String!
+
+  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  requiresOwnerId: Boolean!
 }
 
 """Information about a database table"""
@@ -2559,18 +3012,36 @@ type MetaUniqueConstraint {
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
+  approveDevice(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ApproveDeviceInput!
+  ): ApproveDevicePayload
   checkPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: CheckPasswordInput!
   ): CheckPasswordPayload
+  completeMfaChallenge(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CompleteMfaChallengeInput!
+  ): CompleteMfaChallengePayload
   confirmDeleteAccount(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: ConfirmDeleteAccountInput!
   ): ConfirmDeleteAccountPayload
+  confirmTotpSetup(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ConfirmTotpSetupInput!
+  ): ConfirmTotpSetupPayload
   createApiKey(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2652,6 +3123,22 @@ type Mutation {
     input: CreateUserInput!
   ): CreateUserPayload
 
+  """Creates a single `UserSetting`."""
+  createUserSetting(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserSettingInput!
+  ): CreateUserSettingPayload
+
+  """Creates a single `UserSettingsSecurity`."""
+  createUserSettingsSecurity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserSettingsSecurityInput!
+  ): CreateUserSettingsSecurityPayload
+
   """Creates a single `WebauthnCredential`."""
   createWebauthnCredential(
     """
@@ -2728,6 +3215,22 @@ type Mutation {
     input: DeleteUserInput!
   ): DeleteUserPayload
 
+  """Deletes a single `UserSetting` using a unique key."""
+  deleteUserSetting(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserSettingInput!
+  ): DeleteUserSettingPayload
+
+  """Deletes a single `UserSettingsSecurity` using a unique key."""
+  deleteUserSettingsSecurity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserSettingsSecurityInput!
+  ): DeleteUserSettingsSecurityPayload
+
   """Deletes a single `WebauthnCredential` using a unique key."""
   deleteWebauthnCredential(
     """
@@ -2735,12 +3238,48 @@ type Mutation {
     """
     input: DeleteWebauthnCredentialInput!
   ): DeleteWebauthnCredentialPayload
+  disableEmailMfa(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DisableEmailMfaInput!
+  ): DisableEmailMfaPayload
+  disableSmsMfa(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DisableSmsMfaInput!
+  ): DisableSmsMfaPayload
+  disableTotp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DisableTotpInput!
+  ): DisableTotpPayload
   disconnectAccount(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: DisconnectAccountInput!
   ): DisconnectAccountPayload
+  enableEmailMfa(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: EnableEmailMfaInput!
+  ): EnableEmailMfaPayload
+  enableSmsMfa(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: EnableSmsMfaInput!
+  ): EnableSmsMfaPayload
+  enableTotp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: EnableTotpInput!
+  ): EnableTotpPayload
   extendTokenExpires(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2753,6 +3292,12 @@ type Mutation {
     """
     input: ForgotPasswordInput!
   ): ForgotPasswordPayload
+  generateBackupCodes(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: GenerateBackupCodesInput!
+  ): GenerateBackupCodesPayload
   linkIdentity(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2930,6 +3475,24 @@ type Mutation {
     """
     input: UpdateUserInput!
   ): UpdateUserPayload
+
+  """Updates a single `UserSetting` using a unique key and a patch."""
+  updateUserSetting(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserSettingInput!
+  ): UpdateUserSettingPayload
+
+  """
+  Updates a single `UserSettingsSecurity` using a unique key and a patch.
+  """
+  updateUserSettingsSecurity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserSettingsSecurityInput!
+  ): UpdateUserSettingsSecurityPayload
 
   """Updates a single `WebauthnCredential` using a unique key and a patch."""
   updateWebauthnCredential(
@@ -3946,6 +4509,7 @@ type Query {
     """
     where: EmailFilter
   ): EmailConnection
+  getMfaStatus: GetMfaStatusRecord
 
   """Reads and enables pagination through a set of `IdentityProvider`."""
   identityProviders(
@@ -4181,6 +4745,64 @@ type Query {
     """
     where: UserConnectedAccountFilter
   ): UserConnectedAccountConnection
+
+  """Reads and enables pagination through a set of `UserSetting`."""
+  userSettings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `UserSetting`."""
+    orderBy: [UserSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: UserSettingFilter
+  ): UserSettingConnection
+
+  """Reads and enables pagination through a set of `UserSettingsSecurity`."""
+  userSettingsSecurities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `UserSettingsSecurity`."""
+    orderBy: [UserSettingsSecurityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: UserSettingsSecurityFilter
+  ): UserSettingsSecurityConnection
 
   """Reads and enables pagination through a set of `User`."""
   users(
@@ -4604,6 +5226,8 @@ type SignInMagicLinkPayload {
 type SignInMagicLinkRecord {
   accessToken: String
   accessTokenExpiresAt: Datetime
+  deviceApprovalRequired: Boolean
+  outDeviceToken: String
   userId: UUID
 }
 
@@ -4625,10 +5249,12 @@ type SignInPayload {
 type SignInRecord {
   accessToken: String
   accessTokenExpiresAt: Datetime
+  deviceApprovalRequired: Boolean
   id: UUID
   isVerified: Boolean
   mfaChallengeToken: String
   mfaRequired: Boolean
+  outDeviceToken: String
   totpEnabled: Boolean
   userId: UUID
 }
@@ -4665,6 +5291,8 @@ type SignInSmsOtpPayload {
 type SignInSmsOtpRecord {
   accessToken: String
   accessTokenExpiresAt: Datetime
+  deviceApprovalRequired: Boolean
+  outDeviceToken: String
   userId: UUID
 }
 
@@ -4737,6 +5365,7 @@ type SignUpMagicLinkPayload {
 type SignUpMagicLinkRecord {
   accessToken: String
   accessTokenExpiresAt: Datetime
+  outDeviceToken: String
   userId: UUID
 }
 
@@ -4760,6 +5389,7 @@ type SignUpRecord {
   accessTokenExpiresAt: Datetime
   id: UUID
   isVerified: Boolean
+  outDeviceToken: String
   totpEnabled: Boolean
   userId: UUID
 }
@@ -4796,6 +5426,7 @@ type SignUpSmsPayload {
 type SignUpSmsRecord {
   accessToken: String
   accessTokenExpiresAt: Datetime
+  outDeviceToken: String
   userId: UUID
 }
 
@@ -5467,6 +6098,82 @@ type UpdateUserPayload {
   ): UserEdge
 }
 
+"""All input for the `updateUserSetting` mutation."""
+input UpdateUserSettingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `UserSetting` being updated.
+  """
+  userSettingPatch: UserSettingPatch!
+}
+
+"""The output of our update `UserSetting` mutation."""
+type UpdateUserSettingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `UserSetting` that was updated by this mutation."""
+  userSetting: UserSetting
+
+  """An edge for our `UserSetting`. May be used by Relay 1."""
+  userSettingEdge(
+    """The method to use when ordering `UserSetting`."""
+    orderBy: [UserSettingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserSettingEdge
+}
+
+"""All input for the `updateUserSettingsSecurity` mutation."""
+input UpdateUserSettingsSecurityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `UserSettingsSecurity` being updated.
+  """
+  userSettingsSecurityPatch: UserSettingsSecurityPatch!
+}
+
+"""The output of our update `UserSettingsSecurity` mutation."""
+type UpdateUserSettingsSecurityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `UserSettingsSecurity` that was updated by this mutation."""
+  userSettingsSecurity: UserSettingsSecurity
+
+  """An edge for our `UserSettingsSecurity`. May be used by Relay 1."""
+  userSettingsSecurityEdge(
+    """The method to use when ordering `UserSettingsSecurity`."""
+    orderBy: [UserSettingsSecurityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserSettingsSecurityEdge
+}
+
 """All input for the `updateWebauthnCredential` mutation."""
 input UpdateWebauthnCredentialInput {
   """
@@ -5603,6 +6310,12 @@ type User {
     where: EmailFilter
   ): EmailConnection!
   id: UUID!
+
+  """Reads a single `UserSetting` that is related to this `User`."""
+  ownedUserSetting: UserSetting
+
+  """Reads a single `UserSettingsSecurity` that is related to this `User`."""
+  ownedUserSettingsSecurity: UserSettingsSecurity
 
   """Reads and enables pagination through a set of `PhoneNumber`."""
   phoneNumbers(
@@ -5903,6 +6616,18 @@ input UserFilter {
   """Checks for any expressions in this list."""
   or: [UserFilter!]
 
+  """Filter by the object’s `ownedUserSetting` relation."""
+  ownedUserSetting: UserSettingFilter
+
+  """A related `ownedUserSetting` exists."""
+  ownedUserSettingExists: Boolean
+
+  """Filter by the object’s `ownedUserSettingsSecurity` relation."""
+  ownedUserSettingsSecurity: UserSettingsSecurityFilter
+
+  """A related `ownedUserSettingsSecurity` exists."""
+  ownedUserSettingsSecurityExists: Boolean
+
   """Filter by the object’s `phoneNumbers` relation."""
   phoneNumbers: UserToManyPhoneNumberFilter
 
@@ -6013,6 +6738,291 @@ input UserPatch {
   type: Int
   updatedAt: Datetime
   username: String
+}
+
+"""
+Per-user settings and preferences. Extended by other modules (i18n, notifications, MFA) via metaschema.create_field().
+"""
+type UserSetting {
+  createdAt: Datetime
+  id: UUID!
+
+  """Reads a single `User` that is related to this `UserSetting`."""
+  owner: User
+  ownerId: UUID!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `UserSetting` values."""
+type UserSettingConnection {
+  """
+  A list of edges which contains the `UserSetting` and cursor to aid in pagination.
+  """
+  edges: [UserSettingEdge]!
+
+  """A list of `UserSetting` objects."""
+  nodes: [UserSetting]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `UserSetting` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `UserSetting` edge in the connection."""
+type UserSettingEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `UserSetting` at the end of the edge."""
+  node: UserSetting
+}
+
+"""
+A filter to be used against `UserSetting` object types. All fields are combined with a logical ‘and.’
+"""
+input UserSettingFilter {
+  """Checks for all expressions in this list."""
+  and: [UserSettingFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: UserSettingFilter
+
+  """Checks for any expressions in this list."""
+  or: [UserSettingFilter!]
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `UserSetting`"""
+input UserSettingInput {
+  createdAt: Datetime
+  id: UUID
+  ownerId: UUID
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `UserSetting`."""
+enum UserSettingOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `UserSetting`. Fields that are set will be updated.
+"""
+input UserSettingPatch {
+  createdAt: Datetime
+  id: UUID
+  ownerId: UUID
+  updatedAt: Datetime
+}
+
+"""
+Per-user security settings for MFA configuration (separate from user_settings preferences)
+"""
+type UserSettingsSecurity {
+  """Number of remaining unused backup codes"""
+  backupCodesCount: Int!
+  createdAt: Datetime
+
+  """Whether email-based MFA codes are active for this user"""
+  emailMfaEnabled: Boolean!
+  id: UUID!
+
+  """When the first MFA method was enabled"""
+  mfaEnrolledAt: Datetime
+
+  """When MFA was last successfully verified"""
+  mfaLastUsedAt: Datetime
+
+  """Reads a single `User` that is related to this `UserSettingsSecurity`."""
+  owner: User
+  ownerId: UUID!
+
+  """Whether SMS-based MFA codes are active for this user"""
+  smsMfaEnabled: Boolean!
+
+  """Whether TOTP (authenticator app) MFA is active for this user"""
+  totpEnabled: Boolean!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `UserSettingsSecurity` values."""
+type UserSettingsSecurityConnection {
+  """
+  A list of edges which contains the `UserSettingsSecurity` and cursor to aid in pagination.
+  """
+  edges: [UserSettingsSecurityEdge]!
+
+  """A list of `UserSettingsSecurity` objects."""
+  nodes: [UserSettingsSecurity]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `UserSettingsSecurity` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `UserSettingsSecurity` edge in the connection."""
+type UserSettingsSecurityEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `UserSettingsSecurity` at the end of the edge."""
+  node: UserSettingsSecurity
+}
+
+"""
+A filter to be used against `UserSettingsSecurity` object types. All fields are combined with a logical ‘and.’
+"""
+input UserSettingsSecurityFilter {
+  """Checks for all expressions in this list."""
+  and: [UserSettingsSecurityFilter!]
+
+  """Filter by the object’s `backupCodesCount` field."""
+  backupCodesCount: IntFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `emailMfaEnabled` field."""
+  emailMfaEnabled: BooleanFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `mfaEnrolledAt` field."""
+  mfaEnrolledAt: DatetimeFilter
+
+  """Filter by the object’s `mfaLastUsedAt` field."""
+  mfaLastUsedAt: DatetimeFilter
+
+  """Negates the expression."""
+  not: UserSettingsSecurityFilter
+
+  """Checks for any expressions in this list."""
+  or: [UserSettingsSecurityFilter!]
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `smsMfaEnabled` field."""
+  smsMfaEnabled: BooleanFilter
+
+  """Filter by the object’s `totpEnabled` field."""
+  totpEnabled: BooleanFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `UserSettingsSecurity`"""
+input UserSettingsSecurityInput {
+  """Number of remaining unused backup codes"""
+  backupCodesCount: Int
+  createdAt: Datetime
+
+  """Whether email-based MFA codes are active for this user"""
+  emailMfaEnabled: Boolean
+  id: UUID
+
+  """When the first MFA method was enabled"""
+  mfaEnrolledAt: Datetime
+
+  """When MFA was last successfully verified"""
+  mfaLastUsedAt: Datetime
+  ownerId: UUID
+
+  """Whether SMS-based MFA codes are active for this user"""
+  smsMfaEnabled: Boolean
+
+  """Whether TOTP (authenticator app) MFA is active for this user"""
+  totpEnabled: Boolean
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `UserSettingsSecurity`."""
+enum UserSettingsSecurityOrderBy {
+  BACKUP_CODES_COUNT_ASC
+  BACKUP_CODES_COUNT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  EMAIL_MFA_ENABLED_ASC
+  EMAIL_MFA_ENABLED_DESC
+  ID_ASC
+  ID_DESC
+  MFA_ENROLLED_AT_ASC
+  MFA_ENROLLED_AT_DESC
+  MFA_LAST_USED_AT_ASC
+  MFA_LAST_USED_AT_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SMS_MFA_ENABLED_ASC
+  SMS_MFA_ENABLED_DESC
+  TOTP_ENABLED_ASC
+  TOTP_ENABLED_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `UserSettingsSecurity`. Fields that are set will be updated.
+"""
+input UserSettingsSecurityPatch {
+  """Number of remaining unused backup codes"""
+  backupCodesCount: Int
+  createdAt: Datetime
+
+  """Whether email-based MFA codes are active for this user"""
+  emailMfaEnabled: Boolean
+  id: UUID
+
+  """When the first MFA method was enabled"""
+  mfaEnrolledAt: Datetime
+
+  """When MFA was last successfully verified"""
+  mfaLastUsedAt: Datetime
+  ownerId: UUID
+
+  """Whether SMS-based MFA codes are active for this user"""
+  smsMfaEnabled: Boolean
+
+  """Whether TOTP (authenticator app) MFA is active for this user"""
+  totpEnabled: Boolean
+  updatedAt: Datetime
 }
 
 """

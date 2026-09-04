@@ -12,8 +12,8 @@ csdk site-metadatum list --where.<field>.<op> <value> --orderBy <values>
 csdk site-metadatum list --limit 10 --after <cursor>
 csdk site-metadatum find-first --where.<field>.<op> <value>
 csdk site-metadatum get --id <UUID>
-csdk site-metadatum create --databaseId <UUID> --siteId <UUID> [--appleTouchIcon <Image>] [--canonicalUrl <String>] [--commitId <UUID>] [--description <String>] [--favicon <Image>] [--logo <Image>] [--ogImage <Image>] [--robots <String>] [--storeId <UUID>] [--title <String>]
-csdk site-metadatum update --id <UUID> [--appleTouchIcon <Image>] [--canonicalUrl <String>] [--commitId <UUID>] [--databaseId <UUID>] [--description <String>] [--favicon <Image>] [--logo <Image>] [--ogImage <Image>] [--robots <String>] [--siteId <UUID>] [--storeId <UUID>] [--title <String>]
+csdk site-metadatum create --databaseId <UUID> --siteId <UUID> [--appleTouchIcon <Image>] [--canonicalUrl <String>] [--commitId <UUID>] [--description <String>] [--favicon <Image>] [--logo <Image>] [--ogImage <Image>] [--robots <String>] [--robotsSeededFrom <JSON>] [--storeId <UUID>] [--title <String>]
+csdk site-metadatum update --id <UUID> [--appleTouchIcon <Image>] [--canonicalUrl <String>] [--commitId <UUID>] [--databaseId <UUID>] [--description <String>] [--favicon <Image>] [--logo <Image>] [--ogImage <Image>] [--robots <String>] [--robotsSeededFrom <JSON>] [--siteId <UUID>] [--storeId <UUID>] [--title <String>]
 csdk site-metadatum delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk site-metadatum list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a siteMetadatum
 
 ```bash
-csdk site-metadatum create --databaseId <UUID> --siteId <UUID> [--appleTouchIcon <Image>] [--canonicalUrl <String>] [--commitId <UUID>] [--description <String>] [--favicon <Image>] [--logo <Image>] [--ogImage <Image>] [--robots <String>] [--storeId <UUID>] [--title <String>]
+csdk site-metadatum create --databaseId <UUID> --siteId <UUID> [--appleTouchIcon <Image>] [--canonicalUrl <String>] [--commitId <UUID>] [--description <String>] [--favicon <Image>] [--logo <Image>] [--ogImage <Image>] [--robots <String>] [--robotsSeededFrom <JSON>] [--storeId <UUID>] [--title <String>]
 ```
 
 ### Get a siteMetadatum by id

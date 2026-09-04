@@ -33,6 +33,8 @@ const db = createClient({
 | `roleType` | findMany, findOne, create, update, delete |
 | `userConnectedAccount` | findMany, findOne, create, update, delete |
 | `user` | findMany, findOne, create, update, delete |
+| `userSetting` | findMany, findOne, create, update, delete |
+| `userSettingsSecurity` | findMany, findOne, create, update, delete |
 | `webauthnCredential` | findMany, findOne, create, update, delete |
 
 ## Table Operations
@@ -470,6 +472,76 @@ const deleted = await db.user.delete({ where: { id: '<UUID>' } }).execute();
 > **Unified Search API fields:** `searchTsv`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
+### `db.userSetting`
+
+CRUD operations for UserSetting records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `id` | UUID | No |
+| `ownerId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all userSetting records
+const items = await db.userSetting.findMany({ select: { createdAt: true, id: true, ownerId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.userSetting.findOne({ id: '<UUID>', select: { createdAt: true, id: true, ownerId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.userSetting.create({ data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.userSetting.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.userSetting.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.userSettingsSecurity`
+
+CRUD operations for UserSettingsSecurity records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `backupCodesCount` | Int | Yes |
+| `createdAt` | Datetime | No |
+| `emailMfaEnabled` | Boolean | Yes |
+| `id` | UUID | No |
+| `mfaEnrolledAt` | Datetime | Yes |
+| `mfaLastUsedAt` | Datetime | Yes |
+| `ownerId` | UUID | Yes |
+| `smsMfaEnabled` | Boolean | Yes |
+| `totpEnabled` | Boolean | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all userSettingsSecurity records
+const items = await db.userSettingsSecurity.findMany({ select: { backupCodesCount: true, createdAt: true, emailMfaEnabled: true, id: true, mfaEnrolledAt: true, mfaLastUsedAt: true, ownerId: true, smsMfaEnabled: true, totpEnabled: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.userSettingsSecurity.findOne({ id: '<UUID>', select: { backupCodesCount: true, createdAt: true, emailMfaEnabled: true, id: true, mfaEnrolledAt: true, mfaLastUsedAt: true, ownerId: true, smsMfaEnabled: true, totpEnabled: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.userSettingsSecurity.create({ data: { backupCodesCount: '<Int>', emailMfaEnabled: '<Boolean>', mfaEnrolledAt: '<Datetime>', mfaLastUsedAt: '<Datetime>', ownerId: '<UUID>', smsMfaEnabled: '<Boolean>', totpEnabled: '<Boolean>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.userSettingsSecurity.update({ where: { id: '<UUID>' }, data: { backupCodesCount: '<Int>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.userSettingsSecurity.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.webauthnCredential`
 
 CRUD operations for WebauthnCredential records.
@@ -558,6 +630,17 @@ currentUserId
 const result = await db.query.currentUserId().execute();
 ```
 
+### `db.query.getMfaStatus`
+
+getMfaStatus
+
+- **Type:** query
+- **Arguments:** none
+
+```typescript
+const result = await db.query.getMfaStatus().execute();
+```
+
 ### `db.query.requireStepUp`
 
 requireStepUp
@@ -571,6 +654,21 @@ requireStepUp
 
 ```typescript
 const result = await db.query.requireStepUp({ stepUpType: '<String>' }).execute();
+```
+
+### `db.mutation.approveDevice`
+
+approveDevice
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ApproveDeviceInput (required) |
+
+```typescript
+const result = await db.mutation.approveDevice({ input: { approvalToken: '<String>' } }).execute();
 ```
 
 ### `db.mutation.checkPassword`
@@ -588,6 +686,21 @@ checkPassword
 const result = await db.mutation.checkPassword({ input: { password: '<String>' } }).execute();
 ```
 
+### `db.mutation.completeMfaChallenge`
+
+completeMfaChallenge
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CompleteMfaChallengeInput (required) |
+
+```typescript
+const result = await db.mutation.completeMfaChallenge({ input: '<CompleteMfaChallengeInput>' }).execute();
+```
+
 ### `db.mutation.confirmDeleteAccount`
 
 confirmDeleteAccount
@@ -601,6 +714,21 @@ confirmDeleteAccount
 
 ```typescript
 const result = await db.mutation.confirmDeleteAccount({ input: { token: '<String>', userId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.confirmTotpSetup`
+
+confirmTotpSetup
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ConfirmTotpSetupInput (required) |
+
+```typescript
+const result = await db.mutation.confirmTotpSetup({ input: { totpValue: '<String>' } }).execute();
 ```
 
 ### `db.mutation.createApiKey`
@@ -678,6 +806,51 @@ deletePrincipal
 const result = await db.mutation.deletePrincipal({ input: { principalId: '<UUID>' } }).execute();
 ```
 
+### `db.mutation.disableEmailMfa`
+
+disableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableEmailMfaInput (required) |
+
+```typescript
+const result = await db.mutation.disableEmailMfa({ input: '<DisableEmailMfaInput>' }).execute();
+```
+
+### `db.mutation.disableSmsMfa`
+
+disableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableSmsMfaInput (required) |
+
+```typescript
+const result = await db.mutation.disableSmsMfa({ input: '<DisableSmsMfaInput>' }).execute();
+```
+
+### `db.mutation.disableTotp`
+
+disableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisableTotpInput (required) |
+
+```typescript
+const result = await db.mutation.disableTotp({ input: { totpValue: '<String>' } }).execute();
+```
+
 ### `db.mutation.disconnectAccount`
 
 disconnectAccount
@@ -691,6 +864,51 @@ disconnectAccount
 
 ```typescript
 const result = await db.mutation.disconnectAccount({ input: { accountId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.enableEmailMfa`
+
+enableEmailMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableEmailMfaInput (required) |
+
+```typescript
+const result = await db.mutation.enableEmailMfa({ input: '<EnableEmailMfaInput>' }).execute();
+```
+
+### `db.mutation.enableSmsMfa`
+
+enableSmsMfa
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableSmsMfaInput (required) |
+
+```typescript
+const result = await db.mutation.enableSmsMfa({ input: '<EnableSmsMfaInput>' }).execute();
+```
+
+### `db.mutation.enableTotp`
+
+enableTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnableTotpInput (required) |
+
+```typescript
+const result = await db.mutation.enableTotp({ input: '<EnableTotpInput>' }).execute();
 ```
 
 ### `db.mutation.extendTokenExpires`
@@ -721,6 +939,21 @@ forgotPassword
 
 ```typescript
 const result = await db.mutation.forgotPassword({ input: { email: '<Email>' } }).execute();
+```
+
+### `db.mutation.generateBackupCodes`
+
+generateBackupCodes
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | GenerateBackupCodesInput (required) |
+
+```typescript
+const result = await db.mutation.generateBackupCodes({ input: '<GenerateBackupCodesInput>' }).execute();
 ```
 
 ### `db.mutation.linkIdentity`
@@ -921,6 +1154,21 @@ signInCrossOrigin
 const result = await db.mutation.signInCrossOrigin({ input: { credentialKind: '<String>', token: '<String>' } }).execute();
 ```
 
+### `db.mutation.signInMagicLink`
+
+signInMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInMagicLinkInput (required) |
+
+```typescript
+const result = await db.mutation.signInMagicLink({ input: { credentialKind: '<String>', deviceToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } }).execute();
+```
+
 ### `db.mutation.signInSmsOtp`
 
 signInSmsOtp
@@ -964,6 +1212,21 @@ signUp
 
 ```typescript
 const result = await db.mutation.signUp({ input: '<SignUpInput>' }).execute();
+```
+
+### `db.mutation.signUpMagicLink`
+
+signUpMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignUpMagicLinkInput (required) |
+
+```typescript
+const result = await db.mutation.signUpMagicLink({ input: { credentialKind: '<String>', deviceToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } }).execute();
 ```
 
 ### `db.mutation.signUpSms`

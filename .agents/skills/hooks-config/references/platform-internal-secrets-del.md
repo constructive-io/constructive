@@ -7,7 +7,7 @@ React Query mutation hook for platformInternalSecretsDel
 ## Usage
 
 ```typescript
-const { mutate } = usePlatformInternalSecretsDelMutation(); mutate({ input: { namespaceId: '<UUID>', realm: '<String>', secretName: '<String>' } });
+const { mutate } = usePlatformInternalSecretsDelMutation(); mutate({ input: { realm: '<String>', secretName: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = usePlatformInternalSecretsDelMutation(); mutate({ input: { na
 
 ```typescript
 const { mutate, isLoading } = usePlatformInternalSecretsDelMutation();
-mutate({ input: { namespaceId: '<UUID>', realm: '<String>', secretName: '<String>' } });
+mutate({ input: { realm: '<String>', secretName: '<String>' } });
 ```

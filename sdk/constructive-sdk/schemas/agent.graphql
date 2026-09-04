@@ -282,6 +282,11 @@ type AgentMessage {
   databaseId: UUID!
   id: UUID!
 
+  """
+  Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it)
+  """
+  kind: String!
+
   """LLM model that generated this response"""
   model: String
 
@@ -294,6 +299,9 @@ type AgentMessage {
   """Foreign key to agent_thread"""
   threadId: UUID!
   updatedAt: Datetime
+
+  """Who may read this message, inherited from the thread"""
+  visibility: String!
 }
 
 """A connection to a list of `AgentMessage` values."""
@@ -353,6 +361,9 @@ input AgentMessageFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
+  """Filter by the object’s `kind` field."""
+  kind: StringFilter
+
   """Filter by the object’s `model` field."""
   model: StringFilter
 
@@ -373,6 +384,9 @@ input AgentMessageFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
 }
 
 """An input for mutations affecting `AgentMessage`"""
@@ -391,6 +405,11 @@ input AgentMessageInput {
   databaseId: UUID!
   id: UUID
 
+  """
+  Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it)
+  """
+  kind: String
+
   """LLM model that generated this response"""
   model: String
 
@@ -400,6 +419,9 @@ input AgentMessageInput {
   """Foreign key to agent_thread"""
   threadId: UUID!
   updatedAt: Datetime
+
+  """Who may read this message, inherited from the thread"""
+  visibility: String
 }
 
 """Methods to use when ordering `AgentMessage`."""
@@ -416,6 +438,8 @@ enum AgentMessageOrderBy {
   DATABASE_ID_DESC
   ID_ASC
   ID_DESC
+  KIND_ASC
+  KIND_DESC
   MODEL_ASC
   MODEL_DESC
   NATURAL
@@ -427,6 +451,8 @@ enum AgentMessageOrderBy {
   THREAD_ID_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
 }
 
 """
@@ -447,6 +473,11 @@ input AgentMessagePatch {
   databaseId: UUID
   id: UUID
 
+  """
+  Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it)
+  """
+  kind: String
+
   """LLM model that generated this response"""
   model: String
 
@@ -456,6 +487,9 @@ input AgentMessagePatch {
   """Foreign key to agent_thread"""
   threadId: UUID
   updatedAt: Datetime
+
+  """Who may read this message, inherited from the thread"""
+  visibility: String
 }
 
 """Methods to use when ordering `Agent`."""
@@ -561,6 +595,7 @@ type AgentPersona {
   config: JSON
   createdAt: Datetime
   createdBy: UUID
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -585,6 +620,7 @@ type AgentPersona {
   systemPrompt: String
   updatedAt: Datetime
   updatedBy: UUID
+  updatedByPrincipal: UUID
 }
 
 """A connection to a list of `AgentPersona` values."""
@@ -635,6 +671,9 @@ input AgentPersonaFilter {
   """Filter by the object’s `createdBy` field."""
   createdBy: UUIDFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
@@ -670,6 +709,9 @@ input AgentPersonaFilter {
 
   """Filter by the object’s `updatedBy` field."""
   updatedBy: UUIDFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
 }
 
 """An input for mutations affecting `AgentPersona`"""
@@ -678,6 +720,7 @@ input AgentPersonaInput {
   config: JSON
   createdAt: Datetime
   createdBy: UUID
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -702,6 +745,7 @@ input AgentPersonaInput {
   systemPrompt: String
   updatedAt: Datetime
   updatedBy: UUID
+  updatedByPrincipal: UUID
 }
 
 """Methods to use when ordering `AgentPersona`."""
@@ -712,6 +756,8 @@ enum AgentPersonaOrderBy {
   CREATED_AT_DESC
   CREATED_BY_ASC
   CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DESCRIPTION_ASC
@@ -735,6 +781,8 @@ enum AgentPersonaOrderBy {
   UPDATED_AT_DESC
   UPDATED_BY_ASC
   UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
 }
 
 """
@@ -745,6 +793,7 @@ input AgentPersonaPatch {
   config: JSON
   createdAt: Datetime
   createdBy: UUID
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID
@@ -769,6 +818,7 @@ input AgentPersonaPatch {
   systemPrompt: String
   updatedAt: Datetime
   updatedBy: UUID
+  updatedByPrincipal: UUID
 }
 
 """
@@ -841,6 +891,9 @@ type AgentPlan {
   """Human-readable plan name"""
   title: String!
   updatedAt: Datetime
+
+  """Who may read this plan, inherited from the thread"""
+  visibility: String!
 }
 
 """A connection to a list of `AgentPlan` values."""
@@ -917,6 +970,9 @@ input AgentPlanFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
 }
 
 """An input for mutations affecting `AgentPlan`"""
@@ -942,6 +998,9 @@ input AgentPlanInput {
   """Human-readable plan name"""
   title: String!
   updatedAt: Datetime
+
+  """Who may read this plan, inherited from the thread"""
+  visibility: String
 }
 
 """Methods to use when ordering `AgentPlan`."""
@@ -967,6 +1026,8 @@ enum AgentPlanOrderBy {
   TITLE_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
 }
 
 """
@@ -994,6 +1055,9 @@ input AgentPlanPatch {
   """Human-readable plan name"""
   title: String
   updatedAt: Datetime
+
+  """Who may read this plan, inherited from the thread"""
+  visibility: String
 }
 
 """
@@ -1045,6 +1109,7 @@ type AgentPrompt {
   content: String!
   createdAt: Datetime
   createdBy: UUID
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -1063,6 +1128,7 @@ type AgentPrompt {
   name: String!
   updatedAt: Datetime
   updatedBy: UUID
+  updatedByPrincipal: UUID
 }
 
 """A connection to a list of `AgentPrompt` values."""
@@ -1113,6 +1179,9 @@ input AgentPromptFilter {
   """Filter by the object’s `createdBy` field."""
   createdBy: UUIDFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
@@ -1142,6 +1211,9 @@ input AgentPromptFilter {
 
   """Filter by the object’s `updatedBy` field."""
   updatedBy: UUIDFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
 }
 
 """An input for mutations affecting `AgentPrompt`"""
@@ -1150,6 +1222,7 @@ input AgentPromptInput {
   content: String!
   createdAt: Datetime
   createdBy: UUID
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -1168,6 +1241,7 @@ input AgentPromptInput {
   name: String!
   updatedAt: Datetime
   updatedBy: UUID
+  updatedByPrincipal: UUID
 }
 
 """Methods to use when ordering `AgentPrompt`."""
@@ -1178,6 +1252,8 @@ enum AgentPromptOrderBy {
   CREATED_AT_DESC
   CREATED_BY_ASC
   CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DESCRIPTION_ASC
@@ -1197,6 +1273,8 @@ enum AgentPromptOrderBy {
   UPDATED_AT_DESC
   UPDATED_BY_ASC
   UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
 }
 
 """
@@ -1207,6 +1285,7 @@ input AgentPromptPatch {
   content: String
   createdAt: Datetime
   createdBy: UUID
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID
@@ -1225,6 +1304,7 @@ input AgentPromptPatch {
   name: String
   updatedAt: Datetime
   updatedBy: UUID
+  updatedByPrincipal: UUID
 }
 
 """
@@ -1284,6 +1364,7 @@ type AgentResource {
   bodyTrgmSimilarity: Float
   createdAt: Datetime
   createdBy: UUID
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -1347,6 +1428,7 @@ type AgentResource {
   titleTrgmSimilarity: Float
   updatedAt: Datetime
   updatedBy: UUID
+  updatedByPrincipal: UUID
 }
 
 type AgentResourceChunk {
@@ -1358,6 +1440,11 @@ type AgentResourceChunk {
   body: String!
   chunkIndex: Int!
   createdAt: Datetime
+
+  """
+  Policy-required field derived from source table (used by AuthzRelatedEntityMembership)
+  """
+  databaseId: UUID
   embedding: Vector
 
   """
@@ -1424,6 +1511,9 @@ input AgentResourceChunkFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
   """Filter by the object’s `embedding` field."""
   embedding: VectorFilter
 
@@ -1452,6 +1542,11 @@ input AgentResourceChunkInput {
   body: String!
   chunkIndex: Int
   createdAt: Datetime
+
+  """
+  Policy-required field derived from source table (used by AuthzRelatedEntityMembership)
+  """
+  databaseId: UUID
   embedding: Vector
 
   """
@@ -1473,6 +1568,8 @@ enum AgentResourceChunkOrderBy {
   CHUNK_INDEX_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   EMBEDDING_ASC
   EMBEDDING_DESC
   EMBEDDING_VECTOR_DISTANCE_ASC
@@ -1498,6 +1595,11 @@ input AgentResourceChunkPatch {
   body: String
   chunkIndex: Int
   createdAt: Datetime
+
+  """
+  Policy-required field derived from source table (used by AuthzRelatedEntityMembership)
+  """
+  databaseId: UUID
   embedding: Vector
 
   """
@@ -1559,6 +1661,9 @@ input AgentResourceFilter {
 
   """Filter by the object’s `createdBy` field."""
   createdBy: UUIDFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
 
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
@@ -1635,6 +1740,9 @@ input AgentResourceFilter {
   """Filter by the object’s `updatedBy` field."""
   updatedBy: UUIDFilter
 
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+
   """VECTOR search on the `embedding` column."""
   vectorEmbedding: VectorNearbyInput
 }
@@ -1648,6 +1756,7 @@ input AgentResourceInput {
   body: String!
   createdAt: Datetime
   createdBy: UUID
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -1684,6 +1793,7 @@ input AgentResourceInput {
   title: String!
   updatedAt: Datetime
   updatedBy: UUID
+  updatedByPrincipal: UUID
 }
 
 """Methods to use when ordering `AgentResource`."""
@@ -1698,6 +1808,8 @@ enum AgentResourceOrderBy {
   CREATED_AT_DESC
   CREATED_BY_ASC
   CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DESCRIPTION_ASC
@@ -1743,6 +1855,8 @@ enum AgentResourceOrderBy {
   UPDATED_AT_DESC
   UPDATED_BY_ASC
   UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
 }
 
 """
@@ -1756,6 +1870,7 @@ input AgentResourcePatch {
   body: String
   createdAt: Datetime
   createdBy: UUID
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID
@@ -1792,6 +1907,7 @@ input AgentResourcePatch {
   title: String
   updatedAt: Datetime
   updatedBy: UUID
+  updatedByPrincipal: UUID
 }
 
 """
@@ -1856,6 +1972,9 @@ type AgentTask {
   """Current status of this task"""
   status: String!
   updatedAt: Datetime
+
+  """Who may read this task, inherited from its parent"""
+  visibility: String!
 }
 
 """A connection to a list of `AgentTask` values."""
@@ -1947,6 +2066,9 @@ input AgentTaskFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
 }
 
 """An input for mutations affecting `AgentTask`"""
@@ -1994,6 +2116,9 @@ input AgentTaskInput {
   """Current status of this task"""
   status: String
   updatedAt: Datetime
+
+  """Who may read this task, inherited from its parent"""
+  visibility: String
 }
 
 """Methods to use when ordering `AgentTask`."""
@@ -2033,6 +2158,8 @@ enum AgentTaskOrderBy {
   STATUS_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
 }
 
 """
@@ -2082,6 +2209,9 @@ input AgentTaskPatch {
   """Current status of this task"""
   status: String
   updatedAt: Datetime
+
+  """Who may read this task, inherited from its parent"""
+  visibility: String
 }
 
 """Top-level AI/LLM conversation thread"""
@@ -2223,6 +2353,11 @@ type AgentThread {
   """Human-readable conversation title"""
   title: String
   updatedAt: Datetime
+
+  """
+  Who may read this thread: private (owner only) or entity (the scope's members)
+  """
+  visibility: String!
 }
 
 """A connection to a list of `AgentThread` values."""
@@ -2347,6 +2482,9 @@ input AgentThreadFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
 }
 
 """An input for mutations affecting `AgentThread`"""
@@ -2392,6 +2530,11 @@ input AgentThreadInput {
   """Human-readable conversation title"""
   title: String
   updatedAt: Datetime
+
+  """
+  Who may read this thread: private (owner only) or entity (the scope's members)
+  """
+  visibility: String
 }
 
 """Methods to use when ordering `AgentThread`."""
@@ -2431,6 +2574,8 @@ enum AgentThreadOrderBy {
   TITLE_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
 }
 
 """
@@ -2478,6 +2623,11 @@ input AgentThreadPatch {
   """Human-readable conversation title"""
   title: String
   updatedAt: Datetime
+
+  """
+  Who may read this thread: private (owner only) or entity (the scope's members)
+  """
+  visibility: String
 }
 
 """
@@ -2562,6 +2712,53 @@ input AgentToManyAgentThreadFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: AgentThreadFilter
+}
+
+"""
+A floating point number that requires more precision than IEEE 754 binary 64
+"""
+scalar BigFloat
+
+"""
+A filter to be used against BigFloat fields. All fields are combined with a logical ‘and.’
+"""
+input BigFloatFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BigFloat
+
+  """Equal to the specified value."""
+  equalTo: BigFloat
+
+  """Greater than the specified value."""
+  greaterThan: BigFloat
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: BigFloat
+
+  """Included in the specified list."""
+  in: [BigFloat!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: BigFloat
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: BigFloat
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BigFloat
+
+  """Not equal to the specified value."""
+  notEqualTo: BigFloat
+
+  """Not included in the specified list."""
+  notIn: [BigFloat!]
 }
 
 """
@@ -2921,6 +3118,426 @@ type CreateAgentThreadPayload {
   query: Query
 }
 
+"""All input for the create `PlatformAgentEvent` mutation."""
+input CreatePlatformAgentEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentEvent` to be created by this mutation."""
+  platformAgentEvent: PlatformAgentEventInput!
+}
+
+"""The output of our create `PlatformAgentEvent` mutation."""
+type CreatePlatformAgentEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentEvent` that was created by this mutation."""
+  platformAgentEvent: PlatformAgentEvent
+
+  """An edge for our `PlatformAgentEvent`. May be used by Relay 1."""
+  platformAgentEventEdge(
+    """The method to use when ordering `PlatformAgentEvent`."""
+    orderBy: [PlatformAgentEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgent` mutation."""
+input CreatePlatformAgentInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgent` to be created by this mutation."""
+  platformAgent: PlatformAgentInput!
+}
+
+"""All input for the create `PlatformAgentMessage` mutation."""
+input CreatePlatformAgentMessageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentMessage` to be created by this mutation."""
+  platformAgentMessage: PlatformAgentMessageInput!
+}
+
+"""The output of our create `PlatformAgentMessage` mutation."""
+type CreatePlatformAgentMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentMessage` that was created by this mutation."""
+  platformAgentMessage: PlatformAgentMessage
+
+  """An edge for our `PlatformAgentMessage`. May be used by Relay 1."""
+  platformAgentMessageEdge(
+    """The method to use when ordering `PlatformAgentMessage`."""
+    orderBy: [PlatformAgentMessageOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentMessageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""The output of our create `PlatformAgent` mutation."""
+type CreatePlatformAgentPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgent` that was created by this mutation."""
+  platformAgent: PlatformAgent
+
+  """An edge for our `PlatformAgent`. May be used by Relay 1."""
+  platformAgentEdge(
+    """The method to use when ordering `PlatformAgent`."""
+    orderBy: [PlatformAgentOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgentPersona` mutation."""
+input CreatePlatformAgentPersonaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPersona` to be created by this mutation."""
+  platformAgentPersona: PlatformAgentPersonaInput!
+}
+
+"""The output of our create `PlatformAgentPersona` mutation."""
+type CreatePlatformAgentPersonaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPersona` that was created by this mutation."""
+  platformAgentPersona: PlatformAgentPersona
+
+  """An edge for our `PlatformAgentPersona`. May be used by Relay 1."""
+  platformAgentPersonaEdge(
+    """The method to use when ordering `PlatformAgentPersona`."""
+    orderBy: [PlatformAgentPersonaOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentPersonaEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgentPlan` mutation."""
+input CreatePlatformAgentPlanInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPlan` to be created by this mutation."""
+  platformAgentPlan: PlatformAgentPlanInput!
+}
+
+"""The output of our create `PlatformAgentPlan` mutation."""
+type CreatePlatformAgentPlanPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPlan` that was created by this mutation."""
+  platformAgentPlan: PlatformAgentPlan
+
+  """An edge for our `PlatformAgentPlan`. May be used by Relay 1."""
+  platformAgentPlanEdge(
+    """The method to use when ordering `PlatformAgentPlan`."""
+    orderBy: [PlatformAgentPlanOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentPlanEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgentPrompt` mutation."""
+input CreatePlatformAgentPromptInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPrompt` to be created by this mutation."""
+  platformAgentPrompt: PlatformAgentPromptInput!
+}
+
+"""The output of our create `PlatformAgentPrompt` mutation."""
+type CreatePlatformAgentPromptPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPrompt` that was created by this mutation."""
+  platformAgentPrompt: PlatformAgentPrompt
+
+  """An edge for our `PlatformAgentPrompt`. May be used by Relay 1."""
+  platformAgentPromptEdge(
+    """The method to use when ordering `PlatformAgentPrompt`."""
+    orderBy: [PlatformAgentPromptOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentPromptEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgentResourceChunk` mutation."""
+input CreatePlatformAgentResourceChunkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentResourceChunk` to be created by this mutation."""
+  platformAgentResourceChunk: PlatformAgentResourceChunkInput!
+}
+
+"""The output of our create `PlatformAgentResourceChunk` mutation."""
+type CreatePlatformAgentResourceChunkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentResourceChunk` that was created by this mutation."""
+  platformAgentResourceChunk: PlatformAgentResourceChunk
+
+  """An edge for our `PlatformAgentResourceChunk`. May be used by Relay 1."""
+  platformAgentResourceChunkEdge(
+    """The method to use when ordering `PlatformAgentResourceChunk`."""
+    orderBy: [PlatformAgentResourceChunkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentResourceChunkEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgentResource` mutation."""
+input CreatePlatformAgentResourceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentResource` to be created by this mutation."""
+  platformAgentResource: PlatformAgentResourceInput!
+}
+
+"""The output of our create `PlatformAgentResource` mutation."""
+type CreatePlatformAgentResourcePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentResource` that was created by this mutation."""
+  platformAgentResource: PlatformAgentResource
+
+  """An edge for our `PlatformAgentResource`. May be used by Relay 1."""
+  platformAgentResourceEdge(
+    """The method to use when ordering `PlatformAgentResource`."""
+    orderBy: [PlatformAgentResourceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentResourceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgentRun` mutation."""
+input CreatePlatformAgentRunInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentRun` to be created by this mutation."""
+  platformAgentRun: PlatformAgentRunInput!
+}
+
+"""The output of our create `PlatformAgentRun` mutation."""
+type CreatePlatformAgentRunPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentRun` that was created by this mutation."""
+  platformAgentRun: PlatformAgentRun
+
+  """An edge for our `PlatformAgentRun`. May be used by Relay 1."""
+  platformAgentRunEdge(
+    """The method to use when ordering `PlatformAgentRun`."""
+    orderBy: [PlatformAgentRunOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentRunEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgentRunWorkspace` mutation."""
+input CreatePlatformAgentRunWorkspaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentRunWorkspace` to be created by this mutation."""
+  platformAgentRunWorkspace: PlatformAgentRunWorkspaceInput!
+}
+
+"""The output of our create `PlatformAgentRunWorkspace` mutation."""
+type CreatePlatformAgentRunWorkspacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentRunWorkspace` that was created by this mutation."""
+  platformAgentRunWorkspace: PlatformAgentRunWorkspace
+
+  """An edge for our `PlatformAgentRunWorkspace`. May be used by Relay 1."""
+  platformAgentRunWorkspaceEdge(
+    """The method to use when ordering `PlatformAgentRunWorkspace`."""
+    orderBy: [PlatformAgentRunWorkspaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentRunWorkspaceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgentTask` mutation."""
+input CreatePlatformAgentTaskInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentTask` to be created by this mutation."""
+  platformAgentTask: PlatformAgentTaskInput!
+}
+
+"""The output of our create `PlatformAgentTask` mutation."""
+type CreatePlatformAgentTaskPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentTask` that was created by this mutation."""
+  platformAgentTask: PlatformAgentTask
+
+  """An edge for our `PlatformAgentTask`. May be used by Relay 1."""
+  platformAgentTaskEdge(
+    """The method to use when ordering `PlatformAgentTask`."""
+    orderBy: [PlatformAgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentTaskEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformAgentThread` mutation."""
+input CreatePlatformAgentThreadInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentThread` to be created by this mutation."""
+  platformAgentThread: PlatformAgentThreadInput!
+}
+
+"""The output of our create `PlatformAgentThread` mutation."""
+type CreatePlatformAgentThreadPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentThread` that was created by this mutation."""
+  platformAgentThread: PlatformAgentThread
+
+  """An edge for our `PlatformAgentThread`. May be used by Relay 1."""
+  platformAgentThreadEdge(
+    """The method to use when ordering `PlatformAgentThread`."""
+    orderBy: [PlatformAgentThreadOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentThreadEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
@@ -3265,6 +3882,402 @@ type DeleteAgentThreadPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentEvent` mutation."""
+input DeletePlatformAgentEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentEvent` mutation."""
+type DeletePlatformAgentEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentEvent` that was deleted by this mutation."""
+  platformAgentEvent: PlatformAgentEvent
+
+  """An edge for our `PlatformAgentEvent`. May be used by Relay 1."""
+  platformAgentEventEdge(
+    """The method to use when ordering `PlatformAgentEvent`."""
+    orderBy: [PlatformAgentEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgent` mutation."""
+input DeletePlatformAgentInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""All input for the `deletePlatformAgentMessage` mutation."""
+input DeletePlatformAgentMessageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentMessage` mutation."""
+type DeletePlatformAgentMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentMessage` that was deleted by this mutation."""
+  platformAgentMessage: PlatformAgentMessage
+
+  """An edge for our `PlatformAgentMessage`. May be used by Relay 1."""
+  platformAgentMessageEdge(
+    """The method to use when ordering `PlatformAgentMessage`."""
+    orderBy: [PlatformAgentMessageOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentMessageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""The output of our delete `PlatformAgent` mutation."""
+type DeletePlatformAgentPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgent` that was deleted by this mutation."""
+  platformAgent: PlatformAgent
+
+  """An edge for our `PlatformAgent`. May be used by Relay 1."""
+  platformAgentEdge(
+    """The method to use when ordering `PlatformAgent`."""
+    orderBy: [PlatformAgentOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentPersona` mutation."""
+input DeletePlatformAgentPersonaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentPersona` mutation."""
+type DeletePlatformAgentPersonaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPersona` that was deleted by this mutation."""
+  platformAgentPersona: PlatformAgentPersona
+
+  """An edge for our `PlatformAgentPersona`. May be used by Relay 1."""
+  platformAgentPersonaEdge(
+    """The method to use when ordering `PlatformAgentPersona`."""
+    orderBy: [PlatformAgentPersonaOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentPersonaEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentPlan` mutation."""
+input DeletePlatformAgentPlanInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentPlan` mutation."""
+type DeletePlatformAgentPlanPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPlan` that was deleted by this mutation."""
+  platformAgentPlan: PlatformAgentPlan
+
+  """An edge for our `PlatformAgentPlan`. May be used by Relay 1."""
+  platformAgentPlanEdge(
+    """The method to use when ordering `PlatformAgentPlan`."""
+    orderBy: [PlatformAgentPlanOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentPlanEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentPrompt` mutation."""
+input DeletePlatformAgentPromptInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentPrompt` mutation."""
+type DeletePlatformAgentPromptPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPrompt` that was deleted by this mutation."""
+  platformAgentPrompt: PlatformAgentPrompt
+
+  """An edge for our `PlatformAgentPrompt`. May be used by Relay 1."""
+  platformAgentPromptEdge(
+    """The method to use when ordering `PlatformAgentPrompt`."""
+    orderBy: [PlatformAgentPromptOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentPromptEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentResourceChunk` mutation."""
+input DeletePlatformAgentResourceChunkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentResourceChunk` mutation."""
+type DeletePlatformAgentResourceChunkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentResourceChunk` that was deleted by this mutation."""
+  platformAgentResourceChunk: PlatformAgentResourceChunk
+
+  """An edge for our `PlatformAgentResourceChunk`. May be used by Relay 1."""
+  platformAgentResourceChunkEdge(
+    """The method to use when ordering `PlatformAgentResourceChunk`."""
+    orderBy: [PlatformAgentResourceChunkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentResourceChunkEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentResource` mutation."""
+input DeletePlatformAgentResourceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentResource` mutation."""
+type DeletePlatformAgentResourcePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentResource` that was deleted by this mutation."""
+  platformAgentResource: PlatformAgentResource
+
+  """An edge for our `PlatformAgentResource`. May be used by Relay 1."""
+  platformAgentResourceEdge(
+    """The method to use when ordering `PlatformAgentResource`."""
+    orderBy: [PlatformAgentResourceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentResourceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentRun` mutation."""
+input DeletePlatformAgentRunInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentRun` mutation."""
+type DeletePlatformAgentRunPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentRun` that was deleted by this mutation."""
+  platformAgentRun: PlatformAgentRun
+
+  """An edge for our `PlatformAgentRun`. May be used by Relay 1."""
+  platformAgentRunEdge(
+    """The method to use when ordering `PlatformAgentRun`."""
+    orderBy: [PlatformAgentRunOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentRunEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentRunWorkspace` mutation."""
+input DeletePlatformAgentRunWorkspaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentRunWorkspace` mutation."""
+type DeletePlatformAgentRunWorkspacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentRunWorkspace` that was deleted by this mutation."""
+  platformAgentRunWorkspace: PlatformAgentRunWorkspace
+
+  """An edge for our `PlatformAgentRunWorkspace`. May be used by Relay 1."""
+  platformAgentRunWorkspaceEdge(
+    """The method to use when ordering `PlatformAgentRunWorkspace`."""
+    orderBy: [PlatformAgentRunWorkspaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentRunWorkspaceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentTask` mutation."""
+input DeletePlatformAgentTaskInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentTask` mutation."""
+type DeletePlatformAgentTaskPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentTask` that was deleted by this mutation."""
+  platformAgentTask: PlatformAgentTask
+
+  """An edge for our `PlatformAgentTask`. May be used by Relay 1."""
+  platformAgentTaskEdge(
+    """The method to use when ordering `PlatformAgentTask`."""
+    orderBy: [PlatformAgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentTaskEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformAgentThread` mutation."""
+input DeletePlatformAgentThreadInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformAgentThread` mutation."""
+type DeletePlatformAgentThreadPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentThread` that was deleted by this mutation."""
+  platformAgentThread: PlatformAgentThread
+
+  """An edge for our `PlatformAgentThread`. May be used by Relay 1."""
+  platformAgentThreadEdge(
+    """The method to use when ordering `PlatformAgentThread`."""
+    orderBy: [PlatformAgentThreadOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentThreadEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -3659,11 +4672,57 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
+  """GraphQL type name of the plane's buckets table"""
+  bucketsType: String!
+
+  """
+  Computed download-URL field on the files type; null on the buckets side
+  """
+  downloadUrlField: String
+
+  """GraphQL type name of the plane's files table"""
+  filesType: String!
+
   """Whether this table is a storage buckets table"""
   isBucketsTable: Boolean!
 
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
+
+  """The plane's GraphQL upload surface"""
+  upload: MetaStorageUpload!
+}
+
+"""
+The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
+"""
+type MetaStorageUpload {
+  """Per-file input type inside the bulk input"""
+  bulkFileInputType: String!
+
+  """Per-file payload type inside the bulk payload"""
+  bulkFilePayloadType: String!
+
+  """Input type of the bulk upload mutation"""
+  bulkInputType: String!
+
+  """Root mutation field for bulk upload"""
+  bulkMutation: String!
+
+  """Payload type of the bulk upload mutation"""
+  bulkPayloadType: String!
+
+  """Input type of the single upload mutation"""
+  inputType: String!
+
+  """Root mutation field for single-file upload (e.g. uploadAppFile)"""
+  mutation: String!
+
+  """Payload type of the single upload mutation"""
+  payloadType: String!
+
+  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  requiresOwnerId: Boolean!
 }
 
 """Information about a database table"""
@@ -3795,6 +4854,102 @@ type Mutation {
     input: CreateAgentThreadInput!
   ): CreateAgentThreadPayload
 
+  """Creates a single `PlatformAgent`."""
+  createPlatformAgent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentInput!
+  ): CreatePlatformAgentPayload
+
+  """Creates a single `PlatformAgentEvent`."""
+  createPlatformAgentEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentEventInput!
+  ): CreatePlatformAgentEventPayload
+
+  """Creates a single `PlatformAgentMessage`."""
+  createPlatformAgentMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentMessageInput!
+  ): CreatePlatformAgentMessagePayload
+
+  """Creates a single `PlatformAgentPersona`."""
+  createPlatformAgentPersona(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentPersonaInput!
+  ): CreatePlatformAgentPersonaPayload
+
+  """Creates a single `PlatformAgentPlan`."""
+  createPlatformAgentPlan(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentPlanInput!
+  ): CreatePlatformAgentPlanPayload
+
+  """Creates a single `PlatformAgentPrompt`."""
+  createPlatformAgentPrompt(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentPromptInput!
+  ): CreatePlatformAgentPromptPayload
+
+  """Creates a single `PlatformAgentResource`."""
+  createPlatformAgentResource(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentResourceInput!
+  ): CreatePlatformAgentResourcePayload
+
+  """Creates a single `PlatformAgentResourceChunk`."""
+  createPlatformAgentResourceChunk(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentResourceChunkInput!
+  ): CreatePlatformAgentResourceChunkPayload
+
+  """Creates a single `PlatformAgentRun`."""
+  createPlatformAgentRun(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentRunInput!
+  ): CreatePlatformAgentRunPayload
+
+  """Creates a single `PlatformAgentRunWorkspace`."""
+  createPlatformAgentRunWorkspace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentRunWorkspaceInput!
+  ): CreatePlatformAgentRunWorkspacePayload
+
+  """Creates a single `PlatformAgentTask`."""
+  createPlatformAgentTask(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentTaskInput!
+  ): CreatePlatformAgentTaskPayload
+
+  """Creates a single `PlatformAgentThread`."""
+  createPlatformAgentThread(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformAgentThreadInput!
+  ): CreatePlatformAgentThreadPayload
+
   """Deletes a single `Agent` using a unique key."""
   deleteAgent(
     """
@@ -3866,6 +5021,102 @@ type Mutation {
     """
     input: DeleteAgentThreadInput!
   ): DeleteAgentThreadPayload
+
+  """Deletes a single `PlatformAgent` using a unique key."""
+  deletePlatformAgent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentInput!
+  ): DeletePlatformAgentPayload
+
+  """Deletes a single `PlatformAgentEvent` using a unique key."""
+  deletePlatformAgentEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentEventInput!
+  ): DeletePlatformAgentEventPayload
+
+  """Deletes a single `PlatformAgentMessage` using a unique key."""
+  deletePlatformAgentMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentMessageInput!
+  ): DeletePlatformAgentMessagePayload
+
+  """Deletes a single `PlatformAgentPersona` using a unique key."""
+  deletePlatformAgentPersona(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentPersonaInput!
+  ): DeletePlatformAgentPersonaPayload
+
+  """Deletes a single `PlatformAgentPlan` using a unique key."""
+  deletePlatformAgentPlan(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentPlanInput!
+  ): DeletePlatformAgentPlanPayload
+
+  """Deletes a single `PlatformAgentPrompt` using a unique key."""
+  deletePlatformAgentPrompt(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentPromptInput!
+  ): DeletePlatformAgentPromptPayload
+
+  """Deletes a single `PlatformAgentResource` using a unique key."""
+  deletePlatformAgentResource(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentResourceInput!
+  ): DeletePlatformAgentResourcePayload
+
+  """Deletes a single `PlatformAgentResourceChunk` using a unique key."""
+  deletePlatformAgentResourceChunk(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentResourceChunkInput!
+  ): DeletePlatformAgentResourceChunkPayload
+
+  """Deletes a single `PlatformAgentRun` using a unique key."""
+  deletePlatformAgentRun(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentRunInput!
+  ): DeletePlatformAgentRunPayload
+
+  """Deletes a single `PlatformAgentRunWorkspace` using a unique key."""
+  deletePlatformAgentRunWorkspace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentRunWorkspaceInput!
+  ): DeletePlatformAgentRunWorkspacePayload
+
+  """Deletes a single `PlatformAgentTask` using a unique key."""
+  deletePlatformAgentTask(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentTaskInput!
+  ): DeletePlatformAgentTaskPayload
+
+  """Deletes a single `PlatformAgentThread` using a unique key."""
+  deletePlatformAgentThread(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformAgentThreadInput!
+  ): DeletePlatformAgentThreadPayload
 
   """
   Provision an S3 bucket for a logical bucket in the database.
@@ -3951,6 +5202,112 @@ type Mutation {
     """
     input: UpdateAgentThreadInput!
   ): UpdateAgentThreadPayload
+
+  """Updates a single `PlatformAgent` using a unique key and a patch."""
+  updatePlatformAgent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentInput!
+  ): UpdatePlatformAgentPayload
+
+  """Updates a single `PlatformAgentEvent` using a unique key and a patch."""
+  updatePlatformAgentEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentEventInput!
+  ): UpdatePlatformAgentEventPayload
+
+  """
+  Updates a single `PlatformAgentMessage` using a unique key and a patch.
+  """
+  updatePlatformAgentMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentMessageInput!
+  ): UpdatePlatformAgentMessagePayload
+
+  """
+  Updates a single `PlatformAgentPersona` using a unique key and a patch.
+  """
+  updatePlatformAgentPersona(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentPersonaInput!
+  ): UpdatePlatformAgentPersonaPayload
+
+  """Updates a single `PlatformAgentPlan` using a unique key and a patch."""
+  updatePlatformAgentPlan(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentPlanInput!
+  ): UpdatePlatformAgentPlanPayload
+
+  """Updates a single `PlatformAgentPrompt` using a unique key and a patch."""
+  updatePlatformAgentPrompt(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentPromptInput!
+  ): UpdatePlatformAgentPromptPayload
+
+  """
+  Updates a single `PlatformAgentResource` using a unique key and a patch.
+  """
+  updatePlatformAgentResource(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentResourceInput!
+  ): UpdatePlatformAgentResourcePayload
+
+  """
+  Updates a single `PlatformAgentResourceChunk` using a unique key and a patch.
+  """
+  updatePlatformAgentResourceChunk(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentResourceChunkInput!
+  ): UpdatePlatformAgentResourceChunkPayload
+
+  """Updates a single `PlatformAgentRun` using a unique key and a patch."""
+  updatePlatformAgentRun(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentRunInput!
+  ): UpdatePlatformAgentRunPayload
+
+  """
+  Updates a single `PlatformAgentRunWorkspace` using a unique key and a patch.
+  """
+  updatePlatformAgentRunWorkspace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentRunWorkspaceInput!
+  ): UpdatePlatformAgentRunWorkspacePayload
+
+  """Updates a single `PlatformAgentTask` using a unique key and a patch."""
+  updatePlatformAgentTask(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentTaskInput!
+  ): UpdatePlatformAgentTaskPayload
+
+  """Updates a single `PlatformAgentThread` using a unique key and a patch."""
+  updatePlatformAgentThread(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformAgentThreadInput!
+  ): UpdatePlatformAgentThreadPayload
 }
 
 """Information about pagination in a connection."""
@@ -3966,6 +5323,3873 @@ type PageInfo {
 
   """When paginating backwards, the cursor to continue."""
   startCursor: Cursor
+}
+
+"""Agent instance registry (human-managed or ephemeral sub-agents)"""
+type PlatformAgent {
+  """Reads and enables pagination through a set of `PlatformAgent`."""
+  childPlatformAgents(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgent`."""
+    orderBy: [PlatformAgentOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentFilter
+  ): PlatformAgentConnection!
+
+  """Per-instance config overrides (model, temperature, tools)"""
+  config: JSON
+  createdAt: Datetime
+  id: UUID!
+
+  """If true, agent is deleted when its spawning thread is deleted"""
+  isEphemeral: Boolean!
+
+  """Display name for this agent instance"""
+  name: String!
+
+  """Human who owns/manages this agent"""
+  ownerId: UUID!
+
+  """
+  Reads a single `PlatformAgent` that is related to this `PlatformAgent`.
+  """
+  parent: PlatformAgent
+
+  """Parent agent (for sub-agent delegation hierarchy)"""
+  parentId: UUID
+
+  """
+  Reads a single `PlatformAgentPersona` that is related to this `PlatformAgent`.
+  """
+  persona: PlatformAgentPersona
+
+  """Persona template this agent was created from"""
+  personaId: UUID
+
+  """Reads and enables pagination through a set of `PlatformAgentMessage`."""
+  platformAgentMessagesByAgentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentMessage`."""
+    orderBy: [PlatformAgentMessageOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentMessageFilter
+  ): PlatformAgentMessageConnection!
+
+  """Reads and enables pagination through a set of `PlatformAgentThread`."""
+  platformAgentThreadsByAgentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentThread`."""
+    orderBy: [PlatformAgentThreadOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentThreadFilter
+  ): PlatformAgentThreadConnection!
+
+  """Agent lifecycle status: active, paused, terminated"""
+  status: String!
+
+  """System prompt override (NULL = inherit from persona)"""
+  systemPrompt: String
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformAgent` values."""
+type PlatformAgentConnection {
+  """
+  A list of edges which contains the `PlatformAgent` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentEdge]!
+
+  """A list of `PlatformAgent` objects."""
+  nodes: [PlatformAgent]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PlatformAgent` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PlatformAgent` edge in the connection."""
+type PlatformAgentEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgent` at the end of the edge."""
+  node: PlatformAgent
+}
+
+"""
+Append-only transcript of an agent run: one agent session entry per row, stored verbatim
+"""
+type PlatformAgentEvent {
+  """User whose run this entry belongs to, inherited from the run"""
+  actorId: UUID!
+  createdAt: Datetime
+
+  """
+  The agent session entry, verbatim — every rendered surface is a projection of it
+  """
+  entry: JSON!
+  id: UUID!
+
+  """When the writer produced this entry, by its own clock"""
+  recordedAt: Datetime!
+
+  """
+  Reads a single `PlatformAgentRun` that is related to this `PlatformAgentEvent`.
+  """
+  run: PlatformAgentRun
+
+  """Foreign key to agent_run"""
+  runId: UUID!
+
+  """Position of this entry in the run, 1-based and gapless"""
+  seq: Int!
+
+  """Transcript format this entry is encoded in"""
+  transcriptFormat: String!
+
+  """Version of that transcript format this entry was written in"""
+  transcriptVersion: Int!
+  updatedAt: Datetime
+
+  """Who may read this entry, inherited from the run"""
+  visibility: String!
+}
+
+"""A connection to a list of `PlatformAgentEvent` values."""
+type PlatformAgentEventConnection {
+  """
+  A list of edges which contains the `PlatformAgentEvent` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentEventEdge]!
+
+  """A list of `PlatformAgentEvent` objects."""
+  nodes: [PlatformAgentEvent]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentEvent` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentEvent` edge in the connection."""
+type PlatformAgentEventEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentEvent` at the end of the edge."""
+  node: PlatformAgentEvent
+}
+
+"""
+A filter to be used against `PlatformAgentEvent` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentEventFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentEventFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `entry` field."""
+  entry: JSONFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: PlatformAgentEventFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentEventFilter!]
+
+  """Filter by the object’s `recordedAt` field."""
+  recordedAt: DatetimeFilter
+
+  """Filter by the object’s `run` relation."""
+  run: PlatformAgentRunFilter
+
+  """Filter by the object’s `runId` field."""
+  runId: UUIDFilter
+
+  """Filter by the object’s `seq` field."""
+  seq: IntFilter
+
+  """Filter by the object’s `transcriptFormat` field."""
+  transcriptFormat: StringFilter
+
+  """Filter by the object’s `transcriptVersion` field."""
+  transcriptVersion: IntFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
+}
+
+"""An input for mutations affecting `PlatformAgentEvent`"""
+input PlatformAgentEventInput {
+  """User whose run this entry belongs to, inherited from the run"""
+  actorId: UUID
+  createdAt: Datetime
+
+  """
+  The agent session entry, verbatim — every rendered surface is a projection of it
+  """
+  entry: JSON!
+  id: UUID
+
+  """When the writer produced this entry, by its own clock"""
+  recordedAt: Datetime!
+
+  """Foreign key to agent_run"""
+  runId: UUID!
+
+  """Position of this entry in the run, 1-based and gapless"""
+  seq: Int!
+
+  """Transcript format this entry is encoded in"""
+  transcriptFormat: String
+
+  """Version of that transcript format this entry was written in"""
+  transcriptVersion: Int!
+  updatedAt: Datetime
+
+  """Who may read this entry, inherited from the run"""
+  visibility: String
+}
+
+"""Methods to use when ordering `PlatformAgentEvent`."""
+enum PlatformAgentEventOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ENTRY_ASC
+  ENTRY_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  RECORDED_AT_ASC
+  RECORDED_AT_DESC
+  RUN_ID_ASC
+  RUN_ID_DESC
+  SEQ_ASC
+  SEQ_DESC
+  TRANSCRIPT_FORMAT_ASC
+  TRANSCRIPT_FORMAT_DESC
+  TRANSCRIPT_VERSION_ASC
+  TRANSCRIPT_VERSION_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentEvent`. Fields that are set will be updated.
+"""
+input PlatformAgentEventPatch {
+  """User whose run this entry belongs to, inherited from the run"""
+  actorId: UUID
+  createdAt: Datetime
+
+  """
+  The agent session entry, verbatim — every rendered surface is a projection of it
+  """
+  entry: JSON
+  id: UUID
+
+  """When the writer produced this entry, by its own clock"""
+  recordedAt: Datetime
+
+  """Foreign key to agent_run"""
+  runId: UUID
+
+  """Position of this entry in the run, 1-based and gapless"""
+  seq: Int
+
+  """Transcript format this entry is encoded in"""
+  transcriptFormat: String
+
+  """Version of that transcript format this entry was written in"""
+  transcriptVersion: Int
+  updatedAt: Datetime
+
+  """Who may read this entry, inherited from the run"""
+  visibility: String
+}
+
+"""
+A filter to be used against `PlatformAgent` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentFilter!]
+
+  """Filter by the object’s `childPlatformAgents` relation."""
+  childPlatformAgents: PlatformAgentToManyPlatformAgentFilter
+
+  """`childPlatformAgents` exist."""
+  childPlatformAgentsExist: Boolean
+
+  """Filter by the object’s `config` field."""
+  config: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isEphemeral` field."""
+  isEphemeral: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformAgentFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentFilter!]
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `parent` relation."""
+  parent: PlatformAgentFilter
+
+  """A related `parent` exists."""
+  parentExists: Boolean
+
+  """Filter by the object’s `parentId` field."""
+  parentId: UUIDFilter
+
+  """Filter by the object’s `persona` relation."""
+  persona: PlatformAgentPersonaFilter
+
+  """A related `persona` exists."""
+  personaExists: Boolean
+
+  """Filter by the object’s `personaId` field."""
+  personaId: UUIDFilter
+
+  """Filter by the object’s `platformAgentMessagesByAgentId` relation."""
+  platformAgentMessagesByAgentId: PlatformAgentToManyPlatformAgentMessageFilter
+
+  """`platformAgentMessagesByAgentId` exist."""
+  platformAgentMessagesByAgentIdExist: Boolean
+
+  """Filter by the object’s `platformAgentThreadsByAgentId` relation."""
+  platformAgentThreadsByAgentId: PlatformAgentToManyPlatformAgentThreadFilter
+
+  """`platformAgentThreadsByAgentId` exist."""
+  platformAgentThreadsByAgentIdExist: Boolean
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `systemPrompt` field."""
+  systemPrompt: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `PlatformAgent`"""
+input PlatformAgentInput {
+  """Per-instance config overrides (model, temperature, tools)"""
+  config: JSON
+  createdAt: Datetime
+  id: UUID
+
+  """If true, agent is deleted when its spawning thread is deleted"""
+  isEphemeral: Boolean
+
+  """Display name for this agent instance"""
+  name: String!
+
+  """Human who owns/manages this agent"""
+  ownerId: UUID
+
+  """Parent agent (for sub-agent delegation hierarchy)"""
+  parentId: UUID
+
+  """Persona template this agent was created from"""
+  personaId: UUID
+
+  """Agent lifecycle status: active, paused, terminated"""
+  status: String
+
+  """System prompt override (NULL = inherit from persona)"""
+  systemPrompt: String
+  updatedAt: Datetime
+}
+
+"""Message within an agent thread with TextPart/ToolPart jsonb parts"""
+type PlatformAgentMessage {
+  """User who authored this message"""
+  actorId: UUID!
+
+  """
+  Reads a single `PlatformAgent` that is related to this `PlatformAgentMessage`.
+  """
+  agent: PlatformAgent
+
+  """Agent that authored this message (NULL for human messages)"""
+  agentId: UUID
+
+  """Who authored this message: user or assistant"""
+  authorRole: String!
+  createdAt: Datetime
+
+  """
+  Reads a single `PlatformAgentRun` that is related to this `PlatformAgentMessage`.
+  """
+  deliveredRun: PlatformAgentRun
+
+  """Run that consumed this message; null while it is still queued"""
+  deliveredRunId: UUID
+  id: UUID!
+
+  """
+  Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it)
+  """
+  kind: String!
+
+  """LLM model that generated this response"""
+  model: String
+
+  """Message content: TextPart and ToolPart array"""
+  parts: JSON
+
+  """
+  Reads a single `PlatformAgentThread` that is related to this `PlatformAgentMessage`.
+  """
+  thread: PlatformAgentThread
+
+  """Foreign key to agent_thread"""
+  threadId: UUID!
+  updatedAt: Datetime
+
+  """Who may read this message, inherited from the thread"""
+  visibility: String!
+}
+
+"""A connection to a list of `PlatformAgentMessage` values."""
+type PlatformAgentMessageConnection {
+  """
+  A list of edges which contains the `PlatformAgentMessage` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentMessageEdge]!
+
+  """A list of `PlatformAgentMessage` objects."""
+  nodes: [PlatformAgentMessage]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentMessage` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentMessage` edge in the connection."""
+type PlatformAgentMessageEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentMessage` at the end of the edge."""
+  node: PlatformAgentMessage
+}
+
+"""
+A filter to be used against `PlatformAgentMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentMessageFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `agent` relation."""
+  agent: PlatformAgentFilter
+
+  """A related `agent` exists."""
+  agentExists: Boolean
+
+  """Filter by the object’s `agentId` field."""
+  agentId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentMessageFilter!]
+
+  """Filter by the object’s `authorRole` field."""
+  authorRole: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `deliveredRun` relation."""
+  deliveredRun: PlatformAgentRunFilter
+
+  """A related `deliveredRun` exists."""
+  deliveredRunExists: Boolean
+
+  """Filter by the object’s `deliveredRunId` field."""
+  deliveredRunId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `kind` field."""
+  kind: StringFilter
+
+  """Filter by the object’s `model` field."""
+  model: StringFilter
+
+  """Negates the expression."""
+  not: PlatformAgentMessageFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentMessageFilter!]
+
+  """Filter by the object’s `parts` field."""
+  parts: JSONFilter
+
+  """Filter by the object’s `thread` relation."""
+  thread: PlatformAgentThreadFilter
+
+  """Filter by the object’s `threadId` field."""
+  threadId: UUIDFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
+}
+
+"""An input for mutations affecting `PlatformAgentMessage`"""
+input PlatformAgentMessageInput {
+  """User who authored this message"""
+  actorId: UUID
+
+  """Agent that authored this message (NULL for human messages)"""
+  agentId: UUID
+
+  """Who authored this message: user or assistant"""
+  authorRole: String!
+  createdAt: Datetime
+
+  """Run that consumed this message; null while it is still queued"""
+  deliveredRunId: UUID
+  id: UUID
+
+  """
+  Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it)
+  """
+  kind: String
+
+  """LLM model that generated this response"""
+  model: String
+
+  """Message content: TextPart and ToolPart array"""
+  parts: JSON
+
+  """Foreign key to agent_thread"""
+  threadId: UUID!
+  updatedAt: Datetime
+
+  """Who may read this message, inherited from the thread"""
+  visibility: String
+}
+
+"""Methods to use when ordering `PlatformAgentMessage`."""
+enum PlatformAgentMessageOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  AGENT_ID_ASC
+  AGENT_ID_DESC
+  AUTHOR_ROLE_ASC
+  AUTHOR_ROLE_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DELIVERED_RUN_ID_ASC
+  DELIVERED_RUN_ID_DESC
+  ID_ASC
+  ID_DESC
+  KIND_ASC
+  KIND_DESC
+  MODEL_ASC
+  MODEL_DESC
+  NATURAL
+  PARTS_ASC
+  PARTS_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  THREAD_ID_ASC
+  THREAD_ID_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentMessage`. Fields that are set will be updated.
+"""
+input PlatformAgentMessagePatch {
+  """User who authored this message"""
+  actorId: UUID
+
+  """Agent that authored this message (NULL for human messages)"""
+  agentId: UUID
+
+  """Who authored this message: user or assistant"""
+  authorRole: String
+  createdAt: Datetime
+
+  """Run that consumed this message; null while it is still queued"""
+  deliveredRunId: UUID
+  id: UUID
+
+  """
+  Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it)
+  """
+  kind: String
+
+  """LLM model that generated this response"""
+  model: String
+
+  """Message content: TextPart and ToolPart array"""
+  parts: JSON
+
+  """Foreign key to agent_thread"""
+  threadId: UUID
+  updatedAt: Datetime
+
+  """Who may read this message, inherited from the thread"""
+  visibility: String
+}
+
+"""Methods to use when ordering `PlatformAgent`."""
+enum PlatformAgentOrderBy {
+  CONFIG_ASC
+  CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EPHEMERAL_ASC
+  IS_EPHEMERAL_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PERSONA_ID_ASC
+  PERSONA_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STATUS_ASC
+  STATUS_DESC
+  SYSTEM_PROMPT_ASC
+  SYSTEM_PROMPT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformAgent`. Fields that are set will be updated.
+"""
+input PlatformAgentPatch {
+  """Per-instance config overrides (model, temperature, tools)"""
+  config: JSON
+  createdAt: Datetime
+  id: UUID
+
+  """If true, agent is deleted when its spawning thread is deleted"""
+  isEphemeral: Boolean
+
+  """Display name for this agent instance"""
+  name: String
+
+  """Human who owns/manages this agent"""
+  ownerId: UUID
+
+  """Parent agent (for sub-agent delegation hierarchy)"""
+  parentId: UUID
+
+  """Persona template this agent was created from"""
+  personaId: UUID
+
+  """Agent lifecycle status: active, paused, terminated"""
+  status: String
+
+  """System prompt override (NULL = inherit from persona)"""
+  systemPrompt: String
+  updatedAt: Datetime
+}
+
+"""
+Agent persona templates (role, system prompt, default skills/knowledge)
+"""
+type PlatformAgentPersona {
+  """Model preferences, temperature, tool access, constraints"""
+  config: JSON
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Brief description of this persona role"""
+  description: String
+  id: UUID!
+
+  """Whether this persona is available for use"""
+  isActive: Boolean!
+
+  """Display name for this persona"""
+  name: String!
+
+  """Reads and enables pagination through a set of `PlatformAgent`."""
+  platformAgentsByPersonaId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgent`."""
+    orderBy: [PlatformAgentOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentFilter
+  ): PlatformAgentConnection!
+
+  """Slugs of agent_resource entries to link when spawning"""
+  resources: [String]
+
+  """Unique human-readable identifier for this persona"""
+  slug: String!
+
+  """Default system prompt for agents using this persona"""
+  systemPrompt: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""A connection to a list of `PlatformAgentPersona` values."""
+type PlatformAgentPersonaConnection {
+  """
+  A list of edges which contains the `PlatformAgentPersona` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentPersonaEdge]!
+
+  """A list of `PlatformAgentPersona` objects."""
+  nodes: [PlatformAgentPersona]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentPersona` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentPersona` edge in the connection."""
+type PlatformAgentPersonaEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentPersona` at the end of the edge."""
+  node: PlatformAgentPersona
+}
+
+"""
+A filter to be used against `PlatformAgentPersona` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentPersonaFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentPersonaFilter!]
+
+  """Filter by the object’s `config` field."""
+  config: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformAgentPersonaFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentPersonaFilter!]
+
+  """Filter by the object’s `platformAgentsByPersonaId` relation."""
+  platformAgentsByPersonaId: PlatformAgentPersonaToManyPlatformAgentFilter
+
+  """`platformAgentsByPersonaId` exist."""
+  platformAgentsByPersonaIdExist: Boolean
+
+  """Filter by the object’s `resources` field."""
+  resources: StringListFilter
+
+  """Filter by the object’s `slug` field."""
+  slug: StringFilter
+
+  """Filter by the object’s `systemPrompt` field."""
+  systemPrompt: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+}
+
+"""An input for mutations affecting `PlatformAgentPersona`"""
+input PlatformAgentPersonaInput {
+  """Model preferences, temperature, tool access, constraints"""
+  config: JSON
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Brief description of this persona role"""
+  description: String
+  id: UUID
+
+  """Whether this persona is available for use"""
+  isActive: Boolean
+
+  """Display name for this persona"""
+  name: String!
+
+  """Slugs of agent_resource entries to link when spawning"""
+  resources: [String]
+
+  """Unique human-readable identifier for this persona"""
+  slug: String!
+
+  """Default system prompt for agents using this persona"""
+  systemPrompt: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""Methods to use when ordering `PlatformAgentPersona`."""
+enum PlatformAgentPersonaOrderBy {
+  CONFIG_ASC
+  CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  RESOURCES_ASC
+  RESOURCES_DESC
+  SLUG_ASC
+  SLUG_DESC
+  SYSTEM_PROMPT_ASC
+  SYSTEM_PROMPT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentPersona`. Fields that are set will be updated.
+"""
+input PlatformAgentPersonaPatch {
+  """Model preferences, temperature, tool access, constraints"""
+  config: JSON
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Brief description of this persona role"""
+  description: String
+  id: UUID
+
+  """Whether this persona is available for use"""
+  isActive: Boolean
+
+  """Display name for this persona"""
+  name: String
+
+  """Slugs of agent_resource entries to link when spawning"""
+  resources: [String]
+
+  """Unique human-readable identifier for this persona"""
+  slug: String
+
+  """Default system prompt for agents using this persona"""
+  systemPrompt: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""
+A filter to be used against many `PlatformAgent` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentPersonaToManyPlatformAgentFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentFilter
+}
+
+"""
+Workflow plan attached to an agent thread with ordered tasks and optional approval gates
+"""
+type PlatformAgentPlan {
+  createdAt: Datetime
+
+  """Overall goal or context for this plan"""
+  description: String
+  id: UUID!
+
+  """User who owns this plan"""
+  ownerId: UUID!
+
+  """Reads and enables pagination through a set of `PlatformAgentTask`."""
+  platformAgentTasksByPlanId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentTask`."""
+    orderBy: [PlatformAgentTaskOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentTaskFilter
+  ): PlatformAgentTaskConnection!
+
+  """Plan lifecycle: draft, active, completed, failed, cancelled"""
+  status: String!
+
+  """
+  Reads a single `PlatformAgentThread` that is related to this `PlatformAgentPlan`.
+  """
+  thread: PlatformAgentThread
+
+  """Foreign key to agent_thread"""
+  threadId: UUID!
+
+  """Human-readable plan name"""
+  title: String!
+  updatedAt: Datetime
+
+  """Who may read this plan, inherited from the thread"""
+  visibility: String!
+}
+
+"""A connection to a list of `PlatformAgentPlan` values."""
+type PlatformAgentPlanConnection {
+  """
+  A list of edges which contains the `PlatformAgentPlan` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentPlanEdge]!
+
+  """A list of `PlatformAgentPlan` objects."""
+  nodes: [PlatformAgentPlan]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentPlan` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentPlan` edge in the connection."""
+type PlatformAgentPlanEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentPlan` at the end of the edge."""
+  node: PlatformAgentPlan
+}
+
+"""
+A filter to be used against `PlatformAgentPlan` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentPlanFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentPlanFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: PlatformAgentPlanFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentPlanFilter!]
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `platformAgentTasksByPlanId` relation."""
+  platformAgentTasksByPlanId: PlatformAgentPlanToManyPlatformAgentTaskFilter
+
+  """`platformAgentTasksByPlanId` exist."""
+  platformAgentTasksByPlanIdExist: Boolean
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `thread` relation."""
+  thread: PlatformAgentThreadFilter
+
+  """Filter by the object’s `threadId` field."""
+  threadId: UUIDFilter
+
+  """Filter by the object’s `title` field."""
+  title: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
+}
+
+"""An input for mutations affecting `PlatformAgentPlan`"""
+input PlatformAgentPlanInput {
+  createdAt: Datetime
+
+  """Overall goal or context for this plan"""
+  description: String
+  id: UUID
+
+  """User who owns this plan"""
+  ownerId: UUID
+
+  """Plan lifecycle: draft, active, completed, failed, cancelled"""
+  status: String
+
+  """Foreign key to agent_thread"""
+  threadId: UUID!
+
+  """Human-readable plan name"""
+  title: String!
+  updatedAt: Datetime
+
+  """Who may read this plan, inherited from the thread"""
+  visibility: String
+}
+
+"""Methods to use when ordering `PlatformAgentPlan`."""
+enum PlatformAgentPlanOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STATUS_ASC
+  STATUS_DESC
+  THREAD_ID_ASC
+  THREAD_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentPlan`. Fields that are set will be updated.
+"""
+input PlatformAgentPlanPatch {
+  createdAt: Datetime
+
+  """Overall goal or context for this plan"""
+  description: String
+  id: UUID
+
+  """User who owns this plan"""
+  ownerId: UUID
+
+  """Plan lifecycle: draft, active, completed, failed, cancelled"""
+  status: String
+
+  """Foreign key to agent_thread"""
+  threadId: UUID
+
+  """Human-readable plan name"""
+  title: String
+  updatedAt: Datetime
+
+  """Who may read this plan, inherited from the thread"""
+  visibility: String
+}
+
+"""
+A filter to be used against many `PlatformAgentTask` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentPlanToManyPlatformAgentTaskFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentTaskFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentTaskFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentTaskFilter
+}
+
+"""Shared system prompt templates for agent conversations"""
+type PlatformAgentPrompt {
+  """The system prompt template content"""
+  content: String!
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """What this prompt template is for"""
+  description: String
+  id: UUID!
+
+  """Whether this is the default prompt for the entity/app"""
+  isDefault: Boolean!
+
+  """Variables, tags, category metadata"""
+  metadata: JSON
+
+  """Unique name for lookup (e.g. default, code-review, sales-assistant)"""
+  name: String!
+
+  """Reads and enables pagination through a set of `PlatformAgentThread`."""
+  platformAgentThreadsByPromptTemplateId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentThread`."""
+    orderBy: [PlatformAgentThreadOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentThreadFilter
+  ): PlatformAgentThreadConnection!
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""A connection to a list of `PlatformAgentPrompt` values."""
+type PlatformAgentPromptConnection {
+  """
+  A list of edges which contains the `PlatformAgentPrompt` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentPromptEdge]!
+
+  """A list of `PlatformAgentPrompt` objects."""
+  nodes: [PlatformAgentPrompt]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentPrompt` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentPrompt` edge in the connection."""
+type PlatformAgentPromptEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentPrompt` at the end of the edge."""
+  node: PlatformAgentPrompt
+}
+
+"""
+A filter to be used against `PlatformAgentPrompt` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentPromptFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentPromptFilter!]
+
+  """Filter by the object’s `content` field."""
+  content: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isDefault` field."""
+  isDefault: BooleanFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformAgentPromptFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentPromptFilter!]
+
+  """
+  Filter by the object’s `platformAgentThreadsByPromptTemplateId` relation.
+  """
+  platformAgentThreadsByPromptTemplateId: PlatformAgentPromptToManyPlatformAgentThreadFilter
+
+  """`platformAgentThreadsByPromptTemplateId` exist."""
+  platformAgentThreadsByPromptTemplateIdExist: Boolean
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+}
+
+"""An input for mutations affecting `PlatformAgentPrompt`"""
+input PlatformAgentPromptInput {
+  """The system prompt template content"""
+  content: String!
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """What this prompt template is for"""
+  description: String
+  id: UUID
+
+  """Whether this is the default prompt for the entity/app"""
+  isDefault: Boolean
+
+  """Variables, tags, category metadata"""
+  metadata: JSON
+
+  """Unique name for lookup (e.g. default, code-review, sales-assistant)"""
+  name: String!
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""Methods to use when ordering `PlatformAgentPrompt`."""
+enum PlatformAgentPromptOrderBy {
+  CONTENT_ASC
+  CONTENT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  IS_DEFAULT_ASC
+  IS_DEFAULT_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentPrompt`. Fields that are set will be updated.
+"""
+input PlatformAgentPromptPatch {
+  """The system prompt template content"""
+  content: String
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """What this prompt template is for"""
+  description: String
+  id: UUID
+
+  """Whether this is the default prompt for the entity/app"""
+  isDefault: Boolean
+
+  """Variables, tags, category metadata"""
+  metadata: JSON
+
+  """Unique name for lookup (e.g. default, code-review, sales-assistant)"""
+  name: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""
+A filter to be used against many `PlatformAgentThread` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentPromptToManyPlatformAgentThreadFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentThreadFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentThreadFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentThreadFilter
+}
+
+"""Unified skills and knowledge resources for agent retrieval"""
+type PlatformAgentResource {
+  """Timestamp when this record was archived, NULL if active"""
+  archivedAt: Datetime
+
+  """Full content (instructions for skills, reference text for knowledge)"""
+  body: String!
+
+  """
+  TRGM similarity when searching `body`. Returns null when no trgm search filter is active.
+  """
+  bodyTrgmSimilarity: Float
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Brief description of this resource"""
+  description: String
+
+  """
+  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
+  """
+  descriptionTrgmSimilarity: Float
+  embedding: Vector
+  embeddingUpdatedAt: Datetime
+
+  """
+  VECTOR distance when searching `embedding`. Returns null when no vector search filter is active.
+  """
+  embeddingVectorDistance: Float
+  id: UUID!
+
+  """Whether this resource is active and retrievable"""
+  isActive: Boolean!
+
+  """Whether this record has been archived by the user"""
+  isArchived: Boolean!
+
+  """Keywords for deterministic retrieval routing"""
+  keywords: [String]
+
+  """Resource type: skill, knowledge, or convention"""
+  kind: String!
+
+  """
+  TRGM similarity when searching `kind`. Returns null when no trgm search filter is active.
+  """
+  kindTrgmSimilarity: Float
+
+  """Structured metadata: category, version, author, custom attributes"""
+  metadata: JSON
+
+  """
+  Reads and enables pagination through a set of `PlatformAgentResourceChunk`.
+  """
+  platformAgentResourceChunks(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentResourceChunk`."""
+    orderBy: [PlatformAgentResourceChunkOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentResourceChunkFilter
+  ): PlatformAgentResourceChunkConnection!
+  search: FullText
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed using Reciprocal Rank Fusion (RRF) across all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
+  """
+  searchScore: Float
+
+  """
+  TSV rank when searching `search`. Returns null when no tsv search filter is active.
+  """
+  searchTsvRank: Float
+
+  """Unique human-readable identifier for portable references"""
+  slug: String!
+
+  """Resource name or title"""
+  title: String!
+
+  """
+  TRGM similarity when searching `title`. Returns null when no trgm search filter is active.
+  """
+  titleTrgmSimilarity: Float
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+type PlatformAgentResourceChunk {
+  body: String!
+  chunkIndex: Int!
+  createdAt: Datetime
+  embedding: Vector
+
+  """
+  VECTOR distance when searching `embedding`. Returns null when no vector search filter is active.
+  """
+  embeddingVectorDistance: Float
+  id: UUID!
+  metadata: JSON
+
+  """
+  Reads a single `PlatformAgentResource` that is related to this `PlatformAgentResourceChunk`.
+  """
+  platformAgentResource: PlatformAgentResource
+  platformAgentResourceId: UUID!
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed using Reciprocal Rank Fusion (RRF) across all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
+  """
+  searchScore: Float
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformAgentResourceChunk` values."""
+type PlatformAgentResourceChunkConnection {
+  """
+  A list of edges which contains the `PlatformAgentResourceChunk` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentResourceChunkEdge]!
+
+  """A list of `PlatformAgentResourceChunk` objects."""
+  nodes: [PlatformAgentResourceChunk]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentResourceChunk` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentResourceChunk` edge in the connection."""
+type PlatformAgentResourceChunkEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentResourceChunk` at the end of the edge."""
+  node: PlatformAgentResourceChunk
+}
+
+"""
+A filter to be used against `PlatformAgentResourceChunk` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentResourceChunkFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentResourceChunkFilter!]
+
+  """Filter by the object’s `body` field."""
+  body: StringFilter
+
+  """Filter by the object’s `chunkIndex` field."""
+  chunkIndex: IntFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `embedding` field."""
+  embedding: VectorFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Negates the expression."""
+  not: PlatformAgentResourceChunkFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentResourceChunkFilter!]
+
+  """Filter by the object’s `platformAgentResource` relation."""
+  platformAgentResource: PlatformAgentResourceFilter
+
+  """Filter by the object’s `platformAgentResourceId` field."""
+  platformAgentResourceId: UUIDFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """VECTOR search on the `embedding` column."""
+  vectorEmbedding: VectorNearbyInput
+}
+
+"""An input for mutations affecting `PlatformAgentResourceChunk`"""
+input PlatformAgentResourceChunkInput {
+  body: String!
+  chunkIndex: Int
+  createdAt: Datetime
+  embedding: Vector
+
+  """
+  Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
+  """
+  embeddingText: String
+  id: UUID
+  metadata: JSON
+  platformAgentResourceId: UUID!
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `PlatformAgentResourceChunk`."""
+enum PlatformAgentResourceChunkOrderBy {
+  BODY_ASC
+  BODY_DESC
+  CHUNK_INDEX_ASC
+  CHUNK_INDEX_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  EMBEDDING_ASC
+  EMBEDDING_DESC
+  EMBEDDING_VECTOR_DISTANCE_ASC
+  EMBEDDING_VECTOR_DISTANCE_DESC
+  ID_ASC
+  ID_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NATURAL
+  PLATFORM_AGENT_RESOURCE_ID_ASC
+  PLATFORM_AGENT_RESOURCE_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentResourceChunk`. Fields that are set will be updated.
+"""
+input PlatformAgentResourceChunkPatch {
+  body: String
+  chunkIndex: Int
+  createdAt: Datetime
+  embedding: Vector
+
+  """
+  Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
+  """
+  embeddingText: String
+  id: UUID
+  metadata: JSON
+  platformAgentResourceId: UUID
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformAgentResource` values."""
+type PlatformAgentResourceConnection {
+  """
+  A list of edges which contains the `PlatformAgentResource` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentResourceEdge]!
+
+  """A list of `PlatformAgentResource` objects."""
+  nodes: [PlatformAgentResource]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentResource` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentResource` edge in the connection."""
+type PlatformAgentResourceEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentResource` at the end of the edge."""
+  node: PlatformAgentResource
+}
+
+"""
+A filter to be used against `PlatformAgentResource` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentResourceFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentResourceFilter!]
+
+  """Filter by the object’s `archivedAt` field."""
+  archivedAt: DatetimeFilter
+
+  """Filter by the object’s `body` field."""
+  body: StringTrgmFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringTrgmFilter
+
+  """Filter by the object’s `embedding` field."""
+  embedding: VectorFilter
+
+  """Filter by the object’s `embeddingUpdatedAt` field."""
+  embeddingUpdatedAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `isArchived` field."""
+  isArchived: BooleanFilter
+
+  """Filter by the object’s `keywords` field."""
+  keywords: StringListFilter
+
+  """Filter by the object’s `kind` field."""
+  kind: StringTrgmFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Negates the expression."""
+  not: PlatformAgentResourceFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentResourceFilter!]
+
+  """Filter by the object’s `platformAgentResourceChunks` relation."""
+  platformAgentResourceChunks: PlatformAgentResourceToManyPlatformAgentResourceChunkFilter
+
+  """`platformAgentResourceChunks` exist."""
+  platformAgentResourceChunksExist: Boolean
+
+  """Filter by the object’s `search` field."""
+  search: FullTextFilter
+
+  """Filter by the object’s `slug` field."""
+  slug: StringTrgmFilter
+
+  """Filter by the object’s `title` field."""
+  title: StringTrgmFilter
+
+  """TRGM search on the `body` column."""
+  trgmBody: TrgmSearchInput
+
+  """TRGM search on the `description` column."""
+  trgmDescription: TrgmSearchInput
+
+  """TRGM search on the `kind` column."""
+  trgmKind: TrgmSearchInput
+
+  """TRGM search on the `title` column."""
+  trgmTitle: TrgmSearchInput
+
+  """TSV search on the `search` column."""
+  tsvSearch: String
+
+  """
+  Composite unified search. Provide a search string and it will be dispatched to
+  all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. When the LLM plugin is active, pgvector also participates via
+  auto-embedding. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  unifiedSearch: String
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+
+  """VECTOR search on the `embedding` column."""
+  vectorEmbedding: VectorNearbyInput
+}
+
+"""An input for mutations affecting `PlatformAgentResource`"""
+input PlatformAgentResourceInput {
+  """Timestamp when this record was archived, NULL if active"""
+  archivedAt: Datetime
+
+  """Full content (instructions for skills, reference text for knowledge)"""
+  body: String!
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Brief description of this resource"""
+  description: String
+  embedding: Vector
+
+  """
+  Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
+  """
+  embeddingText: String
+  id: UUID
+
+  """Whether this resource is active and retrievable"""
+  isActive: Boolean
+
+  """Whether this record has been archived by the user"""
+  isArchived: Boolean
+
+  """Keywords for deterministic retrieval routing"""
+  keywords: [String]
+
+  """Resource type: skill, knowledge, or convention"""
+  kind: String
+
+  """Structured metadata: category, version, author, custom attributes"""
+  metadata: JSON
+
+  """Unique human-readable identifier for portable references"""
+  slug: String!
+
+  """Resource name or title"""
+  title: String!
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""Methods to use when ordering `PlatformAgentResource`."""
+enum PlatformAgentResourceOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  BODY_ASC
+  BODY_DESC
+  BODY_TRGM_SIMILARITY_ASC
+  BODY_TRGM_SIMILARITY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  DESCRIPTION_TRGM_SIMILARITY_ASC
+  DESCRIPTION_TRGM_SIMILARITY_DESC
+  EMBEDDING_ASC
+  EMBEDDING_DESC
+  EMBEDDING_UPDATED_AT_ASC
+  EMBEDDING_UPDATED_AT_DESC
+  EMBEDDING_VECTOR_DISTANCE_ASC
+  EMBEDDING_VECTOR_DISTANCE_DESC
+  ID_ASC
+  ID_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  IS_ARCHIVED_ASC
+  IS_ARCHIVED_DESC
+  KEYWORDS_ASC
+  KEYWORDS_DESC
+  KIND_ASC
+  KIND_DESC
+  KIND_TRGM_SIMILARITY_ASC
+  KIND_TRGM_SIMILARITY_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SEARCH_ASC
+  SEARCH_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
+  SEARCH_TSV_RANK_ASC
+  SEARCH_TSV_RANK_DESC
+  SLUG_ASC
+  SLUG_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TITLE_TRGM_SIMILARITY_ASC
+  TITLE_TRGM_SIMILARITY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentResource`. Fields that are set will be updated.
+"""
+input PlatformAgentResourcePatch {
+  """Timestamp when this record was archived, NULL if active"""
+  archivedAt: Datetime
+
+  """Full content (instructions for skills, reference text for knowledge)"""
+  body: String
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Brief description of this resource"""
+  description: String
+  embedding: Vector
+
+  """
+  Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
+  """
+  embeddingText: String
+  id: UUID
+
+  """Whether this resource is active and retrievable"""
+  isActive: Boolean
+
+  """Whether this record has been archived by the user"""
+  isArchived: Boolean
+
+  """Keywords for deterministic retrieval routing"""
+  keywords: [String]
+
+  """Resource type: skill, knowledge, or convention"""
+  kind: String
+
+  """Structured metadata: category, version, author, custom attributes"""
+  metadata: JSON
+
+  """Unique human-readable identifier for portable references"""
+  slug: String
+
+  """Resource name or title"""
+  title: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""
+A filter to be used against many `PlatformAgentResourceChunk` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentResourceToManyPlatformAgentResourceChunkFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentResourceChunkFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentResourceChunkFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentResourceChunkFilter
+}
+
+"""
+One supervised agent run of a thread: its placement, workspace, cursor and artifacts
+"""
+type PlatformAgentRun {
+  """User who invoked this run (audit/provenance; billing is entity_id)"""
+  actorId: UUID!
+
+  """What the run produced: commits, diffs, pull requests, usage totals"""
+  artifacts: JSON
+
+  """Attempt number within this run lineage"""
+  attempt: Int!
+
+  """Commit the run started from"""
+  baseCommit: String
+
+  """Branch the run commits to"""
+  branch: String
+  createdAt: Datetime
+
+  """Tenant database this run is attributed to (usage/billing attribution)"""
+  databaseId: UUID!
+
+  """When a supervisor should consider this run abandoned"""
+  deadlineAt: Datetime
+
+  """
+  Entity billed for this run: an org the actor invoked on behalf of, or the actor themselves
+  """
+  entityId: UUID!
+
+  """Failure reason when status is failed"""
+  error: String
+
+  """
+  Execution currently attached to this run, by id and without a foreign key; null when the run holds no compute
+  """
+  executionId: UUID
+
+  """When the run reached a terminal status"""
+  finishedAt: Datetime
+
+  """Commit the run has reached"""
+  headCommit: String
+  id: UUID!
+
+  """Highest event seq appended for this run; 0 before the first event"""
+  lastEventSeq: Int!
+
+  """
+  Run this one retries, by id and without a foreign key so lineage survives pruning
+  """
+  parentRunId: UUID
+
+  """Where this run executes: cloud (a job) or local (an embedded host)"""
+  placement: String!
+
+  """Reads and enables pagination through a set of `PlatformAgentEvent`."""
+  platformAgentEventsByRunId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentEvent`."""
+    orderBy: [PlatformAgentEventOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentEventFilter
+  ): PlatformAgentEventConnection!
+
+  """Reads and enables pagination through a set of `PlatformAgentMessage`."""
+  platformAgentMessagesByDeliveredRunId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentMessage`."""
+    orderBy: [PlatformAgentMessageOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentMessageFilter
+  ): PlatformAgentMessageConnection!
+
+  """
+  Reads and enables pagination through a set of `PlatformAgentRunWorkspace`.
+  """
+  platformAgentRunWorkspacesByRunId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentRunWorkspace`."""
+    orderBy: [PlatformAgentRunWorkspaceOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentRunWorkspaceFilter
+  ): PlatformAgentRunWorkspaceConnection!
+
+  """
+  Principal that invoked this run; equals actor_id when the actor acted directly
+  """
+  principalId: UUID
+
+  """Git remote the run works against — the workspace sync protocol"""
+  repoUrl: String
+
+  """When the run began executing"""
+  startedAt: Datetime
+
+  """
+  Lifecycle state: pending, running, waiting, idle, interrupted, succeeded, failed, cancelled
+  """
+  status: String!
+
+  """
+  Reads a single `PlatformAgentThread` that is related to this `PlatformAgentRun`.
+  """
+  thread: PlatformAgentThread
+
+  """Foreign key to agent_thread"""
+  threadId: UUID!
+
+  """
+  Token counts this run accumulated, per model, as the runtime reports them; null until settled
+  """
+  tokenUsage: JSON
+
+  """
+  Settled cost of this run in the billing currency, summarising its metered rows; null until settled
+  """
+  totalCost: BigFloat
+  updatedAt: Datetime
+
+  """Who may read this run, inherited from the thread"""
+  visibility: String!
+}
+
+"""A connection to a list of `PlatformAgentRun` values."""
+type PlatformAgentRunConnection {
+  """
+  A list of edges which contains the `PlatformAgentRun` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentRunEdge]!
+
+  """A list of `PlatformAgentRun` objects."""
+  nodes: [PlatformAgentRun]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentRun` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentRun` edge in the connection."""
+type PlatformAgentRunEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentRun` at the end of the edge."""
+  node: PlatformAgentRun
+}
+
+"""
+A filter to be used against `PlatformAgentRun` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentRunFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentRunFilter!]
+
+  """Filter by the object’s `artifacts` field."""
+  artifacts: JSONFilter
+
+  """Filter by the object’s `attempt` field."""
+  attempt: IntFilter
+
+  """Filter by the object’s `baseCommit` field."""
+  baseCommit: StringFilter
+
+  """Filter by the object’s `branch` field."""
+  branch: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `deadlineAt` field."""
+  deadlineAt: DatetimeFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `error` field."""
+  error: StringFilter
+
+  """Filter by the object’s `executionId` field."""
+  executionId: UUIDFilter
+
+  """Filter by the object’s `finishedAt` field."""
+  finishedAt: DatetimeFilter
+
+  """Filter by the object’s `headCommit` field."""
+  headCommit: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `lastEventSeq` field."""
+  lastEventSeq: IntFilter
+
+  """Negates the expression."""
+  not: PlatformAgentRunFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentRunFilter!]
+
+  """Filter by the object’s `parentRunId` field."""
+  parentRunId: UUIDFilter
+
+  """Filter by the object’s `placement` field."""
+  placement: StringFilter
+
+  """Filter by the object’s `platformAgentEventsByRunId` relation."""
+  platformAgentEventsByRunId: PlatformAgentRunToManyPlatformAgentEventFilter
+
+  """`platformAgentEventsByRunId` exist."""
+  platformAgentEventsByRunIdExist: Boolean
+
+  """
+  Filter by the object’s `platformAgentMessagesByDeliveredRunId` relation.
+  """
+  platformAgentMessagesByDeliveredRunId: PlatformAgentRunToManyPlatformAgentMessageFilter
+
+  """`platformAgentMessagesByDeliveredRunId` exist."""
+  platformAgentMessagesByDeliveredRunIdExist: Boolean
+
+  """Filter by the object’s `platformAgentRunWorkspacesByRunId` relation."""
+  platformAgentRunWorkspacesByRunId: PlatformAgentRunToManyPlatformAgentRunWorkspaceFilter
+
+  """`platformAgentRunWorkspacesByRunId` exist."""
+  platformAgentRunWorkspacesByRunIdExist: Boolean
+
+  """Filter by the object’s `principalId` field."""
+  principalId: UUIDFilter
+
+  """Filter by the object’s `repoUrl` field."""
+  repoUrl: StringFilter
+
+  """Filter by the object’s `startedAt` field."""
+  startedAt: DatetimeFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `thread` relation."""
+  thread: PlatformAgentThreadFilter
+
+  """Filter by the object’s `threadId` field."""
+  threadId: UUIDFilter
+
+  """Filter by the object’s `tokenUsage` field."""
+  tokenUsage: JSONFilter
+
+  """Filter by the object’s `totalCost` field."""
+  totalCost: BigFloatFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
+}
+
+"""An input for mutations affecting `PlatformAgentRun`"""
+input PlatformAgentRunInput {
+  """User who invoked this run (audit/provenance; billing is entity_id)"""
+  actorId: UUID
+
+  """What the run produced: commits, diffs, pull requests, usage totals"""
+  artifacts: JSON
+
+  """Attempt number within this run lineage"""
+  attempt: Int
+
+  """Commit the run started from"""
+  baseCommit: String
+
+  """Branch the run commits to"""
+  branch: String
+  createdAt: Datetime
+
+  """Tenant database this run is attributed to (usage/billing attribution)"""
+  databaseId: UUID
+
+  """When a supervisor should consider this run abandoned"""
+  deadlineAt: Datetime
+
+  """
+  Entity billed for this run: an org the actor invoked on behalf of, or the actor themselves
+  """
+  entityId: UUID
+
+  """Failure reason when status is failed"""
+  error: String
+
+  """
+  Execution currently attached to this run, by id and without a foreign key; null when the run holds no compute
+  """
+  executionId: UUID
+
+  """When the run reached a terminal status"""
+  finishedAt: Datetime
+
+  """Commit the run has reached"""
+  headCommit: String
+  id: UUID
+
+  """Highest event seq appended for this run; 0 before the first event"""
+  lastEventSeq: Int
+
+  """
+  Run this one retries, by id and without a foreign key so lineage survives pruning
+  """
+  parentRunId: UUID
+
+  """Where this run executes: cloud (a job) or local (an embedded host)"""
+  placement: String
+
+  """
+  Principal that invoked this run; equals actor_id when the actor acted directly
+  """
+  principalId: UUID
+
+  """Git remote the run works against — the workspace sync protocol"""
+  repoUrl: String
+
+  """When the run began executing"""
+  startedAt: Datetime
+
+  """
+  Lifecycle state: pending, running, waiting, idle, interrupted, succeeded, failed, cancelled
+  """
+  status: String
+
+  """Foreign key to agent_thread"""
+  threadId: UUID!
+
+  """
+  Token counts this run accumulated, per model, as the runtime reports them; null until settled
+  """
+  tokenUsage: JSON
+
+  """
+  Settled cost of this run in the billing currency, summarising its metered rows; null until settled
+  """
+  totalCost: BigFloat
+  updatedAt: Datetime
+
+  """Who may read this run, inherited from the thread"""
+  visibility: String
+}
+
+"""Methods to use when ordering `PlatformAgentRun`."""
+enum PlatformAgentRunOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ARTIFACTS_ASC
+  ARTIFACTS_DESC
+  ATTEMPT_ASC
+  ATTEMPT_DESC
+  BASE_COMMIT_ASC
+  BASE_COMMIT_DESC
+  BRANCH_ASC
+  BRANCH_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEADLINE_AT_ASC
+  DEADLINE_AT_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  ERROR_ASC
+  ERROR_DESC
+  EXECUTION_ID_ASC
+  EXECUTION_ID_DESC
+  FINISHED_AT_ASC
+  FINISHED_AT_DESC
+  HEAD_COMMIT_ASC
+  HEAD_COMMIT_DESC
+  ID_ASC
+  ID_DESC
+  LAST_EVENT_SEQ_ASC
+  LAST_EVENT_SEQ_DESC
+  NATURAL
+  PARENT_RUN_ID_ASC
+  PARENT_RUN_ID_DESC
+  PLACEMENT_ASC
+  PLACEMENT_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRINCIPAL_ID_ASC
+  PRINCIPAL_ID_DESC
+  REPO_URL_ASC
+  REPO_URL_DESC
+  STARTED_AT_ASC
+  STARTED_AT_DESC
+  STATUS_ASC
+  STATUS_DESC
+  THREAD_ID_ASC
+  THREAD_ID_DESC
+  TOKEN_USAGE_ASC
+  TOKEN_USAGE_DESC
+  TOTAL_COST_ASC
+  TOTAL_COST_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentRun`. Fields that are set will be updated.
+"""
+input PlatformAgentRunPatch {
+  """User who invoked this run (audit/provenance; billing is entity_id)"""
+  actorId: UUID
+
+  """What the run produced: commits, diffs, pull requests, usage totals"""
+  artifacts: JSON
+
+  """Attempt number within this run lineage"""
+  attempt: Int
+
+  """Commit the run started from"""
+  baseCommit: String
+
+  """Branch the run commits to"""
+  branch: String
+  createdAt: Datetime
+
+  """Tenant database this run is attributed to (usage/billing attribution)"""
+  databaseId: UUID
+
+  """When a supervisor should consider this run abandoned"""
+  deadlineAt: Datetime
+
+  """
+  Entity billed for this run: an org the actor invoked on behalf of, or the actor themselves
+  """
+  entityId: UUID
+
+  """Failure reason when status is failed"""
+  error: String
+
+  """
+  Execution currently attached to this run, by id and without a foreign key; null when the run holds no compute
+  """
+  executionId: UUID
+
+  """When the run reached a terminal status"""
+  finishedAt: Datetime
+
+  """Commit the run has reached"""
+  headCommit: String
+  id: UUID
+
+  """Highest event seq appended for this run; 0 before the first event"""
+  lastEventSeq: Int
+
+  """
+  Run this one retries, by id and without a foreign key so lineage survives pruning
+  """
+  parentRunId: UUID
+
+  """Where this run executes: cloud (a job) or local (an embedded host)"""
+  placement: String
+
+  """
+  Principal that invoked this run; equals actor_id when the actor acted directly
+  """
+  principalId: UUID
+
+  """Git remote the run works against — the workspace sync protocol"""
+  repoUrl: String
+
+  """When the run began executing"""
+  startedAt: Datetime
+
+  """
+  Lifecycle state: pending, running, waiting, idle, interrupted, succeeded, failed, cancelled
+  """
+  status: String
+
+  """Foreign key to agent_thread"""
+  threadId: UUID
+
+  """
+  Token counts this run accumulated, per model, as the runtime reports them; null until settled
+  """
+  tokenUsage: JSON
+
+  """
+  Settled cost of this run in the billing currency, summarising its metered rows; null until settled
+  """
+  totalCost: BigFloat
+  updatedAt: Datetime
+
+  """Who may read this run, inherited from the thread"""
+  visibility: String
+}
+
+"""
+A filter to be used against many `PlatformAgentEvent` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentRunToManyPlatformAgentEventFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentEventFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentEventFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentEventFilter
+}
+
+"""
+A filter to be used against many `PlatformAgentMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentRunToManyPlatformAgentMessageFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentMessageFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentMessageFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentMessageFilter
+}
+
+"""
+A filter to be used against many `PlatformAgentRunWorkspace` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentRunToManyPlatformAgentRunWorkspaceFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentRunWorkspaceFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentRunWorkspaceFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentRunWorkspaceFilter
+}
+
+"""
+One repository an agent run works in: its remote, branch, commits and how the work is published
+"""
+type PlatformAgentRunWorkspace {
+  """User whose run this workspace belongs to, inherited from the run"""
+  actorId: UUID!
+
+  """
+  What publishing this workspace produced: diff stats, a pull request, a stored patch
+  """
+  artifacts: JSON
+
+  """Branch the workspace was cut from, and what a pull request merges into"""
+  baseBranch: String!
+
+  """Commit the workspace was cut from; fixed once recorded"""
+  baseCommit: String
+
+  """Branch this run commits to in this repository"""
+  branch: String!
+
+  """When an execution first cloned this workspace"""
+  clonedAt: Datetime
+  createdAt: Datetime
+
+  """Commit the work in this repository has reached"""
+  headCommit: String
+  id: UUID!
+
+  """
+  When an execution last worked in this workspace; what a reclaim policy reads
+  """
+  lastUsedAt: Datetime
+
+  """Position of this workspace among the run's, 1-based and in clone order"""
+  ordinal: Int!
+
+  """
+  Git host this workspace was cloned from, as the runtime names it: github, local
+  """
+  provider: String!
+
+  """How the work is published: pull_request, push, patch_artifact or none"""
+  publication: String!
+
+  """Repository as its provider names it (owner/name)"""
+  repo: String!
+
+  """
+  Catalog repository this workspace was cloned from, when the platform hosts it
+  """
+  repositoryId: UUID
+
+  """
+  Reads a single `PlatformAgentRun` that is related to this `PlatformAgentRunWorkspace`.
+  """
+  run: PlatformAgentRun
+
+  """Foreign key to agent_run"""
+  runId: UUID!
+
+  """
+  Whether the tree still exists: active (on disk), cold (reclaimed, restorable from head_commit) or purged
+  """
+  state: String!
+  updatedAt: Datetime
+
+  """Who may read this workspace, inherited from the run"""
+  visibility: String!
+}
+
+"""A connection to a list of `PlatformAgentRunWorkspace` values."""
+type PlatformAgentRunWorkspaceConnection {
+  """
+  A list of edges which contains the `PlatformAgentRunWorkspace` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentRunWorkspaceEdge]!
+
+  """A list of `PlatformAgentRunWorkspace` objects."""
+  nodes: [PlatformAgentRunWorkspace]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentRunWorkspace` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentRunWorkspace` edge in the connection."""
+type PlatformAgentRunWorkspaceEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentRunWorkspace` at the end of the edge."""
+  node: PlatformAgentRunWorkspace
+}
+
+"""
+A filter to be used against `PlatformAgentRunWorkspace` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentRunWorkspaceFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentRunWorkspaceFilter!]
+
+  """Filter by the object’s `artifacts` field."""
+  artifacts: JSONFilter
+
+  """Filter by the object’s `baseBranch` field."""
+  baseBranch: StringFilter
+
+  """Filter by the object’s `baseCommit` field."""
+  baseCommit: StringFilter
+
+  """Filter by the object’s `branch` field."""
+  branch: StringFilter
+
+  """Filter by the object’s `clonedAt` field."""
+  clonedAt: DatetimeFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `headCommit` field."""
+  headCommit: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `lastUsedAt` field."""
+  lastUsedAt: DatetimeFilter
+
+  """Negates the expression."""
+  not: PlatformAgentRunWorkspaceFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentRunWorkspaceFilter!]
+
+  """Filter by the object’s `ordinal` field."""
+  ordinal: IntFilter
+
+  """Filter by the object’s `provider` field."""
+  provider: StringFilter
+
+  """Filter by the object’s `publication` field."""
+  publication: StringFilter
+
+  """Filter by the object’s `repo` field."""
+  repo: StringFilter
+
+  """Filter by the object’s `repositoryId` field."""
+  repositoryId: UUIDFilter
+
+  """Filter by the object’s `run` relation."""
+  run: PlatformAgentRunFilter
+
+  """Filter by the object’s `runId` field."""
+  runId: UUIDFilter
+
+  """Filter by the object’s `state` field."""
+  state: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
+}
+
+"""An input for mutations affecting `PlatformAgentRunWorkspace`"""
+input PlatformAgentRunWorkspaceInput {
+  """User whose run this workspace belongs to, inherited from the run"""
+  actorId: UUID
+
+  """
+  What publishing this workspace produced: diff stats, a pull request, a stored patch
+  """
+  artifacts: JSON
+
+  """Branch the workspace was cut from, and what a pull request merges into"""
+  baseBranch: String!
+
+  """Commit the workspace was cut from; fixed once recorded"""
+  baseCommit: String
+
+  """Branch this run commits to in this repository"""
+  branch: String!
+
+  """When an execution first cloned this workspace"""
+  clonedAt: Datetime
+  createdAt: Datetime
+
+  """Commit the work in this repository has reached"""
+  headCommit: String
+  id: UUID
+
+  """
+  When an execution last worked in this workspace; what a reclaim policy reads
+  """
+  lastUsedAt: Datetime
+
+  """Position of this workspace among the run's, 1-based and in clone order"""
+  ordinal: Int
+
+  """
+  Git host this workspace was cloned from, as the runtime names it: github, local
+  """
+  provider: String!
+
+  """How the work is published: pull_request, push, patch_artifact or none"""
+  publication: String
+
+  """Repository as its provider names it (owner/name)"""
+  repo: String!
+
+  """
+  Catalog repository this workspace was cloned from, when the platform hosts it
+  """
+  repositoryId: UUID
+
+  """Foreign key to agent_run"""
+  runId: UUID!
+
+  """
+  Whether the tree still exists: active (on disk), cold (reclaimed, restorable from head_commit) or purged
+  """
+  state: String
+  updatedAt: Datetime
+
+  """Who may read this workspace, inherited from the run"""
+  visibility: String
+}
+
+"""Methods to use when ordering `PlatformAgentRunWorkspace`."""
+enum PlatformAgentRunWorkspaceOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ARTIFACTS_ASC
+  ARTIFACTS_DESC
+  BASE_BRANCH_ASC
+  BASE_BRANCH_DESC
+  BASE_COMMIT_ASC
+  BASE_COMMIT_DESC
+  BRANCH_ASC
+  BRANCH_DESC
+  CLONED_AT_ASC
+  CLONED_AT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  HEAD_COMMIT_ASC
+  HEAD_COMMIT_DESC
+  ID_ASC
+  ID_DESC
+  LAST_USED_AT_ASC
+  LAST_USED_AT_DESC
+  NATURAL
+  ORDINAL_ASC
+  ORDINAL_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROVIDER_ASC
+  PROVIDER_DESC
+  PUBLICATION_ASC
+  PUBLICATION_DESC
+  REPOSITORY_ID_ASC
+  REPOSITORY_ID_DESC
+  REPO_ASC
+  REPO_DESC
+  RUN_ID_ASC
+  RUN_ID_DESC
+  STATE_ASC
+  STATE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentRunWorkspace`. Fields that are set will be updated.
+"""
+input PlatformAgentRunWorkspacePatch {
+  """User whose run this workspace belongs to, inherited from the run"""
+  actorId: UUID
+
+  """
+  What publishing this workspace produced: diff stats, a pull request, a stored patch
+  """
+  artifacts: JSON
+
+  """Branch the workspace was cut from, and what a pull request merges into"""
+  baseBranch: String
+
+  """Commit the workspace was cut from; fixed once recorded"""
+  baseCommit: String
+
+  """Branch this run commits to in this repository"""
+  branch: String
+
+  """When an execution first cloned this workspace"""
+  clonedAt: Datetime
+  createdAt: Datetime
+
+  """Commit the work in this repository has reached"""
+  headCommit: String
+  id: UUID
+
+  """
+  When an execution last worked in this workspace; what a reclaim policy reads
+  """
+  lastUsedAt: Datetime
+
+  """Position of this workspace among the run's, 1-based and in clone order"""
+  ordinal: Int
+
+  """
+  Git host this workspace was cloned from, as the runtime names it: github, local
+  """
+  provider: String
+
+  """How the work is published: pull_request, push, patch_artifact or none"""
+  publication: String
+
+  """Repository as its provider names it (owner/name)"""
+  repo: String
+
+  """
+  Catalog repository this workspace was cloned from, when the platform hosts it
+  """
+  repositoryId: UUID
+
+  """Foreign key to agent_run"""
+  runId: UUID
+
+  """
+  Whether the tree still exists: active (on disk), cold (reclaimed, restorable from head_commit) or purged
+  """
+  state: String
+  updatedAt: Datetime
+
+  """Who may read this workspace, inherited from the run"""
+  visibility: String
+}
+
+"""Task within a plan, with ordering and optional approval gates"""
+type PlatformAgentTask {
+  """User who authored this task"""
+  actorId: UUID!
+
+  """Reviewer feedback or reason for the decision"""
+  approvalFeedback: String
+
+  """
+  Approval decision: pending, approved, rejected (NULL if not an approval task)
+  """
+  approvalStatus: String
+
+  """Timestamp of the approval or rejection decision"""
+  approvedAt: Datetime
+
+  """User who approved or rejected this task"""
+  approvedBy: UUID
+  createdAt: Datetime
+
+  """Natural-language description of the work to do"""
+  description: String!
+
+  """Error message captured when the task failed"""
+  error: String
+  id: UUID!
+
+  """Position within the plan (for ordered task lists)"""
+  orderIndex: Int
+
+  """
+  Reads a single `PlatformAgentPlan` that is related to this `PlatformAgentTask`.
+  """
+  plan: PlatformAgentPlan
+
+  """Foreign key to agent_plan"""
+  planId: UUID!
+
+  """Whether this task is an approval gate requiring human decision"""
+  requiresApproval: Boolean!
+
+  """Who created the task: agent or user"""
+  source: String!
+
+  """Current status of this task"""
+  status: String!
+  updatedAt: Datetime
+
+  """Who may read this task, inherited from its parent"""
+  visibility: String!
+}
+
+"""A connection to a list of `PlatformAgentTask` values."""
+type PlatformAgentTaskConnection {
+  """
+  A list of edges which contains the `PlatformAgentTask` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentTaskEdge]!
+
+  """A list of `PlatformAgentTask` objects."""
+  nodes: [PlatformAgentTask]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentTask` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentTask` edge in the connection."""
+type PlatformAgentTaskEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentTask` at the end of the edge."""
+  node: PlatformAgentTask
+}
+
+"""
+A filter to be used against `PlatformAgentTask` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentTaskFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentTaskFilter!]
+
+  """Filter by the object’s `approvalFeedback` field."""
+  approvalFeedback: StringFilter
+
+  """Filter by the object’s `approvalStatus` field."""
+  approvalStatus: StringFilter
+
+  """Filter by the object’s `approvedAt` field."""
+  approvedAt: DatetimeFilter
+
+  """Filter by the object’s `approvedBy` field."""
+  approvedBy: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `error` field."""
+  error: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: PlatformAgentTaskFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentTaskFilter!]
+
+  """Filter by the object’s `orderIndex` field."""
+  orderIndex: IntFilter
+
+  """Filter by the object’s `plan` relation."""
+  plan: PlatformAgentPlanFilter
+
+  """Filter by the object’s `planId` field."""
+  planId: UUIDFilter
+
+  """Filter by the object’s `requiresApproval` field."""
+  requiresApproval: BooleanFilter
+
+  """Filter by the object’s `source` field."""
+  source: StringFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
+}
+
+"""An input for mutations affecting `PlatformAgentTask`"""
+input PlatformAgentTaskInput {
+  """User who authored this task"""
+  actorId: UUID
+
+  """Reviewer feedback or reason for the decision"""
+  approvalFeedback: String
+
+  """
+  Approval decision: pending, approved, rejected (NULL if not an approval task)
+  """
+  approvalStatus: String
+
+  """Timestamp of the approval or rejection decision"""
+  approvedAt: Datetime
+
+  """User who approved or rejected this task"""
+  approvedBy: UUID
+  createdAt: Datetime
+
+  """Natural-language description of the work to do"""
+  description: String!
+
+  """Error message captured when the task failed"""
+  error: String
+  id: UUID
+
+  """Position within the plan (for ordered task lists)"""
+  orderIndex: Int
+
+  """Foreign key to agent_plan"""
+  planId: UUID!
+
+  """Whether this task is an approval gate requiring human decision"""
+  requiresApproval: Boolean
+
+  """Who created the task: agent or user"""
+  source: String
+
+  """Current status of this task"""
+  status: String
+  updatedAt: Datetime
+
+  """Who may read this task, inherited from its parent"""
+  visibility: String
+}
+
+"""Methods to use when ordering `PlatformAgentTask`."""
+enum PlatformAgentTaskOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  APPROVAL_FEEDBACK_ASC
+  APPROVAL_FEEDBACK_DESC
+  APPROVAL_STATUS_ASC
+  APPROVAL_STATUS_DESC
+  APPROVED_AT_ASC
+  APPROVED_AT_DESC
+  APPROVED_BY_ASC
+  APPROVED_BY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ERROR_ASC
+  ERROR_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  ORDER_INDEX_ASC
+  ORDER_INDEX_DESC
+  PLAN_ID_ASC
+  PLAN_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  REQUIRES_APPROVAL_ASC
+  REQUIRES_APPROVAL_DESC
+  SOURCE_ASC
+  SOURCE_DESC
+  STATUS_ASC
+  STATUS_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentTask`. Fields that are set will be updated.
+"""
+input PlatformAgentTaskPatch {
+  """User who authored this task"""
+  actorId: UUID
+
+  """Reviewer feedback or reason for the decision"""
+  approvalFeedback: String
+
+  """
+  Approval decision: pending, approved, rejected (NULL if not an approval task)
+  """
+  approvalStatus: String
+
+  """Timestamp of the approval or rejection decision"""
+  approvedAt: Datetime
+
+  """User who approved or rejected this task"""
+  approvedBy: UUID
+  createdAt: Datetime
+
+  """Natural-language description of the work to do"""
+  description: String
+
+  """Error message captured when the task failed"""
+  error: String
+  id: UUID
+
+  """Position within the plan (for ordered task lists)"""
+  orderIndex: Int
+
+  """Foreign key to agent_plan"""
+  planId: UUID
+
+  """Whether this task is an approval gate requiring human decision"""
+  requiresApproval: Boolean
+
+  """Who created the task: agent or user"""
+  source: String
+
+  """Current status of this task"""
+  status: String
+  updatedAt: Datetime
+
+  """Who may read this task, inherited from its parent"""
+  visibility: String
+}
+
+"""Top-level AI/LLM conversation thread"""
+type PlatformAgentThread {
+  """
+  Reads a single `PlatformAgent` that is related to this `PlatformAgentThread`.
+  """
+  agent: PlatformAgent
+
+  """Agent instance assigned to this thread"""
+  agentId: UUID
+
+  """Timestamp when this record was archived, NULL if active"""
+  archivedAt: Datetime
+  createdAt: Datetime
+  id: UUID!
+
+  """Whether this record has been archived by the user"""
+  isArchived: Boolean!
+
+  """Conversation mode: ask (plain Q&A) or agent (tool-enabled)"""
+  mode: String!
+
+  """LLM model id this thread is bound to"""
+  model: String
+
+  """User who owns this thread"""
+  ownerId: UUID!
+
+  """
+  Reads a single `PlatformAgentThread` that is related to this `PlatformAgentThread`.
+  """
+  parentThread: PlatformAgentThread
+
+  """Parent thread that spawned this sub-conversation"""
+  parentThreadId: UUID
+
+  """Reads and enables pagination through a set of `PlatformAgentMessage`."""
+  platformAgentMessagesByThreadId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentMessage`."""
+    orderBy: [PlatformAgentMessageOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentMessageFilter
+  ): PlatformAgentMessageConnection!
+
+  """Reads and enables pagination through a set of `PlatformAgentPlan`."""
+  platformAgentPlansByThreadId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentPlan`."""
+    orderBy: [PlatformAgentPlanOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentPlanFilter
+  ): PlatformAgentPlanConnection!
+
+  """Reads and enables pagination through a set of `PlatformAgentRun`."""
+  platformAgentRunsByThreadId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentRun`."""
+    orderBy: [PlatformAgentRunOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentRunFilter
+  ): PlatformAgentRunConnection!
+
+  """Reads and enables pagination through a set of `PlatformAgentThread`."""
+  platformAgentThreadsByParentThreadId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentThread`."""
+    orderBy: [PlatformAgentThreadOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentThreadFilter
+  ): PlatformAgentThreadConnection!
+
+  """
+  Reads a single `PlatformAgentPrompt` that is related to this `PlatformAgentThread`.
+  """
+  promptTemplate: PlatformAgentPrompt
+
+  """Optional FK to a shared prompt template"""
+  promptTemplateId: UUID
+
+  """Current status of this thread"""
+  status: String!
+
+  """System prompt active for this thread"""
+  systemPrompt: String
+
+  """User-defined labels for organizing and filtering threads"""
+  tags: [String]
+
+  """Human-readable conversation title"""
+  title: String
+  updatedAt: Datetime
+
+  """
+  Who may read this thread: private (owner only) or entity (the scope's members)
+  """
+  visibility: String!
+}
+
+"""A connection to a list of `PlatformAgentThread` values."""
+type PlatformAgentThreadConnection {
+  """
+  A list of edges which contains the `PlatformAgentThread` and cursor to aid in pagination.
+  """
+  edges: [PlatformAgentThreadEdge]!
+
+  """A list of `PlatformAgentThread` objects."""
+  nodes: [PlatformAgentThread]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformAgentThread` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformAgentThread` edge in the connection."""
+type PlatformAgentThreadEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformAgentThread` at the end of the edge."""
+  node: PlatformAgentThread
+}
+
+"""
+A filter to be used against `PlatformAgentThread` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentThreadFilter {
+  """Filter by the object’s `agent` relation."""
+  agent: PlatformAgentFilter
+
+  """A related `agent` exists."""
+  agentExists: Boolean
+
+  """Filter by the object’s `agentId` field."""
+  agentId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformAgentThreadFilter!]
+
+  """Filter by the object’s `archivedAt` field."""
+  archivedAt: DatetimeFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isArchived` field."""
+  isArchived: BooleanFilter
+
+  """Filter by the object’s `mode` field."""
+  mode: StringFilter
+
+  """Filter by the object’s `model` field."""
+  model: StringFilter
+
+  """Negates the expression."""
+  not: PlatformAgentThreadFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformAgentThreadFilter!]
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `parentThread` relation."""
+  parentThread: PlatformAgentThreadFilter
+
+  """A related `parentThread` exists."""
+  parentThreadExists: Boolean
+
+  """Filter by the object’s `parentThreadId` field."""
+  parentThreadId: UUIDFilter
+
+  """Filter by the object’s `platformAgentMessagesByThreadId` relation."""
+  platformAgentMessagesByThreadId: PlatformAgentThreadToManyPlatformAgentMessageFilter
+
+  """`platformAgentMessagesByThreadId` exist."""
+  platformAgentMessagesByThreadIdExist: Boolean
+
+  """Filter by the object’s `platformAgentPlansByThreadId` relation."""
+  platformAgentPlansByThreadId: PlatformAgentThreadToManyPlatformAgentPlanFilter
+
+  """`platformAgentPlansByThreadId` exist."""
+  platformAgentPlansByThreadIdExist: Boolean
+
+  """Filter by the object’s `platformAgentRunsByThreadId` relation."""
+  platformAgentRunsByThreadId: PlatformAgentThreadToManyPlatformAgentRunFilter
+
+  """`platformAgentRunsByThreadId` exist."""
+  platformAgentRunsByThreadIdExist: Boolean
+
+  """
+  Filter by the object’s `platformAgentThreadsByParentThreadId` relation.
+  """
+  platformAgentThreadsByParentThreadId: PlatformAgentThreadToManyPlatformAgentThreadFilter
+
+  """`platformAgentThreadsByParentThreadId` exist."""
+  platformAgentThreadsByParentThreadIdExist: Boolean
+
+  """Filter by the object’s `promptTemplate` relation."""
+  promptTemplate: PlatformAgentPromptFilter
+
+  """A related `promptTemplate` exists."""
+  promptTemplateExists: Boolean
+
+  """Filter by the object’s `promptTemplateId` field."""
+  promptTemplateId: UUIDFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `systemPrompt` field."""
+  systemPrompt: StringFilter
+
+  """Filter by the object’s `tags` field."""
+  tags: StringListFilter
+
+  """Filter by the object’s `title` field."""
+  title: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `visibility` field."""
+  visibility: StringFilter
+}
+
+"""An input for mutations affecting `PlatformAgentThread`"""
+input PlatformAgentThreadInput {
+  """Agent instance assigned to this thread"""
+  agentId: UUID
+
+  """Timestamp when this record was archived, NULL if active"""
+  archivedAt: Datetime
+  createdAt: Datetime
+  id: UUID
+
+  """Whether this record has been archived by the user"""
+  isArchived: Boolean
+
+  """Conversation mode: ask (plain Q&A) or agent (tool-enabled)"""
+  mode: String
+
+  """LLM model id this thread is bound to"""
+  model: String
+
+  """User who owns this thread"""
+  ownerId: UUID
+
+  """Parent thread that spawned this sub-conversation"""
+  parentThreadId: UUID
+
+  """Optional FK to a shared prompt template"""
+  promptTemplateId: UUID
+
+  """Current status of this thread"""
+  status: String
+
+  """System prompt active for this thread"""
+  systemPrompt: String
+
+  """User-defined labels for organizing and filtering threads"""
+  tags: [String]
+
+  """Human-readable conversation title"""
+  title: String
+  updatedAt: Datetime
+
+  """
+  Who may read this thread: private (owner only) or entity (the scope's members)
+  """
+  visibility: String
+}
+
+"""Methods to use when ordering `PlatformAgentThread`."""
+enum PlatformAgentThreadOrderBy {
+  AGENT_ID_ASC
+  AGENT_ID_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_ARCHIVED_ASC
+  IS_ARCHIVED_DESC
+  MODEL_ASC
+  MODEL_DESC
+  MODE_ASC
+  MODE_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PARENT_THREAD_ID_ASC
+  PARENT_THREAD_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROMPT_TEMPLATE_ID_ASC
+  PROMPT_TEMPLATE_ID_DESC
+  STATUS_ASC
+  STATUS_DESC
+  SYSTEM_PROMPT_ASC
+  SYSTEM_PROMPT_DESC
+  TAGS_ASC
+  TAGS_DESC
+  TITLE_ASC
+  TITLE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VISIBILITY_ASC
+  VISIBILITY_DESC
+}
+
+"""
+Represents an update to a `PlatformAgentThread`. Fields that are set will be updated.
+"""
+input PlatformAgentThreadPatch {
+  """Agent instance assigned to this thread"""
+  agentId: UUID
+
+  """Timestamp when this record was archived, NULL if active"""
+  archivedAt: Datetime
+  createdAt: Datetime
+  id: UUID
+
+  """Whether this record has been archived by the user"""
+  isArchived: Boolean
+
+  """Conversation mode: ask (plain Q&A) or agent (tool-enabled)"""
+  mode: String
+
+  """LLM model id this thread is bound to"""
+  model: String
+
+  """User who owns this thread"""
+  ownerId: UUID
+
+  """Parent thread that spawned this sub-conversation"""
+  parentThreadId: UUID
+
+  """Optional FK to a shared prompt template"""
+  promptTemplateId: UUID
+
+  """Current status of this thread"""
+  status: String
+
+  """System prompt active for this thread"""
+  systemPrompt: String
+
+  """User-defined labels for organizing and filtering threads"""
+  tags: [String]
+
+  """Human-readable conversation title"""
+  title: String
+  updatedAt: Datetime
+
+  """
+  Who may read this thread: private (owner only) or entity (the scope's members)
+  """
+  visibility: String
+}
+
+"""
+A filter to be used against many `PlatformAgentMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentThreadToManyPlatformAgentMessageFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentMessageFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentMessageFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentMessageFilter
+}
+
+"""
+A filter to be used against many `PlatformAgentPlan` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentThreadToManyPlatformAgentPlanFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentPlanFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentPlanFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentPlanFilter
+}
+
+"""
+A filter to be used against many `PlatformAgentRun` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentThreadToManyPlatformAgentRunFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentRunFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentRunFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentRunFilter
+}
+
+"""
+A filter to be used against many `PlatformAgentThread` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentThreadToManyPlatformAgentThreadFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentThreadFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentThreadFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentThreadFilter
+}
+
+"""
+A filter to be used against many `PlatformAgent` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentToManyPlatformAgentFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentFilter
+}
+
+"""
+A filter to be used against many `PlatformAgentMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentToManyPlatformAgentMessageFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentMessageFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentMessageFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentMessageFilter
+}
+
+"""
+A filter to be used against many `PlatformAgentThread` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformAgentToManyPlatformAgentThreadFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformAgentThreadFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformAgentThreadFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformAgentThreadFilter
 }
 
 input ProvisionBucketInput {
@@ -4266,6 +9490,358 @@ type Query {
     """
     where: AgentFilter
   ): AgentConnection
+
+  """Reads and enables pagination through a set of `PlatformAgentEvent`."""
+  platformAgentEvents(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentEvent`."""
+    orderBy: [PlatformAgentEventOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentEventFilter
+  ): PlatformAgentEventConnection
+
+  """Reads and enables pagination through a set of `PlatformAgentMessage`."""
+  platformAgentMessages(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentMessage`."""
+    orderBy: [PlatformAgentMessageOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentMessageFilter
+  ): PlatformAgentMessageConnection
+
+  """Reads and enables pagination through a set of `PlatformAgentPersona`."""
+  platformAgentPersonas(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentPersona`."""
+    orderBy: [PlatformAgentPersonaOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentPersonaFilter
+  ): PlatformAgentPersonaConnection
+
+  """Reads and enables pagination through a set of `PlatformAgentPlan`."""
+  platformAgentPlans(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentPlan`."""
+    orderBy: [PlatformAgentPlanOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentPlanFilter
+  ): PlatformAgentPlanConnection
+
+  """Reads and enables pagination through a set of `PlatformAgentPrompt`."""
+  platformAgentPrompts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentPrompt`."""
+    orderBy: [PlatformAgentPromptOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentPromptFilter
+  ): PlatformAgentPromptConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformAgentResourceChunk`.
+  """
+  platformAgentResourceChunks(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentResourceChunk`."""
+    orderBy: [PlatformAgentResourceChunkOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentResourceChunkFilter
+  ): PlatformAgentResourceChunkConnection
+
+  """Reads and enables pagination through a set of `PlatformAgentResource`."""
+  platformAgentResources(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentResource`."""
+    orderBy: [PlatformAgentResourceOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentResourceFilter
+  ): PlatformAgentResourceConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformAgentRunWorkspace`.
+  """
+  platformAgentRunWorkspaces(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentRunWorkspace`."""
+    orderBy: [PlatformAgentRunWorkspaceOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentRunWorkspaceFilter
+  ): PlatformAgentRunWorkspaceConnection
+
+  """Reads and enables pagination through a set of `PlatformAgentRun`."""
+  platformAgentRuns(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentRun`."""
+    orderBy: [PlatformAgentRunOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentRunFilter
+  ): PlatformAgentRunConnection
+
+  """Reads and enables pagination through a set of `PlatformAgentTask`."""
+  platformAgentTasks(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentTask`."""
+    orderBy: [PlatformAgentTaskOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentTaskFilter
+  ): PlatformAgentTaskConnection
+
+  """Reads and enables pagination through a set of `PlatformAgentThread`."""
+  platformAgentThreads(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgentThread`."""
+    orderBy: [PlatformAgentThreadOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentThreadFilter
+  ): PlatformAgentThreadConnection
+
+  """Reads and enables pagination through a set of `PlatformAgent`."""
+  platformAgents(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformAgent`."""
+    orderBy: [PlatformAgentOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformAgentFilter
+  ): PlatformAgentConnection
 }
 
 """
@@ -5000,6 +10576,462 @@ type UpdateAgentThreadPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentEvent` mutation."""
+input UpdatePlatformAgentEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentEvent` being updated.
+  """
+  platformAgentEventPatch: PlatformAgentEventPatch!
+}
+
+"""The output of our update `PlatformAgentEvent` mutation."""
+type UpdatePlatformAgentEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentEvent` that was updated by this mutation."""
+  platformAgentEvent: PlatformAgentEvent
+
+  """An edge for our `PlatformAgentEvent`. May be used by Relay 1."""
+  platformAgentEventEdge(
+    """The method to use when ordering `PlatformAgentEvent`."""
+    orderBy: [PlatformAgentEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgent` mutation."""
+input UpdatePlatformAgentInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgent` being updated.
+  """
+  platformAgentPatch: PlatformAgentPatch!
+}
+
+"""All input for the `updatePlatformAgentMessage` mutation."""
+input UpdatePlatformAgentMessageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentMessage` being updated.
+  """
+  platformAgentMessagePatch: PlatformAgentMessagePatch!
+}
+
+"""The output of our update `PlatformAgentMessage` mutation."""
+type UpdatePlatformAgentMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentMessage` that was updated by this mutation."""
+  platformAgentMessage: PlatformAgentMessage
+
+  """An edge for our `PlatformAgentMessage`. May be used by Relay 1."""
+  platformAgentMessageEdge(
+    """The method to use when ordering `PlatformAgentMessage`."""
+    orderBy: [PlatformAgentMessageOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentMessageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""The output of our update `PlatformAgent` mutation."""
+type UpdatePlatformAgentPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgent` that was updated by this mutation."""
+  platformAgent: PlatformAgent
+
+  """An edge for our `PlatformAgent`. May be used by Relay 1."""
+  platformAgentEdge(
+    """The method to use when ordering `PlatformAgent`."""
+    orderBy: [PlatformAgentOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentPersona` mutation."""
+input UpdatePlatformAgentPersonaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentPersona` being updated.
+  """
+  platformAgentPersonaPatch: PlatformAgentPersonaPatch!
+}
+
+"""The output of our update `PlatformAgentPersona` mutation."""
+type UpdatePlatformAgentPersonaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPersona` that was updated by this mutation."""
+  platformAgentPersona: PlatformAgentPersona
+
+  """An edge for our `PlatformAgentPersona`. May be used by Relay 1."""
+  platformAgentPersonaEdge(
+    """The method to use when ordering `PlatformAgentPersona`."""
+    orderBy: [PlatformAgentPersonaOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentPersonaEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentPlan` mutation."""
+input UpdatePlatformAgentPlanInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentPlan` being updated.
+  """
+  platformAgentPlanPatch: PlatformAgentPlanPatch!
+}
+
+"""The output of our update `PlatformAgentPlan` mutation."""
+type UpdatePlatformAgentPlanPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPlan` that was updated by this mutation."""
+  platformAgentPlan: PlatformAgentPlan
+
+  """An edge for our `PlatformAgentPlan`. May be used by Relay 1."""
+  platformAgentPlanEdge(
+    """The method to use when ordering `PlatformAgentPlan`."""
+    orderBy: [PlatformAgentPlanOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentPlanEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentPrompt` mutation."""
+input UpdatePlatformAgentPromptInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentPrompt` being updated.
+  """
+  platformAgentPromptPatch: PlatformAgentPromptPatch!
+}
+
+"""The output of our update `PlatformAgentPrompt` mutation."""
+type UpdatePlatformAgentPromptPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentPrompt` that was updated by this mutation."""
+  platformAgentPrompt: PlatformAgentPrompt
+
+  """An edge for our `PlatformAgentPrompt`. May be used by Relay 1."""
+  platformAgentPromptEdge(
+    """The method to use when ordering `PlatformAgentPrompt`."""
+    orderBy: [PlatformAgentPromptOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentPromptEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentResourceChunk` mutation."""
+input UpdatePlatformAgentResourceChunkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentResourceChunk` being updated.
+  """
+  platformAgentResourceChunkPatch: PlatformAgentResourceChunkPatch!
+}
+
+"""The output of our update `PlatformAgentResourceChunk` mutation."""
+type UpdatePlatformAgentResourceChunkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentResourceChunk` that was updated by this mutation."""
+  platformAgentResourceChunk: PlatformAgentResourceChunk
+
+  """An edge for our `PlatformAgentResourceChunk`. May be used by Relay 1."""
+  platformAgentResourceChunkEdge(
+    """The method to use when ordering `PlatformAgentResourceChunk`."""
+    orderBy: [PlatformAgentResourceChunkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentResourceChunkEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentResource` mutation."""
+input UpdatePlatformAgentResourceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentResource` being updated.
+  """
+  platformAgentResourcePatch: PlatformAgentResourcePatch!
+}
+
+"""The output of our update `PlatformAgentResource` mutation."""
+type UpdatePlatformAgentResourcePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentResource` that was updated by this mutation."""
+  platformAgentResource: PlatformAgentResource
+
+  """An edge for our `PlatformAgentResource`. May be used by Relay 1."""
+  platformAgentResourceEdge(
+    """The method to use when ordering `PlatformAgentResource`."""
+    orderBy: [PlatformAgentResourceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentResourceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentRun` mutation."""
+input UpdatePlatformAgentRunInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentRun` being updated.
+  """
+  platformAgentRunPatch: PlatformAgentRunPatch!
+}
+
+"""The output of our update `PlatformAgentRun` mutation."""
+type UpdatePlatformAgentRunPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentRun` that was updated by this mutation."""
+  platformAgentRun: PlatformAgentRun
+
+  """An edge for our `PlatformAgentRun`. May be used by Relay 1."""
+  platformAgentRunEdge(
+    """The method to use when ordering `PlatformAgentRun`."""
+    orderBy: [PlatformAgentRunOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentRunEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentRunWorkspace` mutation."""
+input UpdatePlatformAgentRunWorkspaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentRunWorkspace` being updated.
+  """
+  platformAgentRunWorkspacePatch: PlatformAgentRunWorkspacePatch!
+}
+
+"""The output of our update `PlatformAgentRunWorkspace` mutation."""
+type UpdatePlatformAgentRunWorkspacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentRunWorkspace` that was updated by this mutation."""
+  platformAgentRunWorkspace: PlatformAgentRunWorkspace
+
+  """An edge for our `PlatformAgentRunWorkspace`. May be used by Relay 1."""
+  platformAgentRunWorkspaceEdge(
+    """The method to use when ordering `PlatformAgentRunWorkspace`."""
+    orderBy: [PlatformAgentRunWorkspaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentRunWorkspaceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentTask` mutation."""
+input UpdatePlatformAgentTaskInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentTask` being updated.
+  """
+  platformAgentTaskPatch: PlatformAgentTaskPatch!
+}
+
+"""The output of our update `PlatformAgentTask` mutation."""
+type UpdatePlatformAgentTaskPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentTask` that was updated by this mutation."""
+  platformAgentTask: PlatformAgentTask
+
+  """An edge for our `PlatformAgentTask`. May be used by Relay 1."""
+  platformAgentTaskEdge(
+    """The method to use when ordering `PlatformAgentTask`."""
+    orderBy: [PlatformAgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentTaskEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformAgentThread` mutation."""
+input UpdatePlatformAgentThreadInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformAgentThread` being updated.
+  """
+  platformAgentThreadPatch: PlatformAgentThreadPatch!
+}
+
+"""The output of our update `PlatformAgentThread` mutation."""
+type UpdatePlatformAgentThreadPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformAgentThread` that was updated by this mutation."""
+  platformAgentThread: PlatformAgentThread
+
+  """An edge for our `PlatformAgentThread`. May be used by Relay 1."""
+  platformAgentThreadEdge(
+    """The method to use when ordering `PlatformAgentThread`."""
+    orderBy: [PlatformAgentThreadOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformAgentThreadEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

@@ -952,11 +952,57 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
+  """GraphQL type name of the plane's buckets table"""
+  bucketsType: String!
+
+  """
+  Computed download-URL field on the files type; null on the buckets side
+  """
+  downloadUrlField: String
+
+  """GraphQL type name of the plane's files table"""
+  filesType: String!
+
   """Whether this table is a storage buckets table"""
   isBucketsTable: Boolean!
 
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
+
+  """The plane's GraphQL upload surface"""
+  upload: MetaStorageUpload!
+}
+
+"""
+The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
+"""
+type MetaStorageUpload {
+  """Per-file input type inside the bulk input"""
+  bulkFileInputType: String!
+
+  """Per-file payload type inside the bulk payload"""
+  bulkFilePayloadType: String!
+
+  """Input type of the bulk upload mutation"""
+  bulkInputType: String!
+
+  """Root mutation field for bulk upload"""
+  bulkMutation: String!
+
+  """Payload type of the bulk upload mutation"""
+  bulkPayloadType: String!
+
+  """Input type of the single upload mutation"""
+  inputType: String!
+
+  """Root mutation field for single-file upload (e.g. uploadAppFile)"""
+  mutation: String!
+
+  """Payload type of the single upload mutation"""
+  payloadType: String!
+
+  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  requiresOwnerId: Boolean!
 }
 
 """Information about a database table"""

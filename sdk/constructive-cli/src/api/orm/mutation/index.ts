@@ -10,35 +10,83 @@ import type {
   AcceptDatabaseTransferInput,
   ApplyRlsInput,
   CancelDatabaseTransferInput,
+  DeleteSitePreviewInput,
   DomainsAssignSubdomainInput,
+  MintSitePreviewTokenInput,
+  PagesInstallPagesInput,
+  PlatformDeleteSitePreviewInput,
   PlatformDomainsAssignSubdomainInput,
+  PlatformMintSitePreviewTokenInput,
+  PlatformPagesInstallPagesInput,
+  PlatformProvisionSitePreviewInput,
+  PlatformSetSitePreviewInput,
+  PlatformSiteMetadataInstallRobotsInput,
+  PlatformSitesInstallContentPresetInput,
+  PlatformSitesInstallMantraInput,
   PlatformSitesProvisionStaticSiteInput,
   ProvisionBucketInput,
+  ProvisionSitePreviewInput,
   RejectDatabaseTransferInput,
   RequestDatabaseInput,
   SetFieldOrderInput,
+  SetSitePreviewInput,
+  SiteMetadataInstallRobotsInput,
+  SitesInstallContentPresetInput,
+  SitesInstallMantraInput,
   SitesProvisionStaticSiteInput,
   AcceptDatabaseTransferPayload,
   ApplyRlsPayload,
   CancelDatabaseTransferPayload,
+  DeleteSitePreviewPayload,
   DomainsAssignSubdomainPayload,
+  MintSitePreviewTokenPayload,
+  PagesInstallPagesPayload,
+  PlatformDeleteSitePreviewPayload,
   PlatformDomainsAssignSubdomainPayload,
+  PlatformMintSitePreviewTokenPayload,
+  PlatformPagesInstallPagesPayload,
+  PlatformProvisionSitePreviewPayload,
+  PlatformSetSitePreviewPayload,
+  PlatformSiteMetadataInstallRobotsPayload,
+  PlatformSitesInstallContentPresetPayload,
+  PlatformSitesInstallMantraPayload,
   PlatformSitesProvisionStaticSitePayload,
   ProvisionBucketPayload,
+  ProvisionSitePreviewPayload,
   RejectDatabaseTransferPayload,
   RequestDatabasePayload,
   SetFieldOrderPayload,
+  SetSitePreviewPayload,
+  SiteMetadataInstallRobotsPayload,
+  SitesInstallContentPresetPayload,
+  SitesInstallMantraPayload,
   SitesProvisionStaticSitePayload,
   AcceptDatabaseTransferPayloadSelect,
   ApplyRlsPayloadSelect,
   CancelDatabaseTransferPayloadSelect,
+  DeleteSitePreviewPayloadSelect,
   DomainsAssignSubdomainPayloadSelect,
+  MintSitePreviewTokenPayloadSelect,
+  PagesInstallPagesPayloadSelect,
+  PlatformDeleteSitePreviewPayloadSelect,
   PlatformDomainsAssignSubdomainPayloadSelect,
+  PlatformMintSitePreviewTokenPayloadSelect,
+  PlatformPagesInstallPagesPayloadSelect,
+  PlatformProvisionSitePreviewPayloadSelect,
+  PlatformSetSitePreviewPayloadSelect,
+  PlatformSiteMetadataInstallRobotsPayloadSelect,
+  PlatformSitesInstallContentPresetPayloadSelect,
+  PlatformSitesInstallMantraPayloadSelect,
   PlatformSitesProvisionStaticSitePayloadSelect,
   ProvisionBucketPayloadSelect,
+  ProvisionSitePreviewPayloadSelect,
   RejectDatabaseTransferPayloadSelect,
   RequestDatabasePayloadSelect,
   SetFieldOrderPayloadSelect,
+  SetSitePreviewPayloadSelect,
+  SiteMetadataInstallRobotsPayloadSelect,
+  SitesInstallContentPresetPayloadSelect,
+  SitesInstallMantraPayloadSelect,
   SitesProvisionStaticSitePayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -51,11 +99,44 @@ export interface ApplyRlsVariables {
 export interface CancelDatabaseTransferVariables {
   input: CancelDatabaseTransferInput;
 }
+export interface DeleteSitePreviewVariables {
+  input: DeleteSitePreviewInput;
+}
 export interface DomainsAssignSubdomainVariables {
   input: DomainsAssignSubdomainInput;
 }
+export interface MintSitePreviewTokenVariables {
+  input: MintSitePreviewTokenInput;
+}
+export interface PagesInstallPagesVariables {
+  input: PagesInstallPagesInput;
+}
+export interface PlatformDeleteSitePreviewVariables {
+  input: PlatformDeleteSitePreviewInput;
+}
 export interface PlatformDomainsAssignSubdomainVariables {
   input: PlatformDomainsAssignSubdomainInput;
+}
+export interface PlatformMintSitePreviewTokenVariables {
+  input: PlatformMintSitePreviewTokenInput;
+}
+export interface PlatformPagesInstallPagesVariables {
+  input: PlatformPagesInstallPagesInput;
+}
+export interface PlatformProvisionSitePreviewVariables {
+  input: PlatformProvisionSitePreviewInput;
+}
+export interface PlatformSetSitePreviewVariables {
+  input: PlatformSetSitePreviewInput;
+}
+export interface PlatformSiteMetadataInstallRobotsVariables {
+  input: PlatformSiteMetadataInstallRobotsInput;
+}
+export interface PlatformSitesInstallContentPresetVariables {
+  input: PlatformSitesInstallContentPresetInput;
+}
+export interface PlatformSitesInstallMantraVariables {
+  input: PlatformSitesInstallMantraInput;
 }
 export interface PlatformSitesProvisionStaticSiteVariables {
   input: PlatformSitesProvisionStaticSiteInput;
@@ -70,6 +151,9 @@ and lifecycle settings.
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
 }
+export interface ProvisionSitePreviewVariables {
+  input: ProvisionSitePreviewInput;
+}
 export interface RejectDatabaseTransferVariables {
   input: RejectDatabaseTransferInput;
 }
@@ -77,17 +161,30 @@ export interface RejectDatabaseTransferVariables {
  * Variables for requestDatabase
  * Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. Pass organization_id to have the organization own the database from the start (the caller must be an owner of that organization); the requesting user is still the identity bootstrapped into the new database. Omit it for a personal database. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
+  SELECT * FROM metaschema_public.request_database('team_app', 'example.com', preset_slug := 'full', organization_id := '00000000-0000-0000-0000-000000000000'::uuid);
  */
 export interface RequestDatabaseVariables {
   input: RequestDatabaseInput;
 }
 export interface SetFieldOrderVariables {
   input: SetFieldOrderInput;
+}
+export interface SetSitePreviewVariables {
+  input: SetSitePreviewInput;
+}
+export interface SiteMetadataInstallRobotsVariables {
+  input: SiteMetadataInstallRobotsInput;
+}
+export interface SitesInstallContentPresetVariables {
+  input: SitesInstallContentPresetInput;
+}
+export interface SitesInstallMantraVariables {
+  input: SitesInstallMantraInput;
 }
 export interface SitesProvisionStaticSiteVariables {
   input: SitesProvisionStaticSiteInput;
@@ -181,6 +278,35 @@ export function createMutationOperations(client: OrmClient) {
           'CancelDatabaseTransferPayload'
         ),
       }),
+    deleteSitePreview: <S extends DeleteSitePreviewPayloadSelect>(
+      args: DeleteSitePreviewVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DeleteSitePreviewPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        deleteSitePreview: InferSelectResult<DeleteSitePreviewPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DeleteSitePreview',
+        fieldName: 'deleteSitePreview',
+        ...buildCustomDocument(
+          'mutation',
+          'DeleteSitePreview',
+          'deleteSitePreview',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DeleteSitePreviewInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DeleteSitePreviewPayload'
+        ),
+      }),
     domainsAssignSubdomain: <S extends DomainsAssignSubdomainPayloadSelect>(
       args: DomainsAssignSubdomainVariables,
       options: {
@@ -208,6 +334,93 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'DomainsAssignSubdomainPayload'
+        ),
+      }),
+    mintSitePreviewToken: <S extends MintSitePreviewTokenPayloadSelect>(
+      args: MintSitePreviewTokenVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, MintSitePreviewTokenPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        mintSitePreviewToken: InferSelectResult<MintSitePreviewTokenPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'MintSitePreviewToken',
+        fieldName: 'mintSitePreviewToken',
+        ...buildCustomDocument(
+          'mutation',
+          'MintSitePreviewToken',
+          'mintSitePreviewToken',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'MintSitePreviewTokenInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'MintSitePreviewTokenPayload'
+        ),
+      }),
+    pagesInstallPages: <S extends PagesInstallPagesPayloadSelect>(
+      args: PagesInstallPagesVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PagesInstallPagesPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        pagesInstallPages: InferSelectResult<PagesInstallPagesPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PagesInstallPages',
+        fieldName: 'pagesInstallPages',
+        ...buildCustomDocument(
+          'mutation',
+          'PagesInstallPages',
+          'pagesInstallPages',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PagesInstallPagesInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PagesInstallPagesPayload'
+        ),
+      }),
+    platformDeleteSitePreview: <S extends PlatformDeleteSitePreviewPayloadSelect>(
+      args: PlatformDeleteSitePreviewVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformDeleteSitePreviewPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformDeleteSitePreview: InferSelectResult<PlatformDeleteSitePreviewPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformDeleteSitePreview',
+        fieldName: 'platformDeleteSitePreview',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformDeleteSitePreview',
+          'platformDeleteSitePreview',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformDeleteSitePreviewInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformDeleteSitePreviewPayload'
         ),
       }),
     platformDomainsAssignSubdomain: <S extends PlatformDomainsAssignSubdomainPayloadSelect>(
@@ -240,6 +453,221 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'PlatformDomainsAssignSubdomainPayload'
+        ),
+      }),
+    platformMintSitePreviewToken: <S extends PlatformMintSitePreviewTokenPayloadSelect>(
+      args: PlatformMintSitePreviewTokenVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformMintSitePreviewTokenPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformMintSitePreviewToken: InferSelectResult<
+          PlatformMintSitePreviewTokenPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformMintSitePreviewToken',
+        fieldName: 'platformMintSitePreviewToken',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformMintSitePreviewToken',
+          'platformMintSitePreviewToken',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformMintSitePreviewTokenInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformMintSitePreviewTokenPayload'
+        ),
+      }),
+    platformPagesInstallPages: <S extends PlatformPagesInstallPagesPayloadSelect>(
+      args: PlatformPagesInstallPagesVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformPagesInstallPagesPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformPagesInstallPages: InferSelectResult<PlatformPagesInstallPagesPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformPagesInstallPages',
+        fieldName: 'platformPagesInstallPages',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformPagesInstallPages',
+          'platformPagesInstallPages',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformPagesInstallPagesInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformPagesInstallPagesPayload'
+        ),
+      }),
+    platformProvisionSitePreview: <S extends PlatformProvisionSitePreviewPayloadSelect>(
+      args: PlatformProvisionSitePreviewVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformProvisionSitePreviewPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformProvisionSitePreview: InferSelectResult<
+          PlatformProvisionSitePreviewPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformProvisionSitePreview',
+        fieldName: 'platformProvisionSitePreview',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformProvisionSitePreview',
+          'platformProvisionSitePreview',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformProvisionSitePreviewInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformProvisionSitePreviewPayload'
+        ),
+      }),
+    platformSetSitePreview: <S extends PlatformSetSitePreviewPayloadSelect>(
+      args: PlatformSetSitePreviewVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformSetSitePreviewPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformSetSitePreview: InferSelectResult<PlatformSetSitePreviewPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformSetSitePreview',
+        fieldName: 'platformSetSitePreview',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformSetSitePreview',
+          'platformSetSitePreview',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformSetSitePreviewInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformSetSitePreviewPayload'
+        ),
+      }),
+    platformSiteMetadataInstallRobots: <S extends PlatformSiteMetadataInstallRobotsPayloadSelect>(
+      args: PlatformSiteMetadataInstallRobotsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformSiteMetadataInstallRobotsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformSiteMetadataInstallRobots: InferSelectResult<
+          PlatformSiteMetadataInstallRobotsPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformSiteMetadataInstallRobots',
+        fieldName: 'platformSiteMetadataInstallRobots',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformSiteMetadataInstallRobots',
+          'platformSiteMetadataInstallRobots',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformSiteMetadataInstallRobotsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformSiteMetadataInstallRobotsPayload'
+        ),
+      }),
+    platformSitesInstallContentPreset: <S extends PlatformSitesInstallContentPresetPayloadSelect>(
+      args: PlatformSitesInstallContentPresetVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformSitesInstallContentPresetPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformSitesInstallContentPreset: InferSelectResult<
+          PlatformSitesInstallContentPresetPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformSitesInstallContentPreset',
+        fieldName: 'platformSitesInstallContentPreset',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformSitesInstallContentPreset',
+          'platformSitesInstallContentPreset',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformSitesInstallContentPresetInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformSitesInstallContentPresetPayload'
+        ),
+      }),
+    platformSitesInstallMantra: <S extends PlatformSitesInstallMantraPayloadSelect>(
+      args: PlatformSitesInstallMantraVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformSitesInstallMantraPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformSitesInstallMantra: InferSelectResult<PlatformSitesInstallMantraPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformSitesInstallMantra',
+        fieldName: 'platformSitesInstallMantra',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformSitesInstallMantra',
+          'platformSitesInstallMantra',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformSitesInstallMantraInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformSitesInstallMantraPayload'
         ),
       }),
     platformSitesProvisionStaticSite: <S extends PlatformSitesProvisionStaticSitePayloadSelect>(
@@ -301,6 +729,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionBucketPayload'
+        ),
+      }),
+    provisionSitePreview: <S extends ProvisionSitePreviewPayloadSelect>(
+      args: ProvisionSitePreviewVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionSitePreviewPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionSitePreview: InferSelectResult<ProvisionSitePreviewPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionSitePreview',
+        fieldName: 'provisionSitePreview',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionSitePreview',
+          'provisionSitePreview',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionSitePreviewInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionSitePreviewPayload'
         ),
       }),
     rejectDatabaseTransfer: <S extends RejectDatabaseTransferPayloadSelect>(
@@ -388,6 +845,122 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SetFieldOrderPayload'
+        ),
+      }),
+    setSitePreview: <S extends SetSitePreviewPayloadSelect>(
+      args: SetSitePreviewVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetSitePreviewPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setSitePreview: InferSelectResult<SetSitePreviewPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetSitePreview',
+        fieldName: 'setSitePreview',
+        ...buildCustomDocument(
+          'mutation',
+          'SetSitePreview',
+          'setSitePreview',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetSitePreviewInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetSitePreviewPayload'
+        ),
+      }),
+    siteMetadataInstallRobots: <S extends SiteMetadataInstallRobotsPayloadSelect>(
+      args: SiteMetadataInstallRobotsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SiteMetadataInstallRobotsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        siteMetadataInstallRobots: InferSelectResult<SiteMetadataInstallRobotsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SiteMetadataInstallRobots',
+        fieldName: 'siteMetadataInstallRobots',
+        ...buildCustomDocument(
+          'mutation',
+          'SiteMetadataInstallRobots',
+          'siteMetadataInstallRobots',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SiteMetadataInstallRobotsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SiteMetadataInstallRobotsPayload'
+        ),
+      }),
+    sitesInstallContentPreset: <S extends SitesInstallContentPresetPayloadSelect>(
+      args: SitesInstallContentPresetVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SitesInstallContentPresetPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        sitesInstallContentPreset: InferSelectResult<SitesInstallContentPresetPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SitesInstallContentPreset',
+        fieldName: 'sitesInstallContentPreset',
+        ...buildCustomDocument(
+          'mutation',
+          'SitesInstallContentPreset',
+          'sitesInstallContentPreset',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SitesInstallContentPresetInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SitesInstallContentPresetPayload'
+        ),
+      }),
+    sitesInstallMantra: <S extends SitesInstallMantraPayloadSelect>(
+      args: SitesInstallMantraVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SitesInstallMantraPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        sitesInstallMantra: InferSelectResult<SitesInstallMantraPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SitesInstallMantra',
+        fieldName: 'sitesInstallMantra',
+        ...buildCustomDocument(
+          'mutation',
+          'SitesInstallMantra',
+          'sitesInstallMantra',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SitesInstallMantraInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SitesInstallMantraPayload'
         ),
       }),
     sitesProvisionStaticSite: <S extends SitesProvisionStaticSitePayloadSelect>(

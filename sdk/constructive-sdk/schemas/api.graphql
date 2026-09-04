@@ -1,3 +1,28 @@
+"""All input for the `acceptDatabaseTransfer` mutation."""
+input AcceptDatabaseTransferInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  transferId: UUID
+}
+
+"""The output of our `acceptDatabaseTransfer` mutation."""
+type AcceptDatabaseTransferPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
 """
 API surfaces exposed by this scope; publication makes a surface bindable from other scopes
 """
@@ -867,467 +892,6 @@ input ApiToManyCorsSettingFilter {
   some: CorsSettingFilter
 }
 
-"""
-App aggregates: thin identity rows whose components are global catalog references
-"""
-type App {
-  """Reads and enables pagination through a set of `AppComponent`."""
-  appComponents(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `AppComponent`."""
-    orderBy: [AppComponentOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppComponentFilter
-  ): AppComponentConnection!
-
-  """Module-specific configuration for this app"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-
-  """Human-readable app description"""
-  description: String
-  id: UUID!
-
-  """Whether other scopes may see and reference this app"""
-  isPublished: Boolean!
-
-  """Owner-local app name"""
-  name: String!
-
-  """App lifecycle status: active, suspended, archived"""
-  status: String!
-
-  """Human-readable app title"""
-  title: String
-  updatedAt: Datetime
-}
-
-"""
-App component rows binding an app to typed catalog rows (exactly one typed component reference per row)
-"""
-type AppComponent {
-  """Reads a single `App` that is related to this `AppComponent`."""
-  app: App
-
-  """App this component belongs to"""
-  appId: UUID!
-
-  """
-  Typed catalog api row of the component surface; must be owner-matched or visible cross-scope
-  """
-  componentApiId: UUID
-
-  """
-  Typed catalog domain row of the component surface; must be owner-matched or visible cross-scope
-  """
-  componentDomainId: UUID
-
-  """
-  Typed catalog resource installation row of the component release; must be owner-matched or visible cross-scope
-  """
-  componentInstallationId: UUID
-
-  """
-  Typed catalog site row of the component surface; must be owner-matched or visible cross-scope
-  """
-  componentSiteId: UUID
-
-  """
-  Which kind of catalog row this component binds (api, site, domain, installation)
-  """
-  componentType: String
-
-  """Component-specific configuration inside this app"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-  id: UUID!
-  updatedAt: Datetime
-}
-
-"""A connection to a list of `AppComponent` values."""
-type AppComponentConnection {
-  """
-  A list of edges which contains the `AppComponent` and cursor to aid in pagination.
-  """
-  edges: [AppComponentEdge]!
-
-  """A list of `AppComponent` objects."""
-  nodes: [AppComponent]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppComponent` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `AppComponent` edge in the connection."""
-type AppComponentEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppComponent` at the end of the edge."""
-  node: AppComponent
-}
-
-"""
-A filter to be used against `AppComponent` object types. All fields are combined with a logical ‘and.’
-"""
-input AppComponentFilter {
-  """Checks for all expressions in this list."""
-  and: [AppComponentFilter!]
-
-  """Filter by the object’s `app` relation."""
-  app: AppFilter
-
-  """Filter by the object’s `appId` field."""
-  appId: UUIDFilter
-
-  """Filter by the object’s `componentApiId` field."""
-  componentApiId: UUIDFilter
-
-  """Filter by the object’s `componentDomainId` field."""
-  componentDomainId: UUIDFilter
-
-  """Filter by the object’s `componentInstallationId` field."""
-  componentInstallationId: UUIDFilter
-
-  """Filter by the object’s `componentSiteId` field."""
-  componentSiteId: UUIDFilter
-
-  """Filter by the object’s `componentType` field."""
-  componentType: StringFilter
-
-  """Filter by the object’s `config` field."""
-  config: JSONFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Negates the expression."""
-  not: AppComponentFilter
-
-  """Checks for any expressions in this list."""
-  or: [AppComponentFilter!]
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `AppComponent`"""
-input AppComponentInput {
-  """App this component belongs to"""
-  appId: UUID!
-
-  """
-  Typed catalog api row of the component surface; must be owner-matched or visible cross-scope
-  """
-  componentApiId: UUID
-
-  """
-  Typed catalog domain row of the component surface; must be owner-matched or visible cross-scope
-  """
-  componentDomainId: UUID
-
-  """
-  Typed catalog resource installation row of the component release; must be owner-matched or visible cross-scope
-  """
-  componentInstallationId: UUID
-
-  """
-  Typed catalog site row of the component surface; must be owner-matched or visible cross-scope
-  """
-  componentSiteId: UUID
-
-  """
-  Which kind of catalog row this component binds (api, site, domain, installation)
-  """
-  componentType: String
-
-  """Component-specific configuration inside this app"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-  id: UUID
-  updatedAt: Datetime
-}
-
-"""Methods to use when ordering `AppComponent`."""
-enum AppComponentOrderBy {
-  APP_ID_ASC
-  APP_ID_DESC
-  COMPONENT_API_ID_ASC
-  COMPONENT_API_ID_DESC
-  COMPONENT_DOMAIN_ID_ASC
-  COMPONENT_DOMAIN_ID_DESC
-  COMPONENT_INSTALLATION_ID_ASC
-  COMPONENT_INSTALLATION_ID_DESC
-  COMPONENT_SITE_ID_ASC
-  COMPONENT_SITE_ID_DESC
-  COMPONENT_TYPE_ASC
-  COMPONENT_TYPE_DESC
-  CONFIG_ASC
-  CONFIG_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  ID_ASC
-  ID_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""
-Represents an update to a `AppComponent`. Fields that are set will be updated.
-"""
-input AppComponentPatch {
-  """App this component belongs to"""
-  appId: UUID
-
-  """
-  Typed catalog api row of the component surface; must be owner-matched or visible cross-scope
-  """
-  componentApiId: UUID
-
-  """
-  Typed catalog domain row of the component surface; must be owner-matched or visible cross-scope
-  """
-  componentDomainId: UUID
-
-  """
-  Typed catalog resource installation row of the component release; must be owner-matched or visible cross-scope
-  """
-  componentInstallationId: UUID
-
-  """
-  Typed catalog site row of the component surface; must be owner-matched or visible cross-scope
-  """
-  componentSiteId: UUID
-
-  """
-  Which kind of catalog row this component binds (api, site, domain, installation)
-  """
-  componentType: String
-
-  """Component-specific configuration inside this app"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID
-  id: UUID
-  updatedAt: Datetime
-}
-
-"""A connection to a list of `App` values."""
-type AppConnection {
-  """
-  A list of edges which contains the `App` and cursor to aid in pagination.
-  """
-  edges: [AppEdge]!
-
-  """A list of `App` objects."""
-  nodes: [App]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `App` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `App` edge in the connection."""
-type AppEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `App` at the end of the edge."""
-  node: App
-}
-
-"""
-A filter to be used against `App` object types. All fields are combined with a logical ‘and.’
-"""
-input AppFilter {
-  """Checks for all expressions in this list."""
-  and: [AppFilter!]
-
-  """Filter by the object’s `appComponents` relation."""
-  appComponents: AppToManyAppComponentFilter
-
-  """`appComponents` exist."""
-  appComponentsExist: Boolean
-
-  """Filter by the object’s `config` field."""
-  config: JSONFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isPublished` field."""
-  isPublished: BooleanFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Negates the expression."""
-  not: AppFilter
-
-  """Checks for any expressions in this list."""
-  or: [AppFilter!]
-
-  """Filter by the object’s `status` field."""
-  status: StringFilter
-
-  """Filter by the object’s `title` field."""
-  title: StringFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `App`"""
-input AppInput {
-  """Module-specific configuration for this app"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-
-  """Human-readable app description"""
-  description: String
-  id: UUID
-
-  """Whether other scopes may see and reference this app"""
-  isPublished: Boolean
-
-  """Owner-local app name"""
-  name: String!
-
-  """App lifecycle status: active, suspended, archived"""
-  status: String
-
-  """Human-readable app title"""
-  title: String
-  updatedAt: Datetime
-}
-
-"""Methods to use when ordering `App`."""
-enum AppOrderBy {
-  CONFIG_ASC
-  CONFIG_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  ID_ASC
-  ID_DESC
-  IS_PUBLISHED_ASC
-  IS_PUBLISHED_DESC
-  NAME_ASC
-  NAME_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  STATUS_ASC
-  STATUS_DESC
-  TITLE_ASC
-  TITLE_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""Represents an update to a `App`. Fields that are set will be updated."""
-input AppPatch {
-  """Module-specific configuration for this app"""
-  config: JSON
-  createdAt: Datetime
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID
-
-  """Human-readable app description"""
-  description: String
-  id: UUID
-
-  """Whether other scopes may see and reference this app"""
-  isPublished: Boolean
-
-  """Owner-local app name"""
-  name: String
-
-  """App lifecycle status: active, suspended, archived"""
-  status: String
-
-  """Human-readable app title"""
-  title: String
-  updatedAt: Datetime
-}
-
-"""
-A filter to be used against many `AppComponent` object types. All fields are combined with a logical ‘and.’
-"""
-input AppToManyAppComponentFilter {
-  """Filters to entities where every related entity matches."""
-  every: AppComponentFilter
-
-  """Filters to entities where no related entity matches."""
-  none: AppComponentFilter
-
-  """Filters to entities where at least one related entity matches."""
-  some: AppComponentFilter
-}
-
 """All input for the `applyRls` mutation."""
 input ApplyRlsInput {
   """
@@ -1358,95 +922,130 @@ type ApplyRlsPayload {
   query: Query
 }
 
-"""All input for the `appsInstallApp` mutation."""
-input AppsInstallAppInput {
-  apex: String
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  config: JSON
-  definitionIds: [UUID]
-  hostname: String
-  label: String
+type AstMigration {
+  actionId: UUID
+  actionName: String
+  actorId: UUID
+  createdAt: Datetime
+  databaseId: UUID
+  deploy: JSON
+  deploys: String
+  id: Int
   name: String
-  namespaceId: UUID
-  params: JSON
-  routePath: String
-  slug: String
-  title: String
+  payload: JSON
+  requires: [String]
+  revert: JSON
+  verify: JSON
 }
 
-"""The output of our `appsInstallApp` mutation."""
-type AppsInstallAppPayload {
-  """An edge for our `App`. May be used by Relay 1."""
-  appEdge(
-    """The method to use when ordering `App`."""
-    orderBy: [AppOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppEdge
+"""A connection to a list of `AstMigration` values."""
+type AstMigrationConnection {
+  """
+  A list of edges which contains the `AstMigration` and cursor to aid in pagination.
+  """
+  edges: [AstMigrationEdge]!
 
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
+  """A list of `AstMigration` objects."""
+  nodes: [AstMigration]!
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-  result: App
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AstMigration` you could get from the connection."""
+  totalCount: Int!
 }
 
-"""All input for the `appsUninstallApp` mutation."""
-input AppsUninstallAppInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  targetAppId: UUID
+"""A `AstMigration` edge in the connection."""
+type AstMigrationEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AstMigration` at the end of the edge."""
+  node: AstMigration
 }
 
-"""The output of our `appsUninstallApp` mutation."""
-type AppsUninstallAppPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
+"""
+A filter to be used against `AstMigration` object types. All fields are combined with a logical ‘and.’
+"""
+input AstMigrationFilter {
+  """Filter by the object’s `actionId` field."""
+  actionId: UUIDFilter
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
+  """Filter by the object’s `actionName` field."""
+  actionName: StringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [AstMigrationFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `deploy` field."""
+  deploy: JSONFilter
+
+  """Filter by the object’s `deploys` field."""
+  deploys: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: IntFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: AstMigrationFilter
+
+  """Checks for any expressions in this list."""
+  or: [AstMigrationFilter!]
+
+  """Filter by the object’s `payload` field."""
+  payload: JSONFilter
+
+  """Filter by the object’s `requires` field."""
+  requires: StringListFilter
+
+  """Filter by the object’s `revert` field."""
+  revert: JSONFilter
+
+  """Filter by the object’s `verify` field."""
+  verify: JSONFilter
 }
 
-"""All input for the `appsUpgradeApp` mutation."""
-input AppsUpgradeAppInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  newParams: JSON
-  targetAppId: UUID
-}
-
-"""The output of our `appsUpgradeApp` mutation."""
-type AppsUpgradeAppPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
+"""Methods to use when ordering `AstMigration`."""
+enum AstMigrationOrderBy {
+  ACTION_ID_ASC
+  ACTION_ID_DESC
+  ACTION_NAME_ASC
+  ACTION_NAME_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEPLOYS_ASC
+  DEPLOYS_DESC
+  DEPLOY_ASC
+  DEPLOY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PAYLOAD_ASC
+  PAYLOAD_DESC
+  REQUIRES_ASC
+  REQUIRES_DESC
+  REVERT_ASC
+  REVERT_DESC
+  VERIFY_ASC
+  VERIFY_DESC
 }
 
 """
@@ -1538,6 +1137,31 @@ input BooleanFilter {
 
   """Not included in the specified list."""
   notIn: [Boolean!]
+}
+
+"""All input for the `cancelDatabaseTransfer` mutation."""
+input CancelDatabaseTransferInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  transferId: UUID
+}
+
+"""The output of our `cancelDatabaseTransfer` mutation."""
+type CancelDatabaseTransferPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
 }
 
 type CheckConstraint {
@@ -2170,76 +1794,6 @@ type CreateApiSettingPayload {
     """The method to use when ordering `ApiSetting`."""
     orderBy: [ApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ApiSettingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `AppComponent` mutation."""
-input CreateAppComponentInput {
-  """The `AppComponent` to be created by this mutation."""
-  appComponent: AppComponentInput!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our create `AppComponent` mutation."""
-type CreateAppComponentPayload {
-  """The `AppComponent` that was created by this mutation."""
-  appComponent: AppComponent
-
-  """An edge for our `AppComponent`. May be used by Relay 1."""
-  appComponentEdge(
-    """The method to use when ordering `AppComponent`."""
-    orderBy: [AppComponentOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppComponentEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `App` mutation."""
-input CreateAppInput {
-  """The `App` to be created by this mutation."""
-  app: AppInput!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our create `App` mutation."""
-type CreateAppPayload {
-  """The `App` that was created by this mutation."""
-  app: App
-
-  """An edge for our `App`. May be used by Relay 1."""
-  appEdge(
-    """The method to use when ordering `App`."""
-    orderBy: [AppOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -3130,34 +2684,34 @@ type CreateHostnameBindingPayload {
   query: Query
 }
 
-"""All input for the create `HttpRoute` mutation."""
-input CreateHttpRouteInput {
+"""All input for the create `IdentityProviderRegistry` mutation."""
+input CreateIdentityProviderRegistryInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `HttpRoute` to be created by this mutation."""
-  httpRoute: HttpRouteInput!
+  """The `IdentityProviderRegistry` to be created by this mutation."""
+  identityProviderRegistry: IdentityProviderRegistryInput!
 }
 
-"""The output of our create `HttpRoute` mutation."""
-type CreateHttpRoutePayload {
+"""The output of our create `IdentityProviderRegistry` mutation."""
+type CreateIdentityProviderRegistryPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `HttpRoute` that was created by this mutation."""
-  httpRoute: HttpRoute
+  """The `IdentityProviderRegistry` that was created by this mutation."""
+  identityProviderRegistry: IdentityProviderRegistry
 
-  """An edge for our `HttpRoute`. May be used by Relay 1."""
-  httpRouteEdge(
-    """The method to use when ordering `HttpRoute`."""
-    orderBy: [HttpRouteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): HttpRouteEdge
+  """An edge for our `IdentityProviderRegistry`. May be used by Relay 1."""
+  identityProviderRegistryEdge(
+    """The method to use when ordering `IdentityProviderRegistry`."""
+    orderBy: [IdentityProviderRegistryOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): IdentityProviderRegistryEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -3972,6 +3526,41 @@ type CreatePlatformSitePayload {
   query: Query
 }
 
+"""All input for the create `PlatformSiteRelease` mutation."""
+input CreatePlatformSiteReleaseInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformSiteRelease` to be created by this mutation."""
+  platformSiteRelease: PlatformSiteReleaseInput!
+}
+
+"""The output of our create `PlatformSiteRelease` mutation."""
+type CreatePlatformSiteReleasePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformSiteRelease` that was created by this mutation."""
+  platformSiteRelease: PlatformSiteRelease
+
+  """An edge for our `PlatformSiteRelease`. May be used by Relay 1."""
+  platformSiteReleaseEdge(
+    """The method to use when ordering `PlatformSiteRelease`."""
+    orderBy: [PlatformSiteReleaseOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformSiteReleaseEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `PlatformSiteTheme` mutation."""
 input CreatePlatformSiteThemeInput {
   """
@@ -4145,6 +3734,41 @@ type CreatePubkeySettingPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""All input for the create `Redirect` mutation."""
+input CreateRedirectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Redirect` to be created by this mutation."""
+  redirect: RedirectInput!
+}
+
+"""The output of our create `Redirect` mutation."""
+type CreateRedirectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Redirect` that was created by this mutation."""
+  redirect: Redirect
+
+  """An edge for our `Redirect`. May be used by Relay 1."""
+  redirectEdge(
+    """The method to use when ordering `Redirect`."""
+    orderBy: [RedirectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RedirectEdge
 }
 
 """All input for the create `RlsSetting` mutation."""
@@ -4530,6 +4154,41 @@ type CreateSitePayload {
     """The method to use when ordering `Site`."""
     orderBy: [SiteOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SiteEdge
+}
+
+"""All input for the create `SiteRelease` mutation."""
+input CreateSiteReleaseInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `SiteRelease` to be created by this mutation."""
+  siteRelease: SiteReleaseInput!
+}
+
+"""The output of our create `SiteRelease` mutation."""
+type CreateSiteReleasePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SiteRelease` that was created by this mutation."""
+  siteRelease: SiteRelease
+
+  """An edge for our `SiteRelease`. May be used by Relay 1."""
+  siteReleaseEdge(
+    """The method to use when ordering `SiteRelease`."""
+    orderBy: [SiteReleaseOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteReleaseEdge
 }
 
 """All input for the create `SiteTheme` mutation."""
@@ -6421,6 +6080,11 @@ type DatabaseProvisionModule {
   """
   async: Boolean!
 
+  """
+  The user whose identity is copied into the new database. Defaults to owner_id when NULL; set explicitly when owner_id is an organization
+  """
+  bootstrapActorId: UUID
+
   """Error message from the most recent failed bootstrap attempt"""
   bootstrapError: String
 
@@ -6430,7 +6094,7 @@ type DatabaseProvisionModule {
   bootstrapStatus: String!
 
   """
-  When true, copies the owner user and password hash from source database to the newly provisioned database
+  When true, copies the bootstrap user and password hash from source database to the newly provisioned database
   """
   bootstrapUser: Boolean!
   completedAt: Datetime
@@ -6460,7 +6124,9 @@ type DatabaseProvisionModule {
   """Additional configuration options for provisioning"""
   options: JSON!
 
-  """UUID of the user who owns this database"""
+  """
+  UUID of the entity that owns this database: a user, or an organization for an org-owned request
+  """
   ownerId: UUID!
 
   """
@@ -7773,72 +7439,6 @@ type DeleteApiSettingPayload {
   query: Query
 }
 
-"""All input for the `deleteAppComponent` mutation."""
-input DeleteAppComponentInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `AppComponent` mutation."""
-type DeleteAppComponentPayload {
-  """The `AppComponent` that was deleted by this mutation."""
-  appComponent: AppComponent
-
-  """An edge for our `AppComponent`. May be used by Relay 1."""
-  appComponentEdge(
-    """The method to use when ordering `AppComponent`."""
-    orderBy: [AppComponentOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppComponentEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `deleteApp` mutation."""
-input DeleteAppInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `App` mutation."""
-type DeleteAppPayload {
-  """The `App` that was deleted by this mutation."""
-  app: App
-
-  """An edge for our `App`. May be used by Relay 1."""
-  appEdge(
-    """The method to use when ordering `App`."""
-    orderBy: [AppOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the `deleteCheckConstraint` mutation."""
 input DeleteCheckConstraintInput {
   """
@@ -8666,32 +8266,32 @@ type DeleteHostnameBindingPayload {
   query: Query
 }
 
-"""All input for the `deleteHttpRoute` mutation."""
-input DeleteHttpRouteInput {
+"""All input for the `deleteIdentityProviderRegistry` mutation."""
+input DeleteIdentityProviderRegistryInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: UUID!
+  slug: String!
 }
 
-"""The output of our delete `HttpRoute` mutation."""
-type DeleteHttpRoutePayload {
+"""The output of our delete `IdentityProviderRegistry` mutation."""
+type DeleteIdentityProviderRegistryPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `HttpRoute` that was deleted by this mutation."""
-  httpRoute: HttpRoute
+  """The `IdentityProviderRegistry` that was deleted by this mutation."""
+  identityProviderRegistry: IdentityProviderRegistry
 
-  """An edge for our `HttpRoute`. May be used by Relay 1."""
-  httpRouteEdge(
-    """The method to use when ordering `HttpRoute`."""
-    orderBy: [HttpRouteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): HttpRouteEdge
+  """An edge for our `IdentityProviderRegistry`. May be used by Relay 1."""
+  identityProviderRegistryEdge(
+    """The method to use when ordering `IdentityProviderRegistry`."""
+    orderBy: [IdentityProviderRegistryOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): IdentityProviderRegistryEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -9464,6 +9064,39 @@ type DeletePlatformSitePayload {
   query: Query
 }
 
+"""All input for the `deletePlatformSiteRelease` mutation."""
+input DeletePlatformSiteReleaseInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformSiteRelease` mutation."""
+type DeletePlatformSiteReleasePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformSiteRelease` that was deleted by this mutation."""
+  platformSiteRelease: PlatformSiteRelease
+
+  """An edge for our `PlatformSiteRelease`. May be used by Relay 1."""
+  platformSiteReleaseEdge(
+    """The method to use when ordering `PlatformSiteRelease`."""
+    orderBy: [PlatformSiteReleaseOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformSiteReleaseEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deletePlatformSiteTheme` mutation."""
 input DeletePlatformSiteThemeInput {
   """
@@ -9627,6 +9260,39 @@ type DeletePubkeySettingPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""All input for the `deleteRedirect` mutation."""
+input DeleteRedirectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Redirect` mutation."""
+type DeleteRedirectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Redirect` that was deleted by this mutation."""
+  redirect: Redirect
+
+  """An edge for our `Redirect`. May be used by Relay 1."""
+  redirectEdge(
+    """The method to use when ordering `Redirect`."""
+    orderBy: [RedirectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RedirectEdge
 }
 
 """All input for the `deleteRlsSetting` mutation."""
@@ -9990,6 +9656,64 @@ type DeleteSitePayload {
     """The method to use when ordering `Site`."""
     orderBy: [SiteOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SiteEdge
+}
+
+"""All input for the `deleteSitePreview` mutation."""
+input DeleteSitePreviewInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  targetName: String
+  targetSiteId: UUID
+}
+
+"""The output of our `deleteSitePreview` mutation."""
+type DeleteSitePreviewPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteSiteRelease` mutation."""
+input DeleteSiteReleaseInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `SiteRelease` mutation."""
+type DeleteSiteReleasePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SiteRelease` that was deleted by this mutation."""
+  siteRelease: SiteRelease
+
+  """An edge for our `SiteRelease`. May be used by Relay 1."""
+  siteReleaseEdge(
+    """The method to use when ordering `SiteRelease`."""
+    orderBy: [SiteReleaseOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteReleaseEdge
 }
 
 """All input for the `deleteSiteTheme` mutation."""
@@ -10527,6 +10251,7 @@ type Derive {
   database: Database
   databaseId: UUID!
   id: UUID!
+  includeGrants: Boolean!
   includeMutations: Boolean!
   kind: String!
   policyPrefix: String!
@@ -10586,6 +10311,9 @@ input DeriveFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
+  """Filter by the object’s `includeGrants` field."""
+  includeGrants: BooleanFilter
+
   """Filter by the object’s `includeMutations` field."""
   includeMutations: BooleanFilter
 
@@ -10622,6 +10350,7 @@ input DeriveInput {
   createdAt: Datetime
   databaseId: UUID
   id: UUID
+  includeGrants: Boolean
   includeMutations: Boolean
   kind: String!
   policyPrefix: String
@@ -10638,6 +10367,8 @@ enum DeriveOrderBy {
   DATABASE_ID_DESC
   ID_ASC
   ID_DESC
+  INCLUDE_GRANTS_ASC
+  INCLUDE_GRANTS_DESC
   INCLUDE_MUTATIONS_ASC
   INCLUDE_MUTATIONS_DESC
   KIND_ASC
@@ -10662,6 +10393,7 @@ input DerivePatch {
   createdAt: Datetime
   databaseId: UUID
   id: UUID
+  includeGrants: Boolean
   includeMutations: Boolean
   kind: String
   policyPrefix: String
@@ -10677,6 +10409,7 @@ type Domain {
   """Module-specific configuration for this hostname"""
   config: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -10741,35 +10474,6 @@ type Domain {
 
   """Lowercase fully-qualified hostname; wildcards use the *.parent form"""
   hostname: String!
-
-  """Reads and enables pagination through a set of `HttpRoute`."""
-  httpRoutes(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `HttpRoute`."""
-    orderBy: [HttpRouteOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: HttpRouteFilter
-  ): HttpRouteConnection!
   id: UUID!
 
   """Whether other scopes may see and bind under this hostname"""
@@ -10826,6 +10530,7 @@ type Domain {
   """Certificate lifecycle state for this hostname"""
   tlsStatus: String!
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Ownership verification state of this hostname"""
   verificationStatus: String!
@@ -11096,6 +10801,9 @@ input DomainFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
@@ -11113,12 +10821,6 @@ input DomainFilter {
 
   """Filter by the object’s `hostname` field."""
   hostname: StringFilter
-
-  """Filter by the object’s `httpRoutes` relation."""
-  httpRoutes: DomainToManyHttpRouteFilter
-
-  """`httpRoutes` exist."""
-  httpRoutesExist: Boolean
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
@@ -11159,6 +10861,9 @@ input DomainFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+
   """Filter by the object’s `verificationStatus` field."""
   verificationStatus: StringFilter
 
@@ -11171,6 +10876,7 @@ input DomainInput {
   """Module-specific configuration for this hostname"""
   config: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -11204,6 +10910,7 @@ input DomainInput {
   """Certificate lifecycle state for this hostname"""
   tlsStatus: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Ownership verification state of this hostname"""
   verificationStatus: String
@@ -11218,6 +10925,8 @@ enum DomainOrderBy {
   CONFIG_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   HOSTNAME_ASC
@@ -11243,6 +10952,8 @@ enum DomainOrderBy {
   TLS_STATUS_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
   VERIFICATION_STATUS_ASC
   VERIFICATION_STATUS_DESC
   VERIFIED_AT_ASC
@@ -11256,6 +10967,7 @@ input DomainPatch {
   """Module-specific configuration for this hostname"""
   config: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID
@@ -11289,6 +11001,7 @@ input DomainPatch {
   """Certificate lifecycle state for this hostname"""
   tlsStatus: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Ownership verification state of this hostname"""
   verificationStatus: String
@@ -11323,20 +11036,6 @@ input DomainToManyDomainVerificationFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: DomainVerificationFilter
-}
-
-"""
-A filter to be used against many `HttpRoute` object types. All fields are combined with a logical ‘and.’
-"""
-input DomainToManyHttpRouteFilter {
-  """Filters to entities where every related entity matches."""
-  every: HttpRouteFilter
-
-  """Filters to entities where no related entity matches."""
-  none: HttpRouteFilter
-
-  """Filters to entities where at least one related entity matches."""
-  some: HttpRouteFilter
 }
 
 """
@@ -14683,6 +14382,39 @@ input FunctionPatch {
   schemaId: UUID
 }
 
+"""A connection to a list of `GetSitePreviewsRecord` values."""
+type GetSitePreviewsConnection {
+  """
+  A list of edges which contains the `GetSitePreviewsRecord` and cursor to aid in pagination.
+  """
+  edges: [GetSitePreviewsEdge]!
+
+  """A list of `GetSitePreviewsRecord` objects."""
+  nodes: [GetSitePreviewsRecord]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `GetSitePreviewsRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `GetSitePreviewsRecord` edge in the connection."""
+type GetSitePreviewsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `GetSitePreviewsRecord` at the end of the edge."""
+  node: GetSitePreviewsRecord
+}
+
+type GetSitePreviewsRecord {
+  commitId: UUID
+  name: String
+}
+
 """
 Compiled hostname index maintained by domain sync triggers; read only through the resolver
 """
@@ -14879,231 +14611,130 @@ input HostnameBindingPatch {
   verificationStatus: String
 }
 
-"""
-Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target
-"""
-type HttpRoute {
-  createdAt: Datetime
-  createdBy: UUID
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-
-  """Reads a single `Domain` that is related to this `HttpRoute`."""
-  domain: Domain
-
-  """Registered host in the scoped routing domains table"""
-  domainId: UUID!
-  id: UUID!
-
-  """Whether the resolver may select this route"""
-  isActive: Boolean!
-
-  """Optional uppercase HTTP method; NULL matches every method"""
-  method: String
-
-  """Normalized request path prefix; longest matching prefix wins"""
-  path: String!
-
-  """Tie-break precedence after path length and method specificity"""
-  priority: Int!
-
-  """
-  Target row of the type named by target_kind; existence enforced by trigger
-  """
-  targetId: UUID!
-
-  """Discriminator selecting the type of target_id"""
-  targetKind: String!
-  updatedAt: Datetime
-  updatedBy: UUID
+type IdentityProviderRegistry {
+  authorizationUrl: String
+  displayName: String!
+  issuerUrl: String
+  kind: String!
+  scopes: [String]!
+  slug: String!
+  tokenUrl: String
+  userinfoUrl: String
 }
 
-"""A connection to a list of `HttpRoute` values."""
-type HttpRouteConnection {
+"""A connection to a list of `IdentityProviderRegistry` values."""
+type IdentityProviderRegistryConnection {
   """
-  A list of edges which contains the `HttpRoute` and cursor to aid in pagination.
+  A list of edges which contains the `IdentityProviderRegistry` and cursor to aid in pagination.
   """
-  edges: [HttpRouteEdge]!
+  edges: [IdentityProviderRegistryEdge]!
 
-  """A list of `HttpRoute` objects."""
-  nodes: [HttpRoute]!
+  """A list of `IdentityProviderRegistry` objects."""
+  nodes: [IdentityProviderRegistry]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `HttpRoute` you could get from the connection."""
+  """
+  The count of *all* `IdentityProviderRegistry` you could get from the connection.
+  """
   totalCount: Int!
 }
 
-"""A `HttpRoute` edge in the connection."""
-type HttpRouteEdge {
+"""A `IdentityProviderRegistry` edge in the connection."""
+type IdentityProviderRegistryEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `HttpRoute` at the end of the edge."""
-  node: HttpRoute
+  """The `IdentityProviderRegistry` at the end of the edge."""
+  node: IdentityProviderRegistry
 }
 
 """
-A filter to be used against `HttpRoute` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `IdentityProviderRegistry` object types. All fields are combined with a logical ‘and.’
 """
-input HttpRouteFilter {
+input IdentityProviderRegistryFilter {
   """Checks for all expressions in this list."""
-  and: [HttpRouteFilter!]
+  and: [IdentityProviderRegistryFilter!]
 
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
+  """Filter by the object’s `authorizationUrl` field."""
+  authorizationUrl: StringFilter
 
-  """Filter by the object’s `createdBy` field."""
-  createdBy: UUIDFilter
+  """Filter by the object’s `displayName` field."""
+  displayName: StringFilter
 
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
+  """Filter by the object’s `issuerUrl` field."""
+  issuerUrl: StringFilter
 
-  """Filter by the object’s `domain` relation."""
-  domain: DomainFilter
-
-  """Filter by the object’s `domainId` field."""
-  domainId: UUIDFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isActive` field."""
-  isActive: BooleanFilter
-
-  """Filter by the object’s `method` field."""
-  method: StringFilter
+  """Filter by the object’s `kind` field."""
+  kind: StringFilter
 
   """Negates the expression."""
-  not: HttpRouteFilter
+  not: IdentityProviderRegistryFilter
 
   """Checks for any expressions in this list."""
-  or: [HttpRouteFilter!]
+  or: [IdentityProviderRegistryFilter!]
 
-  """Filter by the object’s `path` field."""
-  path: StringFilter
+  """Filter by the object’s `scopes` field."""
+  scopes: StringListFilter
 
-  """Filter by the object’s `priority` field."""
-  priority: IntFilter
+  """Filter by the object’s `slug` field."""
+  slug: StringFilter
 
-  """Filter by the object’s `targetId` field."""
-  targetId: UUIDFilter
+  """Filter by the object’s `tokenUrl` field."""
+  tokenUrl: StringFilter
 
-  """Filter by the object’s `targetKind` field."""
-  targetKind: StringFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Filter by the object’s `updatedBy` field."""
-  updatedBy: UUIDFilter
+  """Filter by the object’s `userinfoUrl` field."""
+  userinfoUrl: StringFilter
 }
 
-"""An input for mutations affecting `HttpRoute`"""
-input HttpRouteInput {
-  createdAt: Datetime
-  createdBy: UUID
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-
-  """Registered host in the scoped routing domains table"""
-  domainId: UUID!
-  id: UUID
-
-  """Whether the resolver may select this route"""
-  isActive: Boolean
-
-  """Optional uppercase HTTP method; NULL matches every method"""
-  method: String
-
-  """Normalized request path prefix; longest matching prefix wins"""
-  path: String
-
-  """Tie-break precedence after path length and method specificity"""
-  priority: Int
-
-  """
-  Target row of the type named by target_kind; existence enforced by trigger
-  """
-  targetId: UUID!
-
-  """Discriminator selecting the type of target_id"""
-  targetKind: String!
-  updatedAt: Datetime
-  updatedBy: UUID
+"""An input for mutations affecting `IdentityProviderRegistry`"""
+input IdentityProviderRegistryInput {
+  authorizationUrl: String
+  displayName: String!
+  issuerUrl: String
+  kind: String!
+  scopes: [String]
+  slug: String!
+  tokenUrl: String
+  userinfoUrl: String
 }
 
-"""Methods to use when ordering `HttpRoute`."""
-enum HttpRouteOrderBy {
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  CREATED_BY_ASC
-  CREATED_BY_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  DOMAIN_ID_ASC
-  DOMAIN_ID_DESC
-  ID_ASC
-  ID_DESC
-  IS_ACTIVE_ASC
-  IS_ACTIVE_DESC
-  METHOD_ASC
-  METHOD_DESC
+"""Methods to use when ordering `IdentityProviderRegistry`."""
+enum IdentityProviderRegistryOrderBy {
+  AUTHORIZATION_URL_ASC
+  AUTHORIZATION_URL_DESC
+  DISPLAY_NAME_ASC
+  DISPLAY_NAME_DESC
+  ISSUER_URL_ASC
+  ISSUER_URL_DESC
+  KIND_ASC
+  KIND_DESC
   NATURAL
-  PATH_ASC
-  PATH_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  PRIORITY_ASC
-  PRIORITY_DESC
-  TARGET_ID_ASC
-  TARGET_ID_DESC
-  TARGET_KIND_ASC
-  TARGET_KIND_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  UPDATED_BY_ASC
-  UPDATED_BY_DESC
+  SCOPES_ASC
+  SCOPES_DESC
+  SLUG_ASC
+  SLUG_DESC
+  TOKEN_URL_ASC
+  TOKEN_URL_DESC
+  USERINFO_URL_ASC
+  USERINFO_URL_DESC
 }
 
 """
-Represents an update to a `HttpRoute`. Fields that are set will be updated.
+Represents an update to a `IdentityProviderRegistry`. Fields that are set will be updated.
 """
-input HttpRoutePatch {
-  createdAt: Datetime
-  createdBy: UUID
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID
-
-  """Registered host in the scoped routing domains table"""
-  domainId: UUID
-  id: UUID
-
-  """Whether the resolver may select this route"""
-  isActive: Boolean
-
-  """Optional uppercase HTTP method; NULL matches every method"""
-  method: String
-
-  """Normalized request path prefix; longest matching prefix wins"""
-  path: String
-
-  """Tie-break precedence after path length and method specificity"""
-  priority: Int
-
-  """
-  Target row of the type named by target_kind; existence enforced by trigger
-  """
-  targetId: UUID
-
-  """Discriminator selecting the type of target_id"""
-  targetKind: String
-  updatedAt: Datetime
-  updatedBy: UUID
+input IdentityProviderRegistryPatch {
+  authorizationUrl: String
+  displayName: String
+  issuerUrl: String
+  kind: String
+  scopes: [String]
+  slug: String
+  tokenUrl: String
+  userinfoUrl: String
 }
 
 type Index {
@@ -15431,6 +15062,7 @@ type ManagedDomain {
   """Certificate issuance state for this managed hostname"""
   certStatus: String!
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -15508,6 +15140,7 @@ type ManagedDomain {
   """TLS provisioning state for this managed hostname"""
   tlsStatus: String!
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """DNS ownership verification state of this managed hostname"""
   verificationStatus: String!
@@ -15561,6 +15194,9 @@ input ManagedDomainFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
@@ -15600,6 +15236,9 @@ input ManagedDomainFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+
   """Filter by the object’s `verificationStatus` field."""
   verificationStatus: StringFilter
 
@@ -15618,6 +15257,7 @@ input ManagedDomainInput {
   """Certificate issuance state for this managed hostname"""
   certStatus: String
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -15637,6 +15277,7 @@ input ManagedDomainInput {
   """TLS provisioning state for this managed hostname"""
   tlsStatus: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """DNS ownership verification state of this managed hostname"""
   verificationStatus: String
@@ -15655,6 +15296,8 @@ enum ManagedDomainOrderBy {
   CERT_STATUS_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DOMAIN_ASC
@@ -15672,6 +15315,8 @@ enum ManagedDomainOrderBy {
   TLS_STATUS_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
   VERIFICATION_STATUS_ASC
   VERIFICATION_STATUS_DESC
   VERIFIED_AT_ASC
@@ -15691,6 +15336,7 @@ input ManagedDomainPatch {
   """Certificate issuance state for this managed hostname"""
   certStatus: String
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID
@@ -15710,6 +15356,7 @@ input ManagedDomainPatch {
   """TLS provisioning state for this managed hostname"""
   tlsStatus: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """DNS ownership verification state of this managed hostname"""
   verificationStatus: String
@@ -15993,11 +15640,57 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
+  """GraphQL type name of the plane's buckets table"""
+  bucketsType: String!
+
+  """
+  Computed download-URL field on the files type; null on the buckets side
+  """
+  downloadUrlField: String
+
+  """GraphQL type name of the plane's files table"""
+  filesType: String!
+
   """Whether this table is a storage buckets table"""
   isBucketsTable: Boolean!
 
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
+
+  """The plane's GraphQL upload surface"""
+  upload: MetaStorageUpload!
+}
+
+"""
+The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
+"""
+type MetaStorageUpload {
+  """Per-file input type inside the bulk input"""
+  bulkFileInputType: String!
+
+  """Per-file payload type inside the bulk payload"""
+  bulkFilePayloadType: String!
+
+  """Input type of the bulk upload mutation"""
+  bulkInputType: String!
+
+  """Root mutation field for bulk upload"""
+  bulkMutation: String!
+
+  """Payload type of the bulk upload mutation"""
+  bulkPayloadType: String!
+
+  """Input type of the single upload mutation"""
+  inputType: String!
+
+  """Root mutation field for single-file upload (e.g. uploadAppFile)"""
+  mutation: String!
+
+  """Payload type of the single upload mutation"""
+  payloadType: String!
+
+  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  requiresOwnerId: Boolean!
 }
 
 """Information about a database table"""
@@ -16053,34 +15746,61 @@ type MetaUniqueConstraint {
   name: String!
 }
 
+"""All input for the `mintSitePreviewToken` mutation."""
+input MintSitePreviewTokenInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  siteId: UUID
+  target: String
+  targetKind: String
+  ttlSeconds: Int
+}
+
+"""The output of our `mintSitePreviewToken` mutation."""
+type MintSitePreviewTokenPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: [MintSitePreviewTokenRecord]
+}
+
+type MintSitePreviewTokenRecord {
+  expiresAt: BigInt
+  token: String
+}
+
 """
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
+  acceptDatabaseTransfer(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: AcceptDatabaseTransferInput!
+  ): AcceptDatabaseTransferPayload
   applyRls(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: ApplyRlsInput!
   ): ApplyRlsPayload
-  appsInstallApp(
+  cancelDatabaseTransfer(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: AppsInstallAppInput!
-  ): AppsInstallAppPayload
-  appsUninstallApp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: AppsUninstallAppInput!
-  ): AppsUninstallAppPayload
-  appsUpgradeApp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: AppsUpgradeAppInput!
-  ): AppsUpgradeAppPayload
+    input: CancelDatabaseTransferInput!
+  ): CancelDatabaseTransferPayload
 
   """Creates a single `Api`."""
   createApi(
@@ -16105,22 +15825,6 @@ type Mutation {
     """
     input: CreateApiSettingInput!
   ): CreateApiSettingPayload
-
-  """Creates a single `App`."""
-  createApp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppInput!
-  ): CreateAppPayload
-
-  """Creates a single `AppComponent`."""
-  createAppComponent(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppComponentInput!
-  ): CreateAppComponentPayload
 
   """Creates a single `CheckConstraint`."""
   createCheckConstraint(
@@ -16322,13 +16026,13 @@ type Mutation {
     input: CreateHostnameBindingInput!
   ): CreateHostnameBindingPayload
 
-  """Creates a single `HttpRoute`."""
-  createHttpRoute(
+  """Creates a single `IdentityProviderRegistry`."""
+  createIdentityProviderRegistry(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateHttpRouteInput!
-  ): CreateHttpRoutePayload
+    input: CreateIdentityProviderRegistryInput!
+  ): CreateIdentityProviderRegistryPayload
 
   """Creates a single `Index`."""
   createIndex(
@@ -16514,6 +16218,14 @@ type Mutation {
     input: CreatePlatformSiteModuleInput!
   ): CreatePlatformSiteModulePayload
 
+  """Creates a single `PlatformSiteRelease`."""
+  createPlatformSiteRelease(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformSiteReleaseInput!
+  ): CreatePlatformSiteReleasePayload
+
   """Creates a single `PlatformSiteTheme`."""
   createPlatformSiteTheme(
     """
@@ -16553,6 +16265,14 @@ type Mutation {
     """
     input: CreatePubkeySettingInput!
   ): CreatePubkeySettingPayload
+
+  """Creates a single `Redirect`."""
+  createRedirect(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRedirectInput!
+  ): CreateRedirectPayload
 
   """Creates a single `RlsSetting`."""
   createRlsSetting(
@@ -16641,6 +16361,14 @@ type Mutation {
     """
     input: CreateSiteModuleInput!
   ): CreateSiteModulePayload
+
+  """Creates a single `SiteRelease`."""
+  createSiteRelease(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSiteReleaseInput!
+  ): CreateSiteReleasePayload
 
   """Creates a single `SiteTheme`."""
   createSiteTheme(
@@ -16793,22 +16521,6 @@ type Mutation {
     """
     input: DeleteApiSettingInput!
   ): DeleteApiSettingPayload
-
-  """Deletes a single `App` using a unique key."""
-  deleteApp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppInput!
-  ): DeleteAppPayload
-
-  """Deletes a single `AppComponent` using a unique key."""
-  deleteAppComponent(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppComponentInput!
-  ): DeleteAppComponentPayload
 
   """Deletes a single `CheckConstraint` using a unique key."""
   deleteCheckConstraint(
@@ -17010,13 +16722,13 @@ type Mutation {
     input: DeleteHostnameBindingInput!
   ): DeleteHostnameBindingPayload
 
-  """Deletes a single `HttpRoute` using a unique key."""
-  deleteHttpRoute(
+  """Deletes a single `IdentityProviderRegistry` using a unique key."""
+  deleteIdentityProviderRegistry(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteHttpRouteInput!
-  ): DeleteHttpRoutePayload
+    input: DeleteIdentityProviderRegistryInput!
+  ): DeleteIdentityProviderRegistryPayload
 
   """Deletes a single `Index` using a unique key."""
   deleteIndex(
@@ -17202,6 +16914,14 @@ type Mutation {
     input: DeletePlatformSiteModuleInput!
   ): DeletePlatformSiteModulePayload
 
+  """Deletes a single `PlatformSiteRelease` using a unique key."""
+  deletePlatformSiteRelease(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformSiteReleaseInput!
+  ): DeletePlatformSiteReleasePayload
+
   """Deletes a single `PlatformSiteTheme` using a unique key."""
   deletePlatformSiteTheme(
     """
@@ -17241,6 +16961,14 @@ type Mutation {
     """
     input: DeletePubkeySettingInput!
   ): DeletePubkeySettingPayload
+
+  """Deletes a single `Redirect` using a unique key."""
+  deleteRedirect(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRedirectInput!
+  ): DeleteRedirectPayload
 
   """Deletes a single `RlsSetting` using a unique key."""
   deleteRlsSetting(
@@ -17329,6 +17057,20 @@ type Mutation {
     """
     input: DeleteSiteModuleInput!
   ): DeleteSiteModulePayload
+  deleteSitePreview(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSitePreviewInput!
+  ): DeleteSitePreviewPayload
+
+  """Deletes a single `SiteRelease` using a unique key."""
+  deleteSiteRelease(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSiteReleaseInput!
+  ): DeleteSiteReleasePayload
 
   """Deletes a single `SiteTheme` using a unique key."""
   deleteSiteTheme(
@@ -17463,12 +17205,72 @@ type Mutation {
     """
     input: DomainsAssignSubdomainInput!
   ): DomainsAssignSubdomainPayload
+  mintSitePreviewToken(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MintSitePreviewTokenInput!
+  ): MintSitePreviewTokenPayload
+  pagesInstallPages(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PagesInstallPagesInput!
+  ): PagesInstallPagesPayload
+  platformDeleteSitePreview(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformDeleteSitePreviewInput!
+  ): PlatformDeleteSitePreviewPayload
   platformDomainsAssignSubdomain(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: PlatformDomainsAssignSubdomainInput!
   ): PlatformDomainsAssignSubdomainPayload
+  platformMintSitePreviewToken(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformMintSitePreviewTokenInput!
+  ): PlatformMintSitePreviewTokenPayload
+  platformPagesInstallPages(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformPagesInstallPagesInput!
+  ): PlatformPagesInstallPagesPayload
+  platformProvisionSitePreview(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformProvisionSitePreviewInput!
+  ): PlatformProvisionSitePreviewPayload
+  platformSetSitePreview(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformSetSitePreviewInput!
+  ): PlatformSetSitePreviewPayload
+  platformSiteMetadataInstallRobots(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformSiteMetadataInstallRobotsInput!
+  ): PlatformSiteMetadataInstallRobotsPayload
+  platformSitesInstallContentPreset(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformSitesInstallContentPresetInput!
+  ): PlatformSitesInstallContentPresetPayload
+  platformSitesInstallMantra(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformSitesInstallMantraInput!
+  ): PlatformSitesInstallMantraPayload
   platformSitesProvisionStaticSite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -17488,15 +17290,28 @@ type Mutation {
     """
     input: ProvisionBucketInput!
   ): ProvisionBucketPayload
+  provisionSitePreview(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionSitePreviewInput!
+  ): ProvisionSitePreviewPayload
+  rejectDatabaseTransfer(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RejectDatabaseTransferInput!
+  ): RejectDatabaseTransferPayload
 
   """
   Requests a database and returns a ticket (database_provision_module row) to poll.
   
-  Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+  Pass exactly one of preset_slug or modules. Pass organization_id to have the organization own the database from the start (the caller must be an owner of that organization); the requesting user is still the identity bootstrapped into the new database. Omit it for a personal database. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
   
   Example usage:
     SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
     SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
+    SELECT * FROM metaschema_public.request_database('team_app', 'example.com', preset_slug := 'full', organization_id := '00000000-0000-0000-0000-000000000000'::uuid);
   """
   requestDatabase(
     """
@@ -17510,6 +17325,30 @@ type Mutation {
     """
     input: SetFieldOrderInput!
   ): SetFieldOrderPayload
+  setSitePreview(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetSitePreviewInput!
+  ): SetSitePreviewPayload
+  siteMetadataInstallRobots(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SiteMetadataInstallRobotsInput!
+  ): SiteMetadataInstallRobotsPayload
+  sitesInstallContentPreset(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SitesInstallContentPresetInput!
+  ): SitesInstallContentPresetPayload
+  sitesInstallMantra(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SitesInstallMantraInput!
+  ): SitesInstallMantraPayload
   sitesProvisionStaticSite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -17540,22 +17379,6 @@ type Mutation {
     """
     input: UpdateApiSettingInput!
   ): UpdateApiSettingPayload
-
-  """Updates a single `App` using a unique key and a patch."""
-  updateApp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppInput!
-  ): UpdateAppPayload
-
-  """Updates a single `AppComponent` using a unique key and a patch."""
-  updateAppComponent(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppComponentInput!
-  ): UpdateAppComponentPayload
 
   """Updates a single `CheckConstraint` using a unique key and a patch."""
   updateCheckConstraint(
@@ -17763,13 +17586,15 @@ type Mutation {
     input: UpdateHostnameBindingInput!
   ): UpdateHostnameBindingPayload
 
-  """Updates a single `HttpRoute` using a unique key and a patch."""
-  updateHttpRoute(
+  """
+  Updates a single `IdentityProviderRegistry` using a unique key and a patch.
+  """
+  updateIdentityProviderRegistry(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateHttpRouteInput!
-  ): UpdateHttpRoutePayload
+    input: UpdateIdentityProviderRegistryInput!
+  ): UpdateIdentityProviderRegistryPayload
 
   """Updates a single `Index` using a unique key and a patch."""
   updateIndex(
@@ -17971,6 +17796,14 @@ type Mutation {
     input: UpdatePlatformSiteModuleInput!
   ): UpdatePlatformSiteModulePayload
 
+  """Updates a single `PlatformSiteRelease` using a unique key and a patch."""
+  updatePlatformSiteRelease(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformSiteReleaseInput!
+  ): UpdatePlatformSiteReleasePayload
+
   """Updates a single `PlatformSiteTheme` using a unique key and a patch."""
   updatePlatformSiteTheme(
     """
@@ -18014,6 +17847,14 @@ type Mutation {
     """
     input: UpdatePubkeySettingInput!
   ): UpdatePubkeySettingPayload
+
+  """Updates a single `Redirect` using a unique key and a patch."""
+  updateRedirect(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRedirectInput!
+  ): UpdateRedirectPayload
 
   """Updates a single `RlsSetting` using a unique key and a patch."""
   updateRlsSetting(
@@ -18102,6 +17943,14 @@ type Mutation {
     """
     input: UpdateSiteModuleInput!
   ): UpdateSiteModulePayload
+
+  """Updates a single `SiteRelease` using a unique key and a patch."""
+  updateSiteRelease(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSiteReleaseInput!
+  ): UpdateSiteReleasePayload
 
   """Updates a single `SiteTheme` using a unique key and a patch."""
   updateSiteTheme(
@@ -18426,6 +18275,11 @@ type Page {
   """Unique page identifier"""
   id: UUID!
 
+  """
+  Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly
+  """
+  seededFrom: JSON
+
   """Reads a single `Site` that is related to this `Page`."""
   site: Site
 
@@ -18500,6 +18354,9 @@ input PageFilter {
   """Checks for any expressions in this list."""
   or: [PageFilter!]
 
+  """Filter by the object’s `seededFrom` field."""
+  seededFrom: JSONFilter
+
   """Filter by the object’s `site` relation."""
   site: SiteFilter
 
@@ -18553,6 +18410,11 @@ input PageInput {
   id: UUID
 
   """
+  Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly
+  """
+  seededFrom: JSON
+
+  """
   Site surface this page belongs to; each site owns its own infra store and pages live at path [page, slug] within it
   """
   siteId: UUID!
@@ -18584,6 +18446,8 @@ enum PageOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  SEEDED_FROM_ASC
+  SEEDED_FROM_DESC
   SITE_ID_ASC
   SITE_ID_DESC
   SLUG_ASC
@@ -18616,6 +18480,11 @@ input PagePatch {
   id: UUID
 
   """
+  Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly
+  """
+  seededFrom: JSON
+
+  """
   Site surface this page belongs to; each site owns its own infra store and pages live at path [page, slug] within it
   """
   siteId: UUID
@@ -18630,6 +18499,33 @@ input PagePatch {
 
   """Timestamp of last modification"""
   updatedAt: Datetime
+}
+
+"""All input for the `pagesInstallPages` mutation."""
+input PagesInstallPagesInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID
+  pagesPreset: String
+  siteId: UUID
+}
+
+"""The output of our `pagesInstallPages` mutation."""
+type PagesInstallPagesPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: JSON
 }
 
 type Partition {
@@ -19698,6 +19594,31 @@ input PlatformCorsSettingPatch {
   updatedAt: Datetime
 }
 
+"""All input for the `platformDeleteSitePreview` mutation."""
+input PlatformDeleteSitePreviewInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  targetName: String
+  targetSiteId: UUID
+}
+
+"""The output of our `platformDeleteSitePreview` mutation."""
+type PlatformDeleteSitePreviewPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """
 Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog
 """
@@ -19705,6 +19626,7 @@ type PlatformDomain {
   """Module-specific configuration for this hostname"""
   config: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Lowercase fully-qualified hostname; wildcards use the *.parent form"""
   hostname: String!
@@ -19795,6 +19717,7 @@ type PlatformDomain {
   """Certificate lifecycle state for this hostname"""
   tlsStatus: String!
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Ownership verification state of this hostname"""
   verificationStatus: String!
@@ -20057,6 +19980,9 @@ input PlatformDomainFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `hostname` field."""
   hostname: StringFilter
 
@@ -20107,6 +20033,9 @@ input PlatformDomainFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+
   """Filter by the object’s `verificationStatus` field."""
   verificationStatus: StringFilter
 
@@ -20119,6 +20048,7 @@ input PlatformDomainInput {
   """Module-specific configuration for this hostname"""
   config: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Lowercase fully-qualified hostname; wildcards use the *.parent form"""
   hostname: String!
@@ -20149,6 +20079,7 @@ input PlatformDomainInput {
   """Certificate lifecycle state for this hostname"""
   tlsStatus: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Ownership verification state of this hostname"""
   verificationStatus: String
@@ -20163,6 +20094,8 @@ enum PlatformDomainOrderBy {
   CONFIG_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   HOSTNAME_ASC
   HOSTNAME_DESC
   ID_ASC
@@ -20186,6 +20119,8 @@ enum PlatformDomainOrderBy {
   TLS_STATUS_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
   VERIFICATION_STATUS_ASC
   VERIFICATION_STATUS_DESC
   VERIFIED_AT_ASC
@@ -20199,6 +20134,7 @@ input PlatformDomainPatch {
   """Module-specific configuration for this hostname"""
   config: JSON
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Lowercase fully-qualified hostname; wildcards use the *.parent form"""
   hostname: String
@@ -20229,6 +20165,7 @@ input PlatformDomainPatch {
   """Certificate lifecycle state for this hostname"""
   tlsStatus: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """Ownership verification state of this hostname"""
   verificationStatus: String
@@ -21356,6 +21293,39 @@ input PlatformEmailSiteIdentityPatch {
   updatedAt: Datetime
 }
 
+"""A connection to a list of `PlatformGetSitePreviewsRecord` values."""
+type PlatformGetSitePreviewsConnection {
+  """
+  A list of edges which contains the `PlatformGetSitePreviewsRecord` and cursor to aid in pagination.
+  """
+  edges: [PlatformGetSitePreviewsEdge]!
+
+  """A list of `PlatformGetSitePreviewsRecord` objects."""
+  nodes: [PlatformGetSitePreviewsRecord]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformGetSitePreviewsRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformGetSitePreviewsRecord` edge in the connection."""
+type PlatformGetSitePreviewsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformGetSitePreviewsRecord` at the end of the edge."""
+  node: PlatformGetSitePreviewsRecord
+}
+
+type PlatformGetSitePreviewsRecord {
+  commitId: UUID
+  name: String
+}
+
 """
 Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
 """
@@ -21369,6 +21339,7 @@ type PlatformManagedDomain {
   """Certificate issuance state for this managed hostname"""
   certStatus: String!
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """
   Lowercase fully-qualified managed hostname; wildcards use the *.parent form
@@ -21445,6 +21416,7 @@ type PlatformManagedDomain {
   """TLS provisioning state for this managed hostname"""
   tlsStatus: String!
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """DNS ownership verification state of this managed hostname"""
   verificationStatus: String!
@@ -21500,6 +21472,9 @@ input PlatformManagedDomainFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `domain` field."""
   domain: StringFilter
 
@@ -21540,6 +21515,9 @@ input PlatformManagedDomainFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+
   """Filter by the object’s `verificationStatus` field."""
   verificationStatus: StringFilter
 
@@ -21558,6 +21536,7 @@ input PlatformManagedDomainInput {
   """Certificate issuance state for this managed hostname"""
   certStatus: String
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """
   Lowercase fully-qualified managed hostname; wildcards use the *.parent form
@@ -21574,6 +21553,7 @@ input PlatformManagedDomainInput {
   """TLS provisioning state for this managed hostname"""
   tlsStatus: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """DNS ownership verification state of this managed hostname"""
   verificationStatus: String
@@ -21592,6 +21572,8 @@ enum PlatformManagedDomainOrderBy {
   CERT_STATUS_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DOMAIN_ASC
   DOMAIN_DESC
   ID_ASC
@@ -21607,6 +21589,8 @@ enum PlatformManagedDomainOrderBy {
   TLS_STATUS_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
   VERIFICATION_STATUS_ASC
   VERIFICATION_STATUS_DESC
   VERIFIED_AT_ASC
@@ -21626,6 +21610,7 @@ input PlatformManagedDomainPatch {
   """Certificate issuance state for this managed hostname"""
   certStatus: String
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """
   Lowercase fully-qualified managed hostname; wildcards use the *.parent form
@@ -21642,6 +21627,7 @@ input PlatformManagedDomainPatch {
   """TLS provisioning state for this managed hostname"""
   tlsStatus: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 
   """DNS ownership verification state of this managed hostname"""
   verificationStatus: String
@@ -21678,6 +21664,39 @@ input PlatformManagedDomainToManyPlatformDomainVerificationFilter {
   some: PlatformDomainVerificationFilter
 }
 
+"""All input for the `platformMintSitePreviewToken` mutation."""
+input PlatformMintSitePreviewTokenInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  siteId: UUID
+  target: String
+  targetKind: String
+  ttlSeconds: Int
+}
+
+"""The output of our `platformMintSitePreviewToken` mutation."""
+type PlatformMintSitePreviewTokenPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: [PlatformMintSitePreviewTokenRecord]
+}
+
+type PlatformMintSitePreviewTokenRecord {
+  expiresAt: BigInt
+  token: String
+}
+
 """
 Site-owned page content — merkle-versioned head over the infra store; never a routing surface
 """
@@ -21697,6 +21716,11 @@ type PlatformPage {
 
   """Unique page identifier"""
   id: UUID!
+
+  """
+  Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly
+  """
+  seededFrom: JSON
 
   """Reads a single `PlatformSite` that is related to this `PlatformPage`."""
   site: PlatformSite
@@ -21769,6 +21793,9 @@ input PlatformPageFilter {
   """Checks for any expressions in this list."""
   or: [PlatformPageFilter!]
 
+  """Filter by the object’s `seededFrom` field."""
+  seededFrom: JSONFilter
+
   """Filter by the object’s `site` relation."""
   site: PlatformSiteFilter
 
@@ -21804,6 +21831,11 @@ input PlatformPageInput {
   id: UUID
 
   """
+  Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly
+  """
+  seededFrom: JSON
+
+  """
   Site surface this page belongs to; each site owns its own infra store and pages live at path [page, slug] within it
   """
   siteId: UUID!
@@ -21833,6 +21865,8 @@ enum PlatformPageOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  SEEDED_FROM_ASC
+  SEEDED_FROM_DESC
   SITE_ID_ASC
   SITE_ID_DESC
   SLUG_ASC
@@ -21864,6 +21898,11 @@ input PlatformPagePatch {
   id: UUID
 
   """
+  Provenance of a seeded page: the content preset (kind, slug, catalog commit_id) it was installed from, or NULL when authored directly
+  """
+  seededFrom: JSON
+
+  """
   Site surface this page belongs to; each site owns its own infra store and pages live at path [page, slug] within it
   """
   siteId: UUID
@@ -21878,6 +21917,62 @@ input PlatformPagePatch {
 
   """Timestamp of last modification"""
   updatedAt: Datetime
+}
+
+"""All input for the `platformPagesInstallPages` mutation."""
+input PlatformPagesInstallPagesInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID
+  pagesPreset: String
+  siteId: UUID
+}
+
+"""The output of our `platformPagesInstallPages` mutation."""
+type PlatformPagesInstallPagesPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: JSON
+}
+
+"""All input for the `platformProvisionSitePreview` mutation."""
+input PlatformProvisionSitePreviewInput {
+  apex: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  commitId: UUID
+  name: String
+  siteId: UUID
+}
+
+"""The output of our `platformProvisionSitePreview` mutation."""
+type PlatformProvisionSitePreviewPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: PlatformRoute
 }
 
 """Routes binding a domain hostname and path to a typed catalog target"""
@@ -21903,34 +21998,70 @@ type PlatformRoute {
   """
   path: String!
 
+  """
+  The site preview this route serves; NULL serves the site's published release
+  """
+  previewRef: String
+
   """Higher priority wins between otherwise-equal matches"""
   priority: Int!
 
   """
-  Api catalog row this route targets; must be owner-matched or visible cross-scope
+  Site whose surface this route serves; the serving lane renders as this site. NULL when the route serves no site
   """
+  servingSiteId: UUID
+
+  """Api surface this route targets; must be this scope's own api"""
   targetApiId: UUID
 
   """
-  Bucket catalog row this route targets; must be a public bucket that is owner-matched or visible cross-scope
+  Bucket this route targets; must be a public bucket in this scope's own storage plane
   """
   targetBucketId: UUID
 
-  """
-  Function catalog row this route targets; must be owner-matched or visible cross-scope
-  """
+  """Function this route targets; must be this scope's own function"""
   targetFunctionId: UUID
 
   """
-  Resource catalog row (a Service resource) this route targets; must be owner-matched or visible cross-scope
+  Redirect this route targets; the edge answers with a redirect status instead of proxying a backend
+  """
+  targetRedirectId: UUID
+
+  """
+  Resource (a Service resource) this route targets; must be this scope's own resource
   """
   targetServiceId: UUID
 
-  """
-  Site catalog row this route targets; must be owner-matched or visible cross-scope
-  """
+  """Site surface this route targets; must be this scope's own site"""
   targetSiteId: UUID
   updatedAt: Datetime
+}
+
+"""All input for the `platformSetSitePreview` mutation."""
+input PlatformSetSitePreviewInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  targetCommitId: UUID
+  targetName: String
+  targetSiteId: UUID
+}
+
+"""The output of our `platformSetSitePreview` mutation."""
+type PlatformSetSitePreviewPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: UUID
 }
 
 """
@@ -21943,17 +22074,18 @@ type PlatformSite {
   activeCommitId: UUID
 
   """
-  Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
+  Bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
   """
   bucketId: UUID
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Human-readable site description"""
   description: String
   id: UUID!
 
   """
-  Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
+  Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
   """
   installationId: UUID
 
@@ -22123,6 +22255,11 @@ type PlatformSite {
     where: PlatformSiteModuleFilter
   ): PlatformSiteModuleConnection!
 
+  """
+  Reads a single `PlatformSiteRelease` that is related to this `PlatformSite`.
+  """
+  platformSiteReleaseBySiteId: PlatformSiteRelease
+
   """Reads and enables pagination through a set of `PlatformSiteTheme`."""
   platformSiteThemesBySiteId(
     """Read all values in the set after (below) this cursor."""
@@ -22158,21 +22295,24 @@ type PlatformSite {
   platformSiteWebConfigBySiteId: PlatformSiteWebConfig
 
   """
-  Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
+  Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
   """
   resourceId: UUID
 
   """Human-readable site title"""
   title: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 }
 
 """
-Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation)
+Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json)
 """
 type PlatformSiteAppLink {
-  """App identifier: iOS bundle id or Android package name"""
-  appIdentifier: String!
+  """
+  App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own)
+  """
+  appStoreIdentityId: UUID!
   createdAt: Datetime
   id: UUID!
 
@@ -22181,12 +22321,6 @@ type PlatformSiteAppLink {
   """
   pathComponents: [String]!
 
-  """Target platform for this association (ios, android)"""
-  platform: String!
-
-  """Android signing certificate SHA-256 fingerprints for assetlinks.json"""
-  sha256CertFingerprints: [String]!
-
   """
   Reads a single `PlatformSite` that is related to this `PlatformSiteAppLink`.
   """
@@ -22194,16 +22328,6 @@ type PlatformSiteAppLink {
 
   """Site surface this app-link association belongs to"""
   siteId: UUID!
-
-  """
-  App/Play store URL for this app (used by install banners and fallbacks)
-  """
-  storeUrl: String
-
-  """
-  Apple Developer team id (iOS); combined with app_identifier to form the AASA appID
-  """
-  teamId: String
   updatedAt: Datetime
 
   """
@@ -22247,8 +22371,8 @@ input PlatformSiteAppLinkFilter {
   """Checks for all expressions in this list."""
   and: [PlatformSiteAppLinkFilter!]
 
-  """Filter by the object’s `appIdentifier` field."""
-  appIdentifier: StringFilter
+  """Filter by the object’s `appStoreIdentityId` field."""
+  appStoreIdentityId: UUIDFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
@@ -22265,23 +22389,11 @@ input PlatformSiteAppLinkFilter {
   """Filter by the object’s `pathComponents` field."""
   pathComponents: StringListFilter
 
-  """Filter by the object’s `platform` field."""
-  platform: StringFilter
-
-  """Filter by the object’s `sha256CertFingerprints` field."""
-  sha256CertFingerprints: StringListFilter
-
   """Filter by the object’s `site` relation."""
   site: PlatformSiteFilter
 
   """Filter by the object’s `siteId` field."""
   siteId: UUIDFilter
-
-  """Filter by the object’s `storeUrl` field."""
-  storeUrl: StringFilter
-
-  """Filter by the object’s `teamId` field."""
-  teamId: StringFilter
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
@@ -22292,8 +22404,10 @@ input PlatformSiteAppLinkFilter {
 
 """An input for mutations affecting `PlatformSiteAppLink`"""
 input PlatformSiteAppLinkInput {
-  """App identifier: iOS bundle id or Android package name"""
-  appIdentifier: String!
+  """
+  App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own)
+  """
+  appStoreIdentityId: UUID!
   createdAt: Datetime
   id: UUID
 
@@ -22302,24 +22416,8 @@ input PlatformSiteAppLinkInput {
   """
   pathComponents: [String]
 
-  """Target platform for this association (ios, android)"""
-  platform: String!
-
-  """Android signing certificate SHA-256 fingerprints for assetlinks.json"""
-  sha256CertFingerprints: [String]
-
   """Site surface this app-link association belongs to"""
   siteId: UUID!
-
-  """
-  App/Play store URL for this app (used by install banners and fallbacks)
-  """
-  storeUrl: String
-
-  """
-  Apple Developer team id (iOS); combined with app_identifier to form the AASA appID
-  """
-  teamId: String
   updatedAt: Datetime
 
   """
@@ -22330,8 +22428,8 @@ input PlatformSiteAppLinkInput {
 
 """Methods to use when ordering `PlatformSiteAppLink`."""
 enum PlatformSiteAppLinkOrderBy {
-  APP_IDENTIFIER_ASC
-  APP_IDENTIFIER_DESC
+  APP_STORE_IDENTITY_ID_ASC
+  APP_STORE_IDENTITY_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   ID_ASC
@@ -22339,18 +22437,10 @@ enum PlatformSiteAppLinkOrderBy {
   NATURAL
   PATH_COMPONENTS_ASC
   PATH_COMPONENTS_DESC
-  PLATFORM_ASC
-  PLATFORM_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  SHA256_CERT_FINGERPRINTS_ASC
-  SHA256_CERT_FINGERPRINTS_DESC
   SITE_ID_ASC
   SITE_ID_DESC
-  STORE_URL_ASC
-  STORE_URL_DESC
-  TEAM_ID_ASC
-  TEAM_ID_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
   WEBCREDENTIALS_ASC
@@ -22361,8 +22451,10 @@ enum PlatformSiteAppLinkOrderBy {
 Represents an update to a `PlatformSiteAppLink`. Fields that are set will be updated.
 """
 input PlatformSiteAppLinkPatch {
-  """App identifier: iOS bundle id or Android package name"""
-  appIdentifier: String
+  """
+  App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own)
+  """
+  appStoreIdentityId: UUID
   createdAt: Datetime
   id: UUID
 
@@ -22371,24 +22463,8 @@ input PlatformSiteAppLinkPatch {
   """
   pathComponents: [String]
 
-  """Target platform for this association (ios, android)"""
-  platform: String
-
-  """Android signing certificate SHA-256 fingerprints for assetlinks.json"""
-  sha256CertFingerprints: [String]
-
   """Site surface this app-link association belongs to"""
   siteId: UUID
-
-  """
-  App/Play store URL for this app (used by install banners and fallbacks)
-  """
-  storeUrl: String
-
-  """
-  Apple Developer team id (iOS); combined with app_identifier to form the AASA appID
-  """
-  teamId: String
   updatedAt: Datetime
 
   """
@@ -22430,6 +22506,11 @@ type PlatformSiteDeepLink {
 
   """Additional link metadata (campaign/UTM parameters, escape hatch)"""
   metadata: JSON
+
+  """
+  Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets)
+  """
+  pageId: UUID
 
   """
   Reads a single `PlatformSite` that is related to this `PlatformSiteDeepLink`.
@@ -22507,6 +22588,9 @@ input PlatformSiteDeepLinkFilter {
   """Checks for any expressions in this list."""
   or: [PlatformSiteDeepLinkFilter!]
 
+  """Filter by the object’s `pageId` field."""
+  pageId: UUIDFilter
+
   """Filter by the object’s `site` relation."""
   site: PlatformSiteFilter
 
@@ -22539,6 +22623,11 @@ input PlatformSiteDeepLinkInput {
   metadata: JSON
 
   """
+  Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets)
+  """
+  pageId: UUID
+
+  """
   Site surface this deep link belongs to (the hostname plane that serves it)
   """
   siteId: UUID!
@@ -22566,6 +22655,8 @@ enum PlatformSiteDeepLinkOrderBy {
   METADATA_ASC
   METADATA_DESC
   NATURAL
+  PAGE_ID_ASC
+  PAGE_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   SITE_ID_ASC
@@ -22594,6 +22685,11 @@ input PlatformSiteDeepLinkPatch {
 
   """Additional link metadata (campaign/UTM parameters, escape hatch)"""
   metadata: JSON
+
+  """
+  Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets)
+  """
+  pageId: UUID
 
   """
   Site surface this deep link belongs to (the hostname plane that serves it)
@@ -22778,6 +22874,9 @@ input PlatformSiteFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `description` field."""
   description: StringFilter
 
@@ -22844,6 +22943,12 @@ input PlatformSiteFilter {
   """`platformSiteModulesBySiteId` exist."""
   platformSiteModulesBySiteIdExist: Boolean
 
+  """Filter by the object’s `platformSiteReleaseBySiteId` relation."""
+  platformSiteReleaseBySiteId: PlatformSiteReleaseFilter
+
+  """A related `platformSiteReleaseBySiteId` exists."""
+  platformSiteReleaseBySiteIdExists: Boolean
+
   """Filter by the object’s `platformSiteThemesBySiteId` relation."""
   platformSiteThemesBySiteId: PlatformSiteToManyPlatformSiteThemeFilter
 
@@ -22864,6 +22969,9 @@ input PlatformSiteFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
 }
 
 """An input for mutations affecting `PlatformSite`"""
@@ -22874,17 +22982,18 @@ input PlatformSiteInput {
   activeCommitId: UUID
 
   """
-  Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
+  Bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
   """
   bucketId: UUID
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Human-readable site description"""
   description: String
   id: UUID
 
   """
-  Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
+  Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
   """
   installationId: UUID
 
@@ -22900,13 +23009,41 @@ input PlatformSiteInput {
   name: String!
 
   """
-  Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
+  Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
   """
   resourceId: UUID
 
   """Human-readable site title"""
   title: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
+"""All input for the `platformSiteMetadataInstallRobots` mutation."""
+input PlatformSiteMetadataInstallRobotsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID
+  robotsPreset: String
+  siteId: UUID
+}
+
+"""The output of our `platformSiteMetadataInstallRobots` mutation."""
+type PlatformSiteMetadataInstallRobotsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: JSON
 }
 
 """SEO and social sharing metadata for a site surface"""
@@ -22938,6 +23075,11 @@ type PlatformSiteMetadatum {
 
   """robots meta directive (e.g. index,follow / noindex,nofollow)"""
   robots: String
+
+  """
+  Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly
+  """
+  robotsSeededFrom: JSON
 
   """
   Reads a single `PlatformSite` that is related to this `PlatformSiteMetadatum`.
@@ -23028,6 +23170,9 @@ input PlatformSiteMetadatumFilter {
   """Filter by the object’s `robots` field."""
   robots: StringFilter
 
+  """Filter by the object’s `robotsSeededFrom` field."""
+  robotsSeededFrom: JSONFilter
+
   """Filter by the object’s `site` relation."""
   site: PlatformSiteFilter
 
@@ -23074,6 +23219,11 @@ input PlatformSiteMetadatumInput {
   """robots meta directive (e.g. index,follow / noindex,nofollow)"""
   robots: String
 
+  """
+  Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly
+  """
+  robotsSeededFrom: JSON
+
   """Site surface this metadata belongs to"""
   siteId: UUID!
 
@@ -23112,6 +23262,8 @@ enum PlatformSiteMetadatumOrderBy {
   PRIMARY_KEY_DESC
   ROBOTS_ASC
   ROBOTS_DESC
+  ROBOTS_SEEDED_FROM_ASC
+  ROBOTS_SEEDED_FROM_DESC
   SITE_ID_ASC
   SITE_ID_DESC
   STORE_ID_ASC
@@ -23165,6 +23317,11 @@ input PlatformSiteMetadatumPatch {
 
   """robots meta directive (e.g. index,follow / noindex,nofollow)"""
   robots: String
+
+  """
+  Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly
+  """
+  robotsSeededFrom: JSON
 
   """Site surface this metadata belongs to"""
   siteId: UUID
@@ -23351,6 +23508,8 @@ enum PlatformSiteOrderBy {
   BUCKET_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DESCRIPTION_ASC
   DESCRIPTION_DESC
   ID_ASC
@@ -23372,6 +23531,8 @@ enum PlatformSiteOrderBy {
   TITLE_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
 }
 
 """
@@ -23384,17 +23545,18 @@ input PlatformSitePatch {
   activeCommitId: UUID
 
   """
-  Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
+  Bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
   """
   bucketId: UUID
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Human-readable site description"""
   description: String
   id: UUID
 
   """
-  Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
+  Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
   """
   installationId: UUID
 
@@ -23410,12 +23572,181 @@ input PlatformSitePatch {
   name: String
 
   """
-  Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
+  Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
   """
   resourceId: UUID
 
   """Human-readable site title"""
   title: String
+  updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
+"""
+Immutable static-site release manifest head, versioned in the site-owned merkle store
+"""
+type PlatformSiteRelease {
+  """
+  Infra store commit for the current content (stamped by the versioned trigger on every write)
+  """
+  commitId: UUID
+  createdAt: Datetime
+  id: UUID!
+
+  """
+  Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N}
+  """
+  manifest: JSON!
+
+  """
+  Reads a single `PlatformSite` that is related to this `PlatformSiteRelease`.
+  """
+  site: PlatformSite
+
+  """Site surface this release manifest belongs to"""
+  siteId: UUID!
+
+  """
+  Infra Merkle store holding this row's history (stamped by the versioned trigger)
+  """
+  storeId: UUID
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformSiteRelease` values."""
+type PlatformSiteReleaseConnection {
+  """
+  A list of edges which contains the `PlatformSiteRelease` and cursor to aid in pagination.
+  """
+  edges: [PlatformSiteReleaseEdge]!
+
+  """A list of `PlatformSiteRelease` objects."""
+  nodes: [PlatformSiteRelease]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformSiteRelease` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformSiteRelease` edge in the connection."""
+type PlatformSiteReleaseEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformSiteRelease` at the end of the edge."""
+  node: PlatformSiteRelease
+}
+
+"""
+A filter to be used against `PlatformSiteRelease` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformSiteReleaseFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformSiteReleaseFilter!]
+
+  """Filter by the object’s `commitId` field."""
+  commitId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `manifest` field."""
+  manifest: JSONFilter
+
+  """Negates the expression."""
+  not: PlatformSiteReleaseFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformSiteReleaseFilter!]
+
+  """Filter by the object’s `site` relation."""
+  site: PlatformSiteFilter
+
+  """Filter by the object’s `siteId` field."""
+  siteId: UUIDFilter
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `PlatformSiteRelease`"""
+input PlatformSiteReleaseInput {
+  """
+  Infra store commit for the current content (stamped by the versioned trigger on every write)
+  """
+  commitId: UUID
+  createdAt: Datetime
+  id: UUID
+
+  """
+  Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N}
+  """
+  manifest: JSON!
+
+  """Site surface this release manifest belongs to"""
+  siteId: UUID!
+
+  """
+  Infra Merkle store holding this row's history (stamped by the versioned trigger)
+  """
+  storeId: UUID
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `PlatformSiteRelease`."""
+enum PlatformSiteReleaseOrderBy {
+  COMMIT_ID_ASC
+  COMMIT_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  MANIFEST_ASC
+  MANIFEST_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SITE_ID_ASC
+  SITE_ID_DESC
+  STORE_ID_ASC
+  STORE_ID_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformSiteRelease`. Fields that are set will be updated.
+"""
+input PlatformSiteReleasePatch {
+  """
+  Infra store commit for the current content (stamped by the versioned trigger on every write)
+  """
+  commitId: UUID
+  createdAt: Datetime
+  id: UUID
+
+  """
+  Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N}
+  """
+  manifest: JSON
+
+  """Site surface this release manifest belongs to"""
+  siteId: UUID
+
+  """
+  Infra Merkle store holding this row's history (stamped by the versioned trigger)
+  """
+  storeId: UUID
   updatedAt: Datetime
 }
 
@@ -23873,6 +24204,67 @@ input PlatformSiteWebConfigPatch {
   updatedAt: Datetime
 }
 
+"""All input for the `platformSitesInstallContentPreset` mutation."""
+input PlatformSitesInstallContentPresetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID
+  presetKind: String
+  presetSlug: String
+  siteId: UUID
+}
+
+"""The output of our `platformSitesInstallContentPreset` mutation."""
+type PlatformSitesInstallContentPresetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: JSON
+}
+
+"""All input for the `platformSitesInstallMantra` mutation."""
+input PlatformSitesInstallMantraInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID
+  routePreset: String
+  siteId: UUID
+}
+
+"""The output of our `platformSitesInstallMantra` mutation."""
+type PlatformSitesInstallMantraPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """An edge for our `PlatformSite`. May be used by Relay 1."""
+  platformSiteEdge(
+    """The method to use when ordering `PlatformSite`."""
+    orderBy: [PlatformSiteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformSiteEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: PlatformSite
+}
+
 """All input for the `platformSitesProvisionStaticSite` mutation."""
 input PlatformSitesProvisionStaticSiteInput {
   apex: String
@@ -23906,6 +24298,11 @@ type PlatformSitesProvisionStaticSitePayload {
 
 type Policy {
   category: ObjectCategory!
+
+  """
+  Columns of this policy's table that its expression filters on. Stamped when the policy is derived onto a companion table, so a consumer needing those columns (e.g. a chunking worker copying them from the parent row) reads them here instead of re-walking the node type's parameter schema.
+  """
+  columnRefs: [String]
   createdAt: Datetime
   data: JSON
 
@@ -23976,6 +24373,9 @@ input PolicyFilter {
 
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
+
+  """Filter by the object’s `columnRefs` field."""
+  columnRefs: StringListFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
@@ -24056,6 +24456,11 @@ input PolicyFilter {
 """An input for mutations affecting `Policy`"""
 input PolicyInput {
   category: ObjectCategory
+
+  """
+  Columns of this policy's table that its expression filters on. Stamped when the policy is derived onto a companion table, so a consumer needing those columns (e.g. a chunking worker copying them from the parent row) reads them here instead of re-walking the node type's parameter schema.
+  """
+  columnRefs: [String]
   createdAt: Datetime
   data: JSON
   databaseId: UUID
@@ -24083,6 +24488,8 @@ input PolicyInput {
 enum PolicyOrderBy {
   CATEGORY_ASC
   CATEGORY_DESC
+  COLUMN_REFS_ASC
+  COLUMN_REFS_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   DATABASE_ID_ASC
@@ -24127,6 +24534,11 @@ Represents an update to a `Policy`. Fields that are set will be updated.
 """
 input PolicyPatch {
   category: ObjectCategory
+
+  """
+  Columns of this policy's table that its expression filters on. Stamped when the policy is derived onto a companion table, so a consumer needing those columns (e.g. a chunking worker copying them from the parent row) reads them here instead of re-walking the node type's parameter schema.
+  """
+  columnRefs: [String]
   createdAt: Datetime
   data: JSON
   databaseId: UUID
@@ -24367,6 +24779,41 @@ type ProvisionBucketPayload {
 
   """Whether provisioning succeeded"""
   success: Boolean!
+}
+
+"""All input for the `provisionSitePreview` mutation."""
+input ProvisionSitePreviewInput {
+  apex: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  commitId: UUID
+  name: String
+  siteId: UUID
+}
+
+"""The output of our `provisionSitePreview` mutation."""
+type ProvisionSitePreviewPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Route
+
+  """An edge for our `Route`. May be used by Relay 1."""
+  routeEdge(
+    """The method to use when ordering `Route`."""
+    orderBy: [RouteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RouteEdge
 }
 
 """
@@ -24737,39 +25184,10 @@ type Query {
     """
     where: ApiFilter
   ): ApiConnection
-
-  """Reads and enables pagination through a set of `AppComponent`."""
-  appComponents(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `AppComponent`."""
-    orderBy: [AppComponentOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppComponentFilter
-  ): AppComponentConnection
   applyRegistryDefaults(data: JSON, nodeType: String): JSON
 
-  """Reads and enables pagination through a set of `App`."""
-  apps(
+  """Reads and enables pagination through a set of `AstMigration`."""
+  astMigrations(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -24788,14 +25206,14 @@ type Query {
     """
     offset: Int
 
-    """The method to use when ordering `App`."""
-    orderBy: [AppOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `AstMigration`."""
+    orderBy: [AstMigrationOrderBy!] = [NATURAL]
 
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: AppFilter
-  ): AppConnection
+    where: AstMigrationFilter
+  ): AstMigrationConnection
 
   """Reads and enables pagination through a set of `CheckConstraint`."""
   checkConstraints(
@@ -25494,6 +25912,24 @@ type Query {
     """
     where: FunctionFilter
   ): FunctionConnection
+  getSitePreviewCommit(targetName: String, targetSiteId: UUID): UUID
+
+  """Reads and enables pagination through a set of `GetSitePreviewsRecord`."""
+  getSitePreviews(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+    targetSiteId: UUID
+  ): GetSitePreviewsConnection
+  getSiteReleaseManifest(targetCommitId: UUID, targetSiteId: UUID): JSON
 
   """Reads and enables pagination through a set of `HostnameBinding`."""
   hostnameBindings(
@@ -25524,8 +25960,10 @@ type Query {
     where: HostnameBindingFilter
   ): HostnameBindingConnection
 
-  """Reads and enables pagination through a set of `HttpRoute`."""
-  httpRoutes(
+  """
+  Reads and enables pagination through a set of `IdentityProviderRegistry`.
+  """
+  identityProviderRegistries(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -25544,14 +25982,14 @@ type Query {
     """
     offset: Int
 
-    """The method to use when ordering `HttpRoute`."""
-    orderBy: [HttpRouteOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `IdentityProviderRegistry`."""
+    orderBy: [IdentityProviderRegistryOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: HttpRouteFilter
-  ): HttpRouteConnection
+    where: IdentityProviderRegistryFilter
+  ): IdentityProviderRegistryConnection
 
   """Reads and enables pagination through a set of `Index`."""
   indices(
@@ -25639,6 +26077,7 @@ type Query {
     """
     where: NodeTypeRegistryFilter
   ): NodeTypeRegistryConnection
+  pagePublished(pageSlug: String, targetSiteId: UUID): JSON
 
   """Reads and enables pagination through a set of `Page`."""
   pages(
@@ -25993,6 +26432,26 @@ type Query {
     """
     where: PlatformEmailSiteIdentityFilter
   ): PlatformEmailSiteIdentityConnection
+  platformGetSitePreviewCommit(targetName: String, targetSiteId: UUID): UUID
+
+  """
+  Reads and enables pagination through a set of `PlatformGetSitePreviewsRecord`.
+  """
+  platformGetSitePreviews(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+    targetSiteId: UUID
+  ): PlatformGetSitePreviewsConnection
+  platformGetSiteReleaseManifest(targetCommitId: UUID, targetSiteId: UUID): JSON
 
   """Reads and enables pagination through a set of `PlatformManagedDomain`."""
   platformManagedDomains(
@@ -26022,6 +26481,7 @@ type Query {
     """
     where: PlatformManagedDomainFilter
   ): PlatformManagedDomainConnection
+  platformPagePublished(pageSlug: String, targetSiteId: UUID): JSON
 
   """Reads and enables pagination through a set of `PlatformPage`."""
   platformPages(
@@ -26197,6 +26657,35 @@ type Query {
     where: PlatformSiteModuleFilter
   ): PlatformSiteModuleConnection
 
+  """Reads and enables pagination through a set of `PlatformSiteRelease`."""
+  platformSiteReleases(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformSiteRelease`."""
+    orderBy: [PlatformSiteReleaseOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformSiteReleaseFilter
+  ): PlatformSiteReleaseConnection
+
   """Reads and enables pagination through a set of `PlatformSiteTheme`."""
   platformSiteThemes(
     """Read all values in the set after (below) this cursor."""
@@ -26283,6 +26772,9 @@ type Query {
     """
     where: PlatformSiteFilter
   ): PlatformSiteConnection
+  platformSitesDeepLinkUrl(linkSlug: String, targetSiteId: UUID): String
+  platformSitesSiteOrigin(targetSiteId: UUID): String
+  platformVerifySitePreviewToken(siteId: UUID, token: String): UUID
 
   """Reads and enables pagination through a set of `Policy`."""
   policies(
@@ -26370,8 +26862,36 @@ type Query {
     """
     where: PubkeySettingFilter
   ): PubkeySettingConnection
+
+  """Reads and enables pagination through a set of `Redirect`."""
+  redirects(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Redirect`."""
+    orderBy: [RedirectOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RedirectFilter
+  ): RedirectConnection
   resolveDeepLink(linkSlug: String, targetSiteId: UUID): JSON
-  resolveHttpRoute(requestHost: String, requestMethod: String, requestPath: String): ResolveHttpRouteRecord
   resolveRoute(requestHost: String, requestMethod: String, requestPath: String): ResolveRouteRecord
   resolveSiteAppLinks(targetSiteId: UUID): JSON
 
@@ -26665,6 +27185,35 @@ type Query {
     where: SiteModuleFilter
   ): SiteModuleConnection
 
+  """Reads and enables pagination through a set of `SiteRelease`."""
+  siteReleases(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SiteRelease`."""
+    orderBy: [SiteReleaseOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SiteReleaseFilter
+  ): SiteReleaseConnection
+
   """Reads and enables pagination through a set of `SiteTheme`."""
   siteThemes(
     """Read all values in the set after (below) this cursor."""
@@ -26751,6 +27300,8 @@ type Query {
     """
     where: SiteFilter
   ): SiteConnection
+  sitesDeepLinkUrl(linkSlug: String, targetSiteId: UUID): String
+  sitesSiteOrigin(targetSiteId: UUID): String
 
   """Reads and enables pagination through a set of `SpatialRelation`."""
   spatialRelations(
@@ -26780,6 +27331,35 @@ type Query {
     """
     where: SpatialRelationFilter
   ): SpatialRelationConnection
+
+  """Reads and enables pagination through a set of `SqlAction`."""
+  sqlActions(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SqlAction`."""
+    orderBy: [SqlActionOrderBy!] = [NATURAL]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SqlActionFilter
+  ): SqlActionConnection
 
   """Reads and enables pagination through a set of `TableBehavior`."""
   tableBehaviors(
@@ -26985,6 +27565,7 @@ type Query {
     """
     where: UniqueConstraintFilter
   ): UniqueConstraintConnection
+  verifySitePreviewToken(siteId: UUID, token: String): UUID
 
   """Reads and enables pagination through a set of `ViewBehavior`."""
   viewBehaviors(
@@ -27161,6 +27742,265 @@ type Query {
   ): WebauthnSettingConnection
 }
 
+"""
+Redirect targets a route can point at; the edge answers with a redirect status instead of a backend
+"""
+type Redirect {
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+  id: UUID!
+
+  """Owner-local name for this redirect"""
+  name: String!
+
+  """Whether the incoming path is appended to the destination"""
+  preservePath: Boolean!
+
+  """Whether the incoming query string is carried to the destination"""
+  preserveQuery: Boolean!
+
+  """Reads and enables pagination through a set of `Route`."""
+  routesByTargetRedirectId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Route`."""
+    orderBy: [RouteOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RouteFilter
+  ): RouteConnection!
+
+  """HTTP redirect status the edge answers with (301, 302, 307 or 308)"""
+  statusCode: Int!
+
+  """Destination hostname the edge redirects to"""
+  toHost: String!
+
+  """Destination path; NULL keeps the incoming path (see preserve_path)"""
+  toPath: String
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `Redirect` values."""
+type RedirectConnection {
+  """
+  A list of edges which contains the `Redirect` and cursor to aid in pagination.
+  """
+  edges: [RedirectEdge]!
+
+  """A list of `Redirect` objects."""
+  nodes: [Redirect]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Redirect` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Redirect` edge in the connection."""
+type RedirectEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Redirect` at the end of the edge."""
+  node: Redirect
+}
+
+"""
+A filter to be used against `Redirect` object types. All fields are combined with a logical ‘and.’
+"""
+input RedirectFilter {
+  """Checks for all expressions in this list."""
+  and: [RedirectFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: RedirectFilter
+
+  """Checks for any expressions in this list."""
+  or: [RedirectFilter!]
+
+  """Filter by the object’s `preservePath` field."""
+  preservePath: BooleanFilter
+
+  """Filter by the object’s `preserveQuery` field."""
+  preserveQuery: BooleanFilter
+
+  """Filter by the object’s `routesByTargetRedirectId` relation."""
+  routesByTargetRedirectId: RedirectToManyRouteFilter
+
+  """`routesByTargetRedirectId` exist."""
+  routesByTargetRedirectIdExist: Boolean
+
+  """Filter by the object’s `statusCode` field."""
+  statusCode: IntFilter
+
+  """Filter by the object’s `toHost` field."""
+  toHost: StringFilter
+
+  """Filter by the object’s `toPath` field."""
+  toPath: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `Redirect`"""
+input RedirectInput {
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+  id: UUID
+
+  """Owner-local name for this redirect"""
+  name: String!
+
+  """Whether the incoming path is appended to the destination"""
+  preservePath: Boolean
+
+  """Whether the incoming query string is carried to the destination"""
+  preserveQuery: Boolean
+
+  """HTTP redirect status the edge answers with (301, 302, 307 or 308)"""
+  statusCode: Int
+
+  """Destination hostname the edge redirects to"""
+  toHost: String!
+
+  """Destination path; NULL keeps the incoming path (see preserve_path)"""
+  toPath: String
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `Redirect`."""
+enum RedirectOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRESERVE_PATH_ASC
+  PRESERVE_PATH_DESC
+  PRESERVE_QUERY_ASC
+  PRESERVE_QUERY_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STATUS_CODE_ASC
+  STATUS_CODE_DESC
+  TO_HOST_ASC
+  TO_HOST_DESC
+  TO_PATH_ASC
+  TO_PATH_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `Redirect`. Fields that are set will be updated.
+"""
+input RedirectPatch {
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+  id: UUID
+
+  """Owner-local name for this redirect"""
+  name: String
+
+  """Whether the incoming path is appended to the destination"""
+  preservePath: Boolean
+
+  """Whether the incoming query string is carried to the destination"""
+  preserveQuery: Boolean
+
+  """HTTP redirect status the edge answers with (301, 302, 307 or 308)"""
+  statusCode: Int
+
+  """Destination hostname the edge redirects to"""
+  toHost: String
+
+  """Destination path; NULL keeps the incoming path (see preserve_path)"""
+  toPath: String
+  updatedAt: Datetime
+}
+
+"""
+A filter to be used against many `Route` object types. All fields are combined with a logical ‘and.’
+"""
+input RedirectToManyRouteFilter {
+  """Filters to entities where every related entity matches."""
+  every: RouteFilter
+
+  """Filters to entities where no related entity matches."""
+  none: RouteFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: RouteFilter
+}
+
+"""All input for the `rejectDatabaseTransfer` mutation."""
+input RejectDatabaseTransferInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  transferId: UUID
+}
+
+"""The output of our `rejectDatabaseTransfer` mutation."""
+type RejectDatabaseTransferPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
 """All input for the `requestDatabase` mutation."""
 input RequestDatabaseInput {
   """
@@ -27172,6 +28012,7 @@ input RequestDatabaseInput {
   domain: String
   modules: JSON
   options: JSON
+  organizationId: UUID
   presetSlug: String
   subdomain: String
 }
@@ -27189,16 +28030,6 @@ type RequestDatabasePayload {
   """
   query: Query
   result: DatabaseProvisionModule
-}
-
-type ResolveHttpRouteRecord {
-  databaseId: UUID
-  domainId: UUID
-  matchedPath: String
-  method: String
-  routeId: UUID
-  targetId: UUID
-  targetKind: String
 }
 
 type ResolveRouteRecord {
@@ -27580,32 +28411,53 @@ type Route {
   """
   path: String!
 
+  """
+  The site preview this route serves; NULL serves the site's published release
+  """
+  previewRef: String
+
   """Higher priority wins between otherwise-equal matches"""
   priority: Int!
 
+  """Reads a single `Site` that is related to this `Route`."""
+  servingSite: Site
+
   """
-  Api catalog row this route targets; must be owner-matched or visible cross-scope
+  Site whose surface this route serves; the serving lane renders as this site. NULL when the route serves no site
   """
+  servingSiteId: UUID
+
+  """Reads a single `Api` that is related to this `Route`."""
+  targetApi: Api
+
+  """Api surface this route targets; must be this scope's own api"""
   targetApiId: UUID
 
   """
-  Bucket catalog row this route targets; must be a public bucket that is owner-matched or visible cross-scope
+  Bucket this route targets; must be a public bucket in this scope's own storage plane
   """
   targetBucketId: UUID
 
-  """
-  Function catalog row this route targets; must be owner-matched or visible cross-scope
-  """
+  """Function this route targets; must be this scope's own function"""
   targetFunctionId: UUID
 
+  """Reads a single `Redirect` that is related to this `Route`."""
+  targetRedirect: Redirect
+
   """
-  Resource catalog row (a Service resource) this route targets; must be owner-matched or visible cross-scope
+  Redirect this route targets; the edge answers with a redirect status instead of proxying a backend
+  """
+  targetRedirectId: UUID
+
+  """
+  Resource (a Service resource) this route targets; must be this scope's own resource
   """
   targetServiceId: UUID
 
-  """
-  Site catalog row this route targets; must be owner-matched or visible cross-scope
-  """
+  """Reads a single `Site` that is related to this `Route`."""
+  targetSite: Site
+
+  """Site surface this route targets; must be this scope's own site"""
   targetSiteId: UUID
   updatedAt: Datetime
 }
@@ -27630,6 +28482,11 @@ type RouteBinding {
   """Priority compiled from the source route"""
   priority: Int!
 
+  """
+  Site whose surface the source route serves; NULL when it serves no site
+  """
+  servingSiteId: UUID
+
   """Api catalog row the source route targets"""
   targetApiId: UUID
 
@@ -27638,6 +28495,9 @@ type RouteBinding {
 
   """Function catalog row the source route targets"""
   targetFunctionId: UUID
+
+  """Redirect catalog row the source route targets"""
+  targetRedirectId: UUID
 
   """Resource catalog row (a Service resource) the source route targets"""
   targetServiceId: UUID
@@ -27706,6 +28566,9 @@ input RouteBindingFilter {
   """Filter by the object’s `priority` field."""
   priority: IntFilter
 
+  """Filter by the object’s `servingSiteId` field."""
+  servingSiteId: UUIDFilter
+
   """Filter by the object’s `targetApiId` field."""
   targetApiId: UUIDFilter
 
@@ -27714,6 +28577,9 @@ input RouteBindingFilter {
 
   """Filter by the object’s `targetFunctionId` field."""
   targetFunctionId: UUIDFilter
+
+  """Filter by the object’s `targetRedirectId` field."""
+  targetRedirectId: UUIDFilter
 
   """Filter by the object’s `targetServiceId` field."""
   targetServiceId: UUIDFilter
@@ -27743,6 +28609,11 @@ input RouteBindingInput {
   """Priority compiled from the source route"""
   priority: Int
 
+  """
+  Site whose surface the source route serves; NULL when it serves no site
+  """
+  servingSiteId: UUID
+
   """Api catalog row the source route targets"""
   targetApiId: UUID
 
@@ -27751,6 +28622,9 @@ input RouteBindingInput {
 
   """Function catalog row the source route targets"""
   targetFunctionId: UUID
+
+  """Redirect catalog row the source route targets"""
+  targetRedirectId: UUID
 
   """Resource catalog row (a Service resource) the source route targets"""
   targetServiceId: UUID
@@ -27779,12 +28653,16 @@ enum RouteBindingOrderBy {
   PRIMARY_KEY_DESC
   PRIORITY_ASC
   PRIORITY_DESC
+  SERVING_SITE_ID_ASC
+  SERVING_SITE_ID_DESC
   TARGET_API_ID_ASC
   TARGET_API_ID_DESC
   TARGET_BUCKET_ID_ASC
   TARGET_BUCKET_ID_DESC
   TARGET_FUNCTION_ID_ASC
   TARGET_FUNCTION_ID_DESC
+  TARGET_REDIRECT_ID_ASC
+  TARGET_REDIRECT_ID_DESC
   TARGET_SERVICE_ID_ASC
   TARGET_SERVICE_ID_DESC
   TARGET_SITE_ID_ASC
@@ -27813,6 +28691,11 @@ input RouteBindingPatch {
   """Priority compiled from the source route"""
   priority: Int
 
+  """
+  Site whose surface the source route serves; NULL when it serves no site
+  """
+  servingSiteId: UUID
+
   """Api catalog row the source route targets"""
   targetApiId: UUID
 
@@ -27821,6 +28704,9 @@ input RouteBindingPatch {
 
   """Function catalog row the source route targets"""
   targetFunctionId: UUID
+
+  """Redirect catalog row the source route targets"""
+  targetRedirectId: UUID
 
   """Resource catalog row (a Service resource) the source route targets"""
   targetServiceId: UUID
@@ -27898,8 +28784,26 @@ input RouteFilter {
   """Filter by the object’s `path` field."""
   path: StringFilter
 
+  """Filter by the object’s `previewRef` field."""
+  previewRef: StringFilter
+
   """Filter by the object’s `priority` field."""
   priority: IntFilter
+
+  """Filter by the object’s `servingSite` relation."""
+  servingSite: SiteFilter
+
+  """A related `servingSite` exists."""
+  servingSiteExists: Boolean
+
+  """Filter by the object’s `servingSiteId` field."""
+  servingSiteId: UUIDFilter
+
+  """Filter by the object’s `targetApi` relation."""
+  targetApi: ApiFilter
+
+  """A related `targetApi` exists."""
+  targetApiExists: Boolean
 
   """Filter by the object’s `targetApiId` field."""
   targetApiId: UUIDFilter
@@ -27910,8 +28814,23 @@ input RouteFilter {
   """Filter by the object’s `targetFunctionId` field."""
   targetFunctionId: UUIDFilter
 
+  """Filter by the object’s `targetRedirect` relation."""
+  targetRedirect: RedirectFilter
+
+  """A related `targetRedirect` exists."""
+  targetRedirectExists: Boolean
+
+  """Filter by the object’s `targetRedirectId` field."""
+  targetRedirectId: UUIDFilter
+
   """Filter by the object’s `targetServiceId` field."""
   targetServiceId: UUIDFilter
+
+  """Filter by the object’s `targetSite` relation."""
+  targetSite: SiteFilter
+
+  """A related `targetSite` exists."""
+  targetSiteExists: Boolean
 
   """Filter by the object’s `targetSiteId` field."""
   targetSiteId: UUIDFilter
@@ -27946,32 +28865,41 @@ input RouteInput {
   """
   path: String
 
+  """
+  The site preview this route serves; NULL serves the site's published release
+  """
+  previewRef: String
+
   """Higher priority wins between otherwise-equal matches"""
   priority: Int
 
   """
-  Api catalog row this route targets; must be owner-matched or visible cross-scope
+  Site whose surface this route serves; the serving lane renders as this site. NULL when the route serves no site
   """
+  servingSiteId: UUID
+
+  """Api surface this route targets; must be this scope's own api"""
   targetApiId: UUID
 
   """
-  Bucket catalog row this route targets; must be a public bucket that is owner-matched or visible cross-scope
+  Bucket this route targets; must be a public bucket in this scope's own storage plane
   """
   targetBucketId: UUID
 
-  """
-  Function catalog row this route targets; must be owner-matched or visible cross-scope
-  """
+  """Function this route targets; must be this scope's own function"""
   targetFunctionId: UUID
 
   """
-  Resource catalog row (a Service resource) this route targets; must be owner-matched or visible cross-scope
+  Redirect this route targets; the edge answers with a redirect status instead of proxying a backend
+  """
+  targetRedirectId: UUID
+
+  """
+  Resource (a Service resource) this route targets; must be this scope's own resource
   """
   targetServiceId: UUID
 
-  """
-  Site catalog row this route targets; must be owner-matched or visible cross-scope
-  """
+  """Site surface this route targets; must be this scope's own site"""
   targetSiteId: UUID
   updatedAt: Datetime
 }
@@ -27995,16 +28923,22 @@ enum RouteOrderBy {
   NATURAL
   PATH_ASC
   PATH_DESC
+  PREVIEW_REF_ASC
+  PREVIEW_REF_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   PRIORITY_ASC
   PRIORITY_DESC
+  SERVING_SITE_ID_ASC
+  SERVING_SITE_ID_DESC
   TARGET_API_ID_ASC
   TARGET_API_ID_DESC
   TARGET_BUCKET_ID_ASC
   TARGET_BUCKET_ID_DESC
   TARGET_FUNCTION_ID_ASC
   TARGET_FUNCTION_ID_DESC
+  TARGET_REDIRECT_ID_ASC
+  TARGET_REDIRECT_ID_DESC
   TARGET_SERVICE_ID_ASC
   TARGET_SERVICE_ID_DESC
   TARGET_SITE_ID_ASC
@@ -28041,32 +28975,41 @@ input RoutePatch {
   """
   path: String
 
+  """
+  The site preview this route serves; NULL serves the site's published release
+  """
+  previewRef: String
+
   """Higher priority wins between otherwise-equal matches"""
   priority: Int
 
   """
-  Api catalog row this route targets; must be owner-matched or visible cross-scope
+  Site whose surface this route serves; the serving lane renders as this site. NULL when the route serves no site
   """
+  servingSiteId: UUID
+
+  """Api surface this route targets; must be this scope's own api"""
   targetApiId: UUID
 
   """
-  Bucket catalog row this route targets; must be a public bucket that is owner-matched or visible cross-scope
+  Bucket this route targets; must be a public bucket in this scope's own storage plane
   """
   targetBucketId: UUID
 
-  """
-  Function catalog row this route targets; must be owner-matched or visible cross-scope
-  """
+  """Function this route targets; must be this scope's own function"""
   targetFunctionId: UUID
 
   """
-  Resource catalog row (a Service resource) this route targets; must be owner-matched or visible cross-scope
+  Redirect this route targets; the edge answers with a redirect status instead of proxying a backend
+  """
+  targetRedirectId: UUID
+
+  """
+  Resource (a Service resource) this route targets; must be this scope's own resource
   """
   targetServiceId: UUID
 
-  """
-  Site catalog row this route targets; must be owner-matched or visible cross-scope
-  """
+  """Site surface this route targets; must be this scope's own site"""
   targetSiteId: UUID
   updatedAt: Datetime
 }
@@ -28875,6 +29818,33 @@ type SetFieldOrderPayload {
   query: Query
 }
 
+"""All input for the `setSitePreview` mutation."""
+input SetSitePreviewInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  targetCommitId: UUID
+  targetName: String
+  targetSiteId: UUID
+}
+
+"""The output of our `setSitePreview` mutation."""
+type SetSitePreviewPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: UUID
+}
+
 """
 Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
 """
@@ -28885,10 +29855,11 @@ type Site {
   activeCommitId: UUID
 
   """
-  Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
+  Bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
   """
   bucketId: UUID
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -28901,7 +29872,7 @@ type Site {
   id: UUID!
 
   """
-  Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
+  Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
   """
   installationId: UUID
 
@@ -28946,9 +29917,38 @@ type Site {
   ): PageConnection!
 
   """
-  Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
+  Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
   """
   resourceId: UUID
+
+  """Reads and enables pagination through a set of `Route`."""
+  routesByServingSiteId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Route`."""
+    orderBy: [RouteOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RouteFilter
+  ): RouteConnection!
 
   """Reads and enables pagination through a set of `SiteAppLink`."""
   siteAppLinks(
@@ -29069,6 +30069,9 @@ type Site {
     where: SiteModuleFilter
   ): SiteModuleConnection!
 
+  """Reads a single `SiteRelease` that is related to this `Site`."""
+  siteRelease: SiteRelease
+
   """Reads and enables pagination through a set of `SiteTheme`."""
   siteThemes(
     """Read all values in the set after (below) this cursor."""
@@ -29104,14 +30107,17 @@ type Site {
   """Human-readable site title"""
   title: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
 }
 
 """
-Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation)
+Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json)
 """
 type SiteAppLink {
-  """App identifier: iOS bundle id or Android package name"""
-  appIdentifier: String!
+  """
+  App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own)
+  """
+  appStoreIdentityId: UUID!
   createdAt: Datetime
 
   """Database that owns this resource (database-scoped isolation)"""
@@ -29123,27 +30129,11 @@ type SiteAppLink {
   """
   pathComponents: [String]!
 
-  """Target platform for this association (ios, android)"""
-  platform: String!
-
-  """Android signing certificate SHA-256 fingerprints for assetlinks.json"""
-  sha256CertFingerprints: [String]!
-
   """Reads a single `Site` that is related to this `SiteAppLink`."""
   site: Site
 
   """Site surface this app-link association belongs to"""
   siteId: UUID!
-
-  """
-  App/Play store URL for this app (used by install banners and fallbacks)
-  """
-  storeUrl: String
-
-  """
-  Apple Developer team id (iOS); combined with app_identifier to form the AASA appID
-  """
-  teamId: String
   updatedAt: Datetime
 
   """
@@ -29185,8 +30175,8 @@ input SiteAppLinkFilter {
   """Checks for all expressions in this list."""
   and: [SiteAppLinkFilter!]
 
-  """Filter by the object’s `appIdentifier` field."""
-  appIdentifier: StringFilter
+  """Filter by the object’s `appStoreIdentityId` field."""
+  appStoreIdentityId: UUIDFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
@@ -29206,23 +30196,11 @@ input SiteAppLinkFilter {
   """Filter by the object’s `pathComponents` field."""
   pathComponents: StringListFilter
 
-  """Filter by the object’s `platform` field."""
-  platform: StringFilter
-
-  """Filter by the object’s `sha256CertFingerprints` field."""
-  sha256CertFingerprints: StringListFilter
-
   """Filter by the object’s `site` relation."""
   site: SiteFilter
 
   """Filter by the object’s `siteId` field."""
   siteId: UUIDFilter
-
-  """Filter by the object’s `storeUrl` field."""
-  storeUrl: StringFilter
-
-  """Filter by the object’s `teamId` field."""
-  teamId: StringFilter
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
@@ -29233,8 +30211,10 @@ input SiteAppLinkFilter {
 
 """An input for mutations affecting `SiteAppLink`"""
 input SiteAppLinkInput {
-  """App identifier: iOS bundle id or Android package name"""
-  appIdentifier: String!
+  """
+  App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own)
+  """
+  appStoreIdentityId: UUID!
   createdAt: Datetime
 
   """Database that owns this resource (database-scoped isolation)"""
@@ -29246,24 +30226,8 @@ input SiteAppLinkInput {
   """
   pathComponents: [String]
 
-  """Target platform for this association (ios, android)"""
-  platform: String!
-
-  """Android signing certificate SHA-256 fingerprints for assetlinks.json"""
-  sha256CertFingerprints: [String]
-
   """Site surface this app-link association belongs to"""
   siteId: UUID!
-
-  """
-  App/Play store URL for this app (used by install banners and fallbacks)
-  """
-  storeUrl: String
-
-  """
-  Apple Developer team id (iOS); combined with app_identifier to form the AASA appID
-  """
-  teamId: String
   updatedAt: Datetime
 
   """
@@ -29274,8 +30238,8 @@ input SiteAppLinkInput {
 
 """Methods to use when ordering `SiteAppLink`."""
 enum SiteAppLinkOrderBy {
-  APP_IDENTIFIER_ASC
-  APP_IDENTIFIER_DESC
+  APP_STORE_IDENTITY_ID_ASC
+  APP_STORE_IDENTITY_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   DATABASE_ID_ASC
@@ -29285,18 +30249,10 @@ enum SiteAppLinkOrderBy {
   NATURAL
   PATH_COMPONENTS_ASC
   PATH_COMPONENTS_DESC
-  PLATFORM_ASC
-  PLATFORM_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  SHA256_CERT_FINGERPRINTS_ASC
-  SHA256_CERT_FINGERPRINTS_DESC
   SITE_ID_ASC
   SITE_ID_DESC
-  STORE_URL_ASC
-  STORE_URL_DESC
-  TEAM_ID_ASC
-  TEAM_ID_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
   WEBCREDENTIALS_ASC
@@ -29307,8 +30263,10 @@ enum SiteAppLinkOrderBy {
 Represents an update to a `SiteAppLink`. Fields that are set will be updated.
 """
 input SiteAppLinkPatch {
-  """App identifier: iOS bundle id or Android package name"""
-  appIdentifier: String
+  """
+  App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own)
+  """
+  appStoreIdentityId: UUID
   createdAt: Datetime
 
   """Database that owns this resource (database-scoped isolation)"""
@@ -29320,24 +30278,8 @@ input SiteAppLinkPatch {
   """
   pathComponents: [String]
 
-  """Target platform for this association (ios, android)"""
-  platform: String
-
-  """Android signing certificate SHA-256 fingerprints for assetlinks.json"""
-  sha256CertFingerprints: [String]
-
   """Site surface this app-link association belongs to"""
   siteId: UUID
-
-  """
-  App/Play store URL for this app (used by install banners and fallbacks)
-  """
-  storeUrl: String
-
-  """
-  Apple Developer team id (iOS); combined with app_identifier to form the AASA appID
-  """
-  teamId: String
   updatedAt: Datetime
 
   """
@@ -29382,6 +30324,11 @@ type SiteDeepLink {
 
   """Additional link metadata (campaign/UTM parameters, escape hatch)"""
   metadata: JSON
+
+  """
+  Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets)
+  """
+  pageId: UUID
 
   """Reads a single `Site` that is related to this `SiteDeepLink`."""
   site: Site
@@ -29458,6 +30405,9 @@ input SiteDeepLinkFilter {
   """Checks for any expressions in this list."""
   or: [SiteDeepLinkFilter!]
 
+  """Filter by the object’s `pageId` field."""
+  pageId: UUIDFilter
+
   """Filter by the object’s `site` relation."""
   site: SiteFilter
 
@@ -29493,6 +30443,11 @@ input SiteDeepLinkInput {
   metadata: JSON
 
   """
+  Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets)
+  """
+  pageId: UUID
+
+  """
   Site surface this deep link belongs to (the hostname plane that serves it)
   """
   siteId: UUID!
@@ -29522,6 +30477,8 @@ enum SiteDeepLinkOrderBy {
   METADATA_ASC
   METADATA_DESC
   NATURAL
+  PAGE_ID_ASC
+  PAGE_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   SITE_ID_ASC
@@ -29553,6 +30510,11 @@ input SiteDeepLinkPatch {
 
   """Additional link metadata (campaign/UTM parameters, escape hatch)"""
   metadata: JSON
+
+  """
+  Page this link's web_path resolves to (soft reference into the pages module; NULL for external or non-page targets)
+  """
+  pageId: UUID
 
   """
   Site surface this deep link belongs to (the hostname plane that serves it)
@@ -29747,6 +30709,9 @@ input SiteFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
@@ -29789,6 +30754,12 @@ input SiteFilter {
   """Filter by the object’s `resourceId` field."""
   resourceId: UUIDFilter
 
+  """Filter by the object’s `routesByServingSiteId` relation."""
+  routesByServingSiteId: SiteToManyRouteFilter
+
+  """`routesByServingSiteId` exist."""
+  routesByServingSiteIdExist: Boolean
+
   """Filter by the object’s `siteAppLinks` relation."""
   siteAppLinks: SiteToManySiteAppLinkFilter
 
@@ -29819,6 +30790,12 @@ input SiteFilter {
   """`siteModules` exist."""
   siteModulesExist: Boolean
 
+  """Filter by the object’s `siteRelease` relation."""
+  siteRelease: SiteReleaseFilter
+
+  """A related `siteRelease` exists."""
+  siteReleaseExists: Boolean
+
   """Filter by the object’s `siteThemes` relation."""
   siteThemes: SiteToManySiteThemeFilter
 
@@ -29836,6 +30813,9 @@ input SiteFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
 }
 
 """An input for mutations affecting `Site`"""
@@ -29846,10 +30826,11 @@ input SiteInput {
   activeCommitId: UUID
 
   """
-  Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
+  Bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
   """
   bucketId: UUID
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
@@ -29859,7 +30840,7 @@ input SiteInput {
   id: UUID
 
   """
-  Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
+  Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
   """
   installationId: UUID
 
@@ -29875,13 +30856,41 @@ input SiteInput {
   name: String!
 
   """
-  Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
+  Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
   """
   resourceId: UUID
 
   """Human-readable site title"""
   title: String
   updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
+"""All input for the `siteMetadataInstallRobots` mutation."""
+input SiteMetadataInstallRobotsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID
+  robotsPreset: String
+  siteId: UUID
+}
+
+"""The output of our `siteMetadataInstallRobots` mutation."""
+type SiteMetadataInstallRobotsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: JSON
 }
 
 """SEO and social sharing metadata for a site surface"""
@@ -29916,6 +30925,11 @@ type SiteMetadatum {
 
   """robots meta directive (e.g. index,follow / noindex,nofollow)"""
   robots: String
+
+  """
+  Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly
+  """
+  robotsSeededFrom: JSON
 
   """Reads a single `Site` that is related to this `SiteMetadatum`."""
   site: Site
@@ -30005,6 +31019,9 @@ input SiteMetadatumFilter {
   """Filter by the object’s `robots` field."""
   robots: StringFilter
 
+  """Filter by the object’s `robotsSeededFrom` field."""
+  robotsSeededFrom: JSONFilter
+
   """Filter by the object’s `site` relation."""
   site: SiteFilter
 
@@ -30054,6 +31071,11 @@ input SiteMetadatumInput {
   """robots meta directive (e.g. index,follow / noindex,nofollow)"""
   robots: String
 
+  """
+  Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly
+  """
+  robotsSeededFrom: JSON
+
   """Site surface this metadata belongs to"""
   siteId: UUID!
 
@@ -30094,6 +31116,8 @@ enum SiteMetadatumOrderBy {
   PRIMARY_KEY_DESC
   ROBOTS_ASC
   ROBOTS_DESC
+  ROBOTS_SEEDED_FROM_ASC
+  ROBOTS_SEEDED_FROM_DESC
   SITE_ID_ASC
   SITE_ID_DESC
   STORE_ID_ASC
@@ -30150,6 +31174,11 @@ input SiteMetadatumPatch {
 
   """robots meta directive (e.g. index,follow / noindex,nofollow)"""
   robots: String
+
+  """
+  Provenance of the robots value: the content preset (kind, slug, catalog commit_id) an install applied, or NULL when it was authored directly
+  """
+  robotsSeededFrom: JSON
 
   """Site surface this metadata belongs to"""
   siteId: UUID
@@ -30346,6 +31375,8 @@ enum SiteOrderBy {
   BUCKET_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DESCRIPTION_ASC
@@ -30369,6 +31400,8 @@ enum SiteOrderBy {
   TITLE_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
 }
 
 """Represents an update to a `Site`. Fields that are set will be updated."""
@@ -30379,10 +31412,11 @@ input SitePatch {
   activeCommitId: UUID
 
   """
-  Catalog bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
+  Bucket that backs this site (static content store; exactly one of bucket_id/resource_id)
   """
   bucketId: UUID
   createdAt: Datetime
+  createdByPrincipal: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID
@@ -30392,7 +31426,7 @@ input SitePatch {
   id: UUID
 
   """
-  Catalog resource_installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
+  Resource installation (release) that backs this site; the servable member is named by installation_member_slug (exactly one of bucket_id/resource_id/installation_id)
   """
   installationId: UUID
 
@@ -30408,12 +31442,191 @@ input SitePatch {
   name: String
 
   """
-  Catalog resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
+  Resource/service that backs this site (SSR/app Service pinned to one concrete resource row; exactly one of bucket_id/resource_id/installation_id)
   """
   resourceId: UUID
 
   """Human-readable site title"""
   title: String
+  updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
+"""
+Immutable static-site release manifest head, versioned in the site-owned merkle store
+"""
+type SiteRelease {
+  """
+  Infra store commit for the current content (stamped by the versioned trigger on every write)
+  """
+  commitId: UUID
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+  id: UUID!
+
+  """
+  Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N}
+  """
+  manifest: JSON!
+
+  """Reads a single `Site` that is related to this `SiteRelease`."""
+  site: Site
+
+  """Site surface this release manifest belongs to"""
+  siteId: UUID!
+
+  """
+  Infra Merkle store holding this row's history (stamped by the versioned trigger)
+  """
+  storeId: UUID
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `SiteRelease` values."""
+type SiteReleaseConnection {
+  """
+  A list of edges which contains the `SiteRelease` and cursor to aid in pagination.
+  """
+  edges: [SiteReleaseEdge]!
+
+  """A list of `SiteRelease` objects."""
+  nodes: [SiteRelease]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `SiteRelease` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `SiteRelease` edge in the connection."""
+type SiteReleaseEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SiteRelease` at the end of the edge."""
+  node: SiteRelease
+}
+
+"""
+A filter to be used against `SiteRelease` object types. All fields are combined with a logical ‘and.’
+"""
+input SiteReleaseFilter {
+  """Checks for all expressions in this list."""
+  and: [SiteReleaseFilter!]
+
+  """Filter by the object’s `commitId` field."""
+  commitId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `manifest` field."""
+  manifest: JSONFilter
+
+  """Negates the expression."""
+  not: SiteReleaseFilter
+
+  """Checks for any expressions in this list."""
+  or: [SiteReleaseFilter!]
+
+  """Filter by the object’s `site` relation."""
+  site: SiteFilter
+
+  """Filter by the object’s `siteId` field."""
+  siteId: UUIDFilter
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `SiteRelease`"""
+input SiteReleaseInput {
+  """
+  Infra store commit for the current content (stamped by the versioned trigger on every write)
+  """
+  commitId: UUID
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+  id: UUID
+
+  """
+  Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N}
+  """
+  manifest: JSON!
+
+  """Site surface this release manifest belongs to"""
+  siteId: UUID!
+
+  """
+  Infra Merkle store holding this row's history (stamped by the versioned trigger)
+  """
+  storeId: UUID
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `SiteRelease`."""
+enum SiteReleaseOrderBy {
+  COMMIT_ID_ASC
+  COMMIT_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  ID_ASC
+  ID_DESC
+  MANIFEST_ASC
+  MANIFEST_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SITE_ID_ASC
+  SITE_ID_DESC
+  STORE_ID_ASC
+  STORE_ID_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `SiteRelease`. Fields that are set will be updated.
+"""
+input SiteReleasePatch {
+  """
+  Infra store commit for the current content (stamped by the versioned trigger on every write)
+  """
+  commitId: UUID
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+  id: UUID
+
+  """
+  Release manifest: {"files":{"<logical path>":{"hash":"<64-hex sha256>","content_type":"...","size":123}},"file_count":N,"total_bytes":N}
+  """
+  manifest: JSON
+
+  """Site surface this release manifest belongs to"""
+  siteId: UUID
+
+  """
+  Infra Merkle store holding this row's history (stamped by the versioned trigger)
+  """
+  storeId: UUID
   updatedAt: Datetime
 }
 
@@ -30627,6 +31840,20 @@ input SiteToManyPageFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: PageFilter
+}
+
+"""
+A filter to be used against many `Route` object types. All fields are combined with a logical ‘and.’
+"""
+input SiteToManyRouteFilter {
+  """Filters to entities where every related entity matches."""
+  every: RouteFilter
+
+  """Filters to entities where no related entity matches."""
+  none: RouteFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: RouteFilter
 }
 
 """
@@ -30891,6 +32118,67 @@ input SiteWebConfigPatch {
   updatedAt: Datetime
 }
 
+"""All input for the `sitesInstallContentPreset` mutation."""
+input SitesInstallContentPresetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID
+  presetKind: String
+  presetSlug: String
+  siteId: UUID
+}
+
+"""The output of our `sitesInstallContentPreset` mutation."""
+type SitesInstallContentPresetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: JSON
+}
+
+"""All input for the `sitesInstallMantra` mutation."""
+input SitesInstallMantraInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID
+  routePreset: String
+  siteId: UUID
+}
+
+"""The output of our `sitesInstallMantra` mutation."""
+type SitesInstallMantraPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Site
+
+  """An edge for our `Site`. May be used by Relay 1."""
+  siteEdge(
+    """The method to use when ordering `Site`."""
+    orderBy: [SiteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteEdge
+}
+
 """All input for the `sitesProvisionStaticSite` mutation."""
 input SitesProvisionStaticSiteInput {
   apex: String
@@ -30919,7 +32207,13 @@ type SitesProvisionStaticSitePayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  result: PlatformRoute
+  result: Route
+
+  """An edge for our `Route`. May be used by Relay 1."""
+  routeEdge(
+    """The method to use when ordering `Route`."""
+    orderBy: [RouteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RouteEdge
 }
 
 type SpatialRelation {
@@ -31116,6 +32410,129 @@ input SpatialRelationPatch {
   tableId: UUID
   tags: [String]
   updatedAt: Datetime
+}
+
+type SqlAction {
+  actionId: UUID
+  actionName: String
+  actorId: UUID
+  content: String
+  createdAt: Datetime
+  databaseId: UUID
+  deploy: String
+  deps: [String]
+  id: Int
+  name: String
+  payload: JSON
+  revert: String
+  verify: String
+}
+
+"""A connection to a list of `SqlAction` values."""
+type SqlActionConnection {
+  """
+  A list of edges which contains the `SqlAction` and cursor to aid in pagination.
+  """
+  edges: [SqlActionEdge]!
+
+  """A list of `SqlAction` objects."""
+  nodes: [SqlAction]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `SqlAction` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `SqlAction` edge in the connection."""
+type SqlActionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SqlAction` at the end of the edge."""
+  node: SqlAction
+}
+
+"""
+A filter to be used against `SqlAction` object types. All fields are combined with a logical ‘and.’
+"""
+input SqlActionFilter {
+  """Filter by the object’s `actionId` field."""
+  actionId: UUIDFilter
+
+  """Filter by the object’s `actionName` field."""
+  actionName: StringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [SqlActionFilter!]
+
+  """Filter by the object’s `content` field."""
+  content: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `deploy` field."""
+  deploy: StringFilter
+
+  """Filter by the object’s `deps` field."""
+  deps: StringListFilter
+
+  """Filter by the object’s `id` field."""
+  id: IntFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: SqlActionFilter
+
+  """Checks for any expressions in this list."""
+  or: [SqlActionFilter!]
+
+  """Filter by the object’s `revert` field."""
+  revert: StringFilter
+
+  """Filter by the object’s `verify` field."""
+  verify: StringFilter
+}
+
+"""Methods to use when ordering `SqlAction`."""
+enum SqlActionOrderBy {
+  ACTION_ID_ASC
+  ACTION_ID_DESC
+  ACTION_NAME_ASC
+  ACTION_NAME_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CONTENT_ASC
+  CONTENT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEPLOY_ASC
+  DEPLOY_DESC
+  DEPS_ASC
+  DEPS_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PAYLOAD_ASC
+  PAYLOAD_DESC
+  REVERT_ASC
+  REVERT_DESC
+  VERIFY_ASC
+  VERIFY_DESC
 }
 
 """
@@ -33788,82 +35205,6 @@ type UpdateApiSettingPayload {
   query: Query
 }
 
-"""All input for the `updateAppComponent` mutation."""
-input UpdateAppComponentInput {
-  """
-  An object where the defined keys will be set on the `AppComponent` being updated.
-  """
-  appComponentPatch: AppComponentPatch!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our update `AppComponent` mutation."""
-type UpdateAppComponentPayload {
-  """The `AppComponent` that was updated by this mutation."""
-  appComponent: AppComponent
-
-  """An edge for our `AppComponent`. May be used by Relay 1."""
-  appComponentEdge(
-    """The method to use when ordering `AppComponent`."""
-    orderBy: [AppComponentOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppComponentEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updateApp` mutation."""
-input UpdateAppInput {
-  """
-  An object where the defined keys will be set on the `App` being updated.
-  """
-  appPatch: AppPatch!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our update `App` mutation."""
-type UpdateAppPayload {
-  """The `App` that was updated by this mutation."""
-  app: App
-
-  """An edge for our `App`. May be used by Relay 1."""
-  appEdge(
-    """The method to use when ordering `App`."""
-    orderBy: [AppOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the `updateCheckConstraint` mutation."""
 input UpdateCheckConstraintInput {
   """
@@ -34816,8 +36157,8 @@ type UpdateHostnameBindingPayload {
   query: Query
 }
 
-"""All input for the `updateHttpRoute` mutation."""
-input UpdateHttpRouteInput {
+"""All input for the `updateIdentityProviderRegistry` mutation."""
+input UpdateIdentityProviderRegistryInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -34825,28 +36166,28 @@ input UpdateHttpRouteInput {
   clientMutationId: String
 
   """
-  An object where the defined keys will be set on the `HttpRoute` being updated.
+  An object where the defined keys will be set on the `IdentityProviderRegistry` being updated.
   """
-  httpRoutePatch: HttpRoutePatch!
-  id: UUID!
+  identityProviderRegistryPatch: IdentityProviderRegistryPatch!
+  slug: String!
 }
 
-"""The output of our update `HttpRoute` mutation."""
-type UpdateHttpRoutePayload {
+"""The output of our update `IdentityProviderRegistry` mutation."""
+type UpdateIdentityProviderRegistryPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `HttpRoute` that was updated by this mutation."""
-  httpRoute: HttpRoute
+  """The `IdentityProviderRegistry` that was updated by this mutation."""
+  identityProviderRegistry: IdentityProviderRegistry
 
-  """An edge for our `HttpRoute`. May be used by Relay 1."""
-  httpRouteEdge(
-    """The method to use when ordering `HttpRoute`."""
-    orderBy: [HttpRouteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): HttpRouteEdge
+  """An edge for our `IdentityProviderRegistry`. May be used by Relay 1."""
+  identityProviderRegistryEdge(
+    """The method to use when ordering `IdentityProviderRegistry`."""
+    orderBy: [IdentityProviderRegistryOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): IdentityProviderRegistryEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -35734,6 +37075,44 @@ type UpdatePlatformSitePayload {
   query: Query
 }
 
+"""All input for the `updatePlatformSiteRelease` mutation."""
+input UpdatePlatformSiteReleaseInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformSiteRelease` being updated.
+  """
+  platformSiteReleasePatch: PlatformSiteReleasePatch!
+}
+
+"""The output of our update `PlatformSiteRelease` mutation."""
+type UpdatePlatformSiteReleasePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformSiteRelease` that was updated by this mutation."""
+  platformSiteRelease: PlatformSiteRelease
+
+  """An edge for our `PlatformSiteRelease`. May be used by Relay 1."""
+  platformSiteReleaseEdge(
+    """The method to use when ordering `PlatformSiteRelease`."""
+    orderBy: [PlatformSiteReleaseOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformSiteReleaseEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updatePlatformSiteTheme` mutation."""
 input UpdatePlatformSiteThemeInput {
   """
@@ -35922,6 +37301,44 @@ type UpdatePubkeySettingPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""All input for the `updateRedirect` mutation."""
+input UpdateRedirectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Redirect` being updated.
+  """
+  redirectPatch: RedirectPatch!
+}
+
+"""The output of our update `Redirect` mutation."""
+type UpdateRedirectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Redirect` that was updated by this mutation."""
+  redirect: Redirect
+
+  """An edge for our `Redirect`. May be used by Relay 1."""
+  redirectEdge(
+    """The method to use when ordering `Redirect`."""
+    orderBy: [RedirectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RedirectEdge
 }
 
 """All input for the `updateRlsSetting` mutation."""
@@ -36340,6 +37757,44 @@ type UpdateSitePayload {
     """The method to use when ordering `Site`."""
     orderBy: [SiteOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SiteEdge
+}
+
+"""All input for the `updateSiteRelease` mutation."""
+input UpdateSiteReleaseInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `SiteRelease` being updated.
+  """
+  siteReleasePatch: SiteReleasePatch!
+}
+
+"""The output of our update `SiteRelease` mutation."""
+type UpdateSiteReleasePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SiteRelease` that was updated by this mutation."""
+  siteRelease: SiteRelease
+
+  """An edge for our `SiteRelease`. May be used by Relay 1."""
+  siteReleaseEdge(
+    """The method to use when ordering `SiteRelease`."""
+    orderBy: [SiteReleaseOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteReleaseEdge
 }
 
 """All input for the `updateSiteTheme` mutation."""

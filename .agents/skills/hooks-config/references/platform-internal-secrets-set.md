@@ -7,7 +7,7 @@ React Query mutation hook for platformInternalSecretsSet
 ## Usage
 
 ```typescript
-const { mutate } = usePlatformInternalSecretsSetMutation(); mutate({ input: { algo: '<String>', secretName: '<String>', secretNamespaceId: '<UUID>', secretRealm: '<String>', secretValue: '<String>' } });
+const { mutate } = usePlatformInternalSecretsSetMutation(); mutate({ input: { algo: '<String>', secretName: '<String>', secretRealm: '<String>', secretValue: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = usePlatformInternalSecretsSetMutation(); mutate({ input: { al
 
 ```typescript
 const { mutate, isLoading } = usePlatformInternalSecretsSetMutation();
-mutate({ input: { algo: '<String>', secretName: '<String>', secretNamespaceId: '<UUID>', secretRealm: '<String>', secretValue: '<String>' } });
+mutate({ input: { algo: '<String>', secretName: '<String>', secretRealm: '<String>', secretValue: '<String>' } });
 ```

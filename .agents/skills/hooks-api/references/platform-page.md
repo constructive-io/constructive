@@ -7,8 +7,8 @@ Site-owned page content — merkle-versioned head over the infra store; never a 
 ## Usage
 
 ```typescript
-usePlatformPagesQuery({ selection: { fields: { commitId: true, content: true, createdAt: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } } })
-usePlatformPageQuery({ id: '<UUID>', selection: { fields: { commitId: true, content: true, createdAt: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } } })
+usePlatformPagesQuery({ selection: { fields: { commitId: true, content: true, createdAt: true, id: true, seededFrom: true, siteId: true, slug: true, storeId: true, updatedAt: true } } })
+usePlatformPageQuery({ id: '<UUID>', selection: { fields: { commitId: true, content: true, createdAt: true, id: true, seededFrom: true, siteId: true, slug: true, storeId: true, updatedAt: true } } })
 useCreatePlatformPageMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformPageMutation({ selection: { fields: { id: true } } })
 useDeletePlatformPageMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformPageMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformPagesQuery({
-  selection: { fields: { commitId: true, content: true, createdAt: true, id: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
+  selection: { fields: { commitId: true, content: true, createdAt: true, id: true, seededFrom: true, siteId: true, slug: true, storeId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformPagesQuery({
 const { mutate } = useCreatePlatformPageMutation({
   selection: { fields: { id: true } },
 });
-mutate({ commitId: '<UUID>', content: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
+mutate({ commitId: '<UUID>', content: '<JSON>', seededFrom: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
 ```
