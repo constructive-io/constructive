@@ -164,6 +164,12 @@ export type ConstructiveAPIToken = {
   session_id?: string;
   access_level?: string;
   kind?: string;
+  /** Session lineage: the top of this session's exchange chain. */
+  root_session_id?: string;
+  /** Session lineage: the session this one was exchanged from, if any. */
+  parent_session_id?: string;
+  /** Caller-declared purpose recorded on the credential at exchange time. */
+  intent?: string;
   [key: string]: unknown;
 };
 

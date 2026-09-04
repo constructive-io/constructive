@@ -46,6 +46,19 @@ export function buildPgSettings(input: PgSettingsInput): Record<string, string> 
     settings['jwt.claims.session_id'] = token.session_id;
   }
 
+  // Session lineage (token exchange chains)
+  if (token?.root_session_id) {
+    settings['jwt.claims.root_session_id'] = token.root_session_id;
+  }
+  if (token?.parent_session_id) {
+    settings['jwt.claims.parent_session_id'] = token.parent_session_id;
+  }
+
+  // Declared purpose of the credential
+  if (token?.intent) {
+    settings['jwt.claims.intent'] = token.intent;
+  }
+
   // Principal identity (service accounts / bots)
   if (token?.principal_id) {
     settings['jwt.claims.principal_id'] = token.principal_id;
