@@ -138,6 +138,111 @@ describe('getEnvOptions', () => {
     expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
   });
 
+  it('defaults to untouched stock introspection', () => {
+    const result = getEnvOptions({}, process.cwd(), {});
+
+    expect(result.graphile?.scopedIntrospection).toBe(false);
+    expect(result.graphile?.introspectionJit).toBe(false);
+  });
+
+  it('parses the scoped introspection environment booleans', () => {
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: 'true' }).graphile
+        ?.scopedIntrospection
+    ).toBe(true);
+    expect(
+      getGraphQLEnvVars({
+        GRAPHILE_SCOPED_INTROSPECTION: 'false'
+      }).graphile?.scopedIntrospection
+    ).toBe(false);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: 'yes' }).graphile
+        ?.scopedIntrospection
+    ).toBe(true);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: 'not-enabled' })
+        .graphile?.scopedIntrospection
+    ).toBe(false);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION: '' }).graphile
+        ?.scopedIntrospection
+    ).toBeUndefined();
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION_JIT: 'true' }).graphile
+        ?.introspectionJit
+    ).toBe(true);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION_JIT: 'false' }).graphile
+        ?.introspectionJit
+    ).toBe(false);
+    expect(
+      getGraphQLEnvVars({ GRAPHILE_SCOPED_INTROSPECTION_JIT: '' }).graphile
+        ?.introspectionJit
+    ).toBeUndefined();
+  });
+
+  it.each(['scopedIntrospection', 'introspectionJit'] as const)(
+    'rejects a non-boolean graphile.%s value at the configuration boundary',
+    (option) => {
+      tempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), 'graphql-env-invalid-introspection-')
+      );
+      writeConfig(tempDir, {
+        graphile: { [option]: 'true' }
+      });
+
+      expect(() => getEnvOptions({}, tempDir, {})).toThrow(
+        `graphile.${option} must be a boolean`
+      );
+    }
+  );
+
+  it.each([
+    ['introspectionDependencySchemas', 'shared'],
+    ['introspectionCapabilityExtensions', [42]],
+  ] as const)(
+    'rejects an invalid graphile.%s value at the configuration boundary',
+    (option, value) => {
+      tempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), 'graphql-env-invalid-introspection-')
+      );
+      writeConfig(tempDir, {
+        graphile: { [option]: value }
+      });
+
+      expect(() => getEnvOptions({}, tempDir, {})).toThrow(
+        `graphile.${option} must be an array of strings`
+      );
+    }
+  );
+
+  it('honors config, env, and runtime priority for scoped introspection', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-introspection-')
+    );
+    writeConfig(tempDir, {
+      graphile: { scopedIntrospection: false, introspectionJit: false }
+    });
+
+    const envOptions = getEnvOptions({}, tempDir, {
+      GRAPHILE_SCOPED_INTROSPECTION: 'true',
+      GRAPHILE_SCOPED_INTROSPECTION_JIT: 'true'
+    });
+    expect(envOptions.graphile?.scopedIntrospection).toBe(true);
+    expect(envOptions.graphile?.introspectionJit).toBe(true);
+
+    const runtimeOptions = getEnvOptions(
+      { graphile: { scopedIntrospection: false, introspectionJit: false } },
+      tempDir,
+      {
+        GRAPHILE_SCOPED_INTROSPECTION: 'true',
+        GRAPHILE_SCOPED_INTROSPECTION_JIT: 'true'
+      }
+    );
+    expect(runtimeOptions.graphile?.scopedIntrospection).toBe(false);
+    expect(runtimeOptions.graphile?.introspectionJit).toBe(false);
+  });
+
   it('parses SMS environment variables into typed options', () => {
     const result = getGraphQLEnvVars({
       SMS_PROVIDER: 'devsms',

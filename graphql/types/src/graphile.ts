@@ -1,11 +1,21 @@
 import type { GraphileConfig } from 'graphile-config';
 
+export type ScopedCatalogTypes = 'all' | 'dependency-closure';
+
 /**
  * PostGraphile/Graphile v5 configuration
  */
 export interface GraphileOptions {
   /** Database schema(s) to expose through GraphQL */
   schema?: string | string[];
+  /** Use CNC schema-scoped PostgreSQL introspection. */
+  scopedIntrospection?: boolean;
+  /** Enable PostgreSQL JIT while running scoped introspection queries. */
+  introspectionJit?: boolean;
+  /** Additional schemas that scoped dependency closure may retain. */
+  introspectionDependencySchemas?: string[];
+  /** Installed extensions whose optional capability metadata must be retained. */
+  introspectionCapabilityExtensions?: string[];
   /** Additional presets to extend */
   extends?: GraphileConfig.Preset[];
   /** Preset overrides */
@@ -51,6 +61,10 @@ export interface ApiOptions {
  */
 export const graphileDefaults: GraphileOptions = {
   schema: [],
+  scopedIntrospection: false,
+  introspectionJit: false,
+  introspectionDependencySchemas: [],
+  introspectionCapabilityExtensions: [],
   extends: [],
   preset: {}
 };

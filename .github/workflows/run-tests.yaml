@@ -242,7 +242,7 @@ jobs:
           - batch: pg-core
             packages: 'pgpm/ast pgpm/traverse pgpm/bundle pgpm/core pgpm/cli pgpm/portability pgpm/export packages/client packages/safegres postgres/pg-codegen'
           - batch: pg-postgres
-            packages: 'postgres/pgsql-test postgres/drizzle-orm-test postgres/introspectron graphile/graphile-test graphile/graphile-connection-filter graphile/graphile-postgis'
+            packages: 'postgres/pgsql-test postgres/drizzle-orm-test postgres/introspectron graphile/graphile-test graphile/graphile-connection-filter graphile/graphile-postgis graphile/graphile-scoped-introspection'
           - batch: pg-graphql
             packages: 'graphile/graphile-search graphile/graphile-ltree graphile/graphile-bulk-mutations graphile/graphile-function-bindings graphile/graphile-history graphile/graphile-meta graphile/graphile-schema graphql/orm-test graphql/test graphql/playwright-test'
           - batch: pg-graphile-extras
