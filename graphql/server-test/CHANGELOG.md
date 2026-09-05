@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.25.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.24.6...graphql-server-test@3.25.0) (2026-09-05)
+
+### Features
+
+- **graphql-server:** record principal.widening_refused after PRINCIPAL_CHILD_WIDENS ([37a6476](https://github.com/constructive-io/constructive/commit/37a64763a01485677fb89dc7de77b1c0473f87fc))
+
 ## [3.24.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.24.5...graphql-server-test@3.24.6) (2026-09-04)
 
 **Note:** Version bump only for package graphql-server-test

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.22.0...@constructive-io/graphql-server@5.23.0) (2026-09-05)
+
+### Bug Fixes
+
+- **graphql-server:** escape events module identifiers in record_event SQL ([706c4f2](https://github.com/constructive-io/constructive/commit/706c4f2eb742282a7320b4511bc6d1d1f5f41470))
+
+### Features
+
+- **graphql-server:** record principal.widening_refused after PRINCIPAL_CHILD_WIDENS ([37a6476](https://github.com/constructive-io/constructive/commit/37a64763a01485677fb89dc7de77b1c0473f87fc))
+
 # [5.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.21.0...@constructive-io/graphql-server@5.22.0) (2026-09-04)
 
 ### Bug Fixes

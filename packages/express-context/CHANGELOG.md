@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.29.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.28.0...@constructive-io/express-context@0.29.0) (2026-09-05)
+
+### Features
+
+- **graphql-server:** record principal.widening_refused after PRINCIPAL_CHILD_WIDENS ([37a6476](https://github.com/constructive-io/constructive/commit/37a64763a01485677fb89dc7de77b1c0473f87fc))
+
 # [0.28.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.27.0...@constructive-io/express-context@0.28.0) (2026-09-04)
 
 ### Features
