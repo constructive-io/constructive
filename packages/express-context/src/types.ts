@@ -219,6 +219,12 @@ export interface ComputeConfig {
   modules: ComputeModuleConfig[];
 }
 
+/** The tenant's app-scoped events module: where `record_event` lives. */
+export interface EventsConfig {
+  privateSchemaName: string;
+  recordEvent: string;
+}
+
 export interface LlmConfig {
   embeddingProvider: string;
   embeddingModel: string;
@@ -256,6 +262,7 @@ export interface BuiltinModuleMap {
   agentChat: AgentChatConfig;
   llm: LlmConfig;
   compute: ComputeConfig;
+  events: EventsConfig;
   requestProtection: RequestProtection;
 }
 

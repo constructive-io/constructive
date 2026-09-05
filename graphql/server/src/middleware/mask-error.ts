@@ -63,7 +63,7 @@ const BAD_USER_INPUT = 'BAD_USER_INPUT';
  * underlying pg error at `originalError`). We parse `originalError` first so we
  * can recover the structured code, then fall back to the GraphQL error itself.
  */
-const normalizeError = (
+export const normalizeError = (
   error: GraphQLError,
 ): { code: string | null; context: ErrorContext; class: 'public' | 'internal' } => {
   const original = (error as { originalError?: unknown }).originalError;

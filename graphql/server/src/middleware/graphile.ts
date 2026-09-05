@@ -19,6 +19,7 @@ import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
+import { createWideningRefusedPlugin } from '../plugins/widening-refused-plugin';
 import type { DatabaseSettings } from '../types';
 import { maskError } from './mask-error';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
@@ -85,6 +86,7 @@ const buildPreset = (
     plugins: [
       AuthCookiePlugin,
       RequestProtectionPlugin,
+      createWideningRefusedPlugin(pool),
       // Only registered when the compute module is provisioned for this
       // database — all schema/table names come from the constructive
       // metaschema (express-context compute module loader); the plugin has
