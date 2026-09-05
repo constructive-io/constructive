@@ -14,6 +14,7 @@
  *   - webauthnSettings(routing-plane webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
  *   - authSurface     (identity/connected-accounts/emails modules → tenant DB)
+ *   - events          (metaschema_modules_public.events_module, app scope → tenant DB)
  *
  * Opt-in (not in the default registry, register it explicitly):
  *   - identityProviders (three round trips, decrypts client secrets)
@@ -51,6 +52,7 @@ export { billingLoader } from './billing';
 export { computeLoader } from './compute';
 export { corsLoader } from './cors';
 export { databaseSettingsLoader } from './database-settings';
+export { eventsLoader } from './events';
 export { identityProvidersLoader, requireIdentityProvider } from './identity-providers';
 export { inferenceLogLoader } from './inference-log';
 export { llmLoader } from './llm';
@@ -69,6 +71,7 @@ import { billingLoader } from './billing';
 import { computeLoader } from './compute';
 import { corsLoader } from './cors';
 import { databaseSettingsLoader } from './database-settings';
+import { eventsLoader } from './events';
 import { inferenceLogLoader } from './inference-log';
 import { llmLoader } from './llm';
 import { pubkeyLoader } from './pubkey';
@@ -91,6 +94,7 @@ export function createDefaultRegistry() {
   registry.register(agentChatLoader);
   registry.register(llmLoader);
   registry.register(computeLoader);
+  registry.register(eventsLoader);
   registry.register(requestProtectionLoader);
   return registry;
 }
