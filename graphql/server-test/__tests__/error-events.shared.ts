@@ -5,7 +5,7 @@ import type supertest from 'supertest';
 import { getConnections, seed } from '../src';
 
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
-const localSeedRoot = path.join(__dirname, '..', '__fixtures__', 'seed', 'widening-refused');
+const localSeedRoot = path.join(__dirname, '..', '__fixtures__', 'seed', 'error-events');
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const metaSchemas = [
@@ -45,13 +45,13 @@ export const connect = ({ withEventsModule }: { withEventsModule: boolean }) =>
   );
 
 /** Issue the mutation that is refused with PRINCIPAL_CHILD_WIDENS. */
-export const refuse = (request: supertest.Agent, token: 'human-token' | 'principal-token') =>
-  request
+export const refuse = (request: supertest.Agent, token?: 'human-token' | 'principal-token') => {
+  const req = request
     .post('/graphql')
     .set('Host', HOST)
-    .set('Authorization', `Bearer ${token}`)
-    .set('X-Request-Id', `widening-${token}`)
-    .send({ query: MUTATION });
+    .set('X-Request-Id', `refused-${token ?? 'anonymous'}`);
+  return (token ? req.set('Authorization', `Bearer ${token}`) : req).send({ query: MUTATION });
+};
 
 export const events = (pg: PgTestClient) =>
   pg.query(

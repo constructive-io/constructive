@@ -1,7 +1,7 @@
--- Widening-refused fixture: a stand-in auth module, a mutation that refuses a
--- child principal with PRINCIPAL_CHILD_WIDENS (the errors.raise_error shape:
--- MESSAGE = code, DETAIL = {code, context, class}), and a stand-in events
--- module with the tenant `record_event` the server resolves through
+-- Error-events fixture: a stand-in auth module, a mutation that is refused with
+-- a structured registry code (PRINCIPAL_CHILD_WIDENS, in the errors.raise_error
+-- shape: MESSAGE = code, DETAIL = {code, context, class}), and a stand-in
+-- events module with the tenant `record_event` the server resolves through
 -- metaschema_modules_public.events_module.
 --
 -- Compose after app-schemas/simple-pets/schema.sql and scoped/test-data.sql.

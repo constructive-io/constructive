@@ -1,15 +1,15 @@
 /**
- * Widening refused on an endpoint whose database has no events module: the
+ * Refused mutation on an endpoint whose database has no events module: the
  * refusal is returned unchanged, nothing is recorded, nothing errors.
  *
  * Run tests:
- *   pnpm test -- --testPathPattern=widening-refused-no-events
+ *   pnpm test -- --testPathPattern=error-events-no-module
  */
 
 import type { PgTestClient } from 'pgsql-test/test-client';
 import type supertest from 'supertest';
 
-import { connect, events, refuse } from './widening-refused.shared';
+import { connect, events, refuse } from './error-events.shared';
 
 jest.setTimeout(30000);
 
@@ -25,8 +25,8 @@ afterAll(async () => {
   await teardown();
 });
 
-describe('principal.widening_refused (endpoint without an events module)', () => {
-  it('refuses the principal without error and records nothing', async () => {
+describe('graphql.error (endpoint without an events module)', () => {
+  it('returns the refusal without error and records nothing', async () => {
     const res = await refuse(request, 'principal-token');
 
     expect(res.status).toBe(200);

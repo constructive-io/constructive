@@ -1,4 +1,4 @@
-import { recordEventSql } from '../widening-refused-plugin';
+import { recordEventSql } from '../error-events-plugin';
 
 describe('recordEventSql', () => {
   it('quotes the events module identifiers', () => {

@@ -11,21 +11,23 @@ import { withPgClient } from 'pg-query-context';
 
 import { normalizeError } from '../middleware/mask-error';
 
-const log = new Logger('widening-refused');
+const log = new Logger('error-events');
 
-export const WIDENING_REFUSED_EVENT = 'principal.widening_refused';
-
-/** Refusals that count as an agent trying to widen its own reach. */
-const WIDENING_CODES = new Set(['PRINCIPAL_CHILD_WIDENS']);
+export const GRAPHQL_ERROR_EVENT = 'graphql.error';
 
 const getExpressRequest = (
   requestContext: Partial<Grafast.RequestContext> | undefined
 ): Request | undefined => (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
 
-const wideningCode = (errors: readonly GraphQLError[] | undefined): string | undefined => {
+/**
+ * The first structured, public-classified registry code among the errors.
+ * Internal/unknown errors are bugs, not refusals: they are masked and logged
+ * by `maskError` and never recorded as tenant events.
+ */
+const refusalCode = (errors: readonly GraphQLError[] | undefined): string | undefined => {
   for (const error of errors ?? []) {
-    const { code } = normalizeError(error);
-    if (code && WIDENING_CODES.has(code)) return code;
+    const { code, class: errorClass } = normalizeError(error);
+    if (code && errorClass === 'public') return code;
   }
   return undefined;
 };
@@ -34,17 +36,21 @@ export const recordEventSql = (events: EventsConfig): string =>
   `SELECT ${escapeIdentifier(events.privateSchemaName)}.${escapeIdentifier(events.recordEvent)}($1, $2::uuid, $3::jsonb)`;
 
 /**
- * Records `principal.widening_refused` for the principal whose mutation was
- * refused with a widening code. The refusal itself rolled back the mutation's
+ * Records `graphql.error` when an authenticated mutation is refused with a
+ * structured registry code. The refusal rolled back the mutation's own
  * transaction, so the event is written afterwards in a fresh transaction under
- * the same request claims, via the tenant's own events module `record_event`.
- * Only principals are on the agent trust ladder: a human refused by the same
- * code records nothing. The client response is never altered.
+ * the same request claims, via the tenant's events module `record_event`.
+ *
+ * The server carries no policy about what a code means: the database reads
+ * `payload->>'code'` (e.g. PRINCIPAL_CHILD_WIDENS demoting a principal on the
+ * trust ladder). Endpoints without an events module record nothing.
+ * Unauthenticated requests are never recorded, so anonymous traffic cannot
+ * drive writes. The client response is never altered.
  */
-export const createWideningRefusedPlugin = (pool: Pool): GraphileConfig.Plugin => ({
-  name: 'WideningRefusedPlugin',
+export const createErrorEventsPlugin = (pool: Pool): GraphileConfig.Plugin => ({
+  name: 'ErrorEventsPlugin',
   version: '0.0.0',
-  description: 'Records principal.widening_refused after a mutation is refused with PRINCIPAL_CHILD_WIDENS.',
+  description: 'Records graphql.error through the tenant events module when an authenticated mutation is refused.',
 
   grafast: {
     middleware: {
@@ -54,11 +60,11 @@ export const createWideningRefusedPlugin = (pool: Pool): GraphileConfig.Plugin =
 
         const { args } = event;
         const req = getExpressRequest(args.requestContext);
-        const principalId = req?.token?.principal_id;
-        if (!principalId) return result;
+        const actorId = req?.token?.principal_id ?? req?.token?.user_id;
+        if (!actorId) return result;
         if (getOperationAST(args.document, args.operationName)?.operation !== 'mutation') return result;
 
-        const code = wideningCode(result.errors);
+        const code = refusalCode(result.errors);
         if (!code) return result;
 
         const pgSettings = (args.contextValue as { pgSettings?: Record<string, string> })?.pgSettings;
@@ -69,14 +75,14 @@ export const createWideningRefusedPlugin = (pool: Pool): GraphileConfig.Plugin =
           const operation = args.operationName ?? getOperationAST(args.document)?.name?.value ?? null;
           await withPgClient(pool, pgSettings, (client) =>
             client.query(recordEventSql(events), [
-              WIDENING_REFUSED_EVENT,
-              principalId,
+              GRAPHQL_ERROR_EVENT,
+              actorId,
               JSON.stringify({ code, operation })
             ])
           );
         } catch (err) {
           log.error(
-            `${label} failed to record ${WIDENING_REFUSED_EVENT} for principal ${principalId}: ${
+            `${label} failed to record ${GRAPHQL_ERROR_EVENT} (${code}) for ${actorId}: ${
               err instanceof Error ? err.message : String(err)
             }`
           );
