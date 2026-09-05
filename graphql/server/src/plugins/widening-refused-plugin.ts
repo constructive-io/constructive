@@ -1,11 +1,12 @@
 import '../middleware/types'; // for Request type
 
+import type { EventsConfig } from '@constructive-io/express-context';
 import { Logger } from '@pgpmjs/logger';
 import type { Request } from 'express';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLError } from 'graphql';
 import { getOperationAST } from 'graphql';
-import type { Pool } from 'pg';
+import { escapeIdentifier, type Pool } from 'pg';
 import { withPgClient } from 'pg-query-context';
 
 import { normalizeError } from '../middleware/mask-error';
@@ -28,6 +29,9 @@ const wideningCode = (errors: readonly GraphQLError[] | undefined): string | und
   }
   return undefined;
 };
+
+export const recordEventSql = (events: EventsConfig): string =>
+  `SELECT ${escapeIdentifier(events.privateSchemaName)}.${escapeIdentifier(events.recordEvent)}($1, $2::uuid, $3::jsonb)`;
 
 /**
  * Records `principal.widening_refused` for the principal whose mutation was
@@ -64,7 +68,7 @@ export const createWideningRefusedPlugin = (pool: Pool): GraphileConfig.Plugin =
           if (!events || !pgSettings) return result;
           const operation = args.operationName ?? getOperationAST(args.document)?.name?.value ?? null;
           await withPgClient(pool, pgSettings, (client) =>
-            client.query(`SELECT "${events.privateSchemaName}"."${events.recordEvent}"($1, $2::uuid, $3::jsonb)`, [
+            client.query(recordEventSql(events), [
               WIDENING_REFUSED_EVENT,
               principalId,
               JSON.stringify({ code, operation })
