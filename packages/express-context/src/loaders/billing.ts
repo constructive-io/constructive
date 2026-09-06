@@ -17,10 +17,13 @@ const BILLING_MODULE_SQL = `
     ps.schema_name AS private_schema,
     bm.record_usage_function
   FROM metaschema_modules_public.billing_module bm
-  JOIN metaschema_public.schema s ON bm.schema_id = s.id
-  JOIN metaschema_public.schema ps ON bm.private_schema_id = ps.id
+  JOIN metaschema_public.schema s
+    ON bm.schema_id = s.id
+   AND s.database_id = bm.database_id
+  JOIN metaschema_public.schema ps
+    ON bm.private_schema_id = ps.id
+   AND ps.database_id = bm.database_id
   WHERE bm.database_id = $1
-  LIMIT 1
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -43,8 +46,14 @@ export const billingLoader: ModuleLoader<BillingConfig> = createModuleLoader<Bil
       BILLING_MODULE_SQL,
       [databaseId],
     );
+    if (result.rows.length > 1) {
+      throw new Error('Ambiguous billing module configuration');
+    }
     const row = result.rows[0];
-    if (!row?.record_usage_function) return undefined;
+    if (!row) return undefined;
+    if (!row.public_schema || !row.private_schema || !row.record_usage_function) {
+      throw new Error('Incomplete or cross-database billing module configuration');
+    }
 
     return {
       publicSchema: row.public_schema,

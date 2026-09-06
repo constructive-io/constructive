@@ -22,13 +22,26 @@ const pubkeySettingsSql = (schema: string): string => `
     sign_in_fail_fn.name AS sign_in_record_failure,
     sign_in_fn.name AS sign_in_with_challenge
   FROM "${schema}".pubkey_settings ps
-  LEFT JOIN metaschema_public.schema s ON ps.schema_id = s.id
-  LEFT JOIN metaschema_public.function sign_up_fn ON ps.sign_up_with_key_function_id = sign_up_fn.id
-  LEFT JOIN metaschema_public.function sign_in_req_fn ON ps.sign_in_request_challenge_function_id = sign_in_req_fn.id
-  LEFT JOIN metaschema_public.function sign_in_fail_fn ON ps.sign_in_record_failure_function_id = sign_in_fail_fn.id
-  LEFT JOIN metaschema_public.function sign_in_fn ON ps.sign_in_with_challenge_function_id = sign_in_fn.id
+  LEFT JOIN metaschema_public.schema s
+    ON ps.schema_id = s.id
+   AND s.database_id = ps.database_id
+  LEFT JOIN metaschema_public.function sign_up_fn
+    ON ps.sign_up_with_key_function_id = sign_up_fn.id
+   AND sign_up_fn.database_id = ps.database_id
+   AND sign_up_fn.schema_id = ps.schema_id
+  LEFT JOIN metaschema_public.function sign_in_req_fn
+    ON ps.sign_in_request_challenge_function_id = sign_in_req_fn.id
+   AND sign_in_req_fn.database_id = ps.database_id
+   AND sign_in_req_fn.schema_id = ps.schema_id
+  LEFT JOIN metaschema_public.function sign_in_fail_fn
+    ON ps.sign_in_record_failure_function_id = sign_in_fail_fn.id
+   AND sign_in_fail_fn.database_id = ps.database_id
+   AND sign_in_fail_fn.schema_id = ps.schema_id
+  LEFT JOIN metaschema_public.function sign_in_fn
+    ON ps.sign_in_with_challenge_function_id = sign_in_fn.id
+   AND sign_in_fn.database_id = ps.database_id
+   AND sign_in_fn.schema_id = ps.schema_id
   WHERE ps.database_id = $1
-  LIMIT 1
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -45,7 +58,18 @@ interface PubkeySettingsRow {
 // ─── Transforms ─────────────────────────────────────────────────────────────
 
 function fromRow(row: PubkeySettingsRow | null): PubkeyChallengeSettings | undefined {
-  if (!row?.schema || !row?.sign_up_with_key) return undefined;
+  if (!row) return undefined;
+  const required = [
+    row.schema,
+    row.crypto_network,
+    row.sign_up_with_key,
+    row.sign_in_request_challenge,
+    row.sign_in_record_failure,
+    row.sign_in_with_challenge
+  ];
+  if (required.some((value) => typeof value !== 'string' || value.length === 0)) {
+    throw new Error('Incomplete or cross-database public-key authentication configuration');
+  }
   return {
     schema: row.schema,
     cryptoNetwork: row.crypto_network,
@@ -60,10 +84,14 @@ function fromRow(row: PubkeySettingsRow | null): PubkeyChallengeSettings | undef
 
 export const pubkeyLoader: ModuleLoader<PubkeyChallengeSettings> = createModuleLoader<PubkeyChallengeSettings>({
   name: 'pubkeyChallengeSettings',
-  ttlMs: 5 * 60_000,
+  // Public-key authentication policy must be authoritative per request.
+  cache: false,
   async resolve(ctx: LoaderContext) {
     const { routingPool, databaseId } = ctx;
     const result = await routingPool.query<PubkeySettingsRow>(pubkeySettingsSql(routingSchemaOf(ctx)), [databaseId]);
+    if (result.rows.length > 1) {
+      throw new Error('Ambiguous public-key authentication configuration');
+    }
     return fromRow(result.rows[0] ?? null);
   }
 });

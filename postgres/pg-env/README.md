@@ -97,8 +97,30 @@ interface PgConfig {
   user: string;
   password: string;
   database: string;
+  ssl?: boolean | PgSslOptions;
 }
 ```
+
+`ssl` is a data-only subset of Node TLS options (`ca`, `cert`, `key`,
+`passphrase`, hostname verification, protocol bounds, and ciphers). Callback
+and pre-opened-socket TLS options are deliberately excluded so connection pool
+identities can account for the complete trust contract deterministically.
+
+#### `PgPoolConfig`
+
+```typescript
+interface PgPoolConfig {
+  max?: number;
+  maxUses?: number;
+  idleTimeoutMillis?: number;
+  connectionTimeoutMillis?: number;
+  allowExitOnIdle?: boolean;
+}
+```
+
+`maxUses` is passed to native pg-pool by `pg-cache`. Its
+`PG_POOL_MAX_USES` parser treats `0` or an unset value as unlimited reuse and
+accepts only canonical positive decimal safe integers otherwise.
 
 ### Functions
 

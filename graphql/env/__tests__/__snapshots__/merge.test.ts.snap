@@ -3,6 +3,7 @@
 exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and overrides 1`] = `
 {
   "api": {
+    "allowMetaSchemaHeader": false,
     "anonRole": "env_anon",
     "exposedSchemas": [
       "public",
@@ -70,10 +71,19 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
   },
   "graphile": {
     "extends": [],
+    "introspectionClientReleaseMode": "reuse",
+    "introspectionDependencySchemas": [],
+    "introspectionMode": "stock",
     "preset": {},
+    "realtimeCursorHeartbeatIntervalMs": 30000,
+    "realtimeCursorPollIntervalMs": 5000,
+    "realtimeNotificationMode": "dedicated",
+    "realtimeNotificationRoleRevalidationMs": 60000,
+    "releaseBuildStateAfterValidation": false,
     "schema": [
       "override_schema",
     ],
+    "trustCallerPresetsInProduction": false,
   },
   "migrations": {
     "codegen": {
@@ -87,6 +97,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "port": 5432,
     "user": "env-user",
   },
+  "routingCache": {},
   "server": {
     "host": "localhost",
     "port": 5000,

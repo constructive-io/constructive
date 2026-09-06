@@ -16,6 +16,7 @@
  * makes that resolution sticky for its TTL.
  */
 
+import { quoteQualifiedSqlIdentifier } from '../sql-identifiers';
 import type { AuthSettings } from '../types';
 import { createModuleLoader } from './create-loader';
 import type { LoaderContext, ModuleLoader } from './types';
@@ -26,9 +27,10 @@ import { requireDatabaseId } from './types';
 const AUTH_SETTINGS_DISCOVERY_SQL = `
   SELECT s.schema_name, sm.auth_settings_table_name AS table_name
   FROM metaschema_modules_public.sessions_module sm
-  JOIN metaschema_public.schema s ON s.id = sm.schema_id
+  JOIN metaschema_public.schema s
+    ON s.id = sm.schema_id
+   AND s.database_id = sm.database_id
   WHERE sm.database_id = $1
-  LIMIT 1
 `;
 
 const buildAuthSettingsQuery = (schemaName: string, tableName: string) => `
@@ -42,7 +44,7 @@ const buildAuthSettingsQuery = (schemaName: string, tableName: string) => `
     remember_me_duration,
     enable_captcha,
     captcha_site_key
-  FROM "${schemaName}"."${tableName}"
+  FROM ${quoteQualifiedSqlIdentifier(schemaName, tableName, 'auth settings table')}
   LIMIT 1
 `;
 
@@ -64,7 +66,9 @@ interface AuthSettingsRow {
 
 export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader<AuthSettings>({
   name: 'authSettings',
-  ttlMs: 5 * 60_000,
+  // Cookie and CAPTCHA policy changes must take effect on the next request,
+  // independently of lossy LISTEN delivery.
+  cache: false,
   async resolve(ctx: LoaderContext) {
     const { tenantPool, databaseId } = ctx;
     requireDatabaseId(databaseId, 'authSettings');
@@ -74,6 +78,9 @@ export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader
       AUTH_SETTINGS_DISCOVERY_SQL,
       [databaseId]
     );
+    if (discovery.rows.length > 1) {
+      throw new Error('Ambiguous sessions module configuration');
+    }
     const resolved = discovery.rows[0];
     if (!resolved) return undefined;
 
