@@ -109,7 +109,7 @@ jobs:
           - batch: packages-core
             packages: 'packages/url-domains packages/coerce packages/csrf packages/oauth packages/12factor-env packages/orm packages/express-context packages/errors packages/llm-env packages/node-type-registry packages/query-spec packages/server-utils packages/site-deploy examples/site-deploy-ssg postgres/pg-cache postgres/pg-env'
           - batch: packages-services
-            packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli postgres/pgsql-client postgres/pg-ast'
+            packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli packages/perf-harness postgres/pgsql-client postgres/pg-ast'
           - batch: graphql
             packages: 'graphql/query graphql/codegen'
           - batch: graphile-unit

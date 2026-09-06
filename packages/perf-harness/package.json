@@ -27,7 +27,7 @@
   "devDependencies": {
     "@types/node": "^22.19.11",
     "@types/pg": "^8.20.4",
-    "makage": "^0.3.0"
+    "makage": "^0.8.0"
   },
   "engines": {
     "node": ">=22"
