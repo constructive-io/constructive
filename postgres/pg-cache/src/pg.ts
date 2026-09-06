@@ -24,9 +24,9 @@ interface NodePostgresConnection {
   _graphilePreparedStatementCache?: unknown;
 }
 
-interface NodePostgresClient extends pg.PoolClient {
+type NodePostgresClient = pg.PoolClient & {
   connection?: NodePostgresConnection;
-}
+};
 
 type PoolQueryCallback = (error: Error | undefined, result?: unknown) => void;
 

@@ -2621,8 +2621,8 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       '@pgsql/quotes':
-        specifier: ^18.2.0
-        version: 18.2.1
+        specifier: ^18.2.4
+        version: 18.2.4
       lru-cache:
         specifier: ^11.2.7
         version: 11.2.7
