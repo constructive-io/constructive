@@ -57,3 +57,6 @@ export const events = (pg: PgTestClient) =>
   pg.query(
     `SELECT name, actor_id, payload, request_id FROM "simple-pets-events-public".app_events ORDER BY created_at`
   );
+
+export const eventTypes = (pg: PgTestClient) =>
+  pg.query(`SELECT name, category, feeds_levels FROM "simple-pets-events-public".event_types ORDER BY name`);

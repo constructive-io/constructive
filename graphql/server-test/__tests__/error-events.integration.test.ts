@@ -2,11 +2,12 @@
  * Error-events integration tests
  *
  * When an authenticated mutation is refused with a structured registry code,
- * the server records `graphql.error` for the actor (principal, else user)
- * through the tenant's events module `record_event` (resolved from
+ * the server records an event named after that code for the actor (principal,
+ * else user) through the tenant's events module `record_error` (resolved from
  * metaschema_modules_public.events_module), in a fresh transaction after the
  * failed mutation. The client response is unchanged; the database decides what
- * each code means (e.g. PRINCIPAL_CHILD_WIDENS demotes a principal).
+ * each code means (e.g. PRINCIPAL_CHILD_WIDENS demotes a principal) and
+ * classifies it as an error that earns no ladder progress.
  *
  * The no-events-module case lives in error-events-no-module.integration so
  * each suite has its own process-wide module-loader cache.
@@ -18,7 +19,7 @@
 import type { PgTestClient } from 'pgsql-test/test-client';
 import type supertest from 'supertest';
 
-import { connect, events, HUMAN_ID, PRINCIPAL_ID, refuse } from './error-events.shared';
+import { connect, events, eventTypes, HUMAN_ID, PRINCIPAL_ID, refuse } from './error-events.shared';
 
 jest.setTimeout(30000);
 
@@ -34,7 +35,7 @@ afterAll(async () => {
   await teardown();
 });
 
-describe('graphql.error (endpoint with an events module)', () => {
+describe('refusal events (endpoint with an events module)', () => {
   it('records the refusal for a principal, with the principal as actor', async () => {
     const res = await refuse(request, 'principal-token');
 
@@ -46,11 +47,15 @@ describe('graphql.error (endpoint with an events module)', () => {
     const { rows } = await events(pg);
     expect(rows).toEqual([
       {
-        name: 'graphql.error',
+        name: 'PRINCIPAL_CHILD_WIDENS',
         actor_id: PRINCIPAL_ID,
-        payload: { code: 'PRINCIPAL_CHILD_WIDENS', operation: 'WidenChild' },
+        payload: { operation: 'WidenChild' },
         request_id: 'refused-principal-token'
       }
+    ]);
+
+    expect((await eventTypes(pg)).rows).toEqual([
+      { name: 'PRINCIPAL_CHILD_WIDENS', category: 'error', feeds_levels: false }
     ]);
   });
 
@@ -63,11 +68,15 @@ describe('graphql.error (endpoint with an events module)', () => {
     const { rows } = await events(pg);
     expect(rows).toHaveLength(2);
     expect(rows[1]).toEqual({
-      name: 'graphql.error',
+      name: 'PRINCIPAL_CHILD_WIDENS',
       actor_id: HUMAN_ID,
-      payload: { code: 'PRINCIPAL_CHILD_WIDENS', operation: 'WidenChild' },
+      payload: { operation: 'WidenChild' },
       request_id: 'refused-human-token'
     });
+
+    expect((await eventTypes(pg)).rows).toEqual([
+      { name: 'PRINCIPAL_CHILD_WIDENS', category: 'error', feeds_levels: false }
+    ]);
   });
 
   it('records nothing for an unauthenticated request', async () => {
