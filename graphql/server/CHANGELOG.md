@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.23.0...@constructive-io/graphql-server@5.24.0) (2026-09-06)
+
+### Features
+
+- **graphql-server:** record refusals as their error code via events record_error ([c0a1208](https://github.com/constructive-io/constructive/commit/c0a1208e83052dd28c819a15c68b906aac1af32a))
+
 # [5.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.22.0...@constructive-io/graphql-server@5.23.0) (2026-09-05)
 
 ### Bug Fixes

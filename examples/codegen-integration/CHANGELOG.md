@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.11](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.15.10...@constructive-io/examples-codegen-integration@2.15.11) (2026-09-06)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
 ## [2.15.10](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.15.9...@constructive-io/examples-codegen-integration@2.15.10) (2026-09-05)
 
 **Note:** Version bump only for package @constructive-io/examples-codegen-integration
