@@ -219,10 +219,15 @@ export interface ComputeConfig {
   modules: ComputeModuleConfig[];
 }
 
-/** The tenant's app-scoped events module: where `record_event` lives. */
+/**
+ * The tenant's app-scoped events module: where `record_event` and
+ * `record_error` live. `recordError` is null on a tenant whose events module
+ * predates the function; callers must report that rather than skip silently.
+ */
 export interface EventsConfig {
   privateSchemaName: string;
   recordEvent: string;
+  recordError: string | null;
 }
 
 export interface LlmConfig {

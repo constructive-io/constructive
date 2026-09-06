@@ -25,7 +25,7 @@ afterAll(async () => {
   await teardown();
 });
 
-describe('graphql.error (endpoint without an events module)', () => {
+describe('refusal events (endpoint without an events module)', () => {
   it('returns the refusal without error and records nothing', async () => {
     const res = await refuse(request, 'principal-token');
 

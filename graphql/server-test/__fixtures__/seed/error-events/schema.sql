@@ -1,8 +1,8 @@
 -- Error-events fixture: a stand-in auth module, a mutation that is refused with
 -- a structured registry code (PRINCIPAL_CHILD_WIDENS, in the errors.raise_error
 -- shape: MESSAGE = code, DETAIL = {code, context, class}), and a stand-in
--- events module with the tenant `record_event` the server resolves through
--- metaschema_modules_public.events_module.
+-- events module with the tenant `record_event`/`record_error` the server
+-- resolves through metaschema_modules_public.events_module.
 --
 -- Compose after app-schemas/simple-pets/schema.sql and scoped/test-data.sql.
 
@@ -75,6 +75,16 @@ CREATE TABLE "simple-pets-events-public".app_events (
 );
 GRANT SELECT, INSERT ON "simple-pets-events-public".app_events TO administrator, authenticated;
 
+-- Event classification: an unregistered name defaults to feeds_levels = true,
+-- so `record_error` registers every code it records as an error that earns no
+-- ladder progress.
+CREATE TABLE "simple-pets-events-public".event_types (
+  name text PRIMARY KEY,
+  category text NOT NULL,
+  feeds_levels boolean NOT NULL DEFAULT true
+);
+GRANT SELECT, INSERT ON "simple-pets-events-public".event_types TO administrator, authenticated;
+
 CREATE FUNCTION "simple-pets-events-private".record_event(
   step text,
   actor_id uuid DEFAULT NULL,
@@ -84,6 +94,21 @@ CREATE FUNCTION "simple-pets-events-private".record_event(
   VALUES (step, actor_id, 1, payload);
 $$ LANGUAGE sql VOLATILE;
 GRANT EXECUTE ON FUNCTION "simple-pets-events-private".record_event(text, uuid, jsonb) TO administrator, authenticated;
+
+CREATE FUNCTION "simple-pets-events-private".record_error(
+  code text,
+  actor_id uuid DEFAULT NULL,
+  payload jsonb DEFAULT NULL
+) RETURNS void AS $$
+  WITH registered AS (
+    INSERT INTO "simple-pets-events-public".event_types (name, category, feeds_levels)
+    VALUES (code, 'error', false)
+    ON CONFLICT (name) DO NOTHING
+  )
+  INSERT INTO "simple-pets-events-public".app_events (name, actor_id, count, payload)
+  VALUES (code, actor_id, 1, payload);
+$$ LANGUAGE sql VOLATILE;
+GRANT EXECUTE ON FUNCTION "simple-pets-events-private".record_error(text, uuid, jsonb) TO administrator, authenticated;
 
 -- ─── Metaschema registration ─────────────────────────────────────────────────
 

@@ -2,9 +2,9 @@
  * Events Module Loader
  *
  * Resolves the tenant's app-scoped events module from
- * metaschema_modules_public.events_module: the private schema and the name of
- * its `record_event` function, so the server can record events without
- * hard-coding the generated schema or function names.
+ * metaschema_modules_public.events_module: the private schema and the names of
+ * its `record_event` and `record_error` functions, so the server can record
+ * events without hard-coding the generated schema or function names.
  */
 
 import type { EventsConfig } from '../types';
@@ -16,7 +16,8 @@ import type { LoaderContext, ModuleLoader } from './types';
 const EVENTS_MODULE_SQL = `
   SELECT
     s.schema_name AS private_schema_name,
-    em.record_event
+    em.record_event,
+    em.record_error
   FROM metaschema_modules_public.events_module em
   JOIN metaschema_public.schema s ON s.id = em.private_schema_id
   WHERE em.database_id = $1
@@ -29,6 +30,7 @@ const EVENTS_MODULE_SQL = `
 interface EventsModuleRow {
   private_schema_name: string;
   record_event: string;
+  record_error: string | null;
 }
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
@@ -45,7 +47,8 @@ export const eventsLoader: ModuleLoader<EventsConfig> = createModuleLoader<Event
 
     return {
       privateSchemaName: row.private_schema_name,
-      recordEvent: row.record_event
+      recordEvent: row.record_event,
+      recordError: row.record_error ?? null
     };
   }
 });
