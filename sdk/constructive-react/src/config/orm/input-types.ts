@@ -230,12 +230,25 @@ export interface UUIDListFilter {
   anyGreaterThan?: string;
   anyGreaterThanOrEqualTo?: string;
 }
-/** Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed */
 // ============ Entity Types ============
+export interface AppInternalSecret {
+  annotations?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  description?: string | null;
+  id: string;
+  labels?: Record<string, unknown> | null;
+  name?: string | null;
+  realm?: string | null;
+  retiredAt?: string | null;
+  rotatedAt?: string | null;
+  updatedAt?: string | null;
+}
+/** Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed */
 export interface Config {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown> | null;
   createdAt?: string | null;
+  createdByPrincipal?: string | null;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
   /** Human-readable note about this config entry */
@@ -255,14 +268,54 @@ export interface Config {
   /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
   realm?: string | null;
   updatedAt?: string | null;
+  updatedByPrincipal?: string | null;
   /** Plaintext config value */
   value?: string | null;
+}
+/** -level plaintext key-value config store; database-resident, never projected into Kubernetes */
+export interface InternalConfig {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Human-readable note about this config entry */
+  description?: string | null;
+  /** Optional expiration timestamp for time-limited config entries */
+  expiresAt?: string | null;
+  /** Unique identifier for this config entry */
+  id: string;
+  /** Key/value pairs for selecting/filtering config entries */
+  labels?: Record<string, unknown> | null;
+  /** Key name identifying the config entry */
+  name?: string | null;
+  /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
+  provider?: string | null;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string | null;
+  updatedAt?: string | null;
+  /** Plaintext config value */
+  value?: string | null;
+}
+export interface InternalSecret {
+  annotations?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  databaseId?: string | null;
+  description?: string | null;
+  id: string;
+  labels?: Record<string, unknown> | null;
+  name?: string | null;
+  realm?: string | null;
+  retiredAt?: string | null;
+  rotatedAt?: string | null;
+  updatedAt?: string | null;
 }
 /** Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed */
 export interface PlatformConfig {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown> | null;
   createdAt?: string | null;
+  createdByPrincipal?: string | null;
   /** Human-readable note about this config entry */
   description?: string | null;
   /** Optional expiration timestamp for time-limited config entries */
@@ -280,6 +333,30 @@ export interface PlatformConfig {
   /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
   realm?: string | null;
   updatedAt?: string | null;
+  updatedByPrincipal?: string | null;
+  /** Plaintext config value */
+  value?: string | null;
+}
+/** platform-level plaintext key-value config store; database-resident, never projected into Kubernetes */
+export interface PlatformInternalConfig {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Human-readable note about this config entry */
+  description?: string | null;
+  /** Optional expiration timestamp for time-limited config entries */
+  expiresAt?: string | null;
+  /** Unique identifier for this config entry */
+  id: string;
+  /** Key/value pairs for selecting/filtering config entries */
+  labels?: Record<string, unknown> | null;
+  /** Key name identifying the config entry */
+  name?: string | null;
+  /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
+  provider?: string | null;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string | null;
+  updatedAt?: string | null;
   /** Plaintext config value */
   value?: string | null;
 }
@@ -290,7 +367,6 @@ export interface PlatformInternalSecret {
   id: string;
   labels?: Record<string, unknown> | null;
   name?: string | null;
-  namespaceId?: string | null;
   realm?: string | null;
   retiredAt?: string | null;
   rotatedAt?: string | null;
@@ -338,22 +414,44 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
+export interface AppInternalSecretRelations {}
 export interface ConfigRelations {}
+export interface InternalConfigRelations {}
+export interface InternalSecretRelations {}
 export interface PlatformConfigRelations {}
+export interface PlatformInternalConfigRelations {}
 export interface PlatformInternalSecretRelations {}
 export interface PlatformSecretRelations {}
 export interface SecretRelations {}
 // ============ Entity Types With Relations ============
+export type AppInternalSecretWithRelations = AppInternalSecret & AppInternalSecretRelations;
 export type ConfigWithRelations = Config & ConfigRelations;
+export type InternalConfigWithRelations = InternalConfig & InternalConfigRelations;
+export type InternalSecretWithRelations = InternalSecret & InternalSecretRelations;
 export type PlatformConfigWithRelations = PlatformConfig & PlatformConfigRelations;
+export type PlatformInternalConfigWithRelations = PlatformInternalConfig &
+  PlatformInternalConfigRelations;
 export type PlatformInternalSecretWithRelations = PlatformInternalSecret &
   PlatformInternalSecretRelations;
 export type PlatformSecretWithRelations = PlatformSecret & PlatformSecretRelations;
 export type SecretWithRelations = Secret & SecretRelations;
 // ============ Entity Select Types ============
+export type AppInternalSecretSelect = {
+  annotations?: boolean;
+  createdAt?: boolean;
+  description?: boolean;
+  id?: boolean;
+  labels?: boolean;
+  name?: boolean;
+  realm?: boolean;
+  retiredAt?: boolean;
+  rotatedAt?: boolean;
+  updatedAt?: boolean;
+};
 export type ConfigSelect = {
   annotations?: boolean;
   createdAt?: boolean;
+  createdByPrincipal?: boolean;
   databaseId?: boolean;
   description?: boolean;
   expiresAt?: boolean;
@@ -364,9 +462,53 @@ export type ConfigSelect = {
   provider?: boolean;
   realm?: boolean;
   updatedAt?: boolean;
+  updatedByPrincipal?: boolean;
   value?: boolean;
 };
+export type InternalConfigSelect = {
+  annotations?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  description?: boolean;
+  expiresAt?: boolean;
+  id?: boolean;
+  labels?: boolean;
+  name?: boolean;
+  provider?: boolean;
+  realm?: boolean;
+  updatedAt?: boolean;
+  value?: boolean;
+};
+export type InternalSecretSelect = {
+  annotations?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  description?: boolean;
+  id?: boolean;
+  labels?: boolean;
+  name?: boolean;
+  realm?: boolean;
+  retiredAt?: boolean;
+  rotatedAt?: boolean;
+  updatedAt?: boolean;
+};
 export type PlatformConfigSelect = {
+  annotations?: boolean;
+  createdAt?: boolean;
+  createdByPrincipal?: boolean;
+  description?: boolean;
+  expiresAt?: boolean;
+  id?: boolean;
+  labels?: boolean;
+  name?: boolean;
+  namespaceId?: boolean;
+  provider?: boolean;
+  realm?: boolean;
+  updatedAt?: boolean;
+  updatedByPrincipal?: boolean;
+  value?: boolean;
+};
+export type PlatformInternalConfigSelect = {
   annotations?: boolean;
   createdAt?: boolean;
   description?: boolean;
@@ -374,7 +516,6 @@ export type PlatformConfigSelect = {
   id?: boolean;
   labels?: boolean;
   name?: boolean;
-  namespaceId?: boolean;
   provider?: boolean;
   realm?: boolean;
   updatedAt?: boolean;
@@ -387,7 +528,6 @@ export type PlatformInternalSecretSelect = {
   id?: boolean;
   labels?: boolean;
   name?: boolean;
-  namespaceId?: boolean;
   realm?: boolean;
   retiredAt?: boolean;
   rotatedAt?: boolean;
@@ -423,6 +563,34 @@ export type SecretSelect = {
   updatedAt?: boolean;
 };
 // ============ Table Filter Types ============
+export interface AppInternalSecretFilter {
+  /** Checks for all expressions in this list. */
+  and?: AppInternalSecretFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AppInternalSecretFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppInternalSecretFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `retiredAt` field. */
+  retiredAt?: DatetimeFilter;
+  /** Filter by the object’s `rotatedAt` field. */
+  rotatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 export interface ConfigFilter {
   /** Checks for all expressions in this list. */
   and?: ConfigFilter[];
@@ -430,6 +598,8 @@ export interface ConfigFilter {
   annotations?: JSONFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
@@ -454,8 +624,72 @@ export interface ConfigFilter {
   realm?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
   /** Filter by the object’s `value` field. */
   value?: StringFilter;
+}
+export interface InternalConfigFilter {
+  /** Checks for all expressions in this list. */
+  and?: InternalConfigFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: InternalConfigFilter;
+  /** Checks for any expressions in this list. */
+  or?: InternalConfigFilter[];
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `value` field. */
+  value?: StringFilter;
+}
+export interface InternalSecretFilter {
+  /** Checks for all expressions in this list. */
+  and?: InternalSecretFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: InternalSecretFilter;
+  /** Checks for any expressions in this list. */
+  or?: InternalSecretFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `retiredAt` field. */
+  retiredAt?: DatetimeFilter;
+  /** Filter by the object’s `rotatedAt` field. */
+  rotatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface PlatformConfigFilter {
   /** Checks for all expressions in this list. */
@@ -464,6 +698,8 @@ export interface PlatformConfigFilter {
   annotations?: JSONFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `expiresAt` field. */
@@ -480,6 +716,38 @@ export interface PlatformConfigFilter {
   not?: PlatformConfigFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformConfigFilter[];
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `value` field. */
+  value?: StringFilter;
+}
+export interface PlatformInternalConfigFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformInternalConfigFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformInternalConfigFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformInternalConfigFilter[];
   /** Filter by the object’s `provider` field. */
   provider?: StringFilter;
   /** Filter by the object’s `realm` field. */
@@ -504,8 +772,6 @@ export interface PlatformInternalSecretFilter {
   labels?: JSONFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
   /** Negates the expression. */
   not?: PlatformInternalSecretFilter;
   /** Checks for any expressions in this list. */
@@ -586,11 +852,35 @@ export interface SecretFilter {
   updatedAt?: DatetimeFilter;
 }
 // ============ OrderBy Types ============
+export type AppInternalSecretOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'RETIRED_AT_ASC'
+  | 'RETIRED_AT_DESC'
+  | 'ROTATED_AT_ASC'
+  | 'ROTATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type ConfigOrderBy =
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
@@ -614,9 +904,95 @@ export type ConfigOrderBy =
   | 'REALM_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
   | 'VALUE_ASC'
   | 'VALUE_DESC';
+export type InternalConfigOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VALUE_ASC'
+  | 'VALUE_DESC';
+export type InternalSecretOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'RETIRED_AT_ASC'
+  | 'RETIRED_AT_DESC'
+  | 'ROTATED_AT_ASC'
+  | 'ROTATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type PlatformConfigOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC'
+  | 'VALUE_ASC'
+  | 'VALUE_DESC';
+export type PlatformInternalConfigOrderBy =
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
   | 'CREATED_AT_ASC'
@@ -629,8 +1005,6 @@ export type PlatformConfigOrderBy =
   | 'ID_DESC'
   | 'LABELS_ASC'
   | 'LABELS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
@@ -655,8 +1029,6 @@ export type PlatformInternalSecretOrderBy =
   | 'ID_DESC'
   | 'LABELS_ASC'
   | 'LABELS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
@@ -723,10 +1095,41 @@ export type SecretOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 // ============ CRUD Input Types ============
+export interface CreateAppInternalSecretInput {
+  clientMutationId?: string;
+  appInternalSecret: {
+    annotations?: Record<string, unknown>;
+    description?: string;
+    labels?: Record<string, unknown>;
+    name?: string;
+    realm?: string;
+    retiredAt?: string;
+    rotatedAt?: string;
+  };
+}
+export interface AppInternalSecretPatch {
+  annotations?: Record<string, unknown> | null;
+  description?: string | null;
+  labels?: Record<string, unknown> | null;
+  name?: string | null;
+  realm?: string | null;
+  retiredAt?: string | null;
+  rotatedAt?: string | null;
+}
+export interface UpdateAppInternalSecretInput {
+  clientMutationId?: string;
+  id: string;
+  appInternalSecretPatch: AppInternalSecretPatch;
+}
+export interface DeleteAppInternalSecretInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateConfigInput {
   clientMutationId?: string;
   config: {
     annotations?: Record<string, unknown>;
+    createdByPrincipal?: string;
     databaseId: string;
     description?: string;
     expiresAt?: string;
@@ -735,11 +1138,13 @@ export interface CreateConfigInput {
     namespaceId: string;
     provider?: string;
     realm?: string;
+    updatedByPrincipal?: string;
     value?: string;
   };
 }
 export interface ConfigPatch {
   annotations?: Record<string, unknown> | null;
+  createdByPrincipal?: string | null;
   databaseId?: string | null;
   description?: string | null;
   expiresAt?: string | null;
@@ -748,6 +1153,7 @@ export interface ConfigPatch {
   namespaceId?: string | null;
   provider?: string | null;
   realm?: string | null;
+  updatedByPrincipal?: string | null;
   value?: string | null;
 }
 export interface UpdateConfigInput {
@@ -759,10 +1165,77 @@ export interface DeleteConfigInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateInternalConfigInput {
+  clientMutationId?: string;
+  internalConfig: {
+    annotations?: Record<string, unknown>;
+    databaseId: string;
+    description?: string;
+    expiresAt?: string;
+    labels?: Record<string, unknown>;
+    name: string;
+    provider?: string;
+    realm?: string;
+    value?: string;
+  };
+}
+export interface InternalConfigPatch {
+  annotations?: Record<string, unknown> | null;
+  databaseId?: string | null;
+  description?: string | null;
+  expiresAt?: string | null;
+  labels?: Record<string, unknown> | null;
+  name?: string | null;
+  provider?: string | null;
+  realm?: string | null;
+  value?: string | null;
+}
+export interface UpdateInternalConfigInput {
+  clientMutationId?: string;
+  id: string;
+  internalConfigPatch: InternalConfigPatch;
+}
+export interface DeleteInternalConfigInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateInternalSecretInput {
+  clientMutationId?: string;
+  internalSecret: {
+    annotations?: Record<string, unknown>;
+    databaseId: string;
+    description?: string;
+    labels?: Record<string, unknown>;
+    name?: string;
+    realm?: string;
+    retiredAt?: string;
+    rotatedAt?: string;
+  };
+}
+export interface InternalSecretPatch {
+  annotations?: Record<string, unknown> | null;
+  databaseId?: string | null;
+  description?: string | null;
+  labels?: Record<string, unknown> | null;
+  name?: string | null;
+  realm?: string | null;
+  retiredAt?: string | null;
+  rotatedAt?: string | null;
+}
+export interface UpdateInternalSecretInput {
+  clientMutationId?: string;
+  id: string;
+  internalSecretPatch: InternalSecretPatch;
+}
+export interface DeleteInternalSecretInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreatePlatformConfigInput {
   clientMutationId?: string;
   platformConfig: {
     annotations?: Record<string, unknown>;
+    createdByPrincipal?: string;
     description?: string;
     expiresAt?: string;
     labels?: Record<string, unknown>;
@@ -770,11 +1243,13 @@ export interface CreatePlatformConfigInput {
     namespaceId: string;
     provider?: string;
     realm?: string;
+    updatedByPrincipal?: string;
     value?: string;
   };
 }
 export interface PlatformConfigPatch {
   annotations?: Record<string, unknown> | null;
+  createdByPrincipal?: string | null;
   description?: string | null;
   expiresAt?: string | null;
   labels?: Record<string, unknown> | null;
@@ -782,6 +1257,7 @@ export interface PlatformConfigPatch {
   namespaceId?: string | null;
   provider?: string | null;
   realm?: string | null;
+  updatedByPrincipal?: string | null;
   value?: string | null;
 }
 export interface UpdatePlatformConfigInput {
@@ -793,6 +1269,38 @@ export interface DeletePlatformConfigInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreatePlatformInternalConfigInput {
+  clientMutationId?: string;
+  platformInternalConfig: {
+    annotations?: Record<string, unknown>;
+    description?: string;
+    expiresAt?: string;
+    labels?: Record<string, unknown>;
+    name: string;
+    provider?: string;
+    realm?: string;
+    value?: string;
+  };
+}
+export interface PlatformInternalConfigPatch {
+  annotations?: Record<string, unknown> | null;
+  description?: string | null;
+  expiresAt?: string | null;
+  labels?: Record<string, unknown> | null;
+  name?: string | null;
+  provider?: string | null;
+  realm?: string | null;
+  value?: string | null;
+}
+export interface UpdatePlatformInternalConfigInput {
+  clientMutationId?: string;
+  id: string;
+  platformInternalConfigPatch: PlatformInternalConfigPatch;
+}
+export interface DeletePlatformInternalConfigInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreatePlatformInternalSecretInput {
   clientMutationId?: string;
   platformInternalSecret: {
@@ -800,7 +1308,6 @@ export interface CreatePlatformInternalSecretInput {
     description?: string;
     labels?: Record<string, unknown>;
     name?: string;
-    namespaceId: string;
     realm?: string;
     retiredAt?: string;
     rotatedAt?: string;
@@ -811,7 +1318,6 @@ export interface PlatformInternalSecretPatch {
   description?: string | null;
   labels?: Record<string, unknown> | null;
   name?: string | null;
-  namespaceId?: string | null;
   realm?: string | null;
   retiredAt?: string | null;
   rotatedAt?: string | null;
@@ -898,6 +1404,34 @@ export interface DeleteSecretInput {
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {} as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
+export interface _InternalSecretsDelInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  realm?: string;
+  secretName?: string;
+}
+export interface _InternalSecretsRemoveArrayInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  realm?: string;
+  secretNames?: string[];
+}
+export interface _InternalSecretsRotateInput {
+  algo?: string;
+  clientMutationId?: string;
+  databaseId?: string;
+  realm?: string;
+  secretName?: string;
+  secretValue?: string;
+}
+export interface _InternalSecretsSetInput {
+  algo?: string;
+  clientMutationId?: string;
+  scopeDatabaseId?: string;
+  secretName?: string;
+  secretRealm?: string;
+  secretValue?: string;
+}
 export interface _SecretsDelInput {
   clientMutationId?: string;
   databaseId?: string;
@@ -931,22 +1465,43 @@ export interface _SecretsSetInput {
   secretRealm?: string;
   secretValue?: string;
 }
+export interface AppInternalSecretsDelInput {
+  clientMutationId?: string;
+  realm?: string;
+  secretName?: string;
+}
+export interface AppInternalSecretsRemoveArrayInput {
+  clientMutationId?: string;
+  realm?: string;
+  secretNames?: string[];
+}
+export interface AppInternalSecretsRotateInput {
+  algo?: string;
+  clientMutationId?: string;
+  realm?: string;
+  secretName?: string;
+  secretValue?: string;
+}
+export interface AppInternalSecretsSetInput {
+  algo?: string;
+  clientMutationId?: string;
+  secretName?: string;
+  secretRealm?: string;
+  secretValue?: string;
+}
 export interface PlatformInternalSecretsDelInput {
   clientMutationId?: string;
-  namespaceId?: string;
   realm?: string;
   secretName?: string;
 }
 export interface PlatformInternalSecretsRemoveArrayInput {
   clientMutationId?: string;
-  namespaceId?: string;
   realm?: string;
   secretNames?: string[];
 }
 export interface PlatformInternalSecretsRotateInput {
   algo?: string;
   clientMutationId?: string;
-  namespaceId?: string;
   realm?: string;
   secretName?: string;
   secretValue?: string;
@@ -955,7 +1510,6 @@ export interface PlatformInternalSecretsSetInput {
   algo?: string;
   clientMutationId?: string;
   secretName?: string;
-  secretNamespaceId?: string;
   secretRealm?: string;
   secretValue?: string;
 }
@@ -1002,6 +1556,7 @@ export interface ConfigInput {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown>;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Human-readable note about this config entry */
@@ -1021,6 +1576,32 @@ export interface ConfigInput {
   /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
   realm?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** Plaintext config value */
+  value?: string;
+}
+/** An input for mutations affecting `InternalConfig` */
+export interface InternalConfigInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown>;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Human-readable note about this config entry */
+  description?: string;
+  /** Optional expiration timestamp for time-limited config entries */
+  expiresAt?: string;
+  /** Unique identifier for this config entry */
+  id?: string;
+  /** Key/value pairs for selecting/filtering config entries */
+  labels?: Record<string, unknown>;
+  /** Key name identifying the config entry */
+  name: string;
+  /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
+  provider?: string;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string;
+  updatedAt?: string;
   /** Plaintext config value */
   value?: string;
 }
@@ -1029,6 +1610,7 @@ export interface PlatformConfigInput {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown>;
   createdAt?: string;
+  createdByPrincipal?: string;
   /** Human-readable note about this config entry */
   description?: string;
   /** Optional expiration timestamp for time-limited config entries */
@@ -1046,10 +1628,62 @@ export interface PlatformConfigInput {
   /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
   realm?: string;
   updatedAt?: string;
+  updatedByPrincipal?: string;
+  /** Plaintext config value */
+  value?: string;
+}
+/** An input for mutations affecting `PlatformInternalConfig` */
+export interface PlatformInternalConfigInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown>;
+  createdAt?: string;
+  /** Human-readable note about this config entry */
+  description?: string;
+  /** Optional expiration timestamp for time-limited config entries */
+  expiresAt?: string;
+  /** Unique identifier for this config entry */
+  id?: string;
+  /** Key/value pairs for selecting/filtering config entries */
+  labels?: Record<string, unknown>;
+  /** Key name identifying the config entry */
+  name: string;
+  /** Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK. */
+  provider?: string;
+  /** Optional discriminator scoping this value under its name. NULL = the default/unqualified value; getters fall back from an exact realm match to the NULL-realm row. */
+  realm?: string;
+  updatedAt?: string;
   /** Plaintext config value */
   value?: string;
 }
 // ============ Payload/Return Types (for custom operations) ============
+export interface _InternalSecretsDelPayload {
+  clientMutationId?: string | null;
+}
+export type _InternalSecretsDelPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface _InternalSecretsRemoveArrayPayload {
+  clientMutationId?: string | null;
+}
+export type _InternalSecretsRemoveArrayPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface _InternalSecretsRotatePayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type _InternalSecretsRotatePayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface _InternalSecretsSetPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type _InternalSecretsSetPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface _SecretsDelPayload {
   clientMutationId?: string | null;
 }
@@ -1075,6 +1709,34 @@ export interface _SecretsSetPayload {
   result?: boolean | null;
 }
 export type _SecretsSetPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface AppInternalSecretsDelPayload {
+  clientMutationId?: string | null;
+}
+export type AppInternalSecretsDelPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface AppInternalSecretsRemoveArrayPayload {
+  clientMutationId?: string | null;
+}
+export type AppInternalSecretsRemoveArrayPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface AppInternalSecretsRotatePayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type AppInternalSecretsRotatePayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface AppInternalSecretsSetPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type AppInternalSecretsSetPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -1135,26 +1797,19 @@ export type PlatformSecretsSetPayloadSelect = {
   result?: boolean;
 };
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
 }
 export type ProvisionBucketPayloadSelect = {
-  accessType?: boolean;
-  bucketName?: boolean;
-  endpoint?: boolean;
-  error?: boolean;
-  provider?: boolean;
-  success?: boolean;
+  bucketId?: boolean;
+  bucketKey?: boolean;
+  jobId?: boolean;
+  physicalName?: boolean;
 };
 export interface CreateConfigPayload {
   clientMutationId?: string | null;
@@ -1199,6 +1854,51 @@ export type DeleteConfigPayloadSelect = {
   };
   configEdge?: {
     select: ConfigEdgeSelect;
+  };
+};
+export interface CreateInternalConfigPayload {
+  clientMutationId?: string | null;
+  /** The `InternalConfig` that was created by this mutation. */
+  internalConfig?: InternalConfig | null;
+  internalConfigEdge?: InternalConfigEdge | null;
+}
+export type CreateInternalConfigPayloadSelect = {
+  clientMutationId?: boolean;
+  internalConfig?: {
+    select: InternalConfigSelect;
+  };
+  internalConfigEdge?: {
+    select: InternalConfigEdgeSelect;
+  };
+};
+export interface UpdateInternalConfigPayload {
+  clientMutationId?: string | null;
+  /** The `InternalConfig` that was updated by this mutation. */
+  internalConfig?: InternalConfig | null;
+  internalConfigEdge?: InternalConfigEdge | null;
+}
+export type UpdateInternalConfigPayloadSelect = {
+  clientMutationId?: boolean;
+  internalConfig?: {
+    select: InternalConfigSelect;
+  };
+  internalConfigEdge?: {
+    select: InternalConfigEdgeSelect;
+  };
+};
+export interface DeleteInternalConfigPayload {
+  clientMutationId?: string | null;
+  /** The `InternalConfig` that was deleted by this mutation. */
+  internalConfig?: InternalConfig | null;
+  internalConfigEdge?: InternalConfigEdge | null;
+}
+export type DeleteInternalConfigPayloadSelect = {
+  clientMutationId?: boolean;
+  internalConfig?: {
+    select: InternalConfigSelect;
+  };
+  internalConfigEdge?: {
+    select: InternalConfigEdgeSelect;
   };
 };
 export interface CreatePlatformConfigPayload {
@@ -1246,6 +1946,51 @@ export type DeletePlatformConfigPayloadSelect = {
     select: PlatformConfigEdgeSelect;
   };
 };
+export interface CreatePlatformInternalConfigPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInternalConfig` that was created by this mutation. */
+  platformInternalConfig?: PlatformInternalConfig | null;
+  platformInternalConfigEdge?: PlatformInternalConfigEdge | null;
+}
+export type CreatePlatformInternalConfigPayloadSelect = {
+  clientMutationId?: boolean;
+  platformInternalConfig?: {
+    select: PlatformInternalConfigSelect;
+  };
+  platformInternalConfigEdge?: {
+    select: PlatformInternalConfigEdgeSelect;
+  };
+};
+export interface UpdatePlatformInternalConfigPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInternalConfig` that was updated by this mutation. */
+  platformInternalConfig?: PlatformInternalConfig | null;
+  platformInternalConfigEdge?: PlatformInternalConfigEdge | null;
+}
+export type UpdatePlatformInternalConfigPayloadSelect = {
+  clientMutationId?: boolean;
+  platformInternalConfig?: {
+    select: PlatformInternalConfigSelect;
+  };
+  platformInternalConfigEdge?: {
+    select: PlatformInternalConfigEdgeSelect;
+  };
+};
+export interface DeletePlatformInternalConfigPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInternalConfig` that was deleted by this mutation. */
+  platformInternalConfig?: PlatformInternalConfig | null;
+  platformInternalConfigEdge?: PlatformInternalConfigEdge | null;
+}
+export type DeletePlatformInternalConfigPayloadSelect = {
+  clientMutationId?: boolean;
+  platformInternalConfig?: {
+    select: PlatformInternalConfigSelect;
+  };
+  platformInternalConfigEdge?: {
+    select: PlatformInternalConfigEdgeSelect;
+  };
+};
 /** A `Config` edge in the connection. */
 export interface ConfigEdge {
   cursor?: string | null;
@@ -1258,6 +2003,18 @@ export type ConfigEdgeSelect = {
     select: ConfigSelect;
   };
 };
+/** A `InternalConfig` edge in the connection. */
+export interface InternalConfigEdge {
+  cursor?: string | null;
+  /** The `InternalConfig` at the end of the edge. */
+  node?: InternalConfig | null;
+}
+export type InternalConfigEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: InternalConfigSelect;
+  };
+};
 /** A `PlatformConfig` edge in the connection. */
 export interface PlatformConfigEdge {
   cursor?: string | null;
@@ -1268,5 +2025,17 @@ export type PlatformConfigEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PlatformConfigSelect;
+  };
+};
+/** A `PlatformInternalConfig` edge in the connection. */
+export interface PlatformInternalConfigEdge {
+  cursor?: string | null;
+  /** The `PlatformInternalConfig` at the end of the edge. */
+  node?: PlatformInternalConfig | null;
+}
+export type PlatformInternalConfigEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformInternalConfigSelect;
   };
 };

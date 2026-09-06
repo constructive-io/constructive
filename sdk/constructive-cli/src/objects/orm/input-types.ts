@@ -665,6 +665,15 @@ export interface InsertNodeAtPathInput {
   root?: string;
   sId?: string;
 }
+export interface InsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: Record<string, unknown>[];
+  kidsList?: Record<string, unknown>;
+  ktreeList?: Record<string, unknown>;
+  paths?: Record<string, unknown>;
+  root?: string;
+  sId?: string;
+}
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
   bucketKey: string;
@@ -674,12 +683,31 @@ export interface ProvisionBucketInput {
    */
   ownerId?: string;
 }
+export interface SetAndCommitInput {
+  clientMutationId?: string;
+  data?: Record<string, unknown>;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
 export interface SetDataAtPathInput {
   clientMutationId?: string;
   data?: Record<string, unknown>;
   path?: string[];
   root?: string;
   sId?: string;
+}
+export interface SetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: Record<string, unknown>;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
 }
 /** An input for mutations affecting `Commit` */
 export interface CommitInput {
@@ -758,27 +786,42 @@ export type InsertNodeAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface InsertNodesAtPathsPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type InsertNodesAtPathsPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
 }
 export type ProvisionBucketPayloadSelect = {
-  accessType?: boolean;
-  bucketName?: boolean;
-  endpoint?: boolean;
-  error?: boolean;
-  provider?: boolean;
-  success?: boolean;
+  bucketId?: boolean;
+  bucketKey?: boolean;
+  jobId?: boolean;
+  physicalName?: boolean;
+};
+export interface SetAndCommitPayload {
+  clientMutationId?: string | null;
+  commitEdge?: CommitEdge | null;
+  result?: Commit | null;
+}
+export type SetAndCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  commitEdge?: {
+    select: CommitEdgeSelect;
+  };
+  result?: {
+    select: CommitSelect;
+  };
 };
 export interface SetDataAtPathPayload {
   clientMutationId?: string | null;
@@ -787,6 +830,20 @@ export interface SetDataAtPathPayload {
 export type SetDataAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface SetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  commitEdge?: CommitEdge | null;
+  result?: Commit | null;
+}
+export type SetManyAndCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  commitEdge?: {
+    select: CommitEdgeSelect;
+  };
+  result?: {
+    select: CommitSelect;
+  };
 };
 export interface CreateCommitPayload {
   clientMutationId?: string | null;

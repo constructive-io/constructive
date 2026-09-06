@@ -7,8 +7,8 @@ Task within a plan, with ordering and optional approval gates
 ## Usage
 
 ```typescript
-useAgentTasksQuery({ selection: { fields: { actorId: true, approvalFeedback: true, approvalStatus: true, approvedAt: true, approvedBy: true, createdAt: true, databaseId: true, description: true, error: true, id: true, orderIndex: true, planId: true, requiresApproval: true, source: true, status: true, updatedAt: true } } })
-useAgentTaskQuery({ id: '<UUID>', selection: { fields: { actorId: true, approvalFeedback: true, approvalStatus: true, approvedAt: true, approvedBy: true, createdAt: true, databaseId: true, description: true, error: true, id: true, orderIndex: true, planId: true, requiresApproval: true, source: true, status: true, updatedAt: true } } })
+useAgentTasksQuery({ selection: { fields: { actorId: true, approvalFeedback: true, approvalStatus: true, approvedAt: true, approvedBy: true, createdAt: true, databaseId: true, description: true, error: true, id: true, orderIndex: true, planId: true, requiresApproval: true, source: true, status: true, updatedAt: true, visibility: true } } })
+useAgentTaskQuery({ id: '<UUID>', selection: { fields: { actorId: true, approvalFeedback: true, approvalStatus: true, approvedAt: true, approvedBy: true, createdAt: true, databaseId: true, description: true, error: true, id: true, orderIndex: true, planId: true, requiresApproval: true, source: true, status: true, updatedAt: true, visibility: true } } })
 useCreateAgentTaskMutation({ selection: { fields: { id: true } } })
 useUpdateAgentTaskMutation({ selection: { fields: { id: true } } })
 useDeleteAgentTaskMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentTaskMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentTasksQuery({
-  selection: { fields: { actorId: true, approvalFeedback: true, approvalStatus: true, approvedAt: true, approvedBy: true, createdAt: true, databaseId: true, description: true, error: true, id: true, orderIndex: true, planId: true, requiresApproval: true, source: true, status: true, updatedAt: true } },
+  selection: { fields: { actorId: true, approvalFeedback: true, approvalStatus: true, approvedAt: true, approvedBy: true, createdAt: true, databaseId: true, description: true, error: true, id: true, orderIndex: true, planId: true, requiresApproval: true, source: true, status: true, updatedAt: true, visibility: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentTasksQuery({
 const { mutate } = useCreateAgentTaskMutation({
   selection: { fields: { id: true } },
 });
-mutate({ actorId: '<UUID>', approvalFeedback: '<String>', approvalStatus: '<String>', approvedAt: '<Datetime>', approvedBy: '<UUID>', databaseId: '<UUID>', description: '<String>', error: '<String>', orderIndex: '<Int>', planId: '<UUID>', requiresApproval: '<Boolean>', source: '<String>', status: '<String>' });
+mutate({ actorId: '<UUID>', approvalFeedback: '<String>', approvalStatus: '<String>', approvedAt: '<Datetime>', approvedBy: '<UUID>', databaseId: '<UUID>', description: '<String>', error: '<String>', orderIndex: '<Int>', planId: '<UUID>', requiresApproval: '<Boolean>', source: '<String>', status: '<String>', visibility: '<String>' });
 ```

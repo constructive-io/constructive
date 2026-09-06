@@ -27,6 +27,8 @@ import {
   roleTypeKeys,
   userConnectedAccountKeys,
   userKeys,
+  userSettingKeys,
+  userSettingsSecurityKeys,
   webauthnCredentialKeys,
 } from './query-keys';
 /**
@@ -244,6 +246,40 @@ export const invalidate = {
         queryKey: userKeys.detail(id),
       }),
   },
+  /** Invalidate userSetting queries */ userSetting: {
+    /** Invalidate all userSetting queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingKeys.all,
+      }),
+    /** Invalidate userSetting list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingKeys.lists(),
+      }),
+    /** Invalidate a specific userSetting */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingKeys.detail(id),
+      }),
+  },
+  /** Invalidate userSettingsSecurity queries */ userSettingsSecurity: {
+    /** Invalidate all userSettingsSecurity queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingsSecurityKeys.all,
+      }),
+    /** Invalidate userSettingsSecurity list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingsSecurityKeys.lists(),
+      }),
+    /** Invalidate a specific userSettingsSecurity */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingsSecurityKeys.detail(id),
+      }),
+  },
   /** Invalidate webauthnCredential queries */ webauthnCredential: {
     /** Invalidate all webauthnCredential queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -356,6 +392,22 @@ export const remove = {
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: userKeys.detail(id),
+    });
+  },
+  /** Remove userSetting from cache */ userSetting: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userSettingKeys.detail(id),
+    });
+  },
+  /** Remove userSettingsSecurity from cache */ userSettingsSecurity: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userSettingsSecurityKeys.detail(id),
     });
   },
   /** Remove webauthnCredential from cache */ webauthnCredential: (

@@ -7,8 +7,8 @@ Agent persona templates (role, system prompt, default skills/knowledge)
 ## Usage
 
 ```typescript
-useAgentPersonasQuery({ selection: { fields: { config: true, createdAt: true, createdBy: true, databaseId: true, description: true, id: true, isActive: true, name: true, resources: true, slug: true, systemPrompt: true, updatedAt: true, updatedBy: true } } })
-useAgentPersonaQuery({ id: '<UUID>', selection: { fields: { config: true, createdAt: true, createdBy: true, databaseId: true, description: true, id: true, isActive: true, name: true, resources: true, slug: true, systemPrompt: true, updatedAt: true, updatedBy: true } } })
+useAgentPersonasQuery({ selection: { fields: { config: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, description: true, id: true, isActive: true, name: true, resources: true, slug: true, systemPrompt: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
+useAgentPersonaQuery({ id: '<UUID>', selection: { fields: { config: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, description: true, id: true, isActive: true, name: true, resources: true, slug: true, systemPrompt: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
 useCreateAgentPersonaMutation({ selection: { fields: { id: true } } })
 useUpdateAgentPersonaMutation({ selection: { fields: { id: true } } })
 useDeleteAgentPersonaMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentPersonaMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentPersonasQuery({
-  selection: { fields: { config: true, createdAt: true, createdBy: true, databaseId: true, description: true, id: true, isActive: true, name: true, resources: true, slug: true, systemPrompt: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { config: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, description: true, id: true, isActive: true, name: true, resources: true, slug: true, systemPrompt: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentPersonasQuery({
 const { mutate } = useCreateAgentPersonaMutation({
   selection: { fields: { id: true } },
 });
-mutate({ config: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', name: '<String>', resources: '<String>', slug: '<String>', systemPrompt: '<String>', updatedBy: '<UUID>' });
+mutate({ config: '<JSON>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', name: '<String>', resources: '<String>', slug: '<String>', systemPrompt: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```

@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Native-app deep-link association metadata for a site surface (feeds AASA / assetlinks.json generation)
+Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json)
 
 ## Usage
 
 ```typescript
-usePlatformSiteAppLinksQuery({ selection: { fields: { appIdentifier: true, createdAt: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } } })
-usePlatformSiteAppLinkQuery({ id: '<UUID>', selection: { fields: { appIdentifier: true, createdAt: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } } })
+usePlatformSiteAppLinksQuery({ selection: { fields: { appStoreIdentityId: true, createdAt: true, id: true, pathComponents: true, siteId: true, updatedAt: true, webcredentials: true } } })
+usePlatformSiteAppLinkQuery({ id: '<UUID>', selection: { fields: { appStoreIdentityId: true, createdAt: true, id: true, pathComponents: true, siteId: true, updatedAt: true, webcredentials: true } } })
 useCreatePlatformSiteAppLinkMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformSiteAppLinkMutation({ selection: { fields: { id: true } } })
 useDeletePlatformSiteAppLinkMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformSiteAppLinkMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformSiteAppLinksQuery({
-  selection: { fields: { appIdentifier: true, createdAt: true, id: true, pathComponents: true, platform: true, sha256CertFingerprints: true, siteId: true, storeUrl: true, teamId: true, updatedAt: true, webcredentials: true } },
+  selection: { fields: { appStoreIdentityId: true, createdAt: true, id: true, pathComponents: true, siteId: true, updatedAt: true, webcredentials: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformSiteAppLinksQuery({
 const { mutate } = useCreatePlatformSiteAppLinkMutation({
   selection: { fields: { id: true } },
 });
-mutate({ appIdentifier: '<String>', pathComponents: '<String>', platform: '<String>', sha256CertFingerprints: '<String>', siteId: '<UUID>', storeUrl: '<String>', teamId: '<String>', webcredentials: '<Boolean>' });
+mutate({ appStoreIdentityId: '<UUID>', pathComponents: '<String>', siteId: '<UUID>', webcredentials: '<Boolean>' });
 ```

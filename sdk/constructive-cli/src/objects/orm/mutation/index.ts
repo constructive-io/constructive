@@ -9,16 +9,25 @@ import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   InitEmptyRepoInput,
   InsertNodeAtPathInput,
+  InsertNodesAtPathsInput,
   ProvisionBucketInput,
+  SetAndCommitInput,
   SetDataAtPathInput,
+  SetManyAndCommitInput,
   InitEmptyRepoPayload,
   InsertNodeAtPathPayload,
+  InsertNodesAtPathsPayload,
   ProvisionBucketPayload,
+  SetAndCommitPayload,
   SetDataAtPathPayload,
+  SetManyAndCommitPayload,
   InitEmptyRepoPayloadSelect,
   InsertNodeAtPathPayloadSelect,
+  InsertNodesAtPathsPayloadSelect,
   ProvisionBucketPayloadSelect,
+  SetAndCommitPayloadSelect,
   SetDataAtPathPayloadSelect,
+  SetManyAndCommitPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface InitEmptyRepoVariables {
@@ -27,18 +36,28 @@ export interface InitEmptyRepoVariables {
 export interface InsertNodeAtPathVariables {
   input: InsertNodeAtPathInput;
 }
+export interface InsertNodesAtPathsVariables {
+  input: InsertNodesAtPathsInput;
+}
 /**
  * Variables for provisionBucket
- * Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+ * Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
 }
+export interface SetAndCommitVariables {
+  input: SetAndCommitInput;
+}
 export interface SetDataAtPathVariables {
   input: SetDataAtPathInput;
+}
+export interface SetManyAndCommitVariables {
+  input: SetManyAndCommitInput;
 }
 export function createMutationOperations(client: OrmClient) {
   return {
@@ -100,6 +119,35 @@ export function createMutationOperations(client: OrmClient) {
           'InsertNodeAtPathPayload'
         ),
       }),
+    insertNodesAtPaths: <S extends InsertNodesAtPathsPayloadSelect>(
+      args: InsertNodesAtPathsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InsertNodesAtPathsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        insertNodesAtPaths: InferSelectResult<InsertNodesAtPathsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InsertNodesAtPaths',
+        fieldName: 'insertNodesAtPaths',
+        ...buildCustomDocument(
+          'mutation',
+          'InsertNodesAtPaths',
+          'insertNodesAtPaths',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InsertNodesAtPathsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InsertNodesAtPathsPayload'
+        ),
+      }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(
       args: ProvisionBucketVariables,
       options: {
@@ -129,6 +177,35 @@ export function createMutationOperations(client: OrmClient) {
           'ProvisionBucketPayload'
         ),
       }),
+    setAndCommit: <S extends SetAndCommitPayloadSelect>(
+      args: SetAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setAndCommit: InferSelectResult<SetAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetAndCommit',
+        fieldName: 'setAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'SetAndCommit',
+          'setAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetAndCommitPayload'
+        ),
+      }),
     setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
       args: SetDataAtPathVariables,
       options: {
@@ -156,6 +233,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SetDataAtPathPayload'
+        ),
+      }),
+    setManyAndCommit: <S extends SetManyAndCommitPayloadSelect>(
+      args: SetManyAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetManyAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setManyAndCommit: InferSelectResult<SetManyAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetManyAndCommit',
+        fieldName: 'setManyAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'SetManyAndCommit',
+          'setManyAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetManyAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetManyAndCommitPayload'
         ),
       }),
   };
