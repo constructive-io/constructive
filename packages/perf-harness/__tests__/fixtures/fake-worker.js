@@ -9,10 +9,16 @@ const valueFor = (name) => {
   return process.argv[index + 1];
 };
 
-valueFor('database-url');
+const databaseUrl = valueFor('database-url');
 const envelope = JSON.parse(
   Buffer.from(valueFor('worker-config'), 'base64url').toString('utf8')
 );
+if (envelope.workerConfig.pidFile) {
+  require('node:fs').writeFileSync(
+    envelope.workerConfig.pidFile,
+    String(process.pid)
+  );
+}
 const value = envelope.workerConfig.value;
 const memory = {
   rss: value,
@@ -37,4 +43,10 @@ const result = {
     processPeakRss: value,
   },
 };
-process.stdout.write(`CPERF_RESULT ${JSON.stringify(result)}\n`);
+if (envelope.workerConfig.mode !== 'hang') {
+  process.stdout.write(`CPERF_RESULT ${JSON.stringify(result)}\n`);
+}
+if (['hang', 'result-then-hang'].includes(envelope.workerConfig.mode)) {
+  process.stderr.write(`connecting to ${databaseUrl}\n`);
+  setInterval(() => undefined, 1_000);
+}

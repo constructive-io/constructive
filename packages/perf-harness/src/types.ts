@@ -114,6 +114,7 @@ export interface BenchmarkReport {
     repetitions: number;
     seed: number;
     order: string[] | null;
+    workerTimeoutMs: number;
   };
   schedule: BenchmarkCoordinate[];
   runs: BenchmarkRun[];

@@ -2,7 +2,15 @@ import { mkdir, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
 import { prepareFixture } from './fixture';
-import { parseValueArgs, redactSecret, runWorkerProcess } from './process';
+import {
+  DEFAULT_WORKER_TIMEOUT_MS,
+  MAX_WORKER_TIMEOUT_MS,
+  parseValueArgs,
+  redactSecret,
+  runWorkerProcess,
+  validateWorkerTimeoutMs,
+  WorkerCleanupError,
+} from './process';
 import { summarizeCase, validateSchemaGroups } from './report';
 import { makeSchedule, validateCaseDefinitions } from './schedule';
 import type {
@@ -18,6 +26,7 @@ export interface RunSuiteOptions {
   seed: number;
   order: string[] | null;
   output?: string;
+  workerTimeoutMs?: number;
 }
 
 export const runBenchmarkSuite = async (
@@ -25,6 +34,7 @@ export const runBenchmarkSuite = async (
   options: RunSuiteOptions,
   workerPath: string
 ): Promise<BenchmarkReport> => {
+  const workerTimeoutMs = validateWorkerTimeoutMs(options.workerTimeoutMs);
   validateCaseDefinitions(suite.cases);
   const byName = new Map(
     suite.cases.map((definition) => [definition.name, definition])
@@ -47,15 +57,23 @@ export const runBenchmarkSuite = async (
       const spawned = await runWorkerProcess(
         workerPath,
         options.databaseUrl,
-        definition
+        definition,
+        workerTimeoutMs
       );
-      runs.push({ ...coordinate, result: spawned.result });
+      let result = spawned.result;
+      if (result.status === 'error') {
+        result = {
+          ...result,
+          error: redactSecret(result.error, options.databaseUrl),
+        };
+      }
+      runs.push({ ...coordinate, result });
     } catch (error) {
       runs.push({
         ...coordinate,
         result: {
           status: 'error',
-          pid: -1,
+          pid: error instanceof WorkerCleanupError ? (error.pid ?? -1) : -1,
           caseName: coordinate.caseName,
           error: redactSecret(
             error instanceof Error ? error.message : String(error),
@@ -63,6 +81,7 @@ export const runBenchmarkSuite = async (
           ),
         },
       });
+      if (error instanceof WorkerCleanupError) break;
     }
   }
   const successfulRuns = runs.filter((run) => run.result.status === 'ok');
@@ -113,6 +132,7 @@ export const runBenchmarkSuite = async (
       repetitions: options.repetitions,
       seed: options.seed,
       order: options.order,
+      workerTimeoutMs,
     },
     schedule,
     runs,
@@ -224,6 +244,12 @@ export const cliMain = async (args = process.argv.slice(2)): Promise<void> => {
       ),
       order: stringList(parsed.values.get('order')),
       output: parsed.values.get('output'),
+      workerTimeoutMs: positiveInteger(
+        parsed.values.get('worker-timeout-ms'),
+        'worker-timeout-ms',
+        DEFAULT_WORKER_TIMEOUT_MS,
+        MAX_WORKER_TIMEOUT_MS
+      ),
     },
     resolve(worker)
   );
