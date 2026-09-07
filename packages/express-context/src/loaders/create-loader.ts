@@ -65,23 +65,15 @@ const cacheKey = (ctx: LoaderContext, contract: LoaderCacheContract): string =>
   ]);
 
 interface LoaderCacheEntry<T> {
-  contract: LoaderCacheContract;
-  value: T | undefined;
+  databaseId: string;
+  value: T;
 }
 
 interface PendingResolution<T> {
-  contract: LoaderCacheContract;
+  databaseId: string;
   invalidated: boolean;
   promise: Promise<T | undefined>;
 }
-
-const samePhysicalContract = (
-  left: LoaderCacheContract,
-  right: LoaderCacheContract
-): boolean =>
-  left.routingPoolIdentity === right.routingPoolIdentity
-  && left.tenantPoolIdentity === right.tenantPoolIdentity
-  && left.routingSchema === right.routingSchema;
 
 export function createModuleLoader<T>(opts: CreateLoaderOptions<T>): ModuleLoader<T> {
   const log = new Logger(`loader:${opts.name}`);
@@ -122,15 +114,16 @@ export function createModuleLoader<T>(opts: CreateLoaderOptions<T>): ModuleLoade
       // Any other resolution error (bad query, ambiguous config) propagates —
       // never silently coerced into "module absent".
       const resolution: PendingResolution<T> = {
-        contract,
+        databaseId: contract.databaseId,
         invalidated: false,
         promise: Promise.resolve(undefined)
       };
       resolution.promise = Promise.resolve().then(async () => {
         try {
           const value = await opts.resolve(ctx);
-          if (!resolution.invalidated) {
-            cache.set(key, { contract, value });
+          // Keep absence uncached so subsequent calls can discover new config.
+          if (!resolution.invalidated && value !== undefined) {
+            cache.set(key, { databaseId: contract.databaseId, value });
           }
           return value;
         } catch (e: any) {
@@ -138,9 +131,6 @@ export function createModuleLoader<T>(opts: CreateLoaderOptions<T>): ModuleLoade
             log.debug(
               `Module tables absent for databaseId=${logicalKey}: ${e.message}`
             );
-            if (!resolution.invalidated) {
-              cache.set(key, { contract, value: undefined });
-            }
             return undefined;
           }
           log.warn(`Failed to resolve databaseId=${logicalKey}: ${e.message}`);
@@ -155,8 +145,8 @@ export function createModuleLoader<T>(opts: CreateLoaderOptions<T>): ModuleLoade
       return resolution.promise;
     },
 
-    invalidate(databaseId?: string, context?: LoaderContext): void {
-      if (!databaseId && !context) {
+    invalidate(databaseId?: string): void {
+      if (!databaseId) {
         const previousSize = cache.size;
         cache.clear();
         for (const resolution of pending.values()) {
@@ -166,21 +156,15 @@ export function createModuleLoader<T>(opts: CreateLoaderOptions<T>): ModuleLoade
         return;
       }
 
-      const exact = context ? cacheContract(context) : null;
-      const matches = (contract: LoaderCacheContract): boolean =>
-        (!databaseId || contract.databaseId === databaseId)
-        && (!exact || samePhysicalContract(contract, exact));
       let cleared = 0;
       for (const [key, entry] of cache.entries()) {
-        if (!matches(entry.contract)) continue;
+        if (entry.databaseId !== databaseId) continue;
         if (cache.delete(key)) cleared++;
       }
       for (const resolution of pending.values()) {
-        if (matches(resolution.contract)) resolution.invalidated = true;
+        if (resolution.databaseId === databaseId) resolution.invalidated = true;
       }
-      log.debug(
-        `Invalidated ${cleared} entries${databaseId ? ` for databaseId=${databaseId}` : ''}`
-      );
+      log.debug(`Invalidated ${cleared} entries for databaseId=${databaseId}`);
     },
 
     get cacheSize(): number {

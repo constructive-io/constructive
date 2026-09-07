@@ -64,6 +64,20 @@ hard expiry bounds, and concurrent misses for one exact contract share a single
 resolution. Loaders are registered in a `LoaderRegistry` and resolved lazily
 via `useModule(name)`.
 
+The existing `invalidate(databaseId?)` API is retained by design. Passing a
+database ID invalidates that database across all pools, routing schemas, and
+APIs; omitting it clears the loader's entire cache. Registry invalidation applies
+the same operation to every registered loader. Matching in-flight resolutions
+cannot repopulate an invalidated cache, although their existing callers can still
+receive the results. Pool/schema-specific invalidation is not required for this
+cache isolation change.
+
+Absence remains uncached by design: neither `undefined` results nor PostgreSQL
+`42P01` (undefined table) results are stored, so subsequent calls can discover
+newly available configuration. Concurrent calls may still share the same
+in-flight resolution. Negative caching is not required for this change; other
+resolution errors continue to propagate without being cached.
+
 ### Built-in loaders
 
 | Loader | Source | Description |

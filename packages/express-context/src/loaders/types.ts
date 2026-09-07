@@ -78,10 +78,10 @@ export interface ModuleLoader<T = unknown> {
   /** Resolve the module config for a given database. Returns undefined if not provisioned. */
   resolve(ctx: LoaderContext): Promise<T | undefined>;
   /**
-   * Invalidate one logical database across all physical pools, or only the
-   * exact pool pair represented by `context`. Omitting both clears everything.
+   * Invalidate one logical database across all pools, schemas, and APIs.
+   * Omitting the database ID clears everything.
    */
-  invalidate(databaseId?: string, context?: LoaderContext): void;
+  invalidate(databaseId?: string): void;
   /** Current number of cached entries */
   readonly cacheSize: number;
 }

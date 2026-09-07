@@ -57,36 +57,46 @@ describe('module loader cache lifecycle', () => {
     expect(loader.cacheSize).toBe(4);
   });
 
-  it('invalidates one physical contract without evicting its logical twin', async () => {
+  it('invalidates every database when called without a database ID', async () => {
     const ctxA = context();
-    const ctxB = context();
+    const ctxB = context({ databaseId: 'database-b' });
     let generation = 0;
     const resolve = jest.fn(async () => ++generation);
-    const loader = createModuleLoader({ name: 'exact-invalidation', resolve });
+    const loader = createModuleLoader({ name: 'global-invalidation', resolve });
 
     const firstA = await loader.resolve(ctxA);
     const firstB = await loader.resolve(ctxB);
-    loader.invalidate(ctxA.databaseId, ctxA);
+    loader.invalidate();
 
-    await expect(loader.resolve(ctxB)).resolves.toBe(firstB);
+    expect(loader.cacheSize).toBe(0);
     await expect(loader.resolve(ctxA)).resolves.not.toBe(firstA);
-    expect(resolve).toHaveBeenCalledTimes(3);
+    await expect(loader.resolve(ctxB)).resolves.not.toBe(firstB);
+    expect(resolve).toHaveBeenCalledTimes(4);
   });
 
-  it('invalidates a logical database across every physical contract', async () => {
+  it('invalidates all pools, schemas, and APIs for one database only', async () => {
     const ctxA = context();
-    const ctxB = context();
+    const contexts = [
+      ctxA,
+      context(),
+      context({ ...ctxA, routingSchema: 'routing_shadow' }),
+      context({ ...ctxA, apiId: 'api-b' })
+    ];
+    const otherDatabase = context({ ...ctxA, databaseId: 'database-b' });
     let generation = 0;
     const resolve = jest.fn(async () => ++generation);
     const loader = createModuleLoader({ name: 'logical-invalidation', resolve });
 
-    await loader.resolve(ctxA);
-    await loader.resolve(ctxB);
+    const previous = await Promise.all(contexts.map((ctx) => loader.resolve(ctx)));
+    const otherValue = await loader.resolve(otherDatabase);
     loader.invalidate('database-a');
-    await loader.resolve(ctxA);
-    await loader.resolve(ctxB);
 
-    expect(resolve).toHaveBeenCalledTimes(4);
+    expect(loader.cacheSize).toBe(1);
+    await expect(loader.resolve(otherDatabase)).resolves.toBe(otherValue);
+    for (let index = 0; index < contexts.length; index++) {
+      await expect(loader.resolve(contexts[index])).resolves.not.toBe(previous[index]);
+    }
+    expect(resolve).toHaveBeenCalledTimes(contexts.length * 2 + 1);
   });
 
   it('coalesces concurrent misses for one exact contract', async () => {
@@ -104,29 +114,73 @@ describe('module loader cache lifecycle', () => {
     expect(resolve).toHaveBeenCalledTimes(1);
   });
 
-  it('does not publish a resolution invalidated while it is in flight', async () => {
-    const ctx = context();
-    let complete!: (value: string) => void;
-    const first = new Promise<string>((resolve) => {
-      complete = resolve;
-    });
-    const resolve = jest.fn()
-      .mockImplementationOnce(() => first)
-      .mockResolvedValueOnce('fresh-config');
-    const loader = createModuleLoader<string>({
-      name: 'inflight-invalidation',
-      resolve
-    });
+  it.each(['database', 'global'])(
+    'does not republish an old result after %s invalidation and a fresh result',
+    async (scope) => {
+      const ctx = context();
+      let complete!: (value: string) => void;
+      const first = new Promise<string>((resolve) => {
+        complete = resolve;
+      });
+      const resolve = jest.fn()
+        .mockImplementationOnce(() => first)
+        .mockResolvedValueOnce('fresh-config');
+      const loader = createModuleLoader<string>({
+        name: 'inflight-invalidation',
+        resolve
+      });
 
-    const stale = loader.resolve(ctx);
-    loader.invalidate(ctx.databaseId, ctx);
-    const fresh = loader.resolve(ctx);
-    await expect(fresh).resolves.toBe('fresh-config');
-    complete('stale-config');
-    await expect(stale).resolves.toBe('stale-config');
-    await expect(loader.resolve(ctx)).resolves.toBe('fresh-config');
-    expect(resolve).toHaveBeenCalledTimes(2);
-  });
+      const stale = loader.resolve(ctx);
+      await Promise.resolve();
+      loader.invalidate(scope === 'database' ? ctx.databaseId : undefined);
+      const fresh = loader.resolve(ctx);
+      await expect(fresh).resolves.toBe('fresh-config');
+      complete('stale-config');
+      await expect(stale).resolves.toBe('stale-config');
+      await expect(loader.resolve(ctx)).resolves.toBe('fresh-config');
+      expect(resolve).toHaveBeenCalledTimes(2);
+    }
+  );
+
+  it.each(['database', 'global'])(
+    'keeps the new query pending when an old result finishes after %s invalidation',
+    async (scope) => {
+      const ctx = context();
+      let completeOld!: (value: string) => void;
+      let completeFresh!: (value: string) => void;
+      const oldResult = new Promise<string>((resolve) => {
+        completeOld = resolve;
+      });
+      const freshResult = new Promise<string>((resolve) => {
+        completeFresh = resolve;
+      });
+      const resolve = jest.fn()
+        .mockImplementationOnce(() => oldResult)
+        .mockImplementationOnce(() => freshResult);
+      const loader = createModuleLoader<string>({
+        name: 'pending-invalidation',
+        resolve
+      });
+
+      const stale = loader.resolve(ctx);
+      await Promise.resolve();
+      loader.invalidate(scope === 'database' ? ctx.databaseId : undefined);
+      const fresh = loader.resolve(ctx);
+
+      completeOld('stale-config');
+      await expect(stale).resolves.toBe('stale-config');
+      expect(loader.cacheSize).toBe(0);
+      const coalesced = loader.resolve(ctx);
+      completeFresh('fresh-config');
+
+      await expect(Promise.all([fresh, coalesced])).resolves.toEqual([
+        'fresh-config',
+        'fresh-config'
+      ]);
+      await expect(loader.resolve(ctx)).resolves.toBe('fresh-config');
+      expect(resolve).toHaveBeenCalledTimes(2);
+    }
+  );
 
   it('uses a hard TTL that cache hits cannot extend', async () => {
     let now = 1;
@@ -171,31 +225,56 @@ describe('module loader cache lifecycle', () => {
     expect(resolve).toHaveBeenCalledTimes(102);
   });
 
-  it('caches undefined results without confusing them for misses', async () => {
-    const resolve = jest.fn(async (): Promise<undefined> => undefined);
+  it('discovers newly available config after an uncached undefined result', async () => {
+    const resolve = jest.fn()
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce('new-config');
     const loader = createModuleLoader({ name: 'absent-module', resolve });
     const ctx = context();
 
     await expect(loader.resolve(ctx)).resolves.toBeUndefined();
-    await expect(loader.resolve(ctx)).resolves.toBeUndefined();
+    expect(loader.cacheSize).toBe(0);
+    await expect(loader.resolve(ctx)).resolves.toBe('new-config');
+    await expect(loader.resolve(ctx)).resolves.toBe('new-config');
 
-    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(resolve).toHaveBeenCalledTimes(2);
     expect(loader.cacheSize).toBe(1);
   });
 
-  it('caches an absent module reported by PostgreSQL undefined_table', async () => {
+  it('retries PostgreSQL undefined_table on the next call without invalidation', async () => {
     const error = Object.assign(new Error('module table absent'), {
       code: '42P01'
     });
-    const resolve = jest.fn().mockRejectedValue(error);
+    const resolve = jest.fn()
+      .mockRejectedValueOnce(error)
+      .mockResolvedValueOnce('new-config');
     const loader = createModuleLoader({ name: 'missing-table', resolve });
     const ctx = context();
 
     await expect(loader.resolve(ctx)).resolves.toBeUndefined();
-    await expect(loader.resolve(ctx)).resolves.toBeUndefined();
+    expect(loader.cacheSize).toBe(0);
+    await expect(loader.resolve(ctx)).resolves.toBe('new-config');
+    await expect(loader.resolve(ctx)).resolves.toBe('new-config');
 
-    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(resolve).toHaveBeenCalledTimes(2);
     expect(loader.cacheSize).toBe(1);
+  });
+
+  it('coalesces concurrent absence checks without caching their result', async () => {
+    const resolve = jest.fn(async (): Promise<undefined> => undefined);
+    const loader = createModuleLoader({ name: 'absent-coalescing', resolve });
+    const ctx = context();
+
+    await expect(Promise.all([
+      loader.resolve(ctx),
+      loader.resolve(ctx),
+      loader.resolve(ctx)
+    ])).resolves.toEqual([undefined, undefined, undefined]);
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(loader.cacheSize).toBe(0);
+
+    await expect(loader.resolve(ctx)).resolves.toBeUndefined();
+    expect(resolve).toHaveBeenCalledTimes(2);
   });
 
   it('preserves other resolution errors and never caches them', async () => {
@@ -213,20 +292,22 @@ describe('module loader cache lifecycle', () => {
     expect(loader.cacheSize).toBe(1);
   });
 
-  it('forwards exact invalidation context through the registry', () => {
-    const ctx = context();
-    const invalidate = jest.fn();
-    const loader = {
-      name: 'registered',
-      resolve: jest.fn(),
-      invalidate,
-      cacheSize: 0
-    } as ModuleLoader;
-    const registry = createLoaderRegistry();
-    registry.register(loader);
+  it.each([undefined, 'database-a'])(
+    'forwards database ID %s through registry invalidation',
+    (databaseId) => {
+      const invalidate = jest.fn();
+      const loader = {
+        name: 'registered',
+        resolve: jest.fn(),
+        invalidate,
+        cacheSize: 0
+      } as ModuleLoader;
+      const registry = createLoaderRegistry();
+      registry.register(loader);
 
-    registry.invalidate(ctx.databaseId, ctx);
+      registry.invalidate(databaseId);
 
-    expect(invalidate).toHaveBeenCalledWith(ctx.databaseId, ctx);
-  });
+      expect(invalidate).toHaveBeenCalledWith(databaseId);
+    }
+  );
 });

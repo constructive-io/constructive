@@ -40,8 +40,8 @@ export interface LoaderRegistry {
   /** Check whether a loader is registered. */
   has(name: string): boolean;
 
-  /** Invalidate one database, optionally limited to an exact pool pair. */
-  invalidate(databaseId?: string, context?: LoaderContext): void;
+  /** Invalidate caches for one database (or all databases if omitted). */
+  invalidate(databaseId?: string): void;
 
   /** List all registered loader names. */
   readonly names: string[];
@@ -96,9 +96,9 @@ export function createLoaderRegistry(): LoaderRegistry {
       return loaders.has(name);
     },
 
-    invalidate(databaseId?: string, context?: LoaderContext): void {
+    invalidate(databaseId?: string): void {
       for (const loader of loaders.values()) {
-        loader.invalidate(databaseId, context);
+        loader.invalidate(databaseId);
       }
       log.debug(
         databaseId
