@@ -61,6 +61,30 @@ describe('composeRun', () => {
     expect(run.lanes.meteredModel!.selectedModel).toBe('gpt-5');
   });
 
+  it('books metered calls against the run: X-Run-Id rides on the gateway headers', () => {
+    const run = composeRun({
+      runId: 'run-42',
+      metering: { mode: 'gateway', gatewayUrl, identity: { ...identity, invocationId: 'inv-1', jobId: '7', attempt: 1 }, models }
+    });
+
+    expect(run.lanes.meteredModel!.config.headers).toMatchObject({
+      'X-Run-Id': 'run-42',
+      'X-Invocation-Id': 'inv-1',
+      'X-Job-Id': '7',
+      'X-Attempt': '1',
+      'X-Entity-Id': 'ent-1'
+    });
+  });
+
+  it('lets a host pin the run id on the identity explicitly', () => {
+    const run = composeRun({
+      runId: 'run-42',
+      metering: { mode: 'gateway', gatewayUrl, identity: { ...identity, runId: 'run-pinned' }, models }
+    });
+
+    expect(run.lanes.meteredModel!.config.headers['X-Run-Id']).toBe('run-pinned');
+  });
+
   it('picks the self-report lane for a run on the host’s own provider key', () => {
     const run = composeRun({
       runId: 'run-1',

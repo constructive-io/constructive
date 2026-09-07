@@ -23,10 +23,14 @@ export {
 } from './gateway';
 export {
   ACTOR_ID_HEADER,
+  ATTEMPT_HEADER,
   buildIdentityHeaders,
   DATABASE_ID_HEADER,
   ENTITY_ID_HEADER,
-  type MeteredIdentity
+  INVOCATION_ID_HEADER,
+  JOB_ID_HEADER,
+  type MeteredIdentity,
+  RUN_ID_HEADER
 } from './identity';
 export {
   httpUsageSink,
