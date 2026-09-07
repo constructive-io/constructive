@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { Pool, type PoolClient } from 'pg';
 
 export const FIXTURE_VERSION = 1;
 
@@ -40,6 +40,15 @@ export const validateFixtureTableCount = (tables: number): number => {
 const quoteIdentifier = (identifier: string): string =>
   `"${identifier.replaceAll('"', '""')}"`;
 
+const throwFixtureErrors = (errors: unknown[]): never => {
+  if (errors.length === 1) {
+    throw errors[0];
+  }
+  throw new AggregateError(errors, 'fixture preparation failed', {
+    cause: errors[0],
+  });
+};
+
 export const prepareFixture = async (
   options: PrepareFixtureOptions
 ): Promise<PreparedFixture> => {
@@ -47,8 +56,12 @@ export const prepareFixture = async (
   const tables = validateFixtureTableCount(options.tables);
   const quotedSchema = quoteIdentifier(schema);
   const pool = new Pool({ connectionString: options.databaseUrl, max: 1 });
-  const client = await pool.connect();
+  const errors: unknown[] = [];
+  let client: PoolClient | undefined;
+  let result: PreparedFixture | undefined;
+
   try {
+    client = await pool.connect();
     await client.query('begin');
     const existing = await client.query<{ exists: boolean }>(
       'select exists(select 1 from pg_catalog.pg_namespace where nspname = $1) as exists',
@@ -105,7 +118,7 @@ export const prepareFixture = async (
       "select current_database() as database, current_setting('server_version') as server_version"
     );
     await client.query('commit');
-    return {
+    result = {
       fixtureVersion: FIXTURE_VERSION,
       database: identity.rows[0].database,
       serverVersion: identity.rows[0].server_version,
@@ -114,14 +127,32 @@ export const prepareFixture = async (
       functionCount: tables,
     };
   } catch (error) {
-    try {
-      await client.query('rollback');
-    } catch {
-      // Preserve the fixture preparation error; the client is discarded below.
+    errors.push(error);
+    if (client) {
+      try {
+        await client.query('rollback');
+      } catch (rollbackError) {
+        errors.push(rollbackError);
+      }
     }
-    throw error;
   } finally {
-    client.release();
-    await pool.end();
+    if (client) {
+      try {
+        await client.release();
+      } catch (releaseError) {
+        errors.push(releaseError);
+      }
+    }
+    try {
+      await pool.end();
+    } catch (endError) {
+      errors.push(endError);
+    }
   }
+
+  if (errors.length > 0) {
+    throwFixtureErrors(errors);
+  }
+
+  return result as PreparedFixture;
 };
