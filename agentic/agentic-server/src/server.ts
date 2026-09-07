@@ -7,11 +7,18 @@ export interface AgenticServerStartOptions extends AgenticServerOptions {
   port?: number;
 }
 
-/** Identity headers trusted only when isPublic === false (private network). */
+/** Identity + task-correlation headers trusted only when isPublic === false
+ *  (private network). The correlation headers say which invocation/job/attempt/
+ *  run a model call is a cost of; an external client must not be able to pin
+ *  its usage onto someone else's task. */
 const IDENTITY_HEADERS = [
   'x-database-id',
   'x-entity-id',
-  'x-actor-id'
+  'x-actor-id',
+  'x-invocation-id',
+  'x-job-id',
+  'x-attempt',
+  'x-run-id'
 ] as const;
 
 /**

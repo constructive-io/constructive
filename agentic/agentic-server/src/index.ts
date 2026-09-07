@@ -28,6 +28,7 @@ export type { AgenticServerStartOptions } from './server';
 export { createAgenticServer } from './server';
 export type {
   AgenticServerOptions,
+  InferenceAttribution,
   InferenceEntry,
   InferenceSink,
   ProviderConfig,
