@@ -58,19 +58,24 @@ app.post('/v1/chat', async (req, res) => {
 ## Module Loaders
 
 Each loader encapsulates a SQL query + type transform + bounded LRU cache for
-one piece of per-database configuration. Entries are isolated by the exact
-routing pool, tenant pool, routing schema, database, and API contract. TTLs are
-hard expiry bounds, and concurrent misses for one exact contract share a single
-resolution. Loaders are registered in a `LoaderRegistry` and resolved lazily
-via `useModule(name)`.
+one piece of per-database configuration. The existing cache key is retained:
+`databaseId:apiId` when an API ID is present, otherwise `databaseId`. TTLs are
+hard expiry bounds, and concurrent misses for the same key share a single
+resolution. Loaders are registered in a `LoaderRegistry` and resolved lazily via
+`useModule(name)`.
+
+Logical database IDs already distinguish tenant databases, and the optional API
+ID distinguishes their API configuration. Pool identities and routing schemas
+are not added to the key; extending cache identity is not required for these
+TTL, concurrency, and invalidation improvements.
 
 The existing `invalidate(databaseId?)` API is retained by design. Passing a
-database ID invalidates that database across all pools, routing schemas, and
-APIs; omitting it clears the loader's entire cache. Registry invalidation applies
-the same operation to every registered loader. Matching in-flight resolutions
+database ID invalidates that database and all of its API entries; omitting it
+clears the loader's entire cache. Registry invalidation applies the same operation
+to every registered loader. Matching in-flight resolutions
 cannot repopulate an invalidated cache, although their existing callers can still
-receive the results. Pool/schema-specific invalidation is not required for this
-cache isolation change.
+receive the results. Global and database-level invalidation are sufficient;
+additional invalidation parameters are not required for this change.
 
 Absence remains uncached by design: neither `undefined` results nor PostgreSQL
 `42P01` (undefined table) results are stored, so subsequent calls can discover

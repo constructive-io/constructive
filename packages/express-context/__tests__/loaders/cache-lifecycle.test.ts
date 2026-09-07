@@ -26,35 +26,43 @@ describe('module loader cache lifecycle', () => {
     jest.restoreAllMocks();
   });
 
-  it('isolates identical logical IDs across physical pools and routing schemas', async () => {
-    const routingA = pool();
-    const routingB = pool();
-    const tenantA = pool();
-    const tenantB = pool();
-    const ctxA = context({ routingPool: routingA, tenantPool: tenantA });
-    const ctxB = context({ routingPool: routingB, tenantPool: tenantA });
-    const ctxC = context({ routingPool: routingA, tenantPool: tenantB });
-    const ctxD = context({
-      routingPool: routingA,
-      routingSchema: 'routing_shadow',
-      tenantPool: tenantA
-    });
-    const resolve = jest.fn(async (ctx: LoaderContext) => {
-      if (ctx.routingSchema === 'routing_shadow') return 'schema-d';
-      if (ctx.routingPool === routingB) return 'routing-b';
-      if (ctx.tenantPool === tenantB) return 'tenant-c';
-      return 'contract-a';
-    });
+  it('isolates databases and optional APIs that share the same pools', async () => {
+    const ctxA = context();
+    const ctxB = context({ ...ctxA, databaseId: 'database-b' });
+    const ctxC = context({ ...ctxA, apiId: 'api-b' });
+    const ctxD = context({ ...ctxA, apiId: undefined });
+    let generation = 0;
+    const resolve = jest.fn(async () => ++generation);
     const loader = createModuleLoader({ name: 'isolation', resolve });
 
-    await expect(loader.resolve(ctxA)).resolves.toBe('contract-a');
-    await expect(loader.resolve(ctxB)).resolves.toBe('routing-b');
-    await expect(loader.resolve(ctxC)).resolves.toBe('tenant-c');
-    await expect(loader.resolve(ctxD)).resolves.toBe('schema-d');
-    await expect(loader.resolve(ctxA)).resolves.toBe('contract-a');
+    for (const [index, ctx] of [ctxA, ctxB, ctxC, ctxD].entries()) {
+      await expect(loader.resolve(ctx)).resolves.toBe(index + 1);
+    }
+    for (const [index, ctx] of [ctxA, ctxB, ctxC, ctxD].entries()) {
+      await expect(loader.resolve(ctx)).resolves.toBe(index + 1);
+    }
 
     expect(resolve).toHaveBeenCalledTimes(4);
     expect(loader.cacheSize).toBe(4);
+  });
+
+  it('reuses the same logical key across pool and routing schema changes', async () => {
+    const ctx = context();
+    const resolve = jest.fn(async () => 'shared-config');
+    const loader = createModuleLoader({ name: 'logical-key', resolve });
+
+    await expect(loader.resolve(ctx)).resolves.toBe('shared-config');
+    for (const overrides of [
+      { routingPool: pool() },
+      { tenantPool: pool() },
+      { routingSchema: 'routing_shadow' }
+    ]) {
+      await expect(loader.resolve(context({ ...ctx, ...overrides })))
+        .resolves.toBe('shared-config');
+    }
+
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(loader.cacheSize).toBe(1);
   });
 
   it('invalidates every database when called without a database ID', async () => {
@@ -74,12 +82,11 @@ describe('module loader cache lifecycle', () => {
     expect(resolve).toHaveBeenCalledTimes(4);
   });
 
-  it('invalidates all pools, schemas, and APIs for one database only', async () => {
+  it('invalidates the plain database key and all of its API entries only', async () => {
     const ctxA = context();
     const contexts = [
       ctxA,
-      context(),
-      context({ ...ctxA, routingSchema: 'routing_shadow' }),
+      context({ ...ctxA, apiId: undefined }),
       context({ ...ctxA, apiId: 'api-b' })
     ];
     const otherDatabase = context({ ...ctxA, databaseId: 'database-b' });
@@ -99,7 +106,7 @@ describe('module loader cache lifecycle', () => {
     expect(resolve).toHaveBeenCalledTimes(contexts.length * 2 + 1);
   });
 
-  it('coalesces concurrent misses for one exact contract', async () => {
+  it('coalesces concurrent misses for the same logical key', async () => {
     const ctx = context();
     const resolve = jest.fn(async () => 'shared-config');
     const loader = createModuleLoader({ name: 'coalescing', resolve });
@@ -107,8 +114,8 @@ describe('module loader cache lifecycle', () => {
     await expect(
       Promise.all([
         loader.resolve(ctx),
-        loader.resolve(ctx),
-        loader.resolve(ctx)
+        loader.resolve(context()),
+        loader.resolve(context({ routingSchema: 'routing_shadow' }))
       ])
     ).resolves.toEqual(['shared-config', 'shared-config', 'shared-config']);
     expect(resolve).toHaveBeenCalledTimes(1);
@@ -202,7 +209,7 @@ describe('module loader cache lifecycle', () => {
     expect(resolve).toHaveBeenCalledTimes(2);
   });
 
-  it('keeps the default cache bounded to 100 completed contracts', async () => {
+  it('keeps the default cache bounded to 100 completed entries', async () => {
     const routingPool = pool();
     const tenantPool = pool();
     const resolve = jest.fn(async (ctx: LoaderContext) => ctx.databaseId);

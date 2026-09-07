@@ -9,8 +9,8 @@
  *     parallel. Useful for pre-warming or migration from the monolithic
  *     svcCache pattern.
  *
- * Each loader's result is independently cached per exact pool/schema/database
- * contract — resolving one module never invalidates another.
+ * Each loader's result is independently cached per databaseId and optional
+ * apiId — resolving one module never invalidates another.
  */
 
 import { Logger } from '@pgpmjs/logger';
@@ -26,8 +26,8 @@ export interface LoaderRegistry {
   /**
    * Resolve a single loader by name (lazy, on-demand).
    * Returns undefined if the loader isn't registered or the module
-   * isn't provisioned for this database. Results are cached per exact context
-   * contract inside the loader's own LRU — repeated calls are cheap.
+   * isn't provisioned for this database. Results are cached per databaseId and
+   * optional apiId inside the loader's own LRU — repeated calls are cheap.
    */
   resolve<T = unknown>(name: string, ctx: LoaderContext): Promise<T | undefined>;
 
