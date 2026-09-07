@@ -21,7 +21,7 @@ import {
   transformEmbedRequest,
   transformEmbedResponse
 } from './transforms';
-import type { AgenticServerOptions, ResolvedProvider } from './types';
+import type { AgenticServerOptions, InferenceAttribution, ResolvedProvider } from './types';
 
 const log = new Logger('agentic-server');
 
@@ -62,6 +62,26 @@ function upstreamErrorMessage(
     : `${provider.type} provider error ${status}`;
 }
 
+/**
+ * Who the call is for and which task it is a cost of. Identity comes from the
+ * caller's identity headers; task linkage from the correlation headers the
+ * runtimes forward (`X-Invocation-Id`, `X-Job-Id`, `X-Attempt`, `X-Run-Id`).
+ * `X-Attempt` must be a non-negative integer or it is dropped.
+ */
+export const readAttribution = (req: any): InferenceAttribution => {
+  const rawAttempt = req.get('X-Attempt');
+  const attempt = typeof rawAttempt === 'string' && /^\d+$/.test(rawAttempt) ? Number(rawAttempt) : undefined;
+  return {
+    databaseId: req.get('X-Database-Id'),
+    entityId: req.get('X-Entity-Id'),
+    actorId: req.get('X-Actor-Id'),
+    invocationId: req.get('X-Invocation-Id'),
+    jobId: req.get('X-Job-Id'),
+    attempt,
+    runId: req.get('X-Run-Id')
+  };
+};
+
 export const createRouter = (options: AgenticServerOptions): Router => {
   const router = Router();
   // Metering is backend-agnostic: the caller injects an InferenceSink. When
@@ -75,8 +95,8 @@ export const createRouter = (options: AgenticServerOptions): Router => {
       res.status(400).json({ error: { message: 'X-Database-Id is required' } });
       return;
     }
-    const entityId = req.get('X-Entity-Id');
-    const actorId = req.get('X-Actor-Id');
+    const attribution = readAttribution(req);
+    const { entityId } = attribution;
     const requestProvider = req.get('X-LLM-Provider');
     const startTime = process.hrtime.bigint();
 
@@ -134,7 +154,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
         if (sink) {
           sink.logInference({
-            databaseId, entityId, actorId,
+            ...attribution,
             model: String(req.body?.model || body.model || ''),
             provider: provider.type,
             service: 'chat',
@@ -167,7 +187,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
         if (sink) {
           sink.logInference({
-            databaseId, entityId, actorId,
+            ...attribution,
             model: String(req.body?.model || body.model || ''),
             provider: provider.type,
             service: 'chat',
@@ -196,7 +216,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
       if (sink) {
         sink.logInference({
-          databaseId, entityId, actorId,
+          ...attribution,
           model: String(req.body?.model || body.model || ''),
           provider: provider.type,
           service: 'chat',
@@ -217,7 +237,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
       if (sink) {
         sink.logInference({
-          databaseId, entityId, actorId,
+          ...attribution,
           model: String(req.body?.model || ''),
           provider: provider.type,
           service: 'chat',
@@ -249,8 +269,8 @@ export const createRouter = (options: AgenticServerOptions): Router => {
       res.status(400).json({ error: { message: 'X-Database-Id is required' } });
       return;
     }
-    const entityId = req.get('X-Entity-Id');
-    const actorId = req.get('X-Actor-Id');
+    const attribution = readAttribution(req);
+    const { entityId } = attribution;
     const requestProvider = req.get('X-LLM-Provider');
     const startTime = process.hrtime.bigint();
 
@@ -277,7 +297,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
         if (sink) {
           sink.logInference({
-            databaseId, entityId, actorId,
+            ...attribution,
             model: String(req.body?.model || body.model || ''),
             provider: provider.type,
             service: 'embed',
@@ -302,7 +322,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
       if (sink) {
         sink.logInference({
-          databaseId, entityId, actorId,
+          ...attribution,
           model: String(req.body?.model || body.model || ''),
           provider: provider.type,
           service: 'embed',
@@ -323,7 +343,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
       if (sink) {
         sink.logInference({
-          databaseId, entityId, actorId,
+          ...attribution,
           model: String(req.body?.model || ''),
           provider: provider.type,
           service: 'embed',
@@ -348,8 +368,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
       res.status(400).json({ error: { message: 'X-Database-Id is required' } });
       return;
     }
-    const entityId = req.get('X-Entity-Id');
-    const actorId = req.get('X-Actor-Id');
+    const attribution = readAttribution(req);
 
     const {
       model,
@@ -372,9 +391,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
     if (sink) {
       sink.logInference({
-        databaseId,
-        entityId,
-        actorId,
+        ...attribution,
         model: String(model),
         provider: String(reportedProvider || 'unknown'),
         service: (service === 'embed' ? 'embed' : 'chat') as 'chat' | 'embed',

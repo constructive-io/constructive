@@ -1,13 +1,18 @@
 import {
   ACTOR_ID_HEADER,
+  ATTEMPT_HEADER,
   buildIdentityHeaders,
   completionsBaseUrl,
   DATABASE_ID_HEADER,
   ENTITY_ID_HEADER,
   GATEWAY_API,
+  INVOCATION_ID_HEADER,
+  JOB_ID_HEADER,
   normalizeGatewayUrl,
   resolveMeteredGateway,
-  resolveMeteredModel} from '../src';
+  resolveMeteredModel,
+  RUN_ID_HEADER
+} from '../src';
 
 const models = [{ id: 'anthropic/claude-sonnet-4', contextWindow: 200000, maxTokens: 8192 }];
 
@@ -36,6 +41,33 @@ describe('buildIdentityHeaders', () => {
 
   it('rejects a missing databaseId up front', () => {
     expect(() => buildIdentityHeaders({ databaseId: '   ' })).toThrow(/databaseId is required/);
+  });
+
+  it('carries the task the run is a cost of: invocation, job, attempt, run', () => {
+    expect(
+      buildIdentityHeaders({
+        databaseId: 'db-1',
+        invocationId: 'inv-1',
+        jobId: '4242',
+        attempt: 0,
+        runId: 'run-1'
+      })
+    ).toEqual({
+      [DATABASE_ID_HEADER]: 'db-1',
+      [INVOCATION_ID_HEADER]: 'inv-1',
+      [JOB_ID_HEADER]: '4242',
+      [ATTEMPT_HEADER]: '0',
+      [RUN_ID_HEADER]: 'run-1'
+    });
+  });
+
+  it('refuses malformed task linkage rather than sending something the gateway drops', () => {
+    expect(() => buildIdentityHeaders({ databaseId: 'db-1', jobId: 'job-1' })).toThrow(/jobId must be decimal digits/);
+    expect(() => buildIdentityHeaders({ databaseId: 'db-1', attempt: -1 })).toThrow(/attempt must be a non-negative integer/);
+    expect(() => buildIdentityHeaders({ databaseId: 'db-1', attempt: 1.5 })).toThrow(/attempt must be a non-negative integer/);
+    expect(buildIdentityHeaders({ databaseId: 'db-1', invocationId: ' ', jobId: '', runId: '' })).toEqual({
+      [DATABASE_ID_HEADER]: 'db-1'
+    });
   });
 });
 
