@@ -1,9 +1,9 @@
 /**
  * Module Loader Types
  *
- * A ModuleLoader is a per-database cached lookup that resolves config
- * from the routing DB or tenant DB. Each loader owns its own LRU cache
- * keyed by databaseId, with independent TTL and eviction.
+ * A ModuleLoader is a cached lookup that resolves config from the routing DB
+ * or tenant DB. Each loader owns an independent, bounded LRU keyed by
+ * databaseId and optional apiId.
  *
  * Loaders are registered in a LoaderRegistry and resolved in parallel
  * during context building. The result is a typed modules map on
@@ -69,15 +69,18 @@ export interface LoaderContext {
 }
 
 /**
- * A single module loader. Encapsulates the SQL query, type transform,
- * and per-databaseId LRU cache for one piece of per-database config.
+ * A single module loader. Encapsulates the SQL query, type transform, and
+ * per-database/API LRU cache for one piece of per-database config.
  */
 export interface ModuleLoader<T = unknown> {
   /** Unique name (used in log prefix and as the key in the modules map) */
   readonly name: string;
   /** Resolve the module config for a given database. Returns undefined if not provisioned. */
   resolve(ctx: LoaderContext): Promise<T | undefined>;
-  /** Invalidate the cache for one database (or all databases if omitted) */
+  /**
+   * Invalidate one logical database, including all of its API entries.
+   * Omitting the database ID clears everything.
+   */
   invalidate(databaseId?: string): void;
   /** Current number of cached entries */
   readonly cacheSize: number;
