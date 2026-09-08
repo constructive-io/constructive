@@ -181,6 +181,28 @@ describe('introspection', () => {
     expect(() => enforce('{ __schema { queryType { name } } }')).not.toThrow();
   });
 
+  it('does not charge the standard introspection document against the depth budget', () => {
+    const source = `
+      { __schema { types { fields { args { type { ...TypeRef } } } } } }
+      fragment TypeRef on __Type {
+        kind name
+        ofType { kind name ofType { kind name ofType { kind name ofType { kind name
+          ofType { kind name ofType { kind name ofType { kind name } } } } } } }
+      }
+    `;
+    expect(enforce(source, { maxQueryDepth: 3 })).toEqual({ depth: 1, cost: 0 });
+  });
+
+  it('still measures the rest of an operation that also introspects', () => {
+    expect(
+      codeOf(() =>
+        enforce('{ __schema { queryType { name } } user(id: "1") { manager { manager { name } } } }', {
+          maxQueryDepth: 3
+        })
+      )
+    ).toBe('QUERY_TOO_DEEP');
+  });
+
   it('never blocks __typename, which is not introspection of the schema', () => {
     expect(() =>
       enforce('{ user(id: "1") { __typename name } }', { enableIntrospection: false })

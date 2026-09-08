@@ -16,6 +16,13 @@
  * The walk is manual rather than `visitWithTypeInfo` because fragment spreads
  * have to be followed (a document can hide its depth entirely inside
  * fragments) and the visitor does not follow them.
+ *
+ * Schema introspection (`__schema` / `__type`) is governed only by
+ * `enableIntrospection`. Its selections are not walked: the introspection types
+ * carry no connections, so there is nothing to cost, and the standard
+ * introspection document nests a fixed `ofType` chain deeper than a sensible
+ * tenant depth budget, so charging depth would make the budget decide whether
+ * clients can introspect at all — a decision the dedicated switch already owns.
  */
 
 import type { ConstructiveError } from '@constructive-io/errors';
@@ -119,6 +126,7 @@ function walkSelectionSet(
         if (!walk.protection.enableIntrospection) {
           reject(errors.INTROSPECTION_DISABLED());
         }
+        continue;
       }
 
       const field =
