@@ -51,7 +51,7 @@ const report = (runs: BenchmarkRun[], repetitions = 3): BenchmarkReport => ({
   platform: 'darwin',
   architecture: 'arm64',
   suite: { name: 'test', cases: [] },
-  config: { repetitions, seed: 1, order: null },
+  config: { repetitions, seed: 1, order: null, workerTimeoutMs: 300_000 },
   schedule: [],
   runs,
   validation: {

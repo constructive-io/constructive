@@ -1250,8 +1250,8 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       makage:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.8.0
+        version: 0.8.0
       pg-introspection:
         specifier: 1.0.1
         version: 1.0.1

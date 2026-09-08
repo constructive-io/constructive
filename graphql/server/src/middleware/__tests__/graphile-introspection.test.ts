@@ -97,4 +97,11 @@ describe('Graphile introspection mode wiring', () => {
     ).rejects.toThrow(/require scopedIntrospection: true/);
     expect(loadScopedPreset).not.toHaveBeenCalled();
   });
+  it.each([false, true])('preserves introspection role with scoped=%s', async (scopedIntrospection) => {
+    const wiring = await makeIntrospectionWiring(
+      pool, ['tenant_a'], { scopedIntrospection }, async () => ({}), 'tenant_introspector'
+    );
+    expect(wiring.pgService.pgSettingsForIntrospection).toMatchObject({ role: 'tenant_introspector' });
+  });
+
 });
