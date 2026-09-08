@@ -15,4 +15,6 @@ export { PrincipalScopeOverrideModel } from './principalScopeOverride';
 export { RoleTypeModel } from './roleType';
 export { UserConnectedAccountModel } from './userConnectedAccount';
 export { UserModel } from './user';
+export { UserSettingModel } from './userSetting';
+export { UserSettingsSecurityModel } from './userSettingsSecurity';
 export { WebauthnCredentialModel } from './webauthnCredential';

@@ -15,6 +15,7 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
+  contentPresetKeys,
   dbPresetKeys,
   namespaceKeys,
   namespaceEventKeys,
@@ -46,6 +47,23 @@ import {
  * ```
  */
 export const invalidate = {
+  /** Invalidate contentPreset queries */ contentPreset: {
+    /** Invalidate all contentPreset queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: contentPresetKeys.all,
+      }),
+    /** Invalidate contentPreset list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: contentPresetKeys.lists(),
+      }),
+    /** Invalidate a specific contentPreset */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: contentPresetKeys.detail(id),
+      }),
+  },
   /** Invalidate dbPreset queries */ dbPreset: {
     /** Invalidate all dbPreset queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -230,6 +248,14 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
+  /** Remove contentPreset from cache */ contentPreset: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: contentPresetKeys.detail(id),
+    });
+  },
   /** Remove dbPreset from cache */ dbPreset: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: dbPresetKeys.detail(id),

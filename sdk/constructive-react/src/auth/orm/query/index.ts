@@ -6,7 +6,12 @@
 import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
-import type { User, UserSelect } from '../input-types';
+import type {
+  User,
+  GetMfaStatusRecord,
+  UserSelect,
+  GetMfaStatusRecordSelect,
+} from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface RequireStepUpVariables {
   stepUpType?: string;
@@ -91,6 +96,29 @@ export function createQueryOperations(client: OrmClient) {
           [],
           connectionFieldsMap,
           undefined
+        ),
+      }),
+    getMfaStatus: <S extends GetMfaStatusRecordSelect>(
+      options: {
+        select: S;
+      } & StrictSelect<S, GetMfaStatusRecordSelect>
+    ) =>
+      new QueryBuilder<{
+        getMfaStatus: InferSelectResult<GetMfaStatusRecord, S> | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'GetMfaStatus',
+        fieldName: 'getMfaStatus',
+        ...buildCustomDocument(
+          'query',
+          'GetMfaStatus',
+          'getMfaStatus',
+          options.select,
+          undefined,
+          [],
+          connectionFieldsMap,
+          'GetMfaStatusRecord'
         ),
       }),
     requireStepUp: (

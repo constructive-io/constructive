@@ -17,6 +17,7 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   category: 'string',
+  columnRefs: 'string',
   createdAt: 'string',
   data: 'json',
   databaseId: 'uuid',
@@ -87,6 +88,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       category: true,
+      columnRefs: true,
       createdAt: true,
       data: true,
       databaseId: true,
@@ -125,6 +127,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       category: true,
+      columnRefs: true,
       createdAt: true,
       data: true,
       databaseId: true,
@@ -175,6 +178,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           category: true,
+          columnRefs: true,
           createdAt: true,
           data: true,
           databaseId: true,
@@ -211,6 +215,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'category',
         message: 'category',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'columnRefs',
+        message: 'columnRefs',
         required: false,
         skipPrompt: true,
       },
@@ -319,6 +330,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           category: cleanedData.category,
+          columnRefs: cleanedData.columnRefs,
           data: cleanedData.data,
           databaseId: cleanedData.databaseId,
           derivedFromPolicyId: cleanedData.derivedFromPolicyId,
@@ -336,6 +348,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           category: true,
+          columnRefs: true,
           createdAt: true,
           data: true,
           databaseId: true,
@@ -378,6 +391,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'category',
         message: 'category',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'columnRefs',
+        message: 'columnRefs',
         required: false,
         skipPrompt: true,
       },
@@ -489,6 +509,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           category: cleanedData.category,
+          columnRefs: cleanedData.columnRefs,
           data: cleanedData.data,
           databaseId: cleanedData.databaseId,
           derivedFromPolicyId: cleanedData.derivedFromPolicyId,
@@ -506,6 +527,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           category: true,
+          columnRefs: true,
           createdAt: true,
           data: true,
           databaseId: true,

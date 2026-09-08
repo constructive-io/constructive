@@ -25,6 +25,7 @@ const fieldSchema: FieldSchema = {
   threadId: 'uuid',
   title: 'string',
   updatedAt: 'string',
+  visibility: 'string',
 };
 const usage =
   '\nagent-plan <command>\n\nCommands:\n  list                  List agentPlan records\n  find-first            Find first matching agentPlan record\n  get                   Get a agentPlan by ID\n  create                Create a new agentPlan\n  update                Update an existing agentPlan\n  delete                Delete a agentPlan\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -86,6 +87,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       threadId: true,
       title: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentPlanSelect, AgentPlanFilter, AgentPlanOrderBy> & {
@@ -115,6 +117,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       threadId: true,
       title: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentPlanSelect, AgentPlanFilter, AgentPlanOrderBy> & {
@@ -156,6 +159,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           threadId: true,
           title: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -210,6 +214,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'title',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateAgentPlanInput['agentPlan'];
@@ -223,6 +234,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           status: cleanedData.status,
           threadId: cleanedData.threadId,
           title: cleanedData.title,
+          visibility: cleanedData.visibility,
         },
         select: {
           createdAt: true,
@@ -234,6 +246,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           threadId: true,
           title: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -294,6 +307,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'title',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentPlanPatch;
@@ -310,6 +330,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           status: cleanedData.status,
           threadId: cleanedData.threadId,
           title: cleanedData.title,
+          visibility: cleanedData.visibility,
         },
         select: {
           createdAt: true,
@@ -321,6 +342,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           threadId: true,
           title: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();

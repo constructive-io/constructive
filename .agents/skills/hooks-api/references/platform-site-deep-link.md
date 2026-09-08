@@ -7,8 +7,8 @@ Named, retargetable deep links owned by a site surface (served at the deep-link 
 ## Usage
 
 ```typescript
-usePlatformSiteDeepLinksQuery({ selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } } })
-usePlatformSiteDeepLinkQuery({ id: '<UUID>', selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } } })
+usePlatformSiteDeepLinksQuery({ selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } } })
+usePlatformSiteDeepLinkQuery({ id: '<UUID>', selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } } })
 useCreatePlatformSiteDeepLinkMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformSiteDeepLinkMutation({ selection: { fields: { id: true } } })
 useDeletePlatformSiteDeepLinkMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformSiteDeepLinkMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformSiteDeepLinksQuery({
-  selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+  selection: { fields: { appPath: true, createdAt: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformSiteDeepLinksQuery({
 const { mutate } = useCreatePlatformSiteDeepLinkMutation({
   selection: { fields: { id: true } },
 });
-mutate({ appPath: '<String>', fallbackUrl: '<String>', metadata: '<JSON>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
+mutate({ appPath: '<String>', fallbackUrl: '<String>', metadata: '<JSON>', pageId: '<UUID>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
 ```

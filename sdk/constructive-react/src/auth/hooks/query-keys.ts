@@ -127,6 +127,24 @@ export const userKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...userKeys.details(), id] as const,
 } as const;
+export const userSettingKeys = {
+  /** All userSetting queries */ all: ['usersetting'] as const,
+  /** List query keys */ lists: () => [...userSettingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...userSettingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...userSettingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...userSettingKeys.details(), id] as const,
+} as const;
+export const userSettingsSecurityKeys = {
+  /** All userSettingsSecurity queries */ all: ['usersettingssecurity'] as const,
+  /** List query keys */ lists: () => [...userSettingsSecurityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...userSettingsSecurityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...userSettingsSecurityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...userSettingsSecurityKeys.details(), id] as const,
+} as const;
 export const webauthnCredentialKeys = {
   /** All webauthnCredential queries */ all: ['webauthncredential'] as const,
   /** List query keys */ lists: () => [...webauthnCredentialKeys.all, 'list'] as const,
@@ -146,6 +164,7 @@ export const customQueryKeys = {
   /** Query key for currentUser */ currentUser: () => ['currentUser'] as const,
   /** Query key for currentUserAgent */ currentUserAgent: () => ['currentUserAgent'] as const,
   /** Query key for currentUserId */ currentUserId: () => ['currentUserId'] as const,
+  /** Query key for getMfaStatus */ getMfaStatus: () => ['getMfaStatus'] as const,
   /** Query key for requireStepUp */ requireStepUp: (variables?: object) =>
     ['requireStepUp', variables] as const,
 } as const;
@@ -184,6 +203,8 @@ export const queryKeys = {
   roleType: roleTypeKeys,
   userConnectedAccount: userConnectedAccountKeys,
   user: userKeys,
+  userSetting: userSettingKeys,
+  userSettingsSecurity: userSettingsSecurityKeys,
   webauthnCredential: webauthnCredentialKeys,
   custom: customQueryKeys,
 } as const;

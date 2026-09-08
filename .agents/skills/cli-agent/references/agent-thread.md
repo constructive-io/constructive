@@ -12,8 +12,8 @@ csdk agent-thread list --where.<field>.<op> <value> --orderBy <values>
 csdk agent-thread list --limit 10 --after <cursor>
 csdk agent-thread find-first --where.<field>.<op> <value>
 csdk agent-thread get --id <UUID>
-csdk agent-thread create --databaseId <UUID> [--agentId <UUID>] [--archivedAt <Datetime>] [--isArchived <Boolean>] [--mode <String>] [--model <String>] [--ownerId <UUID>] [--parentThreadId <UUID>] [--promptTemplateId <UUID>] [--status <String>] [--systemPrompt <String>] [--tags <String>] [--title <String>]
-csdk agent-thread update --id <UUID> [--agentId <UUID>] [--archivedAt <Datetime>] [--databaseId <UUID>] [--isArchived <Boolean>] [--mode <String>] [--model <String>] [--ownerId <UUID>] [--parentThreadId <UUID>] [--promptTemplateId <UUID>] [--status <String>] [--systemPrompt <String>] [--tags <String>] [--title <String>]
+csdk agent-thread create --databaseId <UUID> [--agentId <UUID>] [--archivedAt <Datetime>] [--isArchived <Boolean>] [--mode <String>] [--model <String>] [--ownerId <UUID>] [--parentThreadId <UUID>] [--promptTemplateId <UUID>] [--status <String>] [--systemPrompt <String>] [--tags <String>] [--title <String>] [--visibility <String>]
+csdk agent-thread update --id <UUID> [--agentId <UUID>] [--archivedAt <Datetime>] [--databaseId <UUID>] [--isArchived <Boolean>] [--mode <String>] [--model <String>] [--ownerId <UUID>] [--parentThreadId <UUID>] [--promptTemplateId <UUID>] [--status <String>] [--systemPrompt <String>] [--tags <String>] [--title <String>] [--visibility <String>]
 csdk agent-thread delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent-thread list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agentThread
 
 ```bash
-csdk agent-thread create --databaseId <UUID> [--agentId <UUID>] [--archivedAt <Datetime>] [--isArchived <Boolean>] [--mode <String>] [--model <String>] [--ownerId <UUID>] [--parentThreadId <UUID>] [--promptTemplateId <UUID>] [--status <String>] [--systemPrompt <String>] [--tags <String>] [--title <String>]
+csdk agent-thread create --databaseId <UUID> [--agentId <UUID>] [--archivedAt <Datetime>] [--isArchived <Boolean>] [--mode <String>] [--model <String>] [--ownerId <UUID>] [--parentThreadId <UUID>] [--promptTemplateId <UUID>] [--status <String>] [--systemPrompt <String>] [--tags <String>] [--title <String>] [--visibility <String>]
 ```
 
 ### Get a agentThread by id

@@ -12,8 +12,8 @@ csdk agent-task list --where.<field>.<op> <value> --orderBy <values>
 csdk agent-task list --limit 10 --after <cursor>
 csdk agent-task find-first --where.<field>.<op> <value>
 csdk agent-task get --id <UUID>
-csdk agent-task create --databaseId <UUID> --description <String> --planId <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>]
-csdk agent-task update --id <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--databaseId <UUID>] [--description <String>] [--error <String>] [--orderIndex <Int>] [--planId <UUID>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>]
+csdk agent-task create --databaseId <UUID> --description <String> --planId <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>] [--visibility <String>]
+csdk agent-task update --id <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--databaseId <UUID>] [--description <String>] [--error <String>] [--orderIndex <Int>] [--planId <UUID>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>] [--visibility <String>]
 csdk agent-task delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent-task list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agentTask
 
 ```bash
-csdk agent-task create --databaseId <UUID> --description <String> --planId <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>]
+csdk agent-task create --databaseId <UUID> --description <String> --planId <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>] [--visibility <String>]
 ```
 
 ### Get a agentTask by id

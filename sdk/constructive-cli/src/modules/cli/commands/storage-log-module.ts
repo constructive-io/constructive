@@ -16,11 +16,9 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  actorFkTableId: 'uuid',
   apiName: 'string',
   databaseId: 'uuid',
   entityField: 'string',
-  entityFkTableId: 'uuid',
   id: 'uuid',
   interval: 'string',
   prefix: 'string',
@@ -30,6 +28,7 @@ const fieldSchema: FieldSchema = {
   privateSchemaName: 'string',
   publicSchemaName: 'string',
   retention: 'string',
+  rollupFunctionName: 'string',
   schemaId: 'uuid',
   scope: 'string',
   storageLogTableId: 'uuid',
@@ -88,11 +87,9 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      actorFkTableId: true,
       apiName: true,
       databaseId: true,
       entityField: true,
-      entityFkTableId: true,
       id: true,
       interval: true,
       prefix: true,
@@ -102,6 +99,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       privateSchemaName: true,
       publicSchemaName: true,
       retention: true,
+      rollupFunctionName: true,
       schemaId: true,
       scope: true,
       storageLogTableId: true,
@@ -128,11 +126,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      actorFkTableId: true,
       apiName: true,
       databaseId: true,
       entityField: true,
-      entityFkTableId: true,
       id: true,
       interval: true,
       prefix: true,
@@ -142,6 +138,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       privateSchemaName: true,
       publicSchemaName: true,
       retention: true,
+      rollupFunctionName: true,
       schemaId: true,
       scope: true,
       storageLogTableId: true,
@@ -180,11 +177,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          actorFkTableId: true,
           apiName: true,
           databaseId: true,
           entityField: true,
-          entityFkTableId: true,
           id: true,
           interval: true,
           prefix: true,
@@ -194,6 +189,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           privateSchemaName: true,
           publicSchemaName: true,
           retention: true,
+          rollupFunctionName: true,
           schemaId: true,
           scope: true,
           storageLogTableId: true,
@@ -217,13 +213,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'actorFkTableId',
-        message: 'actorFkTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'apiName',
         message: 'apiName',
         required: false,
@@ -239,13 +228,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'entityField',
         message: 'entityField',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'entityFkTableId',
-        message: 'entityFkTableId',
         required: false,
         skipPrompt: true,
       },
@@ -302,6 +284,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'retention',
         message: 'retention',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'rollupFunctionName',
+        message: 'rollupFunctionName',
         required: false,
         skipPrompt: true,
       },
@@ -356,11 +345,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.storageLogModule
       .create({
         data: {
-          actorFkTableId: cleanedData.actorFkTableId,
           apiName: cleanedData.apiName,
           databaseId: cleanedData.databaseId,
           entityField: cleanedData.entityField,
-          entityFkTableId: cleanedData.entityFkTableId,
           interval: cleanedData.interval,
           prefix: cleanedData.prefix,
           premake: cleanedData.premake,
@@ -369,6 +356,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: cleanedData.privateSchemaName,
           publicSchemaName: cleanedData.publicSchemaName,
           retention: cleanedData.retention,
+          rollupFunctionName: cleanedData.rollupFunctionName,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
           storageLogTableId: cleanedData.storageLogTableId,
@@ -377,11 +365,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           usageSummaryTableName: cleanedData.usageSummaryTableName,
         },
         select: {
-          actorFkTableId: true,
           apiName: true,
           databaseId: true,
           entityField: true,
-          entityFkTableId: true,
           id: true,
           interval: true,
           prefix: true,
@@ -391,6 +377,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: true,
           publicSchemaName: true,
           retention: true,
+          rollupFunctionName: true,
           schemaId: true,
           scope: true,
           storageLogTableId: true,
@@ -420,13 +407,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'actorFkTableId',
-        message: 'actorFkTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'apiName',
         message: 'apiName',
         required: false,
@@ -442,13 +422,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'entityField',
         message: 'entityField',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'entityFkTableId',
-        message: 'entityFkTableId',
         required: false,
         skipPrompt: true,
       },
@@ -510,6 +483,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'rollupFunctionName',
+        message: 'rollupFunctionName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'schemaId',
         message: 'schemaId',
         required: false,
@@ -559,11 +539,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          actorFkTableId: cleanedData.actorFkTableId,
           apiName: cleanedData.apiName,
           databaseId: cleanedData.databaseId,
           entityField: cleanedData.entityField,
-          entityFkTableId: cleanedData.entityFkTableId,
           interval: cleanedData.interval,
           prefix: cleanedData.prefix,
           premake: cleanedData.premake,
@@ -572,6 +550,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: cleanedData.privateSchemaName,
           publicSchemaName: cleanedData.publicSchemaName,
           retention: cleanedData.retention,
+          rollupFunctionName: cleanedData.rollupFunctionName,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
           storageLogTableId: cleanedData.storageLogTableId,
@@ -580,11 +559,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           usageSummaryTableName: cleanedData.usageSummaryTableName,
         },
         select: {
-          actorFkTableId: true,
           apiName: true,
           databaseId: true,
           entityField: true,
-          entityFkTableId: true,
           id: true,
           interval: true,
           prefix: true,
@@ -594,6 +571,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: true,
           publicSchemaName: true,
           retention: true,
+          rollupFunctionName: true,
           schemaId: true,
           scope: true,
           storageLogTableId: true,

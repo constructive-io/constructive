@@ -19,4 +19,6 @@
 | infra | - | ORM, CLI | [./src/infra/README.md](./src/infra/README.md) |
 | modules | - | ORM, CLI | [./src/modules/README.md](./src/modules/README.md) |
 | objects | - | ORM, CLI | [./src/objects/README.md](./src/objects/README.md) |
+| remote | - | ORM, CLI | [./src/remote/README.md](./src/remote/README.md) |
+| storage | - | ORM, CLI | [./src/storage/README.md](./src/storage/README.md) |
 | usage | - | ORM, CLI | [./src/usage/README.md](./src/usage/README.md) |

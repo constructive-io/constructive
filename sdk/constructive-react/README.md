@@ -19,4 +19,6 @@
 | infra | - | React Query, ORM | [./src/infra/README.md](./src/infra/README.md) |
 | modules | - | React Query, ORM | [./src/modules/README.md](./src/modules/README.md) |
 | objects | - | React Query, ORM | [./src/objects/README.md](./src/objects/README.md) |
+| remote | - | React Query, ORM | [./src/remote/README.md](./src/remote/README.md) |
+| storage | - | React Query, ORM | [./src/storage/README.md](./src/storage/README.md) |
 | usage | - | React Query, ORM | [./src/usage/README.md](./src/usage/README.md) |

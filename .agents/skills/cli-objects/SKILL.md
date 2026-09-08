@@ -1,13 +1,13 @@
 ---
 name: cli-objects
-description: CLI tool (csdk) for the objects API — provides CRUD commands for 5 tables and 4 custom operations
+description: CLI tool (csdk) for the objects API — provides CRUD commands for 5 tables and 7 custom operations
 ---
 
 # cli-objects
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the objects API — provides CRUD commands for 5 tables and 4 custom operations
+CLI tool (csdk) for the objects API — provides CRUD commands for 5 tables and 7 custom operations
 
 ## Usage
 
@@ -63,5 +63,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [store](references/store.md)
 - [init-empty-repo](references/init-empty-repo.md)
 - [insert-node-at-path](references/insert-node-at-path.md)
+- [insert-nodes-at-paths](references/insert-nodes-at-paths.md)
 - [provision-bucket](references/provision-bucket.md)
+- [set-and-commit](references/set-and-commit.md)
 - [set-data-at-path](references/set-data-at-path.md)
+- [set-many-and-commit](references/set-many-and-commit.md)
