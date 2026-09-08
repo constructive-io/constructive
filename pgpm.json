@@ -3,10 +3,10 @@
     "testing/*"
   ],
   "dependencies": {
-    "@constructive-db/apps": "7.1.0",
-    "@constructive-db/catalog": "6.1.0",
-    "@constructive-db/routing": "8.2.0",
-    "@constructive-db/routing-platform": "7.1.0",
+    "@constructive-db/apps": "7.1.1",
+    "@constructive-db/catalog": "6.2.0",
+    "@constructive-db/routing": "8.3.0",
+    "@constructive-db/routing-platform": "7.1.1",
     "@pgpm/database-jobs": "0.44.0",
     "@pgpm/function-resolution": "0.44.2",
     "@pgpm/jwt-claims": "0.44.0",
