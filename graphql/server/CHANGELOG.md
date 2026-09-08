@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.25.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.25.0...@constructive-io/graphql-server@5.25.1) (2026-09-08)
+
+### Bug Fixes
+
+- **graphql-server:** exempt schema introspection from the depth and cost gate ([6c737cb](https://github.com/constructive-io/constructive/commit/6c737cb68e910ee450ea86e70a2752e69570ccbf))
+
 # [5.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.24.0...@constructive-io/graphql-server@5.25.0) (2026-09-08)
 
 ### Features
