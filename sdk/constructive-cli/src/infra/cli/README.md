@@ -26,6 +26,7 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
+| `content-preset` | contentPreset CRUD operations |
 | `db-preset` | dbPreset CRUD operations |
 | `namespace` | namespace CRUD operations |
 | `namespace-event` | namespaceEvent CRUD operations |
@@ -38,11 +39,15 @@ csdk auth set-token <your-token>
 | `platform-namespace-event` | platformNamespaceEvent CRUD operations |
 | `platform-infra-init-empty-repo` | platformInfraInitEmptyRepo |
 | `platform-infra-insert-node-at-path` | platformInfraInsertNodeAtPath |
+| `platform-infra-insert-nodes-at-paths` | platformInfraInsertNodesAtPaths |
+| `platform-infra-set-and-commit` | platformInfraSetAndCommit |
 | `platform-infra-set-data-at-path` | platformInfraSetDataAtPath |
-| `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `platform-infra-set-many-and-commit` | platformInfraSetManyAndCommit |
+| `provision-bucket` | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
 
 ## Infrastructure Commands
 
@@ -84,6 +89,38 @@ Manage per-context key-value configuration variables.
 Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
+
+### `content-preset`
+
+CRUD operations for ContentPreset records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all contentPreset records |
+| `find-first` | Find first matching contentPreset record |
+| `get` | Get a contentPreset by id |
+| `create` | Create a new contentPreset |
+| `update` | Update an existing contentPreset |
+| `delete` | Delete a contentPreset |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `active` | Boolean |
+| `commitId` | UUID |
+| `createdAt` | Datetime |
+| `definition` | JSON |
+| `description` | String |
+| `id` | UUID |
+| `kind` | String |
+| `label` | String |
+| `slug` | String |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `definition`, `kind`, `slug`
+**Optional create fields (backend defaults):** `active`, `commitId`, `description`, `label`, `storeId`
 
 ### `db-preset`
 
@@ -135,6 +172,7 @@ CRUD operations for Namespace records.
 | Field | Type |
 |-------|------|
 | `annotations` | JSON |
+| `clusterId` | UUID |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `description` | String |
@@ -149,7 +187,7 @@ CRUD operations for Namespace records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `name`, `namespaceName`
-**Optional create fields (backend defaults):** `annotations`, `description`, `isActive`, `isManaged`, `labels`, `lastError`, `status`
+**Optional create fields (backend defaults):** `annotations`, `clusterId`, `description`, `isActive`, `isManaged`, `labels`, `lastError`, `status`
 
 ### `namespace-event`
 
@@ -329,6 +367,7 @@ CRUD operations for PlatformNamespace records.
 | Field | Type |
 |-------|------|
 | `annotations` | JSON |
+| `clusterId` | UUID |
 | `createdAt` | Datetime |
 | `description` | String |
 | `id` | UUID |
@@ -342,7 +381,7 @@ CRUD operations for PlatformNamespace records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `name`, `namespaceName`
-**Optional create fields (backend defaults):** `annotations`, `description`, `isActive`, `isManaged`, `labels`, `lastError`, `status`
+**Optional create fields (backend defaults):** `annotations`, `clusterId`, `description`, `isActive`, `isManaged`, `labels`, `lastError`, `status`
 
 ### `platform-namespace-event`
 
@@ -404,6 +443,42 @@ platformInfraInsertNodeAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
+### `platform-infra-insert-nodes-at-paths`
+
+platformInfraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `platform-infra-set-and-commit`
+
+platformInfraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `platform-infra-set-data-at-path`
 
 platformInfraSetDataAtPath
@@ -419,12 +494,29 @@ platformInfraSetDataAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
+### `platform-infra-set-many-and-commit`
+
+platformInfraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `provision-bucket`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**

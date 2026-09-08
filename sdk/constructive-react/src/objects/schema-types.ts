@@ -545,18 +545,13 @@ export interface InsertNodesAtPathsPayload {
   result?: string | null;
 }
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
 }
 export interface SetAndCommitPayload {
   clientMutationId?: string | null;
@@ -776,10 +771,18 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
+  /** GraphQL type name of the plane's buckets table */
+  bucketsType: string;
+  /** Computed download-URL field on the files type; null on the buckets side */
+  downloadUrlField?: string | null;
+  /** GraphQL type name of the plane's files table */
+  filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
+  /** The plane's GraphQL upload surface */
+  upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
 export interface MetaUniqueConstraint {
@@ -861,6 +864,27 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+export interface MetaStorageUpload {
+  /** Per-file input type inside the bulk input */
+  bulkFileInputType: string;
+  /** Per-file payload type inside the bulk payload */
+  bulkFilePayloadType: string;
+  /** Input type of the bulk upload mutation */
+  bulkInputType: string;
+  /** Root mutation field for bulk upload */
+  bulkMutation: string;
+  /** Payload type of the bulk upload mutation */
+  bulkPayloadType: string;
+  /** Input type of the single upload mutation */
+  inputType: string;
+  /** Root mutation field for single-file upload (e.g. uploadAppFile) */
+  mutation: string;
+  /** Payload type of the single upload mutation */
+  payloadType: string;
+  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  requiresOwnerId: boolean;
 }
 /** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {

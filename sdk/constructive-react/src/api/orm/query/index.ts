@@ -6,12 +6,7 @@
 import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
-import type {
-  ResolveHttpRouteRecord,
-  ResolveRouteRecord,
-  ResolveHttpRouteRecordSelect,
-  ResolveRouteRecordSelect,
-} from '../input-types';
+import type { ResolveRouteRecord, ResolveRouteRecordSelect } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface ApiSchemaNamesVariables {
   targetApiId?: string;
@@ -20,14 +15,44 @@ export interface ApplyRegistryDefaultsVariables {
   data?: unknown;
   nodeType?: string;
 }
-export interface ResolveDeepLinkVariables {
+export interface GetSitePreviewCommitVariables {
+  targetName?: string;
+  targetSiteId?: string;
+}
+export interface GetSiteReleaseManifestVariables {
+  targetCommitId?: string;
+  targetSiteId?: string;
+}
+export interface PagePublishedVariables {
+  pageSlug?: string;
+  targetSiteId?: string;
+}
+export interface PlatformGetSitePreviewCommitVariables {
+  targetName?: string;
+  targetSiteId?: string;
+}
+export interface PlatformGetSiteReleaseManifestVariables {
+  targetCommitId?: string;
+  targetSiteId?: string;
+}
+export interface PlatformPagePublishedVariables {
+  pageSlug?: string;
+  targetSiteId?: string;
+}
+export interface PlatformSitesDeepLinkUrlVariables {
   linkSlug?: string;
   targetSiteId?: string;
 }
-export interface ResolveHttpRouteVariables {
-  requestHost?: string;
-  requestMethod?: string;
-  requestPath?: string;
+export interface PlatformSitesSiteOriginVariables {
+  targetSiteId?: string;
+}
+export interface PlatformVerifySitePreviewTokenVariables {
+  siteId?: string;
+  token?: string;
+}
+export interface ResolveDeepLinkVariables {
+  linkSlug?: string;
+  targetSiteId?: string;
 }
 export interface ResolveRouteVariables {
   requestHost?: string;
@@ -36,6 +61,17 @@ export interface ResolveRouteVariables {
 }
 export interface ResolveSiteAppLinksVariables {
   targetSiteId?: string;
+}
+export interface SitesDeepLinkUrlVariables {
+  linkSlug?: string;
+  targetSiteId?: string;
+}
+export interface SitesSiteOriginVariables {
+  targetSiteId?: string;
+}
+export interface VerifySitePreviewTokenVariables {
+  siteId?: string;
+  token?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
@@ -101,6 +137,299 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
+    getSitePreviewCommit: (
+      args: GetSitePreviewCommitVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        getSitePreviewCommit: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'GetSitePreviewCommit',
+        fieldName: 'getSitePreviewCommit',
+        ...buildCustomDocument(
+          'query',
+          'GetSitePreviewCommit',
+          'getSitePreviewCommit',
+          options?.select,
+          args,
+          [
+            {
+              name: 'targetName',
+              type: 'String',
+            },
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    getSiteReleaseManifest: (
+      args: GetSiteReleaseManifestVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        getSiteReleaseManifest: unknown | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'GetSiteReleaseManifest',
+        fieldName: 'getSiteReleaseManifest',
+        ...buildCustomDocument(
+          'query',
+          'GetSiteReleaseManifest',
+          'getSiteReleaseManifest',
+          options?.select,
+          args,
+          [
+            {
+              name: 'targetCommitId',
+              type: 'UUID',
+            },
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    pagePublished: (
+      args: PagePublishedVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        pagePublished: unknown | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'PagePublished',
+        fieldName: 'pagePublished',
+        ...buildCustomDocument(
+          'query',
+          'PagePublished',
+          'pagePublished',
+          options?.select,
+          args,
+          [
+            {
+              name: 'pageSlug',
+              type: 'String',
+            },
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    platformGetSitePreviewCommit: (
+      args: PlatformGetSitePreviewCommitVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        platformGetSitePreviewCommit: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'PlatformGetSitePreviewCommit',
+        fieldName: 'platformGetSitePreviewCommit',
+        ...buildCustomDocument(
+          'query',
+          'PlatformGetSitePreviewCommit',
+          'platformGetSitePreviewCommit',
+          options?.select,
+          args,
+          [
+            {
+              name: 'targetName',
+              type: 'String',
+            },
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    platformGetSiteReleaseManifest: (
+      args: PlatformGetSiteReleaseManifestVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        platformGetSiteReleaseManifest: unknown | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'PlatformGetSiteReleaseManifest',
+        fieldName: 'platformGetSiteReleaseManifest',
+        ...buildCustomDocument(
+          'query',
+          'PlatformGetSiteReleaseManifest',
+          'platformGetSiteReleaseManifest',
+          options?.select,
+          args,
+          [
+            {
+              name: 'targetCommitId',
+              type: 'UUID',
+            },
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    platformPagePublished: (
+      args: PlatformPagePublishedVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        platformPagePublished: unknown | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'PlatformPagePublished',
+        fieldName: 'platformPagePublished',
+        ...buildCustomDocument(
+          'query',
+          'PlatformPagePublished',
+          'platformPagePublished',
+          options?.select,
+          args,
+          [
+            {
+              name: 'pageSlug',
+              type: 'String',
+            },
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    platformSitesDeepLinkUrl: (
+      args: PlatformSitesDeepLinkUrlVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        platformSitesDeepLinkUrl: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'PlatformSitesDeepLinkUrl',
+        fieldName: 'platformSitesDeepLinkUrl',
+        ...buildCustomDocument(
+          'query',
+          'PlatformSitesDeepLinkUrl',
+          'platformSitesDeepLinkUrl',
+          options?.select,
+          args,
+          [
+            {
+              name: 'linkSlug',
+              type: 'String',
+            },
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    platformSitesSiteOrigin: (
+      args: PlatformSitesSiteOriginVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        platformSitesSiteOrigin: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'PlatformSitesSiteOrigin',
+        fieldName: 'platformSitesSiteOrigin',
+        ...buildCustomDocument(
+          'query',
+          'PlatformSitesSiteOrigin',
+          'platformSitesSiteOrigin',
+          options?.select,
+          args,
+          [
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    platformVerifySitePreviewToken: (
+      args: PlatformVerifySitePreviewTokenVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        platformVerifySitePreviewToken: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'PlatformVerifySitePreviewToken',
+        fieldName: 'platformVerifySitePreviewToken',
+        ...buildCustomDocument(
+          'query',
+          'PlatformVerifySitePreviewToken',
+          'platformVerifySitePreviewToken',
+          options?.select,
+          args,
+          [
+            {
+              name: 'siteId',
+              type: 'UUID',
+            },
+            {
+              name: 'token',
+              type: 'String',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
     resolveDeepLink: (
       args: ResolveDeepLinkVariables,
       options?: {
@@ -132,43 +461,6 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           undefined
-        ),
-      }),
-    resolveHttpRoute: <S extends ResolveHttpRouteRecordSelect>(
-      args: ResolveHttpRouteVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ResolveHttpRouteRecordSelect>
-    ) =>
-      new QueryBuilder<{
-        resolveHttpRoute: InferSelectResult<ResolveHttpRouteRecord, S> | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'ResolveHttpRoute',
-        fieldName: 'resolveHttpRoute',
-        ...buildCustomDocument(
-          'query',
-          'ResolveHttpRoute',
-          'resolveHttpRoute',
-          options.select,
-          args,
-          [
-            {
-              name: 'requestHost',
-              type: 'String',
-            },
-            {
-              name: 'requestMethod',
-              type: 'String',
-            },
-            {
-              name: 'requestPath',
-              type: 'String',
-            },
-          ],
-          connectionFieldsMap,
-          'ResolveHttpRouteRecord'
         ),
       }),
     resolveRoute: <S extends ResolveRouteRecordSelect>(
@@ -231,6 +523,101 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'targetSiteId',
               type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    sitesDeepLinkUrl: (
+      args: SitesDeepLinkUrlVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        sitesDeepLinkUrl: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'SitesDeepLinkUrl',
+        fieldName: 'sitesDeepLinkUrl',
+        ...buildCustomDocument(
+          'query',
+          'SitesDeepLinkUrl',
+          'sitesDeepLinkUrl',
+          options?.select,
+          args,
+          [
+            {
+              name: 'linkSlug',
+              type: 'String',
+            },
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    sitesSiteOrigin: (
+      args: SitesSiteOriginVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        sitesSiteOrigin: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'SitesSiteOrigin',
+        fieldName: 'sitesSiteOrigin',
+        ...buildCustomDocument(
+          'query',
+          'SitesSiteOrigin',
+          'sitesSiteOrigin',
+          options?.select,
+          args,
+          [
+            {
+              name: 'targetSiteId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    verifySitePreviewToken: (
+      args: VerifySitePreviewTokenVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        verifySitePreviewToken: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'VerifySitePreviewToken',
+        fieldName: 'verifySitePreviewToken',
+        ...buildCustomDocument(
+          'query',
+          'VerifySitePreviewToken',
+          'verifySitePreviewToken',
+          options?.select,
+          args,
+          [
+            {
+              name: 'siteId',
+              type: 'UUID',
+            },
+            {
+              name: 'token',
+              type: 'String',
             },
           ],
           connectionFieldsMap,

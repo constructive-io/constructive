@@ -7,8 +7,8 @@ Logical namespace containers for grouping secrets, config, functions, and other 
 ## Usage
 
 ```typescript
-useNamespacesQuery({ selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } } })
-useNamespaceQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } } })
+useNamespacesQuery({ selection: { fields: { annotations: true, clusterId: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } } })
+useNamespaceQuery({ id: '<UUID>', selection: { fields: { annotations: true, clusterId: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } } })
 useCreateNamespaceMutation({ selection: { fields: { id: true } } })
 useUpdateNamespaceMutation({ selection: { fields: { id: true } } })
 useDeleteNamespaceMutation({})
@@ -20,7 +20,7 @@ useDeleteNamespaceMutation({})
 
 ```typescript
 const { data, isLoading } = useNamespacesQuery({
-  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
+  selection: { fields: { annotations: true, clusterId: true, createdAt: true, databaseId: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useNamespacesQuery({
 const { mutate } = useCreateNamespaceMutation({
   selection: { fields: { id: true } },
 });
-mutate({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' });
+mutate({ annotations: '<JSON>', clusterId: '<UUID>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' });
 ```

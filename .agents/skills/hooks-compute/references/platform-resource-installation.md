@@ -7,8 +7,8 @@ Installed resource bundle ("release") — groups a set of resources; params are 
 ## Usage
 
 ```typescript
-usePlatformResourceInstallationsQuery({ selection: { fields: { commitId: true, createdAt: true, createdBy: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } } })
-usePlatformResourceInstallationQuery({ id: '<UUID>', selection: { fields: { commitId: true, createdAt: true, createdBy: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } } })
+usePlatformResourceInstallationsQuery({ selection: { fields: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
+usePlatformResourceInstallationQuery({ id: '<UUID>', selection: { fields: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
 useCreatePlatformResourceInstallationMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformResourceInstallationMutation({ selection: { fields: { id: true } } })
 useDeletePlatformResourceInstallationMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformResourceInstallationMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformResourceInstallationsQuery({
-  selection: { fields: { commitId: true, createdAt: true, createdBy: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true } },
+  selection: { fields: { commitId: true, createdAt: true, createdBy: true, createdByPrincipal: true, id: true, name: true, namespaceId: true, params: true, revision: true, slug: true, status: true, storeId: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformResourceInstallationsQuery({
 const { mutate } = useCreatePlatformResourceInstallationMutation({
   selection: { fields: { id: true } },
 });
-mutate({ commitId: '<UUID>', createdBy: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>' });
+mutate({ commitId: '<UUID>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', name: '<String>', namespaceId: '<UUID>', params: '<JSON>', revision: '<Int>', slug: '<String>', status: '<String>', storeId: '<UUID>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```

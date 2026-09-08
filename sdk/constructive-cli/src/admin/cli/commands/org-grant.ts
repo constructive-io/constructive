@@ -17,12 +17,12 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   actorId: 'uuid',
+  capabilities: 'string',
   createdAt: 'string',
   entityId: 'uuid',
   grantorId: 'uuid',
   id: 'uuid',
   isGrant: 'boolean',
-  permissions: 'string',
   updatedAt: 'string',
 };
 const usage =
@@ -77,12 +77,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       actorId: true,
+      capabilities: true,
       createdAt: true,
       entityId: true,
       grantorId: true,
       id: true,
       isGrant: true,
-      permissions: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -105,12 +105,12 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       actorId: true,
+      capabilities: true,
       createdAt: true,
       entityId: true,
       grantorId: true,
       id: true,
       isGrant: true,
-      permissions: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -145,12 +145,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           actorId: true,
+          capabilities: true,
           createdAt: true,
           entityId: true,
           grantorId: true,
           id: true,
           isGrant: true,
-          permissions: true,
           updatedAt: true,
         },
       })
@@ -176,6 +176,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'capabilities',
+        message: 'capabilities',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'entityId',
         message: 'entityId',
         required: true,
@@ -194,13 +201,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'text',
-        name: 'permissions',
-        message: 'permissions',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateOrgGrantInput['orgGrant'];
@@ -209,19 +209,19 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           actorId: cleanedData.actorId,
+          capabilities: cleanedData.capabilities,
           entityId: cleanedData.entityId,
           grantorId: cleanedData.grantorId,
           isGrant: cleanedData.isGrant,
-          permissions: cleanedData.permissions,
         },
         select: {
           actorId: true,
+          capabilities: true,
           createdAt: true,
           entityId: true,
           grantorId: true,
           id: true,
           isGrant: true,
-          permissions: true,
           updatedAt: true,
         },
       })
@@ -253,6 +253,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'capabilities',
+        message: 'capabilities',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'entityId',
         message: 'entityId',
         required: false,
@@ -271,13 +278,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'text',
-        name: 'permissions',
-        message: 'permissions',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as OrgGrantPatch;
@@ -289,19 +289,19 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           actorId: cleanedData.actorId,
+          capabilities: cleanedData.capabilities,
           entityId: cleanedData.entityId,
           grantorId: cleanedData.grantorId,
           isGrant: cleanedData.isGrant,
-          permissions: cleanedData.permissions,
         },
         select: {
           actorId: true,
+          capabilities: true,
           createdAt: true,
           entityId: true,
           grantorId: true,
           id: true,
           isGrant: true,
-          permissions: true,
           updatedAt: true,
         },
       })

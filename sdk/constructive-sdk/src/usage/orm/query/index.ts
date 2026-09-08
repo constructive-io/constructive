@@ -6,25 +6,7 @@
 import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
-import type { AppLevelRequirementConnection } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface EventsAchievedVariables {
-  level?: string;
-  roleId?: string;
-}
-export interface EventsRequiredVariables {
-  /** Read all values in the set after (below) this cursor. */
-  after?: string;
-  /** Only read the first `n` values of the set. */
-  first?: number;
-  level?: string;
-  /**
-   * Skip the first `n` values from our `after` cursor, an alternative to cursor
-   * based pagination. May not be used with `last`.
-   */
-  offset?: number;
-  roleId?: string;
-}
 export function createQueryOperations(client: OrmClient) {
   return {
     captureAppLimitDefaults: (options?: { select?: Record<string, unknown> }) =>
@@ -61,103 +43,6 @@ export function createQueryOperations(client: OrmClient) {
           options?.select,
           undefined,
           [],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    captureTrustLadder: (options?: { select?: Record<string, unknown> }) =>
-      new QueryBuilder<{
-        captureTrustLadder: unknown | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'CaptureTrustLadder',
-        fieldName: 'captureTrustLadder',
-        ...buildCustomDocument(
-          'query',
-          'CaptureTrustLadder',
-          'captureTrustLadder',
-          options?.select,
-          undefined,
-          [],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    eventsAchieved: (
-      args: EventsAchievedVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        eventsAchieved: boolean | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'EventsAchieved',
-        fieldName: 'eventsAchieved',
-        ...buildCustomDocument(
-          'query',
-          'EventsAchieved',
-          'eventsAchieved',
-          options?.select,
-          args,
-          [
-            {
-              name: 'level',
-              type: 'String',
-            },
-            {
-              name: 'roleId',
-              type: 'UUID',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    eventsRequired: (
-      args: EventsRequiredVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        eventsRequired: AppLevelRequirementConnection | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'EventsRequired',
-        fieldName: 'eventsRequired',
-        ...buildCustomDocument(
-          'query',
-          'EventsRequired',
-          'eventsRequired',
-          options?.select,
-          args,
-          [
-            {
-              name: 'after',
-              type: 'Cursor',
-            },
-            {
-              name: 'first',
-              type: 'Int',
-            },
-            {
-              name: 'level',
-              type: 'String',
-            },
-            {
-              name: 'offset',
-              type: 'Int',
-            },
-            {
-              name: 'roleId',
-              type: 'UUID',
-            },
-          ],
           connectionFieldsMap,
           undefined
         ),
