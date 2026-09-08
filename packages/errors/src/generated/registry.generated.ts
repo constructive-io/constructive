@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (778 distinct codes
+ * Source of truth: the constructive-db error audit (784 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 778 total, 572 public, 206 internal.
+ * Counts: 784 total, 576 public, 208 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -143,6 +143,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'CONTENT_PRESET_NOT_SAVED': defineError({ code: 'CONTENT_PRESET_NOT_SAVED', class: 'public', http: 400, message: 'Content preset not saved.' }),
   'COPY_TEMPLATE_TO_BLUEPRINT': defineError({ code: 'COPY_TEMPLATE_TO_BLUEPRINT', class: 'internal', http: 500, message: 'Copy template to blueprint.' }),
   'CREDENTIAL_NOT_EXCHANGEABLE': defineError({ code: 'CREDENTIAL_NOT_EXCHANGEABLE', class: 'public', http: 400, message: 'Credential not exchangeable.' }),
+  'CREDENTIAL_NOT_EXTENDABLE': defineError({ code: 'CREDENTIAL_NOT_EXTENDABLE', class: 'public', http: 400, message: 'Credential not extendable.' }),
   'CREDIT_CODE_EXPIRED': defineError({ code: 'CREDIT_CODE_EXPIRED', class: 'internal', http: 500, message: 'Credit code expired.' }),
   'CREDIT_CODE_MAX_REDEMPTIONS_REACHED': defineError({ code: 'CREDIT_CODE_MAX_REDEMPTIONS_REACHED', class: 'internal', http: 500, message: 'Credit code max redemptions reached.' }),
   'CREDIT_CODE_NOT_FOUND': defineError({ code: 'CREDIT_CODE_NOT_FOUND', class: 'internal', http: 500, message: 'Credit code not found.' }),
@@ -543,6 +544,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'MODULES_HASH_DUPLICATE_ENTRY': defineError({ code: 'MODULES_HASH_DUPLICATE_ENTRY', class: 'internal', http: 500, message: 'Modules hash duplicate entry.' }),
   'MODULES_HASH_INVALID_ENTRY': defineError({ code: 'MODULES_HASH_INVALID_ENTRY', class: 'internal', http: 500, message: 'Modules hash invalid entry.' }),
   'MODULES_HASH_INVALID_INPUT': defineError({ code: 'MODULES_HASH_INVALID_INPUT', class: 'internal', http: 500, message: 'Modules hash invalid input.' }),
+  'MODULE_ENTRY_MALFORMED': defineError({ code: 'MODULE_ENTRY_MALFORMED', class: 'internal', http: 500, message: 'Module entry malformed.' }),
   'MODULE_SECURITY_POLICY_ENTRY_MISSING_TYPE': defineError({ code: 'MODULE_SECURITY_POLICY_ENTRY_MISSING_TYPE', class: 'public', http: 400, message: 'Module security policy entry missing type.' }),
   'MODULE_TABLE_ALREADY_ATTRIBUTED': defineError({ code: 'MODULE_TABLE_ALREADY_ATTRIBUTED', class: 'internal', http: 500, message: 'Module table already attributed.' }),
   'MONOTONIC_FIELD': defineError({ code: 'MONOTONIC_FIELD', class: 'internal', http: 500, message: 'Monotonic field.' }),
@@ -609,6 +611,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'PROVISION_INDEX_COLUMNS_REQUIRED': defineError({ code: 'PROVISION_INDEX_COLUMNS_REQUIRED', class: 'internal', http: 500, message: 'Provision index columns required.' }),
   'PROVISION_INDEX_FIELD_NOT_FOUND': defineError({ code: 'PROVISION_INDEX_FIELD_NOT_FOUND', class: 'internal', http: 500, message: 'Provision index field not found.' }),
   'PROVISION_INVALID_DATABASE_ID': defineError({ code: 'PROVISION_INVALID_DATABASE_ID', class: 'internal', http: 500, message: 'Provision invalid database id.' }),
+  'PROVISION_PRIVATE_API_NAME_FORBIDDEN': defineError({ code: 'PROVISION_PRIVATE_API_NAME_FORBIDDEN', class: 'public', http: 403, message: 'Provision private api name forbidden.' }),
   'PROVISION_RELATION': defineError({ code: 'PROVISION_RELATION', class: 'internal', http: 500, message: 'Provision relation.' }),
   'PROVISION_TABLE': defineError({ code: 'PROVISION_TABLE', class: 'internal', http: 500, message: 'Provision table.' }),
   'PROVISION_UNIQUE_CONSTRAINT': defineError({ code: 'PROVISION_UNIQUE_CONSTRAINT', class: 'internal', http: 500, message: 'Provision unique constraint.' }),
@@ -754,6 +757,8 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'SUBDOMAIN_LABEL_EXHAUSTED': defineError({ code: 'SUBDOMAIN_LABEL_EXHAUSTED', class: 'public', http: 400, message: 'Subdomain label exhausted.' }),
   'SUBDOMAIN_LABEL_INVALID': defineError({ code: 'SUBDOMAIN_LABEL_INVALID', class: 'public', http: 400, message: 'Subdomain label invalid.' }),
   'SUPER_CONSTRUCTIVE_REQUIRED': defineError({ code: 'SUPER_CONSTRUCTIVE_REQUIRED', class: 'public', http: 400, message: 'Super constructive required.' }),
+  'SUSPENSION_FORBIDDEN': defineError({ code: 'SUSPENSION_FORBIDDEN', class: 'public', http: 403, message: 'Suspension forbidden.' }),
+  'SUSPENSION_REASON_INVALID': defineError({ code: 'SUSPENSION_REASON_INVALID', class: 'public', http: 400, message: 'Suspension reason invalid.' }),
   'TABLE_MODULE': defineError({ code: 'TABLE_MODULE', class: 'internal', http: 500, message: 'Table module.' }),
   'TABLE_MODULE_TABLE_NOT_FOUND': defineError({ code: 'TABLE_MODULE_TABLE_NOT_FOUND', class: 'internal', http: 500, message: 'Table module table not found.' }),
   'TARGET_EMAILS_NOT_FOUND': defineError({ code: 'TARGET_EMAILS_NOT_FOUND', class: 'internal', http: 500, message: 'Target emails not found.' }),
@@ -776,6 +781,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'TRIGGER_NOT_TRANSPILABLE': defineError({ code: 'TRIGGER_NOT_TRANSPILABLE', class: 'public', http: 400, message: 'Trigger not transpilable.' }),
   'TRIGGER_WHEN_AST_INVALID': defineError({ code: 'TRIGGER_WHEN_AST_INVALID', class: 'public', http: 400, message: 'Trigger when ast invalid.' }),
   'TRIGGER_WHEN_AST_ROW_UNAVAILABLE': defineError({ code: 'TRIGGER_WHEN_AST_ROW_UNAVAILABLE', class: 'public', http: 400, message: 'Trigger when ast row unavailable.' }),
+  'TRUST_LADDER_OPTION_INVALID': defineError({ code: 'TRUST_LADDER_OPTION_INVALID', class: 'internal', http: 500, message: 'Trust ladder option invalid.' }),
   'UNAUTHENTICATED': defineError({ code: 'UNAUTHENTICATED', class: 'public', http: 401, message: 'Unauthenticated.' }),
   'UNKNOWN_POLICY_TYPE': defineError({ code: 'UNKNOWN_POLICY_TYPE', class: 'public', http: 400, message: 'Unknown policy type.' }),
   'UNKNOWN_VIEW_TYPE': defineError({ code: 'UNKNOWN_VIEW_TYPE', class: 'public', http: 400, message: 'Unknown view type.', positional: ['arg0'] }),
@@ -925,6 +931,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'CONTENT_PRESET_NOT_SAVED': { class: 'public', dynamic: false, generatedOnly: false },
   'COPY_TEMPLATE_TO_BLUEPRINT': { class: 'internal', dynamic: false, generatedOnly: false },
   'CREDENTIAL_NOT_EXCHANGEABLE': { class: 'public', dynamic: false, generatedOnly: true },
+  'CREDENTIAL_NOT_EXTENDABLE': { class: 'public', dynamic: false, generatedOnly: false },
   'CREDIT_CODE_EXPIRED': { class: 'internal', dynamic: false, generatedOnly: false },
   'CREDIT_CODE_MAX_REDEMPTIONS_REACHED': { class: 'internal', dynamic: false, generatedOnly: false },
   'CREDIT_CODE_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1325,6 +1332,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'MODULES_HASH_DUPLICATE_ENTRY': { class: 'internal', dynamic: false, generatedOnly: false },
   'MODULES_HASH_INVALID_ENTRY': { class: 'internal', dynamic: false, generatedOnly: false },
   'MODULES_HASH_INVALID_INPUT': { class: 'internal', dynamic: false, generatedOnly: false },
+  'MODULE_ENTRY_MALFORMED': { class: 'internal', dynamic: false, generatedOnly: false },
   'MODULE_SECURITY_POLICY_ENTRY_MISSING_TYPE': { class: 'public', dynamic: false, generatedOnly: false },
   'MODULE_TABLE_ALREADY_ATTRIBUTED': { class: 'internal', dynamic: false, generatedOnly: false },
   'MONOTONIC_FIELD': { class: 'internal', dynamic: false, generatedOnly: true },
@@ -1391,6 +1399,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'PROVISION_INDEX_COLUMNS_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
   'PROVISION_INDEX_FIELD_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'PROVISION_INVALID_DATABASE_ID': { class: 'internal', dynamic: false, generatedOnly: false },
+  'PROVISION_PRIVATE_API_NAME_FORBIDDEN': { class: 'public', dynamic: false, generatedOnly: false },
   'PROVISION_RELATION': { class: 'internal', dynamic: false, generatedOnly: false },
   'PROVISION_TABLE': { class: 'internal', dynamic: false, generatedOnly: false },
   'PROVISION_UNIQUE_CONSTRAINT': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1536,6 +1545,8 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'SUBDOMAIN_LABEL_EXHAUSTED': { class: 'public', dynamic: false, generatedOnly: false },
   'SUBDOMAIN_LABEL_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'SUPER_CONSTRUCTIVE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
+  'SUSPENSION_FORBIDDEN': { class: 'public', dynamic: false, generatedOnly: false },
+  'SUSPENSION_REASON_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'TABLE_MODULE': { class: 'internal', dynamic: false, generatedOnly: false },
   'TABLE_MODULE_TABLE_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'TARGET_EMAILS_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1558,6 +1569,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'TRIGGER_NOT_TRANSPILABLE': { class: 'public', dynamic: false, generatedOnly: false },
   'TRIGGER_WHEN_AST_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'TRIGGER_WHEN_AST_ROW_UNAVAILABLE': { class: 'public', dynamic: false, generatedOnly: false },
+  'TRUST_LADDER_OPTION_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
   'UNAUTHENTICATED': { class: 'public', dynamic: false, generatedOnly: false },
   'UNKNOWN_POLICY_TYPE': { class: 'public', dynamic: false, generatedOnly: false },
   'UNKNOWN_VIEW_TYPE': { class: 'public', dynamic: true, generatedOnly: false },
@@ -1587,4 +1599,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 778;
+export const GENERATED_CODE_COUNT = 784;
