@@ -50,6 +50,7 @@ export type {
   ConstructiveAPIToken,
   ConstructiveContext,
   DatabaseSettings,
+  DatabaseStanding,
   EventsConfig,
   IdentityProviderConfig,
   IdentityProvidersModule,
@@ -152,6 +153,8 @@ export {
   createDefaultRegistry,
   createLoaderRegistry,
   createModuleLoader,
+  DATABASE_STANDING_SQL,
+  DATABASE_STANDING_TTL_MS,
   databaseSettingsLoader,
   eventsLoader,
   identityProvidersLoader,
@@ -162,6 +165,7 @@ export {
   requireDatabaseId,
   requireIdentityProvider,
   rlsLoader,
+  standingLoader,
   webauthnLoader,
 } from './loaders';
 

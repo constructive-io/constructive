@@ -45,6 +45,7 @@ import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createRequestProtectionMiddleware } from './middleware/request-protection';
 import { getRoutingSchema } from './middleware/routing';
+import { createStandingMiddleware } from './middleware/standing';
 import { createPlatformRefusalRecorder, installRefusalRecorder } from './refusals/recorder';
 
 const log = new Logger('server');
@@ -173,6 +174,9 @@ class Server {
       loaders: createDefaultRegistry(),
       routingSchema: getRoutingSchema(effectiveOpts)
     }));
+    // A suspended (or unknown) database is refused before anything is spent on
+    // the request; billing and platform admins set that state, the loader reads it.
+    app.use(createStandingMiddleware());
     // Resolve the tenant's protection bounds before anything can spend budget
     // on the request (and before the GraphQL handler reads them for pgSettings).
     app.use(createRequestProtectionMiddleware());

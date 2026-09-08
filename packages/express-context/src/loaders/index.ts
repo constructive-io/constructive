@@ -10,6 +10,7 @@
  *   - corsOrigins     (routing-plane cors_settings)
  *   - databaseSettings(routing-plane database_settings)
  *   - requestProtection (routing-plane database_settings/api_settings bounds)
+ *   - standing        (metaschema_public.database suspended_at/suspended_reason, 5s TTL)
  *   - pubkeyChallengeSettings (routing-plane pubkey_settings)
  *   - webauthnSettings(routing-plane webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
@@ -59,6 +60,7 @@ export { llmLoader } from './llm';
 export { pubkeyLoader } from './pubkey';
 export { requestProtectionLoader } from './request-protection';
 export { rlsLoader } from './rls';
+export { DATABASE_STANDING_SQL, DATABASE_STANDING_TTL_MS, standingLoader } from './standing';
 export { webauthnLoader } from './webauthn';
 
 /**
@@ -78,6 +80,7 @@ import { pubkeyLoader } from './pubkey';
 import { createLoaderRegistry } from './registry';
 import { requestProtectionLoader } from './request-protection';
 import { rlsLoader } from './rls';
+import { standingLoader } from './standing';
 import { webauthnLoader } from './webauthn';
 
 export function createDefaultRegistry() {
@@ -96,5 +99,6 @@ export function createDefaultRegistry() {
   registry.register(computeLoader);
   registry.register(eventsLoader);
   registry.register(requestProtectionLoader);
+  registry.register(standingLoader);
   return registry;
 }

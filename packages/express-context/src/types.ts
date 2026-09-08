@@ -243,6 +243,18 @@ export interface LlmConfig {
   ragContextLimit: number | null;
 }
 
+/**
+ * Whether a database may be served right now, as read from
+ * `metaschema_public.database`. A database the plane does not know is not
+ * servable either (`exists: false`).
+ */
+export interface DatabaseStanding {
+  exists: boolean;
+  suspended: boolean;
+  suspendedAt: Date | null;
+  reason: string | null;
+}
+
 // ─── Module Types Map ───────────────────────────────────────────────────────
 
 /**
@@ -269,6 +281,7 @@ export interface BuiltinModuleMap {
   compute: ComputeConfig;
   events: EventsConfig;
   requestProtection: RequestProtection;
+  standing: DatabaseStanding;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────
