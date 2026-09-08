@@ -259,6 +259,24 @@ export const registry = {
     http: 403,
     message: 'You do not have permission to do that.'
   }),
+  ACCESS_SUSPENDED: defineError<{ reason?: string }>({
+    code: 'ACCESS_SUSPENDED',
+    class: 'public',
+    http: 403,
+    message: 'Access to this database is suspended.'
+  }),
+  SUSPENSION_FORBIDDEN: defineError<{ database_id?: string }>({
+    code: 'SUSPENSION_FORBIDDEN',
+    class: 'public',
+    http: 403,
+    message: 'Only the platform may change database suspension.'
+  }),
+  SUSPENSION_REASON_INVALID: defineError<{ reason?: string }>({
+    code: 'SUSPENSION_REASON_INVALID',
+    class: 'public',
+    http: 400,
+    message: 'Suspension reason must be "billing" or "admin".'
+  }),
   STEP_UP_REQUIRED: defineError({
     code: 'STEP_UP_REQUIRED',
     class: 'public',
