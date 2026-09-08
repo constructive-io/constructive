@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.30.0...@constructive-io/express-context@0.31.0) (2026-09-08)
+
+### Bug Fixes
+
+- **express-context:** isolate bounded loader caches ([ca37b7c](https://github.com/constructive-io/constructive/commit/ca37b7c0f389bfb0ed837e479f87f16d48ef74b7))
+- **express-context:** preserve invalidation and absence semantics ([8950eaf](https://github.com/constructive-io/constructive/commit/8950eaf6824fa129801391345f5c98b497373669))
+- **express-context:** retain logical loader cache keys ([724b440](https://github.com/constructive-io/constructive/commit/724b4400183a0ef7debf17615be874ad3aea60ab))
+
+### Features
+
+- **graphql:** refuse requests to suspended databases via a standing loader ([ecb3659](https://github.com/constructive-io/constructive/commit/ecb3659a04c52c38e82cb28c1bd955ea8e43d071))
+
 # [0.30.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.29.0...@constructive-io/express-context@0.30.0) (2026-09-06)
 
 ### Features

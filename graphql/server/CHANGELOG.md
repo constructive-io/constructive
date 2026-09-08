@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.24.0...@constructive-io/graphql-server@5.25.0) (2026-09-08)
+
+### Features
+
+- **graphql:** refuse requests to suspended databases via a standing loader ([ecb3659](https://github.com/constructive-io/constructive/commit/ecb3659a04c52c38e82cb28c1bd955ea8e43d071))
+
 # [5.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.23.0...@constructive-io/graphql-server@5.24.0) (2026-09-06)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.13.0...@constructive-io/errors@0.14.0) (2026-09-08)
+
+### Features
+
+- **errors:** register database suspension codes (ACCESS_SUSPENDED, SUSPENSION_*) ([fe752ed](https://github.com/constructive-io/constructive/commit/fe752edef90dc260ef90dc9cfbeb5b0d5b4c831f))
+
 # [0.13.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.12.0...@constructive-io/errors@0.13.0) (2026-09-04)
 
 ### Features
