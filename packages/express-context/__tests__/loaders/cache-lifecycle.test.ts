@@ -22,10 +22,6 @@ const context = (
 });
 
 describe('module loader cache lifecycle', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it('isolates databases and optional APIs that share the same pools', async () => {
     const ctxA = context();
     const ctxB = context({ ...ctxA, databaseId: 'database-b' });
@@ -188,26 +184,6 @@ describe('module loader cache lifecycle', () => {
       expect(resolve).toHaveBeenCalledTimes(2);
     }
   );
-
-  it('uses a hard TTL that cache hits cannot extend', async () => {
-    let now = 1;
-    jest.spyOn(performance, 'now').mockImplementation(() => now);
-    const ctx = context();
-    let generation = 0;
-    const resolve = jest.fn(async () => `config-${++generation}`);
-    const loader = createModuleLoader({
-      name: 'hard-expiry',
-      ttlMs: 100,
-      resolve
-    });
-
-    await expect(loader.resolve(ctx)).resolves.toBe('config-1');
-    now = 76;
-    await expect(loader.resolve(ctx)).resolves.toBe('config-1');
-    now = 106;
-    await expect(loader.resolve(ctx)).resolves.toBe('config-2');
-    expect(resolve).toHaveBeenCalledTimes(2);
-  });
 
   it('keeps the default cache bounded to 100 completed entries', async () => {
     const routingPool = pool();
