@@ -61,4 +61,20 @@ describe('Graphile introspection mode wiring', () => {
       },
     });
   });
+  it.each(['stock', 'scoped-required'] as const)(
+    'preserves the configured introspection role in %s mode',
+    async (introspectionMode) => {
+      const wiring = await makeIntrospectionWiring(
+        pool,
+        ['tenant_a'],
+        { introspectionMode },
+        async () => ({}),
+        'tenant_introspector'
+      );
+      expect(wiring.pgService.pgSettingsForIntrospection).toMatchObject({
+        role: 'tenant_introspector',
+      });
+    }
+  );
+
 });
