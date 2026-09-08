@@ -525,24 +525,17 @@ export interface ProvisionBucketInput {
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
 }
 export type ProvisionBucketPayloadSelect = {
-  accessType?: boolean;
-  bucketName?: boolean;
-  endpoint?: boolean;
-  error?: boolean;
-  provider?: boolean;
-  success?: boolean;
+  bucketId?: boolean;
+  bucketKey?: boolean;
+  jobId?: boolean;
+  physicalName?: boolean;
 };

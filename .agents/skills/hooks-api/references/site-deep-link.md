@@ -7,8 +7,8 @@ Named, retargetable deep links owned by a site surface (served at the deep-link 
 ## Usage
 
 ```typescript
-useSiteDeepLinksQuery({ selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } } })
-useSiteDeepLinkQuery({ id: '<UUID>', selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } } })
+useSiteDeepLinksQuery({ selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } } })
+useSiteDeepLinkQuery({ id: '<UUID>', selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } } })
 useCreateSiteDeepLinkMutation({ selection: { fields: { id: true } } })
 useUpdateSiteDeepLinkMutation({ selection: { fields: { id: true } } })
 useDeleteSiteDeepLinkMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteDeepLinkMutation({})
 
 ```typescript
 const { data, isLoading } = useSiteDeepLinksQuery({
-  selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
+  selection: { fields: { appPath: true, createdAt: true, databaseId: true, fallbackUrl: true, id: true, metadata: true, pageId: true, siteId: true, slug: true, updatedAt: true, webPath: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSiteDeepLinksQuery({
 const { mutate } = useCreateSiteDeepLinkMutation({
   selection: { fields: { id: true } },
 });
-mutate({ appPath: '<String>', databaseId: '<UUID>', fallbackUrl: '<String>', metadata: '<JSON>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
+mutate({ appPath: '<String>', databaseId: '<UUID>', fallbackUrl: '<String>', metadata: '<JSON>', pageId: '<UUID>', siteId: '<UUID>', slug: '<String>', webPath: '<String>' });
 ```

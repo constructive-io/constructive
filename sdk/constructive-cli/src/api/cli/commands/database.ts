@@ -23,6 +23,8 @@ const fieldSchema: FieldSchema = {
   name: 'string',
   ownerId: 'uuid',
   platform: 'boolean',
+  suspendedAt: 'string',
+  suspendedReason: 'string',
   updatedAt: 'string',
 };
 const usage =

@@ -16,12 +16,17 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  apiKeyMaxDuration: 'string',
   bypassStepUp: 'boolean',
   createdAt: 'string',
+  createdBySessionId: 'uuid',
+  depth: 'int',
+  expiresAt: 'string',
   id: 'uuid',
   isReadOnly: 'boolean',
   name: 'string',
   ownerId: 'uuid',
+  parentPrincipalId: 'uuid',
   updatedAt: 'string',
   useAdminOwner: 'boolean',
   userId: 'uuid',
@@ -71,12 +76,17 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      apiKeyMaxDuration: true,
       bypassStepUp: true,
       createdAt: true,
+      createdBySessionId: true,
+      depth: true,
+      expiresAt: true,
       id: true,
       isReadOnly: true,
       name: true,
       ownerId: true,
+      parentPrincipalId: true,
       updatedAt: true,
       useAdminOwner: true,
       userId: true,
@@ -100,12 +110,17 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      apiKeyMaxDuration: true,
       bypassStepUp: true,
       createdAt: true,
+      createdBySessionId: true,
+      depth: true,
+      expiresAt: true,
       id: true,
       isReadOnly: true,
       name: true,
       ownerId: true,
+      parentPrincipalId: true,
       updatedAt: true,
       useAdminOwner: true,
       userId: true,
@@ -130,9 +145,33 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
+        type: 'text',
+        name: 'apiKeyMaxDuration',
+        message: 'apiKeyMaxDuration',
+        required: true,
+      },
+      {
         type: 'boolean',
         name: 'bypassStepUp',
         message: 'bypassStepUp',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'createdBySessionId',
+        message: 'createdBySessionId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'depth',
+        message: 'depth',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'expiresAt',
+        message: 'expiresAt',
         required: true,
       },
       {
@@ -154,6 +193,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
+        type: 'text',
+        name: 'parentPrincipalId',
+        message: 'parentPrincipalId',
+        required: true,
+      },
+      {
         type: 'boolean',
         name: 'useAdminOwner',
         message: 'useAdminOwner',
@@ -172,20 +217,30 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.principal
       .create({
         data: {
+          apiKeyMaxDuration: cleanedData.apiKeyMaxDuration,
           bypassStepUp: cleanedData.bypassStepUp,
+          createdBySessionId: cleanedData.createdBySessionId,
+          depth: cleanedData.depth,
+          expiresAt: cleanedData.expiresAt,
           isReadOnly: cleanedData.isReadOnly,
           name: cleanedData.name,
           ownerId: cleanedData.ownerId,
+          parentPrincipalId: cleanedData.parentPrincipalId,
           useAdminOwner: cleanedData.useAdminOwner,
           userId: cleanedData.userId,
         },
         select: {
+          apiKeyMaxDuration: true,
           bypassStepUp: true,
           createdAt: true,
+          createdBySessionId: true,
+          depth: true,
+          expiresAt: true,
           id: true,
           isReadOnly: true,
           name: true,
           ownerId: true,
+          parentPrincipalId: true,
           updatedAt: true,
           useAdminOwner: true,
           userId: true,

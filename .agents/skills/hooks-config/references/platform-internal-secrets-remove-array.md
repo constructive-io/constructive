@@ -7,7 +7,7 @@ React Query mutation hook for platformInternalSecretsRemoveArray
 ## Usage
 
 ```typescript
-const { mutate } = usePlatformInternalSecretsRemoveArrayMutation(); mutate({ input: { namespaceId: '<UUID>', realm: '<String>', secretNames: '<String>' } });
+const { mutate } = usePlatformInternalSecretsRemoveArrayMutation(); mutate({ input: { realm: '<String>', secretNames: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = usePlatformInternalSecretsRemoveArrayMutation(); mutate({ inp
 
 ```typescript
 const { mutate, isLoading } = usePlatformInternalSecretsRemoveArrayMutation();
-mutate({ input: { namespaceId: '<UUID>', realm: '<String>', secretNames: '<String>' } });
+mutate({ input: { realm: '<String>', secretNames: '<String>' } });
 ```

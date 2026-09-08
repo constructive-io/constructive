@@ -7,8 +7,8 @@ React Query hooks for Derive data operations
 ## Usage
 
 ```typescript
-useDerivesQuery({ selection: { fields: { createdAt: true, databaseId: true, id: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } } })
-useDeriveQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, id: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } } })
+useDerivesQuery({ selection: { fields: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } } })
+useDeriveQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } } })
 useCreateDeriveMutation({ selection: { fields: { id: true } } })
 useUpdateDeriveMutation({ selection: { fields: { id: true } } })
 useDeleteDeriveMutation({})
@@ -20,7 +20,7 @@ useDeleteDeriveMutation({})
 
 ```typescript
 const { data, isLoading } = useDerivesQuery({
-  selection: { fields: { createdAt: true, databaseId: true, id: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDerivesQuery({
 const { mutate } = useCreateDeriveMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' });
+mutate({ databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' });
 ```

@@ -100,6 +100,115 @@ export const agentThreadKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...agentThreadKeys.details(), id] as const,
 } as const;
+export const platformAgentKeys = {
+  /** All platformAgent queries */ all: ['platformagent'] as const,
+  /** List query keys */ lists: () => [...platformAgentKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentKeys.details(), id] as const,
+} as const;
+export const platformAgentEventKeys = {
+  /** All platformAgentEvent queries */ all: ['platformagentevent'] as const,
+  /** List query keys */ lists: () => [...platformAgentEventKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentEventKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentEventKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentEventKeys.details(), id] as const,
+} as const;
+export const platformAgentMessageKeys = {
+  /** All platformAgentMessage queries */ all: ['platformagentmessage'] as const,
+  /** List query keys */ lists: () => [...platformAgentMessageKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentMessageKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentMessageKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentMessageKeys.details(), id] as const,
+} as const;
+export const platformAgentPersonaKeys = {
+  /** All platformAgentPersona queries */ all: ['platformagentpersona'] as const,
+  /** List query keys */ lists: () => [...platformAgentPersonaKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentPersonaKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentPersonaKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentPersonaKeys.details(), id] as const,
+} as const;
+export const platformAgentPlanKeys = {
+  /** All platformAgentPlan queries */ all: ['platformagentplan'] as const,
+  /** List query keys */ lists: () => [...platformAgentPlanKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentPlanKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentPlanKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentPlanKeys.details(), id] as const,
+} as const;
+export const platformAgentPromptKeys = {
+  /** All platformAgentPrompt queries */ all: ['platformagentprompt'] as const,
+  /** List query keys */ lists: () => [...platformAgentPromptKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentPromptKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentPromptKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentPromptKeys.details(), id] as const,
+} as const;
+export const platformAgentResourceChunkKeys = {
+  /** All platformAgentResourceChunk queries */ all: ['platformagentresourcechunk'] as const,
+  /** List query keys */ lists: () => [...platformAgentResourceChunkKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentResourceChunkKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformAgentResourceChunkKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentResourceChunkKeys.details(), id] as const,
+} as const;
+export const platformAgentResourceKeys = {
+  /** All platformAgentResource queries */ all: ['platformagentresource'] as const,
+  /** List query keys */ lists: () => [...platformAgentResourceKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentResourceKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentResourceKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentResourceKeys.details(), id] as const,
+} as const;
+export const platformAgentRunKeys = {
+  /** All platformAgentRun queries */ all: ['platformagentrun'] as const,
+  /** List query keys */ lists: () => [...platformAgentRunKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentRunKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentRunKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentRunKeys.details(), id] as const,
+} as const;
+export const platformAgentRunWorkspaceKeys = {
+  /** All platformAgentRunWorkspace queries */ all: ['platformagentrunworkspace'] as const,
+  /** List query keys */ lists: () => [...platformAgentRunWorkspaceKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentRunWorkspaceKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentRunWorkspaceKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentRunWorkspaceKeys.details(), id] as const,
+} as const;
+export const platformAgentTaskKeys = {
+  /** All platformAgentTask queries */ all: ['platformagenttask'] as const,
+  /** List query keys */ lists: () => [...platformAgentTaskKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentTaskKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentTaskKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentTaskKeys.details(), id] as const,
+} as const;
+export const platformAgentThreadKeys = {
+  /** All platformAgentThread queries */ all: ['platformagentthread'] as const,
+  /** List query keys */ lists: () => [...platformAgentThreadKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformAgentThreadKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformAgentThreadKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformAgentThreadKeys.details(), id] as const,
+} as const;
 /**
 
 // ============================================================================
@@ -132,6 +241,18 @@ export const queryKeys = {
   agentResource: agentResourceKeys,
   agentTask: agentTaskKeys,
   agentThread: agentThreadKeys,
+  platformAgent: platformAgentKeys,
+  platformAgentEvent: platformAgentEventKeys,
+  platformAgentMessage: platformAgentMessageKeys,
+  platformAgentPersona: platformAgentPersonaKeys,
+  platformAgentPlan: platformAgentPlanKeys,
+  platformAgentPrompt: platformAgentPromptKeys,
+  platformAgentResourceChunk: platformAgentResourceChunkKeys,
+  platformAgentResource: platformAgentResourceKeys,
+  platformAgentRun: platformAgentRunKeys,
+  platformAgentRunWorkspace: platformAgentRunWorkspaceKeys,
+  platformAgentTask: platformAgentTaskKeys,
+  platformAgentThread: platformAgentThreadKeys,
 } as const;
 /** Type representing all available query key scopes */
 export type QueryKeyScope = keyof typeof queryKeys;

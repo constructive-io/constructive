@@ -7,8 +7,8 @@ Fully-qualified hostnames owned by this scope; each row claims its hostname glob
 ## Usage
 
 ```typescript
-usePlatformDomainsQuery({ selection: { fields: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } } })
-usePlatformDomainQuery({ id: '<UUID>', selection: { fields: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } } })
+usePlatformDomainsQuery({ selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } } })
+usePlatformDomainQuery({ id: '<UUID>', selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } } })
 useCreatePlatformDomainMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformDomainMutation({ selection: { fields: { id: true } } })
 useDeletePlatformDomainMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformDomainMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformDomainsQuery({
-  selection: { fields: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformDomainsQuery({
 const { mutate } = useCreatePlatformDomainMutation({
   selection: { fields: { id: true } },
 });
-mutate({ config: '<JSON>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+mutate({ config: '<JSON>', createdByPrincipal: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', updatedByPrincipal: '<UUID>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
