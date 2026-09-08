@@ -81,14 +81,22 @@ export function composeRun(options: ComposeRunOptions): ComposedRun {
     extensions.push(lanes.log.extension);
   }
 
+  // The run id rides on the metering identity so the gateway can book every
+  // model call against this run (`X-Run-Id`); a host may still pin it explicitly.
   const metering = options.metering;
   if (metering?.mode === 'gateway') {
-    const { mode: _mode, ...meteredOptions } = metering;
-    lanes.meteredModel = createMeteredModelExtension(meteredOptions);
+    const { mode: _mode, identity, ...meteredOptions } = metering;
+    lanes.meteredModel = createMeteredModelExtension({
+      ...meteredOptions,
+      identity: { runId: options.runId, ...identity }
+    });
     extensions.push(lanes.meteredModel.extension);
   } else if (metering?.mode === 'self-report') {
-    const { mode: _mode, ...reportOptions } = metering;
-    lanes.usageReport = createUsageReportExtension(reportOptions);
+    const { mode: _mode, identity, ...reportOptions } = metering;
+    lanes.usageReport = createUsageReportExtension({
+      ...reportOptions,
+      identity: { runId: options.runId, ...identity }
+    });
     extensions.push(lanes.usageReport.extension);
   }
 

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.21.11...@agentic-kit/pi@0.22.0) (2026-09-07)
+
+### Features
+
+- **metering:** send task linkage from the metering client — X-Invocation-Id/X-Job-Id/X-Attempt on MeteredIdentity, X-Run-Id threaded from composeRun ([d8e4ca6](https://github.com/constructive-io/constructive/commit/d8e4ca606f474b65d865f4a35f9d6c8bc6e51d92))
+
 ## [0.21.11](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.21.10...@agentic-kit/pi@0.21.11) (2026-09-06)
 
 **Note:** Version bump only for package @agentic-kit/pi

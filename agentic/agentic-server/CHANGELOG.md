@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.26.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.25.2...agentic-server@0.26.0) (2026-09-07)
+
+### Features
+
+- **agentic-server:** carry invocation/job/attempt/run linkage into InferenceEntry; strip correlation headers on public servers ([ae65bd8](https://github.com/constructive-io/constructive/commit/ae65bd879e1df3f94c00b84e4d2778bebc03c889))
+
 ## [0.25.2](https://github.com/constructive-io/constructive/compare/agentic-server@0.25.1...agentic-server@0.25.2) (2026-09-01)
 
 **Note:** Version bump only for package agentic-server

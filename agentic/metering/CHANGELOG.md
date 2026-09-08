@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/metering@0.3.1...@agentic-kit/metering@0.4.0) (2026-09-07)
+
+### Features
+
+- **metering:** send task linkage from the metering client — X-Invocation-Id/X-Job-Id/X-Attempt on MeteredIdentity, X-Run-Id threaded from composeRun ([d8e4ca6](https://github.com/constructive-io/constructive/commit/d8e4ca606f474b65d865f4a35f9d6c8bc6e51d92))
+
 ## [0.3.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/metering@0.3.0...@agentic-kit/metering@0.3.1) (2026-08-19)
 
 ### Bug Fixes

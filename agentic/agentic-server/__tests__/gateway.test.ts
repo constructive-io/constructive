@@ -142,6 +142,56 @@ describe('POST /v1/chat/completions', () => {
     });
   });
 
+  it('forwards task-correlation headers into the sink entry so tokens join to the task', async () => {
+    await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Database-Id': 'db-link-1',
+        'X-Entity-Id': 'entity-link-1',
+        'X-Actor-Id': 'actor-link-1',
+        'X-Invocation-Id': '0190a5f0-0000-7000-8000-000000000001',
+        'X-Job-Id': '4242',
+        'X-Attempt': '2',
+        'X-Run-Id': '0190a5f0-0000-7000-8000-000000000002'
+      },
+      body: JSON.stringify({ model: 'llama3', messages: [{ role: 'user', content: 'linked' }] })
+    });
+
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(sinkEntries).toHaveLength(1);
+    expect(sinkEntries[0]).toMatchObject({
+      databaseId: 'db-link-1',
+      entityId: 'entity-link-1',
+      actorId: 'actor-link-1',
+      invocationId: '0190a5f0-0000-7000-8000-000000000001',
+      jobId: '4242',
+      attempt: 2,
+      runId: '0190a5f0-0000-7000-8000-000000000002'
+    });
+  });
+
+  it('leaves linkage undefined when no correlation headers arrive and drops a malformed X-Attempt', async () => {
+    await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Database-Id': 'db-unlinked-1',
+        'X-Attempt': 'two'
+      },
+      body: JSON.stringify({ model: 'llama3', messages: [{ role: 'user', content: 'unlinked' }] })
+    });
+
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(sinkEntries).toHaveLength(1);
+    expect(sinkEntries[0].invocationId).toBeUndefined();
+    expect(sinkEntries[0].jobId).toBeUndefined();
+    expect(sinkEntries[0].attempt).toBeUndefined();
+    expect(sinkEntries[0].runId).toBeUndefined();
+  });
+
   it('flattens content parts into the single string ollama accepts', async () => {
     // pi and every other harness send `content` as parts; ollama's chat api takes
     // only a string, so the gateway is where the dialects meet.
@@ -270,6 +320,26 @@ describe('header security (isPublic)', () => {
 
     expect(res.status).toBe(400);
     expect(llmRequests).toHaveLength(0);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(publicSinkEntries).toHaveLength(0);
+  });
+
+  it('strips task-correlation headers too, so an external client cannot pin usage onto a task', async () => {
+    publicSinkEntries.length = 0;
+    const res = await fetch(`http://localhost:${publicPort}/v1/usage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Database-Id': 'SHOULD-BE-STRIPPED',
+        'X-Invocation-Id': 'SHOULD-BE-STRIPPED',
+        'X-Job-Id': '1',
+        'X-Attempt': '1',
+        'X-Run-Id': 'SHOULD-BE-STRIPPED'
+      },
+      body: JSON.stringify({ model: 'm', total_tokens: 1 })
+    });
+
+    expect(res.status).toBe(400);
     await new Promise((r) => setTimeout(r, 50));
     expect(publicSinkEntries).toHaveLength(0);
   });
