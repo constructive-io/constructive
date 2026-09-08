@@ -193,6 +193,15 @@ describe('introspection', () => {
     expect(enforce(source, { maxQueryDepth: 3 })).toEqual({ depth: 1, cost: 0 });
   });
 
+  it('still bounds a recursive introspection document by its own fixed ceiling', () => {
+    const nest = (n: number): string =>
+      n === 0 ? 'name' : `fields { type { ${nest(n - 1)} } }`;
+    // each `fields { type { … } }` hop is two levels; 9 hops is 18 > INTROSPECTION_MAX_DEPTH
+    const source = `{ __schema { types { ${nest(9)} } } }`;
+    expect(codeOf(() => enforce(source, { maxQueryDepth: 50 }))).toBe('QUERY_TOO_DEEP');
+    expect(() => enforce(`{ __schema { types { ${nest(6)} } } }`, { maxQueryDepth: 3 })).not.toThrow();
+  });
+
   it('still measures the rest of an operation that also introspects', () => {
     expect(
       codeOf(() =>

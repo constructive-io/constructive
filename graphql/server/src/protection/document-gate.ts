@@ -17,12 +17,15 @@
  * have to be followed (a document can hide its depth entirely inside
  * fragments) and the visitor does not follow them.
  *
- * Schema introspection (`__schema` / `__type`) is governed only by
- * `enableIntrospection`. Its selections are not walked: the introspection types
- * carry no connections, so there is nothing to cost, and the standard
- * introspection document nests a fixed `ofType` chain deeper than a sensible
- * tenant depth budget, so charging depth would make the budget decide whether
- * clients can introspect at all — a decision the dedicated switch already owns.
+ * Schema introspection (`__schema` / `__type`) is switched by
+ * `enableIntrospection` and bounded by its own fixed depth ceiling rather than
+ * the tenant's `maxQueryDepth`. The standard introspection document nests a
+ * fixed `ofType` chain deeper than a sensible tenant depth budget, so charging
+ * it against that budget would let the budget decide whether clients can
+ * introspect at all. It still needs a bound of its own, though: the
+ * introspection schema is recursive (`__Type.fields → __Field.type → __Type`),
+ * so an unbounded walk would let a client nest it arbitrarily. Introspection
+ * types carry no connections, so cost is naturally zero.
  */
 
 import type { ConstructiveError } from '@constructive-io/errors';
@@ -55,6 +58,15 @@ const reject = (error: ConstructiveError): never => {
   });
 };
 
+/**
+ * Depth allowed inside a `__schema` / `__type` subtree, counted from the
+ * introspection field itself. graphql-js's `getIntrospectionQuery` with every
+ * option enabled reaches 13 (`types → fields → args → type → ofType×9`), so
+ * this leaves headroom for tooling without permitting the recursive
+ * `fields { type { fields { type … } } }` shape to run away.
+ */
+export const INTROSPECTION_MAX_DEPTH = 16;
+
 /** Arguments a connection field uses to size its page. */
 const PAGE_SIZE_ARGS = ['first', 'last'] as const;
 
@@ -72,6 +84,15 @@ interface Walk {
   maxDepth: number;
   cost: number;
 }
+
+/**
+ * Which bound the current subtree is measured against: the tenant's budget for
+ * data selections, or the fixed ceiling for the introspection subtree (with the
+ * depth at which that subtree began, so the ceiling is relative to it).
+ */
+type DepthBound =
+  | { kind: 'query' }
+  | { kind: 'introspection'; base: number };
 
 /**
  * Resolve a `first`/`last` argument to a number, whether it arrived as a
@@ -107,26 +128,33 @@ const requestedPageSize = (
  *   the walk only stops charging cost rather than raising its own error)
  * @param depth - nesting level of these selections
  * @param multiplier - rows the enclosing connections can return
+ * @param bound - which depth limit applies to these selections
  */
 function walkSelectionSet(
   walk: Walk,
   selectionSet: SelectionSetNode,
   parentType: GraphQLNamedType | null,
   depth: number,
-  multiplier: number
+  multiplier: number,
+  bound: DepthBound
 ): void {
-  if (depth > walk.maxDepth) walk.maxDepth = depth;
-  if (depth > walk.protection.maxQueryDepth) {
-    reject(errors.QUERY_TOO_DEEP({ depth, limit: walk.protection.maxQueryDepth }));
+  if (bound.kind === 'query') {
+    if (depth > walk.maxDepth) walk.maxDepth = depth;
+    if (depth > walk.protection.maxQueryDepth) {
+      reject(errors.QUERY_TOO_DEEP({ depth, limit: walk.protection.maxQueryDepth }));
+    }
+  } else if (depth - bound.base > INTROSPECTION_MAX_DEPTH) {
+    reject(errors.QUERY_TOO_DEEP({ depth: depth - bound.base, limit: INTROSPECTION_MAX_DEPTH }));
   }
 
   for (const selection of selectionSet.selections) {
     if (selection.kind === Kind.FIELD) {
+      let childBound = bound;
       if (selection.name.value === '__schema' || selection.name.value === '__type') {
         if (!walk.protection.enableIntrospection) {
           reject(errors.INTROSPECTION_DISABLED());
         }
-        continue;
+        if (bound.kind === 'query') childBound = { kind: 'introspection', base: depth };
       }
 
       const field =
@@ -162,7 +190,7 @@ function walkSelectionSet(
       }
 
       if (selection.selectionSet) {
-        walkSelectionSet(walk, selection.selectionSet, fieldType, depth + 1, childMultiplier);
+        walkSelectionSet(walk, selection.selectionSet, fieldType, depth + 1, childMultiplier, childBound);
       }
       continue;
     }
@@ -172,7 +200,7 @@ function walkSelectionSet(
         ? (typeFromAST(walk.schema, selection.typeCondition) as GraphQLNamedType | undefined)
         : parentType;
       // An inline fragment is not a level of nesting of its own.
-      walkSelectionSet(walk, selection.selectionSet, onType ?? null, depth, multiplier);
+      walkSelectionSet(walk, selection.selectionSet, onType ?? null, depth, multiplier, bound);
       continue;
     }
 
@@ -190,7 +218,7 @@ function walkSelectionSet(
         | undefined;
       walk.activeFragments.add(name);
       try {
-        walkSelectionSet(walk, fragment.selectionSet, onType ?? null, depth, multiplier);
+        walkSelectionSet(walk, fragment.selectionSet, onType ?? null, depth, multiplier, bound);
       } finally {
         walk.activeFragments.delete(name);
       }
@@ -247,7 +275,7 @@ export function enforceDocumentProtection(
     cost: 0
   };
 
-  walkSelectionSet(walk, operation.selectionSet, rootType ?? null, 1, 1);
+  walkSelectionSet(walk, operation.selectionSet, rootType ?? null, 1, 1, { kind: 'query' });
 
   return { depth: walk.maxDepth, cost: walk.cost };
 }
