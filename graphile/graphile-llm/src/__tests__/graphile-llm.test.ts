@@ -188,6 +188,8 @@ describe('graphile-llm schema enrichment', () => {
       },
       token: { user_id: 'llm-rag-test-user' },
       requestId: 'llm-rag-test-request',
+      // The fixture installs pgvector in public; request search_path is explicit.
+      dependencySchemas: ['public'],
     });
     query = <TResult = unknown>(
       document: string,
@@ -743,6 +745,8 @@ describe('RAG plugin schema enrichment', () => {
       },
       token: { user_id: 'llm-rag-test-user' },
       requestId: 'llm-rag-test-request',
+      // The fixture installs pgvector in public; request search_path is explicit.
+      dependencySchemas: ['public'],
     });
     query = <TResult = unknown>(
       document: string,

@@ -269,7 +269,6 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
   // Provide a custom withPgClient function that uses the test client
   // This ensures GraphQL operations run within the test transaction
   // instead of getting a new connection from the pool
-  const isInTransaction = !input.useRoot;
   const withPgClientKey = pgService.withPgClientKey ?? 'withPgClient';
   contextValue[withPgClientKey] = async <T>(
     requestedPgSettings: Record<string, string> | null,

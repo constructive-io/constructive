@@ -1,4 +1,4 @@
-import { buildPgSettings } from '@constructive-io/express-context';
+import { buildPgSettings, DEFAULT_REQUEST_PROTECTION } from '@constructive-io/express-context';
 import type { Request } from 'express';
 
 import { getGraphileRequestPgSettings } from '../graphile-request-context';
@@ -69,7 +69,8 @@ describe('Graphile canonical request context', () => {
     expect(getGraphileRequestPgSettings(req)).toBe(pgSettings);
     expect(pgSettings.role).toBe('anonymous_runtime');
     expect(pgSettings['jwt.claims.user_id']).toBe('');
-    expect(pgSettings['jwt.claims.entity_id']).toBe('');
+    expect(pgSettings['jwt.claims.entity_id']).toBe('database-1');
+    expect(pgSettings['jwt.claims.entity_type']).toBe('database');
     expect(pgSettings['jwt.claims.organization_id']).toBe('');
   });
 
@@ -119,4 +120,15 @@ describe('Graphile canonical request context', () => {
       /req\.constructive\.pgSettings/
     );
   });
+  it('applies per-request protection to the canonical object at execution time', () => {
+    const pgSettings = buildPgSettings({ api: baseApi, token: null, requestId: 'protected' });
+    const requestProtection = { ...DEFAULT_REQUEST_PROTECTION, statementTimeoutMs: 1234 };
+    const req = makeRequest({ constructive: { pgSettings }, requestProtection });
+    expect(getGraphileRequestPgSettings(req)).toBe(pgSettings);
+    expect(pgSettings.statement_timeout).toBe('1234');
+    expect(pgSettings.lock_timeout).toBe(String(DEFAULT_REQUEST_PROTECTION.lockTimeoutMs));
+    expect(pgSettings['jwt.claims.entity_id']).toBe('database-1');
+    expect(pgSettings['jwt.claims.entity_type']).toBe('database');
+  });
+
 });

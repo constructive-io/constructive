@@ -4,6 +4,8 @@ import type {
   RequestProtection,
 } from '@constructive-io/express-context';
 
+export type { ConstructiveAPIToken } from '@constructive-io/express-context';
+
 declare global {
   namespace Express {
     interface Request {

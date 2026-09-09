@@ -74,7 +74,6 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
 const buildPreset = (
   pool: import('pg').Pool,
   schemas: string[],
-  roleName: string,
   introspectionRole: string | undefined,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
@@ -228,7 +227,6 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const preset = buildPreset(
         pool,
         schema || [],
-        roleName,
         opts.api?.introspectionRole,
         api.databaseSettings,
         api.apiId,

@@ -1,5 +1,7 @@
 import {
   assertCompletePgSettings,
+  DEFAULT_REQUEST_PROTECTION,
+  protectionPgSettings,
   type PgSettings,
 } from '@constructive-io/express-context';
 import type { Request } from 'express';
@@ -15,5 +17,8 @@ export function getGraphileRequestPgSettings(
 ): PgSettings {
   const canonical = req?.constructive?.pgSettings;
   assertCompletePgSettings(canonical, 'req.constructive.pgSettings');
+  // Protection is resolved after express-context, so apply its current bounds
+  // at execution time while retaining the single canonical request object.
+  Object.assign(canonical, protectionPgSettings(req?.requestProtection ?? DEFAULT_REQUEST_PROTECTION));
   return canonical;
 }
