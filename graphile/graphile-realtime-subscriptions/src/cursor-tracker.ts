@@ -99,6 +99,7 @@ export class CursorTracker {
 
   private async startInternal(generation: number): Promise<void> {
     log.info(`Starting cursor tracker: node=${this.nodeId}, schema=${this.schema}`);
+    let registeredDuringStart = false;
     try {
       // A manual operation may have started while the tracker was stopped.
       // Readiness must execute its own strict registration and drain rather
@@ -106,10 +107,19 @@ export class CursorTracker {
       await this.waitForActiveWork();
       this.assertStartCurrent(generation);
 
+      // A failed rollback or stop must be cleaned up before this node can
+      // register another generation. Keep the flag set if cleanup fails.
+      if (this.registered) {
+        await this.cleanupEphemeralInternal(true);
+        this.registered = false;
+        this.assertStartCurrent(generation);
+      }
+
       // Startup is a readiness boundary: the instance must not become resident
       // when the runtime role cannot register or drain the configured schema.
       await this.touchListenerInternal(true);
       this.registered = true;
+      registeredDuringStart = true;
       this.assertStartCurrent(generation);
 
       // A caller can request a manual drain while registration is in flight.
@@ -135,7 +145,7 @@ export class CursorTracker {
       this.clearTimers();
       const error = this.toError(reason);
       let cleanupError: Error | null = null;
-      if (this.registered) {
+      if (this.registered && registeredDuringStart) {
         try {
           await this.cleanupEphemeralInternal(true);
           this.registered = false;

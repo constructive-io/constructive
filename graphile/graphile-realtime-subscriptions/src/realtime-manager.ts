@@ -239,7 +239,6 @@ export class RealtimeManager {
   }
 
   stop(): Promise<void> {
-    if (this.state === 'stopped') return Promise.resolve();
     if (this.state === 'stopping') return this.stopPromise!;
 
     const startInFlight = this.startPromise;
@@ -247,6 +246,8 @@ export class RealtimeManager {
     this.state = 'stopping';
     this.dispatchEnabled = false;
     log.info(`Stopping RealtimeManager: node=${this.nodeId}`);
+    // Even a stopped manager may retain a registration after failed cleanup.
+    // The tracker owns that state and makes successful repeated stops a no-op.
     // Start the tracker shutdown synchronously so an in-flight drain is
     // invalidated before it can dispatch after this method is called.
     const trackerStop = this.cursorTracker.stop();

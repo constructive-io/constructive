@@ -610,6 +610,57 @@ describe('RealtimeManager', () => {
   });
 
   describe('error handling', () => {
+    it('retries cleanup after startup and rollback both fail', async () => {
+      const drainError = new Error('initial drain failed');
+      const cleanupError = new Error('rollback failed');
+      let failCleanup = true;
+      mockPool.query.mockImplementation(async (sql: string) => {
+        if (sql.includes('drain_changes')) throw drainError;
+        if (failCleanup && sql.includes('cleanup_ephemeral')) throw cleanupError;
+        return { rows: [] };
+      });
+      const manager = createManager({ onError: jest.fn() });
+
+      await expect(manager.start()).rejects.toMatchObject({
+        errors: [drainError, cleanupError]
+      });
+      expect(manager.isRunning).toBe(false);
+      await expect(manager.stop()).rejects.toBe(cleanupError);
+
+      failCleanup = false;
+      await manager.stop();
+      await manager.stop();
+      expect(mockPool.query.mock.calls.filter(([sql]) => sql.includes('cleanup_ephemeral')))
+        .toHaveLength(3);
+      expect(jest.getTimerCount()).toBe(0);
+    });
+
+    it('does not start a new generation until failed shutdown cleanup succeeds', async () => {
+      const cleanupError = new Error('cleanup failed');
+      let failCleanup = true;
+      const operations: string[] = [];
+      mockPool.query.mockImplementation(async (sql: string) => {
+        const operation = sql.includes('cleanup_ephemeral') ? 'cleanup'
+          : sql.includes('touch_listener') ? 'register' : 'drain';
+        operations.push(operation);
+        if (failCleanup && operation === 'cleanup') throw cleanupError;
+        return { rows: [] };
+      });
+      const manager = createManager({ onError: jest.fn() });
+      await manager.start();
+      await expect(manager.stop()).rejects.toBe(cleanupError);
+      await expect(manager.start()).rejects.toBe(cleanupError);
+      expect(operations).toEqual(['register', 'drain', 'cleanup', 'cleanup']);
+      expect(manager.isRunning).toBe(false);
+
+      failCleanup = false;
+      await manager.start();
+      expect(operations.slice(-3)).toEqual(['cleanup', 'register', 'drain']);
+      expect(manager.isRunning).toBe(true);
+      await manager.stop();
+      expect(jest.getTimerCount()).toBe(0);
+    });
+
     it('fails startup and rolls back readiness when the initial drain fails', async () => {
       const errors: Error[] = [];
 
