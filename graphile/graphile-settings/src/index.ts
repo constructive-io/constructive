@@ -37,6 +37,12 @@ import 'graphile-build';
 
 import { makePgService } from 'postgraphile/adaptors/pg';
 
+export {
+  applyGrafastCacheLimits,
+  createGrafastCacheLimitsPlugin,
+  createGrafastCacheLimitsPreset
+} from './grafast-cache-limits';
+
 // ============================================================================
 // Re-export all plugins and presets
 // ============================================================================
