@@ -10,6 +10,7 @@ export type { Bm25IndexInfo } from './bm25-codec';
 export {
   Bm25CodecPlugin,
   Bm25CodecPreset,
+  bm25IndexStore,
 } from './bm25-codec';
 export type { TsvectorCodecPluginOptions } from './tsvector-codec';
 export {

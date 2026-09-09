@@ -8,8 +8,8 @@
  * 1. Creates a codec for bm25query via gather.hooks.pgCodecs_findPgCodec
  * 2. Discovers all BM25 indexes via gather.hooks.pgIntrospection_introspection
  *    by querying pg_index + pg_am + pg_class + pg_attribute
- * 3. Stores discovered BM25 index info in a module-level Map for use by
- *    the BM25 adapter during the schema build phase
+ * 3. Attaches discovered BM25 index info to codec attributes belonging to
+ *    the current gather state
  */
 
 import 'graphile-build-pg';
@@ -31,6 +31,14 @@ export interface Bm25IndexInfo {
   /** Index name (e.g. 'docs_idx') — needed for to_bm25query() */
   indexName: string;
 }
+
+/**
+ * @deprecated Pass a store explicitly to createBm25Adapter when needed.
+ *
+ * This compatibility map is never populated by automatic discovery; gather
+ * state is bound to codec attributes instead.
+ */
+export const bm25IndexStore = new Map<string, Bm25IndexInfo>();
 
 declare global {
   namespace GraphileConfig {

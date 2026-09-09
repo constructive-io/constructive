@@ -106,6 +106,7 @@ export type {
 export {
   Bm25CodecPlugin,
   Bm25CodecPreset,
+  bm25IndexStore,
   createBm25Adapter,
   // Operator factories for connection filter integration
   createMatchesOperatorFactory,

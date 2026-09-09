@@ -40,8 +40,8 @@ export interface Bm25AdapterOptions {
   filterPrefix?: string;
 
   /**
-   * External BM25 index store. If not provided, the adapter will attempt
-   * to read from the build object's `pgBm25IndexStore`.
+   * Explicit BM25 index metadata for this adapter's owner. Automatic discovery
+   * uses only metadata attached to the current gather's codec attributes.
    */
   bm25IndexStore?: Map<string, Bm25IndexInfo>;
 }
@@ -51,23 +51,14 @@ export function createBm25Adapter(
 ): SearchAdapter {
   const { filterPrefix = 'bm25', bm25IndexStore } = options;
 
-  function getIndexStore(build: any): Map<string, Bm25IndexInfo> | undefined {
-    if (bm25IndexStore) return bm25IndexStore;
-    // Try build.pgBm25IndexStore (set by standalone Bm25SearchPlugin's build hook)
-    const buildStore = build.pgBm25IndexStore as Map<string, Bm25IndexInfo> | undefined;
-    if (buildStore && buildStore.size > 0) return buildStore;
-    return undefined;
-  }
-
   function getBm25IndexForAttribute(
     codec: any,
     attributeName: string,
-    build: any,
   ): Bm25IndexInfo | undefined {
     const bound = codec.attributes?.[attributeName]?.extensions?.bm25Index;
     if (bound) return bound as Bm25IndexInfo;
 
-    const store = getIndexStore(build);
+    const store = bm25IndexStore;
     if (!store) return undefined;
 
     const pg = codec?.extensions?.pg;
@@ -103,7 +94,7 @@ export function createBm25Adapter(
         codec.attributes as Record<string, any>
       )) {
         if (!isTextCodec(attribute.codec)) continue;
-        const bm25Index = getBm25IndexForAttribute(codec, attributeName, build);
+        const bm25Index = getBm25IndexForAttribute(codec, attributeName);
         if (!bm25Index) continue;
 
         // Check for chunk-aware BM25

@@ -1,7 +1,7 @@
 /**
  * config-cache — Per-database LLM billing configuration cache
  *
- * Caches resolved billing function names per database_id.
+ * Caches resolved billing function names per owner and database_id.
  * Uses an LRU cache with TTL so config changes propagate within a bounded window
  * without requiring a server restart.
  *
@@ -103,12 +103,19 @@ let billingCachesByScope = new WeakMap<
   ModuleConfigCache<LlmBillingCacheEntry>
 >();
 
+function assertValidCacheScope(cacheScope: unknown): asserts cacheScope is object {
+  if (
+    (typeof cacheScope !== 'object' && typeof cacheScope !== 'function') ||
+    cacheScope === null
+  ) {
+    throw new Error('LLM_CONFIG_CACHE_SCOPE_UNAVAILABLE');
+  }
+}
+
 function getBillingCache(
   cacheScope: object
 ): ModuleConfigCache<LlmBillingCacheEntry> {
-  if ((typeof cacheScope !== 'object' && typeof cacheScope !== 'function') || cacheScope === null) {
-    throw new Error('LLM_CONFIG_CACHE_SCOPE_UNAVAILABLE');
-  }
+  assertValidCacheScope(cacheScope);
   let cache = billingCachesByScope.get(cacheScope);
   if (!cache) {
     cache = new ModuleConfigCache<LlmBillingCacheEntry>({
@@ -184,16 +191,17 @@ async function resolveBillingConfig(
 
 /**
  * Resolve billing config for a database.
- * Results are cached per database_id with a 5-minute TTL.
+ * Results are cached per owner and database_id with a 5-minute TTL.
  *
  * @param pgClient - A client connected to the tenant database (from withPgClient)
  * @param databaseId - The database UUID
- * @param cacheScope - The exact Graphile build that owns the cached result
+ * @param cacheScope - The exact owner of the cached result. Defaults to the
+ *   client for compatibility with the original two-argument API.
  */
 export async function getLlmBillingConfig(
   pgClient: PgClient,
   databaseId: string,
-  cacheScope: object
+  cacheScope: object = pgClient
 ): Promise<LlmBillingCacheEntry> {
   const billingCache = getBillingCache(cacheScope);
   const cached = billingCache.get(databaseId);
@@ -217,10 +225,11 @@ export function invalidateLlmBillingConfig(
   databaseId?: string,
   cacheScope?: object
 ): void {
-  if (!cacheScope) {
+  if (cacheScope === undefined) {
     billingCachesByScope = new WeakMap();
     return;
   }
+  assertValidCacheScope(cacheScope);
   const billingCache = billingCachesByScope.get(cacheScope);
   if (!billingCache) return;
   if (databaseId) {
@@ -234,6 +243,7 @@ export function invalidateLlmBillingConfig(
  * Get cache stats for an exact owner without retaining other build identities.
  */
 export function getLlmBillingCacheStats(cacheScope: object): { size: number; max: number } {
+  assertValidCacheScope(cacheScope);
   return {
     size: billingCachesByScope.get(cacheScope)?.size ?? 0,
     max: BILLING_CACHE_MAX
